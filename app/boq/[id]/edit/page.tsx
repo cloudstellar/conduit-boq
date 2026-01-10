@@ -203,16 +203,16 @@ export default function EditBOQPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
+    <div className="min-h-screen bg-gray-50 py-4 md:py-8">
       <div className="max-w-7xl mx-auto px-4">
-        <div className="bg-white rounded-lg shadow-md p-6">
-          <div className="flex justify-between items-center mb-6">
-            <h1 className="text-2xl font-bold text-gray-800">
+        <div className="bg-white rounded-lg shadow-md p-4 md:p-6">
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
+            <h1 className="text-xl md:text-2xl font-bold text-gray-800">
               แก้ไขใบประมาณราคา (BOQ)
             </h1>
             <button
               onClick={() => router.push(`/boq/${boqId}/print`)}
-              className="px-4 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700 flex items-center gap-2"
+              className="w-full sm:w-auto px-4 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700 flex items-center justify-center gap-2 text-sm md:text-base"
             >
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
@@ -222,7 +222,7 @@ export default function EditBOQPage() {
           </div>
 
           {error && (
-            <div className="mb-4 p-4 bg-red-50 border border-red-200 text-red-700 rounded-md">
+            <div className="mb-4 p-3 md:p-4 bg-red-50 border border-red-200 text-red-700 rounded-md text-sm md:text-base">
               {error}
             </div>
           )}
@@ -233,15 +233,19 @@ export default function EditBOQPage() {
             onChange={handleProjectInfoChange}
           />
 
-          <hr className="my-8" />
+          <hr className="my-6 md:my-8" />
 
           {/* Section 2: Line Items */}
-          <LineItemsTable
-            items={lineItems}
-            onAddItem={handleAddItem}
-            onUpdateQuantity={handleUpdateQuantity}
-            onRemoveItem={handleRemoveItem}
-          />
+          <div className="overflow-x-auto -mx-4 md:mx-0">
+            <div className="min-w-[800px] px-4 md:px-0">
+              <LineItemsTable
+                items={lineItems}
+                onAddItem={handleAddItem}
+                onUpdateQuantity={handleUpdateQuantity}
+                onRemoveItem={handleRemoveItem}
+              />
+            </div>
+          </div>
 
           {/* Totals Summary */}
           <TotalsSummary
@@ -252,11 +256,11 @@ export default function EditBOQPage() {
           />
 
           {/* Action Buttons */}
-          <div className="mt-8 flex justify-end gap-4">
+          <div className="mt-6 md:mt-8 flex flex-col sm:flex-row justify-end gap-3 sm:gap-4">
             <button
               type="button"
               onClick={() => router.push('/')}
-              className="px-6 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50"
+              className="w-full sm:w-auto px-6 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 text-sm md:text-base"
             >
               กลับหน้าหลัก
             </button>
@@ -264,7 +268,7 @@ export default function EditBOQPage() {
               type="button"
               onClick={handleSave}
               disabled={isSaving}
-              className="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50"
+              className="w-full sm:w-auto px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50 text-sm md:text-base"
             >
               {isSaving ? 'กำลังบันทึก...' : 'บันทึก'}
             </button>

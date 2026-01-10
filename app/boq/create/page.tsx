@@ -68,15 +68,15 @@ export default function CreateBOQPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
+    <div className="min-h-screen bg-gray-50 py-4 md:py-8">
       <div className="max-w-4xl mx-auto px-4">
-        <div className="bg-white rounded-lg shadow-md p-6">
-          <h1 className="text-2xl font-bold text-gray-800 mb-6">
+        <div className="bg-white rounded-lg shadow-md p-4 md:p-6">
+          <h1 className="text-xl md:text-2xl font-bold text-gray-800 mb-4 md:mb-6">
             สร้างใบประมาณราคา (BOQ)
           </h1>
 
           {error && (
-            <div className="mb-4 p-4 bg-red-50 border border-red-200 text-red-700 rounded-md">
+            <div className="mb-4 p-3 md:p-4 bg-red-50 border border-red-200 text-red-700 rounded-md text-sm md:text-base">
               {error}
             </div>
           )}
@@ -86,11 +86,11 @@ export default function CreateBOQPage() {
             onChange={handleProjectInfoChange}
           />
 
-          <div className="mt-6 flex justify-end gap-4">
+          <div className="mt-6 flex flex-col sm:flex-row justify-end gap-3 sm:gap-4">
             <button
               type="button"
               onClick={() => router.back()}
-              className="px-6 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50"
+              className="w-full sm:w-auto px-6 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 text-sm md:text-base"
             >
               ยกเลิก
             </button>
@@ -98,7 +98,7 @@ export default function CreateBOQPage() {
               type="button"
               onClick={handleSaveDraft}
               disabled={isSubmitting}
-              className="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50"
+              className="w-full sm:w-auto px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50 text-sm md:text-base"
             >
               {isSubmitting ? 'กำลังบันทึก...' : 'บันทึกและดำเนินการต่อ'}
             </button>
