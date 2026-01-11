@@ -76,44 +76,6 @@ export default function ProjectInfoForm({
           />
         </div>
 
-        {/* Route */}
-        <div>
-          <label
-            htmlFor="route"
-            className="block text-sm font-medium text-gray-700 mb-1"
-          >
-            เส้นทาง
-          </label>
-          <input
-            type="text"
-            id="route"
-            value={projectInfo.route}
-            onChange={(e) => onChange('route', e.target.value)}
-            disabled={disabled}
-            className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-100 disabled:cursor-not-allowed"
-            placeholder="กรอกเส้นทาง"
-          />
-        </div>
-
-        {/* Construction Area */}
-        <div>
-          <label
-            htmlFor="construction_area"
-            className="block text-sm font-medium text-gray-700 mb-1"
-          >
-            พื้นที่ก่อสร้าง
-          </label>
-          <input
-            type="text"
-            id="construction_area"
-            value={projectInfo.construction_area}
-            onChange={(e) => onChange('construction_area', e.target.value)}
-            disabled={disabled}
-            className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-100 disabled:cursor-not-allowed"
-            placeholder="กรอกพื้นที่ก่อสร้าง"
-          />
-        </div>
-
         {/* Department */}
         <div className="md:col-span-2">
           <label

@@ -6,6 +6,26 @@ import { supabase, PriceListItem } from '@/lib/supabase';
 
 const ITEMS_PER_PAGE = 20;
 
+// Natural sort function for category strings like "1.1.", "2.1.", "10.1."
+const naturalSortCategory = (a: string, b: string): number => {
+  // Extract leading numbers (e.g., "1.1." from "1.1.   งานวางท่อ...")
+  const getNumbers = (str: string): number[] => {
+    const match = str.match(/^([\d.]+)/);
+    if (!match) return [999];
+    return match[1].split('.').filter(s => s).map(s => parseInt(s, 10) || 0);
+  };
+
+  const numsA = getNumbers(a);
+  const numsB = getNumbers(b);
+
+  for (let i = 0; i < Math.max(numsA.length, numsB.length); i++) {
+    const numA = numsA[i] ?? 0;
+    const numB = numsB[i] ?? 0;
+    if (numA !== numB) return numA - numB;
+  }
+  return a.localeCompare(b, 'th');
+};
+
 export default function PriceListPage() {
   const [items, setItems] = useState<PriceListItem[]>([]);
   const [categories, setCategories] = useState<string[]>([]);
@@ -27,8 +47,9 @@ export default function PriceListPage() {
 
         if (itemsData) {
           setItems(itemsData);
-          // Extract unique categories
+          // Extract unique categories and sort naturally
           const uniqueCategories = [...new Set(itemsData.map((i) => i.category).filter(Boolean))] as string[];
+          uniqueCategories.sort(naturalSortCategory);
           setCategories(uniqueCategories);
         }
       } catch (err) {

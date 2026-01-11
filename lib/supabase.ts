@@ -33,6 +33,9 @@ export interface BOQ {
   total_material_cost: number;
   total_labor_cost: number;
   total_cost: number;
+  factor_f: number | null;
+  total_with_factor_f: number;
+  total_with_vat: number;
   status: 'draft' | 'submitted' | 'approved';
   created_at: string;
   updated_at: string;
@@ -41,6 +44,7 @@ export interface BOQ {
 export interface BOQItem {
   id: string;
   boq_id: string;
+  route_id: string | null;
   item_order: number;
   price_list_id: string | null;
   item_name: string;
@@ -53,6 +57,21 @@ export interface BOQItem {
   total_labor_cost: number;
   total_cost: number;
   remarks: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface BOQRoute {
+  id: string;
+  boq_id: string;
+  route_order: number;
+  route_name: string;
+  route_description: string | null;
+  construction_area: string | null;
+  total_material_cost: number;
+  total_labor_cost: number;
+  total_cost: number;
+  cost_with_factor_f: number;
   created_at: string;
   updated_at: string;
 }

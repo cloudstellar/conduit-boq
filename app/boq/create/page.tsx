@@ -9,8 +9,6 @@ export interface ProjectInfo {
   estimator_name: string;
   document_date: string;
   project_name: string;
-  route: string;
-  construction_area: string;
   department: string;
 }
 
@@ -20,8 +18,6 @@ export default function CreateBOQPage() {
     estimator_name: '',
     document_date: new Date().toISOString().split('T')[0],
     project_name: '',
-    route: '',
-    construction_area: '',
     department: 'วิศวกรรมท่อร้อยสาย (วทฐฐ.) ฝ่ายท่อร้อยสาย (ทฐฐ.)',
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -47,8 +43,6 @@ export default function CreateBOQPage() {
           estimator_name: projectInfo.estimator_name,
           document_date: projectInfo.document_date,
           project_name: projectInfo.project_name,
-          route: projectInfo.route || null,
-          construction_area: projectInfo.construction_area || null,
           department: projectInfo.department || null,
           status: 'draft',
         })

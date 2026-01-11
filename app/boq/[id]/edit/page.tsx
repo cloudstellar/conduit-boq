@@ -2,10 +2,11 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { useParams, useRouter } from 'next/navigation';
-import { supabase, BOQ, PriceListItem } from '@/lib/supabase';
+import { supabase } from '@/lib/supabase';
 import ProjectInfoForm from '@/components/boq/ProjectInfoForm';
-import LineItemsTable, { LineItem } from '@/components/boq/LineItemsTable';
-import TotalsSummary from '@/components/boq/TotalsSummary';
+import MultiRouteEditor from '@/components/boq/MultiRouteEditor';
+import { Route } from '@/components/boq/RouteManager';
+import { LineItem } from '@/components/boq/LineItemsTable';
 import { ProjectInfo } from '@/app/boq/create/page';
 
 export default function EditBOQPage() {
@@ -21,20 +22,9 @@ export default function EditBOQPage() {
     construction_area: '',
     department: '',
   });
-  const [lineItems, setLineItems] = useState<LineItem[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
-
-  // Calculate totals
-  const totals = lineItems.reduce(
-    (acc, item) => ({
-      material: acc.material + item.total_material_cost,
-      labor: acc.labor + item.total_labor_cost,
-      total: acc.total + item.total_cost,
-    }),
-    { material: 0, labor: 0, total: 0 }
-  );
 
   // Fetch BOQ data
   useEffect(() => {
@@ -56,16 +46,6 @@ export default function EditBOQPage() {
           construction_area: boq.construction_area || '',
           department: boq.department || 'วิศวกรรมท่อร้อยสาย (วทฐฐ.) ฝ่ายท่อร้อยสาย (ทฐฐ.)',
         });
-
-        // Fetch line items
-        const { data: items, error: itemsError } = await supabase
-          .from('boq_items')
-          .select('*')
-          .eq('boq_id', boqId)
-          .order('item_order');
-
-        if (itemsError) throw itemsError;
-        setLineItems(items || []);
       } catch (err) {
         console.error('Error fetching BOQ:', err);
         setError('ไม่พบข้อมูล BOQ');
@@ -81,49 +61,21 @@ export default function EditBOQPage() {
     setProjectInfo((prev) => ({ ...prev, [field]: value }));
   };
 
-  const handleAddItem = (priceItem: PriceListItem) => {
-    const newItem: LineItem = {
-      id: crypto.randomUUID(),
-      item_order: lineItems.length + 1,
-      price_list_id: priceItem.id,
-      item_name: priceItem.item_name,
-      quantity: 0,
-      unit: priceItem.unit,
-      material_cost_per_unit: Number(priceItem.material_cost),
-      labor_cost_per_unit: Number(priceItem.labor_cost),
-      unit_cost: Number(priceItem.unit_cost),
-      total_material_cost: 0,
-      total_labor_cost: 0,
-      total_cost: 0,
-      remarks: priceItem.remarks,
-    };
-    setLineItems((prev) => [...prev, newItem]);
-  };
-
-  const handleUpdateQuantity = (id: string, quantity: number) => {
-    setLineItems((prev) =>
-      prev.map((item) => {
-        if (item.id !== id) return item;
-        return {
-          ...item,
-          quantity,
-          total_material_cost: quantity * item.material_cost_per_unit,
-          total_labor_cost: quantity * item.labor_cost_per_unit,
-          total_cost: quantity * item.unit_cost,
-        };
-      })
-    );
-  };
-
-  const handleRemoveItem = (id: string) => {
-    setLineItems((prev) => prev.filter((item) => item.id !== id));
-  };
-
-  const handleSave = async () => {
+  const handleSave = async (routes: Route[], routeItems: Record<string, LineItem[]>) => {
     setIsSaving(true);
     setError(null);
 
     try {
+      // Calculate grand totals
+      const grandTotals = routes.reduce(
+        (acc, route) => ({
+          material: acc.material + route.total_material_cost,
+          labor: acc.labor + route.total_labor_cost,
+          total: acc.total + route.total_cost,
+        }),
+        { material: 0, labor: 0, total: 0 }
+      );
+
       // Update BOQ header
       const { error: boqError } = await supabase
         .from('boq')
@@ -131,40 +83,67 @@ export default function EditBOQPage() {
           estimator_name: projectInfo.estimator_name,
           document_date: projectInfo.document_date,
           project_name: projectInfo.project_name,
-          route: projectInfo.route || null,
+          route: routes.map(r => r.route_name).join(', '),
           construction_area: projectInfo.construction_area || null,
           department: projectInfo.department || null,
-          total_material_cost: totals.material,
-          total_labor_cost: totals.labor,
-          total_cost: totals.total,
+          total_material_cost: grandTotals.material,
+          total_labor_cost: grandTotals.labor,
+          total_cost: grandTotals.total,
         })
         .eq('id', boqId);
 
       if (boqError) throw boqError;
 
-      // Delete existing items and insert new ones
-      await supabase.from('boq_items').delete().eq('boq_id', boqId);
+      // Delete existing routes and items
+      await supabase.from('boq_routes').delete().eq('boq_id', boqId);
 
-      if (lineItems.length > 0) {
-        const itemsToInsert = lineItems.map((item, index) => ({
-          boq_id: boqId,
-          item_order: index + 1,
-          price_list_id: item.price_list_id,
-          item_name: item.item_name,
-          quantity: item.quantity,
-          unit: item.unit,
-          material_cost_per_unit: item.material_cost_per_unit,
-          labor_cost_per_unit: item.labor_cost_per_unit,
-          unit_cost: item.unit_cost,
-          total_material_cost: item.total_material_cost,
-          total_labor_cost: item.total_labor_cost,
-          total_cost: item.total_cost,
-          remarks: item.remarks,
-        }));
+      // Insert routes
+      for (let i = 0; i < routes.length; i++) {
+        const route = routes[i];
+        const { data: insertedRoute, error: routeError } = await supabase
+          .from('boq_routes')
+          .insert({
+            boq_id: boqId,
+            route_order: i + 1,
+            route_name: route.route_name,
+            route_description: route.route_description || null,
+            construction_area: route.construction_area || null,
+            total_material_cost: route.total_material_cost,
+            total_labor_cost: route.total_labor_cost,
+            total_cost: route.total_cost,
+          })
+          .select()
+          .single();
 
-        const { error: insertError } = await supabase.from('boq_items').insert(itemsToInsert);
-        if (insertError) throw insertError;
+        if (routeError) throw routeError;
+
+        // Insert items for this route
+        const items = routeItems[route.id] || [];
+        if (items.length > 0) {
+          const itemsToInsert = items.map((item) => ({
+            boq_id: boqId,
+            route_id: insertedRoute.id,
+            item_order: item.item_order,
+            price_list_id: item.price_list_id,
+            item_name: item.item_name,
+            quantity: item.quantity,
+            unit: item.unit,
+            material_cost_per_unit: item.material_cost_per_unit,
+            labor_cost_per_unit: item.labor_cost_per_unit,
+            unit_cost: item.unit_cost,
+            total_material_cost: item.total_material_cost,
+            total_labor_cost: item.total_labor_cost,
+            total_cost: item.total_cost,
+            remarks: item.remarks,
+          }));
+
+          const { error: insertError } = await supabase.from('boq_items').insert(itemsToInsert);
+          if (insertError) throw insertError;
+        }
       }
+
+      // Delete old items without route_id (legacy cleanup)
+      await supabase.from('boq_items').delete().eq('boq_id', boqId).is('route_id', null);
 
       alert('บันทึกสำเร็จ!');
     } catch (err) {
@@ -208,17 +187,25 @@ export default function EditBOQPage() {
         <div className="bg-white rounded-lg shadow-md p-4 md:p-6">
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
             <h1 className="text-xl md:text-2xl font-bold text-gray-800">
-              แก้ไขใบประมาณราคา (BOQ)
+              แก้ไขใบประมาณราคา (BOQ) - หลายเส้นทาง
             </h1>
-            <button
-              onClick={() => router.push(`/boq/${boqId}/print`)}
-              className="w-full sm:w-auto px-4 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700 flex items-center justify-center gap-2 text-sm md:text-base"
-            >
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
-              </svg>
-              พิมพ์
-            </button>
+            <div className="flex gap-2">
+              <button
+                onClick={() => router.push('/')}
+                className="px-4 py-2 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50 text-sm md:text-base"
+              >
+                กลับหน้าหลัก
+              </button>
+              <button
+                onClick={() => router.push(`/boq/${boqId}/print`)}
+                className="px-4 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700 flex items-center gap-2 text-sm md:text-base"
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
+                </svg>
+                พิมพ์
+              </button>
+            </div>
           </div>
 
           {error && (
@@ -235,44 +222,12 @@ export default function EditBOQPage() {
 
           <hr className="my-6 md:my-8" />
 
-          {/* Section 2: Line Items */}
-          <div className="overflow-x-auto -mx-4 md:mx-0">
-            <div className="min-w-[800px] px-4 md:px-0">
-              <LineItemsTable
-                items={lineItems}
-                onAddItem={handleAddItem}
-                onUpdateQuantity={handleUpdateQuantity}
-                onRemoveItem={handleRemoveItem}
-              />
-            </div>
-          </div>
-
-          {/* Totals Summary */}
-          <TotalsSummary
-            totalMaterialCost={totals.material}
-            totalLaborCost={totals.labor}
-            totalCost={totals.total}
-            itemCount={lineItems.length}
+          {/* Section 2: Multi-Route Editor */}
+          <MultiRouteEditor
+            boqId={boqId}
+            onSave={handleSave}
+            isSaving={isSaving}
           />
-
-          {/* Action Buttons */}
-          <div className="mt-6 md:mt-8 flex flex-col sm:flex-row justify-end gap-3 sm:gap-4">
-            <button
-              type="button"
-              onClick={() => router.push('/')}
-              className="w-full sm:w-auto px-6 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 text-sm md:text-base"
-            >
-              กลับหน้าหลัก
-            </button>
-            <button
-              type="button"
-              onClick={handleSave}
-              disabled={isSaving}
-              className="w-full sm:w-auto px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50 text-sm md:text-base"
-            >
-              {isSaving ? 'กำลังบันทึก...' : 'บันทึก'}
-            </button>
-          </div>
         </div>
       </div>
     </div>
