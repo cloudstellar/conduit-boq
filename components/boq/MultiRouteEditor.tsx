@@ -22,6 +22,11 @@ const isSpecialItem = (itemName: string): boolean => {
   return itemName.startsWith('งานวางท่อ') || itemName.startsWith('งานดันท่อ');
 };
 
+// Check if item is single pipe (1 ท่อ) - pattern: "งานวางท่อ 1-" or "งานดันท่อ 1-"
+const isSinglePipeItem = (itemName: string): boolean => {
+  return /^งานวางท่อ\s+1-/.test(itemName) || /^งานดันท่อ.*1-/.test(itemName);
+};
+
 export default function MultiRouteEditor({ boqId, onSave, isSaving }: MultiRouteEditorProps) {
   const [routes, setRoutes] = useState<Route[]>([]);
   const [routeItems, setRouteItems] = useState<Record<string, LineItem[]>>({});
@@ -197,8 +202,8 @@ export default function MultiRouteEditor({ boqId, onSave, isSaving }: MultiRoute
     }));
   }, [activeRouteId, routeItems]);
 
-  // Handle special item selection (Main Duct / Riser)
-  const handleSpecialItemSelect = useCallback((type: 'Main Duct' | 'Riser') => {
+  // Handle special item selection (Main Duct / Riser / Steel Pole / Riser Service)
+  const handleSpecialItemSelect = useCallback((type: 'Main Duct' | 'Riser' | 'Steel Pole' | 'Riser Service') => {
     if (!activeRouteId || !pendingSpecialItem) return;
 
     const itemNameWithType = `${pendingSpecialItem.item_name} (${type})`;
@@ -448,6 +453,29 @@ export default function MultiRouteEditor({ boqId, onSave, isSaving }: MultiRoute
                 <span className="text-2xl">🟢</span>
                 <span className="text-lg font-medium">Riser</span>
               </button>
+
+              {/* Show Steel Pole and Riser Service only for single pipe items (1 ท่อ) */}
+              {isSinglePipeItem(pendingSpecialItem.item_name) && (
+                <>
+                  <button
+                    type="button"
+                    onClick={() => handleSpecialItemSelect('Steel Pole')}
+                    className="w-full py-4 px-6 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition-colors flex items-center justify-center gap-3"
+                  >
+                    <span className="text-2xl">🟠</span>
+                    <span className="text-lg font-medium">Steel Pole</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => handleSpecialItemSelect('Riser Service')}
+                    className="w-full py-4 px-6 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors flex items-center justify-center gap-3"
+                  >
+                    <span className="text-2xl">🟣</span>
+                    <span className="text-lg font-medium">Riser Service</span>
+                  </button>
+                </>
+              )}
             </div>
 
             <button
