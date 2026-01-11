@@ -18,8 +18,6 @@ export default function EditBOQPage() {
     estimator_name: '',
     document_date: new Date().toISOString().split('T')[0],
     project_name: '',
-    route: '',
-    construction_area: '',
     department: '',
   });
   const [isLoading, setIsLoading] = useState(true);
@@ -42,8 +40,6 @@ export default function EditBOQPage() {
           estimator_name: boq.estimator_name,
           document_date: boq.document_date,
           project_name: boq.project_name,
-          route: boq.route || '',
-          construction_area: boq.construction_area || '',
           department: boq.department || 'วิศวกรรมท่อร้อยสาย (วทฐฐ.) ฝ่ายท่อร้อยสาย (ทฐฐ.)',
         });
       } catch (err) {
@@ -84,7 +80,7 @@ export default function EditBOQPage() {
           document_date: projectInfo.document_date,
           project_name: projectInfo.project_name,
           route: routes.map(r => r.route_name).join(', '),
-          construction_area: projectInfo.construction_area || null,
+          construction_area: routes.map(r => r.construction_area).filter(Boolean).join(', ') || null,
           department: projectInfo.department || null,
           total_material_cost: grandTotals.material,
           total_labor_cost: grandTotals.labor,
