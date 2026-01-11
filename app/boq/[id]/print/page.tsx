@@ -772,7 +772,7 @@ export default function PrintBOQPage() {
         .print-page {
           width: 297mm;
           min-height: 210mm;
-          padding: 10mm 15mm;
+          padding: 12mm 15mm;
           margin: 0 auto 20px;
           background: white;
           box-shadow: 0 0 10px rgba(0,0,0,0.1);
@@ -843,13 +843,13 @@ export default function PrintBOQPage() {
         .boq-table {
           width: 100%;
           border-collapse: collapse;
-          font-size: 11pt;
+          font-size: 10pt;
           margin-bottom: 0;
         }
 
         .boq-table th, .boq-table td {
           border: 1px solid #000;
-          padding: 2px 4px;
+          padding: 1px 3px;
         }
 
         .boq-table th {
@@ -982,7 +982,7 @@ export default function PrintBOQPage() {
         @media print {
           @page {
             size: A4 landscape;
-            margin: 8mm;
+            margin: 10mm;
           }
 
           body {
@@ -997,7 +997,7 @@ export default function PrintBOQPage() {
           .print-page {
             width: 100%;
             min-height: auto;
-            padding: 0;
+            padding: 8mm 10mm;
             margin: 0;
             box-shadow: none;
             page-break-after: always;
