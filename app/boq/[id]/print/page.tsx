@@ -345,7 +345,7 @@ export default function PrintBOQPage() {
               {/* Header */}
               <div className="header">
                 <div className="logo-section">
-                  <img src="/nt_logo.png" alt="NT Logo" className="logo" />
+                  <img src="/nt_logo.svg" alt="NT Logo" className="logo" />
                 </div>
                 <div className="page-info">
                   <div>หน้าที่ {currentPage}/{totalPages}</div>
@@ -515,7 +515,7 @@ export default function PrintBOQPage() {
             {/* Header */}
             <div className="header">
               <div className="logo-section">
-                <img src="/nt_logo.png" alt="NT Logo" className="logo" />
+                <img src="/nt_logo.svg" alt="NT Logo" className="logo" />
               </div>
               <div className="page-info">
                 <div>หน้าที่ {totalPages}/{totalPages}</div>
@@ -624,7 +624,7 @@ export default function PrintBOQPage() {
         {/* Header */}
         <div className="header">
           <div className="logo-section">
-            <img src="/nt_logo.png" alt="NT Logo" className="logo" />
+            <img src="/nt_logo.svg" alt="NT Logo" className="logo" />
           </div>
           <div className="page-info">
             <div>สรุปรวม</div>

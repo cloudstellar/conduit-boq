@@ -14,7 +14,7 @@ export default function Home() {
             <p className="mt-1 text-sm md:text-base text-gray-600">Conduit Bill of Quantity (BOQ)</p>
           </div>
           <Image
-            src="/nt_logo.png"
+            src="/nt_logo.svg"
             alt="NT Logo"
             width={441}
             height={85}

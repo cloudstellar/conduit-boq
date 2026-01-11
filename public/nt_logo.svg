@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 200">
+  <!-- Yellow dots pattern -->
+  <rect x="0" y="20" width="20" height="80" rx="10" fill="#FFD700"/>
+  <rect x="67" y="0" width="25" height="120" rx="12.5" fill="#FFD700"/>
+  <circle cx="112" cy="35" r="12" fill="#FFD700"/>
+  <rect x="130" y="50" width="20" height="50" rx="10" fill="#FFD700"/>
+  <rect x="40" y="60" width="15" height="40" rx="7.5" fill="#FFD700"/>
+  
+  <!-- NT text -->
+  <text x="180" y="100" font-family="Arial, sans-serif" font-size="90" font-weight="bold" fill="#5A5A5A">nt</text>
+  
+  <!-- Thai text -->
+  <text x="310" y="75" font-family="Arial, sans-serif" font-size="24" fill="#5A5A5A">บริษัท โทรคมนาคมแห่งชาติ จำกัด (มหาชน)</text>
+  
+  <!-- English text -->
+  <text x="310" y="110" font-family="Arial, sans-serif" font-size="20" font-weight="bold" fill="#5A5A5A">National Telecom Public Company Limited</text>
+</svg>
+
