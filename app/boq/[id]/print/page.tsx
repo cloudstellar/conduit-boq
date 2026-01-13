@@ -431,13 +431,13 @@ export default function PrintBOQPage() {
               <tbody>
                 <tr className="total-row highlight">
                   <td className="col-no"></td>
-                  <td className="col-item" style={{ textAlign: 'right', paddingRight: '10px' }}>ผลรวมค่างานต้นทุน - {route.route_name}</td>
+                  <td className="col-item" style={{ textAlign: 'right', paddingRight: '10px' }}><strong>ผลรวมค่างานต้นทุน</strong></td>
                   <td className="col-qty"></td>
                   <td className="col-unit"></td>
                   <td className="col-sub"></td>
-                  <td className="col-sub" style={{ textAlign: 'right' }}>{formatNumber(route.total_material_cost)}</td>
+                  <td className="col-sub" style={{ textAlign: 'right' }}><strong>{formatNumber(route.total_material_cost)}</strong></td>
                   <td className="col-sub"></td>
-                  <td className="col-sub" style={{ textAlign: 'right' }}>{formatNumber(route.total_labor_cost)}</td>
+                  <td className="col-sub" style={{ textAlign: 'right' }}><strong>{formatNumber(route.total_labor_cost)}</strong></td>
                   <td className="col-total" style={{ textAlign: 'right', fontWeight: 'bold' }}>{formatNumber(route.total_cost)}</td>
                   <td className="col-remark"></td>
                 </tr>
@@ -586,13 +586,13 @@ export default function PrintBOQPage() {
               <tbody>
                 <tr className="total-row highlight">
                   <td className="col-no"></td>
-                  <td className="col-item" style={{ textAlign: 'right', paddingRight: '10px' }}>ผลรวมค่างานต้นทุนทั้งหมด</td>
+                  <td className="col-item" style={{ textAlign: 'right', paddingRight: '10px' }}><strong>ผลรวมค่างานต้นทุนทั้งหมด</strong></td>
                   <td className="col-qty"></td>
                   <td className="col-unit"></td>
                   <td className="col-sub"></td>
-                  <td className="col-sub" style={{ textAlign: 'right' }}>{formatNumber(totalMaterialCost)}</td>
+                  <td className="col-sub" style={{ textAlign: 'right' }}><strong>{formatNumber(totalMaterialCost)}</strong></td>
                   <td className="col-sub"></td>
-                  <td className="col-sub" style={{ textAlign: 'right' }}>{formatNumber(totalLaborCost)}</td>
+                  <td className="col-sub" style={{ textAlign: 'right' }}><strong>{formatNumber(totalLaborCost)}</strong></td>
                   <td className="col-total" style={{ textAlign: 'right', fontWeight: 'bold' }}>{formatNumber(totalCost)}</td>
                   <td className="col-remark"></td>
                 </tr>
@@ -627,7 +627,7 @@ export default function PrintBOQPage() {
             <img src="/nt_logo.svg" alt="NT Logo" className="logo" />
           </div>
           <div className="page-info">
-            <div>สรุปรวม</div>
+            <div>หน้าที่ 1/1</div>
           </div>
         </div>
 
@@ -649,51 +649,70 @@ export default function PrintBOQPage() {
           <thead>
             <tr>
               <th className="col-no2">ที่</th>
-              <th className="col-desc">รายละเอียด</th>
-              <th className="col-cost">ค่างาน (บาท)</th>
-              <th className="col-factor">รวมประมาณ<br/>Factor<br/>≤ 5 ลบ.</th>
-              <th className="col-factor">รวมประมาณ<br/>Factor<br/>&gt; 5 ลบ.</th>
-              <th className="col-result">ค่าก่อสร้าง (ไม่รวม VAT)<br/>รวม - บาท</th>
-              <th className="col-result">ค่าก่อสร้าง (รวม VAT)<br/>รวม - บาท</th>
+              <th className="col-desc">รายการ</th>
+              <th className="col-cost">ค่างานต้นทุน<br/>(บาท)</th>
+              <th className="col-factor">Factor F<br/>≤ 5 ลบ.</th>
+              <th className="col-factor">Factor F<br/>&gt; 5 ลบ.</th>
+              <th className="col-result">ค่าก่อสร้าง<br/>ไม่รวม VAT (บาท)</th>
+              <th className="col-vat">ภาษีมูลค่าเพิ่ม<br/>(บาท)</th>
+              <th className="col-result">ค่าก่อสร้าง<br/>รวม VAT (บาท)</th>
               <th className="col-remark2">หมายเหตุ</th>
             </tr>
           </thead>
           <tbody>
-            {routes.map((route, index) => {
-              const routeWithFactor = route.total_cost * factor;
-              const routeWithVAT = routeWithFactor * (1 + VAT_RATE);
-
-              // Determine which factor column to show based on GRAND TOTAL cost (not individual route)
+            {(() => {
+              // Determine which factor column to show based on GRAND TOTAL cost
               const grandTotalInMillion = totalCost / 1000000;
               const showFactorLTE5 = grandTotalInMillion <= 5;
               const showFactorGT5 = grandTotalInMillion > 5;
 
-              return (
-                <tr key={route.id}>
-                  <td className="center">{index + 1}</td>
-                  <td className="left">{route.route_name}</td>
-                  <td className="right">{formatNumber(route.total_cost)}</td>
-                  <td className="center">{showFactorLTE5 ? factor.toFixed(4) : ''}</td>
-                  <td className="center">{showFactorGT5 ? factor.toFixed(4) : ''}</td>
-                  <td className="right">{formatNumber(routeWithFactor)}</td>
-                  <td className="right">{formatNumber(routeWithVAT)}</td>
+              // Calculate totals for each column
+              let sumCost = 0;
+              let sumBeforeVAT = 0;
+              let sumVAT = 0;
+              let sumWithVAT = 0;
+
+              const rows = routes.map((route, index) => {
+                const routeWithFactor = route.total_cost * factor;
+                const routeVAT = routeWithFactor * VAT_RATE;
+                const routeWithVAT = routeWithFactor + routeVAT;
+
+                sumCost += route.total_cost;
+                sumBeforeVAT += routeWithFactor;
+                sumVAT += routeVAT;
+                sumWithVAT += routeWithVAT;
+
+                return (
+                  <tr key={route.id}>
+                    <td className="center">{index + 1}</td>
+                    <td className="left">{route.route_name}</td>
+                    <td className="right">{formatNumber(route.total_cost)}</td>
+                    <td className="center">{showFactorLTE5 ? factor.toFixed(4) : ''}</td>
+                    <td className="center">{showFactorGT5 ? factor.toFixed(4) : ''}</td>
+                    <td className="right">{formatNumber(routeWithFactor)}</td>
+                    <td className="right">{formatNumber(routeVAT)}</td>
+                    <td className="right">{formatNumber(routeWithVAT)}</td>
+                    <td></td>
+                  </tr>
+                );
+              });
+
+              // Add total row
+              rows.push(
+                <tr key="total-row" className="total-row highlight">
+                  <td className="center" colSpan={2}><strong>รวม</strong></td>
+                  <td className="right"><strong>{formatNumber(sumCost)}</strong></td>
+                  <td className="center"><strong>{showFactorLTE5 ? factor.toFixed(4) : ''}</strong></td>
+                  <td className="center"><strong>{showFactorGT5 ? factor.toFixed(4) : ''}</strong></td>
+                  <td className="right"><strong>{formatNumber(sumBeforeVAT)}</strong></td>
+                  <td className="right"><strong>{formatNumber(sumVAT)}</strong></td>
+                  <td className="right"><strong>{formatNumber(sumWithVAT)}</strong></td>
                   <td></td>
                 </tr>
               );
-            })}
-            {/* Empty rows for spacing */}
-            {Array.from({ length: 5 - routes.length }).map((_, i) => (
-              <tr key={`empty-${i}`} className="empty-row">
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-              </tr>
-            ))}
+
+              return rows;
+            })()}
           </tbody>
         </table>
 
@@ -713,14 +732,9 @@ export default function PrintBOQPage() {
           </div>
         </div>
 
-        {/* Section Header for Summary */}
-        <div style={{ marginTop: '20px', marginBottom: '5px' }}>
-          <span style={{ fontWeight: 'bold' }}>ส่วนประมาณราคาค่าก่อสร้าง รวมภาษีมูลค่าเพิ่ม (VAT)</span>
-        </div>
-
         {/* Thai Text Amount */}
         <div className="thai-amount">
-          <span className="thai-label">ประมาณราคาค่างาน รวม VAT</span>
+          <span className="thai-label"><strong>ประมาณราคาค่าก่อสร้าง รวมภาษีมูลค่าเพิ่ม (VAT)</strong></span>
           <span className="thai-value highlight-box">{numberToThaiText(totalWithVAT)}</span>
         </div>
 
@@ -882,13 +896,13 @@ export default function PrintBOQPage() {
         .summary-table {
           width: 100%;
           border-collapse: collapse;
-          font-size: 11pt;
+          font-size: 10pt;
           margin-top: 10px;
         }
 
         .summary-table th, .summary-table td {
           border: 1px solid #000;
-          padding: 2px 4px;
+          padding: 1px 3px;
         }
 
         .summary-table th {
@@ -898,11 +912,12 @@ export default function PrintBOQPage() {
         }
 
         .summary-table .col-no2 { width: 30px; }
-        .summary-table .col-desc { width: auto; min-width: 150px; }
-        .summary-table .col-cost { width: 100px; }
-        .summary-table .col-factor { width: 80px; }
-        .summary-table .col-result { width: 110px; }
-        .summary-table .col-remark2 { width: 70px; }
+        .summary-table .col-desc { width: auto; min-width: 120px; }
+        .summary-table .col-cost { width: 90px; }
+        .summary-table .col-factor { width: 65px; }
+        .summary-table .col-result { width: 95px; }
+        .summary-table .col-vat { width: 85px; }
+        .summary-table .col-remark2 { width: 50px; }
 
         .summary-table td.center { text-align: center; }
         .summary-table td.left { text-align: left; }
