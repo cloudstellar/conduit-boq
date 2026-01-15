@@ -89,11 +89,20 @@ export default function BOQListPage() {
 
       if (boqError) throw boqError;
 
-      // Create new BOQ with copied data
+      // Get current user's info for ownership
+      const { data: { user: authUser } } = await supabase.auth.getUser();
+
+      // Build estimator name from user's profile
+      const estimatorName = user
+        ? `${user.title || ''}${user.first_name} ${user.last_name}`.trim() || user.email?.split('@')[0] || 'ไม่ระบุ'
+        : originalBOQ.estimator_name;
+
+      // Create new BOQ with copied data - owned by current user
       const { data: newBOQ, error: insertError } = await supabase
         .from('boq')
         .insert({
-          estimator_name: originalBOQ.estimator_name,
+          // Use current user's name as estimator
+          estimator_name: estimatorName,
           document_date: new Date().toISOString().split('T')[0],
           project_name: `${originalBOQ.project_name} (สำเนา)`,
           route: originalBOQ.route,
@@ -106,6 +115,11 @@ export default function BOQListPage() {
           total_with_factor_f: originalBOQ.total_with_factor_f,
           total_with_vat: originalBOQ.total_with_vat,
           status: 'draft',
+          // Ownership: assign to current user
+          created_by: authUser?.id || null,
+          org_id: user?.org_id || null,
+          department_id: user?.department_id || null,
+          sector_id: user?.sector_id || null,
         })
         .select()
         .single();
