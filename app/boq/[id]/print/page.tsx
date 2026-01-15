@@ -1,8 +1,8 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useParams } from 'next/navigation';
-import { supabase } from '@/lib/supabase';
+import { createClient } from '@/lib/supabase/client';
 import { formatConstructionAreas } from '@/lib/constructionAreaUtils';
 
 interface BOQData {
@@ -114,6 +114,7 @@ function numberToThaiText(num: number): string {
 export default function PrintBOQPage() {
   const params = useParams();
   const boqId = params.id as string;
+  const supabase = useMemo(() => createClient(), []);
 
   const [boq, setBOQ] = useState<BOQData | null>(null);
   const [routes, setRoutes] = useState<BOQRoute[]>([]);
@@ -222,7 +223,7 @@ export default function PrintBOQPage() {
       }
     };
     fetchData();
-  }, [boqId]);
+  }, [boqId, supabase]);
 
   const formatNumber = (num: number) =>
     num.toLocaleString('th-TH', { minimumFractionDigits: 2, maximumFractionDigits: 2 });

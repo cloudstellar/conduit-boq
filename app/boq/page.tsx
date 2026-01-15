@@ -1,13 +1,22 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import Link from 'next/link';
-import { supabase, BOQ } from '@/lib/supabase';
+import { createClient } from '@/lib/supabase/client';
+import { BOQ } from '@/lib/supabase';
+import { useAuth } from '@/lib/context/AuthContext';
+import { can } from '@/lib/permissions';
+import BOQPageHeader from '@/components/boq/BOQPageHeader';
+import BOQAccessBanner from '@/components/boq/BOQAccessBanner';
 
 export default function BOQListPage() {
+  const { user } = useAuth();
+  const supabase = useMemo(() => createClient(), []);
   const [boqList, setBOQList] = useState<BOQ[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
+
+  const canCreateBOQ = can(user, 'create', 'boq');
 
   useEffect(() => {
     const fetchBOQList = async () => {
@@ -26,7 +35,7 @@ export default function BOQListPage() {
       }
     };
     fetchBOQList();
-  }, []);
+  }, [supabase]);
 
   const filteredList = boqList.filter(
     (boq) =>
@@ -208,33 +217,44 @@ export default function BOQListPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-4 md:py-8">
-      <div className="max-w-7xl mx-auto px-4">
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
-          <div>
-            <h1 className="text-xl md:text-2xl font-bold text-gray-800">รายการใบประมาณราคา</h1>
-            <p className="text-sm md:text-base text-gray-600">ทั้งหมด {boqList.length} รายการ</p>
-          </div>
-          <Link
-            href="/boq/create"
-            className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 flex items-center gap-2 text-sm md:text-base"
-          >
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-            </svg>
-            สร้างใหม่
-          </Link>
+    <div className="min-h-screen bg-gray-50">
+      {/* Header */}
+      <BOQPageHeader
+        title="รายการใบประมาณราคา"
+        subtitle={`ทั้งหมด ${boqList.length} รายการ`}
+        backHref="/"
+        backLabel="หน้าหลัก"
+      />
+
+      <div className="max-w-7xl mx-auto px-4 py-4 md:py-6">
+        {/* Access Banner */}
+        <div className="mb-4">
+          <BOQAccessBanner mode="list" />
         </div>
 
-        {/* Search */}
-        <div className="mb-6">
+        {/* Actions bar */}
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
+          {/* Search */}
           <input
             type="text"
             placeholder="ค้นหาโครงการ, ผู้ประมาณราคา, เส้นทาง..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full md:w-96 px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500"
+            className="w-full sm:w-96 px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 bg-white"
           />
+
+          {/* Create button */}
+          {canCreateBOQ && (
+            <Link
+              href="/boq/create"
+              className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 flex items-center gap-2 text-sm whitespace-nowrap"
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+              </svg>
+              สร้างใหม่
+            </Link>
+          )}
         </div>
 
         {/* Mobile Card View */}

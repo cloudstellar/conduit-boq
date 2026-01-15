@@ -1,7 +1,8 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
-import { supabase, PriceListItem } from '@/lib/supabase';
+import { useState, useEffect, useCallback, useMemo } from 'react';
+import { createClient } from '@/lib/supabase/client';
+import { PriceListItem } from '@/lib/supabase';
 import RouteManager, { Route } from './RouteManager';
 import LineItemsTable, { LineItem } from './LineItemsTable';
 import TotalsSummary from './TotalsSummary';
@@ -28,6 +29,7 @@ const isSinglePipeItem = (itemName: string): boolean => {
 };
 
 export default function MultiRouteEditor({ boqId, onSave, isSaving }: MultiRouteEditorProps) {
+  const supabase = useMemo(() => createClient(), []);
   const [routes, setRoutes] = useState<Route[]>([]);
   const [routeItems, setRouteItems] = useState<Record<string, LineItem[]>>({});
   const [activeRouteId, setActiveRouteId] = useState<string | null>(null);
@@ -120,7 +122,7 @@ export default function MultiRouteEditor({ boqId, onSave, isSaving }: MultiRoute
       }
     };
     loadData();
-  }, [boqId]);
+  }, [boqId, supabase]);
 
   const handleAddRoute = useCallback(() => {
     const newRoute: Route = {

@@ -1,7 +1,8 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
-import { supabase, PriceListItem } from '@/lib/supabase';
+import { useState, useEffect, useRef, useMemo } from 'react';
+import { createClient } from '@/lib/supabase/client';
+import { PriceListItem } from '@/lib/supabase';
 
 interface ItemSearchProps {
   onSelect: (item: PriceListItem) => void;
@@ -37,6 +38,7 @@ export default function ItemSearch({
   onSelect,
   placeholder = 'ค้นหารายการ...',
 }: ItemSearchProps) {
+  const supabase = useMemo(() => createClient(), []);
   const [query, setQuery] = useState('');
   const [results, setResults] = useState<PriceListItem[]>([]);
   const [categories, setCategories] = useState<CategoryInfo[]>([]);
@@ -69,7 +71,7 @@ export default function ItemSearch({
       }
     };
     loadCategories();
-  }, []);
+  }, [supabase]);
 
   // Search price list
   useEffect(() => {
@@ -116,7 +118,7 @@ export default function ItemSearch({
 
     const debounce = setTimeout(searchItems, 300);
     return () => clearTimeout(debounce);
-  }, [query, selectedCategory]);
+  }, [query, selectedCategory, supabase]);
 
   // Close dropdown when clicking outside
   useEffect(() => {

@@ -1,7 +1,7 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { supabase } from '@/lib/supabase';
+import { useState, useEffect, useMemo } from 'react';
+import { createClient } from '@/lib/supabase/client';
 
 interface FactorReference {
   cost_million: number;
@@ -23,6 +23,7 @@ interface FactorFSummaryProps {
 }
 
 export default function FactorFSummary({ routes, grandTotalCost }: FactorFSummaryProps) {
+  const supabase = useMemo(() => createClient(), []);
   const [lowerFactorRef, setLowerFactorRef] = useState<FactorReference | null>(null);
   const [upperFactorRef, setUpperFactorRef] = useState<FactorReference | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -74,7 +75,7 @@ export default function FactorFSummary({ routes, grandTotalCost }: FactorFSummar
     } else {
       setIsLoading(false);
     }
-  }, [grandTotalCost]);
+  }, [grandTotalCost, supabase]);
 
   const calculateInterpolatedFactor = (): number => {
     const A = grandTotalCost / 1000000;

@@ -1,8 +1,9 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import Link from 'next/link';
-import { supabase, PriceListItem } from '@/lib/supabase';
+import { createClient } from '@/lib/supabase/client';
+import { PriceListItem } from '@/lib/supabase';
 
 const ITEMS_PER_PAGE = 20;
 
@@ -27,6 +28,7 @@ const naturalSortCategory = (a: string, b: string): number => {
 };
 
 export default function PriceListPage() {
+  const supabase = useMemo(() => createClient(), []);
   const [items, setItems] = useState<PriceListItem[]>([]);
   const [categories, setCategories] = useState<string[]>([]);
   const [selectedCategory, setSelectedCategory] = useState<string>('');
@@ -59,7 +61,7 @@ export default function PriceListPage() {
       }
     };
     fetchData();
-  }, []);
+  }, [supabase]);
 
   // Reset to page 1 when filters change
   useEffect(() => {

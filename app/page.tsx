@@ -1,25 +1,35 @@
+'use client';
+
 import Link from "next/link";
 import Image from "next/image";
+import UserMenu from "@/components/auth/UserMenu";
+import AuthGuard from "@/components/auth/AuthGuard";
 
 export default function Home() {
   return (
+    <AuthGuard>
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
       <header className="bg-white shadow-sm">
-        <div className="max-w-7xl mx-auto px-4 py-4 md:py-6 flex flex-col md:flex-row justify-between items-center gap-4">
-          <div className="text-center md:text-left">
-            <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-gray-900">
-              ระบบประมาณราคาท่อร้อยสายสื่อสารใต้ดิน
-            </h1>
-            <p className="mt-1 text-sm md:text-base text-gray-600">Conduit Bill of Quantity (BOQ)</p>
+        <div className="max-w-7xl mx-auto px-4 py-4 md:py-6">
+          <div className="flex justify-between items-start mb-4">
+            <div className="text-center md:text-left flex-1">
+              <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-gray-900">
+                ระบบประมาณราคาท่อร้อยสายสื่อสารใต้ดิน
+              </h1>
+              <p className="mt-1 text-sm md:text-base text-gray-600">Conduit Bill of Quantity (BOQ)</p>
+            </div>
+            <div className="flex items-center gap-4">
+              <UserMenu />
+              <Image
+                src="/nt_logo.svg"
+                alt="NT Logo"
+                width={441}
+                height={85}
+                className="object-contain w-24 sm:w-32 md:w-48 h-auto hidden sm:block"
+              />
+            </div>
           </div>
-          <Image
-            src="/nt_logo.svg"
-            alt="NT Logo"
-            width={441}
-            height={85}
-            className="object-contain w-32 sm:w-48 md:w-64 lg:w-auto h-auto"
-          />
         </div>
       </header>
 
@@ -127,5 +137,6 @@ export default function Home() {
         </div>
       </main>
     </div>
+    </AuthGuard>
   );
 }

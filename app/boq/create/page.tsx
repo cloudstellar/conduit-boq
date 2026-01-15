@@ -1,9 +1,14 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { supabase } from '@/lib/supabase';
+import Link from 'next/link';
+import { createClient } from '@/lib/supabase/client';
+import { useUser } from '@/lib/hooks/useUser';
+import { can } from '@/lib/permissions';
 import ProjectInfoForm from '@/components/boq/ProjectInfoForm';
+import BOQPageHeader from '@/components/boq/BOQPageHeader';
+import BOQAccessBanner from '@/components/boq/BOQAccessBanner';
 
 export interface ProjectInfo {
   estimator_name: string;
@@ -14,14 +19,40 @@ export interface ProjectInfo {
 
 export default function CreateBOQPage() {
   const router = useRouter();
+  const supabase = createClient();
+  const { user, isLoading: isUserLoading } = useUser();
+  const canCreate = can(user, 'create', 'boq');
+
   const [projectInfo, setProjectInfo] = useState<ProjectInfo>({
     estimator_name: '',
     document_date: new Date().toISOString().split('T')[0],
     project_name: '',
-    department: 'วิศวกรรมท่อร้อยสาย (วทฐฐ.) ฝ่ายท่อร้อยสาย (ทฐฐ.)',
+    department: '',
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  // Auto-fill from user profile
+  useEffect(() => {
+    if (user) {
+      const fullName = [user.title, user.first_name, user.last_name]
+        .filter(Boolean)
+        .join(' ');
+
+      const deptDisplay = [
+        user.sector?.full_name || user.sector?.name,
+        user.department?.full_name || user.department?.name,
+      ]
+        .filter(Boolean)
+        .join(' ');
+
+      setProjectInfo(prev => ({
+        ...prev,
+        estimator_name: fullName || prev.estimator_name,
+        department: deptDisplay || prev.department,
+      }));
+    }
+  }, [user]);
 
   const handleProjectInfoChange = (field: keyof ProjectInfo, value: string) => {
     setProjectInfo((prev) => ({ ...prev, [field]: value }));
@@ -37,6 +68,9 @@ export default function CreateBOQPage() {
     setError(null);
 
     try {
+      // Get current auth user for ownership
+      const { data: { user: authUser } } = await supabase.auth.getUser();
+
       const { data, error: insertError } = await supabase
         .from('boq')
         .insert({
@@ -45,6 +79,11 @@ export default function CreateBOQPage() {
           project_name: projectInfo.project_name,
           department: projectInfo.department || null,
           status: 'draft',
+          // Ownership fields (injected from authenticated user)
+          created_by: authUser?.id || null,
+          org_id: user?.org_id || null,
+          department_id: user?.department_id || null,
+          sector_id: user?.sector_id || null,
         })
         .select()
         .single();
@@ -61,14 +100,43 @@ export default function CreateBOQPage() {
     }
   };
 
-  return (
-    <div className="min-h-screen bg-gray-50 py-4 md:py-8">
-      <div className="max-w-4xl mx-auto px-4">
-        <div className="bg-white rounded-lg shadow-md p-4 md:p-6">
-          <h1 className="text-xl md:text-2xl font-bold text-gray-800 mb-4 md:mb-6">
-            สร้างใบประมาณราคา (BOQ)
-          </h1>
+  // Show loading while fetching user profile
+  if (isUserLoading) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+      </div>
+    );
+  }
 
+  // Check permission
+  if (!canCreate) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <h1 className="text-2xl font-bold text-gray-900 mb-4">ไม่มีสิทธิ์เข้าถึง</h1>
+          <p className="text-gray-600 mb-4">คุณไม่มีสิทธิ์สร้างใบประมาณราคา</p>
+          <Link href="/boq" className="text-blue-600 hover:underline">กลับหน้ารายการ</Link>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen bg-gray-50">
+      {/* Header */}
+      <BOQPageHeader
+        title="สร้างใบประมาณราคา (BOQ)"
+        subtitle="กรอกข้อมูลโครงการเพื่อเริ่มต้น"
+      />
+
+      <div className="max-w-4xl mx-auto px-4 py-4 md:py-6">
+        {/* Access Banner */}
+        <div className="mb-4">
+          <BOQAccessBanner mode="create" />
+        </div>
+
+        <div className="bg-white rounded-lg shadow-md p-4 md:p-6">
           {error && (
             <div className="mb-4 p-3 md:p-4 bg-red-50 border border-red-200 text-red-700 rounded-md text-sm md:text-base">
               {error}

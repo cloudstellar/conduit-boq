@@ -1,10 +1,14 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { useParams, useRouter } from 'next/navigation';
-import { supabase } from '@/lib/supabase';
+import { createClient } from '@/lib/supabase/client';
+import { useUser } from '@/lib/hooks/useUser';
+import { can, BOQContext } from '@/lib/permissions';
 import ProjectInfoForm from '@/components/boq/ProjectInfoForm';
 import MultiRouteEditor from '@/components/boq/MultiRouteEditor';
+import BOQPageHeader from '@/components/boq/BOQPageHeader';
+import BOQAccessBanner from '@/components/boq/BOQAccessBanner';
 import { Route } from '@/components/boq/RouteManager';
 import { LineItem } from '@/components/boq/LineItemsTable';
 import { ProjectInfo } from '@/app/boq/create/page';
@@ -13,6 +17,8 @@ export default function EditBOQPage() {
   const params = useParams();
   const router = useRouter();
   const boqId = params.id as string;
+  const supabase = useMemo(() => createClient(), []);
+  const { user } = useUser();
 
   const [projectInfo, setProjectInfo] = useState<ProjectInfo>({
     estimator_name: '',
@@ -20,9 +26,13 @@ export default function EditBOQPage() {
     project_name: '',
     department: '',
   });
+  const [boqContext, setBOQContext] = useState<BOQContext | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  // Check edit permission
+  const canEdit = can(user, 'update', 'boq', boqContext || undefined);
 
   // Fetch BOQ data
   useEffect(() => {
@@ -42,6 +52,15 @@ export default function EditBOQPage() {
           project_name: boq.project_name,
           department: boq.department || 'วิศวกรรมท่อร้อยสาย (วทฐฐ.) ฝ่ายท่อร้อยสาย (ทฐฐ.)',
         });
+
+        // Set BOQ context for permission checks
+        setBOQContext({
+          created_by: boq.created_by,
+          assigned_to: boq.assigned_to,
+          sector_id: boq.sector_id,
+          department_id: boq.department_id,
+          status: boq.status,
+        });
       } catch (err) {
         console.error('Error fetching BOQ:', err);
         setError('ไม่พบข้อมูล BOQ');
@@ -51,7 +70,7 @@ export default function EditBOQPage() {
     };
 
     fetchBOQ();
-  }, [boqId]);
+  }, [boqId, supabase]);
 
   const handleProjectInfoChange = (field: keyof ProjectInfo, value: string) => {
     setProjectInfo((prev) => ({ ...prev, [field]: value }));
@@ -72,74 +91,50 @@ export default function EditBOQPage() {
         { material: 0, labor: 0, total: 0 }
       );
 
-      // Update BOQ header
-      const { error: boqError } = await supabase
-        .from('boq')
-        .update({
-          estimator_name: projectInfo.estimator_name,
-          document_date: projectInfo.document_date,
-          project_name: projectInfo.project_name,
-          route: routes.map(r => r.route_name).join(', '),
-          construction_area: routes.map(r => r.construction_area).filter(Boolean).join(', ') || null,
-          department: projectInfo.department || null,
-          total_material_cost: grandTotals.material,
-          total_labor_cost: grandTotals.labor,
-          total_cost: grandTotals.total,
-        })
-        .eq('id', boqId);
+      // Prepare data for RPC call (atomic transaction)
+      const boqData = {
+        estimator_name: projectInfo.estimator_name,
+        document_date: projectInfo.document_date,
+        project_name: projectInfo.project_name,
+        route: routes.map(r => r.route_name).join(', '),
+        construction_area: routes.map(r => r.construction_area).filter(Boolean).join(', ') || null,
+        department: projectInfo.department || null,
+        total_material_cost: grandTotals.material,
+        total_labor_cost: grandTotals.labor,
+        total_cost: grandTotals.total,
+      };
 
-      if (boqError) throw boqError;
+      const routesData = routes.map((route) => ({
+        route_name: route.route_name,
+        route_description: route.route_description || null,
+        construction_area: route.construction_area || null,
+        total_material_cost: route.total_material_cost,
+        total_labor_cost: route.total_labor_cost,
+        total_cost: route.total_cost,
+        items: (routeItems[route.id] || []).map((item) => ({
+          item_order: item.item_order,
+          price_list_id: item.price_list_id,
+          item_name: item.item_name,
+          quantity: item.quantity,
+          unit: item.unit,
+          material_cost_per_unit: item.material_cost_per_unit,
+          labor_cost_per_unit: item.labor_cost_per_unit,
+          unit_cost: item.unit_cost,
+          total_material_cost: item.total_material_cost,
+          total_labor_cost: item.total_labor_cost,
+          total_cost: item.total_cost,
+          remarks: item.remarks,
+        })),
+      }));
 
-      // Delete existing routes and items
-      await supabase.from('boq_routes').delete().eq('boq_id', boqId);
+      // Use RPC function for atomic transaction - if any step fails, everything rolls back
+      const { error: rpcError } = await supabase.rpc('save_boq_with_routes', {
+        p_boq_id: boqId,
+        p_boq_data: boqData,
+        p_routes: routesData,
+      });
 
-      // Insert routes
-      for (let i = 0; i < routes.length; i++) {
-        const route = routes[i];
-        const { data: insertedRoute, error: routeError } = await supabase
-          .from('boq_routes')
-          .insert({
-            boq_id: boqId,
-            route_order: i + 1,
-            route_name: route.route_name,
-            route_description: route.route_description || null,
-            construction_area: route.construction_area || null,
-            total_material_cost: route.total_material_cost,
-            total_labor_cost: route.total_labor_cost,
-            total_cost: route.total_cost,
-          })
-          .select()
-          .single();
-
-        if (routeError) throw routeError;
-
-        // Insert items for this route
-        const items = routeItems[route.id] || [];
-        if (items.length > 0) {
-          const itemsToInsert = items.map((item) => ({
-            boq_id: boqId,
-            route_id: insertedRoute.id,
-            item_order: item.item_order,
-            price_list_id: item.price_list_id,
-            item_name: item.item_name,
-            quantity: item.quantity,
-            unit: item.unit,
-            material_cost_per_unit: item.material_cost_per_unit,
-            labor_cost_per_unit: item.labor_cost_per_unit,
-            unit_cost: item.unit_cost,
-            total_material_cost: item.total_material_cost,
-            total_labor_cost: item.total_labor_cost,
-            total_cost: item.total_cost,
-            remarks: item.remarks,
-          }));
-
-          const { error: insertError } = await supabase.from('boq_items').insert(itemsToInsert);
-          if (insertError) throw insertError;
-        }
-      }
-
-      // Delete old items without route_id (legacy cleanup)
-      await supabase.from('boq_items').delete().eq('boq_id', boqId).is('route_id', null);
+      if (rpcError) throw rpcError;
 
       alert('บันทึกสำเร็จ!');
     } catch (err) {
@@ -178,35 +173,51 @@ export default function EditBOQPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-4 md:py-8">
-      <div className="max-w-7xl mx-auto px-4">
-        <div className="bg-white rounded-lg shadow-md p-4 md:p-6">
-          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
-            <h1 className="text-xl md:text-2xl font-bold text-gray-800">
-              แก้ไขใบประมาณราคา (BOQ) - หลายเส้นทาง
-            </h1>
-            <div className="flex gap-2">
-              <button
-                onClick={() => router.push('/')}
-                className="px-4 py-2 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50 text-sm md:text-base"
-              >
-                กลับหน้าหลัก
-              </button>
-              <button
-                onClick={() => router.push(`/boq/${boqId}/print`)}
-                className="px-4 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700 flex items-center gap-2 text-sm md:text-base"
-              >
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
-                </svg>
-                พิมพ์
-              </button>
-            </div>
-          </div>
+    <div className="min-h-screen bg-gray-50">
+      {/* Header */}
+      <BOQPageHeader
+        title="แก้ไขใบประมาณราคา (BOQ)"
+        subtitle={projectInfo.project_name || 'กำลังโหลด...'}
+      />
 
+      <div className="max-w-7xl mx-auto px-4 py-4 md:py-6">
+        {/* Access Banner */}
+        <div className="mb-4">
+          <BOQAccessBanner mode="edit" boq={boqContext} />
+        </div>
+
+        {/* Action buttons */}
+        <div className="flex justify-end gap-2 mb-4">
+          <button
+            onClick={() => router.push(`/boq/${boqId}/print`)}
+            className="px-4 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700 flex items-center gap-2 text-sm"
+          >
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
+            </svg>
+            พิมพ์
+          </button>
+        </div>
+
+        <div className="bg-white rounded-lg shadow-md p-4 md:p-6">
           {error && (
             <div className="mb-4 p-3 md:p-4 bg-red-50 border border-red-200 text-red-700 rounded-md text-sm md:text-base">
               {error}
+            </div>
+          )}
+
+          {/* Read-only warning if no edit permission */}
+          {!canEdit && boqContext && (
+            <div className="mb-4 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+              <div className="flex items-center gap-2 text-yellow-800">
+                <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                </svg>
+                <span className="font-medium">โหมดดูอย่างเดียว</span>
+              </div>
+              <p className="text-sm text-yellow-700 mt-1">
+                คุณไม่มีสิทธิ์แก้ไข BOQ นี้ การเปลี่ยนแปลงจะไม่ถูกบันทึก
+              </p>
             </div>
           )}
 
