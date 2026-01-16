@@ -2,11 +2,11 @@
 
 import { useState, useRef, useEffect } from 'react'
 import Link from 'next/link'
-import { useUser } from '@/lib/hooks/useUser'
+import { useAuth } from '@/lib/context/AuthContext'
 import { getRoleLabel, getRoleBadgeColor } from '@/lib/permissions'
 
 export default function UserMenu() {
-  const { user, isLoading, signOut } = useUser()
+  const { user, isLoading, signOut } = useAuth()
   const [isOpen, setIsOpen] = useState(false)
   const menuRef = useRef<HTMLDivElement>(null)
 

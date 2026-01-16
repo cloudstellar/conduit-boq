@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
-import { useUser } from '@/lib/hooks/useUser';
+import { useAuth } from '@/lib/context/AuthContext';
 import { can, BOQContext } from '@/lib/permissions';
 import ProjectInfoForm from '@/components/boq/ProjectInfoForm';
 import MultiRouteEditor from '@/components/boq/MultiRouteEditor';
@@ -18,7 +18,7 @@ export default function EditBOQPage() {
   const router = useRouter();
   const boqId = params.id as string;
   const supabase = useMemo(() => createClient(), []);
-  const { user } = useUser();
+  const { user } = useAuth();
 
   const [projectInfo, setProjectInfo] = useState<ProjectInfo>({
     estimator_name: '',

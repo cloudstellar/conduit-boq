@@ -29,9 +29,19 @@ export async function updateSession(request: NextRequest) {
 
   // IMPORTANT: Do not remove auth.getUser()
   // This refreshes the session if expired
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
+  let user = null
+  try {
+    const { data, error } = await supabase.auth.getUser()
+    if (error) {
+      console.error('Middleware: Error getting user:', error.message)
+      // On auth error, treat as no user - will redirect to login
+    } else {
+      user = data.user
+    }
+  } catch (err) {
+    console.error('Middleware: Exception getting user:', err)
+    // On exception, treat as no user - will redirect to login
+  }
 
   // Public routes
   const publicPaths = ['/login', '/auth/callback', '/blocked']

@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { createClient } from '@/lib/supabase/client';
-import { useUser } from '@/lib/hooks/useUser';
+import { useAuth } from '@/lib/context/AuthContext';
 import { can } from '@/lib/permissions';
 import ProjectInfoForm from '@/components/boq/ProjectInfoForm';
 import BOQPageHeader from '@/components/boq/BOQPageHeader';
@@ -20,7 +20,7 @@ export interface ProjectInfo {
 export default function CreateBOQPage() {
   const router = useRouter();
   const supabase = createClient();
-  const { user, isLoading: isUserLoading } = useUser();
+  const { user, isLoading: isUserLoading } = useAuth();
   const canCreate = can(user, 'create', 'boq');
 
   const [projectInfo, setProjectInfo] = useState<ProjectInfo>({

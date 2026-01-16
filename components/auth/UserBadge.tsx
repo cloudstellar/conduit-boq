@@ -1,6 +1,6 @@
 'use client'
 
-import { useUser } from '@/lib/hooks/useUser'
+import { useAuth } from '@/lib/context/AuthContext'
 import { getRoleLabel, getRoleBadgeColor } from '@/lib/permissions'
 
 interface UserBadgeProps {
@@ -9,7 +9,7 @@ interface UserBadgeProps {
 }
 
 export default function UserBadge({ variant = 'compact', showDropdown = false }: UserBadgeProps) {
-  const { user, isLoading } = useUser()
+  const { user, isLoading } = useAuth()
 
   if (isLoading) {
     return (

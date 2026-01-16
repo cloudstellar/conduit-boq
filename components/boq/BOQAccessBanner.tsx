@@ -1,6 +1,6 @@
 'use client'
 
-import { useUser } from '@/lib/hooks/useUser'
+import { useAuth } from '@/lib/context/AuthContext'
 import { can, getRoleLabel, BOQContext } from '@/lib/permissions'
 
 interface BOQAccessBannerProps {
@@ -14,7 +14,7 @@ interface PermissionInfo {
 }
 
 export default function BOQAccessBanner({ boq, mode }: BOQAccessBannerProps) {
-  const { user, isLoading } = useUser()
+  const { user, isLoading } = useAuth()
 
   if (isLoading) {
     return (

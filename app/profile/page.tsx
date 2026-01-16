@@ -4,12 +4,12 @@ import { useState, useEffect, useMemo } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
-import { useUser } from '@/lib/hooks/useUser'
+import { useAuth } from '@/lib/context/AuthContext'
 import { Department, Sector } from '@/lib/types/auth'
 
 export default function ProfilePage() {
   const router = useRouter()
-  const { user, isLoading, refreshProfile, signOut } = useUser()
+  const { user, isLoading, refreshProfile, signOut } = useAuth()
   const supabase = useMemo(() => createClient(), [])
 
   const [firstName, setFirstName] = useState('')
