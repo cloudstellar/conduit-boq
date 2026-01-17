@@ -189,6 +189,6 @@ Grand Total with VAT = Grand Total with Factor F × 1.07
 ---
 
 ## 📞 ติดต่อ Support
-- Email: admin@ntplc.co.th
+- Email: suthorn@ntplc.co.th
 - ระบบ: เมนู Profile → ติดต่อผู้ดูแล
 
