@@ -1,6 +1,9 @@
 # Database Schema
 ## Conduit BOQ System
 
+**Last Updated:** 2026-01-19
+**Database:** PostgreSQL 15 (Supabase)
+
 ---
 
 ## 📊 Entity Relationship Diagram
@@ -293,3 +296,24 @@ idx_boq_items_route_id   ON boq_items(route_id)
 ### Auto-create user profile
 - `handle_new_user()` - Creates user_profiles entry when auth.users row is created
 
+---
+
+## 📁 Migration Files
+
+| File | Description | Status |
+|------|-------------|--------|
+| `001_backup_before_migration.sql` | Backup queries | ✅ Applied |
+| `002_add_multi_route_support.sql` | Multi-route tables | ✅ Applied |
+| `003_add_construction_area_to_routes.sql` | Route areas | ✅ Applied |
+| `004_phase1a_auth_ownership.sql` | Auth & ownership columns | ✅ Applied |
+| `005_phase1a_seed_and_rls.sql` | Seed data & RLS policies | ✅ Applied |
+| `006_phase1a_rls_write_and_approval.sql` | RLS write policies | ✅ Applied |
+| `007_app_settings.sql` | App settings table | ✅ Applied |
+| `008_pending_user_status.sql` | Pending status support | ✅ Applied |
+
+---
+
+## 🔗 Related Documentation
+
+- **Domain Model:** [docs/ai/DOMAIN_MODEL.md](./ai/DOMAIN_MODEL.md)
+- **RLS Decision:** [docs/ai/DECISIONS/ADR-001](./ai/DECISIONS/ADR-001-supabase-rls-authorization.md)

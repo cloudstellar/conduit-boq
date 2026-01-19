@@ -81,12 +81,26 @@ conduit-boq/
 
 ## 📚 Documentation
 
+### User & Business Documentation
 | Document | Description |
 |----------|-------------|
 | [PRD.md](./PRD.md) | Product Requirements Document |
 | [KNOWLEDGE_BASE.md](./KNOWLEDGE_BASE.md) | User guide & troubleshooting |
 | [IMPLEMENTATION_PLAN.md](./IMPLEMENTATION_PLAN.md) | Technical implementation details |
 | [TECHNICAL.md](./TECHNICAL.md) | Developer technical reference |
+| [DATABASE_SCHEMA.md](./DATABASE_SCHEMA.md) | Database tables and relationships |
+
+### AI-Native Documentation (`docs/ai/`)
+| Document | Description |
+|----------|-------------|
+| [AI_CONTEXT.md](./ai/AI_CONTEXT.md) | **START HERE** - AI agent rules and workflow |
+| [PROJECT_CONTEXT.md](./ai/PROJECT_CONTEXT.md) | Business goals, users, domain terms |
+| [DOMAIN_MODEL.md](./ai/DOMAIN_MODEL.md) | Entities, relationships, business rules |
+| [SYSTEM_ARCHITECTURE.md](./ai/SYSTEM_ARCHITECTURE.md) | Tech stack, layers, data flow |
+| [BOQ_CALCULATION_LOGIC.md](./ai/BOQ_CALCULATION_LOGIC.md) | How costs are calculated |
+| [ROADMAP.md](./ai/ROADMAP.md) | Phase-based development plan |
+| [HANDOFF.md](./ai/HANDOFF.md) | Session continuity template |
+| [DECISIONS/ADR-001](./ai/DECISIONS/ADR-001-supabase-rls-authorization.md) | Why RLS for authorization |
 
 ---
 
