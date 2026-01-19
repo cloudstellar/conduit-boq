@@ -326,8 +326,8 @@ idx_boq_items_route_id   ON boq_items(route_id)
 | `004_phase1a_auth_ownership.sql` | Auth & ownership columns | ✅ Applied |
 | `005_phase1a_seed_and_rls.sql` | Seed data & RLS policies | ✅ Applied |
 | `006_phase1a_rls_write_and_approval.sql` | RLS write policies | ✅ Applied |
-| `007_add_requested_org_columns.sql` | Onboarding columns (v1.2.0) | ⏳ Pending |
-| `008_rls_and_trigger.sql` | RLS + Trigger + RPC (v1.2.0) | ⏳ Pending |
+| `007_add_requested_org_columns.sql` | Onboarding columns (v1.2.0) | ✅ Applied |
+| `008_rls_and_trigger.sql` | RLS + Trigger + RPC (v1.2.0) | ✅ Applied |
 
 ---
 

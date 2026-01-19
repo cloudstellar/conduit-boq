@@ -122,7 +122,37 @@ def5678 - commit message 2
 
 # Latest Handoff Entry
 
-## Date: 2026-01-19
+## Date: 2026-01-19 (v1.2.0)
+
+### Summary
+- Admin Permission Security: pending user onboarding flow
+- Database: Added `requested_department_id`, `requested_sector_id`, approval columns
+- RPCs: `admin_approve_user()`, `admin_reject_user()`
+- Trigger: `lock_org_fields_after_onboarding()`
+- RLS: Pending users = own BOQ only, Legacy BOQ = admin-only
+- UX: Welcome card for new users, post-onboarding success message
+
+### Key Changes
+- `app/page.tsx` - Onboarding welcome card
+- `app/profile/page.tsx` - Success message + CTA button
+- `app/admin/page.tsx` - Approve/Reject pending users
+- `lib/hooks/useUser.ts` - Explicit FK references
+- `lib/permissions.ts` - Pending user restrictions
+- `migrations/007_add_requested_org_columns.sql`
+- `migrations/008_rls_and_trigger.sql`
+
+### Current State
+- ✅ Preview tested successfully
+- ✅ All v1.2.0 features complete
+- ✅ Ready for production merge
+
+### Next Steps
+- Merge `feature/admin-permission-security` → `main`
+- Tag `v1.2.0`
+
+---
+
+## Date: 2026-01-19 (v1.0.0)
 
 ### Summary
 - Fixed auth deadlock issue in `lib/hooks/useUser.ts`
