@@ -127,7 +127,15 @@ export default function ProfilePage() {
         setMessage({ type: 'error', text: 'เกิดข้อผิดพลาด: ' + error.message })
       }
     } else {
-      setMessage({ type: 'success', text: 'บันทึกข้อมูลเรียบร้อยแล้ว' })
+      // Show different message for first-time onboarding vs regular save
+      if (!onboardingCompleted) {
+        setMessage({
+          type: 'success',
+          text: '✅ ลงทะเบียนสำเร็จ! ข้อมูลของคุณถูกส่งไปยังผู้ดูแลระบบแล้ว ระหว่างรอการอนุมัติ คุณสามารถสร้าง BOQ ได้เลย'
+        })
+      } else {
+        setMessage({ type: 'success', text: 'บันทึกข้อมูลเรียบร้อยแล้ว' })
+      }
       await refreshProfile()
       setOnboardingCompleted(true) // Update local state
     }
@@ -156,7 +164,7 @@ export default function ProfilePage() {
             <p className="text-sm text-gray-600">จัดการข้อมูลส่วนตัว</p>
           </div>
           <div className="flex items-center gap-4">
-            {user?.status === 'active' && (
+            {(user?.status === 'active' || user?.status === 'pending') && (
               <Link href="/" className="text-blue-600 hover:text-blue-800">
                 ← กลับหน้าหลัก
               </Link>
@@ -225,9 +233,23 @@ export default function ProfilePage() {
         {user?.status !== 'inactive' && (
           <div className="bg-white rounded-lg shadow p-6">
             {message && (
-              <div className={`mb-6 p-4 rounded-md ${message.type === 'success' ? 'bg-green-50 text-green-700' : 'bg-red-50 text-red-700'
+              <div className={`mb-6 p-4 rounded-md ${message.type === 'success' ? 'bg-green-50 border border-green-200' : 'bg-red-50 text-red-700'
                 }`}>
-                {message.text}
+                <p className={message.type === 'success' ? 'text-green-700' : ''}>{message.text}</p>
+                {message.type === 'success' && user?.status === 'pending' && (
+                  <div className="mt-4">
+                    <Link
+                      href="/"
+                      className="inline-flex items-center px-4 py-2 bg-green-600 hover:bg-green-700 
+                               text-white font-medium rounded-lg transition-colors"
+                    >
+                      <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+                      </svg>
+                      ไปหน้าหลักเพื่อสร้าง BOQ
+                    </Link>
+                  </div>
+                )}
               </div>
             )}
 
