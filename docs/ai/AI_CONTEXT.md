@@ -1,8 +1,9 @@
 # AI Context
 ## Mandatory Reading for AI Agents
 
-**Last Updated:** 2026-01-19  
-**Version:** 1.0  
+**Last Updated:** 2026-01-20  
+**Version:** 1.2  
+**Current Phase:** Phase 2A (pending)
 
 ---
 
@@ -16,12 +17,12 @@ This document defines rules, workflows, and constraints for AI agents working on
 
 Before making ANY changes, read these documents in order:
 
-1. **PROJECT_CONTEXT.md** - Business goals, users, domain terms
-2. **DOMAIN_MODEL.md** - Entities, relationships, business rules
-3. **SYSTEM_ARCHITECTURE.md** - Tech stack, layers, data flow
-4. **BOQ_CALCULATION_LOGIC.md** - How costs are calculated
-5. **DATABASE_SCHEMA.md** - Tables, columns, constraints
-6. **ROADMAP.md** - What's in scope per phase
+1. **HANDOFF.md** - Current session state
+2. **TASK_CHECKLIST.md** - What's done, what's next
+3. **PHASE2_PLAN.md** - Detailed roadmap (FROZEN)
+4. **PROJECT_CONTEXT.md** - Business goals, users
+5. **DOMAIN_MODEL.md** - Entities, relationships
+6. **DATABASE_SCHEMA.md** - Tables, constraints
 
 ---
 
@@ -158,8 +159,9 @@ Before ending a session:
 If you lose context:
 
 1. Read `docs/ai/HANDOFF.md` for latest state
-2. Check git log for recent changes
-3. Ask user for clarification if needed
+2. Read `docs/ai/TASK_CHECKLIST.md` for what's next
+3. Read `docs/ai/PHASE2_PLAN.md` for detailed roadmap
+4. Check git log for recent changes
 
 ---
 

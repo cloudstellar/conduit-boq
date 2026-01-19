@@ -1,180 +1,92 @@
 # Handoff Document
-## Session Continuity Template
 
-**Last Updated:** 2026-01-19
-
----
-
-## 📋 Template Instructions
-
-Copy this template at the end of each session to ensure continuity.
+**Last Updated:** 2026-01-20  
+**Current Phase:** Phase 2A (READY TO START)
 
 ---
 
-## Session Handoff
+## ⚠️ PREREQUISITE: Upgrade Supabase
 
-### Date: [YYYY-MM-DD]
-### Session Duration: [X hours]
+**Before starting Phase 2A, user must:**
+1. Upgrade to **Supabase Pro plan** ($25/month)
+2. Create a **development branch** (~$0.32/day when active)
 
----
+**Reason:** Prevents breaking production during migrations
 
-## 1. Summary of Changes
-
-### Code Changes
-| File | Change Type | Description |
-|------|-------------|-------------|
-| `path/to/file.ts` | Modified | What was changed |
-| `path/to/new.ts` | Created | Why it was created |
-
-### Database Changes
-- [ ] No database changes
-- [ ] Migration added: `XXX_description.sql`
-- [ ] Data modified (describe)
-
-### Documentation Changes
-- [ ] Updated: [list files]
-- [ ] Created: [list files]
+**Project:** `Conduit Price List` (otlssvssvgkohqwuuiir)
+**Org:** `cloudstellar` (exbuklnrvijrnjsetiey)
 
 ---
 
-## 2. Commits Made
+## 📋 Quick Status
 
+| Item | Status |
+|------|--------|
+| Phase 1 | ✅ v1.2.0 Complete |
+| Phase 2 Roadmap | ✅ FROZEN |
+| Documentation | ✅ Complete |
+| Supabase Pro | ⏳ Pending upgrade |
+| Phase 2A | ⏳ Ready after upgrade |
+
+---
+
+## 🎯 Next Session: Start Phase 2A
+
+### Prompt to Use:
 ```
-abc1234 - commit message 1
-def5678 - commit message 2
-```
+อ่าน docs/ai/PHASE2_PLAN.md และ docs/ai/TASK_CHECKLIST.md แล้วเริ่ม Phase 2A: Foundation
 
-### Tag Created
-- [ ] No tag
-- [ ] Tag: vX.X.X
+Phase 2A ต้องทำตามลำดับนี้:
+1. Create `price_list_versions` table + seed "2568"
+2. Add `version_id` to `price_list` + backfill
+3. Add `price_list_version_id` to `boq` + backfill
+4. Create `system_event_log` table
+5. Add triggers (active-only, immutable)
+6. UI header: Version + Year + Status
 
-### Pushed to Remote
-- [ ] Yes
-- [ ] No - pending review
-
----
-
-## 3. Current State
-
-### Application Status
-- [ ] Running locally without errors
-- [ ] Deployed to production
-- [ ] Has known issues (list below)
-
-### Known Issues
-1. [Issue description]
-2. [Issue description]
-
----
-
-## 4. Pending Tasks
-
-### Must Complete
-- [ ] Task 1 - Priority: High
-- [ ] Task 2 - Priority: High
-
-### Should Complete
-- [ ] Task 3 - Priority: Medium
-- [ ] Task 4 - Priority: Medium
-
-### Nice to Have
-- [ ] Task 5 - Priority: Low
-
----
-
-## 5. Decisions Made
-
-| Decision | Rationale | Reversible? |
-|----------|-----------|-------------|
-| Chose X over Y | Because Z | Yes/No |
-
----
-
-## 6. Risks / Blockers
-
-| Risk | Impact | Mitigation |
-|------|--------|------------|
-| [Risk description] | High/Medium/Low | [Action] |
-
----
-
-## 7. Next Session Recommendations
-
-1. Start by [specific action]
-2. Then [next action]
-3. Verify [specific verification]
-
----
-
-## 8. Context for Next AI
-
-### Key Files to Review
-- `path/to/important/file.ts`
-- `path/to/modified/file.ts`
-
-### Important Patterns Used
-- [Pattern name and location]
-
-### Watch Out For
-- [Gotcha or trap to avoid]
-
----
-
-# Latest Handoff Entry
-
-## Date: 2026-01-19 (v1.2.0)
-
-### Summary
-- Admin Permission Security: pending user onboarding flow
-- Database: Added `requested_department_id`, `requested_sector_id`, approval columns
-- RPCs: `admin_approve_user()`, `admin_reject_user()`
-- Trigger: `lock_org_fields_after_onboarding()`
-- RLS: Pending users = own BOQ only, Legacy BOQ = admin-only
-- UX: Welcome card for new users, post-onboarding success message
-
-### Key Changes
-- `app/page.tsx` - Onboarding welcome card
-- `app/profile/page.tsx` - Success message + CTA button
-- `app/admin/page.tsx` - Approve/Reject pending users
-- `lib/hooks/useUser.ts` - Explicit FK references
-- `lib/permissions.ts` - Pending user restrictions
-- `migrations/007_add_requested_org_columns.sql`
-- `migrations/008_rls_and_trigger.sql`
-
-### Current State
-- ✅ Preview tested successfully
-- ✅ All v1.2.0 features complete
-- ✅ Ready for production merge
-
-### Next Steps
-- Merge `feature/admin-permission-security` → `main`
-- Tag `v1.2.0`
-
----
-
-## Date: 2026-01-19 (v1.0.0)
-
-### Summary
-- Fixed auth deadlock issue in `lib/hooks/useUser.ts`
-- Created comprehensive documentation suite
-- Tagged as v1.0.0 - Phase 1 Complete
-
-### Commits
-```
-51c0a60 - fix: resolve auth deadlock by using setTimeout in onAuthStateChange callback
-b3e6ea2 - docs: add project documentation (PRD, Knowledge Base, Implementation Plan, Technical Reference)
-6614120 - docs: add README and database schema documentation
+สำคัญ: ⛔ Phase 2A = Infrastructure only, ห้ามเพิ่ม feature logic
 ```
 
-### Current State
-- ✅ Application running in production
-- ✅ All Phase 1 features complete
-- ✅ Documentation complete
+---
 
-### Pending
-- None for Phase 1
-- Phase 2 features not started
+## 📁 Key Files to Read
 
-### Next Steps
-- User may request Phase 2 features (Approval workflow, Notifications, Export)
+| Priority | File | Purpose |
+|----------|------|---------|
+| 1 | `docs/ai/PHASE2_PLAN.md` | Detailed roadmap + rules |
+| 2 | `docs/ai/TASK_CHECKLIST.md` | What's done, what's next |
+| 3 | `docs/DATABASE_SCHEMA.md` | Current schema + Phase 2 preview |
+| 4 | `docs/IMPLEMENTATION_PLAN.md` | Overview |
 
+---
+
+## 🔐 Key Rules (Don't Forget!)
+
+### Versioning Integrity
+- One default (UNIQUE WHERE is_default = true)
+- Default must be active
+- Atomic default switch (transaction)
+- Active-only BOQ creation
+- Immutable `boq.price_list_version_id`
+- UNIQUE (version_id, item_code)
+
+### Migration Guardrails
+- Backfill BEFORE SET NOT NULL
+- Log columns: `action`, `table_name`, `created_at` = NOT NULL
+
+---
+
+## ⚠️ Watch Out For
+
+1. **Existing Copy BOQ** (`app/boq/page.tsx` handleDuplicate) — currently copies snapshot prices
+2. **Auth Deadlock** — use `setTimeout` in `onAuthStateChange`
+3. **RLS is source of truth** — `lib/permissions.ts` is UI only
+
+---
+
+## 📊 Tech Stack
+
+- Next.js 16
+- Tailwind CSS 4
+- Supabase (PostgreSQL + RLS)
+- Vercel

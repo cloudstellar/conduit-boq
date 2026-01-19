@@ -152,16 +152,18 @@ Organization (NT)
 
 ## 6. Future Roadmap
 
-### Phase 2 (Planned)
-- [ ] Approval workflow (pending_review → pending_approval → approved)
-- [ ] Committee management
-- [ ] PDF export with company template
-- [ ] BOQ versioning/history
-- [ ] Notification system
+### Phase 2: Modernization (FROZEN)
+**Strategy:** Foundation → Output → Input → Governance
 
-### Phase 3 (Future)
-- [ ] Mobile responsive optimization
-- [ ] Offline support (PWA)
-- [ ] Integration with other NT systems
-- [ ] Advanced reporting & analytics
+- **2A: Foundation** — shadcn/ui, Price Versioning, system_event_log
+- **2B: Reporting** — Summary, PDF Export, Copy/Requote
+- **2C: Smart Estimation** — Model-based BOQ generation
+- **2D: Governance** — Audit Log, Version Comparison
+
+### Phase 3+ (Future)
+- [ ] Approval workflow
+- [ ] Notifications
+- [ ] Mobile PWA / Offline
+- [ ] Analytics & Reporting
+
 

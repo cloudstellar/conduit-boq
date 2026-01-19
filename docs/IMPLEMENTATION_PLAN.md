@@ -5,183 +5,113 @@
 
 ## 📋 Project Overview
 
-**Status:** 🚧 v1.2.0 In Progress  
-**Current Version:** v1.1.0  
-**Next Release:** v1.2.0-admin-security  
+**Current Version:** v1.2.0  
 **Production URL:** Deployed on Vercel  
 
 ---
 
-## 🏗️ Architecture Overview
+## 🏗️ Architecture
 
 ```
-┌─────────────────────────────────────────────────────────┐
-│                      CLIENT                             │
-│  Next.js 15 + React 19 + TypeScript + Tailwind CSS 4    │
-└─────────────────────────────────────────────────────────┘
-                           │
-                           ▼
-┌─────────────────────────────────────────────────────────┐
-│                    SUPABASE                             │
-│  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐     │
-│  │   Auth      │  │  Database   │  │   Storage   │     │
-│  │  (OAuth)    │  │ (PostgreSQL)│  │  (Future)   │     │
-│  └─────────────┘  └─────────────┘  └─────────────┘     │
-│                          │                              │
-│                    ┌─────────────┐                      │
-│                    │     RLS     │                      │
-│                    │  Policies   │                      │
-│                    └─────────────┘                      │
-└─────────────────────────────────────────────────────────┘
-                           │
-                           ▼
-┌─────────────────────────────────────────────────────────┐
-│                      VERCEL                             │
-│               (Hosting + Edge Functions)                │
-└─────────────────────────────────────────────────────────┘
+Next.js 16 + React 19 + TypeScript + Tailwind CSS 4
+                    │
+                    ▼
+             SUPABASE (Auth + PostgreSQL + RLS)
+                    │
+                    ▼
+                 VERCEL
 ```
 
 ---
 
-## 📁 Project Structure
+## ✅ Phase 1: Foundation (COMPLETED v1.2.0)
 
+- [x] Price list (518 items, 52 categories)
+- [x] BOQ with multi-route support
+- [x] Organizations, Departments, Sectors
+- [x] Google OAuth + Auto-create profile
+- [x] RLS policies + RBAC
+- [x] Admin: approve/reject pending users
+- [x] Onboarding flow with requested_* fields
+
+---
+
+## 🚧 Phase 2: Modernization & Versioning (PLANNED)
+
+**Strategy:** Foundation → Output → Input → Governance
+
+### 🔐 Key Integrity Rules
+
+**Rule A: Versioning**
+| Rule | Implementation |
+|------|----------------|
+| One default | `UNIQUE WHERE is_default = true` |
+| Default = active | Constraint |
+| Switch default = atomic | Transaction |
+| Active-only BOQ | Trigger + log |
+| Immutable version_id | Trigger + log |
+| No duplicate items | `UNIQUE (version_id, item_code)` |
+
+**Rule B: Snapshot**
+- No auto-update: Changes don't affect existing BOQs
+- BOQ = Frozen after creation
+- Traceable: `source_model_id`, `cloned_from_boq_id`
+
+---
+
+### 📅 Phase 2A: Foundation
+⛔ **Infrastructure only**
+
+**Order:**
+1. `price_list_versions` + seed "2568"
+2. `price_list.version_id` + backfill + unique
+3. `boq.price_list_version_id` + backfill + NOT NULL
+4. `system_event_log` (use `created_at`)
+5. Triggers + logging
+6. UI/PDF version display
+
+**Guardrails:**
+- Backfill before NOT NULL
+- Atomic default switch
+- Log: `action`, `table_name`, `created_at` = NOT NULL
+
+---
+
+### 📈 Phase 2B: Reporting
+- Summary per Dept/Sector (Read-only)
+- Filters + PDF Export
+
+**Copy/Requote:**
 ```
-conduit-boq/
-├── app/                    # Next.js App Router
-│   ├── admin/             # Admin panel
-│   ├── api/               # API routes
-│   ├── auth/              # Auth callback
-│   ├── blocked/           # Blocked user page
-│   ├── boq/               # BOQ pages
-│   │   ├── [id]/          # View/Edit BOQ
-│   │   └── create/        # Create BOQ
-│   ├── login/             # Login page
-│   ├── onboarding/        # Onboarding flow
-│   ├── price-list/        # Price list viewer
-│   └── profile/           # User profile
-├── components/            # Reusable components
-│   ├── auth/              # Auth components
-│   └── boq/               # BOQ components
-├── lib/                   # Libraries & utilities
-│   ├── context/           # React contexts
-│   ├── hooks/             # Custom hooks
-│   ├── supabase/          # Supabase clients
-│   └── types/             # TypeScript types
-├── migrations/            # SQL migrations
-├── scripts/               # Utility scripts
-└── docs/                  # Documentation
+คัดลอก ▼
+├─ คัดลอก BOQ (ราคาเดิม)
+└─ Requote เป็นราคาปี...
 ```
+- Requote → `cloned_from_boq_id = source`
+- Requote → target `version.status = 'active'`
+- Not found → costs = NULL
 
 ---
 
-## ✅ Phase 1: Foundation (COMPLETED)
-
-### 1.1 Database Setup
-- [x] Price list table with 518 items
-- [x] BOQ table with ownership columns
-- [x] BOQ routes table (multi-route support)
-- [x] BOQ items table with route reference
-- [x] Organizations, Departments, Sectors tables
-- [x] User profiles table with roles
-
-### 1.2 Authentication
-- [x] Google OAuth integration
-- [x] Auto-create user profile on signup
-- [x] Onboarding flow for new users
-- [x] Email domain restriction (optional)
-- [x] Session management with middleware
-
-### 1.3 Authorization
-- [x] Row Level Security (RLS) policies
-- [x] Client-side permission checks
-- [x] Role-based access control (RBAC)
-- [x] Separation of Duties
-
-### 1.4 Core Features
-- [x] Create/Edit/Delete BOQ
-- [x] Multi-route BOQ support
-- [x] Price list search & selection
-- [x] Factor F calculation
-- [x] VAT calculation
-- [x] User profile management
-
-### 1.5 Admin Features
-- [x] User management (role, status)
-- [x] Email domain restriction setting
-- [x] Pending user approval
+### 🧠 Phase 2C: Smart Estimation
+- `source_model_id` NULLABLE + FK to `models`
+- Wizard UI + Model CRUD
 
 ---
 
-## 🔴 Sprint v1.2.0: Admin Permission Security (IN PROGRESS)
-
-**Branch:** `feature/admin-permission-security`
-
-### New Features
-- [ ] Hybrid onboarding (requested_* → admin approve)
-- [ ] Admin approve/reject RPC functions
-- [ ] Trigger: lock org fields after onboarding
-- [ ] RLS: pending users see own-only
-- [ ] RLS: legacy BOQ admin-only
-
-### Migrations
-| File | Description |
-|------|-------------|
-| `007_add_requested_org_columns.sql` | Add 7 onboarding/audit columns |
-| `008_rls_and_trigger.sql` | RLS + Trigger + RPC |
-
-### Verification
-- 10 security test cases in `scripts/test-rls-security.sql`
-- See `docs/SECURITY.md` for access matrix
-
----
-
-## 🚧 Phase 2: Workflow (PLANNED)
-
-### 2.1 Approval Workflow
-- [ ] BOQ status flow: draft → pending_review → pending_approval → approved
-- [ ] Sector Manager: pending_review → pending_approval
-- [ ] Dept Manager: pending_approval → approved
-- [ ] Rejection with comments
-
-### 2.2 Notifications
-- [ ] Email notifications for approval requests
-- [ ] In-app notification center
-- [ ] Status change alerts
-
-### 2.3 Committee Management
-- [ ] Create procurement committees
-- [ ] Assign members to committees
-- [ ] Link approved BOQ to committees
-
-### 2.4 Export & Reports
-- [ ] PDF export with company template
-- [ ] Excel export
-- [ ] Summary reports by department/sector
+### 🔐 Phase 2D: Governance
+- BOQ Audit Log
+- Version Comparison
 
 ---
 
 ## 🔮 Phase 3: Enhancement (FUTURE)
 
-### 3.1 Advanced Features
-- [ ] BOQ versioning/history
-- [ ] BOQ templates
-- [ ] Copy/Clone BOQ
-- [ ] Batch operations
-
-### 3.2 Mobile & Offline
-- [ ] Progressive Web App (PWA)
-- [ ] Offline support
+- [ ] Approval workflow (draft → approved)
+- [ ] Notifications
+- [ ] PDF/Excel export with template
+- [ ] PWA / Offline support
 - [ ] Mobile-optimized UI
-
-### 3.3 Integrations
-- [ ] NT internal systems
-- [ ] Document management
-- [ ] ERP integration
-
-### 3.4 Analytics
-- [ ] Dashboard with metrics
-- [ ] Cost trends
-- [ ] User activity reports
 
 ---
 
@@ -189,52 +119,16 @@ conduit-boq/
 
 | File | Description | Status |
 |------|-------------|--------|
-| `001_backup_before_migration.sql` | Backup queries | ✅ |
-| `002_add_multi_route_support.sql` | Multi-route tables | ✅ |
-| `003_add_construction_area_to_routes.sql` | Route areas | ✅ |
-| `004_phase1a_auth_ownership.sql` | Auth & ownership | ✅ |
-| `005_phase1a_seed_and_rls.sql` | Seed data & RLS | ✅ |
-| `006_phase1a_rls_write_and_approval.sql` | RLS policies | ✅ |
-| `007_add_requested_org_columns.sql` | Onboarding columns | ⏳ v1.2.0 |
-| `008_rls_and_trigger.sql` | RLS + Trigger + RPC | ⏳ v1.2.0 |
-
----
-
-## 🔧 Environment Variables
-
-```env
-# Supabase
-NEXT_PUBLIC_SUPABASE_URL=https://xxx.supabase.co
-NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJhbG...
-
-# Optional
-SUPABASE_SERVICE_ROLE_KEY=eyJhbG... (for admin operations)
-```
+| 001-006 | Phase 1 foundation | ✅ |
+| 007 | Onboarding columns | ✅ v1.2.0 |
+| 008 | RLS + Trigger + RPC | ✅ v1.2.0 |
+| 009+ | Phase 2A versioning | ⏳ Planned |
 
 ---
 
 ## 🚀 Deployment
 
-### Development
 ```bash
-npm run dev
+npm run dev      # Development
+vercel --prod    # Production
 ```
-
-### Production
-- Push to `main` branch
-- Vercel auto-deploys
-
-### Manual Deploy
-```bash
-vercel --prod
-```
-
----
-
-## 📞 Contacts
-
-- **Project Owner:** NT
-- **Development:** Augment Agent
-- **Hosting:** Vercel
-- **Database:** Supabase (ap-south-1)
-

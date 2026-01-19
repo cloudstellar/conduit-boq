@@ -335,3 +335,32 @@ idx_boq_items_route_id   ON boq_items(route_id)
 
 - **Domain Model:** [docs/ai/DOMAIN_MODEL.md](./ai/DOMAIN_MODEL.md)
 - **RLS Decision:** [docs/ai/DECISIONS/ADR-001](./ai/DECISIONS/ADR-001-supabase-rls-authorization.md)
+
+---
+
+## 🔮 Phase 2 Schema Preview (PLANNED)
+
+### NEW: price_list_versions
+| Column | Type | Description |
+|--------|------|-------------|
+| `id` | UUID | Primary Key |
+| `year` | INTEGER | ปีบัญชีราคา |
+| `name` | TEXT | ชื่อ version |
+| `status` | TEXT | draft/active/archived |
+| `is_default` | BOOLEAN | Default version |
+
+**Constraints:** `UNIQUE WHERE is_default = true`, default requires active
+
+### MODIFY: price_list
+- Add `version_id UUID NOT NULL`
+- Add `UNIQUE (version_id, item_code)`
+
+### MODIFY: boq
+- Add `price_list_version_id UUID NOT NULL` (immutable)
+- Add `cloned_from_boq_id UUID` (NULLABLE)
+- Add `source_model_id UUID` (NULLABLE, Phase 2C)
+
+### NEW: system_event_log
+- Trigger rejection logging
+- Columns: `action`, `table_name`, `record_id`, `reason`, `created_at`
+

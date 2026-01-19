@@ -14,41 +14,59 @@
    - Forbidden actions
    - Critical patterns to follow
 
-2. **[PROJECT_CONTEXT.md](./PROJECT_CONTEXT.md)**
+2. **[HANDOFF.md](./HANDOFF.md)** ← CURRENT STATE
+   - Session handoff
+   - What was done, what's next
+
+3. **[PHASE2_PLAN.md](./PHASE2_PLAN.md)** ← FROZEN ROADMAP
+   - Detailed Phase 2 implementation plan
+   - Integrity rules and schema
+
+4. **[PROJECT_CONTEXT.md](./PROJECT_CONTEXT.md)**
    - Business goals and non-goals
    - Target users and roles
-   - Domain terminology
 
-3. **[DOMAIN_MODEL.md](./DOMAIN_MODEL.md)**
+5. **[DOMAIN_MODEL.md](./DOMAIN_MODEL.md)**
    - Entity definitions and relationships
-   - Business rules and invariants
-   - What NOT to misinterpret
+   - Business rules
 
-4. **[SYSTEM_ARCHITECTURE.md](./SYSTEM_ARCHITECTURE.md)**
+6. **[SYSTEM_ARCHITECTURE.md](./SYSTEM_ARCHITECTURE.md)**
    - Tech stack details
    - Layer responsibilities
-   - Data flow diagrams
 
-5. **[BOQ_CALCULATION_LOGIC.md](./BOQ_CALCULATION_LOGIC.md)**
+7. **[BOQ_CALCULATION_LOGIC.md](./BOQ_CALCULATION_LOGIC.md)**
    - Cost calculation formulas
    - Factor F interpolation
-   - Implementation locations
 
-6. **[ROADMAP.md](./ROADMAP.md)**
-   - Phase 1 (completed) checklist
-   - Phase 2 & 3 planned features
-   - Out of scope items
+8. **[ROADMAP.md](./ROADMAP.md)**
+   - Phase overview
 
 ---
 
 ## 📋 Session Continuity
 
-**[HANDOFF.md](./HANDOFF.md)** - Template and latest session state
+**[HANDOFF.md](./HANDOFF.md)** - Latest session state + Phase 2 Roadmap
 
 Use this for:
 - End-of-session handoff
 - Context recovery after session reset
 - Tracking pending tasks
+
+**Current Status:** Phase 1 Complete (v1.2.0), Phase 2 Roadmap FROZEN
+
+---
+
+## 🚀 Phase 2 Quick Reference
+
+**Strategy:** Foundation → Output → Input → Governance
+
+| Phase | Focus |
+|-------|-------|
+| 2A | shadcn/ui + Price Versioning |
+| 2B | Reporting + Copy/Requote |
+| 2C | Smart Estimation |
+| 2D | Governance |
+
 
 ---
 
