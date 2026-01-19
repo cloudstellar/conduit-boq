@@ -20,11 +20,18 @@ export default function ProfilePage() {
   const [phone, setPhone] = useState('')
   const [departmentId, setDepartmentId] = useState('')
   const [sectorId, setSectorId] = useState('')
+  // v1.2.0: Requested org for onboarding
+  const [requestedDepartmentId, setRequestedDepartmentId] = useState('')
+  const [requestedSectorId, setRequestedSectorId] = useState('')
+  const [onboardingCompleted, setOnboardingCompleted] = useState(false)
 
   const [departments, setDepartments] = useState<Department[]>([])
   const [sectors, setSectors] = useState<Sector[]>([])
   const [isSaving, setIsSaving] = useState(false)
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null)
+
+  // v1.2.0: Can user edit org fields?
+  const canEditOrg = !onboardingCompleted
 
   // Load departments and sectors
   useEffect(() => {
@@ -34,30 +41,32 @@ export default function ProfilePage() {
         .select('*')
         .eq('is_active', true)
         .order('name')
-      
+
       if (depts) setDepartments(depts)
     }
     loadOrgData()
   }, [supabase])
 
   // Load sectors when department changes
+  // v1.2.0: Use requestedDepartmentId for pending users, departmentId for approved
   useEffect(() => {
     const loadSectors = async () => {
-      if (!departmentId) {
+      const deptToLoad = canEditOrg ? requestedDepartmentId : departmentId
+      if (!deptToLoad) {
         setSectors([])
         return
       }
       const { data: sects } = await supabase
         .from('sectors')
         .select('*')
-        .eq('department_id', departmentId)
+        .eq('department_id', deptToLoad)
         .eq('is_active', true)
         .order('name')
-      
+
       if (sects) setSectors(sects)
     }
     loadSectors()
-  }, [departmentId, supabase])
+  }, [canEditOrg, requestedDepartmentId, departmentId, supabase])
 
   // Populate form with current user data
   useEffect(() => {
@@ -70,6 +79,10 @@ export default function ProfilePage() {
       setPhone(user.phone || '')
       setDepartmentId(user.department_id || '')
       setSectorId(user.sector_id || '')
+      // v1.2.0: Load onboarding state
+      setOnboardingCompleted((user as any).onboarding_completed ?? false)
+      setRequestedDepartmentId((user as any).requested_department_id || '')
+      setRequestedSectorId((user as any).requested_sector_id || '')
     }
   }, [user])
 
@@ -80,28 +93,43 @@ export default function ProfilePage() {
     setIsSaving(true)
     setMessage(null)
 
+    // v1.2.0: Build update payload based on onboarding status
+    const updatePayload: Record<string, any> = {
+      first_name: firstName,
+      last_name: lastName,
+      title,
+      position,
+      employee_id: employeeId || null,
+      phone: phone || null,
+      updated_at: new Date().toISOString(),
+    }
+
+    // v1.2.0: If not yet onboarded, save to requested_* and mark complete
+    if (!onboardingCompleted) {
+      updatePayload.requested_department_id = requestedDepartmentId || null
+      updatePayload.requested_sector_id = requestedSectorId || null
+      updatePayload.onboarding_completed = true
+    }
+    // Note: actual department_id/sector_id are set by admin via RPC
+
     const { error } = await supabase
       .from('user_profiles')
-      .update({
-        first_name: firstName,
-        last_name: lastName,
-        title,
-        position,
-        employee_id: employeeId || null,
-        phone: phone || null,
-        department_id: departmentId || null,
-        sector_id: sectorId || null,
-        updated_at: new Date().toISOString(),
-      })
+      .update(updatePayload)
       .eq('id', user.id)
 
     setIsSaving(false)
 
     if (error) {
-      setMessage({ type: 'error', text: 'เกิดข้อผิดพลาด: ' + error.message })
+      // v1.2.0: Handle trigger error for locked fields
+      if (error.message.includes('locked after onboarding')) {
+        setMessage({ type: 'error', text: 'ไม่สามารถแก้ไขสังกัดได้ กรุณาติดต่อผู้ดูแลระบบ' })
+      } else {
+        setMessage({ type: 'error', text: 'เกิดข้อผิดพลาด: ' + error.message })
+      }
     } else {
       setMessage({ type: 'success', text: 'บันทึกข้อมูลเรียบร้อยแล้ว' })
       await refreshProfile()
+      setOnboardingCompleted(true) // Update local state
     }
   }
 
@@ -195,174 +223,186 @@ export default function ProfilePage() {
 
         {/* Normal Profile Form - Only for active/pending users */}
         {user?.status !== 'inactive' && (
-        <div className="bg-white rounded-lg shadow p-6">
-          {message && (
-            <div className={`mb-6 p-4 rounded-md ${
-              message.type === 'success' ? 'bg-green-50 text-green-700' : 'bg-red-50 text-red-700'
-            }`}>
-              {message.text}
-            </div>
-          )}
+          <div className="bg-white rounded-lg shadow p-6">
+            {message && (
+              <div className={`mb-6 p-4 rounded-md ${message.type === 'success' ? 'bg-green-50 text-green-700' : 'bg-red-50 text-red-700'
+                }`}>
+                {message.text}
+              </div>
+            )}
 
-          <form onSubmit={handleSubmit} className="space-y-6">
-            {/* Email & Role (read-only) */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div>
-                <label className="block text-sm font-medium text-gray-700">อีเมล</label>
-                <input
-                  type="email"
-                  value={user.email || ''}
-                  disabled
-                  className="mt-1 block w-full px-3 py-2 bg-gray-100 border border-gray-300
+            <form onSubmit={handleSubmit} className="space-y-6">
+              {/* Email & Role (read-only) */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">อีเมล</label>
+                  <input
+                    type="email"
+                    value={user.email || ''}
+                    disabled
+                    className="mt-1 block w-full px-3 py-2 bg-gray-100 border border-gray-300
                            rounded-md text-gray-500 cursor-not-allowed"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700">สิทธิ์การใช้งาน</label>
-                <input
-                  type="text"
-                  value={getRoleLabel(user.role)}
-                  disabled
-                  className="mt-1 block w-full px-3 py-2 bg-gray-100 border border-gray-300
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">สิทธิ์การใช้งาน</label>
+                  <input
+                    type="text"
+                    value={getRoleLabel(user.role)}
+                    disabled
+                    className="mt-1 block w-full px-3 py-2 bg-gray-100 border border-gray-300
                            rounded-md text-gray-500 cursor-not-allowed"
-                />
+                  />
+                </div>
               </div>
-            </div>
 
-            {/* Name */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              <div>
-                <label className="block text-sm font-medium text-gray-700">คำนำหน้า</label>
-                <select
-                  value={title}
-                  onChange={(e) => setTitle(e.target.value)}
-                  className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md
+              {/* Name */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">คำนำหน้า</label>
+                  <select
+                    value={title}
+                    onChange={(e) => setTitle(e.target.value)}
+                    className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md
                            focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                >
-                  <option value="">เลือก...</option>
-                  <option value="นาย">นาย</option>
-                  <option value="นาง">นาง</option>
-                  <option value="นางสาว">นางสาว</option>
-                </select>
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700">ชื่อ *</label>
-                <input
-                  type="text"
-                  required
-                  value={firstName}
-                  onChange={(e) => setFirstName(e.target.value)}
-                  className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md
+                  >
+                    <option value="">เลือก...</option>
+                    <option value="นาย">นาย</option>
+                    <option value="นาง">นาง</option>
+                    <option value="นางสาว">นางสาว</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">ชื่อ *</label>
+                  <input
+                    type="text"
+                    required
+                    value={firstName}
+                    onChange={(e) => setFirstName(e.target.value)}
+                    className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md
                            focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700">นามสกุล</label>
-                <input
-                  type="text"
-                  value={lastName}
-                  onChange={(e) => setLastName(e.target.value)}
-                  className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">นามสกุล</label>
+                  <input
+                    type="text"
+                    value={lastName}
+                    onChange={(e) => setLastName(e.target.value)}
+                    className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md
                            focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                />
+                  />
+                </div>
               </div>
-            </div>
 
-            {/* Position & Employee ID */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div>
-                <label className="block text-sm font-medium text-gray-700">ตำแหน่ง</label>
-                <input
-                  type="text"
-                  value={position}
-                  onChange={(e) => setPosition(e.target.value)}
-                  placeholder="เช่น วิศวกร 6"
-                  className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md
+              {/* Position & Employee ID */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">ตำแหน่ง</label>
+                  <input
+                    type="text"
+                    value={position}
+                    onChange={(e) => setPosition(e.target.value)}
+                    placeholder="เช่น วิศวกร 6"
+                    className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md
                            focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700">รหัสพนักงาน</label>
-                <input
-                  type="text"
-                  value={employeeId}
-                  onChange={(e) => setEmployeeId(e.target.value)}
-                  className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">รหัสพนักงาน</label>
+                  <input
+                    type="text"
+                    value={employeeId}
+                    onChange={(e) => setEmployeeId(e.target.value)}
+                    className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md
                            focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                />
+                  />
+                </div>
               </div>
-            </div>
 
-            {/* Department & Sector */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div>
-                <label className="block text-sm font-medium text-gray-700">ฝ่าย</label>
-                <select
-                  value={departmentId}
-                  onChange={(e) => {
-                    setDepartmentId(e.target.value)
-                    setSectorId('')
-                  }}
-                  className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md
-                           focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                >
-                  <option value="">เลือกฝ่าย...</option>
-                  {departments.map((dept) => (
-                    <option key={dept.id} value={dept.id}>
-                      {dept.full_name || dept.name}
-                    </option>
-                  ))}
-                </select>
+              {/* Department & Sector */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">ฝ่าย</label>
+                  {canEditOrg ? (
+                    <select
+                      value={requestedDepartmentId}
+                      onChange={(e) => {
+                        setRequestedDepartmentId(e.target.value)
+                        setRequestedSectorId('')
+                      }}
+                      className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md
+                             focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                    >
+                      <option value="">เลือกฝ่าย...</option>
+                      {departments.map((dept) => (
+                        <option key={dept.id} value={dept.id}>
+                          {dept.full_name || dept.name}
+                        </option>
+                      ))}
+                    </select>
+                  ) : (
+                    <div className="mt-1 block w-full px-3 py-2 bg-gray-100 border border-gray-300 rounded-md text-gray-600">
+                      {departments.find(d => d.id === departmentId)?.name || 'ยังไม่ได้กำหนด'}
+                      <span className="ml-2 text-xs text-amber-600">(ติดต่อ Admin เพื่อเปลี่ยน)</span>
+                    </div>
+                  )}
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">ส่วน</label>
+                  {canEditOrg ? (
+                    <select
+                      value={requestedSectorId}
+                      onChange={(e) => setRequestedSectorId(e.target.value)}
+                      disabled={!requestedDepartmentId}
+                      className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md
+                             focus:outline-none focus:ring-blue-500 focus:border-blue-500
+                             disabled:bg-gray-100 disabled:cursor-not-allowed"
+                    >
+                      <option value="">เลือกส่วน...</option>
+                      {sectors.map((sector) => (
+                        <option key={sector.id} value={sector.id}>
+                          {sector.full_name || sector.name}
+                        </option>
+                      ))}
+                    </select>
+                  ) : (
+                    <div className="mt-1 block w-full px-3 py-2 bg-gray-100 border border-gray-300 rounded-md text-gray-600">
+                      {sectors.find(s => s.id === sectorId)?.name || 'ยังไม่ได้กำหนด'}
+                    </div>
+                  )}
+                </div>
               </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700">ส่วน</label>
-                <select
-                  value={sectorId}
-                  onChange={(e) => setSectorId(e.target.value)}
-                  disabled={!departmentId}
-                  className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md
-                           focus:outline-none focus:ring-blue-500 focus:border-blue-500
-                           disabled:bg-gray-100 disabled:cursor-not-allowed"
-                >
-                  <option value="">เลือกส่วน...</option>
-                  {sectors.map((sector) => (
-                    <option key={sector.id} value={sector.id}>
-                      {sector.full_name || sector.name}
-                    </option>
-                  ))}
-                </select>
-              </div>
-            </div>
 
-            {/* Phone */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700">เบอร์โทรศัพท์</label>
-              <input
-                type="tel"
-                value={phone}
-                onChange={(e) => setPhone(e.target.value)}
-                className="mt-1 block w-full max-w-xs px-3 py-2 border border-gray-300 rounded-md
+              {/* Phone */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700">เบอร์โทรศัพท์</label>
+                <input
+                  type="tel"
+                  value={phone}
+                  onChange={(e) => setPhone(e.target.value)}
+                  className="mt-1 block w-full max-w-xs px-3 py-2 border border-gray-300 rounded-md
                          focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-              />
-            </div>
+                />
+              </div>
 
-            {/* Submit */}
-            <div className="flex justify-end pt-4">
-              <button
-                type="submit"
-                disabled={isSaving}
-                className="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700
+              {/* Submit */}
+              <div className="flex justify-end pt-4">
+                <button
+                  type="submit"
+                  disabled={isSaving}
+                  className="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700
                          focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2
                          disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                {isSaving ? 'กำลังบันทึก...' : 'บันทึก'}
-              </button>
-            </div>
-          </form>
+                >
+                  {isSaving ? 'กำลังบันทึก...' : 'บันทึก'}
+                </button>
+              </div>
+            </form>
 
-          {/* Change Password Section */}
-          <ChangePasswordSection />
-        </div>
+            {/* Change Password Section */}
+            <ChangePasswordSection />
+          </div>
         )}
       </main>
     </div>
@@ -425,9 +465,8 @@ function ChangePasswordSection() {
       <h2 className="text-lg font-semibold text-gray-900 mb-4">เปลี่ยนรหัสผ่าน</h2>
 
       {message && (
-        <div className={`mb-4 p-4 rounded-md ${
-          message.type === 'success' ? 'bg-green-50 text-green-700' : 'bg-red-50 text-red-700'
-        }`}>
+        <div className={`mb-4 p-4 rounded-md ${message.type === 'success' ? 'bg-green-50 text-green-700' : 'bg-red-50 text-red-700'
+          }`}>
           {message.text}
         </div>
       )}

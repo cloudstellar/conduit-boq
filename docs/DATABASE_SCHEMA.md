@@ -103,6 +103,14 @@
 | `phone` | TEXT | YES | เบอร์โทร |
 | `signature_url` | TEXT | YES | URL ลายเซ็น (future) |
 | `status` | TEXT | NO | สถานะ (active/inactive/suspended/pending) |
+| `onboarding_completed` | BOOLEAN | NO | เสร็จสิ้น onboarding |
+| `requested_department_id` | UUID | YES | FK → departments.id (v1.2.0) |
+| `requested_sector_id` | UUID | YES | FK → sectors.id (v1.2.0) |
+| `approved_at` | TIMESTAMPTZ | YES | วันที่อนุมัติ (v1.2.0) |
+| `approved_by` | UUID | YES | FK → auth.users.id (v1.2.0) |
+| `rejected_at` | TIMESTAMPTZ | YES | วันที่ปฏิเสธ (v1.2.0) |
+| `rejected_by` | UUID | YES | FK → auth.users.id (v1.2.0) |
+| `admin_note` | TEXT | YES | บันทึกจาก admin (v1.2.0) |
 | `created_at` | TIMESTAMPTZ | NO | วันที่สร้าง |
 | `updated_at` | TIMESTAMPTZ | NO | วันที่แก้ไขล่าสุด |
 
@@ -248,12 +256,11 @@ BOQ Header - ใบประมาณราคา
 - Managers can read profiles in their department
 
 **boq:**
-- Legacy BOQ (no owner): accessible by all authenticated
-- Admin: full access
-- Dept Manager: department scope
-- Sector Manager: sector + department read
-- Staff: own + assigned + same sector
-- Procurement: department read-only
+- Legacy BOQ (created_by IS NULL): **Admin-only** (v1.2.0)
+- Owner/Assignee: always see own BOQ
+- Sector access: staff/sector_manager (active only)
+- Department access: dept_manager/procurement (active only)
+- Pending users: own BOQ only (no sector/dept access)
 
 ---
 
@@ -291,10 +298,21 @@ idx_boq_items_route_id   ON boq_items(route_id)
 
 ### Auto-update timestamps
 - `update_updated_at()` - Updates `updated_at` on any table modification
-- `update_boq_routes_updated_at()` - Specific for boq_routes
 
 ### Auto-create user profile
 - `handle_new_user()` - Creates user_profiles entry when auth.users row is created
+
+### Lock org fields after onboarding (v1.2.0)
+- `lock_org_fields_after_onboarding()` - Prevents user from changing dept/sector after onboarding
+
+---
+
+## 🔧 RPC Functions (v1.2.0)
+
+| Function | Description |
+|----------|-------------|
+| `admin_approve_user(p_target_id)` | Atomic approve: copies requested→actual, sets active |
+| `admin_reject_user(p_target_id, p_note)` | Reject user with note |
 
 ---
 
@@ -308,8 +326,8 @@ idx_boq_items_route_id   ON boq_items(route_id)
 | `004_phase1a_auth_ownership.sql` | Auth & ownership columns | ✅ Applied |
 | `005_phase1a_seed_and_rls.sql` | Seed data & RLS policies | ✅ Applied |
 | `006_phase1a_rls_write_and_approval.sql` | RLS write policies | ✅ Applied |
-| `007_app_settings.sql` | App settings table | ✅ Applied |
-| `008_pending_user_status.sql` | Pending status support | ✅ Applied |
+| `007_add_requested_org_columns.sql` | Onboarding columns (v1.2.0) | ⏳ Pending |
+| `008_rls_and_trigger.sql` | RLS + Trigger + RPC (v1.2.0) | ⏳ Pending |
 
 ---
 

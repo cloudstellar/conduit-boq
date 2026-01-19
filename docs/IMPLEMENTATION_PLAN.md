@@ -5,8 +5,9 @@
 
 ## 📋 Project Overview
 
-**Status:** ✅ Phase 1 Completed  
-**Current Version:** 1.0  
+**Status:** 🚧 v1.2.0 In Progress  
+**Current Version:** v1.1.0  
+**Next Release:** v1.2.0-admin-security  
 **Production URL:** Deployed on Vercel  
 
 ---
@@ -111,6 +112,29 @@ conduit-boq/
 
 ---
 
+## 🔴 Sprint v1.2.0: Admin Permission Security (IN PROGRESS)
+
+**Branch:** `feature/admin-permission-security`
+
+### New Features
+- [ ] Hybrid onboarding (requested_* → admin approve)
+- [ ] Admin approve/reject RPC functions
+- [ ] Trigger: lock org fields after onboarding
+- [ ] RLS: pending users see own-only
+- [ ] RLS: legacy BOQ admin-only
+
+### Migrations
+| File | Description |
+|------|-------------|
+| `007_add_requested_org_columns.sql` | Add 7 onboarding/audit columns |
+| `008_rls_and_trigger.sql` | RLS + Trigger + RPC |
+
+### Verification
+- 10 security test cases in `scripts/test-rls-security.sql`
+- See `docs/SECURITY.md` for access matrix
+
+---
+
 ## 🚧 Phase 2: Workflow (PLANNED)
 
 ### 2.1 Approval Workflow
@@ -171,8 +195,8 @@ conduit-boq/
 | `004_phase1a_auth_ownership.sql` | Auth & ownership | ✅ |
 | `005_phase1a_seed_and_rls.sql` | Seed data & RLS | ✅ |
 | `006_phase1a_rls_write_and_approval.sql` | RLS policies | ✅ |
-| `007_app_settings.sql` | App settings table | ✅ |
-| `008_pending_user_status.sql` | Pending status | ✅ |
+| `007_add_requested_org_columns.sql` | Onboarding columns | ⏳ v1.2.0 |
+| `008_rls_and_trigger.sql` | RLS + Trigger + RPC | ⏳ v1.2.0 |
 
 ---
 

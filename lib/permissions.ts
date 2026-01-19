@@ -90,18 +90,17 @@ function canPending(
     return action === 'read'
   }
 
-  // BOQ - limited to own only
+  // BOQ - limited to own only (v1.2.0: only created_by, no assigned_to)
   if (resource === 'boq') {
-    const isOwner = ctx?.created_by === user.id
-    const isLegacy = ctx?.created_by === null || ctx?.created_by === undefined
+    const isOwner = ctx?.created_by === user.id // No assigned_to for pending
 
     switch (action) {
       case 'create':
         return true // Can create new BOQ
       case 'read':
-        return isOwner || isLegacy // Can only read own BOQ
+        return isOwner // Can only read own BOQ (no legacy, no assigned)
       case 'update':
-        return isOwner || isLegacy // Can only update own BOQ
+        return isOwner // Can only update own BOQ
       case 'delete':
         return false // Cannot delete
       case 'approve':
@@ -131,8 +130,18 @@ function canBOQ(
 ): boolean {
   const isOwner = ctx?.created_by === user.id || ctx?.assigned_to === user.id
   const isLegacy = ctx?.created_by === null || ctx?.created_by === undefined
-  const isSameSector = ctx?.sector_id === user.sector_id
-  const isSameDepartment = ctx?.department_id === user.department_id
+
+  // v1.2.0: Explicit null handling for sector/department comparison
+  const hasSector = Boolean(user.sector_id)
+  const hasDepartment = Boolean(user.department_id)
+  const isSameSector = hasSector && ctx?.sector_id != null && ctx.sector_id === user.sector_id
+  const isSameDepartment = hasDepartment && ctx?.department_id != null && ctx.department_id === user.department_id
+
+  // v1.2.0: Legacy BOQ admin-only (client-side hint, RLS enforces)
+  // Active user without org sees only own
+  if (!hasSector && !hasDepartment) {
+    return isOwner || (action === 'create')
+  }
 
   switch (user.role) {
     case 'staff':
@@ -147,9 +156,9 @@ function canBOQ(
       if (['create', 'update'].includes(action)) return isSameSector || isLegacy
       if (action === 'delete') return isSameSector || isLegacy
       if (action === 'approve') {
-        return isSameSector && 
-               ctx?.status === 'pending_review' && 
-               ctx?.created_by !== user.id // SoD
+        return isSameSector &&
+          ctx?.status === 'pending_review' &&
+          ctx?.created_by !== user.id // SoD
       }
       return false
 
@@ -157,9 +166,9 @@ function canBOQ(
       if (action === 'read') return isSameDepartment || isLegacy
       if (['create', 'update', 'delete'].includes(action)) return isSameDepartment || isLegacy
       if (action === 'approve') {
-        return isSameDepartment && 
-               ctx?.status === 'pending_approval' && 
-               ctx?.created_by !== user.id // SoD
+        return isSameDepartment &&
+          ctx?.status === 'pending_approval' &&
+          ctx?.created_by !== user.id // SoD
       }
       return false
 
@@ -177,13 +186,13 @@ function canCommittee(
   _ctx?: BOQContext
 ): boolean {
   if (user.role === 'admin') return true
-  
+
   if (user.role === 'procurement') {
     // Procurement can manage committees they're assigned to
     // Full check requires committee context (not just BOQ context)
     return action === 'read' || action === 'update'
   }
-  
+
   // Others can only read
   return action === 'read'
 }

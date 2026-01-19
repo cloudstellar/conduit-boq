@@ -18,8 +18,11 @@ interface UserProfile {
   position: string | null
   role: UserRole
   status: 'active' | 'inactive' | 'suspended' | 'pending'
-  department: { name: string }[] | null
-  sector: { name: string }[] | null
+  department: { id: string; name: string }[] | null
+  sector: { id: string; name: string }[] | null
+  requested_department: { id: string; name: string }[] | null
+  requested_sector: { id: string; name: string }[] | null
+  onboarding_completed: boolean
   created_at: string
 }
 
@@ -32,6 +35,7 @@ function AdminContent() {
   const [editingUser, setEditingUser] = useState<string | null>(null)
   const [savingUser, setSavingUser] = useState<string | null>(null)
   const [deletingUser, setDeletingUser] = useState<string | null>(null)
+  const [approvingUser, setApprovingUser] = useState<string | null>(null)
   const [restrictEmailDomain, setRestrictEmailDomain] = useState(false)
   const [savingSettings, setSavingSettings] = useState(false)
 
@@ -54,9 +58,11 @@ function AdminContent() {
       try {
         const [usersRes, settingsRes] = await Promise.all([
           supabase.from('user_profiles').select(`
-            id, email, first_name, last_name, title, position, role, status, created_at,
-            department:departments(name),
-            sector:sectors(name)
+            id, email, first_name, last_name, title, position, role, status, created_at, onboarding_completed,
+            department:departments(id, name),
+            sector:sectors(id, name),
+            requested_department:departments!requested_department_id(id, name),
+            requested_sector:sectors!requested_sector_id(id, name)
           `).order('created_at', { ascending: false }),
           supabase.from('app_settings').select('key, value').eq('key', 'restrict_email_domain').single()
         ])
@@ -88,9 +94,11 @@ function AdminContent() {
     const { data, error } = await supabase
       .from('user_profiles')
       .select(`
-        id, email, first_name, last_name, title, position, role, status, created_at,
-        department:departments(name),
-        sector:sectors(name)
+        id, email, first_name, last_name, title, position, role, status, created_at, onboarding_completed,
+        department:departments(id, name),
+        sector:sectors(id, name),
+        requested_department:departments!requested_department_id(id, name),
+        requested_sector:sectors!requested_sector_id(id, name)
       `)
       .order('created_at', { ascending: false })
 
@@ -151,6 +159,56 @@ function AdminContent() {
       setUsers(users.map(u => u.id === userId ? { ...u, status: newStatus } : u))
     }
     setSavingUser(null)
+  }
+
+  // v1.2.0: Approve pending user via RPC
+  const handleApproveUser = async (userId: string) => {
+    const targetUser = users.find(u => u.id === userId)
+    if (!targetUser?.requested_department?.[0] || !targetUser?.requested_sector?.[0]) {
+      alert('ผู้ใช้ยังไม่ได้เลือกฝ่าย/ส่วน กรุณาให้ผู้ใช้ลงทะเบียนสังกัดก่อน')
+      return
+    }
+
+    if (!confirm(`ยืนยันอนุมัติ ${targetUser.email}?\n\nฝ่าย: ${targetUser.requested_department[0].name}\nส่วน: ${targetUser.requested_sector[0].name}`)) {
+      return
+    }
+
+    setApprovingUser(userId)
+    const { error } = await supabase.rpc('admin_approve_user', { p_target_id: userId })
+
+    if (error) {
+      alert('เกิดข้อผิดพลาด: ' + error.message)
+    } else {
+      // Update local state
+      setUsers(users.map(u => u.id === userId ? {
+        ...u,
+        status: 'active' as const,
+        department: targetUser.requested_department,
+        sector: targetUser.requested_sector,
+        onboarding_completed: true
+      } : u))
+    }
+    setApprovingUser(null)
+  }
+
+  // v1.2.0: Reject pending user via RPC  
+  const handleRejectUser = async (userId: string) => {
+    const note = prompt('หมายเหตุ (ไม่บังคับ):')
+    if (note === null) return // User cancelled
+
+    setApprovingUser(userId)
+    const { error } = await supabase.rpc('admin_reject_user', {
+      p_target_id: userId,
+      p_note: note || null
+    })
+
+    if (error) {
+      alert('เกิดข้อผิดพลาด: ' + error.message)
+    } else {
+      alert('ปฏิเสธเรียบร้อย ผู้ใช้สามารถแก้ไขสังกัดและส่งใหม่ได้')
+      await refreshUsers()
+    }
+    setApprovingUser(null)
   }
 
   const handleDeleteUser = async (userId: string, email: string | null) => {
@@ -312,8 +370,24 @@ function AdminContent() {
                       </div>
                     </td>
                     <td className="px-6 py-4 text-sm text-gray-500">
-                      <div>{u.department?.[0]?.name || '-'}</div>
-                      <div className="text-xs">{u.sector?.[0]?.name || ''}</div>
+                      {/* v1.2.0: Show actual or requested org */}
+                      {u.department?.[0]?.name ? (
+                        <>
+                          <div>{u.department[0].name}</div>
+                          <div className="text-xs">{u.sector?.[0]?.name || ''}</div>
+                        </>
+                      ) : u.requested_department?.[0]?.name ? (
+                        <>
+                          <div className="text-amber-600">
+                            (ขอ) {u.requested_department[0].name}
+                          </div>
+                          <div className="text-xs text-amber-500">
+                            {u.requested_sector?.[0]?.name || 'ยังไม่เลือกส่วน'}
+                          </div>
+                        </>
+                      ) : (
+                        <span className="text-gray-400">ยังไม่ได้ลงทะเบียน</span>
+                      )}
                     </td>
                     <td className="px-6 py-4">
                       {editingUser === u.id ? (
@@ -353,16 +427,39 @@ function AdminContent() {
                       </select>
                     </td>
                     <td className="px-6 py-4">
-                      {u.id !== user?.id && (
-                        <button
-                          onClick={() => handleDeleteUser(u.id, u.email)}
-                          disabled={deletingUser === u.id}
-                          className="text-sm text-red-600 hover:text-red-800 hover:underline
-                                   disabled:opacity-50 disabled:cursor-not-allowed"
-                        >
-                          {deletingUser === u.id ? 'กำลังลบ...' : 'ลบ'}
-                        </button>
-                      )}
+                      <div className="flex items-center gap-2">
+                        {/* v1.2.0: Show approve/reject for pending with requested org */}
+                        {u.status === 'pending' && u.onboarding_completed && u.id !== user?.id ? (
+                          <>
+                            <button
+                              onClick={() => handleApproveUser(u.id)}
+                              disabled={approvingUser === u.id}
+                              className="px-2 py-1 text-xs bg-green-100 text-green-700 rounded hover:bg-green-200
+                                       disabled:opacity-50 disabled:cursor-not-allowed"
+                            >
+                              {approvingUser === u.id ? '...' : 'อนุมัติ'}
+                            </button>
+                            <button
+                              onClick={() => handleRejectUser(u.id)}
+                              disabled={approvingUser === u.id}
+                              className="px-2 py-1 text-xs bg-red-100 text-red-700 rounded hover:bg-red-200
+                                       disabled:opacity-50 disabled:cursor-not-allowed"
+                            >
+                              ปฏิเสธ
+                            </button>
+                          </>
+                        ) : null}
+                        {u.id !== user?.id && (
+                          <button
+                            onClick={() => handleDeleteUser(u.id, u.email)}
+                            disabled={deletingUser === u.id}
+                            className="text-sm text-red-600 hover:text-red-800 hover:underline
+                                     disabled:opacity-50 disabled:cursor-not-allowed"
+                          >
+                            {deletingUser === u.id ? 'กำลังลบ...' : 'ลบ'}
+                          </button>
+                        )}
+                      </div>
                     </td>
                   </tr>
                 ))}
