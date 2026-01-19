@@ -1,7 +1,10 @@
 'use client'
 
+// Force dynamic rendering to prevent prerender error on Vercel
+export const dynamic = 'force-dynamic'
+
 import { useState, useEffect, useMemo } from 'react'
-import dynamic from 'next/dynamic'
+import nextDynamic from 'next/dynamic'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
@@ -473,7 +476,7 @@ function AdminContent() {
 }
 
 // Dynamic export to prevent SSR/prerendering issues with useAuth
-const DynamicAdminContent = dynamic(() => Promise.resolve(AdminContent), {
+const DynamicAdminContent = nextDynamic(() => Promise.resolve(AdminContent), {
   ssr: false,
   loading: () => (
     <div className="min-h-screen bg-gray-50 flex items-center justify-center">
