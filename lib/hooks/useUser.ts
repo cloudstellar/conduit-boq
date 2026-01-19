@@ -15,9 +15,9 @@ export function useUser() {
         .from('user_profiles')
         .select(`
           *,
-          organization:organizations(id, name, code),
-          department:departments(id, code, name, full_name),
-          sector:sectors(id, code, name, full_name)
+          organization:organizations!user_profiles_org_id_fkey(id, name, code),
+          department:departments!user_profiles_department_id_fkey(id, code, name, full_name),
+          sector:sectors!user_profiles_sector_id_fkey(id, code, name, full_name)
         `)
         .eq('id', userId)
         .single()

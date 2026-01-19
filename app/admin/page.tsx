@@ -18,10 +18,10 @@ interface UserProfile {
   position: string | null
   role: UserRole
   status: 'active' | 'inactive' | 'suspended' | 'pending'
-  department: { id: string; name: string }[] | null
-  sector: { id: string; name: string }[] | null
-  requested_department: { id: string; name: string }[] | null
-  requested_sector: { id: string; name: string }[] | null
+  department: { id: string; name: string } | null
+  sector: { id: string; name: string } | null
+  requested_department: { id: string; name: string } | null
+  requested_sector: { id: string; name: string } | null
   onboarding_completed: boolean
   created_at: string
 }
@@ -59,10 +59,10 @@ function AdminContent() {
         const [usersRes, settingsRes] = await Promise.all([
           supabase.from('user_profiles').select(`
             id, email, first_name, last_name, title, position, role, status, created_at, onboarding_completed,
-            department:departments(id, name),
-            sector:sectors(id, name),
-            requested_department:departments!requested_department_id(id, name),
-            requested_sector:sectors!requested_sector_id(id, name)
+            department:departments!user_profiles_department_id_fkey(id, name),
+            sector:sectors!user_profiles_sector_id_fkey(id, name),
+            requested_department:departments!user_profiles_requested_department_id_fkey(id, name),
+            requested_sector:sectors!user_profiles_requested_sector_id_fkey(id, name)
           `).order('created_at', { ascending: false }),
           supabase.from('app_settings').select('key, value').eq('key', 'restrict_email_domain').single()
         ])
@@ -72,7 +72,7 @@ function AdminContent() {
         if (usersRes.error) {
           setError(usersRes.error.message)
         } else {
-          setUsers(usersRes.data || [])
+          setUsers((usersRes.data || []) as unknown as UserProfile[])
         }
         if (settingsRes.data) {
           setRestrictEmailDomain(settingsRes.data.value === true || settingsRes.data.value === 'true')
@@ -95,17 +95,17 @@ function AdminContent() {
       .from('user_profiles')
       .select(`
         id, email, first_name, last_name, title, position, role, status, created_at, onboarding_completed,
-        department:departments(id, name),
-        sector:sectors(id, name),
-        requested_department:departments!requested_department_id(id, name),
-        requested_sector:sectors!requested_sector_id(id, name)
+        department:departments!user_profiles_department_id_fkey(id, name),
+        sector:sectors!user_profiles_sector_id_fkey(id, name),
+        requested_department:departments!user_profiles_requested_department_id_fkey(id, name),
+        requested_sector:sectors!user_profiles_requested_sector_id_fkey(id, name)
       `)
       .order('created_at', { ascending: false })
 
     if (error) {
       setError(error.message)
     } else {
-      setUsers(data || [])
+      setUsers((data || []) as unknown as UserProfile[])
     }
     setIsLoading(false)
   }
@@ -164,12 +164,12 @@ function AdminContent() {
   // v1.2.0: Approve pending user via RPC
   const handleApproveUser = async (userId: string) => {
     const targetUser = users.find(u => u.id === userId)
-    if (!targetUser?.requested_department?.[0] || !targetUser?.requested_sector?.[0]) {
+    if (!targetUser?.requested_department || !targetUser?.requested_sector) {
       alert('ผู้ใช้ยังไม่ได้เลือกฝ่าย/ส่วน กรุณาให้ผู้ใช้ลงทะเบียนสังกัดก่อน')
       return
     }
 
-    if (!confirm(`ยืนยันอนุมัติ ${targetUser.email}?\n\nฝ่าย: ${targetUser.requested_department[0].name}\nส่วน: ${targetUser.requested_sector[0].name}`)) {
+    if (!confirm(`ยืนยันอนุมัติ ${targetUser.email}?\n\nฝ่าย: ${targetUser.requested_department.name}\nส่วน: ${targetUser.requested_sector.name}`)) {
       return
     }
 
@@ -371,18 +371,18 @@ function AdminContent() {
                     </td>
                     <td className="px-6 py-4 text-sm text-gray-500">
                       {/* v1.2.0: Show actual or requested org */}
-                      {u.department?.[0]?.name ? (
+                      {u.department?.name ? (
                         <>
-                          <div>{u.department[0].name}</div>
-                          <div className="text-xs">{u.sector?.[0]?.name || ''}</div>
+                          <div>{u.department.name}</div>
+                          <div className="text-xs">{u.sector?.name || ''}</div>
                         </>
-                      ) : u.requested_department?.[0]?.name ? (
+                      ) : u.requested_department?.name ? (
                         <>
                           <div className="text-amber-600">
-                            (ขอ) {u.requested_department[0].name}
+                            (ขอ) {u.requested_department.name}
                           </div>
                           <div className="text-xs text-amber-500">
-                            {u.requested_sector?.[0]?.name || 'ยังไม่เลือกส่วน'}
+                            {u.requested_sector?.name || 'ยังไม่เลือกส่วน'}
                           </div>
                         </>
                       ) : (
