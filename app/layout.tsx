@@ -16,6 +16,9 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "Conduit BOQ",
   description: "ระบบประมาณราคางานก่อสร้างท่อร้อยสายสื่อสารใต้ดิน",
+  icons: {
+    icon: "/favicon.svg",
+  },
 };
 
 export default function RootLayout({
