@@ -1,3 +1,8 @@
+> [!WARNING]
+> **DEPRECATED:** This file has been migrated to the canonical documentation system.
+> See [docs/canonical/ARCHITECTURE.md](../canonical/ARCHITECTURE.md) for the authoritative version.
+> This file is preserved for historical reference.
+
 # Technical Reference
 ## Conduit BOQ - Developer Guide
 

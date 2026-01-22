@@ -1,7 +1,8 @@
 # Domain Model
 ## Conduit BOQ System
 
-**Last Updated:** 2026-01-19
+**Last Updated:** 2026-01-22  
+**Status:** Canonical
 
 ---
 
@@ -67,7 +68,7 @@
 | full_name | Text | No | Full official name |
 | is_active | Boolean | Yes | Active status |
 
-**Constraint:** Unique (org_id, code)
+**Constraint:** `UNIQUE (org_id, code)`
 
 ---
 
@@ -84,7 +85,7 @@
 | full_name | Text | No | Full official name |
 | is_active | Boolean | Yes | Active status |
 
-**Constraint:** Unique (department_id, code)
+**Constraint:** `UNIQUE (department_id, code)`
 
 ---
 
@@ -108,8 +109,8 @@
 | email | Text | No | Email address |
 | phone | Text | No | Phone number |
 
-**Role Values:** admin, dept_manager, sector_manager, staff, procurement  
-**Status Values:** active, inactive, suspended, pending
+**Role Values:** `admin`, `dept_manager`, `sector_manager`, `staff`, `procurement`  
+**Status Values:** `active`, `inactive`, `suspended`, `pending`
 
 ---
 
@@ -134,7 +135,7 @@
 | department_id | UUID | No | Inherited from creator |
 | sector_id | UUID | No | Inherited from creator |
 
-**Status Values:** draft, submitted, approved
+**Status Values:** `draft`, `submitted`, `approved`
 
 **Invariant:** `total_with_vat = total_with_factor_f × 1.07`
 
@@ -194,7 +195,7 @@
 | category | Text | No | Category grouping |
 | is_active | Boolean | Yes | Active status |
 
-**Invariant:** `unit_cost = material_cost + labor_cost`
+**Invariant:** `unit_cost = material_cost + labor_cost`  
 **Data:** 518 items across 52 categories
 
 ---
@@ -209,7 +210,7 @@
 | factor | Decimal | Yes | Base factor |
 | factor_f | Decimal | Yes | Factor F value |
 
-**Note:** Factor F is interpolated between rows based on cost_million
+**Note:** Factor F is interpolated between rows based on `cost_million`
 
 ---
 
@@ -217,36 +218,36 @@
 
 ### 3.1 Ownership Rules
 
-1. **BOQ Ownership**: When created, BOQ inherits `org_id`, `department_id`, `sector_id` from creator's profile
-2. **Legacy Data**: BOQs with `created_by = NULL` are accessible by all authenticated users
-3. **Immutable Ownership**: Once set, ownership fields should not change
+1. **BOQ Ownership:** When created, BOQ inherits `org_id`, `department_id`, `sector_id` from creator's profile
+2. **Legacy Data:** BOQs with `created_by = NULL` are **admin-only** (v1.2.0)
+3. **Immutable Ownership:** Once set, ownership fields should not change
 
 ### 3.2 Access Rules
 
-1. **Hierarchical Access**: Higher roles can see lower levels
-   - Admin → All
-   - Dept Manager → Department + below
-   - Sector Manager → Sector + below
-   - Staff → Own + same sector
-   - Procurement → Approved only (read)
-
-2. **Assigned Access**: BOQ can be assigned to another user (`assigned_to`)
+| Level | Access |
+|-------|--------|
+| Admin | All BOQs |
+| Dept Manager | Department + all sectors below |
+| Sector Manager | Sector + department read |
+| Staff | Own + same sector |
+| Procurement | Approved only (read) |
 
 ### 3.3 Workflow Rules
 
-1. **Draft**: Only creator can edit
-2. **Submitted**: Locked for review
-3. **Approved**: Read-only for all
+1. **Draft:** Only creator can edit
+2. **Submitted:** Locked for review
+3. **Approved:** Read-only for all
 
 ### 3.4 Separation of Duties
 
-**CRITICAL:** `created_by` ≠ `approver` for same BOQ
+> [!IMPORTANT]
+> **`created_by` ≠ `approver` for same BOQ**
 
 ---
 
 ## 4. What Must NOT Be Misinterpreted
 
-| Concept | Correct | Wrong |
+| Concept | ✅ Correct | ❌ Wrong |
 |---------|---------|-------|
 | Factor F | Multiplier applied to total | NOT an item-level markup |
 | Route | Physical path for conduit | NOT a workflow route |
@@ -270,3 +271,11 @@ Organization 1──N Department 1──N Sector 1──N UserProfile
                                                           PriceList
 ```
 
+---
+
+## References
+
+- Domain Rules: [DOMAIN_RULES.md](./DOMAIN_RULES.md)
+- Access Model: [ACCESS_MODEL.md](./ACCESS_MODEL.md)
+- Database Schema: [04_data/DATABASE_SCHEMA.md](../04_data/DATABASE_SCHEMA.md)
+- Original: [docs/legacy/ai/DOMAIN_MODEL.md](../legacy/ai/DOMAIN_MODEL.md)

@@ -1,3 +1,8 @@
+> [!WARNING]
+> **DEPRECATED:** This file has been migrated to the canonical documentation system.
+> See [docs/canonical/DATA_INTEGRITY.md](../canonical/DATA_INTEGRITY.md) for the authoritative version.
+> This file is preserved for historical reference.
+
 # Database Schema
 ## Conduit BOQ System
 

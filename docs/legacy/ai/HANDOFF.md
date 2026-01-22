@@ -1,3 +1,8 @@
+> [!WARNING]
+> **DEPRECATED:** This file has been migrated to the canonical documentation system.
+> See [docs/canonical/AI_HANDOFF.md](../../canonical/AI_HANDOFF.md) for the authoritative version.
+> This file is preserved for historical reference.
+
 # Handoff Document
 
 **Last Updated:** 2026-01-20  

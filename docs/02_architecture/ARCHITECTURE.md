@@ -1,7 +1,8 @@
-# System Architecture
+# Architecture
 ## Conduit BOQ System
 
-**Last Updated:** 2026-01-19
+**Last Updated:** 2026-01-22  
+**Status:** Canonical
 
 ---
 
@@ -9,14 +10,16 @@
 
 | Layer | Technology | Version |
 |-------|------------|---------|
-| Frontend Framework | Next.js | 15.x |
-| UI Library | React | 19.x |
+| Framework | Next.js | 16.1.1 |
+| UI Library | React | 19.2.3 |
 | Language | TypeScript | 5.x |
 | Styling | Tailwind CSS | 4.x |
 | Backend | Supabase | - |
 | Database | PostgreSQL | 15.x |
 | Authentication | Supabase Auth | - |
 | Hosting | Vercel | - |
+
+> **Authority:** See [06_engineering/TECH_STACK.md](../06_engineering/TECH_STACK.md) for definitive versions.
 
 ---
 
@@ -114,7 +117,7 @@
 - UI display logic
 - Separation of Duties enforcement
 
-**Note:** RLS policies are the actual security layer
+> **Important:** RLS policies are the actual security layer. The `can()` function is for UI only.
 
 ### 3.5 Database Layer (Supabase PostgreSQL)
 
@@ -172,23 +175,33 @@
 - Google OAuth via Supabase Auth
 - JWT tokens stored in httpOnly cookies
 - Session refresh via middleware
+- Optional: NT domain restriction (@ntplc.co.th)
 
 ### 5.2 Authorization
 - **Client:** `can()` function for UI
 - **Server:** RLS policies for data access
+- See [ADR-001](./ADR/ADR-001-supabase-rls-authorization.md)
 
 ### 5.3 Data Isolation
 - Users see only permitted data
 - Organization → Department → Sector hierarchy
-- Legacy data (no owner) visible to all
+- Legacy data (no owner) = Admin-only
 
 ---
 
-## 6. Environment Variables
+## 6. Key Architecture Decisions
 
-```
-NEXT_PUBLIC_SUPABASE_URL     # Supabase project URL
-NEXT_PUBLIC_SUPABASE_ANON_KEY # Supabase anonymous key
-SUPABASE_SERVICE_ROLE_KEY    # Admin operations (optional)
-```
+### ADR-001: Supabase RLS as Primary Authorization Layer
 
+- **Status:** Accepted
+- **Decision:** Use RLS for all authorization
+- **Rationale:** Security by default, reduced API surface, single source of truth
+- **Full document:** [ADR/ADR-001-supabase-rls-authorization.md](./ADR/ADR-001-supabase-rls-authorization.md)
+
+---
+
+## References
+
+- Tech versions: [06_engineering/TECH_STACK.md](../06_engineering/TECH_STACK.md)
+- Security: [04_data/SECURITY_MODEL.md](../04_data/SECURITY_MODEL.md)
+- Original: [docs/legacy/ai/SYSTEM_ARCHITECTURE.md](../legacy/ai/SYSTEM_ARCHITECTURE.md)

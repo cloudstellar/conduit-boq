@@ -1,3 +1,8 @@
+> [!WARNING]
+> **DEPRECATED:** This file has been migrated to the canonical documentation system.
+> See [docs/canonical/DOMAIN_RULES.md](../../canonical/DOMAIN_RULES.md) for the authoritative version.
+> This file is preserved for historical reference.
+
 # Project Context
 ## Conduit BOQ System
 
@@ -100,7 +105,8 @@ Organization (องค์กร)
 | `draft` | ร่าง | Being edited, not submitted |
 | `submitted` | ส่งแล้ว | Submitted for review |
 | `approved` | อนุมัติแล้ว | Approved by manager |
-| `rejected` | ไม่อนุมัติ | Rejected with comments (Phase 2) |
+
+> **Note:** `rejected` status is planned for Phase 3 (Approval Workflow).
 
 ---
 
