@@ -146,9 +146,9 @@ function canBOQ(
   switch (user.role) {
     case 'staff':
       if (action === 'create') return true
-      if (action === 'read') return isOwner || isSameSector || isLegacy
-      if (action === 'update') return isOwner || isLegacy
-      if (action === 'delete') return (isOwner && ctx?.status === 'draft') || isLegacy
+      if (action === 'read') return isOwner || isSameSector
+      if (action === 'update') return isOwner
+      if (action === 'delete') return isOwner && ctx?.status === 'draft'
       return false
 
     case 'sector_manager':

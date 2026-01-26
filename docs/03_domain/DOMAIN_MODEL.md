@@ -137,6 +137,9 @@
 
 **Status Values:** `draft`, `submitted`, `approved`
 
+> [!NOTE]
+> Reserved for Phase 3: `pending_review`, `pending_approval` (code exists but not active)
+
 **Invariant:** `total_with_vat = total_with_factor_f × 1.07`
 
 ---

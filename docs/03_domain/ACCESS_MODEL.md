@@ -74,7 +74,7 @@ No sector/dept access until admin approves.
 BOQ with `created_by IS NULL` is only visible to admins.
 
 > [!NOTE]
-> `lib/permissions.ts` currently shows legacy as readable by staff (UI hint), but RLS blocks this. Code fix deferred.
+> Fixed in v1.2.0: `lib/permissions.ts` now correctly blocks legacy for staff (matching RLS).
 
 ### 5.3 Org Lock
 After onboarding, user cannot change `department_id` or `sector_id`.

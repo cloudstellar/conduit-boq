@@ -136,7 +136,9 @@ BOQ Header - ใบประมาณราคา
 | `factor_f` | DECIMAL(10,4) | YES | ค่า Factor F |
 | `total_with_factor_f` | DECIMAL(15,2) | NO | รวมหลังคูณ Factor F |
 | `total_with_vat` | DECIMAL(15,2) | NO | รวมหลัง VAT 7% |
-| `status` | TEXT | NO | สถานะ (draft/submitted/approved) |
+| `status` | TEXT | NO | สถานะ (draft/submitted/approved) ¹ |
+
+¹ Reserved for Phase 3: `pending_review`, `pending_approval`
 | `created_by` | UUID | YES | FK → auth.users.id |
 | `assigned_to` | UUID | YES | FK → auth.users.id |
 | `org_id` | UUID | YES | FK → organizations.id |
