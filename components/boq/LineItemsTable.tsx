@@ -68,13 +68,9 @@ export default function LineItemsTable({
           <TableHeader>
             <TableRow className="bg-muted/50">
               <TableHead className="text-center w-12">ลำดับ</TableHead>
-              <TableHead className="min-w-[300px]">รายการ</TableHead>
-              <TableHead className="text-center w-24">ปริมาณ</TableHead>
+              <TableHead>รายการ</TableHead>
+              <TableHead className="text-center">ปริมาณ</TableHead>
               <TableHead className="text-center w-16">หน่วย</TableHead>
-              <TableHead className="text-right w-28">ค่าวัสดุ/หน่วย</TableHead>
-              <TableHead className="text-right w-28">ค่าแรง/หน่วย</TableHead>
-              <TableHead className="text-right w-32">รวมค่าวัสดุ</TableHead>
-              <TableHead className="text-right w-32">รวมค่าแรง</TableHead>
               <TableHead className="text-right w-32">รวมทั้งสิ้น</TableHead>
               <TableHead className="text-center w-16">ลบ</TableHead>
             </TableRow>
@@ -82,7 +78,7 @@ export default function LineItemsTable({
           <TableBody>
             {items.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={10} className="text-center py-8 text-muted-foreground">
+                <TableCell colSpan={6} className="text-center py-8 text-muted-foreground">
                   ยังไม่มีรายการ - ใช้ช่องค้นหาด้านบนเพื่อเพิ่มรายการ
                 </TableCell>
               </TableRow>
@@ -104,19 +100,7 @@ export default function LineItemsTable({
                     />
                   </TableCell>
                   <TableCell className="text-center text-sm">{item.unit}</TableCell>
-                  <TableCell className="text-right text-sm">
-                    {formatNumber(item.material_cost_per_unit)}
-                  </TableCell>
-                  <TableCell className="text-right text-sm">
-                    {formatNumber(item.labor_cost_per_unit)}
-                  </TableCell>
-                  <TableCell className="text-right text-sm font-medium">
-                    {formatNumber(item.total_material_cost)}
-                  </TableCell>
-                  <TableCell className="text-right text-sm font-medium">
-                    {formatNumber(item.total_labor_cost)}
-                  </TableCell>
-                  <TableCell className="text-right text-sm font-bold text-blue-600">
+                  <TableCell className="text-right text-sm font-bold text-primary">
                     {formatNumber(item.total_cost)}
                   </TableCell>
                   <TableCell className="text-center">

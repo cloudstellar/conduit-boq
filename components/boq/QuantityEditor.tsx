@@ -25,6 +25,10 @@ function clampMin(n: number, min: number) {
     return n < min ? min : n;
 }
 
+function formatFixed(n: number): string {
+    return n.toFixed(2);
+}
+
 export function QuantityEditor({
     value,
     onChange,
@@ -33,33 +37,45 @@ export function QuantityEditor({
     className,
 }: QuantityEditorProps) {
     const inputRef = React.useRef<HTMLInputElement | null>(null);
+    const [isFocused, setIsFocused] = React.useState(false);
 
     const [draft, setDraft] = React.useState<string>(
-        Number.isFinite(value) ? String(value) : "0"
+        Number.isFinite(value) ? formatFixed(value) : "0.00"
     );
 
     // Sync draft when external value changes (stepper/reset/load)
     React.useEffect(() => {
-        const next = Number.isFinite(value) ? String(value) : "0";
-        // avoid cursor jump while typing
-        if (next !== draft) setDraft(next);
+        if (!isFocused) {
+            const next = Number.isFinite(value) ? formatFixed(value) : "0.00";
+            if (next !== draft) setDraft(next);
+        }
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [value]);
+    }, [value, isFocused]);
 
-    const commit = React.useCallback(() => {
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const sanitized = sanitizeDecimal(e.target.value);
+        setDraft(sanitized);
+        // Call onChange immediately for realtime price calculation
+        const num = Number.parseFloat(sanitized);
+        if (Number.isFinite(num)) {
+            onChange(clampMin(num, min));
+        }
+    };
+
+    const handleBlur = () => {
+        setIsFocused(false);
         const d = draft.trim();
         if (d === "" || d === ".") {
             const v = clampMin(0, min);
             onChange(v);
-            setDraft(String(v));
+            setDraft(formatFixed(v));
             return;
         }
-
         const num = Number.parseFloat(d);
         const safe = Number.isFinite(num) ? clampMin(num, min) : clampMin(0, min);
         onChange(safe);
-        setDraft(String(safe));
-    }, [draft, min, onChange]);
+        setDraft(formatFixed(safe));
+    };
 
     return (
         <div className={`flex items-center gap-1 ${className ?? ""}`}>
@@ -79,15 +95,18 @@ export function QuantityEditor({
                 inputMode="decimal"
                 enterKeyHint="done"
                 value={draft}
-                onChange={(e) => setDraft(sanitizeDecimal(e.target.value))}
-                onBlur={commit}
+                onChange={handleChange}
+                onBlur={handleBlur}
+                onFocus={(e) => {
+                    setIsFocused(true);
+                    e.currentTarget.select();
+                }}
                 onKeyDown={(e) => {
                     if (e.key === "Enter") {
-                        commit();
+                        handleBlur();
                         inputRef.current?.blur();
                     }
                 }}
-                onFocus={(e) => e.currentTarget.select()}
                 className="h-10 w-24 sm:w-28 px-2 text-base tabular-nums text-right"
             />
 

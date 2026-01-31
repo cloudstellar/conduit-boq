@@ -250,8 +250,8 @@ export default function ItemSearch({
       )}
 
       {isOpen && results.length > 0 && (
-        <Command className="absolute z-50 w-full mt-1 border rounded-md shadow-lg max-h-[min(50vh,420px)] overflow-auto">
-          <CommandList>
+        <Command className="absolute z-50 w-full mt-1 border rounded-md shadow-lg bg-popover">
+          <CommandList className="max-h-[min(50vh,420px)]">
             <CommandEmpty>ไม่พบรายการ</CommandEmpty>
             <CommandGroup>
               {results.map((item, index) => (
