@@ -62,21 +62,21 @@ export default function LineItemsTable({
         />
       </div>
 
-      {/* Items Table - table-fixed allows text wrap in รายการ column */}
+      {/* Items Table */}
       <div className="border rounded-lg overflow-hidden">
-        <Table className="table-fixed w-full">
+        <Table>
           <TableHeader>
             <TableRow className="bg-muted/50">
-              <TableHead className="text-center w-8">ลำดับ</TableHead>
-              <TableHead className="w-auto">รายการ</TableHead>
-              <TableHead className="text-center w-28">ปริมาณ</TableHead>
-              <TableHead className="text-center w-10">หน่วย</TableHead>
-              <TableHead className="text-right w-24 hidden xl:table-cell">ค่าวัสดุ/หน่วย</TableHead>
-              <TableHead className="text-right w-20 hidden xl:table-cell">ค่าแรง/หน่วย</TableHead>
-              <TableHead className="text-right w-24 hidden xl:table-cell">รวมค่าวัสดุ</TableHead>
-              <TableHead className="text-right w-20 hidden xl:table-cell">รวมค่าแรง</TableHead>
-              <TableHead className="text-right w-24">รวม</TableHead>
-              <TableHead className="text-center w-8">ลบ</TableHead>
+              <TableHead className="text-center w-10">ลำดับ</TableHead>
+              <TableHead>รายการ</TableHead>
+              <TableHead className="text-center">ปริมาณ</TableHead>
+              <TableHead className="text-center w-12">หน่วย</TableHead>
+              <TableHead className="text-right hidden xl:table-cell">ค่าวัสดุ/หน่วย</TableHead>
+              <TableHead className="text-right hidden xl:table-cell">ค่าแรง/หน่วย</TableHead>
+              <TableHead className="text-right hidden xl:table-cell">รวมค่าวัสดุ</TableHead>
+              <TableHead className="text-right hidden xl:table-cell">รวมค่าแรง</TableHead>
+              <TableHead className="text-right">รวมทั้งสิ้น</TableHead>
+              <TableHead className="text-center w-10">ลบ</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -89,8 +89,8 @@ export default function LineItemsTable({
             ) : (
               items.map((item, index) => (
                 <TableRow key={item.id}>
-                  <TableCell className="text-center text-sm">{index + 1}</TableCell>
-                  <TableCell className="whitespace-normal">
+                  <TableCell className="text-center">{index + 1}</TableCell>
+                  <TableCell>
                     <div className="text-sm break-words">{item.item_name}</div>
                     {item.remarks && (
                       <div className="text-xs text-muted-foreground break-words">{item.remarks}</div>
