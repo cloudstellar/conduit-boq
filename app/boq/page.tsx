@@ -8,6 +8,7 @@ import { useAuth } from '@/lib/context/AuthContext';
 import { can } from '@/lib/permissions';
 import BOQPageHeader from '@/components/boq/BOQPageHeader';
 import BOQAccessBanner from '@/components/boq/BOQAccessBanner';
+import { RouteChips } from '@/components/boq/RouteChips';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent } from '@/components/ui/card';
@@ -352,16 +353,14 @@ export default function BOQListPage() {
               ) : (
                 filteredList.map((boq) => (
                   <TableRow key={boq.id}>
-                    {/* 2-layer: Project name + Route */}
+                    {/* 2-layer: Project name + Route chips */}
                     <TableCell className="w-[420px] align-top">
-                      <div className="whitespace-normal break-words line-clamp-2 font-medium leading-snug" title={boq.project_name}>
+                      <div className="whitespace-normal break-words line-clamp-3 font-medium leading-snug" title={boq.project_name}>
                         {boq.project_name}
                       </div>
-                      {boq.route && (
-                        <div className="mt-1 whitespace-normal break-words line-clamp-1 text-xs text-muted-foreground" title={boq.route}>
-                          {boq.route}
-                        </div>
-                      )}
+                      <div className="mt-1.5">
+                        <RouteChips route={boq.route} maxVisible={2} />
+                      </div>
                     </TableCell>
                     <TableCell className="text-muted-foreground align-top">
                       <div className="line-clamp-1" title={boq.estimator_name}>
