@@ -22,38 +22,30 @@
 
 ## 🔄 shadcn/ui Migration (NEXT)
 
-### Phase 1: Setup
-- [ ] Path verify: `ls app/globals.css tailwind.config.ts`
-- [ ] `npx shadcn@latest init` (default, slate, CSS vars)
-- [ ] Install `clsx`, `tailwind-merge`
-- [ ] Create `lib/utils.ts` with `cn()`
-- [ ] Install components (button, card, input, table, etc.)
-- [ ] **🛑 `npm run build` — ต้องผ่านก่อนไปต่อ!**
-- [ ] Commit + Tag + Push: `v1.2.1-shadcn-phase1`
+### Phase 1: Setup (M1-M2)
+- [ ] **M1:** Path verify + `npx shadcn@latest init`
+- [ ] **M1:** Install dependencies (clsx, tailwind-merge, cva, lucide, animate)
+- [ ] **M1:** Create `lib/utils.ts` + Install components
+- [ ] **M2:** 🛑 `npm run build` — ต้องผ่านก่อนไปต่อ!
+- [ ] **M2:** Commit + Tag + Push: `v1.2.1-shadcn-phase1`
 
-### Phase 2: Component Migration
-- [ ] **🔍 PRINT SCAN:** `grep -nE "^import" app/boq/\[id\]/print/page.tsx`
-- [ ] Low-risk (1-4): TotalsSummary, BOQAccessBanner, ProjectInfoForm, UserBadge
-- [ ] Medium-risk (5-10): UserMenu, BOQPageHeader, RouteManager, FactorFSummary, LineItemsTable, ItemSearch
-- [ ] **Build gate:** `npm run build` หลัง Batch 2
-- [ ] High-risk (11): MultiRouteEditor
-- [ ] Tag + Push: `v1.2.1-shadcn-phase2`
+### Phase 2: Component Migration (M3-M6)
+- [ ] **M3:** 🔍 PRINT SCAN → บันทึกผลที่ `docs/print-deps.txt`
+- [ ] **M4:** Low-risk (1-4): TotalsSummary, BOQAccessBanner, ProjectInfoForm, UserBadge
+- [ ] **M5:** Medium-risk (5-10) + `npm run build`
+- [ ] **M6:** MultiRouteEditor → Tag: `v1.2.1-shadcn-phase2`
 
-### Phase 3: Page Migration
-- [ ] Login, Profile
-- [ ] Admin, Price List
-- [ ] Home, BOQ List, Create, Edit
+### Phase 3: Page Migration (M7)
+- [ ] **M7:** Login, Profile, Admin, Price List, Home, BOQ pages
 - [ ] ❌ Skip `/boq/[id]/print`
 
 ### Phase 4: Best Practices
 - [ ] Fix barrel imports → direct
-- [ ] Add `Promise.all()` for parallel fetches
+- [ ] `Promise.all()` for parallel fetches
 
-### Phase 5: Verification
-- [ ] `npm run lint` + `npm run build`
-- [ ] Manual test: 375px, 768px, 1280px
-- [ ] Verify print page NOT affected
-- [ ] Tag + Push: `v1.2.1-shadcn-done`
+### Phase 5: Verification (M8)
+- [ ] **M8:** `npm run lint` + `npm run build` + manual test
+- [ ] **M8:** Tag + Push: `v1.2.1-shadcn-done`
 
 ---
 

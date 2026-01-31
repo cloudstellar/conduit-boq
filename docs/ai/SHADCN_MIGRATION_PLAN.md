@@ -17,6 +17,23 @@
 
 ---
 
+## 📍 Milestones (8 Checkpoints)
+
+> **All milestones are Go/No-Go decision points.**
+
+| ID | Milestone | Phase | Deliverable | Gate | Rollback | Tag |
+|----|-----------|-------|-------------|------|----------|-----|
+| M1 | shadcn Init | 1 | `components.json` + `components/ui/*` | Path ถูก | - | - |
+| M2 | Build Passes | 1 | `npm run build` ผ่าน | 🛑 GATE 1 | Phase 1 | `v1.2.1-shadcn-phase1` |
+| M3 | Print Scan Done | 2 | `docs/print-deps.txt` | Scan ก่อน migrate | - | - |
+| M4 | Low-risk Done | 2 | 4 components | print-safe | Batch 1 | - |
+| M5 | Medium-risk Done | 2 | 6 components + build | Build Gate | Batch 2 | - |
+| M6 | MultiRouteEditor | 2 | checklist ผ่าน | print-safe | 1 commit | `v1.2.1-shadcn-phase2` |
+| M7 | Pages Done | 3 | ทุก page (ยกเว้น print) | Print Gate | Page commits | - |
+| M8 | Verified | 5 | lint + build + manual | พร้อม merge | - | `v1.2.1-shadcn-done` |
+
+---
+
 ## Session Decisions
 
 | Decision | Choice | Reason |
