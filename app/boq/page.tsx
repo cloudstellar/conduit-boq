@@ -334,44 +334,48 @@ export default function BOQListPage() {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead className="min-w-[200px]">โครงการ</TableHead>
-                <TableHead>เส้นทาง</TableHead>
+                <TableHead className="w-[420px]">โครงการ / เส้นทาง</TableHead>
                 <TableHead>ผู้ประมาณราคา</TableHead>
-                <TableHead className="text-right">ยอดรวม (บาท)</TableHead>
+                <TableHead className="text-right whitespace-nowrap">ยอดรวม (บาท)</TableHead>
                 <TableHead className="text-center">สถานะ</TableHead>
-                <TableHead className="text-center">วันที่</TableHead>
-                <TableHead className="text-center">จัดการ</TableHead>
+                <TableHead className="text-center whitespace-nowrap">วันที่</TableHead>
+                <TableHead className="w-[120px] text-center">จัดการ</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {filteredList.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={7} className="text-center py-8 text-muted-foreground">
+                  <TableCell colSpan={6} className="text-center py-8 text-muted-foreground">
                     {searchTerm ? 'ไม่พบรายการที่ค้นหา' : 'ยังไม่มีใบประมาณราคา'}
                   </TableCell>
                 </TableRow>
               ) : (
                 filteredList.map((boq) => (
                   <TableRow key={boq.id}>
-                    <TableCell className="font-medium max-w-[250px]">
-                      <div className="line-clamp-2" title={boq.project_name}>
+                    {/* 2-layer: Project name + Route */}
+                    <TableCell className="w-[420px] align-top">
+                      <div className="whitespace-normal break-words line-clamp-2 font-medium leading-snug" title={boq.project_name}>
                         {boq.project_name}
                       </div>
+                      {boq.route && (
+                        <div className="mt-1 whitespace-normal break-words line-clamp-1 text-xs text-muted-foreground" title={boq.route}>
+                          {boq.route}
+                        </div>
+                      )}
                     </TableCell>
-                    <TableCell className="text-muted-foreground max-w-[150px]">
-                      <div className="line-clamp-1" title={boq.route || '-'}>
-                        {boq.route || '-'}
-                      </div>
-                    </TableCell>
-                    <TableCell className="text-muted-foreground max-w-[120px]">
+                    <TableCell className="text-muted-foreground align-top">
                       <div className="line-clamp-1" title={boq.estimator_name}>
                         {boq.estimator_name}
                       </div>
                     </TableCell>
-                    <TableCell className="text-right font-medium text-blue-600 whitespace-nowrap tabular-nums">{formatNumber(boq.total_cost)}</TableCell>
-                    <TableCell className="text-center">{getStatusBadge(boq.status)}</TableCell>
-                    <TableCell className="text-center text-muted-foreground whitespace-nowrap">{formatDate(boq.document_date)}</TableCell>
-                    <TableCell>
+                    <TableCell className="text-right font-medium text-blue-600 whitespace-nowrap tabular-nums align-top">
+                      {formatNumber(boq.total_cost)}
+                    </TableCell>
+                    <TableCell className="text-center align-top">{getStatusBadge(boq.status)}</TableCell>
+                    <TableCell className="text-center text-muted-foreground whitespace-nowrap align-top">
+                      {formatDate(boq.document_date)}
+                    </TableCell>
+                    <TableCell className="w-[120px] whitespace-nowrap align-top">
                       <div className="flex justify-center gap-1">
                         <Link href={`/boq/${boq.id}/edit`}>
                           <Button variant="ghost" size="icon" className="h-8 w-8">
