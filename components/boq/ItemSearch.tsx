@@ -13,13 +13,18 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from '@/components/ui/popover';
+import {
   Command,
   CommandEmpty,
   CommandGroup,
   CommandItem,
   CommandList,
 } from '@/components/ui/command';
-import { Loader2 } from 'lucide-react';
+import { Loader2, Search } from 'lucide-react';
 
 interface ItemSearchProps {
   onSelect: (item: PriceListItem) => void;
@@ -33,7 +38,6 @@ interface CategoryInfo {
 
 // Natural sort function for category strings like "1.1.", "2.1.", "10.1."
 const naturalSortCategory = (a: string, b: string): number => {
-  // Extract leading numbers (e.g., "1.1." from "1.1.   งานวางท่อ...")
   const getNumbers = (str: string): number[] => {
     const match = str.match(/^([\d.]+)/);
     if (!match) return [999];
@@ -64,7 +68,6 @@ export default function ItemSearch({
   const [isOpen, setIsOpen] = useState(false);
   const [selectedIndex, setSelectedIndex] = useState(-1);
   const [totalCount, setTotalCount] = useState(0);
-  const wrapperRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
   // Load categories on mount
@@ -106,12 +109,10 @@ export default function ItemSearch({
           .select('*', { count: 'exact' })
           .eq('is_active', true);
 
-        // Apply category filter
         if (selectedCategory) {
           queryBuilder = queryBuilder.eq('category', selectedCategory);
         }
 
-        // Apply text search
         if (query.length >= 2) {
           queryBuilder = queryBuilder.or(`item_name.ilike.%${query}%,item_code.ilike.%${query}%`);
         }
@@ -137,21 +138,9 @@ export default function ItemSearch({
     return () => clearTimeout(debounce);
   }, [query, selectedCategory, supabase]);
 
-  // Close dropdown when clicking outside
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (wrapperRef.current && !wrapperRef.current.contains(event.target as Node)) {
-        setIsOpen(false);
-      }
-    };
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, []);
-
   const handleSelect = (item: PriceListItem) => {
     onSelect(item);
     setQuery('');
-    // Don't clear results - let query control display
     // Keep open if category selected for multi-add
     if (!selectedCategory) {
       setIsOpen(false);
@@ -190,7 +179,7 @@ export default function ItemSearch({
   };
 
   return (
-    <div ref={wrapperRef} className="relative space-y-2">
+    <div className="space-y-2">
       {/* Category Filter */}
       <div className="flex gap-2">
         <Select value={selectValue} onValueChange={handleSelectChange}>
@@ -217,62 +206,69 @@ export default function ItemSearch({
         )}
       </div>
 
-
-      {/* Search Input */}
-      <div className="relative">
-        <Input
-          ref={inputRef}
-          type="text"
-          value={query}
-          onChange={(e) => setQuery(e.target.value)}
-          onFocus={() => (query.length >= 2 || selectedCategory) && setIsOpen(true)}
-          onKeyDown={handleKeyDown}
-          placeholder={selectedCategory ? 'พิมพ์เพื่อกรองรายการในหมวดนี้...' : placeholder}
-          className="pr-10"
-        />
-        {isLoading && (
-          <div className="absolute right-3 top-1/2 -translate-y-1/2">
-            <Loader2 className="w-5 h-5 animate-spin text-blue-500" />
+      {/* Search Input with Popover Dropdown */}
+      <Popover open={isOpen && results.length > 0} onOpenChange={setIsOpen}>
+        <PopoverTrigger asChild>
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+            <Input
+              ref={inputRef}
+              type="text"
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              onFocus={() => (query.length >= 2 || selectedCategory) && results.length > 0 && setIsOpen(true)}
+              onKeyDown={handleKeyDown}
+              placeholder={selectedCategory ? 'พิมพ์เพื่อกรองรายการในหมวดนี้...' : placeholder}
+              className="pl-10 pr-10"
+            />
+            {isLoading && (
+              <div className="absolute right-3 top-1/2 -translate-y-1/2">
+                <Loader2 className="w-5 h-5 animate-spin text-primary" />
+              </div>
+            )}
           </div>
-        )}
-      </div>
+        </PopoverTrigger>
+
+        <PopoverContent
+          className="p-0 w-[--radix-popover-trigger-width]"
+          align="start"
+          sideOffset={4}
+          onOpenAutoFocus={(e) => e.preventDefault()}
+        >
+          <Command>
+            <CommandList className="max-h-[min(70vh,560px)]">
+              <CommandEmpty>ไม่พบรายการ</CommandEmpty>
+              <CommandGroup>
+                {results.map((item, index) => (
+                  <CommandItem
+                    key={item.id}
+                    onSelect={() => handleSelect(item)}
+                    className={`py-2 ${index === selectedIndex ? 'bg-accent' : ''}`}
+                  >
+                    <div className="flex flex-col gap-0.5">
+                      <span className="font-medium text-sm line-clamp-1">{item.item_name}</span>
+                      <span className="text-xs text-muted-foreground line-clamp-1">
+                        {item.unit} | ค่าวัสดุ: {item.material_cost.toLocaleString()} | ค่าแรง: {item.labor_cost.toLocaleString()} | รวม: {item.unit_cost.toLocaleString()} บาท
+                      </span>
+                    </div>
+                  </CommandItem>
+                ))}
+              </CommandGroup>
+            </CommandList>
+          </Command>
+        </PopoverContent>
+      </Popover>
 
       {/* Results count hint */}
       {totalCount > 0 && (
         <div className="text-xs text-muted-foreground">
           แสดง {results.length} จาก {totalCount} รายการ
           {totalCount > 100 && (
-            <span className="text-orange-600 ml-1">
+            <span className="text-destructive ml-1">
               (พิมพ์เพิ่มเติมเพื่อกรองผลลัพธ์)
             </span>
           )}
         </div>
-      )}
-
-      {isOpen && results.length > 0 && (
-        <Command className="absolute z-50 w-full mt-1 border rounded-md shadow-lg bg-popover">
-          <CommandList style={{ maxHeight: 'min(50vh, 420px)' }} className="overflow-y-auto">
-            <CommandEmpty>ไม่พบรายการ</CommandEmpty>
-            <CommandGroup>
-              {results.map((item, index) => (
-                <CommandItem
-                  key={item.id}
-                  onSelect={() => handleSelect(item)}
-                  className={index === selectedIndex ? 'bg-accent' : ''}
-                >
-                  <div className="flex flex-col py-1">
-                    <span className="font-medium">{item.item_name}</span>
-                    <span className="text-sm text-muted-foreground">
-                      {item.unit} | ค่าวัสดุ: {item.material_cost.toLocaleString()} |
-                      ค่าแรง: {item.labor_cost.toLocaleString()} |
-                      รวม: {item.unit_cost.toLocaleString()} บาท
-                    </span>
-                  </div>
-                </CommandItem>
-              ))}
-            </CommandGroup>
-          </CommandList>
-        </Command>
       )}
     </div>
   );

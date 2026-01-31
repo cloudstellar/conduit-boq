@@ -69,13 +69,13 @@ export default function LineItemsTable({
             <TableRow className="bg-muted/50">
               <TableHead className="text-center w-10">ลำดับ</TableHead>
               <TableHead>รายการ</TableHead>
-              <TableHead className="text-center w-24">ปริมาณ</TableHead>
+              <TableHead className="text-center">ปริมาณ</TableHead>
               <TableHead className="text-center w-12">หน่วย</TableHead>
-              <TableHead className="text-right w-20">ค่าวัสดุ/หน่วย</TableHead>
-              <TableHead className="text-right w-20">ค่าแรง/หน่วย</TableHead>
-              <TableHead className="text-right w-24">รวมค่าวัสดุ</TableHead>
-              <TableHead className="text-right w-24">รวมค่าแรง</TableHead>
-              <TableHead className="text-right w-28">รวมทั้งสิ้น</TableHead>
+              <TableHead className="text-right hidden xl:table-cell">ค่าวัสดุ/หน่วย</TableHead>
+              <TableHead className="text-right hidden xl:table-cell">ค่าแรง/หน่วย</TableHead>
+              <TableHead className="text-right hidden xl:table-cell">รวมค่าวัสดุ</TableHead>
+              <TableHead className="text-right hidden xl:table-cell">รวมค่าแรง</TableHead>
+              <TableHead className="text-right">รวมทั้งสิ้น</TableHead>
               <TableHead className="text-center w-10">ลบ</TableHead>
             </TableRow>
           </TableHeader>
@@ -104,16 +104,16 @@ export default function LineItemsTable({
                     />
                   </TableCell>
                   <TableCell className="text-center text-sm">{item.unit}</TableCell>
-                  <TableCell className="text-right text-sm tabular-nums">
+                  <TableCell className="text-right text-sm tabular-nums hidden xl:table-cell">
                     {formatNumber(item.material_cost_per_unit)}
                   </TableCell>
-                  <TableCell className="text-right text-sm tabular-nums">
+                  <TableCell className="text-right text-sm tabular-nums hidden xl:table-cell">
                     {formatNumber(item.labor_cost_per_unit)}
                   </TableCell>
-                  <TableCell className="text-right text-sm tabular-nums">
+                  <TableCell className="text-right text-sm tabular-nums hidden xl:table-cell">
                     {formatNumber(item.total_material_cost)}
                   </TableCell>
-                  <TableCell className="text-right text-sm tabular-nums">
+                  <TableCell className="text-right text-sm tabular-nums hidden xl:table-cell">
                     {formatNumber(item.total_labor_cost)}
                   </TableCell>
                   <TableCell className="text-right text-sm font-semibold text-primary tabular-nums">
