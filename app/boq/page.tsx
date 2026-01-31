@@ -8,7 +8,7 @@ import { useAuth } from '@/lib/context/AuthContext';
 import { can } from '@/lib/permissions';
 import BOQPageHeader from '@/components/boq/BOQPageHeader';
 import BOQAccessBanner from '@/components/boq/BOQAccessBanner';
-import { RouteChips } from '@/components/boq/RouteChips';
+import { RouteList, getFirstName } from '@/components/boq/RouteList';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent } from '@/components/ui/card';
@@ -332,70 +332,87 @@ export default function BOQListPage() {
 
         {/* Desktop Table View */}
         <Card className="hidden lg:block">
-          <Table>
+          <Table className="w-full table-fixed">
             <TableHeader>
               <TableRow>
-                <TableHead className="w-[420px]">โครงการ / เส้นทาง</TableHead>
-                <TableHead>ผู้ประมาณราคา</TableHead>
-                <TableHead className="text-right whitespace-nowrap">ยอดรวม (บาท)</TableHead>
-                <TableHead className="text-center">สถานะ</TableHead>
-                <TableHead className="text-center whitespace-nowrap">วันที่</TableHead>
+                <TableHead className="w-[380px]">โครงการ</TableHead>
+                <TableHead className="w-[280px]">เส้นทาง</TableHead>
+                <TableHead className="w-[100px]">ผู้ประมาณ</TableHead>
+                <TableHead className="w-[130px] text-right whitespace-nowrap">ยอดรวม (บาท)</TableHead>
+                <TableHead className="w-[90px] text-center">สถานะ</TableHead>
+                <TableHead className="w-[100px] text-center whitespace-nowrap">วันที่</TableHead>
                 <TableHead className="w-[120px] text-center">จัดการ</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {filteredList.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={6} className="text-center py-8 text-muted-foreground">
+                  <TableCell colSpan={7} className="text-center py-8 text-muted-foreground">
                     {searchTerm ? 'ไม่พบรายการที่ค้นหา' : 'ยังไม่มีใบประมาณราคา'}
                   </TableCell>
                 </TableRow>
               ) : (
-                filteredList.map((boq) => (
-                  <TableRow key={boq.id}>
-                    {/* 2-layer: Project name (5 lines) + Route chips */}
-                    <TableCell className="w-[420px] align-top">
-                      <div className="whitespace-normal break-words line-clamp-5 font-medium leading-snug" title={boq.project_name}>
-                        {boq.project_name}
-                      </div>
-                      <div className="mt-1.5">
-                        <RouteChips route={boq.route} />
-                      </div>
-                    </TableCell>
-                    <TableCell className="text-muted-foreground align-top">
-                      <div className="line-clamp-1" title={boq.estimator_name}>
-                        {boq.estimator_name}
-                      </div>
-                    </TableCell>
-                    <TableCell className="text-right font-medium text-blue-600 whitespace-nowrap tabular-nums align-top">
-                      {formatNumber(boq.total_cost)}
-                    </TableCell>
-                    <TableCell className="text-center align-top">{getStatusBadge(boq.status)}</TableCell>
-                    <TableCell className="text-center text-muted-foreground whitespace-nowrap align-top">
-                      {formatDate(boq.document_date)}
-                    </TableCell>
-                    <TableCell className="w-[120px] whitespace-nowrap align-top">
-                      <div className="flex justify-center gap-1">
-                        <Link href={`/boq/${boq.id}/edit`}>
-                          <Button variant="ghost" size="icon" className="h-8 w-8">
-                            <Edit className="h-4 w-4 text-blue-600" />
+                filteredList.map((boq) => {
+                  const { firstName, fullName } = getFirstName(boq.estimator_name);
+                  return (
+                    <TableRow key={boq.id}>
+                      {/* Project name: 5 lines max */}
+                      <TableCell className="align-top">
+                        <div
+                          className="whitespace-normal break-words line-clamp-5 font-medium leading-snug"
+                          title={boq.project_name}
+                        >
+                          {boq.project_name}
+                        </div>
+                      </TableCell>
+
+                      {/* Routes: bullet list format */}
+                      <TableCell className="align-top">
+                        <RouteList route={boq.route} maxVisible={2} />
+                      </TableCell>
+
+                      {/* Estimator: first name only + tooltip */}
+                      <TableCell className="align-top">
+                        <div className="truncate text-muted-foreground" title={fullName}>
+                          {firstName}
+                        </div>
+                      </TableCell>
+
+                      <TableCell className="align-top text-right font-medium text-blue-600 whitespace-nowrap tabular-nums">
+                        {formatNumber(boq.total_cost)}
+                      </TableCell>
+
+                      <TableCell className="align-top text-center">
+                        {getStatusBadge(boq.status)}
+                      </TableCell>
+
+                      <TableCell className="align-top text-center text-muted-foreground whitespace-nowrap">
+                        {formatDate(boq.document_date)}
+                      </TableCell>
+
+                      <TableCell className="align-top whitespace-nowrap">
+                        <div className="flex justify-center gap-1">
+                          <Link href={`/boq/${boq.id}/edit`}>
+                            <Button variant="ghost" size="icon" className="h-8 w-8">
+                              <Edit className="h-4 w-4 text-blue-600" />
+                            </Button>
+                          </Link>
+                          <Link href={`/boq/${boq.id}/print`}>
+                            <Button variant="ghost" size="icon" className="h-8 w-8">
+                              <Printer className="h-4 w-4 text-gray-600" />
+                            </Button>
+                          </Link>
+                          <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => handleDuplicate(boq.id)}>
+                            <Copy className="h-4 w-4 text-green-600" />
                           </Button>
-                        </Link>
-                        <Link href={`/boq/${boq.id}/print`}>
-                          <Button variant="ghost" size="icon" className="h-8 w-8">
-                            <Printer className="h-4 w-4 text-gray-600" />
+                          <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => handleDelete(boq.id)}>
+                            <Trash2 className="h-4 w-4 text-red-600" />
                           </Button>
-                        </Link>
-                        <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => handleDuplicate(boq.id)}>
-                          <Copy className="h-4 w-4 text-green-600" />
-                        </Button>
-                        <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => handleDelete(boq.id)}>
-                          <Trash2 className="h-4 w-4 text-red-600" />
-                        </Button>
-                      </div>
-                    </TableCell>
-                  </TableRow>
-                ))
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  );
+                })
               )}
             </TableBody>
           </Table>
