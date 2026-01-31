@@ -3,6 +3,8 @@
 # GATE 2 Check: Verify print page is not touched before commit
 # Usage: bash scripts/print-safe.sh
 
+set -euo pipefail
+
 PRINT_FILE="app/boq/\[id\]/print/page.tsx"
 
 echo "🛡️ GATE 2 CHECK: Verifying print page safety..."

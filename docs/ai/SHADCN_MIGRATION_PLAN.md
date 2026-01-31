@@ -57,11 +57,21 @@ npx shadcn@latest init
 # CSS variables: yes
 ```
 
+> [!IMPORTANT]
+> **ยึด CLI output เป็น baseline** — ถ้า CLI generate โครงสร้างแบบใหม่ (Tailwind v4 style) ให้ใช้ตามนั้น อย่าฝืนย้อนเป็นแพทเทิร์นเก่า
+
 ### 1.3 Install Dependencies
 
 ```bash
-npm i clsx tailwind-merge
+# Core utilities
+npm i clsx tailwind-merge class-variance-authority
+
+# Icons + Animation (บาง component ต้องการ)
+npm i lucide-react tailwindcss-animate
 ```
+
+> [!NOTE]
+> CLI อาจ install บางตัวให้อัตโนมัติ แต่ใส่ไว้ก่อนป้องกัน build พัง
 
 ### 1.4 Create Utility File
 
