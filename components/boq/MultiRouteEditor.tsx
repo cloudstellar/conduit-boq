@@ -7,6 +7,17 @@ import RouteManager, { Route } from './RouteManager';
 import LineItemsTable, { LineItem } from './LineItemsTable';
 import TotalsSummary from './TotalsSummary';
 import FactorFSummary from './FactorFSummary';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Separator } from '@/components/ui/separator';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from '@/components/ui/dialog';
+import { Loader2 } from 'lucide-react';
 
 interface MultiRouteEditorProps {
   boqId: string;
@@ -290,11 +301,11 @@ export default function MultiRouteEditor({ boqId, onSave, isSaving }: MultiRoute
       prev.map(r =>
         r.id === activeRouteId
           ? {
-              ...r,
-              total_material_cost: totals.material,
-              total_labor_cost: totals.labor,
-              total_cost: totals.total,
-            }
+            ...r,
+            total_material_cost: totals.material,
+            total_labor_cost: totals.labor,
+            total_cost: totals.total,
+          }
           : r
       )
     );
@@ -321,7 +332,7 @@ export default function MultiRouteEditor({ boqId, onSave, isSaving }: MultiRoute
   if (isLoading) {
     return (
       <div className="flex items-center justify-center py-12">
-        <div className="w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full animate-spin" />
+        <Loader2 className="w-8 h-8 animate-spin text-blue-500" />
       </div>
     );
   }
@@ -340,64 +351,70 @@ export default function MultiRouteEditor({ boqId, onSave, isSaving }: MultiRoute
 
       {/* Active Route Items */}
       {activeRouteId && (
-        <div className="bg-white border rounded-lg p-4">
-          <div className="mb-4">
-            <h3 className="text-md font-medium text-gray-700">
+        <Card>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-md">
               รายการสำหรับ: <span className="text-blue-600">{activeRoute?.route_name}</span>
-            </h3>
-          </div>
-
-          <div className="overflow-x-auto -mx-4 md:mx-0">
-            <div className="min-w-[800px] px-4 md:px-0">
-              <LineItemsTable
-                items={activeRouteItems}
-                onAddItem={handleAddItem}
-                onUpdateQuantity={handleUpdateQuantity}
-                onRemoveItem={handleRemoveItem}
-              />
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="overflow-x-auto -mx-4 md:mx-0">
+              <div className="min-w-[800px] px-4 md:px-0">
+                <LineItemsTable
+                  items={activeRouteItems}
+                  onAddItem={handleAddItem}
+                  onUpdateQuantity={handleUpdateQuantity}
+                  onRemoveItem={handleRemoveItem}
+                />
+              </div>
             </div>
-          </div>
 
-          {/* Route Subtotal */}
-          <div className="mt-4 p-4 bg-blue-50 rounded-lg">
-            <div className="flex justify-between items-center">
-              <span className="text-sm text-gray-600">
-                รวมเส้นทาง "{activeRoute?.route_name}":
-              </span>
-              <span className="text-lg font-bold text-blue-600">
-                {(activeRoute?.total_cost || 0).toLocaleString('th-TH', { minimumFractionDigits: 2 })} บาท
-              </span>
+            {/* Route Subtotal */}
+            <div className="mt-4 p-4 bg-blue-50 rounded-lg">
+              <div className="flex justify-between items-center">
+                <span className="text-sm text-muted-foreground">
+                  รวมเส้นทาง &quot;{activeRoute?.route_name}&quot;:
+                </span>
+                <span className="text-lg font-bold text-blue-600">
+                  {(activeRoute?.total_cost || 0).toLocaleString('th-TH', { minimumFractionDigits: 2 })} บาท
+                </span>
+              </div>
             </div>
-          </div>
-        </div>
+          </CardContent>
+        </Card>
       )}
 
       {/* Grand Totals */}
       {routes.length > 0 && (
-        <div className="bg-gradient-to-r from-gray-50 to-blue-50 rounded-lg p-6 border-2 border-blue-200">
-          <h3 className="text-lg font-semibold text-gray-700 mb-4">สรุปรวมทุกเส้นทาง</h3>
+        <Card className="bg-gradient-to-r from-gray-50 to-blue-50 border-2 border-blue-200">
+          <CardHeader className="pb-2">
+            <CardTitle className="text-lg">สรุปรวมทุกเส้นทาง</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            {/* Routes Summary */}
+            <div className="space-y-2">
+              {routes.map((route, index) => (
+                <div key={route.id} className="flex justify-between items-center py-2 border-b">
+                  <span className="text-sm text-muted-foreground">
+                    {index + 1}. {route.route_name} ({routeItems[route.id]?.length || 0} รายการ)
+                  </span>
+                  <span className="font-medium">
+                    {route.total_cost.toLocaleString('th-TH', { minimumFractionDigits: 2 })} บาท
+                  </span>
+                </div>
+              ))}
+            </div>
 
-          {/* Routes Summary */}
-          <div className="mb-4 space-y-2">
-            {routes.map((route, index) => (
-              <div key={route.id} className="flex justify-between items-center py-2 border-b border-gray-200">
-                <span className="text-sm text-gray-600">
-                  {index + 1}. {route.route_name} ({routeItems[route.id]?.length || 0} รายการ)
-                </span>
-                <span className="font-medium text-gray-800">
-                  {route.total_cost.toLocaleString('th-TH', { minimumFractionDigits: 2 })} บาท
-                </span>
-              </div>
-            ))}
-          </div>
+            <Separator />
 
-          <TotalsSummary
-            totalMaterialCost={grandTotals.material}
-            totalLaborCost={grandTotals.labor}
-            totalCost={grandTotals.total}
-            itemCount={grandTotals.itemCount}
-          />
-        </div>
+            <TotalsSummary
+              totalMaterialCost={grandTotals.material}
+              totalLaborCost={grandTotals.labor}
+              totalCost={grandTotals.total}
+              itemCount={grandTotals.itemCount}
+            />
+          </CardContent>
+        </Card>
       )}
 
       {/* Factor F Summary */}
@@ -416,83 +433,82 @@ export default function MultiRouteEditor({ boqId, onSave, isSaving }: MultiRoute
 
       {/* Save Button */}
       <div className="flex justify-end">
-        <button
-          type="button"
+        <Button
           onClick={handleSaveClick}
           disabled={isSaving || routes.length === 0}
-          className="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50"
         >
-          {isSaving ? 'กำลังบันทึก...' : 'บันทึก'}
-        </button>
+          {isSaving ? (
+            <>
+              <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+              กำลังบันทึก...
+            </>
+          ) : (
+            'บันทึก'
+          )}
+        </Button>
       </div>
 
       {/* Modal for Special Items (งานวางท่อ / งานดันท่อ) */}
-      {showSpecialItemModal && pendingSpecialItem && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg shadow-xl p-6 max-w-md w-full mx-4">
-            <h3 className="text-lg font-bold text-gray-900 mb-2">
-              เลือกประเภทงาน
-            </h3>
-            <p className="text-sm text-gray-600 mb-6">
-              {pendingSpecialItem.item_name}
-            </p>
+      <Dialog open={showSpecialItemModal} onOpenChange={setShowSpecialItemModal}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>เลือกประเภทงาน</DialogTitle>
+            <DialogDescription>
+              {pendingSpecialItem?.item_name}
+            </DialogDescription>
+          </DialogHeader>
 
-            <div className="space-y-3">
-              <button
-                type="button"
-                onClick={() => handleSpecialItemSelect('Main Duct')}
-                className="w-full py-4 px-6 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center justify-center gap-3"
-              >
-                <span className="text-2xl">🔵</span>
-                <span className="text-lg font-medium">Main Duct</span>
-              </button>
-
-              <button
-                type="button"
-                onClick={() => handleSpecialItemSelect('Riser')}
-                className="w-full py-4 px-6 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors flex items-center justify-center gap-3"
-              >
-                <span className="text-2xl">🟢</span>
-                <span className="text-lg font-medium">Riser</span>
-              </button>
-
-              {/* Show Steel Pole and Riser Service only for single pipe items (1 ท่อ) */}
-              {isSinglePipeItem(pendingSpecialItem.item_name) && (
-                <>
-                  <button
-                    type="button"
-                    onClick={() => handleSpecialItemSelect('Steel Pole')}
-                    className="w-full py-4 px-6 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition-colors flex items-center justify-center gap-3"
-                  >
-                    <span className="text-2xl">🟠</span>
-                    <span className="text-lg font-medium">Steel Pole</span>
-                  </button>
-
-                  <button
-                    type="button"
-                    onClick={() => handleSpecialItemSelect('Riser Service')}
-                    className="w-full py-4 px-6 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors flex items-center justify-center gap-3"
-                  >
-                    <span className="text-2xl">🟣</span>
-                    <span className="text-lg font-medium">Riser Service</span>
-                  </button>
-                </>
-              )}
-            </div>
-
-            <button
-              type="button"
-              onClick={() => {
-                setShowSpecialItemModal(false);
-                setPendingSpecialItem(null);
-              }}
-              className="w-full mt-4 py-2 px-4 text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded-lg transition-colors"
+          <div className="space-y-3 mt-4">
+            <Button
+              onClick={() => handleSpecialItemSelect('Main Duct')}
+              className="w-full py-6 bg-blue-600 hover:bg-blue-700"
             >
-              ยกเลิก
-            </button>
+              <span className="text-2xl mr-3">🔵</span>
+              <span className="text-lg font-medium">Main Duct</span>
+            </Button>
+
+            <Button
+              onClick={() => handleSpecialItemSelect('Riser')}
+              className="w-full py-6 bg-green-600 hover:bg-green-700"
+            >
+              <span className="text-2xl mr-3">🟢</span>
+              <span className="text-lg font-medium">Riser</span>
+            </Button>
+
+            {/* Show Steel Pole and Riser Service only for single pipe items (1 ท่อ) */}
+            {pendingSpecialItem && isSinglePipeItem(pendingSpecialItem.item_name) && (
+              <>
+                <Button
+                  onClick={() => handleSpecialItemSelect('Steel Pole')}
+                  className="w-full py-6 bg-orange-600 hover:bg-orange-700"
+                >
+                  <span className="text-2xl mr-3">🟠</span>
+                  <span className="text-lg font-medium">Steel Pole</span>
+                </Button>
+
+                <Button
+                  onClick={() => handleSpecialItemSelect('Riser Service')}
+                  className="w-full py-6 bg-purple-600 hover:bg-purple-700"
+                >
+                  <span className="text-2xl mr-3">🟣</span>
+                  <span className="text-lg font-medium">Riser Service</span>
+                </Button>
+              </>
+            )}
           </div>
-        </div>
-      )}
+
+          <Button
+            variant="ghost"
+            onClick={() => {
+              setShowSpecialItemModal(false);
+              setPendingSpecialItem(null);
+            }}
+            className="w-full mt-2"
+          >
+            ยกเลิก
+          </Button>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
