@@ -27,11 +27,11 @@
 - [x] **M1:** Install dependencies (clsx, tailwind-merge, cva, lucide, animate)
 - [x] **M1:** Create `lib/utils.ts` + Install 15 components
 - [x] **M2:** � `npm run build` — **PASSED!**
-- [/] **M2:** Commit + Tag + Push: `v1.2.1-shadcn-phase1`
+- [x] **M2:** Commit + Tag + Push: `v1.2.1-shadcn-phase1` ✅
 
 ### Phase 2: Component Migration (M3-M6)
-- [ ] **M3:** 🔍 PRINT SCAN → บันทึกผลที่ `docs/print-deps.txt`
-- [ ] **M4:** Low-risk (1-4): TotalsSummary, BOQAccessBanner, ProjectInfoForm, UserBadge
+- [x] **M3:** 🔍 PRINT SCAN → `docs/print-deps.txt` ✅ (0 conflicts!)
+- [/] **M4:** Low-risk (1-4): TotalsSummary, BOQAccessBanner, ProjectInfoForm, UserBadge
 - [ ] **M5:** Medium-risk (5-10) + `npm run build`
 - [ ] **M6:** MultiRouteEditor → Tag: `v1.2.1-shadcn-phase2`
 
