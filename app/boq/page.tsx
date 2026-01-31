@@ -358,7 +358,11 @@ export default function BOQListPage() {
                         {boq.project_name}
                       </div>
                     </TableCell>
-                    <TableCell className="text-muted-foreground whitespace-nowrap">{boq.route || '-'}</TableCell>
+                    <TableCell className="text-muted-foreground">
+                      <div className="line-clamp-1" title={boq.route || '-'}>
+                        {boq.route || '-'}
+                      </div>
+                    </TableCell>
                     <TableCell className="text-muted-foreground">{boq.estimator_name}</TableCell>
                     <TableCell className="text-right font-medium text-blue-600 whitespace-nowrap tabular-nums">{formatNumber(boq.total_cost)}</TableCell>
                     <TableCell className="text-center">{getStatusBadge(boq.status)}</TableCell>
