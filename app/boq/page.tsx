@@ -338,7 +338,7 @@ export default function BOQListPage() {
                 <TableHead className="w-[380px]">โครงการ</TableHead>
                 <TableHead className="w-[100px]">เส้นทาง</TableHead>
                 <TableHead className="w-[150px]">ผู้ประมาณราคา</TableHead>
-                <TableHead className="w-[130px] text-right whitespace-nowrap">ยอดรวม (บาท)</TableHead>
+                <TableHead className="w-[140px] text-right whitespace-nowrap">ก่อน VAT (บาท)</TableHead>
                 <TableHead className="w-[90px] text-center">สถานะ</TableHead>
                 <TableHead className="w-[100px] text-center whitespace-nowrap">วันที่</TableHead>
                 <TableHead className="w-[120px] text-center">จัดการ</TableHead>
@@ -377,7 +377,7 @@ export default function BOQListPage() {
                     </TableCell>
 
                     <TableCell className="align-top text-right font-medium text-blue-600 whitespace-nowrap tabular-nums">
-                      {formatNumber(boq.total_cost)}
+                      {formatNumber(boq.total_with_factor_f)}
                     </TableCell>
 
                     <TableCell className="align-top text-center">
