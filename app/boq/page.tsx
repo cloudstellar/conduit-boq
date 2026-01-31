@@ -356,10 +356,10 @@ export default function BOQListPage() {
                   const { firstName, fullName } = getFirstName(boq.estimator_name);
                   return (
                     <TableRow key={boq.id}>
-                      {/* Project name: 5 lines max */}
+                      {/* Project name: 4 lines max */}
                       <TableCell className="align-top">
                         <div
-                          className="whitespace-normal break-words line-clamp-5 font-medium leading-snug"
+                          className="whitespace-normal break-words line-clamp-4 font-medium leading-snug"
                           title={boq.project_name}
                         >
                           {boq.project_name}
