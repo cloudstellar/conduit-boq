@@ -353,17 +353,21 @@ export default function BOQListPage() {
               ) : (
                 filteredList.map((boq) => (
                   <TableRow key={boq.id}>
-                    <TableCell className="font-medium">
+                    <TableCell className="font-medium max-w-[250px]">
                       <div className="line-clamp-2" title={boq.project_name}>
                         {boq.project_name}
                       </div>
                     </TableCell>
-                    <TableCell className="text-muted-foreground">
+                    <TableCell className="text-muted-foreground max-w-[150px]">
                       <div className="line-clamp-1" title={boq.route || '-'}>
                         {boq.route || '-'}
                       </div>
                     </TableCell>
-                    <TableCell className="text-muted-foreground">{boq.estimator_name}</TableCell>
+                    <TableCell className="text-muted-foreground max-w-[120px]">
+                      <div className="line-clamp-1" title={boq.estimator_name}>
+                        {boq.estimator_name}
+                      </div>
+                    </TableCell>
                     <TableCell className="text-right font-medium text-blue-600 whitespace-nowrap tabular-nums">{formatNumber(boq.total_cost)}</TableCell>
                     <TableCell className="text-center">{getStatusBadge(boq.status)}</TableCell>
                     <TableCell className="text-center text-muted-foreground whitespace-nowrap">{formatDate(boq.document_date)}</TableCell>
