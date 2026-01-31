@@ -63,12 +63,12 @@ export default function RouteManager({
       ) : (
         <>
           <Tabs value={activeRouteId || undefined} onValueChange={onSelectRoute}>
-            <TabsList className="flex flex-wrap h-auto gap-1 bg-transparent p-0 border-b">
+            <TabsList className="flex flex-wrap h-auto gap-1 bg-muted/40 border border-border rounded-lg p-1">
               {routes.map((route, index) => (
                 <TabsTrigger
                   key={route.id}
                   value={route.id}
-                  className="relative group flex items-center gap-2 data-[state=active]:bg-blue-600 data-[state=active]:text-white rounded-t-lg rounded-b-none border-b-0"
+                  className="relative group flex items-center gap-2 data-[state=active]:bg-background data-[state=active]:shadow-sm rounded-md focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
                 >
                   {editingRouteId === route.id ? (
                     <Input

@@ -2,6 +2,7 @@
 
 import { PriceListItem } from '@/lib/supabase';
 import ItemSearch from './ItemSearch';
+import { QuantityEditor } from './QuantityEditor';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -90,19 +91,16 @@ export default function LineItemsTable({
                 <TableRow key={item.id}>
                   <TableCell className="text-center">{index + 1}</TableCell>
                   <TableCell>
-                    <div className="text-sm">{item.item_name}</div>
+                    <div className="text-sm line-clamp-2 break-words" title={item.item_name}>{item.item_name}</div>
                     {item.remarks && (
                       <div className="text-xs text-muted-foreground">{item.remarks}</div>
                     )}
                   </TableCell>
                   <TableCell>
-                    <Input
-                      type="number"
-                      min="0"
-                      step="0.01"
-                      value={item.quantity || ''}
-                      onChange={(e) => onUpdateQuantity(item.id, parseFloat(e.target.value) || 0)}
-                      className="text-right"
+                    <QuantityEditor
+                      value={item.quantity ?? 0}
+                      step={1}
+                      onChange={(v) => onUpdateQuantity(item.id, v)}
                     />
                   </TableCell>
                   <TableCell className="text-center text-sm">{item.unit}</TableCell>
