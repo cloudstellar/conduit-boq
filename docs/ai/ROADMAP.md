@@ -23,7 +23,7 @@ Foundation         │  shadcn/ui            │  Versioning           │  Enha
 
 ## Phase 1: Foundation ✅ v1.2.0
 
-- [x] Google OAuth + Domain restriction
+- [x] Supabase Email Auth + Domain restriction (@ntplc.co.th)
 - [x] RLS + RBAC
 - [x] BOQ CRUD + Multi-route
 - [x] Price List (518 items)
@@ -35,13 +35,19 @@ Foundation         │  shadcn/ui            │  Versioning           │  Enha
 
 ## UI Modernization: shadcn/ui Migration ⏳ NEXT
 
-**Strategy:** shadcn/ui + Next.js Best Practices (combined)
+**Strategy:** shadcn/ui + Next.js Best Practices (combined)  
+**Branch:** `feature/shadcn-migration`  
+**Version:** v3.6 Final
 
 ### Configuration
 - Style: `default`
 - Base color: `slate`
 - CSS Variables: `yes`
 - Dark Mode: `none` (light only)
+
+### Critical Gates
+- **GATE 1:** `npm run build` ผ่านก่อน Phase 2
+- **GATE 2:** `bash scripts/print-safe.sh` ก่อน commit
 
 ### Phases
 1. Setup Foundation (Day 1)
@@ -50,7 +56,7 @@ Foundation         │  shadcn/ui            │  Versioning           │  Enha
 4. Best Practices Refactor (Day 4-5)
 5. Verification (Day 5)
 
-**See:** `docs/ai/SHADCN_MIGRATION_PLAN.md` for details
+**See:** `docs/ai/SHADCN_MIGRATION_PLAN.md` v3.6 for details
 
 ---
 
