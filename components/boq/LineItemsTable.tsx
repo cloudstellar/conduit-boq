@@ -2,6 +2,18 @@
 
 import { PriceListItem } from '@/lib/supabase';
 import ItemSearch from './ItemSearch';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table';
+import { Trash2 } from 'lucide-react';
 
 export interface LineItem {
   id: string;
@@ -41,10 +53,8 @@ export default function LineItemsTable({
       </h2>
 
       {/* Search to add new item */}
-      <div className="mb-4">
-        <label className="block text-sm font-medium text-gray-700 mb-1">
-          เพิ่มรายการ
-        </label>
+      <div className="mb-4 space-y-2">
+        <Label>เพิ่มรายการ</Label>
         <ItemSearch
           onSelect={onAddItem}
           placeholder="พิมพ์เพื่อค้นหารายการจากบัญชีราคามาตรฐาน..."
@@ -52,83 +62,81 @@ export default function LineItemsTable({
       </div>
 
       {/* Items Table */}
-      <div className="overflow-x-auto">
-        <table className="w-full border-collapse border border-gray-300">
-          <thead>
-            <tr className="bg-gray-100">
-              <th className="border border-gray-300 px-2 py-2 text-center w-12">ลำดับ</th>
-              <th className="border border-gray-300 px-2 py-2 text-left min-w-[300px]">รายการ</th>
-              <th className="border border-gray-300 px-2 py-2 text-center w-24">ปริมาณ</th>
-              <th className="border border-gray-300 px-2 py-2 text-center w-16">หน่วย</th>
-              <th className="border border-gray-300 px-2 py-2 text-right w-28">ค่าวัสดุ/หน่วย</th>
-              <th className="border border-gray-300 px-2 py-2 text-right w-28">ค่าแรง/หน่วย</th>
-              <th className="border border-gray-300 px-2 py-2 text-right w-32">รวมค่าวัสดุ</th>
-              <th className="border border-gray-300 px-2 py-2 text-right w-32">รวมค่าแรง</th>
-              <th className="border border-gray-300 px-2 py-2 text-right w-32">รวมทั้งสิ้น</th>
-              <th className="border border-gray-300 px-2 py-2 text-center w-16">ลบ</th>
-            </tr>
-          </thead>
-          <tbody>
+      <div className="overflow-x-auto border rounded-lg">
+        <Table>
+          <TableHeader>
+            <TableRow className="bg-muted/50">
+              <TableHead className="text-center w-12">ลำดับ</TableHead>
+              <TableHead className="min-w-[300px]">รายการ</TableHead>
+              <TableHead className="text-center w-24">ปริมาณ</TableHead>
+              <TableHead className="text-center w-16">หน่วย</TableHead>
+              <TableHead className="text-right w-28">ค่าวัสดุ/หน่วย</TableHead>
+              <TableHead className="text-right w-28">ค่าแรง/หน่วย</TableHead>
+              <TableHead className="text-right w-32">รวมค่าวัสดุ</TableHead>
+              <TableHead className="text-right w-32">รวมค่าแรง</TableHead>
+              <TableHead className="text-right w-32">รวมทั้งสิ้น</TableHead>
+              <TableHead className="text-center w-16">ลบ</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
             {items.length === 0 ? (
-              <tr>
-                <td colSpan={10} className="border border-gray-300 px-4 py-8 text-center text-gray-500">
+              <TableRow>
+                <TableCell colSpan={10} className="text-center py-8 text-muted-foreground">
                   ยังไม่มีรายการ - ใช้ช่องค้นหาด้านบนเพื่อเพิ่มรายการ
-                </td>
-              </tr>
+                </TableCell>
+              </TableRow>
             ) : (
               items.map((item, index) => (
-                <tr key={item.id} className="hover:bg-gray-50">
-                  <td className="border border-gray-300 px-2 py-2 text-center">{index + 1}</td>
-                  <td className="border border-gray-300 px-2 py-2">
+                <TableRow key={item.id}>
+                  <TableCell className="text-center">{index + 1}</TableCell>
+                  <TableCell>
                     <div className="text-sm">{item.item_name}</div>
                     {item.remarks && (
-                      <div className="text-xs text-gray-500">{item.remarks}</div>
+                      <div className="text-xs text-muted-foreground">{item.remarks}</div>
                     )}
-                  </td>
-                  <td className="border border-gray-300 px-2 py-2">
-                    <input
+                  </TableCell>
+                  <TableCell>
+                    <Input
                       type="number"
                       min="0"
                       step="0.01"
                       value={item.quantity || ''}
                       onChange={(e) => onUpdateQuantity(item.id, parseFloat(e.target.value) || 0)}
-                      className="w-full px-2 py-1 border border-gray-300 rounded text-right focus:ring-2 focus:ring-blue-500"
+                      className="text-right"
                     />
-                  </td>
-                  <td className="border border-gray-300 px-2 py-2 text-center text-sm">{item.unit}</td>
-                  <td className="border border-gray-300 px-2 py-2 text-right text-sm">
+                  </TableCell>
+                  <TableCell className="text-center text-sm">{item.unit}</TableCell>
+                  <TableCell className="text-right text-sm">
                     {formatNumber(item.material_cost_per_unit)}
-                  </td>
-                  <td className="border border-gray-300 px-2 py-2 text-right text-sm">
+                  </TableCell>
+                  <TableCell className="text-right text-sm">
                     {formatNumber(item.labor_cost_per_unit)}
-                  </td>
-                  <td className="border border-gray-300 px-2 py-2 text-right text-sm font-medium">
+                  </TableCell>
+                  <TableCell className="text-right text-sm font-medium">
                     {formatNumber(item.total_material_cost)}
-                  </td>
-                  <td className="border border-gray-300 px-2 py-2 text-right text-sm font-medium">
+                  </TableCell>
+                  <TableCell className="text-right text-sm font-medium">
                     {formatNumber(item.total_labor_cost)}
-                  </td>
-                  <td className="border border-gray-300 px-2 py-2 text-right text-sm font-bold text-blue-600">
+                  </TableCell>
+                  <TableCell className="text-right text-sm font-bold text-blue-600">
                     {formatNumber(item.total_cost)}
-                  </td>
-                  <td className="border border-gray-300 px-2 py-2 text-center">
-                    <button
+                  </TableCell>
+                  <TableCell className="text-center">
+                    <Button
+                      variant="ghost"
+                      size="sm"
                       onClick={() => onRemoveItem(item.id)}
-                      className="text-red-500 hover:text-red-700 p-1"
-                      title="ลบรายการ"
+                      className="text-red-500 hover:text-red-700 hover:bg-red-50"
                     >
-                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                      </svg>
-                    </button>
-                  </td>
-                </tr>
+                      <Trash2 className="w-4 h-4" />
+                    </Button>
+                  </TableCell>
+                </TableRow>
               ))
             )}
-          </tbody>
-        </table>
+          </TableBody>
+        </Table>
       </div>
     </div>
   );
 }
-

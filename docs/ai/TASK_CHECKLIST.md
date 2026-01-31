@@ -31,8 +31,8 @@
 
 ### Phase 2: Component Migration (M3-M6)
 - [x] **M3:** 🔍 PRINT SCAN → `docs/print-deps.txt` ✅ (0 conflicts!)
-- [/] **M4:** Low-risk (1-4): TotalsSummary, BOQAccessBanner, ProjectInfoForm, UserBadge
-- [ ] **M5:** Medium-risk (5-10) + `npm run build`
+- [x] **M4:** Low-risk (1-4): TotalsSummary, BOQAccessBanner, ProjectInfoForm, UserBadge ✅
+- [/] **M5:** Medium-risk (5-10) + `npm run build`
 - [ ] **M6:** MultiRouteEditor → Tag: `v1.2.1-shadcn-phase2`
 
 ### Phase 3: Page Migration (M7)
