@@ -106,20 +106,14 @@ export default function FactorFSummary({ routes, grandTotalCost, onFactorCalcula
   const formatNumber = (num: number) =>
     num.toLocaleString('th-TH', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
-  if (isLoading) {
-    return (
-      <div className="p-4 text-center">
-        <Loader2 className="w-6 h-6 animate-spin mx-auto text-blue-500" />
-      </div>
-    );
-  }
-
+  // Calculate factor and derived values (must be before any early return for hooks rules)
   const factor = calculateInterpolatedFactor();
   const costInMillion = grandTotalCost / 1000000;
   const totalWithFactor = grandTotalCost * factor;
   const totalWithVAT = totalWithFactor * (1 + VAT_RATE);
 
   // Call callback when factor values change (for snapshot saving)
+  // Must be before early returns to comply with React hooks rules
   useEffect(() => {
     if (onFactorCalculated && !isLoading && grandTotalCost > 0) {
       onFactorCalculated({
@@ -129,6 +123,14 @@ export default function FactorFSummary({ routes, grandTotalCost, onFactorCalcula
       });
     }
   }, [factor, totalWithFactor, totalWithVAT, onFactorCalculated, isLoading, grandTotalCost]);
+
+  if (isLoading) {
+    return (
+      <div className="p-4 text-center">
+        <Loader2 className="w-6 h-6 animate-spin mx-auto text-blue-500" />
+      </div>
+    );
+  }
 
   return (
     <Card className="bg-gradient-to-br from-blue-50 to-indigo-50 border-blue-200">
