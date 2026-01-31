@@ -62,21 +62,21 @@ export default function LineItemsTable({
         />
       </div>
 
-      {/* Items Table */}
-      <div className="overflow-x-auto border rounded-lg">
-        <Table>
+      {/* Items Table - table-fixed prevents horizontal scroll */}
+      <div className="border rounded-lg">
+        <Table className="table-fixed w-full">
           <TableHeader>
             <TableRow className="bg-muted/50">
-              <TableHead className="text-center w-12">ลำดับ</TableHead>
-              <TableHead>รายการ</TableHead>
-              <TableHead className="text-center">ปริมาณ</TableHead>
-              <TableHead className="text-center w-16">หน่วย</TableHead>
-              <TableHead className="text-right hidden lg:table-cell">ค่าวัสดุ/หน่วย</TableHead>
-              <TableHead className="text-right hidden lg:table-cell">ค่าแรง/หน่วย</TableHead>
-              <TableHead className="text-right hidden xl:table-cell">รวมค่าวัสดุ</TableHead>
-              <TableHead className="text-right hidden xl:table-cell">รวมค่าแรง</TableHead>
-              <TableHead className="text-right">รวมทั้งสิ้น</TableHead>
-              <TableHead className="text-center w-12">ลบ</TableHead>
+              <TableHead className="text-center w-[3rem]">ลำดับ</TableHead>
+              <TableHead className="w-auto">รายการ</TableHead>
+              <TableHead className="text-center w-[5rem]">ปริมาณ</TableHead>
+              <TableHead className="text-center w-[3rem]">หน่วย</TableHead>
+              <TableHead className="text-right w-[6rem]">ค่าวัสดุ/หน่วย</TableHead>
+              <TableHead className="text-right w-[5rem]">ค่าแรง/หน่วย</TableHead>
+              <TableHead className="text-right w-[6rem]">รวมค่าวัสดุ</TableHead>
+              <TableHead className="text-right w-[5rem]">รวมค่าแรง</TableHead>
+              <TableHead className="text-right w-[6rem]">รวมทั้งสิ้น</TableHead>
+              <TableHead className="text-center w-[2.5rem]">ลบ</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -91,42 +91,43 @@ export default function LineItemsTable({
                 <TableRow key={item.id}>
                   <TableCell className="text-center">{index + 1}</TableCell>
                   <TableCell>
-                    <div className="text-sm line-clamp-2 break-words" title={item.item_name}>{item.item_name}</div>
+                    <div className="text-sm truncate" title={item.item_name}>{item.item_name}</div>
                     {item.remarks && (
-                      <div className="text-xs text-muted-foreground">{item.remarks}</div>
+                      <div className="text-xs text-muted-foreground truncate">{item.remarks}</div>
                     )}
                   </TableCell>
-                  <TableCell>
+                  <TableCell className="p-1">
                     <QuantityEditor
                       value={item.quantity ?? 0}
                       step={1}
                       onChange={(v) => onUpdateQuantity(item.id, v)}
+                      className="w-full"
                     />
                   </TableCell>
                   <TableCell className="text-center text-sm">{item.unit}</TableCell>
-                  <TableCell className="text-right text-sm hidden lg:table-cell">
+                  <TableCell className="text-right text-sm tabular-nums">
                     {formatNumber(item.material_cost_per_unit)}
                   </TableCell>
-                  <TableCell className="text-right text-sm hidden lg:table-cell">
+                  <TableCell className="text-right text-sm tabular-nums">
                     {formatNumber(item.labor_cost_per_unit)}
                   </TableCell>
-                  <TableCell className="text-right text-sm hidden xl:table-cell">
+                  <TableCell className="text-right text-sm tabular-nums">
                     {formatNumber(item.total_material_cost)}
                   </TableCell>
-                  <TableCell className="text-right text-sm hidden xl:table-cell">
+                  <TableCell className="text-right text-sm tabular-nums">
                     {formatNumber(item.total_labor_cost)}
                   </TableCell>
-                  <TableCell className="text-right text-sm font-bold text-primary">
+                  <TableCell className="text-right text-sm font-semibold text-primary tabular-nums">
                     {formatNumber(item.total_cost)}
                   </TableCell>
-                  <TableCell className="text-center">
+                  <TableCell className="text-center p-1">
                     <Button
                       variant="ghost"
                       size="icon"
                       onClick={() => onRemoveItem(item.id)}
-                      className="text-destructive hover:text-destructive hover:bg-destructive/10"
+                      className="h-8 w-8 text-destructive hover:text-destructive hover:bg-destructive/10"
                     >
-                      <Trash2 className="w-4 h-4" />
+                      <Trash2 className="h-4 w-4" />
                     </Button>
                   </TableCell>
                 </TableRow>
