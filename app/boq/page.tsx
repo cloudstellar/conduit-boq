@@ -334,7 +334,7 @@ export default function BOQListPage() {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>โครงการ</TableHead>
+                <TableHead className="min-w-[200px]">โครงการ</TableHead>
                 <TableHead>เส้นทาง</TableHead>
                 <TableHead>ผู้ประมาณราคา</TableHead>
                 <TableHead className="text-right">ยอดรวม (บาท)</TableHead>
@@ -353,12 +353,16 @@ export default function BOQListPage() {
               ) : (
                 filteredList.map((boq) => (
                   <TableRow key={boq.id}>
-                    <TableCell className="font-medium">{boq.project_name}</TableCell>
-                    <TableCell className="text-muted-foreground">{boq.route || '-'}</TableCell>
+                    <TableCell className="font-medium">
+                      <div className="line-clamp-2" title={boq.project_name}>
+                        {boq.project_name}
+                      </div>
+                    </TableCell>
+                    <TableCell className="text-muted-foreground whitespace-nowrap">{boq.route || '-'}</TableCell>
                     <TableCell className="text-muted-foreground">{boq.estimator_name}</TableCell>
-                    <TableCell className="text-right font-medium text-blue-600">{formatNumber(boq.total_cost)}</TableCell>
+                    <TableCell className="text-right font-medium text-blue-600 whitespace-nowrap tabular-nums">{formatNumber(boq.total_cost)}</TableCell>
                     <TableCell className="text-center">{getStatusBadge(boq.status)}</TableCell>
-                    <TableCell className="text-center text-muted-foreground">{formatDate(boq.document_date)}</TableCell>
+                    <TableCell className="text-center text-muted-foreground whitespace-nowrap">{formatDate(boq.document_date)}</TableCell>
                     <TableCell>
                       <div className="flex justify-center gap-1">
                         <Link href={`/boq/${boq.id}/edit`}>
