@@ -23,11 +23,11 @@
 ## 🔄 shadcn/ui Migration (NEXT)
 
 ### Phase 1: Setup (M1-M2)
-- [ ] **M1:** Path verify + `npx shadcn@latest init`
-- [ ] **M1:** Install dependencies (clsx, tailwind-merge, cva, lucide, animate)
-- [ ] **M1:** Create `lib/utils.ts` + Install components
-- [ ] **M2:** 🛑 `npm run build` — ต้องผ่านก่อนไปต่อ!
-- [ ] **M2:** Commit + Tag + Push: `v1.2.1-shadcn-phase1`
+- [x] **M1:** Path verify + `npx shadcn@latest init`
+- [x] **M1:** Install dependencies (clsx, tailwind-merge, cva, lucide, animate)
+- [x] **M1:** Create `lib/utils.ts` + Install 15 components
+- [x] **M2:** � `npm run build` — **PASSED!**
+- [/] **M2:** Commit + Tag + Push: `v1.2.1-shadcn-phase1`
 
 ### Phase 2: Component Migration (M3-M6)
 - [ ] **M3:** 🔍 PRINT SCAN → บันทึกผลที่ `docs/print-deps.txt`
