@@ -132,3 +132,43 @@ State: Don't clear results on select
 ### Mobile
 - [ ] 375px ไม่มี horizontal scroll
 - [ ] Card layout ทำงานถูกต้อง
+
+---
+
+## 6. BOQ List Table Patterns (2026-02-01)
+
+### Route Column: Badge + Dialog
+```
+┌─ Table Cell ─┐     ┌─ Dialog (on click) ─────────────────────┐
+│ [5 เส้นทาง] │ --> │ รายการเส้นทาง (5 เส้นทาง)               │
+└──────────────┘     │ • เส้นทาง 1 ชื่อเต็ม ไม่ clamp        │
+                     │ • เส้นทาง 2 ชื่อเต็ม ไม่ clamp        │
+                     └─────────────────────────────────────────┘
+```
+
+**Why Badge + Dialog:**
+- Table cells stay compact
+- Route names often long (50+ chars)
+- Users can see count at a glance
+- Full details on demand
+
+**Component:** `RouteBadge.tsx`
+
+---
+
+### Column Layout (7 columns)
+
+| Column | Width | Content |
+|--------|-------|---------|
+| โครงการ | 380px | line-clamp-4 |
+| เส้นทาง | 100px | Badge "N เส้นทาง" |
+| ผู้ประมาณราคา | 150px | full name, line-clamp-2 |
+| ก่อน VAT | 140px | `total_with_factor_f` (snapshot) |
+| สถานะ | 90px | Badge color-coded |
+| วันที่ | 100px | DD MMM format |
+| จัดการ | 120px | icon buttons: edit/print/copy/delete |
+
+**Key Decisions:**
+- "ก่อน VAT" uses snapshot value, not calculated
+- Estimator shows full name (not abbreviated)
+- Actions are icon-only with tooltips
