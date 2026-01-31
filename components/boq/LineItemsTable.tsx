@@ -62,74 +62,84 @@ export default function LineItemsTable({
         />
       </div>
 
-      {/* Items Table */}
+      {/* Items Table - 2-row pattern: row1=name, row2=data */}
       <div className="border rounded-lg overflow-hidden">
         <Table>
           <TableHeader>
             <TableRow className="bg-muted/50">
-              <TableHead className="text-center w-10">ลำดับ</TableHead>
-              <TableHead>รายการ</TableHead>
+              <TableHead className="text-center w-8">#</TableHead>
               <TableHead className="text-center">ปริมาณ</TableHead>
               <TableHead className="text-center w-12">หน่วย</TableHead>
-              <TableHead className="text-right hidden xl:table-cell">ค่าวัสดุ/หน่วย</TableHead>
-              <TableHead className="text-right hidden xl:table-cell">ค่าแรง/หน่วย</TableHead>
-              <TableHead className="text-right hidden xl:table-cell">รวมค่าวัสดุ</TableHead>
-              <TableHead className="text-right hidden xl:table-cell">รวมค่าแรง</TableHead>
-              <TableHead className="text-right">รวมทั้งสิ้น</TableHead>
+              <TableHead className="text-right whitespace-nowrap">ค่าวัสดุ/หน่วย</TableHead>
+              <TableHead className="text-right whitespace-nowrap">ค่าแรง/หน่วย</TableHead>
+              <TableHead className="text-right whitespace-nowrap">รวมค่าวัสดุ</TableHead>
+              <TableHead className="text-right whitespace-nowrap">รวมค่าแรง</TableHead>
+              <TableHead className="text-right whitespace-nowrap">รวมทั้งสิ้น</TableHead>
               <TableHead className="text-center w-10">ลบ</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {items.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={10} className="text-center py-8 text-muted-foreground">
+                <TableCell colSpan={9} className="text-center py-8 text-muted-foreground">
                   ยังไม่มีรายการ - ใช้ช่องค้นหาด้านบนเพื่อเพิ่มรายการ
                 </TableCell>
               </TableRow>
             ) : (
               items.map((item, index) => (
-                <TableRow key={item.id}>
-                  <TableCell className="text-center">{index + 1}</TableCell>
-                  <TableCell>
-                    <div className="text-sm break-words">{item.item_name}</div>
-                    {item.remarks && (
-                      <div className="text-xs text-muted-foreground break-words">{item.remarks}</div>
-                    )}
-                  </TableCell>
-                  <TableCell className="p-1">
-                    <QuantityEditor
-                      value={item.quantity ?? 0}
-                      step={1}
-                      onChange={(v) => onUpdateQuantity(item.id, v)}
-                    />
-                  </TableCell>
-                  <TableCell className="text-center text-sm">{item.unit}</TableCell>
-                  <TableCell className="text-right text-sm tabular-nums hidden xl:table-cell">
-                    {formatNumber(item.material_cost_per_unit)}
-                  </TableCell>
-                  <TableCell className="text-right text-sm tabular-nums hidden xl:table-cell">
-                    {formatNumber(item.labor_cost_per_unit)}
-                  </TableCell>
-                  <TableCell className="text-right text-sm tabular-nums hidden xl:table-cell">
-                    {formatNumber(item.total_material_cost)}
-                  </TableCell>
-                  <TableCell className="text-right text-sm tabular-nums hidden xl:table-cell">
-                    {formatNumber(item.total_labor_cost)}
-                  </TableCell>
-                  <TableCell className="text-right text-sm font-semibold text-primary tabular-nums">
-                    {formatNumber(item.total_cost)}
-                  </TableCell>
-                  <TableCell className="text-center p-1">
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      onClick={() => onRemoveItem(item.id)}
-                      className="h-8 w-8 text-destructive hover:text-destructive hover:bg-destructive/10"
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
-                  </TableCell>
-                </TableRow>
+                <>
+                  {/* Row 1: Item name (full width) */}
+                  <TableRow key={`${item.id}-name`} className="bg-accent/30 border-b-0">
+                    <TableCell className="text-center text-sm font-medium text-muted-foreground py-2">
+                      {index + 1}
+                    </TableCell>
+                    <TableCell colSpan={8} className="py-2">
+                      <div className="text-sm font-medium line-clamp-2" title={item.item_name}>
+                        {item.item_name}
+                      </div>
+                      {item.remarks && (
+                        <div className="text-xs text-muted-foreground mt-0.5">{item.remarks}</div>
+                      )}
+                    </TableCell>
+                  </TableRow>
+                  {/* Row 2: Data columns */}
+                  <TableRow key={`${item.id}-data`}>
+                    <TableCell />
+                    <TableCell className="p-1">
+                      <QuantityEditor
+                        value={item.quantity ?? 0}
+                        step={1}
+                        onChange={(v) => onUpdateQuantity(item.id, v)}
+                      />
+                    </TableCell>
+                    <TableCell className="text-center text-sm">{item.unit}</TableCell>
+                    <TableCell className="text-right text-sm tabular-nums whitespace-nowrap">
+                      {formatNumber(item.material_cost_per_unit)}
+                    </TableCell>
+                    <TableCell className="text-right text-sm tabular-nums whitespace-nowrap">
+                      {formatNumber(item.labor_cost_per_unit)}
+                    </TableCell>
+                    <TableCell className="text-right text-sm tabular-nums whitespace-nowrap">
+                      {formatNumber(item.total_material_cost)}
+                    </TableCell>
+                    <TableCell className="text-right text-sm tabular-nums whitespace-nowrap">
+                      {formatNumber(item.total_labor_cost)}
+                    </TableCell>
+                    <TableCell className="text-right text-sm font-semibold text-primary tabular-nums whitespace-nowrap">
+                      {formatNumber(item.total_cost)}
+                    </TableCell>
+                    <TableCell className="text-center p-1">
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => onRemoveItem(item.id)}
+                        className="h-8 w-8 text-destructive hover:text-destructive hover:bg-destructive/10"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </TableCell>
+                  </TableRow>
+                </>
               ))
             )}
           </TableBody>
