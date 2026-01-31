@@ -62,21 +62,21 @@ export default function LineItemsTable({
         />
       </div>
 
-      {/* Items Table - table-fixed prevents horizontal scroll */}
-      <div className="border rounded-lg">
-        <Table className="table-fixed w-full">
+      {/* Items Table */}
+      <div className="border rounded-lg overflow-hidden">
+        <Table>
           <TableHeader>
             <TableRow className="bg-muted/50">
-              <TableHead className="text-center w-[3rem]">ลำดับ</TableHead>
-              <TableHead className="w-auto">รายการ</TableHead>
-              <TableHead className="text-center w-[5rem]">ปริมาณ</TableHead>
-              <TableHead className="text-center w-[3rem]">หน่วย</TableHead>
-              <TableHead className="text-right w-[6rem]">ค่าวัสดุ/หน่วย</TableHead>
-              <TableHead className="text-right w-[5rem]">ค่าแรง/หน่วย</TableHead>
-              <TableHead className="text-right w-[6rem]">รวมค่าวัสดุ</TableHead>
-              <TableHead className="text-right w-[5rem]">รวมค่าแรง</TableHead>
-              <TableHead className="text-right w-[6rem]">รวมทั้งสิ้น</TableHead>
-              <TableHead className="text-center w-[2.5rem]">ลบ</TableHead>
+              <TableHead className="text-center w-10">ลำดับ</TableHead>
+              <TableHead>รายการ</TableHead>
+              <TableHead className="text-center w-24">ปริมาณ</TableHead>
+              <TableHead className="text-center w-12">หน่วย</TableHead>
+              <TableHead className="text-right w-20">ค่าวัสดุ/หน่วย</TableHead>
+              <TableHead className="text-right w-20">ค่าแรง/หน่วย</TableHead>
+              <TableHead className="text-right w-24">รวมค่าวัสดุ</TableHead>
+              <TableHead className="text-right w-24">รวมค่าแรง</TableHead>
+              <TableHead className="text-right w-28">รวมทั้งสิ้น</TableHead>
+              <TableHead className="text-center w-10">ลบ</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -91,9 +91,9 @@ export default function LineItemsTable({
                 <TableRow key={item.id}>
                   <TableCell className="text-center">{index + 1}</TableCell>
                   <TableCell>
-                    <div className="text-sm truncate" title={item.item_name}>{item.item_name}</div>
+                    <div className="text-sm break-words">{item.item_name}</div>
                     {item.remarks && (
-                      <div className="text-xs text-muted-foreground truncate">{item.remarks}</div>
+                      <div className="text-xs text-muted-foreground break-words">{item.remarks}</div>
                     )}
                   </TableCell>
                   <TableCell className="p-1">
@@ -101,7 +101,6 @@ export default function LineItemsTable({
                       value={item.quantity ?? 0}
                       step={1}
                       onChange={(v) => onUpdateQuantity(item.id, v)}
-                      className="w-full"
                     />
                   </TableCell>
                   <TableCell className="text-center text-sm">{item.unit}</TableCell>
