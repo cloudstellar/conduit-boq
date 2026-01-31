@@ -40,11 +40,11 @@
 - [x] ❌ Skip `/boq/[id]/print` (as planned)
 
 ### Phase 4: Best Practices
-- [ ] Fix barrel imports → direct
-- [ ] `Promise.all()` for parallel fetches
+- [x] Fix barrel imports → direct ✅ (none found)
+- [x] `Promise.all()` for parallel fetches ✅ (already implemented)
 
 ### Phase 5: Verification (M8)
-- [ ] **M8:** `npm run lint` + `npm run build` + manual test
+- [x] **M8:** `npm run lint` + `npm run build` ✅
 - [ ] **M8:** Tag + Push: `v1.2.1-shadcn-done`
 
 ---

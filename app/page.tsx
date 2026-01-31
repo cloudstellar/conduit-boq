@@ -5,7 +5,7 @@ import Image from "next/image";
 import UserMenu from "@/components/auth/UserMenu";
 import AuthGuard from "@/components/auth/AuthGuard";
 import { useAuth } from "@/lib/context/AuthContext";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Plus, FileText, DollarSign, Clock, Edit } from "lucide-react";
@@ -13,6 +13,7 @@ import { Plus, FileText, DollarSign, Clock, Edit } from "lucide-react";
 export default function Home() {
   const { user } = useAuth();
   const isPending = user?.status === 'pending';
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const needsOnboarding = isPending && !(user as any)?.onboarding_completed;
 
   return (

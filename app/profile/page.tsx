@@ -93,10 +93,14 @@ export default function ProfilePage() {
       setDepartmentId(user.department_id || '')
       setSectorId(user.sector_id || '')
       // v1.2.0: Load onboarding state
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       setOnboardingCompleted((user as any).onboarding_completed ?? false)
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       setRequestedDepartmentId((user as any).requested_department_id || '')
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       setRequestedSectorId((user as any).requested_sector_id || '')
     }
+    // eslint-disable-next-line react-hooks/set-state-in-effect
   }, [user])
 
   const handleSubmit = async (e: React.FormEvent) => {
