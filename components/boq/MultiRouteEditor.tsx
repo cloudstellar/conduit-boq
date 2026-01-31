@@ -23,6 +23,12 @@ interface MultiRouteEditorProps {
   boqId: string;
   onSave: (routes: Route[], routeItems: Record<string, LineItem[]>) => Promise<void>;
   isSaving: boolean;
+  /** Callback to pass calculated factor values up for snapshot saving */
+  onFactorCalculated?: (data: {
+    factor: number;
+    totalWithFactor: number;
+    totalWithVAT: number;
+  }) => void;
 }
 
 export interface RouteWithItems extends Route {
@@ -39,7 +45,7 @@ const isSinglePipeItem = (itemName: string): boolean => {
   return /^งานวางท่อ\s+1-/.test(itemName) || /^งานดันท่อ.*1-/.test(itemName);
 };
 
-export default function MultiRouteEditor({ boqId, onSave, isSaving }: MultiRouteEditorProps) {
+export default function MultiRouteEditor({ boqId, onSave, isSaving, onFactorCalculated }: MultiRouteEditorProps) {
   const supabase = useMemo(() => createClient(), []);
   const [routes, setRoutes] = useState<Route[]>([]);
   const [routeItems, setRouteItems] = useState<Record<string, LineItem[]>>({});
@@ -428,6 +434,7 @@ export default function MultiRouteEditor({ boqId, onSave, isSaving }: MultiRoute
             total_cost: r.total_cost,
           }))}
           grandTotalCost={grandTotals.total}
+          onFactorCalculated={onFactorCalculated}
         />
       )}
 

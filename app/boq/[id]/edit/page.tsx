@@ -31,6 +31,13 @@ export default function EditBOQPage() {
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  // Factor F snapshot data from MultiRouteEditor
+  const [factorData, setFactorData] = useState({
+    factor: 1,
+    totalWithFactor: 0,
+    totalWithVAT: 0,
+  });
+
   // Check edit permission
   const canEdit = can(user, 'update', 'boq', boqContext || undefined);
 
@@ -102,6 +109,10 @@ export default function EditBOQPage() {
         total_material_cost: grandTotals.material,
         total_labor_cost: grandTotals.labor,
         total_cost: grandTotals.total,
+        // Factor F snapshot
+        factor_f: factorData.factor,
+        total_with_factor_f: factorData.totalWithFactor,
+        total_with_vat: factorData.totalWithVAT,
       };
 
       const routesData = routes.map((route) => ({
@@ -234,6 +245,7 @@ export default function EditBOQPage() {
             boqId={boqId}
             onSave={handleSave}
             isSaving={isSaving}
+            onFactorCalculated={setFactorData}
           />
         </div>
       </div>

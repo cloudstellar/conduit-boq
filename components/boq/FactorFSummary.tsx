@@ -24,9 +24,15 @@ interface RouteData {
 interface FactorFSummaryProps {
   routes: RouteData[];
   grandTotalCost: number;
+  /** Callback to pass calculated factor values up for snapshot saving */
+  onFactorCalculated?: (data: {
+    factor: number;
+    totalWithFactor: number;
+    totalWithVAT: number;
+  }) => void;
 }
 
-export default function FactorFSummary({ routes, grandTotalCost }: FactorFSummaryProps) {
+export default function FactorFSummary({ routes, grandTotalCost, onFactorCalculated }: FactorFSummaryProps) {
   const supabase = useMemo(() => createClient(), []);
   const [lowerFactorRef, setLowerFactorRef] = useState<FactorReference | null>(null);
   const [upperFactorRef, setUpperFactorRef] = useState<FactorReference | null>(null);
@@ -110,6 +116,19 @@ export default function FactorFSummary({ routes, grandTotalCost }: FactorFSummar
 
   const factor = calculateInterpolatedFactor();
   const costInMillion = grandTotalCost / 1000000;
+  const totalWithFactor = grandTotalCost * factor;
+  const totalWithVAT = totalWithFactor * (1 + VAT_RATE);
+
+  // Call callback when factor values change (for snapshot saving)
+  useEffect(() => {
+    if (onFactorCalculated && !isLoading && grandTotalCost > 0) {
+      onFactorCalculated({
+        factor,
+        totalWithFactor,
+        totalWithVAT,
+      });
+    }
+  }, [factor, totalWithFactor, totalWithVAT, onFactorCalculated, isLoading, grandTotalCost]);
 
   return (
     <Card className="bg-gradient-to-br from-blue-50 to-indigo-50 border-blue-200">
