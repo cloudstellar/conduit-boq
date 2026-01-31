@@ -6,6 +6,19 @@ import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
 import { useAuth } from '@/lib/context/AuthContext'
 import { Department, Sector } from '@/lib/types/auth'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Alert, AlertDescription } from '@/components/ui/alert'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
+import { Loader2, ArrowLeft, LogOut, Clock, Ban, Home } from 'lucide-react'
 
 export default function ProfilePage() {
   const router = useRouter()
@@ -144,7 +157,7 @@ export default function ProfilePage() {
   if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+        <Loader2 className="h-8 w-8 animate-spin text-blue-600" />
       </div>
     )
   }
@@ -161,20 +174,19 @@ export default function ProfilePage() {
         <div className="max-w-4xl mx-auto px-4 py-4 flex justify-between items-center">
           <div>
             <h1 className="text-2xl font-bold text-gray-900">โปรไฟล์</h1>
-            <p className="text-sm text-gray-600">จัดการข้อมูลส่วนตัว</p>
+            <p className="text-sm text-muted-foreground">จัดการข้อมูลส่วนตัว</p>
           </div>
           <div className="flex items-center gap-4">
             {(user?.status === 'active' || user?.status === 'pending') && (
-              <Link href="/" className="text-blue-600 hover:text-blue-800">
-                ← กลับหน้าหลัก
+              <Link href="/" className="text-blue-600 hover:text-blue-800 flex items-center gap-1">
+                <ArrowLeft className="h-4 w-4" />
+                กลับหน้าหลัก
               </Link>
             )}
-            <button
-              onClick={signOut}
-              className="text-red-600 hover:text-red-800 text-sm"
-            >
+            <Button variant="ghost" onClick={signOut} className="text-red-600 hover:text-red-800">
+              <LogOut className="h-4 w-4 mr-1" />
               ออกจากระบบ
-            </button>
+            </Button>
           </div>
         </div>
       </header>
@@ -182,250 +194,223 @@ export default function ProfilePage() {
       <main className="max-w-4xl mx-auto px-4 py-8">
         {/* Pending Status Banner */}
         {user?.status === 'pending' && (
-          <div className="mb-6 p-4 bg-amber-50 border border-amber-200 rounded-lg">
-            <div className="flex items-start gap-3">
-              <svg className="w-6 h-6 text-amber-600 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
-              <div>
-                <h3 className="font-medium text-amber-800">บัญชีของคุณอยู่ระหว่างรอการยืนยันสังกัดจากผู้ดูแลระบบ</h3>
-                <p className="text-sm text-amber-700 mt-1">
-                  ขณะนี้คุณสามารถสร้างและแก้ไข BOQ ของตนเองได้ แต่ยังไม่สามารถลบ/อนุมัติ BOQ ได้
-                </p>
-                <p className="text-sm text-amber-700 mt-2">
-                  กรุณากรอกข้อมูลโปรไฟล์ให้ครบถ้วน โดยเฉพาะข้อมูลสังกัด เพื่อให้ผู้ดูแลระบบพิจารณาอนุมัติ
-                </p>
-              </div>
-            </div>
-          </div>
+          <Alert className="mb-6 bg-amber-50 border-amber-200">
+            <Clock className="h-5 w-5 text-amber-600" />
+            <AlertDescription className="ml-2">
+              <p className="font-medium text-amber-800">บัญชีของคุณอยู่ระหว่างรอการยืนยันสังกัดจากผู้ดูแลระบบ</p>
+              <p className="text-sm text-amber-700 mt-1">
+                ขณะนี้คุณสามารถสร้างและแก้ไข BOQ ของตนเองได้ แต่ยังไม่สามารถลบ/อนุมัติ BOQ ได้
+              </p>
+              <p className="text-sm text-amber-700 mt-1">
+                กรุณากรอกข้อมูลโปรไฟล์ให้ครบถ้วน โดยเฉพาะข้อมูลสังกัด เพื่อให้ผู้ดูแลระบบพิจารณาอนุมัติ
+              </p>
+            </AlertDescription>
+          </Alert>
         )}
 
         {/* Inactive Status - Full Screen Block */}
         {user?.status === 'inactive' && (
-          <div className="bg-white rounded-lg shadow-lg p-8 text-center max-w-lg mx-auto mt-8">
-            <div className="w-20 h-20 mx-auto mb-6 bg-red-100 rounded-full flex items-center justify-center">
-              <svg className="w-10 h-10 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636" />
-              </svg>
-            </div>
-            <h2 className="text-2xl font-bold text-gray-900 mb-2">บัญชีถูกระงับการใช้งาน</h2>
-            <p className="text-gray-600 mb-6">
-              บัญชีของคุณถูกระงับการใช้งานชั่วคราว<br />
-              หากต้องการใช้งานอีกครั้ง กรุณาติดต่อผู้ดูแลระบบ
-            </p>
-            <div className="space-y-3">
-              <div className="p-4 bg-gray-50 rounded-lg text-left">
-                <p className="text-sm text-gray-500">อีเมลที่ลงทะเบียน</p>
-                <p className="font-medium text-gray-900">{user.email}</p>
+          <Card className="max-w-lg mx-auto mt-8 text-center">
+            <CardContent className="pt-8 pb-8">
+              <div className="w-20 h-20 mx-auto mb-6 bg-red-100 rounded-full flex items-center justify-center">
+                <Ban className="w-10 h-10 text-red-600" />
               </div>
-              <button
-                onClick={signOut}
-                className="w-full px-4 py-3 bg-red-600 text-white rounded-lg hover:bg-red-700
-                         transition-colors font-medium"
-              >
-                ออกจากระบบ
-              </button>
-            </div>
-          </div>
+              <h2 className="text-2xl font-bold text-gray-900 mb-2">บัญชีถูกระงับการใช้งาน</h2>
+              <p className="text-muted-foreground mb-6">
+                บัญชีของคุณถูกระงับการใช้งานชั่วคราว<br />
+                หากต้องการใช้งานอีกครั้ง กรุณาติดต่อผู้ดูแลระบบ
+              </p>
+              <div className="space-y-3">
+                <div className="p-4 bg-gray-50 rounded-lg text-left">
+                  <p className="text-sm text-muted-foreground">อีเมลที่ลงทะเบียน</p>
+                  <p className="font-medium text-gray-900">{user.email}</p>
+                </div>
+                <Button variant="destructive" className="w-full" onClick={signOut}>
+                  <LogOut className="h-4 w-4 mr-2" />
+                  ออกจากระบบ
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
         )}
 
         {/* Normal Profile Form - Only for active/pending users */}
         {user?.status !== 'inactive' && (
-          <div className="bg-white rounded-lg shadow p-6">
-            {message && (
-              <div className={`mb-6 p-4 rounded-md ${message.type === 'success' ? 'bg-green-50 border border-green-200' : 'bg-red-50 text-red-700'
-                }`}>
-                <p className={message.type === 'success' ? 'text-green-700' : ''}>{message.text}</p>
-                {message.type === 'success' && user?.status === 'pending' && (
-                  <div className="mt-4">
-                    <Link
-                      href="/"
-                      className="inline-flex items-center px-4 py-2 bg-green-600 hover:bg-green-700 
-                               text-white font-medium rounded-lg transition-colors"
-                    >
-                      <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
-                      </svg>
-                      ไปหน้าหลักเพื่อสร้าง BOQ
-                    </Link>
+          <Card>
+            <CardContent className="pt-6">
+              {message && (
+                <Alert className={`mb-6 ${message.type === 'success' ? 'bg-green-50 border-green-200' : 'bg-red-50 border-red-200'}`}>
+                  <AlertDescription className={message.type === 'success' ? 'text-green-700' : 'text-red-700'}>
+                    {message.text}
+                  </AlertDescription>
+                  {message.type === 'success' && user?.status === 'pending' && (
+                    <div className="mt-4">
+                      <Link href="/">
+                        <Button className="bg-green-600 hover:bg-green-700">
+                          <Home className="h-4 w-4 mr-2" />
+                          ไปหน้าหลักเพื่อสร้าง BOQ
+                        </Button>
+                      </Link>
+                    </div>
+                  )}
+                </Alert>
+              )}
+
+              <form onSubmit={handleSubmit} className="space-y-6">
+                {/* Email & Role (read-only) */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="space-y-2">
+                    <Label>อีเมล</Label>
+                    <Input value={user.email || ''} disabled className="bg-gray-100" />
                   </div>
-                )}
-              </div>
-            )}
+                  <div className="space-y-2">
+                    <Label>สิทธิ์การใช้งาน</Label>
+                    <Input value={getRoleLabel(user.role)} disabled className="bg-gray-100" />
+                  </div>
+                </div>
 
-            <form onSubmit={handleSubmit} className="space-y-6">
-              {/* Email & Role (read-only) */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">อีเมล</label>
-                  <input
-                    type="email"
-                    value={user.email || ''}
-                    disabled
-                    className="mt-1 block w-full px-3 py-2 bg-gray-100 border border-gray-300
-                           rounded-md text-gray-500 cursor-not-allowed"
+                {/* Name */}
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                  <div className="space-y-2">
+                    <Label>คำนำหน้า</Label>
+                    <Select value={title || '__NONE__'} onValueChange={(v) => setTitle(v === '__NONE__' ? '' : v)}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="เลือก..." />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="__NONE__">เลือก...</SelectItem>
+                        <SelectItem value="นาย">นาย</SelectItem>
+                        <SelectItem value="นาง">นาง</SelectItem>
+                        <SelectItem value="นางสาว">นางสาว</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="space-y-2">
+                    <Label>ชื่อ *</Label>
+                    <Input
+                      required
+                      value={firstName}
+                      onChange={(e) => setFirstName(e.target.value)}
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label>นามสกุล</Label>
+                    <Input
+                      value={lastName}
+                      onChange={(e) => setLastName(e.target.value)}
+                    />
+                  </div>
+                </div>
+
+                {/* Position & Employee ID */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="space-y-2">
+                    <Label>ตำแหน่ง</Label>
+                    <Input
+                      value={position}
+                      onChange={(e) => setPosition(e.target.value)}
+                      placeholder="เช่น วิศวกร 6"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label>รหัสพนักงาน</Label>
+                    <Input
+                      value={employeeId}
+                      onChange={(e) => setEmployeeId(e.target.value)}
+                    />
+                  </div>
+                </div>
+
+                {/* Department & Sector */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="space-y-2">
+                    <Label>ฝ่าย</Label>
+                    {canEditOrg ? (
+                      <Select
+                        value={requestedDepartmentId || '__NONE__'}
+                        onValueChange={(v) => {
+                          setRequestedDepartmentId(v === '__NONE__' ? '' : v)
+                          setRequestedSectorId('')
+                        }}
+                      >
+                        <SelectTrigger>
+                          <SelectValue placeholder="เลือกฝ่าย..." />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="__NONE__">เลือกฝ่าย...</SelectItem>
+                          {departments.map((dept) => (
+                            <SelectItem key={dept.id} value={dept.id}>
+                              {dept.full_name || dept.name}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    ) : (
+                      <div className="px-3 py-2 bg-gray-100 border rounded-md text-muted-foreground">
+                        {departments.find(d => d.id === departmentId)?.name || 'ยังไม่ได้กำหนด'}
+                        <span className="ml-2 text-xs text-amber-600">(ติดต่อ Admin เพื่อเปลี่ยน)</span>
+                      </div>
+                    )}
+                  </div>
+                  <div className="space-y-2">
+                    <Label>ส่วน</Label>
+                    {canEditOrg ? (
+                      <Select
+                        value={requestedSectorId || '__NONE__'}
+                        onValueChange={(v) => setRequestedSectorId(v === '__NONE__' ? '' : v)}
+                        disabled={!requestedDepartmentId}
+                      >
+                        <SelectTrigger>
+                          <SelectValue placeholder="เลือกส่วน..." />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="__NONE__">เลือกส่วน...</SelectItem>
+                          {sectors.map((sector) => (
+                            <SelectItem key={sector.id} value={sector.id}>
+                              {sector.full_name || sector.name}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    ) : (
+                      <div className="px-3 py-2 bg-gray-100 border rounded-md text-muted-foreground">
+                        {sectors.find(s => s.id === sectorId)?.name || 'ยังไม่ได้กำหนด'}
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                {/* Phone */}
+                <div className="space-y-2">
+                  <Label>เบอร์โทรศัพท์</Label>
+                  <Input
+                    type="tel"
+                    value={phone}
+                    onChange={(e) => setPhone(e.target.value)}
+                    className="max-w-xs"
                   />
                 </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">สิทธิ์การใช้งาน</label>
-                  <input
-                    type="text"
-                    value={getRoleLabel(user.role)}
-                    disabled
-                    className="mt-1 block w-full px-3 py-2 bg-gray-100 border border-gray-300
-                           rounded-md text-gray-500 cursor-not-allowed"
-                  />
-                </div>
-              </div>
 
-              {/* Name */}
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">คำนำหน้า</label>
-                  <select
-                    value={title}
-                    onChange={(e) => setTitle(e.target.value)}
-                    className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md
-                           focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                  >
-                    <option value="">เลือก...</option>
-                    <option value="นาย">นาย</option>
-                    <option value="นาง">นาง</option>
-                    <option value="นางสาว">นางสาว</option>
-                  </select>
+                {/* Submit */}
+                <div className="flex justify-end pt-4">
+                  <Button type="submit" disabled={isSaving}>
+                    {isSaving ? (
+                      <>
+                        <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                        กำลังบันทึก...
+                      </>
+                    ) : (
+                      'บันทึก'
+                    )}
+                  </Button>
                 </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">ชื่อ *</label>
-                  <input
-                    type="text"
-                    required
-                    value={firstName}
-                    onChange={(e) => setFirstName(e.target.value)}
-                    className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md
-                           focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">นามสกุล</label>
-                  <input
-                    type="text"
-                    value={lastName}
-                    onChange={(e) => setLastName(e.target.value)}
-                    className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md
-                           focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                  />
-                </div>
-              </div>
-
-              {/* Position & Employee ID */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">ตำแหน่ง</label>
-                  <input
-                    type="text"
-                    value={position}
-                    onChange={(e) => setPosition(e.target.value)}
-                    placeholder="เช่น วิศวกร 6"
-                    className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md
-                           focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">รหัสพนักงาน</label>
-                  <input
-                    type="text"
-                    value={employeeId}
-                    onChange={(e) => setEmployeeId(e.target.value)}
-                    className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md
-                           focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                  />
-                </div>
-              </div>
-
-              {/* Department & Sector */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">ฝ่าย</label>
-                  {canEditOrg ? (
-                    <select
-                      value={requestedDepartmentId}
-                      onChange={(e) => {
-                        setRequestedDepartmentId(e.target.value)
-                        setRequestedSectorId('')
-                      }}
-                      className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md
-                             focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                    >
-                      <option value="">เลือกฝ่าย...</option>
-                      {departments.map((dept) => (
-                        <option key={dept.id} value={dept.id}>
-                          {dept.full_name || dept.name}
-                        </option>
-                      ))}
-                    </select>
-                  ) : (
-                    <div className="mt-1 block w-full px-3 py-2 bg-gray-100 border border-gray-300 rounded-md text-gray-600">
-                      {departments.find(d => d.id === departmentId)?.name || 'ยังไม่ได้กำหนด'}
-                      <span className="ml-2 text-xs text-amber-600">(ติดต่อ Admin เพื่อเปลี่ยน)</span>
-                    </div>
-                  )}
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">ส่วน</label>
-                  {canEditOrg ? (
-                    <select
-                      value={requestedSectorId}
-                      onChange={(e) => setRequestedSectorId(e.target.value)}
-                      disabled={!requestedDepartmentId}
-                      className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md
-                             focus:outline-none focus:ring-blue-500 focus:border-blue-500
-                             disabled:bg-gray-100 disabled:cursor-not-allowed"
-                    >
-                      <option value="">เลือกส่วน...</option>
-                      {sectors.map((sector) => (
-                        <option key={sector.id} value={sector.id}>
-                          {sector.full_name || sector.name}
-                        </option>
-                      ))}
-                    </select>
-                  ) : (
-                    <div className="mt-1 block w-full px-3 py-2 bg-gray-100 border border-gray-300 rounded-md text-gray-600">
-                      {sectors.find(s => s.id === sectorId)?.name || 'ยังไม่ได้กำหนด'}
-                    </div>
-                  )}
-                </div>
-              </div>
-
-              {/* Phone */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700">เบอร์โทรศัพท์</label>
-                <input
-                  type="tel"
-                  value={phone}
-                  onChange={(e) => setPhone(e.target.value)}
-                  className="mt-1 block w-full max-w-xs px-3 py-2 border border-gray-300 rounded-md
-                         focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                />
-              </div>
-
-              {/* Submit */}
-              <div className="flex justify-end pt-4">
-                <button
-                  type="submit"
-                  disabled={isSaving}
-                  className="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700
-                         focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2
-                         disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  {isSaving ? 'กำลังบันทึก...' : 'บันทึก'}
-                </button>
-              </div>
-            </form>
-
-            {/* Change Password Section */}
-            <ChangePasswordSection />
-          </div>
+              </form>
+            </CardContent>
+          </Card>
         )}
+
+        {/* Change Password Section */}
+        {user?.status !== 'inactive' && <ChangePasswordSection />}
       </main>
     </div>
   )
@@ -444,7 +429,6 @@ function getRoleLabel(role: string): string {
 
 function ChangePasswordSection() {
   const supabase = createClient()
-  const [currentPassword, setCurrentPassword] = useState('')
   const [newPassword, setNewPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
   const [isChanging, setIsChanging] = useState(false)
@@ -476,62 +460,62 @@ function ChangePasswordSection() {
       setMessage({ type: 'error', text: error.message })
     } else {
       setMessage({ type: 'success', text: 'เปลี่ยนรหัสผ่านเรียบร้อยแล้ว' })
-      setCurrentPassword('')
       setNewPassword('')
       setConfirmPassword('')
     }
   }
 
   return (
-    <div className="bg-white rounded-lg shadow p-6 mt-6">
-      <h2 className="text-lg font-semibold text-gray-900 mb-4">เปลี่ยนรหัสผ่าน</h2>
+    <Card className="mt-6">
+      <CardHeader>
+        <CardTitle>เปลี่ยนรหัสผ่าน</CardTitle>
+      </CardHeader>
+      <CardContent>
+        {message && (
+          <Alert className={`mb-4 ${message.type === 'success' ? 'bg-green-50 border-green-200' : 'bg-red-50 border-red-200'}`}>
+            <AlertDescription className={message.type === 'success' ? 'text-green-700' : 'text-red-700'}>
+              {message.text}
+            </AlertDescription>
+          </Alert>
+        )}
 
-      {message && (
-        <div className={`mb-4 p-4 rounded-md ${message.type === 'success' ? 'bg-green-50 text-green-700' : 'bg-red-50 text-red-700'
-          }`}>
-          {message.text}
-        </div>
-      )}
-
-      <form onSubmit={handleChangePassword} className="space-y-4">
-        <div>
-          <label className="block text-sm font-medium text-gray-700">รหัสผ่านใหม่</label>
-          <input
-            type="password"
-            required
-            value={newPassword}
-            onChange={(e) => setNewPassword(e.target.value)}
-            minLength={6}
-            className="mt-1 block w-full max-w-md px-3 py-2 border border-gray-300 rounded-md
-                     focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-            placeholder="อย่างน้อย 6 ตัวอักษร"
-          />
-        </div>
-        <div>
-          <label className="block text-sm font-medium text-gray-700">ยืนยันรหัสผ่านใหม่</label>
-          <input
-            type="password"
-            required
-            value={confirmPassword}
-            onChange={(e) => setConfirmPassword(e.target.value)}
-            minLength={6}
-            className="mt-1 block w-full max-w-md px-3 py-2 border border-gray-300 rounded-md
-                     focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-            placeholder="พิมพ์รหัสผ่านใหม่อีกครั้ง"
-          />
-        </div>
-        <div>
-          <button
-            type="submit"
-            disabled={isChanging}
-            className="px-4 py-2 bg-gray-800 text-white rounded-md hover:bg-gray-900
-                     focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2
-                     disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            {isChanging ? 'กำลังเปลี่ยน...' : 'เปลี่ยนรหัสผ่าน'}
-          </button>
-        </div>
-      </form>
-    </div>
+        <form onSubmit={handleChangePassword} className="space-y-4">
+          <div className="space-y-2">
+            <Label>รหัสผ่านใหม่</Label>
+            <Input
+              type="password"
+              required
+              value={newPassword}
+              onChange={(e) => setNewPassword(e.target.value)}
+              minLength={6}
+              className="max-w-md"
+              placeholder="อย่างน้อย 6 ตัวอักษร"
+            />
+          </div>
+          <div className="space-y-2">
+            <Label>ยืนยันรหัสผ่านใหม่</Label>
+            <Input
+              type="password"
+              required
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
+              minLength={6}
+              className="max-w-md"
+              placeholder="พิมพ์รหัสผ่านใหม่อีกครั้ง"
+            />
+          </div>
+          <Button type="submit" variant="secondary" disabled={isChanging}>
+            {isChanging ? (
+              <>
+                <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                กำลังเปลี่ยน...
+              </>
+            ) : (
+              'เปลี่ยนรหัสผ่าน'
+            )}
+          </Button>
+        </form>
+      </CardContent>
+    </Card>
   )
 }

@@ -36,8 +36,8 @@
 - [x] **M6:** MultiRouteEditor → Tag: `v1.2.1-shadcn-phase2` ✅
 
 ### Phase 3: Page Migration (M7)
-- [ ] **M7:** Login, Profile, Admin, Price List, Home, BOQ pages
-- [ ] ❌ Skip `/boq/[id]/print`
+- [x] **M7:** Login, Profile, Admin, Price List, Home, BOQ pages ✅
+- [x] ❌ Skip `/boq/[id]/print` (as planned)
 
 ### Phase 4: Best Practices
 - [ ] Fix barrel imports → direct
