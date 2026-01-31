@@ -45,7 +45,7 @@
 
 ### Phase 5: Verification (M8)
 - [x] **M8:** `npm run lint` + `npm run build` ✅
-- [ ] **M8:** Tag + Push: `v1.2.1-shadcn-done`
+- [x] **M8:** Tag + Push: `v1.2.1-shadcn-done` ✅
 
 ---
 
