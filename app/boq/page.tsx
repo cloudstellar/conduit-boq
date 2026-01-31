@@ -353,13 +353,13 @@ export default function BOQListPage() {
               ) : (
                 filteredList.map((boq) => (
                   <TableRow key={boq.id}>
-                    {/* 2-layer: Project name + Route chips */}
+                    {/* 2-layer: Project name (5 lines) + Route chips */}
                     <TableCell className="w-[420px] align-top">
-                      <div className="whitespace-normal break-words line-clamp-3 font-medium leading-snug" title={boq.project_name}>
+                      <div className="whitespace-normal break-words line-clamp-5 font-medium leading-snug" title={boq.project_name}>
                         {boq.project_name}
                       </div>
                       <div className="mt-1.5">
-                        <RouteChips route={boq.route} maxVisible={2} />
+                        <RouteChips route={boq.route} />
                       </div>
                     </TableCell>
                     <TableCell className="text-muted-foreground align-top">

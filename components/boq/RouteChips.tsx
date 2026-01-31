@@ -10,14 +10,18 @@ import {
 
 interface RouteChipsProps {
     route: string | null | undefined;
-    maxVisible?: number;
 }
 
 /**
  * Display routes as chips with "+N" popover for overflow
  * Routes can be comma-separated in a single string
+ *
+ * Smart display logic:
+ * - ≤3 routes: show all
+ * - 4-8 routes: show 4, +N
+ * - >8 routes: show 3, +N (prevent clutter)
  */
-export function RouteChips({ route, maxVisible = 2 }: RouteChipsProps) {
+export function RouteChips({ route }: RouteChipsProps) {
     if (!route) {
         return <span className="text-xs text-muted-foreground">-</span>;
     }
@@ -32,6 +36,16 @@ export function RouteChips({ route, maxVisible = 2 }: RouteChipsProps) {
         return <span className="text-xs text-muted-foreground">-</span>;
     }
 
+    // Smart maxVisible logic
+    let maxVisible: number;
+    if (routes.length <= 3) {
+        maxVisible = routes.length; // Show all
+    } else if (routes.length <= 8) {
+        maxVisible = 4; // Show 4, +N
+    } else {
+        maxVisible = 3; // Show 3, +N (prevent clutter)
+    }
+
     const visibleRoutes = routes.slice(0, maxVisible);
     const hiddenRoutes = routes.slice(maxVisible);
     const hiddenCount = hiddenRoutes.length;
@@ -42,7 +56,7 @@ export function RouteChips({ route, maxVisible = 2 }: RouteChipsProps) {
                 <Badge
                     key={index}
                     variant="secondary"
-                    className="text-xs font-normal max-w-[120px] truncate"
+                    className="text-xs font-normal truncate max-w-[140px]"
                     title={r}
                 >
                     {r}
@@ -60,17 +74,16 @@ export function RouteChips({ route, maxVisible = 2 }: RouteChipsProps) {
                             +{hiddenCount}
                         </Button>
                     </PopoverTrigger>
-                    <PopoverContent className="w-auto max-w-[300px] p-3" align="start">
+                    <PopoverContent className="w-auto max-w-[350px] p-3" align="start">
                         <div className="text-sm font-medium mb-2">เส้นทางทั้งหมด ({routes.length})</div>
-                        <div className="flex flex-wrap gap-1.5">
+                        <div className="flex flex-col gap-1.5">
                             {routes.map((r, index) => (
-                                <Badge
+                                <div
                                     key={index}
-                                    variant="secondary"
-                                    className="text-xs font-normal"
+                                    className="text-sm text-muted-foreground"
                                 >
-                                    {r}
-                                </Badge>
+                                    • {r}
+                                </div>
                             ))}
                         </div>
                     </PopoverContent>
