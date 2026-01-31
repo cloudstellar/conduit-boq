@@ -180,16 +180,22 @@ export default function ItemSearch({
     }
   };
 
+  // Radix Select doesn't allow empty string value, use sentinel
+  const selectValue = selectedCategory || '__ALL__';
+  const handleSelectChange = (value: string) => {
+    setSelectedCategory(value === '__ALL__' ? '' : value);
+  };
+
   return (
     <div ref={wrapperRef} className="relative space-y-2">
       {/* Category Filter */}
       <div className="flex gap-2">
-        <Select value={selectedCategory} onValueChange={setSelectedCategory}>
+        <Select value={selectValue} onValueChange={handleSelectChange}>
           <SelectTrigger className="flex-1">
             <SelectValue placeholder="-- เลือกหมวดหมู่ (ทั้งหมด) --" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="">ทั้งหมด</SelectItem>
+            <SelectItem value="__ALL__">ทั้งหมด</SelectItem>
             {categories.map((cat) => (
               <SelectItem key={cat.category} value={cat.category}>
                 {cat.category} ({cat.count} รายการ)
@@ -207,6 +213,7 @@ export default function ItemSearch({
           </Button>
         )}
       </div>
+
 
       {/* Search Input */}
       <div className="relative">
