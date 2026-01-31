@@ -71,14 +71,18 @@ export default function LineItemsTable({
               <TableHead>รายการ</TableHead>
               <TableHead className="text-center">ปริมาณ</TableHead>
               <TableHead className="text-center w-16">หน่วย</TableHead>
-              <TableHead className="text-right w-32">รวมทั้งสิ้น</TableHead>
-              <TableHead className="text-center w-16">ลบ</TableHead>
+              <TableHead className="text-right hidden lg:table-cell">ค่าวัสดุ/หน่วย</TableHead>
+              <TableHead className="text-right hidden lg:table-cell">ค่าแรง/หน่วย</TableHead>
+              <TableHead className="text-right hidden xl:table-cell">รวมค่าวัสดุ</TableHead>
+              <TableHead className="text-right hidden xl:table-cell">รวมค่าแรง</TableHead>
+              <TableHead className="text-right">รวมทั้งสิ้น</TableHead>
+              <TableHead className="text-center w-12">ลบ</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {items.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={6} className="text-center py-8 text-muted-foreground">
+                <TableCell colSpan={10} className="text-center py-8 text-muted-foreground">
                   ยังไม่มีรายการ - ใช้ช่องค้นหาด้านบนเพื่อเพิ่มรายการ
                 </TableCell>
               </TableRow>
@@ -100,15 +104,27 @@ export default function LineItemsTable({
                     />
                   </TableCell>
                   <TableCell className="text-center text-sm">{item.unit}</TableCell>
+                  <TableCell className="text-right text-sm hidden lg:table-cell">
+                    {formatNumber(item.material_cost_per_unit)}
+                  </TableCell>
+                  <TableCell className="text-right text-sm hidden lg:table-cell">
+                    {formatNumber(item.labor_cost_per_unit)}
+                  </TableCell>
+                  <TableCell className="text-right text-sm hidden xl:table-cell">
+                    {formatNumber(item.total_material_cost)}
+                  </TableCell>
+                  <TableCell className="text-right text-sm hidden xl:table-cell">
+                    {formatNumber(item.total_labor_cost)}
+                  </TableCell>
                   <TableCell className="text-right text-sm font-bold text-primary">
                     {formatNumber(item.total_cost)}
                   </TableCell>
                   <TableCell className="text-center">
                     <Button
                       variant="ghost"
-                      size="sm"
+                      size="icon"
                       onClick={() => onRemoveItem(item.id)}
-                      className="text-red-500 hover:text-red-700 hover:bg-red-50"
+                      className="text-destructive hover:text-destructive hover:bg-destructive/10"
                     >
                       <Trash2 className="w-4 h-4" />
                     </Button>

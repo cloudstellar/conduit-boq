@@ -334,7 +334,7 @@ export default function BOQListPage() {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead className="max-w-[300px]">โครงการ</TableHead>
+                <TableHead>โครงการ</TableHead>
                 <TableHead>เส้นทาง</TableHead>
                 <TableHead>ผู้ประมาณราคา</TableHead>
                 <TableHead className="text-right">ยอดรวม (บาท)</TableHead>
@@ -353,7 +353,7 @@ export default function BOQListPage() {
               ) : (
                 filteredList.map((boq) => (
                   <TableRow key={boq.id}>
-                    <TableCell className="font-medium max-w-[300px]"><span className="line-clamp-2 block" title={boq.project_name}>{boq.project_name}</span></TableCell>
+                    <TableCell className="font-medium">{boq.project_name}</TableCell>
                     <TableCell className="text-muted-foreground">{boq.route || '-'}</TableCell>
                     <TableCell className="text-muted-foreground">{boq.estimator_name}</TableCell>
                     <TableCell className="text-right font-medium text-blue-600">{formatNumber(boq.total_cost)}</TableCell>

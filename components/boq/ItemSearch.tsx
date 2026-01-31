@@ -251,17 +251,17 @@ export default function ItemSearch({
 
       {isOpen && results.length > 0 && (
         <Command className="absolute z-50 w-full mt-1 border rounded-md shadow-lg bg-popover">
-          <CommandList className="max-h-[min(50vh,420px)]">
+          <CommandList style={{ maxHeight: 'min(50vh, 420px)' }} className="overflow-y-auto">
             <CommandEmpty>ไม่พบรายการ</CommandEmpty>
             <CommandGroup>
               {results.map((item, index) => (
                 <CommandItem
                   key={item.id}
                   onSelect={() => handleSelect(item)}
-                  className={index === selectedIndex ? 'bg-blue-50' : ''}
+                  className={index === selectedIndex ? 'bg-accent' : ''}
                 >
-                  <div className="flex flex-col">
-                    <span className="font-medium line-clamp-1">{item.item_name}</span>
+                  <div className="flex flex-col py-1">
+                    <span className="font-medium">{item.item_name}</span>
                     <span className="text-sm text-muted-foreground">
                       {item.unit} | ค่าวัสดุ: {item.material_cost.toLocaleString()} |
                       ค่าแรง: {item.labor_cost.toLocaleString()} |
