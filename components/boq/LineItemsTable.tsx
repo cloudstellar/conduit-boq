@@ -67,7 +67,7 @@ export default function LineItemsTable({
         <Table>
           <TableHeader>
             <TableRow className="bg-muted/50">
-              <TableHead className="text-center w-8">#</TableHead>
+              <TableHead className="text-center w-8 sticky left-0 bg-muted/50 z-20 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.1)]">#</TableHead>
               <TableHead className="text-center">ปริมาณ</TableHead>
               <TableHead className="text-center w-12">หน่วย</TableHead>
               <TableHead className="text-right whitespace-nowrap">ค่าวัสดุ/หน่วย</TableHead>
@@ -90,7 +90,7 @@ export default function LineItemsTable({
                 <>
                   {/* Row 1: Item name (full width) */}
                   <TableRow key={`${item.id}-name`} className="bg-accent/30 border-b-0">
-                    <TableCell className="text-center text-sm font-medium text-muted-foreground py-2">
+                    <TableCell className="text-center text-sm font-medium text-muted-foreground py-2 sticky left-0 bg-accent/30 z-10 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.1)]">
                       {index + 1}
                     </TableCell>
                     <TableCell colSpan={8} className="py-2">
@@ -104,7 +104,7 @@ export default function LineItemsTable({
                   </TableRow>
                   {/* Row 2: Data columns */}
                   <TableRow key={`${item.id}-data`}>
-                    <TableCell />
+                    <TableCell className="sticky left-0 bg-background z-10 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.1)]" />
                     <TableCell className="p-1">
                       <QuantityEditor
                         value={item.quantity ?? 0}
