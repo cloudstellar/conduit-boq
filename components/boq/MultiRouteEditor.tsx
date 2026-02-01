@@ -20,6 +20,12 @@ import {
   DialogTitle,
   DialogDescription,
 } from '@/components/ui/dialog';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from '@/components/ui/tooltip';
 import { Loader2, Trash2, PanelLeftClose, PanelLeft, Copy } from 'lucide-react';
 
 interface MultiRouteEditorProps {
@@ -434,45 +440,58 @@ export default function MultiRouteEditor({ boqId, onSave, isSaving, onFactorCalc
           {activeRouteId && activeRoute ? (
             <>
               {/* Sticky Header with Toggle Button */}
-              <div className="flex h-14 shrink-0 items-center gap-2 border-b px-4 bg-background/95 backdrop-blur sticky top-0 z-10">
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={toggleSidebar}
-                  className="h-8 w-8"
-                  title={isSidebarCollapsed ? 'ขยายเมนู' : 'ย่อเมนู'}
-                >
-                  {isSidebarCollapsed ? (
-                    <PanelLeft className="h-4 w-4" />
-                  ) : (
-                    <PanelLeftClose className="h-4 w-4" />
-                  )}
-                </Button>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={() => activeRouteId && handleDuplicateRoute(activeRouteId)}
-                  className="h-8 w-8"
-                  title="คัดลอกเส้นทาง"
-                >
-                  <Copy className="h-4 w-4" />
-                </Button>
-                <Separator orientation="vertical" className="h-5" />
-                <h2 className="text-lg font-semibold tracking-tight">
-                  แก้ไขข้อมูล:{' '}
-                  <span className="text-primary">
-                    เส้นทางที่ {routes.findIndex(r => r.id === activeRouteId) + 1}
-                  </span>
-                </h2>
-                <div className="ml-auto text-sm text-muted-foreground">
-                  รวม{' '}
-                  <span className="font-semibold text-primary">
-                    {(activeRoute?.total_cost || 0).toLocaleString('th-TH', { minimumFractionDigits: 2 })}
-                  </span>{' '}
-                  บาท
+              <TooltipProvider delayDuration={300}>
+                <div className="flex h-14 shrink-0 items-center gap-2 border-b px-4 bg-background/95 backdrop-blur sticky top-0 z-10">
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={toggleSidebar}
+                        className="h-8 w-8"
+                      >
+                        {isSidebarCollapsed ? (
+                          <PanelLeft className="h-4 w-4" />
+                        ) : (
+                          <PanelLeftClose className="h-4 w-4" />
+                        )}
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p>{isSidebarCollapsed ? 'ขยายเมนู' : 'ย่อเมนู'}</p>
+                    </TooltipContent>
+                  </Tooltip>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => activeRouteId && handleDuplicateRoute(activeRouteId)}
+                        className="h-8 w-8"
+                      >
+                        <Copy className="h-4 w-4" />
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p>คัดลอกข้อมูลเส้นทางนี้</p>
+                    </TooltipContent>
+                  </Tooltip>
+                  <Separator orientation="vertical" className="h-5" />
+                  <h2 className="text-lg font-semibold tracking-tight">
+                    แก้ไขข้อมูล:{' '}
+                    <span className="text-primary">
+                      เส้นทางที่ {routes.findIndex(r => r.id === activeRouteId) + 1}
+                    </span>
+                  </h2>
+                  <div className="ml-auto text-sm text-muted-foreground">
+                    รวม{' '}
+                    <span className="font-semibold text-primary">
+                      {(activeRoute?.total_cost || 0).toLocaleString('th-TH', { minimumFractionDigits: 2 })}
+                    </span>{' '}
+                    บาท
+                  </div>
                 </div>
-              </div>
-
+              </TooltipProvider>
               {/* Route Header Form */}
               {/* key={activeRouteId} forces React to remount inputs on route switch */}
               <div key={activeRouteId} className="p-4 border-b bg-muted/30 space-y-3">
