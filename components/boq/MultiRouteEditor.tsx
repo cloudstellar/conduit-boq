@@ -25,7 +25,7 @@ import {
   DialogTitle,
   DialogDescription,
 } from '@/components/ui/dialog';
-import { Loader2 } from 'lucide-react';
+import { Loader2, Trash2 } from 'lucide-react';
 
 interface MultiRouteEditorProps {
   boqId: string;
@@ -376,31 +376,58 @@ export default function MultiRouteEditor({ boqId, onSave, isSaving, onFactorCalc
           <div className="flex flex-col h-full">
             {activeRouteId && activeRoute ? (
               <>
-                {/* Route Header - Ghost Input Edit-in-place */}
-                <div className="p-4 border-b bg-background">
-                  <div className="space-y-2">
-                    <div>
-                      <Label className="text-xs text-muted-foreground">ชื่อเส้นทาง</Label>
+                {/* Route Header - Full Edit Form */}
+                <div className="p-4 border-b bg-muted/30 space-y-3">
+                  {/* Row 1: Route Name + Delete Button */}
+                  <div className="flex items-start gap-2">
+                    <div className="flex-1 space-y-1">
+                      <Label className="text-xs text-muted-foreground">
+                        ชื่อเส้นทาง <span className="text-destructive">*</span>
+                      </Label>
                       <Input
                         value={activeRoute.route_name}
                         onChange={(e) => handleUpdateRoute(activeRouteId, 'route_name', e.target.value)}
-                        className="border-transparent bg-transparent text-lg font-semibold 
-                                   focus:border-border focus:bg-background focus:ring-1
-                                   h-auto py-1 px-2 -ml-2"
-                        placeholder="ชื่อเส้นทาง"
+                        placeholder="เช่น ถนนพระราม 4 (แยกคลองเตย-สุขุมวิท)"
+                        className="text-lg font-semibold"
                       />
                     </div>
-                    <div>
-                      <Label className="text-xs text-muted-foreground">พื้นที่ก่อสร้าง</Label>
-                      <Input
-                        value={activeRoute.construction_area}
-                        onChange={(e) => handleUpdateRoute(activeRouteId, 'construction_area', e.target.value)}
-                        className="border-transparent bg-transparent text-sm text-muted-foreground
-                                   focus:border-border focus:bg-background focus:ring-1
-                                   h-auto py-1 px-2 -ml-2"
-                        placeholder="พื้นที่ก่อสร้าง"
-                      />
-                    </div>
+                    {routes.length > 1 && (
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => {
+                          if (confirm('ต้องการลบเส้นทางนี้?')) {
+                            handleRemoveRoute(activeRouteId);
+                          }
+                        }}
+                        className="mt-6 text-destructive hover:text-destructive hover:bg-destructive/10"
+                        title="ลบเส้นทาง"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </Button>
+                    )}
+                  </div>
+
+                  {/* Row 2: Construction Area */}
+                  <div className="space-y-1">
+                    <Label className="text-xs text-muted-foreground">พื้นที่ก่อสร้าง</Label>
+                    <Input
+                      value={activeRoute.construction_area}
+                      onChange={(e) => handleUpdateRoute(activeRouteId, 'construction_area', e.target.value)}
+                      placeholder="เช่น ชส.คลองเตย จ.กรุงเทพมหานคร"
+                    />
+                  </div>
+
+                  {/* Row 3: Description (Textarea) */}
+                  <div className="space-y-1">
+                    <Label className="text-xs text-muted-foreground">คำอธิบาย</Label>
+                    <textarea
+                      value={activeRoute.route_description}
+                      onChange={(e) => handleUpdateRoute(activeRouteId, 'route_description', e.target.value)}
+                      placeholder="รายละเอียดเพิ่มเติมเกี่ยวกับเส้นทางนี้"
+                      rows={2}
+                      className="w-full px-3 py-2 text-sm border border-border rounded-md bg-background focus:ring-2 focus:ring-ring focus:border-ring resize-none"
+                    />
                   </div>
                 </div>
 
