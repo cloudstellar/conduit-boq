@@ -1,10 +1,17 @@
 'use client';
 
-import { Button } from '@/components/ui/button';
-import { ScrollArea } from '@/components/ui/scroll-area';
-import { cn } from '@/lib/utils';
 import { Plus } from 'lucide-react';
 import { Route } from './RouteManager';
+import {
+    SidebarHeader,
+    SidebarContent,
+    SidebarMenu,
+    SidebarMenuItem,
+    SidebarMenuButton,
+    useSidebar,
+} from '@/components/ui/sidebar';
+import { Button } from '@/components/ui/button';
+import { cn } from '@/lib/utils';
 
 interface RouteSidebarProps {
     routes: Route[];
@@ -15,13 +22,12 @@ interface RouteSidebarProps {
 }
 
 /**
- * Compact Route Number Sidebar
+ * Collapsible Route Sidebar using shadcn/ui Sidebar
  * 
- * Active state styling uses shadcn tokens:
- * - Active: `bg-primary text-primary-foreground`
- * - Inactive: `bg-muted hover:bg-accent`
+ * Collapsed (icon mode): Shows circled route numbers [1] [2] [3]
+ * Expanded: Shows "เส้นทางที่ X" with full labels
  * 
- * To change active colors later, edit the className below at line ~50
+ * Active state uses: bg-primary text-primary-foreground
  */
 export default function RouteSidebar({
     routes,
@@ -29,50 +35,83 @@ export default function RouteSidebar({
     onSelectRoute,
     onAddRoute,
 }: RouteSidebarProps) {
-    return (
-        <div className="flex flex-col h-full bg-muted/30 border-r w-16">
-            {/* Add Button - Top */}
-            <div className="p-2 border-b">
-                <Button
-                    onClick={onAddRoute}
-                    size="icon"
-                    variant="outline"
-                    className="w-full h-10"
-                    title="เพิ่มเส้นทาง"
-                >
-                    <Plus className="w-4 h-4" />
-                </Button>
-            </div>
+    const { state } = useSidebar();
+    const isCollapsed = state === 'collapsed';
 
-            {/* Route Numbers - Scrollable */}
-            <ScrollArea className="flex-1">
-                <div className="p-2 space-y-2">
+    return (
+        <>
+            {/* Header: Add Route Button */}
+            <SidebarHeader className="border-b">
+                {isCollapsed ? (
+                    <Button
+                        onClick={onAddRoute}
+                        size="icon"
+                        variant="outline"
+                        className="w-full"
+                        title="เพิ่มเส้นทาง"
+                    >
+                        <Plus className="w-4 h-4" />
+                    </Button>
+                ) : (
+                    <Button
+                        onClick={onAddRoute}
+                        variant="outline"
+                        className="w-full gap-2"
+                    >
+                        <Plus className="w-4 h-4" />
+                        เพิ่มเส้นทาง
+                    </Button>
+                )}
+            </SidebarHeader>
+
+            {/* Content: Route List */}
+            <SidebarContent>
+                <SidebarMenu>
                     {routes.length === 0 ? (
-                        <div className="text-center py-4">
-                            <span className="text-xs text-muted-foreground">ว่าง</span>
+                        <div className="px-2 py-4 text-center">
+                            <span className="text-xs text-muted-foreground">ไม่มีเส้นทาง</span>
                         </div>
                     ) : (
                         routes.map((route, index) => (
-                            <button
-                                key={route.id}
-                                onClick={() => onSelectRoute(route.id)}
-                                className={cn(
-                                    "w-full aspect-square rounded-lg flex items-center justify-center cursor-pointer",
-                                    "text-sm font-semibold transition-colors",
-                                    "focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
-                                    // Active state - uses shadcn tokens (edit here to change colors)
-                                    activeRouteId === route.id
-                                        ? "bg-primary text-primary-foreground shadow-md"
-                                        : "bg-background hover:bg-accent text-foreground border"
-                                )}
-                                title={route.route_name || `เส้นทาง ${index + 1}`}
-                            >
-                                {index + 1}
-                            </button>
+                            <SidebarMenuItem key={route.id}>
+                                <SidebarMenuButton
+                                    onClick={() => onSelectRoute(route.id)}
+                                    isActive={activeRouteId === route.id}
+                                    tooltip={route.route_name || `เส้นทาง ${index + 1}`}
+                                    className={cn(
+                                        'transition-all',
+                                        activeRouteId === route.id && 'bg-primary text-primary-foreground hover:bg-primary/90'
+                                    )}
+                                >
+                                    {isCollapsed ? (
+                                        // Collapsed: Circled number
+                                        <span
+                                            className={cn(
+                                                'size-7 rounded-full flex items-center justify-center text-sm font-semibold',
+                                                activeRouteId === route.id
+                                                    ? 'bg-primary-foreground/20'
+                                                    : 'bg-muted'
+                                            )}
+                                        >
+                                            {index + 1}
+                                        </span>
+                                    ) : (
+                                        // Expanded: Full label
+                                        <span className="truncate">
+                                            เส้นทางที่ {index + 1}
+                                            {route.route_name && (
+                                                <span className="text-muted-foreground ml-1">
+                                                    - {route.route_name}
+                                                </span>
+                                            )}
+                                        </span>
+                                    )}
+                                </SidebarMenuButton>
+                            </SidebarMenuItem>
                         ))
                     )}
-                </div>
-            </ScrollArea>
-        </div>
+                </SidebarMenu>
+            </SidebarContent>
+        </>
     );
 }
