@@ -377,7 +377,8 @@ export default function MultiRouteEditor({ boqId, onSave, isSaving, onFactorCalc
             {activeRouteId && activeRoute ? (
               <>
                 {/* Route Header - Full Edit Form */}
-                <div className="p-4 border-b bg-muted/30 space-y-3">
+                {/* key={activeRouteId} forces React to remount inputs on route switch */}
+                <div key={activeRouteId} className="p-4 border-b bg-muted/30 space-y-3">
                   {/* Row 1: Route Name + Delete Button */}
                   <div className="flex items-start gap-2">
                     <div className="flex-1 space-y-1">
