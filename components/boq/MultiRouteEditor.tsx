@@ -14,19 +14,13 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
 import {
-  SidebarProvider,
-  Sidebar,
-  SidebarInset,
-  SidebarTrigger,
-} from '@/components/ui/sidebar';
-import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
   DialogDescription,
 } from '@/components/ui/dialog';
-import { Loader2, Trash2 } from 'lucide-react';
+import { Loader2, Trash2, PanelLeftClose, PanelLeft } from 'lucide-react';
 
 interface MultiRouteEditorProps {
   boqId: string;
@@ -64,6 +58,23 @@ export default function MultiRouteEditor({ boqId, onSave, isSaving, onFactorCalc
   // State for special item modal (งานวางท่อ / งานดันท่อ)
   const [pendingSpecialItem, setPendingSpecialItem] = useState<PriceListItem | null>(null);
   const [showSpecialItemModal, setShowSpecialItemModal] = useState(false);
+
+  // Sidebar collapse state with localStorage persistence
+  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(() => {
+    if (typeof window !== 'undefined') {
+      return localStorage.getItem('boq-sidebar-collapsed') === 'true';
+    }
+    return false;
+  });
+
+  // Toggle sidebar and persist to localStorage
+  const toggleSidebar = useCallback(() => {
+    setIsSidebarCollapsed(prev => {
+      const newState = !prev;
+      localStorage.setItem('boq-sidebar-collapsed', String(newState));
+      return newState;
+    });
+  }, []);
 
   // Load routes and items
   useEffect(() => {
@@ -354,128 +365,149 @@ export default function MultiRouteEditor({ boqId, onSave, isSaving, onFactorCalc
 
   return (
     <div className="flex flex-col">
-      {/* SidebarProvider: Collapsible Sidebar + Detail View */}
-      <SidebarProvider defaultOpen={true}>
-        <div className="flex min-h-[600px] rounded-lg border overflow-hidden">
-          {/* Left: Collapsible Sidebar */}
-          <Sidebar collapsible="icon" className="border-r bg-sidebar">
-            <RouteSidebar
-              routes={routes}
-              activeRouteId={activeRouteId}
-              onSelectRoute={handleSelectRoute}
-              onAddRoute={handleAddRoute}
-              onRemoveRoute={handleRemoveRoute}
-            />
-          </Sidebar>
-
-          {/* Right: Detail View (SidebarInset) */}
-          <SidebarInset className="flex-1">
-            <div className="flex flex-col h-full">
-              {activeRouteId && activeRoute ? (
-                <>
-                  {/* Sticky Header with SidebarTrigger */}
-                  <div className="flex items-center gap-4 px-4 py-3 border-b bg-background/95 backdrop-blur sticky top-0 z-30">
-                    <SidebarTrigger />
-                    <Separator orientation="vertical" className="h-5" />
-                    <h2 className="text-lg font-semibold tracking-tight">
-                      แก้ไขข้อมูล: <span className="text-primary">เส้นทางที่ {routes.findIndex(r => r.id === activeRouteId) + 1}</span>
-                    </h2>
-                    <div className="ml-auto text-sm text-muted-foreground">
-                      รวม <span className="font-semibold text-primary">{(activeRoute?.total_cost || 0).toLocaleString('th-TH', { minimumFractionDigits: 2 })}</span> บาท
-                    </div>
-                  </div>
-
-                  {/* Route Header Form */}
-                  {/* key={activeRouteId} forces React to remount inputs on route switch */}
-                  <div key={activeRouteId} className="p-4 border-b bg-muted/30 space-y-3">
-                    {/* Row 1: Route Name + Delete Button */}
-                    <div className="flex items-start gap-2">
-                      <div className="flex-1 space-y-1">
-                        <Label className="text-xs text-muted-foreground">
-                          ชื่อเส้นทาง <span className="text-destructive">*</span>
-                        </Label>
-                        <Input
-                          value={activeRoute.route_name}
-                          onChange={(e) => handleUpdateRoute(activeRouteId, 'route_name', e.target.value)}
-                          placeholder="เช่น ถนนพระราม 4 (แยกคลองเตย-สุขุมวิท)"
-                          className="text-lg font-semibold"
-                        />
-                      </div>
-                      {routes.length > 1 && (
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          onClick={() => {
-                            if (confirm('ต้องการลบเส้นทางนี้?')) {
-                              handleRemoveRoute(activeRouteId);
-                            }
-                          }}
-                          className="mt-6 text-destructive hover:text-destructive hover:bg-destructive/10"
-                          title="ลบเส้นทาง"
-                        >
-                          <Trash2 className="w-4 h-4" />
-                        </Button>
-                      )}
-                    </div>
-
-                    {/* Row 2: Construction Area */}
-                    <div className="space-y-1">
-                      <Label className="text-xs text-muted-foreground">พื้นที่ก่อสร้าง</Label>
-                      <Input
-                        value={activeRoute.construction_area}
-                        onChange={(e) => handleUpdateRoute(activeRouteId, 'construction_area', e.target.value)}
-                        placeholder="เช่น ชส.คลองเตย จ.กรุงเทพมหานคร"
-                      />
-                    </div>
-
-                    {/* Row 3: Description (Textarea) */}
-                    <div className="space-y-1">
-                      <Label className="text-xs text-muted-foreground">คำอธิบาย</Label>
-                      <textarea
-                        value={activeRoute.route_description}
-                        onChange={(e) => handleUpdateRoute(activeRouteId, 'route_description', e.target.value)}
-                        placeholder="รายละเอียดเพิ่มเติมเกี่ยวกับเส้นทางนี้"
-                        rows={2}
-                        className="w-full px-3 py-2 text-sm border border-border rounded-md bg-background focus:ring-2 focus:ring-ring focus:border-ring resize-none"
-                      />
-                    </div>
-                  </div>
-
-                  {/* Line Items Table */}
-                  <div className="flex-1 overflow-auto p-4">
-                    <div className="overflow-x-auto">
-                      <div className="min-w-[800px]">
-                        <LineItemsTable
-                          items={activeRouteItems}
-                          onAddItem={handleAddItem}
-                          onUpdateQuantity={handleUpdateQuantity}
-                          onRemoveItem={handleRemoveItem}
-                        />
-                      </div>
-                    </div>
-
-                    {/* Route Subtotal */}
-                    <div className="mt-4 p-4 bg-accent/50 rounded-lg">
-                      <div className="flex justify-between items-center">
-                        <span className="text-sm text-muted-foreground">
-                          รวมเส้นทาง &quot;{activeRoute?.route_name}&quot;:
-                        </span>
-                        <span className="text-lg font-bold text-primary">
-                          {(activeRoute?.total_cost || 0).toLocaleString('th-TH', { minimumFractionDigits: 2 })} บาท
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-                </>
-              ) : (
-                <div className="flex-1 flex items-center justify-center text-muted-foreground">
-                  <p>เลือกเส้นทางจากด้านซ้ายเพื่อดูรายการ</p>
-                </div>
-              )}
-            </div>
-          </SidebarInset>
+      {/* Collapsible Sidebar + Detail View */}
+      <div className="flex min-h-[600px] rounded-lg border overflow-hidden">
+        {/* Left: Collapsible Sidebar */}
+        <div
+          className={`
+            border-r transition-all duration-300 shrink-0
+            ${isSidebarCollapsed ? 'w-[64px]' : 'w-[240px]'}
+          `}
+        >
+          <RouteSidebar
+            routes={routes}
+            activeRouteId={activeRouteId}
+            onSelectRoute={handleSelectRoute}
+            onAddRoute={handleAddRoute}
+            onRemoveRoute={handleRemoveRoute}
+            isCollapsed={isSidebarCollapsed}
+          />
         </div>
-      </SidebarProvider>
+
+        {/* Right: Detail View */}
+        <div className="flex-1 flex flex-col h-full">
+          {activeRouteId && activeRoute ? (
+            <>
+              {/* Sticky Header with Toggle Button */}
+              <div className="flex h-14 shrink-0 items-center gap-2 border-b px-4 bg-background/95 backdrop-blur sticky top-0 z-10">
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={toggleSidebar}
+                  className="h-8 w-8"
+                  title={isSidebarCollapsed ? 'ขยายเมนู' : 'ย่อเมนู'}
+                >
+                  {isSidebarCollapsed ? (
+                    <PanelLeft className="h-4 w-4" />
+                  ) : (
+                    <PanelLeftClose className="h-4 w-4" />
+                  )}
+                </Button>
+                <Separator orientation="vertical" className="h-5" />
+                <h2 className="text-lg font-semibold tracking-tight">
+                  แก้ไขข้อมูล:{' '}
+                  <span className="text-primary">
+                    เส้นทางที่ {routes.findIndex(r => r.id === activeRouteId) + 1}
+                  </span>
+                </h2>
+                <div className="ml-auto text-sm text-muted-foreground">
+                  รวม{' '}
+                  <span className="font-semibold text-primary">
+                    {(activeRoute?.total_cost || 0).toLocaleString('th-TH', { minimumFractionDigits: 2 })}
+                  </span>{' '}
+                  บาท
+                </div>
+              </div>
+
+              {/* Route Header Form */}
+              {/* key={activeRouteId} forces React to remount inputs on route switch */}
+              <div key={activeRouteId} className="p-4 border-b bg-muted/30 space-y-3">
+                {/* Row 1: Route Name + Delete Button */}
+                <div className="flex items-start gap-2">
+                  <div className="flex-1 space-y-1">
+                    <Label className="text-xs text-muted-foreground">
+                      ชื่อเส้นทาง <span className="text-destructive">*</span>
+                    </Label>
+                    <Input
+                      value={activeRoute.route_name}
+                      onChange={(e) => handleUpdateRoute(activeRouteId, 'route_name', e.target.value)}
+                      placeholder="เช่น ถนนพระราม 4 (แยกคลองเตย-สุขุมวิท)"
+                      className="text-lg font-semibold"
+                    />
+                  </div>
+                  {routes.length > 1 && (
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => {
+                        if (confirm('ต้องการลบเส้นทางนี้?')) {
+                          handleRemoveRoute(activeRouteId);
+                        }
+                      }}
+                      className="mt-6 text-destructive hover:text-destructive hover:bg-destructive/10"
+                      title="ลบเส้นทาง"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </Button>
+                  )}
+                </div>
+
+                {/* Row 2: Construction Area */}
+                <div className="space-y-1">
+                  <Label className="text-xs text-muted-foreground">พื้นที่ก่อสร้าง</Label>
+                  <Input
+                    value={activeRoute.construction_area}
+                    onChange={(e) => handleUpdateRoute(activeRouteId, 'construction_area', e.target.value)}
+                    placeholder="เช่น ชส.คลองเตย จ.กรุงเทพมหานคร"
+                  />
+                </div>
+
+                {/* Row 3: Description (Textarea) */}
+                <div className="space-y-1">
+                  <Label className="text-xs text-muted-foreground">คำอธิบาย</Label>
+                  <textarea
+                    value={activeRoute.route_description}
+                    onChange={(e) => handleUpdateRoute(activeRouteId, 'route_description', e.target.value)}
+                    placeholder="รายละเอียดเพิ่มเติมเกี่ยวกับเส้นทางนี้"
+                    rows={2}
+                    className="w-full px-3 py-2 text-sm border border-border rounded-md bg-background focus:ring-2 focus:ring-ring focus:border-ring resize-none"
+                  />
+                </div>
+              </div>
+
+              {/* Line Items Table */}
+              <div className="flex-1 overflow-auto p-4">
+                <div className="overflow-x-auto">
+                  <div className="min-w-[800px]">
+                    <LineItemsTable
+                      items={activeRouteItems}
+                      onAddItem={handleAddItem}
+                      onUpdateQuantity={handleUpdateQuantity}
+                      onRemoveItem={handleRemoveItem}
+                    />
+                  </div>
+                </div>
+
+                {/* Route Subtotal */}
+                <div className="mt-4 p-4 bg-accent/50 rounded-lg">
+                  <div className="flex justify-between items-center">
+                    <span className="text-sm text-muted-foreground">
+                      รวมเส้นทาง &quot;{activeRoute?.route_name}&quot;:
+                    </span>
+                    <span className="text-lg font-bold text-primary">
+                      {(activeRoute?.total_cost || 0).toLocaleString('th-TH', { minimumFractionDigits: 2 })} บาท
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </>
+          ) : (
+            <div className="flex-1 flex items-center justify-center text-muted-foreground">
+              <p>เลือกเส้นทางจากด้านซ้ายเพื่อดูรายการ</p>
+            </div>
+          )}
+        </div>
+      </div>
 
       {/* Below ResizablePanel: Grand Totals */}
       {routes.length > 0 && (
