@@ -1,5 +1,7 @@
 'use client';
 
+import { Fragment } from 'react';
+
 import { PriceListItem } from '@/lib/supabase';
 import ItemSearch from './ItemSearch';
 import { QuantityEditor } from './QuantityEditor';
@@ -87,7 +89,7 @@ export default function LineItemsTable({
               </TableRow>
             ) : (
               items.map((item, index) => (
-                <>
+                <Fragment key={item.id}>
                   {/* Row 1: Item name (full width) */}
                   <TableRow key={`${item.id}-name`} className="bg-accent/30 border-b-0">
                     <TableCell className="text-center text-sm font-medium text-muted-foreground py-2 sticky left-0 bg-accent/30 z-10 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.1)]">
@@ -139,7 +141,7 @@ export default function LineItemsTable({
                       </Button>
                     </TableCell>
                   </TableRow>
-                </>
+                </Fragment>
               ))
             )}
           </TableBody>
