@@ -331,7 +331,7 @@ export default function BOQListPage() {
         </div>
 
         {/* Desktop Table View */}
-        <Card className="hidden lg:block">
+        <Card className="hidden lg:block overflow-hidden">
           <Table className="w-full table-fixed">
             <TableHeader>
               <TableRow>
@@ -390,22 +390,22 @@ export default function BOQListPage() {
 
                     {/* Actions: icon buttons */}
                     <TableCell className="align-top whitespace-nowrap">
-                      <div className="flex justify-center gap-1">
+                      <div className="flex justify-center gap-2">
                         <Link href={`/boq/${boq.id}/edit`}>
-                          <Button variant="ghost" size="icon" className="h-8 w-8">
-                            <Edit className="h-4 w-4 text-blue-600" />
+                          <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-primary">
+                            <Edit className="h-4 w-4" />
                           </Button>
                         </Link>
                         <Link href={`/boq/${boq.id}/print`}>
-                          <Button variant="ghost" size="icon" className="h-8 w-8">
-                            <Printer className="h-4 w-4 text-gray-600" />
+                          <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-foreground">
+                            <Printer className="h-4 w-4" />
                           </Button>
                         </Link>
-                        <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => handleDuplicate(boq.id)}>
-                          <Copy className="h-4 w-4 text-green-600" />
+                        <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-green-600" onClick={() => handleDuplicate(boq.id)}>
+                          <Copy className="h-4 w-4" />
                         </Button>
-                        <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => handleDelete(boq.id)}>
-                          <Trash2 className="h-4 w-4 text-red-600" />
+                        <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-destructive" onClick={() => handleDelete(boq.id)}>
+                          <Trash2 className="h-4 w-4" />
                         </Button>
                       </div>
                     </TableCell>

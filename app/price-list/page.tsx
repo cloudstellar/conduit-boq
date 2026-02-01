@@ -226,7 +226,7 @@ export default function PriceListPage() {
         </div>
 
         {/* Desktop Table View */}
-        <Card className="hidden md:block">
+        <Card className="hidden md:block overflow-hidden">
           <Table>
             <TableHeader>
               <TableRow>
