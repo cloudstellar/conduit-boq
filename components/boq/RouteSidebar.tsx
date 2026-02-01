@@ -57,7 +57,7 @@ export default function RouteSidebar({
                                 key={route.id}
                                 onClick={() => onSelectRoute(route.id)}
                                 className={cn(
-                                    "w-full aspect-square rounded-lg flex items-center justify-center",
+                                    "w-full aspect-square rounded-lg flex items-center justify-center cursor-pointer",
                                     "text-sm font-semibold transition-colors",
                                     "focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
                                     // Active state - uses shadcn tokens (edit here to change colors)
