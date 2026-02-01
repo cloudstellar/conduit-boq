@@ -3,13 +3,21 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import { PriceListItem } from '@/lib/supabase';
-import RouteManager, { Route } from './RouteManager';
+import { Route } from './RouteManager';
+import RouteSidebar from './RouteSidebar';
 import LineItemsTable, { LineItem } from './LineItemsTable';
 import TotalsSummary from './TotalsSummary';
 import FactorFSummary from './FactorFSummary';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
+import {
+  ResizablePanelGroup,
+  ResizablePanel,
+  ResizableHandle,
+} from '@/components/ui/resizable';
 import {
   Dialog,
   DialogContent,
@@ -344,55 +352,96 @@ export default function MultiRouteEditor({ boqId, onSave, isSaving, onFactorCalc
   }
 
   return (
-    <div className="space-y-6">
-      {/* Route Tabs */}
-      <RouteManager
-        routes={routes}
-        activeRouteId={activeRouteId}
-        onAddRoute={handleAddRoute}
-        onSelectRoute={handleSelectRoute}
-        onUpdateRoute={handleUpdateRoute}
-        onRemoveRoute={handleRemoveRoute}
-      />
+    <div className="flex flex-col">
+      {/* ResizablePanelGroup: Sidebar + Detail View */}
+      <ResizablePanelGroup
+        orientation="horizontal"
+        className="min-h-[600px] rounded-lg border"
+      >
+        {/* Left Panel: Route Sidebar */}
+        <ResizablePanel defaultSize={25} minSize={15} maxSize={40}>
+          <RouteSidebar
+            routes={routes}
+            activeRouteId={activeRouteId}
+            onSelectRoute={handleSelectRoute}
+            onAddRoute={handleAddRoute}
+            onRemoveRoute={handleRemoveRoute}
+          />
+        </ResizablePanel>
 
-      {/* Active Route Items */}
-      {activeRouteId && (
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-md">
-              รายการสำหรับ: <span className="text-blue-600">{activeRoute?.route_name}</span>
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="overflow-x-auto -mx-4 md:mx-0">
-              <div className="min-w-[800px] px-4 md:px-0">
-                <LineItemsTable
-                  items={activeRouteItems}
-                  onAddItem={handleAddItem}
-                  onUpdateQuantity={handleUpdateQuantity}
-                  onRemoveItem={handleRemoveItem}
-                />
+        <ResizableHandle withHandle />
+
+        {/* Right Panel: Detail View */}
+        <ResizablePanel defaultSize={75}>
+          <div className="flex flex-col h-full">
+            {activeRouteId && activeRoute ? (
+              <>
+                {/* Route Header - Ghost Input Edit-in-place */}
+                <div className="p-4 border-b bg-background">
+                  <div className="space-y-2">
+                    <div>
+                      <Label className="text-xs text-muted-foreground">ชื่อเส้นทาง</Label>
+                      <Input
+                        value={activeRoute.route_name}
+                        onChange={(e) => handleUpdateRoute(activeRouteId, 'route_name', e.target.value)}
+                        className="border-transparent bg-transparent text-lg font-semibold 
+                                   focus:border-border focus:bg-background focus:ring-1
+                                   h-auto py-1 px-2 -ml-2"
+                        placeholder="ชื่อเส้นทาง"
+                      />
+                    </div>
+                    <div>
+                      <Label className="text-xs text-muted-foreground">พื้นที่ก่อสร้าง</Label>
+                      <Input
+                        value={activeRoute.construction_area}
+                        onChange={(e) => handleUpdateRoute(activeRouteId, 'construction_area', e.target.value)}
+                        className="border-transparent bg-transparent text-sm text-muted-foreground
+                                   focus:border-border focus:bg-background focus:ring-1
+                                   h-auto py-1 px-2 -ml-2"
+                        placeholder="พื้นที่ก่อสร้าง"
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                {/* Line Items Table */}
+                <div className="flex-1 overflow-auto p-4">
+                  <div className="overflow-x-auto">
+                    <div className="min-w-[800px]">
+                      <LineItemsTable
+                        items={activeRouteItems}
+                        onAddItem={handleAddItem}
+                        onUpdateQuantity={handleUpdateQuantity}
+                        onRemoveItem={handleRemoveItem}
+                      />
+                    </div>
+                  </div>
+
+                  {/* Route Subtotal */}
+                  <div className="mt-4 p-4 bg-accent/50 rounded-lg">
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm text-muted-foreground">
+                        รวมเส้นทาง &quot;{activeRoute?.route_name}&quot;:
+                      </span>
+                      <span className="text-lg font-bold text-primary">
+                        {(activeRoute?.total_cost || 0).toLocaleString('th-TH', { minimumFractionDigits: 2 })} บาท
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </>
+            ) : (
+              <div className="flex-1 flex items-center justify-center text-muted-foreground">
+                <p>เลือกเส้นทางจากด้านซ้ายเพื่อดูรายการ</p>
               </div>
-            </div>
+            )}
+          </div>
+        </ResizablePanel>
+      </ResizablePanelGroup>
 
-            {/* Route Subtotal */}
-            <div className="mt-4 p-4 bg-blue-50 rounded-lg">
-              <div className="flex justify-between items-center">
-                <span className="text-sm text-muted-foreground">
-                  รวมเส้นทาง &quot;{activeRoute?.route_name}&quot;:
-                </span>
-                <span className="text-lg font-bold text-blue-600">
-                  {(activeRoute?.total_cost || 0).toLocaleString('th-TH', { minimumFractionDigits: 2 })} บาท
-                </span>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      )}
-
-      {/* Grand Totals */}
+      {/* Below ResizablePanel: Grand Totals */}
       {routes.length > 0 && (
-        <Card className="bg-gradient-to-r from-gray-50 to-blue-50 border-2 border-blue-200">
+        <Card className="mt-6 bg-gradient-to-r from-gray-50 to-blue-50 border-2 border-blue-200">
           <CardHeader className="pb-2">
             <CardTitle className="text-lg">สรุปรวมทุกเส้นทาง</CardTitle>
           </CardHeader>
@@ -425,21 +474,23 @@ export default function MultiRouteEditor({ boqId, onSave, isSaving, onFactorCalc
 
       {/* Factor F Summary */}
       {routes.length > 0 && grandTotals.total > 0 && (
-        <FactorFSummary
-          routes={routes.map(r => ({
-            id: r.id,
-            route_name: r.route_name,
-            total_material_cost: r.total_material_cost,
-            total_labor_cost: r.total_labor_cost,
-            total_cost: r.total_cost,
-          }))}
-          grandTotalCost={grandTotals.total}
-          onFactorCalculated={onFactorCalculated}
-        />
+        <div className="mt-6">
+          <FactorFSummary
+            routes={routes.map(r => ({
+              id: r.id,
+              route_name: r.route_name,
+              total_material_cost: r.total_material_cost,
+              total_labor_cost: r.total_labor_cost,
+              total_cost: r.total_cost,
+            }))}
+            grandTotalCost={grandTotals.total}
+            onFactorCalculated={onFactorCalculated}
+          />
+        </div>
       )}
 
       {/* Save Button */}
-      <div className="flex justify-end">
+      <div className="flex justify-end mt-6">
         <Button
           onClick={handleSaveClick}
           disabled={isSaving || routes.length === 0}
