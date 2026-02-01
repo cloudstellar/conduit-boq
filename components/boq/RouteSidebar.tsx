@@ -2,8 +2,14 @@
 
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 import { cn } from '@/lib/utils';
-import { Plus } from 'lucide-react';
+import { Plus, Copy, ChevronDown } from 'lucide-react';
 import { Route } from './RouteManager';
 
 interface RouteSidebarProps {
@@ -12,6 +18,7 @@ interface RouteSidebarProps {
     onSelectRoute: (routeId: string) => void;
     onAddRoute: () => void;
     onRemoveRoute: (routeId: string) => void;
+    onDuplicateRoute?: (routeId: string) => void;
     isCollapsed: boolean;
 }
 
@@ -19,7 +26,7 @@ interface RouteSidebarProps {
  * Custom Collapsible Route Sidebar
  * 
  * Collapsed (w-[64px]): Shows circled route numbers [1] [2] [3]
- * Expanded (w-[240px]): Shows "เส้นทางที่ X" with full labels + add button
+ * Expanded (w-[240px]): Shows "เส้นทางที่ X" with full labels + DropdownMenu for add/duplicate
  * 
  * Active state uses: bg-primary text-primary-foreground
  */
@@ -28,13 +35,17 @@ export default function RouteSidebar({
     activeRouteId,
     onSelectRoute,
     onAddRoute,
+    onDuplicateRoute,
     isCollapsed,
 }: RouteSidebarProps) {
+    const hasActiveRoute = activeRouteId !== null;
+
     return (
         <div className="flex flex-col h-full bg-muted/30">
-            {/* Header: Add Route Button */}
+            {/* Header: Add Route Button / DropdownMenu */}
             <div className="p-2 border-b">
                 {isCollapsed ? (
+                    // Collapsed: Simple + button
                     <Button
                         onClick={onAddRoute}
                         size="icon"
@@ -45,14 +56,34 @@ export default function RouteSidebar({
                         <Plus className="w-4 h-4" />
                     </Button>
                 ) : (
-                    <Button
-                        onClick={onAddRoute}
-                        variant="outline"
-                        className="w-full gap-2"
-                    >
-                        <Plus className="w-4 h-4" />
-                        เพิ่มเส้นทาง
-                    </Button>
+                    // Expanded: DropdownMenu with options
+                    <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                            <Button
+                                variant="outline"
+                                className="w-full gap-2 justify-between"
+                            >
+                                <span className="flex items-center gap-2">
+                                    <Plus className="w-4 h-4" />
+                                    เพิ่มเส้นทาง
+                                </span>
+                                <ChevronDown className="w-4 h-4 opacity-50" />
+                            </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="start" className="w-[220px]">
+                            <DropdownMenuItem onClick={onAddRoute}>
+                                <Plus className="w-4 h-4 mr-2" />
+                                เพิ่มเส้นทางใหม่ (ว่าง)
+                            </DropdownMenuItem>
+                            <DropdownMenuItem
+                                onClick={() => activeRouteId && onDuplicateRoute?.(activeRouteId)}
+                                disabled={!hasActiveRoute}
+                            >
+                                <Copy className="w-4 h-4 mr-2" />
+                                คัดลอกเส้นทางปัจจุบัน
+                            </DropdownMenuItem>
+                        </DropdownMenuContent>
+                    </DropdownMenu>
                 )}
             </div>
 

@@ -20,7 +20,7 @@ import {
   DialogTitle,
   DialogDescription,
 } from '@/components/ui/dialog';
-import { Loader2, Trash2, PanelLeftClose, PanelLeft } from 'lucide-react';
+import { Loader2, Trash2, PanelLeftClose, PanelLeft, Copy } from 'lucide-react';
 
 interface MultiRouteEditorProps {
   boqId: string;
@@ -196,6 +196,50 @@ export default function MultiRouteEditor({ boqId, onSave, isSaving, onFactorCalc
       setActiveRouteId(routes.find(r => r.id !== routeId)?.id || null);
     }
   }, [activeRouteId, routes]);
+
+  // Duplicate a route with all its items (deep copy)
+  const handleDuplicateRoute = useCallback((routeId: string) => {
+    const sourceRoute = routes.find(r => r.id === routeId);
+    if (!sourceRoute) return;
+
+    const sourceItems = routeItems[routeId] || [];
+    const baseName = sourceRoute.route_name || `เส้นทาง ${routes.findIndex(r => r.id === routeId) + 1}`;
+
+    // Generate unique copy name: "Name - สำเนา" or "Name - สำเนา (2)"
+    const copyPattern = /^(.+) - สำเนา(?: \((\d+)\))?$/;
+    const existingCopies = routes.filter(r => {
+      const match = r.route_name?.match(copyPattern);
+      return match && match[1] === baseName || r.route_name === `${baseName} - สำเนา`;
+    });
+
+    let newName: string;
+    if (existingCopies.length === 0) {
+      newName = `${baseName} - สำเนา`;
+    } else {
+      newName = `${baseName} - สำเนา (${existingCopies.length + 1})`;
+    }
+
+    // Create new route (deep copy)
+    const newRoute: Route = {
+      ...structuredClone(sourceRoute),
+      id: crypto.randomUUID(),
+      route_name: newName,
+      route_order: routes.length + 1,
+    };
+
+    // Deep copy all items with new UUIDs
+    const newItems: LineItem[] = sourceItems.map(item => ({
+      ...structuredClone(item),
+      id: crypto.randomUUID(),
+    }));
+
+    // Update state
+    setRoutes(prev => [...prev, newRoute]);
+    setRouteItems(prev => ({ ...prev, [newRoute.id]: newItems }));
+
+    // Switch to new route
+    setActiveRouteId(newRoute.id);
+  }, [routes, routeItems]);
 
   const handleAddItem = useCallback((priceItem: PriceListItem) => {
     if (!activeRouteId) return;
@@ -380,6 +424,7 @@ export default function MultiRouteEditor({ boqId, onSave, isSaving, onFactorCalc
             onSelectRoute={handleSelectRoute}
             onAddRoute={handleAddRoute}
             onRemoveRoute={handleRemoveRoute}
+            onDuplicateRoute={handleDuplicateRoute}
             isCollapsed={isSidebarCollapsed}
           />
         </div>
@@ -402,6 +447,15 @@ export default function MultiRouteEditor({ boqId, onSave, isSaving, onFactorCalc
                   ) : (
                     <PanelLeftClose className="h-4 w-4" />
                   )}
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => activeRouteId && handleDuplicateRoute(activeRouteId)}
+                  className="h-8 w-8"
+                  title="คัดลอกเส้นทาง"
+                >
+                  <Copy className="h-4 w-4" />
                 </Button>
                 <Separator orientation="vertical" className="h-5" />
                 <h2 className="text-lg font-semibold tracking-tight">
