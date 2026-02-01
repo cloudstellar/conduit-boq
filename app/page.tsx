@@ -140,7 +140,7 @@ export default function Home() {
             <Card>
               <CardContent className="pt-6">
                 <p className="text-sm text-muted-foreground">รายการราคามาตรฐาน</p>
-                <p className="text-3xl font-bold text-gray-900">518</p>
+                <p className="text-3xl font-bold text-gray-900">662</p>
                 <p className="text-sm text-muted-foreground">รายการ</p>
               </CardContent>
             </Card>
