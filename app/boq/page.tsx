@@ -8,6 +8,20 @@ import { useAuth } from '@/lib/context/AuthContext';
 import { can } from '@/lib/permissions';
 import BOQPageHeader from '@/components/boq/BOQPageHeader';
 import BOQAccessBanner from '@/components/boq/BOQAccessBanner';
+import { RouteBadge } from '@/components/boq/RouteBadge';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Card, CardContent } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table';
+import { Loader2, Plus, Edit, Printer, Copy, Trash2, ArrowLeft } from 'lucide-react';
 
 export default function BOQListPage() {
   const { user } = useAuth();
@@ -57,11 +71,11 @@ export default function BOQListPage() {
   };
 
   const getStatusBadge = (status: string) => {
-    const styles: Record<string, string> = {
-      draft: 'bg-yellow-100 text-yellow-800',
-      pending: 'bg-blue-100 text-blue-800',
-      approved: 'bg-green-100 text-green-800',
-      rejected: 'bg-red-100 text-red-800',
+    const variants: Record<string, 'default' | 'secondary' | 'destructive' | 'outline'> = {
+      draft: 'outline',
+      pending: 'secondary',
+      approved: 'default',
+      rejected: 'destructive',
     };
     const labels: Record<string, string> = {
       draft: 'ฉบับร่าง',
@@ -70,9 +84,9 @@ export default function BOQListPage() {
       rejected: 'ไม่อนุมัติ',
     };
     return (
-      <span className={`px-2 py-1 rounded-full text-xs font-medium ${styles[status] || 'bg-gray-100 text-gray-800'}`}>
+      <Badge variant={variants[status] || 'secondary'} className={status === 'draft' ? 'bg-yellow-100 text-yellow-800' : ''}>
         {labels[status] || status}
-      </span>
+      </Badge>
     );
   };
 
@@ -225,7 +239,7 @@ export default function BOQListPage() {
   if (isLoading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full animate-spin" />
+        <Loader2 className="h-12 w-12 animate-spin text-blue-600" />
       </div>
     );
   }
@@ -249,24 +263,21 @@ export default function BOQListPage() {
         {/* Actions bar */}
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
           {/* Search */}
-          <input
+          <Input
             type="text"
             placeholder="ค้นหาโครงการ, ผู้ประมาณราคา, เส้นทาง..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full sm:w-96 px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 bg-white"
+            className="w-full sm:w-96"
           />
 
           {/* Create button */}
           {canCreateBOQ && (
-            <Link
-              href="/boq/create"
-              className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 flex items-center gap-2 text-sm whitespace-nowrap"
-            >
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-              </svg>
-              สร้างใหม่
+            <Link href="/boq/create">
+              <Button>
+                <Plus className="h-4 w-4 mr-2" />
+                สร้างใหม่
+              </Button>
             </Link>
           )}
         </div>
@@ -274,120 +285,145 @@ export default function BOQListPage() {
         {/* Mobile Card View */}
         <div className="block lg:hidden space-y-4">
           {filteredList.length === 0 ? (
-            <div className="bg-white rounded-lg shadow p-6 text-center text-gray-500">
-              {searchTerm ? 'ไม่พบรายการที่ค้นหา' : 'ยังไม่มีใบประมาณราคา'}
-            </div>
+            <Card>
+              <CardContent className="py-8 text-center text-muted-foreground">
+                {searchTerm ? 'ไม่พบรายการที่ค้นหา' : 'ยังไม่มีใบประมาณราคา'}
+              </CardContent>
+            </Card>
           ) : (
             filteredList.map((boq) => (
-              <div key={boq.id} className="bg-white rounded-lg shadow p-4">
-                <div className="flex justify-between items-start mb-2">
-                  <h3 className="font-medium text-gray-900 flex-1">{boq.project_name}</h3>
-                  {getStatusBadge(boq.status)}
-                </div>
-                <p className="text-sm text-gray-600 mb-1">เส้นทาง: {boq.route || '-'}</p>
-                <p className="text-sm text-gray-600 mb-1">ผู้ประมาณราคา: {boq.estimator_name}</p>
-                <p className="text-sm text-gray-600 mb-2">วันที่: {formatDate(boq.document_date)}</p>
-                <p className="text-lg font-medium text-blue-600 mb-3">{formatNumber(boq.total_cost)} บาท</p>
-                <div className="flex gap-4 border-t pt-3">
-                  <Link href={`/boq/${boq.id}/edit`} className="flex items-center gap-1 text-blue-600 hover:text-blue-800 text-sm">
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                    </svg>
-                    แก้ไข
-                  </Link>
-                  <Link href={`/boq/${boq.id}/print`} className="flex items-center gap-1 text-gray-600 hover:text-gray-800 text-sm">
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
-                    </svg>
-                    พิมพ์
-                  </Link>
-                  <button onClick={() => handleDuplicate(boq.id)} className="flex items-center gap-1 text-green-600 hover:text-green-800 text-sm">
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
-                    </svg>
-                    คัดลอก
-                  </button>
-                  <button onClick={() => handleDelete(boq.id)} className="flex items-center gap-1 text-red-600 hover:text-red-800 text-sm">
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                    </svg>
-                    ลบ
-                  </button>
-                </div>
-              </div>
+              <Card key={boq.id}>
+                <CardContent className="p-4">
+                  <div className="flex justify-between items-start mb-2">
+                    <h3 className="font-medium text-gray-900 flex-1 line-clamp-2" title={boq.project_name}>{boq.project_name}</h3>
+                    {getStatusBadge(boq.status)}
+                  </div>
+                  <p className="text-sm text-muted-foreground mb-1">เส้นทาง: {boq.route || '-'}</p>
+                  <p className="text-sm text-muted-foreground mb-1">ผู้ประมาณราคา: {boq.estimator_name}</p>
+                  <p className="text-sm text-muted-foreground mb-2">วันที่: {formatDate(boq.document_date)}</p>
+                  <p className="text-lg font-medium text-blue-600 mb-3">{formatNumber(boq.total_cost)} บาท</p>
+                  <div className="flex gap-2 border-t pt-3">
+                    <Link href={`/boq/${boq.id}/edit`}>
+                      <Button variant="outline" size="sm">
+                        <Edit className="h-4 w-4 mr-1" />
+                        แก้ไข
+                      </Button>
+                    </Link>
+                    <Link href={`/boq/${boq.id}/print`}>
+                      <Button variant="outline" size="sm">
+                        <Printer className="h-4 w-4 mr-1" />
+                        พิมพ์
+                      </Button>
+                    </Link>
+                    <Button variant="outline" size="sm" onClick={() => handleDuplicate(boq.id)}>
+                      <Copy className="h-4 w-4 mr-1" />
+                      คัดลอก
+                    </Button>
+                    <Button variant="outline" size="sm" className="text-red-600 hover:text-red-700" onClick={() => handleDelete(boq.id)}>
+                      <Trash2 className="h-4 w-4 mr-1" />
+                      ลบ
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
             ))
           )}
         </div>
 
         {/* Desktop Table View */}
-        <div className="hidden lg:block bg-white rounded-lg shadow overflow-hidden">
-          <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead className="bg-gray-50">
-                <tr>
-                  <th className="px-4 py-3 text-left text-sm font-medium text-gray-700">โครงการ</th>
-                  <th className="px-4 py-3 text-left text-sm font-medium text-gray-700">เส้นทาง</th>
-                  <th className="px-4 py-3 text-left text-sm font-medium text-gray-700">ผู้ประมาณราคา</th>
-                  <th className="px-4 py-3 text-right text-sm font-medium text-gray-700">ยอดรวม (บาท)</th>
-                  <th className="px-4 py-3 text-center text-sm font-medium text-gray-700">สถานะ</th>
-                  <th className="px-4 py-3 text-center text-sm font-medium text-gray-700">วันที่</th>
-                  <th className="px-4 py-3 text-center text-sm font-medium text-gray-700">จัดการ</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-gray-200">
-                {filteredList.length === 0 ? (
-                  <tr>
-                    <td colSpan={7} className="px-4 py-8 text-center text-gray-500">
-                      {searchTerm ? 'ไม่พบรายการที่ค้นหา' : 'ยังไม่มีใบประมาณราคา'}
-                    </td>
-                  </tr>
-                ) : (
-                  filteredList.map((boq) => (
-                    <tr key={boq.id} className="hover:bg-gray-50">
-                      <td className="px-4 py-3 font-medium text-gray-900">{boq.project_name}</td>
-                      <td className="px-4 py-3 text-gray-600">{boq.route || '-'}</td>
-                      <td className="px-4 py-3 text-gray-600">{boq.estimator_name}</td>
-                      <td className="px-4 py-3 text-right font-medium text-blue-600">{formatNumber(boq.total_cost)}</td>
-                      <td className="px-4 py-3 text-center">{getStatusBadge(boq.status)}</td>
-                      <td className="px-4 py-3 text-center text-gray-600">{formatDate(boq.document_date)}</td>
-                      <td className="px-4 py-3 text-center">
-                        <div className="flex justify-center gap-2">
-                          <Link href={`/boq/${boq.id}/edit`} className="text-blue-600 hover:text-blue-800" title="แก้ไข">
-                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                            </svg>
-                          </Link>
-                          <Link href={`/boq/${boq.id}/print`} className="text-gray-600 hover:text-gray-800" title="พิมพ์">
-                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
-                            </svg>
-                          </Link>
-                          <button onClick={() => handleDuplicate(boq.id)} className="text-green-600 hover:text-green-800" title="คัดลอก">
-                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
-                            </svg>
-                          </button>
-                          <button onClick={() => handleDelete(boq.id)} className="text-red-600 hover:text-red-800" title="ลบ">
-                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                            </svg>
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
-                  ))
-                )}
-              </tbody>
-            </table>
-          </div>
-        </div>
+        <Card className="hidden lg:block overflow-hidden">
+          <Table className="w-full table-fixed">
+            <TableHeader>
+              <TableRow>
+                <TableHead className="w-[360px]">โครงการ</TableHead>
+                <TableHead className="w-[100px]">เส้นทาง</TableHead>
+                <TableHead className="w-[150px]">ผู้ประมาณราคา</TableHead>
+                <TableHead className="w-[140px] text-right whitespace-nowrap">ก่อน VAT (บาท)</TableHead>
+                <TableHead className="w-[90px] text-center">สถานะ</TableHead>
+                <TableHead className="w-[100px] text-center whitespace-nowrap">วันที่</TableHead>
+                <TableHead className="w-[160px] text-center">จัดการ</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {filteredList.length === 0 ? (
+                <TableRow>
+                  <TableCell colSpan={7} className="text-center py-8 text-muted-foreground">
+                    {searchTerm ? 'ไม่พบรายการที่ค้นหา' : 'ยังไม่มีใบประมาณราคา'}
+                  </TableCell>
+                </TableRow>
+              ) : (
+                filteredList.map((boq) => (
+                  <TableRow key={boq.id}>
+                    {/* Project name: 4 lines max */}
+                    <TableCell className="align-top">
+                      <div
+                        className="whitespace-normal break-words line-clamp-4 font-medium leading-snug"
+                        title={boq.project_name}
+                      >
+                        {boq.project_name}
+                      </div>
+                    </TableCell>
+
+                    {/* Routes: badge "N เส้นทาง" → click opens Dialog */}
+                    <TableCell className="align-top">
+                      <RouteBadge route={boq.route} />
+                    </TableCell>
+
+                    {/* Estimator: full name */}
+                    <TableCell className="align-top">
+                      <div className="whitespace-normal break-words line-clamp-2 text-muted-foreground" title={boq.estimator_name}>
+                        {boq.estimator_name}
+                      </div>
+                    </TableCell>
+
+                    <TableCell className="align-top text-right font-medium text-blue-600 whitespace-nowrap tabular-nums">
+                      {formatNumber(boq.total_with_factor_f)}
+                    </TableCell>
+
+                    <TableCell className="align-top text-center">
+                      {getStatusBadge(boq.status)}
+                    </TableCell>
+
+                    <TableCell className="align-top text-center text-muted-foreground whitespace-nowrap">
+                      {formatDate(boq.document_date)}
+                    </TableCell>
+
+                    {/* Actions: icon buttons */}
+                    <TableCell className="align-top whitespace-nowrap">
+                      <div className="flex justify-center gap-2">
+                        <Link href={`/boq/${boq.id}/edit`}>
+                          <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-primary">
+                            <Edit className="h-4 w-4" />
+                          </Button>
+                        </Link>
+                        <Link href={`/boq/${boq.id}/print`}>
+                          <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-foreground">
+                            <Printer className="h-4 w-4" />
+                          </Button>
+                        </Link>
+                        <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-green-600" onClick={() => handleDuplicate(boq.id)}>
+                          <Copy className="h-4 w-4" />
+                        </Button>
+                        <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-destructive" onClick={() => handleDelete(boq.id)}>
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                ))
+              )}
+            </TableBody>
+          </Table>
+        </Card>
 
         {/* Back to Home */}
         <div className="mt-6">
-          <Link href="/" className="text-blue-600 hover:text-blue-800 text-sm md:text-base">← กลับหน้าหลัก</Link>
+          <Link href="/" className="text-blue-600 hover:text-blue-800 text-sm md:text-base flex items-center gap-1">
+            <ArrowLeft className="h-4 w-4" />
+            กลับหน้าหลัก
+          </Link>
         </div>
       </div>
     </div>
   );
 }
-

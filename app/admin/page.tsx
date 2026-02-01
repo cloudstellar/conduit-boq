@@ -11,6 +11,28 @@ import { createClient } from '@/lib/supabase/client'
 import { useAuth } from '@/lib/context/AuthContext'
 import { UserRole } from '@/lib/types/auth'
 import { getRoleLabel } from '@/lib/permissions'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Alert, AlertDescription } from '@/components/ui/alert'
+import { Badge } from '@/components/ui/badge'
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
+import { Switch } from '@/components/ui/switch'
+import { Label } from '@/components/ui/label'
+import { Loader2, ArrowLeft, Check, X, Trash2 } from 'lucide-react'
 
 interface UserProfile {
   id: string
@@ -244,7 +266,7 @@ function AdminContent() {
   if (authLoading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+        <Loader2 className="h-8 w-8 animate-spin text-blue-600" />
       </div>
     )
   }
@@ -253,7 +275,7 @@ function AdminContent() {
   if (!user) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+        <Loader2 className="h-8 w-8 animate-spin text-blue-600" />
       </div>
     )
   }
@@ -264,7 +286,7 @@ function AdminContent() {
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
           <h1 className="text-2xl font-bold text-gray-900 mb-4">ไม่มีสิทธิ์เข้าถึง</h1>
-          <p className="text-gray-600 mb-4">หน้านี้สำหรับผู้ดูแลระบบเท่านั้น</p>
+          <p className="text-muted-foreground mb-4">หน้านี้สำหรับผู้ดูแลระบบเท่านั้น</p>
           <Link href="/" className="text-blue-600 hover:underline">กลับหน้าหลัก</Link>
         </div>
       </div>
@@ -272,11 +294,11 @@ function AdminContent() {
   }
 
   const getStatusBadge = (status: string) => {
-    const styles: Record<string, string> = {
-      active: 'bg-green-100 text-green-800',
-      inactive: 'bg-gray-100 text-gray-800',
-      suspended: 'bg-red-100 text-red-800',
-      pending: 'bg-yellow-100 text-yellow-800',
+    const variants: Record<string, 'default' | 'secondary' | 'destructive' | 'outline'> = {
+      active: 'default',
+      inactive: 'secondary',
+      suspended: 'destructive',
+      pending: 'outline',
     }
     const labels: Record<string, string> = {
       active: 'ใช้งาน',
@@ -285,9 +307,9 @@ function AdminContent() {
       pending: 'รอการอนุมัติ',
     }
     return (
-      <span className={`px-2 py-1 text-xs rounded-full ${styles[status] || 'bg-gray-100 text-gray-800'}`}>
+      <Badge variant={variants[status] || 'secondary'} className={status === 'pending' ? 'bg-yellow-100 text-yellow-800' : ''}>
         {labels[status] || status}
-      </span>
+      </Badge>
     )
   }
 
@@ -300,18 +322,19 @@ function AdminContent() {
         <div className="max-w-7xl mx-auto px-4 py-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
-              <Link href="/" className="text-gray-500 hover:text-gray-700">
-                ← กลับ
+              <Link href="/" className="text-muted-foreground hover:text-gray-700 flex items-center gap-1">
+                <ArrowLeft className="h-4 w-4" />
+                กลับ
               </Link>
               <h1 className="text-xl font-semibold text-gray-900">จัดการผู้ใช้งาน</h1>
             </div>
             <div className="flex items-center gap-4">
               {pendingCount > 0 && (
-                <span className="px-3 py-1 text-sm bg-yellow-100 text-yellow-800 rounded-full font-medium">
+                <Badge className="bg-yellow-100 text-yellow-800">
                   {pendingCount} รอการอนุมัติ
-                </span>
+                </Badge>
               )}
-              <span className="text-sm text-gray-500">{users.length} ผู้ใช้</span>
+              <span className="text-sm text-muted-foreground">{users.length} ผู้ใช้</span>
             </div>
           </div>
         </div>
@@ -319,65 +342,64 @@ function AdminContent() {
 
       <main className="max-w-7xl mx-auto px-4 py-6 sm:px-6 lg:px-8">
         {/* Settings Section */}
-        <div className="bg-white shadow rounded-lg p-4 mb-6">
-          <h2 className="text-lg font-medium text-gray-900 mb-4">ตั้งค่าระบบ</h2>
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="font-medium text-gray-700">จำกัดการสมัครเฉพาะอีเมล @ntplc.co.th</p>
-              <p className="text-sm text-gray-500">เมื่อเปิดใช้งาน ผู้ใช้สามารถสมัครได้เฉพาะอีเมลของ NT เท่านั้น</p>
-            </div>
-            <button
-              onClick={handleToggleEmailRestriction}
-              disabled={savingSettings}
-              className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors
-                ${restrictEmailDomain ? 'bg-blue-600' : 'bg-gray-200'}
-                ${savingSettings ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
-            >
-              <span
-                className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform
-                  ${restrictEmailDomain ? 'translate-x-6' : 'translate-x-1'}`}
+        <Card className="mb-6">
+          <CardHeader>
+            <CardTitle>ตั้งค่าระบบ</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="flex items-center justify-between">
+              <div className="space-y-0.5">
+                <Label>จำกัดการสมัครเฉพาะอีเมล @ntplc.co.th</Label>
+                <p className="text-sm text-muted-foreground">
+                  เมื่อเปิดใช้งาน ผู้ใช้สามารถสมัครได้เฉพาะอีเมลของ NT เท่านั้น
+                </p>
+              </div>
+              <Switch
+                checked={restrictEmailDomain}
+                onCheckedChange={handleToggleEmailRestriction}
+                disabled={savingSettings}
               />
-            </button>
-          </div>
-        </div>
+            </div>
+          </CardContent>
+        </Card>
 
         {error && (
-          <div className="mb-4 p-4 bg-red-50 text-red-700 rounded-md">{error}</div>
+          <Alert variant="destructive" className="mb-4">
+            <AlertDescription>{error}</AlertDescription>
+          </Alert>
         )}
 
         {isLoading ? (
           <div className="flex justify-center py-12">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+            <Loader2 className="h-8 w-8 animate-spin text-blue-600" />
           </div>
         ) : (
-          <div className="bg-white shadow rounded-lg overflow-hidden">
-            <table className="min-w-full divide-y divide-gray-200">
-              <thead className="bg-gray-50">
-                <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">ผู้ใช้</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">สังกัด</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">บทบาท</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">สถานะ</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">การดำเนินการ</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-gray-200">
+          <Card>
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>ผู้ใช้</TableHead>
+                  <TableHead>สังกัด</TableHead>
+                  <TableHead>บทบาท</TableHead>
+                  <TableHead>สถานะ</TableHead>
+                  <TableHead>การดำเนินการ</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
                 {users.map((u) => (
-                  <tr key={u.id} className={savingUser === u.id ? 'opacity-50' : ''}>
-                    <td className="px-6 py-4">
-                      <div>
-                        <div className="font-medium text-gray-900">
-                          {[u.title, u.first_name, u.last_name].filter(Boolean).join(' ') || 'ไม่ระบุชื่อ'}
-                        </div>
-                        <div className="text-sm text-gray-500">{u.email}</div>
+                  <TableRow key={u.id} className={savingUser === u.id ? 'opacity-50' : ''}>
+                    <TableCell>
+                      <div className="font-medium">
+                        {[u.title, u.first_name, u.last_name].filter(Boolean).join(' ') || 'ไม่ระบุชื่อ'}
                       </div>
-                    </td>
-                    <td className="px-6 py-4 text-sm text-gray-500">
+                      <div className="text-sm text-muted-foreground">{u.email}</div>
+                    </TableCell>
+                    <TableCell className="text-sm">
                       {/* v1.2.0: Show actual or requested org */}
                       {u.department?.name ? (
                         <>
                           <div>{u.department.name}</div>
-                          <div className="text-xs">{u.sector?.name || ''}</div>
+                          <div className="text-xs text-muted-foreground">{u.sector?.name || ''}</div>
                         </>
                       ) : u.requested_department?.name ? (
                         <>
@@ -389,86 +411,98 @@ function AdminContent() {
                           </div>
                         </>
                       ) : (
-                        <span className="text-gray-400">ยังไม่ได้ลงทะเบียน</span>
+                        <span className="text-muted-foreground">ยังไม่ได้ลงทะเบียน</span>
                       )}
-                    </td>
-                    <td className="px-6 py-4">
+                    </TableCell>
+                    <TableCell>
                       {editingUser === u.id ? (
-                        <select
+                        <Select
                           value={u.role}
-                          onChange={(e) => handleRoleChange(u.id, e.target.value as UserRole)}
-                          className="text-sm border rounded px-2 py-1"
+                          onValueChange={(v) => handleRoleChange(u.id, v as UserRole)}
                           disabled={savingUser === u.id}
                         >
-                          <option value="admin">ผู้ดูแลระบบ</option>
-                          <option value="dept_manager">ผู้จัดการฝ่าย</option>
-                          <option value="sector_manager">ผู้จัดการส่วน</option>
-                          <option value="staff">พนักงาน</option>
-                          <option value="procurement">จัดซื้อจัดจ้าง</option>
-                        </select>
+                          <SelectTrigger className="w-[140px]">
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="admin">ผู้ดูแลระบบ</SelectItem>
+                            <SelectItem value="dept_manager">ผู้จัดการฝ่าย</SelectItem>
+                            <SelectItem value="sector_manager">ผู้จัดการส่วน</SelectItem>
+                            <SelectItem value="staff">พนักงาน</SelectItem>
+                            <SelectItem value="procurement">จัดซื้อจัดจ้าง</SelectItem>
+                          </SelectContent>
+                        </Select>
                       ) : (
-                        <button
+                        <Button
+                          variant="link"
+                          className="p-0 h-auto"
                           onClick={() => setEditingUser(u.id)}
-                          className="text-sm text-blue-600 hover:underline"
                           disabled={u.id === user?.id}
                         >
                           {getRoleLabel(u.role)}
-                        </button>
+                        </Button>
                       )}
-                    </td>
-                    <td className="px-6 py-4">
-                      <select
+                    </TableCell>
+                    <TableCell>
+                      <Select
                         value={u.status}
-                        onChange={(e) => handleStatusChange(u.id, e.target.value as 'active' | 'inactive' | 'suspended' | 'pending')}
-                        className={`text-sm border rounded px-2 py-1 ${u.status === 'pending' ? 'border-yellow-400 bg-yellow-50' : ''}`}
+                        onValueChange={(v) => handleStatusChange(u.id, v as 'active' | 'inactive' | 'suspended' | 'pending')}
                         disabled={savingUser === u.id || u.id === user?.id}
                       >
-                        <option value="active">ใช้งาน</option>
-                        <option value="pending">รอการอนุมัติ</option>
-                        <option value="inactive">ไม่ใช้งาน</option>
-                        <option value="suspended">ระงับ</option>
-                      </select>
-                    </td>
-                    <td className="px-6 py-4">
+                        <SelectTrigger className={`w-[130px] ${u.status === 'pending' ? 'border-yellow-400 bg-yellow-50' : ''}`}>
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="active">ใช้งาน</SelectItem>
+                          <SelectItem value="pending">รอการอนุมัติ</SelectItem>
+                          <SelectItem value="inactive">ไม่ใช้งาน</SelectItem>
+                          <SelectItem value="suspended">ระงับ</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </TableCell>
+                    <TableCell>
                       <div className="flex items-center gap-2">
                         {/* v1.2.0: Show approve/reject for pending with requested org */}
                         {u.status === 'pending' && u.onboarding_completed && u.id !== user?.id ? (
                           <>
-                            <button
+                            <Button
+                              size="sm"
+                              variant="outline"
                               onClick={() => handleApproveUser(u.id)}
                               disabled={approvingUser === u.id}
-                              className="px-2 py-1 text-xs bg-green-100 text-green-700 rounded hover:bg-green-200
-                                       disabled:opacity-50 disabled:cursor-not-allowed"
+                              className="h-7 bg-green-50 text-green-700 hover:bg-green-100"
                             >
-                              {approvingUser === u.id ? '...' : 'อนุมัติ'}
-                            </button>
-                            <button
+                              {approvingUser === u.id ? <Loader2 className="h-3 w-3 animate-spin" /> : <Check className="h-3 w-3" />}
+                            </Button>
+                            <Button
+                              size="sm"
+                              variant="outline"
                               onClick={() => handleRejectUser(u.id)}
                               disabled={approvingUser === u.id}
-                              className="px-2 py-1 text-xs bg-red-100 text-red-700 rounded hover:bg-red-200
-                                       disabled:opacity-50 disabled:cursor-not-allowed"
+                              className="h-7 bg-red-50 text-red-700 hover:bg-red-100"
                             >
-                              ปฏิเสธ
-                            </button>
+                              <X className="h-3 w-3" />
+                            </Button>
                           </>
                         ) : null}
                         {u.id !== user?.id && (
-                          <button
+                          <Button
+                            size="sm"
+                            variant="ghost"
                             onClick={() => handleDeleteUser(u.id, u.email)}
                             disabled={deletingUser === u.id}
-                            className="text-sm text-red-600 hover:text-red-800 hover:underline
-                                     disabled:opacity-50 disabled:cursor-not-allowed"
+                            className="h-7 text-red-600 hover:text-red-800 hover:bg-red-50"
                           >
-                            {deletingUser === u.id ? 'กำลังลบ...' : 'ลบ'}
-                          </button>
+                            {deletingUser === u.id ? <Loader2 className="h-3 w-3 animate-spin" /> : <Trash2 className="h-3 w-3" />}
+                          </Button>
                         )}
                       </div>
-                    </td>
-                  </tr>
+                    </TableCell>
+                  </TableRow>
                 ))}
-              </tbody>
-            </table>
-          </div>
+              </TableBody>
+            </Table>
+          </Card>
         )}
       </main>
     </div>
@@ -480,7 +514,7 @@ const DynamicAdminContent = nextDynamic(() => Promise.resolve(AdminContent), {
   ssr: false,
   loading: () => (
     <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+      <Loader2 className="h-8 w-8 animate-spin text-blue-600" />
     </div>
   ),
 })

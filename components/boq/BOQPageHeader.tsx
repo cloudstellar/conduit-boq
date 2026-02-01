@@ -1,10 +1,21 @@
 'use client'
 
-import { useState, useRef, useEffect } from 'react'
 import Link from 'next/link'
 import { useAuth } from '@/lib/context/AuthContext'
 import UserBadge from '@/components/auth/UserBadge'
 import { getRoleLabel, getRoleBadgeColor } from '@/lib/permissions'
+import { Button } from '@/components/ui/button'
+import { Badge } from '@/components/ui/badge'
+import { Separator } from '@/components/ui/separator'
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu'
+import { ChevronLeft, User, FileText, Settings, LogOut } from 'lucide-react'
 
 interface BOQPageHeaderProps {
   title: string
@@ -13,26 +24,13 @@ interface BOQPageHeaderProps {
   backLabel?: string
 }
 
-export default function BOQPageHeader({ 
-  title, 
-  subtitle, 
+export default function BOQPageHeader({
+  title,
+  subtitle,
   backHref = '/boq',
   backLabel = 'รายการ BOQ'
 }: BOQPageHeaderProps) {
-  const { user, isLoading, signOut } = useAuth()
-  const [isMenuOpen, setIsMenuOpen] = useState(false)
-  const menuRef = useRef<HTMLDivElement>(null)
-
-  // Close menu when clicking outside
-  useEffect(() => {
-    function handleClickOutside(event: MouseEvent) {
-      if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
-        setIsMenuOpen(false)
-      }
-    }
-    document.addEventListener('mousedown', handleClickOutside)
-    return () => document.removeEventListener('mousedown', handleClickOutside)
-  }, [])
+  const { user, signOut } = useAuth()
 
   return (
     <header className="bg-white border-b border-gray-200 sticky top-0 z-40">
@@ -40,116 +38,94 @@ export default function BOQPageHeader({
         <div className="flex items-center justify-between h-16">
           {/* Left side: Back + Title */}
           <div className="flex items-center gap-4">
-            <Link 
-              href={backHref}
-              className="flex items-center gap-1 text-gray-500 hover:text-gray-700 transition-colors"
-            >
-              <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-              </svg>
-              <span className="hidden sm:inline text-sm">{backLabel}</span>
-            </Link>
-            
-            <div className="h-6 w-px bg-gray-300 hidden sm:block"></div>
-            
+            <Button variant="ghost" size="sm" asChild>
+              <Link href={backHref} className="flex items-center gap-1">
+                <ChevronLeft className="h-5 w-5" />
+                <span className="hidden sm:inline">{backLabel}</span>
+              </Link>
+            </Button>
+
+            <Separator orientation="vertical" className="h-6 hidden sm:block" />
+
             <div>
               <h1 className="text-lg font-semibold text-gray-900">{title}</h1>
               {subtitle && (
-                <p className="text-xs text-gray-500 -mt-0.5">{subtitle}</p>
+                <p className="text-xs text-muted-foreground -mt-0.5">{subtitle}</p>
               )}
             </div>
           </div>
 
           {/* Right side: User Badge + Dropdown */}
-          <div className="relative" ref={menuRef}>
-            <button
-              onClick={() => setIsMenuOpen(!isMenuOpen)}
-              className="flex items-center gap-2 p-2 -m-2 rounded-lg hover:bg-gray-50 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
-            >
-              <UserBadge variant="compact" showDropdown />
-            </button>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" className="p-2 -m-2 rounded-lg">
+                <UserBadge variant="compact" showDropdown />
+              </Button>
+            </DropdownMenuTrigger>
 
-            {/* Dropdown Menu */}
-            {isMenuOpen && user && (
-              <div className="absolute right-0 mt-2 w-72 bg-white rounded-lg shadow-lg border border-gray-200 py-2 z-50">
+            {user && (
+              <DropdownMenuContent align="end" className="w-72">
                 {/* User Info Header */}
-                <div className="px-4 py-3 border-b border-gray-100">
-                  <p className="text-sm font-semibold text-gray-900">
-                    {[user.title, user.first_name, user.last_name].filter(Boolean).join(' ')}
-                  </p>
-                  <p className="text-xs text-gray-500 truncate">{user.email}</p>
-                  <div className="flex items-center gap-2 mt-2">
-                    <span className={`inline-flex items-center px-2 py-0.5 text-xs font-medium rounded-full ${getRoleBadgeColor(user.role)}`}>
-                      {getRoleLabel(user.role)}
-                    </span>
-                    {user.sector?.name && (
-                      <span className="text-xs text-gray-500">
-                        {user.sector.name}
-                      </span>
-                    )}
+                <DropdownMenuLabel className="font-normal">
+                  <div className="flex flex-col space-y-1">
+                    <p className="text-sm font-semibold">
+                      {[user.title, user.first_name, user.last_name].filter(Boolean).join(' ')}
+                    </p>
+                    <p className="text-xs text-muted-foreground truncate">{user.email}</p>
+                    <div className="flex items-center gap-2 mt-2">
+                      <Badge variant="secondary" className={getRoleBadgeColor(user.role)}>
+                        {getRoleLabel(user.role)}
+                      </Badge>
+                      {user.sector?.name && (
+                        <span className="text-xs text-muted-foreground">
+                          {user.sector.name}
+                        </span>
+                      )}
+                    </div>
                   </div>
-                </div>
+                </DropdownMenuLabel>
+
+                <DropdownMenuSeparator />
 
                 {/* Menu Items */}
-                <div className="py-1">
-                  <Link
-                    href="/profile"
-                    onClick={() => setIsMenuOpen(false)}
-                    className="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
-                  >
-                    <svg className="h-4 w-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                    </svg>
+                <DropdownMenuItem asChild>
+                  <Link href="/profile" className="flex items-center gap-2 cursor-pointer">
+                    <User className="h-4 w-4 text-muted-foreground" />
                     โปรไฟล์ของฉัน
                   </Link>
-                  
-                  <Link
-                    href="/boq"
-                    onClick={() => setIsMenuOpen(false)}
-                    className="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
-                  >
-                    <svg className="h-4 w-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                    </svg>
+                </DropdownMenuItem>
+
+                <DropdownMenuItem asChild>
+                  <Link href="/boq" className="flex items-center gap-2 cursor-pointer">
+                    <FileText className="h-4 w-4 text-muted-foreground" />
                     รายการ BOQ
                   </Link>
+                </DropdownMenuItem>
 
-                  {user.role === 'admin' && (
-                    <Link
-                      href="/admin"
-                      onClick={() => setIsMenuOpen(false)}
-                      className="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
-                    >
-                      <svg className="h-4 w-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                      </svg>
+                {user.role === 'admin' && (
+                  <DropdownMenuItem asChild>
+                    <Link href="/admin" className="flex items-center gap-2 cursor-pointer">
+                      <Settings className="h-4 w-4 text-muted-foreground" />
                       จัดการระบบ
                     </Link>
-                  )}
-                </div>
+                  </DropdownMenuItem>
+                )}
+
+                <DropdownMenuSeparator />
 
                 {/* Logout */}
-                <div className="border-t border-gray-100 py-1">
-                  <button
-                    onClick={() => {
-                      setIsMenuOpen(false)
-                      signOut()
-                    }}
-                    className="flex items-center gap-2 w-full px-4 py-2 text-sm text-red-600 hover:bg-red-50"
-                  >
-                    <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-                    </svg>
-                    ออกจากระบบ
-                  </button>
-                </div>
-              </div>
+                <DropdownMenuItem
+                  onClick={() => signOut()}
+                  className="flex items-center gap-2 text-red-600 focus:text-red-600 cursor-pointer"
+                >
+                  <LogOut className="h-4 w-4" />
+                  ออกจากระบบ
+                </DropdownMenuItem>
+              </DropdownMenuContent>
             )}
-          </div>
+          </DropdownMenu>
         </div>
       </div>
     </header>
   )
 }
-

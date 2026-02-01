@@ -231,7 +231,7 @@ export default function PrintBOQPage() {
   const formatThaiMonth = (dateStr: string) => {
     const date = new Date(dateStr);
     const thaiMonths = ['มกราคม', 'กุมภาพันธ์', 'มีนาคม', 'เมษายน', 'พฤษภาคม', 'มิถุนายน',
-                        'กรกฎาคม', 'สิงหาคม', 'กันยายน', 'ตุลาคม', 'พฤศจิกายน', 'ธันวาคม'];
+      'กรกฎาคม', 'สิงหาคม', 'กันยายน', 'ตุลาคม', 'พฤศจิกายน', 'ธันวาคม'];
     const buddhistYear = date.getFullYear() + 543;
     return `${thaiMonths[date.getMonth()]} ${buddhistYear}`;
   };
@@ -354,116 +354,116 @@ export default function PrintBOQPage() {
                 </div>
               </div>
 
-            {/* Title */}
-            <div className="title">
-              แบบฟอร์มแสดงรายการ ปริมาณงาน และราคางานก่อสร้างท่อร้อยสายสื่อสารใต้ดิน (BOQ)
-            </div>
-
-            {/* Info Section */}
-            <div className="info-section">
-              <div className="info-left">
-                <div><span className="label">ส่วนงาน</span> {boq.department || 'วิศวกรรมท่อร้อยสาย (วทฐฐ.) ฝ่ายท่อร้อยสาย (ทฐฐ.)'}</div>
-                <div><span className="label">บัญชีราคา</span> งานจ้างเหมาก่อสร้างท่อร้อยสายสื่อสารใต้ดินและบ่อพัก</div>
-                <div><span className="label">เส้นทาง</span> <strong>{route.route_name}</strong> {routes.length > 1 && `(${routeIndex + 1}/${routes.length})`}</div>
+              {/* Title */}
+              <div className="title">
+                แบบฟอร์มแสดงรายการ ปริมาณงาน และราคางานก่อสร้างท่อร้อยสายสื่อสารใต้ดิน (BOQ)
               </div>
-              <div className="info-right">
-                <div><span className="label">โครงการ</span> {boq.project_name}</div>
-                <div><span className="label">พื้นที่ก่อสร้าง</span> {route.construction_area || boq.construction_area || '-'}</div>
+
+              {/* Info Section */}
+              <div className="info-section">
+                <div className="info-left">
+                  <div><span className="label">ส่วนงาน</span> {boq.department || 'วิศวกรรมท่อร้อยสาย (วทฐฐ.) ฝ่ายท่อร้อยสาย (ทฐฐ.)'}</div>
+                  <div><span className="label">บัญชีราคา</span> งานจ้างเหมาก่อสร้างท่อร้อยสายสื่อสารใต้ดินและบ่อพัก</div>
+                  <div><span className="label">เส้นทาง</span> <strong>{route.route_name}</strong> {routes.length > 1 && `(${routeIndex + 1}/${routes.length})`}</div>
+                </div>
+                <div className="info-right">
+                  <div><span className="label">โครงการ</span> {boq.project_name}</div>
+                  <div><span className="label">พื้นที่ก่อสร้าง</span> {route.construction_area || '-'}</div>
+                </div>
               </div>
-            </div>
 
-            <div className="unit-label">หน่วย - บาท</div>
+              <div className="unit-label">หน่วย - บาท</div>
 
-            {/* Main Table */}
-            <table className="boq-table">
-              <thead>
-                <tr>
-                  <th rowSpan={2} className="col-no">ลำดับที่</th>
-                  <th rowSpan={2} className="col-item">รายการ</th>
-                  <th rowSpan={2} className="col-qty">ปริมาณงาน</th>
-                  <th rowSpan={2} className="col-unit">หน่วย</th>
-                  <th colSpan={2} className="col-material-header">ค่าวัสดุ ไม่รวมภาษีมูลค่าเพิ่ม (1)</th>
-                  <th colSpan={2} className="col-labor-header">ค่าแรง ไม่รวมภาษีมูลค่าเพิ่ม (2)</th>
-                  <th rowSpan={2} className="col-total">ค่างานต้นทุน<br/>(3)=(1)+(2)</th>
-                  <th rowSpan={2} className="col-remark">หมายเหตุ</th>
-                </tr>
-                <tr>
-                  <th className="col-sub">ราคา/หน่วย</th>
-                  <th className="col-sub">จำนวนเงิน</th>
-                  <th className="col-sub">ราคา/หน่วย</th>
-                  <th className="col-sub">จำนวนเงิน</th>
-                </tr>
-              </thead>
-              <tbody>
-                {items.map((item, idx) => (
-                  <tr key={item.id}>
-                    <td className="center">{idx + 1}</td>
-                    <td className="left">{item.item_name}</td>
-                    <td className="right">{formatNumber(item.quantity)}</td>
-                    <td className="center">{item.unit}</td>
-                    <td className="right">{formatNumber(item.material_cost_per_unit)}</td>
-                    <td className="right">{formatNumber(item.total_material_cost)}</td>
-                    <td className="right">{formatNumber(item.labor_cost_per_unit)}</td>
-                    <td className="right">{formatNumber(item.total_labor_cost)}</td>
-                    <td className="right">{formatNumber(item.total_cost)}</td>
-                    <td className="center">{item.remarks || ''}</td>
+              {/* Main Table */}
+              <table className="boq-table">
+                <thead>
+                  <tr>
+                    <th rowSpan={2} className="col-no">ลำดับที่</th>
+                    <th rowSpan={2} className="col-item">รายการ</th>
+                    <th rowSpan={2} className="col-qty">ปริมาณงาน</th>
+                    <th rowSpan={2} className="col-unit">หน่วย</th>
+                    <th colSpan={2} className="col-material-header">ค่าวัสดุ ไม่รวมภาษีมูลค่าเพิ่ม (1)</th>
+                    <th colSpan={2} className="col-labor-header">ค่าแรง ไม่รวมภาษีมูลค่าเพิ่ม (2)</th>
+                    <th rowSpan={2} className="col-total">ค่างานต้นทุน<br />(3)=(1)+(2)</th>
+                    <th rowSpan={2} className="col-remark">หมายเหตุ</th>
                   </tr>
-                ))}
-                {/* Empty rows for spacing */}
-                {Array.from({ length: Math.max(0, 8 - items.length) }).map((_, i) => (
-                  <tr key={`empty-${i}`} className="empty-row">
-                    <td>&nbsp;</td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
+                  <tr>
+                    <th className="col-sub">ราคา/หน่วย</th>
+                    <th className="col-sub">จำนวนเงิน</th>
+                    <th className="col-sub">ราคา/หน่วย</th>
+                    <th className="col-sub">จำนวนเงิน</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody>
+                  {items.map((item, idx) => (
+                    <tr key={item.id}>
+                      <td className="center">{idx + 1}</td>
+                      <td className="left">{item.item_name}</td>
+                      <td className="right">{formatNumber(item.quantity)}</td>
+                      <td className="center">{item.unit}</td>
+                      <td className="right">{formatNumber(item.material_cost_per_unit)}</td>
+                      <td className="right">{formatNumber(item.total_material_cost)}</td>
+                      <td className="right">{formatNumber(item.labor_cost_per_unit)}</td>
+                      <td className="right">{formatNumber(item.total_labor_cost)}</td>
+                      <td className="right">{formatNumber(item.total_cost)}</td>
+                      <td className="center">{item.remarks || ''}</td>
+                    </tr>
+                  ))}
+                  {/* Empty rows for spacing */}
+                  {Array.from({ length: Math.max(0, 8 - items.length) }).map((_, i) => (
+                    <tr key={`empty-${i}`} className="empty-row">
+                      <td>&nbsp;</td>
+                      <td></td>
+                      <td></td>
+                      <td></td>
+                      <td></td>
+                      <td></td>
+                      <td></td>
+                      <td></td>
+                      <td></td>
+                      <td></td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
 
-            {/* Totals Row for this route */}
-            <table className="boq-table totals-table">
-              <tbody>
-                <tr className="total-row highlight">
-                  <td className="col-no"></td>
-                  <td className="col-item" style={{ textAlign: 'right', paddingRight: '10px' }}><strong>ผลรวมค่างานต้นทุน</strong></td>
-                  <td className="col-qty"></td>
-                  <td className="col-unit"></td>
-                  <td className="col-sub"></td>
-                  <td className="col-sub" style={{ textAlign: 'right' }}><strong>{formatNumber(route.total_material_cost)}</strong></td>
-                  <td className="col-sub"></td>
-                  <td className="col-sub" style={{ textAlign: 'right' }}><strong>{formatNumber(route.total_labor_cost)}</strong></td>
-                  <td className="col-total" style={{ textAlign: 'right', fontWeight: 'bold' }}>{formatNumber(route.total_cost)}</td>
-                  <td className="col-remark"></td>
-                </tr>
-              </tbody>
-            </table>
+              {/* Totals Row for this route */}
+              <table className="boq-table totals-table">
+                <tbody>
+                  <tr className="total-row highlight">
+                    <td className="col-no"></td>
+                    <td className="col-item" style={{ textAlign: 'right', paddingRight: '10px' }}><strong>ผลรวมค่างานต้นทุน</strong></td>
+                    <td className="col-qty"></td>
+                    <td className="col-unit"></td>
+                    <td className="col-sub"></td>
+                    <td className="col-sub" style={{ textAlign: 'right' }}><strong>{formatNumber(route.total_material_cost)}</strong></td>
+                    <td className="col-sub"></td>
+                    <td className="col-sub" style={{ textAlign: 'right' }}><strong>{formatNumber(route.total_labor_cost)}</strong></td>
+                    <td className="col-total" style={{ textAlign: 'right', fontWeight: 'bold' }}>{formatNumber(route.total_cost)}</td>
+                    <td className="col-remark"></td>
+                  </tr>
+                </tbody>
+              </table>
 
-            {/* Footer */}
-            <div className="footer-section">
-              <div className="conditions">
-                <span className="highlight-text">เงื่อนไข</span> Factor F งานก่อสร้างทาง เงินล่วงหน้าจ่าย 0.00 %, เงินประกันผลงานหัก 0.00 %, ดอกเบี้ยเงินกู้ 7.00 % ต่อปี, ค่าภาษีมูลค่าเพิ่ม 7.00 %
-              </div>
-              <div className="note">
-                <span className="highlight-text">หมายเหตุ</span> ทั้งนี้ ราคางานโครงการ/งานก่อสร้าง ไม่ใช่ราคาค่าก่อสร้างที่แท้จริง แต่เป็นเพียงราคาโดยประมาณเท่านั้น
-              </div>
-              <div className="signature-section">
-                <div className="signature">
-                  <div className="sig-line"></div>
-                  <div>ผู้ประมาณราคา {boq.estimator_name}</div>
-                  <div>{formatThaiMonth(boq.document_date)}</div>
+              {/* Footer */}
+              <div className="footer-section">
+                <div className="conditions">
+                  <span className="highlight-text">เงื่อนไข</span> Factor F งานก่อสร้างทาง เงินล่วงหน้าจ่าย 0.00 %, เงินประกันผลงานหัก 0.00 %, ดอกเบี้ยเงินกู้ 7.00 % ต่อปี, ค่าภาษีมูลค่าเพิ่ม 7.00 %
+                </div>
+                <div className="note">
+                  <span className="highlight-text">หมายเหตุ</span> ทั้งนี้ ราคางานโครงการ/งานก่อสร้าง ไม่ใช่ราคาค่าก่อสร้างที่แท้จริง แต่เป็นเพียงราคาโดยประมาณเท่านั้น
+                </div>
+                <div className="signature-section">
+                  <div className="signature">
+                    <div className="sig-line"></div>
+                    <div>ผู้ประมาณราคา {boq.estimator_name}</div>
+                    <div>{formatThaiMonth(boq.document_date)}</div>
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
-        );
-      });
+          );
+        });
       })()}
 
       {/* ===== CONSOLIDATED ITEMS PAGE: All Routes Combined ===== */}
@@ -554,7 +554,7 @@ export default function PrintBOQPage() {
                   <th rowSpan={2} className="col-unit">หน่วย</th>
                   <th colSpan={2} className="col-material-header">ค่าวัสดุ ไม่รวมภาษีมูลค่าเพิ่ม (1)</th>
                   <th colSpan={2} className="col-labor-header">ค่าแรง ไม่รวมภาษีมูลค่าเพิ่ม (2)</th>
-                  <th rowSpan={2} className="col-total">ค่างานต้นทุน<br/>(3)=(1)+(2)</th>
+                  <th rowSpan={2} className="col-total">ค่างานต้นทุน<br />(3)=(1)+(2)</th>
                   <th rowSpan={2} className="col-remark">หมายเหตุ</th>
                 </tr>
                 <tr>
@@ -651,12 +651,12 @@ export default function PrintBOQPage() {
             <tr>
               <th className="col-no2">ที่</th>
               <th className="col-desc">รายการ</th>
-              <th className="col-cost">ค่างานต้นทุน<br/>(บาท)</th>
-              <th className="col-factor">Factor F<br/>≤ 5 ลบ.</th>
-              <th className="col-factor">Factor F<br/>&gt; 5 ลบ.</th>
-              <th className="col-result">ค่าก่อสร้าง<br/>ไม่รวม VAT (บาท)</th>
-              <th className="col-vat">ภาษีมูลค่าเพิ่ม<br/>(บาท)</th>
-              <th className="col-result">ค่าก่อสร้าง<br/>รวม VAT (บาท)</th>
+              <th className="col-cost">ค่างานต้นทุน<br />(บาท)</th>
+              <th className="col-factor">Factor F<br />≤ 5 ลบ.</th>
+              <th className="col-factor">Factor F<br />&gt; 5 ลบ.</th>
+              <th className="col-result">ค่าก่อสร้าง<br />ไม่รวม VAT (บาท)</th>
+              <th className="col-vat">ภาษีมูลค่าเพิ่ม<br />(บาท)</th>
+              <th className="col-result">ค่าก่อสร้าง<br />รวม VAT (บาท)</th>
               <th className="col-remark2">หมายเหตุ</th>
             </tr>
           </thead>

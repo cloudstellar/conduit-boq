@@ -1,9 +1,36 @@
 # Implementation Plan: shadcn/ui + Next.js Best Practices Migration
 
-**Version:** 3.0 (Final decisions - 2026-01-31)  
-**Estimated Effort:** 5 days  
-**Risk Level:** 🟡 Medium  
-**Status:** Ready for execution
+**Version:** 4.0 (Completed - 2026-02-01)  
+**Branch:** `feature/shadcn-migration` → merged to `main`  
+**Final Release:** v1.4.0  
+**Risk Level:** ✅ Complete  
+**Status:** ✅ COMPLETED
+
+---
+
+## 🛑 CRITICAL GATES (ห้ามข้าม)
+
+> [!CAUTION]
+> **GATE 1:** Phase 1 ต้อง `npm run build` ผ่านก่อน ถึงจะเริ่ม Phase 2 ได้
+>
+> **GATE 2:** Phase 2/3 ห้ามแตะ `/boq/[id]/print` เด็ดขาด — ใช้ `bash scripts/print-safe.sh` ตรวจก่อน commit
+
+---
+
+## 📍 Milestones (8 Checkpoints)
+
+> **All milestones are Go/No-Go decision points.**
+
+| ID | Milestone | Phase | Deliverable | Gate | Rollback | Tag |
+|----|-----------|-------|-------------|------|----------|-----|
+| M1 | shadcn Init | 1 | `components.json` + `components/ui/*` | Path ถูก | - | - |
+| M2 | Build Passes | 1 | `npm run build` ผ่าน | 🛑 GATE 1 | Phase 1 | `v1.2.1-shadcn-phase1` |
+| M3 | Print Scan Done | 2 | `docs/print-deps.txt` | Scan ก่อน migrate | - | - |
+| M4 | Low-risk Done | 2 | 4 components | print-safe | Batch 1 | - |
+| M5 | Medium-risk Done | 2 | 6 components + build | Build Gate | Batch 2 | - |
+| M6 | MultiRouteEditor | 2 | checklist ผ่าน | print-safe | 1 commit | `v1.2.1-shadcn-phase2` |
+| M7 | Pages Done | 3 | ทุก page (ยกเว้น print) | Print Gate | Page commits | - |
+| M8 | Verified | 5 | lint + build + manual | พร้อม merge | - | `v1.2.1-shadcn-done` |
 
 ---
 
@@ -15,7 +42,6 @@
 | Color Admin UI | ❌ Skip | Edit CSS directly |
 | react-hook-form | ⏳ Phase 2 | Keep existing controlled forms |
 | TanStack Table | ⏳ Optional | Use shadcn Table first |
-| Best Practices | ✅ Combined | Do with shadcn migration |
 
 ---
 
@@ -32,17 +58,12 @@
 
 ## Phase 1: Setup Foundation (Day 1)
 
-### 1.1 Commit Convention
+### 1.1 Path Verification
 
+```bash
+ls app/globals.css src/app/globals.css 2>/dev/null
+ls tailwind.config.ts tailwind.config.js 2>/dev/null
 ```
-chore(ui): shadcn init + primitives
-refactor(ui): migrate <component>
-refactor(ui): migrate <page>
-fix(logic): ... (separate if logic changes)
-```
-
-> [!IMPORTANT]
-> **UI Boundary Rule:** No logic changes during migrate. Separate commit if needed.
 
 ### 1.2 Initialize shadcn/ui
 
@@ -53,17 +74,25 @@ npx shadcn@latest init
 # CSS variables: yes
 ```
 
+> [!IMPORTANT]
+> **ยึด CLI output เป็น baseline** — ถ้า CLI generate โครงสร้างแบบใหม่ (Tailwind v4 style) ให้ใช้ตามนั้น อย่าฝืนย้อนเป็นแพทเทิร์นเก่า
+
 ### 1.3 Install Dependencies
 
 ```bash
-npm i clsx tailwind-merge
+# Core utilities
+npm i clsx tailwind-merge class-variance-authority
+
+# Icons + Animation (บาง component ต้องการ)
+npm i lucide-react tailwindcss-animate
 ```
 
-> **Note:** Skip `next-themes` — light mode only.
+> [!NOTE]
+> CLI อาจ install บางตัวให้อัตโนมัติ แต่ใส่ไว้ก่อนป้องกัน build พัง
 
 ### 1.4 Create Utility File
 
-#### [NEW] `lib/utils.ts`
+**[NEW] `lib/utils.ts`:**
 ```typescript
 import { clsx, type ClassValue } from "clsx"
 import { twMerge } from "tailwind-merge"
@@ -81,32 +110,58 @@ npx shadcn@latest add dropdown-menu alert dialog select
 npx shadcn@latest add command popover tabs avatar separator
 ```
 
+### 1.6 Build Verification
+
+> [!CAUTION]
+> **🛑 STOP: ต้อง build ผ่านก่อนไปต่อ!**
+
+```bash
+npm run build
+```
+
+### 1.7 Checkpoint
+
+```bash
+git add .
+git commit -m "chore(ui): shadcn init + primitives"
+git tag v1.2.1-shadcn-phase1
+git push origin feature/shadcn-migration
+git push origin --tags
+```
+
 ---
 
 ## Phase 2: Component Migration (Day 2-3)
 
+### 🔍 PRINT DEPENDENCY SCAN (ทำก่อน!)
+
+```bash
+grep -nE "^import" app/boq/\[id\]/print/page.tsx
+grep -nE "from\s+['\"]@/components" app/boq/\[id\]/print/page.tsx
+sed -n '1,120p' app/boq/\[id\]/print/page.tsx  # (Optional)
+```
+
+### 🛡️ GATE 2 CHECK (ก่อน commit ทุก batch)
+
+```bash
+bash scripts/print-safe.sh
+```
+
 ### Migration Order
 
-| Order | Component | shadcn → | Risk |
-|-------|-----------|----------|------|
-| 1 | `TotalsSummary.tsx` | Card | 🟢 |
-| 2 | `BOQAccessBanner.tsx` | Alert | 🟢 |
-| 3 | `ProjectInfoForm.tsx` | Card, Input, Label | 🟢 |
-| 4 | `UserBadge.tsx` | Badge, Avatar | 🟢 |
-| 5 | `UserMenu.tsx` | DropdownMenu, Button | 🟡 |
-| 6 | `RouteManager.tsx` | Card, Button, Input | 🟡 |
-| 7 | `BOQPageHeader.tsx` | Button, Input | 🟡 |
-| 8 | `FactorFSummary.tsx` | Card, Table | 🟡 |
-| 9 | `ItemSearch.tsx` | Command, Popover | 🟡 |
-| 10 | `LineItemsTable.tsx` | Table | 🟡 |
-| 11 | `MultiRouteEditor.tsx` | Tabs, Card, Table | 🔴 |
+| Order | Component | Risk |
+|-------|-----------|------|
+| 1-4 | TotalsSummary, BOQAccessBanner, ProjectInfoForm, UserBadge | 🟢 |
+| 5-6 | UserMenu, BOQPageHeader | 🟡 |
+| 7-8 | RouteManager, FactorFSummary | 🟡 |
+| 9-10 | LineItemsTable, ItemSearch | 🟡 |
+| 11 | MultiRouteEditor | 🔴 |
 
-### Key Rules
+### Commit Strategy (Batched)
 
-- ❌ Do NOT adopt full shadcn Form pattern (keep controlled state)
-- ✅ Keep `overflow-x-auto` wrapper for responsive tables
-- ✅ Keep `min-w-[800px]` for horizontal scroll
-- ❌ Do NOT apply shadcn to `/boq/[id]/print`
+**Batch 1:** Low-risk (Order 1-4)  
+**Batch 2:** Medium-risk (Order 5-10) + `npm run build`  
+**Batch 3:** MultiRouteEditor + Tag
 
 ---
 
@@ -114,43 +169,23 @@ npx shadcn@latest add command popover tabs avatar separator
 
 | Order | Page | Focus |
 |-------|------|-------|
-| 1 | `/login` | Button, Card |
-| 2 | `/profile` | Card, Input, Button |
-| 3 | `/admin` | Table, Badge, DropdownMenu |
-| 4 | `/price-list` | Table (keep pagination) |
-| 5 | `/` (home) | Card, Button |
-| 6 | `/boq` | Table, Badge |
-| 7 | `/boq/create` | Form components |
-| 8 | `/boq/[id]/edit` | All components |
+| 1-2 | `/login`, `/profile` | Card, Input, Button |
+| 3-4 | `/admin`, `/price-list` | Table, Badge |
+| 5-6 | `/` (home), `/boq` | Card, Table |
+| 7-8 | `/boq/create`, `/boq/[id]/edit` | All components |
 
-### Responsive Preservation
-
-> [!IMPORTANT]
-> Keep all responsive classes intact!
-
-| Pattern | Action |
-|---------|--------|
-| `grid grid-cols-1 md:grid-cols-2` | ✅ Keep |
-| `hidden sm:block` | ✅ Keep |
-| `text-sm md:text-base` | ✅ Keep |
+> [!CAUTION]
+> **❌ Skip `/boq/[id]/print`** — ห้ามแตะ!
 
 ---
 
-## Phase 4: Best Practices Refactor (Day 4-5)
+## Phase 4: Best Practices (Day 4-5)
 
-### HIGH Priority (from `/react-best-practices`)
-
-| Rule | Action |
-|------|--------|
-| `bundle-barrel-imports` | Direct imports: `import { X } from "@/components/ui/x"` |
-| `async-parallel` | Use `Promise.all()` for independent fetches |
-
-### MEDIUM Priority
-
-| Rule | Action |
-|------|--------|
-| `server-cache-react` | Add `React.cache()` for dedup |
-| `server-serialization` | Minimize data to client |
+| Priority | Rule | Action |
+|----------|------|--------|
+| HIGH | `bundle-barrel-imports` | Direct imports |
+| HIGH | `async-parallel` | `Promise.all()` |
+| MEDIUM | `React.cache()` | Dedup fetches |
 
 ---
 
@@ -163,50 +198,51 @@ npm run build
 ```
 
 ### Manual Checklist
-
-- [ ] Login: Google OAuth works
-- [ ] Home: Navigation, BOQ list
+- [ ] Login: Supabase Email Auth works
 - [ ] Admin: User table, role change
 - [ ] BOQ: Create, Edit, List
-- [ ] Price List: Table, pagination
 - [ ] Print page: NOT affected
 
-### Responsive (3 Breakpoints)
-| Width | Test |
-|-------|------|
-| 375px | Login, Home, BOQ list |
+### Responsive Test
+| Width | Pages |
+|-------|-------|
+| 375px | Login, Home |
 | 768px | Admin, BOQ edit |
-| 1280px | All pages |
+| 1280px | All |
+
+### Final Tag
+```bash
+git tag v1.2.1-shadcn-done
+git push origin feature/shadcn-migration
+git push origin --tags
+```
 
 ---
 
 ## Rollback Strategy
 
-- Each phase = separate commit
-- `git revert` if issues
-- Test before next phase
+```bash
+# Recovery branch จาก tag
+git checkout -b recovery/phase1 v1.2.1-shadcn-phase1
 
----
+# หรือ revert commit
+git revert <commit-hash>
 
-## Related Files
-
-| File | Purpose |
-|------|---------|
-| `.agent/workflows/shadcn-migration.md` | Skill (auto-loads) |
-| `.agent/workflows/react-best-practices.md` | 57 performance rules |
-| `lib/utils.ts` | `cn()` utility (to create) |
-| `components/ui/` | shadcn components (to create) |
+# กลับ main
+git checkout main && git pull origin main
+```
 
 ---
 
 ## For Next AI Session
 
 1. Read `.agent/workflows/shadcn-migration.md`
-2. Execute Phase 1: `npx shadcn@latest init`
-3. Follow migration order above
+2. Branch: `feature/shadcn-migration`
+3. Run `bash scripts/print-safe.sh` before each commit
+4. Execute Phase 1 → verify build → Phase 2...
 
 **Key Constraints:**
 - Light mode only
 - Keep existing controlled forms
-- Skip print page
+- ❌ Skip print page
 - Separate commits for UI vs logic

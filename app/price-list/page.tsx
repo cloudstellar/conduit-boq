@@ -4,6 +4,26 @@ import { useState, useEffect, useMemo } from 'react';
 import Link from 'next/link';
 import { createClient } from '@/lib/supabase/client';
 import { PriceListItem } from '@/lib/supabase';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Card, CardContent } from '@/components/ui/card';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table';
+import { Loader2, ArrowLeft, ChevronLeft, ChevronRight } from 'lucide-react';
 
 const ITEMS_PER_PAGE = 20;
 
@@ -119,10 +139,16 @@ export default function PriceListPage() {
     return pages;
   };
 
+  // Handle Select change with sentinel pattern
+  const selectValue = selectedCategory || '__ALL__';
+  const handleCategoryChange = (value: string) => {
+    setSelectedCategory(value === '__ALL__' ? '' : value);
+  };
+
   if (isLoading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full animate-spin" />
+        <Loader2 className="h-12 w-12 animate-spin text-blue-600" />
       </div>
     );
   }
@@ -132,171 +158,175 @@ export default function PriceListPage() {
       <div className="max-w-7xl mx-auto px-4">
         <div className="mb-4 md:mb-6">
           <h1 className="text-xl md:text-2xl font-bold text-gray-800">บัญชีราคามาตรฐาน ปี 2568</h1>
-          <p className="text-sm md:text-base text-gray-600">รายการราคามาตรฐานงานก่อสร้างท่อร้อยสายสื่อสารใต้ดิน</p>
+          <p className="text-sm md:text-base text-muted-foreground">รายการราคามาตรฐานงานก่อสร้างท่อร้อยสายสื่อสารใต้ดิน</p>
         </div>
 
         {/* Filters */}
-        <div className="bg-white rounded-lg shadow p-3 md:p-4 mb-4 md:mb-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">ค้นหา</label>
-              <input
-                type="text"
-                placeholder="พิมพ์ชื่อรายการหรือรหัส..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full px-3 md:px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 text-sm md:text-base"
-              />
+        <Card className="mb-4 md:mb-6">
+          <CardContent className="pt-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4">
+              <div className="space-y-2">
+                <Label>ค้นหา</Label>
+                <Input
+                  placeholder="พิมพ์ชื่อรายการหรือรหัส..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                />
+              </div>
+              <div className="space-y-2">
+                <Label>หมวดหมู่</Label>
+                <Select value={selectValue} onValueChange={handleCategoryChange}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="ทุกหมวดหมู่" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="__ALL__">ทุกหมวดหมู่</SelectItem>
+                    {categories.map((cat) => (
+                      <SelectItem key={cat} value={cat}>{cat}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
             </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">หมวดหมู่</label>
-              <select
-                value={selectedCategory}
-                onChange={(e) => setSelectedCategory(e.target.value)}
-                className="w-full px-3 md:px-4 py-2 pr-8 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 text-sm md:text-base appearance-none bg-white bg-[url('data:image/svg+xml;charset=UTF-8,%3csvg%20xmlns%3d%22http%3a%2f%2fwww.w3.org%2f2000%2fsvg%22%20viewBox%3d%220%200%2020%2020%22%20fill%3d%22%236b7280%22%3e%3cpath%20fill-rule%3d%22evenodd%22%20d%3d%22M5.293%207.293a1%201%200%20011.414%200L10%2010.586l3.293-3.293a1%201%200%20111.414%201.414l-4%204a1%201%200%2001-1.414%200l-4-4a1%201%200%20010-1.414z%22%20clip-rule%3d%22evenodd%22%2f%3e%3c%2fsvg%3e')] bg-[length:1.25rem_1.25rem] bg-[right_0.5rem_center] bg-no-repeat"
-              >
-                <option value="">ทุกหมวดหมู่</option>
-                {categories.map((cat) => (
-                  <option key={cat} value={cat}>{cat}</option>
-                ))}
-              </select>
-            </div>
-          </div>
-          <p className="mt-2 text-xs md:text-sm text-gray-500">
-            แสดง {startIndex + 1}-{Math.min(endIndex, filteredItems.length)} จาก {filteredItems.length} รายการ
-            {filteredItems.length !== items.length && ` (ทั้งหมด ${items.length} รายการ)`}
-          </p>
-        </div>
+            <p className="mt-2 text-xs md:text-sm text-muted-foreground">
+              แสดง {startIndex + 1}-{Math.min(endIndex, filteredItems.length)} จาก {filteredItems.length} รายการ
+              {filteredItems.length !== items.length && ` (ทั้งหมด ${items.length} รายการ)`}
+            </p>
+          </CardContent>
+        </Card>
 
         {/* Mobile Card View */}
         <div className="block md:hidden space-y-3">
           {paginatedItems.map((item) => (
-            <div key={item.id} className="bg-white rounded-lg shadow p-3">
-              <div className="flex justify-between items-start mb-2">
-                <span className="text-xs font-mono text-gray-500">{item.item_code}</span>
-                <span className="text-xs text-gray-500">{item.unit}</span>
-              </div>
-              <p className="text-sm font-medium text-gray-900 mb-1">{item.item_name}</p>
-              <p className="text-xs text-gray-500 mb-2">{item.category}</p>
-              <div className="grid grid-cols-3 gap-2 text-xs border-t pt-2">
-                <div>
-                  <span className="text-gray-500">วัสดุ</span>
-                  <p className="font-medium">{formatNumber(item.material_cost)}</p>
+            <Card key={item.id}>
+              <CardContent className="p-3">
+                <div className="flex justify-between items-start mb-2">
+                  <span className="text-xs font-mono text-muted-foreground">{item.item_code}</span>
+                  <span className="text-xs text-muted-foreground">{item.unit}</span>
                 </div>
-                <div>
-                  <span className="text-gray-500">ค่าแรง</span>
-                  <p className="font-medium">{formatNumber(item.labor_cost)}</p>
+                <p className="text-sm font-medium text-gray-900 mb-1">{item.item_name}</p>
+                <p className="text-xs text-muted-foreground mb-2">{item.category}</p>
+                <div className="grid grid-cols-3 gap-2 text-xs border-t pt-2">
+                  <div>
+                    <span className="text-muted-foreground">วัสดุ</span>
+                    <p className="font-medium">{formatNumber(item.material_cost)}</p>
+                  </div>
+                  <div>
+                    <span className="text-muted-foreground">ค่าแรง</span>
+                    <p className="font-medium">{formatNumber(item.labor_cost)}</p>
+                  </div>
+                  <div>
+                    <span className="text-muted-foreground">รวม</span>
+                    <p className="font-medium text-blue-600">{formatNumber(item.unit_cost)}</p>
+                  </div>
                 </div>
-                <div>
-                  <span className="text-gray-500">รวม</span>
-                  <p className="font-medium text-blue-600">{formatNumber(item.unit_cost)}</p>
-                </div>
-              </div>
-            </div>
+              </CardContent>
+            </Card>
           ))}
         </div>
 
         {/* Desktop Table View */}
-        <div className="hidden md:block bg-white rounded-lg shadow overflow-hidden">
-          <div className="overflow-x-auto">
-            <table className="w-full text-sm">
-              <thead className="bg-gray-50">
-                <tr>
-                  <th className="px-3 py-3 text-left font-medium text-gray-700">รหัส</th>
-                  <th className="px-3 py-3 text-left font-medium text-gray-700">รายการ</th>
-                  <th className="px-3 py-3 text-center font-medium text-gray-700">หน่วย</th>
-                  <th className="px-3 py-3 text-right font-medium text-gray-700">ค่าวัสดุ</th>
-                  <th className="px-3 py-3 text-right font-medium text-gray-700">ค่าแรง</th>
-                  <th className="px-3 py-3 text-right font-medium text-gray-700">รวม</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-gray-200">
-                {paginatedItems.map((item) => (
-                  <tr key={item.id} className="hover:bg-gray-50">
-                    <td className="px-3 py-2 text-gray-600 font-mono text-xs">{item.item_code}</td>
-                    <td className="px-3 py-2 text-gray-900">
-                      <div>{item.item_name}</div>
-                      <div className="text-xs text-gray-500">{item.category}</div>
-                    </td>
-                    <td className="px-3 py-2 text-center text-gray-600">{item.unit}</td>
-                    <td className="px-3 py-2 text-right text-gray-600">{formatNumber(item.material_cost)}</td>
-                    <td className="px-3 py-2 text-right text-gray-600">{formatNumber(item.labor_cost)}</td>
-                    <td className="px-3 py-2 text-right font-medium text-blue-600">{formatNumber(item.unit_cost)}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </div>
+        <Card className="hidden md:block overflow-hidden">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>รหัส</TableHead>
+                <TableHead>รายการ</TableHead>
+                <TableHead className="text-center">หน่วย</TableHead>
+                <TableHead className="text-right">ค่าวัสดุ</TableHead>
+                <TableHead className="text-right">ค่าแรง</TableHead>
+                <TableHead className="text-right">รวม</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {paginatedItems.map((item) => (
+                <TableRow key={item.id}>
+                  <TableCell className="font-mono text-xs text-muted-foreground">{item.item_code}</TableCell>
+                  <TableCell>
+                    <div>{item.item_name}</div>
+                    <div className="text-xs text-muted-foreground">{item.category}</div>
+                  </TableCell>
+                  <TableCell className="text-center text-muted-foreground">{item.unit}</TableCell>
+                  <TableCell className="text-right text-muted-foreground">{formatNumber(item.material_cost)}</TableCell>
+                  <TableCell className="text-right text-muted-foreground">{formatNumber(item.labor_cost)}</TableCell>
+                  <TableCell className="text-right font-medium text-blue-600">{formatNumber(item.unit_cost)}</TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </Card>
 
         {/* Pagination */}
         {totalPages > 1 && (
           <div className="mt-4 md:mt-6 flex flex-col sm:flex-row items-center justify-between gap-4">
-            <div className="text-xs md:text-sm text-gray-500">
+            <div className="text-xs md:text-sm text-muted-foreground">
               หน้า {currentPage} จาก {totalPages}
             </div>
             <div className="flex items-center gap-1 md:gap-2">
               {/* Previous Button */}
-              <button
+              <Button
+                variant="outline"
+                size="sm"
                 onClick={() => goToPage(currentPage - 1)}
                 disabled={currentPage === 1}
-                className="px-2 md:px-3 py-1 md:py-2 text-xs md:text-sm border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                ก่อนหน้า
-              </button>
+                <ChevronLeft className="h-4 w-4" />
+                <span className="hidden sm:inline ml-1">ก่อนหน้า</span>
+              </Button>
 
               {/* Page Numbers */}
               <div className="hidden sm:flex items-center gap-1">
                 {getPageNumbers().map((page, index) => (
                   typeof page === 'number' ? (
-                    <button
+                    <Button
                       key={index}
+                      variant={currentPage === page ? 'default' : 'outline'}
+                      size="sm"
                       onClick={() => goToPage(page)}
-                      className={`px-3 py-1 md:py-2 text-xs md:text-sm rounded-md ${
-                        currentPage === page
-                          ? 'bg-blue-600 text-white'
-                          : 'border border-gray-300 hover:bg-gray-50'
-                      }`}
                     >
                       {page}
-                    </button>
+                    </Button>
                   ) : (
-                    <span key={index} className="px-2 text-gray-500">...</span>
+                    <span key={index} className="px-2 text-muted-foreground">...</span>
                   )
                 ))}
               </div>
 
               {/* Mobile Page Input */}
               <div className="flex sm:hidden items-center gap-2">
-                <input
+                <Input
                   type="number"
                   min={1}
                   max={totalPages}
                   value={currentPage}
                   onChange={(e) => goToPage(parseInt(e.target.value) || 1)}
-                  className="w-14 px-2 py-1 text-center text-sm border border-gray-300 rounded-md"
+                  className="w-14 text-center"
                 />
-                <span className="text-xs text-gray-500">/ {totalPages}</span>
+                <span className="text-xs text-muted-foreground">/ {totalPages}</span>
               </div>
 
               {/* Next Button */}
-              <button
+              <Button
+                variant="outline"
+                size="sm"
                 onClick={() => goToPage(currentPage + 1)}
                 disabled={currentPage === totalPages}
-                className="px-2 md:px-3 py-1 md:py-2 text-xs md:text-sm border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                ถัดไป
-              </button>
+                <span className="hidden sm:inline mr-1">ถัดไป</span>
+                <ChevronRight className="h-4 w-4" />
+              </Button>
             </div>
           </div>
         )}
 
         {/* Back to Home */}
         <div className="mt-4 md:mt-6">
-          <Link href="/" className="text-blue-600 hover:text-blue-800 text-sm md:text-base">← กลับหน้าหลัก</Link>
+          <Link href="/" className="text-blue-600 hover:text-blue-800 text-sm md:text-base flex items-center gap-1">
+            <ArrowLeft className="h-4 w-4" />
+            กลับหน้าหลัก
+          </Link>
         </div>
       </div>
     </div>
   );
 }
-

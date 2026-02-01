@@ -5,6 +5,13 @@ import { useRouter, useSearchParams } from 'next/navigation'
 import Image from 'next/image'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { Card, CardContent } from '@/components/ui/card'
+import { Alert, AlertDescription } from '@/components/ui/alert'
+import { Separator } from '@/components/ui/separator'
+import { Loader2 } from 'lucide-react'
 
 function LoginForm() {
   const router = useRouter()
@@ -136,125 +143,119 @@ function LoginForm() {
         <h2 className="mt-6 text-center text-2xl font-bold text-gray-900">
           {mode === 'login' ? 'เข้าสู่ระบบ' : mode === 'signup' ? 'สมัครสมาชิก' : 'ลืมรหัสผ่าน'}
         </h2>
-        <p className="mt-2 text-center text-sm text-gray-600">
+        <p className="mt-2 text-center text-sm text-muted-foreground">
           ระบบประมาณราคาท่อร้อยสายสื่อสารใต้ดิน
         </p>
       </div>
 
       <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
-        <div className="bg-white py-8 px-4 shadow sm:rounded-lg sm:px-10">
-          <form className="space-y-6" onSubmit={handleSubmit}>
-            {error && (
-              <div className="p-3 rounded-md text-sm bg-red-50 text-red-700">
-                {error}
-              </div>
-            )}
-            {success && (
-              <div className="p-3 rounded-md text-sm bg-green-50 text-green-700">
-                {success}
-              </div>
-            )}
-
-            <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-700">
-                อีเมล
-              </label>
-              <input
-                id="email"
-                name="email"
-                type="email"
-                autoComplete="email"
-                required
-                value={email}
-                onChange={handleEmailChange}
-                onBlur={handleEmailBlur}
-                className={`mt-1 block w-full px-3 py-2 border rounded-md shadow-sm
-                         focus:outline-none focus:ring-blue-500 focus:border-blue-500
-                         ${emailDomainError ? 'border-red-300 bg-red-50' : 'border-gray-300'}`}
-                placeholder={isEmailRestricted ? 'ชื่อผู้ใช้ (ไม่ต้องพิมพ์ @ntplc.co.th)' : 'name@ntplc.co.th'}
-              />
-              {emailDomainError && (
-                <p className="mt-1 text-sm text-red-600">{emailDomainError}</p>
+        <Card>
+          <CardContent className="pt-6">
+            <form className="space-y-6" onSubmit={handleSubmit}>
+              {error && (
+                <Alert variant="destructive">
+                  <AlertDescription>{error}</AlertDescription>
+                </Alert>
               )}
-              {isEmailRestricted && !emailDomainError && (
-                <p className="mt-1 text-xs text-gray-500">
-                  พิมพ์แค่ชื่อผู้ใช้ ระบบจะเติม @ntplc.co.th ให้อัตโนมัติ
-                </p>
+              {success && (
+                <Alert className="bg-green-50 text-green-700 border-green-200">
+                  <AlertDescription>{success}</AlertDescription>
+                </Alert>
               )}
-            </div>
 
-            {mode !== 'forgot' && (
-              <div>
-                <div className="flex items-center justify-between">
-                  <label htmlFor="password" className="block text-sm font-medium text-gray-700">
-                    รหัสผ่าน
-                  </label>
-                  {mode === 'login' && (
-                    <button
-                      type="button"
-                      onClick={() => { setMode('forgot'); setError(null); setSuccess(null) }}
-                      className="text-sm text-blue-600 hover:text-blue-500"
-                    >
-                      ลืมรหัสผ่าน?
-                    </button>
-                  )}
-                </div>
-                <input
-                  id="password"
-                  name="password"
-                  type="password"
-                  autoComplete={mode === 'login' ? 'current-password' : 'new-password'}
+              <div className="space-y-2">
+                <Label htmlFor="email">อีเมล</Label>
+                <Input
+                  id="email"
+                  name="email"
+                  type="email"
+                  autoComplete="email"
                   required
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm
-                           focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                  placeholder="••••••••"
-                  minLength={6}
+                  value={email}
+                  onChange={handleEmailChange}
+                  onBlur={handleEmailBlur}
+                  className={emailDomainError ? 'border-red-300 bg-red-50' : ''}
+                  placeholder={isEmailRestricted ? 'ชื่อผู้ใช้ (ไม่ต้องพิมพ์ @ntplc.co.th)' : 'name@ntplc.co.th'}
                 />
+                {emailDomainError && (
+                  <p className="text-sm text-red-600">{emailDomainError}</p>
+                )}
+                {isEmailRestricted && !emailDomainError && (
+                  <p className="text-xs text-muted-foreground">
+                    พิมพ์แค่ชื่อผู้ใช้ ระบบจะเติม @ntplc.co.th ให้อัตโนมัติ
+                  </p>
+                )}
               </div>
-            )}
 
-            <div>
-              <button
+              {mode !== 'forgot' && (
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <Label htmlFor="password">รหัสผ่าน</Label>
+                    {mode === 'login' && (
+                      <Button
+                        type="button"
+                        variant="link"
+                        className="p-0 h-auto text-sm"
+                        onClick={() => { setMode('forgot'); setError(null); setSuccess(null) }}
+                      >
+                        ลืมรหัสผ่าน?
+                      </Button>
+                    )}
+                  </div>
+                  <Input
+                    id="password"
+                    name="password"
+                    type="password"
+                    autoComplete={mode === 'login' ? 'current-password' : 'new-password'}
+                    required
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    placeholder="••••••••"
+                    minLength={6}
+                  />
+                </div>
+              )}
+
+              <Button
                 type="submit"
+                className="w-full"
                 disabled={isLoading || !isFormValid}
-                className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md
-                         shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700
-                         focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500
-                         disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                {isLoading ? 'กำลังดำเนินการ...' :
+                {isLoading ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    กำลังดำเนินการ...
+                  </>
+                ) : (
                   mode === 'login' ? 'เข้าสู่ระบบ' :
-                  mode === 'signup' ? 'สมัครสมาชิก' :
-                  'ส่งลิงก์รีเซ็ตรหัสผ่าน'}
-              </button>
-            </div>
-          </form>
-
-          <div className="mt-6">
-            <div className="relative">
-              <div className="absolute inset-0 flex items-center">
-                <div className="w-full border-t border-gray-300" />
-              </div>
-              <div className="relative flex justify-center text-sm">
-                <span className="px-2 bg-white text-gray-500">
-                  {mode === 'forgot' ? 'จำรหัสผ่านได้แล้ว?' : mode === 'login' ? 'ยังไม่มีบัญชี?' : 'มีบัญชีแล้ว?'}
-                </span>
-              </div>
-            </div>
+                    mode === 'signup' ? 'สมัครสมาชิก' :
+                      'ส่งลิงก์รีเซ็ตรหัสผ่าน'
+                )}
+              </Button>
+            </form>
 
             <div className="mt-6">
-              <button
-                onClick={() => { setMode(mode === 'login' ? 'signup' : 'login'); setError(null); setSuccess(null) }}
-                className="w-full flex justify-center py-2 px-4 border border-gray-300 rounded-md
-                         shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50"
-              >
-                {mode === 'forgot' ? 'กลับไปเข้าสู่ระบบ' : mode === 'login' ? 'สมัครสมาชิก' : 'เข้าสู่ระบบ'}
-              </button>
+              <div className="relative">
+                <Separator />
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <span className="px-2 bg-white text-sm text-muted-foreground">
+                    {mode === 'forgot' ? 'จำรหัสผ่านได้แล้ว?' : mode === 'login' ? 'ยังไม่มีบัญชี?' : 'มีบัญชีแล้ว?'}
+                  </span>
+                </div>
+              </div>
+
+              <div className="mt-6">
+                <Button
+                  variant="outline"
+                  className="w-full"
+                  onClick={() => { setMode(mode === 'login' ? 'signup' : 'login'); setError(null); setSuccess(null) }}
+                >
+                  {mode === 'forgot' ? 'กลับไปเข้าสู่ระบบ' : mode === 'login' ? 'สมัครสมาชิก' : 'เข้าสู่ระบบ'}
+                </Button>
+              </div>
             </div>
-          </div>
-        </div>
+          </CardContent>
+        </Card>
       </div>
     </div>
   )
@@ -263,7 +264,7 @@ function LoginForm() {
 function LoginLoading() {
   return (
     <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+      <Loader2 className="h-8 w-8 animate-spin text-blue-600" />
     </div>
   )
 }

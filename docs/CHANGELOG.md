@@ -3,6 +3,49 @@
 
 ---
 
+## [v1.4.0] - 2026-02-01 (shadcn/ui Migration Complete)
+
+### 🎨 UI/UX Improvements
+
+#### shadcn/ui Integration
+- Migrated to shadcn/ui component library (Button, Card, Input, Table, Dialog, etc.)
+- Professional design tokens with consistent styling
+- Improved accessibility and keyboard navigation
+
+#### Multi-Route Editor
+- **Custom Collapsible Sidebar** replacing shadcn Sidebar (fixed positioning issue)
+  - Collapsed width: 64px (route numbers as circled badges)
+  - Expanded width: 240px (full route names)
+  - State persistence via localStorage
+  - Smooth transition animation (duration-300)
+- Sticky header with toggle button + route context
+- Route total summary always visible in header
+
+#### BOQ List Table
+- 7-column optimized layout
+- Route badge with click-to-expand dialog
+- "ก่อน VAT" column using snapshotted `total_with_factor_f`
+- Icon action buttons (View, Edit, Print, Delete)
+
+### 🔧 Technical Improvements
+
+#### Factor F Snapshotting
+- Factor values (factor_f, total_with_factor_f, total_with_vat) now saved at BOQ creation
+- Historical accuracy preserved even when Factor F rates change
+
+#### Component Architecture
+- New `RouteBadge.tsx` component for route count display
+- Improved props typing with TypeScript
+
+### 📌 Migration Tags
+- `v1.2.1-shadcn-phase1` → Phase 1 complete
+- `v1.2.1-shadcn-phase2` → Phase 2 complete
+- `v1.2.1-shadcn-done` → All migration complete
+- `v1.3.0` → Factor F snapshotting
+- `v1.4.0` → Custom collapsible sidebar + final polish
+
+---
+
 ## [2026-01-22] Documentation Reorganization
 
 ### Added

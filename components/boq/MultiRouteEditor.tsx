@@ -3,15 +3,35 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import { PriceListItem } from '@/lib/supabase';
-import RouteManager, { Route } from './RouteManager';
+import { Route } from './RouteManager';
+import RouteSidebar from './RouteSidebar';
 import LineItemsTable, { LineItem } from './LineItemsTable';
 import TotalsSummary from './TotalsSummary';
 import FactorFSummary from './FactorFSummary';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Separator } from '@/components/ui/separator';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from '@/components/ui/dialog';
+import { Loader2, Trash2, PanelLeftClose, PanelLeft } from 'lucide-react';
 
 interface MultiRouteEditorProps {
   boqId: string;
   onSave: (routes: Route[], routeItems: Record<string, LineItem[]>) => Promise<void>;
   isSaving: boolean;
+  /** Callback to pass calculated factor values up for snapshot saving */
+  onFactorCalculated?: (data: {
+    factor: number;
+    totalWithFactor: number;
+    totalWithVAT: number;
+  }) => void;
 }
 
 export interface RouteWithItems extends Route {
@@ -28,7 +48,7 @@ const isSinglePipeItem = (itemName: string): boolean => {
   return /^งานวางท่อ\s+1-/.test(itemName) || /^งานดันท่อ.*1-/.test(itemName);
 };
 
-export default function MultiRouteEditor({ boqId, onSave, isSaving }: MultiRouteEditorProps) {
+export default function MultiRouteEditor({ boqId, onSave, isSaving, onFactorCalculated }: MultiRouteEditorProps) {
   const supabase = useMemo(() => createClient(), []);
   const [routes, setRoutes] = useState<Route[]>([]);
   const [routeItems, setRouteItems] = useState<Record<string, LineItem[]>>({});
@@ -38,6 +58,23 @@ export default function MultiRouteEditor({ boqId, onSave, isSaving }: MultiRoute
   // State for special item modal (งานวางท่อ / งานดันท่อ)
   const [pendingSpecialItem, setPendingSpecialItem] = useState<PriceListItem | null>(null);
   const [showSpecialItemModal, setShowSpecialItemModal] = useState(false);
+
+  // Sidebar collapse state with localStorage persistence
+  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(() => {
+    if (typeof window !== 'undefined') {
+      return localStorage.getItem('boq-sidebar-collapsed') === 'true';
+    }
+    return false;
+  });
+
+  // Toggle sidebar and persist to localStorage
+  const toggleSidebar = useCallback(() => {
+    setIsSidebarCollapsed(prev => {
+      const newState = !prev;
+      localStorage.setItem('boq-sidebar-collapsed', String(newState));
+      return newState;
+    });
+  }, []);
 
   // Load routes and items
   useEffect(() => {
@@ -290,11 +327,11 @@ export default function MultiRouteEditor({ boqId, onSave, isSaving }: MultiRoute
       prev.map(r =>
         r.id === activeRouteId
           ? {
-              ...r,
-              total_material_cost: totals.material,
-              total_labor_cost: totals.labor,
-              total_cost: totals.total,
-            }
+            ...r,
+            total_material_cost: totals.material,
+            total_labor_cost: totals.labor,
+            total_cost: totals.total,
+          }
           : r
       )
     );
@@ -321,178 +358,285 @@ export default function MultiRouteEditor({ boqId, onSave, isSaving }: MultiRoute
   if (isLoading) {
     return (
       <div className="flex items-center justify-center py-12">
-        <div className="w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full animate-spin" />
+        <Loader2 className="w-8 h-8 animate-spin text-blue-500" />
       </div>
     );
   }
 
   return (
-    <div className="space-y-6">
-      {/* Route Tabs */}
-      <RouteManager
-        routes={routes}
-        activeRouteId={activeRouteId}
-        onAddRoute={handleAddRoute}
-        onSelectRoute={handleSelectRoute}
-        onUpdateRoute={handleUpdateRoute}
-        onRemoveRoute={handleRemoveRoute}
-      />
-
-      {/* Active Route Items */}
-      {activeRouteId && (
-        <div className="bg-white border rounded-lg p-4">
-          <div className="mb-4">
-            <h3 className="text-md font-medium text-gray-700">
-              รายการสำหรับ: <span className="text-blue-600">{activeRoute?.route_name}</span>
-            </h3>
-          </div>
-
-          <div className="overflow-x-auto -mx-4 md:mx-0">
-            <div className="min-w-[800px] px-4 md:px-0">
-              <LineItemsTable
-                items={activeRouteItems}
-                onAddItem={handleAddItem}
-                onUpdateQuantity={handleUpdateQuantity}
-                onRemoveItem={handleRemoveItem}
-              />
-            </div>
-          </div>
-
-          {/* Route Subtotal */}
-          <div className="mt-4 p-4 bg-blue-50 rounded-lg">
-            <div className="flex justify-between items-center">
-              <span className="text-sm text-gray-600">
-                รวมเส้นทาง "{activeRoute?.route_name}":
-              </span>
-              <span className="text-lg font-bold text-blue-600">
-                {(activeRoute?.total_cost || 0).toLocaleString('th-TH', { minimumFractionDigits: 2 })} บาท
-              </span>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Grand Totals */}
-      {routes.length > 0 && (
-        <div className="bg-gradient-to-r from-gray-50 to-blue-50 rounded-lg p-6 border-2 border-blue-200">
-          <h3 className="text-lg font-semibold text-gray-700 mb-4">สรุปรวมทุกเส้นทาง</h3>
-
-          {/* Routes Summary */}
-          <div className="mb-4 space-y-2">
-            {routes.map((route, index) => (
-              <div key={route.id} className="flex justify-between items-center py-2 border-b border-gray-200">
-                <span className="text-sm text-gray-600">
-                  {index + 1}. {route.route_name} ({routeItems[route.id]?.length || 0} รายการ)
-                </span>
-                <span className="font-medium text-gray-800">
-                  {route.total_cost.toLocaleString('th-TH', { minimumFractionDigits: 2 })} บาท
-                </span>
-              </div>
-            ))}
-          </div>
-
-          <TotalsSummary
-            totalMaterialCost={grandTotals.material}
-            totalLaborCost={grandTotals.labor}
-            totalCost={grandTotals.total}
-            itemCount={grandTotals.itemCount}
+    <div className="flex flex-col">
+      {/* Collapsible Sidebar + Detail View */}
+      <div className="flex min-h-[600px] rounded-lg border overflow-hidden">
+        {/* Left: Collapsible Sidebar */}
+        <div
+          className={`
+            border-r transition-all duration-300 shrink-0
+            ${isSidebarCollapsed ? 'w-[64px]' : 'w-[240px]'}
+          `}
+        >
+          <RouteSidebar
+            routes={routes}
+            activeRouteId={activeRouteId}
+            onSelectRoute={handleSelectRoute}
+            onAddRoute={handleAddRoute}
+            onRemoveRoute={handleRemoveRoute}
+            isCollapsed={isSidebarCollapsed}
           />
         </div>
+
+        {/* Right: Detail View */}
+        <div className="flex-1 flex flex-col h-full">
+          {activeRouteId && activeRoute ? (
+            <>
+              {/* Sticky Header with Toggle Button */}
+              <div className="flex h-14 shrink-0 items-center gap-2 border-b px-4 bg-background/95 backdrop-blur sticky top-0 z-10">
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={toggleSidebar}
+                  className="h-8 w-8"
+                  title={isSidebarCollapsed ? 'ขยายเมนู' : 'ย่อเมนู'}
+                >
+                  {isSidebarCollapsed ? (
+                    <PanelLeft className="h-4 w-4" />
+                  ) : (
+                    <PanelLeftClose className="h-4 w-4" />
+                  )}
+                </Button>
+                <Separator orientation="vertical" className="h-5" />
+                <h2 className="text-lg font-semibold tracking-tight">
+                  แก้ไขข้อมูล:{' '}
+                  <span className="text-primary">
+                    เส้นทางที่ {routes.findIndex(r => r.id === activeRouteId) + 1}
+                  </span>
+                </h2>
+                <div className="ml-auto text-sm text-muted-foreground">
+                  รวม{' '}
+                  <span className="font-semibold text-primary">
+                    {(activeRoute?.total_cost || 0).toLocaleString('th-TH', { minimumFractionDigits: 2 })}
+                  </span>{' '}
+                  บาท
+                </div>
+              </div>
+
+              {/* Route Header Form */}
+              {/* key={activeRouteId} forces React to remount inputs on route switch */}
+              <div key={activeRouteId} className="p-4 border-b bg-muted/30 space-y-3">
+                {/* Row 1: Route Name + Delete Button */}
+                <div className="flex items-start gap-2">
+                  <div className="flex-1 space-y-1">
+                    <Label className="text-xs text-muted-foreground">
+                      ชื่อเส้นทาง <span className="text-destructive">*</span>
+                    </Label>
+                    <Input
+                      value={activeRoute.route_name}
+                      onChange={(e) => handleUpdateRoute(activeRouteId, 'route_name', e.target.value)}
+                      placeholder="เช่น ถนนพระราม 4 (แยกคลองเตย-สุขุมวิท)"
+                      className="text-lg font-semibold"
+                    />
+                  </div>
+                  {routes.length > 1 && (
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => {
+                        if (confirm('ต้องการลบเส้นทางนี้?')) {
+                          handleRemoveRoute(activeRouteId);
+                        }
+                      }}
+                      className="mt-6 text-destructive hover:text-destructive hover:bg-destructive/10"
+                      title="ลบเส้นทาง"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </Button>
+                  )}
+                </div>
+
+                {/* Row 2: Construction Area */}
+                <div className="space-y-1">
+                  <Label className="text-xs text-muted-foreground">พื้นที่ก่อสร้าง</Label>
+                  <Input
+                    value={activeRoute.construction_area}
+                    onChange={(e) => handleUpdateRoute(activeRouteId, 'construction_area', e.target.value)}
+                    placeholder="เช่น ชส.คลองเตย จ.กรุงเทพมหานคร"
+                  />
+                </div>
+
+                {/* Row 3: Description (Textarea) */}
+                <div className="space-y-1">
+                  <Label className="text-xs text-muted-foreground">คำอธิบาย</Label>
+                  <textarea
+                    value={activeRoute.route_description}
+                    onChange={(e) => handleUpdateRoute(activeRouteId, 'route_description', e.target.value)}
+                    placeholder="รายละเอียดเพิ่มเติมเกี่ยวกับเส้นทางนี้"
+                    rows={2}
+                    className="w-full px-3 py-2 text-sm border border-border rounded-md bg-background focus:ring-2 focus:ring-ring focus:border-ring resize-none"
+                  />
+                </div>
+              </div>
+
+              {/* Line Items Table */}
+              <div className="flex-1 overflow-auto p-4">
+                <div className="overflow-x-auto">
+                  <div className="min-w-[800px]">
+                    <LineItemsTable
+                      items={activeRouteItems}
+                      onAddItem={handleAddItem}
+                      onUpdateQuantity={handleUpdateQuantity}
+                      onRemoveItem={handleRemoveItem}
+                    />
+                  </div>
+                </div>
+
+                {/* Route Subtotal */}
+                <div className="mt-4 p-4 bg-accent/50 rounded-lg">
+                  <div className="flex justify-between items-center">
+                    <span className="text-sm text-muted-foreground">
+                      รวมเส้นทาง &quot;{activeRoute?.route_name}&quot;:
+                    </span>
+                    <span className="text-lg font-bold text-primary">
+                      {(activeRoute?.total_cost || 0).toLocaleString('th-TH', { minimumFractionDigits: 2 })} บาท
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </>
+          ) : (
+            <div className="flex-1 flex items-center justify-center text-muted-foreground">
+              <p>เลือกเส้นทางจากด้านซ้ายเพื่อดูรายการ</p>
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* Below ResizablePanel: Grand Totals */}
+      {routes.length > 0 && (
+        <Card className="mt-6 bg-gradient-to-r from-gray-50 to-blue-50 border-2 border-blue-200">
+          <CardHeader className="pb-2">
+            <CardTitle className="text-lg">สรุปรวมทุกเส้นทาง</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            {/* Routes Summary */}
+            <div className="space-y-2">
+              {routes.map((route, index) => (
+                <div key={route.id} className="flex justify-between items-center py-2 border-b">
+                  <span className="text-sm text-muted-foreground">
+                    {index + 1}. {route.route_name} ({routeItems[route.id]?.length || 0} รายการ)
+                  </span>
+                  <span className="font-medium">
+                    {route.total_cost.toLocaleString('th-TH', { minimumFractionDigits: 2 })} บาท
+                  </span>
+                </div>
+              ))}
+            </div>
+
+            <Separator />
+
+            <TotalsSummary
+              totalMaterialCost={grandTotals.material}
+              totalLaborCost={grandTotals.labor}
+              totalCost={grandTotals.total}
+              itemCount={grandTotals.itemCount}
+            />
+          </CardContent>
+        </Card>
       )}
 
       {/* Factor F Summary */}
       {routes.length > 0 && grandTotals.total > 0 && (
-        <FactorFSummary
-          routes={routes.map(r => ({
-            id: r.id,
-            route_name: r.route_name,
-            total_material_cost: r.total_material_cost,
-            total_labor_cost: r.total_labor_cost,
-            total_cost: r.total_cost,
-          }))}
-          grandTotalCost={grandTotals.total}
-        />
+        <div className="mt-6">
+          <FactorFSummary
+            routes={routes.map(r => ({
+              id: r.id,
+              route_name: r.route_name,
+              total_material_cost: r.total_material_cost,
+              total_labor_cost: r.total_labor_cost,
+              total_cost: r.total_cost,
+            }))}
+            grandTotalCost={grandTotals.total}
+            onFactorCalculated={onFactorCalculated}
+          />
+        </div>
       )}
 
       {/* Save Button */}
-      <div className="flex justify-end">
-        <button
-          type="button"
+      <div className="flex justify-end mt-6">
+        <Button
           onClick={handleSaveClick}
           disabled={isSaving || routes.length === 0}
-          className="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50"
         >
-          {isSaving ? 'กำลังบันทึก...' : 'บันทึก'}
-        </button>
+          {isSaving ? (
+            <>
+              <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+              กำลังบันทึก...
+            </>
+          ) : (
+            'บันทึก'
+          )}
+        </Button>
       </div>
 
       {/* Modal for Special Items (งานวางท่อ / งานดันท่อ) */}
-      {showSpecialItemModal && pendingSpecialItem && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg shadow-xl p-6 max-w-md w-full mx-4">
-            <h3 className="text-lg font-bold text-gray-900 mb-2">
-              เลือกประเภทงาน
-            </h3>
-            <p className="text-sm text-gray-600 mb-6">
-              {pendingSpecialItem.item_name}
-            </p>
+      <Dialog open={showSpecialItemModal} onOpenChange={setShowSpecialItemModal}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>เลือกประเภทงาน</DialogTitle>
+            <DialogDescription>
+              {pendingSpecialItem?.item_name}
+            </DialogDescription>
+          </DialogHeader>
 
-            <div className="space-y-3">
-              <button
-                type="button"
-                onClick={() => handleSpecialItemSelect('Main Duct')}
-                className="w-full py-4 px-6 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center justify-center gap-3"
-              >
-                <span className="text-2xl">🔵</span>
-                <span className="text-lg font-medium">Main Duct</span>
-              </button>
-
-              <button
-                type="button"
-                onClick={() => handleSpecialItemSelect('Riser')}
-                className="w-full py-4 px-6 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors flex items-center justify-center gap-3"
-              >
-                <span className="text-2xl">🟢</span>
-                <span className="text-lg font-medium">Riser</span>
-              </button>
-
-              {/* Show Steel Pole and Riser Service only for single pipe items (1 ท่อ) */}
-              {isSinglePipeItem(pendingSpecialItem.item_name) && (
-                <>
-                  <button
-                    type="button"
-                    onClick={() => handleSpecialItemSelect('Steel Pole')}
-                    className="w-full py-4 px-6 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition-colors flex items-center justify-center gap-3"
-                  >
-                    <span className="text-2xl">🟠</span>
-                    <span className="text-lg font-medium">Steel Pole</span>
-                  </button>
-
-                  <button
-                    type="button"
-                    onClick={() => handleSpecialItemSelect('Riser Service')}
-                    className="w-full py-4 px-6 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors flex items-center justify-center gap-3"
-                  >
-                    <span className="text-2xl">🟣</span>
-                    <span className="text-lg font-medium">Riser Service</span>
-                  </button>
-                </>
-              )}
-            </div>
-
-            <button
-              type="button"
-              onClick={() => {
-                setShowSpecialItemModal(false);
-                setPendingSpecialItem(null);
-              }}
-              className="w-full mt-4 py-2 px-4 text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded-lg transition-colors"
+          <div className="space-y-3 mt-4">
+            <Button
+              onClick={() => handleSpecialItemSelect('Main Duct')}
+              className="w-full py-6 bg-blue-600 hover:bg-blue-700"
             >
-              ยกเลิก
-            </button>
+              <span className="text-2xl mr-3">🔵</span>
+              <span className="text-lg font-medium">Main Duct</span>
+            </Button>
+
+            <Button
+              onClick={() => handleSpecialItemSelect('Riser')}
+              className="w-full py-6 bg-green-600 hover:bg-green-700"
+            >
+              <span className="text-2xl mr-3">🟢</span>
+              <span className="text-lg font-medium">Riser</span>
+            </Button>
+
+            {/* Show Steel Pole and Riser Service only for single pipe items (1 ท่อ) */}
+            {pendingSpecialItem && isSinglePipeItem(pendingSpecialItem.item_name) && (
+              <>
+                <Button
+                  onClick={() => handleSpecialItemSelect('Steel Pole')}
+                  className="w-full py-6 bg-orange-600 hover:bg-orange-700"
+                >
+                  <span className="text-2xl mr-3">🟠</span>
+                  <span className="text-lg font-medium">Steel Pole</span>
+                </Button>
+
+                <Button
+                  onClick={() => handleSpecialItemSelect('Riser Service')}
+                  className="w-full py-6 bg-purple-600 hover:bg-purple-700"
+                >
+                  <span className="text-2xl mr-3">🟣</span>
+                  <span className="text-lg font-medium">Riser Service</span>
+                </Button>
+              </>
+            )}
           </div>
-        </div>
-      )}
+
+          <Button
+            variant="ghost"
+            onClick={() => {
+              setShowSpecialItemModal(false);
+              setPendingSpecialItem(null);
+            }}
+            className="w-full mt-2"
+          >
+            ยกเลิก
+          </Button>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

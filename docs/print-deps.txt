@@ -1,0 +1,29 @@
+# Print Page Dependency Scan
+# Generated: 2026-01-31
+# File: app/boq/[id]/print/page.tsx
+
+## All Imports
+3: import { useState, useEffect, useMemo } from 'react';
+4: import { useParams } from 'next/navigation';
+5: import { createClient } from '@/lib/supabase/client';
+6: import { formatConstructionAreas } from '@/lib/constructionAreaUtils';
+
+## @/components Imports
+NONE - No components from @/components are used in print page
+
+## Migration Impact
+✅ ALL 11 components in migration plan are SAFE to migrate
+❌ No components need to be skipped or duplicated
+
+## Components Safe to Migrate
+1. TotalsSummary.tsx ✅
+2. BOQAccessBanner.tsx ✅
+3. ProjectInfoForm.tsx ✅
+4. UserBadge.tsx ✅
+5. UserMenu.tsx ✅
+6. BOQPageHeader.tsx ✅
+7. RouteManager.tsx ✅
+8. FactorFSummary.tsx ✅
+9. LineItemsTable.tsx ✅
+10. ItemSearch.tsx ✅
+11. MultiRouteEditor.tsx ✅

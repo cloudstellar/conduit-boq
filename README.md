@@ -1,7 +1,7 @@
 # Conduit BOQ
 ## ระบบประมาณราคาท่อร้อยสายสื่อสารใต้ดิน (Underground Conduit BOQ System)
 
-[![Version](https://img.shields.io/badge/version-1.2.0-blue.svg)](https://github.com/cloudstellar/conduit-boq/releases/tag/v1.2.0)
+[![Version](https://img.shields.io/badge/version-1.4.0-blue.svg)](https://github.com/cloudstellar/conduit-boq/releases/tag/v1.4.0)
 [![Next.js](https://img.shields.io/badge/Next.js-16.x-black.svg)](https://nextjs.org/)
 [![Supabase](https://img.shields.io/badge/Supabase-PostgreSQL-green.svg)](https://supabase.com/)
 
