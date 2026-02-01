@@ -9,6 +9,7 @@ import { can } from '@/lib/permissions';
 import ProjectInfoForm from '@/components/boq/ProjectInfoForm';
 import BOQPageHeader from '@/components/boq/BOQPageHeader';
 import BOQAccessBanner from '@/components/boq/BOQAccessBanner';
+import { Button } from '@/components/ui/button';
 
 export interface ProjectInfo {
   estimator_name: string;
@@ -149,21 +150,22 @@ export default function CreateBOQPage() {
           />
 
           <div className="mt-6 flex flex-col sm:flex-row justify-end gap-3 sm:gap-4">
-            <button
+            <Button
               type="button"
+              variant="outline"
               onClick={() => router.back()}
-              className="w-full sm:w-auto px-6 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 text-sm md:text-base"
+              className="w-full sm:w-auto"
             >
               ยกเลิก
-            </button>
-            <button
+            </Button>
+            <Button
               type="button"
               onClick={handleSaveDraft}
               disabled={isSubmitting}
-              className="w-full sm:w-auto px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50 text-sm md:text-base"
+              className="w-full sm:w-auto"
             >
               {isSubmitting ? 'กำลังบันทึก...' : 'บันทึกและดำเนินการต่อ'}
-            </button>
+            </Button>
           </div>
         </div>
       </div>
