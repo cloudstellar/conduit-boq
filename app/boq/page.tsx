@@ -335,13 +335,13 @@ export default function BOQListPage() {
           <Table className="w-full table-fixed">
             <TableHeader>
               <TableRow>
-                <TableHead className="w-[380px]">โครงการ</TableHead>
+                <TableHead className="w-[360px]">โครงการ</TableHead>
                 <TableHead className="w-[100px]">เส้นทาง</TableHead>
                 <TableHead className="w-[150px]">ผู้ประมาณราคา</TableHead>
                 <TableHead className="w-[140px] text-right whitespace-nowrap">ก่อน VAT (บาท)</TableHead>
                 <TableHead className="w-[90px] text-center">สถานะ</TableHead>
                 <TableHead className="w-[100px] text-center whitespace-nowrap">วันที่</TableHead>
-                <TableHead className="w-[120px] text-center">จัดการ</TableHead>
+                <TableHead className="w-[160px] text-center">จัดการ</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
