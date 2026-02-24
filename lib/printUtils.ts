@@ -27,25 +27,25 @@ const UNIT_LABEL_HEIGHT = 5;
 /** ความสูง table header (2-row thead) */
 const TABLE_HEADER_HEIGHT = 12;
 
-/** ความสูงต่อแถวข้อมูล (conservative) */
+/** ความสูงต่อแถวข้อมูล */
 const ROW_HEIGHT = 6;
 
 /** ความสูง footer (เงื่อนไข + หมายเหตุ + ลายเซ็น) */
-const FOOTER_HEIGHT = 30;
+const FOOTER_HEIGHT = 32;
 
 /** ความสูงแถวรวมยอด */
 const TOTALS_ROW_HEIGHT = 8;
 
-/** เผื่อพื้นที่ป้องกันล้น */
-const SAFETY_MARGIN = 10;
+/** เผื่อพื้นที่ป้องกันล้นตอนพิมพ์จริง */
+const SAFETY_MARGIN = 8;
 
 /** จำนวนตัวอักษรต่อบรรทัดในคอลัมน์ "รายการ" (BOQ items table)
- *  วัดจริง: 463px ÷ ~8px/char = 58 chars (TH Sarabun New 10pt) */
-const ITEM_COL_MAX_CHARS = 58;
+ *  ปรับจากผลจริงหลายรอบ — เผื่อ padding + Thai glyph width */
+const ITEM_COL_MAX_CHARS = 100;
 
 /** จำนวนตัวอักษรต่อบรรทัดในคอลัมน์ "รายการ" (Summary table)
- *  วัดจริง: 433px ÷ ~8px/char = 54 chars (TH Sarabun New 10pt) */
-const SUMMARY_COL_MAX_CHARS = 54;
+ *  ปรับจากภาพจริง — คอลัมน์ยังเหลือพื้นที่เยอะ */
+const SUMMARY_COL_MAX_CHARS = 100;
 
 /** Info section: ตัวอักษรต่อบรรทัด (แต่ละคอลัมน์ซ้าย/ขวา) */
 const INFO_COL_MAX_CHARS = 32;
