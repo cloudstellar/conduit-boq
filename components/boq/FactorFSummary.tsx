@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useMemo } from 'react';
 import { createClient } from '@/lib/supabase/client';
+import { roundMoney, calculateVAT } from '@/lib/calculation';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Separator } from '@/components/ui/separator';
@@ -109,8 +110,8 @@ export default function FactorFSummary({ routes, grandTotalCost, onFactorCalcula
   // Calculate factor and derived values (must be before any early return for hooks rules)
   const factor = calculateInterpolatedFactor();
   const costInMillion = grandTotalCost / 1000000;
-  const totalWithFactor = grandTotalCost * factor;
-  const totalWithVAT = totalWithFactor * (1 + VAT_RATE);
+  const { beforeVAT: totalWithFactor, vat: totalVATAmount, total: totalWithVAT } =
+    calculateVAT(grandTotalCost * factor);
 
   // Call callback when factor values change (for snapshot saving)
   // Must be before early returns to comply with React hooks rules
@@ -155,8 +156,8 @@ export default function FactorFSummary({ routes, grandTotalCost, onFactorCalcula
         <div className="space-y-3">
           <div className="text-sm font-medium text-muted-foreground">ราคาแยกรายเส้นทาง (คูณ Factor F):</div>
           {routes.map((route, index) => {
-            const routeWithFactorF = route.total_cost * factor;
-            const routeWithVAT = routeWithFactorF * (1 + VAT_RATE);
+            const routeWithFactorF = roundMoney(route.total_cost * factor);
+            const { total: routeWithVAT } = calculateVAT(routeWithFactorF);
             return (
               <Card key={route.id}>
                 <CardContent className="p-4">
@@ -207,7 +208,7 @@ export default function FactorFSummary({ routes, grandTotalCost, onFactorCalcula
             <CardContent className="p-4">
               <div className="text-sm text-green-600">รวมทั้งสิ้น (VAT 7%)</div>
               <div className="text-xl font-bold text-green-700">
-                {formatNumber(grandTotalCost * factor * (1 + VAT_RATE))}
+                {formatNumber(totalWithVAT)}
               </div>
               <div className="text-xs text-green-500">บาท</div>
             </CardContent>

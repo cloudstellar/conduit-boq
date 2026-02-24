@@ -3,6 +3,7 @@
 import { useState, useEffect, useMemo } from 'react';
 import { useParams } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
+import { roundMoney, calculateVAT, allocateToRoutes } from '@/lib/calculation';
 import { formatConstructionAreas } from '@/lib/constructionAreaUtils';
 
 interface BOQData {
@@ -292,9 +293,8 @@ export default function PrintBOQPage() {
   };
 
   const factor = calculateInterpolatedFactor();
-  const constructionCostBeforeVAT = totalCost * factor;
-  const vatAmount = constructionCostBeforeVAT * VAT_RATE;
-  const totalWithVAT = constructionCostBeforeVAT + vatAmount;
+  const { beforeVAT: constructionCostBeforeVAT, vat: vatAmount, total: totalWithVAT } =
+    calculateVAT(totalCost * factor);
 
   return (
     <>
@@ -667,19 +667,21 @@ export default function PrintBOQPage() {
               const showFactorLTE5 = grandTotalInMillion <= 5;
               const showFactorGT5 = grandTotalInMillion > 5;
 
-              // Calculate totals for each column
+              // Calculate totals for each column using allocateToRoutes
+              // so per-route sum = grand total exactly (remainder allocation)
+              const routeCosts = routes.map(r => r.total_cost);
+              const allocated = allocateToRoutes(routeCosts, factor);
+
               let sumCost = 0;
               let sumBeforeVAT = 0;
               let sumVAT = 0;
               let sumWithVAT = 0;
 
               const rows = routes.map((route, index) => {
-                const routeWithFactor = route.total_cost * factor;
-                const routeVAT = routeWithFactor * VAT_RATE;
-                const routeWithVAT = routeWithFactor + routeVAT;
+                const { beforeVAT: routeBeforeVAT, vat: routeVAT, total: routeWithVAT } = allocated[index];
 
                 sumCost += route.total_cost;
-                sumBeforeVAT += routeWithFactor;
+                sumBeforeVAT += routeBeforeVAT;
                 sumVAT += routeVAT;
                 sumWithVAT += routeWithVAT;
 
@@ -690,7 +692,7 @@ export default function PrintBOQPage() {
                     <td className="right">{formatNumber(route.total_cost)}</td>
                     <td className="center">{showFactorLTE5 ? factor.toFixed(4) : ''}</td>
                     <td className="center">{showFactorGT5 ? factor.toFixed(4) : ''}</td>
-                    <td className="right">{formatNumber(routeWithFactor)}</td>
+                    <td className="right">{formatNumber(routeBeforeVAT)}</td>
                     <td className="right">{formatNumber(routeVAT)}</td>
                     <td className="right">{formatNumber(routeWithVAT)}</td>
                     <td></td>
