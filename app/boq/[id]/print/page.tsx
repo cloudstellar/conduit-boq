@@ -5,6 +5,24 @@ import { useParams } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
 import { roundMoney, calculateVAT, allocateToRoutes } from '@/lib/calculation';
 import { formatConstructionAreas } from '@/lib/constructionAreaUtils';
+import {
+  splitText,
+  estimateInfoHeight,
+  calculateMaxRowsForPage,
+  chunkItems,
+  chunkSummaryRoutes,
+  countBOQPages,
+  countItemRows,
+  PRINT_CONSTANTS,
+} from '@/lib/printUtils';
+import { Button } from '@/components/ui/button';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Skeleton } from '@/components/ui/skeleton';
+import { ArrowLeft, Printer, FileSpreadsheet, AlertCircle } from 'lucide-react';
+
+// ──────────────────────────────────
+// Types
+// ──────────────────────────────────
 
 interface BOQData {
   id: string;
@@ -59,41 +77,32 @@ interface FactorReference {
   factor_f_rain_2: number;
 }
 
-// Convert number to Thai Baht text
+// ──────────────────────────────────
+// Thai Baht Text Conversion
+// ──────────────────────────────────
+
 function numberToThaiText(num: number): string {
   const thaiNumbers = ['', 'หนึ่ง', 'สอง', 'สาม', 'สี่', 'ห้า', 'หก', 'เจ็ด', 'แปด', 'เก้า'];
   const thaiUnits = ['', 'สิบ', 'ร้อย', 'พัน', 'หมื่น', 'แสน', 'ล้าน'];
-
   if (num === 0) return 'ศูนย์บาทถ้วน';
-
   const baht = Math.floor(num);
   const satang = Math.round((num - baht) * 100);
-
   const convertGroup = (n: number): string => {
     if (n === 0) return '';
     let result = '';
     const str = n.toString();
     const len = str.length;
-
     for (let i = 0; i < len; i++) {
       const digit = parseInt(str[i]);
       const position = len - i - 1;
-
       if (digit === 0) continue;
-
-      if (position === 1 && digit === 1) {
-        result += 'สิบ';
-      } else if (position === 1 && digit === 2) {
-        result += 'ยี่สิบ';
-      } else if (position === 0 && digit === 1 && len > 1) {
-        result += 'เอ็ด';
-      } else {
-        result += thaiNumbers[digit] + thaiUnits[position];
-      }
+      if (position === 1 && digit === 1) result += 'สิบ';
+      else if (position === 1 && digit === 2) result += 'ยี่สิบ';
+      else if (position === 0 && digit === 1 && len > 1) result += 'เอ็ด';
+      else result += thaiNumbers[digit] + thaiUnits[position];
     }
     return result;
   };
-
   let result = '';
   if (baht >= 1000000) {
     result += convertGroup(Math.floor(baht / 1000000)) + 'ล้าน';
@@ -102,15 +111,142 @@ function numberToThaiText(num: number): string {
     result += convertGroup(baht);
   }
   result += 'บาท';
-
   if (satang > 0) {
     result += convertGroup(satang) + 'สตางค์';
   } else {
     result += 'ถ้วน';
   }
-
   return result;
 }
+
+// ──────────────────────────────────
+// Sub-Components (print-only, not exported)
+// ──────────────────────────────────
+
+function PageHeader({ currentPage, totalPages, formLabel }: {
+  currentPage: number;
+  totalPages: number;
+  formLabel?: string;
+}) {
+  return (
+    <div className="header">
+      <div className="logo-section">
+        <img src="/nt_logo.svg" alt="NT Logo" className="logo" />
+      </div>
+      <div className="page-info">
+        <div>หน้าที่ {currentPage}/{totalPages}</div>
+        {formLabel && <div>{formLabel}</div>}
+      </div>
+    </div>
+  );
+}
+
+function InfoSection({ boq, routeName, routeLabel, constructionArea, department }: {
+  boq: BOQData;
+  routeName: string;
+  routeLabel?: string;
+  constructionArea: string;
+  department?: string;
+}) {
+  return (
+    <div className="info-section">
+      <div className="info-left">
+        <div><span className="label">ส่วนงาน</span> {department || boq.department || 'วิศวกรรมท่อร้อยสาย (วทฐฐ.) ฝ่ายท่อร้อยสาย (ทฐฐ.)'}</div>
+        <div><span className="label">บัญชีราคา</span> งานจ้างเหมาก่อสร้างท่อร้อยสายสื่อสารใต้ดินและบ่อพัก</div>
+        <div><span className="label">เส้นทาง</span> <strong>{routeName}</strong> {routeLabel && `(${routeLabel})`}</div>
+      </div>
+      <div className="info-right">
+        <div><span className="label">โครงการ</span> {boq.project_name}</div>
+        <div><span className="label">พื้นที่ก่อสร้าง</span> {constructionArea || '-'}</div>
+      </div>
+    </div>
+  );
+}
+
+function BOQTableHeader() {
+  return (
+    <thead>
+      <tr>
+        <th rowSpan={2} className="col-no">ลำดับที่</th>
+        <th rowSpan={2} className="col-item">รายการ</th>
+        <th rowSpan={2} className="col-qty">ปริมาณงาน</th>
+        <th rowSpan={2} className="col-unit">หน่วย</th>
+        <th colSpan={2} className="col-material-header">ค่าวัสดุ ไม่รวมภาษีมูลค่าเพิ่ม (1)</th>
+        <th colSpan={2} className="col-labor-header">ค่าแรง ไม่รวมภาษีมูลค่าเพิ่ม (2)</th>
+        <th rowSpan={2} className="col-total">ค่างานต้นทุน<br />(3)=(1)+(2)</th>
+        <th rowSpan={2} className="col-remark">หมายเหตุ</th>
+      </tr>
+      <tr>
+        <th className="col-sub">ราคา/หน่วย</th>
+        <th className="col-sub">จำนวนเงิน</th>
+        <th className="col-sub">ราคา/หน่วย</th>
+        <th className="col-sub">จำนวนเงิน</th>
+      </tr>
+    </thead>
+  );
+}
+
+function PageFooter({ boq }: { boq: BOQData }) {
+  const formatThaiMonth = (dateStr: string) => {
+    const date = new Date(dateStr);
+    const thaiMonths = ['มกราคม', 'กุมภาพันธ์', 'มีนาคม', 'เมษายน', 'พฤษภาคม', 'มิถุนายน',
+      'กรกฎาคม', 'สิงหาคม', 'กันยายน', 'ตุลาคม', 'พฤศจิกายน', 'ธันวาคม'];
+    const buddhistYear = date.getFullYear() + 543;
+    return `${thaiMonths[date.getMonth()]} ${buddhistYear}`;
+  };
+
+  return (
+    <div className="footer-section">
+      <div className="conditions">
+        <span className="highlight-text">เงื่อนไข</span> Factor F งานก่อสร้างทาง เงินล่วงหน้าจ่าย 0.00 %, เงินประกันผลงานหัก 0.00 %, ดอกเบี้ยเงินกู้ 7.00 % ต่อปี, ค่าภาษีมูลค่าเพิ่ม 7.00 %
+      </div>
+      <div className="note">
+        <span className="highlight-text">หมายเหตุ</span> ทั้งนี้ ราคางานโครงการ/งานก่อสร้าง ไม่ใช่ราคาค่าก่อสร้างที่แท้จริง แต่เป็นเพียงราคาโดยประมาณเท่านั้น
+      </div>
+      <div className="signature-section">
+        <div className="signature">
+          <div className="sig-line"></div>
+          <div>ผู้ประมาณราคา {boq.estimator_name}</div>
+          <div>{formatThaiMonth(boq.document_date)}</div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function ContinueIndicator() {
+  return <div className="continue-indicator">─ ต่อหน้าถัดไป ─</div>;
+}
+
+/** Render BOQ item rows with text splitting (continuation rows) */
+function renderItemRows(items: BOQItem[], startIndex: number, formatNumber: (n: number) => string) {
+  const rows: React.ReactNode[] = [];
+  items.forEach((item, idx) => {
+    const lines = splitText(item.item_name, PRINT_CONSTANTS.ITEM_COL_MAX_CHARS);
+    lines.forEach((line, lineIdx) => {
+      const isFirst = lineIdx === 0;
+      rows.push(
+        <tr key={`${item.id}-${lineIdx}`}>
+          <td className="center">{isFirst ? startIndex + idx + 1 : ''}</td>
+          <td className="left">{line}</td>
+          <td className="right">{isFirst ? formatNumber(item.quantity) : ''}</td>
+          <td className="center">{isFirst ? item.unit : ''}</td>
+          <td className="right">{isFirst ? formatNumber(item.material_cost_per_unit) : ''}</td>
+          <td className="right">{isFirst ? formatNumber(item.total_material_cost) : ''}</td>
+          <td className="right">{isFirst ? formatNumber(item.labor_cost_per_unit) : ''}</td>
+          <td className="right">{isFirst ? formatNumber(item.total_labor_cost) : ''}</td>
+          <td className="right">{isFirst ? formatNumber(item.total_cost) : ''}</td>
+          <td className="center">{isFirst ? (item.remarks || '') : ''}</td>
+        </tr>
+      );
+    });
+  });
+  return rows;
+}
+
+// ──────────────────────────────────
+// Main Component
+// ──────────────────────────────────
 
 export default function PrintBOQPage() {
   const params = useParams();
@@ -134,10 +270,8 @@ export default function PrintBOQPage() {
           .select('*')
           .eq('id', boqId)
           .single();
-
         setBOQ(boqData);
 
-        // Fetch routes
         const { data: routesData } = await supabase
           .from('boq_routes')
           .select('*')
@@ -146,8 +280,6 @@ export default function PrintBOQPage() {
 
         if (routesData && routesData.length > 0) {
           setRoutes(routesData);
-
-          // Fetch items for each route
           const itemsMap: Record<string, BOQItem[]> = {};
           for (const route of routesData) {
             const { data: items } = await supabase
@@ -159,13 +291,11 @@ export default function PrintBOQPage() {
           }
           setRouteItems(itemsMap);
         } else {
-          // Legacy: items without routes
           const { data: legacyItems } = await supabase
             .from('boq_items')
             .select('*')
             .eq('boq_id', boqId)
             .order('item_order');
-
           if (legacyItems && legacyItems.length > 0) {
             const defaultRoute: BOQRoute = {
               id: 'legacy',
@@ -182,10 +312,8 @@ export default function PrintBOQPage() {
           }
         }
 
-        // Fetch factor reference bounds for interpolation
         if (boqData) {
           const costInMillion = boqData.total_cost / 1000000;
-
           const { data: lowerData } = await supabase
             .from('factor_reference')
             .select('*')
@@ -193,7 +321,6 @@ export default function PrintBOQPage() {
             .order('cost_million', { ascending: false })
             .limit(1)
             .single();
-
           const { data: upperData } = await supabase
             .from('factor_reference')
             .select('*')
@@ -201,7 +328,6 @@ export default function PrintBOQPage() {
             .order('cost_million', { ascending: true })
             .limit(1)
             .single();
-
           if (lowerData) {
             setLowerFactorRef(lowerData);
           } else {
@@ -212,10 +338,7 @@ export default function PrintBOQPage() {
               .single();
             setLowerFactorRef(defaultFactor);
           }
-
-          if (upperData) {
-            setUpperFactorRef(upperData);
-          }
+          if (upperData) setUpperFactorRef(upperData);
         }
       } catch (err) {
         console.error('Error:', err);
@@ -229,66 +352,49 @@ export default function PrintBOQPage() {
   const formatNumber = (num: number) =>
     num.toLocaleString('th-TH', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
-  const formatThaiMonth = (dateStr: string) => {
-    const date = new Date(dateStr);
-    const thaiMonths = ['มกราคม', 'กุมภาพันธ์', 'มีนาคม', 'เมษายน', 'พฤษภาคม', 'มิถุนายน',
-      'กรกฎาคม', 'สิงหาคม', 'กันยายน', 'ตุลาคม', 'พฤศจิกายน', 'ธันวาคม'];
-    const buddhistYear = date.getFullYear() + 543;
-    return `${thaiMonths[date.getMonth()]} ${buddhistYear}`;
-  };
-
   const handlePrint = () => window.print();
 
+  // ──── Loading State ────
   if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center gap-4">
+        <Skeleton className="h-8 w-64" />
+        <Skeleton className="h-4 w-48" />
         <div className="w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full animate-spin" />
       </div>
     );
   }
 
+  // ──── Error State ────
   if (!boq) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <p className="text-red-600">ไม่พบข้อมูล BOQ</p>
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
+        <Alert variant="destructive" className="max-w-md">
+          <AlertCircle className="h-4 w-4" />
+          <AlertDescription>ไม่พบข้อมูล BOQ</AlertDescription>
+        </Alert>
       </div>
     );
   }
 
-  // Calculate totals using factor reference with interpolation
-  // Formula: Factor = D - [(D - E) × (A - B) / (C - B)]
-  // A = ค่างานต้นทุน (actual cost in millions)
-  // B = ค่างานต้นทุนตัวต่ำกว่า (lower bound cost_million)
-  // C = ค่างานต้นทุนตัวสูงกว่า (upper bound cost_million)
-  // D = Factor ของ B
-  // E = Factor ของ C
+  // ──────────────────────────────────
+  // Calculate Factor & Totals
+  // ──────────────────────────────────
+
   const totalCost = boq.total_cost;
   const totalMaterialCost = routes.reduce((sum, route) => sum + route.total_material_cost, 0);
   const totalLaborCost = routes.reduce((sum, route) => sum + route.total_labor_cost, 0);
   const costInMillion = totalCost / 1000000;
 
   const calculateInterpolatedFactor = (): number => {
-    const A = costInMillion; // Actual cost in millions
+    const A = costInMillion;
     const B = lowerFactorRef?.cost_million || 5;
     const D = lowerFactorRef?.factor || 1.2750;
-
-    // If no upper bound or cost is exactly at lower bound, use lower factor
-    if (!upperFactorRef || A <= B) {
-      return D;
-    }
-
+    if (!upperFactorRef || A <= B) return D;
     const C = upperFactorRef.cost_million;
     const E = upperFactorRef.factor;
-
-    // If cost exceeds upper bound, use upper factor
-    if (A >= C) {
-      return E;
-    }
-
-    // Interpolation formula: D - [(D - E) × (A - B) / (C - B)]
+    if (A >= C) return E;
     const interpolatedFactor = D - ((D - E) * (A - B) / (C - B));
-
-    // Truncate to 4 decimal places (ปัดทิ้ง)
     return Math.floor(interpolatedFactor * 10000) / 10000;
   };
 
@@ -296,245 +402,273 @@ export default function PrintBOQPage() {
   const { beforeVAT: constructionCostBeforeVAT, vat: vatAmount, total: totalWithVAT } =
     calculateVAT(totalCost * factor);
 
+  // ──────────────────────────────────
+  // Pagination: Pre-calculate chunks for all sections
+  // ──────────────────────────────────
+
+  // --- Route Detail Pages ---
+  const routeChunksMap: { route: BOQRoute; chunks: BOQItem[][]; infoHeight: number }[] = routes.map((route) => {
+    const items = (routeItems[route.id] || []).sort((a, b) => a.item_order - b.item_order);
+    const infoHeight = estimateInfoHeight(
+      route.route_name,
+      boq.project_name,
+      route.construction_area || '-',
+    );
+    const maxFirst = calculateMaxRowsForPage(infoHeight, false, false);
+    const maxMiddle = calculateMaxRowsForPage(infoHeight, false, true);
+    const maxLast = calculateMaxRowsForPage(infoHeight, true, false);
+    const chunks = chunkItems(items, maxFirst, maxMiddle, maxLast);
+    return { route, chunks, infoHeight };
+  });
+
+  // --- Consolidated Page ---
+  const hasConsolidated = routes.length > 1;
+  let consolidatedChunks: BOQItem[][] = [[]];
+  if (hasConsolidated) {
+    const consolidatedMap = new Map<string, {
+      item_order: number; item_name: string; quantity: number; unit: string;
+      material_cost_per_unit: number; labor_cost_per_unit: number;
+      total_material_cost: number; total_labor_cost: number; total_cost: number;
+    }>();
+    routes.forEach((route) => {
+      (routeItems[route.id] || []).forEach((item) => {
+        const key = item.item_name;
+        if (consolidatedMap.has(key)) {
+          const existing = consolidatedMap.get(key)!;
+          existing.quantity += item.quantity;
+          existing.total_material_cost += item.total_material_cost;
+          existing.total_labor_cost += item.total_labor_cost;
+          existing.total_cost += item.total_cost;
+        } else {
+          consolidatedMap.set(key, {
+            item_order: item.item_order, item_name: item.item_name,
+            quantity: item.quantity, unit: item.unit,
+            material_cost_per_unit: item.material_cost_per_unit,
+            labor_cost_per_unit: item.labor_cost_per_unit,
+            total_material_cost: item.total_material_cost,
+            total_labor_cost: item.total_labor_cost,
+            total_cost: item.total_cost,
+          });
+        }
+      });
+    });
+    const consolidatedItems = Array.from(consolidatedMap.values())
+      .sort((a, b) => a.item_order - b.item_order)
+      .map((item, idx) => ({ ...item, id: `consolidated-${idx}`, route_id: null, unit_cost: 0, remarks: null } as BOQItem));
+
+    const consAllRouteNames = routes.map(r => r.route_name).join(', ');
+    const consArea = formatConstructionAreas(routes.map(r => r.construction_area));
+    const consInfoHeight = estimateInfoHeight(consAllRouteNames, boq.project_name, consArea);
+    const consMaxFirst = calculateMaxRowsForPage(consInfoHeight, false, false);
+    const consMaxMiddle = calculateMaxRowsForPage(consInfoHeight, false, true);
+    const consMaxLast = calculateMaxRowsForPage(consInfoHeight, true, false);
+    consolidatedChunks = chunkItems(consolidatedItems, consMaxFirst, consMaxMiddle, consMaxLast);
+  }
+
+  // --- Total Pages (ปร.4 section) ---
+  const boqTotalPages = countBOQPages({
+    routeChunkCounts: routeChunksMap.map(rc => rc.chunks.length),
+    consolidatedChunkCount: consolidatedChunks.length,
+    hasConsolidatedPage: hasConsolidated,
+  });
+
+  // --- Summary Pages ---
+  const summaryInfoHeight = estimateInfoHeight(
+    routes.map(r => r.route_name).join(', '),
+    boq.project_name,
+    formatConstructionAreas(routes.map(r => r.construction_area)),
+  );
+  // Summary last page needs extra space for calc summary + thai text + footer
+  const summaryMaxPerPage = calculateMaxRowsForPage(summaryInfoHeight, false, false);
+  // Last page: substantially less rows because of calc summary block (~50mm)
+  const summaryMaxLastPage = Math.max(3, summaryMaxPerPage - 8);
+  const summaryChunks = chunkSummaryRoutes(routes, summaryMaxPerPage, summaryMaxLastPage);
+  const summaryTotalPages = summaryChunks.length;
+
+  // ──────────────────────────────────
+  // Render
+  // ──────────────────────────────────
+
+  let currentPage = 0;
+
   return (
     <>
-      {/* Print Button - Hidden in print */}
-      <div className="print:hidden fixed top-4 right-4 z-50 flex gap-2">
-        <button
-          onClick={() => window.history.back()}
-          className="px-4 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700"
-        >
-          กลับ
-        </button>
-        <button
-          onClick={handlePrint}
-          className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 flex items-center gap-2"
-        >
-          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
-          </svg>
-          พิมพ์
-        </button>
+      {/* ===== Sticky Preview Toolbar (Screen Only) ===== */}
+      <div className="print:hidden sticky top-0 z-50 bg-white/95 backdrop-blur border-b shadow-sm">
+        <div className="max-w-[1200px] mx-auto px-4 py-2 flex items-center justify-between">
+          <Button variant="ghost" size="sm" onClick={() => window.history.back()}>
+            <ArrowLeft className="w-4 h-4 mr-1" /> กลับ
+          </Button>
+          <div className="text-sm text-muted-foreground">
+            📄 Preview: {boq.project_name} ({boqTotalPages + summaryTotalPages} หน้า)
+          </div>
+          <div className="flex gap-2">
+            <Button size="sm" onClick={handlePrint}>
+              <Printer className="w-4 h-4 mr-1" /> พิมพ์
+            </Button>
+          </div>
+        </div>
       </div>
 
-      {/* ===== PAGES: BOQ Detail per Route ===== */}
-      {(() => {
-        // Calculate total pages
-        const ITEMS_PER_PAGE = 20; // Approximate items per page
-        let totalPages = 0;
-
-        // Count pages for each route
-        routes.forEach((route) => {
-          const items = routeItems[route.id] || [];
-          const pagesForRoute = Math.max(1, Math.ceil(items.length / ITEMS_PER_PAGE));
-          totalPages += pagesForRoute;
-        });
-
-        // Add consolidated page if multiple routes
-        if (routes.length > 1) {
-          totalPages += 1;
-        }
-
-        let currentPage = 0;
-
-        return routes.map((route, routeIndex) => {
-          const items = (routeItems[route.id] || []).sort((a, b) => a.item_order - b.item_order);
+      {/* ===== ROUTE DETAIL PAGES ===== */}
+      {routeChunksMap.map(({ route, chunks }, routeIndex) => {
+        const routeChunkLabel = chunks.length > 1;
+        return chunks.map((chunkItems, chunkIndex) => {
           currentPage++;
+          const isLastChunk = chunkIndex === chunks.length - 1;
+          // Calculate startIndex for item numbering
+          let startIndex = 0;
+          for (let c = 0; c < chunkIndex; c++) {
+            startIndex += chunks[c].length;
+          }
 
           return (
-            <div key={route.id} className="print-page page-1">
-              {/* Header */}
-              <div className="header">
-                <div className="logo-section">
-                  <img src="/nt_logo.svg" alt="NT Logo" className="logo" />
-                </div>
-                <div className="page-info">
-                  <div>หน้าที่ {currentPage}/{totalPages}</div>
-                  <div>แบบ ปร.4 (ก)</div>
-                </div>
-              </div>
-
-              {/* Title */}
+            <div key={`route-${route.id}-chunk-${chunkIndex}`} className="print-page page-1">
+              <PageHeader
+                currentPage={currentPage}
+                totalPages={boqTotalPages}
+                formLabel="แบบ ปร.4 (ก)"
+              />
               <div className="title">
                 แบบฟอร์มแสดงรายการ ปริมาณงาน และราคางานก่อสร้างท่อร้อยสายสื่อสารใต้ดิน (BOQ)
               </div>
-
-              {/* Info Section */}
-              <div className="info-section">
-                <div className="info-left">
-                  <div><span className="label">ส่วนงาน</span> {boq.department || 'วิศวกรรมท่อร้อยสาย (วทฐฐ.) ฝ่ายท่อร้อยสาย (ทฐฐ.)'}</div>
-                  <div><span className="label">บัญชีราคา</span> งานจ้างเหมาก่อสร้างท่อร้อยสายสื่อสารใต้ดินและบ่อพัก</div>
-                  <div><span className="label">เส้นทาง</span> <strong>{route.route_name}</strong> {routes.length > 1 && `(${routeIndex + 1}/${routes.length})`}</div>
-                </div>
-                <div className="info-right">
-                  <div><span className="label">โครงการ</span> {boq.project_name}</div>
-                  <div><span className="label">พื้นที่ก่อสร้าง</span> {route.construction_area || '-'}</div>
-                </div>
-              </div>
-
+              <InfoSection
+                boq={boq}
+                routeName={route.route_name}
+                routeLabel={
+                  routes.length > 1
+                    ? routeChunkLabel
+                      ? `${routeIndex + 1}/${routes.length} - ${chunkIndex + 1}/${chunks.length}`
+                      : `${routeIndex + 1}/${routes.length}`
+                    : routeChunkLabel
+                      ? `${chunkIndex + 1}/${chunks.length}`
+                      : undefined
+                }
+                constructionArea={route.construction_area || '-'}
+              />
               <div className="unit-label">หน่วย - บาท</div>
 
-              {/* Main Table */}
               <table className="boq-table">
-                <thead>
-                  <tr>
-                    <th rowSpan={2} className="col-no">ลำดับที่</th>
-                    <th rowSpan={2} className="col-item">รายการ</th>
-                    <th rowSpan={2} className="col-qty">ปริมาณงาน</th>
-                    <th rowSpan={2} className="col-unit">หน่วย</th>
-                    <th colSpan={2} className="col-material-header">ค่าวัสดุ ไม่รวมภาษีมูลค่าเพิ่ม (1)</th>
-                    <th colSpan={2} className="col-labor-header">ค่าแรง ไม่รวมภาษีมูลค่าเพิ่ม (2)</th>
-                    <th rowSpan={2} className="col-total">ค่างานต้นทุน<br />(3)=(1)+(2)</th>
-                    <th rowSpan={2} className="col-remark">หมายเหตุ</th>
-                  </tr>
-                  <tr>
-                    <th className="col-sub">ราคา/หน่วย</th>
-                    <th className="col-sub">จำนวนเงิน</th>
-                    <th className="col-sub">ราคา/หน่วย</th>
-                    <th className="col-sub">จำนวนเงิน</th>
-                  </tr>
-                </thead>
+                <BOQTableHeader />
                 <tbody>
-                  {items.map((item, idx) => (
-                    <tr key={item.id}>
-                      <td className="center">{idx + 1}</td>
-                      <td className="left">{item.item_name}</td>
-                      <td className="right">{formatNumber(item.quantity)}</td>
-                      <td className="center">{item.unit}</td>
-                      <td className="right">{formatNumber(item.material_cost_per_unit)}</td>
-                      <td className="right">{formatNumber(item.total_material_cost)}</td>
-                      <td className="right">{formatNumber(item.labor_cost_per_unit)}</td>
-                      <td className="right">{formatNumber(item.total_labor_cost)}</td>
-                      <td className="right">{formatNumber(item.total_cost)}</td>
-                      <td className="center">{item.remarks || ''}</td>
-                    </tr>
-                  ))}
-                  {/* Empty rows for spacing */}
-                  {Array.from({ length: Math.max(0, 8 - items.length) }).map((_, i) => (
-                    <tr key={`empty-${i}`} className="empty-row">
-                      <td>&nbsp;</td>
-                      <td></td>
-                      <td></td>
-                      <td></td>
-                      <td></td>
-                      <td></td>
-                      <td></td>
-                      <td></td>
-                      <td></td>
-                      <td></td>
-                    </tr>
-                  ))}
+                  {renderItemRows(chunkItems, startIndex, formatNumber)}
                 </tbody>
               </table>
 
-              {/* Totals Row for this route */}
-              <table className="boq-table totals-table">
-                <tbody>
-                  <tr className="total-row highlight">
-                    <td className="col-no"></td>
-                    <td className="col-item" style={{ textAlign: 'right', paddingRight: '10px' }}><strong>ผลรวมค่างานต้นทุน</strong></td>
-                    <td className="col-qty"></td>
-                    <td className="col-unit"></td>
-                    <td className="col-sub"></td>
-                    <td className="col-sub" style={{ textAlign: 'right' }}><strong>{formatNumber(route.total_material_cost)}</strong></td>
-                    <td className="col-sub"></td>
-                    <td className="col-sub" style={{ textAlign: 'right' }}><strong>{formatNumber(route.total_labor_cost)}</strong></td>
-                    <td className="col-total" style={{ textAlign: 'right', fontWeight: 'bold' }}>{formatNumber(route.total_cost)}</td>
-                    <td className="col-remark"></td>
-                  </tr>
-                </tbody>
-              </table>
-
-              {/* Footer */}
-              <div className="footer-section">
-                <div className="conditions">
-                  <span className="highlight-text">เงื่อนไข</span> Factor F งานก่อสร้างทาง เงินล่วงหน้าจ่าย 0.00 %, เงินประกันผลงานหัก 0.00 %, ดอกเบี้ยเงินกู้ 7.00 % ต่อปี, ค่าภาษีมูลค่าเพิ่ม 7.00 %
-                </div>
-                <div className="note">
-                  <span className="highlight-text">หมายเหตุ</span> ทั้งนี้ ราคางานโครงการ/งานก่อสร้าง ไม่ใช่ราคาค่าก่อสร้างที่แท้จริง แต่เป็นเพียงราคาโดยประมาณเท่านั้น
-                </div>
-                <div className="signature-section">
-                  <div className="signature">
-                    <div className="sig-line"></div>
-                    <div>ผู้ประมาณราคา {boq.estimator_name}</div>
-                    <div>{formatThaiMonth(boq.document_date)}</div>
-                  </div>
-                </div>
-              </div>
+              {isLastChunk ? (
+                <>
+                  {/* Totals Row */}
+                  <table className="boq-table totals-table">
+                    <tbody>
+                      <tr className="total-row highlight">
+                        <td className="col-no"></td>
+                        <td className="col-item" style={{ textAlign: 'right', paddingRight: '10px' }}><strong>ผลรวมค่างานต้นทุน</strong></td>
+                        <td className="col-qty"></td>
+                        <td className="col-unit"></td>
+                        <td className="col-sub"></td>
+                        <td className="col-sub" style={{ textAlign: 'right' }}><strong>{formatNumber(route.total_material_cost)}</strong></td>
+                        <td className="col-sub"></td>
+                        <td className="col-sub" style={{ textAlign: 'right' }}><strong>{formatNumber(route.total_labor_cost)}</strong></td>
+                        <td className="col-total" style={{ textAlign: 'right', fontWeight: 'bold' }}>{formatNumber(route.total_cost)}</td>
+                        <td className="col-remark"></td>
+                      </tr>
+                    </tbody>
+                  </table>
+                  <PageFooter boq={boq} />
+                </>
+              ) : (
+                <ContinueIndicator />
+              )}
             </div>
           );
         });
-      })()}
+      })}
 
-      {/* ===== CONSOLIDATED ITEMS PAGE: All Routes Combined ===== */}
-      {routes.length > 1 && (() => {
-        // Calculate total pages (same logic as above)
-        const ITEMS_PER_PAGE = 20;
-        let totalPages = 0;
-        routes.forEach((route) => {
-          const items = routeItems[route.id] || [];
-          const pagesForRoute = Math.max(1, Math.ceil(items.length / ITEMS_PER_PAGE));
-          totalPages += pagesForRoute;
-        });
-        totalPages += 1; // Add this consolidated page
-
-        // Consolidate items: merge items with same item_name
-        const consolidatedMap = new Map();
-
-        routes.forEach((route) => {
-          const items = routeItems[route.id] || [];
-          items.forEach((item) => {
-            const key = item.item_name;
-            if (consolidatedMap.has(key)) {
-              const existing = consolidatedMap.get(key);
-              existing.quantity += item.quantity;
-              existing.total_material_cost += item.total_material_cost;
-              existing.total_labor_cost += item.total_labor_cost;
-              existing.total_cost += item.total_cost;
-            } else {
-              consolidatedMap.set(key, {
-                item_order: item.item_order,
-                item_name: item.item_name,
-                quantity: item.quantity,
-                unit: item.unit,
-                material_cost_per_unit: item.material_cost_per_unit,
-                labor_cost_per_unit: item.labor_cost_per_unit,
-                total_material_cost: item.total_material_cost,
-                total_labor_cost: item.total_labor_cost,
-                total_cost: item.total_cost,
-              });
-            }
-          });
-        });
-
-        // Convert to array and sort by item_order
-        const consolidatedItems = Array.from(consolidatedMap.values())
-          .sort((a, b) => a.item_order - b.item_order);
+      {/* ===== CONSOLIDATED ITEMS PAGES ===== */}
+      {hasConsolidated && consolidatedChunks.map((chunkItems, chunkIndex) => {
+        currentPage++;
+        const isLastChunk = chunkIndex === consolidatedChunks.length - 1;
+        let startIndex = 0;
+        for (let c = 0; c < chunkIndex; c++) {
+          startIndex += consolidatedChunks[c].length;
+        }
 
         return (
-          <div className="print-page page-1">
-            {/* Header */}
-            <div className="header">
-              <div className="logo-section">
-                <img src="/nt_logo.svg" alt="NT Logo" className="logo" />
-              </div>
-              <div className="page-info">
-                <div>หน้าที่ {totalPages}/{totalPages}</div>
-                <div>แบบ ปร.4 (ก)</div>
-              </div>
-            </div>
+          <div key={`consolidated-chunk-${chunkIndex}`} className="print-page page-1">
+            <PageHeader
+              currentPage={currentPage}
+              totalPages={boqTotalPages}
+              formLabel="แบบ ปร.4 (ก)"
+            />
+            <div className="title">รวมรายการก่อสร้างทุกเส้นทาง</div>
+            <InfoSection
+              boq={boq}
+              routeName={routes.map(r => r.route_name).join(', ')}
+              constructionArea={formatConstructionAreas(routes.map(r => r.construction_area))}
+            />
+            <div className="unit-label">หน่วย - บาท</div>
 
-            {/* Title */}
-            <div className="title">
-              รวมรายการก่อสร้างทุกเส้นทาง
-            </div>
+            <table className="boq-table">
+              <BOQTableHeader />
+              <tbody>
+                {renderItemRows(chunkItems, startIndex, formatNumber)}
+              </tbody>
+            </table>
 
-            {/* Info Section */}
+            {isLastChunk ? (
+              <>
+                <table className="boq-table totals-table">
+                  <tbody>
+                    <tr className="total-row highlight">
+                      <td className="col-no"></td>
+                      <td className="col-item" style={{ textAlign: 'right', paddingRight: '10px' }}><strong>ผลรวมค่างานต้นทุนทั้งหมด</strong></td>
+                      <td className="col-qty"></td>
+                      <td className="col-unit"></td>
+                      <td className="col-sub"></td>
+                      <td className="col-sub" style={{ textAlign: 'right' }}><strong>{formatNumber(totalMaterialCost)}</strong></td>
+                      <td className="col-sub"></td>
+                      <td className="col-sub" style={{ textAlign: 'right' }}><strong>{formatNumber(totalLaborCost)}</strong></td>
+                      <td className="col-total" style={{ textAlign: 'right', fontWeight: 'bold' }}>{formatNumber(totalCost)}</td>
+                      <td className="col-remark"></td>
+                    </tr>
+                  </tbody>
+                </table>
+                <PageFooter boq={boq} />
+              </>
+            ) : (
+              <ContinueIndicator />
+            )}
+          </div>
+        );
+      })}
+
+      {/* ===== SUMMARY PAGES ===== */}
+      {summaryChunks.map((chunkRoutes, chunkIndex) => {
+        const isLastChunk = chunkIndex === summaryChunks.length - 1;
+        const grandTotalInMillion = totalCost / 1000000;
+        const showFactorLTE5 = grandTotalInMillion <= 5;
+        const showFactorGT5 = grandTotalInMillion > 5;
+
+        const routeCosts = routes.map(r => r.total_cost);
+        const allocated = allocateToRoutes(routeCosts, factor);
+
+        // Calculate which routes are in this chunk
+        let routeStartIdx = 0;
+        for (let c = 0; c < chunkIndex; c++) {
+          routeStartIdx += summaryChunks[c].length;
+        }
+
+        return (
+          <div key={`summary-chunk-${chunkIndex}`} className="print-page page-2">
+            <PageHeader
+              currentPage={chunkIndex + 1}
+              totalPages={summaryTotalPages}
+            />
             <div className="info-section">
               <div className="info-left">
                 <div><span className="label">ส่วนงาน</span> {boq.department || 'วิศวกรรมท่อร้อยสาย (วทฐฐ.) ฝ่ายท่อร้อยสาย (ทฐฐ.)'}</div>
-                <div><span className="label">บัญชีราคา</span> งานจ้างเหมาก่อสร้างท่อร้อยสายสื่อสารใต้ดินและบ่อพัก</div>
-                <div><span className="label">เส้นทาง</span> <strong>{routes.map(r => r.route_name).join(', ')}</strong></div>
+                <div><span className="label">สรุปรวม</span> บัญชีราคา งานจ้างเหมาก่อสร้างท่อร้อยสายสื่อสารใต้ดินและบ่อพัก</div>
+                <div><span className="label">จำนวนเส้นทาง</span> {routes.length} เส้นทาง</div>
               </div>
               <div className="info-right">
                 <div><span className="label">โครงการ</span> {boq.project_name}</div>
@@ -542,224 +676,108 @@ export default function PrintBOQPage() {
               </div>
             </div>
 
-            <div className="unit-label">หน่วย - บาท</div>
-
-            {/* Main Table - Consolidated Items */}
-            <table className="boq-table">
+            <table className="summary-table">
               <thead>
                 <tr>
-                  <th rowSpan={2} className="col-no">ลำดับที่</th>
-                  <th rowSpan={2} className="col-item">รายการ</th>
-                  <th rowSpan={2} className="col-qty">ปริมาณงาน</th>
-                  <th rowSpan={2} className="col-unit">หน่วย</th>
-                  <th colSpan={2} className="col-material-header">ค่าวัสดุ ไม่รวมภาษีมูลค่าเพิ่ม (1)</th>
-                  <th colSpan={2} className="col-labor-header">ค่าแรง ไม่รวมภาษีมูลค่าเพิ่ม (2)</th>
-                  <th rowSpan={2} className="col-total">ค่างานต้นทุน<br />(3)=(1)+(2)</th>
-                  <th rowSpan={2} className="col-remark">หมายเหตุ</th>
-                </tr>
-                <tr>
-                  <th className="col-sub">ราคา/หน่วย</th>
-                  <th className="col-sub">จำนวนเงิน</th>
-                  <th className="col-sub">ราคา/หน่วย</th>
-                  <th className="col-sub">จำนวนเงิน</th>
+                  <th className="col-no2">ที่</th>
+                  <th className="col-desc">รายการ</th>
+                  <th className="col-cost">ค่างานต้นทุน<br />(บาท)</th>
+                  <th className="col-factor">Factor F<br />≤ 5 ลบ.</th>
+                  <th className="col-factor">Factor F<br />&gt; 5 ลบ.</th>
+                  <th className="col-result">ค่าก่อสร้าง<br />ไม่รวม VAT (บาท)</th>
+                  <th className="col-vat">ภาษีมูลค่าเพิ่ม<br />(บาท)</th>
+                  <th className="col-result">ค่าก่อสร้าง<br />รวม VAT (บาท)</th>
+                  <th className="col-remark2">หมายเหตุ</th>
                 </tr>
               </thead>
               <tbody>
-                {consolidatedItems.map((item, index) => (
-                  <tr key={index}>
-                    <td className="center">{index + 1}</td>
-                    <td className="left">{item.item_name}</td>
-                    <td className="right">{formatNumber(item.quantity)}</td>
-                    <td className="center">{item.unit}</td>
-                    <td className="right">{formatNumber(item.material_cost_per_unit)}</td>
-                    <td className="right">{formatNumber(item.total_material_cost)}</td>
-                    <td className="right">{formatNumber(item.labor_cost_per_unit)}</td>
-                    <td className="right">{formatNumber(item.total_labor_cost)}</td>
-                    <td className="right">{formatNumber(item.total_cost)}</td>
-                    <td className="center"></td>
-                  </tr>
-                ))}
+                {(() => {
+                  const tableRows: React.ReactNode[] = [];
+
+                  chunkRoutes.forEach((route, idx) => {
+                    const globalIdx = routeStartIdx + idx;
+                    const { beforeVAT: rBV, vat: rVAT, total: rTotal } = allocated[globalIdx];
+                    const nameLines = splitText(route.route_name, PRINT_CONSTANTS.SUMMARY_COL_MAX_CHARS);
+
+                    nameLines.forEach((line, lineIdx) => {
+                      const isFirst = lineIdx === 0;
+                      tableRows.push(
+                        <tr key={`summary-${globalIdx}-${lineIdx}`}>
+                          <td className="center">{isFirst ? globalIdx + 1 : ''}</td>
+                          <td className="left">{line}</td>
+                          <td className="right">{isFirst ? formatNumber(route.total_cost) : ''}</td>
+                          <td className="center">{isFirst && showFactorLTE5 ? factor.toFixed(4) : ''}</td>
+                          <td className="center">{isFirst && showFactorGT5 ? factor.toFixed(4) : ''}</td>
+                          <td className="right">{isFirst ? formatNumber(rBV) : ''}</td>
+                          <td className="right">{isFirst ? formatNumber(rVAT) : ''}</td>
+                          <td className="right">{isFirst ? formatNumber(rTotal) : ''}</td>
+                          <td>{''}</td>
+                        </tr>
+                      );
+                    });
+                  });
+
+                  // Total row (only on last chunk)
+                  if (isLastChunk) {
+                    let sumCost = 0, sumBV = 0, sumVAT = 0, sumTotal = 0;
+                    routes.forEach((r, i) => {
+                      sumCost += r.total_cost;
+                      sumBV += allocated[i].beforeVAT;
+                      sumVAT += allocated[i].vat;
+                      sumTotal += allocated[i].total;
+                    });
+                    tableRows.push(
+                      <tr key="total-row" className="total-row highlight">
+                        <td className="center" colSpan={2}><strong>รวม</strong></td>
+                        <td className="right"><strong>{formatNumber(sumCost)}</strong></td>
+                        <td className="center"><strong>{showFactorLTE5 ? factor.toFixed(4) : ''}</strong></td>
+                        <td className="center"><strong>{showFactorGT5 ? factor.toFixed(4) : ''}</strong></td>
+                        <td className="right"><strong>{formatNumber(sumBV)}</strong></td>
+                        <td className="right"><strong>{formatNumber(sumVAT)}</strong></td>
+                        <td className="right"><strong>{formatNumber(sumTotal)}</strong></td>
+                        <td></td>
+                      </tr>
+                    );
+                  }
+
+                  return tableRows;
+                })()}
               </tbody>
             </table>
 
-            {/* Grand Totals Row */}
-            <table className="boq-table totals-table">
-              <tbody>
-                <tr className="total-row highlight">
-                  <td className="col-no"></td>
-                  <td className="col-item" style={{ textAlign: 'right', paddingRight: '10px' }}><strong>ผลรวมค่างานต้นทุนทั้งหมด</strong></td>
-                  <td className="col-qty"></td>
-                  <td className="col-unit"></td>
-                  <td className="col-sub"></td>
-                  <td className="col-sub" style={{ textAlign: 'right' }}><strong>{formatNumber(totalMaterialCost)}</strong></td>
-                  <td className="col-sub"></td>
-                  <td className="col-sub" style={{ textAlign: 'right' }}><strong>{formatNumber(totalLaborCost)}</strong></td>
-                  <td className="col-total" style={{ textAlign: 'right', fontWeight: 'bold' }}>{formatNumber(totalCost)}</td>
-                  <td className="col-remark"></td>
-                </tr>
-              </tbody>
-            </table>
-
-            {/* Footer */}
-            <div className="footer-section">
-              <div className="conditions">
-                <span className="highlight-text">เงื่อนไข</span> Factor F งานก่อสร้างทาง เงินล่วงหน้าจ่าย 0.00 %, เงินประกันผลงานหัก 0.00 %, ดอกเบี้ยเงินกู้ 7.00 % ต่อปี, ค่าภาษีมูลค่าเพิ่ม 7.00 %
-              </div>
-              <div className="note">
-                <span className="highlight-text">หมายเหตุ</span> ทั้งนี้ ราคางานโครงการ/งานก่อสร้าง ไม่ใช่ราคาค่าก่อสร้างที่แท้จริง แต่เป็นเพียงราคาโดยประมาณเท่านั้น
-              </div>
-              <div className="signature-section">
-                <div className="signature">
-                  <div className="sig-line"></div>
-                  <div>ผู้ประมาณราคา {boq.estimator_name}</div>
-                  <div>{formatThaiMonth(boq.document_date)}</div>
+            {isLastChunk ? (
+              <>
+                {/* Calculation Summary */}
+                <div className="calc-summary">
+                  <div className="calc-row">
+                    <span className="calc-label">(1) ประมาณราคาค่าก่อสร้างทั้งโครงการ/งานก่อสร้าง ก่อนภาษี</span>
+                    <span className="calc-value">{formatNumber(constructionCostBeforeVAT)}</span>
+                  </div>
+                  <div className="calc-row">
+                    <span className="calc-label">(2) ภาษีมูลค่าเพิ่ม 7.00 %</span>
+                    <span className="calc-value">{formatNumber(vatAmount)}</span>
+                  </div>
+                  <div className="calc-row total">
+                    <span className="calc-label">(1) + (2) รวมประมาณค่างานทั้งโครงการ/งานก่อสร้าง เป็นเงินทั้งสิ้น</span>
+                    <span className="calc-value">{formatNumber(totalWithVAT)}</span>
+                  </div>
                 </div>
-              </div>
-            </div>
+
+                <div className="thai-amount">
+                  <span className="thai-label"><strong>ประมาณราคาค่าก่อสร้าง รวมภาษีมูลค่าเพิ่ม (VAT)</strong></span>
+                  <span className="thai-value highlight-box">{numberToThaiText(totalWithVAT)}</span>
+                </div>
+
+                <PageFooter boq={boq} />
+              </>
+            ) : (
+              <ContinueIndicator />
+            )}
           </div>
         );
-      })()}
+      })}
 
-      {/* ===== FINAL PAGE: Summary ===== */}
-      <div className="print-page page-2">
-        {/* Header */}
-        <div className="header">
-          <div className="logo-section">
-            <img src="/nt_logo.svg" alt="NT Logo" className="logo" />
-          </div>
-          <div className="page-info">
-            <div>หน้าที่ 1/1</div>
-          </div>
-        </div>
-
-        {/* Info Section */}
-        <div className="info-section">
-          <div className="info-left">
-            <div><span className="label">ส่วนงาน</span> {boq.department || 'วิศวกรรมท่อร้อยสาย (วทฐฐ.) ฝ่ายท่อร้อยสาย (ทฐฐ.)'}</div>
-            <div><span className="label">สรุปรวม</span> บัญชีราคา งานจ้างเหมาก่อสร้างท่อร้อยสายสื่อสารใต้ดินและบ่อพัก</div>
-            <div><span className="label">จำนวนเส้นทาง</span> {routes.length} เส้นทาง</div>
-          </div>
-          <div className="info-right">
-            <div><span className="label">โครงการ</span> {boq.project_name}</div>
-            <div><span className="label">พื้นที่ก่อสร้าง</span> {formatConstructionAreas(routes.map(r => r.construction_area))}</div>
-          </div>
-        </div>
-
-        {/* Summary Table - Per Route */}
-        <table className="summary-table">
-          <thead>
-            <tr>
-              <th className="col-no2">ที่</th>
-              <th className="col-desc">รายการ</th>
-              <th className="col-cost">ค่างานต้นทุน<br />(บาท)</th>
-              <th className="col-factor">Factor F<br />≤ 5 ลบ.</th>
-              <th className="col-factor">Factor F<br />&gt; 5 ลบ.</th>
-              <th className="col-result">ค่าก่อสร้าง<br />ไม่รวม VAT (บาท)</th>
-              <th className="col-vat">ภาษีมูลค่าเพิ่ม<br />(บาท)</th>
-              <th className="col-result">ค่าก่อสร้าง<br />รวม VAT (บาท)</th>
-              <th className="col-remark2">หมายเหตุ</th>
-            </tr>
-          </thead>
-          <tbody>
-            {(() => {
-              // Determine which factor column to show based on GRAND TOTAL cost
-              const grandTotalInMillion = totalCost / 1000000;
-              const showFactorLTE5 = grandTotalInMillion <= 5;
-              const showFactorGT5 = grandTotalInMillion > 5;
-
-              // Calculate totals for each column using allocateToRoutes
-              // so per-route sum = grand total exactly (remainder allocation)
-              const routeCosts = routes.map(r => r.total_cost);
-              const allocated = allocateToRoutes(routeCosts, factor);
-
-              let sumCost = 0;
-              let sumBeforeVAT = 0;
-              let sumVAT = 0;
-              let sumWithVAT = 0;
-
-              const rows = routes.map((route, index) => {
-                const { beforeVAT: routeBeforeVAT, vat: routeVAT, total: routeWithVAT } = allocated[index];
-
-                sumCost += route.total_cost;
-                sumBeforeVAT += routeBeforeVAT;
-                sumVAT += routeVAT;
-                sumWithVAT += routeWithVAT;
-
-                return (
-                  <tr key={route.id}>
-                    <td className="center">{index + 1}</td>
-                    <td className="left">{route.route_name}</td>
-                    <td className="right">{formatNumber(route.total_cost)}</td>
-                    <td className="center">{showFactorLTE5 ? factor.toFixed(4) : ''}</td>
-                    <td className="center">{showFactorGT5 ? factor.toFixed(4) : ''}</td>
-                    <td className="right">{formatNumber(routeBeforeVAT)}</td>
-                    <td className="right">{formatNumber(routeVAT)}</td>
-                    <td className="right">{formatNumber(routeWithVAT)}</td>
-                    <td></td>
-                  </tr>
-                );
-              });
-
-              // Add total row
-              rows.push(
-                <tr key="total-row" className="total-row highlight">
-                  <td className="center" colSpan={2}><strong>รวม</strong></td>
-                  <td className="right"><strong>{formatNumber(sumCost)}</strong></td>
-                  <td className="center"><strong>{showFactorLTE5 ? factor.toFixed(4) : ''}</strong></td>
-                  <td className="center"><strong>{showFactorGT5 ? factor.toFixed(4) : ''}</strong></td>
-                  <td className="right"><strong>{formatNumber(sumBeforeVAT)}</strong></td>
-                  <td className="right"><strong>{formatNumber(sumVAT)}</strong></td>
-                  <td className="right"><strong>{formatNumber(sumWithVAT)}</strong></td>
-                  <td></td>
-                </tr>
-              );
-
-              return rows;
-            })()}
-          </tbody>
-        </table>
-
-        {/* Calculation Summary */}
-        <div className="calc-summary">
-          <div className="calc-row">
-            <span className="calc-label">(1) ประมาณราคาค่าก่อสร้างทั้งโครงการ/งานก่อสร้าง ก่อนภาษี</span>
-            <span className="calc-value">{formatNumber(constructionCostBeforeVAT)}</span>
-          </div>
-          <div className="calc-row">
-            <span className="calc-label">(2) ภาษีมูลค่าเพิ่ม 7.00 %</span>
-            <span className="calc-value">{formatNumber(vatAmount)}</span>
-          </div>
-          <div className="calc-row total">
-            <span className="calc-label">(1) + (2) รวมประมาณค่างานทั้งโครงการ/งานก่อสร้าง เป็นเงินทั้งสิ้น</span>
-            <span className="calc-value">{formatNumber(totalWithVAT)}</span>
-          </div>
-        </div>
-
-        {/* Thai Text Amount */}
-        <div className="thai-amount">
-          <span className="thai-label"><strong>ประมาณราคาค่าก่อสร้าง รวมภาษีมูลค่าเพิ่ม (VAT)</strong></span>
-          <span className="thai-value highlight-box">{numberToThaiText(totalWithVAT)}</span>
-        </div>
-
-        {/* Footer */}
-        <div className="footer-section">
-          <div className="conditions">
-            <span className="highlight-text">เงื่อนไข</span> Factor F งานก่อสร้างทาง เงินล่วงหน้าจ่าย 0.00 %, เงินประกันผลงานหัก 0.00 %, ดอกเบี้ยเงินกู้ 7.00 % ต่อปี, ค่าภาษีมูลค่าเพิ่ม 7.00 %
-          </div>
-          <div className="note">
-            <span className="highlight-text">หมายเหตุ</span> ทั้งนี้ ราคางานโครงการ/งานก่อสร้าง ไม่ใช่ราคาค่าก่อสร้างที่แท้จริง แต่เป็นเพียงราคาโดยประมาณเท่านั้น
-          </div>
-          <div className="signature-section">
-            <div className="signature">
-              <div className="sig-line"></div>
-              <div>ผู้ประมาณราคา {boq.estimator_name}</div>
-              <div>{formatThaiMonth(boq.document_date)}</div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Styles */}
+      {/* ===== Styles ===== */}
       <style jsx global>{`
         @font-face {
           font-family: 'TH Sarabun New';
@@ -774,13 +792,9 @@ export default function PrintBOQPage() {
           font-style: normal;
         }
 
-        * {
-          box-sizing: border-box;
-        }
+        * { box-sizing: border-box; }
 
-        body {
-          margin: 0;
-          padding: 0;
+        .print-page {
           font-family: 'TH Sarabun New', sans-serif;
           font-size: 14pt;
           line-height: 1.3;
@@ -808,25 +822,9 @@ export default function PrintBOQPage() {
           gap: 10px;
         }
 
-        .logo {
-          height: 50px;
-          width: auto;
-        }
+        .logo { height: 50px; width: auto; }
 
-        .company-name .thai {
-          font-size: 14pt;
-          font-weight: bold;
-        }
-
-        .company-name .eng {
-          font-size: 10pt;
-          color: #666;
-        }
-
-        .page-info {
-          text-align: right;
-          font-size: 12pt;
-        }
+        .page-info { text-align: right; font-size: 12pt; }
 
         .title {
           font-size: 14pt;
@@ -841,14 +839,9 @@ export default function PrintBOQPage() {
           font-size: 13pt;
         }
 
-        .info-left, .info-right {
-          flex: 1;
-        }
+        .info-left, .info-right { flex: 1; }
 
-        .label {
-          font-weight: bold;
-          margin-right: 5px;
-        }
+        .label { font-weight: bold; margin-right: 5px; }
 
         .unit-label {
           text-align: right;
@@ -867,6 +860,8 @@ export default function PrintBOQPage() {
         .boq-table th, .boq-table td {
           border: 1px solid #000;
           padding: 1px 3px;
+          white-space: nowrap;
+          overflow: hidden;
         }
 
         .boq-table th {
@@ -876,7 +871,7 @@ export default function PrintBOQPage() {
         }
 
         .boq-table .col-no { width: 35px; }
-        .boq-table .col-item { width: auto; }
+        .boq-table .col-item { width: auto; white-space: normal; }
         .boq-table .col-qty { width: 55px; }
         .boq-table .col-unit { width: 35px; }
         .boq-table .col-sub { width: 70px; }
@@ -888,12 +883,8 @@ export default function PrintBOQPage() {
         .boq-table td.left { text-align: left; }
         .boq-table td.right { text-align: right; }
 
-        .empty-row td { height: 22px; }
-
-        /* Totals Table */
-        .total-row.highlight {
-          background: #fffde7;
-        }
+        /* Totals */
+        .total-row.highlight { background: #fffde7; }
 
         /* Summary Table */
         .summary-table {
@@ -927,27 +918,18 @@ export default function PrintBOQPage() {
         .summary-table td.right { text-align: right; }
 
         /* Calc Summary */
-        .calc-summary {
-          margin-top: 20px;
-          font-size: 12pt;
-        }
-
+        .calc-summary { margin-top: 20px; font-size: 12pt; }
         .calc-row {
           display: flex;
           justify-content: space-between;
           padding: 3px 0;
           border-bottom: 1px dotted #ccc;
         }
-
         .calc-row.total {
           font-weight: bold;
           border-bottom: 2px solid #000;
         }
-
-        .calc-value {
-          min-width: 120px;
-          text-align: right;
-        }
+        .calc-value { min-width: 120px; text-align: right; }
 
         /* Thai Amount */
         .thai-amount {
@@ -957,7 +939,6 @@ export default function PrintBOQPage() {
           gap: 10px;
           font-size: 12pt;
         }
-
         .highlight-box {
           background: #ffeb3b;
           padding: 5px 15px;
@@ -965,36 +946,31 @@ export default function PrintBOQPage() {
         }
 
         /* Footer */
-        .footer-section {
-          margin-top: 15px;
-          font-size: 11pt;
-        }
-
-        .conditions, .note {
-          margin-bottom: 5px;
-        }
-
+        .footer-section { margin-top: 15px; font-size: 11pt; }
+        .conditions, .note { margin-bottom: 5px; }
         .highlight-text {
           background: #ffeb3b;
           padding: 1px 5px;
           font-weight: bold;
         }
-
         .signature-section {
           display: flex;
           justify-content: flex-end;
           margin-top: 20px;
         }
-
-        .signature {
-          text-align: center;
-          min-width: 200px;
-        }
-
+        .signature { text-align: center; min-width: 200px; }
         .sig-line {
           border-bottom: 1px solid #000;
           height: 30px;
           margin-bottom: 5px;
+        }
+
+        /* Continue Indicator */
+        .continue-indicator {
+          text-align: right;
+          color: #999;
+          font-size: 10pt;
+          padding: 8px 10px 0 0;
         }
 
         @media print {
@@ -1024,6 +1000,10 @@ export default function PrintBOQPage() {
           .print-page:last-child {
             page-break-after: auto;
           }
+
+          tr {
+            page-break-inside: avoid;
+          }
         }
 
         @media screen {
@@ -1035,4 +1015,3 @@ export default function PrintBOQPage() {
     </>
   );
 }
-
