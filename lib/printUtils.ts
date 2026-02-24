@@ -39,11 +39,13 @@ const TOTALS_ROW_HEIGHT = 8;
 /** เผื่อพื้นที่ป้องกันล้น */
 const SAFETY_MARGIN = 10;
 
-/** จำนวนตัวอักษรต่อบรรทัดในคอลัมน์ "รายการ" (BOQ items table) */
-const ITEM_COL_MAX_CHARS = 35;
+/** จำนวนตัวอักษรต่อบรรทัดในคอลัมน์ "รายการ" (BOQ items table)
+ *  วัดจริง: 463px ÷ ~8px/char = 58 chars (TH Sarabun New 10pt) */
+const ITEM_COL_MAX_CHARS = 58;
 
-/** จำนวนตัวอักษรต่อบรรทัดในคอลัมน์ "รายการ" (Summary table) */
-const SUMMARY_COL_MAX_CHARS = 28;
+/** จำนวนตัวอักษรต่อบรรทัดในคอลัมน์ "รายการ" (Summary table)
+ *  วัดจริง: 433px ÷ ~8px/char = 54 chars (TH Sarabun New 10pt) */
+const SUMMARY_COL_MAX_CHARS = 54;
 
 /** Info section: ตัวอักษรต่อบรรทัด (แต่ละคอลัมน์ซ้าย/ขวา) */
 const INFO_COL_MAX_CHARS = 32;
