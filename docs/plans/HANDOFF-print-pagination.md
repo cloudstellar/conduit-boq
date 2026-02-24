@@ -28,6 +28,9 @@ Utility functions สำหรับ pagination:
 3. แก้ส่วน Consolidated Items Page — ใช้ chunkItems เช่นกัน
 4. แก้ส่วน Summary Page — ใช้ chunkSummaryRoutes
 5. เพิ่ม CSS safety (`page-break-inside: avoid`, `white-space: nowrap`)
+6. **UI/UX:** เปลี่ยนปุ่ม → shadcn `Button` + lucide icons
+7. **UI/UX:** Loading → shadcn `Skeleton`, Error → shadcn `Alert`
+8. **UI/UX:** เพิ่ม Sticky Preview Toolbar (ชื่อโครงการ + จำนวนหน้า + ปุ่ม)
 
 ### ขั้นตอนที่ 3: ทดสอบ
 - Test กับ BOQ รายการน้อย (ต้องดูเหมือนเดิม!)

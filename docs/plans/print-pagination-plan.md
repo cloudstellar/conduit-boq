@@ -200,6 +200,30 @@ function splitRouteName(name: string, maxChars: number): string[] {
 
 ---
 
+### UI/UX ปรับปรุง (Screen Only — ไม่กระทบ Print)
+
+> [!NOTE]
+> เปลี่ยนเฉพาะ UI บนจอ (`print:hidden`) ไม่กระทบเอกสารที่พิมพ์ออกมา
+
+#### 1. ปุ่มควบคุม → shadcn/ui `Button` + lucide icons
+เดิม: raw `<button>` + inline SVG → ใหม่: shadcn `Button` + `Printer`, `ArrowLeft`, `FileSpreadsheet` icons
+
+#### 2. Loading → shadcn `Skeleton`
+เดิม: raw spinner → ใหม่: `Skeleton` component
+
+#### 3. Error → shadcn `Alert`
+เดิม: `<p className="text-red-600">` → ใหม่: `Alert` + `AlertCircle` icon
+
+#### 4. Sticky Preview Toolbar
+เพิ่ม toolbar ด้านบน (แทนปุ่มลอยมุมขวา) แสดง: ชื่อโครงการ + จำนวนหน้า + ปุ่มทั้งหมด
+```
+┌────────────────────────────────────────────────────────┐
+│ ← กลับ   📄 Preview: โครงการ XXX (4 หน้า)   🖨 พิมพ์  📥 Excel │
+└────────────────────────────────────────────────────────┘
+```
+
+---
+
 ### Export Features (Optional Phase)
 
 #### Export Excel
