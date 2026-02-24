@@ -512,7 +512,6 @@ export default function PrintBOQPage() {
 
       {/* ===== ROUTE DETAIL PAGES ===== */}
       {routeChunksMap.map(({ route, chunks }, routeIndex) => {
-        const routeChunkLabel = chunks.length > 1;
         return chunks.map((chunkItems, chunkIndex) => {
           currentPage++;
           const isLastChunk = chunkIndex === chunks.length - 1;
@@ -537,12 +536,8 @@ export default function PrintBOQPage() {
                 routeName={route.route_name}
                 routeLabel={
                   routes.length > 1
-                    ? routeChunkLabel
-                      ? `${routeIndex + 1}/${routes.length} - ${chunkIndex + 1}/${chunks.length}`
-                      : `${routeIndex + 1}/${routes.length}`
-                    : routeChunkLabel
-                      ? `${chunkIndex + 1}/${chunks.length}`
-                      : undefined
+                    ? `เส้นทางที่ ${routeIndex + 1}/${routes.length}`
+                    : undefined
                 }
                 constructionArea={route.construction_area || '-'}
               />
