@@ -43,6 +43,29 @@ Utility functions สำหรับ pagination:
 
 ---
 
+## แนวทาง Design (ยึดตามนี้เสมอ)
+
+UI/UX ของโปรเจคนี้ทำได้ดีมาก **สไตล์ Notion-like, professional** ต้องรักษาแนวทางนี้:
+
+| Pattern | ตัวอย่างจาก Codebase |
+|---------|---------------------|
+| **Components** | ใช้ shadcn/ui เสมอ (`Button`, `DropdownMenu`, `Tooltip`, `ScrollArea`, `Dialog`) |
+| **Icons** | ใช้ `lucide-react` เสมอ (`Plus`, `Copy`, `Trash2`, `Loader2`, `ChevronDown`) |
+| **Styling** | ใช้ `cn()` utility + semantic colors (`bg-muted/30`, `bg-primary`, `text-muted-foreground`) |
+| **Active state** | `bg-primary text-primary-foreground shadow-md` |
+| **Hover** | `hover:bg-accent` |
+| **Transitions** | `transition-all` เสมอ |
+| **Collapsible** | Sidebar ยุบ/ขยายได้ (64px ↔ 240px) + Tooltip แสดงเมื่อยุบ |
+| **Number badges** | `size-6 rounded-full bg-muted font-semibold text-xs` |
+| **Layout** | `bg-gray-50` page, `bg-white rounded-lg shadow-md` card |
+| **Actions** | DropdownMenu สำหรับกลุ่ม action (เพิ่ม/คัดลอก/ลบ) |
+| **Loading** | `animate-spin rounded-full border-b-2 border-blue-600` |
+| **Error** | `bg-red-50 border-red-200 text-red-700 rounded-md` |
+
+**หลักสำคัญ:** ทุกอย่างที่ทำต้อง **เนียนและ professional เหมือน Notion** ไม่ทำ UI ที่ดูดิบหรือไม่ consistent
+
+---
+
 ## กฎสำคัญ (ห้ามลืม)
 1. **ห้ามใช้ `...` (ellipsis)** ตัดข้อความ — เป็นเอกสารราชการต้องแสดงครบ
 2. **ข้อความยาว → ตัดเป็นหลายแถว** ทุกแถวสูงเท่ากัน แถวต่อแสดงเฉพาะคอลัมน์ชื่อ ช่องอื่นว่าง
