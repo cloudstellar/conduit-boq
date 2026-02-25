@@ -223,10 +223,12 @@ function renderItemRows(items: BOQItem[], startIndex: number, formatNumber: (n: 
   const rows: React.ReactNode[] = [];
   items.forEach((item, idx) => {
     const lines = splitText(item.item_name, PRINT_CONSTANTS.ITEM_COL_MAX_CHARS);
+    const isMultiLine = lines.length > 1;
     lines.forEach((line, lineIdx) => {
       const isFirst = lineIdx === 0;
+      const rowClass = !isMultiLine ? '' : isFirst ? 'has-continuation' : 'continuation-row';
       rows.push(
-        <tr key={`${item.id}-${lineIdx}`} className={isFirst ? '' : 'continuation-row'}>
+        <tr key={`${item.id}-${lineIdx}`} className={rowClass}>
           <td className="center">{isFirst ? startIndex + idx + 1 : ''}</td>
           <td className="left">{line}</td>
           <td className="right">{isFirst ? formatNumber(item.quantity) : ''}</td>
@@ -696,8 +698,10 @@ export default function PrintBOQPage() {
 
                     nameLines.forEach((line, lineIdx) => {
                       const isFirst = lineIdx === 0;
+                      const isMulti = nameLines.length > 1;
+                      const rowClass = !isMulti ? '' : isFirst ? 'has-continuation' : 'continuation-row';
                       tableRows.push(
-                        <tr key={`summary-${globalIdx}-${lineIdx}`} className={isFirst ? '' : 'continuation-row'}>
+                        <tr key={`summary-${globalIdx}-${lineIdx}`} className={rowClass}>
                           <td className="center">{isFirst ? globalIdx + 1 : ''}</td>
                           <td className="left">{line}</td>
                           <td className="right">{isFirst ? formatNumber(route.total_cost) : ''}</td>
@@ -894,10 +898,14 @@ export default function PrintBOQPage() {
           padding: 1px 3px;
         }
 
-        /* Continuation rows: ไม่มีเส้นบน ดูเหมือน cell ขยาย */
+        /* Continuation rows: เอาเส้นกั้นออก ดูเหมือน cell ขยาย */
+        .boq-table .has-continuation td,
+        .summary-table .has-continuation td {
+          border-bottom: none !important;
+        }
         .boq-table .continuation-row td,
         .summary-table .continuation-row td {
-          border-top: none;
+          border-top: none !important;
         }
 
         .summary-table th {
