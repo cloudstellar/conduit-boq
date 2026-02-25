@@ -226,7 +226,7 @@ function renderItemRows(items: BOQItem[], startIndex: number, formatNumber: (n: 
     lines.forEach((line, lineIdx) => {
       const isFirst = lineIdx === 0;
       rows.push(
-        <tr key={`${item.id}-${lineIdx}`}>
+        <tr key={`${item.id}-${lineIdx}`} className={isFirst ? '' : 'continuation-row'}>
           <td className="center">{isFirst ? startIndex + idx + 1 : ''}</td>
           <td className="left">{line}</td>
           <td className="right">{isFirst ? formatNumber(item.quantity) : ''}</td>
@@ -697,7 +697,7 @@ export default function PrintBOQPage() {
                     nameLines.forEach((line, lineIdx) => {
                       const isFirst = lineIdx === 0;
                       tableRows.push(
-                        <tr key={`summary-${globalIdx}-${lineIdx}`}>
+                        <tr key={`summary-${globalIdx}-${lineIdx}`} className={isFirst ? '' : 'continuation-row'}>
                           <td className="center">{isFirst ? globalIdx + 1 : ''}</td>
                           <td className="left">{line}</td>
                           <td className="right">{isFirst ? formatNumber(route.total_cost) : ''}</td>
@@ -892,6 +892,12 @@ export default function PrintBOQPage() {
         .summary-table th, .summary-table td {
           border: 1px solid #000;
           padding: 1px 3px;
+        }
+
+        /* Continuation rows: ไม่มีเส้นบน ดูเหมือน cell ขยาย */
+        .boq-table .continuation-row td,
+        .summary-table .continuation-row td {
+          border-top: none;
         }
 
         .summary-table th {
