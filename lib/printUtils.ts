@@ -59,31 +59,35 @@ const INFO_LINE_HEIGHT = 6;
 
 /**
  * ตัดข้อความยาวเป็นหลายบรรทัด แต่ละบรรทัดไม่เกิน maxChars ตัวอักษร
- * ใช้กับทุกตาราง (ห้ามใช้ ellipsis — เอกสารราชการ)
+ * ใช้ Intl.Segmenter ตัดคำไทยถูกต้อง (ไม่หั่นกลางคำ)
+ * ห้ามใช้ ellipsis — เอกสารราชการ
  */
 export function splitText(text: string, maxChars: number): string[] {
     if (!text || text.length <= maxChars) return [text || ''];
+
+    // Use Intl.Segmenter for proper Thai word boundaries
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const SegmenterClass = (Intl as any).Segmenter;
+    const segmenter = new SegmenterClass('th', { granularity: 'word' });
+    const segments: string[] = Array.from(segmenter.segment(text), (s: any) => s.segment);
+
     const lines: string[] = [];
-    let remaining = text;
-    while (remaining.length > 0) {
-        if (remaining.length <= maxChars) {
-            lines.push(remaining);
-            break;
+    let currentLine = '';
+
+    for (const word of segments) {
+        if (currentLine.length + word.length > maxChars && currentLine.length > 0) {
+            lines.push(currentLine.trimEnd());
+            currentLine = word.trimStart();
+        } else {
+            currentLine += word;
         }
-        // Try to break at a space/dash near maxChars
-        let breakAt = maxChars;
-        const searchFrom = Math.max(0, maxChars - 8);
-        for (let i = maxChars; i >= searchFrom; i--) {
-            const ch = remaining[i];
-            if (ch === ' ' || ch === '-' || ch === '/' || ch === '(' || ch === ')') {
-                breakAt = i + 1;
-                break;
-            }
-        }
-        lines.push(remaining.slice(0, breakAt).trimEnd());
-        remaining = remaining.slice(breakAt).trimStart();
     }
-    return lines;
+
+    if (currentLine.length > 0) {
+        lines.push(currentLine.trimEnd());
+    }
+
+    return lines.length > 0 ? lines : [text];
 }
 
 /**
