@@ -801,8 +801,9 @@ export default function PrintBOQPage() {
 
         .print-page {
           width: 297mm;
-          min-height: 210mm;
-          padding: 12mm 15mm;
+          height: 210mm;
+          overflow: hidden;
+          padding: 8mm 10mm;
           margin: 0 auto 20px;
           background: white;
           box-shadow: 0 0 10px rgba(0,0,0,0.1);

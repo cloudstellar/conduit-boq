@@ -232,6 +232,39 @@ export function chunkItems<T extends ChunkableItem>(
         chunks.push(currentChunk);
     }
 
+    // ★ Fix: if only 1 chunk but it exceeds maxRowsLastPage (needs footer),
+    //        re-split using maxRowsLastPage for the first-and-only page.
+    if (chunks.length === 1) {
+        const totalRows = itemRows.reduce((sum, ir) => sum + ir.rows, 0);
+        if (totalRows > maxRowsLastPage) {
+            // Re-chunk: first page gets maxRowsFirstPage, last page gets maxRowsLastPage
+            const reChunks: T[][] = [];
+            let reChunk: T[] = [];
+            let reRowCount = 0;
+            let reIsFirst = true;
+
+            for (const { item, rows } of itemRows) {
+                const reMax = reIsFirst ? maxRowsFirstPage : maxRowsMiddlePage;
+
+                if (reRowCount + rows > reMax && reChunk.length > 0) {
+                    reChunks.push(reChunk);
+                    reChunk = [item];
+                    reRowCount = rows;
+                    reIsFirst = false;
+                } else {
+                    reChunk.push(item);
+                    reRowCount += rows;
+                }
+            }
+
+            if (reChunk.length > 0) {
+                reChunks.push(reChunk);
+            }
+
+            return reChunks;
+        }
+    }
+
     return chunks;
 }
 
