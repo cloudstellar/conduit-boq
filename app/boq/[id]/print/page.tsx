@@ -1144,6 +1144,7 @@ export default function PrintBOQPage() {
           font-size: 14pt;
           font-weight: bold;
           text-align: center;
+          margin-top: 10px;
           margin-bottom: 10px;
           border: 1px solid #e0d48e;
         }
