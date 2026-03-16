@@ -280,8 +280,8 @@ function FactorFSupplementPage({ boq, lowerFactorRef, upperFactorRef }: {
   return (
     <div className="print-page page-supplement">
       {/* Logo Header */}
-      <div className="company-logo">
-        <img src="/images/nt-logo.png" alt="NT Logo" />
+      <div className="logo-section">
+        <img src="/nt_logo.svg" alt="NT Logo" className="logo" />
       </div>
 
       {/* Title */}
