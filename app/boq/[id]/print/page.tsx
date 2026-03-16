@@ -228,7 +228,11 @@ function ContinueIndicator() {
   return <div className="continue-indicator">─ ต่อหน้าถัดไป ─</div>;
 }
 
-function FactorFSupplementPage({ boq }: { boq: BOQData }) {
+function FactorFSupplementPage({ boq, lowerFactorRef, upperFactorRef }: {
+  boq: BOQData;
+  lowerFactorRef: FactorReference | null;
+  upperFactorRef: FactorReference | null;
+}) {
   const formatNumber = (num: number) =>
     num.toLocaleString('th-TH', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
@@ -240,17 +244,46 @@ function FactorFSupplementPage({ boq }: { boq: BOQData }) {
     return `${thaiMonths[date.getMonth()]} ${buddhistYear}`;
   };
 
+  // Use snapshot if available, otherwise fallback to live factor_reference query
   const A = boq.total_cost;
-  const B = boq.factor_f_lower_cost || 0;
-  const C = boq.factor_f_upper_cost || 0;
-  const D = boq.factor_f_lower_value || 0;
-  const E = boq.factor_f_upper_value || 0;
-  const factorRaw = boq.factor_f_raw || boq.factor_f || 0;
-  const factorTruncated = boq.factor_f || 0;
-  const isExactMatch = B === C || factorRaw === factorTruncated;
+  const hasSnapshot = boq.factor_f_lower_cost != null && boq.factor_f_lower_cost > 0;
+
+  const B = hasSnapshot
+    ? boq.factor_f_lower_cost!
+    : (lowerFactorRef?.cost_million || 5) * 1000000;
+  const C = hasSnapshot
+    ? boq.factor_f_upper_cost!
+    : (upperFactorRef?.cost_million || (lowerFactorRef?.cost_million || 5)) * 1000000;
+  const D = hasSnapshot
+    ? boq.factor_f_lower_value!
+    : lowerFactorRef?.factor || 1.2750;
+  const E = hasSnapshot
+    ? boq.factor_f_upper_value!
+    : upperFactorRef?.factor || (lowerFactorRef?.factor || 1.2750);
+
+  // Calculate raw factor F (from snapshot or recalculate from bracket)
+  let factorRaw: number;
+  if (hasSnapshot && boq.factor_f_raw != null) {
+    factorRaw = boq.factor_f_raw;
+  } else if (B === C || !upperFactorRef) {
+    factorRaw = D;
+  } else {
+    const aMil = A / 1000000;
+    const bMil = B / 1000000;
+    const cMil = C / 1000000;
+    factorRaw = D - ((D - E) * (aMil - bMil) / (cMil - bMil));
+  }
+
+  const factorTruncated = boq.factor_f || Math.floor(factorRaw * 10000) / 10000;
+  const isExactMatch = B === C || Math.abs(factorRaw - factorTruncated) < 0.000000001;
 
   return (
     <div className="print-page page-supplement">
+      {/* Logo Header */}
+      <div className="company-logo">
+        <img src="/images/nt-logo.png" alt="NT Logo" />
+      </div>
+
       {/* Title */}
       <div className="supplement-title">
         สูตรคำนวณหาค่า Factor F ที่อยู่ระหว่างช่วงของค่างานต้นทุน
@@ -919,7 +952,7 @@ export default function PrintBOQPage() {
 
       {/* ===== Factor F Supplement Page ===== */}
       {boq.factor_f != null && (
-        <FactorFSupplementPage boq={boq} />
+        <FactorFSupplementPage boq={boq} lowerFactorRef={lowerFactorRef} upperFactorRef={upperFactorRef} />
       )}
 
       {/* ===== Styles ===== */}
