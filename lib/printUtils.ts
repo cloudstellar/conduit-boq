@@ -30,8 +30,8 @@ const TABLE_HEADER_HEIGHT = 12;
 /** ความสูงต่อแถวข้อมูล */
 const ROW_HEIGHT = 6;
 
-/** ความสูง footer (เงื่อนไข + หมายเหตุ + ลายเซ็น) */
-const FOOTER_HEIGHT = 32;
+/** ความสูง footer (ลายเซ็นเท่านั้น — เงื่อนไข/หมายเหตุ ย้ายไปหน้าสรุป) */
+const FOOTER_HEIGHT = 17;
 
 /** ความสูงแถวรวมยอด */
 const TOTALS_ROW_HEIGHT = 8;

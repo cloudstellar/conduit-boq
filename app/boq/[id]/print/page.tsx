@@ -186,7 +186,7 @@ function BOQTableHeader() {
   );
 }
 
-function PageFooter({ boq }: { boq: BOQData }) {
+function PageFooter({ boq, showConditions = true }: { boq: BOQData; showConditions?: boolean }) {
   const formatThaiMonth = (dateStr: string) => {
     const date = new Date(dateStr);
     const thaiMonths = ['มกราคม', 'กุมภาพันธ์', 'มีนาคม', 'เมษายน', 'พฤษภาคม', 'มิถุนายน',
@@ -197,12 +197,16 @@ function PageFooter({ boq }: { boq: BOQData }) {
 
   return (
     <div className="footer-section">
-      <div className="conditions">
-        <span className="highlight-text">เงื่อนไข</span> Factor F งานก่อสร้างทาง เงินล่วงหน้าจ่าย 0.00 %, เงินประกันผลงานหัก 0.00 %, ดอกเบี้ยเงินกู้ 7.00 % ต่อปี, ค่าภาษีมูลค่าเพิ่ม 7.00 %
-      </div>
-      <div className="note">
-        <span className="highlight-text">หมายเหตุ</span> ทั้งนี้ ราคางานโครงการ/งานก่อสร้าง ไม่ใช่ราคาค่าก่อสร้างที่แท้จริง แต่เป็นเพียงราคาโดยประมาณเท่านั้น
-      </div>
+      {showConditions && (
+        <>
+          <div className="conditions">
+            <span className="highlight-text">เงื่อนไข</span> Factor F งานก่อสร้างทาง เงินล่วงหน้าจ่าย 0.00 %, เงินประกันผลงานหัก 0.00 %, ดอกเบี้ยเงินกู้ 7.00 % ต่อปี, ค่าภาษีมูลค่าเพิ่ม 7.00 %
+          </div>
+          <div className="note">
+            <span className="highlight-text">หมายเหตุ</span> ทั้งนี้ ราคางานโครงการ/งานก่อสร้าง ไม่ใช่ราคาค่าก่อสร้างที่แท้จริง แต่เป็นเพียงราคาโดยประมาณเท่านั้น
+          </div>
+        </>
+      )}
       <div className="signature-section">
         <div className="signature">
           <div className="sig-line"></div>
@@ -571,7 +575,7 @@ export default function PrintBOQPage() {
                       </tr>
                     </tbody>
                   </table>
-                  <PageFooter boq={boq} />
+                  <PageFooter boq={boq} showConditions={false} />
                 </>
               ) : (
                 <ContinueIndicator />
@@ -630,7 +634,7 @@ export default function PrintBOQPage() {
                     </tr>
                   </tbody>
                 </table>
-                <PageFooter boq={boq} />
+                <PageFooter boq={boq} showConditions={false} />
               </>
             ) : (
               <ContinueIndicator />
