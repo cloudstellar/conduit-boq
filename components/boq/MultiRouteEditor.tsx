@@ -37,6 +37,11 @@ interface MultiRouteEditorProps {
     factor: number;
     totalWithFactor: number;
     totalWithVAT: number;
+    factorRaw: number;
+    lowerCost: number;
+    upperCost: number;
+    lowerValue: number;
+    upperValue: number;
   }) => void;
 }
 

@@ -35,6 +35,12 @@ interface BOQData {
   total_material_cost: number;
   total_labor_cost: number;
   total_cost: number;
+  factor_f: number | null;
+  factor_f_raw: number | null;
+  factor_f_lower_cost: number | null;
+  factor_f_upper_cost: number | null;
+  factor_f_lower_value: number | null;
+  factor_f_upper_value: number | null;
 }
 
 interface BOQRoute {
@@ -220,6 +226,137 @@ function PageFooter({ boq, showConditions = true }: { boq: BOQData; showConditio
 
 function ContinueIndicator() {
   return <div className="continue-indicator">─ ต่อหน้าถัดไป ─</div>;
+}
+
+function FactorFSupplementPage({ boq }: { boq: BOQData }) {
+  const formatNumber = (num: number) =>
+    num.toLocaleString('th-TH', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+
+  const formatThaiMonth = (dateStr: string) => {
+    const date = new Date(dateStr);
+    const thaiMonths = ['มกราคม', 'กุมภาพันธ์', 'มีนาคม', 'เมษายน', 'พฤษภาคม', 'มิถุนายน',
+      'กรกฎาคม', 'สิงหาคม', 'กันยายน', 'ตุลาคม', 'พฤศจิกายน', 'ธันวาคม'];
+    const buddhistYear = date.getFullYear() + 543;
+    return `${thaiMonths[date.getMonth()]} ${buddhistYear}`;
+  };
+
+  const A = boq.total_cost;
+  const B = boq.factor_f_lower_cost || 0;
+  const C = boq.factor_f_upper_cost || 0;
+  const D = boq.factor_f_lower_value || 0;
+  const E = boq.factor_f_upper_value || 0;
+  const factorRaw = boq.factor_f_raw || boq.factor_f || 0;
+  const factorTruncated = boq.factor_f || 0;
+  const isExactMatch = B === C || factorRaw === factorTruncated;
+
+  return (
+    <div className="print-page page-supplement">
+      {/* Title */}
+      <div className="supplement-title">
+        สูตรคำนวณหาค่า Factor F ที่อยู่ระหว่างช่วงของค่างานต้นทุน
+      </div>
+
+      {/* Project Info */}
+      <div className="supplement-info">
+        <div><span className="label">ของงานโครงการ</span> {boq.project_name}</div>
+        <div><span className="label">ส่วนงาน</span> {boq.department || ''}</div>
+      </div>
+
+      {/* Condition */}
+      <div className="supplement-condition">
+        <div style={{ marginBottom: '4px' }}>
+          <strong>กรณีค่างานอยู่ระหว่างช่วงของค่างานต้นทุนที่กำหนดในตาราง Factor F ให้ใช้สูตรเพื่อหาค่า Factor F ดังนี้</strong>
+        </div>
+        <div>
+          <strong>ใช้ Factor F งานก่อสร้างทาง</strong> ( เงินล่วงหน้าจ่าย 0.00 %, เงินประกันผลงานหัก 0.00 %, ดอกเบี้ยเงินกู้ 7.00 % ต่อปี, ค่าภาษีมูลค่าเพิ่ม (VAT) 7.00 % )
+        </div>
+      </div>
+
+      {/* Formula */}
+      <div className="supplement-formula">
+        <div className="formula-line">
+          <span className="formula-label">สูตร</span>
+          <span>ค่า Factor F ของค่างานต้นทุน A &nbsp;=&nbsp; D - {'{'} (D - E) × (A - B) / (C - B) {'}'}</span>
+        </div>
+      </div>
+
+      {/* Variables */}
+      <div className="supplement-variables">
+        <div className="var-header">เมื่อ</div>
+        <table className="var-table">
+          <tbody>
+            <tr>
+              <td>ต้องการหาค่า Factor F ของค่างานต้นทุน</td>
+              <td>=</td><td>A</td><td>บาท</td>
+              <td>=</td><td className="right">{formatNumber(A)}</td><td>บาท</td>
+            </tr>
+            <tr>
+              <td>ค่างานต้นทุนตัวต่ำกว่าค่างานต้นทุน A</td>
+              <td>=</td><td>B</td><td>บาท</td>
+              <td>=</td><td className="right">{formatNumber(B)}</td><td>บาท</td>
+            </tr>
+            <tr>
+              <td>ค่างานต้นทุนตัวสูงกว่าค่างานต้นทุน A</td>
+              <td>=</td><td>C</td><td>บาท</td>
+              <td>=</td><td className="right">{formatNumber(C)}</td><td>บาท</td>
+            </tr>
+            <tr>
+              <td>ค่า Factor F ของค่างานต้นทุน B</td>
+              <td>=</td><td>D</td><td></td>
+              <td>=</td><td className="right">{D.toFixed(4)}</td><td></td>
+            </tr>
+            <tr>
+              <td>ค่า Factor F ของค่างานต้นทุน C</td>
+              <td>=</td><td>E</td><td></td>
+              <td>=</td><td className="right">{E.toFixed(4)}</td><td></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      {/* Calculation */}
+      <div className="supplement-calculation">
+        {isExactMatch ? (
+          <div className="calc-result">
+            <div className="calc-line">
+              <span className="calc-label">ค่า Factor F ของค่างานต้นทุน A</span>
+              <span>=</span>
+              <span className="calc-value">{factorTruncated.toFixed(4)}</span>
+              <span className="calc-note">(ค่างานต้นทุนตรงกับตาราง Factor F)</span>
+            </div>
+          </div>
+        ) : (
+          <div className="calc-result">
+            <div className="calc-line">
+              <span className="calc-label">ค่า Factor F ของค่างานต้นทุน A</span>
+              <span>=</span>
+              <span>{D.toFixed(4)} - {'['} ({D.toFixed(4)} - {E.toFixed(4)}) × ({formatNumber(A)} - {formatNumber(B)}) / ({formatNumber(C)} - {formatNumber(B)}) {']'}</span>
+            </div>
+            <div className="calc-line indent">
+              <span>=</span>
+              <span className="calc-value">{factorRaw}</span>
+            </div>
+            <div className="calc-line indent">
+              <span>=</span>
+              <span className="calc-value">{factorTruncated.toFixed(4)}</span>
+              <span className="calc-note">ปัดใช้ทศนิยม 4 ตำแหน่ง (ปัดทิ้ง)</span>
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* Signature */}
+      <div className="footer-section">
+        <div className="signature-section">
+          <div className="signature">
+            <div className="sig-line"></div>
+            <div>ผู้ประมาณราคา {boq.estimator_name}</div>
+            <div>{formatThaiMonth(boq.document_date)}</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
 }
 
 /** Render BOQ item rows with text splitting (continuation rows) */
@@ -780,6 +917,11 @@ export default function PrintBOQPage() {
         );
       })}
 
+      {/* ===== Factor F Supplement Page ===== */}
+      {boq.factor_f != null && (
+        <FactorFSupplementPage boq={boq} />
+      )}
+
       {/* ===== Styles ===== */}
       <style jsx global>{`
         @font-face {
@@ -961,6 +1103,34 @@ export default function PrintBOQPage() {
 
         /* Footer */
         .footer-section { margin-top: 15px; font-size: 11pt; }
+
+        /* ===== Supplement Page ===== */
+        .supplement-title {
+          background: #fffde7;
+          padding: 8px 12px;
+          font-size: 14pt;
+          font-weight: bold;
+          text-align: center;
+          margin-bottom: 10px;
+          border: 1px solid #e0d48e;
+        }
+        .supplement-info { margin-bottom: 10px; font-size: 12pt; }
+        .supplement-info .label { font-weight: bold; display: inline-block; width: 100px; }
+        .supplement-condition { margin-bottom: 12px; font-size: 11pt; }
+        .supplement-formula { margin-bottom: 12px; font-size: 12pt; }
+        .formula-line { display: flex; gap: 8px; align-items: baseline; }
+        .formula-label { font-weight: bold; min-width: 40px; }
+        .supplement-variables { margin-bottom: 15px; font-size: 11pt; }
+        .var-header { font-weight: bold; margin-bottom: 4px; }
+        .var-table { border-collapse: collapse; margin-left: 20px; }
+        .var-table td { padding: 2px 8px; white-space: nowrap; }
+        .var-table td.right { text-align: right; }
+        .supplement-calculation { margin-bottom: 20px; font-size: 12pt; }
+        .calc-line { display: flex; gap: 8px; align-items: baseline; margin-bottom: 4px; flex-wrap: wrap; }
+        .calc-line.indent { padding-left: 230px; }
+        .calc-label { font-weight: bold; min-width: 230px; }
+        .calc-value { font-weight: bold; }
+        .calc-note { font-style: italic; color: #555; font-size: 10pt; }
         .conditions, .note { margin-bottom: 5px; }
         .highlight-text {
           background: #ffeb3b;

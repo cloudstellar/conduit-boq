@@ -30,6 +30,16 @@ interface FactorFSummaryProps {
     factor: number;
     totalWithFactor: number;
     totalWithVAT: number;
+    /** Factor F ดิบก่อน truncate */
+    factorRaw: number;
+    /** B: ค่างานต้นทุนช่วงล่าง (ล้านบาท → บาท) */
+    lowerCost: number;
+    /** C: ค่างานต้นทุนช่วงบน */
+    upperCost: number;
+    /** D: Factor F ของช่วงล่าง */
+    lowerValue: number;
+    /** E: Factor F ของช่วงบน */
+    upperValue: number;
   }) => void;
 }
 
@@ -88,27 +98,28 @@ export default function FactorFSummary({ routes, grandTotalCost, onFactorCalcula
     }
   }, [grandTotalCost, supabase]);
 
-  const calculateInterpolatedFactor = (): number => {
+  const calculateInterpolatedFactor = (): { factor: number; raw: number } => {
     const A = grandTotalCost / 1000000;
     const B = lowerFactorRef?.cost_million || 5;
     const D = lowerFactorRef?.factor || 1.2750;
 
-    if (!upperFactorRef || A <= B) return D;
+    if (!upperFactorRef || A <= B) return { factor: D, raw: D };
 
     const C = upperFactorRef.cost_million;
     const E = upperFactorRef.factor;
 
-    if (A >= C) return E;
+    if (A >= C) return { factor: E, raw: E };
 
     const interpolatedFactor = D - ((D - E) * (A - B) / (C - B));
-    return Math.floor(interpolatedFactor * 10000) / 10000;
+    const truncated = Math.floor(interpolatedFactor * 10000) / 10000;
+    return { factor: truncated, raw: interpolatedFactor };
   };
 
   const formatNumber = (num: number) =>
     num.toLocaleString('th-TH', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
   // Calculate factor and derived values (must be before any early return for hooks rules)
-  const factor = calculateInterpolatedFactor();
+  const { factor, raw: factorRaw } = calculateInterpolatedFactor();
   const costInMillion = grandTotalCost / 1000000;
   const { beforeVAT: totalWithFactor, vat: totalVATAmount, total: totalWithVAT } =
     calculateVAT(grandTotalCost * factor);
@@ -121,9 +132,14 @@ export default function FactorFSummary({ routes, grandTotalCost, onFactorCalcula
         factor,
         totalWithFactor,
         totalWithVAT,
+        factorRaw,
+        lowerCost: (lowerFactorRef?.cost_million || 5) * 1000000,
+        upperCost: (upperFactorRef?.cost_million || (lowerFactorRef?.cost_million || 5)) * 1000000,
+        lowerValue: lowerFactorRef?.factor || 1.2750,
+        upperValue: upperFactorRef?.factor || (lowerFactorRef?.factor || 1.2750),
       });
     }
-  }, [factor, totalWithFactor, totalWithVAT, onFactorCalculated, isLoading, grandTotalCost]);
+  }, [factor, totalWithFactor, totalWithVAT, factorRaw, onFactorCalculated, isLoading, grandTotalCost, lowerFactorRef, upperFactorRef]);
 
   if (isLoading) {
     return (

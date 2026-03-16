@@ -36,6 +36,11 @@ export default function EditBOQPage() {
     factor: 1,
     totalWithFactor: 0,
     totalWithVAT: 0,
+    factorRaw: 1,
+    lowerCost: 0,
+    upperCost: 0,
+    lowerValue: 0,
+    upperValue: 0,
   });
 
   // Check edit permission
@@ -57,7 +62,7 @@ export default function EditBOQPage() {
           estimator_name: boq.estimator_name,
           document_date: boq.document_date,
           project_name: boq.project_name,
-          department: boq.department || 'วิศวกรรมท่อร้อยสาย (วทฐฐ.) ฝ่ายท่อร้อยสาย (ทฐฐ.)',
+          department: boq.department || '',
         });
 
         // Set BOQ context for permission checks
@@ -113,6 +118,11 @@ export default function EditBOQPage() {
         factor_f: factorData.factor,
         total_with_factor_f: factorData.totalWithFactor,
         total_with_vat: factorData.totalWithVAT,
+        factor_f_raw: factorData.factorRaw,
+        factor_f_lower_cost: factorData.lowerCost,
+        factor_f_upper_cost: factorData.upperCost,
+        factor_f_lower_value: factorData.lowerValue,
+        factor_f_upper_value: factorData.upperValue,
       };
 
       const routesData = routes.map((route) => ({
