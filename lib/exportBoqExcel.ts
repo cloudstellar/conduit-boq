@@ -819,6 +819,62 @@ export async function exportBoqToExcel(
     createRouteSheet(wb, boq, route, items, sheetName);
   });
 
+  // ── Create consolidated sheet (multi-route only) ──
+  if (routes.length > 1) {
+    const consolidatedMap = new Map<string, {
+      item_order: number; item_name: string; quantity: number; unit: string;
+      material_cost_per_unit: number; labor_cost_per_unit: number;
+      total_material_cost: number; total_labor_cost: number; total_cost: number;
+    }>();
+    routes.forEach((route) => {
+      (routeItems[route.id] || []).forEach((item) => {
+        const key = item.item_name;
+        if (consolidatedMap.has(key)) {
+          const existing = consolidatedMap.get(key)!;
+          existing.quantity += item.quantity;
+          existing.total_material_cost += item.total_material_cost;
+          existing.total_labor_cost += item.total_labor_cost;
+          existing.total_cost += item.total_cost;
+        } else {
+          consolidatedMap.set(key, {
+            item_order: item.item_order, item_name: item.item_name,
+            quantity: item.quantity, unit: item.unit,
+            material_cost_per_unit: item.material_cost_per_unit,
+            labor_cost_per_unit: item.labor_cost_per_unit,
+            total_material_cost: item.total_material_cost,
+            total_labor_cost: item.total_labor_cost,
+            total_cost: item.total_cost,
+          });
+        }
+      });
+    });
+
+    const consolidatedItems: ExportBOQItem[] = Array.from(consolidatedMap.values())
+      .sort((a, b) => a.item_order - b.item_order)
+      .map((item, idx) => ({
+        ...item,
+        id: `consolidated-${idx}`,
+        remarks: null,
+      }));
+
+    const totalMaterial = consolidatedItems.reduce((s, i) => s + i.total_material_cost, 0);
+    const totalLabor = consolidatedItems.reduce((s, i) => s + i.total_labor_cost, 0);
+    const totalCost = consolidatedItems.reduce((s, i) => s + i.total_cost, 0);
+
+    const consolidatedRoute: ExportBOQRoute = {
+      id: 'consolidated',
+      route_order: 0,
+      route_name: routes.map(r => r.route_name).join(', '),
+      route_description: null,
+      construction_area: routes.map(r => r.construction_area).filter(Boolean).join(', ') || null,
+      total_material_cost: totalMaterial,
+      total_labor_cost: totalLabor,
+      total_cost: totalCost,
+    };
+
+    createRouteSheet(wb, boq, consolidatedRoute, consolidatedItems, 'ปร.4 รวมทุกเส้นทาง');
+  }
+
   // ── Create summary sheet ──
   createSummarySheet(wb, boq, routes, allocated, factor, constructionCostBeforeVAT, vatAmount, totalWithVAT);
 
