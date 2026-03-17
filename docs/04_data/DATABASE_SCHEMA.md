@@ -136,6 +136,11 @@ BOQ Header - ใบประมาณราคา
 | `factor_f` | DECIMAL(10,4) | YES | ค่า Factor F |
 | `total_with_factor_f` | DECIMAL(15,2) | NO | รวมหลังคูณ Factor F |
 | `total_with_vat` | DECIMAL(15,2) | NO | รวมหลัง VAT 7% |
+| `factor_f_raw` | DECIMAL(15,4) | YES | ค่าเบื้องต้นดิบ (ก่อนปัด) |
+| `factor_f_lower_cost` | DECIMAL(15,2) | YES | B: ค่างานต้นทุนตัวต่ำ |
+| `factor_f_upper_cost` | DECIMAL(15,2) | YES | C: ค่างานต้นทุนตัวสูง |
+| `factor_f_lower_value` | DECIMAL(10,4) | YES | D: ค่า Factor F ของ B |
+| `factor_f_upper_value` | DECIMAL(10,4) | YES | E: ค่า Factor F ของ C |
 | `status` | TEXT | NO | สถานะ (draft/submitted/approved) ¹ |
 
 ¹ Reserved for Phase 3: `pending_review`, `pending_approval`
@@ -333,6 +338,7 @@ idx_boq_items_route_id   ON boq_items(route_id)
 | `007b_add_onboarding_completed.sql` | onboarding_completed column | ✅ Applied (manual) |
 | `008_pending_user_status.sql` | Pending status for new users | ✅ Applied |
 | `008_rls_and_trigger.sql` | RLS + Trigger + RPC (v1.2.0) | ✅ Applied |
+| `20260317_factor_f_supplement.sql` | Factor F snapshot columns | ✅ Applied |
 
 ---
 

@@ -3,6 +3,23 @@
 
 ---
 
+## [v1.5.0] - 2026-03-17 (Factor F Supplement Page)
+
+### 📄 Document Printing
+- **Factor F Supplement Page**: Added a new final page to the print output showing the exact formula, variables, and calculation steps for Factor F interpolation.
+- **Space Optimization**: Removed redundant Factor F conditions from individual item page footers to allow more rows per page. Conditions now only show on the summary page.
+
+### 💾 Data & Calculation
+- **Factor F Snapshots**: Added 5 new snapshot columns (`factor_f_raw`, `factor_f_lower_cost`, `factor_f_upper_cost`, `factor_f_lower_value`, `factor_f_upper_value`) to preserve exact interpolation variables at the time of BOQ creation.
+- **Fallback Logic**: For legacy BOQs without snapshots, the system dynamically queries the `factor_reference` table during printing to construct the calculation page.
+- **RPC Update**: Updated `save_boq_with_routes` to persist the new snapshot columns securely.
+
+### 🎨 UX Improvements
+- **Quick Print**: Added a "Print" button immediately next to the primary "Save" button in the BOQ editor for faster workflow.
+- **Global Cursors**: Enforced `cursor: pointer` globlally on all buttons and interactive elements.
+
+---
+
 ## [v1.4.0] - 2026-02-01 (shadcn/ui Migration Complete)
 
 ### 🎨 UI/UX Improvements
