@@ -75,13 +75,13 @@ const allBorders = {
 const headerFill: Fill = {
   type: 'pattern',
   pattern: 'solid',
-  fgColor: { argb: 'FFF8E1' }, // light yellow
+  fgColor: { argb: 'FFFDE7' }, // matches print preview .boq-table th
 };
 
 const totalFill: Fill = {
   type: 'pattern',
   pattern: 'solid',
-  fgColor: { argb: 'E3F2FD' }, // light blue
+  fgColor: { argb: 'FFFDE7' }, // matches print preview .total-row.highlight
 };
 
 const numberFormat = '#,##0.00';
