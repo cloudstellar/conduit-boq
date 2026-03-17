@@ -357,6 +357,16 @@ export default function MultiRouteEditor({ boqId, onSave, isSaving, onFactorCalc
     }));
   }, [activeRouteId]);
 
+  const handleUpdateRemarks = useCallback((itemId: string, remarks: string) => {
+    if (!activeRouteId) return;
+    setRouteItems(prev => ({
+      ...prev,
+      [activeRouteId]: (prev[activeRouteId] || []).map(item =>
+        item.id === itemId ? { ...item, remarks } : item
+      ),
+    }));
+  }, [activeRouteId]);
+
   const handleRemoveItem = useCallback((itemId: string) => {
     if (!activeRouteId) return;
     setRouteItems(prev => ({
@@ -540,13 +550,13 @@ export default function MultiRouteEditor({ boqId, onSave, isSaving, onFactorCalc
                   />
                 </div>
 
-                {/* Row 3: Description (Textarea) */}
+                {/* Row 3: Route Remarks (Textarea) — repurposed route_description */}
                 <div className="space-y-1">
-                  <Label className="text-xs text-muted-foreground">คำอธิบาย</Label>
+                  <Label className="text-xs text-muted-foreground">หมายเหตุเส้นทาง (แสดงในหน้าสรุปรวม ปร.4)</Label>
                   <textarea
                     value={activeRoute.route_description}
                     onChange={(e) => handleUpdateRoute(activeRouteId, 'route_description', e.target.value)}
-                    placeholder="รายละเอียดเพิ่มเติมเกี่ยวกับเส้นทางนี้"
+                    placeholder="หมายเหตุสำหรับเส้นทางนี้ (จะแสดงในหน้าสรุปรวม)"
                     rows={2}
                     className="w-full px-3 py-2 text-sm border border-border rounded-md bg-background focus:ring-2 focus:ring-ring focus:border-ring resize-none"
                   />
@@ -561,6 +571,7 @@ export default function MultiRouteEditor({ boqId, onSave, isSaving, onFactorCalc
                       items={activeRouteItems}
                       onAddItem={handleAddItem}
                       onUpdateQuantity={handleUpdateQuantity}
+                      onUpdateRemarks={handleUpdateRemarks}
                       onRemoveItem={handleRemoveItem}
                     />
                   </div>

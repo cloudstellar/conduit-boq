@@ -38,6 +38,7 @@ interface LineItemsTableProps {
   items: LineItem[];
   onAddItem: (priceItem: PriceListItem) => void;
   onUpdateQuantity: (id: string, quantity: number) => void;
+  onUpdateRemarks: (id: string, remarks: string) => void;
   onRemoveItem: (id: string) => void;
 }
 
@@ -45,6 +46,7 @@ export default function LineItemsTable({
   items,
   onAddItem,
   onUpdateQuantity,
+  onUpdateRemarks,
   onRemoveItem,
 }: LineItemsTableProps) {
   const formatNumber = (num: number) => num.toLocaleString('th-TH', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
@@ -99,9 +101,12 @@ export default function LineItemsTable({
                       <div className="text-sm font-medium line-clamp-2" title={item.item_name}>
                         {item.item_name}
                       </div>
-                      {item.remarks && (
-                        <div className="text-xs text-muted-foreground mt-0.5">{item.remarks}</div>
-                      )}
+                      <Input
+                        value={item.remarks || ''}
+                        onChange={(e) => onUpdateRemarks(item.id, e.target.value)}
+                        placeholder="หมายเหตุ (ถ้ามี)"
+                        className="mt-1 h-7 text-xs text-muted-foreground bg-muted/30 border-dashed max-w-md"
+                      />
                     </TableCell>
                   </TableRow>
                   {/* Row 2: Data columns */}

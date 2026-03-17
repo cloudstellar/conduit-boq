@@ -884,7 +884,7 @@ export default function PrintBOQPage() {
                           <td className="right">{isFirst ? formatNumber(rBV) : ''}</td>
                           <td className="right">{isFirst ? formatNumber(rVAT) : ''}</td>
                           <td className="right">{isFirst ? formatNumber(rTotal) : ''}</td>
-                          <td>{''}</td>
+                          <td>{isFirst ? (route.route_description || '') : ''}</td>
                         </tr>
                       );
                     });
@@ -1055,7 +1055,7 @@ export default function PrintBOQPage() {
         .boq-table .col-unit { width: 35px; }
         .boq-table .col-sub { width: 70px; }
         .boq-table .col-total { width: 80px; }
-        .boq-table .col-remark { width: 60px; }
+        .boq-table .col-remark { width: 120px; }
         .boq-table .col-material-header, .boq-table .col-labor-header { text-align: center; }
 
         .boq-table td.center { text-align: center; }
@@ -1100,7 +1100,7 @@ export default function PrintBOQPage() {
         .summary-table .col-factor { width: 65px; }
         .summary-table .col-result { width: 95px; }
         .summary-table .col-vat { width: 85px; }
-        .summary-table .col-remark2 { width: 50px; }
+        .summary-table .col-remark2 { width: 120px; }
 
         .summary-table td.center { text-align: center; }
         .summary-table td.left { text-align: left; }
