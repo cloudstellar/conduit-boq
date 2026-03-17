@@ -109,7 +109,7 @@ Next.js 16 + React 19 + TypeScript + Tailwind CSS 4
 
 - [ ] Approval workflow (draft → approved)
 - [ ] Notifications
-- [ ] PDF/Excel export with template
+- [x] ~~PDF/Excel export with template~~ → ✅ Completed in v1.6.0 (Excel export via `exceljs`, see `lib/exportBoqExcel.ts`)
 - [ ] PWA / Offline support
 - [ ] Mobile-optimized UI
 

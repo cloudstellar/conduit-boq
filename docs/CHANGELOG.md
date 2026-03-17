@@ -3,6 +3,46 @@
 
 ---
 
+## [v1.6.0] - 2026-03-17 (Excel Export)
+
+### 📊 Excel Export (ปร.4)
+- **Export to Excel Button**: Added "Excel" button (with FileSpreadsheet icon) next to the "พิมพ์" button on the BOQ print preview page.
+- **Route Detail Sheets** (`ปร.4 เส้นทาง N`): One sheet per route with 2-row merged headers, styled cells, and all item data.
+- **Consolidated Sheet** (`ปร.4 รวมทุกเส้นทาง`): For multi-route BOQs, merges items with the same name across all routes (summed quantities and costs). Only appears when routes > 1.
+- **Summary Sheet** (`สรุปรวม`): Factor F columns (≤5M / >5M), allocated route costs with VAT, Thai baht text (`numberToThaiText`), conditions, notes, and estimator signature.
+- **Factor F Supplement Sheet** (`Factor F`): Formula display, variables A-E with values, calculation steps (raw → truncated), and signature.
+
+### 🎨 Styling
+- **Font**: TH Sarabun New applied globally via `defaultFont()` helper (fallback to system font if not installed).
+- **Colors**: Header fill `#FFFDE7`, total row fill `#FFFDE7`, highlight-box `#FFEB3B` — all matching print preview CSS exactly.
+- **Page Setup**: A4 landscape with fit-to-width for route/summary sheets, A4 portrait for Factor F sheet.
+
+### 🔒 Data Correctness
+- **Single Source of Truth**: Export uses the same React state as print preview — no separate DB query.
+- **Checksum Validation**: Verifies route totals match sum of item totals before generating file (tolerance ≤ 0.01 baht).
+- **Raw Numbers**: Sends actual numbers to Excel (not formatted strings) to preserve calculation precision.
+
+### 🔧 Technical
+- **Dynamic Import**: `exceljs` and `file-saver` loaded via `import()` on button click — zero impact on initial page bundle.
+- **Dependencies Added**: `exceljs@4.4.0`, `file-saver@2.0.5`, `@types/file-saver`.
+- **Branch**: Developed on `feat/excel-export`, merged to `main` via fast-forward.
+
+### 📁 Files
+- `lib/exportBoqExcel.ts` — 894 lines, core export module
+- `app/boq/[id]/print/page.tsx` — +27 lines (button + handler)
+
+---
+
+## [v1.5.1] - 2026-03-17 (BOQ Remarks)
+
+### 📝 Remarks Feature
+- **Item-Level Remarks**: Added remarks input field in the line items editor (`LineItemsTable.tsx`).
+- **Route-Level Remarks**: Repurposed `route_description` field in `MultiRouteEditor.tsx` as "หมายเหตุเส้นทาง (แสดงในหน้าสรุปรวม ปร.4)".
+- **Print Layout**: Both remark columns set to symmetrical `120px` width in print CSS.
+- **No Migration**: Used existing `remarks` column in `boq_items` and `route_description` in `boq_routes`.
+
+---
+
 ## [v1.5.0] - 2026-03-17 (Factor F Supplement Page)
 
 ### 📄 Document Printing
