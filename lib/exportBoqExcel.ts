@@ -84,6 +84,12 @@ const totalFill: Fill = {
   fgColor: { argb: 'FFFDE7' }, // matches print preview .total-row.highlight
 };
 
+const highlightFill: Fill = {
+  type: 'pattern',
+  pattern: 'solid',
+  fgColor: { argb: 'FFEB3B' }, // matches print preview .highlight-box
+};
+
 const numberFormat = '#,##0.00';
 const factorFormat = '0.0000';
 
@@ -119,6 +125,43 @@ function formatThaiDate(dateStr: string): string {
 
 function formatNum(num: number): string {
   return num.toLocaleString('th-TH', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+}
+
+function numberToThaiText(num: number): string {
+  const thaiNumbers = ['', 'หนึ่ง', 'สอง', 'สาม', 'สี่', 'ห้า', 'หก', 'เจ็ด', 'แปด', 'เก้า'];
+  if (num === 0) return 'ศูนย์บาทถ้วน';
+  const baht = Math.floor(num);
+  const satang = Math.round((num - baht) * 100);
+  const convertGroup = (n: number): string => {
+    if (n === 0) return '';
+    let result = '';
+    const str = n.toString();
+    const len = str.length;
+    for (let i = 0; i < len; i++) {
+      const digit = parseInt(str[i]);
+      const position = len - i - 1;
+      if (digit === 0) continue;
+      if (position === 1 && digit === 1) result += 'สิบ';
+      else if (position === 1 && digit === 2) result += 'ยี่สิบ';
+      else if (position === 0 && digit === 1 && len > 1) result += 'เอ็ด';
+      else result += thaiNumbers[digit] + ['', 'สิบ', 'ร้อย', 'พัน', 'หมื่น', 'แสน', 'ล้าน'][position];
+    }
+    return result;
+  };
+  let result = '';
+  if (baht >= 1000000) {
+    result += convertGroup(Math.floor(baht / 1000000)) + 'ล้าน';
+    result += convertGroup(baht % 1000000);
+  } else {
+    result += convertGroup(baht);
+  }
+  result += 'บาท';
+  if (satang > 0) {
+    result += convertGroup(satang) + 'สตางค์';
+  } else {
+    result += 'ถ้วน';
+  }
+  return result;
 }
 
 // ──────────────────────────────────
@@ -477,6 +520,49 @@ function createSummarySheet(
   ws.getCell(r, 8).alignment = { horizontal: 'right' };
   ws.getCell(r, 8).font = defaultFont({ bold: true, size: 16 });
   ws.getCell(r, 8).fill = totalFill;
+  r += 2;
+
+  // ── Thai Baht Text ──
+  ws.getCell(r, 1).value = 'ประมาณราคาค่าก่อสร้าง รวมภาษีมูลค่าเพิ่ม (VAT)';
+  ws.getCell(r, 1).font = defaultFont({ bold: true });
+  ws.mergeCells(r, 1, r, 4);
+  ws.getCell(r, 5).value = numberToThaiText(totalWithVAT);
+  ws.getCell(r, 5).font = defaultFont({ bold: true });
+  ws.getCell(r, 5).fill = highlightFill;
+  ws.mergeCells(r, 5, r, 9);
+  r += 2;
+
+  // ── Conditions ──
+  ws.getCell(r, 1).value = 'เงื่อนไข';
+  ws.getCell(r, 1).font = defaultFont({ bold: true });
+  ws.getCell(r, 1).fill = highlightFill;
+  ws.getCell(r, 2).value = 'Factor F งานก่อสร้างทาง เงินล่วงหน้าจ่าย 0.00 %, เงินประกันผลงานหัก 0.00 %, ดอกเบี้ยเงินกู้ 7.00 % ต่อปี, ค่าภาษีมูลค่าเพิ่ม 7.00 %';
+  ws.getCell(r, 2).font = defaultFont();
+  ws.mergeCells(r, 2, r, 9);
+  r++;
+
+  // ── Note ──
+  ws.getCell(r, 1).value = 'หมายเหตุ';
+  ws.getCell(r, 1).font = defaultFont({ bold: true });
+  ws.getCell(r, 1).fill = highlightFill;
+  ws.getCell(r, 2).value = 'ทั้งนี้ ราคางานโครงการ/งานก่อสร้าง ไม่ใช่ราคาค่าก่อสร้างที่แท้จริง แต่เป็นเพียงราคาโดยประมาณเท่านั้น';
+  ws.getCell(r, 2).font = defaultFont();
+  ws.mergeCells(r, 2, r, 9);
+  r += 2;
+
+  // ── Signature ──
+  ws.getCell(r, 7).value = `ผู้ประมาณราคา ${boq.estimator_name}`;
+  ws.getCell(r, 7).font = defaultFont();
+  ws.mergeCells(r, 7, r, 9);
+  ws.getCell(r, 7).alignment = { horizontal: 'center' };
+  r++;
+
+  if (boq.document_date) {
+    ws.getCell(r, 7).value = formatThaiDate(boq.document_date);
+    ws.getCell(r, 7).font = defaultFont();
+    ws.mergeCells(r, 7, r, 9);
+    ws.getCell(r, 7).alignment = { horizontal: 'center' };
+  }
 }
 
 // ──────────────────────────────────
@@ -633,7 +719,7 @@ function createFactorFSheet(
     ws.getCell(r, 7).value = factorTruncated.toFixed(4);
     ws.getCell(r, 7).font = defaultFont({ bold: true, size: 16 });
     ws.getCell(r, 7).alignment = { horizontal: 'right' };
-    ws.getCell(r, 7).fill = totalFill;
+    ws.getCell(r, 7).fill = highlightFill;
     r++;
     ws.getCell(r, 7).value = '(ค่างานต้นทุนตรงกับตาราง Factor F)';
     ws.getCell(r, 7).font = defaultFont({ italic: true, size: 12 });
@@ -664,7 +750,7 @@ function createFactorFSheet(
     ws.getCell(r, 7).value = factorTruncated.toFixed(4);
     ws.getCell(r, 7).font = defaultFont({ bold: true, size: 16 });
     ws.getCell(r, 7).alignment = { horizontal: 'right' };
-    ws.getCell(r, 7).fill = totalFill;
+    ws.getCell(r, 7).fill = highlightFill;
     ws.getCell(r, 8).value = 'ปัดใช้ทศนิยม 4 ตำแหน่ง (ปัดทิ้ง)';
     ws.getCell(r, 8).font = defaultFont({ italic: true, size: 12 });
   }
