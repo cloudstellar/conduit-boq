@@ -13,6 +13,12 @@ export interface ExportBOQData {
   project_name: string;
   department: string | null;
   total_cost: number;
+  factor_f: number | null;
+  factor_f_raw: number | null;
+  factor_f_lower_cost: number | null;
+  factor_f_upper_cost: number | null;
+  factor_f_lower_value: number | null;
+  factor_f_upper_value: number | null;
 }
 
 export interface ExportBOQRoute {
@@ -46,9 +52,17 @@ export interface ExportSummaryAllocated {
   total: number;
 }
 
+export interface ExportFactorRef {
+  cost_million: number;
+  factor: number;
+}
+
 // ──────────────────────────────────
-// Styles
+// Default Font & Styles
 // ──────────────────────────────────
+
+const DEFAULT_FONT = 'TH Sarabun New';
+const DEFAULT_SIZE = 14;
 
 const thinBorder: Partial<Border> = { style: 'thin', color: { argb: '000000' } };
 const allBorders = {
@@ -73,10 +87,14 @@ const totalFill: Fill = {
 const numberFormat = '#,##0.00';
 const factorFormat = '0.0000';
 
+function defaultFont(overrides?: { bold?: boolean; size?: number; italic?: boolean }) {
+  return { name: DEFAULT_FONT, size: overrides?.size ?? DEFAULT_SIZE, bold: overrides?.bold, italic: overrides?.italic };
+}
+
 function applyHeaderStyle(ws: Worksheet, row: number, colStart: number, colEnd: number) {
   for (let c = colStart; c <= colEnd; c++) {
     const cell = ws.getCell(row, c);
-    cell.font = { bold: true, size: 12 };
+    cell.font = defaultFont({ bold: true, size: 14 });
     cell.alignment = { horizontal: 'center', vertical: 'middle', wrapText: true };
     cell.fill = headerFill;
     cell.border = allBorders;
@@ -86,14 +104,25 @@ function applyHeaderStyle(ws: Worksheet, row: number, colStart: number, colEnd: 
 function applyTotalStyle(ws: Worksheet, row: number, colStart: number, colEnd: number) {
   for (let c = colStart; c <= colEnd; c++) {
     const cell = ws.getCell(row, c);
-    cell.font = { bold: true, size: 12 };
+    cell.font = defaultFont({ bold: true });
     cell.border = allBorders;
     cell.fill = totalFill;
   }
 }
 
+function formatThaiDate(dateStr: string): string {
+  const d = new Date(dateStr);
+  const thaiMonth = ['มกราคม','กุมภาพันธ์','มีนาคม','เมษายน','พฤษภาคม','มิถุนายน',
+    'กรกฎาคม','สิงหาคม','กันยายน','ตุลาคม','พฤศจิกายน','ธันวาคม'];
+  return `${thaiMonth[d.getMonth()]} พ.ศ. ${d.getFullYear() + 543}`;
+}
+
+function formatNum(num: number): string {
+  return num.toLocaleString('th-TH', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+}
+
 // ──────────────────────────────────
-// Sheet 1: Route Detail (per route)
+// Sheet: Route Detail (per route)
 // ──────────────────────────────────
 
 function createRouteSheet(
@@ -105,9 +134,8 @@ function createRouteSheet(
 ) {
   const ws = wb.addWorksheet(sheetName);
 
-  // Page setup: A4 Landscape
   ws.pageSetup = {
-    paperSize: 9, // A4
+    paperSize: 9,
     orientation: 'landscape',
     fitToPage: true,
     fitToWidth: 1,
@@ -115,7 +143,6 @@ function createRouteSheet(
     margins: { left: 0.3, right: 0.3, top: 0.4, bottom: 0.4, header: 0.2, footer: 0.2 },
   };
 
-  // Column widths (10 columns: A-J)
   ws.columns = [
     { width: 5 },   // A: ลำดับที่
     { width: 45 },  // B: รายการ
@@ -133,62 +160,61 @@ function createRouteSheet(
 
   // ── Title ──
   ws.getCell(r, 1).value = 'บริษัท โทรคมนาคมแห่งชาติ จำกัด (มหาชน)';
-  ws.getCell(r, 1).font = { bold: true, size: 14 };
+  ws.getCell(r, 1).font = defaultFont({ bold: true, size: 16 });
   ws.mergeCells(r, 1, r, 10);
   r++;
 
   ws.getCell(r, 1).value = 'แบบฟอร์มแสดงรายการ ปริมาณงาน และราคางานก่อสร้างท่อร้อยสายสื่อสารใต้ดิน (BOQ)';
-  ws.getCell(r, 1).font = { bold: true, size: 13 };
+  ws.getCell(r, 1).font = defaultFont({ bold: true, size: 15 });
   ws.mergeCells(r, 1, r, 10);
   r++;
 
   // ── Info Section ──
   ws.getCell(r, 1).value = `ส่วนงาน: ${boq.department || 'วิศวกรรมท่อร้อยสาย (วทฐฐ.) ฝ่ายท่อร้อยสาย (ทฐฐ.)'}`;
+  ws.getCell(r, 1).font = defaultFont();
   ws.mergeCells(r, 1, r, 5);
   ws.getCell(r, 6).value = `โครงการ: ${boq.project_name}`;
+  ws.getCell(r, 6).font = defaultFont();
   ws.mergeCells(r, 6, r, 10);
   r++;
 
   ws.getCell(r, 1).value = `บัญชีราคา: งานจ้างเหมาก่อสร้างท่อร้อยสายสื่อสารใต้ดินและบ่อพัก`;
+  ws.getCell(r, 1).font = defaultFont();
   ws.mergeCells(r, 1, r, 5);
   ws.getCell(r, 6).value = `พื้นที่ก่อสร้าง: ${route.construction_area || '-'}`;
+  ws.getCell(r, 6).font = defaultFont();
   ws.mergeCells(r, 6, r, 10);
   r++;
 
   ws.getCell(r, 1).value = `เส้นทาง: ${route.route_name}`;
+  ws.getCell(r, 1).font = defaultFont();
   ws.mergeCells(r, 1, r, 10);
   r++;
 
   // ── Unit label ──
   ws.getCell(r, 10).value = 'หน่วย - บาท';
   ws.getCell(r, 10).alignment = { horizontal: 'right' };
-  ws.getCell(r, 10).font = { italic: true, size: 10 };
+  ws.getCell(r, 10).font = defaultFont({ italic: true, size: 12 });
   r++;
 
   // ── Table Header (2 rows with merged cells) ──
   const headerRow1 = r;
   const headerRow2 = r + 1;
 
-  // Row 1 headers
   ws.getCell(headerRow1, 1).value = 'ลำดับที่';
   ws.mergeCells(headerRow1, 1, headerRow2, 1);
-
   ws.getCell(headerRow1, 2).value = 'รายการ';
   ws.mergeCells(headerRow1, 2, headerRow2, 2);
-
   ws.getCell(headerRow1, 3).value = 'ปริมาณงาน';
   ws.mergeCells(headerRow1, 3, headerRow2, 3);
-
   ws.getCell(headerRow1, 4).value = 'หน่วย';
   ws.mergeCells(headerRow1, 4, headerRow2, 4);
 
-  // Merged: ค่าวัสดุ
   ws.getCell(headerRow1, 5).value = 'ค่าวัสดุ ไม่รวมภาษีมูลค่าเพิ่ม (1)';
   ws.mergeCells(headerRow1, 5, headerRow1, 6);
   ws.getCell(headerRow2, 5).value = 'ราคา/หน่วย';
   ws.getCell(headerRow2, 6).value = 'จำนวนเงิน';
 
-  // Merged: ค่าแรง
   ws.getCell(headerRow1, 7).value = 'ค่าแรง ไม่รวมภาษีมูลค่าเพิ่ม (2)';
   ws.mergeCells(headerRow1, 7, headerRow1, 8);
   ws.getCell(headerRow2, 7).value = 'ราคา/หน่วย';
@@ -196,15 +222,11 @@ function createRouteSheet(
 
   ws.getCell(headerRow1, 9).value = 'ค่างานต้นทุน\n(3)=(1)+(2)';
   ws.mergeCells(headerRow1, 9, headerRow2, 9);
-
   ws.getCell(headerRow1, 10).value = 'หมายเหตุ';
   ws.mergeCells(headerRow1, 10, headerRow2, 10);
 
-  // Apply header styles
   applyHeaderStyle(ws, headerRow1, 1, 10);
   applyHeaderStyle(ws, headerRow2, 1, 10);
-
-  // Set header row height
   ws.getRow(headerRow1).height = 28;
   ws.getRow(headerRow2).height = 20;
 
@@ -214,7 +236,6 @@ function createRouteSheet(
   const sortedItems = [...items].sort((a, b) => a.item_order - b.item_order);
 
   sortedItems.forEach((item, idx) => {
-    const row = ws.getRow(r);
     ws.getCell(r, 1).value = idx + 1;
     ws.getCell(r, 1).alignment = { horizontal: 'center' };
     ws.getCell(r, 2).value = item.item_name;
@@ -241,10 +262,9 @@ function createRouteSheet(
     ws.getCell(r, 9).alignment = { horizontal: 'right' };
     ws.getCell(r, 10).value = item.remarks || '';
 
-    // Apply borders
     for (let c = 1; c <= 10; c++) {
       ws.getCell(r, c).border = allBorders;
-      ws.getCell(r, c).font = { size: 11 };
+      ws.getCell(r, c).font = defaultFont();
     }
 
     r++;
@@ -264,21 +284,18 @@ function createRouteSheet(
   ws.getCell(r, 9).alignment = { horizontal: 'right' };
 
   applyTotalStyle(ws, r, 1, 10);
-
   r += 2;
 
   // ── Estimator ──
   ws.getCell(r, 8).value = `ผู้ประมาณราคา ${boq.estimator_name}`;
+  ws.getCell(r, 8).font = defaultFont();
   ws.mergeCells(r, 8, r, 10);
   ws.getCell(r, 8).alignment = { horizontal: 'center' };
   r++;
 
   if (boq.document_date) {
-    const d = new Date(boq.document_date);
-    const thaiMonth = ['มกราคม','กุมภาพันธ์','มีนาคม','เมษายน','พฤษภาคม','มิถุนายน',
-      'กรกฎาคม','สิงหาคม','กันยายน','ตุลาคม','พฤศจิกายน','ธันวาคม'];
-    const dateStr = `${thaiMonth[d.getMonth()]} พ.ศ. ${d.getFullYear() + 543}`;
-    ws.getCell(r, 8).value = dateStr;
+    ws.getCell(r, 8).value = formatThaiDate(boq.document_date);
+    ws.getCell(r, 8).font = defaultFont();
     ws.mergeCells(r, 8, r, 10);
     ws.getCell(r, 8).alignment = { horizontal: 'center' };
   }
@@ -310,15 +327,15 @@ function createSummarySheet(
   };
 
   ws.columns = [
-    { width: 5 },   // A: ที่
-    { width: 40 },  // B: รายการ
-    { width: 14 },  // C: ค่างานต้นทุน
-    { width: 10 },  // D: Factor F ≤ 5 ลบ.
-    { width: 10 },  // E: Factor F > 5 ลบ.
-    { width: 16 },  // F: ค่าก่อสร้างไม่รวม VAT
-    { width: 14 },  // G: ภาษีมูลค่าเพิ่ม
-    { width: 16 },  // H: ค่าก่อสร้างรวม VAT
-    { width: 14 },  // I: หมายเหตุ
+    { width: 5 },
+    { width: 40 },
+    { width: 14 },
+    { width: 10 },
+    { width: 10 },
+    { width: 16 },
+    { width: 14 },
+    { width: 16 },
+    { width: 14 },
   ];
 
   const grandTotalInMillion = boq.total_cost / 1000000;
@@ -327,28 +344,29 @@ function createSummarySheet(
 
   let r = 1;
 
-  // ── Title ──
   ws.getCell(r, 1).value = 'บริษัท โทรคมนาคมแห่งชาติ จำกัด (มหาชน)';
-  ws.getCell(r, 1).font = { bold: true, size: 14 };
+  ws.getCell(r, 1).font = defaultFont({ bold: true, size: 16 });
   ws.mergeCells(r, 1, r, 9);
   r++;
 
   ws.getCell(r, 1).value = 'สรุปรวม บัญชีราคา งานจ้างเหมาก่อสร้างท่อร้อยสายสื่อสารใต้ดินและบ่อพัก';
-  ws.getCell(r, 1).font = { bold: true, size: 13 };
+  ws.getCell(r, 1).font = defaultFont({ bold: true, size: 15 });
   ws.mergeCells(r, 1, r, 9);
   r++;
 
-  // ── Info ──
   ws.getCell(r, 1).value = `ส่วนงาน: ${boq.department || 'วิศวกรรมท่อร้อยสาย (วทฐฐ.) ฝ่ายท่อร้อยสาย (ทฐฐ.)'}`;
+  ws.getCell(r, 1).font = defaultFont();
   ws.mergeCells(r, 1, r, 5);
   ws.getCell(r, 6).value = `โครงการ: ${boq.project_name}`;
+  ws.getCell(r, 6).font = defaultFont();
   ws.mergeCells(r, 6, r, 9);
   r++;
 
   ws.getCell(r, 1).value = `จำนวนเส้นทาง: ${routes.length} เส้นทาง`;
+  ws.getCell(r, 1).font = defaultFont();
   ws.mergeCells(r, 1, r, 9);
   r++;
-  r++; // blank row
+  r++;
 
   // ── Table Header ──
   const headers = [
@@ -393,9 +411,8 @@ function createSummarySheet(
 
     for (let c = 1; c <= 9; c++) {
       ws.getCell(r, c).border = allBorders;
-      ws.getCell(r, c).font = { size: 11 };
+      ws.getCell(r, c).font = defaultFont();
     }
-
     r++;
   });
 
@@ -435,29 +452,238 @@ function createSummarySheet(
 
   // ── Calculation Summary ──
   ws.getCell(r, 1).value = '(1) ประมาณราคาค่าก่อสร้างทั้งโครงการ ก่อนภาษี';
+  ws.getCell(r, 1).font = defaultFont({ bold: true });
   ws.mergeCells(r, 1, r, 7);
   ws.getCell(r, 8).value = constructionCostBeforeVAT;
   ws.getCell(r, 8).numFmt = numberFormat;
   ws.getCell(r, 8).alignment = { horizontal: 'right' };
-  ws.getCell(r, 8).font = { bold: true, size: 12 };
+  ws.getCell(r, 8).font = defaultFont({ bold: true });
   r++;
 
   ws.getCell(r, 1).value = '(2) ภาษีมูลค่าเพิ่ม 7.00 %';
+  ws.getCell(r, 1).font = defaultFont({ bold: true });
   ws.mergeCells(r, 1, r, 7);
   ws.getCell(r, 8).value = vatAmount;
   ws.getCell(r, 8).numFmt = numberFormat;
   ws.getCell(r, 8).alignment = { horizontal: 'right' };
-  ws.getCell(r, 8).font = { bold: true, size: 12 };
+  ws.getCell(r, 8).font = defaultFont({ bold: true });
   r++;
 
   ws.getCell(r, 1).value = '(1) + (2) รวมประมาณค่างานทั้งโครงการ เป็นเงินทั้งสิ้น';
+  ws.getCell(r, 1).font = defaultFont({ bold: true, size: 16 });
   ws.mergeCells(r, 1, r, 7);
-  ws.getCell(r, 1).font = { bold: true, size: 13 };
   ws.getCell(r, 8).value = totalWithVAT;
   ws.getCell(r, 8).numFmt = numberFormat;
   ws.getCell(r, 8).alignment = { horizontal: 'right' };
-  ws.getCell(r, 8).font = { bold: true, size: 13 };
+  ws.getCell(r, 8).font = defaultFont({ bold: true, size: 16 });
   ws.getCell(r, 8).fill = totalFill;
+}
+
+// ──────────────────────────────────
+// Sheet: Factor F Supplement
+// ──────────────────────────────────
+
+function createFactorFSheet(
+  wb: Workbook,
+  boq: ExportBOQData,
+  factor: number,
+  lowerFactorRef: ExportFactorRef | null,
+  upperFactorRef: ExportFactorRef | null,
+) {
+  const ws = wb.addWorksheet('Factor F');
+
+  ws.pageSetup = {
+    paperSize: 9,
+    orientation: 'portrait',
+    fitToPage: true,
+    fitToWidth: 1,
+    fitToHeight: 1,
+    margins: { left: 0.7, right: 0.7, top: 0.5, bottom: 0.5, header: 0.2, footer: 0.2 },
+  };
+
+  ws.columns = [
+    { width: 8 },   // A
+    { width: 40 },  // B
+    { width: 5 },   // C: =
+    { width: 5 },   // D: var
+    { width: 8 },   // E: unit
+    { width: 5 },   // F: =
+    { width: 18 },  // G: value
+    { width: 8 },   // H: unit
+  ];
+
+  // Calculate Factor F variables (same logic as FactorFSupplementPage)
+  const A = boq.total_cost;
+  const hasSnapshot = boq.factor_f_lower_cost != null && boq.factor_f_lower_cost > 0;
+
+  const B = hasSnapshot ? boq.factor_f_lower_cost! : (lowerFactorRef?.cost_million || 5) * 1000000;
+  const C = hasSnapshot ? boq.factor_f_upper_cost! : (upperFactorRef?.cost_million || (lowerFactorRef?.cost_million || 5)) * 1000000;
+  const D = hasSnapshot ? boq.factor_f_lower_value! : lowerFactorRef?.factor || 1.2750;
+  const E = hasSnapshot ? boq.factor_f_upper_value! : upperFactorRef?.factor || (lowerFactorRef?.factor || 1.2750);
+
+  let factorRaw: number;
+  if (hasSnapshot && boq.factor_f_raw != null) {
+    factorRaw = boq.factor_f_raw;
+  } else if (B === C || !upperFactorRef) {
+    factorRaw = D;
+  } else {
+    const aMil = A / 1000000;
+    const bMil = B / 1000000;
+    const cMil = C / 1000000;
+    factorRaw = D - ((D - E) * (aMil - bMil) / (cMil - bMil));
+  }
+
+  const factorTruncated = boq.factor_f || Math.floor(factorRaw * 10000) / 10000;
+  const isExactMatch = B === C || Math.abs(factorRaw - factorTruncated) < 0.000000001;
+
+  let r = 1;
+
+  // ── Title ──
+  ws.getCell(r, 1).value = 'บริษัท โทรคมนาคมแห่งชาติ จำกัด (มหาชน)';
+  ws.getCell(r, 1).font = defaultFont({ bold: true, size: 16 });
+  ws.mergeCells(r, 1, r, 8);
+  ws.getCell(r, 1).alignment = { horizontal: 'center' };
+  r += 2;
+
+  ws.getCell(r, 1).value = 'สูตรคำนวณหาค่า Factor F ที่อยู่ระหว่างช่วงของค่างานต้นทุน';
+  ws.getCell(r, 1).font = defaultFont({ bold: true, size: 16 });
+  ws.mergeCells(r, 1, r, 8);
+  ws.getCell(r, 1).alignment = { horizontal: 'center' };
+  r += 2;
+
+  // ── Project Info ──
+  ws.getCell(r, 1).value = 'ของงานโครงการ';
+  ws.getCell(r, 1).font = defaultFont({ bold: true });
+  ws.getCell(r, 2).value = boq.project_name;
+  ws.getCell(r, 2).font = defaultFont();
+  ws.mergeCells(r, 2, r, 8);
+  r++;
+
+  ws.getCell(r, 1).value = 'ส่วนงาน';
+  ws.getCell(r, 1).font = defaultFont({ bold: true });
+  ws.getCell(r, 2).value = boq.department || '';
+  ws.getCell(r, 2).font = defaultFont();
+  ws.mergeCells(r, 2, r, 8);
+  r += 2;
+
+  // ── Condition ──
+  ws.getCell(r, 1).value = 'กรณีค่างานอยู่ระหว่างช่วงของค่างานต้นทุนที่กำหนดในตาราง Factor F ให้ใช้สูตรเพื่อหาค่า Factor F ดังนี้';
+  ws.getCell(r, 1).font = defaultFont({ bold: true });
+  ws.mergeCells(r, 1, r, 8);
+  r++;
+
+  ws.getCell(r, 1).value = 'ใช้ Factor F งานก่อสร้างทาง ( เงินล่วงหน้าจ่าย 0.00 %, เงินประกันผลงานหัก 0.00 %, ดอกเบี้ยเงินกู้ 7.00 % ต่อปี, ค่า VAT 7.00 % )';
+  ws.getCell(r, 1).font = defaultFont({ bold: true });
+  ws.mergeCells(r, 1, r, 8);
+  r += 2;
+
+  // ── Formula ──
+  ws.getCell(r, 1).value = 'สูตร';
+  ws.getCell(r, 1).font = defaultFont({ bold: true });
+  ws.getCell(r, 2).value = 'ค่า Factor F ของค่างานต้นทุน A  =  D - { (D - E) × (A - B) / (C - B) }';
+  ws.getCell(r, 2).font = defaultFont({ bold: true, size: 16 });
+  ws.mergeCells(r, 2, r, 8);
+  r += 2;
+
+  // ── Variables ──
+  ws.getCell(r, 1).value = 'เมื่อ';
+  ws.getCell(r, 1).font = defaultFont({ bold: true, size: 16 });
+  r++;
+
+  const vars = [
+    ['ต้องการหาค่า Factor F ของค่างานต้นทุน', 'A', 'บาท', formatNum(A), 'บาท'],
+    ['ค่างานต้นทุนตัวต่ำกว่าค่างานต้นทุน A', 'B', 'บาท', formatNum(B), 'บาท'],
+    ['ค่างานต้นทุนตัวสูงกว่าค่างานต้นทุน A', 'C', 'บาท', formatNum(C), 'บาท'],
+    ['ค่า Factor F ของค่างานต้นทุน B', 'D', '', D.toFixed(4), ''],
+    ['ค่า Factor F ของค่างานต้นทุน C', 'E', '', E.toFixed(4), ''],
+  ];
+
+  vars.forEach(([desc, varName, unit1, val, unit2]) => {
+    ws.getCell(r, 2).value = desc;
+    ws.getCell(r, 2).font = defaultFont();
+    ws.getCell(r, 3).value = '=';
+    ws.getCell(r, 3).font = defaultFont();
+    ws.getCell(r, 3).alignment = { horizontal: 'center' };
+    ws.getCell(r, 4).value = varName;
+    ws.getCell(r, 4).font = defaultFont({ bold: true });
+    ws.getCell(r, 4).alignment = { horizontal: 'center' };
+    ws.getCell(r, 5).value = unit1;
+    ws.getCell(r, 5).font = defaultFont();
+    ws.getCell(r, 6).value = '=';
+    ws.getCell(r, 6).font = defaultFont();
+    ws.getCell(r, 6).alignment = { horizontal: 'center' };
+    ws.getCell(r, 7).value = val;
+    ws.getCell(r, 7).font = defaultFont();
+    ws.getCell(r, 7).alignment = { horizontal: 'right' };
+    ws.getCell(r, 8).value = unit2;
+    ws.getCell(r, 8).font = defaultFont();
+    r++;
+  });
+
+  r += 2;
+
+  // ── Calculation Result ──
+  if (isExactMatch) {
+    ws.getCell(r, 1).value = 'ค่า Factor F ของค่างานต้นทุน A';
+    ws.getCell(r, 1).font = defaultFont({ bold: true });
+    ws.mergeCells(r, 1, r, 5);
+    ws.getCell(r, 6).value = '=';
+    ws.getCell(r, 6).font = defaultFont();
+    ws.getCell(r, 6).alignment = { horizontal: 'center' };
+    ws.getCell(r, 7).value = factorTruncated.toFixed(4);
+    ws.getCell(r, 7).font = defaultFont({ bold: true, size: 16 });
+    ws.getCell(r, 7).alignment = { horizontal: 'right' };
+    ws.getCell(r, 7).fill = totalFill;
+    r++;
+    ws.getCell(r, 7).value = '(ค่างานต้นทุนตรงกับตาราง Factor F)';
+    ws.getCell(r, 7).font = defaultFont({ italic: true, size: 12 });
+    ws.mergeCells(r, 7, r, 8);
+  } else {
+    ws.getCell(r, 1).value = 'ค่า Factor F ของค่างานต้นทุน A';
+    ws.getCell(r, 1).font = defaultFont({ bold: true });
+    ws.mergeCells(r, 1, r, 5);
+    ws.getCell(r, 6).value = '=';
+    ws.getCell(r, 6).font = defaultFont();
+    ws.getCell(r, 6).alignment = { horizontal: 'center' };
+    ws.getCell(r, 7).value = `${D.toFixed(4)} - [ (${D.toFixed(4)} - ${E.toFixed(4)}) × (${formatNum(A)} - ${formatNum(B)}) / (${formatNum(C)} - ${formatNum(B)}) ]`;
+    ws.getCell(r, 7).font = defaultFont();
+    ws.mergeCells(r, 7, r, 8);
+    r++;
+
+    ws.getCell(r, 6).value = '=';
+    ws.getCell(r, 6).font = defaultFont();
+    ws.getCell(r, 6).alignment = { horizontal: 'center' };
+    ws.getCell(r, 7).value = factorRaw;
+    ws.getCell(r, 7).font = defaultFont();
+    ws.getCell(r, 7).alignment = { horizontal: 'right' };
+    r++;
+
+    ws.getCell(r, 6).value = '=';
+    ws.getCell(r, 6).font = defaultFont();
+    ws.getCell(r, 6).alignment = { horizontal: 'center' };
+    ws.getCell(r, 7).value = factorTruncated.toFixed(4);
+    ws.getCell(r, 7).font = defaultFont({ bold: true, size: 16 });
+    ws.getCell(r, 7).alignment = { horizontal: 'right' };
+    ws.getCell(r, 7).fill = totalFill;
+    ws.getCell(r, 8).value = 'ปัดใช้ทศนิยม 4 ตำแหน่ง (ปัดทิ้ง)';
+    ws.getCell(r, 8).font = defaultFont({ italic: true, size: 12 });
+  }
+
+  r += 3;
+
+  // ── Signature ──
+  ws.getCell(r, 5).value = `ผู้ประมาณราคา ${boq.estimator_name}`;
+  ws.getCell(r, 5).font = defaultFont();
+  ws.mergeCells(r, 5, r, 8);
+  ws.getCell(r, 5).alignment = { horizontal: 'center' };
+  r++;
+
+  if (boq.document_date) {
+    ws.getCell(r, 5).value = formatThaiDate(boq.document_date);
+    ws.getCell(r, 5).font = defaultFont();
+    ws.mergeCells(r, 5, r, 8);
+    ws.getCell(r, 5).alignment = { horizontal: 'center' };
+  }
 }
 
 // ──────────────────────────────────
@@ -473,6 +699,8 @@ export async function exportBoqToExcel(
   constructionCostBeforeVAT: number,
   vatAmount: number,
   totalWithVAT: number,
+  lowerFactorRef?: ExportFactorRef | null,
+  upperFactorRef?: ExportFactorRef | null,
 ) {
   // Dynamic import to avoid bundle bloat
   const ExcelJS = (await import('exceljs')).default;
@@ -489,7 +717,6 @@ export async function exportBoqToExcel(
     return sum + items.reduce((s, item) => s + item.total_cost, 0);
   }, 0);
 
-  // Allow tiny floating point tolerance (0.01 baht)
   if (Math.abs(stateTotal - itemsTotal) > 0.01) {
     throw new Error(
       `Data Integrity Error: Route totals (${stateTotal}) do not match item totals (${itemsTotal}). ` +
@@ -508,6 +735,11 @@ export async function exportBoqToExcel(
 
   // ── Create summary sheet ──
   createSummarySheet(wb, boq, routes, allocated, factor, constructionCostBeforeVAT, vatAmount, totalWithVAT);
+
+  // ── Create Factor F supplement sheet (if factor_f exists) ──
+  if (boq.factor_f != null) {
+    createFactorFSheet(wb, boq, factor, lowerFactorRef || null, upperFactorRef || null);
+  }
 
   // ── Generate and download ──
   const buffer = await wb.xlsx.writeBuffer();

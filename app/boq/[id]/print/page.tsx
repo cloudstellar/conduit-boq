@@ -568,6 +568,8 @@ export default function PrintBOQPage() {
         constructionCostBeforeVAT,
         vatAmount,
         totalWithVAT,
+        lowerFactorRef,
+        upperFactorRef,
       );
     } catch (err) {
       console.error('Excel export error:', err);
