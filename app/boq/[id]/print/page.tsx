@@ -553,6 +553,28 @@ export default function PrintBOQPage() {
     );
   }
 
+  // ── handleExportExcel must be after the null check for boq ──
+  const handleExportExcel = async () => {
+    try {
+      const { exportBoqToExcel } = await import('@/lib/exportBoqExcel');
+      const routeCosts = routes.map(r => r.total_cost);
+      const alloc = allocateToRoutes(routeCosts, factor);
+      await exportBoqToExcel(
+        boq,
+        routes,
+        routeItems,
+        factor,
+        alloc,
+        constructionCostBeforeVAT,
+        vatAmount,
+        totalWithVAT,
+      );
+    } catch (err) {
+      console.error('Excel export error:', err);
+      alert(`ส่งออก Excel ไม่สำเร็จ: ${err instanceof Error ? err.message : 'Unknown error'}`);
+    }
+  };
+
   // ──────────────────────────────────
   // Calculate Factor & Totals
   // ──────────────────────────────────
@@ -679,6 +701,9 @@ export default function PrintBOQPage() {
             📄 Preview: {boq.project_name} ({boqTotalPages + summaryTotalPages} หน้า)
           </div>
           <div className="flex gap-2">
+            <Button size="sm" variant="outline" onClick={handleExportExcel}>
+              <FileSpreadsheet className="w-4 h-4 mr-1" /> Excel
+            </Button>
             <Button size="sm" onClick={handlePrint}>
               <Printer className="w-4 h-4 mr-1" /> พิมพ์
             </Button>
