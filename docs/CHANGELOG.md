@@ -3,11 +3,51 @@
 
 ---
 
-## [v1.6.1] - 2026-03-18 (Rounding Precision Fix)
+## [v1.6.2] - 2026-03-18 (Comprehensive Float Precision Safety)
+
+### 🔢 ปัญหา: JavaScript Floating-Point Precision
+
+JavaScript ใช้ IEEE 754 double-precision ในการเก็บตัวเลข ทำให้การคูณทศนิยมบางชุดได้ผลลัพธ์เพี้ยน:
+
+```
+2,738,389 × 1.275 → JS ได้ 3,491,445.9749999996 (ควรเป็น .975)
+```
+
+ต่างจาก Excel ที่ซ่อนความเพี้ยนโดยปัดเหลือ 15 significant digits ก่อนแสดงผล
+
+### 🛡️ การแก้ไข: Integer Math ทุกจุดคูณ
+
+สร้าง `safeMul()` เป็นฟังก์ชันแกนกลาง แปลงตัวเลขเป็น **จำนวนเต็ม** ก่อนคูณ:
+
+| จุดคำนวณ | ฟังก์ชัน | Precision |
+|---|---|---|
+| ค่างาน × Factor F | `multiplyFactor()` | 2dp × 4dp |
+| ปริมาณ × ราคา/หน่วย | `safeItemCalc()` | 2dp × 2dp |
+| ค่าก่อน VAT × 0.07 | `safeMul()` (ใน `calculateVAT`) | 2dp × 4dp |
+| ปัดเศษ 2 ทศนิยม | `roundMoney()` | exponential notation |
+
+### ⚠️ เจตนารมณ์ (สำหรับ AI session ถัดไป)
+
+> **ห้ามใช้ `*` ดิบในการคูณตัวเลขที่เกี่ยวกับเงิน/ราคาโดยเด็ดขาด**
+>
+> ทุกการคูณทศนิยมต้องผ่าน `safeMul()`, `multiplyFactor()`, หรือ `safeItemCalc()` เท่านั้น
+> การบวก/ลบ (addition/subtraction) ไม่มีปัญหา ไม่ต้องใช้ safe function
+
+### 📁 Files Changed
+- `lib/calculation.ts` — เพิ่ม `safeMul()`, `safeItemCalc()`, ปรับ `calculateVAT()` ให้ใช้ `safeMul()`
+- `components/boq/FactorFSummary.tsx` — ใช้ `multiplyFactor()` แทน `*`
+- `components/boq/MultiRouteEditor.tsx` — ใช้ `safeItemCalc()` แทน `quantity * unit_cost`
+- `app/boq/[id]/print/page.tsx` — ใช้ `multiplyFactor()` แทน `*`
+
+---
+
+## [v1.6.1] - 2026-03-18 (Rounding Precision Fix - Partial)
+
+> **Note**: v1.6.1 แก้ได้แค่บางกรณี (exponential notation ในขั้นปัด) ยังไม่ครอบคลุมขั้นคูณ ดู v1.6.2 สำหรับการแก้ไขสมบูรณ์
 
 ### 🐛 Bug Fix
-- **Float Precision in `roundMoney`**: Fixed JavaScript floating-point precision issue where values ending in `.x75` (e.g. `4,673,243.475`) were incorrectly rounded down to `.x7` instead of up to `.x8`. Switched from `Math.round(value * 100) / 100` to exponential notation (`Number(Math.round(Number(value + 'e2')) + 'e-2')`) to eliminate float representation errors.
-- **FactorFSummary Display Consistency**: Changed the "รวมหลัง × Factor F" card from raw `grandTotalCost * factor` to the already-rounded `totalWithFactor` variable, ensuring the displayed value always matches the calculation pipeline.
+- **Float Precision in `roundMoney`**: Switched from `Math.round(value * 100) / 100` to exponential notation
+- **FactorFSummary Display Consistency**: ใช้ `totalWithFactor` ที่ปัดแล้ว แทน raw `grandTotalCost * factor`
 
 ### 📁 Files
 - `lib/calculation.ts` — `roundMoney()` implementation fix

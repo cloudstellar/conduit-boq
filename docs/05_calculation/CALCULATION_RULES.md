@@ -1,7 +1,7 @@
 # Calculation Rules
 ## Conduit BOQ System
 
-**Last Updated:** 2026-01-22  
+**Last Updated:** 2026-03-18  
 **Status:** Canonical
 
 ---
@@ -126,19 +126,46 @@ Total with VAT = Total with Factor F × 1.07
 
 > [!IMPORTANT]
 > **กุญแจสำคัญ**: ต้องปัดทุกขั้นตอนก่อน แล้วนำค่าที่ปัดแล้วมาบวกกัน — ไม่ใช่บวก raw แล้วค่อยปัด
+
+### Float Precision Safety (v1.6.2)
+
+> [!CAUTION]
+> **ห้ามใช้ `*` (JavaScript multiplication operator) ดิบกับตัวเลขเงิน/ราคาโดยเด็ดขาด**
 >
-> Implementation ใช้ exponential notation (`Number(Math.round(Number(value + 'e2')) + 'e-2')`) เพื่อป้องกันปัญหา JS floating-point precision
+> JavaScript ใช้ IEEE 754 double-precision ซึ่งทำให้ผลคูณทศนิยมเพี้ยนได้:
+> ```
+> 2,738,389 × 1.275 → JS ได้ 3,491,445.9749999996 (ควรเป็น .975)
+> ```
+>
+> Excel ซ่อนปัญหานี้โดยปัดเหลือ 15 significant digits ก่อนแสดงผล
+> แต่ในโค้ดของเรา ค่าที่เพี้ยนจะถูกส่งต่อไปให้ roundMoney() ทำให้ปัดผิดทิศทาง
+
+**ทุกการคูณทศนิยมต้องผ่านฟังก์ชัน safe multiplication ใน `lib/calculation.ts`:**
+
+| ฟังก์ชัน | ใช้สำหรับ | Decimal Precision |
+|---|---|---|
+| `safeMul(a, b, aDP, bDP)` | ฟังก์ชันแกนกลาง (internal) | กำหนดเอง |
+| `multiplyFactor(cost, factor)` | ค่างาน × Factor F | 2dp × 4dp |
+| `safeItemCalc(qty, unitCost)` | ปริมาณ × ราคาต่อหน่วย | 2dp × 2dp |
+| `roundMoney(value)` | ปัดเศษ 2 ทศนิยม | exponential notation |
+
+**หลักการทำงาน**: แปลงตัวเลขเป็นจำนวนเต็มก่อนคูณ แล้วหารกลับ → ไม่มี float error
+
+**การบวก/ลบ** ไม่มีปัญหา float precision ไม่ต้องใช้ safe function
 
 ---
 
 ## 4. Implementation Location
 
-| Calculation | File | Function/Component |
-|-------------|------|-------------------|
-| Item totals | `app/boq/[id]/page.tsx` | Form submission handler |
-| Route totals | `app/boq/[id]/page.tsx` | Form submission handler |
+| Calculation | File | Function |
+|-------------|------|----------|
+| Safe multiplication (core) | `lib/calculation.ts` | `safeMul()` |
+| Item totals (qty × price) | `components/boq/MultiRouteEditor.tsx` | `safeItemCalc()` |
+| Factor F multiplication | `lib/calculation.ts` | `multiplyFactor()` |
+| VAT calculation | `lib/calculation.ts` | `calculateVAT()` → `safeMul()` |
+| Rounding | `lib/calculation.ts` | `roundMoney()` |
+| Route allocation | `lib/calculation.ts` | `allocateToRoutes()` |
 | Factor F lookup | `components/boq/FactorFSummary.tsx` | `calculateInterpolatedFactor()` |
-| VAT | `components/boq/FactorFSummary.tsx` | Inline (`× 1.07`) |
 
 ---
 
