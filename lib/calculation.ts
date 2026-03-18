@@ -15,15 +15,32 @@ export function roundMoney(value: number): number {
 }
 
 /**
- * คูณค่างานกับ Factor F อย่างปลอดภัยจากปัญหา Float Precision ของ JavaScript
+ * คูณเลขทศนิยม 2 ตัวอย่างปลอดภัยจากปัญหา Float Precision ของ JavaScript
+ * รองรับตัวคูณที่มีทศนิยมสูงสุด 4 ตำแหน่ง (เช่น Factor F, VAT rate)
+ * ตัวตั้งรองรับทศนิยมสูงสุด 2 ตำแหน่ง (เช่น ค่างาน, ราคา/หน่วย)
+ */
+function safeMul(a: number, b: number, aDecimals: number, bDecimals: number): number {
+    const scaleA = Math.pow(10, aDecimals);
+    const scaleB = Math.pow(10, bDecimals);
+    const intA = Math.round(a * scaleA);
+    const intB = Math.round(b * scaleB);
+    return (intA * intB) / (scaleA * scaleB);
+}
+
+/**
+ * คูณค่างาน (2 ทศนิยม) กับ Factor F (4 ทศนิยม) อย่างปลอดภัย
  * (เช่น 2738389 * 1.275 = 3491445.9749999996 แทนที่จะเป็น .975)
- * โดยการแปลงค่าเป็นจำนวนเต็มก่อนคูณ (ค่างาน ×100, Factor ×10000)
  */
 export function multiplyFactor(cost: number, factor: number): number {
-    // cost มีทศนิยมสูงสุด 2 ตำแหน่ง, factor มี 4 ตำแหน่ง
-    const intCost = Math.round(cost * 100);
-    const intFactor = Math.round(factor * 10000);
-    return (intCost * intFactor) / 1000000;
+    return safeMul(cost, factor, 2, 4);
+}
+
+/**
+ * คูณปริมาณ × ราคาต่อหน่วย อย่างปลอดภัย
+ * ปริมาณ: ทศนิยมสูงสุด 2 ตำแหน่ง, ราคาต่อหน่วย: ทศนิยมสูงสุด 2 ตำแหน่ง
+ */
+export function safeItemCalc(quantity: number, unitCost: number): number {
+    return safeMul(quantity, unitCost, 2, 2);
 }
 
 /**
@@ -39,7 +56,7 @@ export function calculateVAT(
     total: number;
 } {
     const beforeVAT = roundMoney(amountBeforeVAT);
-    const vat = roundMoney(beforeVAT * rate);
+    const vat = roundMoney(safeMul(beforeVAT, rate, 2, 4));
     const total = roundMoney(beforeVAT + vat);
     return { beforeVAT, vat, total };
 }

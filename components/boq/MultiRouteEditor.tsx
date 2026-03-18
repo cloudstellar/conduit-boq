@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import { PriceListItem } from '@/lib/supabase';
+import { safeItemCalc } from '@/lib/calculation';
 import { Route } from './RouteManager';
 import RouteSidebar from './RouteSidebar';
 import LineItemsTable, { LineItem } from './LineItemsTable';
@@ -349,9 +350,9 @@ export default function MultiRouteEditor({ boqId, onSave, isSaving, onFactorCalc
         return {
           ...item,
           quantity,
-          total_material_cost: quantity * item.material_cost_per_unit,
-          total_labor_cost: quantity * item.labor_cost_per_unit,
-          total_cost: quantity * item.unit_cost,
+          total_material_cost: safeItemCalc(quantity, item.material_cost_per_unit),
+          total_labor_cost: safeItemCalc(quantity, item.labor_cost_per_unit),
+          total_cost: safeItemCalc(quantity, item.unit_cost),
         };
       }),
     }));
