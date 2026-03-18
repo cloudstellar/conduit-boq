@@ -10,7 +10,8 @@
 
 /** ปัดเศษ 2 ทศนิยม ตามหลักกรมสรรพากร (standard rounding) */
 export function roundMoney(value: number): number {
-    return Math.round(value * 100) / 100;
+    // ใช้ exponential (e2) เพื่อป้องกันปัญหา JS Float Precision (เช่น .475 กลายเป็น .474999...)
+    return Number(Math.round(Number(value + 'e2')) + 'e-2');
 }
 
 /**

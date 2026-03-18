@@ -216,7 +216,7 @@ export default function FactorFSummary({ routes, grandTotalCost, onFactorCalcula
           <Card className="bg-blue-100">
             <CardContent className="p-4">
               <div className="text-sm text-blue-600">รวมหลัง × Factor F</div>
-              <div className="text-xl font-bold text-blue-700">{formatNumber(grandTotalCost * factor)}</div>
+              <div className="text-xl font-bold text-blue-700">{formatNumber(totalWithFactor)}</div>
               <div className="text-xs text-blue-500">บาท (ก่อน VAT)</div>
             </CardContent>
           </Card>

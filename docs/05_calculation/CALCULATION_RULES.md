@@ -115,6 +115,20 @@ Total with VAT = Total with Factor F × 1.07
 
 > **VAT is always 7%** — this is fixed and not configurable.
 
+### Rounding Rules
+
+| ขั้นตอน | หลักเกณฑ์ |
+|---------|-----------|
+| **Factor F** | Truncate (ตัดทิ้ง) เหลือ 4 ทศนิยม |
+| **ค่าก่อน VAT** | ปัดเป็น 2 ทศนิยม (standard rounding) |
+| **VAT 7%** | ปัดตามหลักกรมสรรพากร: ทศนิยมตำแหน่งที่ 3 < 5 ปัดทิ้ง, ≥ 5 ปัดขึ้น |
+| **รวม VAT** | **ก่อน VAT (ปัดแล้ว) + VAT (ปัดแล้ว)** — ไม่คำนวณใหม่ |
+
+> [!IMPORTANT]
+> **กุญแจสำคัญ**: ต้องปัดทุกขั้นตอนก่อน แล้วนำค่าที่ปัดแล้วมาบวกกัน — ไม่ใช่บวก raw แล้วค่อยปัด
+>
+> Implementation ใช้ exponential notation (`Number(Math.round(Number(value + 'e2')) + 'e-2')`) เพื่อป้องกันปัญหา JS floating-point precision
+
 ---
 
 ## 4. Implementation Location

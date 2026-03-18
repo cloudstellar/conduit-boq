@@ -3,6 +3,18 @@
 
 ---
 
+## [v1.6.1] - 2026-03-18 (Rounding Precision Fix)
+
+### 🐛 Bug Fix
+- **Float Precision in `roundMoney`**: Fixed JavaScript floating-point precision issue where values ending in `.x75` (e.g. `4,673,243.475`) were incorrectly rounded down to `.x7` instead of up to `.x8`. Switched from `Math.round(value * 100) / 100` to exponential notation (`Number(Math.round(Number(value + 'e2')) + 'e-2')`) to eliminate float representation errors.
+- **FactorFSummary Display Consistency**: Changed the "รวมหลัง × Factor F" card from raw `grandTotalCost * factor` to the already-rounded `totalWithFactor` variable, ensuring the displayed value always matches the calculation pipeline.
+
+### 📁 Files
+- `lib/calculation.ts` — `roundMoney()` implementation fix
+- `components/boq/FactorFSummary.tsx` — display consistency fix
+
+---
+
 ## [v1.6.0] - 2026-03-17 (Excel Export)
 
 ### 📊 Excel Export (ปร.4)
