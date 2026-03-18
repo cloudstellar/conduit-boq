@@ -15,6 +15,18 @@ export function roundMoney(value: number): number {
 }
 
 /**
+ * คูณค่างานกับ Factor F อย่างปลอดภัยจากปัญหา Float Precision ของ JavaScript
+ * (เช่น 2738389 * 1.275 = 3491445.9749999996 แทนที่จะเป็น .975)
+ * โดยการแปลงค่าเป็นจำนวนเต็มก่อนคูณ (ค่างาน ×100, Factor ×10000)
+ */
+export function multiplyFactor(cost: number, factor: number): number {
+    // cost มีทศนิยมสูงสุด 2 ตำแหน่ง, factor มี 4 ตำแหน่ง
+    const intCost = Math.round(cost * 100);
+    const intFactor = Math.round(factor * 10000);
+    return (intCost * intFactor) / 1000000;
+}
+
+/**
  * คำนวณ VAT จากยอดก่อน VAT
  * ปัดทุกขั้นตอนก่อนนำมาบวกกัน เพื่อให้ beforeVAT + vat = total เสมอ
  */
@@ -46,17 +58,18 @@ export function allocateToRoutes(
 ): { beforeVAT: number; vat: number; total: number }[] {
     if (routeCosts.length === 0) return [];
     if (routeCosts.length === 1) {
-        const raw = routeCosts[0] * factor;
+        const raw = multiplyFactor(routeCosts[0], factor);
         return [calculateVAT(raw, vatRate)];
     }
 
     // 1. คำนวณ grand total ที่เป็น "ค่ายุติ"
-    const grandRaw = routeCosts.reduce((s, c) => s + c, 0) * factor;
+    const sumCosts = routeCosts.reduce((s, c) => s + c, 0);
+    const grandRaw = multiplyFactor(sumCosts, factor);
     const grand = calculateVAT(grandRaw, vatRate);
 
     // 2. ปัดแต่ละ route ปกติ
     const results = routeCosts.map((cost) => {
-        const raw = cost * factor;
+        const raw = multiplyFactor(cost, factor);
         return calculateVAT(raw, vatRate);
     });
 

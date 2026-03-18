@@ -3,7 +3,7 @@
 import { useState, useEffect, useMemo } from 'react';
 import { useParams } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
-import { roundMoney, calculateVAT, allocateToRoutes } from '@/lib/calculation';
+import { roundMoney, calculateVAT, allocateToRoutes, multiplyFactor } from '@/lib/calculation';
 import { formatConstructionAreas } from '@/lib/constructionAreaUtils';
 import {
   splitText,
@@ -600,7 +600,7 @@ export default function PrintBOQPage() {
 
   const factor = calculateInterpolatedFactor();
   const { beforeVAT: constructionCostBeforeVAT, vat: vatAmount, total: totalWithVAT } =
-    calculateVAT(totalCost * factor);
+    calculateVAT(multiplyFactor(totalCost, factor));
 
   // ──────────────────────────────────
   // Pagination: Pre-calculate chunks for all sections

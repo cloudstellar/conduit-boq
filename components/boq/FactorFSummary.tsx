@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useMemo } from 'react';
 import { createClient } from '@/lib/supabase/client';
-import { roundMoney, calculateVAT } from '@/lib/calculation';
+import { roundMoney, calculateVAT, multiplyFactor } from '@/lib/calculation';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Separator } from '@/components/ui/separator';
@@ -122,7 +122,7 @@ export default function FactorFSummary({ routes, grandTotalCost, onFactorCalcula
   const { factor, raw: factorRaw } = calculateInterpolatedFactor();
   const costInMillion = grandTotalCost / 1000000;
   const { beforeVAT: totalWithFactor, vat: totalVATAmount, total: totalWithVAT } =
-    calculateVAT(grandTotalCost * factor);
+    calculateVAT(multiplyFactor(grandTotalCost, factor));
 
   // Call callback when factor values change (for snapshot saving)
   // Must be before early returns to comply with React hooks rules
@@ -172,7 +172,7 @@ export default function FactorFSummary({ routes, grandTotalCost, onFactorCalcula
         <div className="space-y-3">
           <div className="text-sm font-medium text-muted-foreground">ราคาแยกรายเส้นทาง (คูณ Factor F):</div>
           {routes.map((route, index) => {
-            const routeWithFactorF = roundMoney(route.total_cost * factor);
+            const routeWithFactorF = roundMoney(multiplyFactor(route.total_cost, factor));
             const { total: routeWithVAT } = calculateVAT(routeWithFactorF);
             return (
               <Card key={route.id}>
