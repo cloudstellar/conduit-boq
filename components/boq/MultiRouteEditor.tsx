@@ -50,6 +50,17 @@ export interface RouteWithItems extends Route {
   items: LineItem[];
 }
 
+// Sort items by category (natural sort), then item_order within category
+function sortItemsByCategory<T extends { item_order: number; category?: string | null }>(items: T[]): T[] {
+  return [...items].sort((a, b) => {
+    const catA = a.category || '';
+    const catB = b.category || '';
+    const cmp = catA.localeCompare(catB, undefined, { numeric: true });
+    if (cmp !== 0) return cmp;
+    return a.item_order - b.item_order;
+  });
+}
+
 // Check if item is special (งานวางท่อ / งานดันท่อ)
 const isSpecialItem = (itemName: string): boolean => {
   return itemName.startsWith('งานวางท่อ') || itemName.startsWith('งานดันท่อ');
@@ -117,20 +128,34 @@ export default function MultiRouteEditor({ boqId, onSave, isSaving, onFactorCalc
           for (const route of routesData) {
             const { data: items } = await supabase
               .from('boq_items')
-              .select('*')
+              .select('*, price_list(category)')
               .eq('route_id', route.id)
               .order('item_order');
-            itemsMap[route.id] = items || [];
+            // Flatten nested price_list.category into item.category
+            itemsMap[route.id] = (items || []).map((item: Record<string, unknown>) => {
+              const { price_list: pl, ...rest } = item;
+              return {
+                ...rest,
+                category: (pl as { category?: string } | null)?.category || null,
+              } as LineItem;
+            });
           }
           setRouteItems(itemsMap);
         } else {
           // Check for legacy items without route
-          const { data: legacyItems } = await supabase
+          const { data: legacyRaw } = await supabase
             .from('boq_items')
-            .select('*')
+            .select('*, price_list(category)')
             .eq('boq_id', boqId)
             .is('route_id', null)
             .order('item_order');
+          const legacyItems = (legacyRaw || []).map((item: Record<string, unknown>) => {
+            const { price_list: pl, ...rest } = item;
+            return {
+              ...rest,
+              category: (pl as { category?: string } | null)?.category || null,
+            } as LineItem;
+          });
 
           if (legacyItems && legacyItems.length > 0) {
             // Create default route for legacy items
@@ -290,6 +315,7 @@ export default function MultiRouteEditor({ boqId, onSave, isSaving, onFactorCalc
       total_labor_cost: 0,
       total_cost: 0,
       remarks: priceItem.remarks,
+      category: priceItem.category,
     };
     setRouteItems(prev => ({
       ...prev,
@@ -330,6 +356,7 @@ export default function MultiRouteEditor({ boqId, onSave, isSaving, onFactorCalc
       total_labor_cost: 0,
       total_cost: 0,
       remarks: pendingSpecialItem.remarks,
+      category: pendingSpecialItem.category,
     };
 
     setRouteItems(prev => ({
@@ -414,7 +441,9 @@ export default function MultiRouteEditor({ boqId, onSave, isSaving, onFactorCalc
     { material: 0, labor: 0, total: 0, itemCount: 0 }
   );
 
-  const activeRouteItems = activeRouteId ? routeItems[activeRouteId] || [] : [];
+  const activeRouteItems = activeRouteId
+    ? sortItemsByCategory(routeItems[activeRouteId] || [])
+    : [];
   const activeRoute = routes.find(r => r.id === activeRouteId);
 
   const handleSaveClick = async () => {

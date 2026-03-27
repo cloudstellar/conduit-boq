@@ -68,6 +68,7 @@ interface BOQItem {
   total_labor_cost: number;
   total_cost: number;
   remarks: string | null;
+  category?: string | null;
 }
 
 interface FactorReference {
@@ -81,6 +82,20 @@ interface FactorReference {
   factor_f: number;
   factor_f_rain_1: number;
   factor_f_rain_2: number;
+}
+
+// ──────────────────────────────────
+// Sort by Category (natural sort), then item_order
+// ──────────────────────────────────
+
+function sortItemsByCategory<T extends { item_order: number; category?: string | null }>(items: T[]): T[] {
+  return [...items].sort((a, b) => {
+    const catA = a.category || '';
+    const catB = b.category || '';
+    const cmp = catA.localeCompare(catB, undefined, { numeric: true });
+    if (cmp !== 0) return cmp;
+    return a.item_order - b.item_order;
+  });
 }
 
 // ──────────────────────────────────
@@ -460,18 +475,31 @@ export default function PrintBOQPage() {
           for (const route of routesData) {
             const { data: items } = await supabase
               .from('boq_items')
-              .select('*')
+              .select('*, price_list(category)')
               .eq('route_id', route.id)
               .order('item_order');
-            itemsMap[route.id] = items || [];
+            itemsMap[route.id] = (items || []).map((item: Record<string, unknown>) => {
+              const { price_list: pl, ...rest } = item;
+              return {
+                ...rest,
+                category: (pl as { category?: string } | null)?.category || null,
+              } as BOQItem;
+            });
           }
           setRouteItems(itemsMap);
         } else {
-          const { data: legacyItems } = await supabase
+          const { data: legacyRaw } = await supabase
             .from('boq_items')
-            .select('*')
+            .select('*, price_list(category)')
             .eq('boq_id', boqId)
             .order('item_order');
+          const legacyItems = (legacyRaw || []).map((item: Record<string, unknown>) => {
+            const { price_list: pl, ...rest } = item;
+            return {
+              ...rest,
+              category: (pl as { category?: string } | null)?.category || null,
+            } as BOQItem;
+          });
           if (legacyItems && legacyItems.length > 0) {
             const defaultRoute: BOQRoute = {
               id: 'legacy',
@@ -608,7 +636,7 @@ export default function PrintBOQPage() {
 
   // --- Route Detail Pages ---
   const routeChunksMap: { route: BOQRoute; chunks: BOQItem[][]; infoHeight: number }[] = routes.map((route) => {
-    const items = (routeItems[route.id] || []).sort((a, b) => a.item_order - b.item_order);
+    const items = sortItemsByCategory(routeItems[route.id] || []);
     const infoHeight = estimateInfoHeight(
       route.route_name,
       boq.project_name,
@@ -629,6 +657,7 @@ export default function PrintBOQPage() {
       item_order: number; item_name: string; quantity: number; unit: string;
       material_cost_per_unit: number; labor_cost_per_unit: number;
       total_material_cost: number; total_labor_cost: number; total_cost: number;
+      category?: string | null;
     }>();
     routes.forEach((route) => {
       (routeItems[route.id] || []).forEach((item) => {
@@ -648,12 +677,12 @@ export default function PrintBOQPage() {
             total_material_cost: item.total_material_cost,
             total_labor_cost: item.total_labor_cost,
             total_cost: item.total_cost,
+            category: item.category,
           });
         }
       });
     });
-    const consolidatedItems = Array.from(consolidatedMap.values())
-      .sort((a, b) => a.item_order - b.item_order)
+    const consolidatedItems = sortItemsByCategory(Array.from(consolidatedMap.values()))
       .map((item, idx) => ({ ...item, id: `consolidated-${idx}`, route_id: null, unit_cost: 0, remarks: null } as BOQItem));
 
     const consAllRouteNames = routes.map(r => r.route_name).join(', ');

@@ -32,6 +32,7 @@ export interface LineItem {
   total_labor_cost: number;
   total_cost: number;
   remarks: string | null;
+  category?: string | null;
 }
 
 interface LineItemsTableProps {

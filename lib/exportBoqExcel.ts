@@ -44,6 +44,7 @@ export interface ExportBOQItem {
   total_labor_cost: number;
   total_cost: number;
   remarks: string | null;
+  category?: string | null;
 }
 
 export interface ExportSummaryAllocated {
@@ -92,6 +93,17 @@ const highlightFill: Fill = {
 
 const numberFormat = '#,##0.00';
 const factorFormat = '0.0000';
+
+// Sort items by category (natural sort), then item_order within category
+function sortItemsByCategory<T extends { item_order: number; category?: string | null }>(items: T[]): T[] {
+  return [...items].sort((a, b) => {
+    const catA = a.category || '';
+    const catB = b.category || '';
+    const cmp = catA.localeCompare(catB, undefined, { numeric: true });
+    if (cmp !== 0) return cmp;
+    return a.item_order - b.item_order;
+  });
+}
 
 function defaultFont(overrides?: { bold?: boolean; size?: number; italic?: boolean }) {
   return { name: DEFAULT_FONT, size: overrides?.size ?? DEFAULT_SIZE, bold: overrides?.bold, italic: overrides?.italic };
@@ -276,7 +288,7 @@ function createRouteSheet(
   r = headerRow2 + 1;
 
   // ── Data Rows ──
-  const sortedItems = [...items].sort((a, b) => a.item_order - b.item_order);
+  const sortedItems = sortItemsByCategory(items);
 
   sortedItems.forEach((item, idx) => {
     ws.getCell(r, 1).value = idx + 1;
@@ -825,6 +837,7 @@ export async function exportBoqToExcel(
       item_order: number; item_name: string; quantity: number; unit: string;
       material_cost_per_unit: number; labor_cost_per_unit: number;
       total_material_cost: number; total_labor_cost: number; total_cost: number;
+      category?: string | null;
     }>();
     routes.forEach((route) => {
       (routeItems[route.id] || []).forEach((item) => {
@@ -844,13 +857,13 @@ export async function exportBoqToExcel(
             total_material_cost: item.total_material_cost,
             total_labor_cost: item.total_labor_cost,
             total_cost: item.total_cost,
+            category: item.category,
           });
         }
       });
     });
 
-    const consolidatedItems: ExportBOQItem[] = Array.from(consolidatedMap.values())
-      .sort((a, b) => a.item_order - b.item_order)
+    const consolidatedItems: ExportBOQItem[] = sortItemsByCategory(Array.from(consolidatedMap.values()))
       .map((item, idx) => ({
         ...item,
         id: `consolidated-${idx}`,
