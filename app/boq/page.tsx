@@ -304,7 +304,7 @@ export default function BOQListPage() {
                     <h3 className="font-medium text-gray-900 flex-1 line-clamp-2" title={boq.project_name}>{boq.project_name}</h3>
                     {getStatusBadge(boq.status)}
                   </div>
-                  <p className="text-sm text-muted-foreground mb-1">เส้นทาง: {boq.route || '-'}</p>
+                  <p className="text-sm text-muted-foreground mb-1">เส้นทาง: <RouteBadge boqId={boq.id} route={boq.route} /></p>
                   <p className="text-sm text-muted-foreground mb-1">ผู้ประมาณราคา: {boq.estimator_name}</p>
                   <p className="text-sm text-muted-foreground mb-2">วันที่: {formatDate(boq.document_date)}</p>
                   <p className="text-lg font-medium text-blue-600 mb-3">{formatNumber(boq.total_cost)} บาท</p>
@@ -372,7 +372,7 @@ export default function BOQListPage() {
 
                     {/* Routes: badge "N เส้นทาง" → click opens Dialog */}
                     <TableCell className="align-top">
-                      <RouteBadge route={boq.route} />
+                      <RouteBadge boqId={boq.id} route={boq.route} />
                     </TableCell>
 
                     {/* Estimator: full name */}

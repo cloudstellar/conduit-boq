@@ -278,6 +278,19 @@ export default function MultiRouteEditor({ boqId, onSave, isSaving, onFactorCalc
     setActiveRouteId(newRoute.id);
   }, [routes, routeItems]);
 
+  // Reorder routes after drag-and-drop (receives new ordered array of route IDs)
+  const handleReorderRoutes = useCallback((orderedIds: string[]) => {
+    setRoutes(prev => {
+      const routeMap = new Map(prev.map(r => [r.id, r]));
+      return orderedIds
+        .map((id, idx) => {
+          const route = routeMap.get(id);
+          return route ? { ...route, route_order: idx + 1 } : null;
+        })
+        .filter((r): r is Route => r !== null);
+    });
+  }, []);
+
   const handleAddItem = useCallback((priceItem: PriceListItem) => {
     if (!activeRouteId) return;
 
@@ -476,6 +489,7 @@ export default function MultiRouteEditor({ boqId, onSave, isSaving, onFactorCalc
             onAddRoute={handleAddRoute}
             onRemoveRoute={handleRemoveRoute}
             onDuplicateRoute={handleDuplicateRoute}
+            onReorderRoutes={handleReorderRoutes}
             isCollapsed={isSidebarCollapsed}
           />
         </div>

@@ -1,6 +1,7 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect, useMemo } from 'react';
+import { createClient } from '@/lib/supabase/client';
 import { Badge } from '@/components/ui/badge';
 import {
     Dialog,
@@ -10,37 +11,56 @@ import {
 } from '@/components/ui/dialog';
 
 interface RouteBadgeProps {
-    route: string | null | undefined;
+    boqId: string;
+    /** Legacy fallback: comma-separated route text from boq.route */
+    route?: string | null;
 }
 
 /**
  * Display route count as a clickable badge.
- * Click opens a Dialog showing full route names.
- * 
- * UX Rule:
- * - List: show count only
- * - Click: show full names
- * - Table: no long text
- * - Dialog: read full content
+ * Queries boq_routes table for accurate count and names.
+ * Falls back to legacy boq.route text if no routes found.
  */
-export function RouteBadge({ route }: RouteBadgeProps) {
+export function RouteBadge({ boqId, route }: RouteBadgeProps) {
     const [open, setOpen] = useState(false);
+    const supabase = useMemo(() => createClient(), []);
+    const [routeNames, setRouteNames] = useState<string[] | null>(null);
+    const [loaded, setLoaded] = useState(false);
 
-    if (!route) {
+    // Load route names from boq_routes on first dialog open or mount
+    useEffect(() => {
+        const fetchRoutes = async () => {
+            const { data } = await supabase
+                .from('boq_routes')
+                .select('route_name')
+                .eq('boq_id', boqId)
+                .order('route_order');
+            setRouteNames(data?.map(r => r.route_name) || []);
+            setLoaded(true);
+        };
+        fetchRoutes();
+    }, [boqId, supabase]);
+
+    // While loading, show legacy count or dash
+    if (!loaded) {
+        if (!route) return <span className="text-sm text-muted-foreground">-</span>;
+        return (
+            <Badge variant="secondary" className="opacity-50">
+                ...
+            </Badge>
+        );
+    }
+
+    // If no routes in boq_routes, fall back to legacy text
+    const names = routeNames && routeNames.length > 0
+        ? routeNames
+        : (route ? [route] : []);
+
+    if (names.length === 0) {
         return <span className="text-sm text-muted-foreground">-</span>;
     }
 
-    // Parse comma-separated routes
-    const routes = route
-        .split(',')
-        .map((r) => r.trim())
-        .filter((r) => r.length > 0);
-
-    if (routes.length === 0) {
-        return <span className="text-sm text-muted-foreground">-</span>;
-    }
-
-    const routeCount = routes.length;
+    const routeCount = names.length;
 
     return (
         <>
@@ -58,7 +78,7 @@ export function RouteBadge({ route }: RouteBadgeProps) {
                         <DialogTitle>รายการเส้นทาง ({routeCount} เส้นทาง)</DialogTitle>
                     </DialogHeader>
                     <div className="space-y-3 max-h-[60vh] overflow-y-auto">
-                        {routes.map((r, index) => (
+                        {names.map((r, index) => (
                             <div
                                 key={index}
                                 className="text-sm text-muted-foreground leading-relaxed"
