@@ -702,11 +702,9 @@ export default function PrintBOQPage() {
   });
 
   // --- Summary Pages ---
-  const summaryInfoHeight = estimateInfoHeight(
-    routes.map(r => r.route_name).join(', '),
-    boq.project_name,
-    formatConstructionAreas(routes.map(r => r.construction_area)),
-  );
+  // Summary info section is compact: 3 fixed lines (ส่วนงาน + สรุปรวม + จำนวนเส้นทาง)
+  // NOT the variable route-name layout — use fixed height instead of estimateInfoHeight
+  const summaryInfoHeight = 18; // 3 lines × 6mm = 18mm (actual compact layout)
   // Summary last page needs extra space for calc summary + thai text + footer
   const summaryMaxPerPage = calculateMaxRowsForPage(summaryInfoHeight, false, false);
   // Last page: substantially less rows because of calc summary block (~50mm)
