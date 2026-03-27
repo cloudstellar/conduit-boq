@@ -3,6 +3,47 @@
 
 ---
 
+## [v1.6.3] - 2026-03-27 (Category-Based Item Sorting)
+
+### 🔧 ปัญหา: รายการที่เพิ่มทีหลังตกท้ายเอกสาร
+
+20 รายการ PN8 กลบทราย ถูกเพิ่มเข้า `price_list` เป็น **ITEM-0663~0682** (category `2.3.`) แต่ `item_order` ที่ derive จาก `item_code` ทำให้ sort ตกท้ายเอกสาร (order 669 > 662 ซึ่งเป็นรายการสุดท้ายของชุดเดิม)
+
+### 🛡️ การแก้ไข: Sort by Category → item_order
+
+เปลี่ยนจาก sort by `item_order` อย่างเดียว เป็น **sort by `category` (natural sort) → `item_order`** ภายใน category เดียวกัน:
+
+```typescript
+function sortItemsByCategory(items) {
+  return items.sort((a, b) => {
+    const cmp = a.category.localeCompare(b.category, undefined, { numeric: true });
+    if (cmp !== 0) return cmp;           // "2.3." < "10.2." (natural sort)
+    return a.item_order - b.item_order;   // ภายใน category เดียวกัน
+  });
+}
+```
+
+**วิธีดึง category:** Join `price_list(category)` ผ่าน FK `boq_items.price_list_id` — ไม่ต้อง migration
+
+### 📦 ไฟล์ที่เปลี่ยน (4 ไฟล์)
+
+| ไฟล์ | เปลี่ยนแปลง |
+|------|-----------|
+| `LineItemsTable.tsx` | เพิ่ม `category?` ใน `LineItem` interface |
+| `MultiRouteEditor.tsx` | Join price_list, แนบ category, sort ก่อนแสดงผล |
+| `print/page.tsx` | Join price_list, sort route + consolidated pages |
+| `exportBoqExcel.ts` | เพิ่ม category ใน ExportBOQItem, sort route + consolidated |
+
+### ⚠️ หลักการสำคัญ (สำหรับ AI session ถัดไป)
+
+1. **item_order ไม่ใช่ลำดับจริง** — เป็นแค่ตัวเลขจาก item_code (ITEM-0669 → 669) ใช้เรียงภายใน category เดียวกันเท่านั้น
+2. **category เป็น sort key หลัก** — ดึงจาก `price_list` ผ่าน FK `price_list_id` ไม่ได้เก็บใน `boq_items`
+3. **ใช้ `localeCompare` กับ `{ numeric: true }`** — เพื่อให้ `"2.3."` มาก่อน `"10.2."`
+4. **ไม่มี migration** — ทำง่ายเมื่อทำระบบ category/item_code ใหม่ในอนาคต เปลี่ยน sort logic ได้เลย
+5. **BOQ เก่าก็ได้ประโยชน์** — พิมพ์ใหม่เมื่อไร ก็เรียงถูกเลย (แต่เลขลำดับอาจเปลี่ยน)
+
+---
+
 ## [v1.6.2] - 2026-03-18 (Comprehensive Float Precision Safety)
 
 ### 🔢 ปัญหา: JavaScript Floating-Point Precision
