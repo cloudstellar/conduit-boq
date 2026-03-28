@@ -25,6 +25,7 @@ import {
     closestCenter,
     KeyboardSensor,
     PointerSensor,
+    TouchSensor,
     useSensor,
     useSensors,
     type DragEndEvent,
@@ -98,6 +99,7 @@ function SortableRouteItem({
                             {...attributes}
                             {...listeners}
                             onClick={onSelect}
+                            style={{ touchAction: 'none' }}
                             className={cn(
                                 'w-full rounded-lg flex items-center justify-center aspect-square',
                                 'transition-all cursor-grab active:cursor-grabbing',
@@ -127,10 +129,11 @@ function SortableRouteItem({
                                 ref={setActivatorNodeRef}
                                 {...attributes}
                                 {...listeners}
+                                style={{ touchAction: 'none' }}
                                 className={cn(
-                                    'shrink-0 cursor-grab active:cursor-grabbing p-1 rounded',
+                                    'shrink-0 cursor-grab active:cursor-grabbing p-1.5 rounded',
                                     'text-muted-foreground/40 hover:text-muted-foreground',
-                                    'opacity-0 group-hover:opacity-100 transition-opacity',
+                                    'opacity-60 md:opacity-0 md:group-hover:opacity-100 transition-opacity',
                                     isDragging && 'opacity-100',
                                 )}
                                 tabIndex={-1}
@@ -191,6 +194,12 @@ export default function RouteSidebar({
     const sensors = useSensors(
         useSensor(PointerSensor, {
             activationConstraint: { distance: 8 },
+        }),
+        useSensor(TouchSensor, {
+            activationConstraint: {
+                delay: 200,
+                tolerance: 5,
+            },
         }),
         useSensor(KeyboardSensor, {
             coordinateGetter: sortableKeyboardCoordinates,
