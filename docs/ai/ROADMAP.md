@@ -26,7 +26,7 @@ Foundation         │  shadcn/ui            │  Versioning           │  Enha
 - [x] Supabase Email Auth + Domain restriction (@ntplc.co.th)
 - [x] RLS + RBAC
 - [x] BOQ CRUD + Multi-route
-- [x] Price List (518 items)
+- [x] Price List (682 items)
 - [x] Factor F + VAT
 - [x] Admin Panel + Pending user approval
 - [x] Onboarding flow

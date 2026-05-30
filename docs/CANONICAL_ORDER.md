@@ -57,29 +57,29 @@
 - [ ] `KNOWLEDGE_BASE.md` ← docs/KNOWLEDGE_BASE.md
 
 ### 02_architecture/
-- [ ] `ARCHITECTURE.md` ← legacy/ai/SYSTEM_ARCHITECTURE.md
+- [x] `ARCHITECTURE.md` ← legacy/ai/SYSTEM_ARCHITECTURE.md
 - [ ] `SYSTEM_LAYERS.md` ← legacy/TECHNICAL.md
 - [ ] `ADR/ADR-001-supabase-rls-authorization.md` ← docs/ai/DECISIONS/
 
 ### 03_domain/
-- [ ] `DOMAIN_RULES.md` ← legacy/ai/PROJECT_CONTEXT.md
-- [ ] `DOMAIN_MODEL.md` ← legacy/ai/DOMAIN_MODEL.md
-- [ ] `ACCESS_MODEL.md` — NEW (from SECURITY.md roles)
+- [x] `DOMAIN_RULES.md` ← legacy/ai/PROJECT_CONTEXT.md
+- [x] `DOMAIN_MODEL.md` ← legacy/ai/DOMAIN_MODEL.md
+- [x] `ACCESS_MODEL.md` — NEW (from SECURITY.md roles)
 
 ### 04_data/
 - [ ] `DATA_INTEGRITY.md` — NEW (summary)
-- [ ] `DATABASE_SCHEMA.md` ← legacy/DATABASE_SCHEMA.md
-- [ ] `SECURITY_MODEL.md` ← docs/SECURITY.md
-- [ ] `MIGRATIONS.md` — NEW (from migrations/README.md)
+- [x] `DATABASE_SCHEMA.md` ← legacy/DATABASE_SCHEMA.md
+- [x] `SECURITY_MODEL.md` ← docs/SECURITY.md
+- [x] `MIGRATIONS.md` — NEW (from migrations/README.md)
 
 ### 05_calculation/
-- [ ] `CALCULATION_RULES.md` ← legacy/ai/BOQ_CALCULATION_LOGIC.md
-- [ ] `FACTOR_F.md` — NEW (extracted section)
-- [ ] `VAT_AND_TOTALS.md` — NEW (extracted section)
+- [x] `CALCULATION_RULES.md` ← legacy/ai/BOQ_CALCULATION_LOGIC.md
+- [x] `FACTOR_F.md` — NEW (extracted section)
+- [x] `VAT_AND_TOTALS.md` — NEW (extracted section)
 
 ### 06_engineering/
-- [ ] `TECH_STACK.md` ← canonical/TECH_STACK.md
-- [ ] `CODING_RULES.md` — NEW
+- [x] `TECH_STACK.md` ← canonical/TECH_STACK.md
+- [x] `CODING_RULES.md` — NEW
 - [ ] `PERMISSION_PATTERNS.md` — NEW (from lib/permissions.ts docs)
 
 ### 07_process/

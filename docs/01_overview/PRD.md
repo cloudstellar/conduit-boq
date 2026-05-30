@@ -20,7 +20,7 @@
 
 ### 1.3 Solution
 Web application ที่:
-- มี price list มาตรฐาน 518 รายการ
+- มี price list มาตรฐาน 682 รายการ
 - รองรับ multi-route BOQ (หลายเส้นทางใน 1 โครงการ)
 - คำนวณ Factor F และ VAT อัตโนมัติ
 - มีระบบ authentication และ authorization ตามโครงสร้างองค์กร
@@ -75,7 +75,7 @@ Organization (NT)
 
 ### 3.2 Price List
 
-- 518 รายการมาตรฐาน
+- 682 รายการมาตรฐาน
 - 52 หมวดหมู่
 - แต่ละรายการมี:
   - รหัสรายการ (Item Code)
@@ -88,7 +88,7 @@ Organization (NT)
 ### 3.3 Authentication & Authorization
 
 #### 3.3.1 Authentication
-- Google OAuth (NT domain: @ntplc.co.th)
+- Supabase Auth (Email/Password) (NT domain: @ntplc.co.th)
 - Option: Restrict to @ntplc.co.th only
 - Auto-create user profile on first login
 - Onboarding flow for new users

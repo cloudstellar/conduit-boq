@@ -1,7 +1,7 @@
 # Architecture
 ## Conduit BOQ System
 
-**Last Updated:** 2026-01-22  
+**Last Updated:** 2026-05-30  
 **Status:** Canonical
 
 ---
@@ -57,8 +57,8 @@
 │                        SUPABASE                                 │
 │  ┌─────────────┐  ┌─────────────┐  ┌─────────────────────────┐ │
 │  │    Auth     │  │  Database   │  │       Storage           │ │
-│  │  (Google    │  │ (PostgreSQL)│  │     (Future)            │ │
-│  │   OAuth)    │  │             │  │                         │ │
+│  │  (Email/    │  │ (PostgreSQL)│  │     (Future)            │ │
+│  │   Password) │  │             │  │                         │ │
 │  └─────────────┘  └──────┬──────┘  └─────────────────────────┘ │
 │                          │                                      │
 │                    ┌─────┴─────┐                                │
@@ -134,14 +134,13 @@
 ### 4.1 Authentication Flow
 
 ```
-1. User clicks "Login with Google"
-2. Redirect to Google OAuth
-3. Google returns to /auth/callback
-4. Supabase exchanges code for session
-5. Middleware refreshes session cookies
-6. onAuthStateChange fires
-7. useUser hook fetches profile from user_profiles
-8. User is authenticated
+1. User enters email and password on login page
+2. Supabase Auth verifies credentials
+3. Session token created and stored in cookies
+4. Middleware refreshes session cookies on each request
+5. onAuthStateChange fires
+6. useUser hook fetches profile from user_profiles
+7. User is authenticated
 ```
 
 ### 4.2 BOQ Creation Flow
@@ -172,7 +171,7 @@
 ## 5. Security Model
 
 ### 5.1 Authentication
-- Google OAuth via Supabase Auth
+- Email/Password via Supabase Auth
 - JWT tokens stored in httpOnly cookies
 - Session refresh via middleware
 - Optional: NT domain restriction (@ntplc.co.th)

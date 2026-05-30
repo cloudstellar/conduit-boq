@@ -2,7 +2,7 @@
 ## Conduit BOQ System
 
 > **Status:** CANONICAL  
-> **Last Updated:** 2026-01-22  
+> **Last Updated:** 2026-05-30  
 > **Authority:** Definitive source for version numbers (sourced from package.json)
 
 ---
@@ -47,7 +47,7 @@
 |---------|----------|---------|
 | Frontend Hosting | Vercel | Static + SSR |
 | Database | Supabase | PostgreSQL + RLS |
-| Authentication | Supabase Auth | Google OAuth |
+| Authentication | Supabase Auth | Email/Password (NT Domain Restriction) |
 
 ---
 

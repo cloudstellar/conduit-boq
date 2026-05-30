@@ -16,7 +16,7 @@ Items → Routes → BOQ Total → Factor F → VAT → Final Total
 
 ### Core Principles
 
-1. **Standard Prices**: All unit prices come from the official price list (518 items)
+1. **Standard Prices**: All unit prices come from the official price list (682 items)
 2. **Separation of Costs**: Material and labor costs are tracked separately
 3. **Factor F**: A multiplier that accounts for overhead, profit, and interest
 4. **VAT**: Always 7% on top of Factor F-adjusted total

@@ -24,10 +24,10 @@ Foundation         │  Modernization              │  Enhancement
 
 ## Phase 1: Foundation ✅ v1.2.0
 
-- [x] Google OAuth + Domain restriction
+- [x] Supabase Auth (Email/Password) + Domain restriction
 - [x] RLS + RBAC
 - [x] BOQ CRUD + Multi-route
-- [x] Price List (518 items)
+- [x] Price List (682 items)
 - [x] Factor F + VAT
 - [x] Admin Panel + Pending user approval
 - [x] Onboarding flow

@@ -28,7 +28,7 @@
   - Factor F  
   - VAT  
   - รวมยอดตามมาตรฐานองค์กร
-- 📊 Price List มาตรฐาน (518 รายการ)
+- 📊 Price List มาตรฐาน (682 รายการ)
 - 🔐 Authentication & Authorization ระดับองค์กร
 - 👥 Role-Based Access Control (RBAC)
 - 🧾 แยกบทบาท “ผู้จัดทำ / ผู้ตรวจสอบ / ผู้อนุมัติ” อย่างชัดเจน
@@ -47,7 +47,7 @@
 | UI / Styling | Tailwind CSS 4 |
 | Backend | Supabase (PostgreSQL, Auth, RLS) |
 | Hosting | Vercel |
-| Auth | Supabase Auth (Google OAuth) |
+| Auth | Supabase Auth (Email/Password) |
 
 ---
 

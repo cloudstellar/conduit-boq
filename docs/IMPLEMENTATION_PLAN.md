@@ -26,10 +26,10 @@ Next.js 16 + React 19 + TypeScript + Tailwind CSS 4
 
 ## ✅ Phase 1: Foundation (COMPLETED v1.2.0)
 
-- [x] Price list (518 items, 52 categories)
+- [x] Price list (682 items, 52 categories)
 - [x] BOQ with multi-route support
 - [x] Organizations, Departments, Sectors
-- [x] Google OAuth + Auto-create profile
+- [x] Supabase Auth (Email/Password) + Auto-create profile
 - [x] RLS policies + RBAC
 - [x] Admin: approve/reject pending users
 - [x] Onboarding flow with requested_* fields

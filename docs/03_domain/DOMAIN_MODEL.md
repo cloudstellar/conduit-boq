@@ -199,7 +199,7 @@
 | is_active | Boolean | Yes | Active status |
 
 **Invariant:** `unit_cost = material_cost + labor_cost`  
-**Data:** 518 items across 52 categories
+**Data:** 682 items across 52 categories
 
 ---
 

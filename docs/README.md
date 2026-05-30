@@ -11,7 +11,7 @@
 - 📋 สร้าง BOQ (Bill of Quantities) ได้รวดเร็ว
 - 🛣️ รองรับหลายเส้นทาง (Multi-Route)
 - 💰 คำนวณ Factor F และ VAT อัตโนมัติ
-- 📊 Price List มาตรฐาน 518 รายการ
+- 📊 Price List มาตรฐาน 682 รายการ
 - 🔐 ระบบ Authentication & Authorization
 - 👥 Role-Based Access Control (RBAC)
 
@@ -118,7 +118,7 @@ conduit-boq/
 
 ## 🔐 Security
 
-- **Authentication:** Google OAuth via Supabase
+- **Authentication:** Supabase Auth (Email/Password)
 - **Authorization:** Row Level Security (RLS) at database level
 - **Separation of Duties:** ผู้สร้าง BOQ ไม่สามารถอนุมัติเองได้
 

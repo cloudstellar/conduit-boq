@@ -28,7 +28,7 @@
 ## 3. Solution
 
 Web application ที่:
-- มี price list มาตรฐาน **518 รายการ** (52 หมวดหมู่)
+- มี price list มาตรฐาน **682 รายการ** (52 หมวดหมู่)
 - รองรับ **multi-route BOQ** (หลายเส้นทางใน 1 โครงการ)
 - คำนวณ **Factor F** และ **VAT 7%** อัตโนมัติ
 - มีระบบ **authentication** และ **authorization** ตามโครงสร้างองค์กร
@@ -43,8 +43,8 @@ Web application ที่:
 | 📋 BOQ Creation | สร้างใบประมาณราคาได้อย่างเป็นระบบและรวดเร็ว |
 | 🛣️ Multi-Route | รองรับงานหลายเส้นทาง (Multi-Route / Multi-Segment) |
 | 💰 Auto-Calculate | คำนวณ Factor F, VAT, รวมยอดอัตโนมัติ |
-| 📊 Price List | ราคามาตรฐาน 518 รายการ |
-| 🔐 Auth | Google OAuth + Domain restriction |
+| 📊 Price List | ราคามาตรฐาน 682 รายการ |
+| 🔐 Auth | Supabase Auth (Email/Password) + Domain restriction |
 | 👥 RBAC | Role-Based Access Control |
 | 🧾 Separation of Duties | แยกบทบาท "ผู้จัดทำ / ผู้ตรวจสอบ / ผู้อนุมัติ" |
 

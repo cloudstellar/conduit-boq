@@ -1,9 +1,9 @@
 # Database Schema
 ## Conduit BOQ System
 
-**Last Updated:** 2026-01-22  
+**Last Updated:** 2026-05-30  
 **Status:** Canonical  
-**Database:** PostgreSQL 15 (Supabase)
+**Database:** PostgreSQL 17 (Supabase)
 
 ---
 
@@ -164,7 +164,14 @@ BOQ Header - ใบประมาณราคา
 | `boq_id` | UUID | NO | FK → boq.id (CASCADE) |
 | `route_order` | INTEGER | NO | ลำดับเส้นทาง |
 | `route_name` | TEXT | NO | ชื่อเส้นทาง |
-| `route_description` | TEXT | YES | รายละเอียด |
+| `route_description` | TEXT | YES | รายละเอียด/หมายเหตุ |
+| `construction_area` | TEXT | YES | พื้นที่ก่อสร้างของเส้นทาง |
+| `total_material_cost` | DECIMAL(15,2) | YES | รวมค่าวัสดุของเส้นทาง (default: 0) |
+| `total_labor_cost` | DECIMAL(15,2) | YES | รวมค่าแรงของเส้นทาง (default: 0) |
+| `total_cost` | DECIMAL(15,2) | YES | รวมค่างานของเส้นทาง (default: 0) |
+| `cost_with_factor_f` | DECIMAL(15,2) | YES | ค่างานหลังคูณ Factor F (default: 0) |
+| `created_at` | TIMESTAMPTZ | NO | วันที่สร้าง |
+| `updated_at` | TIMESTAMPTZ | NO | วันที่แก้ไขล่าสุด |
 
 ---
 
@@ -194,7 +201,7 @@ BOQ Header - ใบประมาณราคา
 ---
 
 ### 8. price_list
-รายการราคามาตรฐาน (518 รายการ, 52 หมวด)
+รายการราคามาตรฐาน (682 รายการ, 52 หมวด)
 
 | Column | Type | Nullable | Description |
 |--------|------|----------|-------------|

@@ -1,7 +1,7 @@
 # Coding Rules
 ## Conduit BOQ System
 
-**Last Updated:** 2026-01-22  
+**Last Updated:** 2026-05-30  
 **Status:** Canonical
 
 ---
@@ -54,6 +54,50 @@ if (can(user, 'update', 'boq', context)) {
 // ✅ BUT actual security is enforced by RLS
 // Even if can() returns true, RLS will block unauthorized access
 ```
+
+### 2.3 Float Precision Safety (v1.6.2)
+
+> [!CAUTION]
+> **Never use raw `*` multiplication for financial math.** IEEE 754 floating-point arithmetic can silently produce incorrect results (e.g., `0.1 * 0.2 === 0.020000000000000004`).
+
+**Required:** Use the safe multiplication functions from `lib/calculation.ts`:
+
+| Function | Use Case |
+|----------|----------|
+| `multiplyFactor()` | Multiply a value by Factor F |
+| `safeItemCalc()` | Calculate a single BOQ item's cost (quantity × unit price) |
+| `safeMul()` | General-purpose safe multiplication |
+
+```typescript
+// ❌ WRONG - raw multiplication
+const cost = quantity * unitPrice;
+const withFactor = grandTotal * factorF;
+
+// ✅ CORRECT - safe functions
+const cost = safeItemCalc(quantity, unitPrice);
+const withFactor = multiplyFactor(grandTotal, factorF);
+```
+
+> [!NOTE]
+> **Addition and subtraction are safe** — they do not suffer from the same class of floating-point errors as multiplication. You do not need safe wrappers for `+` or `-` operations.
+
+### 2.4 BOQ Item Sort Order (v1.6.3)
+
+> [!IMPORTANT]
+> BOQ items must be sorted by **`category` (natural sort) FIRST**, then by **`item_order`** within the same category. This applies to the MultiRouteEditor, print page, and Excel export.
+
+```typescript
+// Sort by category (natural/numeric sort), then by item_order within category
+items.sort((a, b) => {
+  const catCmp = a.category.localeCompare(b.category, undefined, { numeric: true });
+  if (catCmp !== 0) return catCmp;
+  return a.item_order - b.item_order;
+});
+```
+
+**Why natural sort for category?** Categories like `"1"`, `"2"`, `"10"` must sort as 1 → 2 → 10, not the lexicographic 1 → 10 → 2. The `{ numeric: true }` option in `localeCompare` handles this correctly.
+
+**Why `item_order` second?** The `item_order` field is derived from `item_code` numbers in the `price_list` table (via foreign key), not from user-defined display order. Sorting by `item_order` within a category preserves the price-list sequence.
 
 ---
 

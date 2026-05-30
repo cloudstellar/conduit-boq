@@ -1,7 +1,7 @@
 # Domain Rules
 ## Conduit BOQ System
 
-**Last Updated:** 2026-01-22  
+**Last Updated:** 2026-05-30  
 **Status:** Canonical
 
 ---
@@ -61,7 +61,7 @@ Organization (องค์กร) — NT
 | **BOQ** | ใบประมาณราคา | Bill of Quantities - a cost estimate document |
 | **Route** | เส้นทาง | A physical path for conduit installation |
 | **Item** | รายการ | A line item in the BOQ (material or labor) |
-| **Price List** | บัญชีราคา | Standard unit prices (518 items, 52 categories) |
+| **Price List** | บัญชีราคา | Standard unit prices (682 items, 52 categories) |
 | **Factor F** | แฟกเตอร์ F | Cost adjustment coefficient |
 
 ### 4.2 Cost Terminology
@@ -114,11 +114,15 @@ This is enforced in both:
 | Staff | Own BOQs + same sector (read) |
 | Procurement | Approved BOQs only (read-only) |
 
-### 5.4 Domain Restriction (Optional)
+### 5.4 Domain Restriction
 
-- Can restrict login to `@ntplc.co.th` emails only
-- Configured via `app_settings` table
-- Key: `allowed_email_domains`
+- Login/signup can be restricted to `@ntplc.co.th` emails only
+- Configured via `app_settings` table with two keys:
+  - `restrict_email_domain` (Boolean): enables/disables restriction
+  - `allowed_email_domains` (JSONB array): list of allowed domains
+
+> [!WARNING]
+> **Known Implementation Mismatch:** The middleware (`lib/supabase/middleware.ts`) queries for `allowed_email_domain` (singular, no `s`), which does not match the seeded key `allowed_email_domains` (plural). This causes the middleware domain check to silently skip. The login page correctly uses `restrict_email_domain` for client-side enforcement.
 
 ---
 
@@ -126,7 +130,7 @@ This is enforced in both:
 
 | System | Purpose | Integration |
 |--------|---------|-------------|
-| Google OAuth | Authentication | Via Supabase Auth |
+| Supabase Auth (Email/Password) | Authentication | Via Supabase Auth |
 | Supabase | Database + Auth + RLS | Direct SDK |
 | Vercel | Hosting | Auto-deploy from main |
 
