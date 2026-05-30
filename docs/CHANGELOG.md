@@ -3,6 +3,44 @@
 
 ---
 
+## [v1.7.0] - 2026-05-31 (Calm & Professional NT Enterprise Dashboard MVP)
+
+### 🎨 สุนทรียภาพดีไซน์: ปรับปรุงหน้าแรกสู่ Calm Enterprise Dashboard
+ปรับปรุงการแสดงผลหน้าแรก (Dashboard/Home) จากเดิมที่เป็นบล็อกดีไซน์เริ่มต้นทั่วไป (AI Boilerplate) ให้กลายเป็นแดชบอร์ดระดับวิสาหกิจที่นิ่ง สะอาดตา สแกนอ่านข้อมูลได้รวดเร็ว (High Scanning Efficiency) ตามหลักการ **pbakaus/impeccable** หลีกเลี่ยงดีไซน์แบบ AI-SaaS ซ้ำซาก (ไม่มี gradient หนา, ไม่มี glow หนา, ไม่มีตัวอักษรสีเทาบนพื้นสี)
+
+- **อัตลักษณ์องค์กร NT (NT Brand Identity)**: ใช้สีหลักคือ **สีน้ำเงิน NT (`#0056B3`)** และ **สีส้ม NT (`#F58220`)** เฉพาะจุดนำสายตา ปุ่มคำสั่งหลัก ไอคอน และขอบ Badge เพื่อความภูมิฐานและสวยงามอย่างลงตัว
+- **ฟอนต์ภาษาไทยพรีเมียม (IBM Plex Sans Thai)**: นำเข้าฟอนต์ภาษาไทยผ่าน `next/font/google` ใน `app/layout.tsx` และตั้งค่าภาษาหลักของหน้าเว็บเป็น `lang="th"`
+- **Tailwind Tokens**: แมปตัวแปรสี NT เข้ากับระบบดีไซน์ใน `globals.css` เป็น `@theme inline` สำหรับใช้งานใน Tailwind v4 ปราศจากสีที่ไม่มีจริงใน Palette มาตรฐาน (กำจัด slate-150, slate-250, slate-350 ออกทั้งหมด)
+
+### 💾 ข้อมูลและสถิติ: ดึงข้อมูลจริงจาก Supabase (Dynamic stats & hook)
+สร้าง Custom Hook `lib/hooks/useDashboardData.ts` ดึงตัวเลขอิงข้อมูลจริงแบบไร้ปัญหา Waterfall (ผ่าน `Promise.all` และ Query แบบจำกัดคอลัมน์)
+- **สถิติส่วนบุคคล (Personal Stats)**: แสดงจำนวนใบประมาณราคาของตนเอง และยอดงบประมาณสะสมรวมภาษีสุทธิ (`total_with_vat` เป็นหลักแรกสุด)
+- **การแยกสิทธิ์ข้อมูล (Stats Scope Separation)**: สิทธิ์ทั่วไปมองเห็นสถิติตนเอง ส่วนสิทธิ์ผู้จัดการ/แอดมิน (`dept_manager`, `sector_manager`, `admin`) จะมีการ์ดสรุปข้อมูลรวมของแผนกแยกบล็อกออกไปอย่างเป็นระเบียบชัดเจน
+- **ข้อมูลราคากลางสด**: คำนวณจำนวนข้อมูลวัสดุและค่าแรงสดตรงจากตาราง `price_list` ด้วย Head-only query ประหยัด bandwidth
+- **บอร์ดกลับไปทำงานต่อ (Recent BOQs)**: ดึง 5 ใบงานล่าสุดที่แก้ไขล่าสุดจริง (อิงตามการสั่งจัดเรียง `updated_at` Descending) เพื่อความสะดวกรวดเร็วในการกดทำต่อ
+
+### 🧩 ชิ้นส่วนคอมโพเนนต์ย่อย (Subcomponents Composition)
+จัดสัดส่วนคอมโพเนนต์ให้ยืดหยุ่น ดูแลรักษาง่ายภายใต้โฟลเดอร์ `components/dashboard/*`:
+- `DashboardHeader.tsx`: ต้อนรับผู้ใช้ สังกัด และแสดง Badge สิทธิ์ พร้อมระบบ Onboarding เช็คจากตัวแปรจริง `onboarding_completed`
+- `StatsGrid.tsx`: แสดงตัวเลขวิเคราะห์ข้อมูลสรุป พร้อมระบบ Skeletons รองรับสถานะโหลดช้า
+- `ActionHub.tsx`: ปุ่มปฏิบัติการด่วนนำทางสร้างงาน ค้นหา และดูรายการทั้งหมด
+- `RecentBOQList.tsx`: บอร์ดตารางรวมใบงานล่าสุด และแสดงสภาวะไม่มีงานค้าง (Empty State) เป็นภาษาไทยอย่างนุ่มนวล
+
+### 📁 ไฟล์ที่เกี่ยวข้อง (8 ไฟล์)
+
+| ไฟล์ | การเปลี่ยนแปลง |
+|---|---|
+| `app/layout.tsx` | นำเข้า IBM Plex Sans Thai ผ่าน `next/font`, เปลี่ยนภาษาเว็บหลักเป็น `lang="th"` |
+| `app/globals.css` | สร้าง NT design tokens และเชื่อมฟอนต์ภาษาไทยเข้ากับระบบ Tailwind v4 |
+| `lib/hooks/useDashboardData.ts` | [NEW] Custom hook ดึงและประมวลผลข้อมูลสดจากระบบด้วยความเร็วสูงและประเภทข้อมูลที่ปลอดภัย |
+| `components/dashboard/DashboardHeader.tsx` | [NEW] คอมโพเนนต์แสดงสิทธิ์ สังกัด และต้อนรับผู้ใช้งาน |
+| `components/dashboard/StatsGrid.tsx` | [NEW] คอมโพเนนต์สรุปตัวเลขสถิติแยกตามระดับผู้ใช้งาน |
+| `components/dashboard/ActionHub.tsx` | [NEW] คอมโพเนนต์ทางด่วนสร้างและสืบค้นเอกสาร |
+| `components/dashboard/RecentBOQList.tsx` | [NEW] บอร์ดแสดงเอกสารประมาณการล่าสุดเพื่อกดปฏิบัติการต่อ |
+| `app/page.tsx` | ประสานงานคอมโพเนนต์ย่อย และจัดระบบความทนทานต่อสภาวะโหลด/บั๊ก (States Handling) |
+
+---
+
 ## [v1.6.3] - 2026-03-27 (Category-Based Item Sorting)
 
 ### 🔧 ปัญหา: รายการที่เพิ่มทีหลังตกท้ายเอกสาร
