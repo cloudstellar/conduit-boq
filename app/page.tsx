@@ -1,164 +1,185 @@
 'use client';
 
-import Link from "next/link";
-import Image from "next/image";
-import UserMenu from "@/components/auth/UserMenu";
-import AuthGuard from "@/components/auth/AuthGuard";
-import { useAuth } from "@/lib/context/AuthContext";
-import { Card, CardContent } from "@/components/ui/card";
-import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Button } from "@/components/ui/button";
-import { Plus, FileText, DollarSign, Clock, Edit } from "lucide-react";
+import Image from 'next/image';
+import UserMenu from '@/components/auth/UserMenu';
+import AuthGuard from '@/components/auth/AuthGuard';
+import { useAuth } from '@/lib/context/AuthContext';
+import { useDashboardData } from '@/lib/hooks/useDashboardData';
+import { can } from '@/lib/permissions';
+import DashboardHeader from '@/components/dashboard/DashboardHeader';
+import StatsGrid from '@/components/dashboard/StatsGrid';
+import ActionHub from '@/components/dashboard/ActionHub';
+import RecentBOQList from '@/components/dashboard/RecentBOQList';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { Button } from '@/components/ui/button';
+import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
+import { AlertTriangle, RefreshCw, BookOpen, CheckCircle, Info } from 'lucide-react';
 
 export default function Home() {
-  const { user } = useAuth();
-  const isPending = user?.status === 'pending';
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const needsOnboarding = isPending && !(user as any)?.onboarding_completed;
+  const { user, isLoading: isAuthLoading } = useAuth();
+  const { stats, recentBoqs, isLoading: isDataLoading, error, refreshData } = useDashboardData(user);
+
+  const canCreateBOQ = can(user, 'create', 'boq');
+  const isLoading = isAuthLoading || isDataLoading;
 
   return (
     <AuthGuard>
-      <div className="min-h-screen bg-gray-50">
-        {/* Header */}
-        <header className="bg-white shadow-sm">
-          <div className="max-w-7xl mx-auto px-4 py-4 md:py-6">
-            <div className="flex justify-between items-start mb-4">
-              <div className="text-center md:text-left flex-1">
-                <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-gray-900">
+      <div className="min-h-screen bg-slate-50/50 flex flex-col font-sans">
+
+        {/* Header - Aligned with NT corporate branding guidelines */}
+        <header className="bg-white border-b border-slate-200/80 sticky top-0 z-40">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3.5 flex justify-between items-center">
+            <div className="flex items-center gap-3">
+              <div className="relative w-7 h-7 flex-shrink-0">
+                <Image
+                  src="/favicon.svg"
+                  alt="NT Icon"
+                  fill
+                  className="object-contain"
+                  priority
+                />
+              </div>
+              <div className="border-l border-slate-200 pl-3">
+                <h1 className="text-base sm:text-lg font-bold text-slate-900 leading-none">
                   ระบบประมาณราคาท่อร้อยสายสื่อสารใต้ดิน
                 </h1>
-                <p className="mt-1 text-sm md:text-base text-muted-foreground">Conduit Bill of Quantity (BOQ)</p>
+                <p className="text-[11px] text-slate-500 mt-1 font-medium tracking-wide">
+                  Conduit Bill of Quantity (BOQ) • National Telecom
+                </p>
               </div>
-              <div className="flex items-center gap-4">
-                <UserMenu />
+            </div>
+
+            <div className="flex items-center gap-4">
+              <UserMenu />
+              <div className="border-l border-slate-200 pl-4 h-7 hidden sm:flex items-center">
                 <Image
                   src="/nt_logo.svg"
                   alt="NT Logo"
-                  width={441}
-                  height={85}
-                  className="object-contain w-24 sm:w-32 md:w-48 h-auto hidden sm:block"
+                  width={90}
+                  height={18}
+                  className="object-contain w-20 h-auto"
+                  priority
                 />
               </div>
             </div>
           </div>
         </header>
 
-        {/* Main Content */}
-        <main className="max-w-7xl mx-auto px-4 py-8">
-          {/* Welcome Card for New Users */}
-          {needsOnboarding && (
-            <Card className="mb-8 bg-gradient-to-r from-amber-50 to-orange-50 border-2 border-amber-200">
-              <CardContent className="pt-6">
-                <div className="flex flex-col md:flex-row items-start md:items-center gap-6">
-                  <div className="flex-shrink-0">
-                    <div className="w-16 h-16 bg-amber-100 rounded-full flex items-center justify-center">
-                      <Edit className="w-8 h-8 text-amber-600" />
+        {/* Main Content Area */}
+        <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 flex-grow w-full space-y-6">
+
+          {/* Error State - Dynamic fallback */}
+          {error ? (
+            <Alert variant="destructive" className="border-red-200 bg-red-50/20 py-4 max-w-3xl mx-auto">
+              <AlertTriangle className="h-5 w-5 text-red-600 mt-0.5" />
+              <div className="ml-2 space-y-1.5 flex-1">
+                <AlertTitle className="text-red-900 font-semibold text-sm">ไม่สามารถโหลดข้อมูลสถิติระบได้</AlertTitle>
+                <AlertDescription className="text-slate-700 text-xs">
+                  {error}
+                </AlertDescription>
+                <div className="pt-2">
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={refreshData}
+                    className="h-8 border-red-200 hover:bg-red-50 hover:text-red-900 gap-1.5 text-xs font-semibold text-red-800"
+                  >
+                    <RefreshCw className="w-3.5 h-3.5" />
+                    ลองโหลดใหม่อีกครั้ง
+                  </Button>
+                </div>
+              </div>
+            </Alert>
+          ) : null}
+
+          {/* Greeting Section (Handles onboarding warning & pending approval states) */}
+          <DashboardHeader user={user} />
+
+          {/* Key Metrics Dashboard (Stats Grid) */}
+          <StatsGrid
+            stats={stats}
+            isLoading={isLoading}
+            userRole={user?.role || 'staff'}
+          />
+
+          {/* Quick Action Navigation Hub */}
+          <ActionHub canCreateBOQ={canCreateBOQ} />
+
+          {/* Desktop/Tablet 2-Column Split Workspace */}
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+            {/* Left Column (Spans 2): Recent work list */}
+            <div className="lg:col-span-2">
+              <RecentBOQList
+                recentBoqs={recentBoqs}
+                isLoading={isLoading}
+                canCreateBOQ={canCreateBOQ}
+              />
+            </div>
+
+            {/* Right Column (Spans 1): Quick guidelines & resources */}
+            <div className="lg:col-span-1">
+              <Card className="border-slate-200/80 shadow-sm bg-white overflow-hidden h-full">
+                <CardHeader className="p-5 border-b border-slate-100/80">
+                  <CardTitle className="text-base font-semibold text-slate-900 tracking-wide flex items-center gap-1.5">
+                    <BookOpen className="w-4 h-4 text-slate-500" />
+                    <span>คำแนะนำและข้อกำหนดการเขียน BOQ</span>
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="p-5 space-y-4">
+
+                  {/* Guideline item 1 */}
+                  <div className="flex gap-3">
+                    <div className="flex-shrink-0 w-5 h-5 rounded-full bg-emerald-50 border border-emerald-100 flex items-center justify-center text-emerald-600">
+                      <CheckCircle className="w-3 h-3" />
+                    </div>
+                    <div className="space-y-1">
+                      <h5 className="text-xs font-semibold text-slate-900">อัตราคูณและตัวคูณ Factor F</h5>
+                      <p className="text-[11px] text-slate-500 leading-relaxed">
+                        ระบบจะทำการจับคู่ค่าตัวคูณ Factor F ตามยอดประมาณการก่อสร้างและประเภทพื้นที่ฝนชุก/พื้นที่ฝนตกชุกโดยอัตโนมัติ ตามเกณฑ์มาตรฐานกรมบัญชีกลาง
+                      </p>
                     </div>
                   </div>
-                  <div className="flex-1">
-                    <h2 className="text-xl font-bold text-gray-900 mb-2">
-                      ยินดีต้อนรับ! กรุณาลงทะเบียนข้อมูลของคุณ
-                    </h2>
-                    <p className="text-muted-foreground mb-4">
-                      เพื่อเริ่มใช้งานระบบ กรุณากรอกข้อมูลส่วนตัวและเลือกสังกัดของคุณ
-                      ผู้ดูแลระบบจะตรวจสอบและอนุมัติบัญชีของคุณภายหลัง
+
+                  {/* Guideline item 2 */}
+                  <div className="flex gap-3">
+                    <div className="flex-shrink-0 w-5 h-5 rounded-full bg-emerald-50 border border-emerald-100 flex items-center justify-center text-emerald-600">
+                      <CheckCircle className="w-3 h-3" />
+                    </div>
+                    <div className="space-y-1">
+                      <h5 className="text-xs font-semibold text-slate-900">การแบ่งประเภทหมวดหมู่งาน</h5>
+                      <p className="text-[11px] text-slate-500 leading-relaxed">
+                        โปรดระบุหมวดหมู่งานหลัก เช่น งานก่อสร้างท่อร้อยสาย, งานบ่อพัก, งานขุดเปิด/ขุดเจาะท่อลอด HDD ให้สอดคล้องตามลำดับโครงสร้างราคากลางปี 2568
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Guideline item 3 */}
+                  <div className="flex gap-3">
+                    <div className="flex-shrink-0 w-5 h-5 rounded-full bg-emerald-50 border border-emerald-100 flex items-center justify-center text-emerald-600">
+                      <CheckCircle className="w-3 h-3" />
+                    </div>
+                    <div className="space-y-1">
+                      <h5 className="text-xs font-semibold text-slate-900">การออกรายงานพิมพ์และอนุมัติ</h5>
+                      <p className="text-[11px] text-slate-500 leading-relaxed">
+                        คุณสามารถส่งใบประมาณราคาเสนอผู้อำนวยการส่วนหรือผู้ช่วยผู้อำนวยการฝ่ายตรวจสอบผ่านทางอิเล็กทรอนิกส์ และสั่งพิมพ์ออกมาในรูปแบบฟอร์มมาตรฐานของรัฐ (TH Sarabun) ได้ทันที
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="border-t border-slate-100 pt-4 flex gap-2 items-start bg-slate-50/50 p-3.5 rounded-lg border border-slate-200 mt-2">
+                    <Info className="w-4 h-4 text-nt-blue flex-shrink-0 mt-0.5" />
+                    <p className="text-[10px] text-slate-600 leading-relaxed">
+                      หากพบข้อมูลราคากลางวัสดุหรือค่าแรงไม่ถูกต้อง หรือต้องการขออนุมัติขยายสิทธิ์การใช้งานบัญชีเพิ่มเติม โปรดติดต่อผู้ดูแลระบบเครือข่ายประมาณราคา NT หรือส่งจดหมายอิเล็กทรอนิกส์เพื่อขอความช่วยเหลือ
                     </p>
-                    <Link href="/profile">
-                      <Button className="bg-amber-500 hover:bg-amber-600">
-                        <Edit className="w-4 h-4 mr-2" />
-                        กรอกข้อมูลและเลือกสังกัด
-                      </Button>
-                    </Link>
                   </div>
-                </div>
-              </CardContent>
-            </Card>
-          )}
 
-          {/* Pending Status Banner (after onboarding completed) */}
-          {isPending && !needsOnboarding && (
-            <Alert className="mb-6 bg-amber-50 border-amber-200">
-              <Clock className="h-4 w-4 text-amber-600" />
-              <AlertDescription className="ml-2 text-amber-800">
-                <span className="font-medium">บัญชีของคุณอยู่ระหว่างรอผู้ดูแลระบบอนุมัติ</span>
-                {' — คุณสามารถสร้างและแก้ไข BOQ ได้ระหว่างรอ'}
-              </AlertDescription>
-            </Alert>
-          )}
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {/* Create New BOQ Card */}
-            <Link href="/boq/create" className="group">
-              <Card className="h-full hover:shadow-lg transition-shadow border-2 border-transparent group-hover:border-blue-500">
-                <CardContent className="pt-6">
-                  <div className="flex items-center justify-center w-16 h-16 bg-blue-100 rounded-full mb-4">
-                    <Plus className="w-8 h-8 text-blue-600" />
-                  </div>
-                  <h2 className="text-xl font-semibold text-gray-800 mb-2">
-                    สร้างใบประมาณราคาใหม่
-                  </h2>
-                  <p className="text-muted-foreground">
-                    สร้าง BOQ ใหม่สำหรับโครงการก่อสร้างท่อร้อยสาย
-                  </p>
                 </CardContent>
               </Card>
-            </Link>
+            </div>
 
-            {/* View BOQ List Card */}
-            <Link href="/boq" className="group">
-              <Card className="h-full hover:shadow-lg transition-shadow border-2 border-transparent group-hover:border-green-500">
-                <CardContent className="pt-6">
-                  <div className="flex items-center justify-center w-16 h-16 bg-green-100 rounded-full mb-4">
-                    <FileText className="w-8 h-8 text-green-600" />
-                  </div>
-                  <h2 className="text-xl font-semibold text-gray-800 mb-2">
-                    รายการใบประมาณราคา
-                  </h2>
-                  <p className="text-muted-foreground">ดูและจัดการใบประมาณราคาทั้งหมด</p>
-                </CardContent>
-              </Card>
-            </Link>
-
-            {/* Price List Card */}
-            <Link href="/price-list" className="group">
-              <Card className="h-full hover:shadow-lg transition-shadow border-2 border-transparent group-hover:border-purple-500">
-                <CardContent className="pt-6">
-                  <div className="flex items-center justify-center w-16 h-16 bg-purple-100 rounded-full mb-4">
-                    <DollarSign className="w-8 h-8 text-purple-600" />
-                  </div>
-                  <h2 className="text-xl font-semibold text-gray-800 mb-2">
-                    บัญชีราคามาตรฐาน
-                  </h2>
-                  <p className="text-muted-foreground">ดูรายการราคามาตรฐานประจำปี 2568</p>
-                </CardContent>
-              </Card>
-            </Link>
           </div>
 
-          {/* Stats Section */}
-          <div className="mt-8 grid grid-cols-1 md:grid-cols-3 gap-6">
-            <Card>
-              <CardContent className="pt-6">
-                <p className="text-sm text-muted-foreground">รายการราคามาตรฐาน</p>
-                <p className="text-3xl font-bold text-gray-900">682</p>
-                <p className="text-sm text-muted-foreground">รายการ</p>
-              </CardContent>
-            </Card>
-            <Card>
-              <CardContent className="pt-6">
-                <p className="text-sm text-muted-foreground">หมวดหมู่</p>
-                <p className="text-3xl font-bold text-gray-900">52</p>
-                <p className="text-sm text-muted-foreground">หมวด</p>
-              </CardContent>
-            </Card>
-            <Card>
-              <CardContent className="pt-6">
-                <p className="text-sm text-muted-foreground">ปีบัญชีราคา</p>
-                <p className="text-3xl font-bold text-gray-900">2568</p>
-                <p className="text-sm text-muted-foreground">พ.ศ.</p>
-              </CardContent>
-            </Card>
-          </div>
         </main>
       </div>
     </AuthGuard>
