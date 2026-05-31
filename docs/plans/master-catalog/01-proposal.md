@@ -17,7 +17,7 @@
 *   **แนวทางการแก้ไข**:
     1.  ฝังการตรวจสอบสิทธิ์ความปลอดภัยในฟังก์ชัน: 
         *   `clone_price_list_version` และ `make_version_default` จะขวางทันทีหากผู้เรียกใช้ไม่ใช่บทบาท `'admin'` ในระบบจริง
-        *   `save_boq_with_routes` จะตรวจสอบสิทธิ์ผู้เซฟให้ตรงกับ `permissions.ts` ทุกบทบาท: `admin` (ทุกใบงาน), `staff` (เฉพาะ `created_by` / `assigned_to`), `sector_manager` (เซกเตอร์เดียวกันหรือ Legacy), `dept_manager` (ดีพาร์ตเมนต์เดียวกันหรือ Legacy) — บทบาทอื่น (`procurement`, ไม่มี role) จะถูกปฏิเสธโดยอัตโนมัติ
+        *   `save_boq_with_routes` จะตรวจสอบสิทธิ์ผู้เซฟให้ตรงกับ `SECURITY.md` + `permissions.ts` ทุกบทบาท: `pending` (เฉพาะ BOQ ที่ตัวเอง `created_by`), `admin` (ทุกใบงาน), `staff` (เฉพาะ `created_by` / `assigned_to`), `sector_manager` (เซกเตอร์เดียวกัน), `dept_manager` (ดีพาร์ตเมนต์เดียวกัน) — Legacy BOQ (`created_by IS NULL`) แก้ได้เฉพาะ admin, บทบาทอื่น (`procurement`, ไม่มี role) จะถูกปฏิเสธโดยอัตโนมัติ
     2.  ใช้คำสั่งถอนและมอบสิทธิ์อย่างจำเพาะเจาะจง:
         ```sql
         REVOKE EXECUTE ON FUNCTION ... FROM PUBLIC, anon;
@@ -28,7 +28,7 @@
 *   **ปัญหา**: ป้องกันกรณีโปรแกรมฝั่งหน้าบ้านเกิดข้อผิดพลาดในการโหลดแคช หรือระบบถูกแทรกแซงโดยเจตนาส่งราคาไอเทมจากเล่มเวอร์ชันเก่าและใหม่ปนกันเข้ามาในใบงานเดียว
 *   **แนวทางการแก้ไข**: เพิ่มคำสั่งตรวจสอบภายในฟังก์ชัน `save_boq_with_routes` เพื่อไล่เช็คทุก `price_list_id` ที่ฝั่งหน้าบ้านส่งเข้ามา หากพบว่ามีรายการราคาใดชี้ไปยังไอดีที่มี `version_id` ไม่ตรงกับ `price_list_version_id` ของตัวใบงานหลัก ระบบจะทำแท้ง (Abort) ธุรกรรมและปฏิเสธการเซฟทันที
 
-### 1.4 ควบคุมความสมบูรณ์ในการคัดลอกราคากลางข้ามรุ่น (Idempotent Cloner Protection)
+### 1.4 ควบคุมความสมบูรณ์ในการคัดลอกราคากลางข้ามรุ่น (Clone Safety Protection)
 *   **ปัญหา**: ป้องกันความเสียหายกรณีผู้ดูแลระบบเผลอกดเบิ้ล (Double-Click) บนหน้าเมนู หรือสั่งคัดลอกราคากลางเข้าสู่ตารางเวอร์ชันเป้าหมายที่มีรายการอยู่แล้ว ซึ่งจะส่งผลเสียต่อการชนของข้อมูลแบบ Unique
 *   **แนวทางการแก้ไข**: ในตัวฟังก์ชัน `clone_price_list_version` ได้ฝังระบบตรวจสอบเงื่อนไขดังนี้:
     *   เวอร์ชันปลายทางต้องมีสถานะเป็น `'draft'` เท่านั้น (ห้ามโคลนทับเวอร์ชันที่ใช้งานจริงแล้ว)
@@ -39,7 +39,7 @@
 
 ## 💾 2. พิมพ์เขียว SQL สำหรับรันใน Supabase (Production-Safe DDL Spec - Revised)
 
-ด้านล่างนี้คือสคริปต์ DDL ที่ได้รับการรับรองความปลอดภัยและออกแบบมาแบบ Idempotent สามารถรันซ้ำเพื่อจัดโครงสร้างได้โดยไม่มีผลข้างเคียง:
+ด้านล่างนี้คือสคริปต์ DDL ที่ได้รับการรับรองความปลอดภัย ออกแบบให้ rerunnable ภายใต้ preflight assertions (ต้องรัน Phase 0 ตรวจสอบก่อนเสมอ):
 
 ```sql
 -- ============================================================================
@@ -92,27 +92,38 @@ ALTER TABLE boq ADD COLUMN IF NOT EXISTS price_list_version_id UUID REFERENCES p
 ALTER TABLE boq_items ADD COLUMN IF NOT EXISTS category TEXT DEFAULT NULL;
 
 -- ============================================================================
+-- [DATA SEED] ต้อง seed ก่อนติดตั้ง fail-closed trigger
+-- ⚠️ ลำดับสำคัญ: ถ้าสลับกัน จะเกิด outage window — BOQ ใหม่สร้างไม่ได้
+-- ============================================================================
+
+-- 1. บันทึกรุ่นดั้งเดิม 2568.0.0 สู่ฐานข้อมูล
+-- ⚠️ หมายเหตุ: ON CONFLICT DO NOTHING จะไม่ซ่อม row ที่มีอยู่แต่ status/is_default ผิด
+-- Phase 0 preflight ต้อง assert ก่อนว่า 2568.0.0 ยังไม่มี หรือมีแบบ status='active', is_default=true
+INSERT INTO price_list_versions (major, minor, patch, name, status, is_default)
+VALUES (2568, 0, 0, 'บัญชีราคามาตรฐาน ปี 2568 (ประกาศฉบับหลัก)', 'active', true)
+ON CONFLICT ON CONSTRAINT uq_major_minor_patch DO NOTHING;
+
+-- ============================================================================
 -- [PHASE 1A - TRIGGERS & FUNCTIONS] ฟังก์ชันป้องกันและทริกเกอร์ SRE-First
 -- ============================================================================
 
--- 1. ฟังก์ชันป้องกันการลบหรือยกเลิกเวอร์ชันเริ่มต้น (Default Active Version - Statement Level AFTER Check)
+-- 2. ฟังก์ชันป้องกันการลบหรือยกเลิกเวอร์ชันเริ่มต้น (Default Active Version - Statement Level AFTER Check)
 CREATE OR REPLACE FUNCTION check_default_version_exists()
 RETURNS TRIGGER AS $$
 DECLARE
     default_count INT;
 BEGIN
-    -- ทำการสืบค้นหาจำนวน Active Default ในภาพรวมหลังคิวรีทำงานเสร็จสิ้นทั้งหมด
     SELECT COUNT(*) INTO default_count
-    FROM price_list_versions
+    FROM public.price_list_versions
     WHERE is_default = true AND status = 'active';
     
     IF default_count = 0 THEN
         RAISE EXCEPTION 'ต้องมีอย่างน้อยหนึ่งเวอร์ชันที่เป็น active และเป็นค่าเริ่มต้น (default) เสมอ เพื่อป้องกันไม่ให้ระบบสร้างใบงานพัง';
     END IF;
     
-    RETURN NULL; -- สำหรับ AFTER Trigger ค่าที่รีเทิร์นไม่มีผล
+    RETURN NULL;
 END;
-$$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public;
+$$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = '';
 
 DROP TRIGGER IF EXISTS trigger_check_default_version_exists ON price_list_versions;
 CREATE TRIGGER trigger_check_default_version_exists
@@ -120,19 +131,23 @@ AFTER UPDATE OR DELETE ON price_list_versions
 FOR EACH STATEMENT
 EXECUTE FUNCTION check_default_version_exists();
 
--- 2. ทริกเกอร์กำหนดค่าเริ่มต้นเวอร์ชันให้อัตโนมัติในระดับ DB กรณีสร้างใบงานใหม่แบบไม่ระบุฟิลด์ราคา
+-- 3. ทริกเกอร์กำหนดค่าเริ่มต้นเวอร์ชันให้อัตโนมัติในระดับ DB กรณีสร้างใบงานใหม่แบบไม่ระบุฟิลด์ราคา
 CREATE OR REPLACE FUNCTION set_default_price_list_version()
 RETURNS TRIGGER AS $$
 BEGIN
     IF NEW.price_list_version_id IS NULL THEN
         SELECT id INTO NEW.price_list_version_id
-        FROM price_list_versions
+        FROM public.price_list_versions
         WHERE is_default = true AND status = 'active'
         LIMIT 1;
+        -- [FAIL-CLOSED] ถ้าไม่พบ active default → RAISE แทนปล่อย NULL ผ่าน
+        IF NEW.price_list_version_id IS NULL THEN
+            RAISE EXCEPTION 'ไม่พบเวอร์ชันราคากลางเริ่มต้น (active default) ในระบบ กรุณาติดต่อผู้ดูแลระบบ';
+        END IF;
     END IF;
     RETURN NEW;
 END;
-$$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public;
+$$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = '';
 
 DROP TRIGGER IF EXISTS trigger_set_default_price_list_version ON boq;
 CREATE TRIGGER trigger_set_default_price_list_version
@@ -140,7 +155,7 @@ BEFORE INSERT ON boq
 FOR EACH ROW
 EXECUTE FUNCTION set_default_price_list_version();
 
--- 3. ฟังก์ชัน Auto-Update Timestamp สำหรับ price_list_versions (Data Hygiene)
+-- 4. ฟังก์ชัน Auto-Update Timestamp สำหรับ price_list_versions (Data Hygiene)
 CREATE OR REPLACE FUNCTION set_updated_at()
 RETURNS TRIGGER AS $$
 BEGIN
@@ -159,26 +174,15 @@ EXECUTE FUNCTION set_updated_at();
 -- [DATA BACKFILLING & MIGRATION] เคลื่อนย้ายข้อมูลอย่างราบรื่น
 -- ============================================================================
 
--- 1. บันทึกรุ่นดั้งเดิม 2568.0.0 สู่ฐานข้อมูล
--- ⚠️ หมายเหตุ: ON CONFLICT DO NOTHING จะไม่ซ่อม row ที่มีอยู่แต่ status/is_default ผิด
--- Phase 0 preflight ต้อง assert ก่อนว่า 2568.0.0 ยังไม่มี หรือมีแบบ status='active', is_default=true
-INSERT INTO price_list_versions (major, minor, patch, name, status, is_default)
-VALUES (2568, 0, 0, 'บัญชีราคามาตรฐาน ปี 2568 (ประกาศฉบับหลัก)', 'active', true)
-ON CONFLICT ON CONSTRAINT uq_major_minor_patch DO NOTHING;
-
--- 2. เชื่อมรายการราคากลางประวัติศาสตร์เข้าสู่รุ่น 2568.0.0
+-- 5. เชื่อมรายการราคากลางประวัติศาสตร์เข้าสู่รุ่น 2568.0.0
 UPDATE price_list 
 SET version_id = (SELECT id FROM price_list_versions WHERE version_string = '2568.0.0' LIMIT 1)
 WHERE version_id IS NULL;
 
--- 3. การปลดบล็อกการรองรับเวอร์ชันในอนาคต (สำคัญมาก!)
+-- 6. การปลดบล็อกการรองรับเวอร์ชันในอนาคต (สำคัญมาก!)
 -- [FIX: Transaction Block] ครอบ DROP/ADD constraint ใน transaction เดียวเพื่อป้องกัน concurrent INSERT
--- ช่วงระหว่าง DROP old unique → ADD new unique ต้องไม่มี gap ที่ไร้ protection
--- ⚠️ หมายเหตุ: ถ้ารันผ่าน Supabase migration runner (supabase db push / migration up)
---    ให้ถอด BEGIN/COMMIT ออก เพราะ runner wrap implicit transaction ให้อยู่แล้ว
---    ใช้ BEGIN/COMMIT เฉพาะกรณีรันผ่าน SQL Editor เท่านั้น
+-- ⚠️ หมายเหตุ: ถ้ารันผ่าน Supabase migration runner ให้ถอด BEGIN/COMMIT ออก
 BEGIN;
-  -- ตั้ง timeout เฉพาะใน transaction นี้ (SET LOCAL หมดอายุหลัง COMMIT ไม่รั่วไหลไป backfill)
   SET LOCAL lock_timeout = '10s';
   SET LOCAL statement_timeout = '30s';
   ALTER TABLE price_list DROP CONSTRAINT IF EXISTS price_list_item_code_key;
@@ -186,16 +190,15 @@ BEGIN;
   ALTER TABLE price_list DROP CONSTRAINT IF EXISTS uq_version_item_code;
   ALTER TABLE price_list ADD CONSTRAINT uq_version_item_code UNIQUE (version_id, item_code);
 COMMIT;
--- คืนค่า timeout หลัง COMMIT เผื่อกัน backfill ต่อไป timeout
 RESET lock_timeout;
 RESET statement_timeout;
 
--- 4. เชื่อมโยงใบงานเดิมทั้งหมดในระบบเข้ากับรุ่นราคา 2568.0.0
+-- 7. เชื่อมโยงใบงานเดิมทั้งหมดในระบบเข้ากับรุ่นราคา 2568.0.0
 UPDATE boq 
 SET price_list_version_id = (SELECT id FROM price_list_versions WHERE version_string = '2568.0.0' LIMIT 1)
 WHERE price_list_version_id IS NULL;
 
--- 5. Snapshot Backfill: ก๊อปปี้หมวดหมู่ประวัติศาสตร์ลงในระดับตารางใบรายการย่อยทั้งหมดทันที
+-- 8. Snapshot Backfill: ก๊อปปี้หมวดหมู่ประวัติศาสตร์ลงในระดับตารางใบรายการย่อยทั้งหมดทันที
 UPDATE boq_items bi
 SET category = pl.category
 FROM price_list pl
@@ -213,7 +216,7 @@ CREATE OR REPLACE FUNCTION save_boq_with_routes(
 ) RETURNS JSONB
 LANGUAGE plpgsql
 SECURITY DEFINER
-SET search_path = public
+SET search_path = ''
 AS $$
 DECLARE
   v_route JSONB;
@@ -238,7 +241,7 @@ BEGIN
   -- ดึงข้อมูลรุ่นเล่มราคาและโครงสร้างสิทธิ์ของ BOQ เป้าหมายมาเก็บไว้ตรวจสอบ
   SELECT price_list_version_id, created_by, assigned_to, sector_id, department_id 
   INTO v_target_boq_version, v_boq_created_by, v_boq_assigned_to, v_boq_sector, v_boq_dept
-  FROM boq
+  FROM public.boq
   WHERE id = p_boq_id
   FOR UPDATE;  -- [FIX: Row Lock] ป้องกัน race condition กรณี 2 คนกด save พร้อมกัน
 
@@ -256,11 +259,18 @@ BEGIN
   -- บล็อก inactive/suspended แม้ token ยังใช้ได้
   SELECT role, status, sector_id, department_id 
   INTO v_caller_role, v_caller_status, v_caller_sector, v_caller_dept
-  FROM user_profiles
+  FROM public.user_profiles
   WHERE id = auth.uid() AND status IN ('active', 'pending');
 
   IF v_caller_role IS NULL THEN
     RAISE EXCEPTION 'ไม่พบบัญชีผู้ใช้ที่ยังเปิดใช้งานอยู่ในระบบ (อาจถูกระงับหรือปิดการใช้งาน)';
+  END IF;
+
+  -- [FIX: Legacy Guard] SECURITY.md L38: Legacy BOQ (created_by IS NULL) = Admin-only
+  -- ต้องตรวจก่อน role check เพราะ RPC เป็น SECURITY DEFINER (bypass RLS)
+  -- RLS 008 มี created_by IS NOT NULL กันไว้ แต่ RPC ต้องกันเองด้วย
+  IF v_boq_created_by IS NULL AND v_caller_role <> 'admin' THEN
+    RAISE EXCEPTION 'ใบงานประวัติศาสตร์ (Legacy BOQ) สามารถแก้ไขได้เฉพาะผู้ดูแลระบบ (Admin) เท่านั้น';
   END IF;
 
   -- [FIX: Pending User] SECURITY.md L28: pending = Own-only (created_by เท่านั้น ไม่รวม assigned_to)
@@ -294,7 +304,7 @@ BEGIN
   END IF;
 
   -- บันทึกข้อมูลตารางหลัก BOQ
-  UPDATE boq SET
+  UPDATE public.boq SET
     estimator_name = p_boq_data->>'estimator_name',
     document_date = (p_boq_data->>'document_date')::DATE,
     project_name = p_boq_data->>'project_name',
@@ -316,14 +326,14 @@ BEGIN
   WHERE id = p_boq_id;
 
   -- ลบรายการเก่าของ BOQ นี้ออกเพื่อบันทึกใหม่
-  DELETE FROM boq_items WHERE boq_id = p_boq_id;
-  DELETE FROM boq_routes WHERE boq_id = p_boq_id;
+  DELETE FROM public.boq_items WHERE boq_id = p_boq_id;
+  DELETE FROM public.boq_routes WHERE boq_id = p_boq_id;
 
   FOR v_route IN SELECT * FROM jsonb_array_elements(p_routes)
   LOOP
     v_route_index := v_route_index + 1;
 
-    INSERT INTO boq_routes (
+    INSERT INTO public.boq_routes (
       boq_id, route_order, route_name, route_description, construction_area,
       total_material_cost, total_labor_cost, total_cost
     ) VALUES (
@@ -342,7 +352,7 @@ BEGIN
       -- [CROSS-VERSION PROTECTION] ตรวจสอบความถูกต้องของไอเทมราคากลางเทียบกับรุ่นของ BOQ
       IF (v_item->>'price_list_id') IS NOT NULL THEN
         SELECT version_id INTO v_item_version
-        FROM price_list
+        FROM public.price_list
         WHERE id = (v_item->>'price_list_id')::UUID;
 
         IF v_item_version IS DISTINCT FROM v_target_boq_version THEN
@@ -353,10 +363,10 @@ BEGIN
       -- ดึงหมวดหมู่จาก price_list อัตโนมัติเป็นแนวป้องกันสำรอง หากไคลเอนต์ไม่ได้ส่งมา
       v_category := v_item->>'category';
       IF v_category IS NULL AND (v_item->>'price_list_id') IS NOT NULL THEN
-        SELECT category INTO v_category FROM price_list WHERE id = (v_item->>'price_list_id')::UUID;
+        SELECT category INTO v_category FROM public.price_list WHERE id = (v_item->>'price_list_id')::UUID;
       END IF;
 
-      INSERT INTO boq_items (
+      INSERT INTO public.boq_items (
         boq_id, route_id, item_order, price_list_id, item_name, quantity, unit,
         material_cost_per_unit, labor_cost_per_unit, unit_cost,
         total_material_cost, total_labor_cost, total_cost, remarks, category
@@ -387,90 +397,17 @@ EXCEPTION
 END;
 $$;
 
--- 2. ฟังก์ชันโคลนราคากลางข้ามเวอร์ชันอย่างรวดเร็วและปลอดภัยระดับ DB (ประสิทธิภาพ 10ms พร้อมระบบตรวจสอบเงื่อนไขแน่นหนา)
-CREATE OR REPLACE FUNCTION clone_price_list_version(
-  p_source_version_id UUID,
-  p_target_version_id UUID
-) RETURNS INT
-LANGUAGE plpgsql
-SECURITY DEFINER
-SET search_path = public
-AS $$
-DECLARE
-  v_count INT;
-BEGIN
-  -- [SECURITY CHECK] บังคับสิทธิ์ Admin ที่ยังเปิดใช้งานอยู่เท่านั้น
-  IF NOT EXISTS (
-    SELECT 1 FROM user_profiles 
-    WHERE id = auth.uid() AND role = 'admin' AND status = 'active'
-  ) THEN
-    RAISE EXCEPTION 'เฉพาะผู้ดูแลระบบ (Admin) ที่ยังเปิดใช้งานอยู่เท่านั้นที่มีสิทธิ์ดำเนินการงานนี้';
-  END IF;
+-- [CRITICAL SECURITY] Revoke ทันทีหลัง CREATE FUNCTION (ไม่รอท้าย script)
+REVOKE EXECUTE ON FUNCTION save_boq_with_routes(UUID, JSONB, JSONB) FROM PUBLIC, anon;
+GRANT EXECUTE ON FUNCTION save_boq_with_routes(UUID, JSONB, JSONB) TO authenticated;
 
-  -- ตรวจสอบตัวตนเวอร์ชันต้นทางและปลายทาง
-  IF NOT EXISTS (SELECT 1 FROM price_list_versions WHERE id = p_source_version_id) OR
-     NOT EXISTS (SELECT 1 FROM price_list_versions WHERE id = p_target_version_id) THEN
-    RAISE EXCEPTION 'เวอร์ชันต้นทางหรือปลายทางไม่ถูกต้อง';
-  END IF;
-
-  -- [CONDITIONAL LOCK] ตรวจสอบสถานะและป้องกันการโคลนซ้ำซ้อน
-  IF NOT EXISTS (SELECT 1 FROM price_list_versions WHERE id = p_target_version_id AND status = 'draft') THEN
-    RAISE EXCEPTION 'เฉพาะเวอร์ชันที่มีสถานะเป็น draft เท่านั้นที่สามารถนำเข้าหรือคัดลอกราคากลางได้';
-  END IF;
-
-  IF EXISTS (SELECT 1 FROM price_list WHERE version_id = p_target_version_id) THEN
-    RAISE EXCEPTION 'เวอร์ชันปลายทางมีข้อมูลราคากลางอยู่แล้ว ไม่สามารถทำการคัดลอกทับได้';
-  END IF;
-
-  -- ทำการคัดลอกราคากลางทั้งหมดระดับอะตอมิก
-  INSERT INTO price_list (
-    version_id, item_code, item_name, unit, material_cost, labor_cost, unit_cost, remarks, category, is_active
-  )
-  SELECT
-    p_target_version_id, item_code, item_name, unit, material_cost, labor_cost, unit_cost, remarks, category, is_active
-  FROM price_list
-  WHERE version_id = p_source_version_id
-  ON CONFLICT (version_id, item_code) DO NOTHING;
-
-  GET DIAGNOSTICS v_count = ROW_COUNT;
-  RETURN v_count;
-END;
-$$;
-
--- 3. ฟังก์ชันสลับเวอร์ชันเริ่มต้นใช้งานจริงอย่างปลอดภัย (Atomic State Swap - [MUST-FIX 1] One-statement swap)
-CREATE OR REPLACE FUNCTION make_version_default(
-  p_version_id UUID
-) RETURNS VOID
-LANGUAGE plpgsql
-SECURITY DEFINER
-SET search_path = public
-AS $$
-BEGIN
-  -- [SECURITY CHECK] บังคับสิทธิ์ Admin ที่ยังเปิดใช้งานอยู่เท่านั้น
-  IF NOT EXISTS (
-    SELECT 1 FROM user_profiles 
-    WHERE id = auth.uid() AND role = 'admin' AND status = 'active'
-  ) THEN
-    RAISE EXCEPTION 'เฉพาะผู้ดูแลระบบ (Admin) ที่ยังเปิดใช้งานอยู่เท่านั้นที่มีสิทธิ์ดำเนินการงานนี้';
-  END IF;
-
-  IF NOT EXISTS (SELECT 1 FROM price_list_versions WHERE id = p_version_id AND status = 'active') THEN
-    RAISE EXCEPTION 'เฉพาะเวอร์ชันที่มีสถานะเป็น active เท่านั้นที่สามารถตั้งเป็นเวอร์ชันเริ่มต้น (default) ได้';
-  END IF;
-
-  -- [MUST-FIX 1] ทำการสลับตำแหน่งค่าเริ่มต้นในประโยค UPDATE ระดับ STATEMENT เดียว เพื่อหลีกเลี่ยงการขัดขวางของ AFTER STATEMENT Trigger
-  UPDATE price_list_versions
-  SET is_default = (id = p_version_id)
-  WHERE is_default = true OR id = p_version_id;
-END;
-$$;
 
 -- ============================================================================
 -- [RLS TIGHTENING & AUTHORIZATION MANAGEMENT]
 -- ============================================================================
 
 -- 1. เปิดใช้การป้องกันความปลอดภัยระดับ RLS ทุกลำวดับอย่างเข้มงวด
--- price_list_versions และ price_list_audit_logs: ENABLE RLS ย้ายไปติดกับ CREATE TABLE แล้ว (L65, L83)
+-- price_list_versions และ price_list_audit_logs: ENABLE RLS ย้ายไปติดกับ CREATE TABLE แล้ว (L66, L87)
 ALTER TABLE price_list ENABLE ROW LEVEL SECURITY;
 
 -- 2. นโยบาย RLS สำหรับตารางรุ่นเล่มราคา (price_list_versions)
@@ -524,56 +461,48 @@ CREATE POLICY "Allow read and write audit logs for admin only" ON price_list_aud
     );
 
 -- ============================================================================
--- [EXPLICIT GRANTS & REVOCATION FOR EXECUTE PRIVILEGES]
+-- [PHASE 1A GRANTS & REVOKE] สิทธิ์ขั้นต่ำ — SELECT เท่านั้น
 -- ============================================================================
 
--- มอบสิทธิ์การดำเนินงานครอบคลุม (CRUD) ให้กับบทบาทผู้ใช้ที่ล็อกอิน (authenticated) 
--- โดยระบบความปลอดภัยระดับแถวข้อมูล (RLS Policies) จะทำหน้าที่บล็อกการปรับแต่งค่า (Write) ให้เฉพาะบทบาท 'admin' เท่านั้น
-GRANT SELECT, INSERT, UPDATE, DELETE ON TABLE price_list_versions TO authenticated;
-GRANT SELECT, INSERT, UPDATE, DELETE ON TABLE price_list TO authenticated;
-GRANT SELECT, INSERT, UPDATE, DELETE ON TABLE price_list_audit_logs TO authenticated;
+-- [EXPLICIT REVOKE] ถอน write privilege ให้ชัดเจน (GRANT เป็น additive ไม่ลบของเดิม)
+REVOKE INSERT, UPDATE, DELETE
+ON TABLE price_list_versions, price_list, price_list_audit_logs
+FROM PUBLIC, authenticated, anon;
 
--- มอบสิทธิ์จัดการแบบ Full แก่บทบาทระบบหลังบ้าน Service Role
+-- Phase 1A: อ่านอย่างเดียว (RPC ทำงานผ่าน SECURITY DEFINER ไม่ต้องใช้ write grant)
+GRANT SELECT ON TABLE price_list_versions TO authenticated;
+GRANT SELECT ON TABLE price_list TO authenticated;
+GRANT SELECT ON TABLE price_list_audit_logs TO authenticated;
+
+-- Service role: Full access (สำหรับ migration/backfill)
 GRANT SELECT, INSERT, UPDATE, DELETE ON TABLE price_list_versions TO service_role;
 GRANT SELECT, INSERT, UPDATE, DELETE ON TABLE price_list TO service_role;
 GRANT SELECT, INSERT, UPDATE, DELETE ON TABLE price_list_audit_logs TO service_role;
 
--- [CRITICAL SECURITY] ถอนและควบคุมสิทธิ์ในการเรียกใช้งานฟังก์ชันระดับแอดมิน ป้องกัน RPC Hijacking
--- [DESIGN DECISION: SECURITY DEFINER in public schema]
--- ตัดสินใจ: คงไว้ใน public schema เพราะ Supabase PostgREST เรียกได้โดยตรง
--- mitigations: SET search_path, REVOKE FROM PUBLIC/anon, internal role check, status='active'
--- ถ้าอนาคตต้องการเข้มขึ้น → ย้ายไป private schema + เรียกผ่าน Server Action/service_role
---
 -- [KNOWN RISK: BOQ Direct-Write RLS]
 -- ตาราง boq, boq_items, boq_routes ยังมี policy USING(true) อยู่ (เปิดกว้าง)
--- ผู้ใช้สามารถ bypass RPC และเขียน boq/items/routes ตรงผ่าน Supabase client ได้
 -- นี่เป็นปัญหาที่มีอยู่เดิม ไม่ได้เกิดจาก migration นี้
--- ควรพิจารณา tighten ในอนาคตเมื่อพร้อม
-REVOKE EXECUTE ON FUNCTION save_boq_with_routes(UUID, JSONB, JSONB) FROM PUBLIC, anon;
-GRANT EXECUTE ON FUNCTION save_boq_with_routes(UUID, JSONB, JSONB) TO authenticated;
-
-REVOKE EXECUTE ON FUNCTION clone_price_list_version(UUID, UUID) FROM PUBLIC, anon;
-GRANT EXECUTE ON FUNCTION clone_price_list_version(UUID, UUID) TO authenticated;
-
-REVOKE EXECUTE ON FUNCTION make_version_default(UUID) FROM PUBLIC, anon;
-GRANT EXECUTE ON FUNCTION make_version_default(UUID) TO authenticated;
 ```
+
+> **Design Decisions (ไม่ใช่ SQL)**
+> - `SECURITY DEFINER` + `search_path = ''` + fully-qualified table names — ตาม [Supabase best practice](https://supabase.com/docs/guides/database/functions)
+> - BOQ direct-write RLS เปิดกว้าง — ปัญหาเดิม ควร tighten ใน sprint ถัดไป
 
 ---
 
 ## 🔒 3. การรัดกุมฐานข้อมูลหลังจากปรับแต่งโปรแกรมเสร็จสิ้น (Phase 1B - Database Hardening)
 
-เมื่อนักพัฒนาและระบบ CI/CD ทำการคอมมิตและเดปลอยซอร์สโค้ดหน้าเว็บ ระบบค้นหาหน้าก๊อปปี้ และการจัดเซฟข้อมูลทั้งหมดขึ้นสู่โปรดักชันเรียบร้อยแล้ว เราจะดำเนินงานในส่วนนี้ทันทีเพื่อรัดกุมข้อตกลงสัญญาข้อมูลให้มั่นคงแบบ 100%:
+รันหลังจาก Phase 2 deploy code เสร็จแล้ว:
 
 ```sql
 -- ============================================================================
 -- [PHASE 1B] รัดกุมข้อตกลงสัญญาข้อมูล (Data Contract Hardening)
 -- ============================================================================
 
--- 1. ลบสถานะความปลอดภัยแบบยืดหยุ่นออก และปรับค่าเวอร์ชันเป็น NOT NULL
+-- 1. ปรับค่าเวอร์ชันเป็น NOT NULL
 ALTER TABLE boq ALTER COLUMN price_list_version_id SET NOT NULL;
 
--- 2. ติดตั้งทริกเกอร์ป้องกันการดัดแปลงเลขรุ่นย้อนหลังหลังจากจัดเซฟใบงานไปแล้ว
+-- 2. ทริกเกอร์ป้องกันการดัดแปลงเลขรุ่นย้อนหลัง
 CREATE OR REPLACE FUNCTION prevent_boq_version_modification()
 RETURNS TRIGGER AS $$
 BEGIN
@@ -582,11 +511,66 @@ BEGIN
     END IF;
     RETURN NEW;
 END;
-$$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public;
+$$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = '';
 
 DROP TRIGGER IF EXISTS trigger_prevent_boq_version_modification ON boq;
 CREATE TRIGGER trigger_prevent_boq_version_modification
 BEFORE UPDATE ON boq
 FOR EACH ROW
 EXECUTE FUNCTION prevent_boq_version_modification();
+```
+
+---
+
+## 🔧 4. ฟังก์ชัน Phase 4 — Admin GUI (ห้ามรันใน Phase 1A)
+
+ฟังก์ชันด้านล่างสำหรับ Phase 4 เท่านั้น เมื่อมี Admin GUI พร้อม:
+
+```sql
+-- ============================================================================
+-- [PHASE 4] ฟังก์ชัน Admin — ติดตั้งพร้อม GUI deploy เท่านั้น
+-- ============================================================================
+
+CREATE OR REPLACE FUNCTION clone_price_list_version(
+  p_source_version_id UUID, p_target_version_id UUID
+) RETURNS INT LANGUAGE plpgsql SECURITY DEFINER SET search_path = '' AS $$
+DECLARE v_count INT;
+BEGIN
+  IF NOT EXISTS (SELECT 1 FROM public.user_profiles WHERE id = auth.uid() AND role = 'admin' AND status = 'active') THEN
+    RAISE EXCEPTION 'Admin only'; END IF;
+  IF NOT EXISTS (SELECT 1 FROM public.price_list_versions WHERE id = p_source_version_id) OR
+     NOT EXISTS (SELECT 1 FROM public.price_list_versions WHERE id = p_target_version_id) THEN
+    RAISE EXCEPTION 'Invalid version'; END IF;
+  IF NOT EXISTS (SELECT 1 FROM public.price_list_versions WHERE id = p_target_version_id AND status = 'draft') THEN
+    RAISE EXCEPTION 'Target must be draft'; END IF;
+  IF EXISTS (SELECT 1 FROM public.price_list WHERE version_id = p_target_version_id) THEN
+    RAISE EXCEPTION 'Target not empty'; END IF;
+
+  INSERT INTO public.price_list (version_id, item_code, item_name, unit, material_cost, labor_cost, unit_cost, remarks, category, is_active)
+  SELECT p_target_version_id, item_code, item_name, unit, material_cost, labor_cost, unit_cost, remarks, category, is_active
+  FROM public.price_list WHERE version_id = p_source_version_id
+  ON CONFLICT (version_id, item_code) DO NOTHING;
+  GET DIAGNOSTICS v_count = ROW_COUNT;
+  RETURN v_count;
+END; $$;
+REVOKE EXECUTE ON FUNCTION clone_price_list_version(UUID, UUID) FROM PUBLIC, anon;
+GRANT EXECUTE ON FUNCTION clone_price_list_version(UUID, UUID) TO authenticated;
+
+CREATE OR REPLACE FUNCTION make_version_default(p_version_id UUID)
+RETURNS VOID LANGUAGE plpgsql SECURITY DEFINER SET search_path = '' AS $$
+BEGIN
+  IF NOT EXISTS (SELECT 1 FROM public.user_profiles WHERE id = auth.uid() AND role = 'admin' AND status = 'active') THEN
+    RAISE EXCEPTION 'Admin only'; END IF;
+  IF NOT EXISTS (SELECT 1 FROM public.price_list_versions WHERE id = p_version_id AND status = 'active') THEN
+    RAISE EXCEPTION 'Version must be active'; END IF;
+  UPDATE public.price_list_versions SET is_default = (id = p_version_id)
+  WHERE is_default = true OR id = p_version_id;
+END; $$;
+REVOKE EXECUTE ON FUNCTION make_version_default(UUID) FROM PUBLIC, anon;
+GRANT EXECUTE ON FUNCTION make_version_default(UUID) TO authenticated;
+
+-- เปิด write grants สำหรับ Admin GUI
+GRANT INSERT, UPDATE, DELETE ON TABLE price_list_versions TO authenticated;
+GRANT INSERT, UPDATE, DELETE ON TABLE price_list TO authenticated;
+GRANT INSERT, UPDATE, DELETE ON TABLE price_list_audit_logs TO authenticated;
 ```

@@ -1,10 +1,10 @@
-# 🔬 Architecture Analysis v7 — Final Audit Trail (Proposal v9 / Plan v8)
+# 🔬 Architecture Analysis v11 — Audit Trail (Proposal v13 / Plan v11)
 
 > เอกสารนี้เป็น **audit trail** ของทุกรอบ review พร้อมสถานะปัจจุบัน
 
 ---
 
-## Proposal Change Log (v1 → v9)
+## Proposal Change Log (v1 → v13)
 
 | Round | จุดที่แก้ | สถานะ |
 |---|---|---|
@@ -24,13 +24,25 @@
 | v7 | เพิ่ม assertion comment สำหรับ `ON CONFLICT DO NOTHING` | ✅ |
 | v7 | เพิ่ม BOQ direct-write RLS known risk note | ✅ |
 | v8 | เปลี่ยน `SET` → `SET LOCAL` + `RESET` หลัง COMMIT | ✅ |
-| **v9** | **[P0 FIX] Pending user: เปลี่ยน `status='active'` → `IN ('active','pending')` + pending logic** | ✅ |
-| **v9** | **[P0 FIX] Legacy BOQ: ลบ `OR v_boq_created_by IS NULL` จาก manager ทุก role** | ✅ |
-| **v9** | **[BEST PRACTICE] ย้าย `ENABLE RLS` ติดกับ `CREATE TABLE` (ปิด gap)** | ✅ |
+| v9 | Pending user: `IN ('active','pending')` + pending logic | ✅ |
+| v9 | Legacy BOQ: ลบ `OR v_boq_created_by IS NULL` จาก manager | ✅ |
+| v9 | ย้าย `ENABLE RLS` ติดกับ `CREATE TABLE` | ✅ |
+| v10 | Legacy Guard: เพิ่ม early check `created_by IS NULL AND role <> admin` | ✅ |
+| v11 | Section 1.2 description: ลบ 'หรือ Legacy' + เพิ่ม pending + อ้าง SECURITY.md | ✅ |
+| v11 | Default trigger: เพิ่ม RAISE EXCEPTION ถ้าหา active default ไม่เจอ (fail-closed) | ✅ |
+| v11 | เปลี่ยน 'Idempotent' → 'rerunnable ภายใต้ preflight assertions' | ✅ |
+| v12 | REVOKE ทันทีหลัง CREATE FUNCTION (ไม่รอท้าย script) | ✅ |
+| v12 | ย้าย clone/swap ไป [PHASE 4 FUNCTIONS] section พร้อม ⚠️ comment | ✅ |
+| v12 | แยก GRANT: Phase 1A = SELECT only / Phase 4 = write grants (commented) | ✅ |
+| **v13** | **ย้าย seed 2568.0.0 ก่อน fail-closed trigger (ปิด outage window)** | ✅ |
+| **v13** | **เปลี่ยน `search_path = ''` + qualify table names ทุก function** | ✅ |
+| **v13** | **เพิ่ม explicit REVOKE INSERT/UPDATE/DELETE ก่อน GRANT SELECT** | ✅ |
+| **v13** | **แยก SQL เป็น 3 executable blocks: Phase 1A / Phase 1B / Phase 4** | ✅ |
+| **v13** | **Phase 1B trigger: `search_path = ''`** | ✅ |
 
 ---
 
-## Implementation Plan Change Log
+## Implementation Plan Change Log (→ v11)
 
 | Round | จุดที่แก้ | สถานะ |
 |---|---|---|
@@ -41,13 +53,28 @@
 | v5 | Phase 1A: migration runner context note | ✅ |
 | v6 | Phase 2: แก้ numbering เป็น 1→6 | ✅ |
 | v6 | Phase 3: เพิ่ม re-verification SQL 3 ตัว | ✅ |
-| v8 | Phase 0: เพิ่ม Backup/Snapshot step | ✅ |
-| v8 | Phase 0: เพิ่ม Rollback Decision Tree | ✅ |
-| v8 | Phase 0: เพิ่ม `boq_routes` ใน RLS check | ✅ |
-| v8 | Phase 0: เพิ่ม constraint name verification query | ✅ |
-| v8 | Phase 0: เพิ่ม 2568.0.0 assertion query | ✅ |
 | v8 | Phase 1A: เปลี่ยน `SET` → `SET LOCAL` + `RESET` | ✅ |
 | v8 | Phase 1A: แก้ inactive user blocking scope | ✅ |
+| v9 | Phase 0: เพิ่ม Backup/Snapshot step | ✅ |
+| v9 | Phase 0: เพิ่ม Rollback Decision Tree | ✅ |
+| v9 | Phase 0: เพิ่ม `boq_routes` ใน RLS query | ✅ |
+| v9 | Phase 0: เพิ่ม constraint name verification (query 6) | ✅ |
+| v9 | Phase 0: เพิ่ม 2568.0.0 assertion (query 7) | ✅ |
+| v10 | Phase 0 query 7: เพิ่ม `to_regclass` check ก่อน (ครั้งแรกยังไม่มี table) | ✅ |
+| v10 | Phase 0 backup: แก้เป็น PITR + `supabase db dump`/`pg_dump` + migration script | ✅ |
+| v10 | Phase 1A: เปลี่ยน 'Idempotent' → 'rerunnable ภายใต้ preflight assertions' | ✅ |
+| v10 | หมายเหตุ RPC: แก้ `status = 'active'` → `status IN ('active','pending')` | ✅ |
+| **v11** | **Query 7: เปลี่ยนเป็น DO $$ block paste-run ได้ทันที** | ✅ |
+| **v11** | **Query 8: เพิ่ม privilege verification (information_schema.role_table_grants)** | ✅ |
+| **v11** | **Test: admin direct-write ถูกบล็อกใน Phase 1A (ต้องผ่าน RPC)** | ✅ |
+| **v11** | **Phase 4: clone/swap อ้าง "Phase 4 migration" ไม่ใช่ "Phase 1A"** | ✅ |
+| **v11** | **Phase 4: Admin writes strategy อ้าง Phase 4 GRANT ไม่ใช่ Phase 1A** | ✅ |
+| **v12** | **Assertion: RAISE WARNING → RAISE EXCEPTION (หยุด migration จริง)** | ✅ |
+| **v12** | **Query 10: privilege check ย้ายไป Post-Verification (ไม่ใช่ preflight)** | ✅ |
+| **v12** | **Admin test: เขียนตรงถูกบล็อก (ต้องผ่าน RPC) ใน Phase 1A** | ✅ |
+| **v13** | **Preflight: แยก row-not-found (NOTICE) vs wrong-status (EXCEPTION)** | OK |
+| **v13** | **Post-verification: ตรวจ PUBLIC + authenticated + anon** | OK |
+| **v12** | **IMPLEMENTATION_PLAN.md: idempotent → rerunnable** | ✅ |
 
 ---
 
@@ -58,20 +85,33 @@
 | Audit log trigger | Phase 4 | ไม่มี admin GUI ใน Phase 1A |
 | `updated_at` trigger | Phase 1A | เล็ก ปลอดภัย |
 | `BEGIN;...COMMIT;` | ใส่พร้อม context note | SQL Editor ใช้ / Supabase CLI ถอด |
-| RPC เช็ค user status | `IN ('active','pending')` | **v9**: pending ต้อง save ได้ตาม SECURITY.md |
+| RPC เช็ค user status | `IN ('active','pending')` | pending ต้อง save ได้ตาม SECURITY.md |
 | RLS ใส่ `WITH CHECK` | ใช่ explicit ทุก policy | PostgreSQL best practice |
 | Row lock | `FOR UPDATE` ใน BOQ SELECT | ป้องกัน concurrent save race |
 | Read exposure | ยอมรับ draft/archived อ่านได้ | ราคากลาง NT = ข้อมูลสาธารณะ |
 | SECURITY DEFINER schema | คงใน public schema | PostgREST + mitigations ครบ |
-| Backup strategy | Supabase snapshot + baseline export | กันไม่ได้ restore |
+| Backup strategy | PITR restore point + `pg_dump`/`supabase db dump` | ถูกต้องตาม Supabase docs |
 | Rollback | Forward-fix DDL / Restore data loss | แยกตาม failure type |
 | BOQ direct-write RLS | บันทึกเป็น known risk | ปัญหาเดิม ไม่เกิดจาก migration |
 | `SET` vs `SET LOCAL` | ใช้ `SET LOCAL` + `RESET` หลัง COMMIT | กัน timeout leak ไป backfill |
 | Inactive user read | บล็อกที่ middleware/UI ไม่ใช่ RLS SELECT | SELECT USING(true) สำหรับ authenticated |
 | Constraint name | ตรวจจริงจาก `pg_constraint` ก่อน migration | Schema สร้างนอก migrations |
-| **Pending user save** | **อนุญาต: own BOQ only (created_by)** | **SECURITY.md L28 + permissions.ts L93** |
-| **Legacy BOQ access** | **Admin-only (ลบ manager legacy access)** | **SECURITY.md L38 + 008_rls L59** |
-| **ENABLE RLS timing** | **ติดกับ CREATE TABLE ทันที** | **Supabase best practice: ปิด gap** |
+| Pending user save | อนุญาต: own BOQ only (created_by) | SECURITY.md L28 + permissions.ts L93 |
+| Legacy BOQ access | Admin-only (early guard + ลบ manager fallback) | SECURITY.md L38 + 008_rls L59 |
+| ENABLE RLS timing | ติดกับ CREATE TABLE ทันที | Supabase best practice: ปิด gap |
+| Default trigger fail | RAISE EXCEPTION (fail-closed) | ป้องกัน NULL ลอดเข้า Phase 3 |
+| "Idempotent" wording | เปลี่ยนเป็น "rerunnable ภายใต้ preflight" | ON CONFLICT DO NOTHING ไม่ซ่อม row ที่ผิด |
+| REVOKE timing | ทันทีหลัง CREATE FUNCTION | PostgreSQL default = PUBLIC can execute |
+| clone/swap scope | Phase 4 only | ลด blast radius — มี version เดียว |
+| authenticated grants | Phase 1A = SELECT / Phase 4 = write | SECURITY DEFINER ไม่ต้องใช้ write grant |
+| search_path | `''` + fully-qualified tables | ตาม Supabase docs best practice |
+| **Seed ordering** | **ก่อน fail-closed trigger** | ป้องกัน outage window |
+| **Write REVOKE** | **Explicit REVOKE ก่อน GRANT SELECT** | GRANT เป็น additive, REVOKE ต้องทำเอง |
+| **SQL block split** | **แยก 3 blocks (Phase 1A / Phase 1B / Phase 4)** | ป้องกัน copy-paste ติดตั้ง Phase 4 |
+| **Privilege verification** | **Query 10 ตรวจ information_schema (Post-Verification)** | พิสูจน์ว่า REVOKE ทำงานจริง |
+| **Preflight retry** | **แยก 4 cases ใน DO block** | partial run (table มี row ไม่มี) ไม่บล็อก retry |
+| **REVOKE scope** | **PUBLIC + authenticated + anon** | PostgreSQL PUBLIC สืบทอดทุก role |
+| **Preflight failure mode** | **RAISE EXCEPTION (ไม่ใช่ WARNING)** | ป้องกัน migration ผ่านแบบ state เสีย |
 
 ---
 
@@ -79,23 +119,49 @@
 
 | # | ประเด็น | Proposal | Plan | สอดคล้อง |
 |---|---|---|---|---|
-| 1 | RPC status check | ✅ `IN ('active','pending')` | ✅ | ✅ |
+| 1 | RPC status check `IN ('active','pending')` | ✅ | ✅ | ✅ |
 | 2 | RLS WITH CHECK + status | ✅ | ✅ | ✅ |
-| 3 | Phase 0: preflight queries | ✅ | ✅ 7 queries + backup + rollback | ✅ |
-| 4 | Phase 2: TypeScript types | ✅ | ✅ | ✅ |
-| 5 | Transaction context | ✅ | ✅ | ✅ |
-| 6 | Audit log → Phase 4 | ✅ | ✅ | ✅ |
-| 7 | Phase 2 numbering 1→6 | N/A | ✅ | ✅ |
-| 8 | FOR UPDATE row lock | ✅ | ✅ | ✅ |
-| 9 | Read exposure decision | ✅ | ✅ | ✅ |
-| 10 | SECURITY DEFINER decision | ✅ | ✅ | ✅ |
-| 11 | Phase 3 re-verification | ✅ | ✅ | ✅ |
-| 12 | Backup/Rollback | ✅ | ✅ Phase 0 items 4-5 | ✅ |
-| 13 | BOQ direct-write RLS | ✅ | ✅ Phase 0 query 5 | ✅ |
-| 14 | `SET LOCAL` + RESET | ✅ | ✅ | ✅ |
-| 15 | 2568.0.0 assertion | ✅ | ✅ Phase 0 query 7 | ✅ |
-| 16 | Constraint name check | ✅ | ✅ Phase 0 query 6 | ✅ |
+| 3 | Phase 0: preflight queries (8 items with DO block) | ✅ | ✅ | ✅ |
+| 4 | Phase 0: backup (PITR + pg_dump) | ✅ | ✅ | ✅ |
+| 5 | Phase 0: rollback tree | ✅ | ✅ | ✅ |
+| 6 | Phase 0: `boq_routes` in RLS query | ✅ | ✅ | ✅ |
+| 7 | Phase 0: constraint name check | ✅ | ✅ | ✅ |
+| 8 | Phase 0: 2568.0.0 assertion (DO block) | ✅ | ✅ | ✅ |
+| 9 | Phase 0: privilege verification (query 10, Post-Verification) | ✅ | ✅ | ✅ |
+| 10 | Phase 2: TypeScript types | ✅ | ✅ | ✅ |
+| 11 | Transaction context | ✅ | ✅ | ✅ |
+| 12 | Audit log → Phase 4 | ✅ | ✅ | ✅ |
+| 13 | FOR UPDATE row lock | ✅ | ✅ | ✅ |
+| 14 | Read exposure decision | ✅ | ✅ | ✅ |
+| 15 | Phase 3 re-verification | ✅ | ✅ | ✅ |
+| 16 | `SET LOCAL` + RESET | ✅ | ✅ | ✅ |
 | 17 | Inactive user scope | ✅ | ✅ | ✅ |
-| **18** | **Pending user save allowed** | ✅ L253-258 | ✅ (consistent) | ✅ |
-| **19** | **Legacy = Admin-only** | ✅ L268-277 | ✅ (matches SECURITY.md) | ✅ |
-| **20** | **ENABLE RLS at creation** | ✅ L65, L83 | ✅ | ✅ |
+| 18 | Pending user save | ✅ | ✅ | ✅ |
+| 19 | Legacy = Admin-only (early guard) | ✅ | ✅ | ✅ |
+| 20 | ENABLE RLS at creation | ✅ | ✅ | ✅ |
+| 21 | Section 1.2 description ตรงกับ SQL | ✅ | ✅ | ✅ |
+| 22 | Default trigger fail-closed | ✅ | ✅ | ✅ |
+| 23 | "rerunnable" ไม่ใช่ "idempotent" | ✅ | ✅ | ✅ |
+| 24 | REVOKE ทันทีหลัง CREATE FUNCTION | ✅ | ✅ | ✅ |
+| 25 | clone/swap อยู่ใน Phase 4 block แยก | ✅ (block แยก) | ✅ | ✅ |
+| 26 | GRANT = SELECT only + explicit REVOKE write (Phase 1A) | ✅ | ✅ | ✅ |
+| **27** | **Seed ก่อน trigger (ไม่มี outage)** | ✅ | ✅ | ✅ |
+| **28** | **`search_path = ''` + qualified tables** | ✅ (ทุก function) | ✅ | ✅ |
+| **29** | **SQL แยก 3 executable blocks** | ✅ | ✅ | ✅ |
+| **30** | **Phase 4 plan อ้าง "Phase 4 migration"** | ✅ | ✅ | ✅ |
+| **31** | **Admin direct-write ถูกบล็อกใน Phase 1A** | ✅ | ✅ | ✅ |
+| **33** | **Preflight retry-safe (partial run ไม่บล็อก)** | OK | OK | OK |
+| **34** | **REVOKE ครอบ PUBLIC** | OK | OK | OK |
+| **32** | **Preflight assertion หยุดจริง (EXCEPTION ไม่ใช่ WARNING)** | ✅ | ✅ | ✅ |
+
+---
+
+## Known Risks (ยอมรับแล้ว ไม่ขวาง Phase 0-1A)
+
+| รายการ | ทำเมื่อไหร่ | เหตุผล |
+|---|---|---|
+| Direct write `boq_items` bypass cross-version | Phase 4 + DB trigger | ตอนนี้มีเวอร์ชันเดียว ไม่เกิดจริง |
+| `make_version_default` ชน unique index? | Phase 4 ทดสอบก่อน deploy | PostgreSQL single-statement ควรผ่าน แต่ต้อง test |
+| `boq`/`boq_items`/`boq_routes` RLS ยังกว้าง | Sprint ถัดไป | ปัญหาเดิม ไม่เกิดจาก migration |
+| `handleDuplicate` ไม่ atomic | Sprint ถัดไป | ปัญหาเดิม ไม่เกิดจาก migration |
+| `handleDelete` ไม่ลบ `boq_routes` | Sprint ถัดไป | ปัญหาเดิม ไม่เกิดจาก migration |

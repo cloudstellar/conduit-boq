@@ -24,12 +24,21 @@
 
 ## 🛠️ รายละเอียดการเปลี่ยนแปลงและแผนการดำเนินงานรายเฟส
 
-### เฟส 0: การตรวจสอบสภาวะและความปลอดภัยเริ่มต้น (Preflight Verification)
-*   **วัตถุประสงค์**: ตรวจทานประวัติข้อมูลเดิมให้แม่นยำก่อนปรับระบบฐานข้อมูล เพื่อความเข้าใจความเสี่ยงในระบบใช้งานจริง
+### เฟส 0: การตรวจสอบสภาวะและความปลอดภัยเริ่มต้น (Preflight Verification & Production Readiness Report)
+*   **วัตถุประสงค์**: ตรวจทานข้อมูลเดิม สำรองข้อมูล และสร้าง rollback plan ก่อนเริ่ม migration
 *   **งานปฏิบัติ**:
     1.  รันคำสั่ง SQL นับและตรวจสอบใบงาน `boq` และรายการไอเทม `boq_items` ในปัจจุบัน
-    2.  ตรวจสอบหาไอเทมประวัติศาสตร์ที่คอลัมน์ `price_list_id` มีค่าเป็น `NULL` หรือชี้ไปที่ไอดีที่ไม่มีอยู่จริงเพื่อทำความเข้าใจและจัดการบันทึกเก็บข้อมูล
-    3.  ตรวจสอบ RLS ปัจจุบันในระบบและสิทธิ์ของผู้ใช้งานในระบบจริง
+    2.  ตรวจสอบหาไอเทมประวัติศาสตร์ที่คอลัมน์ `price_list_id` มีค่าเป็น `NULL` หรือชี้ไปที่ไอดีที่ไม่มีอยู่จริง
+    3.  ตรวจสอบ RLS ปัจจุบันรวม `boq_routes` และตรวจสิทธิ์ของผู้ใช้งานในระบบจริง
+    4.  **สำรองข้อมูลก่อน Migration (Backup)**:
+        *   ตรวจ latest restore point ผ่าน Supabase Dashboard > Database > Backups (PITR)
+        *   รัน `supabase db dump` หรือ `pg_dump` เก็บ logical backup ไว้
+        *   รัน [001_backup_before_migration.sql](file:///Users/cloud/Cloudstellar/conduit-boq/migrations/001_backup_before_migration.sql) ถ้ามี
+        *   Export ผล preflight queries ทั้งหมดเป็น baseline report (เก็บไฟล์ไว้เทียบกับหลัง migration)
+    5.  **Rollback Decision Tree**:
+        *   ถ้า Phase 1A DDL พัง (เช่น duplicate item_code) → **forward-fix**: แก้ข้อมูลแล้วรันใหม่
+        *   ถ้า Phase 1A backfill พัง (ข้อมูลเสียหาย) → **restore** จาก snapshot
+        *   ถ้า Phase 2 code deploy พัง → **revert git** + DB ยังใช้ได้ (เพราะ columns เป็น nullable)
 *   **คำสั่งตรวจสอบ SQL**:
     ```sql
     -- 1. ตรวจสอบจำนวนแถว BOQ และไอเทมปัจจุบัน
@@ -41,38 +50,89 @@
     FROM boq_items 
     WHERE price_list_id IS NULL;
     
-    -- 3. [NEW] ค้นหา boq_items.price_list_id ที่ชี้ไป price_list.id ที่ไม่มีจริง (Dangling FK)
+    -- 3. ค้นหา boq_items.price_list_id ที่ชี้ไป price_list.id ที่ไม่มีจริง (Dangling FK)
     SELECT count(*) AS dangling_fk_items
     FROM boq_items bi
     LEFT JOIN price_list pl ON bi.price_list_id = pl.id
     WHERE bi.price_list_id IS NOT NULL AND pl.id IS NULL;
     
     -- 4. [CRITICAL] ตรวจหา duplicate item_code ก่อนเพิ่ม UNIQUE constraint
-    -- ถ้าผลลัพธ์ > 0 แสดงว่า ADD CONSTRAINT จะ FAIL ต้องแก้ก่อน!
     SELECT item_code, count(*) AS dup_count
     FROM price_list
     GROUP BY item_code
     HAVING count(*) > 1;
     
-    -- 5. ตรวจสอบโครงร่างนโยบาย RLS ที่มีอยู่กับตารางที่เกี่ยวข้อง
+    -- 5. ตรวจสอบ RLS ที่มีอยู่ (รวม boq_routes)
     SELECT tablename, policyname, permissive, roles, cmd, qual 
     FROM pg_policies 
-    WHERE tablename IN ('price_list', 'boq', 'boq_items');
+    WHERE tablename IN ('price_list', 'boq', 'boq_items', 'boq_routes');
+    
+    -- 6. ตรวจชื่อ unique constraint/index จริงบน price_list.item_code
+    -- ถ้าชื่อไม่ใช่ 'price_list_item_code_key' → ต้องแก้ proposal DROP CONSTRAINT
+    SELECT conname, contype
+    FROM pg_constraint
+    WHERE conrelid = 'price_list'::regclass AND contype = 'u';
+    
+    SELECT indexname, indexdef
+    FROM pg_indexes
+    WHERE tablename = 'price_list' AND indexdef LIKE '%item_code%';
+    
+    -- 7. ตรวจว่า price_list_versions มีหรือยัง และ assert 2568.0.0 (รันเป็น block เดียว paste-run ได้ทันที)
+    DO $$
+    DECLARE
+      v_table regclass;
+      v_row_exists BOOLEAN;
+    BEGIN
+      v_table := to_regclass('public.price_list_versions');
+      IF v_table IS NULL THEN
+        RAISE NOTICE 'price_list_versions ยังไม่มี (ปกติสำหรับครั้งแรก)';
+        RETURN;
+      END IF;
+
+      -- ตรวจว่า row 2568.0.0 มีหรือยัง
+      SELECT EXISTS(
+        SELECT 1 FROM public.price_list_versions
+        WHERE major = 2568 AND minor = 0 AND patch = 0
+      ) INTO v_row_exists;
+
+      IF NOT v_row_exists THEN
+        RAISE NOTICE '2568.0.0 ยังไม่มี — seed จะสร้างให้ (ปกติ)';
+        RETURN;
+      END IF;
+
+      -- row มีอยู่ → ต้องตรวจว่า status/is_default ถูกต้อง
+      PERFORM 1 FROM public.price_list_versions
+      WHERE major = 2568 AND minor = 0 AND patch = 0
+        AND status = 'active' AND is_default = true;
+      IF NOT FOUND THEN
+        RAISE EXCEPTION '2568.0.0 มีอยู่แต่ status หรือ is_default ไม่ตรง — ต้องแก้มือก่อน migration (ON CONFLICT DO NOTHING จะไม่ซ่อม)';
+      END IF;
+
+      RAISE NOTICE '2568.0.0 พร้อมใช้งาน';
+    END $$;
     ```
-*   **คำสั่งตรวจสอบ SQL หลัง Backfill (Phase 1A Verification)**:
+*   **คำสั่งตรวจสอบ SQL หลัง Backfill (Phase 1A Post-Verification)**:
     ```sql
-    -- 6. [CRITICAL] ตรวจ boq.price_list_version_id IS NULL หลัง backfill
+    -- 8. [CRITICAL] ตรวจ boq.price_list_version_id IS NULL หลัง backfill
     -- ถ้าผลลัพธ์ > 0 แสดงว่า Phase 1B (SET NOT NULL) จะ FAIL!
     SELECT count(*) AS unlinked_boqs
     FROM boq
     WHERE price_list_version_id IS NULL;
     
-    -- 7. [NEW] ตรวจ cross-version mismatch ระหว่าง boq_items กับ boq
+    -- 9. [NEW] ตรวจ cross-version mismatch ระหว่าง boq_items กับ boq
     SELECT count(*) AS mismatched_items
     FROM boq_items bi
     JOIN price_list pl ON bi.price_list_id = pl.id
     JOIN boq b ON bi.boq_id = b.id
     WHERE pl.version_id IS DISTINCT FROM b.price_list_version_id;
+
+    -- 10. ตรวจ write privileges ของ authenticated (หลัง REVOKE ต้องไม่มี INSERT/UPDATE/DELETE)
+    SELECT grantee, table_name, privilege_type
+    FROM information_schema.role_table_grants
+    WHERE table_name IN ('price_list_versions', 'price_list', 'price_list_audit_logs')
+      AND grantee IN ('PUBLIC', 'authenticated', 'anon')
+      AND privilege_type IN ('INSERT', 'UPDATE', 'DELETE');
+    -- ถ้ามีผลลัพธ์ → REVOKE ยังไม่ทำงาน ต้องแก้
     ```
 
 ---
@@ -80,7 +140,7 @@
 ### เฟส 1A: การปรับโครงสร้างฐานข้อมูลและ Backfill (Defensive Database Schema & Backfill)
 *   **วัตถุประสงค์**: สร้างส่วนขยายแบบ **Nullable (ผ่อนปรน)** และฝังข้อมูลประวัติศาสตร์โดยไม่รบกวนหน้าเว็บปัจจุบัน
 *   **งานปฏิบัติ**:
-    1.  รันคำสั่ง SQL เพื่อสร้างตารางเล่มเวอร์ชัน `price_list_versions` และประวัติการเปลี่ยนแปลงราคา `price_list_audit_logs` (อย่างปลอดภัยและ Idempotent)
+    1.  รันคำสั่ง SQL เพื่อสร้างตารางเล่มเวอร์ชัน `price_list_versions` และประวัติการเปลี่ยนแปลงราคา `price_list_audit_logs` (อย่างปลอดภัยและ rerunnable ภายใต้ preflight assertions)
     2.  เพิ่มคอลัมน์ `version_id` ใน `price_list`, `price_list_version_id` ใน `boq` และ `category` ใน `boq_items` เป็นแบบ **Nullable** และใช้กฎ `ON DELETE RESTRICT` เพื่อป้องกันข้อมูลหายย้อนหลัง
     3.  ติดตั้ง RLS แบบปลอดภัย บังคับอ่านเฉพาะสมาชิกที่ลงทะเบียนใช้งานระบบแล้ว (`TO authenticated`) และกำหนดสิทธิ์การเข้าถึงผ่านคำสั่ง `GRANT` อย่างโปร่งใส
     4.  สร้างและลงทะเบียนฟังก์ชันทริกเกอร์ `trigger_set_default_price_list_version` บนตาราง `boq` เพื่อรองรับการตั้งค่าราคาเวอร์ชันหลัก `2568.0.0` อัตโนมัติในกรณีไม่มีการระบุค่ามาตอนอินเสิร์ต
@@ -105,11 +165,12 @@
         ```
 *   **User Flow Verification หลัง RLS Deploy**:
     *   ทดสอบ 4 สถานะก่อนเดปลอยจริง:
-        *   `admin` → อ่าน/เขียน price_list ได้ ✅
+        *   `admin` → อ่าน price_list ได้ / เขียนตรงถูกบล็อก (ต้องผ่าน RPC ใน Phase 1A) ✅
         *   `staff` → อ่าน price_list ได้ / เขียนถูกบล็อก ✅
         *   `inactive/suspended` user → ถูกบล็อกที่ middleware/UI layer (ไม่ใช่ RLS SELECT เพราะ SELECT policy เป็น `USING(true)` สำหรับ authenticated) ✅
         *   `anon` (ไม่ login) → ถูกบล็อกที่ RLS (`TO authenticated` ไม่รวม anon) ✅
-    *   **หมายเหตุ**: inactive/suspended ถูกบล็อกการเขียนที่ RPC level (AND status = 'active') และ RLS write (WITH CHECK) แต่ยังอ่าน price_list ได้ผ่าน RLS SELECT — การบล็อกอ่านต้องทำที่ middleware/auth guard
+    *   **หมายเหตุ**: inactive/suspended ถูกบล็อกการเขียนที่ RPC level (`status IN ('active','pending')` โดย pending ได้เฉพาะ BOQ ของตัวเอง) และ RLS write (WITH CHECK) แต่ยังอ่าน price_list ได้ผ่าน RLS SELECT — การบล็อกอ่านต้องทำที่ middleware/auth guard
+    *   **Phase 1A Verification**: หลัง REVOKE write แล้ว admin direct-write (ผ่าน Supabase client ไม่ผ่าน RPC) จะถูกบล็อกที่ privilege level ด้วย — admin ต้องเขียนผ่าน RPC เท่านั้น จนกว่า Phase 4 จะเปิด write grants ให้
 
 ---
 
@@ -189,15 +250,16 @@
     1.  **Excel Parser (Deterministic Index-based)**:
         *   สร้างระบบตรวจสอบไฟล์นำเข้า Excel หน้าร้านของ NT โดยใช้กลไกวิเคราะห์ข้อมูลระบุคอลัมน์จากตำแหน่งดัชนีอาร์เรย์ (`header: 1`) เพื่อหลีกเลี่ยงความไม่คงเส้นคงวาและชื่อหัวข้อใน Excel ที่ไม่สม่ำเสมอ
     2.  **Version Bump & Cloner Integration**:
-        *   พัฒนาปุ่มอัปเกรดรุ่น SemVer (เช่น ขยับเล่มราคา Minor หรือ Patch) โดยเมื่อผู้ใช้กดขยับรุ่น หน้าหลังบ้านจะเรียกใช้ Database Function `clone_price_list_version` ที่เขียนไว้ใน Phase 1A ทันที เพื่อทำการโคลนข้อมูลราคากลางทั้งหมด 682 รายการมาเป็นต้นแบบฉบับร่างรุ่นใหม่ด้วยความเร็วระดับ 10ms ปลอดภัยจากขีดจำกัดความเร็วของ Serverless Function หรือความยาวของเน็ตเวิร์ก
-    3.  **State Swap integration**:
-        *   พัฒนาปุ่มสำหรับสลับเวอร์ชันเป็นค่าเริ่มต้นใช้งานจริง (Set Default Version) โดยจะสั่งรันผ่าน Database Function `make_version_default` ซึ่งจะปลดและสลับรุ่นเริ่มต้นใช้งานของระบบสะท้อนความจริงอย่างปลอดภัยแบบ Atomic
+        *   พัฒนาปุ่มอัปเกรดรุ่น SemVer โดยเมื่อผู้ใช้กดขยับรุ่น หน้าหลังบ้านจะเรียกใช้ Database Function `clone_price_list_version` (ติดตั้งพร้อม Phase 4 migration)
+    3.  **State Swap integration** (ติดตั้งพร้อม Phase 4 migration):
+        *   พัฒนาปุ่มสลับเวอร์ชันเริ่มต้น ผ่าน Database Function `make_version_default` (ติดตั้งพร้อม Phase 4 migration)
     4.  **Audit Logs Tracker & Trigger** (เลื่อนมาจาก Phase 1A ตามข้อตกลง):
          *   ติดตั้ง audit trigger บนตาราง `price_list` ให้ auto-INSERT เข้า `price_list_audit_logs` เมื่อมีการ UPDATE/DELETE — ทำพร้อมหน้า admin GUI เพื่อลดความเสี่ยง migration
-         *   นำตารางประวัติ `price_list_audit_logs` มาจัดแสดงผลในระบบตรวจสอบของผู้ดูแลระบบ แสดงประวัติความโปร่งใสของการปรับราคารายไอเทมได้อย่างโปรดักชันเกรด
-    5.  **ยุทธศาสตร์การเขียนข้อมูลฝั่งแอดมิน (Admin Writes Strategy - Policy 2)**:
-        *   การนำเข้า แก้ไขราคากลาง และสลับเวอร์ชัน จะดำเนินการผ่าน Next.js Server Actions (`app/actions/price-list.ts`) โดยใช้สิทธิ์ผู้ลงชื่อเข้าใช้งานของแอดมิน (Client-side Authenticated Session)
-        *   เพื่อความยืดหยุ่นและปลอดภัยสูงสุด ฐานข้อมูลได้มอบสิทธิ์ทำงานแบบ CRUD ให้บทบาท `authenticated` (`GRANT SELECT, INSERT, UPDATE, DELETE TO authenticated`) โดยมีนโยบาย ROW LEVEL SECURITY ("Allow write to admin only") ทำหน้าที่เป็นเกราะสกัดและกรองไม่ให้ผู้ใช้ที่ไม่ใช่ Admin สามารถแก้ไขหรือเซฟข้อมูลใดๆ ลงตารางแคตตาล็อกได้เด็ดขาด
+         *   นำตารางประวัติ `price_list_audit_logs` มาจัดแสดงผลในระบบตรวจสอบของผู้ดูแลระบบ
+    5.  **Admin Writes Strategy**:
+        *   Phase 4 migration จะ GRANT INSERT/UPDATE/DELETE ให้ `authenticated` พร้อมกับติดตั้ง clone/swap functions
+        *   การนำเข้า/แก้ไขราคากลาง ดำเนินการผ่าน Next.js Server Actions โดยใช้สิทธิ์ authenticated session
+        *   RLS policy "Allow write to admin only" ทำหน้าที่กรองไม่ให้ non-admin เขียนได้
 *   **ไฟล์ที่เกี่ยวข้อง**:
     *   [NEW] [app/admin/price-list/page.tsx](file:///Users/cloud/Cloudstellar/conduit-boq/app/admin/price-list/page.tsx)
     *   [NEW] [app/actions/price-list.ts](file:///Users/cloud/Cloudstellar/conduit-boq/app/actions/price-list.ts)

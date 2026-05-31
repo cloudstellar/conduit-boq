@@ -5,7 +5,7 @@
 
 ## 📋 Project Overview
 
-**Current Version:** v1.2.0  
+**Current Version:** v1.6.0 (Added Excel export via `exceljs`)  
 **Production URL:** Deployed on Vercel  
 
 ---
@@ -24,7 +24,7 @@ Next.js 16 + React 19 + TypeScript + Tailwind CSS 4
 
 ---
 
-## ✅ Phase 1: Foundation (COMPLETED v1.2.0)
+## ✅ Phase 1: Foundation (COMPLETED v1.6.0)
 
 - [x] Price list (682 items, 52 categories)
 - [x] BOQ with multi-route support
@@ -33,75 +33,64 @@ Next.js 16 + React 19 + TypeScript + Tailwind CSS 4
 - [x] RLS policies + RBAC
 - [x] Admin: approve/reject pending users
 - [x] Onboarding flow with requested_* fields
+- [x] PDF/Excel export with premium templates (`exceljs`)
 
 ---
 
-## 🚧 Phase 2: Modernization & Versioning (PLANNED)
+## 🚧 Phase 2: Modernization & Versioning (SRE-Hardened - PLANNED)
 
-**Strategy:** Foundation → Output → Input → Governance
+**Strategy:** Foundation (DB) → Integration (Codebase) → Hardening (Locks) → Governance (Admin GUI)
 
-### 🔐 Key Integrity Rules
+### 🔐 Key Integrity & Security Rules (Revised v3)
 
-**Rule A: Versioning**
-| Rule | Implementation |
-|------|----------------|
-| One default | `UNIQUE WHERE is_default = true` |
-| Default = active | Constraint |
-| Switch default = atomic | Transaction |
-| Active-only BOQ | Trigger + log |
-| Immutable version_id | Trigger + log |
-| No duplicate items | `UNIQUE (version_id, item_code)` |
+**Rule A: Versioning & State Control**
+- **One active default**: Handled by unique partial index `idx_only_one_default_active_version`.
+- **Default = active**: Checked via database constraint.
+- **Switch default = atomic**: Executed via transaction or `make_version_default` RPC.
+- **Never 0 defaults**: Ensured by AFTER STATEMENT trigger `trigger_check_default_version_exists`.
+- **Active-only BOQ**: New BOQs auto-bind to the default active version.
+- **Immutable version_id**: Trigger `trigger_prevent_boq_version_modification` locks BOQ versioning post-hardening.
+- **No duplicate items in version**: Guaranteed by composite unique key `UNIQUE (version_id, item_code)` after dropping global `price_list_item_code_key`.
 
-**Rule B: Snapshot**
-- No auto-update: Changes don't affect existing BOQs
-- BOQ = Frozen after creation
-- Traceable: `source_model_id`, `cloned_from_boq_id`
+**Rule B: Snapshot Shield**
+- **No auto-update**: Category and prices are snapshotted in `boq_items.category` at insert.
+- **Automatic Fallback Snapshot**: Database RPC `save_boq_with_routes` automatically falls back to retrieve and snapshot categories from `price_list` if client parameters are empty.
+- **Traceability**: `cloned_from_boq_id` and item snapshot state are fully preserved on duplication.
 
----
-
-### 📅 Phase 2A: Foundation
-⛔ **Infrastructure only**
-
-**Order:**
-1. `price_list_versions` + seed "2568"
-2. `price_list.version_id` + backfill + unique
-3. `boq.price_list_version_id` + backfill + NOT NULL
-4. `system_event_log` (use `created_at`)
-5. Triggers + logging
-6. UI/PDF version display
-
-**Guardrails:**
-- Backfill before NOT NULL
-- Atomic default switch
-- Log: `action`, `table_name`, `created_at` = NOT NULL
+**Rule C: SECURITY DEFINER RPC Hardening**
+- **Auth verification inside RPC**: `clone_price_list_version` and `make_version_default` enforce admin roles, and `save_boq_with_routes` mirrors `permissions.ts` logic (allowing owners, assigned users, sector/department managers, and admins).
+- **Execution privilege boundaries**: Explicitly revoke execute privileges from `PUBLIC`/`anon` and grant exclusively to `authenticated` role.
+- **Cross-Version Isolation**: RPC strictly checks that every inserted `price_list_id` belongs to the BOQ's current `price_list_version_id`.
 
 ---
 
-### 📈 Phase 2B: Reporting
-- Summary per Dept/Sector (Read-only)
-- Filters + PDF Export
+### 📅 Phase 2 Rollout Plan (5-Step Roadmap)
 
-**Copy/Requote:**
-```
-คัดลอก ▼
-├─ คัดลอก BOQ (ราคาเดิม)
-└─ Requote เป็นราคาปี...
-```
-- Requote → `cloned_from_boq_id = source`
-- Requote → target `version.status = 'active'`
-- Not found → costs = NULL
+#### **Phase 0: Preflight Verification**
+- Run counts and integrity checks on current production BOQ rows.
+- Verify existing RLS structures.
 
----
+#### **Phase 1A: Database Setup (Defensive Nullable Setup)**
+- Run rerunnable DDL scripts to create `price_list_versions` and `price_list_audit_logs`.
+- Add nullable version columns and drop old global item code unique constraint.
+- Deploy SRE triggers, RPCs, fallback snapshotters, and explicit role permissions (`GRANT`/`REVOKE`).
+- Run historical backfill and snapshot recovery scripts.
 
-### 🧠 Phase 2C: Smart Estimation
-- `source_model_id` NULLABLE + FK to `models`
-- Wizard UI + Model CRUD
+#### **Phase 2: Codebase Deployment & Integration**
+- Propagate version ID: `MultiRouteEditor` -> `LineItemsTable` -> `ItemSearch` (with version search constraints).
+- Update BOQ duplication in `app/boq/page.tsx` to copy `price_list_version_id` and snapshotted categories.
+- Remove dynamic `.select('*, price_list(category)')` JOIN from print page (`print/page.tsx`) and editor (`MultiRouteEditor.tsx`).
+- Update dashboard hook (`useDashboardData.ts`) and `/price-list` page queries to filter by active default version.
 
----
+#### **Phase 3: Database Hardening (Phase 1B)**
+- Verify zero NULL snapshots via SRE-corrected query (excluding manual custom items).
+- Set `boq.price_list_version_id` to `NOT NULL`.
+- Enable `trigger_prevent_boq_version_modification` to seal historical BOQ version states.
 
-### 🔐 Phase 2D: Governance
-- BOQ Audit Log
-- Version Comparison
+#### **Phase 4: Admin GUI & Governance Tools**
+- Build admin price upload and Excel parsing preview (using deterministic index-based array parser).
+- Connect high-performance DB functions `clone_price_list_version` and `make_version_default` to admin state buttons.
+- Display `price_list_audit_logs` tracking price change histories.
 
 ---
 
@@ -109,7 +98,6 @@ Next.js 16 + React 19 + TypeScript + Tailwind CSS 4
 
 - [ ] Approval workflow (draft → approved)
 - [ ] Notifications
-- [x] ~~PDF/Excel export with template~~ → ✅ Completed in v1.6.0 (Excel export via `exceljs`, see `lib/exportBoqExcel.ts`)
 - [ ] PWA / Offline support
 - [ ] Mobile-optimized UI
 
@@ -122,7 +110,8 @@ Next.js 16 + React 19 + TypeScript + Tailwind CSS 4
 | 001-006 | Phase 1 foundation | ✅ |
 | 007 | Onboarding columns | ✅ v1.2.0 |
 | 008 | RLS + Trigger + RPC | ✅ v1.2.0 |
-| 009+ | Phase 2A versioning | ⏳ Planned |
+| 009 | Factor F Supplement snapshot | ✅ v1.5.0 |
+| 010_phase_2a_versioning | SRE-hardened v3 master catalog migrations | ⏳ Planned |
 
 ---
 
