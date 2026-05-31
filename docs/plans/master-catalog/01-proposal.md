@@ -63,6 +63,9 @@ CREATE TABLE IF NOT EXISTS price_list_versions (
     CONSTRAINT uq_major_minor_patch UNIQUE (major, minor, patch)
 );
 
+-- [BEST PRACTICE] เปิด RLS ทันทีหลังสร้างตาราง ไม่ทิ้ง gap
+ALTER TABLE price_list_versions ENABLE ROW LEVEL SECURITY;
+
 -- ดัชนีรับประกันความมีหนึ่งเดียวของค่าเริ่มต้นเวอร์ชันใช้งานจริง
 CREATE UNIQUE INDEX IF NOT EXISTS idx_only_one_default_active_version 
 ON price_list_versions (is_default) 
@@ -79,6 +82,9 @@ CREATE TABLE IF NOT EXISTS price_list_audit_logs (
     performed_by UUID REFERENCES auth.users(id) ON DELETE SET NULL,
     created_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
+
+-- [BEST PRACTICE] เปิด RLS ทันทีหลังสร้างตาราง
+ALTER TABLE price_list_audit_logs ENABLE ROW LEVEL SECURITY;
 
 -- 3. ปรับโครงสร้างตารางเดิมให้รองรับเวอร์ชันแบบผ่อนปรน (ON DELETE RESTRICT เพื่อความปลอดภัยสูงสุด)
 ALTER TABLE price_list ADD COLUMN IF NOT EXISTS version_id UUID REFERENCES price_list_versions(id) ON DELETE RESTRICT;
@@ -220,6 +226,7 @@ DECLARE
   
   -- ตัวแปรตรวจสอบสิทธิ์ความปลอดภัยที่สอดคล้องกับ permissions.ts
   v_caller_role TEXT;
+  v_caller_status TEXT;
   v_caller_sector UUID;
   v_caller_dept UUID;
   v_boq_created_by UUID;
@@ -244,18 +251,24 @@ BEGIN
     RAISE EXCEPTION 'ใบประมาณราคานี้ยังไม่ได้ผูกกับเวอร์ชันราคากลาง (boq_id: %)', p_boq_id;
   END IF;
 
-  -- [SECURITY CHECK - POLICY 1] ตรวจสอบสิทธิ์ผู้เซฟอย่างละเอียดตรงตาม permissions.ts
-  -- เพิ่ม status = 'active' เพื่อบล็อก user ที่ถูก inactive/suspended แม้ token ยังใช้ได้
-  SELECT role, sector_id, department_id 
-  INTO v_caller_role, v_caller_sector, v_caller_dept
+  -- [SECURITY CHECK - POLICY 1] ตรวจสอบสิทธิ์ผู้เซฟอย่างละเอียดตรงตาม permissions.ts + SECURITY.md
+  -- รับทั้ง active และ pending (pending มีสิทธิ์จำกัด)
+  -- บล็อก inactive/suspended แม้ token ยังใช้ได้
+  SELECT role, status, sector_id, department_id 
+  INTO v_caller_role, v_caller_status, v_caller_sector, v_caller_dept
   FROM user_profiles
-  WHERE id = auth.uid() AND status = 'active';
+  WHERE id = auth.uid() AND status IN ('active', 'pending');
 
   IF v_caller_role IS NULL THEN
     RAISE EXCEPTION 'ไม่พบบัญชีผู้ใช้ที่ยังเปิดใช้งานอยู่ในระบบ (อาจถูกระงับหรือปิดการใช้งาน)';
   END IF;
 
-  IF v_caller_role = 'admin' THEN
+  -- [FIX: Pending User] SECURITY.md L28: pending = Own-only (created_by เท่านั้น ไม่รวม assigned_to)
+  IF v_caller_status = 'pending' THEN
+    IF auth.uid() = v_boq_created_by THEN
+      v_is_authorized := TRUE;
+    END IF;
+  ELSIF v_caller_role = 'admin' THEN
     v_is_authorized := TRUE;
   ELSIF v_caller_role = 'staff' THEN
     -- Staff แก้ไขได้เฉพาะใบงานที่ตัวเองสร้างหรือได้รับมอบหมาย
@@ -263,13 +276,15 @@ BEGIN
       v_is_authorized := TRUE;
     END IF;
   ELSIF v_caller_role = 'sector_manager' THEN
-    -- Sector Manager แก้ไขได้ในเซกเตอร์เดียวกัน หรือใบงานประวัติศาสตร์ (Legacy)
-    IF (v_caller_sector IS NOT NULL AND v_caller_sector = v_boq_sector) OR v_boq_created_by IS NULL THEN
+    -- Sector Manager แก้ไขได้ในเซกเตอร์เดียวกัน
+    -- [FIX: Legacy BOQ] SECURITY.md L38: Legacy = Admin-only (ลบ OR v_boq_created_by IS NULL)
+    IF v_caller_sector IS NOT NULL AND v_caller_sector = v_boq_sector THEN
       v_is_authorized := TRUE;
     END IF;
   ELSIF v_caller_role = 'dept_manager' THEN
-    -- Dept Manager แก้ไขได้ในดีพาร์ตเมนต์เดียวกัน หรือใบงานประวัติศาสตร์ (Legacy)
-    IF (v_caller_dept IS NOT NULL AND v_caller_dept = v_boq_dept) OR v_boq_created_by IS NULL THEN
+    -- Dept Manager แก้ไขได้ในดีพาร์ตเมนต์เดียวกัน
+    -- [FIX: Legacy BOQ] SECURITY.md L38: Legacy = Admin-only (ลบ OR v_boq_created_by IS NULL)
+    IF v_caller_dept IS NOT NULL AND v_caller_dept = v_boq_dept THEN
       v_is_authorized := TRUE;
     END IF;
   END IF;
@@ -455,9 +470,8 @@ $$;
 -- ============================================================================
 
 -- 1. เปิดใช้การป้องกันความปลอดภัยระดับ RLS ทุกลำวดับอย่างเข้มงวด
+-- price_list_versions และ price_list_audit_logs: ENABLE RLS ย้ายไปติดกับ CREATE TABLE แล้ว (L65, L83)
 ALTER TABLE price_list ENABLE ROW LEVEL SECURITY;
-ALTER TABLE price_list_versions ENABLE ROW LEVEL SECURITY;
-ALTER TABLE price_list_audit_logs ENABLE ROW LEVEL SECURITY;
 
 -- 2. นโยบาย RLS สำหรับตารางรุ่นเล่มราคา (price_list_versions)
 -- [DESIGN DECISION: Read Exposure]
