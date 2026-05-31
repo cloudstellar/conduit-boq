@@ -1,10 +1,10 @@
-# 🔬 Architecture Analysis v11 — Audit Trail (Proposal v13 / Plan v11)
+# 🔬 Architecture Analysis v14 — Audit Trail (Proposal v17 / Plan v17)
 
 > เอกสารนี้เป็น **audit trail** ของทุกรอบ review พร้อมสถานะปัจจุบัน
 
 ---
 
-## Proposal Change Log (v1 → v13)
+## Proposal Change Log (v1 → v17)
 
 | Round | จุดที่แก้ | สถานะ |
 |---|---|---|
@@ -39,10 +39,18 @@
 | **v13** | **เพิ่ม explicit REVOKE INSERT/UPDATE/DELETE ก่อน GRANT SELECT** | ✅ |
 | **v13** | **แยก SQL เป็น 3 executable blocks: Phase 1A / Phase 1B / Phase 4** | ✅ |
 | **v13** | **Phase 1B trigger: `search_path = ''`** | ✅ |
+| **v14** | **เพิ่ม Lock timeout คลุม DDL ทั้งหมดของ Phase 1A (Lock Guardrail ครบ)** | ✅ |
+| **v14** | **แก้ RPC `save_boq_with_routes` บังคับอ่าน category จาก DB เสมอสำหรับ item มาตรฐาน** | ✅ |
+| **v14** | **เพิ่ม trigger ใน Phase 4 ป้องกัน cross-version mismatch จากการเขียนตรง** | ✅ |
+| **v14** | **เพิ่ม audit trigger สำหรับ `price_list` ลงใน Phase 4 SQL block จริง** | ✅ |
+| **v15** | **ครอบ RLS / Policies / Grants ทั้งชุดของ Phase 1A ใน Transaction (Atomic)** | ✅ |
+| **v15** | **ครอบ DDL ของ Phase 1B (Phase 3) ด้วย lock_timeout ป้องกันตารางหน่วง** | ✅ |
+| **v16** | **ครอบคำสั่งสร้างตารางเวอร์ชันและเปิด RLS ให้อยู่ใน Transaction เดียวเพื่อปิด gap** | ✅ |
+| **v17** | **ปรับคำรับรอง Downtime และเพิ่มเติม Future Gates สำหรับ Phase 4 ใน Known Risks** | ✅ |
 
 ---
 
-## Implementation Plan Change Log (→ v11)
+## Implementation Plan Change Log (→ v17)
 
 | Round | จุดที่แก้ | สถานะ |
 |---|---|---|
@@ -75,6 +83,18 @@
 | **v13** | **Preflight: แยก row-not-found (NOTICE) vs wrong-status (EXCEPTION)** | OK |
 | **v13** | **Post-verification: ตรวจ PUBLIC + authenticated + anon** | OK |
 | **v12** | **IMPLEMENTATION_PLAN.md: idempotent → rerunnable** | ✅ |
+| **v14** | **Query 7: เพิ่ม assertion ป้องกันการซ้ำซ้อนของ active default อื่น** | ✅ |
+| **v14** | **Type: ปรับ `price_list_version_id` เป็น `string | null` ใน Phase 2** | ✅ |
+| **v14** | **ItemSearch Fallback: จำกัดเฉพาะ Create, ส่วน Edit เป็น fail-closed** | ✅ |
+| **v15** | **Query 5: เพิ่ม `with_check` ในการสแกน pg_policies** | ✅ |
+| **v15** | **Phase 0: เพิ่มขั้นตอนและรายการ FK Indexes Audit** | ✅ |
+| **v15** | **Phase 2: ปรับคอมโพเนนต์ ItemSearch ให้เป็น 100% Fail-Closed เสมอ** | ✅ |
+| **v16** | **Phase 0: เพิ่มคิวรีตรวจสิทธิ์ดั้งเดิมของ RPC และตรวจดัชนีเก่า** | ✅ |
+| **v16** | **Phase 2: เพิ่มสเต็ป Delta Category Backfill (SRE Gate)** | ✅ |
+| **v16** | **Post-Verification: เพิ่ม runbook ในการสร้างดัชนีแบบ CONCURRENTLY** | ✅ |
+| **v17** | **Query 12: เปลี่ยนเป็น table_privileges เพื่อให้ครอบคลุม pseudo-role PUBLIC** | ✅ |
+| **v17** | **Phase 0: ตรวจ CLI Backup Option (--data-only) และกำหนด RPC Audit Expected Results** | ✅ |
+| **v17** | **Post-Verification: เพิ่มคิวรี indisvalid เพื่อตรวจจับความสมบูรณ์ของ concurrent index** | ✅ |
 
 ---
 
@@ -108,7 +128,7 @@
 | **Seed ordering** | **ก่อน fail-closed trigger** | ป้องกัน outage window |
 | **Write REVOKE** | **Explicit REVOKE ก่อน GRANT SELECT** | GRANT เป็น additive, REVOKE ต้องทำเอง |
 | **SQL block split** | **แยก 3 blocks (Phase 1A / Phase 1B / Phase 4)** | ป้องกัน copy-paste ติดตั้ง Phase 4 |
-| **Privilege verification** | **Query 10 ตรวจ information_schema (Post-Verification)** | พิสูจน์ว่า REVOKE ทำงานจริง |
+| **Privilege verification** | **Query 12 ตรวจ information_schema (Post-Verification)** | พิสูจน์ว่า REVOKE ทำงานจริง |
 | **Preflight retry** | **แยก 4 cases ใน DO block** | partial run (table มี row ไม่มี) ไม่บล็อก retry |
 | **REVOKE scope** | **PUBLIC + authenticated + anon** | PostgreSQL PUBLIC สืบทอดทุก role |
 | **Preflight failure mode** | **RAISE EXCEPTION (ไม่ใช่ WARNING)** | ป้องกัน migration ผ่านแบบ state เสีย |
@@ -121,13 +141,13 @@
 |---|---|---|---|---|
 | 1 | RPC status check `IN ('active','pending')` | ✅ | ✅ | ✅ |
 | 2 | RLS WITH CHECK + status | ✅ | ✅ | ✅ |
-| 3 | Phase 0: preflight queries (8 items with DO block) | ✅ | ✅ | ✅ |
+| 3 | Phase 0: preflight queries (9 items with DO block) | ✅ | ✅ | ✅ |
 | 4 | Phase 0: backup (PITR + pg_dump) | ✅ | ✅ | ✅ |
 | 5 | Phase 0: rollback tree | ✅ | ✅ | ✅ |
 | 6 | Phase 0: `boq_routes` in RLS query | ✅ | ✅ | ✅ |
 | 7 | Phase 0: constraint name check | ✅ | ✅ | ✅ |
 | 8 | Phase 0: 2568.0.0 assertion (DO block) | ✅ | ✅ | ✅ |
-| 9 | Phase 0: privilege verification (query 10, Post-Verification) | ✅ | ✅ | ✅ |
+| 9 | Phase 0: privilege verification (query 12, Post-Verification) | ✅ | ✅ | ✅ |
 | 10 | Phase 2: TypeScript types | ✅ | ✅ | ✅ |
 | 11 | Transaction context | ✅ | ✅ | ✅ |
 | 12 | Audit log → Phase 4 | ✅ | ✅ | ✅ |
@@ -165,3 +185,6 @@
 | `boq`/`boq_items`/`boq_routes` RLS ยังกว้าง | Sprint ถัดไป | ปัญหาเดิม ไม่เกิดจาก migration |
 | `handleDuplicate` ไม่ atomic | Sprint ถัดไป | ปัญหาเดิม ไม่เกิดจาก migration |
 | `handleDelete` ไม่ลบ `boq_routes` | Sprint ถัดไป | ปัญหาเดิม ไม่เกิดจาก migration |
+| **[Gate Phase 4] ห้ามสร้าง BOQ ผูกกับเวอร์ชัน Draft/Archived** | Phase 4 + DB Validation | ป้องกันผู้ใช้ทั่วไปเผลอประมาณราคากลางกับเล่มที่ยังไม่ประกาศใช้ |
+| **[Gate Phase 4] ห้ามเปลี่ยน `price_list.version_id` ย้อนหลัง** | Phase 4 + DB Trigger | ป้องกันข้อมูลประวัติศาสตร์คลาดเคลื่อนหลังแอดมินสร้าง standard item แล้ว |
+| **[Gate Phase 4] การตัดสินใจเรื่อง Audit INSERT & Clone Flooding** | Phase 4 Design Decision | ตกลงเงื่อนไขการเก็บ Log ของ `INSERT` ว่าจะข้ามร่าง draft หรือไม่ |

@@ -1,6 +1,6 @@
 # ข้อกำหนดทางเทคนิคและการจัดทำระบบจัดการแคตตาล็อกหลัก (Master Catalog Technical Spec & Blueprint - Revised v6 — Final)
 
-เอกสารฉบับนี้คือ **Technical Specification (ข้อกำหนดคุณสมบัติทางเทคนิคฉบับผ่านการตรวจสอบระดับความปลอดภัยสูงสุด)** และพิมพ์เขียวในการดำเนินการจริงสำหรับระบบจัดการ **Master Catalog (บัญชีราคามาตรฐาน)** ของโครงการ Conduit BOQ โดยแก้ไขและปิดจุดบกพร่องเชิงโครงสร้างและความปลอดภัยฐานข้อมูล 4 ประเด็นสำคัญตามคำแนะนำอย่างละเอียดถี่ถ้วน เพื่อให้มั่นใจได้ 100% ในเสถียรภาพและความปลอดภัยสูงสุดบนระบบโปรดักชัน (Production-Grade Security & Zero-Downtime)
+เอกสารฉบับนี้คือ **Technical Specification (ข้อกำหนดคุณสมบัติทางเทคนิคฉบับผ่านการตรวจสอบระดับความปลอดภัยสูงสุด)** และพิมพ์เขียวในการดำเนินการจริงสำหรับระบบจัดการ **Master Catalog (บัญชีราคามาตรฐาน)** ของโครงการ Conduit BOQ โดยแก้ไขและปิดจุดบกพร่องเชิงโครงสร้างและความปลอดภัยฐานข้อมูล 4 ประเด็นสำคัญตามคำแนะนำอย่างละเอียดถี่ถ้วน เพื่อให้มั่นใจในเสถียรภาพและความปลอดภัยระดับสูงสุดบนระบบโปรดักชัน (Production-Grade Security & High Availability via Lock Timeouts and Atomic Rollbacks)
 
 ---
 
@@ -47,49 +47,62 @@
 -- ============================================================================
 
 -- 1. สร้างตารางราคามาตรฐานเล่มใหญ่และรุ่นย่อย (Price List Versions)
-CREATE TABLE IF NOT EXISTS price_list_versions (
-    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    major INTEGER NOT NULL CHECK (major >= 0),
-    minor INTEGER NOT NULL DEFAULT 0 CHECK (minor >= 0),
-    patch INTEGER NOT NULL DEFAULT 0 CHECK (patch >= 0),
-    version_string TEXT GENERATED ALWAYS AS (major::text || '.' || minor::text || '.' || patch::text) STORED,
-    name TEXT NOT NULL,
-    status TEXT NOT NULL DEFAULT 'draft' CHECK (status IN ('draft', 'active', 'archived')),
-    is_default BOOLEAN NOT NULL DEFAULT false,
-    created_by UUID REFERENCES auth.users(id) ON DELETE SET NULL,
-    created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
-    updated_at TIMESTAMPTZ NOT NULL DEFAULT now(),
-    CONSTRAINT check_is_default_active CHECK (NOT is_default OR status = 'active'),
-    CONSTRAINT uq_major_minor_patch UNIQUE (major, minor, patch)
-);
+-- [FIX: Security Exposure Gap] ครอบด้วย transaction block เพื่อให้การสร้างตารางและ ENABLE RLS เกิดขึ้นพร้อมกันทันที ป้องกัน gap ก่อนรัน RLS
+BEGIN;
+  CREATE TABLE IF NOT EXISTS public.price_list_versions (
+      id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+      major INTEGER NOT NULL CHECK (major >= 0),
+      minor INTEGER NOT NULL DEFAULT 0 CHECK (minor >= 0),
+      patch INTEGER NOT NULL DEFAULT 0 CHECK (patch >= 0),
+      version_string TEXT GENERATED ALWAYS AS (major::text || '.' || minor::text || '.' || patch::text) STORED,
+      name TEXT NOT NULL,
+      status TEXT NOT NULL DEFAULT 'draft' CHECK (status IN ('draft', 'active', 'archived')),
+      is_default BOOLEAN NOT NULL DEFAULT false,
+      created_by UUID REFERENCES auth.users(id) ON DELETE SET NULL,
+      created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+      updated_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+      CONSTRAINT check_is_default_active CHECK (NOT is_default OR status = 'active'),
+      CONSTRAINT uq_major_minor_patch UNIQUE (major, minor, patch)
+  );
 
--- [BEST PRACTICE] เปิด RLS ทันทีหลังสร้างตาราง ไม่ทิ้ง gap
-ALTER TABLE price_list_versions ENABLE ROW LEVEL SECURITY;
+  -- [BEST PRACTICE] เปิด RLS ทันทีหลังสร้างตาราง ไม่ทิ้ง gap
+  ALTER TABLE public.price_list_versions ENABLE ROW LEVEL SECURITY;
 
--- ดัชนีรับประกันความมีหนึ่งเดียวของค่าเริ่มต้นเวอร์ชันใช้งานจริง
-CREATE UNIQUE INDEX IF NOT EXISTS idx_only_one_default_active_version 
-ON price_list_versions (is_default) 
-WHERE is_default = true AND status = 'active';
+  -- ดัชนีรับประกันความมีหนึ่งเดียวของค่าเริ่มต้นเวอร์ชันใช้งานจริง
+  CREATE UNIQUE INDEX IF NOT EXISTS idx_only_one_default_active_version 
+  ON public.price_list_versions (is_default) 
+  WHERE is_default = true AND status = 'active';
+COMMIT;
 
 -- 2. สร้างตารางประวัติการตรวจสอบการแก้ไขราคา (Price Audit Logs)
-CREATE TABLE IF NOT EXISTS price_list_audit_logs (
-    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    version_id UUID REFERENCES price_list_versions(id) ON DELETE SET NULL,
-    item_code TEXT NOT NULL,
-    action TEXT NOT NULL CHECK (action IN ('update_price', 'add_item', 'delete_item')),
-    old_values JSONB, 
-    new_values JSONB, 
-    performed_by UUID REFERENCES auth.users(id) ON DELETE SET NULL,
-    created_at TIMESTAMPTZ NOT NULL DEFAULT now()
-);
+-- [FIX: Security Exposure Gap] ครอบด้วย transaction block เพื่อให้การสร้างตารางและ ENABLE RLS เกิดขึ้นพร้อมกันทันที ป้องกัน gap ก่อนรัน RLS
+BEGIN;
+  CREATE TABLE IF NOT EXISTS public.price_list_audit_logs (
+      id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+      version_id UUID REFERENCES public.price_list_versions(id) ON DELETE SET NULL,
+      item_code TEXT NOT NULL,
+      action TEXT NOT NULL CHECK (action IN ('update_price', 'add_item', 'delete_item')),
+      old_values JSONB, 
+      new_values JSONB, 
+      performed_by UUID REFERENCES auth.users(id) ON DELETE SET NULL,
+      created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+  );
 
--- [BEST PRACTICE] เปิด RLS ทันทีหลังสร้างตาราง
-ALTER TABLE price_list_audit_logs ENABLE ROW LEVEL SECURITY;
+  -- [BEST PRACTICE] เปิด RLS ทันทีหลังสร้างตาราง
+  ALTER TABLE public.price_list_audit_logs ENABLE ROW LEVEL SECURITY;
+COMMIT;
 
 -- 3. ปรับโครงสร้างตารางเดิมให้รองรับเวอร์ชันแบบผ่อนปรน (ON DELETE RESTRICT เพื่อความปลอดภัยสูงสุด)
-ALTER TABLE price_list ADD COLUMN IF NOT EXISTS version_id UUID REFERENCES price_list_versions(id) ON DELETE RESTRICT;
-ALTER TABLE boq ADD COLUMN IF NOT EXISTS price_list_version_id UUID REFERENCES price_list_versions(id) ON DELETE RESTRICT;
-ALTER TABLE boq_items ADD COLUMN IF NOT EXISTS category TEXT DEFAULT NULL;
+-- [FIX: Lock Guardrail] ครอบด้วย transaction block และตั้ง lock_timeout เพื่อความปลอดภัยสูงสุดบนโปรดักชัน
+BEGIN;
+  SET LOCAL lock_timeout = '10s';
+  SET LOCAL statement_timeout = '30s';
+  ALTER TABLE public.price_list ADD COLUMN IF NOT EXISTS version_id UUID REFERENCES public.price_list_versions(id) ON DELETE RESTRICT;
+  ALTER TABLE public.boq ADD COLUMN IF NOT EXISTS price_list_version_id UUID REFERENCES public.price_list_versions(id) ON DELETE RESTRICT;
+  ALTER TABLE public.boq_items ADD COLUMN IF NOT EXISTS category TEXT DEFAULT NULL;
+COMMIT;
+RESET lock_timeout;
+RESET statement_timeout;
 
 -- ============================================================================
 -- [DATA SEED] ต้อง seed ก่อนติดตั้ง fail-closed trigger
@@ -360,10 +373,13 @@ BEGIN
         END IF;
       END IF;
 
-      -- ดึงหมวดหมู่จาก price_list อัตโนมัติเป็นแนวป้องกันสำรอง หากไคลเอนต์ไม่ได้ส่งมา
-      v_category := v_item->>'category';
-      IF v_category IS NULL AND (v_item->>'price_list_id') IS NOT NULL THEN
+      -- ดึงหมวดหมู่ (Category Snapshot)
+      IF (v_item->>'price_list_id') IS NOT NULL THEN
+        -- Standard item: อ่านจากฐานข้อมูลเสมอ เพื่อความถูกต้องของข้อมูล (ห้ามเชื่อใจค่าจาก client เพื่อป้องกันการ mismatch หรือ client bypass)
         SELECT category INTO v_category FROM public.price_list WHERE id = (v_item->>'price_list_id')::UUID;
+      ELSE
+        -- Custom item: ใช้หมวดหมู่จาก client
+        v_category := v_item->>'category';
       END IF;
 
       INSERT INTO public.boq_items (
@@ -406,78 +422,87 @@ GRANT EXECUTE ON FUNCTION save_boq_with_routes(UUID, JSONB, JSONB) TO authentica
 -- [RLS TIGHTENING & AUTHORIZATION MANAGEMENT]
 -- ============================================================================
 
--- 1. เปิดใช้การป้องกันความปลอดภัยระดับ RLS ทุกลำวดับอย่างเข้มงวด
--- price_list_versions และ price_list_audit_logs: ENABLE RLS ย้ายไปติดกับ CREATE TABLE แล้ว (L66, L87)
-ALTER TABLE price_list ENABLE ROW LEVEL SECURITY;
+-- [FIX: RLS Atomicity Transaction Block] ครอบด้วย transaction block เพื่อให้การสลับ RLS, policy และ grant ทำงานแบบ all-or-nothing ป้องกัน outage ระหว่าง deploy
+BEGIN;
+  SET LOCAL lock_timeout = '10s';
+  SET LOCAL statement_timeout = '30s';
 
--- 2. นโยบาย RLS สำหรับตารางรุ่นเล่มราคา (price_list_versions)
--- [DESIGN DECISION: Read Exposure]
--- authenticated อ่านได้ทุกเวอร์ชัน (draft/active/archived) ผ่าน API
--- ตัดสินใจ: ยอมรับได้ เพราะราคากลาง NT เป็นข้อมูลสาธารณะ ไม่ใช่ความลับทางการค้า
--- ถ้าอนาคตต้องการปิดบัง draft → เปลี่ยน SELECT USING เป็น (status = 'active')
-DROP POLICY IF EXISTS "Allow read to authenticated" ON price_list_versions;
-CREATE POLICY "Allow read to authenticated" ON price_list_versions
-    FOR SELECT TO authenticated USING (true);
+  -- 1. เปิดใช้การป้องกันความปลอดภัยระดับ RLS ทุกลำวดับอย่างเข้มงวด
+  -- price_list_versions และ price_list_audit_logs: ENABLE RLS ย้ายไปติดกับ CREATE TABLE แล้ว (L66, L87)
+  ALTER TABLE public.price_list ENABLE ROW LEVEL SECURITY;
 
-DROP POLICY IF EXISTS "Allow write to admin only" ON price_list_versions;
-CREATE POLICY "Allow write to admin only" ON price_list_versions
-    FOR ALL TO authenticated
-    USING (
-        (SELECT role FROM user_profiles WHERE id = auth.uid() AND status = 'active') = 'admin'
-    )
-    WITH CHECK (
-        (SELECT role FROM user_profiles WHERE id = auth.uid() AND status = 'active') = 'admin'
-    );
+  -- 2. นโยบาย RLS สำหรับตารางรุ่นเล่มราคา (price_list_versions)
+  -- [DESIGN DECISION: Read Exposure]
+  -- authenticated อ่านได้ทุกเวอร์ชัน (draft/active/archived) ผ่าน API
+  -- ตัดสินใจ: ยอมรับได้ เพราะราคากลาง NT เป็นข้อมูลสาธารณะ ไม่ใช่ความลับทางการค้า
+  -- ถ้าอนาคตต้องการปิดบัง draft → เปลี่ยน SELECT USING เป็น (status = 'active')
+  DROP POLICY IF EXISTS "Allow read to authenticated" ON public.price_list_versions;
+  CREATE POLICY "Allow read to authenticated" ON public.price_list_versions
+      FOR SELECT TO authenticated USING (true);
 
--- 3. นโยบาย RLS สำหรับตารางราคาหลัก (price_list)
-DROP POLICY IF EXISTS "Allow public read access" ON price_list;
-DROP POLICY IF EXISTS "Allow public insert" ON price_list;
-DROP POLICY IF EXISTS "Allow public update" ON price_list;
-DROP POLICY IF EXISTS "Allow public delete" ON price_list;
+  DROP POLICY IF EXISTS "Allow write to admin only" ON public.price_list_versions;
+  CREATE POLICY "Allow write to admin only" ON public.price_list_versions
+      FOR ALL TO authenticated
+      USING (
+          (SELECT role FROM user_profiles WHERE id = auth.uid() AND status = 'active') = 'admin'
+      )
+      WITH CHECK (
+          (SELECT role FROM user_profiles WHERE id = auth.uid() AND status = 'active') = 'admin'
+      );
 
-DROP POLICY IF EXISTS "Allow select to authenticated" ON price_list;
-CREATE POLICY "Allow select to authenticated" ON price_list
-    FOR SELECT TO authenticated USING (true);
+  -- 3. นโยบาย RLS สำหรับตารางราคาหลัก (price_list)
+  DROP POLICY IF EXISTS "Allow public read access" ON public.price_list;
+  DROP POLICY IF EXISTS "Allow public insert" ON public.price_list;
+  DROP POLICY IF EXISTS "Allow public update" ON public.price_list;
+  DROP POLICY IF EXISTS "Allow public delete" ON public.price_list;
 
-DROP POLICY IF EXISTS "Allow write to admin only" ON price_list;
-CREATE POLICY "Allow write to admin only" ON price_list
-    FOR ALL TO authenticated
-    USING (
-        (SELECT role FROM user_profiles WHERE id = auth.uid() AND status = 'active') = 'admin'
-    )
-    WITH CHECK (
-        (SELECT role FROM user_profiles WHERE id = auth.uid() AND status = 'active') = 'admin'
-    );
+  DROP POLICY IF EXISTS "Allow select to authenticated" ON public.price_list;
+  CREATE POLICY "Allow select to authenticated" ON public.price_list
+      FOR SELECT TO authenticated USING (true);
 
--- 4. นโยบาย RLS สำหรับตารางประวัติราคา (price_list_audit_logs)
-DROP POLICY IF EXISTS "Allow read and write audit logs for admin only" ON price_list_audit_logs;
-CREATE POLICY "Allow read and write audit logs for admin only" ON price_list_audit_logs
-    FOR ALL TO authenticated
-    USING (
-        (SELECT role FROM user_profiles WHERE id = auth.uid() AND status = 'active') = 'admin'
-    )
-    WITH CHECK (
-        (SELECT role FROM user_profiles WHERE id = auth.uid() AND status = 'active') = 'admin'
-    );
+  DROP POLICY IF EXISTS "Allow write to admin only" ON public.price_list;
+  CREATE POLICY "Allow write to admin only" ON public.price_list
+      FOR ALL TO authenticated
+      USING (
+          (SELECT role FROM user_profiles WHERE id = auth.uid() AND status = 'active') = 'admin'
+      )
+      WITH CHECK (
+          (SELECT role FROM user_profiles WHERE id = auth.uid() AND status = 'active') = 'admin'
+      );
 
--- ============================================================================
--- [PHASE 1A GRANTS & REVOKE] สิทธิ์ขั้นต่ำ — SELECT เท่านั้น
--- ============================================================================
+  -- 4. นโยบาย RLS สำหรับตารางประวัติราคา (price_list_audit_logs)
+  DROP POLICY IF EXISTS "Allow read and write audit logs for admin only" ON public.price_list_audit_logs;
+  CREATE POLICY "Allow read and write audit logs for admin only" ON public.price_list_audit_logs
+      FOR ALL TO authenticated
+      USING (
+          (SELECT role FROM user_profiles WHERE id = auth.uid() AND status = 'active') = 'admin'
+      )
+      WITH CHECK (
+          (SELECT role FROM user_profiles WHERE id = auth.uid() AND status = 'active') = 'admin'
+      );
 
--- [EXPLICIT REVOKE] ถอน write privilege ให้ชัดเจน (GRANT เป็น additive ไม่ลบของเดิม)
-REVOKE INSERT, UPDATE, DELETE
-ON TABLE price_list_versions, price_list, price_list_audit_logs
-FROM PUBLIC, authenticated, anon;
+  -- ============================================================================
+  -- [PHASE 1A GRANTS & REVOKE] สิทธิ์ขั้นต่ำ — SELECT เท่านั้น
+  -- ============================================================================
 
--- Phase 1A: อ่านอย่างเดียว (RPC ทำงานผ่าน SECURITY DEFINER ไม่ต้องใช้ write grant)
-GRANT SELECT ON TABLE price_list_versions TO authenticated;
-GRANT SELECT ON TABLE price_list TO authenticated;
-GRANT SELECT ON TABLE price_list_audit_logs TO authenticated;
+  -- [EXPLICIT REVOKE] ถอน write privilege ให้ชัดเจน (GRANT เป็น additive ไม่ลบของเดิม)
+  REVOKE INSERT, UPDATE, DELETE
+  ON TABLE public.price_list_versions, public.price_list, public.price_list_audit_logs
+  FROM PUBLIC, authenticated, anon;
 
--- Service role: Full access (สำหรับ migration/backfill)
-GRANT SELECT, INSERT, UPDATE, DELETE ON TABLE price_list_versions TO service_role;
-GRANT SELECT, INSERT, UPDATE, DELETE ON TABLE price_list TO service_role;
-GRANT SELECT, INSERT, UPDATE, DELETE ON TABLE price_list_audit_logs TO service_role;
+  -- Phase 1A: อ่านอย่างเดียว (RPC ทำงานผ่าน SECURITY DEFINER ไม่ต้องใช้ write grant)
+  GRANT SELECT ON TABLE public.price_list_versions TO authenticated;
+  GRANT SELECT ON TABLE public.price_list TO authenticated;
+  GRANT SELECT ON TABLE public.price_list_audit_logs TO authenticated;
+
+  -- Service role: Full access (สำหรับ migration/backfill)
+  GRANT SELECT, INSERT, UPDATE, DELETE ON TABLE public.price_list_versions TO service_role;
+  GRANT SELECT, INSERT, UPDATE, DELETE ON TABLE public.price_list TO service_role;
+  GRANT SELECT, INSERT, UPDATE, DELETE ON TABLE public.price_list_audit_logs TO service_role;
+
+COMMIT;
+RESET lock_timeout;
+RESET statement_timeout;
 
 -- [KNOWN RISK: BOQ Direct-Write RLS]
 -- ตาราง boq, boq_items, boq_routes ยังมี policy USING(true) อยู่ (เปิดกว้าง)
@@ -500,7 +525,14 @@ GRANT SELECT, INSERT, UPDATE, DELETE ON TABLE price_list_audit_logs TO service_r
 -- ============================================================================
 
 -- 1. ปรับค่าเวอร์ชันเป็น NOT NULL
-ALTER TABLE boq ALTER COLUMN price_list_version_id SET NOT NULL;
+-- [FIX: Lock Guardrail] ครอบด้วย transaction block และตั้ง lock_timeout เนื่องจากคำสั่ง ALTER COLUMN SET NOT NULL ต้องสแกนตาราง boq ทั้งใบและขอ ACCESS EXCLUSIVE lock
+BEGIN;
+  SET LOCAL lock_timeout = '10s';
+  SET LOCAL statement_timeout = '30s';
+  ALTER TABLE public.boq ALTER COLUMN price_list_version_id SET NOT NULL;
+COMMIT;
+RESET lock_timeout;
+RESET statement_timeout;
 
 -- 2. ทริกเกอร์ป้องกันการดัดแปลงเลขรุ่นย้อนหลัง
 CREATE OR REPLACE FUNCTION prevent_boq_version_modification()
@@ -568,6 +600,105 @@ BEGIN
 END; $$;
 REVOKE EXECUTE ON FUNCTION make_version_default(UUID) FROM PUBLIC, anon;
 GRANT EXECUTE ON FUNCTION make_version_default(UUID) TO authenticated;
+
+-- 3. ตรวจจับและบันทึกประวัติการเปลี่ยนแปลงราคามาตรฐาน (Audit Trail Trigger)
+CREATE OR REPLACE FUNCTION audit_price_list_changes()
+RETURNS TRIGGER AS $$
+BEGIN
+  IF TG_OP = 'UPDATE' THEN
+    IF OLD.material_cost IS DISTINCT FROM NEW.material_cost OR 
+       OLD.labor_cost IS DISTINCT FROM NEW.labor_cost OR
+       OLD.unit_cost IS DISTINCT FROM NEW.unit_cost OR
+       OLD.item_name IS DISTINCT FROM NEW.item_name OR
+       OLD.category IS DISTINCT FROM NEW.category OR
+       OLD.is_active IS DISTINCT FROM NEW.is_active THEN
+       
+      INSERT INTO public.price_list_audit_logs (
+        version_id, item_code, action, old_values, new_values, performed_by
+      ) VALUES (
+        NEW.version_id,
+        NEW.item_code,
+        'update_price',
+        jsonb_build_object(
+          'item_name', OLD.item_name,
+          'material_cost', OLD.material_cost,
+          'labor_cost', OLD.labor_cost,
+          'unit_cost', OLD.unit_cost,
+          'category', OLD.category,
+          'is_active', OLD.is_active
+        ),
+        jsonb_build_object(
+          'item_name', NEW.item_name,
+          'material_cost', NEW.material_cost,
+          'labor_cost', NEW.labor_cost,
+          'unit_cost', NEW.unit_cost,
+          'category', NEW.category,
+          'is_active', NEW.is_active
+        ),
+        auth.uid()
+      );
+    END IF;
+    RETURN NEW;
+  ELSIF TG_OP = 'DELETE' THEN
+    INSERT INTO public.price_list_audit_logs (
+      version_id, item_code, action, old_values, performed_by
+    ) VALUES (
+      OLD.version_id,
+      OLD.item_code,
+      'delete_item',
+      jsonb_build_object(
+        'item_name', OLD.item_name,
+        'material_cost', OLD.material_cost,
+        'labor_cost', OLD.labor_cost,
+        'unit_cost', OLD.unit_cost,
+        'category', OLD.category,
+        'is_active', OLD.is_active
+      ),
+      auth.uid()
+    );
+    RETURN OLD;
+  END IF;
+  RETURN NULL;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = '';
+
+DROP TRIGGER IF EXISTS trigger_audit_price_list_changes ON price_list;
+CREATE TRIGGER trigger_audit_price_list_changes
+AFTER UPDATE OR DELETE ON price_list
+FOR EACH ROW
+EXECUTE FUNCTION audit_price_list_changes();
+
+-- 4. ตรวจจับการเขียนตรงที่เวอร์ชันของรายการราคากลางไม่เข้าคู่กับเวอร์ชันของ BOQ หลัก (Cross-Version Isolation Trigger)
+CREATE OR REPLACE FUNCTION validate_boq_item_version()
+RETURNS TRIGGER AS $$
+DECLARE
+  v_boq_version UUID;
+  v_item_version UUID;
+BEGIN
+  IF NEW.price_list_id IS NOT NULL THEN
+    -- ดึงเวอร์ชันของ BOQ
+    SELECT price_list_version_id INTO v_boq_version
+    FROM public.boq
+    WHERE id = NEW.boq_id;
+    
+    -- ดึงเวอร์ชันของรายการราคากลาง
+    SELECT version_id INTO v_item_version
+    FROM public.price_list
+    WHERE id = NEW.price_list_id;
+    
+    IF v_boq_version IS DISTINCT FROM v_item_version THEN
+      RAISE EXCEPTION 'เวอร์ชันของรายการราคากลาง (%) ไม่ตรงกับเวอร์ชันของใบงาน BOQ (%)', v_item_version, v_boq_version;
+    END IF;
+  END IF;
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = '';
+
+DROP TRIGGER IF EXISTS trigger_validate_boq_item_version ON boq_items;
+CREATE TRIGGER trigger_validate_boq_item_version
+BEFORE INSERT OR UPDATE ON boq_items
+FOR EACH ROW
+EXECUTE FUNCTION validate_boq_item_version();
 
 -- เปิด write grants สำหรับ Admin GUI
 GRANT INSERT, UPDATE, DELETE ON TABLE price_list_versions TO authenticated;
