@@ -35,6 +35,17 @@ supabase.auth.onAuthStateChange((event, session) => {
 - **Lesson:** Metadata in documentation might mismatch actual DB if migrations were manual.
 - **Rule:** Always trust `migrations/*.sql` as the source of truth, but verified against production DB if discrepancies arise (like `onboarding_completed` column).
 
+### 1.4 Security Permission Logic — Triangulate All Sources
+- **Lesson (2026-05):** Master Catalog migration เขียน RPC permission check อ้างอิงจาก `permissions.ts` ตัวเดียว โดยไม่เทียบกับ `SECURITY.md` และ RLS ใน `008_rls_and_trigger.sql` ส่งผลให้:
+  1. **Pending user ถูกบล็อก** — RPC ใส่ `status = 'active'` แต่ canonical rule อนุญาต pending save own BOQ
+  2. **Legacy BOQ เปิดให้ manager** — `permissions.ts` อนุญาต แต่ `SECURITY.md` + RLS บอก admin-only
+  3. **Canonical sources ขัดกันเอง** ระหว่าง `permissions.ts` กับ `SECURITY.md` โดยไม่มีใครเห็น
+- **Rule:** ก่อนเขียน permission logic ใหม่ **ต้องเปิด 3 ไฟล์วางข้างกันเสมอ**:
+  1. `docs/SECURITY.md` — Access Matrix (source of truth)
+  2. `lib/permissions.ts` — Client-side UI checks
+  3. `migrations/008_rls_and_trigger.sql` — DB-level enforcement
+- **Rule:** ถ้า 3 ไฟล์ขัดกัน → ยึดตาม `SECURITY.md` + RLS (เข้มกว่า) แล้ว flag ให้แก้ `permissions.ts`
+
 ---
 
 ## 2. Documentation Patterns
@@ -58,6 +69,9 @@ supabase.auth.onAuthStateChange((event, session) => {
 - If inserting between phases, use suffix letters (e.g., `007b_`).
 - **Lesson:** We accidentally had two `008_` files. Use suffixes to fix order without renaming established files.
 
-### 3.2 AI Handoff
+### 3.2 AI Handoff & Document Verification
 - Always verify documentation against code before ending a session.
 - Run `VERIFICATION_REPORT.md` if unsure about discrepancies.
+- **Rule (2026-05):** ก่อนบอกว่า "เอกสารตรงกันแล้ว" **ต้อง diff จริง ไม่ใช่แค่จำ** — ถ้า edit ถูก cancel/fail ต้องตรวจว่าไฟล์ถูกแก้จริงหรือไม่
+- **Rule (2026-05):** ก่อน commit เอกสารลง repo ต้องตรวจว่าเป็น version ล่าสุดที่ผ่าน review แล้ว
+
