@@ -1,4 +1,4 @@
-# ข้อกำหนดทางเทคนิคและการจัดทำระบบจัดการแคตตาล็อกหลัก (Master Catalog Technical Spec & Blueprint - Revised v25)
+# ข้อกำหนดทางเทคนิคและการจัดทำระบบจัดการแคตตาล็อกหลัก (Master Catalog Technical Spec & Blueprint - Revised v26)
 
 เอกสารฉบับนี้คือ **Technical Specification (ข้อกำหนดคุณสมบัติทางเทคนิคฉบับผ่านการตรวจสอบระดับความปลอดภัยสูงสุด)** และพิมพ์เขียวในการดำเนินการจริงสำหรับระบบจัดการ **Master Catalog (บัญชีราคามาตรฐาน)** ของโครงการ Conduit BOQ โดยแก้ไขและปิดจุดบกพร่องเชิงโครงสร้างและความปลอดภัยฐานข้อมูล 4 ประเด็นสำคัญตามคำแนะนำอย่างละเอียดถี่ถ้วน เพื่อให้มั่นใจในเสถียรภาพและความปลอดภัยระดับสูงสุดบนระบบโปรดักชัน (Production-Grade Security & High Availability via Lock Timeouts and Atomic Rollbacks)
 
@@ -52,6 +52,21 @@
 -- 1. สร้างตารางราคามาตรฐานเล่มใหญ่และรุ่นย่อย (Price List Versions)
 -- [FIX: Security Exposure Gap] ครอบด้วย transaction block เพื่อให้การสร้างตารางและ ENABLE RLS เกิดขึ้นพร้อมกันทันที ป้องกัน gap ก่อนรัน RLS
 BEGIN;
+
+  -- ============================================================================
+  -- [v26] Default privileges hardening — ต้องทำก่อนที่จะสร้างฟังก์ชันหรือวัตถุระบบใดๆ
+  -- ============================================================================
+  -- ปิด default privileges สำหรับตารางใหม่ในอนาคตเพื่อความปลอดภัยขั้นสูงสุด
+  ALTER DEFAULT PRIVILEGES FOR ROLE postgres IN SCHEMA public
+    REVOKE TRUNCATE, REFERENCES, TRIGGER, MAINTAIN ON TABLES FROM PUBLIC, anon, authenticated;
+  ALTER DEFAULT PRIVILEGES FOR ROLE supabase_admin IN SCHEMA public
+    REVOKE TRUNCATE, REFERENCES, TRIGGER, MAINTAIN ON TABLES FROM PUBLIC, anon, authenticated;
+
+  -- ปิด default privileges สำหรับฟังก์ชันใหม่ในอนาคต
+  ALTER DEFAULT PRIVILEGES FOR ROLE postgres IN SCHEMA public
+    REVOKE EXECUTE ON FUNCTIONS FROM PUBLIC, anon, authenticated;
+  ALTER DEFAULT PRIVILEGES FOR ROLE supabase_admin IN SCHEMA public
+    REVOKE EXECUTE ON FUNCTIONS FROM PUBLIC, anon, authenticated;
   CREATE TABLE IF NOT EXISTS public.price_list_versions (
       id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
       major INTEGER NOT NULL CHECK (major >= 0),
@@ -148,6 +163,8 @@ GRANT SELECT ON TABLE public.price_list_default_version TO authenticated;
 REVOKE INSERT, UPDATE, DELETE ON TABLE public.price_list_default_version FROM PUBLIC, authenticated, anon;
 COMMIT;
 
+
+
 -- [v20] Trigger ห้ามลบ singleton row (แม้ service_role เขียนตรง)
 CREATE OR REPLACE FUNCTION prevent_delete_default_pointer()
 RETURNS TRIGGER AS $$
@@ -161,6 +178,9 @@ CREATE TRIGGER trigger_prevent_delete_default_pointer
 BEFORE DELETE ON price_list_default_version
 FOR EACH ROW
 EXECUTE FUNCTION prevent_delete_default_pointer();
+
+-- [v26] Explicit revoke สำหรับ trigger helper (Defense in Depth)
+REVOKE EXECUTE ON FUNCTION prevent_delete_default_pointer() FROM PUBLIC, anon, authenticated;
 
 -- [v20] Trigger ตรวจว่า pointer ชี้เฉพาะ active version
 CREATE OR REPLACE FUNCTION validate_default_pointer_active()
@@ -178,6 +198,9 @@ CREATE TRIGGER trigger_validate_default_pointer_active
 BEFORE INSERT OR UPDATE ON price_list_default_version
 FOR EACH ROW
 EXECUTE FUNCTION validate_default_pointer_active();
+
+-- [v26] Explicit revoke สำหรับ trigger helper (Defense in Depth)
+REVOKE EXECUTE ON FUNCTION validate_default_pointer_active() FROM PUBLIC, anon, authenticated;
 
 -- Seed pointer ทันทีหลังสร้างตาราง (ก่อนติดตั้ง set_default_price_list_version trigger)
 INSERT INTO public.price_list_default_version (id, version_id)
@@ -216,6 +239,9 @@ AFTER UPDATE OR DELETE ON price_list_versions
 FOR EACH STATEMENT
 EXECUTE FUNCTION check_default_version_exists();
 
+-- [v26] Explicit revoke สำหรับ trigger helper (Defense in Depth)
+REVOKE EXECUTE ON FUNCTION check_default_version_exists() FROM PUBLIC, anon, authenticated;
+
 -- 3. ทริกเกอร์กำหนดค่าเริ่มต้นเวอร์ชันให้อัตโนมัติในระดับ DB กรณีสร้างใบงานใหม่แบบไม่ระบุฟิลด์ราคา
 CREATE OR REPLACE FUNCTION set_default_price_list_version()
 RETURNS TRIGGER AS $$
@@ -241,6 +267,9 @@ BEFORE INSERT ON boq
 FOR EACH ROW
 EXECUTE FUNCTION set_default_price_list_version();
 
+-- [v26] Explicit revoke สำหรับ trigger helper (Defense in Depth)
+REVOKE EXECUTE ON FUNCTION set_default_price_list_version() FROM PUBLIC, anon, authenticated;
+
 -- 4. ฟังก์ชัน Auto-Update Timestamp สำหรับ price_list_versions (Data Hygiene)
 CREATE OR REPLACE FUNCTION set_updated_at()
 RETURNS TRIGGER AS $$
@@ -255,6 +284,9 @@ CREATE TRIGGER trigger_set_updated_at
 BEFORE UPDATE ON price_list_versions
 FOR EACH ROW
 EXECUTE FUNCTION set_updated_at();
+
+-- [v26] Explicit revoke สำหรับ trigger helper (Defense in Depth)
+REVOKE EXECUTE ON FUNCTION set_updated_at() FROM PUBLIC, anon, authenticated;
 
 -- ============================================================================
 -- [DATA BACKFILLING & MIGRATION] เคลื่อนย้ายข้อมูลอย่างราบรื่น
@@ -507,13 +539,7 @@ $$;
 REVOKE EXECUTE ON FUNCTION save_boq_with_routes(UUID, JSONB, JSONB) FROM PUBLIC, anon;
 GRANT EXECUTE ON FUNCTION save_boq_with_routes(UUID, JSONB, JSONB) TO authenticated;
 
--- [v20] ปิด default EXECUTE grant สำหรับ functions ใหม่ทั้งหมดใน public schema
--- Supabase auto-grants EXECUTE ให้ anon, authenticated, service_role โดย default
--- ถ้าไม่ปิด → ทุก function ใหม่ที่สร้างจะถูก anon เรียกได้ทันที
-ALTER DEFAULT PRIVILEGES FOR ROLE postgres IN SCHEMA public
-  REVOKE EXECUTE ON FUNCTIONS FROM PUBLIC, anon;
-ALTER DEFAULT PRIVILEGES FOR ROLE supabase_admin IN SCHEMA public
-  REVOKE EXECUTE ON FUNCTIONS FROM PUBLIC, anon;
+
 
 
 -- ============================================================================
@@ -647,6 +673,9 @@ CREATE TRIGGER trigger_prevent_boq_version_modification
 BEFORE UPDATE ON boq
 FOR EACH ROW
 EXECUTE FUNCTION prevent_boq_version_modification();
+
+-- [v26] Explicit revoke สำหรับ trigger helper (Defense in Depth)
+REVOKE EXECUTE ON FUNCTION prevent_boq_version_modification() FROM PUBLIC, anon, authenticated;
 ```
 
 ---
@@ -723,6 +752,9 @@ BEFORE UPDATE ON price_list_versions
 FOR EACH ROW
 WHEN (NEW.status = 'archived')
 EXECUTE FUNCTION prevent_archive_default_version();
+
+-- [v26] Explicit revoke สำหรับ trigger helper (Defense in Depth)
+REVOKE EXECUTE ON FUNCTION prevent_archive_default_version() FROM PUBLIC, anon, authenticated;
 
 -- 3. ตรวจจับและบันทึกประวัติการเปลี่ยนแปลงราคามาตรฐาน (Audit Trail Trigger)
 CREATE OR REPLACE FUNCTION audit_price_list_changes()
@@ -813,6 +845,9 @@ AFTER INSERT OR UPDATE OR DELETE ON price_list
 FOR EACH ROW
 EXECUTE FUNCTION audit_price_list_changes();
 
+-- [v26] Explicit revoke สำหรับ trigger helper (Defense in Depth)
+REVOKE EXECUTE ON FUNCTION audit_price_list_changes() FROM PUBLIC, anon, authenticated;
+
 -- 4. ตรวจจับการเขียนตรงที่เวอร์ชันของรายการราคากลางไม่เข้าคู่กับเวอร์ชันของ BOQ หลัก (Cross-Version Isolation Trigger)
 CREATE OR REPLACE FUNCTION validate_boq_item_version()
 RETURNS TRIGGER AS $$
@@ -844,6 +879,9 @@ CREATE TRIGGER trigger_validate_boq_item_version
 BEFORE INSERT OR UPDATE ON boq_items
 FOR EACH ROW
 EXECUTE FUNCTION validate_boq_item_version();
+
+-- [v26] Explicit revoke สำหรับ trigger helper (Defense in Depth)
+REVOKE EXECUTE ON FUNCTION validate_boq_item_version() FROM PUBLIC, anon, authenticated;
 
 -- [v19] Phase 4 Writes: ผ่าน Scoped RPC เท่านั้น (ไม่เปิด raw DML grants)
 -- Server Actions ต้องตรวจ session + admin role ก่อนเรียก RPC ทุกครั้ง

@@ -1,10 +1,10 @@
-# 🔬 Architecture Analysis v25 — Audit Trail (Proposal v25 / Plan v25)
+# 🔬 Architecture Analysis v26 — Audit Trail (Proposal v26 / Plan v26)
 
 > เอกสารนี้เป็น **audit trail** ของทุกรอบ review พร้อมสถานะปัจจุบัน
 
 ---
 
-## Proposal Change Log (v1 → v25)
+## Proposal Change Log (v1 → v26)
 
 | Round | จุดที่แก้ | สถานะ |
 |---|---|---|
@@ -68,10 +68,11 @@
 | **v20** | **แก้ BOQ RLS known risk comment ให้สอดคล้องกับ P0** | ✅ |
 | **v21** | **เพิ่ม DECLARE `v_pl_item_name`, `v_pl_unit`, `v_pl_material`, `v_pl_labor`, `v_pl_unit_cost`** | ✅ |
 | **v21** | **Pointer DDL: เพิ่ม `DROP POLICY IF EXISTS` + ครอบ transaction** | ✅ |
+| **v26** | **ย้าย default function hardening ขึ้นก่อนสร้าง, เพิ่ม explicit REVOKE ในทุก trigger helper** | ✅ |
 
 ---
 
-## Implementation Plan Change Log (→ v25)
+## Implementation Plan Change Log (→ v26)
 
 | Round | จุดที่แก้ | สถานะ |
 |---|---|---|
@@ -144,6 +145,7 @@
 | **v24** | **P0: `boq_items_select` + `boq_routes_select` ใช้ EXISTS แทน USING(true)** | ✅ |
 | **v24** | **P0: Containment RPC เพิ่ม procurement block + pending own-only** | ✅ |
 | **v25** | **`boq_insert` เพิ่ม `AND status = 'draft'` ป้องกันปลอม workflow status** | ✅ |
+| **v26** | **เพิ่ม `MAINTAIN` ใน Step 4 และ default tables, ถอน execute 4 SECDEF functions ใน Step 5, ปลดบล็อก pending child insert, ปรับ Query 7** | ✅ |
 
 ---
 
@@ -215,6 +217,10 @@
 | **[v24] RPC procurement block** | **เพิ่ม procurement = read-only** | ตาม permissions.ts L176 |
 | **[v24] RPC pending own-only** | **pending เข้าถึงได้เฉพาะ created_by** | ตาม permissions.ts L93-110 |
 | **[v25] Draft-only INSERT** | **`status = 'draft'` ใน WITH CHECK** | Data API ปลอม approved/pending ได้ |
+| **[v26] PG17 MAINTAIN** | **REVOKE MAINTAIN จาก tables & default tables** | ป้องกัน user ทั่วไปสั่งบำรุงรักษาตารางแคตล็อกใหม่ |
+| **[v26] SECDEF functions** | **ถอนสิทธิ์ execute ฟังก์ชัน SECDEF ที่ขาดไป 4 ตัว** | ยืนยันพบ 8 ฟังก์ชันจริงจาก DB และจัดการครบถ้วน |
+| **[v26] Pending duplicate** | **ปลดบล็อก INSERT ของ pending owner ใน routes/items** | บล็อก pending ทำให้สร้าง BOQ เปล่าๆ ป้องกัน copy-paste regression |
+| **[v26] Query 7 fix** | **ใช้ aclexplode ตรวจ OID 0 (PUBLIC) & 'anon'** | DB จริงเก็บ PUBLIC เป็น grantee OID 0, cast ได้ '-' |
 
 ---
 
@@ -290,6 +296,7 @@
 | **66** | **[v24] RPC procurement block** | ✅ | ✅ | ✅ |
 | **67** | **[v24] RPC pending own-only** | ✅ | ✅ | ✅ |
 | **68** | **[v25] Draft-only INSERT** | ✅ | ✅ | ✅ |
+| **69** | **[v26] DB-verified finite patch (MAINTAIN, SECDEF, pending RLS, Query 7)** | ✅ | ✅ | ✅ |
 
 ---
 

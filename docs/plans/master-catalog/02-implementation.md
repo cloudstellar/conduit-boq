@@ -1,4 +1,4 @@
-# แผนการพัฒนาการจัดการระบบแคตล็อกหลัก (Master Catalog Implementation Plan - Revised v25)
+# แผนการพัฒนาการจัดการระบบแคตล็อกหลัก (Master Catalog Implementation Plan - Revised v26)
 
 แผนพัฒนานี้จัดทำขึ้นจากข้อกำหนดการทบทวนของระบบและปรับโครงสร้างการเปลี่ยนผ่านทั้งหมดให้มี **ความปลอดภัยเป็นอันดับหนึ่ง (SRE-First Rollout)** เพื่อให้มั่นใจได้ 100% ว่าการจัดทำและเปลี่ยนผ่านระบบจะไม่ทำให้ผู้ใช้เดิมสร้าง คัดลอก หรือคำนวณราคาใบงานสะดุดล้มระหว่างช่วงเดปลอยการทำงาน
 
@@ -57,6 +57,12 @@
         *   **Hotfix SQL (รันทันทีก่อนเริ่มงานอื่น — ครบ transaction):**
             ```sql
             BEGIN;
+
+            -- Step 0: [v26] ปิด default EXECUTE grant สำหรับ function ใหม่ทั้งหมด สำหรับ PUBLIC, anon, และ authenticated ก่อนสร้างฟังก์ชันใดๆ
+            ALTER DEFAULT PRIVILEGES FOR ROLE postgres IN SCHEMA public
+              REVOKE EXECUTE ON FUNCTIONS FROM PUBLIC, anon, authenticated;
+            ALTER DEFAULT PRIVILEGES FOR ROLE supabase_admin IN SCHEMA public
+              REVOKE EXECUTE ON FUNCTIONS FROM PUBLIC, anon, authenticated;
 
             -- Step 1: [v20] REVOKE จากทุก role ก่อน (รวม authenticated เพื่อปิด exposure window)
             REVOKE EXECUTE ON FUNCTION public.save_boq_with_routes(uuid, jsonb, jsonb) FROM PUBLIC, anon, authenticated;
@@ -181,19 +187,25 @@
             -- Step 3: GRANT กลับหลัง replace RPC เสร็จ
             GRANT EXECUTE ON FUNCTION public.save_boq_with_routes(uuid, jsonb, jsonb) TO authenticated;
 
-            -- Step 4: [v20] ถอน TRUNCATE/REFERENCES/TRIGGER จากทุก role รวม PUBLIC
-            REVOKE TRUNCATE, REFERENCES, TRIGGER ON ALL TABLES IN SCHEMA public FROM PUBLIC, anon, authenticated;
+            -- Step 4: [v20] ถอน TRUNCATE/REFERENCES/TRIGGER/MAINTAIN จากทุก role รวม PUBLIC
+            REVOKE TRUNCATE, REFERENCES, TRIGGER, MAINTAIN ON ALL TABLES IN SCHEMA public FROM PUBLIC, anon, authenticated;
 
-            -- Step 5: [v19] ถอนสิทธิ์ EXECUTE — แก้ signature ตาม production DB จริง
+            -- [v26] ปิด default privileges ของตารางใหม่เพื่อไม่ให้ตารางแคตล็อกใหม่สืบทอดสิทธิ์เหล่านี้กลับมา
+            ALTER DEFAULT PRIVILEGES FOR ROLE postgres IN SCHEMA public
+              REVOKE TRUNCATE, REFERENCES, TRIGGER, MAINTAIN ON TABLES FROM PUBLIC, anon, authenticated;
+            ALTER DEFAULT PRIVILEGES FOR ROLE supabase_admin IN SCHEMA public
+              REVOKE TRUNCATE, REFERENCES, TRIGGER, MAINTAIN ON TABLES FROM PUBLIC, anon, authenticated;
+
+            -- Step 5: [v19] ถอนสิทธิ์ EXECUTE — แก้ signature และเพิ่มฟังก์ชันความปลอดภัยอื่นๆ ให้ครบถ้วนตาม DB จริง
             REVOKE EXECUTE ON FUNCTION public.admin_approve_user(uuid) FROM PUBLIC, anon;
             REVOKE EXECUTE ON FUNCTION public.admin_reject_user(uuid, text) FROM PUBLIC, anon;
-            REVOKE EXECUTE ON FUNCTION public.handle_new_user() FROM PUBLIC, anon;
+            REVOKE EXECUTE ON FUNCTION public.handle_new_user() FROM PUBLIC, anon, authenticated;
+            REVOKE EXECUTE ON FUNCTION public.can_approve_boq(uuid) FROM PUBLIC, anon;
+            REVOKE EXECUTE ON FUNCTION public.get_my_profile() FROM PUBLIC, anon;
+            REVOKE EXECUTE ON FUNCTION public.get_user_role(uuid) FROM PUBLIC, anon;
+            REVOKE EXECUTE ON FUNCTION public.is_admin(uuid) FROM PUBLIC, anon;
 
-            -- Step 6: [v20] ปิด default EXECUTE grant สำหรับ function ใหม่ทั้งหมด
-            ALTER DEFAULT PRIVILEGES FOR ROLE postgres IN SCHEMA public
-              REVOKE EXECUTE ON FUNCTIONS FROM PUBLIC, anon;
-            ALTER DEFAULT PRIVILEGES FOR ROLE supabase_admin IN SCHEMA public
-              REVOKE EXECUTE ON FUNCTIONS FROM PUBLIC, anon;
+            -- Step 6: [v26] (ย้ายการจำกัดสิทธิ์ฟังก์ชันเริ่มต้นขึ้นไปไว้ที่ Step 0 และจำกัดสิทธิ์ตารางเริ่มต้นไปที่ Step 4 แล้ว)
 
             -- Step 7: [v21] BOQ RLS tightening — DROP ทุก policy เก่าก่อน + สร้าง allowlist ใหม่ครบทุก cmd
             -- เหตุผล: PostgreSQL รวม permissive policies ด้วย OR
@@ -268,14 +280,14 @@
             CREATE POLICY "boq_items_select" ON boq_items FOR SELECT TO authenticated
             USING (EXISTS (SELECT 1 FROM boq b WHERE b.id = boq_items.boq_id));
 
-            -- boq_items: INSERT (ผูกกับ BOQ ที่เขียนได้ + [v22] active only)
+            -- boq_items: INSERT (ผูกกับ BOQ ที่เขียนได้ + [v22] active/pending owner เท่านั้น, assignee branch ต้อง active)
             CREATE POLICY "boq_items_insert" ON boq_items FOR INSERT TO authenticated
             WITH CHECK (
               EXISTS (
                 SELECT 1 FROM boq b
                 WHERE b.id = boq_items.boq_id AND (
                   (SELECT role FROM user_profiles WHERE id = auth.uid() AND status = 'active') = 'admin'
-                  OR (b.created_by = auth.uid() AND (SELECT status FROM user_profiles WHERE id = auth.uid()) = 'active')
+                  OR (b.created_by = auth.uid() AND (SELECT status FROM user_profiles WHERE id = auth.uid()) IN ('active', 'pending'))
                   OR (b.assigned_to = auth.uid() AND (SELECT status FROM user_profiles WHERE id = auth.uid()) = 'active')
                 )
               )
@@ -316,14 +328,14 @@
             CREATE POLICY "boq_routes_select" ON boq_routes FOR SELECT TO authenticated
             USING (EXISTS (SELECT 1 FROM boq b WHERE b.id = boq_routes.boq_id));
 
-            -- boq_routes: INSERT ([v22] active only)
+            -- boq_routes: INSERT ([v22] active/pending owner เท่านั้น, assignee branch ต้อง active)
             CREATE POLICY "boq_routes_insert" ON boq_routes FOR INSERT TO authenticated
             WITH CHECK (
               EXISTS (
                 SELECT 1 FROM boq b
                 WHERE b.id = boq_routes.boq_id AND (
                   (SELECT role FROM user_profiles WHERE id = auth.uid() AND status = 'active') = 'admin'
-                  OR (b.created_by = auth.uid() AND (SELECT status FROM user_profiles WHERE id = auth.uid()) = 'active')
+                  OR (b.created_by = auth.uid() AND (SELECT status FROM user_profiles WHERE id = auth.uid()) IN ('active', 'pending'))
                   OR (b.assigned_to = auth.uid() AND (SELECT status FROM user_profiles WHERE id = auth.uid()) = 'active')
                 )
               )
@@ -397,18 +409,17 @@
     FROM pg_indexes
     WHERE tablename = 'price_list' AND indexdef LIKE '%item_code%';
 
-    -- 7. [NEW] ตรวจสอบสิทธิ์ฟังก์ชัน RPC เดิมในระบบจริง (ตรวจช่องโหว่ default PUBLIC EXECUTE)
-    -- Gate Criteria:
-    --   - public_exec = false
-    --   - anon_exec = false
-    --   - authenticated_exec = true (หรือตามความเหมาะสม)
-    -- ⚠️ หากพบว่า public_exec = true หรือ anon_exec = true ให้หยุดรันเฟสถัดไป และสั่งถอนสิทธิ์ความปลอดภัยทันทีเพื่อปิดช่องโหว่ก่อน:
-    --    REVOKE EXECUTE ON FUNCTION public.save_boq_with_routes(uuid,jsonb,jsonb) FROM PUBLIC, anon;
-    --    GRANT EXECUTE ON FUNCTION public.save_boq_with_routes(uuid,jsonb,jsonb) TO authenticated;
+    -- 7. [NEW] ตรวจสอบสิทธิ์ฟังก์ชัน RPC เดิมในระบบจริง (โดยดูจากการไม่มีสิทธิ์ PUBLIC/anon ใน ACL)
+    -- ⚠️ หากมีผลลัพธ์ปรากฏขึ้น แสดงว่าฟังก์ชัน save_boq_with_routes ยังเปิดเผยต่อสาธารณะ/anon ให้ดำเนินการด่วน
     SELECT
-      has_function_privilege('PUBLIC', 'public.save_boq_with_routes(uuid,jsonb,jsonb)', 'EXECUTE') AS public_exec,
-      has_function_privilege('anon', 'public.save_boq_with_routes(uuid,jsonb,jsonb)', 'EXECUTE') AS anon_exec,
-      has_function_privilege('authenticated', 'public.save_boq_with_routes(uuid,jsonb,jsonb)', 'EXECUTE') AS authenticated_exec;
+      p.oid::regprocedure::text AS function_name,
+      a.grantee,
+      a.privilege_type
+    FROM pg_proc p
+    CROSS JOIN LATERAL aclexplode(COALESCE(p.proacl, acldefault('f', p.proowner))) a
+    WHERE p.oid = 'public.save_boq_with_routes(uuid,jsonb,jsonb)'::regprocedure
+      AND a.privilege_type = 'EXECUTE'
+      AND (a.grantee = 0 OR a.grantee = 'anon'::regrole);
 
     -- 8. [NEW] ตรวจสอบการมีอยู่ของ FK Indexes ดั้งเดิมในระบบ
     SELECT indexname, indexdef 
