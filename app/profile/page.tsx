@@ -82,6 +82,7 @@ export default function ProfilePage() {
   }, [canEditOrg, requestedDepartmentId, departmentId, supabase])
 
   // Populate form with current user data
+  /* eslint-disable react-hooks/set-state-in-effect -- Loaded profile data initializes an editable form draft. */
   useEffect(() => {
     if (user) {
       setFirstName(user.first_name || '')
@@ -93,15 +94,12 @@ export default function ProfilePage() {
       setDepartmentId(user.department_id || '')
       setSectorId(user.sector_id || '')
       // v1.2.0: Load onboarding state
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      setOnboardingCompleted((user as any).onboarding_completed ?? false)
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      setRequestedDepartmentId((user as any).requested_department_id || '')
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      setRequestedSectorId((user as any).requested_sector_id || '')
+      setOnboardingCompleted(user.onboarding_completed ?? false)
+      setRequestedDepartmentId(user.requested_department_id || '')
+      setRequestedSectorId(user.requested_sector_id || '')
     }
-    // eslint-disable-next-line react-hooks/set-state-in-effect
   }, [user])
+  /* eslint-enable react-hooks/set-state-in-effect */
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -111,7 +109,7 @@ export default function ProfilePage() {
     setMessage(null)
 
     // v1.2.0: Build update payload based on onboarding status
-    const updatePayload: Record<string, any> = {
+    const updatePayload: Record<string, string | boolean | null> = {
       first_name: firstName,
       last_name: lastName,
       title,

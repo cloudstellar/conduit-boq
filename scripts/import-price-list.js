@@ -1,8 +1,13 @@
 const XLSX = require('xlsx');
 const { createClient } = require('@supabase/supabase-js');
 
-const supabaseUrl = 'https://otlssvssvgkohqwuuiir.supabase.co';
-const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im90bHNzdnNzdmdrb2hxd3V1aWlyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjgwMzQ1ODksImV4cCI6MjA4MzYxMDU4OX0.QfPnAZA4Q2h6HG2BE4OpcP7aTmafTcammhtS8dx6FUU';
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+
+if (!supabaseUrl || !supabaseKey) {
+  console.error('Error: Set NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY before running this script.');
+  process.exit(1);
+}
 
 const supabase = createClient(supabaseUrl, supabaseKey);
 
