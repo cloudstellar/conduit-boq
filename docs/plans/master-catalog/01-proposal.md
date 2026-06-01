@@ -2,6 +2,14 @@
 
 เอกสารฉบับนี้คือ **Technical Specification (ข้อกำหนดคุณสมบัติทางเทคนิคฉบับผ่านการตรวจสอบระดับความปลอดภัยสูงสุด)** และพิมพ์เขียวในการดำเนินการจริงสำหรับระบบจัดการ **Master Catalog (บัญชีราคามาตรฐาน)** ของโครงการ Conduit BOQ โดยแก้ไขและปิดจุดบกพร่องเชิงโครงสร้างและความปลอดภัยฐานข้อมูล 4 ประเด็นสำคัญตามคำแนะนำอย่างละเอียดถี่ถ้วน เพื่อให้มั่นใจในเสถียรภาพและความปลอดภัยระดับสูงสุดบนระบบโปรดักชัน (Production-Grade Security & High Availability via Lock Timeouts and Atomic Rollbacks)
 
+## สถานะการดำเนินงานปัจจุบัน (2026-06-02)
+
+- Repository quality baseline ถูก merge เข้า `main` แล้วผ่าน [PR #1](https://github.com/cloudstellar/conduit-boq/pull/1) ที่ merge commit `6d607f9`
+- ตรวจ `npm run lint`, `npm test`, `npm run build`, [GitHub Actions Quality run #4](https://github.com/cloudstellar/conduit-boq/actions/runs/26770263106) และ Vercel Production deployment ผ่านแล้ว
+- ถอด legacy Supabase `anon` key ที่เคย hardcode ใน utility scripts ออกจาก HEAD ปัจจุบันแล้ว โดย scripts ต้องรับค่าจาก environment
+- **ยังไม่มี** Master Catalog migration `009`-`011` ถูก apply บน Production DB
+- ขั้นถัดไปคือเตรียม backup, non-production rehearsal และขออนุมัติ execution window สำหรับ P0 containment เท่านั้น
+
 ---
 
 ## 🛡️ 1. ปิดจุดเสี่ยงและปรับสถาปัตยกรรมความปลอดภัยขั้นสูง (Advanced Security Adjustments)

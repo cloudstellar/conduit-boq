@@ -2,6 +2,17 @@
 
 แผนพัฒนานี้จัดทำขึ้นจากข้อกำหนดการทบทวนของระบบและปรับโครงสร้างการเปลี่ยนผ่านทั้งหมดให้มี **ความปลอดภัยเป็นอันดับหนึ่ง (SRE-First Rollout)** เพื่อให้มั่นใจได้ 100% ว่าการจัดทำและเปลี่ยนผ่านระบบจะไม่ทำให้ผู้ใช้เดิมสร้าง คัดลอก หรือคำนวณราคาใบงานสะดุดล้มระหว่างช่วงเดปลอยการทำงาน
 
+## สถานะการดำเนินงานปัจจุบัน (2026-06-02)
+
+| รายการ | สถานะ |
+|---|---|
+| Repository quality baseline | ✅ Merge เข้า `main` แล้วผ่าน [PR #1](https://github.com/cloudstellar/conduit-boq/pull/1), merge commit `6d607f9` |
+| Quality checks | ✅ `npm run lint`, `npm test` (`13/13`), `npm run build`, [GitHub Actions Quality run #4](https://github.com/cloudstellar/conduit-boq/actions/runs/26770263106) |
+| Vercel Production deploy หลัง merge | ✅ ผ่าน |
+| Utility-script credential hygiene | ✅ ถอด hardcoded legacy Supabase `anon` key จาก HEAD แล้ว |
+| Production DB migration `009`-`011` | ⏳ ยังไม่ได้ apply |
+| ขั้นถัดไป | เตรียม backup, non-production rehearsal และอนุมัติ P0 containment window |
+
 ---
 
 ## 🎯 ลำดับขั้นตอนการดำเนินงานจริง (Development Roadmap)

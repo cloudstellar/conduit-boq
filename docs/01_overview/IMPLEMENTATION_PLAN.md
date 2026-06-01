@@ -38,7 +38,13 @@ Next.js 16 + React 19 + TypeScript + Tailwind CSS 4
 
 ## 🚧 Phase 2: Modernization & Versioning (MASTER CATALOG v26 - PLANNED)
 
-**Strategy:** P0 Containment → Nullable DB Setup → Application Integration → DB Hardening → Future Governance
+**Strategy:** Quality Baseline → P0 Containment → Nullable DB Setup → Application Integration → DB Hardening → Future Governance
+
+**Current rollout state (2026-06-02):** Repository quality baseline merged to
+`main` via [PR #1](https://github.com/cloudstellar/conduit-boq/pull/1) at
+`6d607f9`; [GitHub Actions Quality run #4](https://github.com/cloudstellar/conduit-boq/actions/runs/26770263106)
+and Vercel Production deploy passed. No Master Catalog migration has been
+applied to the Production DB.
 
 Detailed execution plan: [Master Catalog v26](../plans/master-catalog/02-implementation.md)
 
@@ -56,12 +62,14 @@ Detailed execution plan: [Master Catalog v26](../plans/master-catalog/02-impleme
 
 ### 📅 Controlled Rollout
 
-1. Apply P0 RPC containment and tightened BOQ RLS.
-2. Apply Phase 1A nullable catalog schema, pointer table, backfill, and version-aware RPC.
-3. Create concurrent indexes from the separate `010a` runbook.
-4. Deploy create, duplicate, edit, print, dashboard, and price-list integration updates.
-5. Run smoke tests and delta backfill verification.
-6. Apply Phase 1B `NOT NULL` and immutable-version hardening.
+1. ✅ Merge repository quality baseline: lint, build, automated tests, and CI workflow.
+2. Apply P0 RPC containment and tightened BOQ RLS.
+3. Confirm latest `main` CI and dependency-audit disposition before catalog schema work.
+4. Apply Phase 1A nullable catalog schema, pointer table, backfill, and version-aware RPC.
+5. Create concurrent indexes from the separate `010a` runbook.
+6. Deploy create, duplicate, edit, print, dashboard, and price-list integration updates.
+7. Run smoke tests and delta backfill verification.
+8. Apply Phase 1B `NOT NULL` and immutable-version hardening.
 
 ### 🔐 Future Governance
 

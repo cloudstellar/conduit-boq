@@ -39,7 +39,13 @@ Next.js 16 + React 19 + TypeScript + Tailwind CSS 4
 
 ## 🚧 Phase 2: Modernization & Versioning (SRE-Hardened - PLANNED)
 
-**Strategy:** Foundation (DB) → Integration (Codebase) → Hardening (Locks) → Governance (Admin GUI)
+**Strategy:** Quality Baseline → P0 Containment → Foundation (DB) → Integration (Codebase) → Hardening (Locks) → Governance (Admin GUI)
+
+**Current rollout state (2026-06-02):** Repository quality baseline merged to
+`main` via [PR #1](https://github.com/cloudstellar/conduit-boq/pull/1) at
+`6d607f9`; [GitHub Actions Quality run #4](https://github.com/cloudstellar/conduit-boq/actions/runs/26770263106)
+and Vercel Production deploy passed. No Master Catalog migration has been
+applied to the Production DB.
 
 ### 🔐 Key Integrity & Security Rules (Revised v26)
 

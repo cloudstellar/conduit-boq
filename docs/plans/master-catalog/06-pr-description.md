@@ -1,20 +1,24 @@
-# PR Draft: Prepare Master Catalog v26 Rollout Artifacts
+# PR Record: Master Catalog Quality Baseline
+
+**Status:** Merged to `main` on 2026-06-02
+**Merged PR:** [PR #1](https://github.com/cloudstellar/conduit-boq/pull/1)
+**Merge commit:** `6d607f9`
 
 ## Summary
 
-Prepare reviewable execution artifacts for the DB-verified Master Catalog v26
-rollout. This PR does not apply migrations or change production data.
+The merged baseline prepares the repository for the DB-verified Master Catalog
+v26 rollout. It does not apply migrations or change production data.
 
-## Changes
+## Merged Changes
 
-- Add P0 containment migration draft.
-- Add Phase 1A nullable versioning migration draft.
-- Add Phase 1A concurrent index runbook draft.
-- Add Phase 1B hardening migration draft.
-- Add change request and rollout verification template.
-- Add ADR-002 for versioned catalog and singleton default-pointer decisions.
+- Add automated regression tests and the `npm test` command.
+- Add `.github/workflows/quality.yml` for lint, tests, and build checks.
+- Fix baseline lint errors required for the quality gate.
+- Update rollout guardrails and verification documents.
+- Remove hardcoded legacy Supabase `anon` credentials from utility scripts;
+  scripts now read environment variables.
 
-## Review Order
+## Next Production Review Order
 
 1. `docs/plans/master-catalog/04-change-request.md`
 2. `migrations/009_master_catalog_p0_containment.sql`
@@ -26,7 +30,10 @@ rollout. This PR does not apply migrations or change production data.
 
 ## Production Safety
 
-- [ ] No migration has been applied by this PR.
+- [x] No migration was applied by this PR.
+- [x] [GitHub Actions Quality run #4](https://github.com/cloudstellar/conduit-boq/actions/runs/26770263106) passed on `main`.
+- [x] Vercel Production deployment passed after merge.
+- [x] Current HEAD contains no hardcoded JWT literal and no tracked `.env`.
 - [ ] P0 containment is reviewed independently from Phase 1A.
 - [ ] Backups and PITR restore point are confirmed before execution.
 - [ ] Migration drafts are tested on a non-production database.

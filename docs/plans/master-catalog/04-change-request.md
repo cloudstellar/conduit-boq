@@ -1,6 +1,6 @@
 # Change Request: Master Catalog v26 Rollout
 
-**Status:** Draft for owner review
+**Status:** Draft for P0 owner approval - repository baseline merged, production DB unchanged
 **Requested date:** 2026-06-01
 **Change type:** Database security containment and phased catalog versioning
 **Production project:** `otlssvssvgkohqwuuiir`
@@ -72,6 +72,29 @@ The current `public.save_boq_with_routes(uuid,jsonb,jsonb)` function is
 `SECURITY DEFINER`, has no internal auth guard, and is executable by `PUBLIC`
 and `anon`. P0 containment is therefore required before catalog work.
 
+## Current Repository State
+
+As of 2026-06-02, [PR #1](https://github.com/cloudstellar/conduit-boq/pull/1)
+was merged into `main` at merge commit `6d607f9`.
+
+| Item | Status |
+|---|---|
+| Repository quality baseline | Completed and merged to `main` |
+| `npm run lint` | Passed with `0` errors and `14` existing warnings |
+| `npm test` | Passed: `13` tests across `3` files |
+| `npm run build` | Passed |
+| GitHub Actions on `main` | [Quality run #4](https://github.com/cloudstellar/conduit-boq/actions/runs/26770263106) passed: install, lint, test, build |
+| Vercel Production deployment after merge | Passed |
+| Hardcoded legacy Supabase `anon` key in utility scripts | Removed from current HEAD; scripts now read environment variables |
+| Production migration `009` | Not applied |
+| Production migrations `010`, `010a`, `011` | Not applied |
+
+The CI workflow is present in `.github/workflows/quality.yml`, and
+[Quality run #4](https://github.com/cloudstellar/conduit-boq/actions/runs/26770263106)
+passed on `main`.
+The removed legacy `anon` value remains in earlier git history; historical
+credential invalidation is a separate reviewed task.
+
 ## P0 Hotfix Preconditions
 
 - [ ] Owner reviewed this change request and migration drafts.
@@ -80,7 +103,8 @@ and `anon`. P0 containment is therefore required before catalog work.
 - [ ] Logical schema backup completed.
 - [ ] Logical data backup completed.
 - [ ] Baseline queries recorded in [05-verification-report.md](./05-verification-report.md).
-- [ ] `git diff --check` passes.
+- [x] Repository quality baseline merged into `main`.
+- [x] `git diff --check` passes.
 - [ ] Migration `009_master_catalog_p0_containment.sql` tested on a
   non-production database.
 
@@ -94,9 +118,10 @@ and `anon`. P0 containment is therefore required before catalog work.
 ## Master Catalog Preconditions
 
 - [ ] P0 hotfix has passed production verification and smoke tests.
-- [ ] `npm run lint` passes.
-- [ ] `npm run build` passes.
-- [ ] Automated regression tests and CI are present and passing.
+- [x] `npm run lint` passes.
+- [x] `npm run build` passes.
+- [x] Automated regression tests are present and passing.
+- [x] Latest `main` CI workflow passed in GitHub Actions.
 - [ ] `npm run audit:prod` findings are remediated or explicitly accepted.
 - [ ] The full Master Catalog rollout has been tested on a non-production
   database.

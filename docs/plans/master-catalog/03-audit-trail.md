@@ -151,6 +151,29 @@
 | **v26** | **Canonical docs reconciliation: sync overview/schema/integrity/guardrails ให้ใช้ singleton pointer + `price_list_audit_logs`; ติดป้าย AI plan เก่าว่า superseded** | ✅ |
 | **v27** | **แยก `009` เป็น standalone P0 security hotfix และเพิ่ม quality baseline gate: lint, build, automated tests, CI, non-production rehearsal ก่อนเริ่ม `010`** | ✅ |
 | **v27** | **เพิ่ม production dependency audit gate ก่อน Master Catalog rollout; remediation หรือ risk acceptance ต้อง review แยกจาก feature PR** | ✅ |
+| **v28** | **บันทึก repository quality baseline merge ผ่าน PR #1 (`6d607f9`), Vercel Production deploy ผ่าน, และยืนยันว่า Production DB ยังไม่ได้ apply migration `009`-`011`** | ✅ |
+| **v28** | **ถอด hardcoded legacy Supabase `anon` key จาก utility scripts; HEAD ปัจจุบันไม่มี JWT literal และไม่มี `.env` ถูก track** | ✅ |
+
+---
+
+## Execution Status (2026-06-02)
+
+| รายการ | สถานะ | หลักฐาน |
+|---|---|---|
+| Repository quality baseline | ✅ Merged to `main` | [PR #1](https://github.com/cloudstellar/conduit-boq/pull/1), merge commit `6d607f9` |
+| Lint | ✅ Passed | `0` errors, `14` existing warnings |
+| Automated tests | ✅ Passed | `npm test`: `13` tests across `3` files |
+| Production build | ✅ Passed | `npm run build` |
+| GitHub Actions | ✅ Passed | [Quality run #4](https://github.com/cloudstellar/conduit-boq/actions/runs/26770263106) on `main`: install, lint, test, build |
+| Vercel Production deploy | ✅ Passed | Deployment status after merge commit `6d607f9` |
+| Credential hygiene | ✅ HEAD cleaned | Removed hardcoded legacy `anon` key from utility scripts; no tracked `.env` |
+| P0 containment `009` | ⏳ Not applied | Production DB unchanged |
+| Master Catalog `010`, `010a`, `011` | ⏳ Not applied | Production DB unchanged |
+
+The removed legacy `anon` key remains visible in earlier git history. It is a
+low-privilege public-client credential rather than a `service_role` secret, but
+credential migration or rotation should be reviewed separately if historical
+invalidation is required.
 
 ---
 

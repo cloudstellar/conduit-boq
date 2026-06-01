@@ -1,6 +1,6 @@
 # Verification Report: Master Catalog v26
 
-**Status:** Template - complete during rollout
+**Status:** Repository quality baseline merged - production DB rollout not started
 **Production project:** `otlssvssvgkohqwuuiir`
 **Related change request:** [04-change-request.md](./04-change-request.md)
 
@@ -8,9 +8,9 @@
 
 | Phase | Migration or deploy | Executor | Started | Completed | Result |
 |---|---|---|---|---|---|
-| Baseline | Read-only queries |  |  |  | Pending |
+| Baseline | Read-only queries | Codex | 2026-06-01 | 2026-06-01 | Recorded |
 | P0 | `009_master_catalog_p0_containment.sql` |  |  |  | Pending |
-| Quality baseline | Lint, build, automated tests, CI |  |  |  | Pending |
+| Quality baseline | Lint, build, automated tests, CI workflow, Vercel deploy | Codex + Owner | 2026-06-01 | 2026-06-02 | Passed and merged to `main` |
 | Phase 1A | `010_master_catalog_phase1a_versioning.sql` |  |  |  | Pending |
 | Phase 1A indexes | `010a_master_catalog_phase1a_indexes.sql` |  |  |  | Pending |
 | Phase 2 | Application deploy |  |  |  | Pending |
@@ -159,11 +159,11 @@ Complete after the standalone P0 hotfix and before Master Catalog Phase 1A.
 
 | Check | Expected | Result |
 |---|---|---|
-| `npm run lint` | Exit code `0` | Pending |
-| `npm run build` | Exit code `0` | Pending |
-| Automated regression test command | Exit code `0` | Pending |
-| CI workflow | Runs lint, build, and automated tests on pull requests | Pending |
-| `npm run audit:prod` | Findings remediated or explicitly accepted | Pending |
+| `npm run lint` | Exit code `0` | Passed: `0` errors, `14` existing warnings |
+| `npm run build` | Exit code `0` | Passed locally and Vercel Production deployment passed after merge |
+| Automated regression test command | Exit code `0` | Passed: `npm test`, `13/13` tests across `3` files |
+| CI workflow | Runs lint, build, and automated tests on pull requests and pushes to `main` | Passed: [Quality run #4](https://github.com/cloudstellar/conduit-boq/actions/runs/26770263106) on merge commit `6d607f9` |
+| `npm run audit:prod` | Findings remediated or explicitly accepted | Pending: `9` production findings recorded (`5` moderate, `4` high) |
 | Non-production rehearsal | `010 -> 010a -> Phase 2 -> 011` passes all gates | Pending |
 
 ## Phase 1A Verification
@@ -295,7 +295,7 @@ Expected:
 
 Record actual query output, screenshots, and incident notes below during rollout.
 
-### Local Quality Preparation - 2026-06-01
+### Repository Quality Baseline - Merged 2026-06-02
 
 | Check | Result |
 |---|---|
@@ -303,7 +303,10 @@ Record actual query output, screenshots, and incident notes below during rollout
 | `npm run lint` | Passed with `0` errors and `14` existing warnings |
 | `npm test` | Passed: `13` tests across `3` files |
 | `npm run build` | Passed |
-| CI workflow | Added; remote run pending |
+| Git merge | [PR #1](https://github.com/cloudstellar/conduit-boq/pull/1) merged to `main` at `6d607f9` |
+| Vercel Production deploy | Passed after merge commit `6d607f9` |
+| CI workflow | Passed: [Quality run #4](https://github.com/cloudstellar/conduit-boq/actions/runs/26770263106) on `main`; install, lint, test, and build succeeded |
+| Credential hygiene | Removed hardcoded legacy Supabase `anon` key from utility scripts; no JWT literal or tracked `.env` remains in current HEAD |
 | `npm run audit:prod` | Review required: `9` production dependency findings (`5` moderate, `4` high) |
 | Non-production rehearsal | Pending |
 
@@ -311,3 +314,8 @@ Dependency audit remediation must be reviewed separately from the Master
 Catalog feature implementation. The 2026-06-01 audit identified a Next.js
 upgrade path from `16.1.1` to `16.2.6` and `xlsx` findings without an available
 registry fix.
+
+No Master Catalog migration (`009`, `010`, `010a`, or `011`) has been applied
+to the Production DB. The removed legacy `anon` key remains in earlier git
+history; historical invalidation requires a separately reviewed credential
+migration or rotation decision.

@@ -3,6 +3,8 @@
 **Status:** Proposed
 **Date:** 2026-06-01
 **Decision Makers:** Owner, Development Team
+**Implementation status:** Repository quality baseline merged to `main` on
+2026-06-02; Production DB migrations `009`-`011` have not been applied.
 
 ## Context
 
