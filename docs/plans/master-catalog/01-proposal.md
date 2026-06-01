@@ -579,6 +579,11 @@ BEGIN;
   DROP POLICY IF EXISTS "Allow public insert" ON public.price_list;
   DROP POLICY IF EXISTS "Allow public update" ON public.price_list;
   DROP POLICY IF EXISTS "Allow public delete" ON public.price_list;
+  -- [v26 execution draft reconciliation] production pg_policies ใช้ชื่อชุดนี้
+  DROP POLICY IF EXISTS "price_list_select" ON public.price_list;
+  DROP POLICY IF EXISTS "price_list_insert" ON public.price_list;
+  DROP POLICY IF EXISTS "price_list_update" ON public.price_list;
+  DROP POLICY IF EXISTS "price_list_delete" ON public.price_list;
 
   DROP POLICY IF EXISTS "Allow select to authenticated" ON public.price_list;
   CREATE POLICY "Allow select to authenticated" ON public.price_list

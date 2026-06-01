@@ -346,39 +346,53 @@ idx_boq_items_route_id   ON boq_items(route_id)
 | `008_pending_user_status.sql` | Pending status for new users | ✅ Applied |
 | `008_rls_and_trigger.sql` | RLS + Trigger + RPC (v1.2.0) | ✅ Applied |
 | `20260317_factor_f_supplement.sql` | Factor F snapshot columns | ✅ Applied |
+| `009_master_catalog_p0_containment.sql` | Master Catalog RPC containment + BOQ RLS tightening | 📝 Draft |
+| `010_master_catalog_phase1a_versioning.sql` | Nullable catalog versioning + historical backfill | 📝 Draft |
+| `010a_master_catalog_phase1a_indexes.sql` | Concurrent index runbook | 📝 Draft |
+| `011_master_catalog_phase1b_hardening.sql` | BOQ version contract hardening | 📝 Draft |
 
 ---
 
 ## 🔗 Related Documentation
 
-- **Domain Model:** [docs/ai/DOMAIN_MODEL.md](./ai/DOMAIN_MODEL.md)
-- **RLS Decision:** [docs/ai/DECISIONS/ADR-001](./ai/DECISIONS/ADR-001-supabase-rls-authorization.md)
+- **Domain Model:** [DOMAIN_MODEL.md](../03_domain/DOMAIN_MODEL.md)
+- **RLS Decision:** [ADR-001](../02_architecture/ADR/ADR-001-supabase-rls-authorization.md)
+- **Master Catalog Decision:** [ADR-002](../02_architecture/ADR/ADR-002-versioned-master-catalog.md)
 
 ---
 
-## 🔮 Phase 2 Schema Preview (PLANNED)
+## 🔮 Master Catalog v26 Schema Preview (PLANNED)
+
+Executable drafts remain subject to non-production testing before approval.
+See [MIGRATIONS.md](./MIGRATIONS.md) for the migration ledger and naming rules.
 
 ### NEW: price_list_versions
 | Column | Type | Description |
 |--------|------|-------------|
 | `id` | UUID | Primary Key |
-| `year` | INTEGER | ปีบัญชีราคา |
+| `major`, `minor`, `patch` | INTEGER | SemVer components |
+| `version_string` | TEXT | Generated SemVer string |
 | `name` | TEXT | ชื่อ version |
 | `status` | TEXT | draft/active/archived |
-| `is_default` | BOOLEAN | Default version |
+| `is_default` | BOOLEAN | Deprecated compatibility flag |
 
-**Constraints:** `UNIQUE WHERE is_default = true`, default requires active
+### NEW: price_list_default_version
+- Singleton pointer row to the active default `price_list_versions.id`
+- Pointer validation trigger rejects inactive versions
+- Sole source of truth for new BOQ default binding
 
 ### MODIFY: price_list
 - Add `version_id UUID NOT NULL`
 - Add `UNIQUE (version_id, item_code)`
 
 ### MODIFY: boq
-- Add `price_list_version_id UUID NOT NULL` (immutable)
-- Add `cloned_from_boq_id UUID` (NULLABLE)
-- Add `source_model_id UUID` (NULLABLE, Phase 2C)
+- Add `price_list_version_id UUID` as nullable during Phase 1A
+- Backfill existing BOQs
+- Enforce `NOT NULL` and immutability in Phase 1B after application verification
 
-### NEW: system_event_log
-- Trigger rejection logging
-- Columns: `action`, `table_name`, `record_id`, `reason`, `created_at`
+### MODIFY: boq_items
+- Add snapshotted `category TEXT`
 
+### NEW: price_list_audit_logs
+- Create the audit-log table in Phase 1A
+- Install admin catalog audit triggers only in the later Phase 4 change request

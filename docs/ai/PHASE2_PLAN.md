@@ -1,7 +1,12 @@
-# Phase 2 Roadmap (FROZEN)
+# Phase 2 Roadmap (SUPERSEDED)
+
+> [!IMPORTANT]
+> Historical plan only. Superseded by
+> [`docs/plans/master-catalog/02-implementation.md`](../plans/master-catalog/02-implementation.md)
+> and ADR-002. Do not execute the SQL preview in this file.
 
 **Last Updated:** 2026-01-20  
-**Status:** FROZEN — Ready for implementation
+**Status:** SUPERSEDED - Historical reference only
 
 ---
 

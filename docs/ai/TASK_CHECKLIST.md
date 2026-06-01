@@ -1,5 +1,9 @@
 # Task Checklist
 
+> [!NOTE]
+> Historical shadcn migration checklist. For Master Catalog execution, use
+> [`docs/plans/master-catalog/02-implementation.md`](../plans/master-catalog/02-implementation.md).
+
 **Last Updated:** 2026-02-01  
 **Version:** 3.7  
 **Branch:** `feature/shadcn-migration`
@@ -79,7 +83,8 @@
 - [ ] Create `price_list_versions` + seed "2568"
 - [ ] Add `version_id` to `price_list`
 - [ ] Add `price_list_version_id` to `boq`
-- [ ] Create `system_event_log`
+- [ ] Create `price_list_default_version` singleton pointer
+- [ ] Create `price_list_audit_logs` table (audit triggers in Phase 4)
 
 ---
 

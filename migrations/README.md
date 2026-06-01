@@ -1,5 +1,11 @@
 # 🚀 Multi-Route BOQ Migration Guide
 
+> [!NOTE]
+> This guide documents the historical `002_add_multi_route_support.sql`
+> workflow only. For the canonical migration ledger and Master Catalog v26
+> rollout artifacts, use
+> [`docs/04_data/MIGRATIONS.md`](../docs/04_data/MIGRATIONS.md).
+
 ## 📋 Overview
 This migration adds multi-route support to the BOQ system while preserving all existing data.
 
@@ -183,4 +189,3 @@ If you encounter issues:
 ---
 
 **Ready to start?** Begin with Step 1: Backup
-

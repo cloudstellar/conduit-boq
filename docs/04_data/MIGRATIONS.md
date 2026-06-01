@@ -1,7 +1,7 @@
 # Migrations
 ## Conduit BOQ System
 
-**Last Updated:** 2026-05-30  
+**Last Updated:** 2026-06-01
 **Status:** Canonical
 
 ---
@@ -24,6 +24,10 @@
 | `007b_add_onboarding_completed.sql` | Add `onboarding_completed` column | **Applied (Manual Supplement)** |
 | `008_pending_user_status.sql` | Add `pending` to user status check constraint | **Applied** |
 | `008_rls_and_trigger.sql` | Consolidated RLS + org-lock trigger + admin RPC | **Applied** |
+| `009_master_catalog_p0_containment.sql` | Master Catalog v26 RPC containment + BOQ RLS tightening | **Draft** |
+| `010_master_catalog_phase1a_versioning.sql` | Master Catalog v26 nullable versioning + historical backfill | **Draft** |
+| `010a_master_catalog_phase1a_indexes.sql` | Master Catalog v26 concurrent index runbook | **Draft** |
+| `011_master_catalog_phase1b_hardening.sql` | Master Catalog v26 BOQ version contract hardening | **Draft** |
 
 ### Supabase Migrations (`supabase/migrations/`)
 
@@ -31,6 +35,18 @@
 |------|-------------|--------|
 | `20250115_rls_policies.sql` | Early RLS policy set | **Applied** (superseded in part by 008 migrations) |
 | `20260317_factor_f_supplement.sql` | Factor F snapshot columns + `save_boq_with_routes` RPC | **Applied Supplement** |
+
+### Naming Convention
+
+The root `migrations/` sequence and timestamped `supabase/migrations/` supplements
+are separate ledgers. The applied Factor F supplement is
+`supabase/migrations/20260317_factor_f_supplement.sql`; it does not reserve the
+root migration number `009`. The Master Catalog rollout therefore starts with
+`migrations/009_master_catalog_p0_containment.sql`.
+
+`010a_master_catalog_phase1a_indexes.sql` is an operational runbook rather than
+a transactional migration. Run its `CREATE INDEX CONCURRENTLY` statements one
+at a time outside an explicit transaction.
 
 ---
 
@@ -69,10 +85,13 @@ For other migrations, rollback must be performed manually by reversing the speci
 | **Applied (Manual Supplement)** | Applied manually outside normal migration sequence |
 | **Backup/Utility** | Not a schema change; diagnostic/backup queries |
 | **Rollback Utility** | Reversal script, run only if rollback is needed |
+| **Draft** | Review and test before applying to production |
 
 ---
 
 ## References
 
-- Migration Guide: [migrations/README.md](../../migrations/README.md)
+- Historical multi-route guide: [migrations/README.md](../../migrations/README.md)
+- Master Catalog change request: [04-change-request.md](../plans/master-catalog/04-change-request.md)
+- Master Catalog verification report: [05-verification-report.md](../plans/master-catalog/05-verification-report.md)
 - Database Schema: [DATABASE_SCHEMA.md](./DATABASE_SCHEMA.md)

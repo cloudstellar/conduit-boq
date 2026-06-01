@@ -1,6 +1,10 @@
 # Roadmap
 ## Conduit BOQ System
 
+> [!NOTE]
+> Historical UI-migration roadmap. For Master Catalog execution, use
+> [`docs/plans/master-catalog/02-implementation.md`](../plans/master-catalog/02-implementation.md).
+
 **Last Updated:** 2026-01-31
 
 ---
@@ -66,7 +70,8 @@ Foundation         │  shadcn/ui            │  Versioning           │  Enha
 - [ ] `price_list_versions` table
 - [ ] Versioned pricing (2568, 2569...)
 - [ ] Immutable BOQ version
-- [ ] `system_event_log`
+- [ ] `price_list_default_version` singleton pointer
+- [ ] `price_list_audit_logs` table (audit triggers in Phase 4)
 
 ### 2B: Reporting
 - [ ] Summary per Dept/Sector

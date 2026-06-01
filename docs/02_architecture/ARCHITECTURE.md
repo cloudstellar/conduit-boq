@@ -197,6 +197,13 @@
 - **Rationale:** Security by default, reduced API surface, single source of truth
 - **Full document:** [ADR/ADR-001-supabase-rls-authorization.md](./ADR/ADR-001-supabase-rls-authorization.md)
 
+### ADR-002: Versioned Master Catalog With Singleton Default Pointer
+
+- **Status:** Proposed
+- **Decision:** Version standard-price catalogs, retain BOQ snapshots, and use a singleton active-default pointer
+- **Rationale:** Historical stability, deterministic defaults, and phased production hardening
+- **Full document:** [ADR/ADR-002-versioned-master-catalog.md](./ADR/ADR-002-versioned-master-catalog.md)
+
 ---
 
 ## References

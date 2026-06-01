@@ -86,32 +86,20 @@ idx_boq_items_route_id   ON boq_items(route_id)
 
 ---
 
-## 5. Phase 2 Schema Preview (PLANNED)
+## 5. Master Catalog v26 Integrity Preview (PLANNED)
 
-### NEW: price_list_versions
+- `price_list_default_version` is the singleton source of truth for the active
+  default catalog.
+- `price_list.version_id` is backfilled and then required.
+- `boq.price_list_version_id` remains nullable during the application rollout,
+  then becomes `NOT NULL` and immutable in Phase 1B.
+- `boq_items.category` stores the historical category snapshot.
+- `price_list_audit_logs` is created in Phase 1A; audit triggers remain Phase 4
+  scope.
+- Cross-version BOQ items are rejected by `save_boq_with_routes`.
 
-| Column | Type | Description |
-|--------|------|-------------|
-| `id` | UUID | Primary Key |
-| `year` | INTEGER | ปีบัญชีราคา |
-| `name` | TEXT | ชื่อ version |
-| `status` | TEXT | draft/active/archived |
-| `is_default` | BOOLEAN | Default version |
-
-**Constraints:** `UNIQUE WHERE is_default = true`, default requires active
-
-### MODIFY: price_list
-- Add `version_id UUID NOT NULL`
-- Add `UNIQUE (version_id, item_code)`
-
-### MODIFY: boq
-- Add `price_list_version_id UUID NOT NULL` (immutable)
-- Add `cloned_from_boq_id UUID` (NULLABLE)
-- Add `source_model_id UUID` (NULLABLE, Phase 2C)
-
-### NEW: system_event_log
-- Trigger rejection logging
-- Columns: `action`, `table_name`, `record_id`, `reason`, `created_at`
+See [ADR-002](../02_architecture/ADR/ADR-002-versioned-master-catalog.md) and
+the [verification report](../plans/master-catalog/05-verification-report.md).
 
 ---
 

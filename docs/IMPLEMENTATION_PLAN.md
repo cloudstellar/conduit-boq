@@ -41,21 +41,22 @@ Next.js 16 + React 19 + TypeScript + Tailwind CSS 4
 
 **Strategy:** Foundation (DB) → Integration (Codebase) → Hardening (Locks) → Governance (Admin GUI)
 
-### 🔐 Key Integrity & Security Rules (Revised v3)
+### 🔐 Key Integrity & Security Rules (Revised v26)
 
 **Rule A: Versioning & State Control**
-- **One active default**: Handled by unique partial index `idx_only_one_default_active_version`.
-- **Default = active**: Checked via database constraint.
-- **Switch default = atomic**: Executed via transaction or `make_version_default` RPC.
+- **One active default**: `price_list_default_version` is the singleton source of truth.
+- **Default = active**: Checked by the pointer validation trigger.
+- **Switch default = atomic**: Phase 4 `make_version_default` updates the singleton pointer.
 - **Never 0 defaults**: Ensured by AFTER STATEMENT trigger `trigger_check_default_version_exists`.
 - **Active-only BOQ**: New BOQs auto-bind to the default active version.
 - **Immutable version_id**: Trigger `trigger_prevent_boq_version_modification` locks BOQ versioning post-hardening.
 - **No duplicate items in version**: Guaranteed by composite unique key `UNIQUE (version_id, item_code)` after dropping global `price_list_item_code_key`.
+- **Compatibility flag**: `price_list_versions.is_default` remains temporarily but is deprecated.
 
 **Rule B: Snapshot Shield**
 - **No auto-update**: Category and prices are snapshotted in `boq_items.category` at insert.
 - **Automatic Fallback Snapshot**: Database RPC `save_boq_with_routes` automatically falls back to retrieve and snapshot categories from `price_list` if client parameters are empty.
-- **Traceability**: `cloned_from_boq_id` and item snapshot state are fully preserved on duplication.
+- **Duplication safety**: Existing BOQ duplication must preserve version and item snapshot state.
 
 **Rule C: SECURITY DEFINER RPC Hardening**
 - **Auth verification inside RPC**: `clone_price_list_version` and `make_version_default` enforce admin roles, and `save_boq_with_routes` mirrors `permissions.ts` logic (allowing owners, assigned users, sector/department managers, and admins).
@@ -71,7 +72,7 @@ Next.js 16 + React 19 + TypeScript + Tailwind CSS 4
 - Verify existing RLS structures.
 
 #### **Phase 1A: Database Setup (Defensive Nullable Setup)**
-- Run rerunnable DDL scripts to create `price_list_versions` and `price_list_audit_logs`.
+- Run rerunnable DDL scripts to create `price_list_versions`, `price_list_default_version`, and `price_list_audit_logs`.
 - Add nullable version columns and drop old global item code unique constraint.
 - Deploy SRE triggers, RPCs, fallback snapshotters, and explicit role permissions (`GRANT`/`REVOKE`).
 - Run historical backfill and snapshot recovery scripts.
@@ -110,8 +111,11 @@ Next.js 16 + React 19 + TypeScript + Tailwind CSS 4
 | 001-006 | Phase 1 foundation | ✅ |
 | 007 | Onboarding columns | ✅ v1.2.0 |
 | 008 | RLS + Trigger + RPC | ✅ v1.2.0 |
-| 009 | Factor F Supplement snapshot | ✅ v1.5.0 |
-| 010_phase_2a_versioning | SRE-hardened v3 master catalog migrations | ⏳ Planned |
+| 20260317_factor_f_supplement | Factor F Supplement snapshot | ✅ v1.5.0 |
+| 009_master_catalog_p0_containment | Master Catalog v26 RPC containment + BOQ RLS tightening | 📝 Draft |
+| 010_master_catalog_phase1a_versioning | Master Catalog v26 nullable versioning + historical backfill | 📝 Draft |
+| 010a_master_catalog_phase1a_indexes | Master Catalog v26 concurrent index runbook | 📝 Draft |
+| 011_master_catalog_phase1b_hardening | Master Catalog v26 BOQ version contract hardening | 📝 Draft |
 
 ---
 

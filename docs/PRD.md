@@ -155,7 +155,7 @@ Organization (NT)
 ### Phase 2: Modernization (FROZEN)
 **Strategy:** Foundation → Output → Input → Governance
 
-- **2A: Foundation** — shadcn/ui, Price Versioning, system_event_log
+- **2A: Foundation** — shadcn/ui, Price Versioning, singleton default pointer, price-list audit log
 - **2B: Reporting** — Summary, PDF Export, Copy/Requote
 - **2C: Smart Estimation** — Model-based BOQ generation
 - **2D: Governance** — Audit Log, Version Comparison
@@ -165,5 +165,4 @@ Organization (NT)
 - [ ] Notifications
 - [ ] Mobile PWA / Offline
 - [ ] Analytics & Reporting
-
 

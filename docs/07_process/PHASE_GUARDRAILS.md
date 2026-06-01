@@ -1,38 +1,26 @@
 # Phase Guardrails
 ## Conduit BOQ System
 
-> **Status:** DRAFT – CANONICAL SKELETON  
-> **Last Updated:** 2026-01-22  
-> **Source:** Migrated from `docs/ai/PHASE2_PLAN.md`
+> **Status:** CANONICAL - MASTER CATALOG v26
+> **Last Updated:** 2026-06-01
+> **Source:** `docs/plans/master-catalog/02-implementation.md`
 
 ---
 
-## Phase 2 Roadmap (FROZEN)
+## Master Catalog v26 Rollout
 
-**Strategy:** Foundation → Output → Input → Governance
+**Strategy:** P0 Containment → Phase 1A Nullable Setup → Phase 2 Application → Phase 1B Hardening
 
-### Phase 2A: Foundation
-⛔ **Infrastructure only — No feature logic**
+1. Apply `009_master_catalog_p0_containment.sql` and stop unless P0 gates pass.
+2. Apply `010_master_catalog_phase1a_versioning.sql`.
+3. Run each `010a_master_catalog_phase1a_indexes.sql` statement separately
+   outside an explicit transaction.
+4. Stop unless Phase 1A gates pass.
+5. Deploy the application integration PR and run smoke tests.
+6. Run delta category backfill verification.
+7. Apply `011_master_catalog_phase1b_hardening.sql`.
 
-1. Create `price_list_versions` + seed "2568"
-2. Add `version_id` to `price_list` + backfill
-3. Add `price_list_version_id` to `boq` + backfill
-4. Create `system_event_log`
-5. Add triggers (active-only, immutable)
-6. UI header: Version + Year + Status
-
-### Phase 2B: Reporting
-- Summary per Dept/Sector
-- PDF Export
-- Copy/Requote dropdown
-
-### Phase 2C: Smart Estimation
-- Model-based BOQ generation
-- Wizard UI
-
-### Phase 2D: Governance
-- Audit Log
-- Version Comparison
+Admin import, clone, default swap, and audit-trigger flows remain Phase 4 scope.
 
 ---
 
@@ -41,17 +29,20 @@
 ### Rule A: Versioning
 | Rule | Implementation |
 |------|----------------|
-| One default | `UNIQUE WHERE is_default = true` |
-| Default = active | Constraint |
-| Switch default = atomic | Transaction |
-| Active-only BOQ | Trigger + log |
-| Immutable version_id | Trigger + log |
+| One active default | Singleton pointer table `price_list_default_version` |
+| Default = active | Pointer validation trigger |
+| Switch default = atomic | Scoped Phase 4 RPC updates the pointer |
+| Active-only BOQ binding | BOQ insert trigger reads the pointer |
+| Immutable BOQ version | Phase 1B trigger after smoke tests |
 
 ### Rule B: Snapshot
 - No auto-update: Changes don't affect existing BOQs
-- BOQ = Frozen after creation
+- Standard item category is snapshotted in `boq_items.category`
+- Version-aware RPC rejects cross-version item writes
 
 ---
 
 ## References
-- Source: [docs/ai/PHASE2_PLAN.md](../ai/PHASE2_PLAN.md)
+- [Master Catalog implementation plan](../plans/master-catalog/02-implementation.md)
+- [Change request](../plans/master-catalog/04-change-request.md)
+- [Verification report](../plans/master-catalog/05-verification-report.md)

@@ -146,6 +146,9 @@
 | **v24** | **P0: Containment RPC เพิ่ม procurement block + pending own-only** | ✅ |
 | **v25** | **`boq_insert` เพิ่ม `AND status = 'draft'` ป้องกันปลอม workflow status** | ✅ |
 | **v26** | **เพิ่ม `MAINTAIN` ใน Step 4 และ default tables, ถอน execute 4 SECDEF functions ใน Step 5, ปลดบล็อก pending child insert, ปรับ Query 7** | ✅ |
+| **v26** | **Execution draft reconciliation: DROP production `price_list_*` policy names ก่อนสร้าง catalog allowlist** | ✅ |
+| **v26** | **Migration naming reconciliation: Factor F เป็น timestamped supplement; Master Catalog root sequence เริ่ม `009` และแยก `010a` concurrent-index runbook** | ✅ |
+| **v26** | **Canonical docs reconciliation: sync overview/schema/integrity/guardrails ให้ใช้ singleton pointer + `price_list_audit_logs`; ติดป้าย AI plan เก่าว่า superseded** | ✅ |
 
 ---
 

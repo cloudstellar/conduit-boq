@@ -43,7 +43,8 @@ Foundation         │  Modernization              │  Enhancement
 - [ ] `price_list_versions` table
 - [ ] Versioned pricing (2568, 2569...)
 - [ ] Immutable BOQ version
-- [ ] `system_event_log` for triggers
+- [ ] `price_list_default_version` singleton pointer
+- [ ] `price_list_audit_logs` table (audit triggers in Phase 4)
 
 ### 2B: Reporting
 - [ ] Summary per Dept/Sector

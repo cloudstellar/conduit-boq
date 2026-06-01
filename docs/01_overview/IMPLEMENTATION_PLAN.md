@@ -36,72 +36,37 @@ Next.js 16 + React 19 + TypeScript + Tailwind CSS 4
 
 ---
 
-## 🚧 Phase 2: Modernization & Versioning (PLANNED)
+## 🚧 Phase 2: Modernization & Versioning (MASTER CATALOG v26 - PLANNED)
 
-**Strategy:** Foundation → Output → Input → Governance
+**Strategy:** P0 Containment → Nullable DB Setup → Application Integration → DB Hardening → Future Governance
+
+Detailed execution plan: [Master Catalog v26](../plans/master-catalog/02-implementation.md)
 
 ### 🔐 Key Integrity Rules
 
-**Rule A: Versioning**
 | Rule | Implementation |
 |------|----------------|
-| One default | `UNIQUE WHERE is_default = true` |
-| Default = active | Constraint |
-| Switch default = atomic | Transaction |
-| Active-only BOQ | Trigger + log |
-| Immutable version_id | Trigger + log |
+| One active default | Singleton pointer table `price_list_default_version` |
+| Default must be active | Pointer validation trigger |
+| Switch default = atomic | Scoped Phase 4 RPC updates the singleton pointer |
+| Active-only BOQ binding | BOQ insert trigger reads the singleton pointer |
+| Immutable BOQ version | Phase 1B trigger after application rollout |
 | No duplicate items | `UNIQUE (version_id, item_code)` |
+| Historical category snapshot | `boq_items.category` |
 
-**Rule B: Snapshot**
-- No auto-update: Changes don't affect existing BOQs
-- BOQ = Frozen after creation
-- Traceable: `source_model_id`, `cloned_from_boq_id`
+### 📅 Controlled Rollout
 
----
+1. Apply P0 RPC containment and tightened BOQ RLS.
+2. Apply Phase 1A nullable catalog schema, pointer table, backfill, and version-aware RPC.
+3. Create concurrent indexes from the separate `010a` runbook.
+4. Deploy create, duplicate, edit, print, dashboard, and price-list integration updates.
+5. Run smoke tests and delta backfill verification.
+6. Apply Phase 1B `NOT NULL` and immutable-version hardening.
 
-### 📅 Phase 2A: Foundation
-⛔ **Infrastructure only**
+### 🔐 Future Governance
 
-**Order:**
-1. `price_list_versions` + seed "2568"
-2. `price_list.version_id` + backfill + unique
-3. `boq.price_list_version_id` + backfill + NOT NULL
-4. `system_event_log` (use `created_at`)
-5. Triggers + logging
-6. UI/PDF version display
-
-**Guardrails:**
-- Backfill before NOT NULL
-- Atomic default switch
-- Log: `action`, `table_name`, `created_at` = NOT NULL
-
----
-
-### 📈 Phase 2B: Reporting
-- Summary per Dept/Sector (Read-only)
-- Filters + PDF Export
-
-**Copy/Requote:**
-```
-คัดลอก ▼
-├─ คัดลอก BOQ (ราคาเดิม)
-└─ Requote เป็นราคาปี...
-```
-- Requote → `cloned_from_boq_id = source`
-- Requote → target `version.status = 'active'`
-- Not found → costs = NULL
-
----
-
-### 🧠 Phase 2C: Smart Estimation
-- `source_model_id` NULLABLE + FK to `models`
-- Wizard UI + Model CRUD
-
----
-
-### 🔐 Phase 2D: Governance
-- BOQ Audit Log
-- Version Comparison
+Admin import, catalog clone, default swap, and audit-trigger flows require a
+separate Phase 4 change request.
 
 ---
 
@@ -122,7 +87,11 @@ Next.js 16 + React 19 + TypeScript + Tailwind CSS 4
 | 001-006 | Phase 1 foundation | ✅ |
 | 007 | Onboarding columns | ✅ v1.2.0 |
 | 008 | RLS + Trigger + RPC | ✅ v1.2.0 |
-| 009+ | Phase 2A versioning | ⏳ Planned |
+| 20260317_factor_f_supplement | Factor F Supplement snapshot | ✅ v1.5.0 |
+| 009_master_catalog_p0_containment | Master Catalog v26 RPC containment + BOQ RLS tightening | 📝 Draft |
+| 010_master_catalog_phase1a_versioning | Master Catalog v26 nullable versioning + historical backfill | 📝 Draft |
+| 010a_master_catalog_phase1a_indexes | Master Catalog v26 concurrent index runbook | 📝 Draft |
+| 011_master_catalog_phase1b_hardening | Master Catalog v26 BOQ version contract hardening | 📝 Draft |
 
 ---
 
