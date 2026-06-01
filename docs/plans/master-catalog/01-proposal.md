@@ -1,4 +1,4 @@
-# ข้อกำหนดทางเทคนิคและการจัดทำระบบจัดการแคตตาล็อกหลัก (Master Catalog Technical Spec & Blueprint - Revised v6 — Final)
+# ข้อกำหนดทางเทคนิคและการจัดทำระบบจัดการแคตตาล็อกหลัก (Master Catalog Technical Spec & Blueprint - Revised v25)
 
 เอกสารฉบับนี้คือ **Technical Specification (ข้อกำหนดคุณสมบัติทางเทคนิคฉบับผ่านการตรวจสอบระดับความปลอดภัยสูงสุด)** และพิมพ์เขียวในการดำเนินการจริงสำหรับระบบจัดการ **Master Catalog (บัญชีราคามาตรฐาน)** ของโครงการ Conduit BOQ โดยแก้ไขและปิดจุดบกพร่องเชิงโครงสร้างและความปลอดภัยฐานข้อมูล 4 ประเด็นสำคัญตามคำแนะนำอย่างละเอียดถี่ถ้วน เพื่อให้มั่นใจในเสถียรภาพและความปลอดภัยระดับสูงสุดบนระบบโปรดักชัน (Production-Grade Security & High Availability via Lock Timeouts and Atomic Rollbacks)
 
@@ -8,9 +8,12 @@
 
 เราได้วิเคราะห์และยกระดับพิมพ์เขียวความปลอดภัยของฐานข้อมูลในทุกมิติ ดังนี้:
 
-### 1.1 การแก้ปัญหาการชนกันระหว่างฟังก์ชันสลับและทริกเกอร์ตารางเวอร์ชัน (State Swap Resolved)
-*   **ปัญหา**: เดิมทีตัวทริกเกอร์ `check_default_version_exists` ตรวจสอบแบบทีละแถว (`FOR EACH ROW`) ซึ่งจะขวางไม่ให้ปลดสถานะ `is_default` ของแถวเดิมระหว่างฟังก์ชัน `make_version_default` ทำงาน ส่งผลให้กระบวนการสลับค่าเริ่มต้นพังลง
-*   **แนวทางการแก้ไข**: ปรับทริกเกอร์ให้เป็นแบบ **`AFTER UPDATE OR DELETE ... FOR EACH STATEMENT` (การตรวจสอบหลังจบคิวรี)** ซึ่งช่วยให้ฟังก์ชันสามารถทำการสลับค่าเริ่มต้นระหว่างแถวในประโยคคำสั่งเดียวได้อย่างราบรื่น และทำการรับประกันความถูกต้องในตอนท้ายสุดว่ามีเล่ม Active Default คงเหลืออยู่อย่างน้อยหนึ่งเล่มเสมอ
+### 1.1 การแก้ปัญหาการชนกันระหว่างฟังก์ชันสลับและทริกเกอร์ตารางเวอร์ชัน (State Swap — Singleton Pointer)
+*   **ปัญหา**: (1) ทริกเกอร์ `check_default_version_exists` เดิมตรวจแบบ `FOR EACH ROW` ซึ่งขวางการสลับค่า default (2) **Partial unique index** (`idx_only_one_default_active_version`) ที่ใช้อยู่เป็น non-deferrable constraint ซึ่ง PostgreSQL ตรวจสอบ **ทีละแถว (per-row)** ไม่ใช่ท้าย statement ดังนั้นวิธี one-statement swap (`SET is_default = (id = p_version_id)`) เสี่ยงชนได้ขึ้นกับลำดับ internal update และ partial unique index ไม่รองรับ `DEFERRABLE` ได้โดยตรง
+*   **แนวทางการแก้ไข**:
+    1.  ปรับทริกเกอร์ `check_default_version_exists` ให้เป็นแบบ **`AFTER UPDATE OR DELETE ... FOR EACH STATEMENT`** เพื่อรับประกันว่ามี Active Default อย่างน้อยหนึ่งเล่มเสมอ
+    2.  **[v18] เปลี่ยนกลไก default pointer จาก boolean flag เป็น Singleton Pointer Table** (`price_list_default_version`) ซึ่งมี row เดียวชี้ไปที่ `version_id` ของเวอร์ชัน default — ตัดปัญหา unique index ชนทั้งหมด ดู Section 4 Phase 4 สำหรับ DDL จริง
+*   **อ้างอิง**: [PostgreSQL CREATE TABLE](https://www.postgresql.org/docs/current/sql-createtable.html) — non-deferrable unique constraints ตรวจ per-row, [SET CONSTRAINTS](https://www.postgresql.org/docs/15/sql-set-constraints.html) — partial unique index ไม่รองรับ DEFERRABLE
 
 ### 1.2 ยกระดับสิทธิ์และการเข้าถึงฟังก์ชัน `SECURITY DEFINER` (RPC Security Hardening)
 *   **ปัญหา**: ฟังก์ชันระดับฐานข้อมูลที่มีคำสั่ง `SECURITY DEFINER` จะทำงานด้วยสิทธิ์แอดมินสูงสุด หากไม่คัดกรองตัวผู้เรียกใช้อาจเปิดช่องโหว่ให้ผู้ใช้ทั่วไปหรือบุคคลภายนอกที่ไม่ได้รับอนุญาตสามารถดึงข้อมูล สลับเวอร์ชัน หรือทำลายเอกสารได้
@@ -57,6 +60,8 @@ BEGIN;
       version_string TEXT GENERATED ALWAYS AS (major::text || '.' || minor::text || '.' || patch::text) STORED,
       name TEXT NOT NULL,
       status TEXT NOT NULL DEFAULT 'draft' CHECK (status IN ('draft', 'active', 'archived')),
+      -- [v20] is_default: deprecated — ใช้ price_list_default_version pointer table เป็น sole source of truth
+      -- คงไว้เพื่อ backward compatibility ระหว่าง migration, จะ DROP หลัง Phase 4 เสร็จ
       is_default BOOLEAN NOT NULL DEFAULT false,
       created_by UUID REFERENCES auth.users(id) ON DELETE SET NULL,
       created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
@@ -68,7 +73,8 @@ BEGIN;
   -- [BEST PRACTICE] เปิด RLS ทันทีหลังสร้างตาราง ไม่ทิ้ง gap
   ALTER TABLE public.price_list_versions ENABLE ROW LEVEL SECURITY;
 
-  -- ดัชนีรับประกันความมีหนึ่งเดียวของค่าเริ่มต้นเวอร์ชันใช้งานจริง
+  -- [v20 DEPRECATED] ดัชนี partial unique index — คงไว้เพราะ is_default ยังอยู่ระหว่าง migration
+  -- จะ DROP พร้อม is_default column หลัง Phase 4
   CREATE UNIQUE INDEX IF NOT EXISTS idx_only_one_default_active_version 
   ON public.price_list_versions (is_default) 
   WHERE is_default = true AND status = 'active';
@@ -117,6 +123,70 @@ VALUES (2568, 0, 0, 'บัญชีราคามาตรฐาน ปี 256
 ON CONFLICT ON CONSTRAINT uq_major_minor_patch DO NOTHING;
 
 -- ============================================================================
+-- [v20] Singleton Pointer Table — ต้องสร้าง + seed ก่อน triggers ที่อ่านจากตารางนี้
+-- [v21] ครอบ transaction + idempotent (DROP POLICY IF EXISTS ก่อน CREATE)
+-- ============================================================================
+BEGIN;
+CREATE TABLE IF NOT EXISTS public.price_list_default_version (
+    id BOOLEAN PRIMARY KEY DEFAULT true CHECK (id = true),  -- singleton row
+    version_id UUID NOT NULL REFERENCES public.price_list_versions(id) ON DELETE RESTRICT,
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+ALTER TABLE public.price_list_default_version ENABLE ROW LEVEL SECURITY;
+
+-- [v21] DROP ก่อน CREATE เพื่อให้ rerun ได้
+DROP POLICY IF EXISTS "Allow read to authenticated" ON public.price_list_default_version;
+CREATE POLICY "Allow read to authenticated" ON public.price_list_default_version
+    FOR SELECT TO authenticated USING (true);
+DROP POLICY IF EXISTS "Allow write to admin only" ON public.price_list_default_version;
+CREATE POLICY "Allow write to admin only" ON public.price_list_default_version
+    FOR ALL TO authenticated
+    USING ((SELECT role FROM user_profiles WHERE id = auth.uid() AND status = 'active') = 'admin')
+    WITH CHECK ((SELECT role FROM user_profiles WHERE id = auth.uid() AND status = 'active') = 'admin');
+
+GRANT SELECT ON TABLE public.price_list_default_version TO authenticated;
+REVOKE INSERT, UPDATE, DELETE ON TABLE public.price_list_default_version FROM PUBLIC, authenticated, anon;
+COMMIT;
+
+-- [v20] Trigger ห้ามลบ singleton row (แม้ service_role เขียนตรง)
+CREATE OR REPLACE FUNCTION prevent_delete_default_pointer()
+RETURNS TRIGGER AS $$
+BEGIN
+  RAISE EXCEPTION 'ห้ามลบ singleton row ของ price_list_default_version — ให้ UPDATE version_id แทน';
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = '';
+
+DROP TRIGGER IF EXISTS trigger_prevent_delete_default_pointer ON price_list_default_version;
+CREATE TRIGGER trigger_prevent_delete_default_pointer
+BEFORE DELETE ON price_list_default_version
+FOR EACH ROW
+EXECUTE FUNCTION prevent_delete_default_pointer();
+
+-- [v20] Trigger ตรวจว่า pointer ชี้เฉพาะ active version
+CREATE OR REPLACE FUNCTION validate_default_pointer_active()
+RETURNS TRIGGER AS $$
+BEGIN
+  IF NOT EXISTS (SELECT 1 FROM public.price_list_versions WHERE id = NEW.version_id AND status = 'active') THEN
+    RAISE EXCEPTION 'pointer ต้องชี้ไปเวอร์ชันที่ status = active เท่านั้น';
+  END IF;
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = '';
+
+DROP TRIGGER IF EXISTS trigger_validate_default_pointer_active ON price_list_default_version;
+CREATE TRIGGER trigger_validate_default_pointer_active
+BEFORE INSERT OR UPDATE ON price_list_default_version
+FOR EACH ROW
+EXECUTE FUNCTION validate_default_pointer_active();
+
+-- Seed pointer ทันทีหลังสร้างตาราง (ก่อนติดตั้ง set_default_price_list_version trigger)
+INSERT INTO public.price_list_default_version (id, version_id)
+SELECT true, v.id
+FROM public.price_list_versions v
+WHERE v.major = 2568 AND v.minor = 0 AND v.patch = 0 AND v.status = 'active'
+ON CONFLICT (id) DO NOTHING;
+
+-- ============================================================================
 -- [PHASE 1A - TRIGGERS & FUNCTIONS] ฟังก์ชันป้องกันและทริกเกอร์ SRE-First
 -- ============================================================================
 
@@ -126,9 +196,11 @@ RETURNS TRIGGER AS $$
 DECLARE
     default_count INT;
 BEGIN
+    -- [v19] ตรวจจาก Singleton Pointer Table
     SELECT COUNT(*) INTO default_count
-    FROM public.price_list_versions
-    WHERE is_default = true AND status = 'active';
+    FROM public.price_list_default_version dv
+    JOIN public.price_list_versions v ON v.id = dv.version_id
+    WHERE v.status = 'active' AND dv.id = true;
     
     IF default_count = 0 THEN
         RAISE EXCEPTION 'ต้องมีอย่างน้อยหนึ่งเวอร์ชันที่เป็น active และเป็นค่าเริ่มต้น (default) เสมอ เพื่อป้องกันไม่ให้ระบบสร้างใบงานพัง';
@@ -149,10 +221,11 @@ CREATE OR REPLACE FUNCTION set_default_price_list_version()
 RETURNS TRIGGER AS $$
 BEGIN
     IF NEW.price_list_version_id IS NULL THEN
-        SELECT id INTO NEW.price_list_version_id
-        FROM public.price_list_versions
-        WHERE is_default = true AND status = 'active'
-        LIMIT 1;
+        -- [v19] อ่านจาก Singleton Pointer Table แทน is_default boolean
+        SELECT dv.version_id INTO NEW.price_list_version_id
+        FROM public.price_list_default_version dv
+        JOIN public.price_list_versions v ON v.id = dv.version_id
+        WHERE v.status = 'active' AND dv.id = true;
         -- [FAIL-CLOSED] ถ้าไม่พบ active default → RAISE แทนปล่อย NULL ผ่าน
         IF NEW.price_list_version_id IS NULL THEN
             RAISE EXCEPTION 'ไม่พบเวอร์ชันราคากลางเริ่มต้น (active default) ในระบบ กรุณาติดต่อผู้ดูแลระบบ';
@@ -239,6 +312,13 @@ DECLARE
   v_category TEXT;
   v_target_boq_version UUID;
   v_item_version UUID;
+
+  -- [v21] ตัวแปร SELECT INTO สำหรับ standard item lookup
+  v_pl_item_name TEXT;
+  v_pl_unit TEXT;
+  v_pl_material NUMERIC;
+  v_pl_labor NUMERIC;
+  v_pl_unit_cost NUMERIC;
   
   -- ตัวแปรตรวจสอบสิทธิ์ความปลอดภัยที่สอดคล้องกับ permissions.ts
   v_caller_role TEXT;
@@ -373,12 +453,22 @@ BEGIN
         END IF;
       END IF;
 
-      -- ดึงหมวดหมู่ (Category Snapshot)
+      -- [v20] Standard item: SELECT INTO ครั้งเดียว (แทน 9 CASE subqueries ใน v19)
       IF (v_item->>'price_list_id') IS NOT NULL THEN
-        -- Standard item: อ่านจากฐานข้อมูลเสมอ เพื่อความถูกต้องของข้อมูล (ห้ามเชื่อใจค่าจาก client เพื่อป้องกันการ mismatch หรือ client bypass)
-        SELECT category INTO v_category FROM public.price_list WHERE id = (v_item->>'price_list_id')::UUID;
+        SELECT item_name, unit, material_cost, labor_cost, unit_cost, category
+        INTO v_pl_item_name, v_pl_unit, v_pl_material, v_pl_labor, v_pl_unit_cost, v_category
+        FROM public.price_list WHERE id = (v_item->>'price_list_id')::UUID;
+
+        IF v_pl_item_name IS NULL THEN
+          RAISE EXCEPTION 'price_list_id % ไม่พบในฐานข้อมูล', (v_item->>'price_list_id');
+        END IF;
       ELSE
-        -- Custom item: ใช้หมวดหมู่จาก client
+        -- Custom item: ใช้ค่าจาก client
+        v_pl_item_name := v_item->>'item_name';
+        v_pl_unit := v_item->>'unit';
+        v_pl_material := (v_item->>'material_cost_per_unit')::NUMERIC;
+        v_pl_labor := (v_item->>'labor_cost_per_unit')::NUMERIC;
+        v_pl_unit_cost := (v_item->>'unit_cost')::NUMERIC;
         v_category := v_item->>'category';
       END IF;
 
@@ -391,15 +481,15 @@ BEGIN
         v_inserted_route_id,
         (v_item->>'item_order')::INT,
         (v_item->>'price_list_id')::UUID,
-        v_item->>'item_name',
+        v_pl_item_name,
         (v_item->>'quantity')::NUMERIC,
-        v_item->>'unit',
-        (v_item->>'material_cost_per_unit')::NUMERIC,
-        (v_item->>'labor_cost_per_unit')::NUMERIC,
-        (v_item->>'unit_cost')::NUMERIC,
-        (v_item->>'total_material_cost')::NUMERIC,
-        (v_item->>'total_labor_cost')::NUMERIC,
-        (v_item->>'total_cost')::NUMERIC,
+        v_pl_unit,
+        v_pl_material,
+        v_pl_labor,
+        v_pl_unit_cost,
+        v_pl_material * (v_item->>'quantity')::NUMERIC,
+        v_pl_labor * (v_item->>'quantity')::NUMERIC,
+        v_pl_unit_cost * (v_item->>'quantity')::NUMERIC,
         v_item->>'remarks',
         v_category
       );
@@ -416,6 +506,14 @@ $$;
 -- [CRITICAL SECURITY] Revoke ทันทีหลัง CREATE FUNCTION (ไม่รอท้าย script)
 REVOKE EXECUTE ON FUNCTION save_boq_with_routes(UUID, JSONB, JSONB) FROM PUBLIC, anon;
 GRANT EXECUTE ON FUNCTION save_boq_with_routes(UUID, JSONB, JSONB) TO authenticated;
+
+-- [v20] ปิด default EXECUTE grant สำหรับ functions ใหม่ทั้งหมดใน public schema
+-- Supabase auto-grants EXECUTE ให้ anon, authenticated, service_role โดย default
+-- ถ้าไม่ปิด → ทุก function ใหม่ที่สร้างจะถูก anon เรียกได้ทันที
+ALTER DEFAULT PRIVILEGES FOR ROLE postgres IN SCHEMA public
+  REVOKE EXECUTE ON FUNCTIONS FROM PUBLIC, anon;
+ALTER DEFAULT PRIVILEGES FOR ROLE supabase_admin IN SCHEMA public
+  REVOKE EXECUTE ON FUNCTIONS FROM PUBLIC, anon;
 
 
 -- ============================================================================
@@ -471,13 +569,12 @@ BEGIN;
       );
 
   -- 4. นโยบาย RLS สำหรับตารางประวัติราคา (price_list_audit_logs)
+  -- [v19] Audit log = immutable: admin SELECT only (trigger writes via SECURITY DEFINER)
   DROP POLICY IF EXISTS "Allow read and write audit logs for admin only" ON public.price_list_audit_logs;
-  CREATE POLICY "Allow read and write audit logs for admin only" ON public.price_list_audit_logs
-      FOR ALL TO authenticated
+  DROP POLICY IF EXISTS "Allow read audit logs for admin only" ON public.price_list_audit_logs;
+  CREATE POLICY "Allow read audit logs for admin only" ON public.price_list_audit_logs
+      FOR SELECT TO authenticated
       USING (
-          (SELECT role FROM user_profiles WHERE id = auth.uid() AND status = 'active') = 'admin'
-      )
-      WITH CHECK (
           (SELECT role FROM user_profiles WHERE id = auth.uid() AND status = 'active') = 'admin'
       );
 
@@ -504,14 +601,14 @@ COMMIT;
 RESET lock_timeout;
 RESET statement_timeout;
 
--- [KNOWN RISK: BOQ Direct-Write RLS]
--- ตาราง boq, boq_items, boq_routes ยังมี policy USING(true) อยู่ (เปิดกว้าง)
--- นี่เป็นปัญหาที่มีอยู่เดิม ไม่ได้เกิดจาก migration นี้
+-- [v20] BOQ Direct-Write RLS: ย้ายเข้า P0 hotfix แล้ว (ดู 02-implementation.md)
+-- P0 จะ DROP + CREATE policy ใหม่สำหรับ boq, boq_items, boq_routes
+-- เปลี่ยน roles จาก {public} เป็น {authenticated} และลบ created_by IS NULL
 ```
 
 > **Design Decisions (ไม่ใช่ SQL)**
 > - `SECURITY DEFINER` + `search_path = ''` + fully-qualified table names — ตาม [Supabase best practice](https://supabase.com/docs/guides/database/functions)
-> - BOQ direct-write RLS เปิดกว้าง — ปัญหาเดิม ควร tighten ใน sprint ถัดไป
+> - ~~BOQ direct-write RLS เปิดกว้าง~~ **[v20]** ย้ายเข้า P0 hotfix แล้ว (ดู 02-implementation.md)
 
 ---
 
@@ -588,6 +685,9 @@ END; $$;
 REVOKE EXECUTE ON FUNCTION clone_price_list_version(UUID, UUID) FROM PUBLIC, anon;
 GRANT EXECUTE ON FUNCTION clone_price_list_version(UUID, UUID) TO authenticated;
 
+-- [v20] Singleton Pointer Table: ย้ายไป Phase 1A แล้ว (ก่อน seed + triggers)
+-- ดู DDL + RLS + grants + triggers ที่บรรทัด 130-190 (หลัง version seed)
+
 CREATE OR REPLACE FUNCTION make_version_default(p_version_id UUID)
 RETURNS VOID LANGUAGE plpgsql SECURITY DEFINER SET search_path = '' AS $$
 BEGIN
@@ -595,17 +695,62 @@ BEGIN
     RAISE EXCEPTION 'Admin only'; END IF;
   IF NOT EXISTS (SELECT 1 FROM public.price_list_versions WHERE id = p_version_id AND status = 'active') THEN
     RAISE EXCEPTION 'Version must be active'; END IF;
-  UPDATE public.price_list_versions SET is_default = (id = p_version_id)
-  WHERE is_default = true OR id = p_version_id;
+  -- [v19] UPDATE singleton pointer + row count check
+  UPDATE public.price_list_default_version SET version_id = p_version_id, updated_at = now() WHERE id = true;
+  IF NOT FOUND THEN
+    RAISE EXCEPTION 'Singleton pointer row ไม่พบ — กรุณา seed price_list_default_version ก่อน';
+  END IF;
 END; $$;
 REVOKE EXECUTE ON FUNCTION make_version_default(UUID) FROM PUBLIC, anon;
 GRANT EXECUTE ON FUNCTION make_version_default(UUID) TO authenticated;
+
+-- [v19] Trigger ห้าม archive เวอร์ชันที่ pointer ชี้อยู่
+CREATE OR REPLACE FUNCTION prevent_archive_default_version()
+RETURNS TRIGGER AS $$
+BEGIN
+  IF NEW.status = 'archived' AND EXISTS (
+    SELECT 1 FROM public.price_list_default_version WHERE version_id = NEW.id
+  ) THEN
+    RAISE EXCEPTION 'ห้าม archive เวอร์ชันที่เป็น default — ต้องสลับ default ไปเวอร์ชันอื่นก่อน';
+  END IF;
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = '';
+
+DROP TRIGGER IF EXISTS trigger_prevent_archive_default ON price_list_versions;
+CREATE TRIGGER trigger_prevent_archive_default
+BEFORE UPDATE ON price_list_versions
+FOR EACH ROW
+WHEN (NEW.status = 'archived')
+EXECUTE FUNCTION prevent_archive_default_version();
 
 -- 3. ตรวจจับและบันทึกประวัติการเปลี่ยนแปลงราคามาตรฐาน (Audit Trail Trigger)
 CREATE OR REPLACE FUNCTION audit_price_list_changes()
 RETURNS TRIGGER AS $$
 BEGIN
-  IF TG_OP = 'UPDATE' THEN
+  -- [v18] เพิ่ม INSERT audit (สำหรับ non-draft versions เท่านั้น เพื่อป้องกัน clone flooding)
+  IF TG_OP = 'INSERT' THEN
+    -- ข้าม log INSERT ถ้า version เป็น draft (ป้องกัน clone flooding)
+    IF EXISTS (SELECT 1 FROM public.price_list_versions WHERE id = NEW.version_id AND status <> 'draft') THEN
+      INSERT INTO public.price_list_audit_logs (
+        version_id, item_code, action, new_values, performed_by
+      ) VALUES (
+        NEW.version_id,
+        NEW.item_code,
+        'add_item',
+        jsonb_build_object(
+          'item_name', NEW.item_name,
+          'material_cost', NEW.material_cost,
+          'labor_cost', NEW.labor_cost,
+          'unit_cost', NEW.unit_cost,
+          'category', NEW.category,
+          'is_active', NEW.is_active
+        ),
+        auth.uid()
+      );
+    END IF;
+    RETURN NEW;
+  ELSIF TG_OP = 'UPDATE' THEN
     IF OLD.material_cost IS DISTINCT FROM NEW.material_cost OR 
        OLD.labor_cost IS DISTINCT FROM NEW.labor_cost OR
        OLD.unit_cost IS DISTINCT FROM NEW.unit_cost OR
@@ -664,7 +809,7 @@ $$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = '';
 
 DROP TRIGGER IF EXISTS trigger_audit_price_list_changes ON price_list;
 CREATE TRIGGER trigger_audit_price_list_changes
-AFTER UPDATE OR DELETE ON price_list
+AFTER INSERT OR UPDATE OR DELETE ON price_list
 FOR EACH ROW
 EXECUTE FUNCTION audit_price_list_changes();
 
@@ -700,8 +845,13 @@ BEFORE INSERT OR UPDATE ON boq_items
 FOR EACH ROW
 EXECUTE FUNCTION validate_boq_item_version();
 
--- เปิด write grants สำหรับ Admin GUI
-GRANT INSERT, UPDATE, DELETE ON TABLE price_list_versions TO authenticated;
-GRANT INSERT, UPDATE, DELETE ON TABLE price_list TO authenticated;
-GRANT INSERT, UPDATE, DELETE ON TABLE price_list_audit_logs TO authenticated;
+-- [v19] Phase 4 Writes: ผ่าน Scoped RPC เท่านั้น (ไม่เปิด raw DML grants)
+-- Server Actions ต้องตรวจ session + admin role ก่อนเรียก RPC ทุกครั้ง
+-- ถ้าจำเป็นต้อง GRANT INSERT/UPDATE/DELETE ให้ scope ผ่าน admin-only RLS policy
+-- ห้าม GRANT ให้ authenticated โดยไม่มี RLS กรอง
+GRANT SELECT ON TABLE price_list_versions TO authenticated;
+GRANT SELECT ON TABLE price_list TO authenticated;
+GRANT SELECT ON TABLE price_list_audit_logs TO authenticated;
+-- Admin write: ผ่าน SECURITY DEFINER RPCs (clone_price_list_version, make_version_default, etc.)
+-- Import/Edit: ผ่าน Server Actions → scoped RPCs ที่ตรวจ admin role ภายใน
 ```

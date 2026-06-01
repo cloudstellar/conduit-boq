@@ -1,10 +1,10 @@
-# 🔬 Architecture Analysis v14 — Audit Trail (Proposal v17 / Plan v17)
+# 🔬 Architecture Analysis v25 — Audit Trail (Proposal v25 / Plan v25)
 
 > เอกสารนี้เป็น **audit trail** ของทุกรอบ review พร้อมสถานะปัจจุบัน
 
 ---
 
-## Proposal Change Log (v1 → v17)
+## Proposal Change Log (v1 → v25)
 
 | Round | จุดที่แก้ | สถานะ |
 |---|---|---|
@@ -47,10 +47,31 @@
 | **v15** | **ครอบ DDL ของ Phase 1B (Phase 3) ด้วย lock_timeout ป้องกันตารางหน่วง** | ✅ |
 | **v16** | **ครอบคำสั่งสร้างตารางเวอร์ชันและเปิด RLS ให้อยู่ใน Transaction เดียวเพื่อปิด gap** | ✅ |
 | **v17** | **ปรับคำรับรอง Downtime และเพิ่มเติม Future Gates สำหรับ Phase 4 ใน Known Risks** | ✅ |
+| **v18** | **แก้ `make_version_default` จาก one-statement swap เป็น Singleton Pointer Table** | ✅ |
+| **v18** | **แก้ audit trigger ให้ log `INSERT` (non-draft) นอกจาก UPDATE/DELETE** | ✅ |
+| **v18** | **แก้ Phase 4 audit log grant เป็น SELECT only (ห้าม UPDATE/DELETE)** | ✅ |
+| **v18** | **เพิ่ม `price_list_default_version` singleton pointer table + RLS + grants** | ✅ |
+| **v18** | **ปรับ Section 1.1 อ้างอิง PostgreSQL per-row unique constraint timing** | ✅ |
+| **v19** | **แก้ trigger `set_default_price_list_version` ให้อ่านจาก pointer table แทน `is_default`** | ✅ |
+| **v19** | **แก้ `check_default_version_exists` ให้ตรวจจาก pointer table** | ✅ |
+| **v19** | **เพิ่ม seed row สำหรับ `price_list_default_version` ใน Phase 1A** | ✅ |
+| **v19** | **เพิ่ม row count check ใน `make_version_default` (ป้องกัน UPDATE 0 rows เงียบ)** | ✅ |
+| **v19** | **เพิ่ม trigger ห้าม archive เวอร์ชันที่ pointer ชี้อยู่** | ✅ |
+| **v19** | **เปลี่ยน audit log RLS จาก `FOR ALL` เป็น admin `FOR SELECT` only** | ✅ |
+| **v19** | **RPC: standard items ดึงชื่อ/ราคาจาก DB, คำนวณ totals ฝั่ง server** | ✅ |
+| **v19** | **Phase 4: เปลี่ยนจาก raw DML grants เป็น Scoped RPC** | ✅ |
+| **v20** | **ย้าย pointer DDL + RLS + grants + triggers มา Phase 1A (ก่อน seed) — แก้ ordering bug** | ✅ |
+| **v20** | **ทำ `is_default` boolean เป็น deprecated (คงไว้ backward compat, DROP หลัง Phase 4)** | ✅ |
+| **v20** | **เพิ่ม trigger ห้ามลบ singleton row + ตรวจ active version** | ✅ |
+| **v20** | **RPC: เปลี่ยน 9 CASE subqueries เป็น SELECT INTO ครั้งเดียว** | ✅ |
+| **v20** | **เพิ่ม `ALTER DEFAULT PRIVILEGES` ปิด auto-grant EXECUTE จาก anon** | ✅ |
+| **v20** | **แก้ BOQ RLS known risk comment ให้สอดคล้องกับ P0** | ✅ |
+| **v21** | **เพิ่ม DECLARE `v_pl_item_name`, `v_pl_unit`, `v_pl_material`, `v_pl_labor`, `v_pl_unit_cost`** | ✅ |
+| **v21** | **Pointer DDL: เพิ่ม `DROP POLICY IF EXISTS` + ครอบ transaction** | ✅ |
 
 ---
 
-## Implementation Plan Change Log (→ v17)
+## Implementation Plan Change Log (→ v25)
 
 | Round | จุดที่แก้ | สถานะ |
 |---|---|---|
@@ -95,6 +116,34 @@
 | **v17** | **Query 12: เปลี่ยนเป็น table_privileges เพื่อให้ครอบคลุม pseudo-role PUBLIC** | ✅ |
 | **v17** | **Phase 0: ตรวจ CLI Backup Option (--data-only) และกำหนด RPC Audit Expected Results** | ✅ |
 | **v17** | **Post-Verification: เพิ่มคิวรี indisvalid เพื่อตรวจจับความสมบูรณ์ของ concurrent index** | ✅ |
+| **v18** | **Phase 0: เพิ่ม P0 Hotfix — Production RPC Hardening (REVOKE + auth check deploy)** | ✅ |
+| **v18** | **Phase 0: เพิ่ม TRUNCATE/REFERENCES revoke จาก anon/authenticated** | ✅ |
+| **v18** | **Phase 4: State Swap เปลี่ยนเป็น Singleton Pointer Table** | ✅ |
+| **v18** | **เพิ่มหมายเหตุ Next.js middleware → proxy.ts deprecation** | ✅ |
+| **v19** | **แก้ function signature ตาม production DB: `admin_approve_user(uuid)`, `admin_reject_user(uuid, text)`** | ✅ |
+| **v19** | **เพิ่ม `TRIGGER` ในรายการ REVOKE (P0 hotfix)** | ✅ |
+| **v19** | **เพิ่ม BOQ RLS tightening ใน P0 (ลบ `created_by IS NULL` + เปลี่ยน roles เป็น `authenticated`)** | ✅ |
+| **v19** | **แยก RPC deployment: P0 containment (schema เดิม) vs Phase 1A (ฉบับเต็ม)** | ✅ |
+| **v19** | **Phase 2 create page: เปลี่ยน `is_default` เป็น pointer table lookup** | ✅ |
+| **v19** | **Phase 4: เปลี่ยน raw DML grants เป็น Scoped RPC strategy** | ✅ |
+| **v20** | **P0: REVOKE จากทุก role (รวม PUBLIC + authenticated) ก่อน ปิด exposure window** | ✅ |
+| **v20** | **P0: เพิ่ม boq_items + boq_routes ใน RLS tightening (ครบทุกตาราง)** | ✅ |
+| **v20** | **P0: เพิ่ม status check ใน policy matrix (บล็อก inactive/pending)** | ✅ |
+| **v20** | **P0: เพิ่ม PUBLIC ใน table REVOKE** | ✅ |
+| **v20** | **P0: เพิ่ม `ALTER DEFAULT PRIVILEGES` ปิด auto-grant** | ✅ |
+| **v20** | **P0: ครบ transaction (มี BEGIN/COMMIT)** | ✅ |
+| **v20** | **แก้ L277 consistency: เปลี่ยนจาก "Phase 4 เปิด write grants" เป็น Scoped RPC** | ✅ |
+| **v21** | **P0: เขียน containment RPC จริง (ไม่ใช่ placeholder) — คัดจาก production RPC + เพิ่ม auth guard** | ✅ |
+| **v21** | **P0: DROP ทุก policy เก่าก่อนสร้าง allowlist ใหม่ (รวม INSERT + SELECT)** | ✅ |
+| **v21** | **P0: เพิ่ม `boq_insert` / `boq_routes_select` จาก `{public}` เป็น `{authenticated}`** | ✅ |
+| **v21** | **P0: ลบ `created_by IS NULL` จาก INSERT policies ของ boq_items/boq_routes** | ✅ |
+| **v22** | **P0: เพิ่ม `status = 'active'` ใน owner/assignee branches ของ boq_items + boq_routes (6 policies)** | ✅ |
+| **v23** | **P0: `boq_insert` เปลี่ยนจาก `active` เป็น `IN ('active', 'pending')` ตาม permissions.ts + SECURITY.md** | ✅ |
+| **v24** | **P0: `boq_select` คืน 008 granular matrix (ไม่ใช้ USING(true)) — child inherit parent RLS** | ✅ |
+| **v24** | **P0: `boq_insert` เพิ่ม `created_by = auth.uid()` ป้องกันปลอม owner** | ✅ |
+| **v24** | **P0: `boq_items_select` + `boq_routes_select` ใช้ EXISTS แทน USING(true)** | ✅ |
+| **v24** | **P0: Containment RPC เพิ่ม procurement block + pending own-only** | ✅ |
+| **v25** | **`boq_insert` เพิ่ม `AND status = 'draft'` ป้องกันปลอม workflow status** | ✅ |
 
 ---
 
@@ -132,6 +181,40 @@
 | **Preflight retry** | **แยก 4 cases ใน DO block** | partial run (table มี row ไม่มี) ไม่บล็อก retry |
 | **REVOKE scope** | **PUBLIC + authenticated + anon** | PostgreSQL PUBLIC สืบทอดทุก role |
 | **Preflight failure mode** | **RAISE EXCEPTION (ไม่ใช่ WARNING)** | ป้องกัน migration ผ่านแบบ state เสีย |
+| **[v18] Default pointer** | **Singleton Pointer Table แทน boolean flag** | Non-deferrable unique ตรวจ per-row → boolean swap เสี่ยง |
+| **[v18] Audit INSERT** | **Log INSERT สำหรับ non-draft versions** | ป้องกัน clone flooding โดยข้ามร่าง draft |
+| **[v18] Audit log grants** | **SELECT only (ห้าม UPDATE/DELETE)** | Immutability — trigger เขียนผ่าน SECURITY DEFINER |
+| **[v18] P0 RPC hardening** | **REVOKE + deploy auth-checked version ก่อน catalog** | Production: anon + SECURITY DEFINER = bypass RLS |
+| **[v18] TRUNCATE/REFERENCES** | **REVOKE จาก anon/authenticated** | PostgreSQL: ไม่ถูกควบคุมด้วย RLS |
+| **[v19] TRIGGER grant** | **REVOKE TRIGGER จาก anon/authenticated** | Production DB ยืนยัน: มี TRIGGER grant ทุกตาราง |
+| **[v19] Function signatures** | **แก้ตาม `pg_get_function_identity_arguments` จริง** | `admin_approve_user(uuid)`, `admin_reject_user(uuid, text)` |
+| **[v19] BOQ RLS {public}** | **เปลี่ยน roles จาก `{public}` เป็น `{authenticated}`, ลบ `created_by IS NULL`** | Production: anon ผ่าน RLS ได้สำหรับ legacy BOQ |
+| **[v19] P0 RPC split** | **แยก containment (schema เดิม) จาก full RPC (Phase 1A)** | คอลัมน์ catalog ยังไม่มีใน production |
+| **[v19] Pointer as sole SoT** | **ทุก lookup เปลี่ยนจาก `is_default` เป็น pointer table** | ตัด dual source of truth |
+| **[v19] Archive protection** | **Trigger ห้าม archive default version** | pointer ชี้อยู่ต้องสลับก่อน |
+| **[v19] Standard item pricing** | **Server-side price lookup + totals calculation** | ป้องกัน client-side price manipulation |
+| **[v19] Scoped RPC** | **ไม่เปิด raw DML grants, ใช้ SECURITY DEFINER RPCs** | Server Actions ตรวจ session + admin role |
+| **[v20] Pointer DDL ordering** | **ย้าย DDL จาก Phase 4 ไป Phase 1A (ก่อน seed)** | v19 ล้มเพราะ seed ตารางยังไม่มี |
+| **[v20] is_default deprecated** | **คงไว้ backward compat, pointer = sole SoT** | ตัด dual source of truth, DROP หลัง Phase 4 |
+| **[v20] Pointer delete prevention** | **Trigger ห้ามลบ singleton row** | แม้ service_role เขียนตรง |
+| **[v20] Pointer active validation** | **Trigger ตรวจ pointer → active version** | ป้องกันชี้ draft/archived |
+| **[v20] RPC SELECT INTO** | **เปลี่ยน 9 CASE subqueries เป็น 1 SELECT INTO** | ลด query จาก 9 เหลือ 1 ต่อ item |
+| **[v20] ALTER DEFAULT PRIVILEGES** | **REVOKE EXECUTE FROM PUBLIC, anon** | Supabase auto-grant: function ใหม่ = anon EXECUTE |
+| **[v20] P0 exposure window** | **REVOKE รวม authenticated ก่อน, replace RPC, GRANT กลับ** | ปิดช่วง auth-less RPC + authenticated |
+| **[v20] P0 full table coverage** | **เพิ่ม boq_items + boq_routes ใน RLS tightening** | DB ยืนยัน: 4 policies ใช้ {public} |
+| **[v20] P0 status check** | **เพิ่ม `status = 'active'` ใน policy matrix** | บล็อก inactive/pending แก้/ลบ |
+| **[v21] RPC DECLARE fix** | **เพิ่ม 5 ตัวแปร SELECT INTO** | compile ไม่ผ่านใน v20 |
+| **[v21] Containment RPC** | **SQL จริงจาก production + auth guard** | ไม่ใช่ placeholder อีกต่อไป |
+| **[v21] Full policy DROP** | **DROP ทุก policy เก่าก่อน allowlist ใหม่** | PostgreSQL: permissive OR ทับ |
+| **[v21] Pointer idempotency** | **DROP POLICY IF EXISTS + transaction** | rerun ได้โดยไม่ error |
+| **[v22] Child policy status check** | **เพิ่ม `status = 'active'` ใน owner/assignee ทุก branch** | suspended/inactive ยัง INSERT/UPDATE/DELETE ผ่าน direct DML |
+| **[v23] Pending create BOQ** | **`boq_insert` ให้ `IN ('active', 'pending')`** | P0 hotfix ไม่ควรเปลี่ยน business logic |
+| **[v24] Granular SELECT** | **คืน 008 matrix แทน USING(true)** | policy subquery ผ่าน parent RLS → child inherit |
+| **[v24] Owner enforcement** | **`created_by = auth.uid()` ใน INSERT** | ป้องกัน Data API ปลอม owner |
+| **[v24] Child RLS inherit** | **EXISTS แทน USING(true) ใน items/routes SELECT** | PostgreSQL: subquery ผ่าน parent RLS |
+| **[v24] RPC procurement block** | **เพิ่ม procurement = read-only** | ตาม permissions.ts L176 |
+| **[v24] RPC pending own-only** | **pending เข้าถึงได้เฉพาะ created_by** | ตาม permissions.ts L93-110 |
+| **[v25] Draft-only INSERT** | **`status = 'draft'` ใน WITH CHECK** | Data API ปลอม approved/pending ได้ |
 
 ---
 
@@ -173,6 +256,40 @@
 | **33** | **Preflight retry-safe (partial run ไม่บล็อก)** | OK | OK | OK |
 | **34** | **REVOKE ครอบ PUBLIC** | OK | OK | OK |
 | **32** | **Preflight assertion หยุดจริง (EXCEPTION ไม่ใช่ WARNING)** | ✅ | ✅ | ✅ |
+| **35** | **[v18] Default pointer = Singleton Table** | ✅ | ✅ | ✅ |
+| **36** | **[v18] Audit INSERT (non-draft)** | ✅ | ✅ | ✅ |
+| **37** | **[v18] Audit log grants = SELECT only** | ✅ | ✅ | ✅ |
+| **38** | **[v18] P0 RPC hardening ก่อน catalog** | ✅ | ✅ | ✅ |
+| **39** | **[v18] TRUNCATE/REFERENCES revoke** | ✅ | ✅ | ✅ |
+| **40** | **[v19] TRIGGER revoke** | ✅ | ✅ | ✅ |
+| **41** | **[v19] Function signatures ตาม production** | ✅ | ✅ | ✅ |
+| **42** | **[v19] BOQ RLS tightening (P0)** | ✅ | ✅ | ✅ |
+| **43** | **[v19] P0/Phase 1A RPC split** | ✅ | ✅ | ✅ |
+| **44** | **[v19] Pointer = sole source of truth** | ✅ | ✅ | ✅ |
+| **45** | **[v19] Archive default protection** | ✅ | ✅ | ✅ |
+| **46** | **[v19] Server-side price validation** | ✅ | ✅ | ✅ |
+| **47** | **[v19] Scoped RPC (no raw DML)** | ✅ | ✅ | ✅ |
+| **48** | **[v20] Pointer DDL ก่อน seed** | ✅ | ✅ | ✅ |
+| **49** | **[v20] `is_default` deprecated** | ✅ | ✅ | ✅ |
+| **50** | **[v20] Pointer delete/active triggers** | ✅ | ✅ | ✅ |
+| **51** | **[v20] RPC SELECT INTO** | ✅ | ✅ | ✅ |
+| **52** | **[v20] ALTER DEFAULT PRIVILEGES** | ✅ | ✅ | ✅ |
+| **53** | **[v20] P0 full table coverage** | ✅ | ✅ | ✅ |
+| **54** | **[v20] P0 status check** | ✅ | ✅ | ✅ |
+| **55** | **[v20] P0 transaction wrap** | ✅ | ✅ | ✅ |
+| **56** | **[v20] BOQ RLS consistency fix** | ✅ | ✅ | ✅ |
+| **57** | **[v21] RPC DECLARE fix** | ✅ | ✅ | ✅ |
+| **58** | **[v21] Containment RPC จริง** | ✅ | ✅ | ✅ |
+| **59** | **[v21] Full policy inventory DROP** | ✅ | ✅ | ✅ |
+| **60** | **[v21] Pointer idempotent** | ✅ | ✅ | ✅ |
+| **61** | **[v22] Child policy status check** | ✅ | ✅ | ✅ |
+| **62** | **[v23] Pending create BOQ** | ✅ | ✅ | ✅ |
+| **63** | **[v24] Granular SELECT matrix** | ✅ | ✅ | ✅ |
+| **64** | **[v24] Owner enforcement** | ✅ | ✅ | ✅ |
+| **65** | **[v24] Child RLS inherit** | ✅ | ✅ | ✅ |
+| **66** | **[v24] RPC procurement block** | ✅ | ✅ | ✅ |
+| **67** | **[v24] RPC pending own-only** | ✅ | ✅ | ✅ |
+| **68** | **[v25] Draft-only INSERT** | ✅ | ✅ | ✅ |
 
 ---
 
@@ -181,10 +298,15 @@
 | รายการ | ทำเมื่อไหร่ | เหตุผล |
 |---|---|---|
 | Direct write `boq_items` bypass cross-version | Phase 4 + DB trigger | ตอนนี้มีเวอร์ชันเดียว ไม่เกิดจริง |
-| `make_version_default` ชน unique index? | Phase 4 ทดสอบก่อน deploy | PostgreSQL single-statement ควรผ่าน แต่ต้อง test |
-| `boq`/`boq_items`/`boq_routes` RLS ยังกว้าง | Sprint ถัดไป | ปัญหาเดิม ไม่เกิดจาก migration |
+| ~~`make_version_default` ชน unique index?~~ | ~~Phase 4 ทดสอบก่อน deploy~~ | **[v18] แก้แล้ว — เปลี่ยนเป็น Singleton Pointer Table ตัดปัญหา per-row unique check ทั้งหมด** |
+| ~~`boq`/`boq_items`/`boq_routes` RLS ยังกว้าง~~ | ~~Sprint ถัดไป~~ | **[v19] ย้ายเข้า P0 แล้ว — production DB ยืนยัน: policy ใช้ `roles={public}` + `created_by IS NULL` ทำให้ anon แก้/ลบ legacy BOQ ได้** |
 | `handleDuplicate` ไม่ atomic | Sprint ถัดไป | ปัญหาเดิม ไม่เกิดจาก migration |
-| `handleDelete` ไม่ลบ `boq_routes` | Sprint ถัดไป | ปัญหาเดิม ไม่เกิดจาก migration |
+| ~~`handleDelete` ไม่ลบ `boq_routes`~~ | ~~Sprint ถัดไป~~ | **[v19] ไม่ใช่ปัญหา — production DB มี `ON DELETE CASCADE` บน `boq_routes.boq_id` แล้ว ปัญหาจริงคือ frontend ไม่ตรวจ delete error** |
 | **[Gate Phase 4] ห้ามสร้าง BOQ ผูกกับเวอร์ชัน Draft/Archived** | Phase 4 + DB Validation | ป้องกันผู้ใช้ทั่วไปเผลอประมาณราคากลางกับเล่มที่ยังไม่ประกาศใช้ |
 | **[Gate Phase 4] ห้ามเปลี่ยน `price_list.version_id` ย้อนหลัง** | Phase 4 + DB Trigger | ป้องกันข้อมูลประวัติศาสตร์คลาดเคลื่อนหลังแอดมินสร้าง standard item แล้ว |
-| **[Gate Phase 4] การตัดสินใจเรื่อง Audit INSERT & Clone Flooding** | Phase 4 Design Decision | ตกลงเงื่อนไขการเก็บ Log ของ `INSERT` ว่าจะข้ามร่าง draft หรือไม่ |
+| ~~**[Gate Phase 4] การตัดสินใจเรื่อง Audit INSERT & Clone Flooding**~~ | ~~Phase 4 Design Decision~~ | **[v18] ตัดสินใจแล้ว — log INSERT เฉพาะ non-draft versions เพื่อป้องกัน clone flooding** |
+| **[v18] Production RPC: anon + SECURITY DEFINER bypass** | **P0 ก่อน Phase 0** | `save_boq_with_routes` production ไม่มี auth check + anon EXECUTE ได้ |
+| ~~**[v18] TRUNCATE/REFERENCES ไม่ถูกคุมด้วย RLS**~~ | ~~**P0 ก่อน Phase 0**~~ | **[v19] แก้แล้ว — เปลี่ยนเป็น REVOKE TRUNCATE, REFERENCES, TRIGGER** |
+| **[v18] Next.js middleware → proxy.ts** | Sprint ถัดไป | deprecated ใน Next.js 16 แต่ไม่ใช่ blocker |
+| **[v19] Audit log: UPDATE/DELETE draft ยัง log อยู่** | Phase 4 Design | ตัดสินใจว่าจะข้าม draft log ทั้ง INSERT/UPDATE/DELETE หรือเฉพาะ INSERT |
+| **[v19] Audit log: activation/import batch logging** | Phase 4 Design | กำหนดว่า batch import log เป็น 1 entry หรือ per-item |
