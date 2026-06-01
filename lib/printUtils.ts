@@ -66,10 +66,8 @@ export function splitText(text: string, maxChars: number): string[] {
     if (!text || text.length <= maxChars) return [text || ''];
 
     // Use Intl.Segmenter for proper Thai word boundaries
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const SegmenterClass = (Intl as any).Segmenter;
-    const segmenter = new SegmenterClass('th', { granularity: 'word' });
-    const segments: string[] = Array.from(segmenter.segment(text), (s: any) => s.segment);
+    const segmenter = new Intl.Segmenter('th', { granularity: 'word' });
+    const segments = Array.from(segmenter.segment(text), segment => segment.segment);
 
     const lines: string[] = [];
     let currentLine = '';

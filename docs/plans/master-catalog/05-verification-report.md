@@ -10,6 +10,7 @@
 |---|---|---|---|---|---|
 | Baseline | Read-only queries |  |  |  | Pending |
 | P0 | `009_master_catalog_p0_containment.sql` |  |  |  | Pending |
+| Quality baseline | Lint, build, automated tests, CI |  |  |  | Pending |
 | Phase 1A | `010_master_catalog_phase1a_versioning.sql` |  |  |  | Pending |
 | Phase 1A indexes | `010a_master_catalog_phase1a_indexes.sql` |  |  |  | Pending |
 | Phase 2 | Application deploy |  |  |  | Pending |
@@ -152,6 +153,19 @@ ORDER BY owner_role, grantee, a.privilege_type;
 | Procurement user saves a BOQ | Rejected | Pending or N/A |
 | Pending owner duplicates BOQ with route and items | Allowed | Pending |
 
+## Quality Baseline Gate
+
+Complete after the standalone P0 hotfix and before Master Catalog Phase 1A.
+
+| Check | Expected | Result |
+|---|---|---|
+| `npm run lint` | Exit code `0` | Pending |
+| `npm run build` | Exit code `0` | Pending |
+| Automated regression test command | Exit code `0` | Pending |
+| CI workflow | Runs lint, build, and automated tests on pull requests | Pending |
+| `npm run audit:prod` | Findings remediated or explicitly accepted | Pending |
+| Non-production rehearsal | `010 -> 010a -> Phase 2 -> 011` passes all gates | Pending |
+
 ## Phase 1A Verification
 
 Run after migration 010.
@@ -280,3 +294,20 @@ Expected:
 ## Notes
 
 Record actual query output, screenshots, and incident notes below during rollout.
+
+### Local Quality Preparation - 2026-06-01
+
+| Check | Result |
+|---|---|
+| `git diff --check` | Passed |
+| `npm run lint` | Passed with `0` errors and `14` existing warnings |
+| `npm test` | Passed: `13` tests across `3` files |
+| `npm run build` | Passed |
+| CI workflow | Added; remote run pending |
+| `npm run audit:prod` | Review required: `9` production dependency findings (`5` moderate, `4` high) |
+| Non-production rehearsal | Pending |
+
+Dependency audit remediation must be reviewed separately from the Master
+Catalog feature implementation. The 2026-06-01 audit identified a Next.js
+upgrade path from `16.1.1` to `16.2.6` and `xlsx` findings without an available
+registry fix.

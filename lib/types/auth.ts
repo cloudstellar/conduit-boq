@@ -16,6 +16,9 @@ export interface UserProfile {
   email: string | null
   phone: string | null
   signature_url: string | null
+  requested_department_id: string | null
+  requested_sector_id: string | null
+  onboarding_completed: boolean
   status: 'active' | 'inactive' | 'suspended' | 'pending'
   created_at: string
   updated_at: string
@@ -78,4 +81,3 @@ export interface AuthContextType {
   signOut: () => Promise<void>
   refreshProfile: () => Promise<void>
 }
-

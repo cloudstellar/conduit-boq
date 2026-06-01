@@ -149,6 +149,8 @@
 | **v26** | **Execution draft reconciliation: DROP production `price_list_*` policy names ก่อนสร้าง catalog allowlist** | ✅ |
 | **v26** | **Migration naming reconciliation: Factor F เป็น timestamped supplement; Master Catalog root sequence เริ่ม `009` และแยก `010a` concurrent-index runbook** | ✅ |
 | **v26** | **Canonical docs reconciliation: sync overview/schema/integrity/guardrails ให้ใช้ singleton pointer + `price_list_audit_logs`; ติดป้าย AI plan เก่าว่า superseded** | ✅ |
+| **v27** | **แยก `009` เป็น standalone P0 security hotfix และเพิ่ม quality baseline gate: lint, build, automated tests, CI, non-production rehearsal ก่อนเริ่ม `010`** | ✅ |
+| **v27** | **เพิ่ม production dependency audit gate ก่อน Master Catalog rollout; remediation หรือ risk acceptance ต้อง review แยกจาก feature PR** | ✅ |
 
 ---
 

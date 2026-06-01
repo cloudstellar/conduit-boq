@@ -31,6 +31,22 @@ application during rollout.
 | Phase 1B | `migrations/011_master_catalog_phase1b_hardening.sql` | Enforce BOQ version `NOT NULL` and immutable version trigger | Execute after Phase 2 verification |
 | Phase 4 | Future change request | Admin catalog UI, import, clone, swap, audit triggers | Explicitly excluded |
 
+## Execution Strategy
+
+Treat P0 containment as an independent security hotfix. It uses the current
+production schema and may be executed before the Master Catalog application
+work after its own backup, non-production rehearsal, approval, verification,
+and smoke tests complete.
+
+Do not start Phase 1A until the repository quality baseline is established:
+
+- `npm run lint` passes.
+- `npm run build` passes.
+- Automated regression tests and CI are present and passing.
+- Production dependency audit findings are remediated or explicitly accepted.
+- The full `010 -> 010a -> Phase 2 -> 011` path has been rehearsed on a
+  non-production database.
+
 ## Production Evidence
 
 Read-only DB inspection on 2026-06-01 confirmed:
@@ -56,7 +72,7 @@ The current `public.save_boq_with_routes(uuid,jsonb,jsonb)` function is
 `SECURITY DEFINER`, has no internal auth guard, and is executable by `PUBLIC`
 and `anon`. P0 containment is therefore required before catalog work.
 
-## Preconditions
+## P0 Hotfix Preconditions
 
 - [ ] Owner reviewed this change request and migration drafts.
 - [ ] Owner approved the P0 production execution window.
@@ -65,20 +81,40 @@ and `anon`. P0 containment is therefore required before catalog work.
 - [ ] Logical data backup completed.
 - [ ] Baseline queries recorded in [05-verification-report.md](./05-verification-report.md).
 - [ ] `git diff --check` passes.
-- [ ] Migration drafts tested on a non-production database.
+- [ ] Migration `009_master_catalog_p0_containment.sql` tested on a
+  non-production database.
 
-## Rollout
+## P0 Hotfix Rollout
 
 1. Run `009_master_catalog_p0_containment.sql`.
 2. Run the P0 verification section. Stop unless all P0 gates pass.
-3. Run `010_master_catalog_phase1a_versioning.sql`.
-4. Run each statement in `010a_master_catalog_phase1a_indexes.sql` separately
+3. Run the P0 smoke tests. Stop and forward-fix if any test fails.
+4. Record the production result before starting Master Catalog Phase 1A.
+
+## Master Catalog Preconditions
+
+- [ ] P0 hotfix has passed production verification and smoke tests.
+- [ ] `npm run lint` passes.
+- [ ] `npm run build` passes.
+- [ ] Automated regression tests and CI are present and passing.
+- [ ] `npm run audit:prod` findings are remediated or explicitly accepted.
+- [ ] The full Master Catalog rollout has been tested on a non-production
+  database.
+- [ ] Owner approved the Master Catalog production execution window.
+- [ ] No `price_list` or `factor_reference` changes are scheduled during the
+  rollout window.
+
+## Master Catalog Rollout
+
+1. Run `010_master_catalog_phase1a_versioning.sql`.
+2. Run each statement in `010a_master_catalog_phase1a_indexes.sql` separately
    and outside an explicit transaction.
-5. Run Phase 1A post-verification. Stop unless all Phase 1A gates pass.
-6. Deploy the Phase 2 application PR.
-7. Run user-flow smoke tests and delta backfill verification.
-8. Run `011_master_catalog_phase1b_hardening.sql`.
-9. Run Phase 1B post-verification.
+3. Run Phase 1A post-verification. Stop unless all Phase 1A gates pass.
+4. Deploy the Phase 2 application PR.
+5. Run automated regression tests, user-flow smoke tests, and delta backfill
+   verification.
+6. Run `011_master_catalog_phase1b_hardening.sql`.
+7. Run Phase 1B post-verification.
 
 ## Rollback Decision
 

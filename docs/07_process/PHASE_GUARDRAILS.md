@@ -9,16 +9,22 @@
 
 ## Master Catalog v26 Rollout
 
-**Strategy:** P0 Containment → Phase 1A Nullable Setup → Phase 2 Application → Phase 1B Hardening
+**Strategy:** P0 Containment Hotfix → Quality Baseline → Phase 1A Nullable Setup → Phase 2 Application → Phase 1B Hardening
 
-1. Apply `009_master_catalog_p0_containment.sql` and stop unless P0 gates pass.
-2. Apply `010_master_catalog_phase1a_versioning.sql`.
-3. Run each `010a_master_catalog_phase1a_indexes.sql` statement separately
+1. Rehearse `009_master_catalog_p0_containment.sql` on non-production.
+2. Apply `009_master_catalog_p0_containment.sql` as an independent production
+   security hotfix and stop unless P0 gates and smoke tests pass.
+3. Establish the repository quality baseline: lint, build, automated tests,
+   and CI must pass.
+4. Rehearse the full Master Catalog rollout on non-production.
+5. Apply `010_master_catalog_phase1a_versioning.sql`.
+6. Run each `010a_master_catalog_phase1a_indexes.sql` statement separately
    outside an explicit transaction.
-4. Stop unless Phase 1A gates pass.
-5. Deploy the application integration PR and run smoke tests.
-6. Run delta category backfill verification.
-7. Apply `011_master_catalog_phase1b_hardening.sql`.
+7. Stop unless Phase 1A gates pass.
+8. Deploy the application integration PR and run automated tests plus smoke
+   tests.
+9. Run delta category backfill verification.
+10. Apply `011_master_catalog_phase1b_hardening.sql`.
 
 Admin import, clone, default swap, and audit-trigger flows remain Phase 4 scope.
 
