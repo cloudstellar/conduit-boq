@@ -95,6 +95,23 @@ passed on `main`.
 The removed legacy `anon` value remains in earlier git history; historical
 credential invalidation is a separate reviewed task.
 
+## Live Data Rule
+
+Normal user activity before the execution window does not require migration
+draft changes. Migration `010` backfills rows with null compatibility columns,
+so BOQs added before execution are included automatically.
+
+The recorded production metrics are point-in-time evidence, not fixed
+assertions. Refresh preflight counts, integrity queries, and backups immediately
+before P0 and again before Phase 1A.
+
+During the Phase 1A to Phase 2 cutover, the old application can still duplicate
+BOQs using direct inserts without the new category snapshot. Run the delta
+category backfill and zero-row assertion once before the Phase 2 deploy and
+again immediately after the deploy. Prefer a brief BOQ write pause during this
+cutover. If writes cannot be paused, repeat reconciliation until the assertion
+returns zero before Phase 1B.
+
 ## P0 Hotfix Preconditions
 
 - [ ] Owner reviewed this change request and migration drafts.
@@ -102,7 +119,7 @@ credential invalidation is a separate reviewed task.
 - [ ] Latest Supabase restore point confirmed in Dashboard.
 - [ ] Logical schema backup completed.
 - [ ] Logical data backup completed.
-- [ ] Baseline queries recorded in [05-verification-report.md](./05-verification-report.md).
+- [ ] Fresh baseline queries recorded immediately before execution in [05-verification-report.md](./05-verification-report.md).
 - [x] Repository quality baseline merged into `main`.
 - [x] `git diff --check` passes.
 - [ ] Migration `009_master_catalog_p0_containment.sql` tested on a
@@ -125,6 +142,7 @@ credential invalidation is a separate reviewed task.
 - [ ] `npm run audit:prod` findings are remediated or explicitly accepted.
 - [ ] The full Master Catalog rollout has been tested on a non-production
   database.
+- [ ] Fresh preflight counts, integrity queries, and backups recorded before Phase 1A.
 - [ ] Owner approved the Master Catalog production execution window.
 - [ ] No `price_list` or `factor_reference` changes are scheduled during the
   rollout window.
@@ -135,11 +153,13 @@ credential invalidation is a separate reviewed task.
 2. Run each statement in `010a_master_catalog_phase1a_indexes.sql` separately
    and outside an explicit transaction.
 3. Run Phase 1A post-verification. Stop unless all Phase 1A gates pass.
-4. Deploy the Phase 2 application PR.
-5. Run automated regression tests, user-flow smoke tests, and delta backfill
-   verification.
-6. Run `011_master_catalog_phase1b_hardening.sql`.
-7. Run Phase 1B post-verification.
+4. Run delta category backfill and its zero-row assertion before the Phase 2
+   deploy.
+5. Deploy the Phase 2 application PR.
+6. Run delta category backfill and its zero-row assertion again immediately
+   after deploy, then run automated regression tests and user-flow smoke tests.
+7. Run `011_master_catalog_phase1b_hardening.sql`.
+8. Run Phase 1B post-verification.
 
 ## Rollback Decision
 

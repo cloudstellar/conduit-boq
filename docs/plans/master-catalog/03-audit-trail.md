@@ -153,6 +153,8 @@
 | **v27** | **เพิ่ม production dependency audit gate ก่อน Master Catalog rollout; remediation หรือ risk acceptance ต้อง review แยกจาก feature PR** | ✅ |
 | **v28** | **บันทึก repository quality baseline merge ผ่าน PR #1 (`6d607f9`), Vercel Production deploy ผ่าน, และยืนยันว่า Production DB ยังไม่ได้ apply migration `009`-`011`** | ✅ |
 | **v28** | **ถอด hardcoded legacy Supabase `anon` key จาก utility scripts; HEAD ปัจจุบันไม่มี JWT literal และไม่มี `.env` ถูก track** | ✅ |
+| **v29** | **เพิ่ม live-data rule: BOQ ที่เพิ่มก่อน rollout ไม่ทำให้ต้องแก้ SQL drafts; ต้อง refresh preflight counts และ backup ก่อน execution window** | ✅ |
+| **v29** | **เพิ่ม delta category backfill สองรอบรอบ Phase 2 deploy เพื่อเก็บ direct-insert duplicate จากแอปเก่าระหว่าง cutover; `011` ยังคง fail-closed** | ✅ |
 
 ---
 
@@ -249,6 +251,8 @@ invalidation is required.
 | **[v26] SECDEF functions** | **ถอนสิทธิ์ execute ฟังก์ชัน SECDEF ที่ขาดไป 4 ตัว** | ยืนยันพบ 8 ฟังก์ชันจริงจาก DB และจัดการครบถ้วน |
 | **[v26] Pending duplicate** | **ปลดบล็อก INSERT ของ pending owner ใน routes/items** | บล็อก pending ทำให้สร้าง BOQ เปล่าๆ ป้องกัน copy-paste regression |
 | **[v26] Query 7 fix** | **ใช้ aclexplode ตรวจ OID 0 (PUBLIC) & 'anon'** | DB จริงเก็บ PUBLIC เป็น grantee OID 0, cast ได้ '-' |
+| **[v29] Live BOQ growth** | **ไม่แก้ migration drafts; refresh preflight counts และ backup ก่อน execution window** | `010` backfill ทุก row ที่ target column ยังเป็น `NULL` |
+| **[v29] Cutover reconciliation** | **รัน delta category backfill ก่อนและหลัง Phase 2 deploy** | แอปเก่า duplicate BOQ แบบ direct insert และยังไม่ส่ง `category` snapshot |
 
 ---
 

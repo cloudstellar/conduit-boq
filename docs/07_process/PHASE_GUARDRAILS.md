@@ -22,6 +22,17 @@
 Merging the quality baseline changed repository code and triggered Vercel
 deployment. It did not apply any Production DB migration.
 
+### Live Data Rule
+
+- Normal BOQ create, edit, and duplicate activity before the execution window
+  does not require migration draft changes.
+- Refresh preflight counts, integrity queries, and backups immediately before
+  P0 and again before Phase 1A.
+- During the Phase 1A to Phase 2 cutover, run delta category backfill and its
+  zero-row assertion before and immediately after the Phase 2 deploy.
+- Prefer a brief BOQ write pause during cutover. If writes cannot be paused,
+  repeat reconciliation until the assertion returns zero before Phase 1B.
+
 1. Rehearse `009_master_catalog_p0_containment.sql` on non-production.
 2. Apply `009_master_catalog_p0_containment.sql` as an independent production
    security hotfix and stop unless P0 gates and smoke tests pass.
@@ -32,10 +43,12 @@ deployment. It did not apply any Production DB migration.
 6. Run each `010a_master_catalog_phase1a_indexes.sql` statement separately
    outside an explicit transaction.
 7. Stop unless Phase 1A gates pass.
-8. Deploy the application integration PR and run automated tests plus smoke
-   tests.
-9. Run delta category backfill verification.
-10. Apply `011_master_catalog_phase1b_hardening.sql`.
+8. Run delta category backfill and its zero-row assertion before the Phase 2
+   deploy.
+9. Deploy the application integration PR.
+10. Run delta category backfill and its zero-row assertion again immediately
+    after deploy, then run automated tests plus smoke tests.
+11. Apply `011_master_catalog_phase1b_hardening.sql`.
 
 Admin import, clone, default swap, and audit-trigger flows remain Phase 4 scope.
 

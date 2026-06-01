@@ -18,7 +18,10 @@
 
 ## Baseline
 
-Read-only inspection on 2026-06-01 recorded:
+Read-only inspection on 2026-06-01 recorded the following point-in-time
+snapshot. Refresh these metrics immediately before P0 and again before Phase
+1A; normal user BOQ activity can change the counts without requiring migration
+draft edits.
 
 | Metric | Expected baseline |
 |---|---:|
@@ -32,6 +35,34 @@ Read-only inspection on 2026-06-01 recorded:
 | Legacy BOQs (`created_by IS NULL`) | 24 |
 | Pending users | 4 |
 | Procurement users | 0 |
+
+### Production Read-Only Recheck - 2026-06-02
+
+The read-only recheck matched the 2026-06-01 baseline exactly:
+
+| Metric | Rechecked value |
+|---|---:|
+| `boq` rows | 168 |
+| `boq_items` rows | 1364 |
+| `boq_routes` rows | 195 |
+| `price_list` rows | 710 |
+| Custom items (`price_list_id IS NULL`) | 0 |
+| Dangling `price_list_id` rows | 0 |
+| Duplicate `price_list.item_code` groups | 0 |
+| Legacy BOQs (`created_by IS NULL`) | 24 |
+| Pending users | 4 |
+| Procurement users | 0 |
+
+Production still has none of the Phase 1A tables or compatibility columns:
+
+| Object | Rechecked value |
+|---|---|
+| `price_list_versions` | Absent |
+| `price_list_default_version` | Absent |
+| `price_list_audit_logs` | Absent |
+| `price_list.version_id` | Absent |
+| `boq.price_list_version_id` | Absent |
+| `boq_items.category` | Absent |
 
 ## P0 Verification
 
@@ -256,6 +287,30 @@ Expected:
 | `1A.8` | `4 rows`, all `indisvalid = true` |
 
 ## Phase 2 Smoke Tests
+
+### Delta Category Reconciliation
+
+Run once before Phase 2 deploy and again immediately after deploy. Repeat the
+post-deploy reconciliation if BOQ writes cannot be paused during cutover.
+
+```sql
+UPDATE public.boq_items bi
+SET category = pl.category
+FROM public.price_list pl
+WHERE bi.price_list_id = pl.id
+  AND bi.price_list_id IS NOT NULL
+  AND bi.category IS NULL;
+
+SELECT count(*) AS invalid_null_categories
+FROM public.boq_items
+WHERE price_list_id IS NOT NULL
+  AND category IS NULL;
+```
+
+| Pass | Expected | Result |
+|---|---|---|
+| Before Phase 2 deploy | `0` invalid standard-item categories | Pending |
+| Immediately after Phase 2 deploy | `0` invalid standard-item categories | Pending |
 
 | Flow | Expected | Result |
 |---|---|---|

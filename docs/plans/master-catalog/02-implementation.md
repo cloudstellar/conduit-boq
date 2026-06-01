@@ -39,6 +39,8 @@
 *   **วัตถุประสงค์**: ตรวจทานข้อมูลเดิม สำรองข้อมูล และสร้าง rollback plan ก่อนเริ่ม migration
 *   **งานปฏิบัติ**:
     1.  รันคำสั่ง SQL นับและตรวจสอบใบงาน `boq` และรายการไอเทม `boq_items` ในปัจจุบัน
+        *   ตัวเลขที่บันทึกไว้เป็น point-in-time snapshot เท่านั้น ผู้ใช้ยังสร้าง แก้ไข หรือคัดลอก BOQ ได้ตามปกติก่อน execution window
+        *   ต้องรัน preflight counts และ integrity queries ซ้ำทันที ก่อนเริ่ม P0 และก่อนเริ่ม Phase 1A ห้ามยึดตัวเลขเดิมเป็นเงื่อนไขตายตัว
     2.  ตรวจสอบหาไอเทมประวัติศาสตร์ที่คอลัมน์ `price_list_id` มีค่าเป็น `NULL` หรือชี้ไปที่ไอดีที่ไม่มีอยู่จริง
     3.  ตรวจสอบ RLS ปัจจุบันรวม `boq_routes` และตรวจสิทธิ์ของผู้ใช้งานในระบบจริง
     4.  **ตรวจสอบการมีอยู่และขนาดยอดข้อมูลของดัชนี (Foreign Key Indexing Audit)**:
@@ -568,9 +570,9 @@
 ### เฟส 2: การพัฒนาและอัปเดตโค้ดหน้าเว็บ (Code base Deployment & Integration)
 *   **วัตถุประสงค์**: แก้ไขโปรแกรมฝั่งหน้าบ้านและโมดูลการคำนวณทั้งหมดให้ทำงานสอดคล้องกับโครงสร้างเวอร์ชันและระบบ Snapshot หมวดหมู่ใหม่ โดยไม่มีปัญหาเรื่องรุ่นรั่วไหล (Version Leak)
 *   **งานปฏิบัติ**:
-    1.  **การทำ Delta Category Backfill (SRE Gate)**:
+    1.  **การทำ Delta Category Backfill สองรอบ (SRE Gate)**:
         *   เนื่องจากมีช่วงเวลาต่างกัน (Time lag) ระหว่างการรันฐานข้อมูล Phase 1A กับการเดปลอยโค้ด Phase 2 ผู้ใช้อาจสั่ง Duplicate BOQ ผ่านระบบเดิมทำให้เกิดไอเทมที่มี `category` เป็น `NULL` ค้างได้
-        *   ก่อนเริ่มการดีพลอยโค้ดหน้าบ้านและถอด Dynamic JOIN ให้ทำการรันคิวรี backfill ซ้ำอีกครั้ง:
+        *   รันคิวรี backfill ซ้ำ **รอบที่ 1 ก่อน deploy Phase 2** เพื่อให้ข้อมูลพร้อมก่อนถอด Dynamic JOIN และรัน **รอบที่ 2 หลัง deploy Phase 2 ทันที** เพื่อเก็บแถวที่อาจเกิดจากแอปเก่าระหว่าง cutover:
             ```sql
             UPDATE public.boq_items bi
             SET category = pl.category
@@ -583,7 +585,9 @@
             FROM public.boq_items
             WHERE price_list_id IS NOT NULL AND category IS NULL;
             ```
-            (คิวรีต้องได้ผลลัพธ์เป็น 0 ก่อนจะถอดโค้ด Dynamic JOIN ออกเพื่อไม่ให้หมวดหมู่ประวัติศาสตร์สูญหายบนหน้าจอ)
+            (คิวรีต้องได้ผลลัพธ์เป็น 0 หลัง backfill ทั้งสองรอบ และก่อนรัน Phase 1B เพื่อไม่ให้หมวดหมู่ประวัติศาสตร์สูญหายบนหน้าจอ)
+        *   แนะนำให้ใช้ execution window สั้น ๆ และหยุด BOQ writes ชั่วคราวระหว่าง backfill รอบที่ 1 → deploy Phase 2 → backfill รอบที่ 2 หากหยุด writes ไม่ได้ ให้รัน backfill และ assert รอบที่ 2 ซ้ำจนได้ `0` ก่อนเข้าสู่ Phase 1B
+        *   Migration `011` มี assertions แบบ fail-closed อยู่แล้ว หากยังมีข้อมูลหลงเหลือจะหยุด hardening โดยไม่ฝืน `SET NOT NULL`
     2.  **TypeScript Type Update (ต้องทำก่อนแก้ component)**:
         *   เพิ่มฟิลด์ใหม่ใน [lib/supabase.ts](file:///Users/cloud/Cloudstellar/conduit-boq/lib/supabase.ts):
             *   `PriceListItem` → เพิ่ม `version_id: string`
