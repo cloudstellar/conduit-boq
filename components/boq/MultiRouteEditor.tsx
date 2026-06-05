@@ -454,6 +454,21 @@ export default function MultiRouteEditor({ boqId, onSave, isSaving, onFactorCalc
     { material: 0, labor: 0, total: 0, itemCount: 0 }
   );
 
+  useEffect(() => {
+    if (grandTotals.total <= 0 && onFactorCalculated) {
+      onFactorCalculated({
+        factor: 0,
+        totalWithFactor: 0,
+        totalWithVAT: 0,
+        factorRaw: 0,
+        lowerCost: 0,
+        upperCost: 0,
+        lowerValue: 0,
+        upperValue: 0,
+      });
+    }
+  }, [grandTotals.total, onFactorCalculated]);
+
   const activeRouteItems = activeRouteId
     ? sortItemsByCategory(routeItems[activeRouteId] || [])
     : [];
@@ -551,6 +566,22 @@ export default function MultiRouteEditor({ boqId, onSave, isSaving, onFactorCalc
                   </div>
                 </div>
               </TooltipProvider>
+              {grandTotals.total > 0 && (
+                <div className="sticky top-14 z-10 border-b bg-background/95 px-4 py-3 backdrop-blur">
+                  <FactorFSummary
+                    routes={routes.map(r => ({
+                      id: r.id,
+                      route_name: r.route_name,
+                      total_material_cost: r.total_material_cost,
+                      total_labor_cost: r.total_labor_cost,
+                      total_cost: r.total_cost,
+                    }))}
+                    grandTotalCost={grandTotals.total}
+                    variant="compact"
+                    onFactorCalculated={onFactorCalculated}
+                  />
+                </div>
+              )}
               {/* Route Header Form */}
               {/* key={activeRouteId} forces React to remount inputs on route switch */}
               <div key={activeRouteId} className="p-4 border-b bg-muted/30 space-y-3">
@@ -673,23 +704,6 @@ export default function MultiRouteEditor({ boqId, onSave, isSaving, onFactorCalc
             />
           </CardContent>
         </Card>
-      )}
-
-      {/* Factor F Summary */}
-      {routes.length > 0 && grandTotals.total > 0 && (
-        <div className="mt-6">
-          <FactorFSummary
-            routes={routes.map(r => ({
-              id: r.id,
-              route_name: r.route_name,
-              total_material_cost: r.total_material_cost,
-              total_labor_cost: r.total_labor_cost,
-              total_cost: r.total_cost,
-            }))}
-            grandTotalCost={grandTotals.total}
-            onFactorCalculated={onFactorCalculated}
-          />
-        </div>
       )}
 
       {/* Save + Print Buttons */}

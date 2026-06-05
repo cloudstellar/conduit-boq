@@ -3,6 +3,7 @@
 import { useState, useEffect, useMemo } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import { roundMoney, calculateVAT, multiplyFactor } from '@/lib/calculation';
+import { calculateInterpolatedFactorFromRefs } from '@/lib/factorF';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Separator } from '@/components/ui/separator';
@@ -25,6 +26,7 @@ interface RouteData {
 interface FactorFSummaryProps {
   routes: RouteData[];
   grandTotalCost: number;
+  variant?: 'full' | 'compact';
   /** Callback to pass calculated factor values up for snapshot saving */
   onFactorCalculated?: (data: {
     factor: number;
@@ -43,108 +45,192 @@ interface FactorFSummaryProps {
   }) => void;
 }
 
-export default function FactorFSummary({ routes, grandTotalCost, onFactorCalculated }: FactorFSummaryProps) {
+export default function FactorFSummary({
+  routes,
+  grandTotalCost,
+  variant = 'full',
+  onFactorCalculated,
+}: FactorFSummaryProps) {
   const supabase = useMemo(() => createClient(), []);
-  const [lowerFactorRef, setLowerFactorRef] = useState<FactorReference | null>(null);
-  const [upperFactorRef, setUpperFactorRef] = useState<FactorReference | null>(null);
+  const [factorRefs, setFactorRefs] = useState<FactorReference[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-
-  const VAT_RATE = 0.07;
+  const [factorError, setFactorError] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchFactorReference = async () => {
       try {
-        const costInMillion = grandTotalCost / 1000000;
+        setFactorError(null);
 
-        const { data: lowerData } = await supabase
+        const { data, error } = await supabase
           .from('factor_reference')
           .select('cost_million, factor, factor_f')
-          .lte('cost_million', Math.max(5, costInMillion))
-          .order('cost_million', { ascending: false })
-          .limit(1)
-          .single();
+          .order('cost_million', { ascending: true });
 
-        const { data: upperData } = await supabase
-          .from('factor_reference')
-          .select('cost_million, factor, factor_f')
-          .gt('cost_million', costInMillion)
-          .order('cost_million', { ascending: true })
-          .limit(1)
-          .single();
+        if (error) throw error;
 
-        if (lowerData) {
-          setLowerFactorRef(lowerData);
-        } else {
-          const { data: defaultFactor } = await supabase
-            .from('factor_reference')
-            .select('cost_million, factor, factor_f')
-            .eq('cost_million', 5)
-            .single();
-          setLowerFactorRef(defaultFactor);
+        if (!data || data.length === 0) {
+          throw new Error('ไม่พบข้อมูลอ้างอิงในตาราง Factor F');
         }
 
-        if (upperData) setUpperFactorRef(upperData);
+        setFactorRefs(data);
       } catch (err) {
         console.error('Error fetching factor reference:', err);
+        setFactorRefs([]);
+        setFactorError(err instanceof Error ? err.message : 'ไม่สามารถอ่านตาราง Factor F ได้');
       } finally {
         setIsLoading(false);
       }
     };
 
-    if (grandTotalCost > 0) {
-      fetchFactorReference();
-    } else {
-      setIsLoading(false);
-    }
-  }, [grandTotalCost, supabase]);
-
-  const calculateInterpolatedFactor = (): { factor: number; raw: number } => {
-    const A = grandTotalCost / 1000000;
-    const B = lowerFactorRef?.cost_million || 5;
-    const D = lowerFactorRef?.factor || 1.2750;
-
-    if (!upperFactorRef || A <= B) return { factor: D, raw: D };
-
-    const C = upperFactorRef.cost_million;
-    const E = upperFactorRef.factor;
-
-    if (A >= C) return { factor: E, raw: E };
-
-    const interpolatedFactor = D - ((D - E) * (A - B) / (C - B));
-    const truncated = Math.floor(interpolatedFactor * 10000) / 10000;
-    return { factor: truncated, raw: interpolatedFactor };
-  };
+    fetchFactorReference();
+  }, [supabase]);
 
   const formatNumber = (num: number) =>
     num.toLocaleString('th-TH', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
-  // Calculate factor and derived values (must be before any early return for hooks rules)
-  const { factor, raw: factorRaw } = calculateInterpolatedFactor();
+  const { lowerFactorRef, upperFactorRef } = useMemo(() => {
+    if (grandTotalCost <= 0 || factorRefs.length === 0) {
+      return { lowerFactorRef: null, upperFactorRef: null };
+    }
+
+    const costInMillionValue = grandTotalCost / 1000000;
+    const lowerLimit = Math.max(5, costInMillionValue);
+    const lowerRef = [...factorRefs]
+      .reverse()
+      .find((ref) => Number(ref.cost_million) <= lowerLimit) ?? null;
+    const upperRef = factorRefs.find((ref) => Number(ref.cost_million) > costInMillionValue) ?? null;
+
+    return { lowerFactorRef: lowerRef, upperFactorRef: upperRef };
+  }, [factorRefs, grandTotalCost]);
+
+  // Calculate factor and derived values instantly from the loaded reference table.
+  const factorResult = useMemo(
+    () => calculateInterpolatedFactorFromRefs(grandTotalCost, lowerFactorRef, upperFactorRef),
+    [grandTotalCost, lowerFactorRef, upperFactorRef],
+  );
+  const factor = factorResult?.factor ?? 0;
   const costInMillion = grandTotalCost / 1000000;
-  const { beforeVAT: totalWithFactor, vat: totalVATAmount, total: totalWithVAT } =
+  const { beforeVAT: totalWithFactor, total: totalWithVAT } =
     calculateVAT(multiplyFactor(grandTotalCost, factor));
 
   // Call callback when factor values change (for snapshot saving)
   // Must be before early returns to comply with React hooks rules
   useEffect(() => {
-    if (onFactorCalculated && !isLoading && grandTotalCost > 0) {
+    if (onFactorCalculated && !isLoading && grandTotalCost > 0 && factorResult) {
       onFactorCalculated({
-        factor,
+        factor: factorResult.factor,
         totalWithFactor,
         totalWithVAT,
-        factorRaw,
-        lowerCost: (lowerFactorRef?.cost_million || 5) * 1000000,
-        upperCost: (upperFactorRef?.cost_million || (lowerFactorRef?.cost_million || 5)) * 1000000,
-        lowerValue: lowerFactorRef?.factor || 1.2750,
-        upperValue: upperFactorRef?.factor || (lowerFactorRef?.factor || 1.2750),
+        factorRaw: factorResult.raw,
+        lowerCost: factorResult.lowerCost,
+        upperCost: factorResult.upperCost,
+        lowerValue: factorResult.lowerValue,
+        upperValue: factorResult.upperValue,
       });
     }
-  }, [factor, totalWithFactor, totalWithVAT, factorRaw, onFactorCalculated, isLoading, grandTotalCost, lowerFactorRef, upperFactorRef]);
+  }, [
+    factorResult,
+    totalWithFactor,
+    totalWithVAT,
+    onFactorCalculated,
+    isLoading,
+    grandTotalCost,
+  ]);
+
+  useEffect(() => {
+    if (onFactorCalculated && !isLoading && grandTotalCost > 0 && !factorResult) {
+      onFactorCalculated({
+        factor: 0,
+        totalWithFactor: 0,
+        totalWithVAT: 0,
+        factorRaw: 0,
+        lowerCost: 0,
+        upperCost: 0,
+        lowerValue: 0,
+        upperValue: 0,
+      });
+    }
+  }, [factorResult, onFactorCalculated, isLoading, grandTotalCost]);
 
   if (isLoading) {
+    if (variant === 'compact') {
+      return (
+        <div className="rounded-md border bg-white px-3 py-2 text-sm text-muted-foreground shadow-sm">
+          <div className="flex items-center gap-2">
+            <Loader2 className="h-4 w-4 animate-spin text-blue-500" />
+            กำลังโหลด Factor F
+          </div>
+        </div>
+      );
+    }
+
     return (
       <div className="p-4 text-center">
         <Loader2 className="w-6 h-6 animate-spin mx-auto text-blue-500" />
+      </div>
+    );
+  }
+
+  if (factorError || !factorResult) {
+    if (variant === 'compact') {
+      return (
+        <Alert variant="destructive" className="shadow-sm">
+          <AlertDescription className="text-sm">
+            ไม่สามารถคำนวณ Factor F ได้: {factorError || 'ไม่พบข้อมูลอ้างอิงในตาราง Factor F'}
+          </AlertDescription>
+        </Alert>
+      );
+    }
+
+    return (
+      <Alert variant="destructive">
+        <AlertDescription>
+          ไม่สามารถคำนวณ Factor F ได้: {factorError || 'ไม่พบข้อมูลอ้างอิงในตาราง Factor F'}
+        </AlertDescription>
+      </Alert>
+    );
+  }
+
+  if (variant === 'compact') {
+    const lowerMillion = factorResult.lowerCost / 1000000;
+    const upperMillion = factorResult.upperCost / 1000000;
+    const bracketLabel = upperMillion > lowerMillion
+      ? `${lowerMillion.toLocaleString('th-TH')} - ${upperMillion.toLocaleString('th-TH')} ล้าน`
+      : `${lowerMillion.toLocaleString('th-TH')} ล้าน`;
+
+    return (
+      <div className="rounded-lg border border-blue-200 bg-blue-50/95 px-3 py-3 shadow-sm backdrop-blur">
+        <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
+          <div className="min-w-0">
+            <div className="text-xs text-blue-700">ค่างานต้นทุน</div>
+            <div className="truncate text-sm font-semibold text-slate-900 md:text-base">
+              {formatNumber(grandTotalCost)}
+            </div>
+            <div className="text-xs text-blue-600">บาท</div>
+          </div>
+          <div className="min-w-0">
+            <div className="flex items-center gap-1 text-xs text-blue-700">
+              <Calculator className="h-3.5 w-3.5" />
+              Factor F
+            </div>
+            <div className="text-lg font-bold leading-tight text-blue-800">{factor.toFixed(4)}</div>
+            <div className="truncate text-xs text-blue-600">{bracketLabel}</div>
+          </div>
+          <div className="min-w-0">
+            <div className="text-xs text-blue-700">หลังคูณ Factor</div>
+            <div className="truncate text-sm font-semibold text-blue-800 md:text-base">
+              {formatNumber(totalWithFactor)}
+            </div>
+            <div className="text-xs text-blue-600">ก่อน VAT</div>
+          </div>
+          <div className="min-w-0">
+            <div className="text-xs text-green-700">รวม VAT 7%</div>
+            <div className="truncate text-sm font-bold text-green-700 md:text-base">
+              {formatNumber(totalWithVAT)}
+            </div>
+            <div className="text-xs text-green-600">บาท</div>
+          </div>
+        </div>
       </div>
     );
   }

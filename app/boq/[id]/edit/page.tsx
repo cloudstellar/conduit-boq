@@ -33,10 +33,10 @@ export default function EditBOQPage() {
 
   // Factor F snapshot data from MultiRouteEditor
   const [factorData, setFactorData] = useState({
-    factor: 1,
+    factor: 0,
     totalWithFactor: 0,
     totalWithVAT: 0,
-    factorRaw: 1,
+    factorRaw: 0,
     lowerCost: 0,
     upperCost: 0,
     lowerValue: 0,
@@ -103,6 +103,17 @@ export default function EditBOQPage() {
         { material: 0, labor: 0, total: 0 }
       );
 
+      if (
+        grandTotals.total > 0 &&
+        (factorData.factor <= 0 ||
+          factorData.lowerCost <= 0 ||
+          factorData.upperCost <= 0 ||
+          factorData.lowerValue <= 0 ||
+          factorData.upperValue <= 0)
+      ) {
+        throw new Error('ยังคำนวณ Factor F ไม่สำเร็จ กรุณาตรวจสอบตาราง Factor F แล้วลองบันทึกอีกครั้ง');
+      }
+
       // Prepare data for RPC call (atomic transaction)
       const boqData = {
         estimator_name: projectInfo.estimator_name,
@@ -160,7 +171,7 @@ export default function EditBOQPage() {
       alert('บันทึกสำเร็จ!');
     } catch (err) {
       console.error('Error saving BOQ:', err);
-      setError('เกิดข้อผิดพลาดในการบันทึก');
+      setError(err instanceof Error ? err.message : 'เกิดข้อผิดพลาดในการบันทึก');
     } finally {
       setIsSaving(false);
     }
@@ -262,4 +273,3 @@ export default function EditBOQPage() {
     </div>
   );
 }
-

@@ -1,6 +1,7 @@
 'use client';
 
 import type { Workbook, Worksheet, Style, Border, Fill } from 'exceljs';
+import { calculateInterpolatedFactorFromRefs, isFactorSnapshotUsable } from './factorF';
 
 // ──────────────────────────────────
 // Types (mirror from print/page.tsx)
@@ -612,18 +613,28 @@ function createFactorFSheet(
 
   // Calculate Factor F variables (same logic as FactorFSupplementPage)
   const A = boq.total_cost;
-  const hasSnapshot = boq.factor_f_lower_cost != null && boq.factor_f_lower_cost > 0;
+  const liveFactorResult = calculateInterpolatedFactorFromRefs(A, lowerFactorRef, upperFactorRef);
+  const hasSnapshot = isFactorSnapshotUsable(A, boq);
 
-  const B = hasSnapshot ? boq.factor_f_lower_cost! : (lowerFactorRef?.cost_million || 5) * 1000000;
-  const C = hasSnapshot ? boq.factor_f_upper_cost! : (upperFactorRef?.cost_million || (lowerFactorRef?.cost_million || 5)) * 1000000;
-  const D = hasSnapshot ? boq.factor_f_lower_value! : lowerFactorRef?.factor || 1.2750;
-  const E = hasSnapshot ? boq.factor_f_upper_value! : upperFactorRef?.factor || (lowerFactorRef?.factor || 1.2750);
+  const B = hasSnapshot ? boq.factor_f_lower_cost! : liveFactorResult?.lowerCost;
+  const C = hasSnapshot ? boq.factor_f_upper_cost! : liveFactorResult?.upperCost;
+  const D = hasSnapshot ? boq.factor_f_lower_value! : liveFactorResult?.lowerValue;
+  const E = hasSnapshot ? boq.factor_f_upper_value! : liveFactorResult?.upperValue;
+
+  if (B == null || C == null || D == null || E == null) {
+    ws.getCell(1, 1).value = 'ไม่สามารถแสดงสูตร Factor F ได้: ไม่พบข้อมูลอ้างอิง Factor F';
+    ws.getCell(1, 1).font = defaultFont({ bold: true, size: 16 });
+    ws.mergeCells(1, 1, 1, 8);
+    return;
+  }
 
   let factorRaw: number;
   if (hasSnapshot && boq.factor_f_raw != null) {
     factorRaw = boq.factor_f_raw;
-  } else if (B === C || !upperFactorRef) {
+  } else if (hasSnapshot && (B === C || A <= B)) {
     factorRaw = D;
+  } else if (!hasSnapshot) {
+    factorRaw = liveFactorResult!.raw;
   } else {
     const aMil = A / 1000000;
     const bMil = B / 1000000;
@@ -631,7 +642,7 @@ function createFactorFSheet(
     factorRaw = D - ((D - E) * (aMil - bMil) / (cMil - bMil));
   }
 
-  const factorTruncated = boq.factor_f || Math.floor(factorRaw * 10000) / 10000;
+  const factorTruncated = hasSnapshot ? boq.factor_f! : liveFactorResult!.factor;
   const isExactMatch = B === C || Math.abs(factorRaw - factorTruncated) < 0.000000001;
 
   let r = 1;

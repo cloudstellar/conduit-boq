@@ -19,14 +19,17 @@ It is applied to the Grand Total before VAT.
 
 ## 2. Source Table: `factor_reference`
 
+ระบบนี้ใช้คอลัมน์ `factor` เป็นค่า **"รวมในรูป Factor"** จากตาราง Factor F งานก่อสร้างทาง
+เช่น ช่วงค่างาน 30-40 ล้านบาทใช้ `factor` ไม่ใช่คอลัมน์ `factor_f`.
+
 | cost_million | factor | factor_f |
 |--------------|--------|----------|
-| 5            | 1.2750 | 1.0537   |
-| 10           | 1.2413 | 1.0259   |
-| 20           | 1.2261 | 1.0133   |
-| 30           | 1.2178 | 1.0064   |
-| 40           | 1.2128 | 1.0023   |
-| 50           | 1.2094 | 0.9994   |
+| 5            | 1.2750 | 1.3642   |
+| 10           | 1.2274 | 1.3133   |
+| 20           | 1.1730 | 1.2551   |
+| 30           | 1.1422 | 1.2221   |
+| 40           | 1.1359 | 1.2154   |
+| 50           | 1.1310 | 1.2101   |
 | ...          | ...    | ...      |
 
 ---
@@ -46,27 +49,27 @@ Given:
   A = actual cost in millions
   B = lower threshold
   C = upper threshold
-  D = factor_f at lower threshold
-  E = factor_f at upper threshold
+  D = factor at lower threshold
+  E = factor at upper threshold
 
 Interpolated Factor F = D - ((D - E) × (A - B) / (C - B))
 ```
 
 ### Example
 
-If Grand Total = 15,000,000 บาท (15 million):
+If Grand Total = 34,444,444.444444 บาท (34.444444 million):
 
 ```
-A = 15 (actual cost)
-B = 10 (lower threshold)
-C = 20 (upper threshold)
-D = 1.0259 (factor_f at 10M)
-E = 1.0133 (factor_f at 20M)
+A = 34.444444 (actual cost)
+B = 30 (lower threshold)
+C = 40 (upper threshold)
+D = 1.1422 (factor at 30M)
+E = 1.1359 (factor at 40M)
 
-Factor F = 1.0259 - ((1.0259 - 1.0133) × (15 - 10) / (20 - 10))
-         = 1.0259 - (0.0126 × 0.5)
-         = 1.0259 - 0.0063
-         = 1.0196
+Factor F = 1.1422 - ((1.1422 - 1.1359) × (34.444444 - 30) / (40 - 30))
+         = 1.1422 - (0.0063 × 0.444444)
+         = 1.1422 - 0.0028
+         = 1.1394
 ```
 
 ---
@@ -75,9 +78,9 @@ Factor F = 1.0259 - ((1.0259 - 1.0133) × (15 - 10) / (20 - 10))
 
 | Condition | Behavior |
 |-----------|----------|
-| cost ≤ 5 million | Use factor_f for 5 million (1.0537) |
-| cost > max threshold | Use factor_f for max threshold |
-| Exact match | Use exact factor_f, no interpolation |
+| cost ≤ 5 million | Use `factor` for 5 million (1.2750) |
+| cost > max threshold | Use `factor` for max threshold |
+| Exact match | Use exact `factor`, no interpolation |
 
 ### Decimal Handling
 
@@ -101,7 +104,8 @@ Math.floor(interpolatedFactor * 10000) / 10000
 
 | File | Function |
 |------|----------|
-| `components/boq/FactorFSummary.tsx` | `calculateInterpolatedFactor()` |
+| `lib/factorF.ts` | `calculateInterpolatedFactorFromRefs()` |
+| `components/boq/FactorFSummary.tsx` | Factor F reference lookup |
 
 ---
 

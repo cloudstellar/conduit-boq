@@ -4,6 +4,7 @@ import { useState, useEffect, useMemo } from 'react';
 import { useParams } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
 import { roundMoney, calculateVAT, allocateToRoutes, multiplyFactor } from '@/lib/calculation';
+import { calculateInterpolatedFactorFromRefs, isFactorSnapshotUsable } from '@/lib/factorF';
 import { formatConstructionAreas } from '@/lib/constructionAreaUtils';
 import {
   splitText,
@@ -36,6 +37,8 @@ interface BOQData {
   total_labor_cost: number;
   total_cost: number;
   factor_f: number | null;
+  total_with_factor_f: number;
+  total_with_vat: number;
   factor_f_raw: number | null;
   factor_f_lower_cost: number | null;
   factor_f_upper_cost: number | null;
@@ -259,37 +262,45 @@ function FactorFSupplementPage({ boq, lowerFactorRef, upperFactorRef }: {
     return `${thaiMonths[date.getMonth()]} ${buddhistYear}`;
   };
 
-  // Use snapshot if available, otherwise fallback to live factor_reference query
+  // Use a saved snapshot only when its B/C bracket actually covers A.
+  // Bad legacy snapshots used 5M defaults even for 30M+ jobs, which made this page
+  // display a formally correct formula with the wrong variables.
   const A = boq.total_cost;
-  const hasSnapshot = boq.factor_f_lower_cost != null && boq.factor_f_lower_cost > 0;
+  const snapshotCoversA = isFactorSnapshotUsable(A, boq);
+  const liveFactorResult = calculateInterpolatedFactorFromRefs(A, lowerFactorRef, upperFactorRef);
+  const useSnapshot = Boolean(snapshotCoversA);
 
-  const B = hasSnapshot
-    ? boq.factor_f_lower_cost!
-    : (lowerFactorRef?.cost_million || 5) * 1000000;
-  const C = hasSnapshot
-    ? boq.factor_f_upper_cost!
-    : (upperFactorRef?.cost_million || (lowerFactorRef?.cost_million || 5)) * 1000000;
-  const D = hasSnapshot
-    ? boq.factor_f_lower_value!
-    : lowerFactorRef?.factor || 1.2750;
-  const E = hasSnapshot
-    ? boq.factor_f_upper_value!
-    : upperFactorRef?.factor || (lowerFactorRef?.factor || 1.2750);
+  if (!useSnapshot && !liveFactorResult) {
+    return (
+      <div className="print-page page-supplement">
+        <div className="supplement-title">ไม่สามารถแสดงสูตร Factor F ได้</div>
+        <div className="supplement-condition">
+          ไม่พบข้อมูลอ้างอิง Factor F ที่ครอบค่างาน {formatNumber(A)} บาท
+        </div>
+      </div>
+    );
+  }
 
-  // Calculate raw factor F (from snapshot or recalculate from bracket)
+  const B = useSnapshot ? boq.factor_f_lower_cost! : liveFactorResult!.lowerCost;
+  const C = useSnapshot ? boq.factor_f_upper_cost! : liveFactorResult!.upperCost;
+  const D = useSnapshot ? boq.factor_f_lower_value! : liveFactorResult!.lowerValue;
+  const E = useSnapshot ? boq.factor_f_upper_value! : liveFactorResult!.upperValue;
+
   let factorRaw: number;
-  if (hasSnapshot && boq.factor_f_raw != null) {
+  if (useSnapshot && boq.factor_f_raw != null) {
     factorRaw = boq.factor_f_raw;
-  } else if (B === C || !upperFactorRef) {
+  } else if (useSnapshot && (B === C || A <= B)) {
     factorRaw = D;
-  } else {
+  } else if (useSnapshot) {
     const aMil = A / 1000000;
     const bMil = B / 1000000;
     const cMil = C / 1000000;
     factorRaw = D - ((D - E) * (aMil - bMil) / (cMil - bMil));
+  } else {
+    factorRaw = liveFactorResult!.raw;
   }
 
-  const factorTruncated = boq.factor_f || Math.floor(factorRaw * 10000) / 10000;
+  const factorTruncated = useSnapshot ? boq.factor_f! : liveFactorResult!.factor;
   const isExactMatch = B === C || Math.abs(factorRaw - factorTruncated) < 0.000000001;
 
   return (
@@ -518,29 +529,26 @@ export default function PrintBOQPage() {
 
         if (boqData) {
           const costInMillion = boqData.total_cost / 1000000;
-          const { data: lowerData } = await supabase
+          const { data: lowerData, error: lowerError } = await supabase
             .from('factor_reference')
             .select('*')
             .lte('cost_million', Math.max(5, costInMillion))
             .order('cost_million', { ascending: false })
             .limit(1)
-            .single();
-          const { data: upperData } = await supabase
+            .maybeSingle();
+          if (lowerError) throw lowerError;
+
+          const { data: upperData, error: upperError } = await supabase
             .from('factor_reference')
             .select('*')
             .gt('cost_million', costInMillion)
             .order('cost_million', { ascending: true })
             .limit(1)
-            .single();
+            .maybeSingle();
+          if (upperError) throw upperError;
+
           if (lowerData) {
             setLowerFactorRef(lowerData);
-          } else {
-            const { data: defaultFactor } = await supabase
-              .from('factor_reference')
-              .select('*')
-              .eq('cost_million', 5)
-              .single();
-            setLowerFactorRef(defaultFactor);
           }
           if (upperData) setUpperFactorRef(upperData);
         }
@@ -612,23 +620,31 @@ export default function PrintBOQPage() {
   const totalCost = boq.total_cost;
   const totalMaterialCost = routes.reduce((sum, route) => sum + route.total_material_cost, 0);
   const totalLaborCost = routes.reduce((sum, route) => sum + route.total_labor_cost, 0);
-  const costInMillion = totalCost / 1000000;
 
-  const calculateInterpolatedFactor = (): number => {
-    const A = costInMillion;
-    const B = lowerFactorRef?.cost_million || 5;
-    const D = lowerFactorRef?.factor || 1.2750;
-    if (!upperFactorRef || A <= B) return D;
-    const C = upperFactorRef.cost_million;
-    const E = upperFactorRef.factor;
-    if (A >= C) return E;
-    const interpolatedFactor = D - ((D - E) * (A - B) / (C - B));
-    return Math.floor(interpolatedFactor * 10000) / 10000;
-  };
+  const liveFactorResult = calculateInterpolatedFactorFromRefs(totalCost, lowerFactorRef, upperFactorRef);
+  const useSavedFactor = isFactorSnapshotUsable(totalCost, boq);
+  const factor = useSavedFactor ? boq.factor_f! : liveFactorResult?.factor ?? 0;
+  const calculatedTotals = calculateVAT(multiplyFactor(totalCost, factor));
+  const constructionCostBeforeVAT = useSavedFactor && boq.total_with_factor_f > 0
+    ? boq.total_with_factor_f
+    : calculatedTotals.beforeVAT;
+  const totalWithVAT = useSavedFactor && boq.total_with_vat > 0
+    ? boq.total_with_vat
+    : calculatedTotals.total;
+  const vatAmount = roundMoney(totalWithVAT - constructionCostBeforeVAT);
 
-  const factor = calculateInterpolatedFactor();
-  const { beforeVAT: constructionCostBeforeVAT, vat: vatAmount, total: totalWithVAT } =
-    calculateVAT(multiplyFactor(totalCost, factor));
+  if (factor <= 0) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
+        <Alert variant="destructive" className="max-w-md">
+          <AlertCircle className="h-4 w-4" />
+          <AlertDescription>
+            ไม่สามารถคำนวณ Factor F ได้ กรุณาตรวจสอบตาราง Factor F หรือบันทึก BOQ ใหม่อีกครั้ง
+          </AlertDescription>
+        </Alert>
+      </div>
+    );
+  }
 
   // ──────────────────────────────────
   // Pagination: Pre-calculate chunks for all sections
