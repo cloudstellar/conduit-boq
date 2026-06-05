@@ -160,6 +160,10 @@
 | **v30** | **Verification source reconciliation: ต้องยืนยัน count ผ่าน authenticated Supabase SQL/MCP; anon REST/Data API ภายใต้ RLS ไม่ใช่หลักฐาน authoritative** | ✅ |
 | **v31** | **Factor F full-table gate: เปลี่ยนจาก sample 30M/40M เป็น row count, duplicate/null, ordered threshold, positive factor, และ checksum ครอบทุก numeric reference column** | ✅ |
 | **v32** | **เพิ่ม ADR-003 สำหรับการเริ่ม Master Catalog rollout และเลขเวอร์ชัน: ใช้ `2568.0.0` แบบ CalVer-first / SemVer-shaped ตาม schema `major.minor.patch`** | ✅ |
+| **v33** | **ปรับ ADR-003 ให้ปี segment แรกเป็นปีเริ่มใช้งานที่ owner กำหนด (`effective_be_year`) ไม่ใช่ปีจัดทำหรือปี deploy; สามารถกำหนดอนาคต เช่น `2570.0.0` ได้** | ✅ |
+| **v34** | **เพิ่ม item-code governance ใน ADR-003: `item_code` เป็น business key ไม่ใช่ลำดับแสดงผล, ห้ามแก้ active version ทับเงียบ ๆ, และการ renumber ต้องออก version พร้อม audit/mapping** | ✅ |
+| **v35** | **เพิ่ม future structured item-code scheme ใน ADR-003 เช่น `CIC-PVC-001`; ต้องมี segment dictionary, import validation, และ mapping จาก legacy code เมื่อ recode** | ✅ |
+| **v36** | **เพิ่ม best-practices analysis แยก: mapping Supabase/Postgres, Next.js, frontend/admin UI, alternatives, risk register, และ execution readiness checklist** | ✅ |
 
 ---
 
@@ -177,6 +181,7 @@
 | Credential hygiene | ✅ HEAD cleaned | Removed hardcoded legacy `anon` key from utility scripts; no tracked `.env` |
 | Catalog/reference recheck | ✅ Verified by Supabase MCP | `price_list` 710 rows, PN6 28 rows, `factor_reference` 37 rows, checksum `e8040ffbf82beebd61bbb9c2652dd41a` |
 | Catalog versioning ADR | ✅ Added | [ADR-003](../../02_architecture/ADR/ADR-003-master-catalog-rollout-and-version-numbering.md): start at `2568.0.0` |
+| Best-practices analysis | ✅ Added | [07-best-practices-analysis.md](./07-best-practices-analysis.md) |
 | P0 containment `009` | ⏳ Not applied | Production DB unchanged |
 | Master Catalog `010`, `010a`, `011` | ⏳ Not applied | Production DB unchanged |
 
@@ -266,7 +271,10 @@ invalidation is required.
 | **[v30] Factor F snapshot** | **print/export ใช้ saved snapshot ก่อน ถ้า snapshot valid** | รักษาหลักฐานราคาเดิมของ BOQ และเลี่ยงการเปลี่ยนย้อนหลังตาม reference table |
 | **[v30] PN6 count** | **ฐานปัจจุบันที่เอกสารอ้างอิงคือ 710 rows** | เดิม 682 + PN6 28; refresh ผ่าน authenticated SQL/MCP ก่อน execution window |
 | **[v31] Factor F approval gate** | **ตรวจทั้งตาราง ไม่ใช่แค่ 30M/40M** | Factor F ผิดแถวเดียวทำให้ BOQ ในช่วงค่างานนั้นผิดได้ จึงต้องใช้ full-table checksum และ row-level review ถ้า checksum เปลี่ยน |
-| **[v32] Version numbering** | **เริ่ม Master Catalog ที่ `2568.0.0`** | ใช้ปีบัญชีราคากลาง พ.ศ. เป็น segment แรก และใช้ revision/patch ตามหลัก SemVer-style; ไม่ใช้ 4-part key เพราะ schema และ convention ปัจจุบันคือ `major.minor.patch` |
+| **[v32/v33] Version numbering** | **เริ่ม Master Catalog ที่ `2568.0.0`; อนาคตกำหนดปีเริ่มใช้งานได้ เช่น `2570.0.0`** | ใช้ปี พ.ศ. ที่ owner กำหนดให้เป็นปีเริ่มใช้งานเป็น segment แรก และใช้ revision/patch ตามหลัก SemVer-style; ไม่ใช้ 4-part key เพราะ schema และ convention ปัจจุบันคือ `major.minor.patch` |
+| **[v34] Item code governance** | **`item_code` เป็น identity ของรายการใน catalog version** | ห้ามใช้ `item_code` เป็นลำดับแสดงผลหรือ reuse ความหมายใหม่; การเพิ่ม/แก้/renumber หลัง active ต้องมี version bump และ audit/mapping ตามระดับผลกระทบ |
+| **[v35] Structured item codes** | **รองรับรหัสอนาคต เช่น `CIC-PVC-001`** | ใช้ได้เป็น approved taxonomy ของ catalog version ใหม่ แต่ต้องมี dictionary/validation และไม่ให้แอป parse string เป็น business logic โดยไม่มี metadata |
+| **[v36] Best-practice analysis** | **เลือก phased versioned catalog หลังเทียบ alternatives** | Supabase/Postgres หนุน DB invariants, indexes, least privilege, short transactions; Next.js หนุน Server Components/Actions/fail-closed UI; future admin UI ต้องเป็น table-first operational workflow |
 
 ---
 
@@ -346,6 +354,10 @@ invalidation is required.
 | **70** | **[v30] Factor F correction และ preflight verification source** | ✅ | ✅ | ✅ |
 | **71** | **[v31] Factor F full-table integrity gate** | ✅ | ✅ | ✅ |
 | **72** | **[v32] ADR-003 catalog version numbering (`2568.0.0`)** | ✅ | ✅ | ✅ |
+| **73** | **[v33] ADR-003 effective year clarification (`effective_be_year`)** | ✅ | ✅ | ✅ |
+| **74** | **[v34] ADR-003 item-code governance** | ✅ | ✅ | ✅ |
+| **75** | **[v35] ADR-003 structured item-code scheme support** | ✅ | ✅ | ✅ |
+| **76** | **[v36] Skill-backed alternatives/risk analysis** | ✅ | ✅ | ✅ |
 
 ---
 

@@ -18,6 +18,7 @@ application during rollout.
 - [Implementation plan](./02-implementation.md)
 - [Review audit trail](./03-audit-trail.md)
 - [Verification report](./05-verification-report.md)
+- [Best practices analysis](./07-best-practices-analysis.md)
 - [ADR-002](../../02_architecture/ADR/ADR-002-versioned-master-catalog.md)
 - [ADR-003](../../02_architecture/ADR/ADR-003-master-catalog-rollout-and-version-numbering.md)
 
