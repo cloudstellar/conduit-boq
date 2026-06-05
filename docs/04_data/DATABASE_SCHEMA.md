@@ -201,7 +201,13 @@ BOQ Header - ใบประมาณราคา
 ---
 
 ### 8. price_list
-รายการราคามาตรฐาน (682 รายการ, 52 หมวด)
+รายการราคามาตรฐานปัจจุบัน (710 รายการ, 52 หมวด)
+
+> Baseline เดิมมี 682 รายการ และมีการเพิ่ม PN6 catalog 28 รายการ
+> (`ITEM-0683` ถึง `ITEM-0710`) ผ่านสคริปต์ hardened import
+> `scripts/insert_pn6_items.sql`. ตัวเลขนี้เป็น production-observed
+> preflight count และต้อง refresh อีกครั้งผ่าน authenticated SQL/MCP ก่อน
+> เริ่ม Master Catalog execution window.
 
 | Column | Type | Nullable | Description |
 |--------|------|----------|-------------|
@@ -231,9 +237,9 @@ BOQ Header - ใบประมาณราคา
 | `interest_percent` | DECIMAL | NO | % ดอกเบี้ย |
 | `profit_percent` | DECIMAL | NO | % กำไร |
 | `total_expense_percent` | DECIMAL | NO | % ค่าใช้จ่ายรวม |
-| `factor` | DECIMAL | NO | Factor |
+| `factor` | DECIMAL | NO | ค่า "รวมในรูป Factor" ที่ระบบใช้คำนวณ |
 | `vat_percent` | DECIMAL | NO | % VAT |
-| `factor_f` | DECIMAL | NO | Factor F |
+| `factor_f` | DECIMAL | NO | ค่า Factor F หลัง VAT ในตารางอ้างอิง (ไม่ได้ใช้เป็นตัวคูณหลักของ BOQ) |
 | `factor_f_rain_1` | DECIMAL | NO | Factor F ฤดูฝน 1 |
 | `factor_f_rain_2` | DECIMAL | NO | Factor F ฤดูฝน 2 |
 | `created_at` | TIMESTAMPTZ | NO | วันที่สร้าง |

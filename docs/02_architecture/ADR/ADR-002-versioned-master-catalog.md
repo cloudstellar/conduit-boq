@@ -87,6 +87,7 @@ and explicit role grants.
 
 ## References
 
+- [ADR-003: Master Catalog Rollout Start and Version Numbering](./ADR-003-master-catalog-rollout-and-version-numbering.md)
 - [Master Catalog proposal](../../plans/master-catalog/01-proposal.md)
 - [Master Catalog implementation plan](../../plans/master-catalog/02-implementation.md)
 - [Supabase Database Functions](https://supabase.com/docs/guides/database/functions)

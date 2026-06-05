@@ -155,20 +155,28 @@
 | **v28** | **ถอด hardcoded legacy Supabase `anon` key จาก utility scripts; HEAD ปัจจุบันไม่มี JWT literal และไม่มี `.env` ถูก track** | ✅ |
 | **v29** | **เพิ่ม live-data rule: BOQ ที่เพิ่มก่อน rollout ไม่ทำให้ต้องแก้ SQL drafts; ต้อง refresh preflight counts และ backup ก่อน execution window** | ✅ |
 | **v29** | **เพิ่ม delta category backfill สองรอบรอบ Phase 2 deploy เพื่อเก็บ direct-insert duplicate จากแอปเก่าระหว่าง cutover; `011` ยังคง fail-closed** | ✅ |
+| **v30** | **Factor F correction reconciliation: ใช้ `factor_reference.factor` ("รวมในรูป Factor"), แสดงผลทันทีในหน้า edit, validate snapshot สำหรับ print/export, และไม่มี silent 5M fallback** | ✅ |
+| **v30** | **PN6/catalog preflight reconciliation: เอกสาร canonical ระบุ `price_list` = 710 rows จากฐานเดิม 682 + PN6 28 (`ITEM-0683` ถึง `ITEM-0710`)** | ✅ |
+| **v30** | **Verification source reconciliation: ต้องยืนยัน count ผ่าน authenticated Supabase SQL/MCP; anon REST/Data API ภายใต้ RLS ไม่ใช่หลักฐาน authoritative** | ✅ |
+| **v31** | **Factor F full-table gate: เปลี่ยนจาก sample 30M/40M เป็น row count, duplicate/null, ordered threshold, positive factor, และ checksum ครอบทุก numeric reference column** | ✅ |
+| **v32** | **เพิ่ม ADR-003 สำหรับการเริ่ม Master Catalog rollout และเลขเวอร์ชัน: ใช้ `2568.0.0` แบบ CalVer-first / SemVer-shaped ตาม schema `major.minor.patch`** | ✅ |
 
 ---
 
-## Execution Status (2026-06-02)
+## Execution Status (2026-06-05)
 
 | รายการ | สถานะ | หลักฐาน |
 |---|---|---|
 | Repository quality baseline | ✅ Merged to `main` | [PR #1](https://github.com/cloudstellar/conduit-boq/pull/1), merge commit `6d607f9` |
-| Lint | ✅ Passed | `0` errors, `14` existing warnings |
-| Automated tests | ✅ Passed | `npm test`: `13` tests across `3` files |
+| Factor F correction | ✅ Merged to `main` | Uses `factor_reference.factor`, live edit display, snapshot validation, fail-closed fallback |
+| Lint | ✅ Passed | `0` errors, `11` existing warnings |
+| Automated tests | ✅ Passed | `npm test`: `17` tests across `4` files |
 | Production build | ✅ Passed | `npm run build` |
-| GitHub Actions | ✅ Passed | [Quality run #4](https://github.com/cloudstellar/conduit-boq/actions/runs/26770263106) on `main`: install, lint, test, build |
+| GitHub Actions | ✅ Last recorded baseline passed | [Quality run #4](https://github.com/cloudstellar/conduit-boq/actions/runs/26770263106) on `main`: install, lint, test, build; run a fresh gate before production execution |
 | Vercel Production deploy | ✅ Passed | Deployment status after merge commit `6d607f9` |
 | Credential hygiene | ✅ HEAD cleaned | Removed hardcoded legacy `anon` key from utility scripts; no tracked `.env` |
+| Catalog/reference recheck | ✅ Verified by Supabase MCP | `price_list` 710 rows, PN6 28 rows, `factor_reference` 37 rows, checksum `e8040ffbf82beebd61bbb9c2652dd41a` |
+| Catalog versioning ADR | ✅ Added | [ADR-003](../../02_architecture/ADR/ADR-003-master-catalog-rollout-and-version-numbering.md): start at `2568.0.0` |
 | P0 containment `009` | ⏳ Not applied | Production DB unchanged |
 | Master Catalog `010`, `010a`, `011` | ⏳ Not applied | Production DB unchanged |
 
@@ -253,6 +261,12 @@ invalidation is required.
 | **[v26] Query 7 fix** | **ใช้ aclexplode ตรวจ OID 0 (PUBLIC) & 'anon'** | DB จริงเก็บ PUBLIC เป็น grantee OID 0, cast ได้ '-' |
 | **[v29] Live BOQ growth** | **ไม่แก้ migration drafts; refresh preflight counts และ backup ก่อน execution window** | `010` backfill ทุก row ที่ target column ยังเป็น `NULL` |
 | **[v29] Cutover reconciliation** | **รัน delta category backfill ก่อนและหลัง Phase 2 deploy** | แอปเก่า duplicate BOQ แบบ direct insert และยังไม่ส่ง `category` snapshot |
+| **[v30] Factor F source** | **ใช้ `factor_reference.factor` ไม่ใช่ `factor_f` เป็นตัวคูณ BOQ** | คอลัมน์ `factor` คือ "รวมในรูป Factor" ตามตารางที่ใช้งานจริง |
+| **[v30] Factor F fallback** | **ไม่มี silent default เป็นค่า 5M เมื่ออ่านตารางไม่ได้** | กัน print/export และ save แสดงราคาผิดโดยไม่แจ้งผู้ใช้ |
+| **[v30] Factor F snapshot** | **print/export ใช้ saved snapshot ก่อน ถ้า snapshot valid** | รักษาหลักฐานราคาเดิมของ BOQ และเลี่ยงการเปลี่ยนย้อนหลังตาม reference table |
+| **[v30] PN6 count** | **ฐานปัจจุบันที่เอกสารอ้างอิงคือ 710 rows** | เดิม 682 + PN6 28; refresh ผ่าน authenticated SQL/MCP ก่อน execution window |
+| **[v31] Factor F approval gate** | **ตรวจทั้งตาราง ไม่ใช่แค่ 30M/40M** | Factor F ผิดแถวเดียวทำให้ BOQ ในช่วงค่างานนั้นผิดได้ จึงต้องใช้ full-table checksum และ row-level review ถ้า checksum เปลี่ยน |
+| **[v32] Version numbering** | **เริ่ม Master Catalog ที่ `2568.0.0`** | ใช้ปีบัญชีราคากลาง พ.ศ. เป็น segment แรก และใช้ revision/patch ตามหลัก SemVer-style; ไม่ใช้ 4-part key เพราะ schema และ convention ปัจจุบันคือ `major.minor.patch` |
 
 ---
 
@@ -329,6 +343,9 @@ invalidation is required.
 | **67** | **[v24] RPC pending own-only** | ✅ | ✅ | ✅ |
 | **68** | **[v25] Draft-only INSERT** | ✅ | ✅ | ✅ |
 | **69** | **[v26] DB-verified finite patch (MAINTAIN, SECDEF, pending RLS, Query 7)** | ✅ | ✅ | ✅ |
+| **70** | **[v30] Factor F correction และ preflight verification source** | ✅ | ✅ | ✅ |
+| **71** | **[v31] Factor F full-table integrity gate** | ✅ | ✅ | ✅ |
+| **72** | **[v32] ADR-003 catalog version numbering (`2568.0.0`)** | ✅ | ✅ | ✅ |
 
 ---
 
@@ -349,3 +366,4 @@ invalidation is required.
 | **[v18] Next.js middleware → proxy.ts** | Sprint ถัดไป | deprecated ใน Next.js 16 แต่ไม่ใช่ blocker |
 | **[v19] Audit log: UPDATE/DELETE draft ยัง log อยู่** | Phase 4 Design | ตัดสินใจว่าจะข้าม draft log ทั้ง INSERT/UPDATE/DELETE หรือเฉพาะ INSERT |
 | **[v19] Audit log: activation/import batch logging** | Phase 4 Design | กำหนดว่า batch import log เป็น 1 entry หรือ per-item |
+| **[v30/v31] Factor reference integrity** | Preflight before P0 and Phase 1A | ต้องตรวจทั้งตารางผ่าน authenticated Supabase SQL/MCP; app จะ fail closed ถ้าอ่าน rows ไม่ได้ และ rollout ต้องหยุดถ้า checksum/row-level review ไม่ผ่าน |

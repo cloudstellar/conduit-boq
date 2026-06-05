@@ -1,7 +1,7 @@
 # Calculation Rules
 ## Conduit BOQ System
 
-**Last Updated:** 2026-03-18  
+**Last Updated:** 2026-06-05
 **Status:** Canonical
 
 ---
@@ -16,7 +16,7 @@ Items → Routes → BOQ Total → Factor F → VAT → Final Total
 
 ### Core Principles
 
-1. **Standard Prices**: All unit prices come from the official price list (682 items)
+1. **Standard Prices**: All unit prices come from the official price list (710 items: base 682 + PN6 28)
 2. **Separation of Costs**: Material and labor costs are tracked separately
 3. **Factor F**: A multiplier that accounts for overhead, profit, and interest
 4. **VAT**: Always 7% on top of Factor F-adjusted total
@@ -105,7 +105,9 @@ Grand Total          = Grand Material Total + Grand Labor Total
 Total with Factor F = Grand Total × Factor F
 ```
 
-Factor F is looked up or interpolated from `factor_reference` table.
+Factor F is read from `factor_reference.factor`, the **"รวมในรูป Factor"**
+column, then looked up or interpolated from the loaded reference rows. The
+system does not use `factor_reference.factor_f` as the main BOQ multiplier.
 
 ### Step 5: VAT Calculation
 
@@ -165,7 +167,9 @@ Total with VAT = Total with Factor F × 1.07
 | VAT calculation | `lib/calculation.ts` | `calculateVAT()` → `safeMul()` |
 | Rounding | `lib/calculation.ts` | `roundMoney()` |
 | Route allocation | `lib/calculation.ts` | `allocateToRoutes()` |
-| Factor F lookup | `components/boq/FactorFSummary.tsx` | `calculateInterpolatedFactor()` |
+| Factor F lookup/interpolation | `lib/factorF.ts` | `calculateInterpolatedFactorFromRefs()` |
+| Factor F snapshot validation | `lib/factorF.ts` | `isFactorSnapshotUsable()` |
+| Factor F live edit display | `components/boq/FactorFSummary.tsx` | Load reference rows once, then calculate locally |
 
 ---
 
@@ -176,11 +180,19 @@ Total with VAT = Total with Factor F × 1.07
 | Item costs | ✅ | - |
 | Route totals | ✅ (in BOQ header) | Also recalculated |
 | Grand total | ✅ | Also recalculated |
-| Factor F value | ✅ | Also from lookup |
-| Total with Factor F | ✅ | Also recalculated |
-| Total with VAT | ✅ | Also recalculated |
+| Factor F value | ✅ | Live lookup only while editing, or fallback for legacy/invalid snapshot |
+| Total with Factor F | ✅ | Live calculation while editing; print/export use valid snapshot |
+| Total with VAT | ✅ | Live calculation while editing; print/export use valid snapshot |
 
-> **Note:** Values are stored for historical reference but may be recalculated for display to reflect current Factor F rates.
+> **Note:** Stored Factor F snapshots are the historical source for print and
+> export when they are valid. Live Factor F lookup is used on the edit page and
+> only as a fallback for legacy or invalid snapshots.
+
+> [!IMPORTANT]
+> There is no silent default Factor F fallback. If `factor_reference` cannot be
+> read, or if a nonzero BOQ total cannot be mapped to a Factor F row, the UI,
+> print, and export flows must show an error instead of substituting the 5M
+> factor value.
 
 ---
 

@@ -25,10 +25,10 @@
 - 📋 สร้าง BOQ ได้อย่างเป็นระบบและรวดเร็ว
 - 🛣️ รองรับงานหลายเส้นทาง (Multi-Route / Multi-Segment)
 - 💰 คำนวณราคาอัตโนมัติ  
-  - Factor F  
+  - Factor F จากคอลัมน์ `factor` ("รวมในรูป Factor") พร้อม snapshot ตอนบันทึก
   - VAT  
   - รวมยอดตามมาตรฐานองค์กร
-- 📊 Price List มาตรฐาน (682 รายการ)
+- 📊 Price List มาตรฐานปัจจุบัน (710 รายการ: ฐานเดิม 682 + PN6 เพิ่ม 28)
 - 🔐 Authentication & Authorization ระดับองค์กร
 - 👥 Role-Based Access Control (RBAC)
 - 🧾 แยกบทบาท “ผู้จัดทำ / ผู้ตรวจสอบ / ผู้อนุมัติ” อย่างชัดเจน

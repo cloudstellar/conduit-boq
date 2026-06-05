@@ -26,7 +26,7 @@ Next.js 16 + React 19 + TypeScript + Tailwind CSS 4
 
 ## ✅ Phase 1: Foundation (COMPLETED v1.6.0)
 
-- [x] Price list (682 items, 52 categories)
+- [x] Price list (710 items: base 682 + PN6 28, 52 categories)
 - [x] BOQ with multi-route support
 - [x] Organizations, Departments, Sectors
 - [x] Supabase Auth (Email/Password) + Auto-create profile
@@ -41,11 +41,14 @@ Next.js 16 + React 19 + TypeScript + Tailwind CSS 4
 
 **Strategy:** Quality Baseline → P0 Containment → Foundation (DB) → Integration (Codebase) → Hardening (Locks) → Governance (Admin GUI)
 
-**Current rollout state (2026-06-02):** Repository quality baseline merged to
+**Current rollout state (2026-06-05):** Repository quality baseline merged to
 `main` via [PR #1](https://github.com/cloudstellar/conduit-boq/pull/1) at
 `6d607f9`; [GitHub Actions Quality run #4](https://github.com/cloudstellar/conduit-boq/actions/runs/26770263106)
-and Vercel Production deploy passed. No Master Catalog migration has been
-applied to the Production DB.
+and Vercel Production deploy passed. The Factor F correction is also on
+`main`: the application now uses `factor_reference.factor` ("รวมในรูป Factor"),
+shows the edit-page Factor F immediately, validates saved snapshots for
+print/export, and fails closed when reference rows are unavailable. No Master
+Catalog migration has been applied to the Production DB.
 
 ### 🔐 Key Integrity & Security Rules (Revised v26)
 
@@ -69,12 +72,27 @@ applied to the Production DB.
 - **Execution privilege boundaries**: Explicitly revoke execute privileges from `PUBLIC`/`anon` and grant exclusively to `authenticated` role.
 - **Cross-Version Isolation**: RPC strictly checks that every inserted `price_list_id` belongs to the BOQ's current `price_list_version_id`.
 
+**Rule D: Reference Data Freeze**
+- **Price catalog baseline**: Current documented `price_list` count is 710
+  rows, including the PN6 addition (`ITEM-0683` through `ITEM-0710`).
+- **Factor F outside versioning**: `factor_reference` remains a stable
+  read-only reference during the Master Catalog rollout and is not cloned into
+  `price_list_versions`.
+- **Fail-closed calculation**: The app must not save, print, or export nonzero
+  BOQs with a silent Factor F default when `factor_reference` is unreadable.
+
 ---
 
 ### 📅 Phase 2 Rollout Plan (5-Step Roadmap)
 
 #### **Phase 0: Preflight Verification**
 - Run counts and integrity checks on current production BOQ rows.
+- Refresh `price_list` count, including PN6 rows, through authenticated
+  Supabase SQL/MCP immediately before P0 and again before Phase 1A.
+- Verify full `factor_reference` integrity through authenticated SQL/MCP:
+  row count, duplicate/null checks, ordered thresholds, positive factor values,
+  and the approved full-table checksum. The 30M/40M Surin-range values are only
+  a smoke example, not the whole gate.
 - Verify existing RLS structures.
 
 #### **Phase 1A: Database Setup (Defensive Nullable Setup)**

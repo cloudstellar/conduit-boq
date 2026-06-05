@@ -1,7 +1,7 @@
 # Factor F
 ## Conduit BOQ System
 
-**Last Updated:** 2026-01-22  
+**Last Updated:** 2026-06-05
 **Status:** Canonical
 
 ---
@@ -105,7 +105,42 @@ Math.floor(interpolatedFactor * 10000) / 10000
 | File | Function |
 |------|----------|
 | `lib/factorF.ts` | `calculateInterpolatedFactorFromRefs()` |
-| `components/boq/FactorFSummary.tsx` | Factor F reference lookup |
+| `lib/factorF.ts` | `isFactorSnapshotUsable()` |
+| `components/boq/FactorFSummary.tsx` | Load reference rows once, live edit display |
+| `app/boq/[id]/print/page.tsx` | Use valid saved snapshot before live fallback |
+| `lib/exportBoqExcel.ts` | Use valid saved snapshot before live fallback |
+
+---
+
+## 7. Runtime Behavior
+
+After the 2026-06-05 correction, Factor F handling follows these rules:
+
+1. The edit page loads `factor_reference` once and calculates the displayed
+   Factor F immediately in the browser from the loaded rows.
+2. Saving a BOQ stores the full Factor F snapshot:
+   `factor_f`, `factor_f_raw`, lower/upper cost, lower/upper factor values,
+   `total_with_factor_f`, and `total_with_vat`.
+3. Print and Excel export use the saved snapshot first when it is complete and
+   internally consistent with the BOQ total.
+4. Live lookup on print/export is only a fallback for legacy or invalid
+   snapshots.
+5. If the Factor F table cannot be read or no matching factor can be calculated
+   for a nonzero BOQ total, the system shows an error and blocks saving instead
+   of substituting a default value.
+
+### Verification Caveat
+
+The full `factor_reference` table must be verified through authenticated
+Supabase SQL/MCP access before the Master Catalog execution window. Anonymous
+REST/Data API checks can return `0` rows under RLS and are not an authoritative
+count source.
+
+The 2026-06-05 Supabase MCP recheck confirmed 37 `factor_reference` rows and
+the full numeric reference checksum
+`e8040ffbf82beebd61bbb9c2652dd41a`. The 30M = `1.1422` and 40M = `1.1359`
+values are useful smoke examples for the Surin interpolation case, but the
+approval gate must validate every row.
 
 ---
 

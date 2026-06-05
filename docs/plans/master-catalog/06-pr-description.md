@@ -27,6 +27,7 @@ v26 rollout. It does not apply migrations or change production data.
 5. `migrations/010a_master_catalog_phase1a_indexes.sql`
 6. `migrations/011_master_catalog_phase1b_hardening.sql`
 7. `docs/02_architecture/ADR/ADR-002-versioned-master-catalog.md`
+8. `docs/02_architecture/ADR/ADR-003-master-catalog-rollout-and-version-numbering.md`
 
 ## Production Safety
 

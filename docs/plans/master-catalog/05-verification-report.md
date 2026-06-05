@@ -1,6 +1,6 @@
 # Verification Report: Master Catalog v26
 
-**Status:** Repository quality baseline merged - production DB rollout not started
+**Status:** Repository quality baseline and Factor F correction merged - production DB rollout not started
 **Production project:** `otlssvssvgkohqwuuiir`
 **Related change request:** [04-change-request.md](./04-change-request.md)
 
@@ -11,6 +11,7 @@
 | Baseline | Read-only queries | Codex | 2026-06-01 | 2026-06-01 | Recorded |
 | P0 | `009_master_catalog_p0_containment.sql` |  |  |  | Pending |
 | Quality baseline | Lint, build, automated tests, CI workflow, Vercel deploy | Codex + Owner | 2026-06-01 | 2026-06-02 | Passed and merged to `main` |
+| Factor F correction | Application/docs update on `main` | Codex + Owner | 2026-06-05 | 2026-06-05 | Passed |
 | Phase 1A | `010_master_catalog_phase1a_versioning.sql` |  |  |  | Pending |
 | Phase 1A indexes | `010a_master_catalog_phase1a_indexes.sql` |  |  |  | Pending |
 | Phase 2 | Application deploy |  |  |  | Pending |
@@ -21,7 +22,8 @@
 Read-only inspection on 2026-06-01 recorded the following point-in-time
 snapshot. Refresh these metrics immediately before P0 and again before Phase
 1A; normal user BOQ activity can change the counts without requiring migration
-draft edits.
+draft edits. The `price_list` count includes the PN6 addition of 28 rows
+(`ITEM-0683` through `ITEM-0710`) on top of the previous 682-row baseline.
 
 | Metric | Expected baseline |
 |---|---:|
@@ -63,6 +65,136 @@ Production still has none of the Phase 1A tables or compatibility columns:
 | `price_list.version_id` | Absent |
 | `boq.price_list_version_id` | Absent |
 | `boq_items.category` | Absent |
+
+### Supabase MCP Reference Recheck - 2026-06-05
+
+Read-only `execute_sql` through Supabase MCP confirmed the current reference
+data used by the Factor F correction and PN6 preflight:
+
+| Metric | Rechecked value |
+|---|---:|
+| `price_list` rows | 710 |
+| PN6 rows (`ITEM-0683` through `ITEM-0710`) | 28 |
+| `factor_reference` rows | 37 |
+| `factor_reference.factor` at 30M | 1.1422 |
+| `factor_reference.factor` at 40M | 1.1359 |
+| `factor_reference.factor_f` at 30M | 1.2221 |
+| `factor_reference.factor_f` at 40M | 1.2154 |
+| Full numeric reference checksum | `e8040ffbf82beebd61bbb9c2652dd41a` |
+
+## Reference Data Preflight
+
+Run before P0 and again before Phase 1A through authenticated Supabase SQL/MCP.
+Anonymous REST/Data API checks can return `0` rows under RLS and must not be
+used as the source of truth for these gates.
+
+```sql
+-- Gate R.1: current catalog row count. Expected current baseline: 710.
+SELECT count(*) AS price_list_rows
+FROM public.price_list;
+
+-- Gate R.2: PN6 import count. Expected current baseline: 28.
+SELECT count(*) AS pn6_rows
+FROM public.price_list
+WHERE item_code BETWEEN 'ITEM-0683' AND 'ITEM-0710';
+
+-- Gate F.1: Factor F full-table integrity.
+-- The checksum covers every numeric reference column used by the official
+-- Factor F table, ordered by cost_million. It intentionally excludes id and
+-- created_at because those are metadata, not calculation inputs.
+WITH ordered AS (
+  SELECT
+    cost_million,
+    operation_percent,
+    interest_percent,
+    profit_percent,
+    total_expense_percent,
+    factor,
+    vat_percent,
+    factor_f,
+    factor_f_rain_1,
+    factor_f_rain_2,
+    lag(cost_million) OVER (ORDER BY cost_million) AS prev_cost
+  FROM public.factor_reference
+),
+aggregate_check AS (
+  SELECT
+    count(*) AS row_count,
+    count(DISTINCT cost_million) AS distinct_cost_count,
+    count(*) FILTER (
+      WHERE cost_million IS NULL
+         OR operation_percent IS NULL
+         OR interest_percent IS NULL
+         OR profit_percent IS NULL
+         OR total_expense_percent IS NULL
+         OR factor IS NULL
+         OR vat_percent IS NULL
+         OR factor_f IS NULL
+         OR factor_f_rain_1 IS NULL
+         OR factor_f_rain_2 IS NULL
+    ) AS null_required_values,
+    count(*) FILTER (
+      WHERE prev_cost IS NOT NULL
+        AND cost_million <= prev_cost
+    ) AS non_increasing_cost_rows,
+    count(*) FILTER (
+      WHERE factor <= 0
+         OR factor_f <= 0
+         OR factor_f_rain_1 <= 0
+         OR factor_f_rain_2 <= 0
+    ) AS non_positive_factor_rows,
+    md5(string_agg(concat_ws(
+      ':',
+      cost_million::text,
+      operation_percent::text,
+      interest_percent::text,
+      profit_percent::text,
+      total_expense_percent::text,
+      factor::text,
+      vat_percent::text,
+      factor_f::text,
+      factor_f_rain_1::text,
+      factor_f_rain_2::text
+    ), ',' ORDER BY cost_million)) AS factor_reference_checksum
+  FROM ordered
+)
+SELECT *
+FROM aggregate_check;
+
+-- Gate F.2: stop and run row-level review/export if F.1 differs from the
+-- approved checksum.
+SELECT
+  cost_million,
+  operation_percent,
+  interest_percent,
+  profit_percent,
+  total_expense_percent,
+  factor,
+  vat_percent,
+  factor_f,
+  factor_f_rain_1,
+  factor_f_rain_2
+FROM public.factor_reference
+ORDER BY cost_million;
+```
+
+Expected:
+
+| Gate | Expected |
+|---|---|
+| `R.1` | `710`, unless live preflight proves a new approved catalog import |
+| `R.2` | `28` |
+| `F.1.row_count` | `37` |
+| `F.1.distinct_cost_count` | `37` |
+| `F.1.null_required_values` | `0` |
+| `F.1.non_increasing_cost_rows` | `0` |
+| `F.1.non_positive_factor_rows` | `0` |
+| `F.1.factor_reference_checksum` | `e8040ffbf82beebd61bbb9c2652dd41a` |
+| `F.2` | If checksum differs, stop rollout and compare every row against the approved official Factor F table |
+
+The 30M = `1.1422` and 40M = `1.1359` values are retained as human-readable
+smoke examples for the Surin interpolation case. They are not sufficient by
+themselves to approve the Factor F reference table.
 
 ## P0 Verification
 
@@ -190,9 +322,9 @@ Complete after the standalone P0 hotfix and before Master Catalog Phase 1A.
 
 | Check | Expected | Result |
 |---|---|---|
-| `npm run lint` | Exit code `0` | Passed: `0` errors, `14` existing warnings |
+| `npm run lint` | Exit code `0` | Passed: `0` errors, `11` existing warnings |
 | `npm run build` | Exit code `0` | Passed locally and Vercel Production deployment passed after merge |
-| Automated regression test command | Exit code `0` | Passed: `npm test`, `13/13` tests across `3` files |
+| Automated regression test command | Exit code `0` | Passed: `npm test`, `17/17` tests across `4` files |
 | CI workflow | Runs lint, build, and automated tests on pull requests and pushes to `main` | Passed: [Quality run #4](https://github.com/cloudstellar/conduit-boq/actions/runs/26770263106) on merge commit `6d607f9` |
 | `npm run audit:prod` | Findings remediated or explicitly accepted | Pending: `9` production findings recorded (`5` moderate, `4` high) |
 | Non-production rehearsal | `010 -> 010a -> Phase 2 -> 011` passes all gates | Pending |
@@ -355,7 +487,7 @@ Record actual query output, screenshots, and incident notes below during rollout
 | Check | Result |
 |---|---|
 | `git diff --check` | Passed |
-| `npm run lint` | Passed with `0` errors and `14` existing warnings |
+| `npm run lint` | Passed with `0` errors and `11` existing warnings |
 | `npm test` | Passed: `13` tests across `3` files |
 | `npm run build` | Passed |
 | Git merge | [PR #1](https://github.com/cloudstellar/conduit-boq/pull/1) merged to `main` at `6d607f9` |
@@ -364,6 +496,15 @@ Record actual query output, screenshots, and incident notes below during rollout
 | Credential hygiene | Removed hardcoded legacy Supabase `anon` key from utility scripts; no JWT literal or tracked `.env` remains in current HEAD |
 | `npm run audit:prod` | Review required: `9` production dependency findings (`5` moderate, `4` high) |
 | Non-production rehearsal | Pending |
+
+### Factor F Correction - Merged 2026-06-05
+
+| Check | Result |
+|---|---|
+| Factor source column | Uses `factor_reference.factor` ("รวมในรูป Factor") |
+| Edit page behavior | Loads reference rows once and calculates live without a silent 5M fallback |
+| Print/export behavior | Uses valid saved snapshots before live legacy fallback |
+| `npm test` | Passed: `17` tests across `4` files |
 
 Dependency audit remediation must be reviewed separately from the Master
 Catalog feature implementation. The 2026-06-01 audit identified a Next.js

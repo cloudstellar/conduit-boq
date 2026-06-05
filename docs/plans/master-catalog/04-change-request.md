@@ -1,6 +1,6 @@
 # Change Request: Master Catalog v26 Rollout
 
-**Status:** Draft for P0 owner approval - repository baseline merged, production DB unchanged
+**Status:** Draft for P0 owner approval - Factor F hotfix merged, production DB unchanged
 **Requested date:** 2026-06-01
 **Change type:** Database security containment and phased catalog versioning
 **Production project:** `otlssvssvgkohqwuuiir`
@@ -19,6 +19,7 @@ application during rollout.
 - [Review audit trail](./03-audit-trail.md)
 - [Verification report](./05-verification-report.md)
 - [ADR-002](../../02_architecture/ADR/ADR-002-versioned-master-catalog.md)
+- [ADR-003](../../02_architecture/ADR/ADR-003-master-catalog-rollout-and-version-numbering.md)
 
 ## Scope
 
@@ -63,6 +64,17 @@ Read-only DB inspection on 2026-06-01 confirmed:
 | Duplicate `price_list.item_code` values | 0 |
 | Dangling `boq_items.price_list_id` rows | 0 |
 
+`price_list` rows include the PN6 addition of 28 rows (`ITEM-0683` through
+`ITEM-0710`) on top of the previous 682-row baseline. Treat this as
+point-in-time evidence and refresh the count through authenticated Supabase
+SQL/MCP immediately before P0 and Phase 1A. Anonymous REST/Data API counts can
+return `0` rows under RLS and are not an authoritative verification source.
+
+Supabase MCP recheck on 2026-06-05 confirmed `price_list` = 710 rows, PN6 =
+28 rows, `factor_reference` = 37 rows, and `factor_reference.factor` values
+30M = `1.1422`, 40M = `1.1359`. A full numeric `factor_reference` checksum was
+also recorded: `e8040ffbf82beebd61bbb9c2652dd41a`.
+
 Production `price_list` RLS currently uses the policy names
 `price_list_select`, `price_list_insert`, `price_list_update`, and
 `price_list_delete`. Migration 010 explicitly removes these production names
@@ -74,14 +86,19 @@ and `anon`. P0 containment is therefore required before catalog work.
 
 ## Current Repository State
 
-As of 2026-06-02, [PR #1](https://github.com/cloudstellar/conduit-boq/pull/1)
-was merged into `main` at merge commit `6d607f9`.
+As of 2026-06-05, the repository quality baseline and Factor F correction are
+merged into `main`. [PR #1](https://github.com/cloudstellar/conduit-boq/pull/1)
+was merged at `6d607f9`; the later Factor F correction updates the app to use
+`factor_reference.factor` ("รวมในรูป Factor"), show live edit-page calculation,
+validate print/export snapshots, and fail closed when reference rows are not
+available.
 
 | Item | Status |
 |---|---|
 | Repository quality baseline | Completed and merged to `main` |
-| `npm run lint` | Passed with `0` errors and `14` existing warnings |
-| `npm test` | Passed: `13` tests across `3` files |
+| Factor F correction | Completed and merged to `main` |
+| `npm run lint` | Passed with `0` errors and `11` existing warnings |
+| `npm test` | Passed: `17` tests across `4` files |
 | `npm run build` | Passed |
 | GitHub Actions on `main` | [Quality run #4](https://github.com/cloudstellar/conduit-boq/actions/runs/26770263106) passed: install, lint, test, build |
 | Vercel Production deployment after merge | Passed |
@@ -91,7 +108,8 @@ was merged into `main` at merge commit `6d607f9`.
 
 The CI workflow is present in `.github/workflows/quality.yml`, and
 [Quality run #4](https://github.com/cloudstellar/conduit-boq/actions/runs/26770263106)
-passed on `main`.
+passed on `main`. Run a fresh local/CI quality gate again before the production
+execution window.
 The removed legacy `anon` value remains in earlier git history; historical
 credential invalidation is a separate reviewed task.
 
@@ -104,6 +122,11 @@ so BOQs added before execution are included automatically.
 The recorded production metrics are point-in-time evidence, not fixed
 assertions. Refresh preflight counts, integrity queries, and backups immediately
 before P0 and again before Phase 1A.
+
+Refresh full `factor_reference` integrity at the same time, not only table
+visibility or sample rows. The app now requires readable, correct Factor F rows
+for nonzero totals and no longer substitutes the 5M factor value when the table
+is unavailable.
 
 During the Phase 1A to Phase 2 cutover, the old application can still duplicate
 BOQs using direct inserts without the new category snapshot. Run the delta
@@ -121,6 +144,9 @@ returns zero before Phase 1B.
 - [ ] Logical data backup completed.
 - [ ] Fresh baseline queries recorded immediately before execution in [05-verification-report.md](./05-verification-report.md).
 - [x] Repository quality baseline merged into `main`.
+- [x] Factor F calculation correction merged into `main`.
+- [x] Catalog version numbering documented in
+  [ADR-003](../../02_architecture/ADR/ADR-003-master-catalog-rollout-and-version-numbering.md).
 - [x] `git diff --check` passes.
 - [ ] Migration `009_master_catalog_p0_containment.sql` tested on a
   non-production database.
@@ -138,11 +164,15 @@ returns zero before Phase 1B.
 - [x] `npm run lint` passes.
 - [x] `npm run build` passes.
 - [x] Automated regression tests are present and passing.
+- [x] Factor F calculation correction merged to `main` and covered by tests/build.
 - [x] Latest `main` CI workflow passed in GitHub Actions.
 - [ ] `npm run audit:prod` findings are remediated or explicitly accepted.
 - [ ] The full Master Catalog rollout has been tested on a non-production
   database.
 - [ ] Fresh preflight counts, integrity queries, and backups recorded before Phase 1A.
+- [ ] Full Factor F reference integrity checked through authenticated Supabase
+  SQL/MCP before Phase 1A, including row count, null/duplicate checks, ordered
+  thresholds, positive factors, and the approved full-table checksum.
 - [ ] Owner approved the Master Catalog production execution window.
 - [ ] No `price_list` or `factor_reference` changes are scheduled during the
   rollout window.

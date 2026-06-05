@@ -10,8 +10,8 @@
 ### ✨ Key Features
 - 📋 สร้าง BOQ (Bill of Quantities) ได้รวดเร็ว
 - 🛣️ รองรับหลายเส้นทาง (Multi-Route)
-- 💰 คำนวณ Factor F และ VAT อัตโนมัติ
-- 📊 Price List มาตรฐาน 682 รายการ
+- 💰 คำนวณ Factor F จากคอลัมน์ `factor` และ VAT อัตโนมัติ
+- 📊 Price List มาตรฐานปัจจุบัน 710 รายการ
 - 🔐 ระบบ Authentication & Authorization
 - 👥 Role-Based Access Control (RBAC)
 
@@ -21,7 +21,7 @@
 
 | Layer | Technology |
 |-------|------------|
-| Frontend | Next.js 15, React 19, TypeScript |
+| Frontend | Next.js 16, React 19, TypeScript |
 | Styling | Tailwind CSS 4 |
 | Backend | Supabase (PostgreSQL + Auth) |
 | Hosting | Vercel |
@@ -174,4 +174,3 @@ Production deployment is automated via Vercel:
 ## 📄 License
 
 Private - NT Internal Use Only
-
