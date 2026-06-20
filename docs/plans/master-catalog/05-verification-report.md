@@ -431,9 +431,9 @@ rehearsal on branch `codex/master-catalog-phase2`.
 |---|---|---|---|
 | `L2.1` | Confirm Phase 1A Local contracts and active default pointer | Passed | 198 BOQs, 710 price rows, one active version/pointer, zero invalid rows |
 | `L2.2` | Add typed fail-closed default-version lookup | Passed | Three unit tests cover active, missing-pointer, and inactive-version cases |
-| `L2.3` | Make Create, Dashboard, and Price List version-aware | In progress | Implementation complete; full QA pending |
-| `L2.4` | Preserve version/category in Duplicate, Edit, Search, and Print | Pending |  |
-| `L2.5` | Run lint, tests, build, DB assertions, and Browser QA | Pending |  |
+| `L2.3` | Make Create, Dashboard, and Price List version-aware | Passed | Default-version helper is required by all three flows; quality gate passed |
+| `L2.4` | Preserve version/category in Duplicate, Edit, Search, and Print | Passed | Dynamic joins removed; version/category contracts covered by automated tests |
+| `L2.5` | Run lint, tests, build, DB assertions, and Browser QA | In progress | 24 tests and build passed; DB/Browser evidence pending |
 | `L2.6` | Run delta reconciliation and Local Phase 1B (`011`) | Pending |  |
 
 ### Delta Category Reconciliation

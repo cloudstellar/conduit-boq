@@ -37,6 +37,7 @@ export interface LineItem {
 
 interface LineItemsTableProps {
   items: LineItem[];
+  priceListVersionId: string;
   onAddItem: (priceItem: PriceListItem) => void;
   onUpdateQuantity: (id: string, quantity: number) => void;
   onUpdateRemarks: (id: string, remarks: string) => void;
@@ -45,6 +46,7 @@ interface LineItemsTableProps {
 
 export default function LineItemsTable({
   items,
+  priceListVersionId,
   onAddItem,
   onUpdateQuantity,
   onUpdateRemarks,
@@ -62,6 +64,7 @@ export default function LineItemsTable({
       <div className="mb-4 space-y-2">
         <Label>เพิ่มรายการ</Label>
         <ItemSearch
+          priceListVersionId={priceListVersionId}
           onSelect={onAddItem}
           placeholder="พิมพ์เพื่อค้นหารายการจากบัญชีราคามาตรฐาน..."
         />

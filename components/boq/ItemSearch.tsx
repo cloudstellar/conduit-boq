@@ -27,6 +27,7 @@ import {
 import { Loader2, Search } from 'lucide-react';
 
 interface ItemSearchProps {
+  priceListVersionId: string;
   onSelect: (item: PriceListItem) => void;
   placeholder?: string;
 }
@@ -56,6 +57,7 @@ const naturalSortCategory = (a: string, b: string): number => {
 };
 
 export default function ItemSearch({
+  priceListVersionId,
   onSelect,
   placeholder = 'ค้นหารายการ...',
 }: ItemSearchProps) {
@@ -68,34 +70,57 @@ export default function ItemSearch({
   const [isOpen, setIsOpen] = useState(false);
   const [selectedIndex, setSelectedIndex] = useState(-1);
   const [totalCount, setTotalCount] = useState(0);
+  const [catalogError, setCatalogError] = useState<string | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
   // Load categories on mount
   useEffect(() => {
     const loadCategories = async () => {
-      const { data } = await supabase
-        .from('price_list')
-        .select('category')
-        .eq('is_active', true);
+      if (!priceListVersionId) {
+        setCategories([]);
+        setCatalogError('ไม่พบเวอร์ชันราคากลางของใบประมาณราคานี้');
+        return;
+      }
 
-      if (data) {
+      try {
+        const { data, error } = await supabase
+          .from('price_list')
+          .select('category')
+          .eq('version_id', priceListVersionId)
+          .eq('is_active', true);
+
+        if (error) throw error;
+
         const categoryMap = new Map<string, number>();
-        data.forEach(item => {
+        (data || []).forEach(item => {
           const cat = item.category || 'ไม่ระบุ';
           categoryMap.set(cat, (categoryMap.get(cat) || 0) + 1);
         });
-        const cats = Array.from(categoryMap.entries())
-          .map(([category, count]) => ({ category, count }))
-          .sort((a, b) => naturalSortCategory(a.category, b.category));
-        setCategories(cats);
+        setCategories(
+          Array.from(categoryMap.entries())
+            .map(([category, count]) => ({ category, count }))
+            .sort((a, b) => naturalSortCategory(a.category, b.category)),
+        );
+        setCatalogError(null);
+      } catch (err) {
+        console.error('Category load error:', err);
+        setCategories([]);
+        setCatalogError('ไม่สามารถโหลดราคากลางสำหรับเวอร์ชันของใบประมาณราคานี้ได้');
       }
     };
     loadCategories();
-  }, [supabase]);
+  }, [priceListVersionId, supabase]);
 
   // Search price list
   useEffect(() => {
     const searchItems = async () => {
+      if (!priceListVersionId) {
+        setResults([]);
+        setTotalCount(0);
+        setCatalogError('ไม่พบเวอร์ชันราคากลางของใบประมาณราคานี้');
+        return;
+      }
+
       if (query.length < 2 && !selectedCategory) {
         setResults([]);
         setTotalCount(0);
@@ -107,6 +132,7 @@ export default function ItemSearch({
         let queryBuilder = supabase
           .from('price_list')
           .select('*', { count: 'exact' })
+          .eq('version_id', priceListVersionId)
           .eq('is_active', true);
 
         if (selectedCategory) {
@@ -124,11 +150,13 @@ export default function ItemSearch({
         if (error) throw error;
         setResults(data || []);
         setTotalCount(count || 0);
+        setCatalogError(null);
         setIsOpen(true);
         setSelectedIndex(-1);
       } catch (err) {
         console.error('Search error:', err);
         setResults([]);
+        setCatalogError('ไม่สามารถค้นหาราคากลางสำหรับเวอร์ชันของใบประมาณราคานี้ได้');
       } finally {
         setIsLoading(false);
       }
@@ -136,7 +164,7 @@ export default function ItemSearch({
 
     const debounce = setTimeout(searchItems, 300);
     return () => clearTimeout(debounce);
-  }, [query, selectedCategory, supabase]);
+  }, [priceListVersionId, query, selectedCategory, supabase]);
 
   const handleSelect = (item: PriceListItem) => {
     onSelect(item);
@@ -180,9 +208,15 @@ export default function ItemSearch({
 
   return (
     <div className="space-y-2">
+      {catalogError && (
+        <div className="rounded-md border border-red-200 bg-red-50 p-3 text-sm text-red-700">
+          {catalogError}
+        </div>
+      )}
+
       {/* Category Filter */}
       <div className="flex gap-2">
-        <Select value={selectValue} onValueChange={handleSelectChange}>
+        <Select value={selectValue} onValueChange={handleSelectChange} disabled={Boolean(catalogError)}>
           <SelectTrigger className="flex-1">
             <SelectValue placeholder="-- เลือกหมวดหมู่ (ทั้งหมด) --" />
           </SelectTrigger>
@@ -218,6 +252,7 @@ export default function ItemSearch({
               onChange={(e) => setQuery(e.target.value)}
               onFocus={() => (query.length >= 2 || selectedCategory) && results.length > 0 && setIsOpen(true)}
               onKeyDown={handleKeyDown}
+              disabled={Boolean(catalogError)}
               placeholder={selectedCategory ? 'พิมพ์เพื่อกรองรายการในหมวดนี้...' : placeholder}
               className="pl-10 pr-10"
             />
