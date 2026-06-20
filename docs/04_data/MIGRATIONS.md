@@ -1,7 +1,7 @@
 # Migrations
 ## Conduit BOQ System
 
-**Last Updated:** 2026-06-01
+**Last Updated:** 2026-06-20
 **Status:** Canonical
 
 ---
@@ -33,15 +33,23 @@
 
 | File | Description | Status |
 |------|-------------|--------|
-| `20250115_rls_policies.sql` | Early RLS policy set | **Applied** (superseded in part by 008 migrations) |
-| `20260317_factor_f_supplement.sql` | Factor F snapshot columns + `save_boq_with_routes` RPC | **Applied Supplement** |
+| `20260620100634_production_baseline.sql` | Schema-only snapshot pulled from current Production for deterministic Local rebuilds | **Local Baseline Only** |
+
+### Preserved Legacy Artifacts (`supabase/legacy_migrations/`)
+
+| File | Description | Status |
+|------|-------------|--------|
+| `20250115_rls_policies.sql` | Early RLS policy set | **Applied Legacy Artifact** (superseded in part by 008 migrations) |
+| `20260317_factor_f_supplement.sql` | Factor F snapshot columns + `save_boq_with_routes` RPC | **Applied Legacy Artifact** |
 
 ### Naming Convention
 
-The root `migrations/` sequence and timestamped `supabase/migrations/` supplements
-are separate ledgers. The applied Factor F supplement is
-`supabase/migrations/20260317_factor_f_supplement.sql`; it does not reserve the
-root migration number `009`. The Master Catalog rollout therefore starts with
+The root `migrations/` sequence is the reviewed Production rollout ledger. The
+timestamped Production baseline under `supabase/migrations/` exists only to
+rebuild Local Supabase; it must never be pushed to Production. Previously
+applied timestamped scripts are preserved under `supabase/legacy_migrations/`
+for audit context and do not reserve the root migration number `009`. The
+Master Catalog rollout therefore starts with
 `migrations/009_master_catalog_p0_containment.sql`.
 
 `010a_master_catalog_phase1a_indexes.sql` is an operational runbook rather than
@@ -52,7 +60,23 @@ at a time outside an explicit transaction.
 
 ## 2. Migration Process
 
-All migrations are run manually via the **Supabase SQL Editor**:
+### Local rehearsal
+
+Use `npm run db:local:bootstrap`. It resets Local Supabase to the schema-only
+Production baseline, restores scrubbed snapshots, applies root migrations
+`009` and `010`, then applies all four `010a` concurrent indexes individually.
+Migration `011` remains excluded until Phase 2 application verification passes.
+
+The CLI remains intentionally unlinked from Production. Do not use `db push`,
+`db pull`, or linked diff commands from this worktree. The fact that Local
+migration history contains only the baseline while the running Local schema
+also contains rehearsed `009`/`010` changes is expected; the bootstrap script is
+the canonical Local ledger for this rollout.
+
+### Production execution
+
+Production migrations are run only during an approved execution window through
+the reviewed SQL Editor/MCP runbook:
 
 1. Open [Supabase Dashboard](https://app.supabase.com) → SQL Editor
 2. Open the migration file
@@ -83,6 +107,8 @@ For other migrations, rollback must be performed manually by reversing the speci
 | **Applied (superseded)** | Applied but later migrations override some policies |
 | **Applied Supplement** | Applied as an additive change to existing schema |
 | **Applied (Manual Supplement)** | Applied manually outside normal migration sequence |
+| **Applied Legacy Artifact** | Historical script preserved outside the active Local migration directory |
+| **Local Baseline Only** | Schema snapshot used only to rebuild Local Supabase; never push to Production |
 | **Backup/Utility** | Not a schema change; diagnostic/backup queries |
 | **Rollback Utility** | Reversal script, run only if rollback is needed |
 | **Draft** | Review and test before applying to production |
