@@ -149,8 +149,13 @@ returns zero before Phase 1B.
 - [x] Catalog version numbering documented in
   [ADR-003](../../02_architecture/ADR/ADR-003-master-catalog-rollout-and-version-numbering.md).
 - [x] `git diff --check` passes.
-- [ ] Migration `009_master_catalog_p0_containment.sql` tested on a
+- [x] Migration `009_master_catalog_p0_containment.sql` tested on a
   non-production database.
+  Local Supabase rehearsal on 2026-06-20 passed all P0 privilege, RPC, RLS,
+  and row-count gates. The rehearsal also found and fixed an invalid
+  `ALTER DEFAULT PRIVILEGES FOR ROLE supabase_admin` assumption by guarding it
+  with a role-membership check; production MCP confirmed `postgres` is not a
+  `supabase_admin` member there either.
 
 ## P0 Hotfix Rollout
 
@@ -169,7 +174,8 @@ returns zero before Phase 1B.
 - [x] Latest `main` CI workflow passed in GitHub Actions.
 - [ ] `npm run audit:prod` findings are remediated or explicitly accepted.
 - [ ] The full Master Catalog rollout has been tested on a non-production
-  database.
+  database. Local `009 -> 010 -> 010a` passed on 2026-06-20; Phase 2 application
+  integration and `011` remain pending.
 - [ ] Fresh preflight counts, integrity queries, and backups recorded before Phase 1A.
 - [ ] Full Factor F reference integrity checked through authenticated Supabase
   SQL/MCP before Phase 1A, including row count, null/duplicate checks, ordered

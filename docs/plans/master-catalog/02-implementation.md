@@ -79,8 +79,17 @@
             -- Step 0: [v26] ปิด default EXECUTE grant สำหรับ function ใหม่ทั้งหมด สำหรับ PUBLIC, anon, และ authenticated ก่อนสร้างฟังก์ชันใดๆ
             ALTER DEFAULT PRIVILEGES FOR ROLE postgres IN SCHEMA public
               REVOKE EXECUTE ON FUNCTIONS FROM PUBLIC, anon, authenticated;
-            ALTER DEFAULT PRIVILEGES FOR ROLE supabase_admin IN SCHEMA public
-              REVOKE EXECUTE ON FUNCTIONS FROM PUBLIC, anon, authenticated;
+            DO $default_privileges$
+            BEGIN
+              IF current_user = 'supabase_admin'
+                 OR pg_has_role(current_user, 'supabase_admin', 'MEMBER') THEN
+                EXECUTE 'ALTER DEFAULT PRIVILEGES FOR ROLE supabase_admin IN SCHEMA public
+                  REVOKE EXECUTE ON FUNCTIONS FROM PUBLIC, anon, authenticated';
+              ELSE
+                RAISE NOTICE 'Skipping supabase_admin function defaults: % is not a member', current_user;
+              END IF;
+            END;
+            $default_privileges$;
 
             -- Step 1: [v20] REVOKE จากทุก role ก่อน (รวม authenticated เพื่อปิด exposure window)
             REVOKE EXECUTE ON FUNCTION public.save_boq_with_routes(uuid, jsonb, jsonb) FROM PUBLIC, anon, authenticated;
@@ -211,8 +220,18 @@
             -- [v26] ปิด default privileges ของตารางใหม่เพื่อไม่ให้ตารางแคตล็อกใหม่สืบทอดสิทธิ์เหล่านี้กลับมา
             ALTER DEFAULT PRIVILEGES FOR ROLE postgres IN SCHEMA public
               REVOKE TRUNCATE, REFERENCES, TRIGGER, MAINTAIN ON TABLES FROM PUBLIC, anon, authenticated;
-            ALTER DEFAULT PRIVILEGES FOR ROLE supabase_admin IN SCHEMA public
-              REVOKE TRUNCATE, REFERENCES, TRIGGER, MAINTAIN ON TABLES FROM PUBLIC, anon, authenticated;
+            DO $default_privileges$
+            BEGIN
+              IF current_user = 'supabase_admin'
+                 OR pg_has_role(current_user, 'supabase_admin', 'MEMBER') THEN
+                EXECUTE 'ALTER DEFAULT PRIVILEGES FOR ROLE supabase_admin IN SCHEMA public
+                  REVOKE TRUNCATE, REFERENCES, TRIGGER, MAINTAIN
+                  ON TABLES FROM PUBLIC, anon, authenticated';
+              ELSE
+                RAISE NOTICE 'Skipping supabase_admin table defaults: % is not a member', current_user;
+              END IF;
+            END;
+            $default_privileges$;
 
             -- Step 5: [v19] ถอนสิทธิ์ EXECUTE — แก้ signature และเพิ่มฟังก์ชันความปลอดภัยอื่นๆ ให้ครบถ้วนตาม DB จริง
             REVOKE EXECUTE ON FUNCTION public.admin_approve_user(uuid) FROM PUBLIC, anon;

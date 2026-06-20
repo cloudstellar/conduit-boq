@@ -14,6 +14,7 @@ describe('Master Catalog migration contracts', () => {
     expect(sql).toContain("IF auth.uid() IS NULL THEN")
     expect(sql).toContain("SET search_path = ''")
     expect(sql).toContain("GRANT EXECUTE ON FUNCTION public.save_boq_with_routes(uuid, jsonb, jsonb)\n  TO authenticated;")
+    expect(sql).toContain("pg_has_role(current_user, 'supabase_admin', 'MEMBER')")
     expect(sql).not.toContain('CREATE TABLE IF NOT EXISTS public.price_list_versions')
   })
 
@@ -25,6 +26,7 @@ describe('Master Catalog migration contracts', () => {
     expect(sql).toContain('ADD COLUMN IF NOT EXISTS price_list_version_id uuid')
     expect(sql).not.toContain('ALTER COLUMN price_list_version_id SET NOT NULL')
     expect(sql).toContain('IF v_item_version IS DISTINCT FROM v_target_boq_version THEN')
+    expect(sql).toContain("pg_has_role(current_user, 'supabase_admin', 'MEMBER')")
     expect(sql).toContain('REVOKE INSERT, UPDATE, DELETE')
   })
 

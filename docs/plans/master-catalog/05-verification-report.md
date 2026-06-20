@@ -12,6 +12,7 @@
 | P0 | `009_master_catalog_p0_containment.sql` |  |  |  | Pending |
 | Quality baseline | Lint, build, automated tests, CI workflow, Vercel deploy | Codex + Owner | 2026-06-01 | 2026-06-02 | Passed and merged to `main` |
 | Factor F correction | Application/docs update on `main` | Codex + Owner | 2026-06-05 | 2026-06-05 | Passed |
+| Local rehearsal | Production-schema snapshot + scrubbed auth/business data | Codex | 2026-06-20 | 2026-06-20 | `009 -> 010 -> 010a` passed; Phase 2/`011` pending |
 | Phase 1A | `010_master_catalog_phase1a_versioning.sql` |  |  |  | Pending |
 | Phase 1A indexes | `010a_master_catalog_phase1a_indexes.sql` |  |  |  | Pending |
 | Phase 2 | Application deploy |  |  |  | Pending |
@@ -494,8 +495,8 @@ Record actual query output, screenshots, and incident notes below during rollout
 | Vercel Production deploy | Passed after merge commit `6d607f9` |
 | CI workflow | Passed: [Quality run #4](https://github.com/cloudstellar/conduit-boq/actions/runs/26770263106) on `main`; install, lint, test, and build succeeded |
 | Credential hygiene | Removed hardcoded legacy Supabase `anon` key from utility scripts; no JWT literal or tracked `.env` remains in current HEAD |
-| `npm run audit:prod` | Review required: `9` production dependency findings (`5` moderate, `4` high) |
-| Non-production rehearsal | Pending |
+| `npm run audit:prod` | Review required: `9` production dependency findings (`4` moderate, `5` high) as rechecked 2026-06-20 |
+| Non-production rehearsal | Partial pass: local `009 -> 010 -> 010a`; Phase 2/`011` pending |
 
 ### Factor F Correction - Merged 2026-06-05
 
@@ -515,3 +516,28 @@ No Master Catalog migration (`009`, `010`, `010a`, or `011`) has been applied
 to the Production DB. The removed legacy `anon` key remains in earlier git
 history; historical invalidation requires a separately reviewed credential
 migration or rotation decision.
+
+### Local Supabase Rehearsal - 2026-06-20
+
+The local environment was rebuilt from a current production `public` schema
+snapshot and business-data snapshot. Auth UUIDs and identities were retained,
+but production password hashes, sessions, refresh tokens, OTPs, MFA data, and
+audit payloads were excluded. Seven local-only role accounts were seeded for
+RLS and UI testing.
+
+The first P0 attempt failed safely inside its transaction because both local
+and production `postgres` are non-superuser roles and are not members of
+`supabase_admin`. Migrations `009` and `010` were updated to alter
+`supabase_admin` default privileges only when the executor has membership.
+Explicit object grants/revokes and `postgres` defaults remain enforced.
+
+After the correction, local `009`, `010`, and all four `010a` concurrent index
+statements passed. Verification recorded 198 BOQs, 1,547 BOQ items, 217 routes,
+710 price rows, 37 Factor F rows, zero unversioned BOQs, zero cross-version
+mismatches, zero missing category snapshots, four valid required indexes,
+anonymous BOQ-save RPC access revoked, and the Factor F checksum unchanged at
+`e8040ffbf82beebd61bbb9c2652dd41a`.
+
+Browser smoke testing passed for local admin login, dashboard totals, and the
+710-row price-list view. Migration `011` was intentionally not run because the
+Phase 2 version-aware application changes are not implemented yet.
