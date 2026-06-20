@@ -15,6 +15,7 @@
 | Local rehearsal | Production-schema snapshot + scrubbed auth/business data | Codex | 2026-06-20 | 2026-06-20 | `009 -> 010 -> 010a` passed; Phase 2/`011` pending |
 | Phase 1A | `010_master_catalog_phase1a_versioning.sql` |  |  |  | Pending |
 | Phase 1A indexes | `010a_master_catalog_phase1a_indexes.sql` |  |  |  | Pending |
+| Local Phase 2 | Version-aware application implementation and smoke tests | Codex | 2026-06-20 |  | In progress; Local only |
 | Phase 2 | Application deploy |  |  |  | Pending |
 | Phase 1B | `011_master_catalog_phase1b_hardening.sql` |  |  |  | Pending |
 
@@ -420,6 +421,20 @@ Expected:
 | `1A.8` | `4 rows`, all `indisvalid = true` |
 
 ## Phase 2 Smoke Tests
+
+### Local Phase 2 Walkthrough - 2026-06-20
+
+Production remains unchanged. This record covers only the Local Supabase
+rehearsal on branch `codex/master-catalog-phase2`.
+
+| Step | Action | Status | Evidence |
+|---|---|---|---|
+| `L2.1` | Confirm Phase 1A Local contracts and active default pointer | Passed | 198 BOQs, 710 price rows, one active version/pointer, zero invalid rows |
+| `L2.2` | Add typed fail-closed default-version lookup | Passed | Three unit tests cover active, missing-pointer, and inactive-version cases |
+| `L2.3` | Make Create, Dashboard, and Price List version-aware | In progress | Implementation complete; full QA pending |
+| `L2.4` | Preserve version/category in Duplicate, Edit, Search, and Print | Pending |  |
+| `L2.5` | Run lint, tests, build, DB assertions, and Browser QA | Pending |  |
+| `L2.6` | Run delta reconciliation and Local Phase 1B (`011`) | Pending |  |
 
 ### Delta Category Reconciliation
 

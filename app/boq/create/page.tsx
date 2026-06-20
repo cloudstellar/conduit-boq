@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { createClient } from '@/lib/supabase/client';
+import { getActiveDefaultPriceListVersionId } from '@/lib/catalog/defaultVersion';
 import { useAuth } from '@/lib/context/AuthContext';
 import { can } from '@/lib/permissions';
 import ProjectInfoForm from '@/components/boq/ProjectInfoForm';
@@ -69,8 +70,15 @@ export default function CreateBOQPage() {
     setError(null);
 
     try {
-      // Get current auth user for ownership
-      const { data: { user: authUser } } = await supabase.auth.getUser();
+      const [authResult, priceListVersionId] = await Promise.all([
+        supabase.auth.getUser(),
+        getActiveDefaultPriceListVersionId(supabase),
+      ]);
+      const authUser = authResult.data.user;
+
+      if (!authUser) {
+        throw new Error('ไม่พบผู้ใช้ที่เข้าสู่ระบบ');
+      }
 
       const { data, error: insertError } = await supabase
         .from('boq')
@@ -80,8 +88,9 @@ export default function CreateBOQPage() {
           project_name: projectInfo.project_name,
           department: projectInfo.department || null,
           status: 'draft',
+          price_list_version_id: priceListVersionId,
           // Ownership fields (injected from authenticated user)
-          created_by: authUser?.id || null,
+          created_by: authUser.id,
           org_id: user?.org_id || null,
           department_id: user?.department_id || null,
           sector_id: user?.sector_id || null,
@@ -95,7 +104,7 @@ export default function CreateBOQPage() {
       router.push(`/boq/${data.id}/edit`);
     } catch (err) {
       console.error('Error saving BOQ:', err);
-      setError('เกิดข้อผิดพลาดในการบันทึกข้อมูล');
+      setError(err instanceof Error ? err.message : 'เกิดข้อผิดพลาดในการบันทึกข้อมูล');
     } finally {
       setIsSubmitting(false);
     }
@@ -172,4 +181,3 @@ export default function CreateBOQPage() {
     </div>
   );
 }
-
