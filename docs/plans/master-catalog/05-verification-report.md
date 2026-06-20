@@ -433,7 +433,7 @@ rehearsal on branch `codex/master-catalog-phase2`.
 | `L2.2` | Add typed fail-closed default-version lookup | Passed | Three unit tests cover active, missing-pointer, and inactive-version cases |
 | `L2.3` | Make Create, Dashboard, and Price List version-aware | Passed | Default-version helper is required by all three flows; quality gate passed |
 | `L2.4` | Preserve version/category in Duplicate, Edit, Search, and Print | Passed | Dynamic joins removed; version/category contracts covered by automated tests |
-| `L2.5` | Run lint, tests, build, DB assertions, and Browser QA | In progress | API smoke, cleanup assertion, 24 tests, lint (0 errors), and build passed; Browser runtime blocked before navigation |
+| `L2.5` | Run lint, tests, build, DB assertions, and Browser QA | In progress | API/auth smoke, cleanup and DB assertions, 24 tests, lint (0 errors), and build passed; Browser runtime blocked before navigation |
 | `L2.6` | Run delta reconciliation and Local Phase 1B (`011`) | Pending |  |
 
 The automated Local API smoke test used catalog version `2568.0.0` and
@@ -441,6 +441,13 @@ The automated Local API smoke test used catalog version `2568.0.0` and
 retained the item category, and Duplicate retained both version and category.
 Cleanup returned the Local snapshot to 198 BOQs, 1,547 items, and 217 routes,
 with zero `LOCAL QA Master Catalog%` BOQs remaining.
+
+The final Local database assertion found one active version and one matching
+default pointer, 710 versioned catalog rows, zero unversioned BOQs, zero
+unversioned prices, zero missing standard-item categories, zero cross-version
+items, four valid Phase 1A indexes, and no anonymous access to the save RPC.
+The local active-admin authentication smoke test also passed. As expected
+before Phase 1B, `boq.price_list_version_id` remains nullable.
 
 The in-app Browser could not start because its runtime rejected the sandbox
 metadata (`missing field sandboxPolicy`) before any page navigation. This is a
