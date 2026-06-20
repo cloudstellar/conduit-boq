@@ -84,6 +84,9 @@ conduit-boq/
 ### User & Business Documentation
 | Document | Description |
 |----------|-------------|
+| [PRODUCT_BRIEF_AND_MEASUREMENT_PLAN.md](./PRODUCT_BRIEF_AND_MEASUREMENT_PLAN.md) | Product brief, objectives, benefits, workflow, KPIs, and measurement plan |
+| [CODEBASE_DATABASE_MAP.md](./CODEBASE_DATABASE_MAP.md) | Detailed codebase and production database map |
+| [km/README.md](./km/README.md) | Knowledge Management competition document packet |
 | [PRD.md](./PRD.md) | Product Requirements Document |
 | [KNOWLEDGE_BASE.md](./KNOWLEDGE_BASE.md) | User guide & troubleshooting |
 | [IMPLEMENTATION_PLAN.md](./IMPLEMENTATION_PLAN.md) | Technical implementation details |
