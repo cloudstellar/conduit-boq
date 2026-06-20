@@ -10,6 +10,7 @@
     "db:local:bootstrap": "bash scripts/bootstrap-local-db.sh",
     "db:local:seed-users": "node scripts/seed-local-users.mjs",
     "db:local:smoke-auth": "node --env-file=.env.development.local scripts/smoke-local-auth.mjs",
+    "db:local:smoke-master-catalog": "node --env-file=.env.development.local scripts/smoke-master-catalog-phase2.mjs",
     "build": "next build",
     "start": "next start",
     "lint": "eslint",

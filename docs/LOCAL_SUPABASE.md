@@ -9,8 +9,14 @@ other Supabase projects.
 ```bash
 npm run db:local:start
 npm run db:local:status
+npm run db:local:smoke-auth
+npm run db:local:smoke-master-catalog
 npm run db:local:stop
 ```
+
+The Master Catalog smoke test refuses non-local Supabase URLs, signs in as the
+local admin, exercises create/save/duplicate version and category contracts,
+and removes every BOQ, route, and item that it creates.
 
 Run `npm run db:local:bootstrap` only when the local database should be rebuilt
 from the captured production snapshot. It resets the local database, restores
