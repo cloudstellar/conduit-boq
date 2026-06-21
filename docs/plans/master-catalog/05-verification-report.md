@@ -326,10 +326,10 @@ Complete after the standalone P0 hotfix and before Master Catalog Phase 1A.
 |---|---|---|
 | `npm run lint` | Exit code `0` | Passed: `0` errors, `11` existing warnings |
 | `npm run build` | Exit code `0` | Passed locally and Vercel Production deployment passed after merge |
-| Automated regression test command | Exit code `0` | Passed: `npm test`, `17/17` tests across `4` files |
+| Automated regression test command | Exit code `0` | Passed locally: `npm test`, `25/25` tests across `6` files |
 | CI workflow | Runs lint, build, and automated tests on pull requests and pushes to `main` | Passed: [Quality run #4](https://github.com/cloudstellar/conduit-boq/actions/runs/26770263106) on merge commit `6d607f9` |
-| `npm run audit:prod` | Findings remediated or explicitly accepted | Pending: `9` production findings recorded (`5` moderate, `4` high) |
-| Non-production rehearsal | `010 -> 010a -> Phase 2 -> 011` passes all gates | Pending |
+| `npm run audit:prod` | Findings remediated or explicitly accepted | Pending: `9` production findings recorded (`4` moderate, `5` high) on 2026-06-21 |
+| Non-production rehearsal | `010 -> 010a -> Phase 2 -> 011` passes all gates | Passed on Local: canonical rebuild, API/auth, rendered UI, trigger, and advisor gates |
 
 ## Phase 1A Verification
 
