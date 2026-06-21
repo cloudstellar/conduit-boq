@@ -2,7 +2,7 @@
 ## Conduit BOQ System
 
 > **Status:** CANONICAL - MASTER CATALOG v26
-> **Last Updated:** 2026-06-02
+> **Last Updated:** 2026-06-21
 > **Source:** `docs/plans/master-catalog/02-implementation.md`
 
 ---
@@ -14,13 +14,14 @@
 ### Current State
 
 - [x] Repository quality baseline merged into `main` via [PR #1](https://github.com/cloudstellar/conduit-boq/pull/1), merge commit `6d607f9`
-- [x] Lint, automated tests, build, [GitHub Actions Quality run #4](https://github.com/cloudstellar/conduit-boq/actions/runs/26770263106), and Vercel Production deployment passed
+- [x] Phase 2 merged via [PR #2](https://github.com/cloudstellar/conduit-boq/pull/2), merge commit `1439a7a`
+- [x] Lint, automated tests, build, [GitHub Actions Quality run #15](https://github.com/cloudstellar/conduit-boq/actions/runs/27901449961), and Vercel Production deployment passed
 - [x] Hardcoded legacy Supabase `anon` key removed from utility scripts in current HEAD
-- [ ] Production DB P0 containment migration `009` applied
-- [ ] Master Catalog migrations `010`, `010a`, and `011` applied
+- [x] Production DB P0 containment migration `009` applied and verified
+- [x] Master Catalog migrations `010`, `010a`, and `011` applied and verified
 
-Merging the quality baseline changed repository code and triggered Vercel
-deployment. It did not apply any Production DB migration.
+Production rollout through Phase 1B is complete. Final state is 198 BOQs, 1,547
+items, 217 routes, and 710 prices with zero invalid version/category rows.
 
 ### Live Data Rule
 

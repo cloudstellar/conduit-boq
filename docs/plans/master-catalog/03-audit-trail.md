@@ -173,6 +173,10 @@
 | **v38** | **รัน `010a` แยก 4 คำสั่งแบบ concurrent นอก transaction; ทุก index `indisvalid=true` และ `indisready=true`** | ✅ |
 | **v38** | **Production impersonation smoke ผ่าน: anon เห็น 0 rows และ save ไม่ได้; authenticated admin เห็น default version/710 prices/198 BOQ; legacy-create rollback smoke ถูกผูก default version อัตโนมัติและไม่ทิ้งข้อมูล** | ✅ |
 | **v38** | **Pre-deploy delta gate หลังบันทึกผล rollout ยังเป็นศูนย์ทุก invalid-state และมี active default 1 รายการ; พร้อม review/merge/deploy Phase 2** | ✅ |
+| **v39** | **Phase 2 [PR #2](https://github.com/cloudstellar/conduit-boq/pull/2) squash-merged ที่ `1439a7a`; Quality run #15 และ Vercel Production deploy ผ่าน** | ✅ |
+| **v39** | **Authenticated Production Browser QA ผ่าน Dashboard, Price List 710 + ITEM-0710 search, BOQ 198 + AWS search, Create form, Edit/version-scoped search และ Print โดยไม่มี app console error** | ✅ |
+| **v39** | **Apply/verify `011` ผ่าน Supabase MCP ledger `20260621104056`; BOQ version `NOT NULL`, immutable trigger enabled, invoker guard ปฏิเสธการเปลี่ยน version จริง** | ✅ |
+| **v39** | **Post-hardening rollback create/save ผ่าน; final counts 198 / 1,547 / 217 / 710, invalid-state และ smoke rows = 0, Factor F checksum ไม่เปลี่ยน** | ✅ |
 
 ---
 
@@ -185,15 +189,15 @@
 | Lint | ✅ Passed | `0` errors, `11` existing warnings |
 | Automated tests | ✅ Passed | `npm test`: `26/26` tests across `6` files |
 | Production build | ✅ Passed | `npm run build` |
-| GitHub Actions | ✅ Draft PR gate passed | [Quality run #14](https://github.com/cloudstellar/conduit-boq/actions/runs/27894505228): install, lint, test, build |
-| Vercel Production deploy | ✅ Passed | Deployment status after merge commit `6d607f9` |
+| GitHub Actions | ✅ `main` gate passed | [Quality run #15](https://github.com/cloudstellar/conduit-boq/actions/runs/27901449961): install, lint, test, build |
+| Vercel Production deploy | ✅ Passed | Phase 2 merge commit `1439a7a`; [Production](https://conduit-boq.vercel.app) |
 | Credential hygiene | ✅ HEAD cleaned | Removed hardcoded legacy `anon` key from utility scripts; no tracked `.env` |
 | Catalog/reference recheck | ✅ Verified by Supabase MCP | `price_list` 710 rows, PN6 28 rows, `factor_reference` 37 rows, checksum `e8040ffbf82beebd61bbb9c2652dd41a` |
 | Catalog versioning ADR | ✅ Added | [ADR-003](../../02_architecture/ADR/ADR-003-master-catalog-rollout-and-version-numbering.md): start at `2568.0.0` |
 | Best-practices analysis | ✅ Added | [07-best-practices-analysis.md](./07-best-practices-analysis.md) |
 | P0 containment `009` | ✅ Applied/verified | Production ledger `20260621045208` |
 | Master Catalog `010` / `010a` | ✅ Applied/verified | Production ledger `20260621052517`; four concurrent indexes valid/ready |
-| Master Catalog `011` | ⏳ Deploy-gated | Wait for Phase 2 Production deploy, smoke, and delta reconciliation |
+| Master Catalog `011` | ✅ Applied/verified | Production ledger `20260621104056`; `NOT NULL` + immutable invoker trigger |
 
 The removed legacy `anon` key remains visible in earlier git history. It is a
 low-privilege public-client credential rather than a `service_role` secret, but

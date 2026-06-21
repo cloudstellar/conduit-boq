@@ -8,8 +8,8 @@
 |---|---|
 | Repository quality baseline | ✅ Merge เข้า `main` แล้วผ่าน [PR #1](https://github.com/cloudstellar/conduit-boq/pull/1), merge commit `6d607f9` |
 | Factor F correction | ✅ Merge เข้า `main` แล้ว: ใช้ `factor_reference.factor`, คำนวณสดในหน้า edit, validate snapshot สำหรับ print/export |
-| Quality checks | ✅ lint 0 errors, tests `26/26`, production build และ Draft PR Quality CI ผ่าน |
-| Vercel Production deploy หลัง merge | ✅ ผ่าน |
+| Quality checks | ✅ lint 0 errors, tests `26/26`, production build, Draft PR CI และ [Quality run #15](https://github.com/cloudstellar/conduit-boq/actions/runs/27901449961) บน `main` ผ่าน |
+| Phase 2 application | ✅ [PR #2](https://github.com/cloudstellar/conduit-boq/pull/2) squash-merged ที่ `1439a7a` และ Vercel Production deploy ผ่าน |
 | Utility-script credential hygiene | ✅ ถอด hardcoded legacy Supabase `anon` key จาก HEAD แล้ว |
 | Catalog/reference recheck | ✅ Supabase MCP 2026-06-05: `price_list` 710 rows, PN6 28 rows, `factor_reference` 37 rows |
 | Catalog versioning ADR | ✅ [ADR-003](../../02_architecture/ADR/ADR-003-master-catalog-rollout-and-version-numbering.md): เริ่มที่ `2568.0.0` แบบ CalVer-first / SemVer-shaped |
@@ -17,9 +17,10 @@
 | Fresh Phase 1A logical snapshot | ✅ Restored in Local; counts/checksums match all 10 Production public tables |
 | Production dependency gate | ✅ `npm audit --omit=dev` = 0; Next.js 16.2.9 build and Excel export smoke passed |
 | Production DB migration `010` / `010a` | ✅ Applied/verified 2026-06-21; ledger `20260621052517` และ concurrent indexes valid ครบ 4 ตัว |
-| Production DB migration `011` | ⏳ รอ Phase 2 application deploy และ post-deploy smoke ก่อน apply |
+| Production DB migration `011` | ✅ Applied/verified 2026-06-21; ledger `20260621104056`, BOQ version `NOT NULL`, immutable guard enabled |
 | Pre-deploy delta reconciliation | ✅ 0 unversioned BOQ/price, 0 missing category, 0 cross-version item, 1 active default |
-| ขั้นถัดไป | Review/merge/deploy Draft PR #2; ห้าม apply `011` ก่อน post-deploy smoke ผ่าน |
+| Production browser/API smoke | ✅ Dashboard, Price List, BOQ/Search, Create form, Edit/version-scoped search, Print และ rollback-only create/save ผ่าน |
+| สถานะ rollout | ✅ Phase 0 → 1A → 2 → 1B เสร็จสมบูรณ์; Phase 4 admin catalog tooling เป็นงานถัดไปแยกต่างหาก |
 
 ---
 

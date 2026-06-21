@@ -173,6 +173,30 @@ call the save RPC. Authenticated-admin read smoke passed, and a rollback-only
 insert using the pre-Phase-2 app payload received the default version without
 leaving a row behind.
 
-Production now waits at the Phase 2 application deploy gate. Do not apply
-`011_master_catalog_phase1b_hardening.sql` until the application is deployed,
-post-deploy workflow smoke passes, and delta reconciliation is zero again.
+At this checkpoint Production waited at the Phase 2 application deploy gate.
+The rule was not to apply `011_master_catalog_phase1b_hardening.sql` until the
+application deployment, post-deploy workflow smoke, and second delta
+reconciliation passed; Section 8 records completion of those gates.
+
+## 8. Phase 2 and Phase 1B closeout — 2026-06-21
+
+PR #2 was squash-merged as `1439a7a`; GitHub Quality run #15 and the Vercel
+Production deployment passed. Authenticated browser smoke covered Dashboard,
+Price List/version-scoped search, BOQ list/search, Create, Edit, and Print.
+Rollback-only create/save smoke passed without leaving Production data.
+
+The second delta reconciliation returned zero unversioned BOQs/prices, zero
+missing standard-item categories, and zero cross-version items. Migration
+`011_master_catalog_phase1b_hardening.sql` was then applied through Supabase
+MCP and recorded as `20260621104056_master_catalog_phase1b_hardening`.
+
+Final verification preserved `198` BOQs, `1,547` items, `217` routes, and `710`
+prices. `boq.price_list_version_id` is `NOT NULL`; the immutable-version trigger
+is enabled; its function runs with invoker rights and cannot be called directly
+by `anon` or `authenticated`. A real attempted version change was rejected,
+the Phase 2 rollback create/save still passed after hardening, Factor F checksum
+remained unchanged, and no rollback-smoke row or invalid catalog state remains.
+
+The Master Catalog rollout through Phase 1B is complete. Phase 4 admin catalog
+import, clone, default swap, audit log, and GUI workflows require a separate
+reviewed change.

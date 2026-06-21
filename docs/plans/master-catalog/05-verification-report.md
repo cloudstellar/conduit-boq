@@ -576,12 +576,12 @@ zero vulnerabilities. The remaining upstream `xlsx` advisory has no registry
 fix and is excluded from the Production install; operational scripts must use
 trusted spreadsheet inputs only.
 
-Production migrations `009` and `010` were applied and verified on 2026-06-21;
-all four operational `010a` concurrent indexes are valid and ready. Migration
-`011` has not been applied, and the Phase 2 application has not been merged or
-deployed. The removed legacy `anon` key remains in earlier git history;
-historical invalidation requires a separately reviewed credential migration or
-rotation decision.
+Production migrations `009`, `010`, and `011` were applied and verified on
+2026-06-21; all four operational `010a` concurrent indexes are valid and ready.
+The Phase 2 application was merged through PR #2 and deployed to Vercel
+Production before Phase 1B hardening. The removed legacy `anon` key remains in
+earlier git history; historical invalidation requires a separately reviewed
+credential migration or rotation decision.
 
 ### Local Supabase Rehearsal - 2026-06-20
 
@@ -706,6 +706,52 @@ policies returned zero rows for the anonymous impersonation smoke.
 The pre-deploy delta reconciliation was rerun after the rollout record was
 pushed and remained clean: zero unversioned BOQs/prices, zero missing category
 snapshots, zero cross-version items, one active default, and zero unexpected
-active sessions. The next gate is review/merge/deploy of the Phase 2
-application. Migration `011` remains blocked until the Production app deploy,
-post-deploy workflow smoke, and second delta reconciliation pass.
+active sessions. This cleared the Phase 2 application merge/deploy gate.
+
+### Production Phase 2 and Phase 1B Closeout - 2026-06-21
+
+[PR #2](https://github.com/cloudstellar/conduit-boq/pull/2) was marked ready
+and squash-merged to `main` as `1439a7a`. [Quality run
+#15](https://github.com/cloudstellar/conduit-boq/actions/runs/27901449961)
+passed on the merge commit, and Vercel deployed the application successfully to
+[Production](https://conduit-boq.vercel.app).
+
+Authenticated browser QA exercised the rendered Dashboard, Price List, BOQ
+list/search, Create form, Edit form, version-scoped catalog search, and Print
+preview. Price List returned 710 rows and an `ITEM-0710` search returned the
+single expected PN6 item; BOQ list returned 198 rows and an `AWS` search opened
+the expected Edit/Print flows. No application console error appeared on these
+authenticated pages. A rollback-only database smoke also created and saved a
+Phase 2 BOQ with the active default version and left no row behind.
+
+The Dashboard personal/system label arrangement was traced to pre-existing
+commit `bf2437f`; `components/dashboard/StatsGrid.tsx` was unchanged by PR #2.
+No label or metric-semantic change was made during this rollout.
+
+After the post-deploy delta reconciliation returned zero invalid rows,
+`011_master_catalog_phase1b_hardening.sql` (SHA-256
+`d5916d36eee23a277878bc13ce84b9eb65fe2f0ca977036dceb5717625b61abc`)
+was applied through Supabase MCP. The remote ledger recorded
+`20260621104056_master_catalog_phase1b_hardening`.
+
+| Final verification | Production result |
+|---|---:|
+| BOQ / items / routes / prices | `198` / `1,547` / `217` / `710` |
+| Catalog versions / default pointers | `1` / `1` (`2568.0.0`) |
+| Unversioned BOQs / prices | `0` / `0` |
+| Missing standard-item categories | `0` |
+| Cross-version items | `0` |
+| BOQ version nullability | `NO` |
+| Immutable trigger | Enabled |
+| Guard function | `SECURITY INVOKER`; direct anon/auth execution revoked |
+| Attempted historical version change | Rejected with the expected guard error |
+| Post-hardening Phase 2 create/save | Passed in rollback-only transaction |
+| Rollback smoke rows remaining | `0` |
+| Factor F checksum | `e8040ffbf82beebd61bbb9c2652dd41a` |
+| Unexpected active sessions | `0` |
+
+The security advisor reported no new issue from Phase 1B. Existing warnings
+remain for intentionally authenticated, internally guarded `SECURITY DEFINER`
+RPCs and disabled leaked-password protection. The Master Catalog Phase 0 → 1A
+→ 2 → 1B rollout is complete; Phase 4 admin import/clone/default-swap/audit UI
+remains separate future scope.
