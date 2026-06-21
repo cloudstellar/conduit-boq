@@ -761,7 +761,7 @@ export default function PrintBOQPage() {
               <PageHeader
                 currentPage={currentPage}
                 totalPages={boqTotalPages}
-                formLabel="แบบ ปร.4 (ก)"
+                formLabel="แบบ ปร.1"
               />
               <div className="title">
                 แบบฟอร์มแสดงรายการ ปริมาณงาน และราคางานก่อสร้างท่อร้อยสายสื่อสารใต้ดิน (BOQ)
@@ -828,7 +828,7 @@ export default function PrintBOQPage() {
             <PageHeader
               currentPage={currentPage}
               totalPages={boqTotalPages}
-              formLabel="แบบ ปร.4 (ก)"
+              formLabel="แบบ ปร.1"
             />
             <div className="title">รวมรายการก่อสร้างทุกเส้นทาง</div>
             <InfoSection
