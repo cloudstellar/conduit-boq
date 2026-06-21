@@ -5,15 +5,19 @@ ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 SNAPSHOT_DIR="$ROOT_DIR/supabase/.snapshots"
 LOCAL_ENV="$ROOT_DIR/supabase/.env.local"
 DB_CONTAINER="supabase_db_conduit-boq-local"
+PUBLIC_DATA_SNAPSHOT="${PUBLIC_DATA_SNAPSHOT:-$SNAPSHOT_DIR/public-data.sql}"
 
 cd "$ROOT_DIR"
 
-for file in auth-data-scrubbed.sql public-data.sql; do
-  if [[ ! -f "$SNAPSHOT_DIR/$file" ]]; then
-    echo "Missing local snapshot: $SNAPSHOT_DIR/$file" >&2
-    exit 1
-  fi
-done
+if [[ ! -f "$SNAPSHOT_DIR/auth-data-scrubbed.sql" ]]; then
+  echo "Missing local snapshot: $SNAPSHOT_DIR/auth-data-scrubbed.sql" >&2
+  exit 1
+fi
+
+if [[ ! -f "$PUBLIC_DATA_SNAPSHOT" ]]; then
+  echo "Missing public-data snapshot: $PUBLIC_DATA_SNAPSHOT" >&2
+  exit 1
+fi
 
 if [[ ! -f "$LOCAL_ENV" ]]; then
   echo "Missing local-only credentials: $LOCAL_ENV" >&2
@@ -32,7 +36,7 @@ docker cp supabase/local/production-baseline.sql "$DB_CONTAINER:/tmp/production-
 docker exec "$DB_CONTAINER" psql -v ON_ERROR_STOP=1 -U postgres -d postgres -f /tmp/production-baseline.sql
 
 docker cp "$SNAPSHOT_DIR/auth-data-scrubbed.sql" "$DB_CONTAINER:/tmp/auth-data.sql"
-docker cp "$SNAPSHOT_DIR/public-data.sql" "$DB_CONTAINER:/tmp/public-data.sql"
+docker cp "$PUBLIC_DATA_SNAPSHOT" "$DB_CONTAINER:/tmp/public-data.sql"
 docker exec "$DB_CONTAINER" psql -v ON_ERROR_STOP=1 -U postgres -d postgres -f /tmp/auth-data.sql
 docker exec "$DB_CONTAINER" psql -v ON_ERROR_STOP=1 -U postgres -d postgres -f /tmp/public-data.sql
 

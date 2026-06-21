@@ -567,10 +567,14 @@ Record actual query output, screenshots, and incident notes below during rollout
 | Print/export behavior | Uses valid saved snapshots before live legacy fallback |
 | `npm test` | Passed: `17` tests across `4` files |
 
-Dependency audit remediation must be reviewed separately from the Master
-Catalog feature implementation. The 2026-06-21 audit identified a forced
-Next.js upgrade path from `16.1.1` to `16.2.9`, breaking-path updates for other
-packages, and `xlsx` findings without an available registry fix.
+Dependency remediation was completed on 2026-06-21 before Phase 1A. Next.js
+and `eslint-config-next` were upgraded from `16.1.1` to `16.2.9`; safe
+transitive fixes were installed; PostCSS `8.5.15` and UUID `11.1.1` were pinned
+through tested overrides; and `xlsx` was moved to devDependencies because it is
+used only by local import/inspection scripts. `npm audit --omit=dev` now reports
+zero vulnerabilities. The remaining upstream `xlsx` advisory has no registry
+fix and is excluded from the Production install; operational scripts must use
+trusted spreadsheet inputs only.
 
 Production migration `009` was applied and verified on 2026-06-21. Migrations
 `010`, `010a`, and `011` have not been applied, and the Phase 2 application has
@@ -617,9 +621,9 @@ contracts enabled.
 
 The final repository gate after the canonical rebuild passed lint with zero
 errors and 11 existing warnings, all 26 tests, TypeScript, and the production
-build. The production dependency audit remains a separate approval gate with
-four moderate and five high findings; no automatic dependency mutation was
-performed as part of the Master Catalog work.
+build. After dependency remediation, a clean `npm ci`, ExcelJS/UUID workbook
+smoke test, and Next.js `16.2.9` production build passed; the Production audit
+reports zero vulnerabilities.
 
 ### Pre-merge Safety Audit - 2026-06-21
 
@@ -644,3 +648,17 @@ and the invoker-rights immutable trigger enabled. Tests passed 26/26, the
 production build passed, and lint remained at zero errors with 11 existing
 warnings. No Production database request, migration, merge, or deployment was
 performed during this audit.
+
+### Fresh Phase 1A Logical Snapshot - 2026-06-21
+
+A fresh git-ignored SQL snapshot was exported from Production through paged,
+read-only Supabase MCP queries after migration 009. It contains all ten public
+tables that migration 010 can affect or depend on, but no auth password hash,
+session, OTP, MFA, or refresh-token data. The SQL file SHA-256 is
+`a8761632ba4ddbb22934c0e10dca0e4299798d572dc1db56222629a2d86c4570`.
+
+The snapshot restored successfully onto a clean Local schema using the
+scrubbed auth UUID snapshot. Production and Local row counts and canonical
+row-checksums matched exactly for all public tables. The full Local path
+`009 -> 010 -> 010a -> 011`, local user seeding, auth smoke, and Phase 2
+workflow smoke then passed against that fresh data.

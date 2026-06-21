@@ -60,6 +60,8 @@ describe('Master Catalog migration contracts', () => {
 
     expect(bootstrap).toContain('migrations/011_master_catalog_phase1b_hardening.sql')
     expect(bootstrap).toContain('supabase/local/production-baseline.sql')
+    expect(bootstrap).toContain('PUBLIC_DATA_SNAPSHOT=')
+    expect(bootstrap).toContain('docker cp "$PUBLIC_DATA_SNAPSHOT"')
     expect(bootstrap).toContain('psql -v ON_ERROR_STOP=1 -U postgres -d postgres -f /tmp/011.sql')
     expect(bootstrap).toContain('npm run db:local:smoke-master-catalog')
   })

@@ -30,6 +30,14 @@ because the Phase 2 application and rendered Local UI were verified on
 npm run db:local:bootstrap
 ```
 
+To rehearse a specific git-ignored public-data snapshot without replacing the
+default snapshot file:
+
+```bash
+PUBLIC_DATA_SNAPSHOT=supabase/.snapshots/public-data-20260621-post009.sql \
+  npm run db:local:bootstrap
+```
+
 ## Local URLs
 
 - App-facing API: `http://127.0.0.1:55321`
@@ -81,6 +89,11 @@ retained for realistic migration rehearsal.
 The data files under `supabase/.snapshots/` are permission mode `600` and ignored
 by Git. They are a convenient local rehearsal snapshot, not a replacement for a
 verified encrypted production backup and restore process.
+
+Each fresh rollout snapshot has a companion manifest containing source project,
+capture point, table counts, row checksums, and SQL SHA-256. A snapshot is not
+accepted for a Production gate until it restores in Local and its common-schema
+checksums match Production.
 
 Supabase CLI currently publishes local ports on all host interfaces. Run this
 stack only on a trusted network and stop it when not in use.

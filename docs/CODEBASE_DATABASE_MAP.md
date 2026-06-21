@@ -33,13 +33,13 @@ Conduit BOQ เป็น web application สำหรับจัดทำใบ
 
 | Layer | Technology |
 |---|---|
-| Framework | Next.js 16.1.1 App Router |
+| Framework | Next.js 16.2.9 App Router |
 | UI | React 19.2.3, TypeScript 5 |
 | Styling | Tailwind CSS 4, shadcn-style components, Radix UI, lucide-react |
 | Auth | Supabase Auth |
 | Database | Supabase PostgreSQL |
 | Supabase SDK | `@supabase/supabase-js` 2.90.1, `@supabase/ssr` 0.8.0 |
-| Export | `exceljs`, `file-saver`, `xlsx` |
+| Export | `exceljs`, `file-saver`; `xlsx` is dev-only for trusted local import scripts |
 | Tests | Vitest |
 | Hosting target | Vercel |
 

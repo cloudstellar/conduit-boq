@@ -14,8 +14,10 @@
 | Catalog/reference recheck | ✅ Supabase MCP 2026-06-05: `price_list` 710 rows, PN6 28 rows, `factor_reference` 37 rows |
 | Catalog versioning ADR | ✅ [ADR-003](../../02_architecture/ADR/ADR-003-master-catalog-rollout-and-version-numbering.md): เริ่มที่ `2568.0.0` แบบ CalVer-first / SemVer-shaped |
 | Production DB migration `009` | ✅ Applied/verified 2026-06-21 ผ่าน Supabase MCP ledger `20260621045208` |
+| Fresh Phase 1A logical snapshot | ✅ Restored in Local; counts/checksums match all 10 Production public tables |
+| Production dependency gate | ✅ `npm audit --omit=dev` = 0; Next.js 16.2.9 build and Excel export smoke passed |
 | Production DB migration `010`-`011` | ⏳ ยังไม่ได้ apply |
-| ขั้นถัดไป | ทำ fresh logical snapshot, ปิด dependency gate และเตรียม Phase 1A (`010`) window |
+| ขั้นถัดไป | รัน final Phase 1A preflight แล้ว apply/verify `010` และ `010a` |
 
 ---
 

@@ -14,9 +14,10 @@ The manual rollback pack consists of:
 
 - `supabase/local/production-baseline.sql`: schema-only snapshot containing the
   pre-009 RPC, RLS policies, grants, and default privileges.
-- `supabase/.snapshots/public-data.sql`: git-ignored business-data snapshot
-  captured on 2026-06-20. This is rehearsal/last-resort recovery evidence, not
-  a current managed backup.
+- `supabase/.snapshots/public-data-20260621-post009.sql`: fresh git-ignored
+  business-data snapshot captured after 009. It restored successfully in Local
+  and matched Production checksums for all ten public tables. SHA-256:
+  `a8761632ba4ddbb22934c0e10dca0e4299798d572dc1db56222629a2d86c4570`.
 - Production metadata captured read-only through Supabase MCP on 2026-06-21
   11:47 ICT: function definitions/ACLs, BOQ policy expressions, table grants,
   default privileges, and migration history.
@@ -144,3 +145,7 @@ items and did not block P0 containment.
 
 No data backfill, Phase 1A migration, application deployment, or Phase 1B
 hardening was performed in this window.
+
+The fresh logical snapshot required before Phase 1A was subsequently captured
+and restore-verified. It must be refreshed again if the final Phase 1A
+preflight detects any intervening Production row/checksum change.
