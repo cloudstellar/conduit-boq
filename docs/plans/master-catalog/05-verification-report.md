@@ -703,6 +703,9 @@ and disabled leaked-password protection. Although the inherited table ACL
 allows anonymous SELECT attempts on catalog tables, authenticated-only RLS
 policies returned zero rows for the anonymous impersonation smoke.
 
-The next gate is a delta reconciliation followed by review/merge/deploy of the
-Phase 2 application. Migration `011` remains blocked until the Production app
-deploy, post-deploy workflow smoke, and second delta reconciliation pass.
+The pre-deploy delta reconciliation was rerun after the rollout record was
+pushed and remained clean: zero unversioned BOQs/prices, zero missing category
+snapshots, zero cross-version items, one active default, and zero unexpected
+active sessions. The next gate is review/merge/deploy of the Phase 2
+application. Migration `011` remains blocked until the Production app deploy,
+post-deploy workflow smoke, and second delta reconciliation pass.

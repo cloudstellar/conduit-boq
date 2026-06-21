@@ -18,7 +18,8 @@
 | Production dependency gate | ✅ `npm audit --omit=dev` = 0; Next.js 16.2.9 build and Excel export smoke passed |
 | Production DB migration `010` / `010a` | ✅ Applied/verified 2026-06-21; ledger `20260621052517` และ concurrent indexes valid ครบ 4 ตัว |
 | Production DB migration `011` | ⏳ รอ Phase 2 application deploy และ post-deploy smoke ก่อน apply |
-| ขั้นถัดไป | รัน delta reconciliation แล้ว review/merge/deploy Draft PR #2; ห้าม apply `011` ก่อน post-deploy smoke ผ่าน |
+| Pre-deploy delta reconciliation | ✅ 0 unversioned BOQ/price, 0 missing category, 0 cross-version item, 1 active default |
+| ขั้นถัดไป | Review/merge/deploy Draft PR #2; ห้าม apply `011` ก่อน post-deploy smoke ผ่าน |
 
 ---
 

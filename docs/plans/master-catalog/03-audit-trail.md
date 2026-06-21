@@ -172,6 +172,7 @@
 | **v38** | **Apply/verify `010` ผ่าน Supabase MCP ledger `20260621052517`; backfill ครบ 198 BOQ / 710 price rows / 1,547 category snapshots และ cross-version mismatch = 0** | ✅ |
 | **v38** | **รัน `010a` แยก 4 คำสั่งแบบ concurrent นอก transaction; ทุก index `indisvalid=true` และ `indisready=true`** | ✅ |
 | **v38** | **Production impersonation smoke ผ่าน: anon เห็น 0 rows และ save ไม่ได้; authenticated admin เห็น default version/710 prices/198 BOQ; legacy-create rollback smoke ถูกผูก default version อัตโนมัติและไม่ทิ้งข้อมูล** | ✅ |
+| **v38** | **Pre-deploy delta gate หลังบันทึกผล rollout ยังเป็นศูนย์ทุก invalid-state และมี active default 1 รายการ; พร้อม review/merge/deploy Phase 2** | ✅ |
 
 ---
 
