@@ -160,7 +160,7 @@ Key idea: the app has almost no custom backend API except the admin delete route
 | `lib/printUtils.ts` | Print pagination and text chunking |
 | `lib/exportBoqExcel.ts` | Excel workbook generation |
 | `migrations/` | Main manual SQL migration ledger |
-| `supabase/migrations/` | Schema-only Production baseline used for Local rebuilds |
+| `supabase/local/` | Schema-only Production baseline used only for Local rebuilds; excluded from remote migrations |
 | `supabase/legacy_migrations/` | Preserved timestamped scripts already applied historically |
 | `scripts/` | Import/update/migration helper scripts |
 | `tests/` | Vitest tests for calculations, print pagination, migration contracts |
@@ -679,7 +679,7 @@ Applied / production-relevant according to `docs/04_data/MIGRATIONS.md`:
 | `008_pending_user_status.sql` | Applied | New signups default to pending |
 | `008_rls_and_trigger.sql` | Applied | Consolidated BOQ select RLS, org lock trigger, admin RPC |
 | `supabase/legacy_migrations/20260317_factor_f_supplement.sql` | Applied legacy artifact | Factor F snapshot columns and save RPC |
-| `supabase/migrations/20260620100634_production_baseline.sql` | Local baseline only | Current schema snapshot for deterministic Local rebuilds |
+| `supabase/local/production-baseline.sql` | Local baseline only | Current schema snapshot for deterministic Local rebuilds; never pushed as a migration |
 
 Draft / planned:
 

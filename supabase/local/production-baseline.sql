@@ -1,5 +1,8 @@
-
-
+-- LOCAL REHEARSAL ONLY.
+-- Schema-only snapshot of Production. This file intentionally lives outside
+-- supabase/migrations so Supabase CLI db push can never treat it as a remote
+-- migration. Apply it only to the isolated Local Supabase database through
+-- scripts/bootstrap-local-db.sh.
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
@@ -1234,7 +1237,6 @@ ALTER DEFAULT PRIVILEGES FOR ROLE "postgres" IN SCHEMA "public" GRANT ALL ON TAB
 ALTER DEFAULT PRIVILEGES FOR ROLE "postgres" IN SCHEMA "public" GRANT ALL ON TABLES TO "anon";
 ALTER DEFAULT PRIVILEGES FOR ROLE "postgres" IN SCHEMA "public" GRANT ALL ON TABLES TO "authenticated";
 ALTER DEFAULT PRIVILEGES FOR ROLE "postgres" IN SCHEMA "public" GRANT ALL ON TABLES TO "service_role";
-
 
 
 

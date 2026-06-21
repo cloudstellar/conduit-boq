@@ -28,6 +28,9 @@ set +a
 npm run db:local:start
 npx supabase db reset --local --no-seed
 
+docker cp supabase/local/production-baseline.sql "$DB_CONTAINER:/tmp/production-baseline.sql"
+docker exec "$DB_CONTAINER" psql -v ON_ERROR_STOP=1 -U postgres -d postgres -f /tmp/production-baseline.sql
+
 docker cp "$SNAPSHOT_DIR/auth-data-scrubbed.sql" "$DB_CONTAINER:/tmp/auth-data.sql"
 docker cp "$SNAPSHOT_DIR/public-data.sql" "$DB_CONTAINER:/tmp/public-data.sql"
 docker exec "$DB_CONTAINER" psql -v ON_ERROR_STOP=1 -U postgres -d postgres -f /tmp/auth-data.sql

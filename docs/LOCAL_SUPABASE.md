@@ -50,13 +50,14 @@ Do not run `supabase link`, `supabase db push`, `supabase db pull`, or
 `supabase db diff --linked` from this worktree. A missing-project-ref error from
 `--linked` commands is the expected safe state.
 
-The canonical Local rebuild is `npm run db:local:bootstrap`. Migration history
-shows only `20260620100634_production_baseline.sql`; Master Catalog scripts
-`009`, `010`, the four `010a` index statements, and `011` are deliberately
-applied by the bootstrap script so they remain staged rollout artifacts rather
-than being mistaken for Production migration history. Consequently, `supabase
-db diff --local` will show the rehearsed Master Catalog schema as drift from
-the baseline. Do not generate a new migration from that expected diff.
+The canonical Local rebuild is `npm run db:local:bootstrap`. The schema-only
+snapshot is stored at `supabase/local/production-baseline.sql`, outside the
+Supabase CLI migration directory, so `db push` cannot treat it as a Production
+migration. Master Catalog scripts `009`, `010`, the four `010a` index
+statements, and `011` are also applied explicitly by the bootstrap script.
+Consequently, `supabase db diff --local` will show the rehearsed schema as drift
+from an empty CLI migration ledger. Do not generate a new migration from that
+expected diff.
 
 ## Test users
 

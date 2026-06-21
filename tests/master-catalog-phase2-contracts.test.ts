@@ -38,6 +38,8 @@ describe('Master Catalog Phase 2 application contracts', () => {
     const priceListPage = readSource('app/price-list/page.tsx')
 
     expect(dashboard).toContain('getActiveDefaultPriceListVersionId')
+    expect(dashboard).toContain('const priceItemsCount = priceItemsRes.count ?? 0')
+    expect(dashboard).not.toMatch(/682|priceCategoriesCount = 52/)
     expect(priceListPage).toContain('getActiveDefaultPriceListVersionId')
   })
 })

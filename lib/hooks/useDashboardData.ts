@@ -102,18 +102,19 @@ export function useDashboardData(user: UserProfileWithOrg | null) {
       if (categoriesRes.error) throw categoriesRes.error;
       if (myBoqsRes.error) throw myBoqsRes.error;
 
-      // Extract price standard active items count, falling back to 682 if empty
-      const priceItemsCount = priceItemsRes.count !== null ? priceItemsRes.count : 682;
+      // The API request is an exact count; surface zero rather than masking an
+      // empty or misconfigured active catalog with a historical placeholder.
+      const priceItemsCount = priceItemsRes.count ?? 0;
 
       // Extract standard categories count dynamically
-      let priceCategoriesCount = 52;
+      let priceCategoriesCount = 0;
       if (categoriesRes.data) {
         const uniqueCategories = new Set(
           categoriesRes.data
             .map((item) => item.category)
             .filter((cat): cat is string => typeof cat === 'string' && cat.trim() !== '')
         );
-        priceCategoriesCount = uniqueCategories.size > 0 ? uniqueCategories.size : 52;
+        priceCategoriesCount = uniqueCategories.size;
       }
 
       // Process My BOQs metrics

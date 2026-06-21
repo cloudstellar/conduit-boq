@@ -29,11 +29,11 @@
 | `010a_master_catalog_phase1a_indexes.sql` | Master Catalog v26 concurrent index runbook | **Draft** |
 | `011_master_catalog_phase1b_hardening.sql` | Master Catalog v26 BOQ version contract hardening | **Draft** |
 
-### Supabase Migrations (`supabase/migrations/`)
+### Local Schema Baseline (`supabase/local/`)
 
 | File | Description | Status |
 |------|-------------|--------|
-| `20260620100634_production_baseline.sql` | Schema-only snapshot pulled from current Production for deterministic Local rebuilds | **Local Baseline Only** |
+| `production-baseline.sql` | Schema-only snapshot pulled from current Production for deterministic Local rebuilds | **Local Baseline Only — never a remote migration** |
 
 ### Preserved Legacy Artifacts (`supabase/legacy_migrations/`)
 
@@ -45,11 +45,11 @@
 ### Naming Convention
 
 The root `migrations/` sequence is the reviewed Production rollout ledger. The
-timestamped Production baseline under `supabase/migrations/` exists only to
-rebuild Local Supabase; it must never be pushed to Production. Previously
-applied timestamped scripts are preserved under `supabase/legacy_migrations/`
-for audit context and do not reserve the root migration number `009`. The
-Master Catalog rollout therefore starts with
+Production schema snapshot lives under `supabase/local/`, deliberately outside
+the Supabase CLI remote migration ledger, and exists only to rebuild Local
+Supabase. Previously applied timestamped scripts are preserved under
+`supabase/legacy_migrations/` for audit context and do not reserve the root
+migration number `009`. The Master Catalog rollout therefore starts with
 `migrations/009_master_catalog_p0_containment.sql`.
 
 `010a_master_catalog_phase1a_indexes.sql` is an operational runbook rather than
@@ -64,14 +64,14 @@ at a time outside an explicit transaction.
 
 Use `npm run db:local:bootstrap`. It resets Local Supabase to the schema-only
 Production baseline, restores scrubbed snapshots, applies root migrations
-`009` and `010`, then applies all four `010a` concurrent indexes individually.
-Migration `011` remains excluded until Phase 2 application verification passes.
+`009` and `010`, applies all four `010a` concurrent indexes individually, then
+applies `011` and runs the Phase 2 smoke tests.
 
 The CLI remains intentionally unlinked from Production. Do not use `db push`,
-`db pull`, or linked diff commands from this worktree. The fact that Local
-migration history contains only the baseline while the running Local schema
-also contains rehearsed `009`/`010` changes is expected; the bootstrap script is
-the canonical Local ledger for this rollout.
+`db pull`, or linked diff commands from this worktree. Local migration history
+contains no rollout scripts because both the baseline and root Master Catalog
+scripts are applied explicitly by the bootstrap script. That script is the
+canonical Local rehearsal ledger for this rollout.
 
 ### Production execution
 
