@@ -149,3 +149,30 @@ hardening was performed in this window.
 The fresh logical snapshot required before Phase 1A was subsequently captured
 and restore-verified. It must be refreshed again if the final Phase 1A
 preflight detects any intervening Production row/checksum change.
+
+## 7. Phase 1A follow-through — 2026-06-21
+
+The final Phase 1A preflight found no intervening Production change: all ten
+public-table count/hash pairs and all 20 real-user UUIDs matched the fresh
+Local restore. P0 invariants remained intact, duplicate/null item-code counts
+were zero, the Factor F checksum remained
+`e8040ffbf82beebd61bbb9c2652dd41a`, and there were no unexpected active
+sessions.
+
+Migration `010_master_catalog_phase1a_versioning.sql` was applied through
+Supabase MCP and recorded as
+`20260621052517_master_catalog_phase1a_versioning`. The four `010a` concurrent
+indexes were executed one statement at a time outside a transaction and all
+reported `indisvalid=true` and `indisready=true`.
+
+Post-execution verification preserved `198` BOQs, `1,547` items, `217` routes,
+and `710` price rows. The default catalog is `2568.0.0`; unversioned BOQs,
+unversioned prices, missing standard-item categories, and cross-version items
+are all zero. Anonymous impersonation sees zero catalog/BOQ rows and cannot
+call the save RPC. Authenticated-admin read smoke passed, and a rollback-only
+insert using the pre-Phase-2 app payload received the default version without
+leaving a row behind.
+
+Production now waits at the Phase 2 application deploy gate. Do not apply
+`011_master_catalog_phase1b_hardening.sql` until the application is deployed,
+post-deploy workflow smoke passes, and delta reconciliation is zero again.

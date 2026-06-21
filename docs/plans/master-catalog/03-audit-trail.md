@@ -168,26 +168,31 @@
 | **v37** | **Phase 1A gates closed: fresh MCP logical snapshot restore/checksum ตรง Production ทั้ง 10 public tables; Next.js 16.2.9 + patched transitive overrides ผ่าน build/export smoke และ Production npm audit = 0** | ✅ |
 | **v37** | **Local rehearsal ครบ `009 -> 010 -> 010a -> Phase 2 -> 011`; rendered desktop/mobile, API/auth, immutable trigger, security advisor และ canonical bootstrap ผ่าน โดย Production ยังไม่ถูก apply** | ✅ |
 | **v37** | **ลดสิทธิ์ `prevent_boq_version_modification` จาก SECURITY DEFINER เป็น SECURITY INVOKER เพราะ trigger เปรียบเทียบเฉพาะ OLD/NEW และไม่ต้องใช้สิทธิ์ยกระดับ** | ✅ |
+| **v38** | **Production Phase 1A preflight ตรง fresh snapshot ครบ 10 public tables + ผู้ใช้จริง 20 ราย; duplicate/null = 0, Factor F checksum ตรง, active session = 0** | ✅ |
+| **v38** | **Apply/verify `010` ผ่าน Supabase MCP ledger `20260621052517`; backfill ครบ 198 BOQ / 710 price rows / 1,547 category snapshots และ cross-version mismatch = 0** | ✅ |
+| **v38** | **รัน `010a` แยก 4 คำสั่งแบบ concurrent นอก transaction; ทุก index `indisvalid=true` และ `indisready=true`** | ✅ |
+| **v38** | **Production impersonation smoke ผ่าน: anon เห็น 0 rows และ save ไม่ได้; authenticated admin เห็น default version/710 prices/198 BOQ; legacy-create rollback smoke ถูกผูก default version อัตโนมัติและไม่ทิ้งข้อมูล** | ✅ |
 
 ---
 
-## Execution Status (2026-06-05)
+## Execution Status (2026-06-21)
 
 | รายการ | สถานะ | หลักฐาน |
 |---|---|---|
 | Repository quality baseline | ✅ Merged to `main` | [PR #1](https://github.com/cloudstellar/conduit-boq/pull/1), merge commit `6d607f9` |
 | Factor F correction | ✅ Merged to `main` | Uses `factor_reference.factor`, live edit display, snapshot validation, fail-closed fallback |
 | Lint | ✅ Passed | `0` errors, `11` existing warnings |
-| Automated tests | ✅ Passed | `npm test`: `17` tests across `4` files |
+| Automated tests | ✅ Passed | `npm test`: `26/26` tests across `6` files |
 | Production build | ✅ Passed | `npm run build` |
-| GitHub Actions | ✅ Last recorded baseline passed | [Quality run #4](https://github.com/cloudstellar/conduit-boq/actions/runs/26770263106) on `main`: install, lint, test, build; run a fresh gate before production execution |
+| GitHub Actions | ✅ Draft PR gate passed | [Quality run #14](https://github.com/cloudstellar/conduit-boq/actions/runs/27894505228): install, lint, test, build |
 | Vercel Production deploy | ✅ Passed | Deployment status after merge commit `6d607f9` |
 | Credential hygiene | ✅ HEAD cleaned | Removed hardcoded legacy `anon` key from utility scripts; no tracked `.env` |
 | Catalog/reference recheck | ✅ Verified by Supabase MCP | `price_list` 710 rows, PN6 28 rows, `factor_reference` 37 rows, checksum `e8040ffbf82beebd61bbb9c2652dd41a` |
 | Catalog versioning ADR | ✅ Added | [ADR-003](../../02_architecture/ADR/ADR-003-master-catalog-rollout-and-version-numbering.md): start at `2568.0.0` |
 | Best-practices analysis | ✅ Added | [07-best-practices-analysis.md](./07-best-practices-analysis.md) |
-| P0 containment `009` | ⏳ Not applied | Production DB unchanged |
-| Master Catalog `010`, `010a`, `011` | ⏳ Not applied | Production DB unchanged |
+| P0 containment `009` | ✅ Applied/verified | Production ledger `20260621045208` |
+| Master Catalog `010` / `010a` | ✅ Applied/verified | Production ledger `20260621052517`; four concurrent indexes valid/ready |
+| Master Catalog `011` | ⏳ Deploy-gated | Wait for Phase 2 Production deploy, smoke, and delta reconciliation |
 
 The removed legacy `anon` key remains visible in earlier git history. It is a
 low-privilege public-client credential rather than a `service_role` secret, but

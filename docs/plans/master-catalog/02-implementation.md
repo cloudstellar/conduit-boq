@@ -16,8 +16,9 @@
 | Production DB migration `009` | ✅ Applied/verified 2026-06-21 ผ่าน Supabase MCP ledger `20260621045208` |
 | Fresh Phase 1A logical snapshot | ✅ Restored in Local; counts/checksums match all 10 Production public tables |
 | Production dependency gate | ✅ `npm audit --omit=dev` = 0; Next.js 16.2.9 build and Excel export smoke passed |
-| Production DB migration `010`-`011` | ⏳ ยังไม่ได้ apply |
-| ขั้นถัดไป | รัน final Phase 1A preflight แล้ว apply/verify `010` และ `010a` |
+| Production DB migration `010` / `010a` | ✅ Applied/verified 2026-06-21; ledger `20260621052517` และ concurrent indexes valid ครบ 4 ตัว |
+| Production DB migration `011` | ⏳ รอ Phase 2 application deploy และ post-deploy smoke ก่อน apply |
+| ขั้นถัดไป | รัน delta reconciliation แล้ว review/merge/deploy Draft PR #2; ห้าม apply `011` ก่อน post-deploy smoke ผ่าน |
 
 ---
 

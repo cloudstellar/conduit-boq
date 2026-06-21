@@ -555,7 +555,7 @@ Record actual query output, screenshots, and incident notes below during rollout
 | Vercel Production deploy | Passed after merge commit `6d607f9` |
 | CI workflow | Passed: [Quality run #4](https://github.com/cloudstellar/conduit-boq/actions/runs/26770263106) on `main`; install, lint, test, and build succeeded |
 | Credential hygiene | Removed hardcoded legacy Supabase `anon` key from utility scripts; no JWT literal or tracked `.env` remains in current HEAD |
-| `npm run audit:prod` | Review required: `9` production dependency findings (`4` moderate, `5` high) as rechecked 2026-06-21 |
+| `npm run audit:prod` | Passed after dependency remediation: `0` Production vulnerabilities |
 | Non-production rehearsal | Passed: local `009 -> 010 -> 010a -> Phase 2 -> 011`; canonical rebuild and post-hardening UI/API smoke passed |
 
 ### Factor F Correction - Merged 2026-06-05
@@ -576,11 +576,12 @@ zero vulnerabilities. The remaining upstream `xlsx` advisory has no registry
 fix and is excluded from the Production install; operational scripts must use
 trusted spreadsheet inputs only.
 
-Production migration `009` was applied and verified on 2026-06-21. Migrations
-`010`, `010a`, and `011` have not been applied, and the Phase 2 application has
-not been merged or deployed. The removed legacy `anon` key remains in earlier
-git history; historical invalidation requires a separately reviewed credential
-migration or rotation decision.
+Production migrations `009` and `010` were applied and verified on 2026-06-21;
+all four operational `010a` concurrent indexes are valid and ready. Migration
+`011` has not been applied, and the Phase 2 application has not been merged or
+deployed. The removed legacy `anon` key remains in earlier git history;
+historical invalidation requires a separately reviewed credential migration or
+rotation decision.
 
 ### Local Supabase Rehearsal - 2026-06-20
 
@@ -662,3 +663,46 @@ scrubbed auth UUID snapshot. Production and Local row counts and canonical
 row-checksums matched exactly for all public tables. The full Local path
 `009 -> 010 -> 010a -> 011`, local user seeding, auth smoke, and Phase 2
 workflow smoke then passed against that fresh data.
+
+### Production Phase 1A Execution - 2026-06-21
+
+Draft PR commit `500b107` passed [Quality run
+#14](https://github.com/cloudstellar/conduit-boq/actions/runs/27894505228) and
+Vercel Preview before the database execution window. The final read-only
+preflight then matched the fresh snapshot for all ten public tables and the 20
+non-local auth identities. It also confirmed zero duplicate/null item codes,
+28 PN6 rows, the approved Factor F checksum, no Phase 1A objects, intact P0
+security invariants, and zero unexpected active sessions.
+
+Migration `010_master_catalog_phase1a_versioning.sql` was applied through
+Supabase MCP with file SHA-256
+`0e16a5eecb3495ae4e90b35f4c5bee8d94d022c6c28307054f6f7aa403e43c24`.
+The remote migration ledger recorded
+`20260621052517_master_catalog_phase1a_versioning`. The four `010a` statements
+were then run separately with `CREATE INDEX CONCURRENTLY`, outside an explicit
+transaction as required by PostgreSQL.
+
+| Verification | Production result |
+|---|---:|
+| BOQ / items / routes / prices | `198` / `1,547` / `217` / `710` |
+| Active/default version | One `2568.0.0` |
+| Unversioned price rows / BOQs | `0` / `0` |
+| Missing standard-item categories | `0` |
+| Cross-version BOQ items | `0` |
+| Required concurrent indexes | `4`, all valid and ready |
+| Anonymous visibility | `0` versions, defaults, prices, and BOQs |
+| Anonymous save RPC | Rejected |
+| Authenticated admin visibility | `1` version, `1` default, `710` prices, `198` BOQs |
+| Existing-app create compatibility | Passed in rollback-only transaction; default version assigned automatically |
+| Rollback-smoke rows remaining | `0` |
+| Unexpected active sessions | `0` |
+
+The security advisor reported no new Phase 1A issue. Existing warnings remain
+for intentionally authenticated, internally guarded `SECURITY DEFINER` RPCs
+and disabled leaked-password protection. Although the inherited table ACL
+allows anonymous SELECT attempts on catalog tables, authenticated-only RLS
+policies returned zero rows for the anonymous impersonation smoke.
+
+The next gate is a delta reconciliation followed by review/merge/deploy of the
+Phase 2 application. Migration `011` remains blocked until the Production app
+deploy, post-deploy workflow smoke, and second delta reconciliation pass.
