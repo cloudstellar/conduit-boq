@@ -163,6 +163,7 @@
 | **v33** | **ปรับ ADR-003 ให้ปี segment แรกเป็นปีเริ่มใช้งานที่ owner กำหนด (`effective_be_year`) ไม่ใช่ปีจัดทำหรือปี deploy; สามารถกำหนดอนาคต เช่น `2570.0.0` ได้** | ✅ |
 | **v34** | **เพิ่ม item-code governance ใน ADR-003: `item_code` เป็น business key ไม่ใช่ลำดับแสดงผล, ห้ามแก้ active version ทับเงียบ ๆ, และการ renumber ต้องออก version พร้อม audit/mapping** | ✅ |
 | **v35** | **เพิ่ม future structured item-code scheme ใน ADR-003 เช่น `CIC-PVC-001`; ต้องมี segment dictionary, import validation, และ mapping จาก legacy code เมื่อ recode** | ✅ |
+| **v36** | **Production P0 applied/verified 2026-06-21: ปิด anonymous SECURITY DEFINER RPC, fixed save-RPC search path, ถอน dangerous table grants, ติดตั้ง BOQ RLS allowlist โดย counts ไม่เปลี่ยน; ledger `20260621045208`** | ✅ |
 | **v36** | **เพิ่ม best-practices analysis แยก: mapping Supabase/Postgres, Next.js, frontend/admin UI, alternatives, risk register, และ execution readiness checklist** | ✅ |
 | **v37** | **Local rehearsal ครบ `009 -> 010 -> 010a -> Phase 2 -> 011`; rendered desktop/mobile, API/auth, immutable trigger, security advisor และ canonical bootstrap ผ่าน โดย Production ยังไม่ถูก apply** | ✅ |
 | **v37** | **ลดสิทธิ์ `prevent_boq_version_modification` จาก SECURITY DEFINER เป็น SECURITY INVOKER เพราะ trigger เปรียบเทียบเฉพาะ OLD/NEW และไม่ต้องใช้สิทธิ์ยกระดับ** | ✅ |

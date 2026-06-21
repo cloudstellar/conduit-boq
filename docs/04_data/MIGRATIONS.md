@@ -1,7 +1,7 @@
 # Migrations
 ## Conduit BOQ System
 
-**Last Updated:** 2026-06-20
+**Last Updated:** 2026-06-21
 **Status:** Canonical
 
 ---
@@ -24,7 +24,7 @@
 | `007b_add_onboarding_completed.sql` | Add `onboarding_completed` column | **Applied (Manual Supplement)** |
 | `008_pending_user_status.sql` | Add `pending` to user status check constraint | **Applied** |
 | `008_rls_and_trigger.sql` | Consolidated RLS + org-lock trigger + admin RPC | **Applied** |
-| `009_master_catalog_p0_containment.sql` | Master Catalog v26 RPC containment + BOQ RLS tightening | **Draft** |
+| `009_master_catalog_p0_containment.sql` | Master Catalog v26 RPC containment + BOQ RLS tightening | **Applied to Production 2026-06-21** (`20260621045208`) |
 | `010_master_catalog_phase1a_versioning.sql` | Master Catalog v26 nullable versioning + historical backfill | **Draft** |
 | `010a_master_catalog_phase1a_indexes.sql` | Master Catalog v26 concurrent index runbook | **Draft** |
 | `011_master_catalog_phase1b_hardening.sql` | Master Catalog v26 BOQ version contract hardening | **Draft** |

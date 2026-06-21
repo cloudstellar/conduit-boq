@@ -114,3 +114,33 @@ Also verify:
 - Supabase security advisor no longer reports anonymous execution of the
   affected `SECURITY DEFINER` functions or a mutable save-RPC search path.
 - No Production app deployment occurred.
+
+## 6. Production execution result — 2026-06-21
+
+Migration 009 was applied through Supabase MCP at 11:52 ICT and recorded as
+`20260621045208_master_catalog_p0_containment`.
+
+| Verification | Result |
+|---|---:|
+| `boq` / `boq_items` / `boq_routes` / `price_list` | `198` / `1,547` / `217` / `710` (unchanged) |
+| Duplicate item codes | `0` |
+| BOQ/route/item policies | `12`, expected names exactly once |
+| `anon` save RPC execution | `false` |
+| Authenticated save RPC execution | `true` |
+| Save RPC auth guard | Present |
+| Save RPC `search_path` | Empty/fixed |
+| Anonymous legacy-helper execution | `false` for all seven helpers |
+| Dangerous API table grants | `0` |
+| Authenticated admin read smoke | `198` BOQs, `1,547` items, `217` routes |
+| Anonymous read smoke | `0` BOQs; save unavailable |
+| Unexpected active sessions | `0` |
+| Master Catalog Phase 1A objects | Absent, as required |
+
+The security advisor no longer reports anonymous execution of the affected
+`SECURITY DEFINER` functions or the mutable save-RPC search path. Remaining
+advisor warnings concern authenticated execution of intentionally callable
+guarded RPCs and disabled leaked-password protection; these are separate review
+items and did not block P0 containment.
+
+No data backfill, Phase 1A migration, application deployment, or Phase 1B
+hardening was performed in this window.

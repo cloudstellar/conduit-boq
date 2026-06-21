@@ -679,13 +679,13 @@ Applied / production-relevant according to `docs/04_data/MIGRATIONS.md`:
 | `008_pending_user_status.sql` | Applied | New signups default to pending |
 | `008_rls_and_trigger.sql` | Applied | Consolidated BOQ select RLS, org lock trigger, admin RPC |
 | `supabase/legacy_migrations/20260317_factor_f_supplement.sql` | Applied legacy artifact | Factor F snapshot columns and save RPC |
+| `009_master_catalog_p0_containment.sql` | Applied 2026-06-21 | RPC containment and tighter RLS/privileges; MCP ledger `20260621045208` |
 | `supabase/local/production-baseline.sql` | Local baseline only | Current schema snapshot for deterministic Local rebuilds; never pushed as a migration |
 
 Draft / planned:
 
 | File | Status | Summary |
 |---|---|---|
-| `009_master_catalog_p0_containment.sql` | Draft | RPC containment and tighter RLS/privileges |
 | `010_master_catalog_phase1a_versioning.sql` | Draft | Versioned price list schema and version-aware save RPC |
 | `010a_master_catalog_phase1a_indexes.sql` | Draft runbook | Concurrent indexes |
 | `011_master_catalog_phase1b_hardening.sql` | Draft | Enforce BOQ price list version and immutability |

@@ -1,6 +1,6 @@
 # Verification Report: Master Catalog v26
 
-**Status:** Full Local rollout rehearsal passed - production DB rollout not started
+**Status:** Production P0 applied and verified; Phase 1A/Phase 2/Phase 1B pending
 **Production project:** `otlssvssvgkohqwuuiir`
 **Related change request:** [04-change-request.md](./04-change-request.md)
 
@@ -9,7 +9,7 @@
 | Phase | Migration or deploy | Executor | Started | Completed | Result |
 |---|---|---|---|---|---|
 | Baseline | Read-only queries | Codex | 2026-06-01 | 2026-06-01 | Recorded |
-| P0 | `009_master_catalog_p0_containment.sql` |  |  |  | Pending |
+| P0 | `009_master_catalog_p0_containment.sql` | Codex via Supabase MCP | 2026-06-21 11:52 ICT | 2026-06-21 11:53 ICT | Applied and verified (`20260621045208`) |
 | Quality baseline | Lint, build, automated tests, CI workflow, Vercel deploy | Codex + Owner | 2026-06-01 | 2026-06-02 | Passed and merged to `main` |
 | Factor F correction | Application/docs update on `main` | Codex + Owner | 2026-06-05 | 2026-06-05 | Passed |
 | Local rehearsal | Production-schema snapshot + scrubbed auth/business data | Codex | 2026-06-20 | 2026-06-21 | `009 -> 010 -> 010a -> Phase 2 -> 011` passed |
@@ -572,9 +572,10 @@ Catalog feature implementation. The 2026-06-21 audit identified a forced
 Next.js upgrade path from `16.1.1` to `16.2.9`, breaking-path updates for other
 packages, and `xlsx` findings without an available registry fix.
 
-No Master Catalog migration (`009`, `010`, `010a`, or `011`) has been applied
-to the Production DB. The removed legacy `anon` key remains in earlier git
-history; historical invalidation requires a separately reviewed credential
+Production migration `009` was applied and verified on 2026-06-21. Migrations
+`010`, `010a`, and `011` have not been applied, and the Phase 2 application has
+not been merged or deployed. The removed legacy `anon` key remains in earlier
+git history; historical invalidation requires a separately reviewed credential
 migration or rotation decision.
 
 ### Local Supabase Rehearsal - 2026-06-20

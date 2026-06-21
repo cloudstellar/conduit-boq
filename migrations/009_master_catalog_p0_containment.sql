@@ -1,6 +1,7 @@
 -- =============================================================================
 -- Migration 009: Master Catalog P0 Containment
--- Status: DRAFT - REVIEW BEFORE PRODUCTION EXECUTION
+-- Status: APPLIED TO PRODUCTION 2026-06-21 11:52 ICT
+-- Supabase migration: 20260621045208_master_catalog_p0_containment
 -- Source: docs/plans/master-catalog/02-implementation.md (Revised v26)
 --
 -- Purpose:

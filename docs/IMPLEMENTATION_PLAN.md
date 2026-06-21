@@ -136,7 +136,7 @@ Catalog migration has been applied to the Production DB.
 | 007 | Onboarding columns | ✅ v1.2.0 |
 | 008 | RLS + Trigger + RPC | ✅ v1.2.0 |
 | 20260317_factor_f_supplement | Factor F Supplement snapshot | ✅ v1.5.0 |
-| 009_master_catalog_p0_containment | Master Catalog v26 RPC containment + BOQ RLS tightening | 📝 Draft |
+| 009_master_catalog_p0_containment | Master Catalog v26 RPC containment + BOQ RLS tightening | ✅ Production 2026-06-21 |
 | 010_master_catalog_phase1a_versioning | Master Catalog v26 nullable versioning + historical backfill | 📝 Draft |
 | 010a_master_catalog_phase1a_indexes | Master Catalog v26 concurrent index runbook | 📝 Draft |
 | 011_master_catalog_phase1b_hardening | Master Catalog v26 BOQ version contract hardening | 📝 Draft |

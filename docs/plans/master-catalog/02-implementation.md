@@ -2,19 +2,20 @@
 
 แผนพัฒนานี้จัดทำขึ้นจากข้อกำหนดการทบทวนของระบบและปรับโครงสร้างการเปลี่ยนผ่านทั้งหมดให้มี **ความปลอดภัยเป็นอันดับหนึ่ง (SRE-First Rollout)** เพื่อให้มั่นใจได้ 100% ว่าการจัดทำและเปลี่ยนผ่านระบบจะไม่ทำให้ผู้ใช้เดิมสร้าง คัดลอก หรือคำนวณราคาใบงานสะดุดล้มระหว่างช่วงเดปลอยการทำงาน
 
-## สถานะการดำเนินงานปัจจุบัน (2026-06-05)
+## สถานะการดำเนินงานปัจจุบัน (2026-06-21)
 
 | รายการ | สถานะ |
 |---|---|
 | Repository quality baseline | ✅ Merge เข้า `main` แล้วผ่าน [PR #1](https://github.com/cloudstellar/conduit-boq/pull/1), merge commit `6d607f9` |
 | Factor F correction | ✅ Merge เข้า `main` แล้ว: ใช้ `factor_reference.factor`, คำนวณสดในหน้า edit, validate snapshot สำหรับ print/export |
-| Quality checks | ✅ `npm run lint`, `npm test` (`17/17`), `npm run build`; [GitHub Actions Quality run #4](https://github.com/cloudstellar/conduit-boq/actions/runs/26770263106) เป็น baseline ที่ผ่านแล้ว |
+| Quality checks | ✅ lint 0 errors, tests `26/26`, production build และ Draft PR Quality CI ผ่าน |
 | Vercel Production deploy หลัง merge | ✅ ผ่าน |
 | Utility-script credential hygiene | ✅ ถอด hardcoded legacy Supabase `anon` key จาก HEAD แล้ว |
 | Catalog/reference recheck | ✅ Supabase MCP 2026-06-05: `price_list` 710 rows, PN6 28 rows, `factor_reference` 37 rows |
 | Catalog versioning ADR | ✅ [ADR-003](../../02_architecture/ADR/ADR-003-master-catalog-rollout-and-version-numbering.md): เริ่มที่ `2568.0.0` แบบ CalVer-first / SemVer-shaped |
-| Production DB migration `009`-`011` | ⏳ ยังไม่ได้ apply |
-| ขั้นถัดไป | เตรียม backup, non-production rehearsal และอนุมัติ P0 containment window |
+| Production DB migration `009` | ✅ Applied/verified 2026-06-21 ผ่าน Supabase MCP ledger `20260621045208` |
+| Production DB migration `010`-`011` | ⏳ ยังไม่ได้ apply |
+| ขั้นถัดไป | ทำ fresh logical snapshot, ปิด dependency gate และเตรียม Phase 1A (`010`) window |
 
 ---
 
