@@ -15,6 +15,8 @@ describe('Master Catalog migration contracts', () => {
     expect(sql).toContain("SET search_path = ''")
     expect(sql).toContain("GRANT EXECUTE ON FUNCTION public.save_boq_with_routes(uuid, jsonb, jsonb)\n  TO authenticated;")
     expect(sql).toContain("pg_has_role(current_user, 'supabase_admin', 'MEMBER')")
+    expect(sql).toContain("SET LOCAL lock_timeout = '10s'")
+    expect(sql).toContain("SET LOCAL statement_timeout = '60s'")
     expect(sql).not.toContain('CREATE TABLE IF NOT EXISTS public.price_list_versions')
   })
 
