@@ -45,5 +45,7 @@ describe('Master Catalog migration contracts', () => {
     expect(sql).toContain('ALTER COLUMN price_list_version_id SET NOT NULL')
     expect(sql).toContain('CREATE TRIGGER trigger_prevent_boq_version_modification')
     expect(sql).toContain('IF OLD.price_list_version_id IS DISTINCT FROM NEW.price_list_version_id THEN')
+    expect(sql).toContain('SECURITY INVOKER')
+    expect(sql).not.toContain('SECURITY DEFINER')
   })
 })

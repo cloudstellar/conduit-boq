@@ -70,7 +70,9 @@ COMMIT;
 CREATE OR REPLACE FUNCTION public.prevent_boq_version_modification()
 RETURNS trigger
 LANGUAGE plpgsql
-SECURITY DEFINER
+-- This trigger only compares OLD/NEW values and does not need elevated
+-- privileges. Keep it invoker-safe even though direct execution is revoked.
+SECURITY INVOKER
 SET search_path = ''
 AS $function$
 BEGIN
