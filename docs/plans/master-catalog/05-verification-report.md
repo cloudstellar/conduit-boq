@@ -615,7 +615,31 @@ items, 710 prices, zero invalid version/category rows, and the hardened
 contracts enabled.
 
 The final repository gate after the canonical rebuild passed lint with zero
-errors and 11 existing warnings, all 25 tests, TypeScript, and the production
+errors and 11 existing warnings, all 26 tests, TypeScript, and the production
 build. The production dependency audit remains a separate approval gate with
 four moderate and five high findings; no automatic dependency mutation was
 performed as part of the Master Catalog work.
+
+### Pre-merge Safety Audit - 2026-06-21
+
+The Draft PR was reviewed again before merge or Production execution. The
+schema-only Production snapshot was moved from `supabase/migrations/` to
+`supabase/local/production-baseline.sql`, removing it mechanically from the
+Supabase CLI remote migration ledger. The bootstrap now applies that baseline
+explicitly after a Local reset. This prevents an accidental `db push` from
+replaying the baseline and its historical grants against Production.
+
+Migration `011` was changed so the BOQ `NOT NULL` constraint, immutable-version
+function, privilege revocation, and trigger installation share one transaction.
+Any failure now rolls the hardening step back as a unit. Dashboard catalog
+metrics were also changed to show exact zero counts instead of the historical
+placeholder values `682` and `52`.
+
+The post-fix canonical rebuild passed in the order `baseline -> 009 -> 010 ->
+010a -> 011 -> Phase 2 smoke`. Final Local state remained 198 BOQs, 1,547 BOQ
+items, 217 routes, and 710 price rows, with zero unversioned BOQs, zero missing
+category snapshots, anonymous save-RPC access disabled, BOQ version `NOT NULL`,
+and the invoker-rights immutable trigger enabled. Tests passed 26/26, the
+production build passed, and lint remained at zero errors with 11 existing
+warnings. No Production database request, migration, merge, or deployment was
+performed during this audit.
