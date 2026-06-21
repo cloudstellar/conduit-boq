@@ -21,9 +21,10 @@ and removes every BOQ, route, and item that it creates.
 Run `npm run db:local:bootstrap` only when the local database should be rebuilt
 from the captured production snapshot. It resets the local database, restores
 business data and scrubbed auth metadata, applies Master Catalog migrations
-`009`, `010`, and `010a`, seeds local-only role accounts, and runs an auth smoke
-test. Migration `011` is intentionally excluded until the Phase 2 application
-is implemented and verified.
+`009`, `010`, `010a`, and `011`, seeds local-only role accounts, then runs auth
+and Master Catalog workflow smoke tests. The canonical rebuild includes `011`
+because the Phase 2 application and rendered Local UI were verified on
+2026-06-21.
 
 ```bash
 npm run db:local:bootstrap
@@ -51,11 +52,11 @@ Do not run `supabase link`, `supabase db push`, `supabase db pull`, or
 
 The canonical Local rebuild is `npm run db:local:bootstrap`. Migration history
 shows only `20260620100634_production_baseline.sql`; Master Catalog scripts
-`009`, `010`, and the four `010a` index statements are deliberately applied by
-the bootstrap script so they remain staged rollout artifacts rather than being
-mistaken for Production migration history. Consequently, `supabase db diff
---local` will show the rehearsed Master Catalog schema as drift from the
-baseline. Do not generate a new migration from that expected diff.
+`009`, `010`, the four `010a` index statements, and `011` are deliberately
+applied by the bootstrap script so they remain staged rollout artifacts rather
+than being mistaken for Production migration history. Consequently, `supabase
+db diff --local` will show the rehearsed Master Catalog schema as drift from
+the baseline. Do not generate a new migration from that expected diff.
 
 ## Test users
 

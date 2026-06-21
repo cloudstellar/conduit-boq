@@ -173,9 +173,10 @@ returns zero before Phase 1B.
 - [x] Factor F calculation correction merged to `main` and covered by tests/build.
 - [x] Latest `main` CI workflow passed in GitHub Actions.
 - [ ] `npm run audit:prod` findings are remediated or explicitly accepted.
-- [ ] The full Master Catalog rollout has been tested on a non-production
-  database. Local `009 -> 010 -> 010a` passed on 2026-06-20; Phase 2 application
-  integration and `011` remain pending.
+- [x] The full Master Catalog rollout has been tested on a non-production
+  database. Local `009 -> 010 -> 010a -> Phase 2 -> 011`, canonical rebuild,
+  API/auth smoke, desktop/mobile rendered QA, immutable-trigger test, and
+  security advisor passed on 2026-06-21.
 - [ ] Fresh preflight counts, integrity queries, and backups recorded before Phase 1A.
 - [ ] Full Factor F reference integrity checked through authenticated Supabase
   SQL/MCP before Phase 1A, including row count, null/duplicate checks, ordered

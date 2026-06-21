@@ -48,4 +48,12 @@ describe('Master Catalog migration contracts', () => {
     expect(sql).toContain('SECURITY INVOKER')
     expect(sql).not.toContain('SECURITY DEFINER')
   })
+
+  it('keeps the canonical Local bootstrap on the fully rehearsed path', () => {
+    const bootstrap = readFileSync(resolve(process.cwd(), 'scripts/bootstrap-local-db.sh'), 'utf8')
+
+    expect(bootstrap).toContain('migrations/011_master_catalog_phase1b_hardening.sql')
+    expect(bootstrap).toContain('psql -v ON_ERROR_STOP=1 -U postgres -d postgres -f /tmp/011.sql')
+    expect(bootstrap).toContain('npm run db:local:smoke-master-catalog')
+  })
 })
