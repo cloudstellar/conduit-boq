@@ -31,6 +31,7 @@ import { Loader2, Trash2, PanelLeftClose, PanelLeft, Copy } from 'lucide-react';
 
 interface MultiRouteEditorProps {
   boqId: string;
+  priceListVersionId: string;
   onSave: (routes: Route[], routeItems: Record<string, LineItem[]>) => Promise<void>;
   isSaving: boolean;
   /** Callback to pass calculated factor values up for snapshot saving */
@@ -71,7 +72,7 @@ const isSinglePipeItem = (itemName: string): boolean => {
   return /^งานวางท่อ\s+1-/.test(itemName) || /^งานดันท่อ.*1-/.test(itemName);
 };
 
-export default function MultiRouteEditor({ boqId, onSave, isSaving, onFactorCalculated }: MultiRouteEditorProps) {
+export default function MultiRouteEditor({ boqId, priceListVersionId, onSave, isSaving, onFactorCalculated }: MultiRouteEditorProps) {
   const supabase = useMemo(() => createClient(), []);
   const [routes, setRoutes] = useState<Route[]>([]);
   const [routeItems, setRouteItems] = useState<Record<string, LineItem[]>>({});
@@ -104,11 +105,13 @@ export default function MultiRouteEditor({ boqId, onSave, isSaving, onFactorCalc
     const loadData = async () => {
       try {
         // Load routes
-        const { data: routesData } = await supabase
+        const { data: routesData, error: routesError } = await supabase
           .from('boq_routes')
           .select('*')
           .eq('boq_id', boqId)
           .order('route_order');
+
+        if (routesError) throw routesError;
 
         if (routesData && routesData.length > 0) {
           setRoutes(routesData.map(r => ({
@@ -123,39 +126,29 @@ export default function MultiRouteEditor({ boqId, onSave, isSaving, onFactorCalc
           })));
           setActiveRouteId(routesData[0].id);
 
-          // Load items for each route
-          const itemsMap: Record<string, LineItem[]> = {};
-          for (const route of routesData) {
-            const { data: items } = await supabase
+          // Load independent route item sets in parallel.
+          const itemEntries = await Promise.all(routesData.map(async (route) => {
+            const { data: items, error: itemsError } = await supabase
               .from('boq_items')
-              .select('*, price_list(category)')
+              .select('*')
               .eq('route_id', route.id)
               .order('item_order');
-            // Flatten nested price_list.category into item.category
-            itemsMap[route.id] = (items || []).map((item: Record<string, unknown>) => {
-              const { price_list: pl, ...rest } = item;
-              return {
-                ...rest,
-                category: (pl as { category?: string } | null)?.category || null,
-              } as LineItem;
-            });
-          }
-          setRouteItems(itemsMap);
+
+            if (itemsError) throw itemsError;
+            return [route.id, (items || []) as LineItem[]] as const;
+          }));
+          setRouteItems(Object.fromEntries(itemEntries));
         } else {
           // Check for legacy items without route
-          const { data: legacyRaw } = await supabase
+          const { data: legacyRaw, error: legacyError } = await supabase
             .from('boq_items')
-            .select('*, price_list(category)')
+            .select('*')
             .eq('boq_id', boqId)
             .is('route_id', null)
             .order('item_order');
-          const legacyItems = (legacyRaw || []).map((item: Record<string, unknown>) => {
-            const { price_list: pl, ...rest } = item;
-            return {
-              ...rest,
-              category: (pl as { category?: string } | null)?.category || null,
-            } as LineItem;
-          });
+
+          if (legacyError) throw legacyError;
+          const legacyItems = (legacyRaw || []) as LineItem[];
 
           if (legacyItems && legacyItems.length > 0) {
             // Create default route for legacy items
@@ -644,6 +637,7 @@ export default function MultiRouteEditor({ boqId, onSave, isSaving, onFactorCalc
                   <div className="min-w-[800px]">
                     <LineItemsTable
                       items={activeRouteItems}
+                      priceListVersionId={priceListVersionId}
                       onAddItem={handleAddItem}
                       onUpdateQuantity={handleUpdateQuantity}
                       onUpdateRemarks={handleUpdateRemarks}

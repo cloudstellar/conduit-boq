@@ -134,6 +134,7 @@ export default function BOQListPage() {
           factor_f: originalBOQ.factor_f,
           total_with_factor_f: originalBOQ.total_with_factor_f,
           total_with_vat: originalBOQ.total_with_vat,
+          price_list_version_id: originalBOQ.price_list_version_id,
           status: 'draft',
           // Ownership: assign to current user
           created_by: authUser?.id || null,
@@ -205,6 +206,7 @@ export default function BOQListPage() {
             total_labor_cost: item.total_labor_cost,
             total_cost: item.total_cost,
             remarks: item.remarks,
+            category: item.category,
           }));
 
           const { error: itemsInsertError } = await supabase

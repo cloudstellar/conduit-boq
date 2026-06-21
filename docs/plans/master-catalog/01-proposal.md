@@ -67,14 +67,26 @@ BEGIN;
   -- ปิด default privileges สำหรับตารางใหม่ในอนาคตเพื่อความปลอดภัยขั้นสูงสุด
   ALTER DEFAULT PRIVILEGES FOR ROLE postgres IN SCHEMA public
     REVOKE TRUNCATE, REFERENCES, TRIGGER, MAINTAIN ON TABLES FROM PUBLIC, anon, authenticated;
-  ALTER DEFAULT PRIVILEGES FOR ROLE supabase_admin IN SCHEMA public
-    REVOKE TRUNCATE, REFERENCES, TRIGGER, MAINTAIN ON TABLES FROM PUBLIC, anon, authenticated;
 
   -- ปิด default privileges สำหรับฟังก์ชันใหม่ในอนาคต
   ALTER DEFAULT PRIVILEGES FOR ROLE postgres IN SCHEMA public
     REVOKE EXECUTE ON FUNCTIONS FROM PUBLIC, anon, authenticated;
-  ALTER DEFAULT PRIVILEGES FOR ROLE supabase_admin IN SCHEMA public
-    REVOKE EXECUTE ON FUNCTIONS FROM PUBLIC, anon, authenticated;
+  -- postgres บน Supabase ไม่ใช่สมาชิก supabase_admin จึงต้อง guard คำสั่ง
+  -- สำหรับ role นั้น มิฉะนั้น transaction จะล้มด้วย permission denied
+  DO $default_privileges$
+  BEGIN
+    IF current_user = 'supabase_admin'
+       OR pg_has_role(current_user, 'supabase_admin', 'MEMBER') THEN
+      EXECUTE 'ALTER DEFAULT PRIVILEGES FOR ROLE supabase_admin IN SCHEMA public
+        REVOKE TRUNCATE, REFERENCES, TRIGGER, MAINTAIN
+        ON TABLES FROM PUBLIC, anon, authenticated';
+      EXECUTE 'ALTER DEFAULT PRIVILEGES FOR ROLE supabase_admin IN SCHEMA public
+        REVOKE EXECUTE ON FUNCTIONS FROM PUBLIC, anon, authenticated';
+    ELSE
+      RAISE NOTICE 'Skipping supabase_admin defaults: % is not a member', current_user;
+    END IF;
+  END;
+  $default_privileges$;
   CREATE TABLE IF NOT EXISTS public.price_list_versions (
       id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
       major INTEGER NOT NULL CHECK (major >= 0),

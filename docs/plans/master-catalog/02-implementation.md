@@ -2,19 +2,24 @@
 
 แผนพัฒนานี้จัดทำขึ้นจากข้อกำหนดการทบทวนของระบบและปรับโครงสร้างการเปลี่ยนผ่านทั้งหมดให้มี **ความปลอดภัยเป็นอันดับหนึ่ง (SRE-First Rollout)** เพื่อให้มั่นใจได้ 100% ว่าการจัดทำและเปลี่ยนผ่านระบบจะไม่ทำให้ผู้ใช้เดิมสร้าง คัดลอก หรือคำนวณราคาใบงานสะดุดล้มระหว่างช่วงเดปลอยการทำงาน
 
-## สถานะการดำเนินงานปัจจุบัน (2026-06-05)
+## สถานะการดำเนินงานปัจจุบัน (2026-06-21)
 
 | รายการ | สถานะ |
 |---|---|
 | Repository quality baseline | ✅ Merge เข้า `main` แล้วผ่าน [PR #1](https://github.com/cloudstellar/conduit-boq/pull/1), merge commit `6d607f9` |
 | Factor F correction | ✅ Merge เข้า `main` แล้ว: ใช้ `factor_reference.factor`, คำนวณสดในหน้า edit, validate snapshot สำหรับ print/export |
-| Quality checks | ✅ `npm run lint`, `npm test` (`17/17`), `npm run build`; [GitHub Actions Quality run #4](https://github.com/cloudstellar/conduit-boq/actions/runs/26770263106) เป็น baseline ที่ผ่านแล้ว |
+| Quality checks | ✅ lint 0 errors, tests `26/26`, production build และ Draft PR Quality CI ผ่าน |
 | Vercel Production deploy หลัง merge | ✅ ผ่าน |
 | Utility-script credential hygiene | ✅ ถอด hardcoded legacy Supabase `anon` key จาก HEAD แล้ว |
 | Catalog/reference recheck | ✅ Supabase MCP 2026-06-05: `price_list` 710 rows, PN6 28 rows, `factor_reference` 37 rows |
 | Catalog versioning ADR | ✅ [ADR-003](../../02_architecture/ADR/ADR-003-master-catalog-rollout-and-version-numbering.md): เริ่มที่ `2568.0.0` แบบ CalVer-first / SemVer-shaped |
-| Production DB migration `009`-`011` | ⏳ ยังไม่ได้ apply |
-| ขั้นถัดไป | เตรียม backup, non-production rehearsal และอนุมัติ P0 containment window |
+| Production DB migration `009` | ✅ Applied/verified 2026-06-21 ผ่าน Supabase MCP ledger `20260621045208` |
+| Fresh Phase 1A logical snapshot | ✅ Restored in Local; counts/checksums match all 10 Production public tables |
+| Production dependency gate | ✅ `npm audit --omit=dev` = 0; Next.js 16.2.9 build and Excel export smoke passed |
+| Production DB migration `010` / `010a` | ✅ Applied/verified 2026-06-21; ledger `20260621052517` และ concurrent indexes valid ครบ 4 ตัว |
+| Production DB migration `011` | ⏳ รอ Phase 2 application deploy และ post-deploy smoke ก่อน apply |
+| Pre-deploy delta reconciliation | ✅ 0 unversioned BOQ/price, 0 missing category, 0 cross-version item, 1 active default |
+| ขั้นถัดไป | Review/merge/deploy Draft PR #2; ห้าม apply `011` ก่อน post-deploy smoke ผ่าน |
 
 ---
 
@@ -79,8 +84,17 @@
             -- Step 0: [v26] ปิด default EXECUTE grant สำหรับ function ใหม่ทั้งหมด สำหรับ PUBLIC, anon, และ authenticated ก่อนสร้างฟังก์ชันใดๆ
             ALTER DEFAULT PRIVILEGES FOR ROLE postgres IN SCHEMA public
               REVOKE EXECUTE ON FUNCTIONS FROM PUBLIC, anon, authenticated;
-            ALTER DEFAULT PRIVILEGES FOR ROLE supabase_admin IN SCHEMA public
-              REVOKE EXECUTE ON FUNCTIONS FROM PUBLIC, anon, authenticated;
+            DO $default_privileges$
+            BEGIN
+              IF current_user = 'supabase_admin'
+                 OR pg_has_role(current_user, 'supabase_admin', 'MEMBER') THEN
+                EXECUTE 'ALTER DEFAULT PRIVILEGES FOR ROLE supabase_admin IN SCHEMA public
+                  REVOKE EXECUTE ON FUNCTIONS FROM PUBLIC, anon, authenticated';
+              ELSE
+                RAISE NOTICE 'Skipping supabase_admin function defaults: % is not a member', current_user;
+              END IF;
+            END;
+            $default_privileges$;
 
             -- Step 1: [v20] REVOKE จากทุก role ก่อน (รวม authenticated เพื่อปิด exposure window)
             REVOKE EXECUTE ON FUNCTION public.save_boq_with_routes(uuid, jsonb, jsonb) FROM PUBLIC, anon, authenticated;
@@ -211,8 +225,18 @@
             -- [v26] ปิด default privileges ของตารางใหม่เพื่อไม่ให้ตารางแคตล็อกใหม่สืบทอดสิทธิ์เหล่านี้กลับมา
             ALTER DEFAULT PRIVILEGES FOR ROLE postgres IN SCHEMA public
               REVOKE TRUNCATE, REFERENCES, TRIGGER, MAINTAIN ON TABLES FROM PUBLIC, anon, authenticated;
-            ALTER DEFAULT PRIVILEGES FOR ROLE supabase_admin IN SCHEMA public
-              REVOKE TRUNCATE, REFERENCES, TRIGGER, MAINTAIN ON TABLES FROM PUBLIC, anon, authenticated;
+            DO $default_privileges$
+            BEGIN
+              IF current_user = 'supabase_admin'
+                 OR pg_has_role(current_user, 'supabase_admin', 'MEMBER') THEN
+                EXECUTE 'ALTER DEFAULT PRIVILEGES FOR ROLE supabase_admin IN SCHEMA public
+                  REVOKE TRUNCATE, REFERENCES, TRIGGER, MAINTAIN
+                  ON TABLES FROM PUBLIC, anon, authenticated';
+              ELSE
+                RAISE NOTICE 'Skipping supabase_admin table defaults: % is not a member', current_user;
+              END IF;
+            END;
+            $default_privileges$;
 
             -- Step 5: [v19] ถอนสิทธิ์ EXECUTE — แก้ signature และเพิ่มฟังก์ชันความปลอดภัยอื่นๆ ให้ครบถ้วนตาม DB จริง
             REVOKE EXECUTE ON FUNCTION public.admin_approve_user(uuid) FROM PUBLIC, anon;

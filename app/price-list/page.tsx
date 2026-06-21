@@ -4,6 +4,7 @@ import { useState, useEffect, useMemo } from 'react';
 import Link from 'next/link';
 import { createClient } from '@/lib/supabase/client';
 import { PriceListItem } from '@/lib/supabase';
+import { getActiveDefaultPriceListVersionId } from '@/lib/catalog/defaultVersion';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -54,18 +55,22 @@ export default function PriceListPage() {
   const [selectedCategory, setSelectedCategory] = useState<string>('');
   const [searchTerm, setSearchTerm] = useState('');
   const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        // Get all active items
-        const { data: itemsData } = await supabase
+        const defaultVersionId = await getActiveDefaultPriceListVersionId(supabase);
+        const { data: itemsData, error: itemsError } = await supabase
           .from('price_list')
           .select('*')
+          .eq('version_id', defaultVersionId)
           .eq('is_active', true)
           .order('category')
           .order('item_code');
+
+        if (itemsError) throw itemsError;
 
         if (itemsData) {
           setItems(itemsData);
@@ -76,6 +81,7 @@ export default function PriceListPage() {
         }
       } catch (err) {
         console.error('Error:', err);
+        setError(err instanceof Error ? err.message : 'ไม่สามารถโหลดบัญชีราคามาตรฐานได้');
       } finally {
         setIsLoading(false);
       }
@@ -160,6 +166,12 @@ export default function PriceListPage() {
           <h1 className="text-xl md:text-2xl font-bold text-gray-800">บัญชีราคามาตรฐาน ปี 2568</h1>
           <p className="text-sm md:text-base text-muted-foreground">รายการราคามาตรฐานงานก่อสร้างท่อร้อยสายสื่อสารใต้ดิน</p>
         </div>
+
+        {error && (
+          <div className="mb-4 rounded-md border border-red-200 bg-red-50 p-4 text-sm text-red-700">
+            {error}
+          </div>
+        )}
 
         {/* Filters */}
         <Card className="mb-4 md:mb-6">

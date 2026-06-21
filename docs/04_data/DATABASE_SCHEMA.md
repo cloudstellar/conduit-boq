@@ -352,7 +352,7 @@ idx_boq_items_route_id   ON boq_items(route_id)
 | `008_pending_user_status.sql` | Pending status for new users | ✅ Applied |
 | `008_rls_and_trigger.sql` | RLS + Trigger + RPC (v1.2.0) | ✅ Applied |
 | `20260317_factor_f_supplement.sql` | Factor F snapshot columns | ✅ Applied |
-| `009_master_catalog_p0_containment.sql` | Master Catalog RPC containment + BOQ RLS tightening | 📝 Draft |
+| `009_master_catalog_p0_containment.sql` | Master Catalog RPC containment + BOQ RLS tightening | ✅ Production 2026-06-21 |
 | `010_master_catalog_phase1a_versioning.sql` | Nullable catalog versioning + historical backfill | 📝 Draft |
 | `010a_master_catalog_phase1a_indexes.sql` | Concurrent index runbook | 📝 Draft |
 | `011_master_catalog_phase1b_hardening.sql` | BOQ version contract hardening | 📝 Draft |

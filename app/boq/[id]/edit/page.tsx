@@ -27,6 +27,7 @@ export default function EditBOQPage() {
     department: '',
   });
   const [boqContext, setBOQContext] = useState<BOQContext | null>(null);
+  const [priceListVersionId, setPriceListVersionId] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -58,6 +59,12 @@ export default function EditBOQPage() {
 
         if (boqError) throw boqError;
 
+        if (!boq.price_list_version_id) {
+          throw new Error('ใบประมาณราคานี้ยังไม่ได้ผูกกับเวอร์ชันราคากลาง');
+        }
+
+        setPriceListVersionId(boq.price_list_version_id);
+
         setProjectInfo({
           estimator_name: boq.estimator_name,
           document_date: boq.document_date,
@@ -75,7 +82,7 @@ export default function EditBOQPage() {
         });
       } catch (err) {
         console.error('Error fetching BOQ:', err);
-        setError('ไม่พบข้อมูล BOQ');
+        setError(err instanceof Error ? err.message : 'ไม่พบข้อมูล BOQ');
       } finally {
         setIsLoading(false);
       }
@@ -156,6 +163,7 @@ export default function EditBOQPage() {
           total_labor_cost: item.total_labor_cost,
           total_cost: item.total_cost,
           remarks: item.remarks,
+          category: item.category,
         })),
       }));
 
@@ -262,12 +270,15 @@ export default function EditBOQPage() {
           <hr className="my-6 md:my-8" />
 
           {/* Section 2: Multi-Route Editor */}
-          <MultiRouteEditor
-            boqId={boqId}
-            onSave={handleSave}
-            isSaving={isSaving}
-            onFactorCalculated={setFactorData}
-          />
+          {priceListVersionId && (
+            <MultiRouteEditor
+              boqId={boqId}
+              priceListVersionId={priceListVersionId}
+              onSave={handleSave}
+              isSaving={isSaving}
+              onFactorCalculated={setFactorData}
+            />
+          )}
         </div>
       </div>
     </div>

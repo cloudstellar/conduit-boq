@@ -5,6 +5,7 @@ import { createClient } from '@/lib/supabase/client';
 import { BOQ } from '@/lib/supabase';
 import { UserProfileWithOrg } from '@/lib/types/auth';
 import { PostgrestError } from '@supabase/supabase-js';
+import { getActiveDefaultPriceListVersionId } from '@/lib/catalog/defaultVersion';
 
 export interface DashboardStats {
   myBoqsCount: number;
@@ -43,17 +44,7 @@ export function useDashboardData(user: UserProfileWithOrg | null) {
     setError(null);
 
     try {
-      // 1. Fetch active standard items count using head count (highly optimized, no data transferred)
-      const priceItemsPromise = supabase
-        .from('price_list')
-        .select('id', { count: 'exact', head: true })
-        .eq('is_active', true);
-
-      // 2. Fetch categories count
-      const categoriesPromise = supabase
-        .from('price_list')
-        .select('category')
-        .eq('is_active', true);
+      const defaultVersionPromise = getActiveDefaultPriceListVersionId(supabase);
 
       // 3. Fetch BOQs created by this user
       // We retrieve only the exact columns required for layout metrics and listing
@@ -83,6 +74,21 @@ export function useDashboardData(user: UserProfileWithOrg | null) {
         teamBoqsPromise = query as unknown as Promise<{ data: TeamBOQData[] | null; error: PostgrestError | null }>;
       }
 
+      const defaultVersionId = await defaultVersionPromise;
+
+      // Fetch only the active default catalog. BOQ queries above are already in flight.
+      const priceItemsPromise = supabase
+        .from('price_list')
+        .select('id', { count: 'exact', head: true })
+        .eq('version_id', defaultVersionId)
+        .eq('is_active', true);
+
+      const categoriesPromise = supabase
+        .from('price_list')
+        .select('category')
+        .eq('version_id', defaultVersionId)
+        .eq('is_active', true);
+
       // Execute all queries in parallel to eliminate waterfall delays (async-parallel)
       const [priceItemsRes, categoriesRes, myBoqsRes, teamBoqsRes] = await Promise.all([
         priceItemsPromise,
@@ -93,20 +99,22 @@ export function useDashboardData(user: UserProfileWithOrg | null) {
 
       // Check for errors on critical requests
       if (priceItemsRes.error) throw priceItemsRes.error;
+      if (categoriesRes.error) throw categoriesRes.error;
       if (myBoqsRes.error) throw myBoqsRes.error;
 
-      // Extract price standard active items count, falling back to 682 if empty
-      const priceItemsCount = priceItemsRes.count !== null ? priceItemsRes.count : 682;
+      // The API request is an exact count; surface zero rather than masking an
+      // empty or misconfigured active catalog with a historical placeholder.
+      const priceItemsCount = priceItemsRes.count ?? 0;
 
       // Extract standard categories count dynamically
-      let priceCategoriesCount = 52;
+      let priceCategoriesCount = 0;
       if (categoriesRes.data) {
         const uniqueCategories = new Set(
           categoriesRes.data
             .map((item) => item.category)
             .filter((cat): cat is string => typeof cat === 'string' && cat.trim() !== '')
         );
-        priceCategoriesCount = uniqueCategories.size > 0 ? uniqueCategories.size : 52;
+        priceCategoriesCount = uniqueCategories.size;
       }
 
       // Process My BOQs metrics

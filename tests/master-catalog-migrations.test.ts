@@ -14,6 +14,9 @@ describe('Master Catalog migration contracts', () => {
     expect(sql).toContain("IF auth.uid() IS NULL THEN")
     expect(sql).toContain("SET search_path = ''")
     expect(sql).toContain("GRANT EXECUTE ON FUNCTION public.save_boq_with_routes(uuid, jsonb, jsonb)\n  TO authenticated;")
+    expect(sql).toContain("pg_has_role(current_user, 'supabase_admin', 'MEMBER')")
+    expect(sql).toContain("SET LOCAL lock_timeout = '10s'")
+    expect(sql).toContain("SET LOCAL statement_timeout = '60s'")
     expect(sql).not.toContain('CREATE TABLE IF NOT EXISTS public.price_list_versions')
   })
 
@@ -25,6 +28,7 @@ describe('Master Catalog migration contracts', () => {
     expect(sql).toContain('ADD COLUMN IF NOT EXISTS price_list_version_id uuid')
     expect(sql).not.toContain('ALTER COLUMN price_list_version_id SET NOT NULL')
     expect(sql).toContain('IF v_item_version IS DISTINCT FROM v_target_boq_version THEN')
+    expect(sql).toContain("pg_has_role(current_user, 'supabase_admin', 'MEMBER')")
     expect(sql).toContain('REVOKE INSERT, UPDATE, DELETE')
   })
 
@@ -43,5 +47,35 @@ describe('Master Catalog migration contracts', () => {
     expect(sql).toContain('ALTER COLUMN price_list_version_id SET NOT NULL')
     expect(sql).toContain('CREATE TRIGGER trigger_prevent_boq_version_modification')
     expect(sql).toContain('IF OLD.price_list_version_id IS DISTINCT FROM NEW.price_list_version_id THEN')
+    expect(sql).toContain('SECURITY INVOKER')
+    expect(sql).not.toContain('SECURITY DEFINER')
+    expect(sql.match(/^BEGIN;/gm)).toHaveLength(1)
+    expect(sql.match(/^COMMIT;/gm)).toHaveLength(1)
+    expect(sql.indexOf('CREATE TRIGGER trigger_prevent_boq_version_modification'))
+      .toBeLessThan(sql.indexOf('COMMIT;'))
+  })
+
+  it('keeps the canonical Local bootstrap on the fully rehearsed path', () => {
+    const bootstrap = readFileSync(resolve(process.cwd(), 'scripts/bootstrap-local-db.sh'), 'utf8')
+
+    expect(bootstrap).toContain('migrations/011_master_catalog_phase1b_hardening.sql')
+    expect(bootstrap).toContain('supabase/local/production-baseline.sql')
+    expect(bootstrap).toContain('PUBLIC_DATA_SNAPSHOT=')
+    expect(bootstrap).toContain('docker cp "$PUBLIC_DATA_SNAPSHOT"')
+    expect(bootstrap).toContain('psql -v ON_ERROR_STOP=1 -U postgres -d postgres -f /tmp/011.sql')
+    expect(bootstrap).toContain('npm run db:local:smoke-master-catalog')
+  })
+
+  it('keeps the Production snapshot outside the Supabase remote migration ledger', () => {
+    const baseline = resolve(process.cwd(), 'supabase', 'local', 'production-baseline.sql')
+    const remoteMigrationPath = resolve(
+      process.cwd(),
+      'supabase',
+      'migrations',
+      '20260620100634_production_baseline.sql',
+    )
+
+    expect(() => readFileSync(baseline, 'utf8')).not.toThrow()
+    expect(() => readFileSync(remoteMigrationPath, 'utf8')).toThrow()
   })
 })

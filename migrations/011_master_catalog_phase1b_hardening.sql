@@ -54,7 +54,7 @@ END;
 $assertions$;
 
 -- -----------------------------------------------------------------------------
--- 2. Require every BOQ to retain its catalog version.
+-- 2. Apply the BOQ version contract atomically.
 -- -----------------------------------------------------------------------------
 BEGIN;
   SET LOCAL lock_timeout = '10s';
@@ -62,7 +62,6 @@ BEGIN;
 
   ALTER TABLE public.boq
     ALTER COLUMN price_list_version_id SET NOT NULL;
-COMMIT;
 
 -- -----------------------------------------------------------------------------
 -- 3. Prevent historical BOQs from switching catalog versions.
@@ -70,7 +69,9 @@ COMMIT;
 CREATE OR REPLACE FUNCTION public.prevent_boq_version_modification()
 RETURNS trigger
 LANGUAGE plpgsql
-SECURITY DEFINER
+-- This trigger only compares OLD/NEW values and does not need elevated
+-- privileges. Keep it invoker-safe even though direct execution is revoked.
+SECURITY INVOKER
 SET search_path = ''
 AS $function$
 BEGIN
@@ -91,3 +92,5 @@ CREATE TRIGGER trigger_prevent_boq_version_modification
   BEFORE UPDATE ON public.boq
   FOR EACH ROW
   EXECUTE FUNCTION public.prevent_boq_version_modification();
+
+COMMIT;

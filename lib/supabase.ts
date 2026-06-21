@@ -16,6 +16,7 @@ export interface PriceListItem {
   unit_cost: number;
   remarks: string | null;
   category: string | null;
+  version_id: string;
   is_active: boolean;
   created_at: string;
   updated_at: string;
@@ -37,6 +38,7 @@ export interface BOQ {
   total_with_factor_f: number;
   total_with_vat: number;
   status: 'draft' | 'submitted' | 'approved';
+  price_list_version_id: string | null;
   created_at: string;
   updated_at: string;
 }
@@ -57,6 +59,20 @@ export interface BOQItem {
   total_labor_cost: number;
   total_cost: number;
   remarks: string | null;
+  category: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface PriceListVersion {
+  id: string;
+  major: number;
+  minor: number;
+  patch: number;
+  version_string: string;
+  name: string;
+  status: 'draft' | 'active' | 'archived';
+  is_default: boolean;
   created_at: string;
   updated_at: string;
 }

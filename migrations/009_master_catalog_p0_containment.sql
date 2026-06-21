@@ -1,6 +1,7 @@
 -- =============================================================================
 -- Migration 009: Master Catalog P0 Containment
--- Status: DRAFT - REVIEW BEFORE PRODUCTION EXECUTION
+-- Status: APPLIED TO PRODUCTION 2026-06-21 11:52 ICT
+-- Supabase migration: 20260621045208_master_catalog_p0_containment
 -- Source: docs/plans/master-catalog/02-implementation.md (Revised v26)
 --
 -- Purpose:
@@ -16,11 +17,23 @@
 
 BEGIN;
 
+SET LOCAL lock_timeout = '10s';
+SET LOCAL statement_timeout = '60s';
+
 -- Step 0: prevent new functions from inheriting broad API EXECUTE privileges.
 ALTER DEFAULT PRIVILEGES FOR ROLE postgres IN SCHEMA public
   REVOKE EXECUTE ON FUNCTIONS FROM PUBLIC, anon, authenticated;
-ALTER DEFAULT PRIVILEGES FOR ROLE supabase_admin IN SCHEMA public
-  REVOKE EXECUTE ON FUNCTIONS FROM PUBLIC, anon, authenticated;
+DO $default_privileges$
+BEGIN
+  IF current_user = 'supabase_admin'
+     OR pg_has_role(current_user, 'supabase_admin', 'MEMBER') THEN
+    EXECUTE 'ALTER DEFAULT PRIVILEGES FOR ROLE supabase_admin IN SCHEMA public
+      REVOKE EXECUTE ON FUNCTIONS FROM PUBLIC, anon, authenticated';
+  ELSE
+    RAISE NOTICE 'Skipping supabase_admin function defaults: % is not a member', current_user;
+  END IF;
+END;
+$default_privileges$;
 
 -- Step 1: close the current exposure window before replacing the RPC.
 REVOKE EXECUTE ON FUNCTION public.save_boq_with_routes(uuid, jsonb, jsonb)
@@ -213,9 +226,18 @@ REVOKE TRUNCATE, REFERENCES, TRIGGER, MAINTAIN
 ALTER DEFAULT PRIVILEGES FOR ROLE postgres IN SCHEMA public
   REVOKE TRUNCATE, REFERENCES, TRIGGER, MAINTAIN
   ON TABLES FROM PUBLIC, anon, authenticated;
-ALTER DEFAULT PRIVILEGES FOR ROLE supabase_admin IN SCHEMA public
-  REVOKE TRUNCATE, REFERENCES, TRIGGER, MAINTAIN
-  ON TABLES FROM PUBLIC, anon, authenticated;
+DO $default_privileges$
+BEGIN
+  IF current_user = 'supabase_admin'
+     OR pg_has_role(current_user, 'supabase_admin', 'MEMBER') THEN
+    EXECUTE 'ALTER DEFAULT PRIVILEGES FOR ROLE supabase_admin IN SCHEMA public
+      REVOKE TRUNCATE, REFERENCES, TRIGGER, MAINTAIN
+      ON TABLES FROM PUBLIC, anon, authenticated';
+  ELSE
+    RAISE NOTICE 'Skipping supabase_admin table defaults: % is not a member', current_user;
+  END IF;
+END;
+$default_privileges$;
 
 -- Step 5: close anonymous access to existing SECURITY DEFINER helpers.
 REVOKE EXECUTE ON FUNCTION public.admin_approve_user(uuid) FROM PUBLIC, anon;

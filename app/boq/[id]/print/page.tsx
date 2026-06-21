@@ -482,35 +482,24 @@ export default function PrintBOQPage() {
 
         if (routesData && routesData.length > 0) {
           setRoutes(routesData);
-          const itemsMap: Record<string, BOQItem[]> = {};
-          for (const route of routesData) {
-            const { data: items } = await supabase
+          const itemEntries = await Promise.all(routesData.map(async (route) => {
+            const { data: items, error: itemsError } = await supabase
               .from('boq_items')
-              .select('*, price_list(category)')
+              .select('*')
               .eq('route_id', route.id)
               .order('item_order');
-            itemsMap[route.id] = (items || []).map((item: Record<string, unknown>) => {
-              const { price_list: pl, ...rest } = item;
-              return {
-                ...rest,
-                category: (pl as { category?: string } | null)?.category || null,
-              } as BOQItem;
-            });
-          }
-          setRouteItems(itemsMap);
+            if (itemsError) throw itemsError;
+            return [route.id, (items || []) as BOQItem[]] as const;
+          }));
+          setRouteItems(Object.fromEntries(itemEntries));
         } else {
-          const { data: legacyRaw } = await supabase
+          const { data: legacyRaw, error: legacyError } = await supabase
             .from('boq_items')
-            .select('*, price_list(category)')
+            .select('*')
             .eq('boq_id', boqId)
             .order('item_order');
-          const legacyItems = (legacyRaw || []).map((item: Record<string, unknown>) => {
-            const { price_list: pl, ...rest } = item;
-            return {
-              ...rest,
-              category: (pl as { category?: string } | null)?.category || null,
-            } as BOQItem;
-          });
+          if (legacyError) throw legacyError;
+          const legacyItems = (legacyRaw || []) as BOQItem[];
           if (legacyItems && legacyItems.length > 0) {
             const defaultRoute: BOQRoute = {
               id: 'legacy',

@@ -2,7 +2,7 @@
 ## Conduit BOQ System
 
 > **Status:** CANONICAL  
-> **Last Updated:** 2026-05-30  
+> **Last Updated:** 2026-06-21
 > **Authority:** Definitive source for version numbers (sourced from package.json)
 
 ---
@@ -11,11 +11,11 @@
 
 | Layer | Technology | Version |
 |-------|------------|---------|
-| Framework | Next.js | 16.1.1 |
+| Framework | Next.js | 16.2.9 |
 | UI Library | React | 19.2.3 |
 | Language | TypeScript | 5.x |
 | Styling | Tailwind CSS | 4.x |
-| Database | PostgreSQL | 15.x (via Supabase) |
+| Database | PostgreSQL | 17.6 (via Supabase) |
 | Auth | Supabase Auth | latest |
 | Hosting | Vercel | - |
 
@@ -26,11 +26,11 @@
 ### Production
 | Package | Version | Purpose |
 |---------|---------|---------|
-| next | 16.1.1 | App framework |
+| next | 16.2.9 | App framework |
 | react | 19.2.3 | UI library |
 | @supabase/supabase-js | ^2.90.1 | Supabase client |
 | @supabase/ssr | ^0.8.0 | Supabase SSR |
-| xlsx | ^0.18.5 | Excel processing |
+| exceljs | ^4.4.0 | Production Excel export |
 
 ### Development
 | Package | Version | Purpose |
@@ -38,6 +38,7 @@
 | tailwindcss | ^4 | CSS framework |
 | typescript | ^5 | Type checking |
 | eslint | ^9 | Linting |
+| xlsx | 0.18.5 | Trusted-input local import/inspection scripts only |
 
 ---
 
