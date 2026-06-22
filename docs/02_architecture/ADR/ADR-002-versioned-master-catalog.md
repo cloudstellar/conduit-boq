@@ -1,10 +1,12 @@
 # ADR-002: Versioned Master Catalog With Singleton Default Pointer
 
-**Status:** Proposed
+**Status:** Accepted and implemented for Phase 0 → 1B
 **Date:** 2026-06-01
 **Decision Makers:** Owner, Development Team
-**Implementation status:** Repository quality baseline merged to `main` on
-2026-06-02; Production DB migrations `009`-`011` have not been applied.
+**Implementation status:** Production migrations `009`, `010`, four `010a`
+indexes, Phase 2 application, and `011` were applied/deployed and verified on
+2026-06-21. Phase 4 administration/publication is governed separately by
+[ADR-004](./ADR-004-phase4-catalog-governance-and-official-publication.md).
 
 ## Context
 
@@ -88,6 +90,7 @@ and explicit role grants.
 ## References
 
 - [ADR-003: Master Catalog Rollout Start and Version Numbering](./ADR-003-master-catalog-rollout-and-version-numbering.md)
+- [ADR-004: Phase 4 Catalog Governance and Official Publication](./ADR-004-phase4-catalog-governance-and-official-publication.md)
 - [Master Catalog proposal](../../plans/master-catalog/01-proposal.md)
 - [Master Catalog implementation plan](../../plans/master-catalog/02-implementation.md)
 - [Supabase Database Functions](https://supabase.com/docs/guides/database/functions)

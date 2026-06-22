@@ -37,18 +37,15 @@ Next.js 16 + React 19 + TypeScript + Tailwind CSS 4
 
 ---
 
-## 🚧 Phase 2: Modernization & Versioning (MASTER CATALOG v26 - PLANNED)
+## ✅ Phase 2: Modernization & Versioning (MASTER CATALOG v26 - COMPLETED)
 
 **Strategy:** Quality Baseline → P0 Containment → Nullable DB Setup → Application Integration → DB Hardening → Future Governance
 
-**Current rollout state (2026-06-05):** Repository quality baseline merged to
-`main` via [PR #1](https://github.com/cloudstellar/conduit-boq/pull/1) at
-`6d607f9`; [GitHub Actions Quality run #4](https://github.com/cloudstellar/conduit-boq/actions/runs/26770263106)
-and Vercel Production deploy passed. The Factor F correction is also on
-`main`: the application uses `factor_reference.factor` ("รวมในรูป Factor"),
-shows live edit-page calculation, validates saved snapshots for print/export,
-and fails closed when reference rows are unavailable. No Master Catalog
-migration has been applied to the Production DB.
+**Current rollout state (2026-06-22):** Production P0 → Phase 1A → Phase 2 →
+Phase 1B completed on 2026-06-21. The active/default version is `2568.0.0`
+with 710 rows. Migrations `009`, `010`, four operational `010a` indexes, and
+`011` are applied and verified; the version-aware Phase 2 application was
+merged through PR #2 and deployed to Vercel Production.
 
 Detailed execution plan: [Master Catalog v26](../plans/master-catalog/02-implementation.md)
 
@@ -68,24 +65,30 @@ Detailed execution plan: [Master Catalog v26](../plans/master-catalog/02-impleme
 ### 📅 Controlled Rollout
 
 1. ✅ Merge repository quality baseline: lint, build, automated tests, and CI workflow.
-2. Refresh authenticated preflight counts for BOQ, `price_list` 710 rows, PN6
+2. ✅ Refresh authenticated preflight counts for BOQ, `price_list` 710 rows, PN6
    28 rows, and full `factor_reference` table integrity.
-3. Apply P0 RPC containment and tightened BOQ RLS.
-4. Confirm latest `main` CI and dependency-audit disposition before catalog schema work.
-5. Apply Phase 1A nullable catalog schema, pointer table, backfill, and version-aware RPC.
-6. Create concurrent indexes from the separate `010a` runbook.
-7. Deploy create, duplicate, edit, print, dashboard, and price-list integration updates.
-8. Run smoke tests and delta backfill verification.
-9. Apply Phase 1B `NOT NULL` and immutable-version hardening.
+3. ✅ Apply P0 RPC containment and tightened BOQ RLS.
+4. ✅ Confirm `main` CI and remediate Production dependency audit.
+5. ✅ Apply Phase 1A nullable catalog schema, pointer, backfill, and RPC.
+6. ✅ Create and verify four concurrent indexes from `010a`.
+7. ✅ Deploy version-aware create/duplicate/edit/print/dashboard/price-list flows.
+8. ✅ Run smoke tests and delta reconciliation.
+9. ✅ Apply Phase 1B `NOT NULL` and immutable-version hardening.
 
-### 🔐 Future Governance
+### 🚧 Phase 4: Catalog Administration and Official Publication (PLANNED)
 
-Admin import, catalog clone, default swap, and audit-trigger flows require a
-separate Phase 4 change request.
+Admin manual change/import, stable identity, item history, catalog publish,
+official stamped Excel/PDF, and audited pointer restore require the separate
+[Phase 4 Change Request](../plans/master-catalog/09-phase4-change-request.md).
+Implementation/local rehearsal, Production migration, deploy, enablement, and
+publication each have explicit approval gates.
+
+Start review from the
+[Phase 4 Review Guide](../plans/master-catalog/00-phase4-review-guide.md).
 
 ---
 
-## 🔮 Phase 3: Enhancement (FUTURE)
+## 🔮 Product Enhancement Track (FUTURE; separate from Catalog Phase 4)
 
 - [ ] Approval workflow (draft → approved)
 - [ ] Notifications
@@ -103,9 +106,9 @@ separate Phase 4 change request.
 | 008 | RLS + Trigger + RPC | ✅ v1.2.0 |
 | 20260317_factor_f_supplement | Factor F Supplement snapshot | ✅ v1.5.0 |
 | 009_master_catalog_p0_containment | Master Catalog v26 RPC containment + BOQ RLS tightening | ✅ Production 2026-06-21 |
-| 010_master_catalog_phase1a_versioning | Master Catalog v26 nullable versioning + historical backfill | 📝 Draft |
-| 010a_master_catalog_phase1a_indexes | Master Catalog v26 concurrent index runbook | 📝 Draft |
-| 011_master_catalog_phase1b_hardening | Master Catalog v26 BOQ version contract hardening | 📝 Draft |
+| 010_master_catalog_phase1a_versioning | Master Catalog v26 nullable versioning + historical backfill | ✅ Production 2026-06-21 |
+| 010a_master_catalog_phase1a_indexes | Master Catalog v26 concurrent index runbook | ✅ 4 indexes valid/ready 2026-06-21 |
+| 011_master_catalog_phase1b_hardening | Master Catalog v26 BOQ version contract hardening | ✅ Production 2026-06-21 |
 
 ---
 

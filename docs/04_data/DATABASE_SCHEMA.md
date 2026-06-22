@@ -1,7 +1,7 @@
 # Database Schema
 ## Conduit BOQ System
 
-**Last Updated:** 2026-05-30  
+**Last Updated:** 2026-06-22
 **Status:** Canonical  
 **Database:** PostgreSQL 17 (Supabase)
 
@@ -353,9 +353,9 @@ idx_boq_items_route_id   ON boq_items(route_id)
 | `008_rls_and_trigger.sql` | RLS + Trigger + RPC (v1.2.0) | ✅ Applied |
 | `20260317_factor_f_supplement.sql` | Factor F snapshot columns | ✅ Applied |
 | `009_master_catalog_p0_containment.sql` | Master Catalog RPC containment + BOQ RLS tightening | ✅ Production 2026-06-21 |
-| `010_master_catalog_phase1a_versioning.sql` | Nullable catalog versioning + historical backfill | 📝 Draft |
-| `010a_master_catalog_phase1a_indexes.sql` | Concurrent index runbook | 📝 Draft |
-| `011_master_catalog_phase1b_hardening.sql` | BOQ version contract hardening | 📝 Draft |
+| `010_master_catalog_phase1a_versioning.sql` | Nullable catalog versioning + historical backfill | ✅ Production 2026-06-21 |
+| `010a_master_catalog_phase1a_indexes.sql` | Concurrent index runbook | ✅ 4 indexes valid/ready 2026-06-21 |
+| `011_master_catalog_phase1b_hardening.sql` | BOQ version contract hardening | ✅ Production 2026-06-21 |
 
 ---
 
@@ -367,10 +367,14 @@ idx_boq_items_route_id   ON boq_items(route_id)
 
 ---
 
-## 🔮 Master Catalog v26 Schema Preview (PLANNED)
+## Master Catalog v26 Implemented Baseline
 
-Executable drafts remain subject to non-production testing before approval.
-See [MIGRATIONS.md](./MIGRATIONS.md) for the migration ledger and naming rules.
+The Phase 1A/1B baseline below is implemented in Production. Phase 4 identity,
+code registry, versioned categories, imports/change sets, and publication
+metadata remain proposed under
+[ADR-004](../02_architecture/ADR/ADR-004-phase4-catalog-governance-and-official-publication.md)
+and must not be described as deployed until its migration is executed and
+verified. See [MIGRATIONS.md](./MIGRATIONS.md) for the migration ledger.
 
 ### NEW: price_list_versions
 | Column | Type | Description |

@@ -1,11 +1,12 @@
 # ADR-003: Master Catalog Rollout Start and Version Numbering
 
-**Status:** Accepted for planning; production rollout still requires execution approval
+**Status:** Accepted; Production baseline rollout implemented
 **Date:** 2026-06-05
 **Decision Makers:** Owner, Development Team
-**Implementation status:** Documentation preflight refreshed from current
-codebase and Supabase MCP evidence. Production DB migrations `009`-`011` have
-not been applied.
+**Implementation status:** Production `2568.0.0`, singleton pointer, Phase 2
+application, and Phase 1B hardening were applied/deployed and verified on
+2026-06-21. The first proposed structured-code release `2568.1.0` remains
+unpublished Phase 4 scope under ADR-004 and requires owner approval.
 
 ---
 
@@ -243,6 +244,7 @@ production release.
 ## References
 
 - [ADR-002: Versioned Master Catalog With Singleton Default Pointer](./ADR-002-versioned-master-catalog.md)
+- [ADR-004: Phase 4 Catalog Governance and Official Publication](./ADR-004-phase4-catalog-governance-and-official-publication.md)
 - [Master Catalog implementation plan](../../plans/master-catalog/02-implementation.md)
 - [Master Catalog change request](../../plans/master-catalog/04-change-request.md)
 - [Master Catalog verification report](../../plans/master-catalog/05-verification-report.md)

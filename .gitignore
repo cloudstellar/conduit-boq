@@ -24,6 +24,9 @@
 .DS_Store
 *.pem
 
+# Local-only NT brand source files; commit only reviewed runtime derivatives.
+/CI/
+
 # debug
 npm-debug.log*
 yarn-debug.log*

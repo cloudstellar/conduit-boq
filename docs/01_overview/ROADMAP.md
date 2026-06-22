@@ -1,85 +1,112 @@
 # Roadmap
 ## Conduit BOQ System
 
-**Last Updated:** 2026-01-20
+**Last Updated:** 2026-06-22
 
 ---
 
-## Overview
+## Current position
 
-```
-Phase 1 (v1.2.0)   │  Phase 2 (FROZEN)           │  Phase 3+
-Foundation         │  Modernization              │  Enhancement
-───────────────────│─────────────────────────────│────────────────
-✅ Auth            │  2A: Foundation             │  Approval workflow
-✅ BOQ CRUD        │  2B: Reporting              │  Notifications
-✅ Multi-Route     │  2C: Smart Estimation       │  Mobile/PWA
-✅ Price List      │  2D: Governance             │  Analytics
-✅ Factor F        │                             │
-✅ RLS             │                             │
-✅ Admin Panel     │                             │
+```text
+Foundation             Master Catalog baseline       Master Catalog Phase 4
+COMPLETED               COMPLETED 2026-06-21          PLANNED / OWNER REVIEW
+───────────────────     ─────────────────────────     ─────────────────────────
+Auth + RLS              P0 security containment      Admin manual/import
+BOQ + Multi-route       Version 2568.0.0             Stable identity/history
+710-price catalog       Singleton default pointer    Publish + official export
+Factor F snapshots      Version-locked BOQs          Audited pointer restore
+Admin onboarding        Phase 1B hardening           NT CI catalog UI
 ```
 
----
+Product enhancements such as notification, PWA, smart estimation, and wider
+approval workflows are a separate future track. They are not prerequisites for
+Master Catalog Phase 4 and should not be confused with its phase numbering.
 
-## Phase 1: Foundation ✅ v1.2.0
+## Foundation — completed
 
-- [x] Supabase Auth (Email/Password) + Domain restriction
-- [x] RLS + RBAC
-- [x] BOQ CRUD + Multi-route
-- [x] Price List (682 items)
-- [x] Factor F + VAT
-- [x] Admin Panel + Pending user approval
-- [x] Onboarding flow
+- [x] Supabase Auth and domain restriction
+- [x] RLS, RBAC, onboarding, and pending-user administration
+- [x] BOQ CRUD and multi-route support
+- [x] Current Price List: 710 items
+- [x] Factor F/VAT and saved calculation snapshots
+- [x] BOQ PDF/Excel output
 
----
+## Master Catalog baseline — completed
 
-## Phase 2: Modernization (FROZEN)
+Completed in Production on 2026-06-21:
 
-**Strategy:** Foundation → Output → Input → Governance
+- [x] P0 anonymous RPC/security containment
+- [x] `price_list_versions`
+- [x] `price_list_default_version` singleton pointer
+- [x] Current `2568.0.0` with 710 rows
+- [x] Version-aware BOQ create/edit/duplicate/print/price-list/dashboard flows
+- [x] Historical category snapshots
+- [x] Immutable BOQ catalog version
+- [x] Phase 1B `NOT NULL` hardening
+- [x] Local Production-data rehearsal and Production verification
 
-### 2A: Foundation ⛔ Infra only
-- [ ] shadcn/ui + Sidebar layout
-- [ ] `price_list_versions` table
-- [ ] Versioned pricing (2568, 2569...)
-- [ ] Immutable BOQ version
-- [ ] `price_list_default_version` singleton pointer
-- [ ] `price_list_audit_logs` table (audit triggers in Phase 4)
+Evidence: [Master Catalog verification report](../plans/master-catalog/05-verification-report.md).
 
-### 2B: Reporting
-- [ ] Summary per Dept/Sector
-- [ ] PDF Export
-- [ ] Copy/Requote dropdown
-- [ ] Missing price handling
+## Master Catalog Phase 4 — planned, not started
 
-### 2C: Smart Estimation
-- [ ] Model-based BOQ generation
-- [ ] Wizard UI
-- [ ] Output overridable
+### Phase 4-0: decisions and safety
 
-### 2D: Governance
-- [ ] BOQ Audit Log
-- [ ] Version Comparison
+- [ ] Owner approves ADR-004 and Phase 4 Change Request
+- [ ] Approve AAA/TTT dictionary
+- [ ] Approve 710-row reconciliation outcomes
+- [ ] Resolve duplicate and 16 HDPE Crossing conflicts
+- [ ] Verify backup/restore and fresh Local rehearsal base
 
----
+### Phase 4A: additive data foundation
 
-## Phase 3+: Enhancement (FUTURE)
+- [ ] Stable item identity and append-only code registry
+- [ ] Versioned categories and code groups
+- [ ] Import/change-set/full-snapshot audit tables
+- [ ] Approval/hash/count/lineage/lock metadata
+- [ ] Explicit grants, RLS, private functions, indexes, and constraints
 
-- [ ] Approval workflow (draft → submitted → approved/rejected)
-- [ ] Notifications
-- [ ] PWA / Offline
-- [ ] Analytics
+### Phase 4B: application and official outputs
 
----
+- [ ] NT CI-compliant catalog administration UI
+- [ ] Manual add/edit/retire/recode without Excel
+- [ ] Fixed-profile Full/Supplement import and row diff
+- [ ] Item history across versions/recodes
+- [ ] Evidence-gated immutable publish
+- [ ] Official stamped Excel/PDF with dataset hash
+- [ ] Audited pointer restore
 
-## Key Integrity Rules (Phase 2)
+### Phase 4C: rehearsal and controlled Production rollout
 
-**Rule A: Versioning**
-- One default, must be active
-- Active-only BOQ creation
-- Immutable version_id
-- UNIQUE (version_id, item_code)
+- [ ] Clean Local reset and complete workflow rehearsal
+- [ ] Production additive migration with feature flag disabled
+- [ ] Compatible application deploy and admin-only smoke
+- [ ] Explicit feature-enable approval
+- [ ] Explicit named-version publish approval
+- [ ] Export/backup/verification/release-note closeout
 
-**Rule B: Snapshot**
-- BOQ = Frozen after creation
-- Model changes don't affect existing BOQs
+Plan and approval documents:
+
+- [Phase 4 review guide](../plans/master-catalog/00-phase4-review-guide.md)
+- [Phase 4 architecture plan](../plans/master-catalog/08-phase4-architecture-ci-plan.md)
+- [Phase 4 Change Request](../plans/master-catalog/09-phase4-change-request.md)
+- [ADR-004](../02_architecture/ADR/ADR-004-phase4-catalog-governance-and-official-publication.md)
+
+## Deferred Phase 4.2
+
+- BOQ Rebase UI
+- Additional parser profiles/generic mapping only when justified
+- Server pagination after measured threshold
+- Removal of legacy compatibility columns after a stable cycle
+- Wider unrelated CI migration
+- K-formula publication under a separate governance decision
+
+## Future product enhancements
+
+- Approval workflow beyond the current single authorized catalog publisher
+- Notifications
+- PWA/offline support
+- Smart/model-assisted estimation
+- Organization analytics and management reporting
+
+Each future capability requires its own scope, security/data review, tests, and
+approval; none is implied by approval of Master Catalog Phase 4.

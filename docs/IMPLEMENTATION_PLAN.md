@@ -37,18 +37,14 @@ Next.js 16 + React 19 + TypeScript + Tailwind CSS 4
 
 ---
 
-## 🚧 Phase 2: Modernization & Versioning (SRE-Hardened - PLANNED)
+## ✅ Phase 2: Modernization & Versioning (COMPLETED 2026-06-21)
 
 **Strategy:** Quality Baseline → P0 Containment → Foundation (DB) → Integration (Codebase) → Hardening (Locks) → Governance (Admin GUI)
 
-**Current rollout state (2026-06-05):** Repository quality baseline merged to
-`main` via [PR #1](https://github.com/cloudstellar/conduit-boq/pull/1) at
-`6d607f9`; [GitHub Actions Quality run #4](https://github.com/cloudstellar/conduit-boq/actions/runs/26770263106)
-and Vercel Production deploy passed. The Factor F correction is also on
-`main`: the application now uses `factor_reference.factor` ("รวมในรูป Factor"),
-shows the edit-page Factor F immediately, validates saved snapshots for
-print/export, and fails closed when reference rows are unavailable. No Master
-Catalog migration has been applied to the Production DB.
+**Current rollout state (2026-06-22):** P0 → Phase 1A → Phase 2 → Phase 1B is
+complete in Production. Active/default version `2568.0.0` contains 710 rows;
+the version-aware application and hardening are deployed and verified. See the
+[Production verification report](./plans/master-catalog/05-verification-report.md).
 
 ### 🔐 Key Integrity & Security Rules (Revised v26)
 
@@ -85,7 +81,7 @@ Catalog migration has been applied to the Production DB.
 
 ### 📅 Phase 2 Rollout Plan (5-Step Roadmap)
 
-#### **Phase 0: Preflight Verification**
+#### **Phase 0: Preflight Verification — completed**
 - Run counts and integrity checks on current production BOQ rows.
 - Refresh `price_list` count, including PN6 rows, through authenticated
   Supabase SQL/MCP immediately before P0 and again before Phase 1A.
@@ -95,31 +91,35 @@ Catalog migration has been applied to the Production DB.
   a smoke example, not the whole gate.
 - Verify existing RLS structures.
 
-#### **Phase 1A: Database Setup (Defensive Nullable Setup)**
+#### **Phase 1A: Database Setup — completed**
 - Run rerunnable DDL scripts to create `price_list_versions`, `price_list_default_version`, and `price_list_audit_logs`.
 - Add nullable version columns and drop old global item code unique constraint.
 - Deploy SRE triggers, RPCs, fallback snapshotters, and explicit role permissions (`GRANT`/`REVOKE`).
 - Run historical backfill and snapshot recovery scripts.
 
-#### **Phase 2: Codebase Deployment & Integration**
+#### **Phase 2: Codebase Deployment & Integration — completed**
 - Propagate version ID: `MultiRouteEditor` -> `LineItemsTable` -> `ItemSearch` (with version search constraints).
 - Update BOQ duplication in `app/boq/page.tsx` to copy `price_list_version_id` and snapshotted categories.
 - Remove dynamic `.select('*, price_list(category)')` JOIN from print page (`print/page.tsx`) and editor (`MultiRouteEditor.tsx`).
 - Update dashboard hook (`useDashboardData.ts`) and `/price-list` page queries to filter by active default version.
 
-#### **Phase 3: Database Hardening (Phase 1B)**
+#### **Phase 1B: Database Hardening — completed**
 - Verify zero NULL snapshots via SRE-corrected query (excluding manual custom items).
 - Set `boq.price_list_version_id` to `NOT NULL`.
 - Enable `trigger_prevent_boq_version_modification` to seal historical BOQ version states.
 
-#### **Phase 4: Admin GUI & Governance Tools**
-- Build admin price upload and Excel parsing preview (using deterministic index-based array parser).
-- Connect high-performance DB functions `clone_price_list_version` and `make_version_default` to admin state buttons.
-- Display `price_list_audit_logs` tracking price change histories.
+#### **Phase 4: Catalog Administration & Official Publication — planned**
+
+The earlier three-bullet GUI sketch is superseded by the reviewed
+[Revision 8 architecture plan](./plans/master-catalog/08-phase4-architecture-ci-plan.md)
+and [Phase 4 Change Request](./plans/master-catalog/09-phase4-change-request.md).
+Phase 4 now includes stable identity, manual and fixed-profile Excel changes,
+full item history, immutable publish, official hashed Excel/PDF, and audited
+pointer restore. It has not started and requires owner approval.
 
 ---
 
-## 🔮 Phase 3: Enhancement (FUTURE)
+## 🔮 Product Enhancement Track (FUTURE; separate from Catalog Phase 4)
 
 - [ ] Approval workflow (draft → approved)
 - [ ] Notifications
@@ -137,9 +137,9 @@ Catalog migration has been applied to the Production DB.
 | 008 | RLS + Trigger + RPC | ✅ v1.2.0 |
 | 20260317_factor_f_supplement | Factor F Supplement snapshot | ✅ v1.5.0 |
 | 009_master_catalog_p0_containment | Master Catalog v26 RPC containment + BOQ RLS tightening | ✅ Production 2026-06-21 |
-| 010_master_catalog_phase1a_versioning | Master Catalog v26 nullable versioning + historical backfill | 📝 Draft |
-| 010a_master_catalog_phase1a_indexes | Master Catalog v26 concurrent index runbook | 📝 Draft |
-| 011_master_catalog_phase1b_hardening | Master Catalog v26 BOQ version contract hardening | 📝 Draft |
+| 010_master_catalog_phase1a_versioning | Master Catalog v26 nullable versioning + historical backfill | ✅ Production 2026-06-21 |
+| 010a_master_catalog_phase1a_indexes | Master Catalog v26 concurrent index runbook | ✅ 4 indexes valid/ready 2026-06-21 |
+| 011_master_catalog_phase1b_hardening | Master Catalog v26 BOQ version contract hardening | ✅ Production 2026-06-21 |
 
 ---
 

@@ -2,7 +2,7 @@
 ## Conduit BOQ System
 
 > **Status:** CANONICAL
-> **Last Updated:** 2026-06-02
+> **Last Updated:** 2026-06-22
 
 ---
 
@@ -24,10 +24,15 @@ Vercel deploy must never be treated as evidence that a migration was applied.
 
 ## 3. Master Catalog Baseline
 
-As of 2026-06-02, [PR #1](https://github.com/cloudstellar/conduit-boq/pull/1)
-has been merged to `main` at `6d607f9`, and Vercel Production deployment
-passed. [GitHub Actions Quality run #4](https://github.com/cloudstellar/conduit-boq/actions/runs/26770263106)
-also passed. Master Catalog migrations `009`-`011` have not been applied.
+As of 2026-06-21, Production Master Catalog Phase 0 → 1A → 2 → 1B is complete.
+Migrations `009`, `010`, four operational `010a` indexes, and `011` were
+applied/verified; Phase 2 was merged through PR #2 and deployed by Vercel.
+See the [verification report](../plans/master-catalog/05-verification-report.md).
+
+Phase 4 administration/publication has not started. It has a separate
+[Change Request](../plans/master-catalog/09-phase4-change-request.md), owner
+approval gates, feature flag, rehearsal, migration, deploy, and publication
+decisions. Approval of Phase 4 planning does not authorize Production work.
 
 ## 4. Versioning
 

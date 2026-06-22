@@ -1,6 +1,6 @@
 # Change Request: Master Catalog v26 Rollout
 
-**Status:** Draft for P0 owner approval - Factor F hotfix merged, production DB unchanged
+**Status:** Completed in Production on 2026-06-21; Phase 4 excluded
 **Requested date:** 2026-06-01
 **Change type:** Database security containment and phased catalog versioning
 **Production project:** `otlssvssvgkohqwuuiir`
@@ -11,6 +11,15 @@ Deploy the DB-verified Master Catalog v26 plan in controlled phases. The first
 phase closes an existing anonymous `SECURITY DEFINER` RPC exposure. Later phases
 add versioned price catalogs while preserving compatibility with the current
 application during rollout.
+
+## Closeout
+
+P0, Phase 1A, all four Phase 1A indexes, Phase 2 application deployment, and
+Phase 1B hardening completed and were verified on 2026-06-21. The authoritative
+execution evidence is in [05-verification-report.md](./05-verification-report.md).
+
+This historical Change Request does not authorize Phase 4. Phase 4 is proposed
+separately in [09-phase4-change-request.md](./09-phase4-change-request.md).
 
 ## References
 
@@ -31,7 +40,7 @@ application during rollout.
 | Phase 1A indexes | `migrations/010a_master_catalog_phase1a_indexes.sql` | Create and verify FK indexes one statement at a time outside an explicit transaction | Execute after Phase 1A |
 | Phase 2 | Application PR | Update create, copy, edit, print, dashboard, and price-list flows | Deploy after Phase 1A verification |
 | Phase 1B | `migrations/011_master_catalog_phase1b_hardening.sql` | Enforce BOQ version `NOT NULL` and immutable version trigger | Execute after Phase 2 verification |
-| Phase 4 | Future change request | Admin catalog UI, import, clone, swap, audit triggers | Explicitly excluded |
+| Phase 4 | [Separate Change Request](./09-phase4-change-request.md) | Admin catalog UI, import/manual change, publish, exports, audit/history | Explicitly excluded from this completed CR |
 
 ## Execution Strategy
 
@@ -104,8 +113,9 @@ available.
 | GitHub Actions on `main` | [Quality run #4](https://github.com/cloudstellar/conduit-boq/actions/runs/26770263106) passed: install, lint, test, build |
 | Vercel Production deployment after merge | Passed |
 | Hardcoded legacy Supabase `anon` key in utility scripts | Removed from current HEAD; scripts now read environment variables |
-| Production migration `009` | Not applied |
-| Production migrations `010`, `010a`, `011` | Not applied |
+| Production migration `009` | Applied and verified 2026-06-21 |
+| Production migrations `010`, four `010a` indexes, `011` | Applied and verified 2026-06-21 |
+| Phase 2 application | Merged through PR #2 and deployed to Production 2026-06-21 |
 
 The CI workflow is present in `.github/workflows/quality.yml`, and
 [Quality run #4](https://github.com/cloudstellar/conduit-boq/actions/runs/26770263106)
@@ -214,6 +224,6 @@ returns zero before Phase 1B.
 
 | Role | Name | Decision | Timestamp |
 |---|---|---|---|
-| Owner |  | Pending |  |
-| Executor |  | Pending |  |
-| Verifier |  | Pending |  |
+| Owner | See execution evidence | Completed; see verification report | 2026-06-21 |
+| Executor | Codex via approved Supabase/deployment paths | Completed | 2026-06-21 |
+| Verifier | See verification report | Completed | 2026-06-21 |

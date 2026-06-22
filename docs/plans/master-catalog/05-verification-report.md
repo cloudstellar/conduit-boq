@@ -1,8 +1,11 @@
 # Verification Report: Master Catalog v26
 
-**Status:** Production P0 applied and verified; Phase 1A/Phase 2/Phase 1B pending
+**Status:** Production P0 → Phase 1A → Phase 2 → Phase 1B completed and verified
 **Production project:** `otlssvssvgkohqwuuiir`
 **Related change request:** [04-change-request.md](./04-change-request.md)
+
+**Current position:** Phase 4 administration/publication has not started and is
+governed by [09-phase4-change-request.md](./09-phase4-change-request.md).
 
 ## Execution Record
 
@@ -13,11 +16,12 @@
 | Quality baseline | Lint, build, automated tests, CI workflow, Vercel deploy | Codex + Owner | 2026-06-01 | 2026-06-02 | Passed and merged to `main` |
 | Factor F correction | Application/docs update on `main` | Codex + Owner | 2026-06-05 | 2026-06-05 | Passed |
 | Local rehearsal | Production-schema snapshot + scrubbed auth/business data | Codex | 2026-06-20 | 2026-06-21 | `009 -> 010 -> 010a -> Phase 2 -> 011` passed |
-| Phase 1A | `010_master_catalog_phase1a_versioning.sql` |  |  |  | Pending |
-| Phase 1A indexes | `010a_master_catalog_phase1a_indexes.sql` |  |  |  | Pending |
+| Phase 1A | `010_master_catalog_phase1a_versioning.sql` | Codex via Supabase MCP | 2026-06-21 | 2026-06-21 | Applied and verified (`20260621052517`) |
+| Phase 1A indexes | Four statements from `010a_master_catalog_phase1a_indexes.sql` | Codex | 2026-06-21 | 2026-06-21 | All valid and ready |
 | Local Phase 2 | Version-aware application implementation and smoke tests | Codex | 2026-06-20 | 2026-06-21 | Passed; Local only |
-| Phase 2 | Application deploy |  |  |  | Pending |
-| Phase 1B | `011_master_catalog_phase1b_hardening.sql` |  |  |  | Pending |
+| Phase 2 | PR #2, CI, and Vercel Production deploy | Codex + Owner | 2026-06-21 | 2026-06-21 | Merged/deployed and browser/API verified |
+| Phase 1B | `011_master_catalog_phase1b_hardening.sql` | Codex via Supabase MCP | 2026-06-21 | 2026-06-21 | Applied and verified (`20260621104056`) |
+| Phase 4 | Admin/import/manual/publish/export/history |  |  |  | Not started; separate approval required |
 
 ## Baseline
 
@@ -483,8 +487,8 @@ WHERE price_list_id IS NOT NULL
 |---|---|---|
 | Local rehearsal before Phase 2 | `0` invalid standard-item categories | Passed: `0` |
 | Local rehearsal immediately before `011` | `0` invalid standard-item categories | Passed: reconciled `0`, remaining `0` |
-| Before Phase 2 deploy | `0` invalid standard-item categories | Pending |
-| Immediately after Phase 2 deploy | `0` invalid standard-item categories | Pending |
+| Before Phase 2 deploy | `0` invalid standard-item categories | Passed: `0` in Production pre-deploy reconciliation |
+| Immediately after Phase 2 deploy | `0` invalid standard-item categories | Passed: `0` before Phase 1B hardening |
 
 | Flow | Expected | Result |
 |---|---|---|

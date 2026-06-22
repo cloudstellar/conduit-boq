@@ -1,7 +1,7 @@
 # Migrations
 ## Conduit BOQ System
 
-**Last Updated:** 2026-06-21
+**Last Updated:** 2026-06-22
 **Status:** Canonical
 
 ---
@@ -25,9 +25,9 @@
 | `008_pending_user_status.sql` | Add `pending` to user status check constraint | **Applied** |
 | `008_rls_and_trigger.sql` | Consolidated RLS + org-lock trigger + admin RPC | **Applied** |
 | `009_master_catalog_p0_containment.sql` | Master Catalog v26 RPC containment + BOQ RLS tightening | **Applied to Production 2026-06-21** (`20260621045208`) |
-| `010_master_catalog_phase1a_versioning.sql` | Master Catalog v26 nullable versioning + historical backfill | **Draft** |
-| `010a_master_catalog_phase1a_indexes.sql` | Master Catalog v26 concurrent index runbook | **Draft** |
-| `011_master_catalog_phase1b_hardening.sql` | Master Catalog v26 BOQ version contract hardening | **Draft** |
+| `010_master_catalog_phase1a_versioning.sql` | Master Catalog v26 nullable versioning + historical backfill | **Applied to Production 2026-06-21** (`20260621052517`) |
+| `010a_master_catalog_phase1a_indexes.sql` | Master Catalog v26 concurrent index runbook | **Applied operationally 2026-06-21** (4 indexes valid/ready) |
+| `011_master_catalog_phase1b_hardening.sql` | Master Catalog v26 BOQ version contract hardening | **Applied to Production 2026-06-21** (`20260621104056`) |
 
 ### Local Schema Baseline (`supabase/local/`)
 
@@ -76,7 +76,9 @@ canonical Local rehearsal ledger for this rollout.
 ### Production execution
 
 Production migrations are run only during an approved execution window through
-the reviewed SQL Editor/MCP runbook:
+the reviewed SQL Editor/MCP runbook. Master Catalog `009`, `010`, all four
+`010a` indexes, and `011` completed on 2026-06-21; see the verification report
+for exact fingerprints and post-checks. For future migrations:
 
 1. Open [Supabase Dashboard](https://app.supabase.com) → SQL Editor
 2. Open the migration file
@@ -108,6 +110,7 @@ For other migrations, rollback must be performed manually by reversing the speci
 | **Applied Supplement** | Applied as an additive change to existing schema |
 | **Applied (Manual Supplement)** | Applied manually outside normal migration sequence |
 | **Applied Legacy Artifact** | Historical script preserved outside the active Local migration directory |
+| **Applied operationally** | Nontransactional runbook statements executed and verified outside the remote migration ledger |
 | **Local Baseline Only** | Schema snapshot used only to rebuild Local Supabase; never push to Production |
 | **Backup/Utility** | Not a schema change; diagnostic/backup queries |
 | **Rollback Utility** | Reversal script, run only if rollback is needed |
@@ -120,4 +123,5 @@ For other migrations, rollback must be performed manually by reversing the speci
 - Historical multi-route guide: [migrations/README.md](../../migrations/README.md)
 - Master Catalog change request: [04-change-request.md](../plans/master-catalog/04-change-request.md)
 - Master Catalog verification report: [05-verification-report.md](../plans/master-catalog/05-verification-report.md)
+- Phase 4 change request: [09-phase4-change-request.md](../plans/master-catalog/09-phase4-change-request.md)
 - Database Schema: [DATABASE_SCHEMA.md](./DATABASE_SCHEMA.md)
