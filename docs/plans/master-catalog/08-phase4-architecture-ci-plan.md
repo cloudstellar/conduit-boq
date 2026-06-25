@@ -1296,7 +1296,11 @@ but semantically wrong workbook from becoming the official catalog.
 - Create identities, code registry, categories, imports, and change-set tables.
 - Add version lineage/approval/hash/count/lock metadata.
 - Create the versioned code-group dictionary.
-- Backfill 710 identities/legacy codes and 52 display categories.
+- Backfill 710 baseline identities/legacy codes and 52 display categories from
+  the verified Production baseline.
+- Seed or freeze canonical code groups and candidate mappings only after the
+  relevant owner/taxonomy decisions are recorded; pending P-02 through P-07
+  must not be silently guessed during schema work.
 - Add full-snapshot audit contracts and item-history indexes.
 - Add indexes, composite foreign keys, RLS, grants, and private functions.
 - Add and validate the unit-cost constraint.
@@ -1367,10 +1371,15 @@ These items do not block the first official Master Catalog release.
 
 Do not advance when any gate fails:
 
-- **Phase 4-0 → 4A:** Revision 8, ADR-004, Phase 4 Change Request,
-  reconciliation, code dictionary, database/security contract, threat model,
-  decision register, parser/hash and official-export contracts, Production
-  baseline, backup, and owner decisions are complete.
+- **Phase 4-0 → 4A local implementation:** Revision 8, ADR-004, Phase 4
+  Change Request, database/security contract, threat model, decision register,
+  parser/hash and official-export contracts, Production baseline, and P-01 are
+  complete. Generic schema/function/UI/test work may proceed locally while
+  row-level business decisions remain pending, but no final canonical mapping,
+  publishable candidate, or Production action may be implied.
+- **4A data backfill/candidate freeze:** reconciliation, code dictionary,
+  duplicate, HDPE Crossing, Production-only, workbook-only, baseline metadata,
+  and related owner decisions are complete for the exact candidate scope.
 - **Phase 4A → 4B:** Local schema reset/migration succeeds; backfill counts,
   constraints, RLS/grants, and advisors pass.
 - **Phase 4B → 4C:** Manual edit, import, history, publish, export, stale-draft,

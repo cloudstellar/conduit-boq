@@ -201,26 +201,38 @@ separate approved price authority. Production-only rows remain present.
 | Legacy `is_default` becomes stale | Medium | Medium | Sync in publish/restore transaction | Pointer/flag mismatch |
 | Oversized payload fails unpredictably | Low | Medium | 750 KB application cap, tested error | Payload exceeds cap |
 
-## 11. Preconditions before implementation
+## 11. Preconditions before implementation/local rehearsal
 
 - [ ] Owner approves [ADR-004](../../02_architecture/ADR/ADR-004-phase4-catalog-governance-and-official-publication.md)
 - [ ] Owner approves this Change Request for implementation/local rehearsal
+- [ ] Parser/hash specification is approved
+- [ ] Database/security contract, threat model, decision register, and official
+      export specification are approved
+- [ ] Backup restore rehearsal approach and local reset procedure are defined
+- [ ] Source `/CI/` remains local-only
+
+This gate is P-01. It permits local implementation, scaffolding, automated
+tests, and rehearsal. It does not permit Production migration, deploy,
+feature enablement, final catalog publication, or silent business-data choices.
+
+### Additional preconditions before final data backfill/candidate freeze
+
 - [ ] Code dictionary decisions are recorded
 - [ ] 728-record reconciliation draft is reviewed; all 710 Production outcomes
-      have an approved decision
+      needed for the candidate have an approved decision
 - [ ] `ITEM-0131` / `ITEM-0139` duplicate decision is recorded
 - [ ] Both duplicate baseline rows retain distinct UUID histories; candidate
       retirement, if selected, is recorded as `retire` rather than merge
 - [ ] All 16 HDPE Crossing candidate codes are corrected or rejected
 - [ ] Production-only 20 rows receive approved code decisions
 - [ ] Workbook-only 18 rows remain deferred or receive separate price approval
-- [ ] Parser/hash specification is approved
-- [ ] Database/security contract, threat model, decision register, and official
-      export specification are approved
 - [ ] Owner-approved legacy `2568.0.0` publication metadata is available; no
       approval reference/effective date is invented
-- [ ] Backup restore rehearsal and local reset pass
 - [ ] CI runtime assets are approved; source `/CI/` remains local-only
+
+If any of these decisions is still pending, implementation may continue only on
+generic/local scaffolding that does not freeze final canonical mappings or
+pretend a publishable candidate has been approved.
 
 ## 12. Preconditions before Production migration
 

@@ -207,18 +207,37 @@ These omissions are intentional scope control, not missing architecture.
 
 ## Implementation conditions
 
-Implementation may start only after:
+Implementation is intentionally split into smaller gates so that local
+engineering can start without silently deciding business data.
+
+### P-01 — local implementation and rehearsal authority
+
+Local implementation/rehearsal may start only after:
 
 1. this ADR and the Phase 4 Change Request are owner-approved;
-2. the code dictionary and all row-level reconciliation decisions are approved;
-3. local reset/rehearsal, logical backup, and abort procedures are verified;
-4. database/security, threat, parser/hash, and official-export contracts and
-   verification templates are accepted;
-5. no unresolved security or data-integrity blocker remains.
+2. database/security, threat, parser/hash, official-export, verification, and
+   runbook contracts are accepted;
+3. no unresolved security or data-integrity blocker remains.
+
+This gate authorizes additive schema/function scaffolding, parser and
+canonicalizer implementation, UI implementation behind the disabled feature
+flag, automated tests, and Local rehearsal with fixture or clearly marked draft
+data. It does not authorize final business-data choices, Production migration,
+feature enablement, or publication.
+
+### Data freeze and publication authority
+
+Final code-group seeding, approved candidate backfill, and any publishable
+structured-code candidate require the code dictionary and all row-level
+reconciliation decisions to be approved at their stated gates. In particular,
+duplicate treatment, HDPE Crossing codes, Production-only codes, workbook-only
+disposition, baseline publication metadata, runtime CI assets, and export
+visual samples must be resolved before their related backfill/export/publish
+gate proceeds.
 
 Production migration, feature enablement, and catalog publication each require
-separate explicit owner approval. Approval of this ADR alone does not authorize
-Production execution.
+separate explicit owner approval. Approval of this ADR or P-01 alone does not
+authorize Production execution.
 
 ## References
 

@@ -126,11 +126,13 @@ validation records `validated` or `rejected`.
 1. Confirm expected draft and lock version.
 2. When the mass-retirement threshold is reached, type the exact count and
    enter the owner approval reference.
-3. Apply once. A separate request ID protects this mutation; the validated
-   import transitions once to `applied`.
-4. If the result is uncertain, refresh import/change history before retrying;
+3. Apply once. The system resubmits the normalized payload for server hash
+   comparison; the raw workbook still stays local and is not uploaded.
+4. A separate request ID protects this mutation; the validated import
+   transitions once to `applied`.
+5. If the result is uncertain, refresh import/change history before retrying;
    request ID prevents duplicate effects.
-5. Review the created change set and item histories.
+6. Review the created change set and item histories.
 
 K-formula columns are ignored/excluded in Phase 4 Core.
 

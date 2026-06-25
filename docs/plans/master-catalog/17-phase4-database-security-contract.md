@@ -269,6 +269,9 @@ Status lifecycle:
   import `request_id`;
 - apply accepts only `validated`, uses a separate change-set request ID, and
   transitions the same import once to `applied`;
+- apply must resubmit the normalized payload/source metadata, recompute its
+  hash, and match the existing `normalized_payload_hash` before mutation; Phase
+  4 Core does not add a raw-file store or normalized-row staging table;
 - `previewing` is UI state only and is not persisted.
 
 For Full import, every omission is surfaced. When
@@ -394,7 +397,7 @@ idempotency, and transaction behavior are locked by this contract.
 | Function | Purpose | Minimum inputs |
 |---|---|---|
 | `public.create_catalog_draft` | Clone a published base into a new draft | base/version numbers, name, reason, request ID |
-| `public.apply_catalog_changes` | Apply validated manual/import changes | version ID, change JSON, expected lock, reason, request ID, optional import ID |
+| `public.apply_catalog_changes` | Apply validated manual/import changes | version ID, change JSON or import payload hash, expected lock, reason, request ID, optional import ID |
 | `public.publish_catalog_version` | Validate/hash/publish/move pointer | version ID, expected lock, approval metadata, reason, request ID |
 | `public.restore_catalog_pointer` | Move pointer to prior published version | target version ID, reason, request ID |
 

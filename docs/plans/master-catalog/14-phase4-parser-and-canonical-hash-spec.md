@@ -130,7 +130,13 @@ export interface CatalogImportPayloadV1 {
     physicalArchiveReference: string
   }
   retirementApprovalReference: string | null
+  retirementConfirmedCount: number | null
   rows: NormalizedCatalogRowCandidate[]
+}
+
+export interface CatalogImportApplyPayloadV1 extends CatalogImportPayloadV1 {
+  validatedImportId: string
+  applyRequestId: string
 }
 
 export interface NormalizedCatalogRowCandidate {
@@ -150,6 +156,21 @@ export interface NormalizedCatalogRowCandidate {
   priceAuthorityReference: string | null
 }
 ```
+
+`CatalogImportPayloadV1.requestId` identifies the server-validation request.
+`CatalogImportApplyPayloadV1.applyRequestId` identifies the later mutation
+request. Apply resubmits the normalized rows and source metadata instead of
+loading raw workbook bytes or reading a hidden staging table; the server
+recomputes the normalized payload hash and compares it with the previously
+validated `catalog_imports.normalized_payload_hash` before it mutates the
+draft.
+
+Rows are untrusted source observations plus requested outcomes, not final
+business authority. Omitted-row retirements in Full mode are computed by the
+server diff and are not inferred merely from a missing row in the client
+payload. Client-supplied identity outcomes, price authority references, and
+retirement confirmations are accepted only when they match the approved
+reconciliation, code registry, draft state, and server-computed counts.
 
 Money fields are decimal strings, never JavaScript floating-point numbers.
 Accepted syntax is `^(0|[1-9][0-9]*)\.[0-9]{2}$`. Negative, exponent, comma,
@@ -183,9 +204,10 @@ when an import contributes to the version.
 - `previewCatalogImportAction` performs server validation. It records
   `validated` on success or `rejected` with bounded diagnostics on failure.
 - The payload `requestId` identifies that validation request.
-- `applyCatalogImportAction` accepts the validated import ID and a new apply
-  request ID. It atomically creates the change set and moves the import once to
-  `applied`.
+- `applyCatalogImportAction` accepts the validated import ID, a new apply
+  request ID, and the normalized payload/source metadata again. It recomputes
+  the normalized payload hash, compares it with the validated import record,
+  atomically creates the change set, and moves the import once to `applied`.
 - No `previewing` database status exists because Phase 4 has no uploaded file,
   background parser, or resumable job.
 
@@ -210,7 +232,8 @@ The server must independently:
 11. rebuild Full/Supplement diff from current database rows;
 12. apply reconciliation gates and calculate the Full-import retirement count;
     when `retire_count >= max(10, ceil(active_base_item_count * 0.02))`, require
-    a nonblank `retirementApprovalReference` and exact typed-count confirmation;
+    a nonblank `retirementApprovalReference` and
+    `retirementConfirmedCount === retire_count`;
 13. recompute normalized payload hash;
 14. call the exact database mutation function only after validation passes.
 

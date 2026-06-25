@@ -9,7 +9,9 @@
 - Current Master Catalog: **`2568.0.0`, 710 รายการ**
 - Phase 4 Admin/Import/Publish/Official Export: **ยังไม่เริ่ม implement**
 - รอบนี้: **จัดทำ/ปรับเอกสารและ reconciliation draft เท่านั้น**
-- ไม่มีการแก้ Production, deploy, publish, stage หรือ commit
+- ไม่มีการแก้ Production, deploy หรือ publish
+- เอกสาร Phase 4 ถูก checkpoint ใน branch ปัจจุบันแล้ว; review รอบถัดไป
+  ควรดูจาก commit ล่าสุดของ branch นี้
 
 ## ลำดับแนะนำในการ review
 
@@ -77,8 +79,13 @@
 
 อนุมัติเป็นสองชั้น:
 
-1. **อนุมัติหลักการและให้ implement/local rehearsal** หลัง review ADR/CR/แผน
+1. **อนุมัติหลักการและให้ implement/local rehearsal แบบจำกัดขอบเขต** หลัง
+   review ADR/CR/แผนและ P-01
 2. **อนุมัติ Production แยกทีละ gate** หลังเห็นผล Local, migration diff,
    backup restore, test, UI, export hash และ verification report
 
 การอนุมัติชั้นแรกไม่ควรถือเป็นสิทธิ์ deploy หรือ publish Production อัตโนมัติ
+และไม่ควรถือว่า data decisions เช่น duplicate, HDPE Crossing, Production-only,
+workbook-only, CI assets, export sample หรือ baseline publication metadata
+ถูกอนุมัติแล้ว รายการเหล่านั้นยังต้องปิดตาม P-02 ถึง P-11 ก่อน candidate
+freeze, final backfill, export acceptance หรือ publication gate ที่เกี่ยวข้อง

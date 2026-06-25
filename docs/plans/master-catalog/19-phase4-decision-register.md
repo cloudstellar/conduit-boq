@@ -55,9 +55,17 @@ change only application code or SQL.
 
 ## 3. Pending owner/data decisions
 
+P-01 authorizes only local implementation/rehearsal of the reviewed
+architecture and contracts. It does not resolve P-02 through P-11. Work may
+continue on generic additive schema, parser/canonicalizer, UI, tests, and local
+fixture rehearsal while those decisions are pending, but final approved data
+backfill, candidate freeze, export acceptance, Production migration, feature
+enablement, and publication must stop at the stated gates until the relevant
+pending decisions are recorded.
+
 | ID | Decision required | Current evidence/default recommendation | Owner | Due before | Status |
 |---|---|---|---|---|---|
-| P-01 | Approve ADR-004, Change Request, architecture Revision 8, DB/security contract, threat model, and export spec for implementation/local rehearsal | Approve together after review; this does not authorize Production | Owner | Phase 4A implementation | Pending |
+| P-01 | Approve ADR-004, Change Request, architecture Revision 8, DB/security contract, threat model, parser/hash spec, and export spec for implementation/local rehearsal | Approve together after review; this does not authorize Production | Owner | Phase 4A implementation | Pending |
 | P-02 | Decide whether `ITEM-0131` and `ITEM-0139` remain justified distinct items or which erroneous duplicate is retired in the candidate | Both receive distinct baseline identities; UUID/history merge is prohibited | Owner + data custodian | Candidate reconciliation freeze | Pending |
 | P-03 | Approve corrected canonical groups/codes for 16 HDPE Crossing rows | Reject current GIP candidates; use an approved HDPE classification | Owner + engineering data custodian | Candidate code freeze | Pending |
 | P-04 | Assign/approve canonical codes and groups for 20 Production-only rows | Retain all 20 and preserve Production values | Owner + data custodian | Candidate 710-row freeze | Pending |
