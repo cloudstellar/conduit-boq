@@ -43,6 +43,9 @@ docker exec "$DB_CONTAINER" psql -v ON_ERROR_STOP=1 -U postgres -d postgres -f /
 docker cp migrations/009_master_catalog_p0_containment.sql "$DB_CONTAINER:/tmp/009.sql"
 docker cp migrations/010_master_catalog_phase1a_versioning.sql "$DB_CONTAINER:/tmp/010.sql"
 docker cp migrations/011_master_catalog_phase1b_hardening.sql "$DB_CONTAINER:/tmp/011.sql"
+docker cp migrations/012_factor_f_version_foundation.sql "$DB_CONTAINER:/tmp/012.sql"
+docker cp migrations/013_factor_f_seed_current_baseline.sql "$DB_CONTAINER:/tmp/013.sql"
+docker cp migrations/014_factor_f_publish_2569_0_0.sql "$DB_CONTAINER:/tmp/014.sql"
 docker exec "$DB_CONTAINER" psql -v ON_ERROR_STOP=1 -U postgres -d postgres -f /tmp/009.sql
 docker exec "$DB_CONTAINER" psql -v ON_ERROR_STOP=1 -U postgres -d postgres -f /tmp/010.sql
 
@@ -58,6 +61,9 @@ docker exec "$DB_CONTAINER" psql -v ON_ERROR_STOP=1 -U postgres -d postgres -c \
 docker exec "$DB_CONTAINER" psql -v ON_ERROR_STOP=1 -U postgres -d postgres -c \
   'UPDATE public.boq_items bi SET category = pl.category FROM public.price_list pl WHERE bi.price_list_id = pl.id AND bi.price_list_id IS NOT NULL AND bi.category IS NULL;'
 docker exec "$DB_CONTAINER" psql -v ON_ERROR_STOP=1 -U postgres -d postgres -f /tmp/011.sql
+docker exec "$DB_CONTAINER" psql -v ON_ERROR_STOP=1 -U postgres -d postgres -f /tmp/012.sql
+docker exec "$DB_CONTAINER" psql -v ON_ERROR_STOP=1 -U postgres -d postgres -f /tmp/013.sql
+docker exec "$DB_CONTAINER" psql -v ON_ERROR_STOP=1 -U postgres -d postgres -f /tmp/014.sql
 
 npm run db:local:seed-users
 npm run db:local:smoke-auth
@@ -73,9 +79,21 @@ docker exec "$DB_CONTAINER" psql -v ON_ERROR_STOP=1 -U postgres -d postgres -Atc
     'anon_save_rpc', has_function_privilege('anon','public.save_boq_with_routes(uuid,jsonb,jsonb)','EXECUTE'),
     'version_nullable', (SELECT is_nullable FROM information_schema.columns WHERE table_schema = 'public' AND table_name = 'boq' AND column_name = 'price_list_version_id'),
     'immutable_trigger', EXISTS (SELECT 1 FROM pg_trigger WHERE tgrelid = 'public.boq'::regclass AND tgname = 'trigger_prevent_boq_version_modification' AND NOT tgisinternal),
-    'guard_is_invoker', (SELECT NOT prosecdef FROM pg_proc WHERE oid = 'public.prevent_boq_version_modification()'::regprocedure)
+    'guard_is_invoker', (SELECT NOT prosecdef FROM pg_proc WHERE oid = 'public.prevent_boq_version_modification()'::regprocedure),
+    'factor_f_default_version', (
+      SELECT v.version_string
+      FROM public.factor_reference_default_version dv
+      JOIN public.factor_reference_versions v ON v.id = dv.version_id
+      WHERE dv.id = true
+    ),
+    'factor_f_2569_row_count', (
+      SELECT count(*)
+      FROM public.factor_reference_rows r
+      JOIN public.factor_reference_versions v ON v.id = r.version_id
+      WHERE v.version_string = '2569.0.0'
+    )
   );"
 
-echo "Local Master Catalog environment is ready."
+echo "Local Master Catalog and Factor F environment is ready."
 echo "Studio: http://127.0.0.1:55323"
 echo "App API: http://127.0.0.1:55321"

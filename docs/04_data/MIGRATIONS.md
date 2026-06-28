@@ -30,7 +30,7 @@
 | `011_master_catalog_phase1b_hardening.sql` | Master Catalog v26 BOQ version contract hardening | **Applied to Production 2026-06-21** (`20260621104056`) |
 | `012_factor_f_version_foundation.sql` | Factor F version tables, singleton pointer, `boq.factor_reference_version_id`, RLS/grants/triggers | **Draft created and local-verified 2026-06-28 — not applied to Production** |
 | `013_factor_f_seed_current_baseline.sql` | Seed audited current 37-row `factor_reference` baseline as Factor F `2566.0.0` and move the default pointer | **Draft created and local-verified 2026-06-28 — no legacy BOQ backfill; not applied to Production** |
-| `014_factor_f_publish_2569_0_0.sql` | Planned publication of Factor F `2569.0.0` from กค 0433.2/ว 481 and default pointer movement | **Planned — requires F3 approval, diff, hash, and owner review** |
+| `014_factor_f_publish_2569_0_0.sql` | Publish Factor F `2569.0.0` from กค 0433.2/ว 481 and move the default pointer | **Draft created and local-verified 2026-06-28 — no legacy BOQ backfill; not applied to Production** |
 | `015+_master_catalog_phase4_*.sql` | Master Catalog Phase 4 database migrations | **Planned — shifted later because Factor F is owner-selected first** |
 
 ### Local Schema Baseline (`supabase/local/`)
@@ -61,8 +61,9 @@ entry is `20260621104056_master_catalog_phase1b_hardening`, corresponding to
 root migration `011`. Factor F now ships before Master Catalog Phase 4, so
 Factor F reserves root migrations `012`, `013`, and `014`; Master Catalog
 Phase 4 starts at `015+`. F2 uses `2566.0.0` for the audited current Factor F
-baseline sourced from `FACTOR F 2566_7.PDF`; F3 reserves `2569.0.0` for the
-owner-confirmed ว481 source table.
+baseline sourced from `FACTOR F 2566_7.PDF`; F3 uses `2569.0.0` for the
+owner-confirmed ว481 source table and has been local-verified with dataset hash
+`sha256:4f35b267bde3007439aebb193be1e53bdcea5a7acce95b5a7bbf5828018ef1a6`.
 
 `010a_master_catalog_phase1a_indexes.sql` is an operational runbook rather than
 a transactional migration. Run its `CREATE INDEX CONCURRENTLY` statements one
@@ -77,7 +78,7 @@ at a time outside an explicit transaction.
 Use `npm run db:local:bootstrap`. It resets Local Supabase to the schema-only
 Production baseline, restores scrubbed snapshots, applies root migrations
 `009` and `010`, applies all four `010a` concurrent indexes individually, then
-applies `011` and runs the Phase 2 smoke tests.
+applies `011`, Factor F `012` through `014`, and runs the Phase 2 smoke tests.
 
 The CLI remains intentionally unlinked from Production. Do not use `db push`,
 `db pull`, or linked diff commands from this worktree. Local migration history

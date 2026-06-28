@@ -1,6 +1,7 @@
 # Factor F 2569.0.0 Owner Review Pack
 
-**Status:** Owner review draft - do not publish or move the default pointer yet
+**Status:** Local migration verified - do not execute Production until owner
+approval is complete
 **Date prepared:** 2026-06-28
 **Target version:** `2569.0.0`
 **Baseline version for diff:** `2566.0.0`
@@ -50,11 +51,17 @@
 | Min/max new threshold | 5 / 700 million |
 | New thresholds missing from baseline | 0 |
 | Baseline thresholds removed by new source | 600 million |
-| Dataset hash | `sha256:3ca4f535cca5152867774afb2c39db7f4350988d42cf32858db50246b762cc80` |
+| Dataset hash | `sha256:4f35b267bde3007439aebb193be1e53bdcea5a7acce95b5a7bbf5828018ef1a6` |
+| Local migration rehearsal | Passed on 2026-06-28; default pointer moved to `2569.0.0` in Local only |
+| Local BOQ backfill check | Passed; existing BOQ `factor_reference_version_id` count remained unchanged |
 
 The W481 table does not include a 600 million row. If approved as-is, BOQs
 between 500 and 700 million will interpolate directly between the 500 and 700
 rows.
+
+The dataset hash is computed from the same `numeric(10,4)::text` representation
+used by `factor_reference_rows` postconditions, so it is tied to the actual
+stored database row contract rather than a display-only number format.
 
 ## 4. Row-Level Diff For Review
 
@@ -112,5 +119,5 @@ Delta columns are `new - old` compared with baseline `2566.0.0`.
 - [ ] Print and Excel should show `ใช้ Factor F เวอร์ชัน 2569.0.0` in the
       Factor F condition text.
 - [ ] Dataset hash
-      `sha256:3ca4f535cca5152867774afb2c39db7f4350988d42cf32858db50246b762cc80`
+      `sha256:4f35b267bde3007439aebb193be1e53bdcea5a7acce95b5a7bbf5828018ef1a6`
       is approved for migration `014_factor_f_publish_2569_0_0.sql`.

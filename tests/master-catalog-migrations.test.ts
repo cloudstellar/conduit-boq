@@ -59,11 +59,32 @@ describe('Master Catalog migration contracts', () => {
     const bootstrap = readFileSync(resolve(process.cwd(), 'scripts/bootstrap-local-db.sh'), 'utf8')
 
     expect(bootstrap).toContain('migrations/011_master_catalog_phase1b_hardening.sql')
+    expect(bootstrap).toContain('migrations/012_factor_f_version_foundation.sql')
+    expect(bootstrap).toContain('migrations/013_factor_f_seed_current_baseline.sql')
+    expect(bootstrap).toContain('migrations/014_factor_f_publish_2569_0_0.sql')
     expect(bootstrap).toContain('supabase/local/production-baseline.sql')
     expect(bootstrap).toContain('PUBLIC_DATA_SNAPSHOT=')
     expect(bootstrap).toContain('docker cp "$PUBLIC_DATA_SNAPSHOT"')
     expect(bootstrap).toContain('psql -v ON_ERROR_STOP=1 -U postgres -d postgres -f /tmp/011.sql')
+    expect(bootstrap).toContain('psql -v ON_ERROR_STOP=1 -U postgres -d postgres -f /tmp/014.sql')
+    expect(bootstrap).toContain("'factor_f_default_version'")
+    expect(bootstrap).toContain("'factor_f_2569_row_count'")
     expect(bootstrap).toContain('npm run db:local:smoke-master-catalog')
+  })
+
+  it('publishes Factor F 2569 without backfilling existing BOQs', () => {
+    const sql = readMigration('014_factor_f_publish_2569_0_0.sql')
+
+    expect(sql).toContain('Migration 014: Factor F Publish 2569.0.0')
+    expect(sql).toContain("'sha256:4f35b267bde3007439aebb193be1e53bdcea5a7acce95b5a7bbf5828018ef1a6'")
+    expect(sql).toContain('WHERE factor_reference_version_id IS NOT NULL')
+    expect(sql).toContain('F3 postcondition failed: BOQ factor version bindings changed')
+    expect(sql).toContain("WHERE v.version_string = '2569.0.0'")
+    expect(sql).toContain("WHERE version_string = '2569.0.0'")
+    expect(sql).toContain('IF v_row_count <> 36 THEN')
+    expect(sql).toContain('WHERE cost_million = 600')
+    expect(sql).toContain('(36, 700, 1.0727, 1.1477, 1.1641, 1.1805)')
+    expect(sql).not.toContain('UPDATE public.boq\nSET factor_reference_version_id')
   })
 
   it('keeps the Production snapshot outside the Supabase remote migration ledger', () => {
