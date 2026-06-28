@@ -105,6 +105,9 @@ avoid a 2569 DB default while old browser code still calculates 2566 snapshots:
    - Legacy usable snapshot can Print/Excel without claiming latest version.
    - Legacy missing snapshot shows the intentional blocked message.
 
+The detailed Production execution checklist is
+[09-production-no-maintenance-runbook.md](./09-production-no-maintenance-runbook.md).
+
 ## Concurrent User Writes During Rollout
 
 Do not apply `014` while the old application is still accepting create/edit

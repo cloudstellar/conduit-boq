@@ -74,6 +74,8 @@ and the BOQ inventory is captured in
 [08-production-inventory-readiness.md](../plans/factor-f/08-production-inventory-readiness.md).
 The owner approved legacy snapshot metadata repair, so migration `015` is
 reserved for Factor F repair and Master Catalog Phase 4 shifts to `016+`.
+Production execution must follow the no-maintenance checklist in
+[09-production-no-maintenance-runbook.md](../plans/factor-f/09-production-no-maintenance-runbook.md).
 
 `010a_master_catalog_phase1a_indexes.sql` is an operational runbook rather than
 a transactional migration. Run its `CREATE INDEX CONCURRENTLY` statements one
@@ -112,6 +114,11 @@ for exact fingerprints and post-checks. For future migrations:
 > [!IMPORTANT]
 > Always run `001_backup_before_migration.sql` queries first to record the current state before applying any new migration.
 
+For Factor F `012` through `015`, use
+[09-production-no-maintenance-runbook.md](../plans/factor-f/09-production-no-maintenance-runbook.md)
+instead of the generic future-migration sequence, because `014` must run only
+after the version-aware application deployment is live.
+
 ---
 
 ## 3. Rollback Procedures
@@ -148,4 +155,5 @@ For other migrations, rollback must be performed manually by reversing the speci
 - Master Catalog change request: [04-change-request.md](../plans/master-catalog/04-change-request.md)
 - Master Catalog verification report: [05-verification-report.md](../plans/master-catalog/05-verification-report.md)
 - Phase 4 change request: [09-phase4-change-request.md](../plans/master-catalog/09-phase4-change-request.md)
+- Factor F no-maintenance runbook: [09-production-no-maintenance-runbook.md](../plans/factor-f/09-production-no-maintenance-runbook.md)
 - Database Schema: [DATABASE_SCHEMA.md](./DATABASE_SCHEMA.md)

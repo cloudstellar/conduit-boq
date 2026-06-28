@@ -48,6 +48,7 @@ agents do not infer missing context.
 | 2026-06-28 | Created F2 seed migration for owner-confirmed baseline version `2566.0.0`, sourced from `FACTOR F 2566_7.PDF`, with row-count/hash preflight and no BOQ backfill. | `migrations/013_factor_f_seed_current_baseline.sql` | None |
 | 2026-06-29 | Added F4 repair migration for missing legacy snapshot metadata, guarded by `2566.0.0` hash and saved-factor equality. | `migrations/015_factor_f_repair_legacy_snapshot_metadata.sql` | None |
 | 2026-06-29 | Updated no-maintenance rollout plan and shifted Master Catalog Phase 4 migration numbering to `016+`. | `docs/04_data/MIGRATIONS.md`, `docs/plans/factor-f/08-production-inventory-readiness.md`, Master Catalog planning docs | None |
+| 2026-06-29 | Added detailed Production no-maintenance runbook for Factor F `012` through `015`, including preflight SQL, staged app deploy, smoke tests, and failure handling. | `docs/plans/factor-f/09-production-no-maintenance-runbook.md` | None |
 
 ## Implementation Decisions During F1
 
@@ -103,8 +104,8 @@ F1 must not:
 
 ## Next Review Items
 
-- Prepare the no-maintenance Production runbook: apply `012`/`013`, deploy the
-  version-aware app, apply `014`/`015`, then smoke test create/edit/print/Excel.
+- Execute the no-maintenance Production runbook:
+  [09-production-no-maintenance-runbook.md](./09-production-no-maintenance-runbook.md).
 - Repeat the Production inventory preflight immediately before applying `012`.
 - Do not apply `014` while the old application is still accepting create/edit
   saves.
