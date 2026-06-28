@@ -62,13 +62,16 @@ describe('Master Catalog migration contracts', () => {
     expect(bootstrap).toContain('migrations/012_factor_f_version_foundation.sql')
     expect(bootstrap).toContain('migrations/013_factor_f_seed_current_baseline.sql')
     expect(bootstrap).toContain('migrations/014_factor_f_publish_2569_0_0.sql')
+    expect(bootstrap).toContain('migrations/015_factor_f_repair_legacy_snapshot_metadata.sql')
     expect(bootstrap).toContain('supabase/local/production-baseline.sql')
     expect(bootstrap).toContain('PUBLIC_DATA_SNAPSHOT=')
     expect(bootstrap).toContain('docker cp "$PUBLIC_DATA_SNAPSHOT"')
     expect(bootstrap).toContain('psql -v ON_ERROR_STOP=1 -U postgres -d postgres -f /tmp/011.sql')
     expect(bootstrap).toContain('psql -v ON_ERROR_STOP=1 -U postgres -d postgres -f /tmp/014.sql')
+    expect(bootstrap).toContain('psql -v ON_ERROR_STOP=1 -U postgres -d postgres -f /tmp/015.sql')
     expect(bootstrap).toContain("'factor_f_default_version'")
     expect(bootstrap).toContain("'factor_f_2569_row_count'")
+    expect(bootstrap).toContain("'factor_f_partial_legacy_snapshots_remaining'")
     expect(bootstrap).toContain('npm run db:local:smoke-master-catalog')
   })
 
@@ -85,6 +88,23 @@ describe('Master Catalog migration contracts', () => {
     expect(sql).toContain('WHERE cost_million = 600')
     expect(sql).toContain('(36, 700, 1.0727, 1.1477, 1.1641, 1.1805)')
     expect(sql).not.toContain('UPDATE public.boq\nSET factor_reference_version_id')
+  })
+
+  it('repairs legacy Factor F snapshot metadata without binding old BOQs to a version', () => {
+    const sql = readMigration('015_factor_f_repair_legacy_snapshot_metadata.sql')
+
+    expect(sql).toContain('Migration 015: Factor F Repair Legacy Snapshot Metadata')
+    expect(sql).toContain("'sha256:77a2568bed09670242dcadc444be344c638868a7813f2a25ccbb6e6fb8d7ad61'")
+    expect(sql).toContain("v.version_string = '2569.0.0'")
+    expect(sql).toContain("version_string = '2566.0.0'")
+    expect(sql).toContain('saved_factor_f IS DISTINCT FROM trunc(expected_raw_factor, 4)')
+    expect(sql).toContain('factor_f_raw = COALESCE(b.factor_f_raw, repair.repair_factor_f_raw)')
+    expect(sql).toContain('factor_f_lower_cost = COALESCE(b.factor_f_lower_cost, repair.repair_lower_cost)')
+    expect(sql).toContain('F4 repair blocked: % legacy BOQs have factor_f values that do not match 2566.0.0')
+    expect(sql).toContain('F4 repair postcondition failed: % repaired legacy BOQs were bound to a Factor F version')
+    expect(sql).not.toContain('SET factor_reference_version_id')
+    expect(sql).not.toContain('total_with_factor_f =')
+    expect(sql).not.toContain('total_with_vat =')
   })
 
   it('keeps the Production snapshot outside the Supabase remote migration ledger', () => {

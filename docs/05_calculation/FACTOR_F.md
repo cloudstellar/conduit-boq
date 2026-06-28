@@ -1,7 +1,7 @@
 # Factor F
 ## Conduit BOQ System
 
-**Last Updated:** 2026-06-05
+**Last Updated:** 2026-06-29
 **Status:** Canonical
 
 ---
@@ -88,6 +88,12 @@ Factor F = 1.1422 - ((1.1422 - 1.1359) × (34.444444 - 30) / (40 - 30))
 | cost > max threshold | Use `factor` for max threshold |
 | Exact match | Use exact `factor`, no interpolation |
 
+Saved snapshot validation follows the same endpoint rules. A legacy snapshot
+with `B = C = 5,000,000` is valid only for BOQs below the first 5M bracket. A
+legacy snapshot with `B = C = 700,000,000` is valid only for BOQs above the last
+700M bracket. A stale 5M snapshot is still rejected for mid-range work such as
+30M-40M because the saved bracket does not cover the BOQ total.
+
 ### Decimal Handling
 
 > [!IMPORTANT]
@@ -147,11 +153,13 @@ Supabase SQL/MCP access before the Master Catalog execution window. Anonymous
 REST/Data API checks can return `0` rows under RLS and are not an authoritative
 count source.
 
-The 2026-06-05 Supabase MCP recheck confirmed 37 `factor_reference` rows and
-the full numeric reference checksum
-`e8040ffbf82beebd61bbb9c2652dd41a`. The 30M = `1.1422` and 40M = `1.1359`
-values are useful smoke examples for the Surin interpolation case, but the
-approval gate must validate every row.
+The 2026-06-29 Supabase MCP recheck against Production project
+`otlssvssvgkohqwuuiir` confirmed 37 `factor_reference` rows, cost thresholds
+from 5M to 700M, and dataset hash
+`sha256:77a2568bed09670242dcadc444be344c638868a7813f2a25ccbb6e6fb8d7ad61`,
+matching migration `013_factor_f_seed_current_baseline.sql`. The 30M =
+`1.1422` and 40M = `1.1359` values remain useful smoke examples, but the
+approval gate validates every row through the dataset hash.
 
 ---
 

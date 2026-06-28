@@ -32,8 +32,8 @@ This document does not authorize a Production migration.
 Supabase MCP verified Production on 2026-06-28: latest migration ledger
 `20260621104056_master_catalog_phase1b_hardening` corresponds to root
 migration `011`. Owner direction is to ship Factor F first, so Factor F
-reserves `012`, `013`, and `014`; Master Catalog Phase 4 database migrations
-start at `015+`.
+reserves `012`, `013`, `014`, and `015`; Master Catalog Phase 4 database migrations
+start at `016+`.
 
 ## 2. Verified Production baseline
 

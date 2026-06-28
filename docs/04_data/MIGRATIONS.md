@@ -1,7 +1,7 @@
 # Migrations
 ## Conduit BOQ System
 
-**Last Updated:** 2026-06-28
+**Last Updated:** 2026-06-29
 **Status:** Canonical
 
 ---
@@ -31,7 +31,8 @@
 | `012_factor_f_version_foundation.sql` | Factor F version tables, singleton pointer, `boq.factor_reference_version_id`, RLS/grants/triggers | **Draft created and local-verified 2026-06-28 — not applied to Production** |
 | `013_factor_f_seed_current_baseline.sql` | Seed audited current 37-row `factor_reference` baseline as Factor F `2566.0.0` and move the default pointer | **Draft created and local-verified 2026-06-28 — no legacy BOQ backfill; not applied to Production** |
 | `014_factor_f_publish_2569_0_0.sql` | Publish Factor F `2569.0.0` from กค 0433.2/ว 481 and move the default pointer | **Draft created and local-verified 2026-06-28 — no legacy BOQ backfill; not applied to Production** |
-| `015+_master_catalog_phase4_*.sql` | Master Catalog Phase 4 database migrations | **Planned — shifted later because Factor F is owner-selected first** |
+| `015_factor_f_repair_legacy_snapshot_metadata.sql` | Repair missing legacy Factor F snapshot metadata for BOQs whose saved `factor_f` exactly matches `2566.0.0`; does not bind legacy BOQs to a version | **Draft created 2026-06-29 — no reprice and no legacy version backfill; not applied to Production** |
+| `016+_master_catalog_phase4_*.sql` | Master Catalog Phase 4 database migrations | **Planned — shifted later because Factor F is owner-selected first and repair `015` is approved** |
 
 ### Local Schema Baseline (`supabase/local/`)
 
@@ -59,11 +60,20 @@ migration number `009`. The Master Catalog rollout therefore starts with
 Supabase MCP verified Production on 2026-06-28: the latest migration ledger
 entry is `20260621104056_master_catalog_phase1b_hardening`, corresponding to
 root migration `011`. Factor F now ships before Master Catalog Phase 4, so
-Factor F reserves root migrations `012`, `013`, and `014`; Master Catalog
-Phase 4 starts at `015+`. F2 uses `2566.0.0` for the audited current Factor F
+Factor F reserves root migrations `012`, `013`, `014`, and `015`; Master Catalog
+Phase 4 starts at `016+`. F2 uses `2566.0.0` for the audited current Factor F
 baseline sourced from `FACTOR F 2566_7.PDF`; F3 uses `2569.0.0` for the
 owner-confirmed ว481 source table and has been local-verified with dataset hash
 `sha256:4f35b267bde3007439aebb193be1e53bdcea5a7acce95b5a7bbf5828018ef1a6`.
+
+Supabase MCP re-verified Production on 2026-06-29 before Factor F rollout:
+remote migrations `012` through `015` are still not applied, the live
+`factor_reference` table matches the planned `2566.0.0` dataset hash
+`sha256:77a2568bed09670242dcadc444be344c638868a7813f2a25ccbb6e6fb8d7ad61`,
+and the BOQ inventory is captured in
+[08-production-inventory-readiness.md](../plans/factor-f/08-production-inventory-readiness.md).
+The owner approved legacy snapshot metadata repair, so migration `015` is
+reserved for Factor F repair and Master Catalog Phase 4 shifts to `016+`.
 
 `010a_master_catalog_phase1a_indexes.sql` is an operational runbook rather than
 a transactional migration. Run its `CREATE INDEX CONCURRENTLY` statements one
@@ -78,7 +88,7 @@ at a time outside an explicit transaction.
 Use `npm run db:local:bootstrap`. It resets Local Supabase to the schema-only
 Production baseline, restores scrubbed snapshots, applies root migrations
 `009` and `010`, applies all four `010a` concurrent indexes individually, then
-applies `011`, Factor F `012` through `014`, and runs the Phase 2 smoke tests.
+applies `011`, Factor F `012` through `015`, and runs the Phase 2 smoke tests.
 
 The CLI remains intentionally unlinked from Production. Do not use `db push`,
 `db pull`, or linked diff commands from this worktree. Local migration history

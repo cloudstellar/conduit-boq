@@ -46,6 +46,7 @@ docker cp migrations/011_master_catalog_phase1b_hardening.sql "$DB_CONTAINER:/tm
 docker cp migrations/012_factor_f_version_foundation.sql "$DB_CONTAINER:/tmp/012.sql"
 docker cp migrations/013_factor_f_seed_current_baseline.sql "$DB_CONTAINER:/tmp/013.sql"
 docker cp migrations/014_factor_f_publish_2569_0_0.sql "$DB_CONTAINER:/tmp/014.sql"
+docker cp migrations/015_factor_f_repair_legacy_snapshot_metadata.sql "$DB_CONTAINER:/tmp/015.sql"
 docker exec "$DB_CONTAINER" psql -v ON_ERROR_STOP=1 -U postgres -d postgres -f /tmp/009.sql
 docker exec "$DB_CONTAINER" psql -v ON_ERROR_STOP=1 -U postgres -d postgres -f /tmp/010.sql
 
@@ -64,6 +65,7 @@ docker exec "$DB_CONTAINER" psql -v ON_ERROR_STOP=1 -U postgres -d postgres -f /
 docker exec "$DB_CONTAINER" psql -v ON_ERROR_STOP=1 -U postgres -d postgres -f /tmp/012.sql
 docker exec "$DB_CONTAINER" psql -v ON_ERROR_STOP=1 -U postgres -d postgres -f /tmp/013.sql
 docker exec "$DB_CONTAINER" psql -v ON_ERROR_STOP=1 -U postgres -d postgres -f /tmp/014.sql
+docker exec "$DB_CONTAINER" psql -v ON_ERROR_STOP=1 -U postgres -d postgres -f /tmp/015.sql
 
 npm run db:local:seed-users
 npm run db:local:smoke-auth
@@ -91,6 +93,19 @@ docker exec "$DB_CONTAINER" psql -v ON_ERROR_STOP=1 -U postgres -d postgres -Atc
       FROM public.factor_reference_rows r
       JOIN public.factor_reference_versions v ON v.id = r.version_id
       WHERE v.version_string = '2569.0.0'
+    ),
+    'factor_f_partial_legacy_snapshots_remaining', (
+      SELECT count(*)
+      FROM public.boq
+      WHERE factor_reference_version_id IS NULL
+        AND factor_f IS NOT NULL
+        AND (
+          factor_f_raw IS NULL
+          OR factor_f_lower_cost IS NULL
+          OR factor_f_upper_cost IS NULL
+          OR factor_f_lower_value IS NULL
+          OR factor_f_upper_value IS NULL
+        )
     )
   );"
 

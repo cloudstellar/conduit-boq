@@ -42,6 +42,36 @@ describe('Factor F interpolation', () => {
     })).toBe(false)
   })
 
+  it('accepts a saved 5M floor snapshot for jobs below the first reference bracket', () => {
+    expect(isFactorSnapshotUsable(4_968_750, {
+      factor_f: 1.275,
+      factor_f_lower_cost: 5_000_000,
+      factor_f_upper_cost: 5_000_000,
+      factor_f_lower_value: 1.275,
+      factor_f_upper_value: 1.275,
+    })).toBe(true)
+  })
+
+  it('rejects non-minimum exact snapshots when the job is below the saved bracket', () => {
+    expect(isFactorSnapshotUsable(6_000_000, {
+      factor_f: 1.2518,
+      factor_f_lower_cost: 10_000_000,
+      factor_f_upper_cost: 10_000_000,
+      factor_f_lower_value: 1.2518,
+      factor_f_upper_value: 1.2518,
+    })).toBe(false)
+  })
+
+  it('accepts a saved 700M ceiling snapshot for jobs above the last reference bracket', () => {
+    expect(isFactorSnapshotUsable(1_201_013_647, {
+      factor_f: 1.0744,
+      factor_f_lower_cost: 700_000_000,
+      factor_f_upper_cost: 700_000_000,
+      factor_f_lower_value: 1.0744,
+      factor_f_upper_value: 1.0744,
+    })).toBe(true)
+  })
+
   it('accepts a saved 30-40M snapshot that brackets the job cost', () => {
     expect(isFactorSnapshotUsable(33_000_000, {
       factor_f: 1.1394,

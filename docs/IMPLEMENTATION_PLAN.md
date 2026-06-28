@@ -159,8 +159,9 @@ owner-selected before Master Catalog Phase 4, reserve:
 - `migrations/012_factor_f_version_foundation.sql`
 - `migrations/013_factor_f_seed_current_baseline.sql`
 - `migrations/014_factor_f_publish_2569_0_0.sql`
+- `migrations/015_factor_f_repair_legacy_snapshot_metadata.sql`
 
-Master Catalog Phase 4 database migrations must therefore start at `015+`.
+Master Catalog Phase 4 database migrations must therefore start at `016+`.
 Local implementation does not affect users; Production F1/F2 should be a
 controlled additive migration/deploy window, and F3 changes only the default
 Factor F for newly created BOQs.

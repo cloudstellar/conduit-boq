@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { createClient } from '@/lib/supabase/client';
 import { getActiveDefaultPriceListVersionId } from '@/lib/catalog/defaultVersion';
+import { getActiveDefaultFactorReferenceVersion } from '@/lib/factorFReference';
 import { useAuth } from '@/lib/context/AuthContext';
 import { can } from '@/lib/permissions';
 import ProjectInfoForm from '@/components/boq/ProjectInfoForm';
@@ -70,9 +71,10 @@ export default function CreateBOQPage() {
     setError(null);
 
     try {
-      const [authResult, priceListVersionId] = await Promise.all([
+      const [authResult, priceListVersionId, factorReferenceVersion] = await Promise.all([
         supabase.auth.getUser(),
         getActiveDefaultPriceListVersionId(supabase),
+        getActiveDefaultFactorReferenceVersion(supabase),
       ]);
       const authUser = authResult.data.user;
 
@@ -89,6 +91,7 @@ export default function CreateBOQPage() {
           department: projectInfo.department || null,
           status: 'draft',
           price_list_version_id: priceListVersionId,
+          factor_reference_version_id: factorReferenceVersion.id,
           // Ownership fields (injected from authenticated user)
           created_by: authUser.id,
           org_id: user?.org_id || null,

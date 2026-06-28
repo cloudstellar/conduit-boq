@@ -61,7 +61,7 @@ Supabase MCP verified on 2026-06-28 that `20260621104056` / root migration
 `011` is the latest applied migration. Owner direction is to ship Factor F
 before Master Catalog Phase 4, reserving root migrations `012`, `013`, and
 `014` for the Factor F track. Master Catalog Phase 4 database migrations start
-at `015+`.
+at `016+`.
 
 The previous P0 → 1A → 2 → 1B change is complete. Phase 4 has not started.
 

@@ -414,7 +414,8 @@ idx_boq_items_route_id   ON boq_items(route_id)
 | `012_factor_f_version_foundation.sql` | Factor F version tables + BOQ factor version FK | Draft local-verified 2026-06-28; not Production |
 | `013_factor_f_seed_current_baseline.sql` | Seed audited current Factor F baseline `2566.0.0` | Draft local-verified 2026-06-28; not Production |
 | `014_factor_f_publish_2569_0_0.sql` | Publish Factor F `2569.0.0` from confirmed ว 481 source | Draft local-verified 2026-06-28; not Production |
-| `015+_master_catalog_phase4_*.sql` | Master Catalog Phase 4 database migrations | Planned after Factor F migrations |
+| `015_factor_f_repair_legacy_snapshot_metadata.sql` | Repair legacy Factor F snapshot metadata without repricing or binding old BOQs | Draft created 2026-06-29; not Production |
+| `016+_master_catalog_phase4_*.sql` | Master Catalog Phase 4 database migrations | Planned after Factor F migrations |
 
 ---
 

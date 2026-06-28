@@ -1553,7 +1553,7 @@ Do not advance when any gate fails:
   Production on 2026-06-28 with latest ledger entry
   `20260621104056_master_catalog_phase1b_hardening` (`011`). Because Factor F
   ships before Master Catalog Phase 4, Factor F reserves `012`, `013`, and
-  `014`; Master Catalog Phase 4 database migrations start at `015+`. Do not
+  `015`; Master Catalog Phase 4 database migrations start at `016+`. Do not
   create parallel migrations with the same logical order.
 - No paid Supabase branch or additional hosted project is created.
 - Compatibility columns are retained through the first stable Production cycle.

@@ -64,8 +64,8 @@ Stop immediately when any of these occurs:
 
 1. Confirm Factor F track status before scheduling any Master Catalog Phase 4
    database migration. Owner direction on 2026-06-28 is Factor F first, so
-   Master Catalog Phase 4 migrations must start at `015+` after the planned
-   Factor F migrations `012`, `013`, and `014`, unless a later owner decision
+   Master Catalog Phase 4 migrations must start at `016+` after the planned
+   Factor F migrations `012`, `013`, `014`, and `015`, unless a later owner decision
    explicitly changes the sequence.
 2. Record owner approval of ADR-004 and implementation/local-rehearsal CR gate.
 3. Review the 728-record reconciliation draft.

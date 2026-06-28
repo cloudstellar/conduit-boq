@@ -90,6 +90,7 @@ Planned Factor F migrations:
 - `012_factor_f_version_foundation`
 - `013_factor_f_seed_current_baseline` (`2566.0.0` baseline)
 - `014_factor_f_publish_2569_0_0`
+- `015_factor_f_repair_legacy_snapshot_metadata`
 
 The official source is กค 0433.2/ว 481 effective 2026-06-26; F3 publication
 still requires row-level diff, dataset hash, and final owner review.
@@ -101,7 +102,7 @@ official stamped Excel/PDF, and audited pointer restore require the separate
 [Phase 4 Change Request](../plans/master-catalog/09-phase4-change-request.md).
 Implementation/local rehearsal, Production migration, deploy, enablement, and
 publication each have explicit approval gates. Because Factor F now ships
-first, Master Catalog Phase 4 database migrations start at `015+`.
+first, Master Catalog Phase 4 database migrations start at `016+`.
 
 Start review from the
 [Phase 4 Review Guide](../plans/master-catalog/00-phase4-review-guide.md).
@@ -132,7 +133,8 @@ Start review from the
 | 012_factor_f_version_foundation | Factor F version tables + BOQ factor version FK | Draft local-verified 2026-06-28; not Production |
 | 013_factor_f_seed_current_baseline | Seed audited current Factor F baseline `2566.0.0` | Draft local-verified 2026-06-28; not Production |
 | 014_factor_f_publish_2569_0_0 | Publish Factor F `2569.0.0` from ว 481 source | Planned before MC Phase 4 |
-| 015+_master_catalog_phase4_* | Master Catalog Phase 4 DB migrations | Planned after Factor F |
+| 015_factor_f_repair_legacy_snapshot_metadata | Repair legacy Factor F snapshot metadata without repricing or binding old BOQs | Planned before MC Phase 4 |
+| 016+_master_catalog_phase4_* | Master Catalog Phase 4 DB migrations | Planned after Factor F |
 
 ---
 

@@ -86,8 +86,8 @@ Supabase MCP verified Production on 2026-06-28: the latest applied migration
 ledger entry is `20260621104056_master_catalog_phase1b_hardening`,
 corresponding to `migrations/011_master_catalog_phase1b_hardening.sql`. The
 Factor F track is owner-selected before Master Catalog Phase 4, so reserve
-root migration numbers `012`, `013`, and `014` for Factor F. Master Catalog
-Phase 4 database migrations must start at `015+`. Never reuse a number or
+root migration numbers `012`, `013`, `014`, and `015` for Factor F. Master Catalog
+Phase 4 database migrations must start at `016+`. Never reuse a number or
 create parallel migrations with the same logical order.
 
 | Area | Expected files |
@@ -95,6 +95,7 @@ create parallel migrations with the same logical order.
 | Database migration F1 | `migrations/012_factor_f_version_foundation.sql` |
 | Database seed F2 | `migrations/013_factor_f_seed_current_baseline.sql` |
 | Database publish F3 | `migrations/014_factor_f_publish_2569_0_0.sql` |
+| Database repair F4 | `migrations/015_factor_f_repair_legacy_snapshot_metadata.sql` |
 | Types | `lib/supabase.ts` or generated DB types if/when generation is introduced |
 | Factor utilities | `lib/factorF.ts` only if helper signatures need version metadata; calculation formula should not change |
 | Create BOQ | `app/boq/create/page.tsx` |

@@ -30,6 +30,7 @@ agents do not infer missing context.
 | Duplicate `cost_million` thresholds | 0 |
 | Invalid required Factor F rows | 0 |
 | BOQ snapshot coverage | 206 total BOQs; 70 complete snapshots; 136 incomplete snapshots |
+| 2026-06-29 BOQ repair finding | 57 partial legacy BOQs have saved `factor_f` values that exactly match `2566.0.0`; owner approved metadata repair as migration 015 |
 | Legacy grants | Broad grants exist on `factor_reference`; do not copy them to new version tables |
 
 ## Local Actions
@@ -45,6 +46,8 @@ agents do not infer missing context.
 | 2026-06-28 | Added F2 current-baseline runbook and owner-decision checklist before creating migration 013. | `docs/plans/factor-f/06-f2-current-baseline-runbook.md` | None |
 | 2026-06-28 | Aligned F1 active-version metadata constraint so local re-apply and F2 can publish the PDF-backed baseline while still allowing future legacy exceptions. | `migrations/012_factor_f_version_foundation.sql` | None |
 | 2026-06-28 | Created F2 seed migration for owner-confirmed baseline version `2566.0.0`, sourced from `FACTOR F 2566_7.PDF`, with row-count/hash preflight and no BOQ backfill. | `migrations/013_factor_f_seed_current_baseline.sql` | None |
+| 2026-06-29 | Added F4 repair migration for missing legacy snapshot metadata, guarded by `2566.0.0` hash and saved-factor equality. | `migrations/015_factor_f_repair_legacy_snapshot_metadata.sql` | None |
+| 2026-06-29 | Updated no-maintenance rollout plan and shifted Master Catalog Phase 4 migration numbering to `016+`. | `docs/04_data/MIGRATIONS.md`, `docs/plans/factor-f/08-production-inventory-readiness.md`, Master Catalog planning docs | None |
 
 ## Implementation Decisions During F1
 
@@ -56,6 +59,7 @@ agents do not infer missing context.
 | 2026-06-28 | `trigger_set_default_factor_reference_version` validates active status only when `NEW.factor_reference_version_id IS NOT NULL`. | A local rollback test found the earlier `NOT EXISTS` branch rejected intentional `NULL` legacy duplicate rows. |
 | 2026-06-28 | Active Factor F versions require source/approval/published/hash metadata, but not `effective_date` at the database constraint level. | Production current baseline does not contain exact source effective-date evidence; F2 must not invent one. F3/official publication must assert its own effective date. |
 | 2026-06-28 | Owner confirmed `FACTOR F 2566_7.PDF` as the source for the current baseline, selected `2566.0.0` as the baseline version identity, and reserved `2569.0.0` for the new ว481 Factor F table. | Keeps BE-year versioning tied to the source/effective year rather than rollout year. |
+| 2026-06-29 | Owner approved `015_factor_f_repair_legacy_snapshot_metadata.sql` and selected a no-maintenance rollout. | Use staged execution: apply `012`/`013`, deploy version-aware app, then apply `014`/`015`; never run `014` while the old app is still accepting writes. |
 
 ## Local Verification
 
@@ -75,6 +79,8 @@ agents do not infer missing context.
 | 2026-06-28 | Local re-apply of `migrations/012_factor_f_version_foundation.sql` after active metadata constraint alignment | Passed |
 | 2026-06-28 | Local apply of `migrations/013_factor_f_seed_current_baseline.sql` | Passed; active `2566.0.0`, 37 seeded rows, default pointer moved to `2566.0.0`, `backfilled_boq_count = 0` |
 | 2026-06-28 | Local F2 new BOQ rollback test | Passed; inserted draft bound `factor_reference_version_id` to version `2566.0.0`, transaction rolled back |
+| 2026-06-29 | Local apply of `migrations/015_factor_f_repair_legacy_snapshot_metadata.sql` after `014` | Passed; 57 repair candidates, 57 updated, postconditions passed |
+| 2026-06-29 | Local post-015 grouping query | Passed; partial legacy snapshots remaining = 0, default pointer remained `2569.0.0` |
 
 ## F1 Scope Guard
 
@@ -97,15 +103,9 @@ F1 must not:
 
 ## Next Review Items
 
-- Review `migrations/012_factor_f_version_foundation.sql` against ADR-005 and
-  the F1 implementation plan.
-- Review `migrations/013_factor_f_seed_current_baseline.sql` against the F2
-  runbook and repeat the preflight immediately before Production execution.
-- Decide whether F1 and F2 should be deployed in one approved maintenance
-  window so new BOQ creation immediately has the `2566.0.0` default pointer.
-- Run the same SQL verification on staging or a Supabase branch before any
-  Production execution.
+- Prepare the no-maintenance Production runbook: apply `012`/`013`, deploy the
+  version-aware app, apply `014`/`015`, then smoke test create/edit/print/Excel.
+- Repeat the Production inventory preflight immediately before applying `012`.
+- Do not apply `014` while the old application is still accepting create/edit
+  saves.
 - Review whether local DB should be reset after this verification run.
-- Prepare F3 migration `014_factor_f_publish_2569_0_0.sql` only after the
-  36-row ว481 source transcription, diff, checksum, and owner approval are
-  complete.

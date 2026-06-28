@@ -29,6 +29,9 @@ export interface FactorSnapshotData {
   factor_f_upper_value: number | null;
 }
 
+const MINIMUM_FACTOR_REFERENCE_COST = 5_000_000;
+const MAXIMUM_FACTOR_REFERENCE_COST = 700_000_000;
+
 export function truncateFactor(value: number): number {
   return Math.floor(value * 10000) / 10000;
 }
@@ -53,11 +56,19 @@ export function isFactorSnapshotUsable(
   }
 
   if (snapshot.factor_f_lower_cost > totalCost) {
-    return false;
+    return (
+      snapshot.factor_f_lower_cost === MINIMUM_FACTOR_REFERENCE_COST &&
+      snapshot.factor_f_upper_cost === MINIMUM_FACTOR_REFERENCE_COST &&
+      totalCost > 0
+    );
   }
 
   if (snapshot.factor_f_upper_cost > snapshot.factor_f_lower_cost) {
     return totalCost < snapshot.factor_f_upper_cost;
+  }
+
+  if (snapshot.factor_f_lower_cost === MAXIMUM_FACTOR_REFERENCE_COST) {
+    return totalCost >= MAXIMUM_FACTOR_REFERENCE_COST;
   }
 
   return totalCost <= snapshot.factor_f_lower_cost;
