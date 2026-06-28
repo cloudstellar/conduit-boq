@@ -32,6 +32,8 @@ The owner is asked to confirm:
    [ADR-005](../../02_architecture/ADR/ADR-005-versioned-factor-f-reference.md)
    plus the separate
    [Factor F Change Request](../factor-f/01-versioned-factor-f-change-request.md).
+   The first Factor F rollout is already complete; Phase 4 must preserve that
+   separate version binding rather than treating Factor F as catalog data.
 
 ## 2. Current verified baseline
 
@@ -56,12 +58,20 @@ Production migration ledger includes:
 - `20260621045208_master_catalog_p0_containment`
 - `20260621052517_master_catalog_phase1a_versioning`
 - `20260621104056_master_catalog_phase1b_hardening`
+- `20260628190218_factor_f_version_foundation`
+- `20260628190357_factor_f_seed_current_baseline`
+- `20260628190621_factor_f_publish_2569_0_0`
+- `20260628190757_factor_f_repair_legacy_snapshot_metadata`
 
-Supabase MCP verified on 2026-06-28 that `20260621104056` / root migration
-`011` is the latest applied migration. Owner direction is to ship Factor F
-before Master Catalog Phase 4, reserving root migrations `012`, `013`, and
-`014` for the Factor F track. Master Catalog Phase 4 database migrations start
-at `016+`.
+Supabase MCP verified after the Factor F rollout that root migrations `012`
+through `015` are applied, current Factor F default is `2569.0.0`, and legacy
+BOQs were not backfilled with a guessed Factor F version. Master Catalog Phase
+4 database migrations start at `016+`.
+
+Live BOQ counts can change while users continue working. The closeout count is
+evidence for the Factor F rollout, not a fixed Phase 4 preflight expectation.
+Every Production Phase 4 gate must record fresh live counts and the current
+split between legacy snapshot-only BOQs and version-bound Factor F BOQs.
 
 The previous P0 → 1A → 2 → 1B change is complete. Phase 4 has not started.
 
@@ -130,8 +140,9 @@ After completion, an active admin can:
 - Removal of legacy compatibility columns in the same release
 - Redesign of unrelated screens or dashboard metric wording
 - Changes to BOQ print label “แบบ ปร.1”
-- Factor F reference changes, legacy BOQ factor-version backfill, or automatic
-  repricing of existing BOQs
+- Factor F reference changes, Factor F pointer changes, legacy BOQ
+  factor-version backfill, mutation of `boq.factor_reference_version_id`, or
+  automatic repricing of existing BOQs
 
 ## 6. Data-source rule
 
@@ -159,12 +170,10 @@ separate approved price authority. Production-only rows remain present.
 
 ## 7. Proposed implementation sequence
 
-If Factor F must change now, run the separate F-track before changing live
-Factor F values. The recommended order is F0 approval, F1 additive Factor F
-foundation, F2 current baseline seed without legacy BOQ backfill, then F3
-publish the new Factor F version. Master Catalog local work may continue, but
-Master Catalog publication and Factor F publication should not share one
-Production window unless both CRs explicitly approve it.
+The separate Factor F track completed before Master Catalog Phase 4. Master
+Catalog local work may continue on top of that baseline, but Master Catalog
+publication and any future Factor F publication must not share one Production
+window unless both CRs explicitly approve it.
 
 | Phase | Purpose | Production effect |
 |---|---|---|

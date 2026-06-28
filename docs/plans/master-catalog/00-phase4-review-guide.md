@@ -7,11 +7,13 @@
 
 - Production Phase 0 → 1A → 2 → 1B: **เสร็จและใช้งานอยู่**
 - Current Master Catalog: **`2568.0.0`, 710 รายการ**
+- Factor F versioning: **เสร็จแล้วก่อน Phase 4; default ปัจจุบันคือ
+  `2569.0.0` และ BOQ เก่าไม่ได้ถูก backfill**
 - Phase 4 Admin/Import/Publish/Official Export: **ยังไม่เริ่ม implement**
-- รอบนี้: **จัดทำ/ปรับเอกสารและ reconciliation draft เท่านั้น**
-- ไม่มีการแก้ Production, deploy หรือ publish
-- เอกสาร Phase 4 ถูก checkpoint ใน branch ปัจจุบันแล้ว; review รอบถัดไป
-  ควรดูจาก commit ล่าสุดของ branch นี้
+- รอบถัดไปของ Phase 4: **เริ่มจาก baseline หลัง Factor F `012-015` และ
+  migration ถัดไปคือ `016+`**
+- เอกสาร Phase 4 ต้องใช้ live preflight count เสมอ เพราะ BOQ ใหม่อาจเพิ่ม
+  ระหว่างรอ implement
 
 ## ลำดับแนะนำในการ review
 
@@ -46,6 +48,9 @@
 - Raw workbook เก็บในแฟ้มจริง ไม่ใช้ Supabase Storage/signed upload
 - ไม่สร้าง paid Supabase branch/project เพิ่ม
 - K mapping และ BOQ Rebase อยู่นอก Phase 4 Core
+- Factor F อยู่นอก Master Catalog versioning; Phase 4 ต้อง preserve
+  `boq.factor_reference_version_id`, Factor F pointer, และ legacy snapshot
+  policy เดิม
 
 ## เรื่องที่เจ้าของยังต้องตัดสินใจ
 
@@ -60,6 +65,7 @@
 | Runtime font/logo derivative ใด commit/deploy ได้ | CI implementation ยังเริ่มไม่ได้ |
 | Metadata จริงของ baseline `2568.0.0` | ยัง validate publication-completeness constraint ไม่ได้ |
 | รูปแบบตัวอย่าง Excel/PDF ตาม Export Spec | ยังปิดงาน export acceptance ไม่ได้ |
+| Live Production preflight หลัง Factor F rollout | ต้อง refresh ก่อนทุก Production gate; ห้ามใช้ BOQ count จาก closeout เป็นค่าตายตัว |
 
 ## ตัวเลข reconciliation ที่ต้องใช้เป็นจุดตรวจ
 

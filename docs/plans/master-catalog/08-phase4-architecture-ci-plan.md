@@ -1549,6 +1549,15 @@ Do not advance when any gate fails:
   `2569.0.0`, and legacy snapshot metadata repair without old BOQ version
   backfill. The detailed Factor F CR, implementation plan, source-table annex,
   and rollout closeout live in `docs/plans/factor-f/`.
+- Phase 4 now runs in a two-axis version model: catalog version controls item
+  identity/name/unit/price, while Factor F version controls calculation
+  reference data. New BOQs bind both axes independently. Historical BOQs keep
+  their existing catalog version and either their bound Factor F version or
+  legacy snapshot-only state.
+- Any Phase 4 change to BOQ save, duplicate, print, Excel, or admin tooling
+  must prove that `boq.factor_reference_version_id` values, Factor F pointer
+  state, and legacy snapshot behavior are unchanged unless a separate Factor F
+  CR explicitly authorizes the change.
 - Migration numbering follows actual execution order. Factor F used root
   migrations `012`, `013`, `014`, and `015`; Master Catalog Phase 4 database
   migrations start at `016+`. Do not create parallel migrations with the same

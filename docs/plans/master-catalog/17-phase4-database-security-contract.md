@@ -65,6 +65,12 @@ contract. If Factor F must change again, apply ADR-005 first: use the dedicated
 factor version/pointer model, keep old BOQs snapshot-only unless exact source
 evidence exists, and publish the new factor version through its own gate.
 
+Phase 4 implementation must treat the Factor F rollout as existing Production
+state. Migration `016+` may depend on the presence of
+`boq.factor_reference_version_id`, but must not change its values, drop its
+foreign key/index, disable its immutability trigger, or repoint
+`factor_reference_default_version`.
+
 ## 3. Logical model
 
 ```mermaid
@@ -135,6 +141,18 @@ Rules:
   legacy shape.
 - Factor F publication must not be hidden inside a Master Catalog migration or
   catalog publish transaction.
+- If Phase 4 replaces or wraps `save_boq_with_routes`, it must preserve the
+  existing BOQ Factor F contract: do not update
+  `boq.factor_reference_version_id`, keep the bound version immutable, save
+  snapshot fields only from the BOQ's bound version, and fail closed for legacy
+  BOQs that have no usable snapshot.
+- New BOQ creation must bind both independent references: the current price
+  catalog pointer and the current Factor F pointer. These bindings are not
+  derived from each other.
+- BOQ duplicate/preserve keeps both bindings and saved snapshots. BOQ
+  duplicate/reprice intentionally creates a new BOQ with a selected active
+  Factor F version and reset Factor F snapshot fields; it must not mutate the
+  source BOQ.
 
 ## 5. Changes to existing tables
 

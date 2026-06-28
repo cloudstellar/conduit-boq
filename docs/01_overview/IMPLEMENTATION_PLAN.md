@@ -100,8 +100,10 @@ Admin manual change/import, stable identity, item history, catalog publish,
 official stamped Excel/PDF, and audited pointer restore require the separate
 [Phase 4 Change Request](../plans/master-catalog/09-phase4-change-request.md).
 Implementation/local rehearsal, Production migration, deploy, enablement, and
-publication each have explicit approval gates. Because Factor F now ships
-first, Master Catalog Phase 4 database migrations start at `016+`.
+publication each have explicit approval gates. Because Factor F shipped first,
+Master Catalog Phase 4 database migrations start at `016+`, and every Phase 4
+preflight must preserve Factor F version bindings and live legacy snapshot
+state.
 
 Start review from the
 [Phase 4 Review Guide](../plans/master-catalog/00-phase4-review-guide.md).

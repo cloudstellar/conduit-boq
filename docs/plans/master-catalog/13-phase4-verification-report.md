@@ -56,6 +56,22 @@ Read-only Supabase MCP evidence on 2026-06-22:
 
 This is not a substitute for live preflight.
 
+Post-Factor-F rollout evidence on 2026-06-29:
+
+| Check | Observed result |
+|---|---:|
+| Latest migration ledger | `20260628190757_factor_f_repair_legacy_snapshot_metadata` |
+| Price rows / default version | 710 / `2568.0.0` |
+| Factor F default version | `2569.0.0` |
+| Factor F active versions | `2566.0.0`, `2569.0.0` |
+| BOQs / BOQs with price version gap | 207 / 0 |
+| BOQs bound to Factor F version | 1 |
+| Legacy usable Factor F snapshots | 127 |
+| Legacy BOQs missing Factor F snapshot | 79 |
+
+These are point-in-time observations. Use them to understand the mixed BOQ
+population, not as fixed rollout expectations.
+
 ## 5. Fresh Production preflight
 
 | Check | Expected | Actual | Timestamp/source | Result |
@@ -68,9 +84,12 @@ This is not a substitute for live preflight.
 | Current active/default version | One expected version |  |  | Pending |
 | Default pointer rows | 1 |  |  | Pending |
 | BOQ version gaps/cross-version items | 0 |  |  | Pending |
-| Factor F approved checksum | Unchanged |  |  | Pending |
+| Factor F default version | Active expected default |  |  | Pending |
+| Factor F version row counts/hashes | Match published metadata |  |  | Pending |
+| BOQ Factor F binding split | Recorded live; no unexplained mutation |  |  | Pending |
+| Legacy Factor F snapshot states | Recorded live; no partial repair regression |  |  | Pending |
 | Unexpected active admin activity | 0 |  |  | Pending |
-| Migration ledger drift | None |  |  | Pending |
+| Migration ledger drift | Latest includes Factor F `015`; no unexpected newer migration |  |  | Pending |
 
 ## 6. Backup and restore
 
@@ -123,6 +142,9 @@ Approved dictionary fingerprint: `_______________________________`
 | New `catalog_admin_enabled` value type/default | JSON boolean / `false` |  | Pending |
 | Private mutation functions unexposed | Confirmed |  | Pending |
 | Data API grants explicit | Confirmed |  | Pending |
+| `boq.factor_reference_version_id` FK/index/immutability trigger | Preserved |  | Pending |
+| Factor F version tables/pointer/RLS/grants | Unchanged by Phase 4 migration |  | Pending |
+| `save_boq_with_routes` replacement, if any | Preserves price version and Factor F version contracts |  | Pending |
 
 ## 9. RLS and authorization matrix
 
@@ -198,6 +220,8 @@ Also verify:
 | Former current version after publish | Still Published/Active; immutable; not automatically archived | Pending |
 | Published row mutation | Rejected | Pending |
 | Pointer restore | Audited; BOQs unchanged | Pending |
+| Factor F pointer after catalog publish | Unchanged from preflight | Pending |
+| BOQ Factor F bindings after catalog publish | No mutation | Pending |
 
 ## 13. Canonical hash and export
 
@@ -216,6 +240,8 @@ Also verify:
 | Excel exact 5 sheets/headers; no formulas/external links | Exact |  | Pending |
 | PDF Thai font/header/page/clipping | Correct |  | Pending |
 | Short dataset hash | Exactly `sha256:` + first 12 hex + `…`; full hash also present |  | Pending |
+| Catalog export dataset/hash excludes Factor F rows | Confirmed |  | Pending |
+| BOQ print/export regression | Catalog version and Factor F version/snapshot labels still correct |  | Pending |
 
 Official export file/reference and binary SHA-256 (different from dataset hash):
 
@@ -236,6 +262,9 @@ Official export file/reference and binary SHA-256 (different from dataset hash):
 | Duplicate Preserve |  |  | Pending |
 | Print “แบบ ปร.1” |  |  | Pending |
 | Existing BOQ export |  |  | Pending |
+| Existing version-bound BOQ Factor F label |  |  | Pending |
+| Existing legacy snapshot-only BOQ print/export |  |  | Pending |
+| Existing legacy missing-Factor-F BOQ failure state |  |  | Pending |
 | Catalog version list/detail |  |  | Pending |
 | Import/diff/manual/history |  |  | Pending |
 | Keyboard/focus/errors/contrast |  |  | Pending |
@@ -273,6 +302,8 @@ Accepted warnings require owner/technical rationale and remediation owner/date:
 | Pointer row count | 1 |  | Pending |
 | Legacy flag agreement | Exact |  | Pending |
 | Historical BOQs rewritten | 0 |  | Pending |
+| Historical BOQ `factor_reference_version_id` mutations | 0 |  | Pending |
+| Factor F default pointer/hash changed by Phase 4 | 0 |  | Pending |
 | Pre/post backup filed | Yes |  | Pending |
 | Official Excel/PDF filed | Yes |  | Pending |
 | Release note complete | Yes |  | Pending |

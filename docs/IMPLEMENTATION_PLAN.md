@@ -150,6 +150,12 @@ Master Catalog Phase 4 database migrations must therefore start at `016+`.
 Closeout evidence is recorded in
 [docs/plans/factor-f/10-production-rollout-closeout.md](./plans/factor-f/10-production-rollout-closeout.md).
 
+Phase 4 implementation must preserve the separate Factor F version axis. Any
+new or replaced BOQ save/duplicate/export path must keep
+`boq.factor_reference_version_id` immutable, must not backfill legacy BOQs, and
+must continue to show the Factor F version/snapshot state that belongs to each
+BOQ.
+
 Detailed execution is governed by
 [docs/plans/factor-f/03-implementation-plan.md](./plans/factor-f/03-implementation-plan.md).
 

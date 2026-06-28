@@ -66,6 +66,8 @@ Stop immediately when any of these occurs:
    4 database migration. Factor F `012` through `015` completed on 2026-06-29;
    current default Factor F is `2569.0.0`, legacy BOQs were not version
    backfilled, and Master Catalog Phase 4 migrations must start at `016+`.
+   Live BOQ counts may drift after the closeout; record current counts at every
+   Production gate instead of reusing the closeout count.
 2. Record owner approval of ADR-004 and implementation/local-rehearsal CR gate.
 3. Review the 728-record reconciliation draft.
 4. Resolve `ITEM-0131` / `ITEM-0139`: retain both distinct identities or retire
@@ -174,6 +176,62 @@ Expected baseline at document preparation: 710 rows, 710 codes, zero missing or
 mismatch rows, and one `2568.0.0` active/default pointer. Live approved changes
 must be reconciled; never force a stale expectation.
 
+Record the post-Factor-F baseline in the same preflight:
+
+```sql
+select
+  (select v.version_string
+   from public.factor_reference_default_version d
+   join public.factor_reference_versions v on v.id = d.version_id) as factor_default_version,
+  (select count(*) from public.factor_reference_versions) as factor_version_count,
+  (select count(*) from public.factor_reference_rows) as factor_reference_rows,
+  (select count(*) from public.boq) as boq_count,
+  (select count(*) from public.boq where price_list_version_id is null) as boq_missing_price_version,
+  (select count(*) from public.boq where factor_reference_version_id is not null) as boq_bound_factor_version;
+```
+
+Also capture the mixed BOQ population:
+
+```sql
+with classified as (
+  select
+    b.id,
+    fv.version_string as factor_version,
+    case
+      when b.factor_reference_version_id is not null then 'version_bound'
+      when b.factor_f is null then 'legacy_missing_factor_f'
+      when b.factor_f_raw is not null
+        and b.factor_f_lower_cost is not null
+        and b.factor_f_upper_cost is not null
+        and b.factor_f_lower_value is not null
+        and b.factor_f_upper_value is not null
+        and (
+          (b.factor_f_lower_cost = 5000000 and b.factor_f_upper_cost = 5000000)
+          or (b.factor_f_lower_cost = 700000000 and b.factor_f_upper_cost = 700000000)
+          or b.factor_f_lower_cost < b.factor_f_upper_cost
+        )
+        then 'legacy_usable_snapshot'
+      else 'legacy_partial_snapshot'
+    end as factor_state
+  from public.boq b
+  left join public.factor_reference_versions fv
+    on fv.id = b.factor_reference_version_id
+)
+select factor_state, coalesce(factor_version, '-') as factor_version, count(*) as boq_count
+from classified
+group by factor_state, factor_version
+order by factor_state, factor_version;
+```
+
+Expected policy, not fixed counts:
+
+- current Factor F default is an active version, currently `2569.0.0`;
+- `boq_missing_price_version = 0`;
+- legacy BOQs may remain unbound to Factor F by design;
+- version-bound BOQs may exist and must keep their current
+  `factor_reference_version_id`;
+- no Phase 4 step may backfill or mutate legacy Factor F version bindings.
+
 Also verify:
 
 - migration ledger matches repository history;
@@ -181,6 +239,9 @@ Also verify:
 - all current RLS/security invariants from Phase 1B remain intact;
 - no Factor F change is scheduled during the window unless a separate approved
   Factor F CR explicitly defines and verifies that coupling;
+- `factor_reference_versions`, `factor_reference_rows`,
+  `factor_reference_default_version`, and BOQ Factor F immutability triggers are
+  present and will not be modified by the Master Catalog migration;
 - no unexpected active admin session is editing catalog data.
 
 ## 8. Backup gate
@@ -221,6 +282,9 @@ No verified restore means no Production migration.
 - Current `2568.0.0` pointer and current application behavior are unchanged.
 - `is_default` mirror equals the singleton pointer.
 - Existing BOQ counts/version links are unchanged.
+- Existing `boq.factor_reference_version_id` values and legacy nulls are
+  unchanged.
+- Factor F default pointer, published rows, and dataset hashes are unchanged.
 - Security/performance advisors have no new blocker.
 
 If a post-commit issue exists, keep the flag disabled and forward-fix with a
@@ -232,9 +296,11 @@ new reviewed migration. Do not edit the applied migration file.
 2. Deploy the compatible application with Phase 4 flag disabled.
 3. Smoke current Dashboard, Price List, BOQ list/search/create/edit/duplicate,
    print “แบบ ปร.1”, and exports.
-4. Confirm labels/metrics outside approved Phase 4 UI are unchanged.
-5. Confirm no browser console/server error and no secret in client bundles.
-6. Run active-admin Phase 4 read smoke while the feature remains hidden from
+4. Smoke one version-bound BOQ and one legacy snapshot-only BOQ where available;
+   confirm Factor F version labels/snapshot behavior are unchanged.
+5. Confirm labels/metrics outside approved Phase 4 UI are unchanged.
+6. Confirm no browser console/server error and no secret in client bundles.
+7. Run active-admin Phase 4 read smoke while the feature remains hidden from
    ordinary users.
 
 On failure, revert the application deployment. The additive database schema is

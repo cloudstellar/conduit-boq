@@ -19,6 +19,12 @@ copies when their version, item count, and canonical dataset SHA-256 match the
 published record. The source workbook in the physical filing system remains
 supporting evidence.
 
+This specification is only for Master Catalog reference exports. BOQ print and
+Excel exports remain separate operational documents and must continue to show
+both the BOQ's price catalog version and its Factor F provenance. The Master
+Catalog dataset hash never includes Factor F rows, Factor F version metadata,
+BOQ snapshots, or BOQ totals.
+
 This document refines Section 6 of the
 [Phase 4 architecture plan](./08-phase4-architecture-ci-plan.md). The canonical
 data/hash rules in the
@@ -35,6 +41,7 @@ remain authoritative.
 | Current Default | Whether the selected version equals the singleton pointer at export time |
 | Published export | Export of an immutable published/active/archived version with complete official stamp |
 | Draft export | Admin-only review artifact, prominently marked not official |
+| Factor F version | Separate reference-data version used by BOQs; not part of the Master Catalog export dataset |
 
 Dataset and binary hashes are intentionally different:
 
@@ -47,6 +54,11 @@ Dataset and binary hashes are intentionally different:
 - two valid exports may have different binary hashes because of generation
   timestamps, workbook metadata, or PDF renderer differences while still
   having the same official dataset hash.
+
+Catalog and Factor F versions may have similar-looking version strings, for
+example catalog `2568.1.0` and Factor F `2569.0.0`. They are independent
+namespaces. Do not infer one from the other and do not print a Factor F version
+as evidence for a Master Catalog export.
 
 ## 3. Common export contract
 
@@ -65,6 +77,9 @@ Dataset and binary hashes are intentionally different:
    metadata.
 7. Current-default status is calculated separately at export time and does not
    change the selected dataset.
+8. Factor F state is not queried for Master Catalog dataset construction,
+   canonical hash, or official export count. A separate regression test covers
+   BOQ print/export Factor F labels.
 
 ### 3.2 Official stamp fields
 

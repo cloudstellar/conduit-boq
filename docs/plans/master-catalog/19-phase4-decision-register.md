@@ -83,7 +83,7 @@ pending decisions are recorded.
 | P-14 | Approve feature enablement | Requires Production migration/deploy verification | Owner | User visibility | Not requested |
 | P-15 | Approve publication of the exact named catalog version and its final diff/count/hash | Migration/deploy approval does not imply publish approval | Owner | Production publication | Not requested |
 | P-16 | Schedule Supabase legacy API-key migration | Separate maintenance change; complete before provider retirement and after inventory/rehearsal | Owner + developer | Separate security window | Pending |
-| P-17 | Approve Factor F F0-F4 gates if Factor F must change now | Completed before Master Catalog Phase 4. ADR-005 and the separate Factor F CR governed the rollout; current baseline from `FACTOR F 2566_7.PDF` is active as `2566.0.0`, the 26 June 2026 source-table annex is current default `2569.0.0`, legacy BOQs were not backfilled, and `015` repaired only missing legacy snapshot metadata without repricing or binding old BOQs | Owner + factor data custodian | Before any Factor F value change | Completed 2026-06-29; see Factor F closeout |
+| P-17 | Record completed Factor F F0-F4 gates before Master Catalog Phase 4 | Completed before Master Catalog Phase 4. ADR-005 and the separate Factor F CR governed the rollout; current baseline from `FACTOR F 2566_7.PDF` is active as `2566.0.0`, the 26 June 2026 source-table annex is current default `2569.0.0`, legacy BOQs were not backfilled, and `015` repaired only missing legacy snapshot metadata without repricing or binding old BOQs | Owner + factor data custodian | Before Master Catalog Phase 4 Production migration | Completed 2026-06-29; see Factor F closeout |
 
 ## 4. Deferred decisions
 
