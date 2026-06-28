@@ -4,6 +4,9 @@ import type { FactorReferenceCondition, FactorReferenceRow } from './factorF';
 export const FACTOR_REFERENCE_VERSION_REQUIRED_MESSAGE =
   'ใบประมาณราคานี้ยังไม่ได้ผูกกับเวอร์ชัน Factor F และไม่สามารถคำนวณจากตารางล่าสุดโดยอัตโนมัติได้';
 
+export const DEFAULT_FACTOR_REFERENCE_UNAVAILABLE_MESSAGE =
+  'ไม่พบเวอร์ชัน Factor F เริ่มต้นที่เปิดใช้งาน กรุณาติดต่อผู้ดูแลระบบ';
+
 export interface FactorReferenceVersionData extends FactorReferenceCondition {
   id: string;
   version_string: string;
@@ -40,6 +43,51 @@ export async function getActiveFactorReferenceVersion(
   }
 
   return data as FactorReferenceVersionData;
+}
+
+export async function getActiveDefaultFactorReferenceVersion(
+  supabase: SupabaseClient,
+): Promise<FactorReferenceVersionData> {
+  const { data: pointer, error: pointerError } = await supabase
+    .from('factor_reference_default_version')
+    .select('version_id')
+    .eq('id', true)
+    .maybeSingle();
+
+  if (pointerError) {
+    throw new Error(`${DEFAULT_FACTOR_REFERENCE_UNAVAILABLE_MESSAGE}: ${pointerError.message}`);
+  }
+
+  if (!pointer?.version_id) {
+    throw new Error(DEFAULT_FACTOR_REFERENCE_UNAVAILABLE_MESSAGE);
+  }
+
+  return getActiveFactorReferenceVersion(supabase, pointer.version_id);
+}
+
+export async function listActiveFactorReferenceVersions(
+  supabase: SupabaseClient,
+): Promise<FactorReferenceVersionData[]> {
+  const { data, error } = await supabase
+    .from('factor_reference_versions')
+    .select(`
+      id,
+      version_string,
+      name,
+      status,
+      advance_payment_percent,
+      retention_percent,
+      loan_interest_percent,
+      vat_percent
+    `)
+    .eq('status', 'active')
+    .order('version_string', { ascending: false });
+
+  if (error) {
+    throw new Error(`ไม่สามารถอ่านรายการเวอร์ชัน Factor F ได้: ${error.message}`);
+  }
+
+  return (data || []) as FactorReferenceVersionData[];
 }
 
 export async function getFactorReferenceRowsForVersion(

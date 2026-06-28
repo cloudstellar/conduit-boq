@@ -47,6 +47,7 @@ interface RouteSidebarProps {
     onDuplicateRoute?: (routeId: string) => void;
     onReorderRoutes?: (orderedIds: string[]) => void;
     isCollapsed: boolean;
+    readOnly?: boolean;
 }
 
 // ─── Sortable Route Item ───────────────────────
@@ -55,12 +56,14 @@ function SortableRouteItem({
     index,
     isActive,
     isCollapsed,
+    readOnly,
     onSelect,
 }: {
     route: Route;
     index: number;
     isActive: boolean;
     isCollapsed: boolean;
+    readOnly: boolean;
     onSelect: () => void;
 }) {
     const {
@@ -71,7 +74,7 @@ function SortableRouteItem({
         transform,
         transition,
         isDragging,
-    } = useSortable({ id: route.id });
+    } = useSortable({ id: route.id, disabled: readOnly });
 
     const style = {
         transform: CSS.Transform.toString(transform),
@@ -102,7 +105,8 @@ function SortableRouteItem({
                             style={{ touchAction: 'none' }}
                             className={cn(
                                 'w-full rounded-lg flex items-center justify-center aspect-square',
-                                'transition-all cursor-grab active:cursor-grabbing',
+                                'transition-all',
+                                readOnly ? 'cursor-pointer' : 'cursor-grab active:cursor-grabbing',
                                 'focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',
                                 isActive
                                     ? 'bg-primary text-primary-foreground shadow-md'
@@ -131,12 +135,14 @@ function SortableRouteItem({
                                 {...listeners}
                                 style={{ touchAction: 'none' }}
                                 className={cn(
-                                    'shrink-0 cursor-grab active:cursor-grabbing p-1.5 rounded',
+                                    'shrink-0 p-1.5 rounded',
+                                    readOnly ? 'cursor-default' : 'cursor-grab active:cursor-grabbing',
                                     'text-muted-foreground/40 hover:text-muted-foreground',
                                     'opacity-60 md:opacity-0 md:group-hover:opacity-100 transition-opacity',
                                     isDragging && 'opacity-100',
                                 )}
                                 tabIndex={-1}
+                                disabled={readOnly}
                             >
                                 <GripVertical className="w-3.5 h-3.5" />
                             </button>
@@ -187,6 +193,7 @@ export default function RouteSidebar({
     onDuplicateRoute,
     onReorderRoutes,
     isCollapsed,
+    readOnly = false,
 }: RouteSidebarProps) {
     const hasActiveRoute = activeRouteId !== null;
 
@@ -210,6 +217,7 @@ export default function RouteSidebar({
 
     const handleDragEnd = (event: DragEndEvent) => {
         const { active, over } = event;
+        if (readOnly) return;
         if (!over || active.id === over.id) return;
 
         const oldIndex = routes.findIndex(r => r.id === active.id);
@@ -232,11 +240,11 @@ export default function RouteSidebar({
                             <TooltipTrigger asChild>
                                 <DropdownMenuTrigger asChild>
                                     {isCollapsed ? (
-                                        <Button size="icon" variant="outline" className="w-full h-10">
+                                        <Button size="icon" variant="outline" className="w-full h-10" disabled={readOnly}>
                                             <Plus className="w-4 h-4" />
                                         </Button>
                                     ) : (
-                                        <Button variant="outline" className="w-full gap-2 justify-between">
+                                        <Button variant="outline" className="w-full gap-2 justify-between" disabled={readOnly}>
                                             <span className="flex items-center gap-2">
                                                 <Plus className="w-4 h-4" />
                                                 เพิ่มเส้นทาง
@@ -253,13 +261,13 @@ export default function RouteSidebar({
                             )}
                         </Tooltip>
                         <DropdownMenuContent align={isCollapsed ? "end" : "start"} className="w-[220px]">
-                            <DropdownMenuItem onClick={onAddRoute}>
+                            <DropdownMenuItem onClick={onAddRoute} disabled={readOnly}>
                                 <Plus className="w-4 h-4 mr-2" />
                                 เพิ่มเส้นทางใหม่ (ว่าง)
                             </DropdownMenuItem>
                             <DropdownMenuItem
                                 onClick={() => activeRouteId && onDuplicateRoute?.(activeRouteId)}
-                                disabled={!hasActiveRoute}
+                                disabled={readOnly || !hasActiveRoute}
                             >
                                 <Copy className="w-4 h-4 mr-2" />
                                 คัดลอกเส้นทางปัจจุบัน
@@ -294,6 +302,7 @@ export default function RouteSidebar({
                                             index={index}
                                             isActive={activeRouteId === route.id}
                                             isCollapsed={isCollapsed}
+                                            readOnly={readOnly}
                                             onSelect={() => onSelectRoute(route.id)}
                                         />
                                     ))}

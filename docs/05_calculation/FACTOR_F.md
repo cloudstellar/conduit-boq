@@ -134,6 +134,11 @@ After the 2026-06-05 correction, Factor F handling follows these rules:
 5. If the Factor F table cannot be read or no matching factor can be calculated
    for a nonzero BOQ total, the system shows an error and blocks saving instead
    of substituting a default value.
+6. A legacy BOQ with no `factor_reference_version_id` is not silently rebound
+   to the latest table. In edit mode it is treated as snapshot-only/read-only
+   for line-item changes. To continue work, the user creates a new BOQ copy,
+   chooses the intended active Factor F version, reviews it, and saves a new
+   snapshot.
 
 ### Verification Caveat
 

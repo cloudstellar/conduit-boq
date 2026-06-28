@@ -11,6 +11,7 @@ type QuantityEditorProps = {
     step?: number; // default 1
     min?: number;  // default 0
     className?: string;
+    disabled?: boolean;
 };
 
 function sanitizeDecimal(s: string) {
@@ -35,6 +36,7 @@ export function QuantityEditor({
     step = 1,
     min = 0,
     className,
+    disabled = false,
 }: QuantityEditorProps) {
     const inputRef = React.useRef<HTMLInputElement | null>(null);
     const [isFocused, setIsFocused] = React.useState(false);
@@ -85,6 +87,7 @@ export function QuantityEditor({
                 size="icon"
                 onClick={() => onChange(clampMin((value || 0) - step, min))}
                 aria-label="Decrease quantity"
+                disabled={disabled}
             >
                 <Minus className="h-4 w-4" />
             </Button>
@@ -97,6 +100,7 @@ export function QuantityEditor({
                 value={draft}
                 onChange={handleChange}
                 onBlur={handleBlur}
+                disabled={disabled}
                 onFocus={(e) => {
                     setIsFocused(true);
                     e.currentTarget.select();
@@ -116,6 +120,7 @@ export function QuantityEditor({
                 size="icon"
                 onClick={() => onChange((value || 0) + step)}
                 aria-label="Increase quantity"
+                disabled={disabled}
             >
                 <Plus className="h-4 w-4" />
             </Button>

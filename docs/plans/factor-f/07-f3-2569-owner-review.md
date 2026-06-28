@@ -39,7 +39,7 @@ approval is complete
 | Version metadata `vat_percent` | `7.0000` |
 | Row `vat_percent` | `1.0700` to preserve the existing `factor_reference` row contract |
 | Row component percentages | `NULL` for `operation_percent`, `interest_percent`, `profit_percent`, `total_expense_percent` because the W481 table page does not show them |
-| Print/Excel label | `ใช้ Factor F เวอร์ชัน 2569.0.0` |
+| Print/Excel label for BOQs bound to this version | `ใช้ Factor F เวอร์ชัน 2569.0.0` |
 
 ## 3. Validation Summary
 
@@ -62,6 +62,21 @@ rows.
 The dataset hash is computed from the same `numeric(10,4)::text` representation
 used by `factor_reference_rows` postconditions, so it is tied to the actual
 stored database row contract rather than a display-only number format.
+
+Print and Excel labels must follow each BOQ's bound
+`boq.factor_reference_version_id`. BOQs bound to `2566.0.0` must continue to
+show `ใช้ Factor F เวอร์ชัน 2566.0.0`; BOQs bound to `2569.0.0` show
+`ใช้ Factor F เวอร์ชัน 2569.0.0`. Legacy BOQs with no bound version must not
+claim the latest version automatically.
+
+Legacy BOQs with no bound Factor F version remain historical records. If a user
+wants to calculate the same project data with the current Factor F table, the
+application must create a new BOQ copy bound to the current default Factor F
+version instead of updating the old BOQ in place.
+
+If the work must continue under the old-factor policy, the same copy flow should
+allow selecting the old active baseline version, such as `2566.0.0`, instead of
+backfilling the original BOQ.
 
 ## 4. Row-Level Diff For Review
 
@@ -116,8 +131,11 @@ Delta columns are `new - old` compared with baseline `2566.0.0`.
 - [ ] Row component percentages should remain `NULL`.
 - [ ] Row `vat_percent` should be stored as `1.0700`, while version metadata
       `vat_percent` remains `7.0000`.
-- [ ] Print and Excel should show `ใช้ Factor F เวอร์ชัน 2569.0.0` in the
-      Factor F condition text.
+- [ ] Print and Excel should show the Factor F version bound to that BOQ,
+      for example `ใช้ Factor F เวอร์ชัน 2569.0.0` only for BOQs bound to this
+      version.
+- [ ] Legacy BOQs should offer a create-copy/reprice path to a selected active
+      Factor F version, without mutating the old BOQ.
 - [ ] Dataset hash
       `sha256:4f35b267bde3007439aebb193be1e53bdcea5a7acce95b5a7bbf5828018ef1a6`
       is approved for migration `014_factor_f_publish_2569_0_0.sql`.

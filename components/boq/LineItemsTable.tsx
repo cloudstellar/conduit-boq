@@ -42,6 +42,7 @@ interface LineItemsTableProps {
   onUpdateQuantity: (id: string, quantity: number) => void;
   onUpdateRemarks: (id: string, remarks: string) => void;
   onRemoveItem: (id: string) => void;
+  readOnly?: boolean;
 }
 
 export default function LineItemsTable({
@@ -51,6 +52,7 @@ export default function LineItemsTable({
   onUpdateQuantity,
   onUpdateRemarks,
   onRemoveItem,
+  readOnly = false,
 }: LineItemsTableProps) {
   const formatNumber = (num: number) => num.toLocaleString('th-TH', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
@@ -61,14 +63,20 @@ export default function LineItemsTable({
       </h2>
 
       {/* Search to add new item */}
-      <div className="mb-4 space-y-2">
-        <Label>เพิ่มรายการ</Label>
-        <ItemSearch
-          priceListVersionId={priceListVersionId}
-          onSelect={onAddItem}
-          placeholder="พิมพ์เพื่อค้นหารายการจากบัญชีราคามาตรฐาน..."
-        />
-      </div>
+      {readOnly ? (
+        <div className="mb-4 rounded-md border bg-muted/40 px-3 py-2 text-sm text-muted-foreground">
+          โหมดดูอย่างเดียว ไม่สามารถเพิ่ม ลบ หรือแก้ไขรายการใน BOQ เดิมได้
+        </div>
+      ) : (
+        <div className="mb-4 space-y-2">
+          <Label>เพิ่มรายการ</Label>
+          <ItemSearch
+            priceListVersionId={priceListVersionId}
+            onSelect={onAddItem}
+            placeholder="พิมพ์เพื่อค้นหารายการจากบัญชีราคามาตรฐาน..."
+          />
+        </div>
+      )}
 
       {/* Items Table - 2-row pattern: row1=name, row2=data */}
       <div className="border rounded-lg overflow-hidden">
@@ -108,6 +116,7 @@ export default function LineItemsTable({
                       <Input
                         value={item.remarks || ''}
                         onChange={(e) => onUpdateRemarks(item.id, e.target.value)}
+                        disabled={readOnly}
                         placeholder="หมายเหตุ (ถ้ามี)"
                         className="mt-1 h-7 text-xs text-muted-foreground bg-muted/30 border-dashed max-w-md"
                       />
@@ -121,6 +130,7 @@ export default function LineItemsTable({
                         value={item.quantity ?? 0}
                         step={1}
                         onChange={(v) => onUpdateQuantity(item.id, v)}
+                        disabled={readOnly}
                       />
                     </TableCell>
                     <TableCell className="text-center text-sm">{item.unit}</TableCell>
@@ -144,6 +154,7 @@ export default function LineItemsTable({
                         variant="ghost"
                         size="icon"
                         onClick={() => onRemoveItem(item.id)}
+                        disabled={readOnly}
                         className="h-8 w-8 text-destructive hover:text-destructive hover:bg-destructive/10"
                       >
                         <Trash2 className="h-4 w-4" />

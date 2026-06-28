@@ -52,15 +52,33 @@ describe('Factor F interpolation', () => {
     })).toBe(true)
   })
 
-  it('formats the version for print/export conditions', () => {
+  it('formats the bound version for print/export conditions', () => {
+    const formatConditionForVersion = (versionString: string, interestPercent: number) =>
+      formatFactorReferenceCondition({
+        version_string: versionString,
+        advance_payment_percent: 0,
+        retention_percent: 0,
+        loan_interest_percent: interestPercent,
+        vat_percent: 7,
+      })
+
+    expect(formatConditionForVersion('2566.0.0', 7)).toBe(
+      'Factor F เวอร์ชัน 2566.0.0 งานก่อสร้างทาง เงินล่วงหน้าจ่าย 0.00 %, เงินประกันผลงานหัก 0.00 %, ดอกเบี้ยเงินกู้ 7.00 % ต่อปี, ค่าภาษีมูลค่าเพิ่ม 7.00 %'
+    )
+
+    expect(formatConditionForVersion('2569.0.0', 6)).toBe(
+      'Factor F เวอร์ชัน 2569.0.0 งานก่อสร้างทาง เงินล่วงหน้าจ่าย 0.00 %, เงินประกันผลงานหัก 0.00 %, ดอกเบี้ยเงินกู้ 6.00 % ต่อปี, ค่าภาษีมูลค่าเพิ่ม 7.00 %'
+    )
+  })
+
+  it('does not claim the latest version when a legacy BOQ has no bound version', () => {
     expect(formatFactorReferenceCondition({
-      version_string: '2569.0.0',
       advance_payment_percent: 0,
       retention_percent: 0,
-      loan_interest_percent: 6,
+      loan_interest_percent: 7,
       vat_percent: 7,
     })).toBe(
-      'Factor F เวอร์ชัน 2569.0.0 งานก่อสร้างทาง เงินล่วงหน้าจ่าย 0.00 %, เงินประกันผลงานหัก 0.00 %, ดอกเบี้ยเงินกู้ 6.00 % ต่อปี, ค่าภาษีมูลค่าเพิ่ม 7.00 %'
+      'Factor F งานก่อสร้างทาง เงินล่วงหน้าจ่าย 0.00 %, เงินประกันผลงานหัก 0.00 %, ดอกเบี้ยเงินกู้ 7.00 % ต่อปี, ค่าภาษีมูลค่าเพิ่ม 7.00 %'
     )
   })
 })

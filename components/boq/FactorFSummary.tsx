@@ -6,6 +6,8 @@ import { roundMoney, calculateVAT, multiplyFactor } from '@/lib/calculation';
 import { calculateInterpolatedFactorFromRefs, findFactorBracketRefs } from '@/lib/factorF';
 import {
   FACTOR_REFERENCE_VERSION_REQUIRED_MESSAGE,
+  FactorReferenceVersionData,
+  getActiveFactorReferenceVersion,
   getFactorReferenceRowsForVersion,
 } from '@/lib/factorFReference';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -53,20 +55,31 @@ export default function FactorFSummary({
 }: FactorFSummaryProps) {
   const supabase = useMemo(() => createClient(), []);
   const [factorRefs, setFactorRefs] = useState<{ cost_million: number; factor: number }[]>([]);
+  const [factorVersion, setFactorVersion] = useState<FactorReferenceVersionData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [factorError, setFactorError] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchFactorReference = async () => {
       try {
+        setIsLoading(true);
         setFactorError(null);
 
-        const rows = await getFactorReferenceRowsForVersion(supabase, factorReferenceVersionId);
+        if (!factorReferenceVersionId) {
+          throw new Error(FACTOR_REFERENCE_VERSION_REQUIRED_MESSAGE);
+        }
+
+        const [version, rows] = await Promise.all([
+          getActiveFactorReferenceVersion(supabase, factorReferenceVersionId),
+          getFactorReferenceRowsForVersion(supabase, factorReferenceVersionId),
+        ]);
+        setFactorVersion(version);
         setFactorRefs(rows);
       } catch (err) {
         if (!(err instanceof Error) || err.message !== FACTOR_REFERENCE_VERSION_REQUIRED_MESSAGE) {
           console.error('Error fetching factor reference:', err);
         }
+        setFactorVersion(null);
         setFactorRefs([]);
         setFactorError(err instanceof Error ? err.message : 'ไม่สามารถอ่านตาราง Factor F ได้');
       } finally {
@@ -90,6 +103,12 @@ export default function FactorFSummary({
     [grandTotalCost, lowerFactorRef, upperFactorRef],
   );
   const factor = factorResult?.factor ?? 0;
+  const factorVersionLabel = factorVersion?.version_string
+    ? `เวอร์ชัน ${factorVersion.version_string}`
+    : 'ไม่พบเวอร์ชัน';
+  const factorVersionStatus = factorVersion?.version_string
+    ? `ใช้ Factor F เวอร์ชัน ${factorVersion.version_string}`
+    : 'ยังไม่ทราบเวอร์ชัน Factor F';
   const costInMillion = grandTotalCost / 1000000;
   const { beforeVAT: totalWithFactor, total: totalWithVAT } =
     calculateVAT(multiplyFactor(grandTotalCost, factor));
@@ -153,11 +172,20 @@ export default function FactorFSummary({
   }
 
   if (factorError || !factorResult) {
+    const requiresVersionBinding =
+      factorError === FACTOR_REFERENCE_VERSION_REQUIRED_MESSAGE;
+
     if (variant === 'compact') {
       return (
         <Alert variant="destructive" className="shadow-sm">
-          <AlertDescription className="text-sm">
-            ไม่สามารถคำนวณ Factor F ได้: {factorError || 'ไม่พบข้อมูลอ้างอิงในตาราง Factor F'}
+          <AlertDescription className="space-y-1 text-sm">
+            <p>ไม่สามารถคำนวณ Factor F ได้: {factorError || 'ไม่พบข้อมูลอ้างอิงในตาราง Factor F'}</p>
+            {requiresVersionBinding && (
+              <p>
+                หากต้องการใช้ Factor F ปัจจุบัน ให้กดสร้างสำเนาใหม่จากปุ่มด้านบน
+                แล้วตรวจสอบก่อนบันทึก
+              </p>
+            )}
           </AlertDescription>
         </Alert>
       );
@@ -165,8 +193,13 @@ export default function FactorFSummary({
 
     return (
       <Alert variant="destructive">
-        <AlertDescription>
-          ไม่สามารถคำนวณ Factor F ได้: {factorError || 'ไม่พบข้อมูลอ้างอิงในตาราง Factor F'}
+        <AlertDescription className="space-y-1">
+          <p>ไม่สามารถคำนวณ Factor F ได้: {factorError || 'ไม่พบข้อมูลอ้างอิงในตาราง Factor F'}</p>
+          {requiresVersionBinding && (
+            <p>
+              หากต้องการใช้ Factor F ปัจจุบัน ให้สร้างสำเนา BOQ ใหม่แล้วตรวจสอบก่อนบันทึก
+            </p>
+          )}
         </AlertDescription>
       </Alert>
     );
@@ -195,6 +228,9 @@ export default function FactorFSummary({
               Factor F
             </div>
             <div className="text-lg font-bold leading-tight text-blue-800">{factor.toFixed(4)}</div>
+            <div className="truncate text-xs font-medium text-blue-700">
+              {factorVersionLabel}
+            </div>
             <div className="truncate text-xs text-blue-600">{bracketLabel}</div>
           </div>
           <div className="min-w-0">
@@ -227,9 +263,9 @@ export default function FactorFSummary({
       <CardContent className="space-y-4">
         {/* Factor F Info */}
         <Alert className="bg-yellow-50 border-yellow-200">
-          <AlertDescription className="flex justify-between items-center">
+          <AlertDescription className="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
             <span className="text-sm text-gray-600">
-              Factor F (ค่างาน {costInMillion <= 5 ? '≤ 5' : '> 5'} ล้านบาท):
+              {factorVersionStatus} (ค่างาน {costInMillion <= 5 ? '≤ 5' : '> 5'} ล้านบาท):
             </span>
             <span className="text-lg font-bold text-yellow-700">{factor.toFixed(4)}</span>
           </AlertDescription>

@@ -35,6 +35,7 @@ interface MultiRouteEditorProps {
   factorReferenceVersionId: string | null;
   onSave: (routes: Route[], routeItems: Record<string, LineItem[]>) => Promise<void>;
   isSaving: boolean;
+  readOnly?: boolean;
   /** Callback to pass calculated factor values up for snapshot saving */
   onFactorCalculated?: (data: {
     factor: number;
@@ -79,6 +80,7 @@ export default function MultiRouteEditor({
   factorReferenceVersionId,
   onSave,
   isSaving,
+  readOnly = false,
   onFactorCalculated,
 }: MultiRouteEditorProps) {
   const supabase = useMemo(() => createClient(), []);
@@ -200,6 +202,8 @@ export default function MultiRouteEditor({
   }, [boqId, supabase]);
 
   const handleAddRoute = useCallback(() => {
+    if (readOnly) return;
+
     const newRoute: Route = {
       id: crypto.randomUUID(),
       route_order: routes.length + 1,
@@ -213,17 +217,20 @@ export default function MultiRouteEditor({
     setRoutes(prev => [...prev, newRoute]);
     setRouteItems(prev => ({ ...prev, [newRoute.id]: [] }));
     setActiveRouteId(newRoute.id);
-  }, [routes.length]);
+  }, [readOnly, routes.length]);
 
   const handleSelectRoute = useCallback((routeId: string) => {
     setActiveRouteId(routeId);
   }, []);
 
   const handleUpdateRoute = useCallback((routeId: string, field: keyof Route, value: string) => {
+    if (readOnly) return;
     setRoutes(prev => prev.map(r => r.id === routeId ? { ...r, [field]: value } : r));
-  }, []);
+  }, [readOnly]);
 
   const handleRemoveRoute = useCallback((routeId: string) => {
+    if (readOnly) return;
+
     setRoutes(prev => prev.filter(r => r.id !== routeId));
     setRouteItems(prev => {
       const newItems = { ...prev };
@@ -233,10 +240,12 @@ export default function MultiRouteEditor({
     if (activeRouteId === routeId) {
       setActiveRouteId(routes.find(r => r.id !== routeId)?.id || null);
     }
-  }, [activeRouteId, routes]);
+  }, [activeRouteId, readOnly, routes]);
 
   // Duplicate a route with all its items (deep copy)
   const handleDuplicateRoute = useCallback((routeId: string) => {
+    if (readOnly) return;
+
     const sourceRoute = routes.find(r => r.id === routeId);
     if (!sourceRoute) return;
 
@@ -277,10 +286,12 @@ export default function MultiRouteEditor({
 
     // Switch to new route
     setActiveRouteId(newRoute.id);
-  }, [routes, routeItems]);
+  }, [readOnly, routes, routeItems]);
 
   // Reorder routes after drag-and-drop (receives new ordered array of route IDs)
   const handleReorderRoutes = useCallback((orderedIds: string[]) => {
+    if (readOnly) return;
+
     setRoutes(prev => {
       const routeMap = new Map(prev.map(r => [r.id, r]));
       return orderedIds
@@ -290,10 +301,10 @@ export default function MultiRouteEditor({
         })
         .filter((r): r is Route => r !== null);
     });
-  }, []);
+  }, [readOnly]);
 
   const handleAddItem = useCallback((priceItem: PriceListItem) => {
-    if (!activeRouteId) return;
+    if (readOnly || !activeRouteId) return;
 
     // Check if it's a special item (งานวางท่อ / งานดันท่อ)
     if (isSpecialItem(priceItem.item_name)) {
@@ -335,11 +346,11 @@ export default function MultiRouteEditor({
       ...prev,
       [activeRouteId]: [...(prev[activeRouteId] || []), newItem],
     }));
-  }, [activeRouteId, routeItems]);
+  }, [activeRouteId, readOnly, routeItems]);
 
   // Handle special item selection (Main Duct / Riser / Steel Pole / Riser Service)
   const handleSpecialItemSelect = useCallback((type: 'Main Duct' | 'Riser' | 'Steel Pole' | 'Riser Service') => {
-    if (!activeRouteId || !pendingSpecialItem) return;
+    if (readOnly || !activeRouteId || !pendingSpecialItem) return;
 
     const itemNameWithType = `${pendingSpecialItem.item_name} (${type})`;
     const currentItems = routeItems[activeRouteId] || [];
@@ -380,10 +391,10 @@ export default function MultiRouteEditor({
 
     setShowSpecialItemModal(false);
     setPendingSpecialItem(null);
-  }, [activeRouteId, pendingSpecialItem, routeItems]);
+  }, [activeRouteId, pendingSpecialItem, readOnly, routeItems]);
 
   const handleUpdateQuantity = useCallback((itemId: string, quantity: number) => {
-    if (!activeRouteId) return;
+    if (readOnly || !activeRouteId) return;
     setRouteItems(prev => ({
       ...prev,
       [activeRouteId]: (prev[activeRouteId] || []).map(item => {
@@ -397,25 +408,25 @@ export default function MultiRouteEditor({
         };
       }),
     }));
-  }, [activeRouteId]);
+  }, [activeRouteId, readOnly]);
 
   const handleUpdateRemarks = useCallback((itemId: string, remarks: string) => {
-    if (!activeRouteId) return;
+    if (readOnly || !activeRouteId) return;
     setRouteItems(prev => ({
       ...prev,
       [activeRouteId]: (prev[activeRouteId] || []).map(item =>
         item.id === itemId ? { ...item, remarks } : item
       ),
     }));
-  }, [activeRouteId]);
+  }, [activeRouteId, readOnly]);
 
   const handleRemoveItem = useCallback((itemId: string) => {
-    if (!activeRouteId) return;
+    if (readOnly || !activeRouteId) return;
     setRouteItems(prev => ({
       ...prev,
       [activeRouteId]: (prev[activeRouteId] || []).filter(item => item.id !== itemId),
     }));
-  }, [activeRouteId]);
+  }, [activeRouteId, readOnly]);
 
   // Calculate route totals whenever items change
   useEffect(() => {
@@ -476,6 +487,7 @@ export default function MultiRouteEditor({
   const activeRoute = routes.find(r => r.id === activeRouteId);
 
   const handleSaveClick = async () => {
+    if (readOnly) return;
     await onSave(routes, routeItems);
   };
 
@@ -507,6 +519,7 @@ export default function MultiRouteEditor({
             onDuplicateRoute={handleDuplicateRoute}
             onReorderRoutes={handleReorderRoutes}
             isCollapsed={isSidebarCollapsed}
+            readOnly={readOnly}
           />
         </div>
 
@@ -542,6 +555,7 @@ export default function MultiRouteEditor({
                         variant="ghost"
                         size="icon"
                         onClick={() => activeRouteId && handleDuplicateRoute(activeRouteId)}
+                        disabled={readOnly}
                         className="h-8 w-8"
                       >
                         <Copy className="h-4 w-4" />
@@ -553,7 +567,7 @@ export default function MultiRouteEditor({
                   </Tooltip>
                   <Separator orientation="vertical" className="h-5" />
                   <h2 className="text-lg font-semibold tracking-tight">
-                    แก้ไขข้อมูล:{' '}
+                    {readOnly ? 'ดูข้อมูล' : 'แก้ไขข้อมูล'}:{' '}
                     <span className="text-primary">
                       เส้นทางที่ {routes.findIndex(r => r.id === activeRouteId) + 1}
                     </span>
@@ -569,19 +583,26 @@ export default function MultiRouteEditor({
               </TooltipProvider>
               {grandTotals.total > 0 && (
                 <div className="sticky top-14 z-10 border-b bg-background/95 px-4 py-3 backdrop-blur">
-                  <FactorFSummary
-                    routes={routes.map(r => ({
-                      id: r.id,
-                      route_name: r.route_name,
-                      total_material_cost: r.total_material_cost,
-                      total_labor_cost: r.total_labor_cost,
-                      total_cost: r.total_cost,
-                    }))}
-                    grandTotalCost={grandTotals.total}
-                    factorReferenceVersionId={factorReferenceVersionId}
-                    variant="compact"
-                    onFactorCalculated={onFactorCalculated}
-                  />
+                  {readOnly && !factorReferenceVersionId ? (
+                    <div className="rounded-md border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-900 shadow-sm">
+                      BOQ นี้เป็นเอกสารเดิมแบบ snapshot-only จึงไม่คำนวณ Factor F สดบนหน้าแก้ไข
+                      หากต้องการแก้ไขราคาให้สร้างสำเนาและเลือกเวอร์ชัน Factor F
+                    </div>
+                  ) : (
+                    <FactorFSummary
+                      routes={routes.map(r => ({
+                        id: r.id,
+                        route_name: r.route_name,
+                        total_material_cost: r.total_material_cost,
+                        total_labor_cost: r.total_labor_cost,
+                        total_cost: r.total_cost,
+                      }))}
+                      grandTotalCost={grandTotals.total}
+                      factorReferenceVersionId={factorReferenceVersionId}
+                      variant="compact"
+                      onFactorCalculated={onFactorCalculated}
+                    />
+                  )}
                 </div>
               )}
               {/* Route Header Form */}
@@ -596,6 +617,7 @@ export default function MultiRouteEditor({
                     <Input
                       value={activeRoute.route_name}
                       onChange={(e) => handleUpdateRoute(activeRouteId, 'route_name', e.target.value)}
+                      disabled={readOnly}
                       placeholder="เช่น ถนนพระราม 4 (แยกคลองเตย-สุขุมวิท)"
                       className="text-lg font-semibold"
                     />
@@ -609,6 +631,7 @@ export default function MultiRouteEditor({
                           handleRemoveRoute(activeRouteId);
                         }
                       }}
+                      disabled={readOnly}
                       className="mt-6 text-destructive hover:text-destructive hover:bg-destructive/10"
                       title="ลบเส้นทาง"
                     >
@@ -623,6 +646,7 @@ export default function MultiRouteEditor({
                   <Input
                     value={activeRoute.construction_area}
                     onChange={(e) => handleUpdateRoute(activeRouteId, 'construction_area', e.target.value)}
+                    disabled={readOnly}
                     placeholder="เช่น ชส.คลองเตย จ.กรุงเทพมหานคร"
                   />
                 </div>
@@ -633,6 +657,7 @@ export default function MultiRouteEditor({
                   <textarea
                     value={activeRoute.route_description}
                     onChange={(e) => handleUpdateRoute(activeRouteId, 'route_description', e.target.value)}
+                    disabled={readOnly}
                     placeholder="หมายเหตุสำหรับเส้นทางนี้ (จะแสดงในหน้าสรุปรวม)"
                     rows={2}
                     className="w-full px-3 py-2 text-sm border border-border rounded-md bg-background focus:ring-2 focus:ring-ring focus:border-ring resize-none"
@@ -651,6 +676,7 @@ export default function MultiRouteEditor({
                       onUpdateQuantity={handleUpdateQuantity}
                       onUpdateRemarks={handleUpdateRemarks}
                       onRemoveItem={handleRemoveItem}
+                      readOnly={readOnly}
                     />
                   </div>
                 </div>
@@ -724,7 +750,7 @@ export default function MultiRouteEditor({
         </Button>
         <Button
           onClick={handleSaveClick}
-          disabled={isSaving || routes.length === 0}
+          disabled={readOnly || isSaving || routes.length === 0}
           className="cursor-pointer"
         >
           {isSaving ? (

@@ -95,6 +95,14 @@ Because the owner wants to adjust Factor F now, do not update
 | F3 | Create and publish the new Factor F version, then move the factor default pointer | New BOQs use the new Factor F version |
 | F4 | Add or refine duplicate/reprice UX for old project data | Users create a new estimate instead of mutating history |
 
+The first F4 UX path is deliberately narrow: from an edit page, users can
+create a new BOQ copy bound to a selected active Factor F version. The default
+choice is the current pointer, but users may choose the old published baseline
+when the work must continue under the old-factor policy. The source BOQ remains
+unchanged, the new copy resets Factor F snapshot fields, and the user must
+review and save the new BOQ before it becomes the durable calculation record.
+This is not a blanket backfill.
+
 F1 and F2 should happen before the live Factor F values are changed. F3 is the
 actual Factor F policy change.
 

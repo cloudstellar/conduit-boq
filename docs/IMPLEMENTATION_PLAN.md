@@ -134,7 +134,13 @@ changing live Factor F values:
    for future BOQs only; do not backfill old BOQs.
 4. F3: publish the new Factor F version and move the factor default pointer.
 5. F4: add duplicate/reprice UX so old project data can become a new BOQ with
-   the latest Factor F by explicit user action.
+   the latest Factor F by explicit user action. This is being pulled forward
+   as a narrow edit-page action because local testing showed that legacy BOQs
+   without `factor_reference_version_id` otherwise have no user-visible path
+   out of the fail-closed calculation state. The action must create a new BOQ
+   copy and let the user choose an active Factor F version, such as `2566.0.0`
+   for continuing old-factor work or `2569.0.0` for the new table. Do not run a
+   blanket legacy backfill.
 
 The current F3 source candidate is the 26 June 2026 Factor F table recorded in
 [docs/plans/factor-f/04-source-table-2569-06-26.md](./plans/factor-f/04-source-table-2569-06-26.md).
