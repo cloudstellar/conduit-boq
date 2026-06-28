@@ -51,8 +51,8 @@ Owner confirmations recorded on 2026-06-28:
 | Step | Purpose | Production effect |
 |---|---|---|
 | F0 — Approval and freeze | Approve ADR-005, this CR, source document, effective date, and validation method | No data change |
-| F1 — Version foundation | Add `factor_reference_versions`, `factor_reference_rows`, `factor_reference_default_version`, and nullable `boq.factor_reference_version_id`; update app reads to use bound version when present | Existing BOQs remain compatible; new BOQs can bind factor version |
-| F2 — Current baseline seed | Copy the audited current `factor_reference` table into the initial published factor version and point the singleton default there | No old BOQ backfill |
+| F1 — Version foundation | Add `factor_reference_versions`, `factor_reference_rows`, `factor_reference_default_version`, and nullable `boq.factor_reference_version_id`; update app reads to use bound version when present | Existing BOQs remain compatible; new empty BOQs can bind once F2 creates the default pointer |
+| F2 — Current baseline seed | Copy the audited current `factor_reference` table into the initial published factor version and point the singleton default there | New empty BOQs bind the baseline factor version; no old BOQ backfill |
 | F3 — New Factor F publication | Create a new draft factor version from the baseline, apply approved row changes, validate full-table checksum, publish, and move the pointer | New BOQs use new Factor F |
 | F4 — Duplicate/reprice UX | Offer explicit "create new estimate with latest Factor F" behavior for old project data | Old BOQs remain unchanged |
 
@@ -175,7 +175,8 @@ After F3:
 
 ## 8. Acceptance criteria
 
-- New BOQs created after F1 have `factor_reference_version_id`.
+- New empty BOQs created after F2/default pointer setup have
+  `factor_reference_version_id`.
 - Legacy BOQs are not backfilled by assumption.
 - Print/export for version-bound BOQs uses the bound Factor F version.
 - Print/export for legacy BOQs uses valid saved snapshots or fails closed.
@@ -185,6 +186,9 @@ After F3:
 - Database security review confirms RLS/grants/function boundaries follow the
   [Phase 4 Database and Security Contract](../master-catalog/17-phase4-database-security-contract.md)
   companion boundary.
+
+Implementation actions are tracked in the
+[Factor F Implementation Log](./05-implementation-log.md).
 
 ## 9. Approval record
 

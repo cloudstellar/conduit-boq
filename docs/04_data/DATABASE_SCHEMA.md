@@ -356,7 +356,7 @@ idx_boq_items_route_id   ON boq_items(route_id)
 | `010_master_catalog_phase1a_versioning.sql` | Nullable catalog versioning + historical backfill | ✅ Production 2026-06-21 |
 | `010a_master_catalog_phase1a_indexes.sql` | Concurrent index runbook | ✅ 4 indexes valid/ready 2026-06-21 |
 | `011_master_catalog_phase1b_hardening.sql` | BOQ version contract hardening | ✅ Production 2026-06-21 |
-| `012_factor_f_version_foundation.sql` | Factor F version tables + BOQ factor version FK | Planned before Master Catalog Phase 4 |
+| `012_factor_f_version_foundation.sql` | Factor F version tables + BOQ factor version FK | Draft local-verified 2026-06-28; not Production |
 | `013_factor_f_seed_current_baseline.sql` | Seed audited current Factor F baseline | Planned before Master Catalog Phase 4 |
 | `014_factor_f_publish_2569_0_0.sql` | Publish Factor F `2569.0.0` from confirmed ว 481 source | Planned before Master Catalog Phase 4 |
 | `015+_master_catalog_phase4_*.sql` | Master Catalog Phase 4 database migrations | Planned after Factor F migrations |

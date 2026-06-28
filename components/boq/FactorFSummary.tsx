@@ -3,17 +3,12 @@
 import { useState, useEffect, useMemo } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import { roundMoney, calculateVAT, multiplyFactor } from '@/lib/calculation';
-import { calculateInterpolatedFactorFromRefs } from '@/lib/factorF';
+import { calculateInterpolatedFactorFromRefs, findFactorBracketRefs } from '@/lib/factorF';
+import { getFactorReferenceRowsForVersion } from '@/lib/factorFReference';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Separator } from '@/components/ui/separator';
 import { Calculator, Loader2 } from 'lucide-react';
-
-interface FactorReference {
-  cost_million: number;
-  factor: number;
-  factor_f: number;
-}
 
 interface RouteData {
   id: string;
@@ -26,6 +21,7 @@ interface RouteData {
 interface FactorFSummaryProps {
   routes: RouteData[];
   grandTotalCost: number;
+  factorReferenceVersionId: string | null;
   variant?: 'full' | 'compact';
   /** Callback to pass calculated factor values up for snapshot saving */
   onFactorCalculated?: (data: {
@@ -48,11 +44,12 @@ interface FactorFSummaryProps {
 export default function FactorFSummary({
   routes,
   grandTotalCost,
+  factorReferenceVersionId,
   variant = 'full',
   onFactorCalculated,
 }: FactorFSummaryProps) {
   const supabase = useMemo(() => createClient(), []);
-  const [factorRefs, setFactorRefs] = useState<FactorReference[]>([]);
+  const [factorRefs, setFactorRefs] = useState<{ cost_million: number; factor: number }[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [factorError, setFactorError] = useState<string | null>(null);
 
@@ -61,18 +58,8 @@ export default function FactorFSummary({
       try {
         setFactorError(null);
 
-        const { data, error } = await supabase
-          .from('factor_reference')
-          .select('cost_million, factor, factor_f')
-          .order('cost_million', { ascending: true });
-
-        if (error) throw error;
-
-        if (!data || data.length === 0) {
-          throw new Error('ไม่พบข้อมูลอ้างอิงในตาราง Factor F');
-        }
-
-        setFactorRefs(data);
+        const rows = await getFactorReferenceRowsForVersion(supabase, factorReferenceVersionId);
+        setFactorRefs(rows);
       } catch (err) {
         console.error('Error fetching factor reference:', err);
         setFactorRefs([]);
@@ -83,24 +70,13 @@ export default function FactorFSummary({
     };
 
     fetchFactorReference();
-  }, [supabase]);
+  }, [supabase, factorReferenceVersionId]);
 
   const formatNumber = (num: number) =>
     num.toLocaleString('th-TH', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
   const { lowerFactorRef, upperFactorRef } = useMemo(() => {
-    if (grandTotalCost <= 0 || factorRefs.length === 0) {
-      return { lowerFactorRef: null, upperFactorRef: null };
-    }
-
-    const costInMillionValue = grandTotalCost / 1000000;
-    const lowerLimit = Math.max(5, costInMillionValue);
-    const lowerRef = [...factorRefs]
-      .reverse()
-      .find((ref) => Number(ref.cost_million) <= lowerLimit) ?? null;
-    const upperRef = factorRefs.find((ref) => Number(ref.cost_million) > costInMillionValue) ?? null;
-
-    return { lowerFactorRef: lowerRef, upperFactorRef: upperRef };
+    return findFactorBracketRefs(grandTotalCost, factorRefs);
   }, [factorRefs, grandTotalCost]);
 
   // Calculate factor and derived values instantly from the loaded reference table.

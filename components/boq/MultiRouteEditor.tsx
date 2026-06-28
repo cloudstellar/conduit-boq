@@ -32,6 +32,7 @@ import { Loader2, Trash2, PanelLeftClose, PanelLeft, Copy } from 'lucide-react';
 interface MultiRouteEditorProps {
   boqId: string;
   priceListVersionId: string;
+  factorReferenceVersionId: string | null;
   onSave: (routes: Route[], routeItems: Record<string, LineItem[]>) => Promise<void>;
   isSaving: boolean;
   /** Callback to pass calculated factor values up for snapshot saving */
@@ -72,7 +73,14 @@ const isSinglePipeItem = (itemName: string): boolean => {
   return /^งานวางท่อ\s+1-/.test(itemName) || /^งานดันท่อ.*1-/.test(itemName);
 };
 
-export default function MultiRouteEditor({ boqId, priceListVersionId, onSave, isSaving, onFactorCalculated }: MultiRouteEditorProps) {
+export default function MultiRouteEditor({
+  boqId,
+  priceListVersionId,
+  factorReferenceVersionId,
+  onSave,
+  isSaving,
+  onFactorCalculated,
+}: MultiRouteEditorProps) {
   const supabase = useMemo(() => createClient(), []);
   const [routes, setRoutes] = useState<Route[]>([]);
   const [routeItems, setRouteItems] = useState<Record<string, LineItem[]>>({});
@@ -570,6 +578,7 @@ export default function MultiRouteEditor({ boqId, priceListVersionId, onSave, is
                       total_cost: r.total_cost,
                     }))}
                     grandTotalCost={grandTotals.total}
+                    factorReferenceVersionId={factorReferenceVersionId}
                     variant="compact"
                     onFactorCalculated={onFactorCalculated}
                   />

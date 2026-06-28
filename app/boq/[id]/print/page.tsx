@@ -4,7 +4,17 @@ import { useState, useEffect, useMemo } from 'react';
 import { useParams } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
 import { roundMoney, calculateVAT, allocateToRoutes, multiplyFactor } from '@/lib/calculation';
-import { calculateInterpolatedFactorFromRefs, isFactorSnapshotUsable } from '@/lib/factorF';
+import {
+  calculateInterpolatedFactorFromRefs,
+  findFactorBracketRefs,
+  formatFactorReferenceCondition,
+  isFactorSnapshotUsable,
+  type FactorReferenceCondition,
+} from '@/lib/factorF';
+import {
+  getActiveFactorReferenceVersion,
+  getFactorReferenceRowsForVersion,
+} from '@/lib/factorFReference';
 import { formatConstructionAreas } from '@/lib/constructionAreaUtils';
 import {
   splitText,
@@ -44,6 +54,7 @@ interface BOQData {
   factor_f_upper_cost: number | null;
   factor_f_lower_value: number | null;
   factor_f_upper_value: number | null;
+  factor_reference_version_id: string | null;
 }
 
 interface BOQRoute {
@@ -76,15 +87,7 @@ interface BOQItem {
 
 interface FactorReference {
   cost_million: number;
-  operation_percent: number;
-  interest_percent: number;
-  profit_percent: number;
-  total_expense_percent: number;
   factor: number;
-  vat_percent: number;
-  factor_f: number;
-  factor_f_rain_1: number;
-  factor_f_rain_2: number;
 }
 
 // ──────────────────────────────────
@@ -210,7 +213,15 @@ function BOQTableHeader() {
   );
 }
 
-function PageFooter({ boq, showConditions = true }: { boq: BOQData; showConditions?: boolean }) {
+function PageFooter({
+  boq,
+  showConditions = true,
+  factorCondition,
+}: {
+  boq: BOQData;
+  showConditions?: boolean;
+  factorCondition?: FactorReferenceCondition | null;
+}) {
   const formatThaiMonth = (dateStr: string) => {
     const date = new Date(dateStr);
     const thaiMonths = ['มกราคม', 'กุมภาพันธ์', 'มีนาคม', 'เมษายน', 'พฤษภาคม', 'มิถุนายน',
@@ -224,7 +235,7 @@ function PageFooter({ boq, showConditions = true }: { boq: BOQData; showConditio
       {showConditions && (
         <>
           <div className="conditions">
-            <span className="highlight-text">เงื่อนไข</span> Factor F งานก่อสร้างทาง เงินล่วงหน้าจ่าย 0.00 %, เงินประกันผลงานหัก 0.00 %, ดอกเบี้ยเงินกู้ 7.00 % ต่อปี, ค่าภาษีมูลค่าเพิ่ม 7.00 %
+            <span className="highlight-text">เงื่อนไข</span> {formatFactorReferenceCondition(factorCondition)}
           </div>
           <div className="note">
             <span className="highlight-text">หมายเหตุ</span> ทั้งนี้ ราคางานโครงการ/งานก่อสร้าง ไม่ใช่ราคาค่าก่อสร้างที่แท้จริง แต่เป็นเพียงราคาโดยประมาณเท่านั้น
@@ -246,10 +257,16 @@ function ContinueIndicator() {
   return <div className="continue-indicator">─ ต่อหน้าถัดไป ─</div>;
 }
 
-function FactorFSupplementPage({ boq, lowerFactorRef, upperFactorRef }: {
+function FactorFSupplementPage({
+  boq,
+  lowerFactorRef,
+  upperFactorRef,
+  factorCondition,
+}: {
   boq: BOQData;
   lowerFactorRef: FactorReference | null;
   upperFactorRef: FactorReference | null;
+  factorCondition?: FactorReferenceCondition | null;
 }) {
   const formatNumber = (num: number) =>
     num.toLocaleString('th-TH', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
@@ -327,7 +344,7 @@ function FactorFSupplementPage({ boq, lowerFactorRef, upperFactorRef }: {
           <strong>กรณีค่างานอยู่ระหว่างช่วงของค่างานต้นทุนที่กำหนดในตาราง Factor F ให้ใช้สูตรเพื่อหาค่า Factor F ดังนี้</strong>
         </div>
         <div>
-          <strong>ใช้ Factor F งานก่อสร้างทาง</strong> ( เงินล่วงหน้าจ่าย 0.00 %, เงินประกันผลงานหัก 0.00 %, ดอกเบี้ยเงินกู้ 7.00 % ต่อปี, ค่าภาษีมูลค่าเพิ่ม (VAT) 7.00 % )
+          <strong>ใช้ {formatFactorReferenceCondition(factorCondition)}</strong>
         </div>
       </div>
 
@@ -460,6 +477,8 @@ export default function PrintBOQPage() {
   const [routeItems, setRouteItems] = useState<Record<string, BOQItem[]>>({});
   const [lowerFactorRef, setLowerFactorRef] = useState<FactorReference | null>(null);
   const [upperFactorRef, setUpperFactorRef] = useState<FactorReference | null>(null);
+  const [factorCondition, setFactorCondition] = useState<FactorReferenceCondition | null>(null);
+  const [factorError, setFactorError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
   const VAT_RATE = 0.07;
@@ -517,32 +536,25 @@ export default function PrintBOQPage() {
         }
 
         if (boqData) {
-          const costInMillion = boqData.total_cost / 1000000;
-          const { data: lowerData, error: lowerError } = await supabase
-            .from('factor_reference')
-            .select('*')
-            .lte('cost_million', Math.max(5, costInMillion))
-            .order('cost_million', { ascending: false })
-            .limit(1)
-            .maybeSingle();
-          if (lowerError) throw lowerError;
+          const hasUsableSnapshot = isFactorSnapshotUsable(boqData.total_cost, boqData);
 
-          const { data: upperData, error: upperError } = await supabase
-            .from('factor_reference')
-            .select('*')
-            .gt('cost_million', costInMillion)
-            .order('cost_million', { ascending: true })
-            .limit(1)
-            .maybeSingle();
-          if (upperError) throw upperError;
-
-          if (lowerData) {
-            setLowerFactorRef(lowerData);
+          if (boqData.factor_reference_version_id) {
+            const [version, rows] = await Promise.all([
+              getActiveFactorReferenceVersion(supabase, boqData.factor_reference_version_id),
+              getFactorReferenceRowsForVersion(supabase, boqData.factor_reference_version_id),
+            ]);
+            const { lowerFactorRef, upperFactorRef } =
+              findFactorBracketRefs(boqData.total_cost, rows);
+            setFactorCondition(version);
+            setLowerFactorRef(lowerFactorRef);
+            setUpperFactorRef(upperFactorRef);
+          } else if (!hasUsableSnapshot) {
+            setFactorError('BOQ นี้ไม่มี snapshot Factor F ที่ครบถ้วนและยังไม่ได้ผูกกับเวอร์ชัน Factor F');
           }
-          if (upperData) setUpperFactorRef(upperData);
         }
       } catch (err) {
         console.error('Error:', err);
+        setFactorError(err instanceof Error ? err.message : 'ไม่สามารถอ่านข้อมูล Factor F ได้');
       } finally {
         setIsLoading(false);
       }
@@ -595,6 +607,7 @@ export default function PrintBOQPage() {
         totalWithVAT,
         lowerFactorRef,
         upperFactorRef,
+        factorCondition,
       );
     } catch (err) {
       console.error('Excel export error:', err);
@@ -628,7 +641,7 @@ export default function PrintBOQPage() {
         <Alert variant="destructive" className="max-w-md">
           <AlertCircle className="h-4 w-4" />
           <AlertDescription>
-            ไม่สามารถคำนวณ Factor F ได้ กรุณาตรวจสอบตาราง Factor F หรือบันทึก BOQ ใหม่อีกครั้ง
+            ไม่สามารถคำนวณ Factor F ได้: {factorError || 'ไม่พบข้อมูล Factor F ที่ใช้กับ BOQ นี้'}
           </AlertDescription>
         </Alert>
       </div>
@@ -1000,7 +1013,7 @@ export default function PrintBOQPage() {
                   <span className="thai-value highlight-box">{numberToThaiText(totalWithVAT)}</span>
                 </div>
 
-                <PageFooter boq={boq} />
+                <PageFooter boq={boq} factorCondition={factorCondition} />
               </>
             ) : (
               <ContinueIndicator />
@@ -1011,7 +1024,12 @@ export default function PrintBOQPage() {
 
       {/* ===== Factor F Supplement Page ===== */}
       {boq.factor_f != null && (
-        <FactorFSupplementPage boq={boq} lowerFactorRef={lowerFactorRef} upperFactorRef={upperFactorRef} />
+        <FactorFSupplementPage
+          boq={boq}
+          lowerFactorRef={lowerFactorRef}
+          upperFactorRef={upperFactorRef}
+          factorCondition={factorCondition}
+        />
       )}
 
       {/* ===== Styles ===== */}

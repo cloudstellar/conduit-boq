@@ -28,6 +28,7 @@ export default function EditBOQPage() {
   });
   const [boqContext, setBOQContext] = useState<BOQContext | null>(null);
   const [priceListVersionId, setPriceListVersionId] = useState<string | null>(null);
+  const [factorReferenceVersionId, setFactorReferenceVersionId] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -64,6 +65,7 @@ export default function EditBOQPage() {
         }
 
         setPriceListVersionId(boq.price_list_version_id);
+        setFactorReferenceVersionId(boq.factor_reference_version_id ?? null);
 
         setProjectInfo({
           estimator_name: boq.estimator_name,
@@ -274,6 +276,7 @@ export default function EditBOQPage() {
             <MultiRouteEditor
               boqId={boqId}
               priceListVersionId={priceListVersionId}
+              factorReferenceVersionId={factorReferenceVersionId}
               onSave={handleSave}
               isSaving={isSaving}
               onFactorCalculated={setFactorData}

@@ -52,10 +52,12 @@ Create a dedicated Factor F version model:
   `is_default` flag.
 - nullable `boq.factor_reference_version_id`
 
-New BOQs created after the Factor F foundation is deployed must bind to the
-current `factor_reference_default_version` at creation time. Print/export/edit
-calculation for those BOQs must use the BOQ's bound factor version, not an
-unscoped live table.
+New empty BOQs created after the Factor F default pointer is seeded must bind
+to the current `factor_reference_default_version` at creation time. F1 may be
+deployed as a pointer-optional foundation, but F1 and F2 should run in the same
+approved window when users need to create BOQs with line items immediately
+after rollout. Print/export/edit calculation for version-bound BOQs must use
+the BOQ's bound factor version, not an unscoped live table.
 
 Existing BOQs must not be backfilled with `factor_reference_version_id` unless
 there is row-level evidence that identifies the exact Factor F source used by

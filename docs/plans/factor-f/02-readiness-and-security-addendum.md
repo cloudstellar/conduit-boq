@@ -172,7 +172,8 @@ F1 creates new objects with tighter privileges than the legacy
 ### `boq.factor_reference_version_id`
 
 - Nullable FK to `factor_reference_versions`.
-- New BOQs after F1 must bind the current factor pointer.
+- New empty BOQs after F2/default pointer setup must bind the current factor
+  pointer.
 - Existing BOQs remain null unless exact source evidence exists.
 - Later RPC replacements, including Master Catalog Phase 4 functions, must
   preserve or deliberately set this column.
@@ -181,8 +182,9 @@ F1 creates new objects with tighter privileges than the legacy
 
 F1 is not complete until all of these are true:
 
-- BOQ create binds `factor_reference_version_id` from
-  `factor_reference_default_version`.
+- BOQ create preserves existing/legacy nulls and binds
+  `factor_reference_version_id` from `factor_reference_default_version` once F2
+  has seeded the active pointer.
 - BOQ edit and `FactorFSummary` read factor rows by the BOQ-bound version.
 - `save_boq_with_routes` preserves/writes `factor_reference_version_id`.
 - Print uses bound factor rows for version-bound BOQs.
@@ -198,7 +200,7 @@ F1 is not complete until all of these are true:
 
 | Test | Type |
 |---|---|
-| New BOQ receives `factor_reference_version_id` | Integration |
+| New empty BOQ receives `factor_reference_version_id` after F2/default pointer setup | Integration |
 | Legacy BOQ remains null and snapshot-only | DB/integration |
 | Version-bound BOQ reads the bound factor rows | Integration |
 | Valid legacy snapshot prints/exports successfully | Integration |

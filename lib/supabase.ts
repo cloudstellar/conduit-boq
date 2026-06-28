@@ -35,10 +35,16 @@ export interface BOQ {
   total_labor_cost: number;
   total_cost: number;
   factor_f: number | null;
+  factor_f_raw: number | null;
+  factor_f_lower_cost: number | null;
+  factor_f_upper_cost: number | null;
+  factor_f_lower_value: number | null;
+  factor_f_upper_value: number | null;
   total_with_factor_f: number;
   total_with_vat: number;
   status: 'draft' | 'submitted' | 'approved';
   price_list_version_id: string | null;
+  factor_reference_version_id: string | null;
   created_at: string;
   updated_at: string;
 }

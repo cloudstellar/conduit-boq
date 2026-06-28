@@ -8,6 +8,8 @@
 
 **F3 source candidate:** [26 June 2026 Factor F Source Table Candidate](./04-source-table-2569-06-26.md)
 
+**Implementation log:** [Factor F Implementation Log](./05-implementation-log.md)
+
 ## 1. Purpose
 
 Implement Factor F versioning without rewriting historical BOQs and without
@@ -259,9 +261,12 @@ Update or wrap `save_boq_with_routes` so that:
 ### Create BOQ
 
 - Read `factor_reference_default_version`.
-- Insert `boq.factor_reference_version_id` with the pointer value.
-- Fail closed if no active factor pointer exists.
-- Do not read unscoped `factor_reference` for new BOQs after F1.
+- Insert `boq.factor_reference_version_id` with the pointer value once F2 has
+  seeded an active default pointer.
+- F1 alone may leave an empty draft BOQ unbound when no active pointer exists;
+  F1 and F2 should be deployed in the same approved window if users must create
+  BOQs with line items immediately after rollout.
+- Do not read unscoped `factor_reference` for new BOQs after F1/F2.
 
 ### Edit BOQ and Factor Summary
 
@@ -405,7 +410,7 @@ BOQ remains unchanged and auditable.
 
 | Scenario | Expected result |
 |---|---|
-| New BOQ after F1 | Has `factor_reference_version_id` |
+| New empty BOQ after F2/default pointer setup | Has `factor_reference_version_id` |
 | Legacy BOQ after F1 | Keeps null `factor_reference_version_id` |
 | Legacy valid snapshot print | Uses saved snapshot |
 | Legacy invalid snapshot print | Fails closed |

@@ -1,7 +1,12 @@
 'use client';
 
 import type { Workbook, Worksheet, Style, Border, Fill } from 'exceljs';
-import { calculateInterpolatedFactorFromRefs, isFactorSnapshotUsable } from './factorF';
+import {
+  calculateInterpolatedFactorFromRefs,
+  formatFactorReferenceCondition,
+  isFactorSnapshotUsable,
+  type FactorReferenceCondition,
+} from './factorF';
 
 // ──────────────────────────────────
 // Types (mirror from print/page.tsx)
@@ -20,6 +25,7 @@ export interface ExportBOQData {
   factor_f_upper_cost: number | null;
   factor_f_lower_value: number | null;
   factor_f_upper_value: number | null;
+  factor_reference_version_id?: string | null;
 }
 
 export interface ExportBOQRoute {
@@ -370,6 +376,7 @@ function createSummarySheet(
   constructionCostBeforeVAT: number,
   vatAmount: number,
   totalWithVAT: number,
+  factorCondition?: FactorReferenceCondition | null,
 ) {
   const ws = wb.addWorksheet('สรุปรวม');
 
@@ -549,7 +556,7 @@ function createSummarySheet(
   ws.getCell(r, 1).value = 'เงื่อนไข';
   ws.getCell(r, 1).font = defaultFont({ bold: true });
   ws.getCell(r, 1).fill = highlightFill;
-  ws.getCell(r, 2).value = 'Factor F งานก่อสร้างทาง เงินล่วงหน้าจ่าย 0.00 %, เงินประกันผลงานหัก 0.00 %, ดอกเบี้ยเงินกู้ 7.00 % ต่อปี, ค่าภาษีมูลค่าเพิ่ม 7.00 %';
+  ws.getCell(r, 2).value = formatFactorReferenceCondition(factorCondition);
   ws.getCell(r, 2).font = defaultFont();
   ws.mergeCells(r, 2, r, 9);
   r++;
@@ -588,6 +595,7 @@ function createFactorFSheet(
   factor: number,
   lowerFactorRef: ExportFactorRef | null,
   upperFactorRef: ExportFactorRef | null,
+  factorCondition?: FactorReferenceCondition | null,
 ) {
   const ws = wb.addWorksheet('Factor F');
 
@@ -681,7 +689,7 @@ function createFactorFSheet(
   ws.mergeCells(r, 1, r, 8);
   r++;
 
-  ws.getCell(r, 1).value = 'ใช้ Factor F งานก่อสร้างทาง ( เงินล่วงหน้าจ่าย 0.00 %, เงินประกันผลงานหัก 0.00 %, ดอกเบี้ยเงินกู้ 7.00 % ต่อปี, ค่า VAT 7.00 % )';
+  ws.getCell(r, 1).value = `ใช้ ${formatFactorReferenceCondition(factorCondition)}`;
   ws.getCell(r, 1).font = defaultFont({ bold: true });
   ws.mergeCells(r, 1, r, 8);
   r += 2;
@@ -810,6 +818,7 @@ export async function exportBoqToExcel(
   totalWithVAT: number,
   lowerFactorRef?: ExportFactorRef | null,
   upperFactorRef?: ExportFactorRef | null,
+  factorCondition?: FactorReferenceCondition | null,
 ) {
   // Dynamic import to avoid bundle bloat
   const ExcelJS = (await import('exceljs')).default;
@@ -900,11 +909,28 @@ export async function exportBoqToExcel(
   }
 
   // ── Create summary sheet ──
-  createSummarySheet(wb, boq, routes, allocated, factor, constructionCostBeforeVAT, vatAmount, totalWithVAT);
+  createSummarySheet(
+    wb,
+    boq,
+    routes,
+    allocated,
+    factor,
+    constructionCostBeforeVAT,
+    vatAmount,
+    totalWithVAT,
+    factorCondition,
+  );
 
   // ── Create Factor F supplement sheet (if factor_f exists) ──
   if (boq.factor_f != null) {
-    createFactorFSheet(wb, boq, factor, lowerFactorRef || null, upperFactorRef || null);
+    createFactorFSheet(
+      wb,
+      boq,
+      factor,
+      lowerFactorRef || null,
+      upperFactorRef || null,
+      factorCondition,
+    );
   }
 
   // ── Generate and download ──

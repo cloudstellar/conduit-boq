@@ -3,6 +3,13 @@ export interface FactorReferenceRow {
   factor: number;
 }
 
+export interface FactorReferenceCondition {
+  advance_payment_percent: number | null;
+  retention_percent: number | null;
+  loan_interest_percent: number | null;
+  vat_percent: number | null;
+}
+
 export interface FactorCalculationResult {
   factor: number;
   raw: number;
@@ -113,4 +120,41 @@ export function calculateInterpolatedFactorFromRefs(
     upperValue: E,
     exactMatch: Math.abs(raw - factor) < 0.000000001,
   };
+}
+
+export function findFactorBracketRefs(
+  totalCost: number,
+  factorRefs: FactorReferenceRow[],
+): {
+  lowerFactorRef: FactorReferenceRow | null;
+  upperFactorRef: FactorReferenceRow | null;
+} {
+  if (totalCost <= 0 || factorRefs.length === 0) {
+    return { lowerFactorRef: null, upperFactorRef: null };
+  }
+
+  const costInMillionValue = totalCost / 1000000;
+  const lowerLimit = Math.max(5, costInMillionValue);
+  const lowerFactorRef = [...factorRefs]
+    .reverse()
+    .find((ref) => Number(ref.cost_million) <= lowerLimit) ?? null;
+  const upperFactorRef = factorRefs
+    .find((ref) => Number(ref.cost_million) > costInMillionValue) ?? null;
+
+  return { lowerFactorRef, upperFactorRef };
+}
+
+function formatPercent(value: number | null | undefined): string {
+  return `${Number(value ?? 0).toFixed(2)} %`;
+}
+
+export function formatFactorReferenceCondition(
+  condition?: FactorReferenceCondition | null,
+): string {
+  const advance = formatPercent(condition?.advance_payment_percent);
+  const retention = formatPercent(condition?.retention_percent);
+  const interest = formatPercent(condition?.loan_interest_percent ?? 7);
+  const vat = formatPercent(condition?.vat_percent ?? 7);
+
+  return `Factor F งานก่อสร้างทาง เงินล่วงหน้าจ่าย ${advance}, เงินประกันผลงานหัก ${retention}, ดอกเบี้ยเงินกู้ ${interest} ต่อปี, ค่าภาษีมูลค่าเพิ่ม ${vat}`;
 }

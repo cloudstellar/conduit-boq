@@ -28,7 +28,7 @@
 | `010_master_catalog_phase1a_versioning.sql` | Master Catalog v26 nullable versioning + historical backfill | **Applied to Production 2026-06-21** (`20260621052517`) |
 | `010a_master_catalog_phase1a_indexes.sql` | Master Catalog v26 concurrent index runbook | **Applied operationally 2026-06-21** (4 indexes valid/ready) |
 | `011_master_catalog_phase1b_hardening.sql` | Master Catalog v26 BOQ version contract hardening | **Applied to Production 2026-06-21** (`20260621104056`) |
-| `012_factor_f_version_foundation.sql` | Planned Factor F version tables, singleton pointer, `boq.factor_reference_version_id`, RLS/grants/triggers | **Planned — next root migration after Production MCP verified `011` latest on 2026-06-28** |
+| `012_factor_f_version_foundation.sql` | Factor F version tables, singleton pointer, `boq.factor_reference_version_id`, RLS/grants/triggers | **Draft created and local-verified 2026-06-28 — not applied to Production** |
 | `013_factor_f_seed_current_baseline.sql` | Planned seed of audited current 37-row `factor_reference` baseline into Factor F version tables | **Planned — no legacy BOQ backfill** |
 | `014_factor_f_publish_2569_0_0.sql` | Planned publication of Factor F `2569.0.0` from กค 0433.2/ว 481 and default pointer movement | **Planned — requires F3 approval, diff, hash, and owner review** |
 | `015+_master_catalog_phase4_*.sql` | Master Catalog Phase 4 database migrations | **Planned — shifted later because Factor F is owner-selected first** |
