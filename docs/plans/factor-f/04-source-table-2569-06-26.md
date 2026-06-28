@@ -27,7 +27,7 @@ Visible source details from the image:
 | อัตราเงินจ่ายล่วงหน้า | 0% | Store as version-level source metadata |
 | อัตราเงินประกันผลงาน | 0% | Store as version-level source metadata |
 | อัตราดอกเบี้ยเงินกู้ | 6% ต่อปี | Store as version-level source metadata; do not infer per-row operation/profit values |
-| VAT | 7% | Store as version-level source metadata and row `vat_percent = 7.0000` |
+| VAT | 7% | Store as version-level source metadata. Preserve row `vat_percent = 1.0700` to match the existing reference-table contract. |
 
 Version string is reserved as `2569.0.0` because the owner confirmed the
 effective date is 26 June 2026 / BE 2569 and this is the first planned Factor F
@@ -87,6 +87,9 @@ row-level duplicated metadata, or both.
 For the current plan, the 6% loan interest belongs to version-level source
 metadata for print/export text. Do not duplicate it into every row unless a
 separate implementation decision explicitly chooses that compatibility shape.
+The W481 source displays VAT as 7%, but the row-level `vat_percent` column
+keeps the legacy table contract value `1.0700`; the human-readable VAT percent
+is stored in `factor_reference_versions.vat_percent`.
 
 ## 4. Candidate Row Set
 

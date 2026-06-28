@@ -1,5 +1,9 @@
 import { describe, expect, it } from 'vitest'
-import { calculateInterpolatedFactorFromRefs, isFactorSnapshotUsable } from '../lib/factorF'
+import {
+  calculateInterpolatedFactorFromRefs,
+  formatFactorReferenceCondition,
+  isFactorSnapshotUsable,
+} from '../lib/factorF'
 
 describe('Factor F interpolation', () => {
   it('interpolates a 30-40 million job from the table factor column and truncates to 4 decimals', () => {
@@ -46,5 +50,17 @@ describe('Factor F interpolation', () => {
       factor_f_lower_value: 1.1422,
       factor_f_upper_value: 1.1359,
     })).toBe(true)
+  })
+
+  it('formats the version for print/export conditions', () => {
+    expect(formatFactorReferenceCondition({
+      version_string: '2569.0.0',
+      advance_payment_percent: 0,
+      retention_percent: 0,
+      loan_interest_percent: 6,
+      vat_percent: 7,
+    })).toBe(
+      'Factor F เวอร์ชัน 2569.0.0 งานก่อสร้างทาง เงินล่วงหน้าจ่าย 0.00 %, เงินประกันผลงานหัก 0.00 %, ดอกเบี้ยเงินกู้ 6.00 % ต่อปี, ค่าภาษีมูลค่าเพิ่ม 7.00 %'
+    )
   })
 })

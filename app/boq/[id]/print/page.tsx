@@ -235,7 +235,7 @@ function PageFooter({
       {showConditions && (
         <>
           <div className="conditions">
-            <span className="highlight-text">เงื่อนไข</span> {formatFactorReferenceCondition(factorCondition)}
+            <span className="highlight-text">เงื่อนไข</span> ใช้ {formatFactorReferenceCondition(factorCondition)}
           </div>
           <div className="note">
             <span className="highlight-text">หมายเหตุ</span> ทั้งนี้ ราคางานโครงการ/งานก่อสร้าง ไม่ใช่ราคาค่าก่อสร้างที่แท้จริง แต่เป็นเพียงราคาโดยประมาณเท่านั้น

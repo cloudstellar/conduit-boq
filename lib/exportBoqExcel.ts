@@ -556,7 +556,7 @@ function createSummarySheet(
   ws.getCell(r, 1).value = 'เงื่อนไข';
   ws.getCell(r, 1).font = defaultFont({ bold: true });
   ws.getCell(r, 1).fill = highlightFill;
-  ws.getCell(r, 2).value = formatFactorReferenceCondition(factorCondition);
+  ws.getCell(r, 2).value = `ใช้ ${formatFactorReferenceCondition(factorCondition)}`;
   ws.getCell(r, 2).font = defaultFont();
   ws.mergeCells(r, 2, r, 9);
   r++;

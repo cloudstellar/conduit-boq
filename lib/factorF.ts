@@ -4,6 +4,7 @@ export interface FactorReferenceRow {
 }
 
 export interface FactorReferenceCondition {
+  version_string?: string | null;
   advance_payment_percent: number | null;
   retention_percent: number | null;
   loan_interest_percent: number | null;
@@ -148,6 +149,14 @@ function formatPercent(value: number | null | undefined): string {
   return `${Number(value ?? 0).toFixed(2)} %`;
 }
 
+function formatFactorReferenceVersionLabel(
+  condition?: FactorReferenceCondition | null,
+): string | null {
+  if (!condition?.version_string) return null;
+
+  return `Factor F เวอร์ชัน ${condition.version_string}`;
+}
+
 export function formatFactorReferenceCondition(
   condition?: FactorReferenceCondition | null,
 ): string {
@@ -155,6 +164,8 @@ export function formatFactorReferenceCondition(
   const retention = formatPercent(condition?.retention_percent);
   const interest = formatPercent(condition?.loan_interest_percent ?? 7);
   const vat = formatPercent(condition?.vat_percent ?? 7);
+  const versionLabel = formatFactorReferenceVersionLabel(condition);
+  const prefix = versionLabel ? `${versionLabel} ` : 'Factor F ';
 
-  return `Factor F งานก่อสร้างทาง เงินล่วงหน้าจ่าย ${advance}, เงินประกันผลงานหัก ${retention}, ดอกเบี้ยเงินกู้ ${interest} ต่อปี, ค่าภาษีมูลค่าเพิ่ม ${vat}`;
+  return `${prefix}งานก่อสร้างทาง เงินล่วงหน้าจ่าย ${advance}, เงินประกันผลงานหัก ${retention}, ดอกเบี้ยเงินกู้ ${interest} ต่อปี, ค่าภาษีมูลค่าเพิ่ม ${vat}`;
 }
