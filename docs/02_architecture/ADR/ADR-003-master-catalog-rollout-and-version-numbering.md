@@ -23,6 +23,10 @@ catalog state has been rechecked through Supabase MCP:
 - The Factor F correction on `main` now uses `factor_reference.factor`
   ("รวมในรูป Factor"), validates saved snapshots, and fails closed when
   reference rows are unavailable.
+- Future Factor F changes are governed by
+  [ADR-005](./ADR-005-versioned-factor-f-reference.md). Factor F remains
+  separate from Master Catalog price versioning, but new BOQs should bind to a
+  dedicated Factor F reference version after that foundation is deployed.
 
 Before versioning is enabled, the project needs a stable and auditable catalog
 version-numbering convention. The convention must be easy for Thai procurement
@@ -88,7 +92,7 @@ instead of changing the primary sortable version key.
 | Another approved supplement in the same year | `2568.2.0` | Next revision within the same year |
 | Errata, typo fix, category correction, unit-label correction, or data-entry correction within the same approved revision | `2568.0.1` | Correction release, not a new official price basis |
 | Documentation-only change, application-only change, or rollout procedure change | No catalog version bump | Catalog data did not change |
-| Factor F reference change | No `price_list` catalog version bump | Factor F is a separate calculation reference and requires its own change request and full-table verification |
+| Factor F reference change | No `price_list` catalog version bump | Factor F is a separate calculation reference governed by ADR-005; it requires its own version, change request, approval evidence, and full-table verification |
 
 If a correction changes a numeric price because the previously entered value was
 wrong, classify it as a patch only when the correction restores the same
@@ -204,8 +208,9 @@ production release.
 - Item code changes become auditable catalog decisions instead of silent edits.
 - Future structured item-code schemes can be introduced without changing the
   versioning model.
-- Factor F remains outside catalog versioning but is still protected by a
-  separate full-table integrity gate.
+- Factor F remains outside Master Catalog price versioning. Under ADR-005, it
+  receives its own versioned reference/pointer model, and historical BOQs are
+  not backfilled with a guessed factor version.
 
 ### Negative
 
@@ -235,16 +240,19 @@ production release.
 5. Do not introduce a new structured item-code scheme without an approved
    segment dictionary and import validation.
 6. Do not include `factor_reference` in `price_list_versions`. Treat Factor F as
-   separate reference data with full-table integrity verification.
+   separate reference data with its own ADR-005 versioning/change process.
 7. Do not promote a new default version without an audit log entry and owner
    approval.
 8. If catalog data changes but the version number does not, stop the rollout or
    release process and correct the versioning decision before promotion.
+9. Do not backfill historical BOQs with a Factor F version unless exact
+   source/version evidence exists for those BOQs.
 
 ## References
 
 - [ADR-002: Versioned Master Catalog With Singleton Default Pointer](./ADR-002-versioned-master-catalog.md)
 - [ADR-004: Phase 4 Catalog Governance and Official Publication](./ADR-004-phase4-catalog-governance-and-official-publication.md)
+- [ADR-005: Versioned Factor F Reference and Legacy Snapshot Policy](./ADR-005-versioned-factor-f-reference.md)
 - [Master Catalog implementation plan](../../plans/master-catalog/02-implementation.md)
 - [Master Catalog change request](../../plans/master-catalog/04-change-request.md)
 - [Master Catalog verification report](../../plans/master-catalog/05-verification-report.md)

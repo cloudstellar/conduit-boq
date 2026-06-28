@@ -177,6 +177,11 @@
 | **v39** | **Authenticated Production Browser QA ผ่าน Dashboard, Price List 710 + ITEM-0710 search, BOQ 198 + AWS search, Create form, Edit/version-scoped search และ Print โดยไม่มี app console error** | ✅ |
 | **v39** | **Apply/verify `011` ผ่าน Supabase MCP ledger `20260621104056`; BOQ version `NOT NULL`, immutable trigger enabled, invoker guard ปฏิเสธการเปลี่ยน version จริง** | ✅ |
 | **v39** | **Post-hardening rollback create/save ผ่าน; final counts 198 / 1,547 / 217 / 710, invalid-state และ smoke rows = 0, Factor F checksum ไม่เปลี่ยน** | ✅ |
+| **v40** | **เพิ่ม ADR-005 และ Factor F Change Request: Factor F เป็น versioned reference แยก, ห้าม backfill BOQ เก่าแบบเดา, และถ้าจะปรับ Factor F ตอนนี้ต้องทำ F1/F2 ก่อน F3 publish** | ✅ |
+| **v41** | **Review reconciliation: ระบุ `factor_reference_rows` schema, SHA-256 canonical hash, singleton pointer detail, interpolation formula, และ F3 timing เป็นตัวเลือกตาม urgency โดยยังต้องแยก window** | ✅ |
+| **v42** | **เพิ่ม Factor F implementation plan แบบ no-assumption: non-negotiable rules, F0-F4 gates, migration/app/test matrix, rollback/forward-fix, และ prompt rules สำหรับ AI/dev agent** | ✅ |
+| **v43** | **ปิด minor review gaps: ADR-005 ระบุ Factor F version string แบบ `major.minor.patch` และ Architecture Plan ชี้ไปยัง Factor F CR/implementation plan** | ✅ |
+| **v44** | **Owner review reconciliation: ตัด row count ที่ยังไม่ query ออกจาก assumption, ระบุ migration numbers ตาม execution order, และเพิ่ม user-impact note ระหว่าง Factor F implementation/F3 publish** | ✅ |
 
 ---
 
@@ -194,6 +199,7 @@
 | Credential hygiene | ✅ HEAD cleaned | Removed hardcoded legacy `anon` key from utility scripts; no tracked `.env` |
 | Catalog/reference recheck | ✅ Verified by Supabase MCP | `price_list` 710 rows, PN6 28 rows, `factor_reference` 37 rows, checksum `e8040ffbf82beebd61bbb9c2652dd41a` |
 | Catalog versioning ADR | ✅ Added | [ADR-003](../../02_architecture/ADR/ADR-003-master-catalog-rollout-and-version-numbering.md): start at `2568.0.0` |
+| Factor F versioning ADR/CR | ✅ Added | [ADR-005](../../02_architecture/ADR/ADR-005-versioned-factor-f-reference.md) + [Factor F CR](../factor-f/01-versioned-factor-f-change-request.md): separate F-track before changing live factor values |
 | Best-practices analysis | ✅ Added | [07-best-practices-analysis.md](./07-best-practices-analysis.md) |
 | P0 containment `009` | ✅ Applied/verified | Production ledger `20260621045208` |
 | Master Catalog `010` / `010a` | ✅ Applied/verified | Production ledger `20260621052517`; four concurrent indexes valid/ready |
@@ -285,6 +291,8 @@ invalidation is required.
 | **[v30] Factor F snapshot** | **print/export ใช้ saved snapshot ก่อน ถ้า snapshot valid** | รักษาหลักฐานราคาเดิมของ BOQ และเลี่ยงการเปลี่ยนย้อนหลังตาม reference table |
 | **[v30] PN6 count** | **ฐานปัจจุบันที่เอกสารอ้างอิงคือ 710 rows** | เดิม 682 + PN6 28; refresh ผ่าน authenticated SQL/MCP ก่อน execution window |
 | **[v31] Factor F approval gate** | **ตรวจทั้งตาราง ไม่ใช่แค่ 30M/40M** | Factor F ผิดแถวเดียวทำให้ BOQ ในช่วงค่างานนั้นผิดได้ จึงต้องใช้ full-table checksum และ row-level review ถ้า checksum เปลี่ยน |
+| **[v40] Factor F versioning track** | **ทำ Factor F เป็น reference version แยกจาก Master Catalog; seed current baseline สำหรับ BOQ ใหม่เท่านั้น ไม่ backfill BOQ เก่าแบบเดา** | เจ้าของต้องการปรับ Factor F ตอนนี้ จึงต้องมี F0-F3 gate ก่อนเปลี่ยน live factor values |
+| **[v44] Migration ordering** | **เลข migration ของ Factor F และ Master Catalog ต้องเดินตามลำดับ execution จริง** | ถ้า Factor F F1/F2 ทำก่อนจะใช้เลข root ถัดไป และ Master Catalog Phase 4 เลื่อนไปเลขหลังจากนั้น; ถ้า Phase 4 ทำก่อน Factor F ก็เลื่อนตาม |
 | **[v32/v33] Version numbering** | **เริ่ม Master Catalog ที่ `2568.0.0`; อนาคตกำหนดปีเริ่มใช้งานได้ เช่น `2570.0.0`** | ใช้ปี พ.ศ. ที่ owner กำหนดให้เป็นปีเริ่มใช้งานเป็น segment แรก และใช้ revision/patch ตามหลัก SemVer-style; ไม่ใช้ 4-part key เพราะ schema และ convention ปัจจุบันคือ `major.minor.patch` |
 | **[v34] Item code governance** | **`item_code` เป็น identity ของรายการใน catalog version** | ห้ามใช้ `item_code` เป็นลำดับแสดงผลหรือ reuse ความหมายใหม่; การเพิ่ม/แก้/renumber หลัง active ต้องมี version bump และ audit/mapping ตามระดับผลกระทบ |
 | **[v35] Structured item codes** | **รองรับรหัสอนาคต เช่น `CIC-PVC-001`** | ใช้ได้เป็น approved taxonomy ของ catalog version ใหม่ แต่ต้องมี dictionary/validation และไม่ให้แอป parse string เป็น business logic โดยไม่มี metadata |
@@ -372,6 +380,8 @@ invalidation is required.
 | **74** | **[v34] ADR-003 item-code governance** | ✅ | ✅ | ✅ |
 | **75** | **[v35] ADR-003 structured item-code scheme support** | ✅ | ✅ | ✅ |
 | **76** | **[v36] Skill-backed alternatives/risk analysis** | ✅ | ✅ | ✅ |
+| **77** | **[v40] ADR-005 Factor F versioned reference / no guessed legacy backfill** | ✅ | ✅ | ✅ |
+| **78** | **[v44] Factor F row-count assumption removal / migration ordering / user-impact note** | ✅ | ✅ | ✅ |
 
 ---
 

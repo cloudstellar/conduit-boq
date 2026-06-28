@@ -17,6 +17,13 @@ Phase 4 must add safe catalog administration without weakening historical BOQ
 correctness. The owner also requires published data to be usable immediately as
 an official reference through system-generated Excel and PDF exports.
 
+Factor F governance is deliberately separate from Master Catalog price
+governance. If Factor F must change before or during Phase 4, it follows
+[ADR-005](./ADR-005-versioned-factor-f-reference.md) and the separate
+Factor F Change Request. Phase 4 must not update Factor F rows in place, infer
+old BOQ factor provenance, or mix a catalog publication window with a Factor F
+publication window unless both change requests explicitly approve that coupling.
+
 The candidate workbook contains a useful `AAA-TTT-###` taxonomy, but it has 708
 rows rather than Production's 710. Reconciliation found 42 price differences,
 18 workbook-only rows, 20 Production-only rows, and 16 HDPE Crossing rows whose
@@ -159,7 +166,8 @@ contract are required before Phase 4 UI implementation.
 
 Phase 4 Core does not add Supabase Storage, a paid Supabase branch, background
 jobs, generic mapping UI, server pagination at the current 710-row scale, BOQ
-rebase, unrelated CI redesign, or destructive one-click undo.
+rebase, Factor F administration, unrelated CI redesign, or destructive
+one-click undo.
 
 These omissions are intentional scope control, not missing architecture.
 
@@ -192,6 +200,9 @@ These omissions are intentional scope control, not missing architecture.
 - The stricter draft/reason/diff/approval/publish workflow requires admin
   training and disciplined evidence entry compared with direct edits.
 - A later K-formula feature needs its own governance decision.
+- Factor F versioning/change-now work is separate. It may run before Phase 4
+  publication, but it must not rewrite historical BOQs or be hidden inside a
+  Master Catalog price release.
 
 ## Alternatives rejected
 
@@ -204,6 +215,8 @@ These omissions are intentional scope control, not missing architecture.
 | Use application-only authorization | RLS/database functions are required defense in depth |
 | Parse `AAA/TTT` at runtime for pricing | Codes are business identifiers, not executable pricing logic |
 | Add a workflow engine or multi-stage approval subsystem now | One authorized publisher plus real approval evidence meets the present requirement |
+| Fold Factor F into `price_list_versions` | Factor F changes for different policy reasons than item prices and needs its own provenance without forcing a price catalog version bump |
+| Backfill old BOQs with the current Factor F version | It would create false provenance unless exact source evidence exists for each BOQ |
 
 ## Implementation conditions
 
@@ -239,10 +252,16 @@ Production migration, feature enablement, and catalog publication each require
 separate explicit owner approval. Approval of this ADR or P-01 alone does not
 authorize Production execution.
 
+An immediate Factor F change has its own F0-F3 gates under ADR-005. The safest
+ordering is to approve and deploy the Factor F foundation before changing live
+Factor F values, then proceed with Master Catalog Phase 4 in a separate window.
+
 ## References
 
 - [ADR-002: Versioned Master Catalog](./ADR-002-versioned-master-catalog.md)
 - [ADR-003: Rollout and Version Numbering](./ADR-003-master-catalog-rollout-and-version-numbering.md)
+- [ADR-005: Versioned Factor F Reference](./ADR-005-versioned-factor-f-reference.md)
+- [Versioned Factor F Change Request](../../plans/factor-f/01-versioned-factor-f-change-request.md)
 - [Phase 4 architecture plan](../../plans/master-catalog/08-phase4-architecture-ci-plan.md)
 - [Phase 4 reconciliation report](../../plans/master-catalog/11-phase4-reconciliation-report.md)
 - [Parser and canonical hash specification](../../plans/master-catalog/14-phase4-parser-and-canonical-hash-spec.md)

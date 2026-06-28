@@ -17,6 +17,11 @@ Confirm you are signed in with an active admin account and have:
 Do not continue when another admin is publishing, the current pointer is
 unexpected, or the source/approval reference is unclear.
 
+Factor F is not administered through this Master Catalog procedure. If Factor F
+must change, stop and use ADR-005 plus the separate Factor F Change Request.
+Do not update Factor F rows in place and do not backfill old BOQs with a current
+factor version by assumption.
+
 ## 2. Status meanings
 
 | Status | Meaning | Can edit? | Can users use for new BOQs? |
@@ -136,6 +141,9 @@ validation records `validated` or `rejected`.
 
 K-formula columns are ignored/excluded in Phase 4 Core.
 
+Factor F columns or worksheets are also excluded from Master Catalog import.
+They require the separate Factor F process.
+
 ## 9. Review a draft
 
 Before requesting publication, verify:
@@ -207,6 +215,7 @@ Use only when a published current version must stop being used for new BOQs.
 | Draft base stale | Create a new draft from Current and reapply approved changes; do not publish/rebase the stale draft |
 | Publish evidence required | Complete real approval metadata; do not use placeholder text |
 | Export hash mismatch | Do not distribute; report with request/version/hash details |
+| Factor F change requested | Use the ADR-005 Factor F Change Request; do not edit Master Catalog data or legacy BOQs |
 
 ## 14. Prohibited actions
 
@@ -215,6 +224,9 @@ Use only when a published current version must stop being used for new BOQs.
 - Reusing an item code
 - Treating workbook row number/`item_id` as identity
 - Publishing workbook price/K changes without authority
+- Changing Factor F through Master Catalog tools
+- Backfilling legacy BOQs with a guessed Factor F version
+- Auto-repricing old BOQs after a Factor F change
 - Uploading source files to unapproved locations
 - Using another person's account or placeholder approval evidence
 - Repeatedly clicking high-impact actions after an uncertain response

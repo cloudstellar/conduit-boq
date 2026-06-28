@@ -1543,7 +1543,16 @@ Do not advance when any gate fails:
 - Stable item identity and versioned categories are added before the second
   catalog version.
 - BOQ Rebase is Phase 4.2 and does not block Phase 4 Core.
-- Factor F remains outside Master Catalog versioning.
+- Factor F remains outside Master Catalog price versioning and is governed by
+  ADR-005. If Factor F changes now, run the separate F-track before changing
+  live Factor F values: foundation, current baseline seed without old BOQ
+  backfill, then new factor publication. The detailed Factor F CR and
+  implementation plan live in `docs/plans/factor-f/`.
+- Migration numbering follows actual execution order. If Factor F F1/F2 ships
+  before Master Catalog Phase 4 database work, Factor F takes the next root
+  migration numbers and Phase 4 moves later; if Phase 4 ships first, Factor F
+  takes the next available numbers after Phase 4. Do not create parallel
+  migrations with the same logical order.
 - No paid Supabase branch or additional hosted project is created.
 - Compatibility columns are retained through the first stable Production cycle.
 - Local CI sources remain uncommitted; only approved runtime derivatives may be

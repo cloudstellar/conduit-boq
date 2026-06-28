@@ -28,6 +28,10 @@ The owner is asked to confirm:
 4. System-generated stamped Excel/PDF may be used as official reference copies.
 5. Source/approval files remain in the physical filing system.
 6. K-formula publication and BOQ Rebase remain outside Phase 4 Core.
+7. Factor F changes are outside this Master Catalog CR and follow
+   [ADR-005](../../02_architecture/ADR/ADR-005-versioned-factor-f-reference.md)
+   plus the separate
+   [Factor F Change Request](../factor-f/01-versioned-factor-f-change-request.md).
 
 ## 2. Current verified baseline
 
@@ -120,6 +124,8 @@ After completion, an active admin can:
 - Removal of legacy compatibility columns in the same release
 - Redesign of unrelated screens or dashboard metric wording
 - Changes to BOQ print label “แบบ ปร.1”
+- Factor F reference changes, legacy BOQ factor-version backfill, or automatic
+  repricing of existing BOQs
 
 ## 6. Data-source rule
 
@@ -146,6 +152,13 @@ structured-code rollout. Workbook-only rows are deferred until they have
 separate approved price authority. Production-only rows remain present.
 
 ## 7. Proposed implementation sequence
+
+If Factor F must change now, run the separate F-track before changing live
+Factor F values. The recommended order is F0 approval, F1 additive Factor F
+foundation, F2 current baseline seed without legacy BOQ backfill, then F3
+publish the new Factor F version. Master Catalog local work may continue, but
+Master Catalog publication and Factor F publication should not share one
+Production window unless both CRs explicitly approve it.
 
 | Phase | Purpose | Production effect |
 |---|---|---|
@@ -200,6 +213,7 @@ separate approved price authority. Production-only rows remain present.
 | Existing BOQ regression | Low | High | Feature flag and full regression suite | Create/edit/print/export failure |
 | Legacy `is_default` becomes stale | Medium | Medium | Sync in publish/restore transaction | Pointer/flag mismatch |
 | Oversized payload fails unpredictably | Low | Medium | 750 KB application cap, tested error | Payload exceeds cap |
+| Factor F change hidden inside catalog work | Medium | High | ADR-005 and separate Factor F CR/gates | Any Factor F row/value change in this CR |
 
 ## 11. Preconditions before implementation/local rehearsal
 
@@ -283,6 +297,8 @@ Detailed execution is in the
 - Official Excel/PDF hash and count match the selected published version.
 - Existing BOQs and current user flows pass regression checks.
 - Pointer restore is audited and does not rewrite historical BOQs.
+- No Factor F value is changed, and no old BOQ is backfilled with a guessed
+  factor version, under this Master Catalog CR.
 - Verification report and release note are signed/complete.
 
 ## 16. Approval record
@@ -300,6 +316,8 @@ Detailed execution is in the
 ## References
 
 - [Phase 4 architecture plan](./08-phase4-architecture-ci-plan.md)
+- [ADR-005 Factor F reference policy](../../02_architecture/ADR/ADR-005-versioned-factor-f-reference.md)
+- [Factor F Change Request](../factor-f/01-versioned-factor-f-change-request.md)
 - [Code dictionary](./10-phase4-structured-code-dictionary.md)
 - [Reconciliation report](./11-phase4-reconciliation-report.md)
 - [Verification template](./13-phase4-verification-report.md)

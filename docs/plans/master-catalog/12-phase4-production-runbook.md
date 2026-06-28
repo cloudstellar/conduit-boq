@@ -175,7 +175,8 @@ Also verify:
 - migration ledger matches repository history;
 - no Phase 4 object already exists unexpectedly;
 - all current RLS/security invariants from Phase 1B remain intact;
-- no catalog/Factor F change is scheduled during the window;
+- no catalog/Factor F change is scheduled during the window unless a separate
+  approved Factor F CR explicitly defines and verifies that coupling;
 - no unexpected active admin session is editing catalog data.
 
 ## 8. Backup gate

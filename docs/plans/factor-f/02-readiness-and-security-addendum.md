@@ -1,0 +1,188 @@
+# Factor F Track Readiness and Security Addendum
+
+**Status:** Draft companion checklist for F0-F3
+**Date:** 2026-06-28
+**Authority:** [ADR-005](../../02_architecture/ADR/ADR-005-versioned-factor-f-reference.md)
+and the [Factor F Change Request](./01-versioned-factor-f-change-request.md)
+**Implementation plan:** [Factor F Versioning Implementation Plan](./03-implementation-plan.md)
+
+## 1. Readiness interpretation
+
+The Factor F track has two different readiness levels:
+
+| Gate | Meaning | Can proceed without new Factor F values? |
+|---|---|---|
+| F0 | Approve the policy, scope, and evidence requirements | Yes, if the owner accepts the policy and records pending business inputs |
+| F1 | Implement additive schema/app compatibility | Yes, using the current table as the only source |
+| F2 | Seed the audited current baseline for future BOQs | Yes, after baseline checksum/count verification |
+| F3 | Publish a new Factor F table | No; requires the approved new table, effective date, source, and owner approval |
+
+Therefore the track is not ready for F3 until the business evidence is complete,
+but F1/F2 planning can proceed after F0 policy approval.
+
+Do not treat any remembered row count as authority. The baseline count becomes
+authoritative only when the Production preflight query is recorded for F2.
+
+## 2. Business inputs required before F3
+
+| Input | Required before | Notes |
+|---|---|---|
+| Current baseline export | F2 | Current Production `factor_reference` rows and checksum |
+| New Factor F table | F3 | Approved source table; do not type values manually without review |
+| Effective date | F3 | Date new BOQs should start using the new default pointer |
+| Source/approval reference | F3 | Letter number, source document, or equivalent approval evidence |
+| Data custodian | F3 | Person/team responsible for row-level verification |
+| Expected row count | F3 | Must reconcile with source document |
+| Calculation formula decision | F3 | Existing interpolation and truncate-to-4-decimals remain unless separately approved |
+| VAT decision | F3 | Confirm whether `vat_percent` remains 7% |
+| Column decision | F3 | Confirm whether `factor_f_rain_1` and `factor_f_rain_2` remain required |
+
+## 3. Technical preflight before F1
+
+Run and record these checks before any F1 migration.
+
+```sql
+-- Current Factor F row and duplicate check.
+select
+  count(*) as factor_rows,
+  count(distinct cost_million) as distinct_cost_thresholds,
+  count(*) - count(distinct cost_million) as duplicate_thresholds
+from public.factor_reference;
+```
+
+```sql
+-- Required numeric values must be present and positive.
+select count(*) as invalid_factor_rows
+from public.factor_reference
+where cost_million is null
+   or operation_percent is null
+   or interest_percent is null
+   or profit_percent is null
+   or total_expense_percent is null
+   or factor is null
+   or vat_percent is null
+   or factor_f is null
+   or factor_f_rain_1 is null
+   or factor_f_rain_2 is null
+   or cost_million <= 0
+   or factor <= 0
+   or factor_f <= 0
+   or factor_f_rain_1 <= 0
+   or factor_f_rain_2 <= 0;
+```
+
+```sql
+-- BOQ Factor F snapshot coverage. These rows remain legacy/snapshot-only;
+-- do not backfill a factor version by assumption.
+select
+  count(*) as total_boqs,
+  count(*) filter (
+    where factor_f is not null
+      and factor_f_lower_cost is not null
+      and factor_f_upper_cost is not null
+      and factor_f_lower_value is not null
+      and factor_f_upper_value is not null
+      and factor_f > 0
+      and factor_f_lower_cost > 0
+      and factor_f_upper_cost > 0
+      and factor_f_lower_value > 0
+      and factor_f_upper_value > 0
+  ) as snapshot_complete,
+  count(*) filter (
+    where factor_f is null
+       or factor_f_lower_cost is null
+       or factor_f_upper_cost is null
+       or factor_f_lower_value is null
+       or factor_f_upper_value is null
+       or factor_f <= 0
+       or factor_f_lower_cost <= 0
+       or factor_f_upper_cost <= 0
+       or factor_f_lower_value <= 0
+       or factor_f_upper_value <= 0
+  ) as snapshot_incomplete
+from public.boq;
+```
+
+```sql
+-- Privilege snapshot for legacy factor_reference. RLS is still required, but
+-- broad grants should not be carried forward to new Factor F tables.
+select
+  grantee::regrole::text as grantee,
+  privilege_type
+from information_schema.role_table_grants
+where table_schema = 'public'
+  and table_name = 'factor_reference'
+order by grantee, privilege_type;
+```
+
+## 4. F1 database security contract
+
+F1 creates new objects with tighter privileges than the legacy
+`factor_reference` grants.
+
+### `factor_reference_versions`
+
+- RLS enabled immediately.
+- `authenticated` may select published/active versions.
+- Active admins may manage draft/publish only through reviewed functions.
+- No direct `INSERT`, `UPDATE`, or `DELETE` grant to `PUBLIC`, `anon`, or
+  broad application roles.
+- Published metadata is immutable except pointer movement does not mutate it.
+
+### `factor_reference_rows`
+
+- RLS enabled immediately.
+- `authenticated` may select rows for published/active versions.
+- Draft mutation occurs only through reviewed admin functions.
+- Published rows are immutable.
+- Required constraints:
+  - `version_id` FK to `factor_reference_versions` with `ON DELETE RESTRICT`;
+  - `UNIQUE (version_id, cost_million)`;
+  - positive checks for `cost_million`, `factor`, `factor_f`,
+    `factor_f_rain_1`, and `factor_f_rain_2`;
+  - nonnegative `display_order` if present.
+
+### `factor_reference_default_version`
+
+- Singleton row with `id boolean primary key default true check (id = true)`.
+- Pointer must reference a published/active factor version.
+- Delete is blocked by trigger/function.
+- Pointer update requires active-admin authorization and an audit/reason path.
+
+### `boq.factor_reference_version_id`
+
+- Nullable FK to `factor_reference_versions`.
+- New BOQs after F1 must bind the current factor pointer.
+- Existing BOQs remain null unless exact source evidence exists.
+- Later RPC replacements, including Master Catalog Phase 4 functions, must
+  preserve or deliberately set this column.
+
+## 5. F1 application coupling checklist
+
+F1 is not complete until all of these are true:
+
+- BOQ create binds `factor_reference_version_id` from
+  `factor_reference_default_version`.
+- BOQ edit and `FactorFSummary` read factor rows by the BOQ-bound version.
+- `save_boq_with_routes` preserves/writes `factor_reference_version_id`.
+- Print uses bound factor rows for version-bound BOQs.
+- Print uses valid saved snapshots for legacy BOQs and fails closed when the
+  snapshot is incomplete or invalid.
+- Excel export follows the same rules as print.
+- No user-facing print/export path falls back to the latest live factor table
+  for a legacy BOQ with invalid snapshots.
+
+## 6. Minimum F1 tests
+
+| Test | Type |
+|---|---|
+| New BOQ receives `factor_reference_version_id` | Integration |
+| Legacy BOQ remains null and snapshot-only | DB/integration |
+| Version-bound BOQ reads the bound factor rows | Integration |
+| Valid legacy snapshot prints/exports successfully | Integration |
+| Invalid legacy snapshot fails closed | Unit/integration |
+| `save_boq_with_routes` preserves the factor version | DB |
+| Publishing a new factor version does not change existing BOQ totals | Integration |
+| Singleton pointer cannot be deleted or point to draft | DB |
+| Non-admin cannot mutate Factor F version tables | Security |
+| Baseline seed row count equals approved current row count | Migration |

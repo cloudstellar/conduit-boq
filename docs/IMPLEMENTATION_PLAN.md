@@ -68,12 +68,15 @@ the version-aware application and hardening are deployed and verified. See the
 - **Execution privilege boundaries**: Explicitly revoke execute privileges from `PUBLIC`/`anon` and grant exclusively to `authenticated` role.
 - **Cross-Version Isolation**: RPC strictly checks that every inserted `price_list_id` belongs to the BOQ's current `price_list_version_id`.
 
-**Rule D: Reference Data Freeze**
+**Rule D: Reference Data Freeze and Factor F Separation**
 - **Price catalog baseline**: Current documented `price_list` count is 710
   rows, including the PN6 addition (`ITEM-0683` through `ITEM-0710`).
-- **Factor F outside versioning**: `factor_reference` remains a stable
-  read-only reference during the Master Catalog rollout and is not cloned into
-  `price_list_versions`.
+- **Factor F outside price catalog versioning**: Factor F is not cloned into
+  `price_list_versions`; future Factor F changes follow
+  [ADR-005](./02_architecture/ADR/ADR-005-versioned-factor-f-reference.md) and
+  the separate Factor F Change Request.
+- **No guessed legacy backfill**: Existing BOQs must not be backfilled with a
+  current Factor F version unless exact source/version evidence exists.
 - **Fail-closed calculation**: The app must not save, print, or export nonzero
   BOQs with a silent Factor F default when `factor_reference` is unreadable.
 
@@ -117,10 +120,44 @@ Phase 4 now includes stable identity, manual and fixed-profile Excel changes,
 full item history, immutable publish, official hashed Excel/PDF, and audited
 pointer restore. It has not started and requires owner approval.
 
+#### **Factor F Change Track — planned if Factor F must change now**
+
+Factor F changes are separate from Master Catalog Phase 4. If the owner wants
+to adjust Factor F now, run the F-track before changing live Factor F values:
+
+1. F0: approve
+   [ADR-005](./02_architecture/ADR/ADR-005-versioned-factor-f-reference.md),
+   the Factor F Change Request, source document, and effective date.
+2. F1: deploy additive Factor F version foundation and app compatibility.
+3. F2: seed the current Factor F table as the initial published factor version
+   for future BOQs only; do not backfill old BOQs.
+4. F3: publish the new Factor F version and move the factor default pointer.
+5. F4: add duplicate/reprice UX so old project data can become a new BOQ with
+   the latest Factor F by explicit user action.
+
+If the new Factor F must be used immediately, F3 may run before Master Catalog
+Phase 4 rollout in a separate approved window after F1/F2 are verified. If it
+can wait, run Master Catalog Phase 4 application work first and publish F3
+afterward to reduce repeated RPC coordination. In both cases, Production
+Factor F publication and Master Catalog publication should use separate
+approval windows.
+
+Migration numbering follows execution order. The current repository ends at
+`migrations/011_master_catalog_phase1b_hardening.sql`; if Factor F goes first,
+Factor F F1/F2 should reserve `012` and `013`, and Master Catalog Phase 4 moves
+to later numbers. If Master Catalog Phase 4 goes first, Factor F uses the next
+available numbers after Phase 4. Local implementation does not affect users;
+Production F1/F2 should be a controlled additive migration/deploy window, and
+F3 changes only the default Factor F for newly created BOQs.
+
+Detailed execution is governed by
+[docs/plans/factor-f/03-implementation-plan.md](./plans/factor-f/03-implementation-plan.md).
+
 ---
 
 ## 🔮 Product Enhancement Track (FUTURE; separate from Catalog Phase 4)
 
+- [ ] Full Factor F admin/import UI after the F-track foundation proves stable
 - [ ] Approval workflow (draft → approved)
 - [ ] Notifications
 - [ ] PWA / Offline support

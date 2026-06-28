@@ -7,7 +7,11 @@
 **Production project:** `otlssvssvgkohqwuuiir`
 
 **Applies to:** Phase 4A additive database foundation and every Phase 4 write
-path
+path. Factor F changes are governed by
+[ADR-005](../../02_architecture/ADR/ADR-005-versioned-factor-f-reference.md)
+and the separate
+[Factor F Change Request](../factor-f/01-versioned-factor-f-change-request.md);
+this contract records only the boundary with Master Catalog work.
 
 ## 1. Purpose and authority
 
@@ -50,6 +54,12 @@ The current direct active-admin table-write policies are compatible with the
 baseline but are not sufficient for Phase 4 audit guarantees. Phase 4 replaces
 catalog mutation with exact functions and revokes direct application writes.
 
+Current `factor_reference` remains a separate reference table outside
+`price_list_versions`. Do not change Factor F values under this Master Catalog
+contract. If Factor F must change, apply ADR-005 first: add a dedicated factor
+version/pointer model, keep old BOQs snapshot-only unless exact source evidence
+exists, and publish the new factor version through its own gate.
+
 ## 3. Logical model
 
 ```mermaid
@@ -90,6 +100,30 @@ below.
 11. Every foreign key and common RLS/filter path is indexed.
 12. No partitioning, background jobs, `pg_trgm`, or generic workflow engine is
     added at the current scale.
+
+### 4.1 Factor F companion boundary
+
+Master Catalog tables do not own Factor F rows. The target Factor F foundation
+belongs to the separate Factor F change track:
+
+| Object | Contract |
+|---|---|
+| `factor_reference_versions` | Published Factor F metadata, source/effective date, approval evidence, row count, dataset hash |
+| `factor_reference_rows` | Immutable published Factor F rows scoped by `version_id` |
+| `factor_reference_default_version` | Singleton pointer for new BOQs |
+| `boq.factor_reference_version_id` | Nullable FK; required for new BOQs after F1, left null for legacy snapshot-only BOQs unless exact evidence exists |
+
+Rules:
+
+- Do not update published Factor F rows in place.
+- Do not backfill historical BOQs with a factor version by assumption.
+- Do not auto-reprice old, submitted, approved, printed, or exported BOQs.
+- New BOQs after the Factor F foundation bind the factor default pointer at
+  creation time.
+- Version-bound BOQ calculation reads the bound factor version. Legacy
+  snapshot-only calculation uses valid saved snapshots or fails closed.
+- Factor F publication must not be hidden inside a Master Catalog migration or
+  catalog publish transaction.
 
 ## 5. Changes to existing tables
 
