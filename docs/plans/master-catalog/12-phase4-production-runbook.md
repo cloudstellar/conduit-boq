@@ -62,11 +62,10 @@ Stop immediately when any of these occurs:
 
 ## 5. Phase 4-0 — documentation and data decisions
 
-1. Confirm Factor F track status before scheduling any Master Catalog Phase 4
-   database migration. Owner direction on 2026-06-28 is Factor F first, so
-   Master Catalog Phase 4 migrations must start at `016+` after the planned
-   Factor F migrations `012`, `013`, `014`, and `015`, unless a later owner decision
-   explicitly changes the sequence.
+1. Confirm Factor F rollout closeout before scheduling any Master Catalog Phase
+   4 database migration. Factor F `012` through `015` completed on 2026-06-29;
+   current default Factor F is `2569.0.0`, legacy BOQs were not version
+   backfilled, and Master Catalog Phase 4 migrations must start at `016+`.
 2. Record owner approval of ADR-004 and implementation/local-rehearsal CR gate.
 3. Review the 728-record reconciliation draft.
 4. Resolve `ITEM-0131` / `ITEM-0139`: retain both distinct identities or retire
@@ -180,8 +179,8 @@ Also verify:
 - migration ledger matches repository history;
 - no Phase 4 object already exists unexpectedly;
 - all current RLS/security invariants from Phase 1B remain intact;
-- no catalog/Factor F change is scheduled during the window unless a separate
-  approved Factor F CR explicitly defines and verifies that coupling;
+- no Factor F change is scheduled during the window unless a separate approved
+  Factor F CR explicitly defines and verifies that coupling;
 - no unexpected active admin session is editing catalog data.
 
 ## 8. Backup gate

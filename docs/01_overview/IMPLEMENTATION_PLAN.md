@@ -75,25 +75,24 @@ Detailed execution plan: [Master Catalog v26](../plans/master-catalog/02-impleme
 8. ✅ Run smoke tests and delta reconciliation.
 9. ✅ Apply Phase 1B `NOT NULL` and immutable-version hardening.
 
-### 🚧 Factor F Track (OWNER-SELECTED BEFORE PHASE 4)
+### ✅ Factor F Track (COMPLETED BEFORE PHASE 4)
 
-Owner direction on 2026-06-28 is to implement Factor F versioning before
-Master Catalog Phase 4. Supabase MCP verified Production latest ledger
-`20260621104056_master_catalog_phase1b_hardening` (`011`), with
-`factor_reference` at 37 rows and no Factor F version tables yet. The owner
-confirmed `FACTOR F 2566_7.PDF` as the current Factor F baseline source, so
-the baseline version identity is `2566.0.0`; the new ว481 table is reserved as
-`2569.0.0`.
-
-Planned Factor F migrations:
+Owner direction on 2026-06-28 was to implement Factor F versioning before
+Master Catalog Phase 4. Production rollout completed on 2026-06-29:
 
 - `012_factor_f_version_foundation`
 - `013_factor_f_seed_current_baseline` (`2566.0.0` baseline)
 - `014_factor_f_publish_2569_0_0`
 - `015_factor_f_repair_legacy_snapshot_metadata`
 
-The official source is กค 0433.2/ว 481 effective 2026-06-26; F3 publication
-still requires row-level diff, dataset hash, and final owner review.
+Current Production default Factor F is `2569.0.0`; historical baseline
+`2566.0.0` remains active. Legacy BOQs were not backfilled with a Factor F
+version (`bound_boq_count = 0`). Legacy BOQs with usable saved snapshots can
+print/export from those snapshots; missing Factor F snapshots fail closed until
+the user creates a new BOQ copy/revision and chooses an active Factor F version.
+
+Closeout evidence:
+[Factor F Production Rollout Closeout](../plans/factor-f/10-production-rollout-closeout.md).
 
 ### 🚧 Phase 4: Catalog Administration and Official Publication (PLANNED)
 
@@ -130,11 +129,11 @@ Start review from the
 | 010_master_catalog_phase1a_versioning | Master Catalog v26 nullable versioning + historical backfill | ✅ Production 2026-06-21 |
 | 010a_master_catalog_phase1a_indexes | Master Catalog v26 concurrent index runbook | ✅ 4 indexes valid/ready 2026-06-21 |
 | 011_master_catalog_phase1b_hardening | Master Catalog v26 BOQ version contract hardening | ✅ Production 2026-06-21 |
-| 012_factor_f_version_foundation | Factor F version tables + BOQ factor version FK | Draft local-verified 2026-06-28; not Production |
-| 013_factor_f_seed_current_baseline | Seed audited current Factor F baseline `2566.0.0` | Draft local-verified 2026-06-28; not Production |
-| 014_factor_f_publish_2569_0_0 | Publish Factor F `2569.0.0` from ว 481 source | Planned before MC Phase 4 |
-| 015_factor_f_repair_legacy_snapshot_metadata | Repair legacy Factor F snapshot metadata without repricing or binding old BOQs | Planned before MC Phase 4 |
-| 016+_master_catalog_phase4_* | Master Catalog Phase 4 DB migrations | Planned after Factor F |
+| 012_factor_f_version_foundation | Factor F version tables + BOQ factor version FK | ✅ Production 2026-06-29 |
+| 013_factor_f_seed_current_baseline | Seed audited current Factor F baseline `2566.0.0` | ✅ Production 2026-06-29; no legacy BOQ backfill |
+| 014_factor_f_publish_2569_0_0 | Publish Factor F `2569.0.0` from ว 481 source | ✅ Production 2026-06-29 |
+| 015_factor_f_repair_legacy_snapshot_metadata | Repair legacy Factor F snapshot metadata without repricing or binding old BOQs | ✅ Production 2026-06-29 |
+| 016+_master_catalog_phase4_* | Master Catalog Phase 4 DB migrations | Planned after completed Factor F rollout |
 
 ---
 

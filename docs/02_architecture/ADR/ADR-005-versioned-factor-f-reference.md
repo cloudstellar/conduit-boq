@@ -1,6 +1,6 @@
 # ADR-005: Versioned Factor F Reference and Legacy Snapshot Policy
 
-**Status:** Accepted — F0 approved on 2026-06-28 for F1/F2 foundation; F3 requires separate approval
+**Status:** Accepted — Production rollout completed on 2026-06-29
 **Date:** 2026-06-28
 **Decision makers:** Owner, Development Team
 **Related change request:** [Versioned Factor F Change Request](../../plans/factor-f/01-versioned-factor-f-change-request.md)
@@ -18,9 +18,9 @@ cannot clearly explain which approved Factor F table was used by each BOQ.
 Backfilling old BOQs with a current factor version would also create false
 provenance when the original source table is unknown.
 
-The owner now expects Factor F to change before the full Master Catalog Phase 4
-admin workflow is complete. The architecture therefore needs a small, explicit
-Factor F track that can run independently from Master Catalog price governance.
+The owner selected Factor F to change before the full Master Catalog Phase 4
+admin workflow. The explicit Factor F track was implemented independently from
+Master Catalog price governance and rolled out to Production on 2026-06-29.
 
 ## Decision
 
@@ -84,8 +84,9 @@ action must be audited and must change the bound factor version deliberately.
 
 ## Immediate Factor F Change Sequence
 
-Because the owner wants to adjust Factor F now, do not update
-`factor_reference` in place. Use this sequence:
+Because the owner selected Factor F changes before Master Catalog Phase 4, do
+not update `factor_reference` in place. Use this sequence for any similar
+future Factor F change:
 
 | Step | Purpose | Production effect |
 |---|---|---|
@@ -111,6 +112,12 @@ Phase 4 publication as a separate approved window after F1/F2 are verified. If
 there is no urgency, delaying F3 until after the Phase 4 application work can
 reduce repeated `save_boq_with_routes` coordination. In either case, F3 must
 not share a silent combined window with Master Catalog publication.
+
+The 2026-06-29 Production rollout completed this sequence for the first
+versioned Factor F change: `2566.0.0` remains the active historical baseline,
+`2569.0.0` is the current default, legacy BOQs were not version-backfilled, and
+Master Catalog Phase 4 migration numbering starts at `016+`. See
+[Factor F Production Rollout Closeout](../../plans/factor-f/10-production-rollout-closeout.md).
 
 ## Consequences
 

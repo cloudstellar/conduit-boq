@@ -22,10 +22,11 @@ It is applied to the Grand Total before VAT.
 ระบบนี้ใช้คอลัมน์ `factor` เป็นค่า **"รวมในรูป Factor"** จากตาราง Factor F งานก่อสร้างทาง
 เช่น ช่วงค่างาน 30-40 ล้านบาทใช้ `factor` ไม่ใช่คอลัมน์ `factor_f`.
 
-> Pending 2026-06-28 Factor F update:
-> the owner supplied a 26 June 2026 source candidate. It keeps the same
-> calculation contract: use `รวมในรูป Factor` as `factor`; do not use the Thai
-> column `Factor F` as the main BOQ multiplier. The candidate is recorded in
+> Production 2026-06-29 Factor F update:
+> the owner-approved 26 June 2026 source table is published as Factor F
+> version `2569.0.0`. It keeps the same calculation contract: use
+> `รวมในรูป Factor` as `factor`; do not use the Thai column `Factor F` as the
+> main BOQ multiplier. The source table is recorded in
 > [docs/plans/factor-f/04-source-table-2569-06-26.md](../plans/factor-f/04-source-table-2569-06-26.md).
 
 | cost_million | factor | factor_f |
@@ -126,21 +127,25 @@ Math.floor(interpolatedFactor * 10000) / 10000
 
 ## 7. Runtime Behavior
 
-After the 2026-06-05 correction, Factor F handling follows these rules:
+After the 2026-06-29 versioning rollout, Factor F handling follows these
+rules:
 
-1. The edit page loads `factor_reference` once and calculates the displayed
-   Factor F immediately in the browser from the loaded rows.
-2. Saving a BOQ stores the full Factor F snapshot:
+1. New BOQs bind `boq.factor_reference_version_id` to the current default
+   Factor F version at creation time.
+2. The edit page loads reference rows for the BOQ's bound Factor F version and
+   calculates the displayed Factor F from those rows.
+3. Saving a BOQ stores the full Factor F snapshot:
    `factor_f`, `factor_f_raw`, lower/upper cost, lower/upper factor values,
    `total_with_factor_f`, and `total_with_vat`.
-3. Print and Excel export use the saved snapshot first when it is complete and
-   internally consistent with the BOQ total.
-4. Live lookup on print/export is only a fallback for legacy or invalid
-   snapshots.
-5. If the Factor F table cannot be read or no matching factor can be calculated
+4. Print and Excel export for version-bound BOQs use the BOQ's bound Factor F
+   version and show a label such as `ใช้ Factor F เวอร์ชัน 2569.0.0`.
+5. Legacy BOQs without a bound Factor F version use valid saved snapshots for
+   print/export or fail closed. They must not fall back to the latest live
+   Factor F table.
+6. If the Factor F table cannot be read or no matching factor can be calculated
    for a nonzero BOQ total, the system shows an error and blocks saving instead
    of substituting a default value.
-6. A legacy BOQ with no `factor_reference_version_id` is not silently rebound
+7. A legacy BOQ with no `factor_reference_version_id` is not silently rebound
    to the latest table. In edit mode it is treated as snapshot-only/read-only
    for line-item changes. To continue work, the user creates a new BOQ copy,
    chooses the intended active Factor F version, reviews it, and saves a new
@@ -153,13 +158,12 @@ Supabase SQL/MCP access before the Master Catalog execution window. Anonymous
 REST/Data API checks can return `0` rows under RLS and are not an authoritative
 count source.
 
-The 2026-06-29 Supabase MCP recheck against Production project
-`otlssvssvgkohqwuuiir` confirmed 37 `factor_reference` rows, cost thresholds
-from 5M to 700M, and dataset hash
-`sha256:77a2568bed09670242dcadc444be344c638868a7813f2a25ccbb6e6fb8d7ad61`,
-matching migration `013_factor_f_seed_current_baseline.sql`. The 30M =
-`1.1422` and 40M = `1.1359` values remain useful smoke examples, but the
-approval gate validates every row through the dataset hash.
+The 2026-06-29 Supabase MCP post-rollout check against Production project
+`otlssvssvgkohqwuuiir` confirmed active baseline `2566.0.0` with 37 rows and
+current default `2569.0.0` with 36 rows. The 30M smoke row for `2569.0.0` is
+`factor = 1.1405`, `factor_f = 1.2203`, `factor_f_rain_1 = 1.2367`, and
+`factor_f_rain_2 = 1.2531`. The full closeout is recorded in
+[docs/plans/factor-f/10-production-rollout-closeout.md](../plans/factor-f/10-production-rollout-closeout.md).
 
 ---
 

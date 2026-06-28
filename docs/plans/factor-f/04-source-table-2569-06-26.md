@@ -1,6 +1,6 @@
 # Factor F Source Table Candidate: 26 June 2026
 
-**Status:** Owner-confirmed F3 source candidate — not Production-ready SQL by itself
+**Status:** Owner-confirmed source; published to Production as `2569.0.0` via migration `014`. This file is source review evidence, not executable SQL.
 **Date recorded:** 2026-06-28
 **Effective date:** 2026-06-26, confirmed by owner on 2026-06-28
 **Source reference:** หนังสือกรมบัญชีกลาง ด่วนที่สุด ที่ กค 0433.2/ว 481 ลงวันที่ 26 มิถุนายน 2569

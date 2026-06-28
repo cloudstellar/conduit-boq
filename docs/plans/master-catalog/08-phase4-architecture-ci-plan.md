@@ -1544,17 +1544,15 @@ Do not advance when any gate fails:
   catalog version.
 - BOQ Rebase is Phase 4.2 and does not block Phase 4 Core.
 - Factor F remains outside Master Catalog price versioning and is governed by
-  ADR-005. Owner direction on 2026-06-28 is to run the separate Factor F track
-  before Master Catalog Phase 4: foundation, current baseline seed without old
-  BOQ backfill, then new factor publication from the 26 June 2026 source-table
-  candidate after source/diff/hash approval. The detailed Factor F CR,
-  implementation plan, and source-table annex live in `docs/plans/factor-f/`.
-- Migration numbering follows actual execution order. Supabase MCP verified
-  Production on 2026-06-28 with latest ledger entry
-  `20260621104056_master_catalog_phase1b_hardening` (`011`). Because Factor F
-  ships before Master Catalog Phase 4, Factor F reserves `012`, `013`, and
-  `015`; Master Catalog Phase 4 database migrations start at `016+`. Do not
-  create parallel migrations with the same logical order.
+  ADR-005. The separate Factor F track completed before Master Catalog Phase 4
+  on 2026-06-29: foundation, current baseline `2566.0.0`, new default
+  `2569.0.0`, and legacy snapshot metadata repair without old BOQ version
+  backfill. The detailed Factor F CR, implementation plan, source-table annex,
+  and rollout closeout live in `docs/plans/factor-f/`.
+- Migration numbering follows actual execution order. Factor F used root
+  migrations `012`, `013`, `014`, and `015`; Master Catalog Phase 4 database
+  migrations start at `016+`. Do not create parallel migrations with the same
+  logical order.
 - No paid Supabase branch or additional hosted project is created.
 - Compatibility columns are retained through the first stable Production cycle.
 - Local CI sources remain uncommitted; only approved runtime derivatives may be

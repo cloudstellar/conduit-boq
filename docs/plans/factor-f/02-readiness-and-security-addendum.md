@@ -1,6 +1,7 @@
 # Factor F Track Readiness and Security Addendum
 
-**Status:** Draft companion checklist for F0-F3
+**Status:** Historical readiness checklist; F0-F4 Production rollout completed
+on 2026-06-29
 **Date:** 2026-06-28
 **Authority:** [ADR-005](../../02_architecture/ADR/ADR-005-versioned-factor-f-reference.md)
 and the [Factor F Change Request](./01-versioned-factor-f-change-request.md)
@@ -9,7 +10,9 @@ and the [Factor F Change Request](./01-versioned-factor-f-change-request.md)
 
 ## 1. Readiness interpretation
 
-The Factor F track has two different readiness levels:
+This addendum records the readiness logic used before the completed
+2026-06-29 Production rollout. The Factor F track had two different readiness
+levels:
 
 | Gate | Meaning | Can proceed without new Factor F values? |
 |---|---|---|
@@ -18,13 +21,15 @@ The Factor F track has two different readiness levels:
 | F2 | Seed the audited current baseline for future BOQs | Yes, after baseline checksum/count verification |
 | F3 | Publish a new Factor F table | No; requires the approved new table, effective date, source, and owner approval |
 
-Therefore the track is not ready for F3 until the business evidence is complete,
-but F1/F2 planning can proceed after F0 policy approval.
+Therefore the track was not ready for F3 until the business evidence was
+complete, but F1/F2 planning could proceed after F0 policy approval. For the
+completed rollout, those gates were satisfied and closeout evidence is recorded
+in [10-production-rollout-closeout.md](./10-production-rollout-closeout.md).
 
 Do not treat any remembered row count as authority. The baseline count becomes
 authoritative only when the Production preflight query is recorded for F2.
 
-Read-only Supabase MCP inspection on 2026-06-28 recorded the current
+Read-only Supabase MCP inspection on 2026-06-28 recorded the pre-rollout
 Production state:
 
 | Check | Production result |
@@ -39,12 +44,16 @@ Production state:
 | BOQs with incomplete/invalid Factor F snapshots | 136 |
 | Legacy `factor_reference` grants | Broad grants exist for `anon`, `authenticated`, and `service_role`; do not copy to new tables |
 
-Re-run these checks immediately before F2/Production execution; these recorded
-values are planning evidence, not a substitute for execution-window preflight.
+These recorded values are planning evidence, not the current post-rollout
+state. The current post-rollout state is in the closeout document.
 The owner confirmed `FACTOR F 2566_7.PDF` as the current baseline source and
 `2566.0.0` as the current baseline identity on 2026-06-28.
 
 ## 2. Business inputs required before F3
+
+For the completed `2569.0.0` publication, these inputs were reviewed before
+Production migration `014`. Future Factor F publications must repeat the same
+evidence discipline rather than copying these values by assumption.
 
 | Input | Required before | Notes |
 |---|---|---|

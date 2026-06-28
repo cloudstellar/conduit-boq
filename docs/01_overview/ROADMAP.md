@@ -1,21 +1,21 @@
 # Roadmap
 ## Conduit BOQ System
 
-**Last Updated:** 2026-06-22
+**Last Updated:** 2026-06-29
 
 ---
 
 ## Current position
 
 ```text
-Foundation             Master Catalog baseline       Master Catalog Phase 4
-COMPLETED               COMPLETED 2026-06-21          PLANNED / OWNER REVIEW
-───────────────────     ─────────────────────────     ─────────────────────────
-Auth + RLS              P0 security containment      Admin manual/import
-BOQ + Multi-route       Version 2568.0.0             Stable identity/history
-710-price catalog       Singleton default pointer    Publish + official export
-Factor F snapshots      Version-locked BOQs          Audited pointer restore
-Admin onboarding        Phase 1B hardening           NT CI catalog UI
+Foundation             Master Catalog baseline       Factor F versioning        Master Catalog Phase 4
+COMPLETED              COMPLETED 2026-06-21          COMPLETED 2026-06-29       PLANNED / OWNER REVIEW
+───────────────────    ─────────────────────────     ───────────────────────    ─────────────────────────
+Auth + RLS             P0 security containment       Default 2569.0.0           Admin manual/import
+BOQ + Multi-route      Version 2568.0.0              Baseline 2566.0.0          Stable identity/history
+710-price catalog      Singleton default pointer     No legacy backfill         Publish + official export
+Factor F snapshots     Version-locked BOQs           Snapshot repair only       Audited pointer restore
+Admin onboarding       Phase 1B hardening            MC starts at 016+          NT CI catalog UI
 ```
 
 Product enhancements such as notification, PWA, smart estimation, and wider
@@ -46,6 +46,20 @@ Completed in Production on 2026-06-21:
 - [x] Local Production-data rehearsal and Production verification
 
 Evidence: [Master Catalog verification report](../plans/master-catalog/05-verification-report.md).
+
+## Factor F versioning — completed
+
+Completed in Production on 2026-06-29:
+
+- [x] Factor F version metadata, row table, singleton pointer, and BOQ FK column
+- [x] Baseline `2566.0.0` seeded from `FACTOR F 2566_7.PDF`
+- [x] New default `2569.0.0` published from กค 0433.2/ว 481
+- [x] Legacy snapshot metadata repaired without repricing or version backfill
+- [x] Legacy BOQs remain snapshot-only unless they have exact source-version
+      evidence
+
+Evidence:
+[Factor F Production Rollout Closeout](../plans/factor-f/10-production-rollout-closeout.md).
 
 ## Master Catalog Phase 4 — planned, not started
 

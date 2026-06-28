@@ -4,13 +4,26 @@
 **Environment:** Supabase Production `Conduit Price List`
 **Project ref:** `otlssvssvgkohqwuuiir`
 **Access mode:** Supabase MCP read-only SQL
+**Status:** Historical pre-rollout readiness; superseded by
+[10-production-rollout-closeout.md](./10-production-rollout-closeout.md)
 
 ## Summary
 
-Production is still at the pre-Factor-F-version schema. Factor F migrations
-`012`, `013`, `014`, and `015` have not been applied. That is expected before rollout,
-but it means the application code that selects `boq.factor_reference_version_id`
-must not be deployed before the database migrations.
+This document records the pre-rollout inventory used to approve the
+no-maintenance Factor F deployment. The rollout is now complete: migrations
+`012`, `013`, `014`, and `015` were applied to Production on 2026-06-29, and
+the final state is captured in the closeout document.
+
+Post-rollout result:
+
+| Check | Result |
+| --- | --- |
+| Current default Factor F | `2569.0.0` |
+| Active historical baseline | `2566.0.0` |
+| Legacy BOQs bound by rollout | `0` |
+| Partial legacy snapshots remaining | `0` |
+| Legacy BOQs with usable print/export snapshot | `127` |
+| BOQs missing Factor F snapshot | `79` |
 
 The current `public.factor_reference` data is healthy and matches the planned
 `2566.0.0` baseline exactly:
@@ -90,8 +103,8 @@ shift Master Catalog Phase 4 migrations to `016+`.
 
 ## No-Maintenance Release Sequence
 
-The owner selected a no-maintenance-window rollout. Use a staged rollout to
-avoid a 2569 DB default while old browser code still calculates 2566 snapshots:
+The owner selected a no-maintenance-window rollout. The staged rollout avoided a
+2569 DB default while old browser code still calculated 2566 snapshots:
 
 1. Apply `012_factor_f_version_foundation.sql`.
 2. Apply `013_factor_f_seed_current_baseline.sql`.
@@ -105,7 +118,7 @@ avoid a 2569 DB default while old browser code still calculates 2566 snapshots:
    - Legacy usable snapshot can Print/Excel without claiming latest version.
    - Legacy missing snapshot shows the intentional blocked message.
 
-The detailed Production execution checklist is
+The detailed Production execution checklist is retained as executed evidence in
 [09-production-no-maintenance-runbook.md](./09-production-no-maintenance-runbook.md).
 
 ## Concurrent User Writes During Rollout

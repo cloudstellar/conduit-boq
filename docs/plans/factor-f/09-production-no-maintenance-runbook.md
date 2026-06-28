@@ -5,12 +5,27 @@
 **Project ref:** `otlssvssvgkohqwuuiir`
 **Owner decision:** Roll out Factor F `2569.0.0` before Master Catalog Phase 4,
 without a maintenance window.
-**Production write status:** Not executed yet.
+**Production write status:** Executed 2026-06-29; see
+[10-production-rollout-closeout.md](./10-production-rollout-closeout.md).
 
 ## Purpose
 
 This runbook is the execution checklist for applying Factor F migrations
-`012` through `015` to Production without pausing users.
+`012` through `015` to Production without pausing users. It is now retained as
+the executed runbook and historical evidence for the 2026-06-29 rollout.
+
+Execution result:
+
+| Root file | Production ledger version |
+| --- | --- |
+| `012_factor_f_version_foundation.sql` | `20260628190218` |
+| `013_factor_f_seed_current_baseline.sql` | `20260628190357` |
+| `014_factor_f_publish_2569_0_0.sql` | `20260628190621` |
+| `015_factor_f_repair_legacy_snapshot_metadata.sql` | `20260628190757` |
+
+Final postconditions passed: current default Factor F is `2569.0.0`, legacy
+BOQs were not version-backfilled, and partial legacy Factor F snapshots
+remaining is `0`.
 
 The safe sequence is:
 

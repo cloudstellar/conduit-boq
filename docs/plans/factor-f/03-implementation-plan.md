@@ -1,7 +1,7 @@
 # Factor F Versioning Implementation Plan
 
-**Status:** Draft implementation plan; F1/F2 migration files created and
-local-verified — no Production execution authorized
+**Status:** Completed rollout plan; Production `012` through `015` applied on
+2026-06-29
 **Date:** 2026-06-28
 **Authority:** [ADR-005](../../02_architecture/ADR/ADR-005-versioned-factor-f-reference.md),
 [Factor F Change Request](./01-versioned-factor-f-change-request.md), and
@@ -53,7 +53,7 @@ legacy BOQ provenance.
 | VAT change | No | Explicit owner-approved calculation decision |
 | Missing row-level component percentages | No | Separate authoritative source or nullable/source-derived fields |
 | Old BOQ factor provenance | No | Row-level source evidence; otherwise leave null |
-| Whether to publish F3 before Master Catalog Phase 4 | No | Owner direction recorded on 2026-06-28: Factor F before Master Catalog Phase 4; formal F0/F3 approvals still required |
+| Whether to publish F3 before Master Catalog Phase 4 | No | Owner direction recorded on 2026-06-28: Factor F before Master Catalog Phase 4; completed in Production on 2026-06-29 |
 | Full Factor F admin UI | No | Later CR only |
 
 If any required source is missing, stop at the relevant gate and record the
@@ -61,8 +61,9 @@ blocker. Do not fill placeholders with plausible values.
 
 ## 4. Recommended Ordering
 
-Owner direction on 2026-06-28 is to change Factor F before Master Catalog
-Phase 4 publication. Use this ordering:
+Owner direction on 2026-06-28 was to change Factor F before Master Catalog
+Phase 4 publication. The Production rollout completed this ordering on
+2026-06-29:
 
 ```text
 F0 approval
@@ -70,23 +71,21 @@ F1 version foundation
 F2 current baseline seed
 F3 publish approved new Factor F version
 Master Catalog Phase 4
-F4 duplicate/reprice UX refinement
+F4 legacy snapshot metadata repair and duplicate/reprice UX refinement
 ```
 
-If the owner later changes this direction, record that as a new decision before
-reordering the tracks. F3 must be a separate approved Production window from
-Master Catalog publication.
+If the owner later changes this direction for a future Factor F change, record
+that as a new decision before reordering the tracks. Future F3 publication must
+remain separate from Master Catalog publication unless a new approved CR
+explicitly couples them.
 
 ## 5. Files Expected To Change In F1/F2
 
 Exact filenames may change during implementation, but the implementation must
 declare them before editing and keep migration ordering unambiguous.
 
-Supabase MCP verified Production on 2026-06-28: the latest applied migration
-ledger entry is `20260621104056_master_catalog_phase1b_hardening`,
-corresponding to `migrations/011_master_catalog_phase1b_hardening.sql`. The
-Factor F track is owner-selected before Master Catalog Phase 4, so reserve
-root migration numbers `012`, `013`, `014`, and `015` for Factor F. Master Catalog
+Supabase MCP verified Production on 2026-06-29 after rollout: root migration
+numbers `012`, `013`, `014`, and `015` were used for Factor F. Master Catalog
 Phase 4 database migrations must start at `016+`. Never reuse a number or
 create parallel migrations with the same logical order.
 

@@ -1,7 +1,6 @@
 # Change Request: Versioned Factor F Reference and Immediate Factor F Update
 
-**Status:** F1/F2 local implementation in progress — no Production Factor F
-data change authorized
+**Status:** Completed — Production rollout applied on 2026-06-29
 **Requested date:** 2026-06-28
 **Change type:** Additive Factor F reference versioning, compatible BOQ
 calculation behavior, and controlled Factor F publication
@@ -16,11 +15,10 @@ Approve a separate Factor F change track before changing live Factor F values.
 This approval is independent from Master Catalog Phase 4 price/catalog
 publication.
 
-This CR can be approved at different depths. F1/F2 foundation work can start
-after the owner approves the policy and current-baseline verification approach.
-F3 publication cannot start until the new Factor F table, effective date,
-source reference, expected row count, formula/VAT decisions, data custodian,
-and final row-level diff/hash approval are recorded.
+This CR was approved and executed for the first versioned Factor F rollout.
+Future Factor F changes should follow the same approval shape: foundation
+changes, current-baseline verification, source/effective-date confirmation,
+row-level review, dataset hash, and explicit publication approval.
 
 The owner is asked to confirm:
 
@@ -63,20 +61,19 @@ Owner confirmations recorded on 2026-06-28:
 Do F1 and F2 before changing any live Factor F values. F3 is the actual Factor F
 change.
 
-Owner direction on 2026-06-28 is to do Factor F before Master Catalog Phase 4.
-Therefore the recommended path is F0 -> F1 -> F2 -> F3, then Master Catalog
-Phase 4. F3 still requires its own approved window after F1/F2 verification.
-Do not silently combine Factor F publication with Master Catalog publication.
+Owner direction on 2026-06-28 was to do Factor F before Master Catalog Phase 4.
+The path F0 -> F1 -> F2 -> F3 -> F4 was completed in Production on
+2026-06-29. Do not silently combine future Factor F publication with Master
+Catalog publication.
 
 The current baseline row count is not a planning assumption. It must be
 recorded from the Production preflight query before F2; if the result differs
 from the expected current table, stop and reconcile before seeding.
 
-Supabase MCP verified Production on 2026-06-28: latest migration ledger is
-`20260621104056_master_catalog_phase1b_hardening` (`011`), `factor_reference`
-has 37 rows with no duplicate thresholds and no invalid required values, and
-Factor F version tables do not yet exist. Because Factor F is owner-selected
-before Master Catalog Phase 4, reserve:
+Supabase MCP verified Production on 2026-06-29 after rollout: Factor F
+migrations `012` through `015` are applied, current default Factor F is
+`2569.0.0`, active historical baseline is `2566.0.0`, and legacy BOQs remain
+unbound by design. Factor F used:
 
 - `012_factor_f_version_foundation.sql`
 - `013_factor_f_seed_current_baseline.sql`
@@ -124,15 +121,11 @@ Master Catalog Phase 4 database migrations therefore start at `016+`.
 
 ## 5. User behavior
 
-During local implementation and rehearsal, users can continue using the
-Production system because no Production object is changed. During Production
-F1/F2 deployment, the work should be scheduled as a controlled additive
-migration/deploy window; existing BOQ totals are not rewritten, and feature
-visibility should remain compatible with the current workflow. During F3, only
-the default Factor F version for newly created BOQs changes after the pointer
-move. Existing BOQs remain unchanged, but users may see legacy/snapshot-only
-labels or a fail-closed message for old BOQs whose saved Factor F snapshot is
-incomplete.
+During the completed Production rollout, existing BOQ totals were not rewritten
+and legacy BOQs were not bound to a guessed version. After F3, only the default
+Factor F version for newly created BOQs changed. Existing BOQs remain unchanged,
+but users may see legacy/snapshot-only labels or a fail-closed message for old
+BOQs whose saved Factor F snapshot is incomplete.
 
 After F3:
 
@@ -147,36 +140,36 @@ After F3:
 
 ## 6. Preconditions before F1
 
-- [ ] ADR-005 is approved.
-- [ ] This Factor F CR is approved for implementation/local rehearsal.
-- [ ] The
+- [x] ADR-005 is approved.
+- [x] This Factor F CR is approved for implementation/local rehearsal.
+- [x] The
       [Readiness and Security Addendum](./02-readiness-and-security-addendum.md)
       is accepted for F1.
-- [ ] The [Implementation Plan](./03-implementation-plan.md) is accepted for
+- [x] The [Implementation Plan](./03-implementation-plan.md) is accepted for
       F1/F2.
-- [ ] Current `factor_reference` row count and checksum are recorded.
-- [ ] BOQ Factor F snapshot completeness is audited and recorded.
-- [ ] Migration/app changes have rollback/forward-fix instructions.
-- [ ] Tests cover new version-bound BOQ behavior and legacy snapshot-only
+- [x] Current `factor_reference` row count and checksum are recorded.
+- [x] BOQ Factor F snapshot completeness is audited and recorded.
+- [x] Migration/app changes have rollback/forward-fix instructions.
+- [x] Tests cover new version-bound BOQ behavior and legacy snapshot-only
       behavior.
-- [ ] Print and Excel export no longer use the current live factor table as a
+- [x] Print and Excel export no longer use the current live factor table as a
       fallback for legacy BOQs without valid snapshots.
-- [ ] `save_boq_with_routes` and any later Master Catalog RPC replacement
+- [x] `save_boq_with_routes` and any later Master Catalog RPC replacement
       preserve `boq.factor_reference_version_id`.
 
 ## 7. Preconditions before F3
 
-- [ ] F1 schema and app behavior are deployed and verified.
-- [ ] F2 current baseline version is seeded and pointer verification passes.
+- [x] F1 schema and app behavior are deployed and verified.
+- [x] F2 current baseline version is seeded and pointer verification passes.
 - [x] The new Factor F source document/effective date is approved for planning.
       The current F3 candidate is the 26 June 2026 source table annex, and the
       owner confirmed source/effective date as 2026-06-26.
-- [ ] Row-level diff from current baseline is reviewed.
-- [ ] Full-table validation and dataset hash pass.
-- [ ] Expected row count for the new source table is recorded and reconciled
+- [x] Row-level diff from current baseline is reviewed.
+- [x] Full-table validation and dataset hash pass.
+- [x] Expected row count for the new source table is recorded and reconciled
       against the approved source document. The supplied image has 36 visible
       rows; this must be confirmed against the official source before publish.
-- [ ] Owner explicitly approves publishing the named Factor F version.
+- [x] Owner explicitly approves publishing the named Factor F version.
 
 ## 8. Acceptance criteria
 
@@ -200,8 +193,9 @@ Implementation actions are tracked in the
 | Gate | Role | Name | Decision | Timestamp | Evidence/reference |
 |---|---|---|---|---|---|
 | F0 approve ADR/CR | Owner | Owner | Approve F0 for Factor F F1/F2 foundation only. F3 publication requires separate approval after production baseline audit, row-level diff, dataset hash, and final owner review. | 2026-06-28T20:08+07:00 | ADR-005, CR, Readiness Addendum, Implementation Plan reviewed and accepted. Source/effective date 2026-06-26, reference กค 0433.2/ว 481 confirmed. Owner as data custodian. |
-| F1 implement foundation | Owner |  | Not requested |  |  |
-| F2 seed current baseline | Owner | Owner | Confirm `FACTOR F 2566_7.PDF` as current baseline source, approve version identity `2566.0.0`, and authorize local migration/rehearsal only. Production execution remains pending a separate approved window. | 2026-06-28T21:43+07:00 | Production MCP baseline audit: 37 rows, 0 duplicates, 0 invalid rows, hash `sha256:77a2568bed09670242dcadc444be344c638868a7813f2a25ccbb6e6fb8d7ad61`; local PDF review and migration 013 verification passed. |
-| F3 publish new Factor F | Owner |  | Not requested |  |  |
-| Execution | Executor |  | Pending |  |  |
-| Independent verification | Verifier |  | Pending |  |  |
+| F1 implement foundation | Owner | Owner | Approved for Production rollout. | 2026-06-29 | Migration `012_factor_f_version_foundation.sql` applied as ledger `20260628190218`. |
+| F2 seed current baseline | Owner | Owner | Confirm `FACTOR F 2566_7.PDF` as current baseline source, approve version identity `2566.0.0`, and authorize Production baseline seed with no legacy BOQ backfill. | 2026-06-29 | Production MCP baseline audit: 37 rows, 0 duplicates, 0 invalid rows, hash `sha256:77a2568bed09670242dcadc444be344c638868a7813f2a25ccbb6e6fb8d7ad61`; migration `013` applied as ledger `20260628190357`. |
+| F3 publish new Factor F | Owner | Owner | Approved publication of `2569.0.0` from กค 0433.2/ว 481. | 2026-06-29 | Migration `014_factor_f_publish_2569_0_0.sql` applied as ledger `20260628190621`; dataset hash `sha256:4f35b267bde3007439aebb193be1e53bdcea5a7acce95b5a7bbf5828018ef1a6`. |
+| F4 legacy snapshot metadata repair | Owner | Owner | Approved metadata-only repair with no reprice and no legacy version backfill. | 2026-06-29 | Migration `015_factor_f_repair_legacy_snapshot_metadata.sql` applied as ledger `20260628190757`; partial snapshots remaining `0`. |
+| Execution | Executor | Development Team | Completed. | 2026-06-29 | [Production Rollout Closeout](./10-production-rollout-closeout.md). |
+| Independent verification | Verifier | Development Team | Completed through Supabase MCP and production smoke checks. | 2026-06-29 | Vercel deploy succeeded; rollback insert smoke bound new BOQ to `2569.0.0`; transaction rolled back. |

@@ -120,41 +120,26 @@ Phase 4 now includes stable identity, manual and fixed-profile Excel changes,
 full item history, immutable publish, official hashed Excel/PDF, and audited
 pointer restore. It has not started and requires owner approval.
 
-#### **Factor F Change Track — owner-selected before Master Catalog Phase 4**
+#### **Factor F Change Track — completed before Master Catalog Phase 4**
 
 Factor F changes are separate from Master Catalog Phase 4. Owner direction on
-2026-06-28 is to run the F-track before Master Catalog Phase 4 and before
-changing live Factor F values:
+2026-06-28 was to run the F-track before Master Catalog Phase 4, and Production
+rollout completed on 2026-06-29:
 
-1. F0: approve
-   [ADR-005](./02_architecture/ADR/ADR-005-versioned-factor-f-reference.md),
-   the Factor F Change Request, source document, and effective date.
-2. F1: deploy additive Factor F version foundation and app compatibility.
-3. F2: seed the current Factor F table as the initial published factor version
-   for future BOQs only; do not backfill old BOQs.
-4. F3: publish the new Factor F version and move the factor default pointer.
-5. F4: add duplicate/reprice UX so old project data can become a new BOQ with
-   the latest Factor F by explicit user action. This is being pulled forward
-   as a narrow edit-page action because local testing showed that legacy BOQs
-   without `factor_reference_version_id` otherwise have no user-visible path
-   out of the fail-closed calculation state. The action must create a new BOQ
-   copy and let the user choose an active Factor F version, such as `2566.0.0`
-   for continuing old-factor work or `2569.0.0` for the new table. Do not run a
-   blanket legacy backfill.
+1. F0 approved ADR-005, the Factor F Change Request, source document, effective
+   date, and no-backfill policy.
+2. F1 deployed additive Factor F version foundation and app compatibility.
+3. F2 seeded the current Factor F table as published baseline `2566.0.0`.
+4. F3 published the new ว481 version `2569.0.0` and moved the default pointer.
+5. F4 repaired missing legacy snapshot metadata only; it did not reprice or bind
+   old BOQs to a Factor F version.
 
-The current F3 source candidate is the 26 June 2026 Factor F table recorded in
-[docs/plans/factor-f/04-source-table-2569-06-26.md](./plans/factor-f/04-source-table-2569-06-26.md).
-Owner confirmed effective date 2026-06-26 and source reference กค
-0433.2/ว 481 on 2026-06-28. F3 still needs final row transcription review,
-diff/hash approval, and a separate Production window after F1/F2 are verified.
-Production Factor F publication and Master Catalog publication should use
-separate approval windows.
+Current Production default Factor F is `2569.0.0`. Existing BOQs were not
+backfilled with a guessed Factor F version. Users who need old project data
+under a different Factor F table must create a new BOQ copy/revision and choose
+the intended active Factor F version.
 
-Migration numbering follows execution order. Supabase MCP verified Production
-on 2026-06-28: the latest applied ledger entry is
-`20260621104056_master_catalog_phase1b_hardening`, corresponding to
-`migrations/011_master_catalog_phase1b_hardening.sql`. Because Factor F is now
-owner-selected before Master Catalog Phase 4, reserve:
+Migration numbering follows execution order. Factor F used:
 
 - `migrations/012_factor_f_version_foundation.sql`
 - `migrations/013_factor_f_seed_current_baseline.sql`
@@ -162,9 +147,8 @@ owner-selected before Master Catalog Phase 4, reserve:
 - `migrations/015_factor_f_repair_legacy_snapshot_metadata.sql`
 
 Master Catalog Phase 4 database migrations must therefore start at `016+`.
-Local implementation does not affect users; Production F1/F2 should be a
-controlled additive migration/deploy window, and F3 changes only the default
-Factor F for newly created BOQs.
+Closeout evidence is recorded in
+[docs/plans/factor-f/10-production-rollout-closeout.md](./plans/factor-f/10-production-rollout-closeout.md).
 
 Detailed execution is governed by
 [docs/plans/factor-f/03-implementation-plan.md](./plans/factor-f/03-implementation-plan.md).

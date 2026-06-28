@@ -29,11 +29,10 @@ this document.
 
 This document does not authorize a Production migration.
 
-Supabase MCP verified Production on 2026-06-28: latest migration ledger
-`20260621104056_master_catalog_phase1b_hardening` corresponds to root
-migration `011`. Owner direction is to ship Factor F first, so Factor F
-reserves `012`, `013`, `014`, and `015`; Master Catalog Phase 4 database migrations
-start at `016+`.
+Supabase MCP verified Production on 2026-06-29 after Factor F rollout: root
+migrations `012`, `013`, `014`, and `015` were applied for Factor F, current
+default Factor F is `2569.0.0`, and legacy BOQs were not version-backfilled.
+Master Catalog Phase 4 database migrations start at `016+`.
 
 ## 2. Verified Production baseline
 
@@ -60,11 +59,11 @@ The current direct active-admin table-write policies are compatible with the
 baseline but are not sufficient for Phase 4 audit guarantees. Phase 4 replaces
 catalog mutation with exact functions and revokes direct application writes.
 
-Current `factor_reference` remains a separate reference table outside
+Current Factor F version tables remain separate reference data outside
 `price_list_versions`. Do not change Factor F values under this Master Catalog
-contract. If Factor F must change, apply ADR-005 first: add a dedicated factor
-version/pointer model, keep old BOQs snapshot-only unless exact source evidence
-exists, and publish the new factor version through its own gate.
+contract. If Factor F must change again, apply ADR-005 first: use the dedicated
+factor version/pointer model, keep old BOQs snapshot-only unless exact source
+evidence exists, and publish the new factor version through its own gate.
 
 ## 3. Logical model
 
@@ -114,7 +113,7 @@ belongs to the separate Factor F change track:
 
 | Object | Contract |
 |---|---|
-| `factor_reference_versions` | Published Factor F metadata, source/effective date, approval evidence, row count, dataset hash |
+| `factor_reference_versions` | Published Factor F metadata, source/effective date, approval evidence, row count, dataset hash; Production currently has active `2566.0.0` and default `2569.0.0` |
 | `factor_reference_rows` | Immutable published Factor F rows scoped by `version_id` |
 | `factor_reference_default_version` | Singleton pointer for new BOQs |
 | `boq.factor_reference_version_id` | Nullable FK; required for new BOQs after F1, left null for legacy snapshot-only BOQs unless exact evidence exists |

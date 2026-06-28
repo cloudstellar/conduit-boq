@@ -188,6 +188,7 @@
 | **v48** | **Production Supabase MCP verification: latest ledger `20260621104056`/`011`, `factor_reference` 37 rows/no duplicates/no invalid rows, no Factor F version tables yet, BOQ snapshots 70 complete / 136 incomplete; reserve FF `012`/`013`/`014`, superseded by v49 repair decision below** | ✅ |
 | **v48** | **F0 approved: ADR-005 status changed to Accepted, CR approval gate recorded with F1/F2 foundation scope, F3 requires separate approval after baseline audit/diff/hash/owner review** | ✅ |
 | **v49** | **Owner approved no-maintenance Factor F rollout with legacy snapshot metadata repair: reserve FF `012`/`013`/`014`/`015` and move MC Phase 4 to `016+`** | ✅ |
+| **v50** | **Factor F Production rollout completed: `012`/`013`/`014`/`015` applied, default Factor F is `2569.0.0`, baseline `2566.0.0` remains active, legacy BOQs were not version-backfilled, partial legacy snapshots remaining = 0, and MC Phase 4 remains `016+`** | ✅ |
 
 ---
 

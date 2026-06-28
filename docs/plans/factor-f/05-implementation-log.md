@@ -9,15 +9,19 @@ agents do not infer missing context.
 | Date | Branch | Reason |
 |---|---|---|
 | 2026-06-28 | `codex/factor-f-versioning-f1` | Split Factor F F1 implementation from `codex/master-catalog-phase4-design` so Factor F can be reviewed/deployed before Master Catalog Phase 4 if approved. |
+| 2026-06-29 | `main` | Factor F branch merged, Production deployed at commit `985ece0`, and the rollout branch was deleted after closeout. |
 
 ## Production Contact Rules
 
 - Production Supabase MCP is read-only for planning/audit unless the owner
   explicitly approves a production migration execution.
-- No production schema/data changes have been executed for Factor F F1.
-- Factor F value publication is not part of F1.
+- Production writes for Factor F `012` through `015` were explicitly approved
+  and executed on 2026-06-29.
+- Future Supabase schema/data writes still require their own explicit approval.
+- Current Production default Factor F is `2569.0.0`; legacy BOQs were not
+  backfilled with a guessed Factor F version.
 
-## Production Baseline Already Recorded
+## Production Baseline Already Recorded Before Rollout
 
 | Topic | Recorded result |
 |---|---|
@@ -32,6 +36,20 @@ agents do not infer missing context.
 | BOQ snapshot coverage | 206 total BOQs; 70 complete snapshots; 136 incomplete snapshots |
 | 2026-06-29 BOQ repair finding | 57 partial legacy BOQs have saved `factor_f` values that exactly match `2566.0.0`; owner approved metadata repair as migration 015 |
 | Legacy grants | Broad grants exist on `factor_reference`; do not copy them to new version tables |
+
+## Production Rollout Closeout
+
+| Topic | Recorded result |
+|---|---|
+| Application commit | `985ece0` on `main`; Vercel Production deploy succeeded |
+| Applied Factor F migrations | `012` = `20260628190218`, `013` = `20260628190357`, `014` = `20260628190621`, `015` = `20260628190757` |
+| Current default Factor F | `2569.0.0` |
+| Active historical baseline | `2566.0.0` |
+| Legacy BOQs bound by rollout | `0` |
+| Partial legacy snapshots remaining | `0` |
+| Usable legacy print/export snapshots | `127` |
+| Missing Factor F snapshots | `79` total: 17 with routes/items, 1 with routes/no items, 61 with no routes |
+| Closeout evidence | [10-production-rollout-closeout.md](./10-production-rollout-closeout.md) |
 
 ## Local Actions
 
@@ -49,6 +67,7 @@ agents do not infer missing context.
 | 2026-06-29 | Added F4 repair migration for missing legacy snapshot metadata, guarded by `2566.0.0` hash and saved-factor equality. | `migrations/015_factor_f_repair_legacy_snapshot_metadata.sql` | None |
 | 2026-06-29 | Updated no-maintenance rollout plan and shifted Master Catalog Phase 4 migration numbering to `016+`. | `docs/04_data/MIGRATIONS.md`, `docs/plans/factor-f/08-production-inventory-readiness.md`, Master Catalog planning docs | None |
 | 2026-06-29 | Added detailed Production no-maintenance runbook for Factor F `012` through `015`, including preflight SQL, staged app deploy, smoke tests, and failure handling. | `docs/plans/factor-f/09-production-no-maintenance-runbook.md` | None |
+| 2026-06-29 | Applied Factor F Production rollout and recorded closeout state. | `migrations/012_factor_f_version_foundation.sql`, `migrations/013_factor_f_seed_current_baseline.sql`, `migrations/014_factor_f_publish_2569_0_0.sql`, `migrations/015_factor_f_repair_legacy_snapshot_metadata.sql`, `docs/plans/factor-f/10-production-rollout-closeout.md` | Production default Factor F is now `2569.0.0`; legacy BOQs remain unbound |
 
 ## Implementation Decisions During F1
 
@@ -82,8 +101,12 @@ agents do not infer missing context.
 | 2026-06-28 | Local F2 new BOQ rollback test | Passed; inserted draft bound `factor_reference_version_id` to version `2566.0.0`, transaction rolled back |
 | 2026-06-29 | Local apply of `migrations/015_factor_f_repair_legacy_snapshot_metadata.sql` after `014` | Passed; 57 repair candidates, 57 updated, postconditions passed |
 | 2026-06-29 | Local post-015 grouping query | Passed; partial legacy snapshots remaining = 0, default pointer remained `2569.0.0` |
+| 2026-06-29 | Production Vercel deploy for commit `985ece0` | Passed |
+| 2026-06-29 | Production application smoke | Passed; authenticated homepage and create page loaded |
+| 2026-06-29 | Production rollback insert smoke | Passed; new empty BOQ bound to `2569.0.0`, transaction rolled back |
+| 2026-06-29 | Production post-015 inventory | Passed; 206 BOQs, 0 legacy BOQs version-bound by rollout, 127 usable legacy snapshots, 79 missing Factor F snapshots |
 
-## F1 Scope Guard
+## Historical F1 Scope Guard
 
 F1 may add:
 
@@ -104,9 +127,9 @@ F1 must not:
 
 ## Next Review Items
 
-- Execute the no-maintenance Production runbook:
-  [09-production-no-maintenance-runbook.md](./09-production-no-maintenance-runbook.md).
-- Repeat the Production inventory preflight immediately before applying `012`.
-- Do not apply `014` while the old application is still accepting create/edit
-  saves.
-- Review whether local DB should be reset after this verification run.
+- Resume Master Catalog Phase 4 planning with database migration numbers
+  `016+`.
+- Monitor support cases for legacy BOQs missing Factor F snapshots; the correct
+  user path is duplicate/reprice, not mutating the original BOQ.
+- Treat full Factor F admin/import UI as a future enhancement after the
+  versioning foundation proves stable.
