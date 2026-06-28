@@ -10,6 +10,8 @@
 
 **Implementation log:** [Factor F Implementation Log](./05-implementation-log.md)
 
+**F2 runbook:** [F2 Current Baseline Seed Runbook](./06-f2-current-baseline-runbook.md)
+
 ## 1. Purpose
 
 Implement Factor F versioning without rewriting historical BOQs and without
@@ -170,7 +172,7 @@ Create `factor_reference_versions`:
 | `version_string generated` | `major.minor.patch` |
 | `name text not null` | Human-readable reference name |
 | `status text not null` | `draft`, `active`, or `archived` |
-| `effective_date date null` | Required before active publication |
+| `effective_date date null` | Required for official/new publication; legacy current baseline may remain null when no exact source evidence exists |
 | `source_document_date date null` | Source document date; distinct from effective date unless owner confirms they are the same |
 | `source_reference text null` | Required before active publication |
 | `approval_reference text null` | Required before active publication |

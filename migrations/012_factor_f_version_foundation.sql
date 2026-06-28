@@ -67,8 +67,7 @@ CREATE TABLE IF NOT EXISTS public.factor_reference_versions (
     CHECK (
       status <> 'active'
       OR (
-        effective_date IS NOT NULL
-        AND source_reference IS NOT NULL
+        source_reference IS NOT NULL
         AND approval_reference IS NOT NULL
         AND published_at IS NOT NULL
         AND row_count IS NOT NULL
