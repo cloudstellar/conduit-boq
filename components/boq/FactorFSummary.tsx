@@ -4,7 +4,10 @@ import { useState, useEffect, useMemo } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import { roundMoney, calculateVAT, multiplyFactor } from '@/lib/calculation';
 import { calculateInterpolatedFactorFromRefs, findFactorBracketRefs } from '@/lib/factorF';
-import { getFactorReferenceRowsForVersion } from '@/lib/factorFReference';
+import {
+  FACTOR_REFERENCE_VERSION_REQUIRED_MESSAGE,
+  getFactorReferenceRowsForVersion,
+} from '@/lib/factorFReference';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Separator } from '@/components/ui/separator';
@@ -61,7 +64,9 @@ export default function FactorFSummary({
         const rows = await getFactorReferenceRowsForVersion(supabase, factorReferenceVersionId);
         setFactorRefs(rows);
       } catch (err) {
-        console.error('Error fetching factor reference:', err);
+        if (!(err instanceof Error) || err.message !== FACTOR_REFERENCE_VERSION_REQUIRED_MESSAGE) {
+          console.error('Error fetching factor reference:', err);
+        }
         setFactorRefs([]);
         setFactorError(err instanceof Error ? err.message : 'ไม่สามารถอ่านตาราง Factor F ได้');
       } finally {
