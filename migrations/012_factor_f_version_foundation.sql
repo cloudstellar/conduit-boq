@@ -76,6 +76,22 @@ CREATE TABLE IF NOT EXISTS public.factor_reference_versions (
     )
 );
 
+ALTER TABLE public.factor_reference_versions
+  DROP CONSTRAINT IF EXISTS check_factor_reference_active_publication_metadata;
+
+ALTER TABLE public.factor_reference_versions
+  ADD CONSTRAINT check_factor_reference_active_publication_metadata
+    CHECK (
+      status <> 'active'
+      OR (
+        source_reference IS NOT NULL
+        AND approval_reference IS NOT NULL
+        AND published_at IS NOT NULL
+        AND row_count IS NOT NULL
+        AND dataset_hash IS NOT NULL
+      )
+    );
+
 ALTER TABLE public.factor_reference_versions ENABLE ROW LEVEL SECURITY;
 
 CREATE INDEX IF NOT EXISTS idx_factor_reference_versions_status

@@ -41,12 +41,14 @@ Production state:
 
 Re-run these checks immediately before F2/Production execution; these recorded
 values are planning evidence, not a substitute for execution-window preflight.
+The owner confirmed `FACTOR F 2566_7.PDF` as the current baseline source and
+`2566.0.0` as the current baseline identity on 2026-06-28.
 
 ## 2. Business inputs required before F3
 
 | Input | Required before | Notes |
 |---|---|---|
-| Current baseline export | F2 | Current Production `factor_reference` rows and checksum |
+| Current baseline export | F2 | Current Production `factor_reference` rows and checksum; local F2 rehearsal uses owner-confirmed baseline `2566.0.0` |
 | New Factor F table | F3 | Current owner-supplied candidate is the 26 June 2026 source table annex; do not type values manually without independent review |
 | Effective date | F3 | Confirmed by owner on 2026-06-28 as 2026-06-26 for the 26 June 2026 candidate |
 | Source/approval reference | F3 | Confirmed by owner: กค 0433.2/ว 481 ลงวันที่ 26 มิถุนายน 2569; official PDF retained outside repository by owner/NT |

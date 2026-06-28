@@ -29,9 +29,10 @@ Visible source details from the image:
 | อัตราดอกเบี้ยเงินกู้ | 6% ต่อปี | Store as version-level source metadata; do not infer per-row operation/profit values |
 | VAT | 7% | Store as version-level source metadata and row `vat_percent = 7.0000` |
 
-Proposed version string is `2569.0.0` because the owner confirmed the
+Version string is reserved as `2569.0.0` because the owner confirmed the
 effective date is 26 June 2026 / BE 2569 and this is the first planned Factor F
-version for that effective year.
+version for that effective year. The current baseline from `FACTOR F 2566_7.PDF`
+is reserved as `2566.0.0`.
 
 The local PDF review shows this 54-page official source contains multiple
 Factor F table families. The `งานก่อสร้างทาง` section appears on PDF pages

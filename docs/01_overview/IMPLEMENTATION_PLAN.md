@@ -80,12 +80,15 @@ Detailed execution plan: [Master Catalog v26](../plans/master-catalog/02-impleme
 Owner direction on 2026-06-28 is to implement Factor F versioning before
 Master Catalog Phase 4. Supabase MCP verified Production latest ledger
 `20260621104056_master_catalog_phase1b_hardening` (`011`), with
-`factor_reference` at 37 rows and no Factor F version tables yet.
+`factor_reference` at 37 rows and no Factor F version tables yet. The owner
+confirmed `FACTOR F 2566_7.PDF` as the current Factor F baseline source, so
+the baseline version identity is `2566.0.0`; the new ว481 table is reserved as
+`2569.0.0`.
 
 Planned Factor F migrations:
 
 - `012_factor_f_version_foundation`
-- `013_factor_f_seed_current_baseline`
+- `013_factor_f_seed_current_baseline` (`2566.0.0` baseline)
 - `014_factor_f_publish_2569_0_0`
 
 The official source is กค 0433.2/ว 481 effective 2026-06-26; F3 publication
@@ -127,7 +130,7 @@ Start review from the
 | 010a_master_catalog_phase1a_indexes | Master Catalog v26 concurrent index runbook | ✅ 4 indexes valid/ready 2026-06-21 |
 | 011_master_catalog_phase1b_hardening | Master Catalog v26 BOQ version contract hardening | ✅ Production 2026-06-21 |
 | 012_factor_f_version_foundation | Factor F version tables + BOQ factor version FK | Draft local-verified 2026-06-28; not Production |
-| 013_factor_f_seed_current_baseline | Seed audited current Factor F baseline | Planned before MC Phase 4 |
+| 013_factor_f_seed_current_baseline | Seed audited current Factor F baseline `2566.0.0` | Draft local-verified 2026-06-28; not Production |
 | 014_factor_f_publish_2569_0_0 | Publish Factor F `2569.0.0` from ว 481 source | Planned before MC Phase 4 |
 | 015+_master_catalog_phase4_* | Master Catalog Phase 4 DB migrations | Planned after Factor F |
 

@@ -1,6 +1,7 @@
 # Change Request: Versioned Factor F Reference and Immediate Factor F Update
 
-**Status:** Draft for owner review — no Factor F data change authorized
+**Status:** F1/F2 local implementation in progress — no Production Factor F
+data change authorized
 **Requested date:** 2026-06-28
 **Change type:** Additive Factor F reference versioning, compatible BOQ
 calculation behavior, and controlled Factor F publication
@@ -45,6 +46,9 @@ Owner confirmations recorded on 2026-06-28:
 - Official source document is retained outside the repository by owner/NT;
   local files under `files/` are review copies and are not approved for commit
   by this CR.
+- Baseline source for the existing current table is confirmed as
+  `FACTOR F 2566_7.PDF`, so the baseline version identity is `2566.0.0`;
+  the new ว481 Factor F table is reserved as `2569.0.0`.
 
 ## 2. Recommended sequence for changing Factor F now
 
@@ -196,7 +200,7 @@ Implementation actions are tracked in the
 |---|---|---|---|---|---|
 | F0 approve ADR/CR | Owner | Owner | Approve F0 for Factor F F1/F2 foundation only. F3 publication requires separate approval after production baseline audit, row-level diff, dataset hash, and final owner review. | 2026-06-28T20:08+07:00 | ADR-005, CR, Readiness Addendum, Implementation Plan reviewed and accepted. Source/effective date 2026-06-26, reference กค 0433.2/ว 481 confirmed. Owner as data custodian. |
 | F1 implement foundation | Owner |  | Not requested |  |  |
-| F2 seed current baseline | Owner |  | Not requested |  |  |
+| F2 seed current baseline | Owner | Owner | Confirm `FACTOR F 2566_7.PDF` as current baseline source, approve version identity `2566.0.0`, and authorize local migration/rehearsal only. Production execution remains pending a separate approved window. | 2026-06-28T21:43+07:00 | Production MCP baseline audit: 37 rows, 0 duplicates, 0 invalid rows, hash `sha256:77a2568bed09670242dcadc444be344c638868a7813f2a25ccbb6e6fb8d7ad61`; local PDF review and migration 013 verification passed. |
 | F3 publish new Factor F | Owner |  | Not requested |  |  |
 | Execution | Executor |  | Pending |  |  |
 | Independent verification | Verifier |  | Pending |  |  |

@@ -1,7 +1,7 @@
 # Database Schema
 ## Conduit BOQ System
 
-**Last Updated:** 2026-06-22
+**Last Updated:** 2026-06-28
 **Status:** Canonical  
 **Database:** PostgreSQL 17 (Supabase)
 
@@ -141,6 +141,7 @@ BOQ Header - ใบประมาณราคา
 | `factor_f_upper_cost` | DECIMAL(15,2) | YES | C: ค่างานต้นทุนตัวสูง |
 | `factor_f_lower_value` | DECIMAL(10,4) | YES | D: ค่า Factor F ของ B |
 | `factor_f_upper_value` | DECIMAL(10,4) | YES | E: ค่า Factor F ของ C |
+| `factor_reference_version_id` | UUID | YES | FK → factor_reference_versions.id หลัง migration 012; legacy BOQs remain nullable/snapshot-only |
 | `status` | TEXT | NO | สถานะ (draft/submitted/approved) ¹ |
 
 ¹ Reserved for Phase 3: `pending_review`, `pending_approval`
@@ -243,6 +244,60 @@ BOQ Header - ใบประมาณราคา
 | `factor_f_rain_1` | DECIMAL | NO | Factor F ฤดูฝน 1 |
 | `factor_f_rain_2` | DECIMAL | NO | Factor F ฤดูฝน 2 |
 | `created_at` | TIMESTAMPTZ | NO | วันที่สร้าง |
+
+---
+
+### 9a. factor_reference_versions
+ตารางเวอร์ชัน Factor F หลัง migration 012
+
+| Column | Type | Nullable | Description |
+|--------|------|----------|-------------|
+| `id` | UUID | NO | Primary Key |
+| `major` / `minor` / `patch` | INTEGER | NO | เลขเวอร์ชันแบบ `major.minor.patch`; F2 baseline ใช้ `2566.0.0`, F3 ว481 ใช้ `2569.0.0` |
+| `version_string` | TEXT | NO | Generated version string |
+| `name` | TEXT | NO | ชื่อเวอร์ชัน |
+| `status` | TEXT | NO | `draft`, `active`, `archived` |
+| `effective_date` | DATE | YES | วันที่มีผล; F2 baseline ใช้วันที่ประกาศ `2023-08-24` |
+| `source_reference` | TEXT | YES | เอกสารอ้างอิงแหล่งที่มา; required before active |
+| `approval_reference` | TEXT | YES | หลักฐานอนุมัติ; required before active |
+| `advance_payment_percent` | NUMERIC(10,4) | YES | เงื่อนไขเงินจ่ายล่วงหน้า |
+| `retention_percent` | NUMERIC(10,4) | YES | เงื่อนไขเงินประกันผลงาน |
+| `loan_interest_percent` | NUMERIC(10,4) | YES | อัตราดอกเบี้ยเงินกู้ |
+| `vat_percent` | NUMERIC(10,4) | YES | VAT สำหรับข้อความเงื่อนไข |
+| `row_count` | INTEGER | YES | จำนวนแถวของเวอร์ชัน |
+| `dataset_hash` | TEXT | YES | SHA-256 canonical dataset hash |
+
+---
+
+### 9b. factor_reference_rows
+ตารางแถว Factor F ที่ผูกกับแต่ละเวอร์ชันหลัง migration 012
+
+| Column | Type | Nullable | Description |
+|--------|------|----------|-------------|
+| `id` | UUID | NO | Primary Key |
+| `version_id` | UUID | NO | FK → factor_reference_versions.id |
+| `display_order` | INTEGER | NO | ลำดับสำหรับตรวจสอบ/export |
+| `cost_million` | NUMERIC(10,4) | NO | วงเงิน (ล้านบาท); unique per version |
+| `operation_percent` | NUMERIC(10,4) | YES | Legacy/source-derived metadata |
+| `interest_percent` | NUMERIC(10,4) | YES | Legacy/source-derived metadata |
+| `profit_percent` | NUMERIC(10,4) | YES | Legacy/source-derived metadata |
+| `total_expense_percent` | NUMERIC(10,4) | YES | Legacy/source-derived metadata |
+| `factor` | NUMERIC(10,4) | NO | ค่า "รวมในรูป Factor" ที่ใช้คำนวณ BOQ |
+| `vat_percent` | NUMERIC(10,4) | NO | VAT ของแถว |
+| `factor_f` | NUMERIC(10,4) | NO | ค่า Factor F ในตารางอ้างอิง |
+| `factor_f_rain_1` | NUMERIC(10,4) | NO | Factor F ฝนชุก 1 |
+| `factor_f_rain_2` | NUMERIC(10,4) | NO | Factor F ฝนชุก 2 |
+
+---
+
+### 9c. factor_reference_default_version
+singleton pointer สำหรับ Factor F default หลัง migration 012
+
+| Column | Type | Nullable | Description |
+|--------|------|----------|-------------|
+| `id` | BOOLEAN | NO | Singleton primary key; always `true` |
+| `version_id` | UUID | NO | FK → active factor_reference_versions.id |
+| `updated_at` | TIMESTAMPTZ | NO | วันที่ pointer เปลี่ยนล่าสุด |
 
 ---
 
@@ -357,7 +412,7 @@ idx_boq_items_route_id   ON boq_items(route_id)
 | `010a_master_catalog_phase1a_indexes.sql` | Concurrent index runbook | ✅ 4 indexes valid/ready 2026-06-21 |
 | `011_master_catalog_phase1b_hardening.sql` | BOQ version contract hardening | ✅ Production 2026-06-21 |
 | `012_factor_f_version_foundation.sql` | Factor F version tables + BOQ factor version FK | Draft local-verified 2026-06-28; not Production |
-| `013_factor_f_seed_current_baseline.sql` | Seed audited current Factor F baseline | Planned before Master Catalog Phase 4 |
+| `013_factor_f_seed_current_baseline.sql` | Seed audited current Factor F baseline `2566.0.0` | Draft local-verified 2026-06-28; not Production |
 | `014_factor_f_publish_2569_0_0.sql` | Publish Factor F `2569.0.0` from confirmed ว 481 source | Planned before Master Catalog Phase 4 |
 | `015+_master_catalog_phase4_*.sql` | Master Catalog Phase 4 database migrations | Planned after Factor F migrations |
 

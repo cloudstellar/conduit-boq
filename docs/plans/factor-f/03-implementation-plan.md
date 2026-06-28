@@ -1,6 +1,7 @@
 # Factor F Versioning Implementation Plan
 
-**Status:** Draft implementation plan — no Production execution authorized
+**Status:** Draft implementation plan; F1/F2 migration files created and
+local-verified — no Production execution authorized
 **Date:** 2026-06-28
 **Authority:** [ADR-005](../../02_architecture/ADR/ADR-005-versioned-factor-f-reference.md),
 [Factor F Change Request](./01-versioned-factor-f-change-request.md), and
@@ -44,6 +45,7 @@ legacy BOQ provenance.
 |---|---|---|
 | Current baseline row count | No | Production query result recorded before F2 |
 | Current baseline checksum | No | Production canonical checksum recorded before F2 |
+| Current baseline version identity | No | Owner confirmed `FACTOR F 2566_7.PDF` as source and `2566.0.0` as baseline identity on 2026-06-28; new ว481 version reserved as `2569.0.0` |
 | New Factor F values | No | Owner-approved source table; current candidate is the 26 June 2026 source table annex |
 | New effective date | No | Owner confirmed 2026-06-26 for the 26 June 2026 source candidate |
 | Source or approval reference | No | Owner confirmed กค 0433.2/ว 481 ลงวันที่ 26 มิถุนายน 2569; official PDF retained outside repository |
@@ -316,10 +318,12 @@ Do not silently choose new-estimate behavior for the existing duplicate button.
 ### Inputs
 
 - Current factor row count and checksum from Production.
-- Approved baseline version metadata for current table, such as
-  `2568.0.0` or another owner-approved version string.
-- Approval/source reference for the current baseline if available. If not
-  available, mark it as legacy baseline metadata pending and do not invent it.
+- Approved baseline version metadata for current table: owner confirmed
+  `2566.0.0` on 2026-06-28 after identifying `FACTOR F 2566_7.PDF` as the
+  source.
+- Approval/source reference for the current baseline: record the Comptroller
+  General Department announcement dated 2023-08-24 and circular
+  `กค 0433.2/ว 499` dated 2023-08-28.
 
 ### Tasks
 
@@ -351,7 +355,7 @@ It contains 36 visible rows for `ตาราง Factor F งานก่อส�
 For this candidate:
 
 - proposed version string is `2569.0.0` only if the owner confirms the
-  effective date belongs to BE 2569;
+  effective date belongs to BE 2569; owner confirmed this on 2026-06-28;
 - the BOQ multiplier is `รวมในรูป Factor`, mapped to `factor`;
 - `Factor F`, `Factor F ฝนชุก 1`, and `Factor F ฝนชุก 2` are reference columns
   mapped to `factor_f`, `factor_f_rain_1`, and `factor_f_rain_2`;
@@ -462,13 +466,14 @@ Stop and report blockers when owner inputs are missing.
 
 F1/F2 is ready to implement only when:
 
-- [ ] F0 approval is recorded.
-- [ ] This plan is accepted.
-- [ ] Current baseline audit queries are ready to run.
-- [ ] Migration names are reserved.
+- [x] F0 approval is recorded.
+- [x] This plan is accepted for local implementation/rehearsal.
+- [x] Current baseline audit queries are ready to run and were used for F2
+      local verification.
+- [x] Migration names are reserved.
 - [ ] App coupling list is accepted.
 - [ ] Test list is accepted.
-- [ ] No one expects F1/F2 to publish new Factor F values.
+- [x] No one expects F1/F2 to publish new Factor F values.
 
 F3 is ready only when:
 

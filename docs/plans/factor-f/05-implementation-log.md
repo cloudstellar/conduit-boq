@@ -43,6 +43,8 @@ agents do not infer missing context.
 | 2026-06-28 | Updated print/Excel paths to use version-scoped Factor F rows when a BOQ is version-bound and to avoid live-table fallback for invalid legacy snapshots. | `app/boq/[id]/print/page.tsx`, `lib/exportBoqExcel.ts` | None |
 | 2026-06-28 | Aligned ADR/CR/readiness/ledger wording with pointer-optional F1 and F2/default-pointer binding. | `docs/02_architecture/ADR/ADR-005-versioned-factor-f-reference.md`, `docs/plans/factor-f/*.md`, `docs/04_data/*.md`, `docs/01_overview/IMPLEMENTATION_PLAN.md` | None |
 | 2026-06-28 | Added F2 current-baseline runbook and owner-decision checklist before creating migration 013. | `docs/plans/factor-f/06-f2-current-baseline-runbook.md` | None |
+| 2026-06-28 | Aligned F1 active-version metadata constraint so local re-apply and F2 can publish the PDF-backed baseline while still allowing future legacy exceptions. | `migrations/012_factor_f_version_foundation.sql` | None |
+| 2026-06-28 | Created F2 seed migration for owner-confirmed baseline version `2566.0.0`, sourced from `FACTOR F 2566_7.PDF`, with row-count/hash preflight and no BOQ backfill. | `migrations/013_factor_f_seed_current_baseline.sql` | None |
 
 ## Implementation Decisions During F1
 
@@ -53,6 +55,7 @@ agents do not infer missing context.
 | 2026-06-28 | Legacy BOQs without a Factor F version may use valid saved snapshots for print/export but must not recalculate from the latest live `factor_reference` table. | Matches ADR-005 snapshot-only policy and avoids hidden repricing. |
 | 2026-06-28 | `trigger_set_default_factor_reference_version` validates active status only when `NEW.factor_reference_version_id IS NOT NULL`. | A local rollback test found the earlier `NOT EXISTS` branch rejected intentional `NULL` legacy duplicate rows. |
 | 2026-06-28 | Active Factor F versions require source/approval/published/hash metadata, but not `effective_date` at the database constraint level. | Production current baseline does not contain exact source effective-date evidence; F2 must not invent one. F3/official publication must assert its own effective date. |
+| 2026-06-28 | Owner confirmed `FACTOR F 2566_7.PDF` as the source for the current baseline, selected `2566.0.0` as the baseline version identity, and reserved `2569.0.0` for the new ว481 Factor F table. | Keeps BE-year versioning tied to the source/effective year rather than rollout year. |
 
 ## Local Verification
 
@@ -68,6 +71,10 @@ agents do not infer missing context.
 | 2026-06-28 | Local RLS/grant verification | Passed; RLS enabled on all new Factor F tables; `authenticated` has `SELECT`; `anon` has no grants on new tables |
 | 2026-06-28 | Local trigger rollback test | Passed; empty new BOQ draft auto-bound the default Factor F version, duplicate-like legacy row stayed `NULL`, transaction rolled back |
 | 2026-06-28 | Production MCP F2 baseline re-audit | Passed; `factor_reference` has 37 rows, 0 duplicate thresholds, 0 invalid required rows, min/max 5.0000/700.0000, dataset hash `sha256:77a2568bed09670242dcadc444be344c638868a7813f2a25ccbb6e6fb8d7ad61` |
+| 2026-06-28 | Local source PDF review for F2 baseline | Passed; `FACTOR F 2566_7.PDF` shows announcement date 2023-08-24, circular `กค 0433.2/ว 499` dated 2023-08-28, road construction table, 0% advance, 0% retention, 7% loan interest, VAT 7%, and sampled rows matching local `factor_reference` |
+| 2026-06-28 | Local re-apply of `migrations/012_factor_f_version_foundation.sql` after active metadata constraint alignment | Passed |
+| 2026-06-28 | Local apply of `migrations/013_factor_f_seed_current_baseline.sql` | Passed; active `2566.0.0`, 37 seeded rows, default pointer moved to `2566.0.0`, `backfilled_boq_count = 0` |
+| 2026-06-28 | Local F2 new BOQ rollback test | Passed; inserted draft bound `factor_reference_version_id` to version `2566.0.0`, transaction rolled back |
 
 ## F1 Scope Guard
 
@@ -92,10 +99,13 @@ F1 must not:
 
 - Review `migrations/012_factor_f_version_foundation.sql` against ADR-005 and
   the F1 implementation plan.
-- Decide whether the pointer-optional F1 behavior is acceptable for deployment,
-  or whether F1 and F2 must be deployed in one approved maintenance window.
+- Review `migrations/013_factor_f_seed_current_baseline.sql` against the F2
+  runbook and repeat the preflight immediately before Production execution.
+- Decide whether F1 and F2 should be deployed in one approved maintenance
+  window so new BOQ creation immediately has the `2566.0.0` default pointer.
 - Run the same SQL verification on staging or a Supabase branch before any
   Production execution.
 - Review whether local DB should be reset after this verification run.
-- Owner must choose the F2 legacy baseline version identity before migration
-  `013_factor_f_seed_current_baseline.sql` is created.
+- Prepare F3 migration `014_factor_f_publish_2569_0_0.sql` only after the
+  36-row ว481 source transcription, diff, checksum, and owner approval are
+  complete.
