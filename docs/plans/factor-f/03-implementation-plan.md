@@ -6,6 +6,8 @@
 [Factor F Change Request](./01-versioned-factor-f-change-request.md), and
 [Readiness/Security Addendum](./02-readiness-and-security-addendum.md)
 
+**F3 source candidate:** [26 June 2026 Factor F Source Table Candidate](./04-source-table-2569-06-26.md)
+
 ## 1. Purpose
 
 Implement Factor F versioning without rewriting historical BOQs and without
@@ -38,13 +40,14 @@ legacy BOQ provenance.
 |---|---|---|
 | Current baseline row count | No | Production query result recorded before F2 |
 | Current baseline checksum | No | Production canonical checksum recorded before F2 |
-| New Factor F values | No | Owner-approved source table |
-| New effective date | No | Owner approval / source document |
-| Source or approval reference | No | Owner / records custodian |
+| New Factor F values | No | Owner-approved source table; current candidate is the 26 June 2026 source table annex |
+| New effective date | No | Owner confirmed 2026-06-26 for the 26 June 2026 source candidate |
+| Source or approval reference | No | Owner confirmed กค 0433.2/ว 481 ลงวันที่ 26 มิถุนายน 2569; official PDF retained outside repository |
 | Formula change | No | Explicit owner-approved calculation decision |
 | VAT change | No | Explicit owner-approved calculation decision |
+| Missing row-level component percentages | No | Separate authoritative source or nullable/source-derived fields |
 | Old BOQ factor provenance | No | Row-level source evidence; otherwise leave null |
-| Whether to publish F3 before Master Catalog Phase 4 | No | Owner decision based on urgency |
+| Whether to publish F3 before Master Catalog Phase 4 | No | Owner direction recorded on 2026-06-28: Factor F before Master Catalog Phase 4; formal F0/F3 approvals still required |
 | Full Factor F admin UI | No | Later CR only |
 
 If any required source is missing, stop at the relevant gate and record the
@@ -52,8 +55,8 @@ blocker. Do not fill placeholders with plausible values.
 
 ## 4. Recommended Ordering
 
-Use this ordering if Factor F must change before Master Catalog Phase 4
-publication:
+Owner direction on 2026-06-28 is to change Factor F before Master Catalog
+Phase 4 publication. Use this ordering:
 
 ```text
 F0 approval
@@ -64,36 +67,28 @@ Master Catalog Phase 4
 F4 duplicate/reprice UX refinement
 ```
 
-Use this ordering if Factor F can wait:
-
-```text
-F0 approval
-F1 version foundation
-F2 current baseline seed
-Master Catalog Phase 4 application work
-F3 publish approved new Factor F version
-F4 duplicate/reprice UX refinement
-```
-
-In both cases, F3 must be a separate approved Production window from Master
-Catalog publication.
+If the owner later changes this direction, record that as a new decision before
+reordering the tracks. F3 must be a separate approved Production window from
+Master Catalog publication.
 
 ## 5. Files Expected To Change In F1/F2
 
 Exact filenames may change during implementation, but the implementation must
 declare them before editing and keep migration ordering unambiguous.
 
-The repository currently ends at `migrations/011_master_catalog_phase1b_hardening.sql`.
-If Factor F F1/F2 is implemented before Master Catalog Phase 4 database work,
-reserve the next migration numbers for Factor F. If Master Catalog Phase 4
-creates its migrations first, Factor F must move to the next available numbers
-after those files. Never reuse a number or create parallel migrations with the
-same logical order.
+Supabase MCP verified Production on 2026-06-28: the latest applied migration
+ledger entry is `20260621104056_master_catalog_phase1b_hardening`,
+corresponding to `migrations/011_master_catalog_phase1b_hardening.sql`. The
+Factor F track is owner-selected before Master Catalog Phase 4, so reserve
+root migration numbers `012`, `013`, and `014` for Factor F. Master Catalog
+Phase 4 database migrations must start at `015+`. Never reuse a number or
+create parallel migrations with the same logical order.
 
 | Area | Expected files |
 |---|---|
-| Database migration F1 | `migrations/012_factor_f_version_foundation.sql` if Factor F goes first; otherwise the next available migration number |
-| Database seed F2 | `migrations/013_factor_f_seed_current_baseline.sql` if Factor F goes first; otherwise the next available migration number or a reviewed runbook SQL if values are sourced live |
+| Database migration F1 | `migrations/012_factor_f_version_foundation.sql` |
+| Database seed F2 | `migrations/013_factor_f_seed_current_baseline.sql` |
+| Database publish F3 | `migrations/014_factor_f_publish_2569_0_0.sql` |
 | Types | `lib/supabase.ts` or generated DB types if/when generation is introduced |
 | Factor utilities | `lib/factorF.ts` only if helper signatures need version metadata; calculation formula should not change |
 | Create BOQ | `app/boq/create/page.tsx` |
@@ -105,9 +100,9 @@ same logical order.
 | Tests | `tests/factor-f.test.ts`, migration contract tests, focused app/unit tests |
 | Docs | Factor F CR, readiness addendum, verification report/runbook if created |
 
-If Master Catalog Phase 4 reserves migration numbers first, rename Factor F
-migrations before implementation. Do not create two migration files with the
-same logical order.
+Do not create a separate runbook that silently moves the F3 pointer outside
+reviewed migration history unless the owner explicitly changes the deployment
+approach. `014` is the planned auditable Factor F publication migration.
 
 ## 6. F0 — Approval And Freeze
 
@@ -118,7 +113,11 @@ same logical order.
   - F1/F2 foundation only, or
   - F1/F2 plus F3 publication.
 - Readiness/Security Addendum accepted for F1.
-- Owner records whether F3 is urgent or can wait.
+- Owner confirms the 2026-06-28 direction that Factor F goes before Master
+  Catalog Phase 4, or records a later change in direction.
+- Owner confirmations from 2026-06-28 are recorded: effective date 2026-06-26,
+  source reference กค 0433.2/ว 481, official PDF retained outside repository,
+  and owner as row-level reviewer.
 
 ### F0 tasks
 
@@ -143,12 +142,12 @@ Required audit outputs:
 
 | Output | Required result |
 |---|---|
-| Current factor row count | Recorded; expected current baseline is 37 only after query confirms it |
+| Current factor row count | Production MCP 2026-06-28 recorded 37 rows; re-run before F2 execution |
 | Duplicate `cost_million` count | 0 |
-| Invalid factor row count | 0 |
+| Invalid factor row count | Production MCP 2026-06-28 recorded 0 invalid rows; re-run before F2 execution |
 | Ordered threshold inspection | Reviewed by developer/data custodian |
-| BOQ snapshot complete/incomplete counts | Recorded; no backfill action implied |
-| Legacy `factor_reference` grants | Recorded; broad grants not copied to new tables |
+| BOQ snapshot complete/incomplete counts | Production MCP 2026-06-28 recorded 206 BOQs: 70 complete snapshots, 136 incomplete snapshots; no backfill action implied |
+| Legacy `factor_reference` grants | Production MCP 2026-06-28 recorded broad legacy grants; broad grants must not be copied to new tables |
 
 Stop if current `factor_reference` has duplicate thresholds, null/invalid
 required numeric values, or an unexpected row count that the owner cannot
@@ -170,8 +169,13 @@ Create `factor_reference_versions`:
 | `name text not null` | Human-readable reference name |
 | `status text not null` | `draft`, `active`, or `archived` |
 | `effective_date date null` | Required before active publication |
+| `source_document_date date null` | Source document date; distinct from effective date unless owner confirms they are the same |
 | `source_reference text null` | Required before active publication |
 | `approval_reference text null` | Required before active publication |
+| `advance_payment_percent numeric(10,4) null` | Version-level condition metadata for print/export text |
+| `retention_percent numeric(10,4) null` | Version-level condition metadata for print/export text |
+| `loan_interest_percent numeric(10,4) null` | Version-level condition metadata for print/export text |
+| `vat_percent numeric(10,4) null` | Version-level condition metadata; row `vat_percent` remains the reference-table value |
 | `approved_by uuid null` | FK to `auth.users`, `ON DELETE SET NULL` |
 | `approved_by_display_name text null` | Immutable display snapshot |
 | `approved_at timestamptz null` | Set on publish |
@@ -193,10 +197,10 @@ Create `factor_reference_rows`:
 | `version_id uuid not null` | FK to `factor_reference_versions`, `ON DELETE RESTRICT` |
 | `display_order integer not null` | Deterministic review/export order |
 | `cost_million numeric(10,4) not null` | Unique per version |
-| `operation_percent numeric(10,4) not null` | Preserve current contract |
-| `interest_percent numeric(10,4) not null` | Preserve current contract |
-| `profit_percent numeric(10,4) not null` | Preserve current contract |
-| `total_expense_percent numeric(10,4) not null` | Preserve current contract |
+| `operation_percent numeric(10,4) null` | Legacy/source-derived component; do not invent if absent from the approved source |
+| `interest_percent numeric(10,4) null` | Source-derived component; the 26 June 2026 image shows 6% as source metadata, not necessarily row-level data |
+| `profit_percent numeric(10,4) null` | Legacy/source-derived component; do not invent if absent from the approved source |
+| `total_expense_percent numeric(10,4) null` | Legacy/source-derived component; do not invent if absent from the approved source |
 | `factor numeric(10,4) not null` | BOQ multiplier source |
 | `vat_percent numeric(10,4) not null` | Stored reference value |
 | `factor_f numeric(10,4) not null` | Preserve current contract |
@@ -275,12 +279,18 @@ Update or wrap `save_boq_with_routes` so that:
 - Legacy with valid snapshot: print from saved snapshot.
 - Legacy with invalid/incomplete snapshot: show a blocking error and do not
   fallback to current live factor rows.
+- Factor F condition text must come from the bound factor version metadata when
+  available, including advance payment, retention, loan interest, and VAT. Do
+  not keep hardcoded `ดอกเบี้ยเงินกู้ 7.00 % ต่อปี` after F1; the 26 June
+  2026 candidate source shows 6% per year.
 
 ### Excel export
 
 - Follow the same decision tree as print.
 - Export must not create a Factor F supplement from live current rows for a
   legacy BOQ with invalid snapshot data.
+- Exported Factor F supplement condition text must match the same version
+  metadata used by print.
 
 ### Duplicate BOQ
 
@@ -325,20 +335,45 @@ Do not silently choose new-estimate behavior for the existing duplicate button.
 F3 is not part of F1/F2 foundation. Do not start F3 until business inputs are
 complete.
 
+### Candidate source now on file
+
+The current F3 candidate is recorded in
+[26 June 2026 Factor F Source Table Candidate](./04-source-table-2569-06-26.md).
+It contains 36 visible rows for `ตาราง Factor F งานก่อสร้างทาง`.
+
+For this candidate:
+
+- proposed version string is `2569.0.0` only if the owner confirms the
+  effective date belongs to BE 2569;
+- the BOQ multiplier is `รวมในรูป Factor`, mapped to `factor`;
+- `Factor F`, `Factor F ฝนชุก 1`, and `Factor F ฝนชุก 2` are reference columns
+  mapped to `factor_f`, `factor_f_rain_1`, and `factor_f_rain_2`;
+- the image shows source-level values for advance payment 0%, retention 0%,
+  loan interest 6% per year, and VAT 7%;
+- the image does not show row-level `operation_percent`, `profit_percent`, or
+  `total_expense_percent`, so implementation must not invent those values.
+
 ### Required owner inputs
 
 - Approved new Factor F table.
-- Expected row count.
-- Effective date.
-- Source/approval reference.
-- Data custodian.
+- Expected row count. The supplied image shows 36 rows; confirm with the
+  complete approved source.
+- Effective date. Owner confirmed 26 June 2026 as the effective date for this
+  candidate.
+- Source/approval reference. Owner confirmed `กค 0433.2/ว 481 ลงวันที่ 26
+  มิถุนายน 2569`; official PDF is retained outside the repository.
+- Source condition parameters for print/export text: advance payment 0%,
+  retention 0%, loan interest 6% per year, and VAT 7% for the 26 June 2026
+  candidate unless the official source says otherwise.
+- Data custodian. Owner will review the row transcription, diff, and hash.
 - Formula/VAT/column decisions.
 - Explicit approval to publish the named version.
 
 ### Tasks
 
 1. Create draft factor version based on current baseline.
-2. Load the approved new rows.
+2. Load the approved new rows. Do not load directly from OCR without
+   independent review against the approved source.
 3. Validate row count, duplicates, nulls, positives, ordering, and dataset
    hash.
 4. Produce row-level diff from the current baseline.
@@ -403,9 +438,13 @@ When giving this work to an AI/dev agent, include these rules:
 
 ```text
 Read ADR-005, Factor F CR, readiness addendum, and this implementation plan.
+Read the 26 June 2026 Factor F source table annex if implementing F3.
 Do not infer any missing business data.
 Do not backfill legacy BOQs.
 Do not change Factor F values in F1/F2.
+Use the source column "รวมในรูป Factor" as factor_reference_rows.factor.
+Do not use the source column "Factor F" as the main BOQ multiplier.
+Do not invent operation/profit/total_expense percentages missing from the source.
 Do not update print/export to fallback to latest live Factor F for legacy BOQs.
 List files and migration names before editing.
 After editing, run diff checks and the focused tests available locally.
@@ -428,8 +467,10 @@ F3 is ready only when:
 
 - [ ] F1/F2 are deployed and verified.
 - [ ] Approved new Factor F source table is available.
-- [ ] Effective date is recorded.
-- [ ] Source/approval reference is recorded.
-- [ ] Expected row count is recorded.
+- [x] Effective date is recorded as 2026-06-26 for the 26 June 2026 source.
+- [x] Source/approval reference is recorded as กค 0433.2/ว 481 ลงวันที่ 26
+      มิถุนายน 2569; official PDF retained outside repository.
+- [ ] Expected row count is recorded; the current supplied image has 36 visible
+      rows.
 - [ ] Formula/VAT/column decisions are recorded.
 - [ ] Exact diff/count/hash is approved.

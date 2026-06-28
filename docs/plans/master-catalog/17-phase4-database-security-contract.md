@@ -29,6 +29,12 @@ this document.
 
 This document does not authorize a Production migration.
 
+Supabase MCP verified Production on 2026-06-28: latest migration ledger
+`20260621104056_master_catalog_phase1b_hardening` corresponds to root
+migration `011`. Owner direction is to ship Factor F first, so Factor F
+reserves `012`, `013`, and `014`; Master Catalog Phase 4 database migrations
+start at `015+`.
+
 ## 2. Verified Production baseline
 
 Read-only Supabase MCP inspection on 2026-06-22 confirmed:
@@ -122,6 +128,12 @@ Rules:
   creation time.
 - Version-bound BOQ calculation reads the bound factor version. Legacy
   snapshot-only calculation uses valid saved snapshots or fails closed.
+- The BOQ multiplier is `factor`, sourced from the Thai column
+  `รวมในรูป Factor`. The Thai column `Factor F` is stored as `factor_f` for
+  reference/provenance and must not be substituted as the main multiplier.
+- The 26 June 2026 Factor F source-table annex belongs to the Factor F track;
+  missing row-level component percentages must not be invented to satisfy a
+  legacy shape.
 - Factor F publication must not be hidden inside a Master Catalog migration or
   catalog publish transaction.
 

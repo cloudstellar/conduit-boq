@@ -53,7 +53,7 @@ change only application code or SQL.
 | L-26 | Phase 4 Core does not expose an archive transition; former current versions remain Published/Active and immutable | Avoids adding an undefined lifecycle operation while the singleton pointer already identifies Current |
 | L-27 | Phase 4 Core does not rebase stale drafts; create a new draft from Current and deliberately reapply still-approved changes while retaining the stale draft read-only/nonpublishable | Avoids hidden three-way merge semantics and preserves an explicit audit trail |
 | L-28 | Factor F remains outside Master Catalog price versioning and follows ADR-005; old BOQs are not backfilled with a guessed factor version | Prevents false provenance and keeps Factor F policy changes independent from price catalog publication |
-| L-29 | Migration numbers follow actual execution order; if Factor F F1/F2 goes before Phase 4, it reserves the next root migration numbers and Phase 4 moves later | Prevents duplicate migration ordering and keeps deploy history truthful |
+| L-29 | Migration numbers follow actual execution order; Production MCP verified latest ledger `20260621104056`/`011`, so Factor F reserves `012`/`013`/`014` and Master Catalog Phase 4 starts at `015+` | Prevents duplicate migration ordering and keeps deploy history truthful |
 
 ## 3. Pending owner/data decisions
 
@@ -83,7 +83,7 @@ pending decisions are recorded.
 | P-14 | Approve feature enablement | Requires Production migration/deploy verification | Owner | User visibility | Not requested |
 | P-15 | Approve publication of the exact named catalog version and its final diff/count/hash | Migration/deploy approval does not imply publish approval | Owner | Production publication | Not requested |
 | P-16 | Schedule Supabase legacy API-key migration | Separate maintenance change; complete before provider retirement and after inventory/rehearsal | Owner + developer | Separate security window | Pending |
-| P-17 | Approve Factor F F0-F3 gates if Factor F must change now | Use ADR-005 and the separate Factor F CR; do F1/F2 before changing live Factor F values, do not backfill old BOQs by assumption, and confirm whether Factor F reserves the next migration numbers before Master Catalog Phase 4 | Owner + factor data custodian | Before any Factor F value change | Pending |
+| P-17 | Approve Factor F F0-F3 gates if Factor F must change now | Owner direction is Factor F before Master Catalog Phase 4. Use ADR-005 and the separate Factor F CR; do F1/F2 before changing live Factor F values, do not backfill old BOQs by assumption, reserve Factor F migrations `012`/`013`/`014`, shift Master Catalog Phase 4 to `015+`, and validate the 26 June 2026 source-table annex before F3 | Owner + factor data custodian | Before any Factor F value change | F0 approved for F1/F2; F3 approval pending |
 
 ## 4. Deferred decisions
 

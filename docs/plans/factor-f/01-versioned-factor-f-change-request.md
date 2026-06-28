@@ -7,6 +7,7 @@ calculation behavior, and controlled Factor F publication
 **Related ADR:** [ADR-005](../../02_architecture/ADR/ADR-005-versioned-factor-f-reference.md)
 **Readiness addendum:** [Factor F Track Readiness and Security Addendum](./02-readiness-and-security-addendum.md)
 **Implementation plan:** [Factor F Versioning Implementation Plan](./03-implementation-plan.md)
+**F3 source candidate:** [26 June 2026 Factor F Source Table Candidate](./04-source-table-2569-06-26.md)
 
 ## 1. Decision requested
 
@@ -17,8 +18,8 @@ publication.
 This CR can be approved at different depths. F1/F2 foundation work can start
 after the owner approves the policy and current-baseline verification approach.
 F3 publication cannot start until the new Factor F table, effective date,
-source reference, expected row count, formula/VAT decisions, and data custodian
-are recorded.
+source reference, expected row count, formula/VAT decisions, data custodian,
+and final row-level diff/hash approval are recorded.
 
 The owner is asked to confirm:
 
@@ -33,6 +34,18 @@ The owner is asked to confirm:
 6. The specific new Factor F table/source/effective date is approved before
    publication.
 
+Owner confirmations recorded on 2026-06-28:
+
+- Effective date for the 26 June 2026 source candidate is confirmed as
+  2026-06-26.
+- Source reference is confirmed as หนังสือกรมบัญชีกลาง ด่วนที่สุด ที่ กค
+  0433.2/ว 481 ลงวันที่ 26 มิถุนายน 2569.
+- Owner will act as the row-level reviewer/data custodian for the F3 source
+  transcription, diff, and hash approval.
+- Official source document is retained outside the repository by owner/NT;
+  local files under `files/` are review copies and are not approved for commit
+  by this CR.
+
 ## 2. Recommended sequence for changing Factor F now
 
 | Step | Purpose | Production effect |
@@ -46,24 +59,36 @@ The owner is asked to confirm:
 Do F1 and F2 before changing any live Factor F values. F3 is the actual Factor F
 change.
 
-F3 can be scheduled before or after Master Catalog Phase 4 depending on business
-urgency. If the new Factor F is needed now, run F3 in its own approved window
-after F1/F2 verification. If it can wait, run Master Catalog Phase 4 application
-work first and publish the new Factor F afterward to reduce repeated RPC
-coordination. Do not silently combine Factor F publication with Master Catalog
-publication.
+Owner direction on 2026-06-28 is to do Factor F before Master Catalog Phase 4.
+Therefore the recommended path is F0 -> F1 -> F2 -> F3, then Master Catalog
+Phase 4. F3 still requires its own approved window after F1/F2 verification.
+Do not silently combine Factor F publication with Master Catalog publication.
 
 The current baseline row count is not a planning assumption. It must be
 recorded from the Production preflight query before F2; if the result differs
 from the expected current table, stop and reconcile before seeding.
 
+Supabase MCP verified Production on 2026-06-28: latest migration ledger is
+`20260621104056_master_catalog_phase1b_hardening` (`011`), `factor_reference`
+has 37 rows with no duplicate thresholds and no invalid required values, and
+Factor F version tables do not yet exist. Because Factor F is owner-selected
+before Master Catalog Phase 4, reserve:
+
+- `012_factor_f_version_foundation.sql`
+- `013_factor_f_seed_current_baseline.sql`
+- `014_factor_f_publish_2569_0_0.sql`
+
+Master Catalog Phase 4 database migrations therefore start at `015+`.
+
 ## 3. In scope
 
 - Additive Factor F version schema and singleton pointer.
-- `factor_reference_rows` preserves the current `factor_reference` numeric
-  columns: `cost_million`, `operation_percent`, `interest_percent`,
-  `profit_percent`, `total_expense_percent`, `factor`, `vat_percent`,
-  `factor_f`, `factor_f_rain_1`, and `factor_f_rain_2`.
+- `factor_reference_rows` preserves the calculation/reference columns required
+  by the source table: `cost_million`, `factor`, `vat_percent`, `factor_f`,
+  `factor_f_rain_1`, and `factor_f_rain_2`. Legacy/source-derived component
+  columns such as `operation_percent`, `interest_percent`, `profit_percent`,
+  and `total_expense_percent` may be retained as nullable metadata, but must
+  not be invented when absent from the approved source.
 - Initial current Factor F baseline version for future provenance.
 - New BOQ binding to the current Factor F pointer.
 - Calculation reads by `boq.factor_reference_version_id` when present.
@@ -74,7 +99,12 @@ from the expected current table, stop and reconcile before seeding.
   convention as Master Catalog publication.
 - The current interpolation formula and four-decimal truncation remain
   unchanged unless a separate calculation-rule decision approves otherwise.
+- The BOQ multiplier is the Thai source column `รวมในรูป Factor`, stored as
+  `factor`. The Thai source column `Factor F` is stored as `factor_f` for
+  reference/provenance and is not the main BOQ multiplier.
 - Source/approval/effective-date metadata for published Factor F versions.
+- Version-level source condition metadata for print/export text: advance
+  payment, retention, loan interest, and VAT.
 - Clear user-facing labels for legacy snapshot-only BOQs.
 
 ## 4. Explicitly out of scope
@@ -133,11 +163,14 @@ After F3:
 
 - [ ] F1 schema and app behavior are deployed and verified.
 - [ ] F2 current baseline version is seeded and pointer verification passes.
-- [ ] The new Factor F source document/effective date is approved.
+- [x] The new Factor F source document/effective date is approved for planning.
+      The current F3 candidate is the 26 June 2026 source table annex, and the
+      owner confirmed source/effective date as 2026-06-26.
 - [ ] Row-level diff from current baseline is reviewed.
 - [ ] Full-table validation and dataset hash pass.
 - [ ] Expected row count for the new source table is recorded and reconciled
-      against the approved source document.
+      against the approved source document. The supplied image has 36 visible
+      rows; this must be confirmed against the official source before publish.
 - [ ] Owner explicitly approves publishing the named Factor F version.
 
 ## 8. Acceptance criteria
@@ -157,7 +190,7 @@ After F3:
 
 | Gate | Role | Name | Decision | Timestamp | Evidence/reference |
 |---|---|---|---|---|---|
-| F0 approve ADR/CR | Owner |  | Pending |  |  |
+| F0 approve ADR/CR | Owner | Owner | Approve F0 for Factor F F1/F2 foundation only. F3 publication requires separate approval after production baseline audit, row-level diff, dataset hash, and final owner review. | 2026-06-28T20:08+07:00 | ADR-005, CR, Readiness Addendum, Implementation Plan reviewed and accepted. Source/effective date 2026-06-26, reference กค 0433.2/ว 481 confirmed. Owner as data custodian. |
 | F1 implement foundation | Owner |  | Not requested |  |  |
 | F2 seed current baseline | Owner |  | Not requested |  |  |
 | F3 publish new Factor F | Owner |  | Not requested |  |  |

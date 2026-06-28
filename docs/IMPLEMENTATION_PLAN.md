@@ -120,10 +120,11 @@ Phase 4 now includes stable identity, manual and fixed-profile Excel changes,
 full item history, immutable publish, official hashed Excel/PDF, and audited
 pointer restore. It has not started and requires owner approval.
 
-#### **Factor F Change Track — planned if Factor F must change now**
+#### **Factor F Change Track — owner-selected before Master Catalog Phase 4**
 
-Factor F changes are separate from Master Catalog Phase 4. If the owner wants
-to adjust Factor F now, run the F-track before changing live Factor F values:
+Factor F changes are separate from Master Catalog Phase 4. Owner direction on
+2026-06-28 is to run the F-track before Master Catalog Phase 4 and before
+changing live Factor F values:
 
 1. F0: approve
    [ADR-005](./02_architecture/ADR/ADR-005-versioned-factor-f-reference.md),
@@ -135,20 +136,28 @@ to adjust Factor F now, run the F-track before changing live Factor F values:
 5. F4: add duplicate/reprice UX so old project data can become a new BOQ with
    the latest Factor F by explicit user action.
 
-If the new Factor F must be used immediately, F3 may run before Master Catalog
-Phase 4 rollout in a separate approved window after F1/F2 are verified. If it
-can wait, run Master Catalog Phase 4 application work first and publish F3
-afterward to reduce repeated RPC coordination. In both cases, Production
-Factor F publication and Master Catalog publication should use separate
-approval windows.
+The current F3 source candidate is the 26 June 2026 Factor F table recorded in
+[docs/plans/factor-f/04-source-table-2569-06-26.md](./plans/factor-f/04-source-table-2569-06-26.md).
+Owner confirmed effective date 2026-06-26 and source reference กค
+0433.2/ว 481 on 2026-06-28. F3 still needs final row transcription review,
+diff/hash approval, and a separate Production window after F1/F2 are verified.
+Production Factor F publication and Master Catalog publication should use
+separate approval windows.
 
-Migration numbering follows execution order. The current repository ends at
-`migrations/011_master_catalog_phase1b_hardening.sql`; if Factor F goes first,
-Factor F F1/F2 should reserve `012` and `013`, and Master Catalog Phase 4 moves
-to later numbers. If Master Catalog Phase 4 goes first, Factor F uses the next
-available numbers after Phase 4. Local implementation does not affect users;
-Production F1/F2 should be a controlled additive migration/deploy window, and
-F3 changes only the default Factor F for newly created BOQs.
+Migration numbering follows execution order. Supabase MCP verified Production
+on 2026-06-28: the latest applied ledger entry is
+`20260621104056_master_catalog_phase1b_hardening`, corresponding to
+`migrations/011_master_catalog_phase1b_hardening.sql`. Because Factor F is now
+owner-selected before Master Catalog Phase 4, reserve:
+
+- `migrations/012_factor_f_version_foundation.sql`
+- `migrations/013_factor_f_seed_current_baseline.sql`
+- `migrations/014_factor_f_publish_2569_0_0.sql`
+
+Master Catalog Phase 4 database migrations must therefore start at `015+`.
+Local implementation does not affect users; Production F1/F2 should be a
+controlled additive migration/deploy window, and F3 changes only the default
+Factor F for newly created BOQs.
 
 Detailed execution is governed by
 [docs/plans/factor-f/03-implementation-plan.md](./plans/factor-f/03-implementation-plan.md).

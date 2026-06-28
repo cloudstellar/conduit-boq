@@ -57,6 +57,12 @@ Production migration ledger includes:
 - `20260621052517_master_catalog_phase1a_versioning`
 - `20260621104056_master_catalog_phase1b_hardening`
 
+Supabase MCP verified on 2026-06-28 that `20260621104056` / root migration
+`011` is the latest applied migration. Owner direction is to ship Factor F
+before Master Catalog Phase 4, reserving root migrations `012`, `013`, and
+`014` for the Factor F track. Master Catalog Phase 4 database migrations start
+at `015+`.
+
 The previous P0 → 1A → 2 → 1B change is complete. Phase 4 has not started.
 
 ## 3. Business outcome

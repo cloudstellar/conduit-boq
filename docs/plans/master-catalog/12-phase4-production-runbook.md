@@ -62,21 +62,26 @@ Stop immediately when any of these occurs:
 
 ## 5. Phase 4-0 — documentation and data decisions
 
-1. Record owner approval of ADR-004 and implementation/local-rehearsal CR gate.
-2. Review the 728-record reconciliation draft.
-3. Resolve `ITEM-0131` / `ITEM-0139`: retain both distinct identities or retire
+1. Confirm Factor F track status before scheduling any Master Catalog Phase 4
+   database migration. Owner direction on 2026-06-28 is Factor F first, so
+   Master Catalog Phase 4 migrations must start at `015+` after the planned
+   Factor F migrations `012`, `013`, and `014`, unless a later owner decision
+   explicitly changes the sequence.
+2. Record owner approval of ADR-004 and implementation/local-rehearsal CR gate.
+3. Review the 728-record reconciliation draft.
+4. Resolve `ITEM-0131` / `ITEM-0139`: retain both distinct identities or retire
    the erroneous duplicate in the candidate; never merge UUID/history.
-4. Correct/reject all 16 HDPE Crossing taxonomy conflicts.
-5. Allocate approved treatment for 20 Production-only rows.
-6. Keep 18 workbook-only rows deferred unless separate price authority exists.
-7. Approve the complete AAA/TTT dictionary and allocation rules.
-8. Approve parser, payload, error-code, and canonical-hash contract.
-9. Approve database/security, threat, and official-export contracts.
-10. Provide truthful publication metadata for legacy `2568.0.0`; do not invent
+5. Correct/reject all 16 HDPE Crossing taxonomy conflicts.
+6. Allocate approved treatment for 20 Production-only rows.
+7. Keep 18 workbook-only rows deferred unless separate price authority exists.
+8. Approve the complete AAA/TTT dictionary and allocation rules.
+9. Approve parser, payload, error-code, and canonical-hash contract.
+10. Approve database/security, threat, and official-export contracts.
+11. Provide truthful publication metadata for legacy `2568.0.0`; do not invent
     an approval reference or effective date.
-11. Confirm `/CI/` is excluded from commits and identify approved derivative
+12. Confirm `/CI/` is excluded from commits and identify approved derivative
    fonts/logo assets.
-12. Complete the Phase 4 verification template baseline section.
+13. Complete the Phase 4 verification template baseline section.
 
 **Exit gate:** All documents have owner/reviewer decisions; no unresolved row
 or taxonomy blocker.

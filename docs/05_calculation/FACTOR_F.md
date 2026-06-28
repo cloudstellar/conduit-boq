@@ -22,6 +22,12 @@ It is applied to the Grand Total before VAT.
 ระบบนี้ใช้คอลัมน์ `factor` เป็นค่า **"รวมในรูป Factor"** จากตาราง Factor F งานก่อสร้างทาง
 เช่น ช่วงค่างาน 30-40 ล้านบาทใช้ `factor` ไม่ใช่คอลัมน์ `factor_f`.
 
+> Pending 2026-06-28 Factor F update:
+> the owner supplied a 26 June 2026 source candidate. It keeps the same
+> calculation contract: use `รวมในรูป Factor` as `factor`; do not use the Thai
+> column `Factor F` as the main BOQ multiplier. The candidate is recorded in
+> [docs/plans/factor-f/04-source-table-2569-06-26.md](../plans/factor-f/04-source-table-2569-06-26.md).
+
 | cost_million | factor | factor_f |
 |--------------|--------|----------|
 | 5            | 1.2750 | 1.3642   |

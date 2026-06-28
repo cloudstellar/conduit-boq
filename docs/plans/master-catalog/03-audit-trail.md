@@ -182,6 +182,11 @@
 | **v42** | **เพิ่ม Factor F implementation plan แบบ no-assumption: non-negotiable rules, F0-F4 gates, migration/app/test matrix, rollback/forward-fix, และ prompt rules สำหรับ AI/dev agent** | ✅ |
 | **v43** | **ปิด minor review gaps: ADR-005 ระบุ Factor F version string แบบ `major.minor.patch` และ Architecture Plan ชี้ไปยัง Factor F CR/implementation plan** | ✅ |
 | **v44** | **Owner review reconciliation: ตัด row count ที่ยังไม่ query ออกจาก assumption, ระบุ migration numbers ตาม execution order, และเพิ่ม user-impact note ระหว่าง Factor F implementation/F3 publish** | ✅ |
+| **v45** | **Owner supplied 26 มิถุนายน 2569 Factor F table; plan now selects Factor F before MC Phase 4, records `รวมในรูป Factor -> factor`, 36 visible rows, and blocks invented component-percent fields** | ✅ |
+| **v46** | **F0 readiness review follow-up: add version-level source condition metadata for advance payment, retention, loan interest, and VAT so print/export no longer hardcode 7% interest** | ✅ |
+| **v47** | **Owner confirmations: effective date 2026-06-26, source reference กค 0433.2/ว 481, owner as reviewer, and official PDF retained outside repository** | ✅ |
+| **v48** | **Production Supabase MCP verification: latest ledger `20260621104056`/`011`, `factor_reference` 37 rows/no duplicates/no invalid rows, no Factor F version tables yet, BOQ snapshots 70 complete / 136 incomplete; reserve FF `012`/`013`/`014` and MC Phase 4 `015+`** | ✅ |
+| **v48** | **F0 approved: ADR-005 status changed to Accepted, CR approval gate recorded with F1/F2 foundation scope, F3 requires separate approval after baseline audit/diff/hash/owner review** | ✅ |
 
 ---
 
@@ -292,7 +297,11 @@ invalidation is required.
 | **[v30] PN6 count** | **ฐานปัจจุบันที่เอกสารอ้างอิงคือ 710 rows** | เดิม 682 + PN6 28; refresh ผ่าน authenticated SQL/MCP ก่อน execution window |
 | **[v31] Factor F approval gate** | **ตรวจทั้งตาราง ไม่ใช่แค่ 30M/40M** | Factor F ผิดแถวเดียวทำให้ BOQ ในช่วงค่างานนั้นผิดได้ จึงต้องใช้ full-table checksum และ row-level review ถ้า checksum เปลี่ยน |
 | **[v40] Factor F versioning track** | **ทำ Factor F เป็น reference version แยกจาก Master Catalog; seed current baseline สำหรับ BOQ ใหม่เท่านั้น ไม่ backfill BOQ เก่าแบบเดา** | เจ้าของต้องการปรับ Factor F ตอนนี้ จึงต้องมี F0-F3 gate ก่อนเปลี่ยน live factor values |
-| **[v44] Migration ordering** | **เลข migration ของ Factor F และ Master Catalog ต้องเดินตามลำดับ execution จริง** | ถ้า Factor F F1/F2 ทำก่อนจะใช้เลข root ถัดไป และ Master Catalog Phase 4 เลื่อนไปเลขหลังจากนั้น; ถ้า Phase 4 ทำก่อน Factor F ก็เลื่อนตาม |
+| **[v44] Migration ordering** | **เลข migration ของ Factor F และ Master Catalog ต้องเดินตามลำดับ execution จริง** | v48 ยืนยันจาก Production แล้วว่า Factor F ใช้ `012`/`013`/`014` และ Master Catalog Phase 4 เริ่ม `015+` |
+| **[v45] New Factor F source** | **ใช้ `รวมในรูป Factor` จากตาราง 26 มิถุนายน 2569 เป็น `factor` และให้ Factor F track มาก่อน MC Phase 4** | รูปที่ owner ส่งมี 36 visible rows และไม่มี operation/profit/total_expense รายแถว จึงต้อง validate source/hash และห้ามเดาค่าที่ไม่มีในตาราง |
+| **[v46] Factor condition metadata** | **เก็บ advance payment, retention, loan interest, และ VAT เป็น version-level metadata** | print/export ปัจจุบัน hardcode ดอกเบี้ย 7% แต่ source 26 มิถุนายน 2569 ระบุ 6%; F1 ต้องอ่านจาก metadata |
+| **[v47] Owner F3 source confirmations** | **effective date/source reference ยืนยันแล้ว แต่ F3 ยังต้องรอ diff/hash approval** | เอกสารตัวจริงเก็บภายนอกโดย owner/NT และไม่ commit `files/` โดยปริยาย |
+| **[v48] Production migration order** | **Factor F uses root migrations `012`/`013`/`014`; Master Catalog Phase 4 moves to `015+`** | Supabase MCP production ledger verified `011` as latest and no Factor F version tables exist yet |
 | **[v32/v33] Version numbering** | **เริ่ม Master Catalog ที่ `2568.0.0`; อนาคตกำหนดปีเริ่มใช้งานได้ เช่น `2570.0.0`** | ใช้ปี พ.ศ. ที่ owner กำหนดให้เป็นปีเริ่มใช้งานเป็น segment แรก และใช้ revision/patch ตามหลัก SemVer-style; ไม่ใช้ 4-part key เพราะ schema และ convention ปัจจุบันคือ `major.minor.patch` |
 | **[v34] Item code governance** | **`item_code` เป็น identity ของรายการใน catalog version** | ห้ามใช้ `item_code` เป็นลำดับแสดงผลหรือ reuse ความหมายใหม่; การเพิ่ม/แก้/renumber หลัง active ต้องมี version bump และ audit/mapping ตามระดับผลกระทบ |
 | **[v35] Structured item codes** | **รองรับรหัสอนาคต เช่น `CIC-PVC-001`** | ใช้ได้เป็น approved taxonomy ของ catalog version ใหม่ แต่ต้องมี dictionary/validation และไม่ให้แอป parse string เป็น business logic โดยไม่มี metadata |
@@ -382,6 +391,10 @@ invalidation is required.
 | **76** | **[v36] Skill-backed alternatives/risk analysis** | ✅ | ✅ | ✅ |
 | **77** | **[v40] ADR-005 Factor F versioned reference / no guessed legacy backfill** | ✅ | ✅ | ✅ |
 | **78** | **[v44] Factor F row-count assumption removal / migration ordering / user-impact note** | ✅ | ✅ | ✅ |
+| **79** | **[v45] 26 June 2026 Factor F source candidate / Factor F-first sequencing / multiplier column mapping** | ✅ | ✅ | ✅ |
+| **80** | **[v46] Version-level Factor F condition metadata for print/export source text** | ✅ | ✅ | ✅ |
+| **81** | **[v47] Owner effective-date/source-reference/reviewer confirmations and external evidence retention** | ✅ | ✅ | ✅ |
+| **82** | **[v48] Production Supabase MCP migration/schema verification and FF/MC migration number shift** | ✅ | ✅ | ✅ |
 
 ---
 

@@ -1,6 +1,6 @@
 # ADR-005: Versioned Factor F Reference and Legacy Snapshot Policy
 
-**Status:** Proposed — owner approval required before changing Factor F data
+**Status:** Accepted — F0 approved on 2026-06-28 for F1/F2 foundation; F3 requires separate approval
 **Date:** 2026-06-28
 **Decision makers:** Owner, Development Team
 **Related change request:** [Versioned Factor F Change Request](../../plans/factor-f/01-versioned-factor-f-change-request.md)
@@ -36,13 +36,17 @@ a fourth version segment without a separate schema decision.
 Create a dedicated Factor F version model:
 
 - `factor_reference_versions`: version metadata, status, source/effective
-  date, approval evidence, row count, and canonical dataset hash.
+  date, approval evidence, row count, canonical dataset hash, and source
+  condition parameters used for print/export text such as advance payment,
+  retention, loan interest, and VAT.
 - `factor_reference_rows`: row data scoped by `version_id`, preserving the
-  current `factor_reference` numeric contract: `cost_million`,
-  `operation_percent`, `interest_percent`, `profit_percent`,
-  `total_expense_percent`, `factor`, `vat_percent`, `factor_f`,
-  `factor_f_rain_1`, and `factor_f_rain_2`. Add `display_order` only for
-  deterministic review/export; do not use it for calculation.
+  current calculation contract: `cost_million`, `factor`, `vat_percent`,
+  `factor_f`, `factor_f_rain_1`, and `factor_f_rain_2`. Legacy/source-derived
+  component columns such as `operation_percent`, `interest_percent`,
+  `profit_percent`, and `total_expense_percent` may be retained as nullable
+  metadata when the approved source does not provide row-level values. Add
+  `display_order` only for deterministic review/export; do not use it for
+  calculation.
 - `factor_reference_default_version`: singleton pointer table, matching the
   proven `price_list_default_version` pattern rather than a mutable
   `is_default` flag.
@@ -85,7 +89,7 @@ Because the owner wants to adjust Factor F now, do not update
 |---|---|---|
 | F0 | Approve this ADR, source document, effective date, and owner evidence for the Factor F change | No data change |
 | F1 | Deploy additive Factor F version foundation and compatible app changes | New BOQs can bind a factor version; old BOQs stay snapshot-only |
-| F2 | Seed the current 37-row Factor F table as the initial published factor version for future BOQs only | No legacy BOQ backfill |
+| F2 | Seed the audited current Factor F table as the initial published factor version for future BOQs only | No legacy BOQ backfill |
 | F3 | Create and publish the new Factor F version, then move the factor default pointer | New BOQs use the new Factor F version |
 | F4 | Add or refine duplicate/reprice UX for old project data | Users create a new estimate instead of mutating history |
 
@@ -136,6 +140,10 @@ not share a silent combined window with Master Catalog publication.
 9. F1 must update edit, print, and Excel export paths together so legacy BOQs
    without valid snapshots fail closed instead of falling back to the latest
    live reference table.
+10. The BOQ multiplier source is the Thai column `รวมในรูป Factor`, stored as
+    `factor`. The Thai column `Factor F` is stored as `factor_f` for
+    provenance/reference and is not the main multiplier unless a separate
+    calculation-rule decision changes that behavior.
 
 ## References
 
@@ -143,4 +151,5 @@ not share a silent combined window with Master Catalog publication.
 - [ADR-003: Master Catalog Rollout and Version Numbering](./ADR-003-master-catalog-rollout-and-version-numbering.md)
 - [ADR-004: Phase 4 Master Catalog Governance and Official Publication](./ADR-004-phase4-catalog-governance-and-official-publication.md)
 - [Versioned Factor F Change Request](../../plans/factor-f/01-versioned-factor-f-change-request.md)
+- [26 June 2026 Factor F Source Table Candidate](../../plans/factor-f/04-source-table-2569-06-26.md)
 - [Master Catalog Phase 4 Change Request](../../plans/master-catalog/09-phase4-change-request.md)

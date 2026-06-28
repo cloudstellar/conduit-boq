@@ -5,6 +5,7 @@
 **Authority:** [ADR-005](../../02_architecture/ADR/ADR-005-versioned-factor-f-reference.md)
 and the [Factor F Change Request](./01-versioned-factor-f-change-request.md)
 **Implementation plan:** [Factor F Versioning Implementation Plan](./03-implementation-plan.md)
+**F3 source candidate:** [26 June 2026 Factor F Source Table Candidate](./04-source-table-2569-06-26.md)
 
 ## 1. Readiness interpretation
 
@@ -23,19 +24,38 @@ but F1/F2 planning can proceed after F0 policy approval.
 Do not treat any remembered row count as authority. The baseline count becomes
 authoritative only when the Production preflight query is recorded for F2.
 
+Read-only Supabase MCP inspection on 2026-06-28 recorded the current
+Production state:
+
+| Check | Production result |
+|---|---|
+| Latest migration ledger | `20260621104056_master_catalog_phase1b_hardening` / root migration `011` |
+| `factor_reference` rows | 37 |
+| Duplicate `cost_million` thresholds | 0 |
+| Invalid required Factor F rows | 0 |
+| Factor F version tables | Not present |
+| `boq.factor_reference_version_id` | Not present |
+| BOQs with complete Factor F snapshots | 70 |
+| BOQs with incomplete/invalid Factor F snapshots | 136 |
+| Legacy `factor_reference` grants | Broad grants exist for `anon`, `authenticated`, and `service_role`; do not copy to new tables |
+
+Re-run these checks immediately before F2/Production execution; these recorded
+values are planning evidence, not a substitute for execution-window preflight.
+
 ## 2. Business inputs required before F3
 
 | Input | Required before | Notes |
 |---|---|---|
 | Current baseline export | F2 | Current Production `factor_reference` rows and checksum |
-| New Factor F table | F3 | Approved source table; do not type values manually without review |
-| Effective date | F3 | Date new BOQs should start using the new default pointer |
-| Source/approval reference | F3 | Letter number, source document, or equivalent approval evidence |
-| Data custodian | F3 | Person/team responsible for row-level verification |
-| Expected row count | F3 | Must reconcile with source document |
+| New Factor F table | F3 | Current owner-supplied candidate is the 26 June 2026 source table annex; do not type values manually without independent review |
+| Effective date | F3 | Confirmed by owner on 2026-06-28 as 2026-06-26 for the 26 June 2026 candidate |
+| Source/approval reference | F3 | Confirmed by owner: กค 0433.2/ว 481 ลงวันที่ 26 มิถุนายน 2569; official PDF retained outside repository by owner/NT |
+| Data custodian | F3 | Owner will review row-level transcription, diff, and hash before publication |
+| Expected row count | F3 | Supplied image has 36 visible rows; must reconcile with source document |
+| Source condition parameters | F3 | Confirm advance payment 0%, retention 0%, loan interest 6% per year, and VAT 7% for the 26 June 2026 candidate |
 | Calculation formula decision | F3 | Existing interpolation and truncate-to-4-decimals remain unless separately approved |
 | VAT decision | F3 | Confirm whether `vat_percent` remains 7% |
-| Column decision | F3 | Confirm whether `factor_f_rain_1` and `factor_f_rain_2` remain required |
+| Column decision | F3 | Confirm `รวมในรูป Factor -> factor` is the BOQ multiplier; confirm `factor_f_rain_1` and `factor_f_rain_2` remain required; do not invent row-level component percentages missing from the source |
 
 ## 3. Technical preflight before F1
 
@@ -169,6 +189,8 @@ F1 is not complete until all of these are true:
 - Print uses valid saved snapshots for legacy BOQs and fails closed when the
   snapshot is incomplete or invalid.
 - Excel export follows the same rules as print.
+- Print and Excel condition text reads Factor F version metadata instead of
+  hardcoded source parameters such as loan interest.
 - No user-facing print/export path falls back to the latest live factor table
   for a legacy BOQ with invalid snapshots.
 
@@ -181,6 +203,7 @@ F1 is not complete until all of these are true:
 | Version-bound BOQ reads the bound factor rows | Integration |
 | Valid legacy snapshot prints/exports successfully | Integration |
 | Invalid legacy snapshot fails closed | Unit/integration |
+| Print/Excel condition text uses version metadata for loan interest/VAT | Snapshot/integration |
 | `save_boq_with_routes` preserves the factor version | DB |
 | Publishing a new factor version does not change existing BOQ totals | Integration |
 | Singleton pointer cannot be deleted or point to draft | DB |

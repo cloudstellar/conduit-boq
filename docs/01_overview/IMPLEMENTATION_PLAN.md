@@ -75,13 +75,30 @@ Detailed execution plan: [Master Catalog v26](../plans/master-catalog/02-impleme
 8. ✅ Run smoke tests and delta reconciliation.
 9. ✅ Apply Phase 1B `NOT NULL` and immutable-version hardening.
 
+### 🚧 Factor F Track (OWNER-SELECTED BEFORE PHASE 4)
+
+Owner direction on 2026-06-28 is to implement Factor F versioning before
+Master Catalog Phase 4. Supabase MCP verified Production latest ledger
+`20260621104056_master_catalog_phase1b_hardening` (`011`), with
+`factor_reference` at 37 rows and no Factor F version tables yet.
+
+Planned Factor F migrations:
+
+- `012_factor_f_version_foundation`
+- `013_factor_f_seed_current_baseline`
+- `014_factor_f_publish_2569_0_0`
+
+The official source is กค 0433.2/ว 481 effective 2026-06-26; F3 publication
+still requires row-level diff, dataset hash, and final owner review.
+
 ### 🚧 Phase 4: Catalog Administration and Official Publication (PLANNED)
 
 Admin manual change/import, stable identity, item history, catalog publish,
 official stamped Excel/PDF, and audited pointer restore require the separate
 [Phase 4 Change Request](../plans/master-catalog/09-phase4-change-request.md).
 Implementation/local rehearsal, Production migration, deploy, enablement, and
-publication each have explicit approval gates.
+publication each have explicit approval gates. Because Factor F now ships
+first, Master Catalog Phase 4 database migrations start at `015+`.
 
 Start review from the
 [Phase 4 Review Guide](../plans/master-catalog/00-phase4-review-guide.md).
@@ -109,6 +126,10 @@ Start review from the
 | 010_master_catalog_phase1a_versioning | Master Catalog v26 nullable versioning + historical backfill | ✅ Production 2026-06-21 |
 | 010a_master_catalog_phase1a_indexes | Master Catalog v26 concurrent index runbook | ✅ 4 indexes valid/ready 2026-06-21 |
 | 011_master_catalog_phase1b_hardening | Master Catalog v26 BOQ version contract hardening | ✅ Production 2026-06-21 |
+| 012_factor_f_version_foundation | Factor F version tables + BOQ factor version FK | Planned before MC Phase 4 |
+| 013_factor_f_seed_current_baseline | Seed audited current Factor F baseline | Planned before MC Phase 4 |
+| 014_factor_f_publish_2569_0_0 | Publish Factor F `2569.0.0` from ว 481 source | Planned before MC Phase 4 |
+| 015+_master_catalog_phase4_* | Master Catalog Phase 4 DB migrations | Planned after Factor F |
 
 ---
 
