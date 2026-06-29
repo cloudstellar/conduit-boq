@@ -963,7 +963,7 @@ The complete contract and mandatory golden hash are in the
 Every official Excel/PDF export includes:
 
 - NT logo and catalog title
-- Version string, for example `2569.0.0`
+- Catalog version string, not Factor F version, for example `2568.1.0`
 - Status: Published; current-default status shown separately
 - Effective date
 - Approval reference and approval document date
@@ -989,8 +989,8 @@ Published exports:
 Suggested filenames:
 
 ```text
-NT-Master-Catalog-2569.0.0-20260622.xlsx
-NT-Master-Catalog-2569.0.0-20260622.pdf
+NT-Master-Catalog-v2568.1.0-20260622.xlsx
+NT-Master-Catalog-v2568.1.0-20260622.pdf
 ```
 
 ### 6.3 Excel export
@@ -1609,6 +1609,13 @@ Do not advance when any gate fails:
     rules.
 15. **[Architecture Review Disposition](./21-phase4-architecture-review-disposition.md)** —
     accepted/rejected independent-review findings and evidence for Revision 8.
+16. **[Post-Factor-F Adjustment Plan](./22-phase4-post-factor-f-adjustment-plan.md)** —
+    difficulty assessment, two-axis impact matrix, adjusted implementation
+    sequence, required tests, and abort conditions after the completed Factor F
+    rollout.
+17. **[Implementation Execution Pack](./23-phase4-implementation-execution-pack.md)** —
+    work-package checklist, file targets, test gates, owner-decision gates, and
+    start/stop rules for implementation/local rehearsal.
 
 The
 [Supabase API Key Migration Change Request](../security/01-supabase-api-key-migration-change-request.md)

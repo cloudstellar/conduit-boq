@@ -54,6 +54,9 @@ change only application code or SQL.
 | L-27 | Phase 4 Core does not rebase stale drafts; create a new draft from Current and deliberately reapply still-approved changes while retaining the stale draft read-only/nonpublishable | Avoids hidden three-way merge semantics and preserves an explicit audit trail |
 | L-28 | Factor F remains outside Master Catalog price versioning and follows ADR-005; old BOQs are not backfilled with a guessed factor version | Prevents false provenance and keeps Factor F policy changes independent from price catalog publication |
 | L-29 | Migration numbers follow actual execution order; Factor F applied as `012`/`013`/`014`/`015` on 2026-06-29, so Master Catalog Phase 4 starts at `016+` | Prevents duplicate migration ordering and keeps deploy history truthful |
+| L-30 | Catalog and Factor F version strings are independent namespaces; labels and official documents must say Catalog version vs Factor F version explicitly | Prevents mistaking catalog `2568.1.0` for Factor F `2569.0.0` |
+| L-31 | No Factor F publication is part of Master Catalog Phase 4 | MC approval cannot move the Factor F pointer, change Factor F rows, or bind old BOQs by assumption |
+| L-32 | Master Catalog dataset hashes and official catalog exports exclude Factor F rows, Factor F metadata, BOQ snapshots, and BOQ totals | Keeps catalog reproducibility scoped to price-list data and avoids cross-axis hash drift |
 
 ## 3. Pending owner/data decisions
 
@@ -67,7 +70,7 @@ pending decisions are recorded.
 
 | ID | Decision required | Current evidence/default recommendation | Owner | Due before | Status |
 |---|---|---|---|---|---|
-| P-01 | Approve ADR-004, Change Request, architecture Revision 8, DB/security contract, threat model, parser/hash spec, and export spec for implementation/local rehearsal | Approve together after review; this does not authorize Production | Owner | Phase 4A implementation | Pending |
+| P-01 | Approve ADR-004, Change Request, architecture Revision 8, DB/security contract, threat model, parser/hash spec, export spec, Post-Factor-F adjustment plan, and Implementation Execution Pack for implementation/local rehearsal | Approve together after review; this does not authorize Production | Owner | Phase 4A implementation | Pending |
 | P-02 | Decide whether `ITEM-0131` and `ITEM-0139` remain justified distinct items or which erroneous duplicate is retired in the candidate | Both receive distinct baseline identities; UUID/history merge is prohibited | Owner + data custodian | Candidate reconciliation freeze | Pending |
 | P-03 | Approve corrected canonical groups/codes for 16 HDPE Crossing rows | Reject current GIP candidates; use an approved HDPE classification | Owner + engineering data custodian | Candidate code freeze | Pending |
 | P-04 | Assign/approve canonical codes and groups for 20 Production-only rows | Retain all 20 and preserve Production values | Owner + data custodian | Candidate 710-row freeze | Pending |

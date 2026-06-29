@@ -37,9 +37,13 @@ catalog to roll back.
 - [Lean Threat Model](./18-phase4-threat-model.md)
 - [Decision Register](./19-phase4-decision-register.md)
 - [Official Export Specification](./20-phase4-official-export-spec.md)
+- [Architecture Review Disposition](./21-phase4-architecture-review-disposition.md)
+- [Post-Factor-F Adjustment Plan](./22-phase4-post-factor-f-adjustment-plan.md)
+- [Implementation Execution Pack](./23-phase4-implementation-execution-pack.md)
 - [Verification Report](./13-phase4-verification-report.md)
 - [Admin Operating Procedure](./15-phase4-admin-operating-procedure.md)
 - Reviewed migration SQL and file SHA-256
+- Supabase security/performance advisor baseline with known findings triaged
 - Fresh logical backup manifest and tested restore log
 - Approved runtime CI assets; `/CI/` source remains local-only
 
@@ -54,9 +58,17 @@ Stop immediately when any of these occurs:
 - a Production price/name/unit changes during code-only rollout;
 - a code maps to multiple identities or an identity duplicates inside a version;
 - a published baseline identity/code history would be merged or rewritten;
-- current pointer is missing, duplicated, or not the expected base;
+- current catalog pointer is missing, duplicated, or not the expected base;
+- Factor F default pointer, active-version row count/hash, grants, RLS, or
+  immutability trigger changes during a Master Catalog step;
+- an existing BOQ `factor_reference_version_id` mutates, or a legacy BOQ is
+  backfilled with a guessed Factor F version;
+- a Master Catalog export or canonical dataset hash includes Factor F rows,
+  Factor F metadata, BOQ snapshots, or BOQ totals;
 - anonymous/non-admin access succeeds unexpectedly;
-- migration, test, build, advisor, smoke, hash, or export gate fails;
+- migration, test, build, smoke, hash, or export gate fails;
+- Supabase advisors show a new or untriaged security/performance finding for
+  the Phase 4 change set;
 - unexpected active admin activity or simultaneous catalog edit is detected;
 - owner approval is absent for the next Production action.
 
@@ -237,8 +249,7 @@ Also verify:
 - migration ledger matches repository history;
 - no Phase 4 object already exists unexpectedly;
 - all current RLS/security invariants from Phase 1B remain intact;
-- no Factor F change is scheduled during the window unless a separate approved
-  Factor F CR explicitly defines and verifies that coupling;
+- no Factor F change is scheduled or bundled into this Master Catalog window;
 - `factor_reference_versions`, `factor_reference_rows`,
   `factor_reference_default_version`, and BOQ Factor F immutability triggers are
   present and will not be modified by the Master Catalog migration;

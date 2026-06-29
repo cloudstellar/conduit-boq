@@ -18,11 +18,11 @@ correctness. The owner also requires published data to be usable immediately as
 an official reference through system-generated Excel and PDF exports.
 
 Factor F governance is deliberately separate from Master Catalog price
-governance. If Factor F must change before or during Phase 4, it follows
+governance. The Factor F rollout needed before Phase 4 is complete under
 [ADR-005](./ADR-005-versioned-factor-f-reference.md) and the separate
-Factor F Change Request. Phase 4 must not update Factor F rows in place, infer
-old BOQ factor provenance, or mix a catalog publication window with a Factor F
-publication window unless both change requests explicitly approve that coupling.
+Factor F Change Request. Phase 4 must preserve that completed baseline: do not
+update Factor F rows in place, infer old BOQ factor provenance, or move the
+Factor F pointer under a Master Catalog approval.
 
 The candidate workbook contains a useful `AAA-TTT-###` taxonomy, but it has 708
 rows rather than Production's 710. Reconciliation found 42 price differences,
@@ -200,9 +200,8 @@ These omissions are intentional scope control, not missing architecture.
 - The stricter draft/reason/diff/approval/publish workflow requires admin
   training and disciplined evidence entry compared with direct edits.
 - A later K-formula feature needs its own governance decision.
-- Factor F versioning/change-now work is separate. It may run before Phase 4
-  publication, but it must not rewrite historical BOQs or be hidden inside a
-  Master Catalog price release.
+- Factor F versioning/change-now work is complete and separate. Phase 4 runs
+  after that closeout and does not carry additional Factor F work.
 
 ## Alternatives rejected
 
@@ -252,9 +251,11 @@ Production migration, feature enablement, and catalog publication each require
 separate explicit owner approval. Approval of this ADR or P-01 alone does not
 authorize Production execution.
 
-An immediate Factor F change has its own F0-F3 gates under ADR-005. The safest
-ordering is to approve and deploy the Factor F foundation before changing live
-Factor F values, then proceed with Master Catalog Phase 4 in a separate window.
+The immediate Factor F rollout completed before Master Catalog Phase 4. Root
+migrations `012` through `015` are applied, current Factor F default is
+`2569.0.0`, and legacy BOQs were not version-backfilled. Master Catalog Phase 4
+therefore proceeds on top of that completed Factor F baseline in a separate
+window. Factor F work is not part of Master Catalog Phase 4.
 
 ## References
 
@@ -264,6 +265,7 @@ Factor F values, then proceed with Master Catalog Phase 4 in a separate window.
 - [Versioned Factor F Change Request](../../plans/factor-f/01-versioned-factor-f-change-request.md)
 - [Phase 4 architecture plan](../../plans/master-catalog/08-phase4-architecture-ci-plan.md)
 - [Phase 4 reconciliation report](../../plans/master-catalog/11-phase4-reconciliation-report.md)
+- [Post-Factor-F adjustment plan](../../plans/master-catalog/22-phase4-post-factor-f-adjustment-plan.md)
 - [Parser and canonical hash specification](../../plans/master-catalog/14-phase4-parser-and-canonical-hash-spec.md)
 - [Database and security contract](../../plans/master-catalog/17-phase4-database-security-contract.md)
 - [Lean threat model](../../plans/master-catalog/18-phase4-threat-model.md)

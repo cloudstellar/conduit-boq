@@ -215,7 +215,7 @@ Use only when a published current version must stop being used for new BOQs.
 | Draft base stale | Create a new draft from Current and reapply approved changes; do not publish/rebase the stale draft |
 | Publish evidence required | Complete real approval metadata; do not use placeholder text |
 | Export hash mismatch | Do not distribute; report with request/version/hash details |
-| Factor F change requested | Use the ADR-005 Factor F Change Request; do not edit Master Catalog data or legacy BOQs |
+| Factor F change requested | Out of scope for this procedure; do not edit Master Catalog data, Factor F data, or legacy BOQs |
 
 ## 14. Prohibited actions
 

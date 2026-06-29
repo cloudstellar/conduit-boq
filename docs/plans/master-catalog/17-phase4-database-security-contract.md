@@ -4,6 +4,8 @@
 
 **Prepared:** 2026-06-22
 
+**Last updated:** 2026-06-29 after completed Factor F rollout
+
 **Production project:** `otlssvssvgkohqwuuiir`
 
 **Applies to:** Phase 4A additive database foundation and every Phase 4 write
@@ -61,9 +63,7 @@ catalog mutation with exact functions and revokes direct application writes.
 
 Current Factor F version tables remain separate reference data outside
 `price_list_versions`. Do not change Factor F values under this Master Catalog
-contract. If Factor F must change again, apply ADR-005 first: use the dedicated
-factor version/pointer model, keep old BOQs snapshot-only unless exact source
-evidence exists, and publish the new factor version through its own gate.
+contract. Factor F work is outside the Master Catalog Phase 4 approval path.
 
 Phase 4 implementation must treat the Factor F rollout as existing Production
 state. Migration `016+` may depend on the presence of
@@ -139,7 +139,7 @@ Rules:
 - The 26 June 2026 Factor F source-table annex belongs to the Factor F track;
   missing row-level component percentages must not be invented to satisfy a
   legacy shape.
-- Factor F publication must not be hidden inside a Master Catalog migration or
+- No Factor F publication may be hidden inside a Master Catalog migration or
   catalog publish transaction.
 - If Phase 4 replaces or wraps `save_boq_with_routes`, it must preserve the
   existing BOQ Factor F contract: do not update
@@ -640,3 +640,4 @@ migration.
 - [PostgreSQL explicit locking](https://www.postgresql.org/docs/current/explicit-locking.html)
 - [Parser and canonical hash specification](./14-phase4-parser-and-canonical-hash-spec.md)
 - [Phase 4 verification report](./13-phase4-verification-report.md)
+- [Post-Factor-F adjustment plan](./22-phase4-post-factor-f-adjustment-plan.md)

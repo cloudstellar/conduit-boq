@@ -68,6 +68,10 @@ through `015` are applied, current Factor F default is `2569.0.0`, and legacy
 BOQs were not backfilled with a guessed Factor F version. Master Catalog Phase
 4 database migrations start at `016+`.
 
+The detailed post-Factor-F difficulty assessment and adjusted implementation
+sequence are recorded in the
+[Post-Factor-F Adjustment Plan](./22-phase4-post-factor-f-adjustment-plan.md).
+
 Live BOQ counts can change while users continue working. The closeout count is
 evidence for the Factor F rollout, not a fixed Phase 4 preflight expectation.
 Every Production Phase 4 gate must record fresh live counts and the current
@@ -172,8 +176,8 @@ separate approved price authority. Production-only rows remain present.
 
 The separate Factor F track completed before Master Catalog Phase 4. Master
 Catalog local work may continue on top of that baseline, but Master Catalog
-publication and any future Factor F publication must not share one Production
-window unless both CRs explicitly approve it.
+Phase 4 has no Factor F publication, pointer movement, or row-value change in
+scope.
 
 | Phase | Purpose | Production effect |
 |---|---|---|
@@ -228,7 +232,7 @@ window unless both CRs explicitly approve it.
 | Existing BOQ regression | Low | High | Feature flag and full regression suite | Create/edit/print/export failure |
 | Legacy `is_default` becomes stale | Medium | Medium | Sync in publish/restore transaction | Pointer/flag mismatch |
 | Oversized payload fails unpredictably | Low | Medium | 750 KB application cap, tested error | Payload exceeds cap |
-| Factor F change hidden inside catalog work | Medium | High | ADR-005 and separate Factor F CR/gates | Any Factor F row/value change in this CR |
+| Factor F change hidden inside catalog work | Medium | High | Completed Factor F closeout is treated as a protected baseline; Phase 4 has no Factor F write path | Any Factor F row/value/pointer change in this CR |
 
 ## 11. Preconditions before implementation/local rehearsal
 
@@ -343,3 +347,5 @@ Detailed execution is in the
 - [Decision register](./19-phase4-decision-register.md)
 - [Official export specification](./20-phase4-official-export-spec.md)
 - [Architecture review disposition](./21-phase4-architecture-review-disposition.md)
+- [Post-Factor-F adjustment plan](./22-phase4-post-factor-f-adjustment-plan.md)
+- [Implementation execution pack](./23-phase4-implementation-execution-pack.md)

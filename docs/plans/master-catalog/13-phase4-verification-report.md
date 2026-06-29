@@ -34,6 +34,8 @@ blocking gate stops the rollout.
 | Implement/local rehearsal |  | Pending |  |  |
 | DB/security contract + threat model |  | Pending |  |  |
 | Official export specification |  | Pending |  |  |
+| Post-Factor-F Adjustment Plan reviewed |  | Pending |  |  |
+| Implementation Execution Pack reviewed |  | Pending |  |  |
 | Code dictionary |  | Pending |  |  |
 | Row reconciliation |  | Pending |  |  |
 | Production migration |  | Not requested |  |  |
@@ -56,7 +58,7 @@ Read-only Supabase MCP evidence on 2026-06-22:
 
 This is not a substitute for live preflight.
 
-Post-Factor-F rollout evidence on 2026-06-29:
+Post-Factor-F rollout closeout evidence on 2026-06-29:
 
 | Check | Observed result |
 |---|---:|
@@ -64,13 +66,16 @@ Post-Factor-F rollout evidence on 2026-06-29:
 | Price rows / default version | 710 / `2568.0.0` |
 | Factor F default version | `2569.0.0` |
 | Factor F active versions | `2566.0.0`, `2569.0.0` |
-| BOQs / BOQs with price version gap | 207 / 0 |
-| BOQs bound to Factor F version | 1 |
-| Legacy usable Factor F snapshots | 127 |
-| Legacy BOQs missing Factor F snapshot | 79 |
+| BOQs / BOQs with price version gap | 207 / 0 at closeout only |
+| BOQs bound to Factor F version | 1 at closeout only |
+| Legacy usable Factor F snapshots | 127 at closeout only |
+| Legacy BOQs missing Factor F snapshot | 79 at closeout only |
 
 These are point-in-time observations. Use them to understand the mixed BOQ
-population, not as fixed rollout expectations.
+population, not as fixed rollout expectations. Users may create BOQs after
+closeout, so every Phase 4 Production gate must use the live preflight table
+below as the source of truth for total BOQs, bound Factor F BOQs, and legacy
+snapshot states.
 
 ## 5. Fresh Production preflight
 
@@ -88,6 +93,8 @@ population, not as fixed rollout expectations.
 | Factor F version row counts/hashes | Match published metadata |  |  | Pending |
 | BOQ Factor F binding split | Recorded live; no unexplained mutation |  |  | Pending |
 | Legacy Factor F snapshot states | Recorded live; no partial repair regression |  |  | Pending |
+| Factor F pointer mutation plan | No Phase 4 step may change it |  |  | Pending |
+| Supabase advisor baseline | No new or untriaged Phase 4 security/performance finding |  |  | Pending |
 | Unexpected active admin activity | 0 |  |  | Pending |
 | Migration ledger drift | Latest includes Factor F `015`; no unexpected newer migration |  |  | Pending |
 
