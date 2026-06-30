@@ -58,7 +58,7 @@
 
 | เรื่อง | ผลถ้ายังไม่ตัดสินใจ |
 |---|---|
-| อนุมัติชุด P-01: Revision 8, ADR, CR และ contracts สำหรับ implementation/local rehearsal | ยังไม่เริ่ม Phase 4A |
+| อนุมัติชุด P-01: Revision 8, ADR, CR, Post-Factor-F plan, Implementation Execution Pack และ contracts สำหรับ implementation/local rehearsal | ยังไม่เริ่ม Phase 4A |
 | `ITEM-0131` / `ITEM-0139` จะคงทั้งคู่หรือ retire ตัวใด | candidate ยังล็อกไม่ได้; ห้าม merge UUID/history |
 | แก้รหัส HDPE Crossing 16 รายการอย่างไร | code dictionary ยัง publish ไม่ได้ |
 | รหัส canonical ของ Production-only 20 รายการ | candidate 710 แถวยังไม่ครบ |

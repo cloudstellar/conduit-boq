@@ -167,7 +167,7 @@ Goal: build catalog admin workflows while preserving current BOQ behavior.
 
 Required work:
 
-- Add `/admin/catalog` routes behind `catalog_admin_enabled`.
+- Add `/admin/master-catalog` routes behind `catalog_admin_enabled`.
 - Add version list/detail, draft clone, manual edit, import validation, diff,
   item history, publish, pointer restore, and official export.
 - Keep BOQ create/edit/duplicate/print/export flows working as they do now.

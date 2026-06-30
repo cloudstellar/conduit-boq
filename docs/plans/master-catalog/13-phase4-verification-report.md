@@ -58,7 +58,8 @@ Read-only Supabase MCP evidence on 2026-06-22:
 
 This is not a substitute for live preflight.
 
-Post-Factor-F rollout closeout evidence on 2026-06-29:
+Post-Factor-F rollout closeout evidence on 2026-06-29 from
+`docs/plans/factor-f/10-production-rollout-closeout.md`:
 
 | Check | Observed result |
 |---|---:|
@@ -66,8 +67,8 @@ Post-Factor-F rollout closeout evidence on 2026-06-29:
 | Price rows / default version | 710 / `2568.0.0` |
 | Factor F default version | `2569.0.0` |
 | Factor F active versions | `2566.0.0`, `2569.0.0` |
-| BOQs / BOQs with price version gap | 207 / 0 at closeout only |
-| BOQs bound to Factor F version | 1 at closeout only |
+| BOQs / BOQs with price version gap | 206 / 0 at closeout only |
+| Legacy BOQs bound to Factor F version by migration | 0 at closeout only |
 | Legacy usable Factor F snapshots | 127 at closeout only |
 | Legacy BOQs missing Factor F snapshot | 79 at closeout only |
 

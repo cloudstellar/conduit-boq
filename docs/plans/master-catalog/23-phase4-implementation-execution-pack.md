@@ -324,7 +324,7 @@ Export rules:
   effective date, approval refs, published timestamp/by, export timestamp/by,
   item count, and SHA-256;
 - filename follows `NT-Master-Catalog-v{version}-{effective-date}.{ext}`;
-- draft exports are admin-only and visibly marked `DRAFT - ห้ามใช้อ้างอิง`;
+- draft exports are admin-only and visibly marked `DRAFT – ห้ามใช้อ้างอิง`;
 - Excel includes canonical reconstruction sheet/fields per export spec;
 - PDF is server-verified and searchable;
 - Factor F rows/metadata and BOQ data are never included in catalog export
@@ -477,7 +477,7 @@ Before asking for code review:
 
 Recommended next action:
 
-1. Owner reviews docs `08` through `23` in the Review Guide order.
+1. Owner reviews the Phase 4 authority documents in the Review Guide order.
 2. Owner approves P-01 for implementation/local rehearsal only.
 3. Implement WP-0 through WP-8.
 4. Request separate Production approvals only after WP-8 passes.

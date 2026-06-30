@@ -1176,26 +1176,42 @@ this authorization matrix.
 
 ### Routes
 
-`/admin/catalog`
+`/admin/master-catalog`
 
 - Current default version
 - Draft, published, and archived versions
 - Item count, effective date, approval reference, and dataset hash
 - Download Excel and print/save PDF actions
 
-`/admin/catalog/[versionId]`
+`/admin/master-catalog/versions`
+
+- Version list with status, effective date, approval reference, item count,
+  current-default indicator, and dataset hash
+- Draft clone and restore entry points when allowed
+
+`/admin/master-catalog/versions/[versionId]`
 
 - Overview
 - Items
 - Import & Diff
 - Audit
 
-`/admin/catalog/[versionId]/items/[identityId]`
+`/admin/master-catalog/versions/[versionId]/items/[identityId]`
 
 - Versioned item details and current code
 - Manual draft edit/add/retire/recode controls when allowed
 - Item history timeline across all versions and codes
 - Old/new field comparison, actor, time, reason, and source evidence
+
+`/admin/master-catalog/import`
+
+- Import staging and validation for a selected draft
+- Diff preview and mass-retirement safeguard evidence
+
+`/admin/master-catalog/history`
+
+- Published version history, pointer movement evidence, and append-only audit
+- Official export lookup by version
 
 ### Table behavior
 
@@ -1371,12 +1387,14 @@ These items do not block the first official Master Catalog release.
 
 Do not advance when any gate fails:
 
-- **Phase 4-0 → 4A local implementation:** Revision 8, ADR-004, Phase 4
-  Change Request, database/security contract, threat model, decision register,
-  parser/hash and official-export contracts, Production baseline, and P-01 are
-  complete. Generic schema/function/UI/test work may proceed locally while
-  row-level business decisions remain pending, but no final canonical mapping,
-  publishable candidate, or Production action may be implied.
+- **Phase 4-0 → 4A local implementation:** Review Guide authority set
+  (Revision 8, ADR-004, Phase 4 Change Request, Post-Factor-F adjustment plan,
+  Implementation Execution Pack, database/security contract, threat model,
+  decision register, parser/hash and official-export contracts, Production
+  baseline, and P-01) is complete. Generic schema/function/UI/test work may
+  proceed locally while row-level business decisions remain pending, but no
+  final canonical mapping, publishable candidate, or Production action may be
+  implied.
 - **4A data backfill/candidate freeze:** reconciliation, code dictionary,
   duplicate, HDPE Crossing, Production-only, workbook-only, baseline metadata,
   and related owner decisions are complete for the exact candidate scope.
@@ -1677,6 +1695,8 @@ the same pull request or release change set.
 - [ ] Security and performance advisors have no unresolved rollout blockers
 - [x] Deployment/rollback runbook and verification template are drafted and
   link-checked
-- [ ] Revision 8, ADR-004, Phase 4 Change Request, and P-01 in the Decision
-  Register have recorded owner decisions
+- [ ] P-01 in the Decision Register records owner approval for the Review Guide
+  authority set: Revision 8, ADR-004, Phase 4 Change Request, Post-Factor-F
+  adjustment plan, Implementation Execution Pack, database/security contract,
+  threat model, parser/hash spec, and official-export spec
 - [ ] Owner gives explicit Production migration and publish approvals
