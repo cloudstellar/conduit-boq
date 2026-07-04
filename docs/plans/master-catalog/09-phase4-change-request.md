@@ -268,8 +268,11 @@ feature enablement, final catalog publication, or silent business-data choices.
 - [ ] All 16 HDPE Crossing candidate codes are corrected or rejected
 - [ ] Production-only 20 rows receive approved code decisions
 - [ ] Workbook-only 18 rows remain deferred or receive separate price approval
-- [ ] Owner-approved legacy `2568.0.0` publication metadata is available; no
-      approval reference/effective date is invented
+- [x] Owner-approved legacy `2568.0.0` publication metadata is available via
+      P-08: effective `2026-01-01`, approval reference `เอ็นที วทฐฐ./405
+      ลงวันที่ 27 พ.ย. 2568`, approval document date `2025-11-27`, publisher
+      snapshot `ผู้จัดการฝ่ายท่อร้อยสาย (ทฐฐ.)`; generated backfill fields
+      must not be invented
 - [ ] CI runtime assets are approved; source `/CI/` remains local-only
 
 If any of these decisions is still pending, implementation may continue only on

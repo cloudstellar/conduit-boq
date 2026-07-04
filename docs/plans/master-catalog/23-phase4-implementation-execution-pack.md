@@ -484,8 +484,8 @@ Before asking for code review:
 | Blocker | Action |
 |---|---|
 | Owner decision P-02 to P-07 missing | Continue generic implementation; do not freeze candidate data. Current record shows P-02 through P-07 approved; use this only if the decision register is reverted or superseded |
-| P-08/P-09 missing | Continue local draft/publish mechanics; do not publish Production |
-| P-10 missing | Use placeholder-safe local styling only; do not deploy CI assets |
+| P-08/P-09 missing | P-08 is currently approved in the Decision Register; if superseded or missing, continue local draft mechanics but do not validate publication-completeness. If P-09 is missing, continue local draft/publish mechanics but do not publish Production |
+| P-10 missing or superseded | Current Decision Register records P-10 approved limited runtime CI assets; if superseded or missing, use placeholder-safe local styling only and do not deploy CI assets |
 | P-11 missing | Build export mechanics; do not accept official export visual |
 | Advisor warning from pre-existing system | Add to advisor baseline with owner/remediation metadata |
 | New advisor warning from Phase 4 | Stop and fix or get explicit accepted-risk signoff |

@@ -199,6 +199,13 @@ Rules:
 - Current legacy `2568.0.0` must receive owner-approved baseline metadata before
   the new publication-completeness constraint is validated. Do not invent an
   approval reference or effective date.
+- P-08 owner decision records the legacy baseline metadata to backfill:
+  `effective_date = 2026-01-01`, `approval_reference = เอ็นที วทฐฐ./405
+  ลงวันที่ 27 พ.ย. 2568`, `approval_document_date = 2025-11-27`, and
+  `published_by_display_name = ผู้จัดการฝ่ายท่อร้อยสาย (ทฐฐ.)`. For this
+  legacy backfill, `published_at`, `item_count`, and `dataset_hash` are produced
+  by trusted migration/backfill code; do not fabricate a historical publish
+  timestamp and do not reuse Factor F approval evidence.
 - Published metadata is immutable except an audited pointer restore does not
   mutate it.
 - `updated_at` changes only for allowed draft metadata changes and the publish

@@ -63,9 +63,9 @@
 | แก้รหัส HDPE Crossing 16 รายการอย่างไร | P-03 approved; publication ยังรอ gate ที่เหลือ |
 | รหัส canonical ของ Production-only 20 รายการ | P-04 approved; `ITEM-0139` เป็น temporary legacy |
 | Workbook-only 18 raw rows จะ defer ทั้งหมดหรือมี price authority | P-05/P-07 approved: 17 unresolved supplement candidates deferred; workbook `FTW-CON-002` เป็น typo shadow ของ `ITEM-0491` |
-| อนุมัติ AAA/TTT ทั้ง 22/65 กลุ่ม | approved for backfill; publication ยังรอ P-08/P-09 และ gates ที่เหลือ |
-| Runtime font/logo derivative ใด commit/deploy ได้ | CI implementation ยังเริ่มไม่ได้ |
-| Metadata จริงของ baseline `2568.0.0` | ยัง validate publication-completeness constraint ไม่ได้ |
+| อนุมัติ AAA/TTT ทั้ง 22/65 กลุ่ม | approved for backfill; `2568.1.0` reserved for rehearsal; publication metadata/gates ยังรอแยก |
+| Runtime font/logo derivative ใด commit/deploy ได้ | P-10 approved แบบจำกัด; ใช้เฉพาะ runtime derivatives ตาม Decision Register และ [Doc #24](./24-phase4-nt-ci-runtime-asset-analysis.md) |
+| Metadata จริงของ baseline `2568.0.0` | P-08 approved: effective `2026-01-01`; approval ref `เอ็นที วทฐฐ./405 ลงวันที่ 27 พ.ย. 2568`; publisher `ผู้จัดการฝ่ายท่อร้อยสาย (ทฐฐ.)` |
 | รูปแบบตัวอย่าง Excel/PDF ตาม Export Spec | ยังปิดงาน export acceptance ไม่ได้ |
 | Live Production preflight หลัง Factor F rollout | ต้อง refresh ก่อนทุก Production gate; ห้ามใช้ BOQ count จาก closeout เป็นค่าตายตัว |
 
@@ -95,8 +95,11 @@
 การอนุมัติชั้นแรกไม่ควรถือเป็นสิทธิ์ deploy หรือ publish Production อัตโนมัติ
 และไม่ควรถือว่า data decisions เช่น duplicate, HDPE Crossing, Production-only,
 workbook-only, CI assets, export sample หรือ baseline publication metadata
-ถูกอนุมัติแล้ว รายการเหล่านั้นยังต้องปิดตาม P-02 ถึง P-11 ก่อน candidate
-freeze, final backfill, export acceptance หรือ publication gate ที่เกี่ยวข้อง
+ถูกอนุมัติแล้วโดยอัตโนมัติ รายการเหล่านั้นต้องปิดตาม P-02 ถึง P-11 ก่อน
+candidate freeze, final backfill, export acceptance หรือ publication gate ที่
+เกี่ยวข้อง; ขณะนี้ P-02 ถึง P-08 ถูกบันทึกแล้ว, P-09 reserve `2568.1.0`
+สำหรับ draft/rehearsal เท่านั้น, P-10 approved runtime CI assets แบบจำกัดตาม
+Doc #24, และ P-09 publication metadata กับ P-11 ยังต้องปิดแยก
 
 เวลาอ่านบทวิเคราะห์หรือ quick-decision guide ภายนอก ให้ถือเป็นคำแนะนำ ไม่ใช่
 authority โดยตรง:
@@ -108,7 +111,8 @@ authority โดยตรง:
   ยัง deferred ตาม P-05
 - P-06 approved 22/65 group meanings สำหรับ backfill โดยมี `ITEM-0139`
   temporary-legacy safeguard; P-07 approved ให้ใช้ Production `ITEM-0491`
-  wording สำหรับ `FTW-CON-002` และ reject workbook typo; publication ยังรอ
-  P-08/P-09 และ gates ที่เหลือ
-- P-10 ต้องมีรายการ asset, ที่มา, permission/license และ runtime path ก่อน
-  approve ให้ commit/deploy
+  wording สำหรับ `FTW-CON-002` และ reject workbook typo; P-08 approved legacy
+  `2568.0.0` baseline metadata แล้ว; P-09 reserve `2568.1.0` สำหรับ
+  draft/rehearsal เท่านั้น และ publication ยังรอ metadata/gates ที่เหลือ
+- P-10 approved เฉพาะ runtime derivatives ที่ระบุใน Decision Register และ
+  Doc #24; `/CI/` source ยัง local-only และ P-11 visual sample ยัง pending

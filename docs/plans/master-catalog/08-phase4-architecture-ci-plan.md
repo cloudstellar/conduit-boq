@@ -1340,7 +1340,7 @@ but semantically wrong workbook from becoming the official catalog.
 - Backfill 710 baseline identities/legacy codes and 52 display categories from
   the verified Production baseline.
 - Seed or freeze canonical code groups and candidate mappings only from recorded
-  owner/taxonomy decisions. P-02 through P-07 are recorded; any later P-08
+  owner/taxonomy decisions. P-02 through P-08 are recorded; any later P-09
   through P-15 gate must not be silently guessed during schema work.
 - Add full-snapshot audit contracts and item-history indexes.
 - Add indexes, composite foreign keys, RLS, grants, and private functions.
@@ -1734,12 +1734,16 @@ data freeze, Production migration, feature enablement, or publication.
   P-07.
 - [ ] Any external analysis or quick-decision guide has been reconciled into the
   Decision Register; proposed outcomes are not treated as approved data.
-- [ ] Owner-approved legacy `2568.0.0` publication metadata is available; no
-  approval reference, effective date, publisher, or archive reference is
+- [x] P-08 legacy `2568.0.0` publication metadata is recorded:
+  effective `2026-01-01`, approval reference `เอ็นที วทฐฐ./405 ลงวันที่
+  27 พ.ย. 2568`, approval document date `2025-11-27`, and publisher
+  `ผู้จัดการฝ่ายท่อร้อยสาย (ทฐฐ.)`; generated backfill fields must not be
   invented.
 - [ ] Exact candidate version/effective date/archive reference is approved.
-- [ ] Approved runtime font/logo derivatives are identified and licensed for
-  repository/Production use.
+- [x] Approved runtime font/logo derivatives are identified and licensed for
+  repository/Production use via P-10 and
+  [Doc #24](./24-phase4-nt-ci-runtime-asset-analysis.md); `/CI/` source remains
+  local-only and P-11 visual acceptance remains separate.
 - [ ] Parser/canonicalizer implementation and golden hash tests pass.
 - [ ] Manual-only and Excel workflows both pass audit and publish tests.
 - [ ] Item history follows identity across recodes.

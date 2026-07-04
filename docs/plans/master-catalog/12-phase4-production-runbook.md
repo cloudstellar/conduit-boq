@@ -45,7 +45,9 @@ catalog to roll back.
 - Reviewed migration SQL and file SHA-256
 - Supabase security/performance advisor baseline with known findings triaged
 - Fresh logical backup manifest and tested restore log
-- Approved runtime CI assets; `/CI/` source remains local-only
+- Approved runtime CI assets via P-10 and
+  [Doc #24](./24-phase4-nt-ci-runtime-asset-analysis.md); `/CI/` source
+  remains local-only
 
 ## 4. Stop conditions applying to every phase
 
@@ -92,8 +94,11 @@ Stop immediately when any of these occurs:
 8. Approve the complete AAA/TTT dictionary and allocation rules.
 9. Approve parser, payload, error-code, and canonical-hash contract.
 10. Approve database/security, threat, and official-export contracts.
-11. Provide truthful publication metadata for legacy `2568.0.0`; do not invent
-    an approval reference or effective date.
+11. Use P-08 truthful publication metadata for legacy `2568.0.0`: effective
+    `2026-01-01`, approval reference `เอ็นที วทฐฐ./405 ลงวันที่ 27 พ.ย. 2568`,
+    approval document date `2025-11-27`, and publisher snapshot
+    `ผู้จัดการฝ่ายท่อร้อยสาย (ทฐฐ.)`; do not invent generated backfill fields
+    or reuse Factor F evidence.
 12. Confirm `/CI/` is excluded from commits and identify approved derivative
    fonts/logo assets.
 13. Complete the Phase 4 verification template baseline section.
