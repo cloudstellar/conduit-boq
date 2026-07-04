@@ -170,14 +170,13 @@ Run and record:
 **Exit gate:** Rehearsal and fresh reset both pass; no unresolved advisor or
 regression blocker.
 
-### 6.5 Same-window local-to-Production handoff
+### 6.5 Production readiness review after WP-8
 
-If the owner wants Local completion followed by Production execution in one
-operating window, the executor may continue to the Production preflight only
-after all Local evidence above is green and recorded. This is a scheduling
-shortcut, not standing permission to change Production.
+After Local evidence is green, pause before Production and review the evidence
+as a separate readiness package. This gives the owner, executor, and verifier
+time to decide whether the rollout is truly ready before requesting P-12.
 
-Before touching Production, record:
+Before requesting P-12, record:
 
 - WP-8 verification report evidence for clean Local reset and full workflow;
 - current branch/commit, migration filename, migration SHA-256, and deployment
@@ -192,13 +191,12 @@ Before touching Production, record:
 - feature flag state proving the Phase 4 UI remains disabled by default;
 - owner go/no-go for P-12 Production migration.
 
-P-13 deploy and P-14 feature enablement may proceed in the same operating
-window only if their immediately preceding Production gate passes and the
-owner records the next go/no-go. P-15 publication remains separate and requires
+P-13 deploy, P-14 feature enablement, and P-15 publication are requested only
+after the immediately preceding gate passes. P-15 remains separate and requires
 the exact final catalog metadata, diff/count/hash, export, and filing evidence.
 
-Stop the same-window path and return to normal gated approval if any evidence
-is missing, stale, failed, ambiguous, or differs from the reviewed plan.
+Do not request or run P-12 if any evidence is missing, stale, failed,
+ambiguous, or different from the reviewed plan.
 
 ## 7. Production preflight — read only
 

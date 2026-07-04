@@ -34,21 +34,21 @@ blocking gate stops the rollout.
 | Architecture Review Disposition | Owner | Approved as supporting disposition record | 2026-07-04 | External review is input only; Revision 8 remains authority |
 | ADR-004 | Owner | Approved for implementation/local rehearsal | 2026-07-04 | Owner chat approval; Production gates separate |
 | Phase 4 Change Request | Owner | Approved for implementation/local rehearsal | 2026-07-04 | Owner chat approval; Production gates separate |
-| Decision Register | Owner | Approved as Phase 4 decision source of truth | 2026-07-04 | Owner chat approval; P-02 through P-08 recorded separately; P-09 version string, P-10 runtime CI assets, and P-11 export direction recorded separately; P-12 through P-14 same-window fast-track conditions recorded; P-09 publication metadata plus final P-11 artifacts and P-15 remain separate |
+| Decision Register | Owner | Approved as Phase 4 decision source of truth | 2026-07-04 | Owner chat approval; P-02 through P-08 recorded separately; P-09 version string, P-10 runtime CI assets, and P-11 export direction recorded separately; P-09 publication metadata plus final P-11 artifacts and P-12 through P-15 remain separate |
 | Implement/local rehearsal | Owner | Approved via P-01 | 2026-07-04 | Architecture/contract package approved; local implementation only |
 | DB/security contract | Owner | Approved for implementation/local rehearsal | 2026-07-04 | Owner chat approval; technical verification and Production migration separate |
 | Threat model | Owner | Approved for implementation/local rehearsal | 2026-07-04 | Owner chat approval; reviewer verification and Production change separate |
 | Parser/hash specification | Owner | Approved for implementation/local rehearsal | 2026-07-04 | Owner chat approval; Production import/publication and final data freeze separate |
 | Official export specification | Owner | Approved for implementation/local rehearsal | 2026-07-04 | Owner chat approval; P-10/P-11, reviewer sign-offs, and Production publication separate |
 | Post-Factor-F Adjustment Plan reviewed | Owner | Approved for implementation/local rehearsal | 2026-07-04 | Owner chat approval; Production gates separate |
-| Implementation Execution Pack reviewed | Owner | Approved for WP-0 through WP-8 | 2026-07-04 | Owner chat approval; P-12 through P-14 fast-track conditions recorded; P-15 separate |
+| Implementation Execution Pack reviewed | Owner | Approved for WP-0 through WP-8 | 2026-07-04 | Owner chat approval; Production gates remain separate |
 | Code dictionary | Owner | Approved as candidate dictionary/governance framework; P-02 through P-07 row/code decisions now recorded separately | 2026-07-04 | Owner chat approval; publication gates separate |
 | Row reconciliation | Owner | Approved as draft evidence/framework; P-02 through P-07 row-level outcomes now recorded separately | 2026-07-04 | Owner chat approval; raw CSV is evidence, not import authority |
 | Legacy `2568.0.0` publication metadata | Owner/records custodian | Approved via P-08 for baseline metadata backfill | 2026-07-04 | Effective `2026-01-01`; approval ref `เอ็นที วทฐฐ./405 ลงวันที่ 27 พ.ย. 2568`; approval doc date `2025-11-27`; publisher `ผู้จัดการฝ่ายท่อร้อยสาย (ทฐฐ.)` |
 | NT CI runtime asset scope | Owner/brand custodian | Approved via P-10 for limited runtime derivatives | 2026-07-04 | Use [Doc #24](./24-phase4-nt-ci-runtime-asset-analysis.md); owner confirms NT CI asset rights for business use; `/CI/` source remains local-only; final P-11 artifacts still pending |
-| Production migration | Owner | Fast-track conditions recorded; execution approval pending | 2026-07-04 | P-12 requires WP-8 green evidence, fresh baseline/drift check, backup/restore, reviewed fingerprints, and owner go/no-go |
-| Application deployment | Owner | Fast-track conditions recorded; execution approval pending | 2026-07-04 | P-13 requires migration verification, CI/deployment fingerprint, disabled feature flag, smoke checks, and owner go/no-go |
-| Feature enablement | Owner | Fast-track conditions recorded; execution approval pending | 2026-07-04 | P-14 requires admin-only smoke, authorization checks, non-admin denial tests, and owner go/no-go |
+| Production migration | Owner | Not requested; request after WP-8 evidence review |  | P-12 requires green evidence, fresh baseline/drift check, backup/restore, reviewed fingerprints, and owner go/no-go |
+| Application deployment | Owner | Not requested; request after migration verification |  | P-13 requires CI/deployment fingerprint, disabled feature flag, smoke checks, and owner go/no-go |
+| Feature enablement | Owner | Not requested; request after deploy/admin-only smoke verification |  | P-14 requires authorization checks, non-admin denial tests, and owner go/no-go |
 | Publish named version |  | Not requested |  |  |
 
 ## 4. Known preparation baseline
@@ -119,11 +119,11 @@ snapshot states.
 | Rollback/fix-forward plan documented |  | Pending |
 | Post-publish logical backup |  | Pending |
 
-## 6.5 Same-window handoff readiness
+## 6.5 Production readiness review
 
-Use this section only if Local completion and Production execution occur in
-one operating window. Any missing, stale, failed, ambiguous, or mismatched row
-stops the same-window path.
+Use this section after WP-8 and before requesting P-12. Any missing, stale,
+failed, ambiguous, or mismatched row blocks the Production request until it is
+fixed and reviewed.
 
 | Check | Expected | Evidence | Result |
 |---|---|---|---|
@@ -136,10 +136,10 @@ stops the same-window path.
 | Factor F before/after assertion | Pointer, rows, hashes, grants, RLS, and BOQ bindings unchanged |  | Pending |
 | Advisors | No unresolved Phase 4 blocker |  | Pending |
 | Feature flag | Disabled by default before migration/deploy |  | Pending |
-| P-12 owner go/no-go | Recorded before Production migration |  | Pending |
-| P-13 owner go/no-go | Recorded before application deploy |  | Pending |
-| P-14 owner go/no-go | Recorded before feature enablement |  | Pending |
-| P-15 separation | Publication not implied; final metadata/diff/count/hash/export approval still pending |  | Pending |
+| P-12 readiness package | Evidence reviewed before Production migration request |  | Pending |
+| P-13 readiness package | Evidence reviewed after migration verification and before deploy request |  | Pending |
+| P-14 readiness package | Evidence reviewed after deploy/admin smoke and before enablement request |  | Pending |
+| P-15 separation | Publication not implied; final metadata/diff/count/hash/export approval still separate |  | Pending |
 
 ## 7. Reconciliation and code governance
 
