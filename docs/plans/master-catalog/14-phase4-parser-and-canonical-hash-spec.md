@@ -1,8 +1,22 @@
 # Phase 4 Parser, Payload, Error, and Canonical Hash Specification
 
-**Status:** Draft implementation contract
+**Status:** Owner-approved implementation contract for implementation/local
+rehearsal; Production import/publication remains separately gated
 **Prepared:** 2026-06-22
 **Purpose:** Make import, publish, Excel, and PDF verification deterministic
+
+**Owner decision recorded:** 2026-07-04 — approved according to the
+recommendation for implementation/local rehearsal. This approval accepts the
+deterministic parser profile, file/row/payload limits, browser-as-convenience
+and server-as-authority boundary, stable `CatalogActionResult`/error-code
+contract, K-field exclusion, decimal-string money handling, shared canonical
+hash contract, and golden/cross-runtime tests. It does not authorize Production
+import, publication, global Next.js body-limit changes, generic column mapping,
+additional parser profiles, or any price/name/unit change outside approved
+gates. Before Production publication, the implementation must reproduce the
+golden hash, pass malicious/Unicode/money/payload/security tests, independently
+verify the filed source workbook SHA-256 when an import contributes to the
+version, and prove Excel/PDF count/hash controls.
 
 ## 1. Boundaries
 

@@ -1,9 +1,18 @@
 # Master Catalog Phase 4 Reconciliation Report
 
-**Status:** Draft evidence for owner review — not approved for import/publish
+**Status:** Owner-approved as draft evidence and decision framework; not
+approved for candidate freeze, import, or publication
 **Prepared:** 2026-06-22
 **Production project:** `otlssvssvgkohqwuuiir`
 **Target use:** First structured-code candidate `2568.1.0`
+
+**Owner decision recorded:** 2026-07-04 — approved according to the
+recommendation as evidence framework only. The owner accepts the method,
+counts, CSV field contract, Production price precedence, workbook-only deferral
+default, Production-only retention, UUID/history merge prohibition, current
+HDPE-as-GIP rejection, and approval rules. This approval does not resolve
+P-02 through P-07, approve final row-level outcomes, authorize candidate freeze,
+make the CSV an import file, or authorize publication.
 
 ## 1. Purpose
 

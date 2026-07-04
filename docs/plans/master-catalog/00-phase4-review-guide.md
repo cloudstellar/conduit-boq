@@ -97,3 +97,16 @@
 workbook-only, CI assets, export sample หรือ baseline publication metadata
 ถูกอนุมัติแล้ว รายการเหล่านั้นยังต้องปิดตาม P-02 ถึง P-11 ก่อน candidate
 freeze, final backfill, export acceptance หรือ publication gate ที่เกี่ยวข้อง
+
+เวลาอ่านบทวิเคราะห์หรือ quick-decision guide ภายนอก ให้ถือเป็นคำแนะนำ ไม่ใช่
+authority โดยตรง:
+
+- P-02 ยังไม่ควรฟันธง retire `ITEM-0139` จนกว่า owner/data custodian ยืนยันว่า
+  แถวนั้นผิดจริง; ถ้าไม่ยืนยัน ให้ retain ทั้งสอง identity และห้าม merge
+  UUID/history
+- P-03 รหัสอย่าง `CRS-H06`/`CRS-H08` เป็น proposal จนกว่าจะอนุมัติ exact
+  canonical group/code/sequence
+- P-06 อาจ approve รูปแบบหรือ governance ได้ก่อน แต่ยังไม่ใช่ final taxonomy
+  approval ถ้า row-level conflicts ยังไม่ปิด
+- P-10 ต้องมีรายการ asset, ที่มา, permission/license และ runtime path ก่อน
+  approve ให้ commit/deploy

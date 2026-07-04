@@ -1,10 +1,20 @@
 # Phase 4 Database and Security Contract
 
-**Status:** Draft for owner and technical review
+**Status:** Owner-approved as Phase 4 database/security contract for
+implementation/local rehearsal; technical verification and Production
+migration approval remain separate gates
 
 **Prepared:** 2026-06-22
 
 **Last updated:** 2026-06-29 after completed Factor F rollout
+
+**Owner decision recorded:** 2026-07-04 — approved according to the
+recommendation as the technical backbone for Phase 4A and every Phase 4 write
+path. The owner accepts the additive `016+` migration contract, explicit
+grants/RLS, private `SECURITY DEFINER` boundary, direct-write revocation,
+publish/restore lock order, Factor F/BOQ immutability boundary, required local
+DB/security/advisor verification, and forward-fix-only migration recovery. This
+approval does not authorize Production migration.
 
 **Production project:** `otlssvssvgkohqwuuiir`
 
@@ -627,7 +637,7 @@ migration.
 
 | Role | Name | Decision | Timestamp | Note |
 |---|---|---|---|---|
-| Owner |  | Pending |  |  |
+| Owner | Owner | Approved for implementation/local rehearsal | 2026-07-04 | Production migration remains separate; technical verification still required |
 | Database reviewer |  | Pending |  |  |
 | Security/RLS reviewer |  | Pending |  |  |
 | Application reviewer |  | Pending |  |  |

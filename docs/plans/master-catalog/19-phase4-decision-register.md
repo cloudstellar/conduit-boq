@@ -1,9 +1,16 @@
 # Phase 4 Decision Register
 
-**Status:** Draft — locked decisions apply; pending decisions require owner
-resolution at the stated gate
+**Status:** Owner-approved decision source of truth for Phase 4 governance;
+pending decisions still require owner resolution at the stated gate
 
 **Prepared:** 2026-06-22
+
+**Owner decision recorded:** 2026-07-04 — approved according to the
+recommendation as the Phase 4 governance backbone and source of truth for
+locked, pending, and deferred decisions. This approval accepts the recording
+procedure and current P-01 component tracker, but it does not resolve P-02
+through P-15, authorize Production migration, deploy, feature enablement, or
+publication, or convert analysis memos into authority.
 
 ## 1. How to use this register
 
@@ -68,18 +75,34 @@ backfill, candidate freeze, export acceptance, Production migration, feature
 enablement, and publication must stop at the stated gates until the relevant
 pending decisions are recorded.
 
+Analysis memos and quick-decision guides may recommend outcomes, but they do
+not become authority until the owner records the exact outcome and evidence in
+this register. In particular:
+
+- `ITEM-0139` must not be retired merely because it is the likely duplicate
+  candidate. Retire only the row the owner/data custodian confirms is
+  erroneous; otherwise retain both published identities.
+- HDPE Crossing prefixes such as `CRS-H06`/`CRS-H08` are proposals until the
+  engineering data custodian approves the exact canonical groups, codes, and
+  reserved sequences.
+- AAA/TTT governance or format may be approved separately, but final group
+  meanings for publication remain pending until the related row-level conflicts
+  are resolved.
+- Named NT font/logo derivatives require an asset/license inventory before they
+  are approved for repository or Production use.
+
 | ID | Decision required | Current evidence/default recommendation | Owner | Due before | Status |
 |---|---|---|---|---|---|
-| P-01 | Approve ADR-004, Change Request, architecture Revision 8, DB/security contract, threat model, parser/hash spec, export spec, Post-Factor-F adjustment plan, and Implementation Execution Pack for implementation/local rehearsal | Approve together after review; this does not authorize Production | Owner | Phase 4A implementation | Pending |
-| P-02 | Decide whether `ITEM-0131` and `ITEM-0139` remain justified distinct items or which erroneous duplicate is retired in the candidate | Both receive distinct baseline identities; UUID/history merge is prohibited | Owner + data custodian | Candidate reconciliation freeze | Pending |
-| P-03 | Approve corrected canonical groups/codes for 16 HDPE Crossing rows | Reject current GIP candidates; use an approved HDPE classification | Owner + engineering data custodian | Candidate code freeze | Pending |
+| P-01 | Approve ADR-004, Change Request, architecture Revision 8, DB/security contract, threat model, parser/hash spec, export spec, Post-Factor-F adjustment plan, and Implementation Execution Pack for implementation/local rehearsal | Approved together after owner review; this does not authorize Production migration, deploy, enablement, publication, or P-02 through P-15 data/records/visual decisions | Owner | Phase 4A implementation | Approved 2026-07-04 |
+| P-02 | Decide whether `ITEM-0131` and `ITEM-0139` remain justified distinct items or which erroneous duplicate is retired in the candidate | Both receive distinct baseline identities by default; if duplicate is confirmed, retire only the proven erroneous row; UUID/history merge is prohibited | Owner + data custodian | Candidate reconciliation freeze | Pending |
+| P-03 | Approve corrected canonical groups/codes for 16 HDPE Crossing rows | Reject current GIP candidates; use an approved HDPE classification; exact prefixes/sequences remain proposals until approved | Owner + engineering data custodian | Candidate code freeze | Pending |
 | P-04 | Assign/approve canonical codes and groups for 20 Production-only rows | Retain all 20 and preserve Production values | Owner + data custodian | Candidate 710-row freeze | Pending |
 | P-05 | Decide disposition of 18 workbook-only rows | Defer by default; add only with separate item and price authority | Owner | First structured candidate freeze | Pending |
-| P-06 | Approve all 22 work-context (`AAA`) and 62 item-type (`AAA-TTT`) group meanings | Treat workbook dictionary as candidate only | Owner + engineering data custodian | Code-group backfill | Pending |
+| P-06 | Approve all 22 work-context (`AAA`) and 62 item-type (`AAA-TTT`) group meanings | Treat workbook dictionary as candidate only; partial approval of format/governance does not approve unresolved group meanings | Owner + engineering data custodian | Code-group backfill | Pending |
 | P-07 | Approve correction of repeated Thai phrase in `FTW-CON-002` | Do not mix the correction into taxonomy-only version unless separately approved | Owner | Candidate scope freeze | Pending |
 | P-08 | Provide truthful baseline publication metadata for legacy `2568.0.0` | Required: effective date, approval reference/document date, readable publisher/owner snapshot; never invent | Owner/records custodian | Validate Phase 4 publication-completeness constraint | Pending |
 | P-09 | Approve exact candidate version, effective date, approval reference, and physical archive reference | `2568.1.0` is a planning example, not authority | Owner | Candidate draft/publish rehearsal | Pending |
-| P-10 | Approve which NT fonts/logo derivatives may be committed and deployed | Use only necessary optimized runtime assets derived from local `/CI/` | Owner/brand custodian | Phase 4B UI implementation | Pending |
+| P-10 | Approve which NT fonts/logo derivatives may be committed and deployed | Use only necessary optimized runtime assets derived from local `/CI/`; require asset names, source, license/permission, and intended runtime path before approval | Owner/brand custodian | Phase 4B UI implementation | Pending |
 | P-11 | Approve the official Excel/PDF visual sample and field order | Follow CI and [export spec](./20-phase4-official-export-spec.md) | Owner | Export implementation acceptance | Pending |
 | P-12 | Approve the named Production migration window | Requires Local reset/rehearsal, backup restore evidence, drift check, and verification readiness | Owner | Production migration | Not requested |
 | P-13 | Approve application deploy and admin-only smoke window | Feature remains disabled by default | Owner | Production deploy | Not requested |
@@ -134,11 +157,31 @@ Every record must include:
 Chat acknowledgement alone should not be interpreted as approval for a later
 Production gate unless it identifies the exact gate and version.
 
-## 6. Approval summary
+## 6. P-01 component review tracker
+
+P-01 is approved only after all required implementation/local-rehearsal
+authority documents below are accepted. A component approval does not authorize
+Production migration, deploy, feature enablement, or publication.
+
+| Component | Status | Owner decision / condition | Evidence |
+|---|---|---|---|
+| Post-Factor-F adjustment plan | Approved for implementation/local rehearsal | Factor F pointer/rows/bindings stay unchanged; before/after assertions and `save_boq_with_routes` immutability regressions are mandatory Production gates | Owner chat approval, 2026-07-04 |
+| Implementation Execution Pack | Approved for WP-0 through WP-8 implementation/local rehearsal | WP-9 requires P-12 through P-15; feature flag disabled, BOQ regression, Factor F assertions, live preflight, and Decision Register authority are mandatory gates | Owner chat approval, 2026-07-04 |
+| Architecture Revision 8 | Approved as Phase 4 Core architecture authority for implementation/local rehearsal | Production gates require rollback/fix-forward evidence plus RLS/grants, advisory lock, status-transition, export formula-safety, BOQ, and Factor F regression proof | Owner chat approval, 2026-07-04 |
+| Architecture Review Disposition | Approved as supporting disposition record | Revision 8 and the contract suite remain authority; external review is input only and must not become shadow authority | Owner chat approval, 2026-07-04 |
+| ADR-004 | Approved as Phase 4 governance/architecture decision for implementation/local rehearsal | Published database catalog is system of record; system-generated Excel/PDF are official only when stamp/count/hash match; Production and publish gates remain separate | Owner chat approval, 2026-07-04 |
+| Phase 4 Change Request | Approved for implementation/local rehearsal | Missing decision at its due gate is a stop condition; Production migration, deploy, enablement, publication, Factor F work, and unauthorized Production name/unit/price changes remain unauthorized | Owner chat approval, 2026-07-04 |
+| Database/security contract | Approved for implementation/local rehearsal | Additive `016+`, explicit grants/RLS, private definer boundary, direct-write revocation, lock order, Factor F/BOQ immutability, local DB/security/advisor verification, and forward-fix-only recovery are accepted | Owner chat approval, 2026-07-04 |
+| Threat model | Approved as threat/control baseline for implementation/local rehearsal | Required security tests, advisors, malicious fixtures, BOQ/Factor F regression, residual-risk acceptance, and re-review triggers are mandatory before Production | Owner chat approval, 2026-07-04 |
+| Decision Register | Approved as Phase 4 decision source of truth | Current locked/pending/deferred model, recording procedure, and "chat acknowledgement is not approval" control are accepted; P-02 through P-15 remain unresolved unless separately approved | Owner chat approval, 2026-07-04 |
+| Parser/hash spec | Approved for implementation/local rehearsal | Deterministic single parser profile, server revalidation, file/row/payload limits, stable error contract, K-exclusion, decimal-string money, canonical hash contract, golden/cross-runtime tests, and independent filed-source rehash before publication are accepted | Owner chat approval, 2026-07-04 |
+| Official export spec | Approved for implementation/local rehearsal | Dataset-hash versus binary-hash model, selected-version server export, fail-closed count/hash checks, five-sheet Excel architecture, visible canonical verification, PDF server-verified stamp, draft markings, Factor F exclusion, accessibility, filing evidence, and failure behavior are accepted; P-10/P-11 and reviewer sign-offs remain separate | Owner chat approval, 2026-07-04 |
+
+## 7. Approval summary
 
 | Approval package | Decision | Owner | Timestamp | Evidence |
 |---|---|---|---|---|
-| Architecture + local implementation/rehearsal | Pending |  |  | P-01 |
+| Architecture + local implementation/rehearsal | Approved | Owner | 2026-07-04 | P-01; Production and P-02 through P-15 remain separate |
 | Frozen 710-row identity/code reconciliation | Pending |  |  | P-02–P-07 |
 | Legacy baseline publication metadata | Pending |  |  | P-08 |
 | Official export format | Pending |  |  | P-11 |

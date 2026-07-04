@@ -1,9 +1,20 @@
 # ADR-004: Phase 4 Master Catalog Governance and Official Publication
 
-**Status:** Proposed — owner approval required before implementation
+**Status:** Owner-approved as Phase 4 governance/architecture decision for
+implementation/local rehearsal; Production migration, deploy, feature
+enablement, and publication require separate approvals
 **Date:** 2026-06-22
 **Decision makers:** Owner, Development Team
 **Related change request:** [Phase 4 Change Request](../../plans/master-catalog/09-phase4-change-request.md)
+
+**Owner decision recorded:** 2026-07-04 — approved according to the
+recommendation. The immutable published database catalog is the system of
+record; system-generated Excel/PDF are official reference copies only when
+their stamp, count, and dataset hash match the published version. Production
+`2568.0.0` remains the first-rollout name/unit/price authority, Factor F stays
+separate from Master Catalog governance, and this approval does not authorize
+Production migration, deploy, feature enablement, publication, Factor F work,
+or legacy BOQ Factor F backfill.
 
 ## Context
 

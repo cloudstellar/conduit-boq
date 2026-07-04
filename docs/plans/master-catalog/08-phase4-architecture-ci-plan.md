@@ -1,8 +1,18 @@
 # Master Catalog Phase 4: Lean Architecture, CI and Official Export Plan
 
-**Status:** Revision 8 — Draft for owner review
+**Status:** Revision 8 — Owner-approved as Phase 4 Core architecture authority
+for implementation/local rehearsal; Production migration, deploy, enablement,
+and publish still require separate approvals
 
 **Date:** 2026-06-22
+
+**Owner decision recorded:** 2026-07-04 — approved according to the
+recommendation for Phase 4 Core/local implementation. This approval does not
+authorize Production migration, deploy, feature enablement, candidate data
+freeze, or publication. Before any Production gate, the Verification Report
+must document the rollback/fix-forward plan and prove RLS/grants, advisory
+lock behavior, publish/import status transitions, export formula-safety, and
+BOQ/Factor F regression gates.
 
 **Scope:** Lean Master Catalog administration, item-level history, manual and
 Excel change workflows, NT CI foundation, authoritative versioned exports,
@@ -1663,40 +1673,77 @@ the same pull request or release change set.
 
 ---
 
-## 14. Pre-Implementation Checklist
+## 14. Gate-Specific Checklists
 
-- [ ] Owner approves Production price precedence and candidate `2568.1.0`
-- [ ] 710-row reconciliation and code dictionary are approved
-- [ ] Duplicate and 16 Crossing decisions are recorded
-- [x] `/CI/` is ignored and remains local-only
-- [ ] Approved runtime font/logo derivatives are identified and licensed for
-  repository/Production use
-- [x] Fresh read-only Production catalog/version baseline was recorded on
-  2026-06-22
-- [ ] Fresh encrypted logical backup and restore verification are completed for
-  the implementation/Production window
-- [ ] Current Supabase changelog/docs, Data API exposed-schema settings, CLI
-  `--help`, and Next.js version-specific conventions are rechecked
-- [ ] Existing Supabase server/browser clients are reused and generated
-  database types are current
-- [ ] Parser profile, 750 KB application payload cap, `ActionResult` error
-  codes, canonical null/order/decimal/LF rules, and golden hash are implemented
-  and tested; no global Next.js body-limit increase is added
-- [ ] Migration plan uses additive changes, explicit grants/RLS, indexed foreign
-  keys, safe constraint creation, and `NOT VALID`/`VALIDATE` where appropriate
-- [ ] Database/security contract, threat model, decision register, and official
-  export specification are approved and reflected in migrations/tests
-- [ ] Local reset/rehearsal works from a fresh database state
-- [ ] Manual-only and Excel workflows both pass audit and publish tests
-- [ ] Item history follows identity across recodes
-- [ ] Stale draft, lock conflict, request retry, and pointer restore tests pass
-- [ ] Official Excel/PDF hash and count verification pass
-- [ ] Existing BOQ create/edit/duplicate/print/export regressions pass
-- [ ] Security and performance advisors have no unresolved rollout blockers
-- [x] Deployment/rollback runbook and verification template are drafted and
-  link-checked
+Use these lists as gate checks, not as one flat start condition. P-01 allows
+generic local implementation and rehearsal only. It does not approve candidate
+data freeze, Production migration, feature enablement, or publication.
+
+### 14.1 Before local implementation / Phase 4A start
+
 - [ ] P-01 in the Decision Register records owner approval for the Review Guide
   authority set: Revision 8, ADR-004, Phase 4 Change Request, Post-Factor-F
   adjustment plan, Implementation Execution Pack, database/security contract,
-  threat model, parser/hash spec, and official-export spec
-- [ ] Owner gives explicit Production migration and publish approvals
+  threat model, decision register, parser/hash spec, and official-export spec.
+- [ ] Current live read-only Production evidence is recorded in the Verification
+  Report, including catalog baseline, Factor F baseline, BOQ count/split, and
+  security/performance advisor baseline. The 2026-06-22 preparation baseline is
+  not a substitute for this fresh preflight.
+- [ ] No new or untriaged Phase 4 security/data-integrity blocker exists.
+- [ ] `/CI/` is ignored and remains local-only.
+- [ ] Current Supabase docs/changelog, Data API exposed-schema settings, CLI
+  `--help`, and Next.js version-specific conventions are rechecked before
+  implementation decisions that depend on them.
+- [ ] Existing Supabase server/browser clients are reused, and the plan for
+  generated database types is current.
+- [ ] Migration design is additive and starts at `016+`; it uses explicit
+  grants/RLS, indexed foreign keys and hot filters, safe constraint creation,
+  bounded lock/statement timeouts, and `NOT VALID`/`VALIDATE` where appropriate.
+- [ ] Phase 4 migration design has no Factor F table write, Factor F pointer
+  change, or legacy BOQ Factor F backfill.
+- [ ] Parser profile, 750 KB application payload cap, `ActionResult` error
+  codes, canonical null/order/decimal/LF rules, and golden hash are accepted as
+  the implementation contract.
+- [x] Deployment/rollback runbook and verification template are drafted and
+  link-checked.
+
+### 14.2 Before candidate data freeze / export acceptance
+
+- [ ] Owner approves Production price precedence for the candidate scope.
+- [ ] 710-row reconciliation and code dictionary are approved.
+- [ ] Duplicate and 16 Crossing decisions are recorded.
+- [ ] Production-only 20 rows and workbook-only 18 rows have recorded decisions.
+- [ ] Any external analysis or quick-decision guide has been reconciled into the
+  Decision Register; proposed outcomes are not treated as approved data.
+- [ ] Owner-approved legacy `2568.0.0` publication metadata is available; no
+  approval reference, effective date, publisher, or archive reference is
+  invented.
+- [ ] Exact candidate version/effective date/archive reference is approved.
+- [ ] Approved runtime font/logo derivatives are identified and licensed for
+  repository/Production use.
+- [ ] Parser/canonicalizer implementation and golden hash tests pass.
+- [ ] Manual-only and Excel workflows both pass audit and publish tests.
+- [ ] Item history follows identity across recodes.
+- [ ] Stale draft, lock conflict, request retry, and pointer restore tests pass.
+- [ ] Official Excel/PDF visual sample, hash, and count verification pass.
+- [ ] Existing BOQ create/edit/duplicate/print/export regressions pass.
+
+### 14.3 Before Production migration / deploy / publish
+
+- [ ] Local reset/rehearsal works from a fresh database state.
+- [ ] Fresh read-only Production preflight is recorded immediately before the
+  Production gate.
+- [ ] Fresh encrypted logical backup and restore verification are completed for
+  the Production window.
+- [ ] Verification Report documents the rollback/fix-forward plan and proves
+  RLS/grants, advisory lock behavior, publish/import status transitions, export
+  formula-safety, and BOQ/Factor F regression gates.
+- [ ] Security and performance advisors have no unresolved rollout blockers;
+  pre-existing warnings are baselined or separately accepted with owner and
+  remediation metadata.
+- [ ] Feature flag defaults to disabled after migration/deploy.
+- [ ] Owner explicitly approves the Production migration window.
+- [ ] Owner explicitly approves application deploy and admin-only smoke.
+- [ ] Owner explicitly approves feature enablement.
+- [ ] Owner explicitly approves publication of the named catalog version and its
+  final diff/count/hash.

@@ -1,8 +1,18 @@
 # Phase 4 Lean Threat Model
 
-**Status:** Draft for owner and security review
+**Status:** Owner-approved as Phase 4 threat/control baseline for
+implementation/local rehearsal; security/RLS and application reviewer
+verification remain separate gates
 
 **Prepared:** 2026-06-22
+
+**Owner decision recorded:** 2026-07-04 — approved according to the
+recommendation. The owner accepts the 26-threat control register, residual
+Medium risk framing, incident-response procedure, required security tests, and
+re-review triggers. Required security tests, Supabase advisors, RLS/grants and
+function checks, import/export malicious fixtures, BOQ/Factor F regression,
+residual-risk acceptance, and re-review triggers are mandatory gates before
+Production. This approval does not authorize Production change.
 
 **Applies to:** Master Catalog administration, local Excel parsing, draft
 changes, publication, history, and official Excel/PDF exports
@@ -246,7 +256,7 @@ Re-review this model when any of these changes:
 
 | Role | Name | Decision | Timestamp | Note |
 |---|---|---|---|---|
-| Owner |  | Pending |  |  |
+| Owner | Owner | Approved for implementation/local rehearsal | 2026-07-04 | Production change remains separate; reviewer verification still required |
 | Security/RLS reviewer |  | Pending |  |  |
 | Application reviewer |  | Pending |  |  |
 

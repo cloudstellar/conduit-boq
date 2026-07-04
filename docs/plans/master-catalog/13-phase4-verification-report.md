@@ -30,14 +30,20 @@ blocking gate stops the rollout.
 
 | Gate | Approver | Decision | Timestamp | Reference |
 |---|---|---|---|---|
-| ADR-004 |  | Pending |  |  |
-| Implement/local rehearsal |  | Pending |  |  |
-| DB/security contract + threat model |  | Pending |  |  |
-| Official export specification |  | Pending |  |  |
-| Post-Factor-F Adjustment Plan reviewed |  | Pending |  |  |
-| Implementation Execution Pack reviewed |  | Pending |  |  |
-| Code dictionary |  | Pending |  |  |
-| Row reconciliation |  | Pending |  |  |
+| Architecture Revision 8 | Owner | Approved for implementation/local rehearsal | 2026-07-04 | Owner chat approval; Production gates separate |
+| Architecture Review Disposition | Owner | Approved as supporting disposition record | 2026-07-04 | External review is input only; Revision 8 remains authority |
+| ADR-004 | Owner | Approved for implementation/local rehearsal | 2026-07-04 | Owner chat approval; Production gates separate |
+| Phase 4 Change Request | Owner | Approved for implementation/local rehearsal | 2026-07-04 | Owner chat approval; Production gates separate |
+| Decision Register | Owner | Approved as Phase 4 decision source of truth | 2026-07-04 | Owner chat approval; P-02 through P-15 still separate |
+| Implement/local rehearsal | Owner | Approved via P-01 | 2026-07-04 | Architecture/contract package approved; local implementation only |
+| DB/security contract | Owner | Approved for implementation/local rehearsal | 2026-07-04 | Owner chat approval; technical verification and Production migration separate |
+| Threat model | Owner | Approved for implementation/local rehearsal | 2026-07-04 | Owner chat approval; reviewer verification and Production change separate |
+| Parser/hash specification | Owner | Approved for implementation/local rehearsal | 2026-07-04 | Owner chat approval; Production import/publication and final data freeze separate |
+| Official export specification | Owner | Approved for implementation/local rehearsal | 2026-07-04 | Owner chat approval; P-10/P-11, reviewer sign-offs, and Production publication separate |
+| Post-Factor-F Adjustment Plan reviewed | Owner | Approved for implementation/local rehearsal | 2026-07-04 | Owner chat approval; Production gates separate |
+| Implementation Execution Pack reviewed | Owner | Approved for WP-0 through WP-8 | 2026-07-04 | Owner chat approval; WP-9 separate |
+| Code dictionary | Owner | Approved as candidate dictionary/governance framework; final taxonomy decisions pending | 2026-07-04 | Owner chat approval; P-02 through P-07 separate |
+| Row reconciliation | Owner | Approved as draft evidence/framework; final row-level decisions pending | 2026-07-04 | Owner chat approval; P-02 through P-07 separate |
 | Production migration |  | Not requested |  |  |
 | Application deployment |  | Not requested |  |  |
 | Feature enablement |  | Not requested |  |  |
@@ -108,6 +114,7 @@ snapshot states.
 | Sensitive auth fields excluded |  | Pending |
 | Restore to clean Local |  | Pending |
 | Restored counts/checksums match |  | Pending |
+| Rollback/fix-forward plan documented |  | Pending |
 | Post-publish logical backup |  | Pending |
 
 ## 7. Reconciliation and code governance
@@ -150,6 +157,7 @@ Approved dictionary fingerprint: `_______________________________`
 | New `catalog_admin_enabled` value type/default | JSON boolean / `false` |  | Pending |
 | Private mutation functions unexposed | Confirmed |  | Pending |
 | Data API grants explicit | Confirmed |  | Pending |
+| Publish/restore advisory lock behavior | Serialized; no competing pointer mutation |  | Pending |
 | `boq.factor_reference_version_id` FK/index/immutability trigger | Preserved |  | Pending |
 | Factor F version tables/pointer/RLS/grants | Unchanged by Phase 4 migration |  | Pending |
 | `save_boq_with_routes` replacement, if any | Preserves price version and Factor F version contracts |  | Pending |
@@ -197,6 +205,7 @@ Also verify:
 | Client-tampered payload | Server rejection | Pending |
 | Duplicate request ID | One effect/consistent result | Pending |
 | Import status lifecycle | UI-only preview; `validated/rejected`; one transition to `applied` | Pending |
+| Import invalid status transition | Rejected without partial apply | Pending |
 | Validation/apply request IDs | Separate and idempotent | Pending |
 | Import full old/new snapshots | Complete | Pending |
 | Filed source independently rehashed | Matches recorded client fingerprint | Pending |
@@ -222,6 +231,7 @@ Also verify:
 | Stale base pointer | `DRAFT_BASE_STALE` | Pending |
 | Duplicate publish request ID | No duplicate effect | Pending |
 | Publish transaction | Atomic | Pending |
+| Publish invalid status transition | Rejected without pointer movement | Pending |
 | Dataset count/hash from DB | Stored | Pending |
 | Pointer and `is_default` sync | Exact | Pending |
 | Previous version remains readable | Yes | Pending |
@@ -246,6 +256,7 @@ Also verify:
 | Published stamp | Version/effective date/published at/by/count/hash |  | Pending |
 | Excel numeric cell types | Numeric, formatted |  | Pending |
 | Excel exact 5 sheets/headers; no formulas/external links | Exact |  | Pending |
+| Formula-control text safety | Malicious strings remain inert text |  | Pending |
 | PDF Thai font/header/page/clipping | Correct |  | Pending |
 | Short dataset hash | Exactly `sha256:` + first 12 hex + `…`; full hash also present |  | Pending |
 | Catalog export dataset/hash excludes Factor F rows | Confirmed |  | Pending |

@@ -1,9 +1,19 @@
 # Master Catalog Phase 4 Structured-Code Dictionary
 
-**Status:** Candidate dictionary for owner/taxonomy review
+**Status:** Owner-approved as candidate dictionary/governance framework; final
+taxonomy publication and code-group backfill remain pending
 **Prepared:** 2026-06-22
 **Source workbook:** `files/NT_Item_Code_Master_K_Mapping_2568.xlsx`
 **Scope:** Business code `AAA-TTT-###`; not K-formula approval
+
+**Owner decision recorded:** 2026-07-04 — approved according to the
+recommendation as a candidate dictionary and code-governance framework for
+implementation/local rehearsal. The owner accepts the code format, no-reuse
+rule, retired-sequence reservation, sequence-900 capacity review, UUID identity
+separation, explicit group metadata, and K-formula exclusion. This approval
+does not authorize final taxonomy publication, code-group backfill, or
+candidate freeze until P-02 through P-07 blockers are resolved in the Decision
+Register and reconciliation artifact.
 
 ## 1. How to read the code
 

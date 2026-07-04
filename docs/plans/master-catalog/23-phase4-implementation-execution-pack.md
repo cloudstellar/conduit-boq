@@ -1,8 +1,19 @@
 # Phase 4 Implementation Execution Pack
 
-**Status:** Ready for owner P-01 review
+**Status:** Owner-approved for WP-0 through WP-8 implementation/local
+rehearsal; WP-9 Production execution requires separate P-12 through P-15
+approvals
 
 **Prepared:** 2026-06-29
+
+**Owner decision recorded:** 2026-07-04 — approved according to the
+recommendation for WP-0 through WP-8 only. Mandatory gates include disabled
+feature flag by default, BOQ regression preservation, Factor F before/after
+assertions, `save_boq_with_routes` contract/regression coverage inherited from
+the approved Post-Factor-F plan, live Production preflight before Production
+gates, and Decision Register authority for P-02 through P-11 data decisions.
+This approval does not authorize WP-9, Production migration, deploy, feature
+enablement, catalog publication, or any Factor F write/pointer/backfill.
 
 **Purpose:** Turn the reviewed Phase 4 architecture into an execution checklist
 that an implementer can follow without re-deciding scope, sequencing, database
@@ -59,6 +70,10 @@ Start blocked:
 9. BOQ Rebase is Phase 4.2 and must not be implemented in Phase 4 Core.
 10. Supabase advisor findings from before Phase 4 must be baselined/triaged.
     New or untriaged findings from Phase 4 are blockers.
+11. External analysis memos and quick-decision guides are advisory only. Seed,
+    backfill, export, and publish code must read the recorded Decision Register
+    outcome, not infer final choices such as retiring `ITEM-0139`, approving
+    `CRS-H06`/`CRS-H08`, or deploying named CI assets from an analysis note.
 
 ## 3. Required owner decisions before each work band
 

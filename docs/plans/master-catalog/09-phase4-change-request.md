@@ -1,11 +1,20 @@
 # Change Request: Master Catalog Phase 4 Administration and Official Publication
 
-**Status:** Draft for owner review — no Production execution authorized
+**Status:** Owner-approved for implementation/local rehearsal; no Production
+migration, deploy, feature enablement, or publication authorized
 **Requested date:** 2026-06-22
 **Change type:** Additive database governance, admin UI, import/manual change,
 audit history, and official Excel/PDF export
 **Production project:** `otlssvssvgkohqwuuiir`
 **Proposed first structured-code version:** `2568.1.0`
+
+**Owner decision recorded:** 2026-07-04 — approved according to the
+recommendation for implementation/local rehearsal only. The gate structure,
+abort conditions, reconciliation counts, fail-closed governance, and missing
+decision stop policy are accepted. This approval does not authorize Production
+migration, application deploy, feature enablement, publication of `2568.1.0`,
+Factor F changes, legacy BOQ Factor F backfill, or any unauthorized
+Production name/unit/price change.
 
 ## 1. Decision requested
 
@@ -324,7 +333,7 @@ Detailed execution is in the
 
 | Gate | Role | Name | Decision | Timestamp | Evidence/reference |
 |---|---|---|---|---|---|
-| Implement + local rehearsal | Owner |  | Pending |  |  |
+| Implement + local rehearsal | Owner | Owner | Approved for CR scope; P-01 remains pending until remaining authority documents are accepted | 2026-07-04 | Owner chat approval; Production gates separate |
 | Production migration | Owner |  | Not requested |  |  |
 | Application deploy | Owner |  | Not requested |  |  |
 | Feature enablement | Owner |  | Not requested |  |  |

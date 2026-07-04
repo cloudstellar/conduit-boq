@@ -1,9 +1,18 @@
 # Phase 4 Post-Factor-F Adjustment Plan
 
-**Status:** Draft for owner and implementation review
+**Status:** Owner-approved for implementation/local rehearsal; Production
+migration, deploy, enablement, and publish still require separate approvals
 **Prepared:** 2026-06-29
 **Scope:** Reassess and adjust Master Catalog Phase 4 after the completed
 Factor F versioning rollout
+
+**Owner decision recorded:** 2026-07-04 — approved according to the
+recommendation in this plan, with mandatory Production gates for Factor F
+before/after pointer, row-count, and dataset-hash assertions plus
+`save_boq_with_routes`/BOQ immutability regression tests. This approval does
+not authorize any Factor F pointer movement, Factor F row change, legacy BOQ
+Factor F backfill, Production migration, deploy, feature enablement, or catalog
+publication.
 
 ## 1. Difficulty assessment
 
