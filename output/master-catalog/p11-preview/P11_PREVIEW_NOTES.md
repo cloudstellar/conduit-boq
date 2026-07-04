@@ -150,7 +150,21 @@ The full SHA-256 and approval metadata must still be printed as selectable text.
 
 ## Watermark And Footer Decision
 
-The field-facing price page uses a diagonal red draft watermark above the table layer at low opacity. This avoids the table blocking the watermark while keeping item names and prices readable.
+The field-facing price page uses a diagonal red price-disclaimer watermark above the table layer at low opacity. This avoids the table blocking the watermark while keeping item names and prices readable.
+
+Production-generated field-facing PDF price pages, including the published official PDF, must use the same watermark wording and visual style as:
+
+`files/รายการบัญชีราคามาตรฐานงานก่อสร้างท่อร้อยสาย 2568.pdf`
+
+Reference watermark wording:
+
+`รายการบัญชีราคานี้ไม่ใช่ราคาก่อสร้างที่แท้จริงหรือถูกต้องตรงกับราคาก่อสร้าง`
+
+`แต่เป็นเพียงราคาโดยประมาณซึ่งใกล้เคียงกับราคาก่อสร้างจริงเท่านั้น`
+
+`(สำหรับกิจการ บมจ.โทรคมนาคมแห่งชาติ เท่านั้น มิให้เผยแพร่ก่อนได้รับอนุญาต)`
+
+This is a price-disclaimer watermark, not a Draft/Preview status mark. Draft/review status should still be shown through document status text, filename, footer, and access controls.
 
 The cover and verification pages do not use a large diagonal watermark over the full SHA-256. This prevents watermark text from polluting copied hash text or PDF text extraction.
 

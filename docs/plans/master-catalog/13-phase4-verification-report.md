@@ -34,21 +34,21 @@ blocking gate stops the rollout.
 | Architecture Review Disposition | Owner | Approved as supporting disposition record | 2026-07-04 | External review is input only; Revision 8 remains authority |
 | ADR-004 | Owner | Approved for implementation/local rehearsal | 2026-07-04 | Owner chat approval; Production gates separate |
 | Phase 4 Change Request | Owner | Approved for implementation/local rehearsal | 2026-07-04 | Owner chat approval; Production gates separate |
-| Decision Register | Owner | Approved as Phase 4 decision source of truth | 2026-07-04 | Owner chat approval; P-02 through P-08 recorded separately; P-09 version string and P-10 runtime CI assets recorded separately; P-09 publication metadata plus P-11 through P-15 still separate |
+| Decision Register | Owner | Approved as Phase 4 decision source of truth | 2026-07-04 | Owner chat approval; P-02 through P-08 recorded separately; P-09 version string, P-10 runtime CI assets, and P-11 export direction recorded separately; P-12 through P-14 same-window fast-track conditions recorded; P-09 publication metadata plus final P-11 artifacts and P-15 remain separate |
 | Implement/local rehearsal | Owner | Approved via P-01 | 2026-07-04 | Architecture/contract package approved; local implementation only |
 | DB/security contract | Owner | Approved for implementation/local rehearsal | 2026-07-04 | Owner chat approval; technical verification and Production migration separate |
 | Threat model | Owner | Approved for implementation/local rehearsal | 2026-07-04 | Owner chat approval; reviewer verification and Production change separate |
 | Parser/hash specification | Owner | Approved for implementation/local rehearsal | 2026-07-04 | Owner chat approval; Production import/publication and final data freeze separate |
 | Official export specification | Owner | Approved for implementation/local rehearsal | 2026-07-04 | Owner chat approval; P-10/P-11, reviewer sign-offs, and Production publication separate |
 | Post-Factor-F Adjustment Plan reviewed | Owner | Approved for implementation/local rehearsal | 2026-07-04 | Owner chat approval; Production gates separate |
-| Implementation Execution Pack reviewed | Owner | Approved for WP-0 through WP-8 | 2026-07-04 | Owner chat approval; WP-9 separate |
+| Implementation Execution Pack reviewed | Owner | Approved for WP-0 through WP-8 | 2026-07-04 | Owner chat approval; P-12 through P-14 fast-track conditions recorded; P-15 separate |
 | Code dictionary | Owner | Approved as candidate dictionary/governance framework; P-02 through P-07 row/code decisions now recorded separately | 2026-07-04 | Owner chat approval; publication gates separate |
 | Row reconciliation | Owner | Approved as draft evidence/framework; P-02 through P-07 row-level outcomes now recorded separately | 2026-07-04 | Owner chat approval; raw CSV is evidence, not import authority |
 | Legacy `2568.0.0` publication metadata | Owner/records custodian | Approved via P-08 for baseline metadata backfill | 2026-07-04 | Effective `2026-01-01`; approval ref `เอ็นที วทฐฐ./405 ลงวันที่ 27 พ.ย. 2568`; approval doc date `2025-11-27`; publisher `ผู้จัดการฝ่ายท่อร้อยสาย (ทฐฐ.)` |
-| NT CI runtime asset scope | Owner/brand custodian | Approved via P-10 for limited runtime derivatives | 2026-07-04 | Use [Doc #24](./24-phase4-nt-ci-runtime-asset-analysis.md); owner confirms NT CI asset rights for business use; `/CI/` source remains local-only; P-11 visual sample still pending |
-| Production migration |  | Not requested |  |  |
-| Application deployment |  | Not requested |  |  |
-| Feature enablement |  | Not requested |  |  |
+| NT CI runtime asset scope | Owner/brand custodian | Approved via P-10 for limited runtime derivatives | 2026-07-04 | Use [Doc #24](./24-phase4-nt-ci-runtime-asset-analysis.md); owner confirms NT CI asset rights for business use; `/CI/` source remains local-only; final P-11 artifacts still pending |
+| Production migration | Owner | Fast-track conditions recorded; execution approval pending | 2026-07-04 | P-12 requires WP-8 green evidence, fresh baseline/drift check, backup/restore, reviewed fingerprints, and owner go/no-go |
+| Application deployment | Owner | Fast-track conditions recorded; execution approval pending | 2026-07-04 | P-13 requires migration verification, CI/deployment fingerprint, disabled feature flag, smoke checks, and owner go/no-go |
+| Feature enablement | Owner | Fast-track conditions recorded; execution approval pending | 2026-07-04 | P-14 requires admin-only smoke, authorization checks, non-admin denial tests, and owner go/no-go |
 | Publish named version |  | Not requested |  |  |
 
 ## 4. Known preparation baseline
@@ -118,6 +118,28 @@ snapshot states.
 | Restored counts/checksums match |  | Pending |
 | Rollback/fix-forward plan documented |  | Pending |
 | Post-publish logical backup |  | Pending |
+
+## 6.5 Same-window handoff readiness
+
+Use this section only if Local completion and Production execution occur in
+one operating window. Any missing, stale, failed, ambiguous, or mismatched row
+stops the same-window path.
+
+| Check | Expected | Evidence | Result |
+|---|---|---|---|
+| WP-8 clean Local rehearsal | Passed with no unresolved blocker |  | Pending |
+| Reviewed migration fingerprint | Filename and SHA-256 match approved file |  | Pending |
+| Repository/deployment fingerprint | Exact branch, commit, CI, and deploy artifact recorded |  | Pending |
+| Fresh Production preflight | Live counts, pointer, Factor F, BOQ split, and drift recorded |  | Pending |
+| Backup/restore gate | Fresh backup manifest and clean Local restore test pass |  | Pending |
+| BOQ regression | Current BOQ flows and historical version links unchanged |  | Pending |
+| Factor F before/after assertion | Pointer, rows, hashes, grants, RLS, and BOQ bindings unchanged |  | Pending |
+| Advisors | No unresolved Phase 4 blocker |  | Pending |
+| Feature flag | Disabled by default before migration/deploy |  | Pending |
+| P-12 owner go/no-go | Recorded before Production migration |  | Pending |
+| P-13 owner go/no-go | Recorded before application deploy |  | Pending |
+| P-14 owner go/no-go | Recorded before feature enablement |  | Pending |
+| P-15 separation | Publication not implied; final metadata/diff/count/hash/export approval still pending |  | Pending |
 
 ## 7. Reconciliation and code governance
 
@@ -257,7 +279,8 @@ Also verify:
 | Excel `_canonical_row_json` reconstruction | Exact UTF-8 dataset hash |  | Pending |
 | PDF server-verified printed count/hash | Exact match |  | Pending |
 | Older-version export | Uses selected version |  | Pending |
-| Draft export watermark | `DRAFT – ห้ามใช้อ้างอิง` |  | Pending |
+| Draft export status mark | `DRAFT – ห้ามใช้อ้างอิง` |  | Pending |
+| PDF price-disclaimer watermark | Matches approved three-line wording and style from `files/รายการบัญชีราคามาตรฐานงานก่อสร้างท่อร้อยสาย 2568.pdf`: `รายการบัญชีราคานี้ไม่ใช่ราคาก่อสร้างที่แท้จริงหรือถูกต้องตรงกับราคาก่อสร้าง`; `แต่เป็นเพียงราคาโดยประมาณซึ่งใกล้เคียงกับราคาก่อสร้างจริงเท่านั้น`; `(สำหรับกิจการ บมจ.โทรคมนาคมแห่งชาติ เท่านั้น มิให้เผยแพร่ก่อนได้รับอนุญาต)` |  | Pending |
 | Published stamp | Version/effective date/published at/by/count/hash |  | Pending |
 | Excel numeric cell types | Numeric, formatted |  | Pending |
 | Excel exact 5 sheets/headers; no formulas/external links | Exact |  | Pending |

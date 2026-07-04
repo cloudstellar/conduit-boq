@@ -353,6 +353,14 @@ custody is required.
 - The field-facing price table shows only core price-list fields: sequence,
   item description, counting unit (`หน่วยนับ`), material cost, labor cost, and
   total unit price.
+- Field-facing PDF price pages, including the published Production PDF, must
+  use the same diagonal red disclaimer watermark wording and style as
+  `files/รายการบัญชีราคามาตรฐานงานก่อสร้างท่อร้อยสาย 2568.pdf`:
+  `รายการบัญชีราคานี้ไม่ใช่ราคาก่อสร้างที่แท้จริงหรือถูกต้องตรงกับราคาก่อสร้าง`;
+  `แต่เป็นเพียงราคาโดยประมาณซึ่งใกล้เคียงกับราคาก่อสร้างจริงเท่านั้น`;
+  `(สำหรับกิจการ บมจ.โทรคมนาคมแห่งชาติ เท่านั้น มิให้เผยแพร่ก่อนได้รับอนุญาต)`.
+  This watermark is a price-disclaimer watermark, not a Draft/Preview status
+  mark.
 - Show `(หน่วยเงิน: บาท)` as a right-aligned table-level currency note
   immediately above the price columns/header. Repeat it with the table header
   on continued pages. Do not place it in the document title or footer.

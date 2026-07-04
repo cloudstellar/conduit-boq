@@ -21,6 +21,10 @@ Production name/unit/price change.
 Approve detailed implementation and local rehearsal of Master Catalog Phase 4.
 This approval does not authorize a Production migration, feature enablement, or
 catalog publication. Those actions have separate gates in this document.
+To avoid a slow handoff after a clean rehearsal, P-12 through P-14 may be
+requested and recorded in the same operating window after the WP-8 evidence is
+green. That same-window path is conditional, not automatic, and does not
+pre-approve P-15 publication.
 
 Approval covers the reviewed supporting contracts listed in the
 [Decision Register](./19-phase4-decision-register.md), especially P-01. A
@@ -290,6 +294,13 @@ pretend a publishable candidate has been approved.
 - [ ] Feature flag defaults to disabled
 - [ ] Owner explicitly approves the Production migration window
 
+Same-window fast-track is allowed only when all checks above are green in the
+same operating window, the reviewed migration/deployment fingerprints match,
+and the verification report already contains the Local reset, drift, backup,
+BOQ regression, Factor F assertion, security/advisor, and export evidence. Any
+failed, missing, stale, or ambiguous evidence stops the fast-track and returns
+to normal gated approval.
+
 ## 13. Preconditions before publication
 
 - [ ] Production additive migration and compatible application are verified
@@ -303,6 +314,11 @@ pretend a publishable candidate has been approved.
 - [ ] Full-import below/at mass-retirement threshold tests pass and required
       approval evidence is persisted
 - [ ] Owner explicitly approves publication of the named version
+
+P-15 is never implied by same-window migration, deploy, or feature enablement.
+Publication requires the final exact version, effective date, approval
+reference, approval document date, physical archive reference, approver/publisher
+snapshot, diff totals, item count, dataset hash, and export filing evidence.
 
 ## 14. Rollout and rollback rule
 
@@ -336,10 +352,10 @@ Detailed execution is in the
 
 | Gate | Role | Name | Decision | Timestamp | Evidence/reference |
 |---|---|---|---|---|---|
-| Implement + local rehearsal | Owner | Owner | Approved for CR scope; P-01 remains pending until remaining authority documents are accepted | 2026-07-04 | Owner chat approval; Production gates separate |
-| Production migration | Owner |  | Not requested |  |  |
-| Application deploy | Owner |  | Not requested |  |  |
-| Feature enablement | Owner |  | Not requested |  |  |
+| Implement + local rehearsal | Owner | Owner | Approved for implementation/local rehearsal via P-01 | 2026-07-04 | Owner chat approval; Production gates separate |
+| Production migration | Owner |  | Conditional same-window path recorded; execution approval pending | 2026-07-04 | Requires WP-8 green evidence, backup/restore, drift check, and owner go/no-go |
+| Application deploy | Owner |  | Conditional same-window path recorded; execution approval pending | 2026-07-04 | Requires migration verification, CI/deployment fingerprint, disabled feature flag, and owner go/no-go |
+| Feature enablement | Owner |  | Conditional same-window path recorded; execution approval pending | 2026-07-04 | Requires admin-only smoke, authorization checks, feature-scope confirmation, and owner go/no-go |
 | Publish `2568.1.0` | Owner |  | Not requested |  |  |
 | Execution | Executor |  | Pending |  |  |
 | Independent verification | Verifier |  | Pending |  |  |

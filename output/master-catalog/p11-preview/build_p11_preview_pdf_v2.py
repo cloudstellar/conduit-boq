@@ -56,6 +56,11 @@ canonical_keys = [
 
 source = json.loads(DATA_PATH.read_text(encoding="utf-8"))
 rows = source["rows"]
+WATERMARK_LINES = [
+    "รายการบัญชีราคานี้ไม่ใช่ราคาก่อสร้างที่แท้จริงหรือถูกต้องตรงกับราคาก่อสร้าง",
+    "แต่เป็นเพียงราคาโดยประมาณซึ่งใกล้เคียงกับราคาก่อสร้างจริงเท่านั้น",
+    "(สำหรับกิจการ บมจ.โทรคมนาคมแห่งชาติ เท่านั้น มิให้เผยแพร่ก่อนได้รับอนุญาต)",
+]
 
 
 def canonical_json(row):
@@ -315,8 +320,8 @@ def make_overlay(page_number, total_pages):
         overlay.setFillColor(colors.Color(1, 0.22, 0.18, alpha=0.24))
         overlay.translate(width / 2, height / 2)
         overlay.rotate(36)
-        overlay.drawCentredString(0, 0, "ร่างตัวอย่างก่อนรับรองเอกสาร ห้ามใช้อ้างอิงราคา")
-        overlay.drawCentredString(0, -11 * mm, "DRAFT PREVIEW - NOT OFFICIAL")
+        for offset, line in enumerate(WATERMARK_LINES):
+            overlay.drawCentredString(0, -offset * 11 * mm, line)
         overlay.restoreState()
 
     overlay.saveState()

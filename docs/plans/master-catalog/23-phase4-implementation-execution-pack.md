@@ -2,7 +2,9 @@
 
 **Status:** Owner-approved for WP-0 through WP-8 implementation/local
 rehearsal; WP-9 Production execution requires separate P-12 through P-15
-approvals
+approvals. P-12 through P-14 may be requested and recorded in the same
+operating window after WP-8 passes under the fast-track conditions below; P-15
+publication remains a separate final owner decision.
 
 **Prepared:** 2026-06-29
 
@@ -28,9 +30,11 @@ implementation.
 Phase 4 is detailed enough to start **implementation and local rehearsal** after
 P-01 owner approval.
 
-It is **not** detailed enough to authorize Production migration, feature
+It is **not** standing authorization for Production migration, feature
 enablement, or catalog publication. Those remain separate gates in the Change
-Request, Runbook, and Verification Report.
+Request, Runbook, and Verification Report. If WP-8 evidence is complete and
+green, the team may request P-12 through P-14 in the same operating window
+instead of pausing for another design review.
 
 Start allowed:
 
@@ -408,12 +412,49 @@ Exit gate:
 - all gates pass;
 - accepted warnings have owner, technical rationale, remediation owner, and due
   date;
-- Production approval P-12 can be requested.
+- Production approval P-12 can be requested, including same-window fast-track
+  if the handoff evidence below is complete.
+
+## 13.1 Same-window Production fast-track
+
+Goal: prevent unnecessary delay after a clean local rehearsal while preserving
+the Production and publication gates.
+
+This path is allowed only when WP-8 has just passed and the Verification Report
+contains current evidence for:
+
+- clean Local reset and full workflow success;
+- reviewed migration filename and SHA-256;
+- exact branch/commit and deployment artifact fingerprint;
+- fresh read-only Production baseline and schema drift check;
+- fresh logical backup plus restore-test evidence;
+- BOQ regression preservation, including price-list version links;
+- Factor F before/after assertions proving no pointer, row, hash, grant, RLS,
+  or BOQ binding change;
+- Supabase security/performance advisor results with no unresolved blocker;
+- feature flag disabled by default;
+- P-11 export preview/count/hash evidence;
+- owner go/no-go captured for each Production step before that step runs.
+
+Same-window fast-track can cover:
+
+- P-12 Production migration after the checklist above is green;
+- P-13 application deploy after migration verification is green;
+- P-14 admin feature enablement after deploy/admin-only smoke is green.
+
+It cannot cover P-15. Publication requires exact final `2568.1.0` metadata,
+approval reference, effective date, physical archive reference, final diff,
+item count, dataset hash, official Excel/PDF evidence, and owner approval.
+
+Abort the fast-track and return to the normal gated path if any evidence is
+missing, stale, failed, ambiguous, or different from the reviewed plan.
 
 ## 14. WP-9 Production execution
 
 This package cannot start from this document alone. It requires P-12 through
 P-15, the Production Runbook, and a completed Verification Report from WP-8.
+P-12 through P-14 may be captured in the same operating window only under the
+fast-track rule above.
 
 Production order:
 
@@ -501,7 +542,8 @@ Recommended next action:
 1. Owner reviews the Phase 4 authority documents in the Review Guide order.
 2. Owner approves P-01 for implementation/local rehearsal only.
 3. Implement WP-0 through WP-8.
-4. Request separate Production approvals only after WP-8 passes.
+4. After WP-8 passes, request Production approvals. Use the same-window
+   fast-track only if the handoff evidence is complete and green.
 
 Do not wait for all Production data decisions before starting generic local
 implementation. Do wait for the relevant owner decision before freezing,
