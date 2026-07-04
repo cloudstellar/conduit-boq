@@ -1,0 +1,46 @@
+{
+  "workbookPath": "/Users/cloud/Cloudstellar/conduit-boq/output/master-catalog/p11-preview/DRAFT-PREVIEW-NT-Master-Catalog-v2568.1.0-p11-preview.xlsx",
+  "datasetHash": "sha256:591d59fb1704721cc54f64d356e0b09d409f75006a4f9229b275f96e6b1ff139",
+  "itemCount": 12,
+  "source": "Production-derived rows from docs/plans/master-catalog/evidence/phase4-reconciliation-draft.csv",
+  "sheetOrder": [
+    "ข้อมูลเอกสาร",
+    "รายการราคา",
+    "พจนานุกรมรหัส",
+    "สรุปการเปลี่ยนแปลง",
+    "ข้อมูลตรวจสอบ"
+  ],
+  "priceColumns": [
+    "ลำดับ",
+    "รหัสรายการ",
+    "รายการ",
+    "หน่วย",
+    "ค่าวัสดุ (บาท)",
+    "ค่าแรง (บาท)",
+    "ราคาต่อหน่วย (บาท)",
+    "หมวดหมู่",
+    "รหัสบริบทงาน",
+    "บริบทงาน",
+    "รหัสชนิดรายการ",
+    "ชนิดรายการ",
+    "สถานะ"
+  ],
+  "verificationColumns": [
+    "identity_id",
+    "item_code",
+    "item_name",
+    "unit",
+    "material_cost",
+    "labor_cost",
+    "unit_cost",
+    "category_code",
+    "category_name",
+    "work_context_code",
+    "work_context_name_th",
+    "item_type_code",
+    "item_type_name_th",
+    "is_active",
+    "display_order",
+    "_canonical_row_json"
+  ]
+}
