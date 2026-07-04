@@ -35,6 +35,12 @@
 16. [Admin Operating Procedure](./15-phase4-admin-operating-procedure.md) — วิธีใช้งานของผู้ดูแลระบบ
 17. [Release Note Template](./16-phase4-release-note-template.md) — เอกสารต่อหนึ่งเวอร์ชันที่ publish
 
+ระหว่าง implementation ให้ใช้
+[Execution Progress Tracker](./25-phase4-execution-progress-tracker.md)
+เป็น dashboard อ่านเร็วสำหรับ owner และใช้
+[Verification Report](./13-phase4-verification-report.md) เป็นหลักฐานละเอียด
+ตาม gate.
+
 [แผนย้าย Supabase API key](../security/01-supabase-api-key-migration-change-request.md)
 เป็น maintenance แยก ไม่ต้องรวมใน Production change เดียวกับ Phase 4 และไม่
 บล็อกการเริ่ม implement/local rehearsal ของ Master Catalog

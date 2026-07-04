@@ -24,6 +24,11 @@ This document does not replace the architecture, CR, runbook, DB contract, or
 verification report. It is the operational bridge from approved plan to local
 implementation.
 
+During implementation, keep
+[Doc #25 Execution Progress Tracker](./25-phase4-execution-progress-tracker.md)
+updated as the owner-facing dashboard. The Verification Report remains the
+gate evidence record.
+
 ## 1. Readiness verdict
 
 Phase 4 is detailed enough to start **implementation and local rehearsal** after
