@@ -36,9 +36,11 @@ update Factor F rows in place, infer old BOQ factor provenance, or move the
 Factor F pointer under a Master Catalog approval.
 
 The candidate workbook contains a useful `AAA-TTT-###` taxonomy, but it has 708
-rows rather than Production's 710. Reconciliation found 42 price differences,
-18 workbook-only rows, 20 Production-only rows, and 16 HDPE Crossing rows whose
-GIP code/K mapping conflicts with their descriptions. Therefore the workbook
+rows rather than Production's 710. Reconciliation found 42 price differences, 18
+raw workbook-only evidence rows, 20 Production-only rows, and 16 HDPE Crossing
+rows whose GIP code/K mapping conflicts with their descriptions. P-07 later
+resolves one raw workbook row, `FTW-CON-002`, as a typo shadow of Production
+`ITEM-0491`, leaving 17 unresolved supplement candidates. Therefore the workbook
 cannot be promoted as a replacement price source.
 
 ## Decision

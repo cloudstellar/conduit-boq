@@ -59,11 +59,11 @@
 | เรื่อง | ผลถ้ายังไม่ตัดสินใจ |
 |---|---|
 | อนุมัติชุด P-01: Revision 8, ADR, CR, Post-Factor-F plan, Implementation Execution Pack และ contracts สำหรับ implementation/local rehearsal | ยังไม่เริ่ม Phase 4A |
-| `ITEM-0131` / `ITEM-0139` จะคงทั้งคู่หรือ retire ตัวใด | candidate ยังล็อกไม่ได้; ห้าม merge UUID/history |
-| แก้รหัส HDPE Crossing 16 รายการอย่างไร | code dictionary ยัง publish ไม่ได้ |
-| รหัส canonical ของ Production-only 20 รายการ | candidate 710 แถวยังไม่ครบ |
-| Workbook-only 18 รายการจะ defer ทั้งหมดหรือมี price authority | ยังเพิ่มเป็นของจริงไม่ได้ |
-| อนุมัติ AAA/TTT ทั้ง 22/62 กลุ่ม | structured code ยังเป็นเพียง candidate |
+| `ITEM-0131` / `ITEM-0139` จะคงทั้งคู่หรือ retire ตัวใด | P-02 approved retain both; ห้าม merge UUID/history |
+| แก้รหัส HDPE Crossing 16 รายการอย่างไร | P-03 approved; publication ยังรอ gate ที่เหลือ |
+| รหัส canonical ของ Production-only 20 รายการ | P-04 approved; `ITEM-0139` เป็น temporary legacy |
+| Workbook-only 18 raw rows จะ defer ทั้งหมดหรือมี price authority | P-05/P-07 approved: 17 unresolved supplement candidates deferred; workbook `FTW-CON-002` เป็น typo shadow ของ `ITEM-0491` |
+| อนุมัติ AAA/TTT ทั้ง 22/65 กลุ่ม | approved for backfill; publication ยังรอ P-08/P-09 และ gates ที่เหลือ |
 | Runtime font/logo derivative ใด commit/deploy ได้ | CI implementation ยังเริ่มไม่ได้ |
 | Metadata จริงของ baseline `2568.0.0` | ยัง validate publication-completeness constraint ไม่ได้ |
 | รูปแบบตัวอย่าง Excel/PDF ตาม Export Spec | ยังปิดงาน export acceptance ไม่ได้ |
@@ -101,12 +101,14 @@ freeze, final backfill, export acceptance หรือ publication gate ที�
 เวลาอ่านบทวิเคราะห์หรือ quick-decision guide ภายนอก ให้ถือเป็นคำแนะนำ ไม่ใช่
 authority โดยตรง:
 
-- P-02 ยังไม่ควรฟันธง retire `ITEM-0139` จนกว่า owner/data custodian ยืนยันว่า
-  แถวนั้นผิดจริง; ถ้าไม่ยืนยัน ให้ retain ทั้งสอง identity และห้าม merge
+- P-02 approved ให้ retain `ITEM-0131` และ `ITEM-0139` ทั้งคู่ใน `2568.1.0`;
+  `ITEM-0139` เป็น future-retirement candidate เท่านั้น และห้าม merge
   UUID/history
-- P-03 รหัสอย่าง `CRS-H06`/`CRS-H08` เป็น proposal จนกว่าจะอนุมัติ exact
-  canonical group/code/sequence
-- P-06 อาจ approve รูปแบบหรือ governance ได้ก่อน แต่ยังไม่ใช่ final taxonomy
-  approval ถ้า row-level conflicts ยังไม่ปิด
+- P-03 approved ให้แยก HDPE Crossing เป็น `CRS-H06`/`CRS-H08`; `CRS-GIP-025`
+  ยัง deferred ตาม P-05
+- P-06 approved 22/65 group meanings สำหรับ backfill โดยมี `ITEM-0139`
+  temporary-legacy safeguard; P-07 approved ให้ใช้ Production `ITEM-0491`
+  wording สำหรับ `FTW-CON-002` และ reject workbook typo; publication ยังรอ
+  P-08/P-09 และ gates ที่เหลือ
 - P-10 ต้องมีรายการ asset, ที่มา, permission/license และ runtime path ก่อน
   approve ให้ commit/deploy

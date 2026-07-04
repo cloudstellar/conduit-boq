@@ -10,9 +10,10 @@ approved for candidate freeze, import, or publication
 recommendation as evidence framework only. The owner accepts the method,
 counts, CSV field contract, Production price precedence, workbook-only deferral
 default, Production-only retention, UUID/history merge prohibition, current
-HDPE-as-GIP rejection, and approval rules. This approval does not resolve
-P-02 through P-07, approve final row-level outcomes, authorize candidate freeze,
-make the CSV an import file, or authorize publication.
+HDPE-as-GIP rejection, and approval rules. P-02 through P-07 row-level decisions
+are recorded below as separate owner decisions. This report still does not make
+the CSV an import file, authorize Production candidate freeze, or authorize
+publication.
 
 ## 1. Purpose
 
@@ -69,9 +70,9 @@ matches, but an owner/reviewer must approve them explicitly.
 | Exact material/labor/unit cost matches | 648 | Preserve Production values |
 | Same name+unit but different costs | 42 | Preserve Production; not a price-change request |
 | Production-only rows | 20 | Retain; assign approved code or document temporary legacy code |
-| Workbook-only rows | 18 | Defer; not publishable without separate price authority |
-| HDPE Crossing taxonomy conflicts | 16 | Correct/reject `CRS-GIP-018`–`033`; do not publish as GIP |
-| Decision records in attached CSV | 728 | 710 Production + 18 workbook-only candidates |
+| Workbook-only rows | 18 raw / 17 unresolved | Raw workbook evidence has 18 rows; P-07 resolves workbook `FTW-CON-002` as a typo shadow of Production `ITEM-0491`, leaving 17 supplement candidates deferred |
+| HDPE Crossing taxonomy conflicts | 16 | Correct/reject `CRS-GIP-018`-`033`; do not publish as GIP |
+| Decision records in attached CSV | 728 | 710 Production + 18 raw workbook-only records |
 
 ## 5. Locked price decision
 
@@ -109,12 +110,44 @@ would violate `UNIQUE (version_id, identity_id)` or require rewriting history.
 Retirement in a new version expresses the business correction without either
 problem.
 
+**Owner decision recorded:** 2026-07-04 — retain both `ITEM-0131` and
+`ITEM-0139` as distinct valid items in the candidate. No available evidence
+identifies which historical row, if either, is erroneous; legacy creation audit
+is unavailable and BOQ reference impact has not been proven. Retaining both is
+reversible in a later approved version, while retiring the wrong identity would
+create unnecessary operational and audit risk. No UUID/history merge, price
+change, name change, unit change, or implicit retirement is authorized by this
+decision.
+
+**Future-retirement note:** `ITEM-0139` may be proposed for retirement in a
+subsequent approved version only if live preflight confirms BOQ references are
+zero, the data custodian/owner confirms it is the erroneous duplicate, and the
+change is recorded as a `retire` outcome for that identity only. UUID/history
+merge remains prohibited. The 2026-06-21 snapshot check found zero BOQ item
+references for both `ITEM-0131` and `ITEM-0139`, but that snapshot is
+supporting evidence, not a substitute for live preflight before a future
+retirement.
+
 ### 6.2 HDPE Crossing rows
 
 Sixteen descriptions identify HDPE but candidate codes
 `CRS-GIP-018` through `CRS-GIP-033` classify them as GIP and map them toward
 GIP formula `K(5.6)`. These rows require corrected `AAA-TTT` codes or explicit
 rejection. Phase 4 does not import K fields.
+
+**Owner decision recorded:** 2026-07-04 — reject `CRS-GIP-018` through
+`CRS-GIP-033` as GIP classifications and split the HDPE Crossing candidates
+into HDPE Crossing subtypes following the existing `H06`/`H08` convention:
+`CRS-H06` for HDPE PN6 Crossing and `CRS-H08` for HDPE PN8 Crossing. This is a
+taxonomy recode only; Production names, units, material costs, labor costs,
+unit costs, identities, and BOQ history are unchanged. Workbook-only
+`CRS-GIP-025` remains deferred/not publishable under P-05 because it has no
+Production identity or separate price authority. Retained duplicate
+`ITEM-0139` is handled under P-04 as a Production-only row that needs its own
+canonical-code or temporary legacy-code decision. K-formula fields remain
+excluded from Phase 4 Core. Exact draft code names/sequences may still be
+corrected before publication under the Code Dictionary governance rule that
+draft codes may be corrected before publication.
 
 ### 6.3 Production-only 20 rows
 
@@ -124,17 +157,89 @@ Every row remains in the candidate catalog. The owner must either:
 - approve temporary continued use of its legacy `ITEM-####` code for this
   version with a reason and follow-up owner.
 
-### 6.4 Workbook-only 18 rows
+**Owner decision recorded:** 2026-07-04 — retain all 20 Production-only rows
+in `2568.1.0` and preserve Production names, units, material costs, labor
+costs, unit costs, identities, and BOQ history. Nineteen rows receive canonical
+codes now. `ITEM-0139` keeps temporary legacy code `ITEM-0139` in this version
+because P-02 retains both duplicate identities and allows future retirement only
+with live BOQ-reference evidence plus owner/data-custodian confirmation.
+
+| Legacy item | Approved code for `2568.1.0` | Decision note |
+|---|---|---|
+| `ITEM-0139` | `ITEM-0139` | Temporary legacy code; future retirement candidate under P-02 controls |
+| `ITEM-0491` | `FTW-CON-002` | Use Production wording; do not import workbook typo |
+| `ITEM-0683` | `CIC-H06-001` | HDPE PN6 concrete-encased communication conduit |
+| `ITEM-0684` | `CIC-H06-002` | HDPE PN6 concrete-encased communication conduit |
+| `ITEM-0685` | `CIC-H06-003` | HDPE PN6 concrete-encased communication conduit |
+| `ITEM-0686` | `CIC-H06-004` | HDPE PN6 concrete-encased communication conduit |
+| `ITEM-0687` | `CIC-H06-005` | HDPE PN6 concrete-encased communication conduit |
+| `ITEM-0688` | `CIC-H06-006` | HDPE PN6 concrete-encased communication conduit |
+| `ITEM-0689` | `CIC-H06-007` | HDPE PN6 concrete-encased communication conduit |
+| `ITEM-0690` | `CIC-H06-008` | HDPE PN6 concrete-encased communication conduit |
+| `ITEM-0691` | `CIC-H06-009` | HDPE PN6 concrete-encased communication conduit |
+| `ITEM-0692` | `CIC-H06-010` | HDPE PN6 concrete-encased communication conduit |
+| `ITEM-0699` | `JNT-PVC-013` | Next never-issued PVC joint code |
+| `ITEM-0700` | `RSR-PL0-040` | Pole riser; skip deferred workbook-only draft gaps |
+| `ITEM-0701` | `RSR-PL0-041` | Pole riser; skip deferred workbook-only draft gaps |
+| `ITEM-0702` | `RSR-PL0-042` | Pole riser; skip deferred workbook-only draft gaps |
+| `ITEM-0707` | `RSR-PL0-043` | Pole riser; skip deferred workbook-only draft gaps |
+| `ITEM-0708` | `RSR-PL0-044` | Pole riser; skip deferred workbook-only draft gaps |
+| `ITEM-0709` | `RSR-PL0-045` | Pole riser; skip deferred workbook-only draft gaps |
+| `ITEM-0710` | `RSR-PL0-046` | Pole riser; skip deferred workbook-only draft gaps |
+
+### 6.4 Workbook-only raw 18 rows / 17 supplement candidates
 
 Default decision is `candidate_add` + `deferred_not_publishable`. Adding one
 requires approved name/unit/price authority, an allocated identity/code, and a
 reviewed change request. Candidate presence in the workbook is insufficient.
 
+**Owner decision recorded:** 2026-07-04 — the raw reconciliation keeps 18
+workbook-only evidence rows, but P-07 resolves workbook `FTW-CON-002` as a typo
+shadow of Production `ITEM-0491`, not a separate supplement candidate. Defer the
+remaining 17 unresolved workbook-only rows from `2568.1.0` and open them as a
+separate supplement intake. This is not an abandonment of the rows; it keeps the
+first structured-code release clean as a 710-row Production clone/recode while
+preserving the unresolved rows as future candidates with explicit gates. The
+default target for a true new supplement is `2568.2.0`; a different version
+classification is allowed only if approved evidence classifies the change
+differently under ADR-003.
+
+The 17 unresolved supplement candidates may be published only after all of the
+following are recorded:
+
+1. item authority for the new standard item or omission;
+2. price authority for material, labor, and unit cost;
+3. corrected taxonomy and non-conflicting code allocation;
+4. owner/data-custodian approval;
+5. import preview and reconciliation evidence;
+6. dataset hash and publish verification.
+
+Additional P-05 constraints:
+
+- `CRS-GIP-025` must not publish as GIP because its description is HDPE.
+- Workbook `FTW-CON-002` must not be imported as a new item. After removing the
+  repeated Thai phrase and normalizing whitespace, it maps to Production
+  `ITEM-0491`; P-04/P-07 assign canonical code `FTW-CON-002` to that Production
+  identity and wording.
+- `RSR-PL0-010`-`013`, `018`-`020`, and `029`-`031` remain deferred gaps and
+  must not be reused by the `2568.1.0` Production-only recode.
+- Snapshot review supports deferral for the 17 unresolved supplement candidates,
+  but does not replace live preflight before any future supplement.
+
 ### 6.5 `FTW-CON-002`
 
-The candidate wording contains a repeated Thai phrase. Production wording is
-preserved in the first clone. A later wording correction must be explicit and
-audited.
+**Owner decision recorded:** 2026-07-04 — approve `FTW-CON-002` as the
+canonical code for Production `ITEM-0491` using the existing Production wording,
+unit, material cost, labor cost, unit cost, identity, and BOQ history. Reject the
+workbook-only `FTW-CON-002` row as a typo shadow caused by the repeated phrase
+`งานซ่อมทางเท้างานซ่อมทางเท้าด้วย`; it is not a separate catalog candidate and
+must not be imported over the Production wording.
+
+The 2026-06-21 snapshot shows 8 `boq_items` references to Production
+`ITEM-0491`, so Phase 4 must not replace or merge its identity/history.
+Production also contains a double space in the retained wording. Any future
+whitespace-only cleanup is a separate wording correction/change request and is
+not part of P-07 or the `2568.1.0` taxonomy-only rollout.
 
 ## 7. CSV field contract
 

@@ -59,7 +59,9 @@ Start blocked:
    approved candidate changes.
 4. The first rollout preserves Production prices. Workbook prices are not
    authority.
-5. The 18 workbook-only rows are deferred unless separate item and price
+5. Raw workbook evidence has 18 workbook-only rows. P-07 resolves workbook
+   `FTW-CON-002` as a typo shadow of Production `ITEM-0491`; the remaining 17
+   unresolved supplement candidates are deferred unless separate item and price
    authority is approved.
 6. The 16 HDPE Crossing candidate code conflicts must be corrected or rejected
    before candidate code freeze.
@@ -83,9 +85,9 @@ Start blocked:
 | P-02 duplicate treatment for `ITEM-0131` / `ITEM-0139` | Candidate freeze, not generic schema | Decision Register |
 | P-03 HDPE Crossing code correction/rejection | Candidate code freeze | Decision Register |
 | P-04 canonical codes for 20 Production-only rows | Candidate 710-row freeze | Decision Register |
-| P-05 disposition of 18 workbook-only rows | Candidate freeze/publication | Decision Register |
+| P-05 disposition of 18 raw workbook-only rows / 17 unresolved supplement candidates | Candidate freeze/publication | Decision Register |
 | P-06 AAA/TTT group meanings | Code-group backfill/publication | Decision Register |
-| P-07 `FTW-CON-002` wording correction | If included in candidate scope | Decision Register |
+| P-07 `FTW-CON-002` wording disposition | Candidate scope freeze | Decision Register |
 | P-08 legacy `2568.0.0` publication metadata | Publication-completeness constraint | Decision Register |
 | P-09 exact candidate version/effective/archive refs | Candidate draft/publish rehearsal | Decision Register |
 | P-10 runtime CI assets | CI implementation/deploy | Decision Register |
@@ -284,6 +286,10 @@ Implementation rules:
 - sequence capacity at `900` blocks and requires capacity decision;
 - Production prices win in the first rollout;
 - workbook-only rows are not publishable without owner authority.
+- `ITEM-0139` is the only approved temporary legacy-code exception for
+  `2568.1.0`; publish validation must allow null `code_group_id` only for this
+  row and fail if any other active structured-version row has a null code
+  group.
 
 Exit gate:
 
@@ -477,7 +483,7 @@ Before asking for code review:
 
 | Blocker | Action |
 |---|---|
-| Owner decision P-02 to P-07 missing | Continue generic implementation; do not freeze candidate data |
+| Owner decision P-02 to P-07 missing | Continue generic implementation; do not freeze candidate data. Current record shows P-02 through P-07 approved; use this only if the decision register is reverted or superseded |
 | P-08/P-09 missing | Continue local draft/publish mechanics; do not publish Production |
 | P-10 missing | Use placeholder-safe local styling only; do not deploy CI assets |
 | P-11 missing | Build export mechanics; do not accept official export visual |

@@ -212,7 +212,7 @@ Add:
 |---|---|---|
 | `identity_id` | `uuid` | Stable identity FK; backfill all 710 rows before `NOT NULL` |
 | `category_id` | `uuid` | Version-safe category FK; backfill before structured publish |
-| `code_group_id` | `uuid null` | May remain null for legacy `2568.0.0`; required for structured versions |
+| `code_group_id` | `uuid null` | May remain null for legacy `2568.0.0`; required for structured versions except approved temporary legacy-code exceptions |
 | `display_order` | `integer` | Explicit nonnegative presentation order; never physical row order |
 
 Keep during the first stable Production cycle:
@@ -229,6 +229,11 @@ Constraints after verified backfill:
 - composite FK `(item_code, identity_id)` to the code registry;
 - composite FK `(version_id, category_id)` to versioned category;
 - composite FK `(version_id, code_group_id)` to versioned code group;
+- structured-version `code_group_id` is required for active rows except a
+  recorded temporary legacy-code exception. For P-06, the only approved
+  exception is `ITEM-0139` in `2568.1.0`, backed by P-02/P-04/P-06 owner
+  decisions. Publish validation must assert exactly that exception and fail if
+  any other active structured-version row has `code_group_id is null`;
 - nonnegative material/labor/unit costs;
 - `unit_cost = material_cost + labor_cost`;
 - nonnegative `display_order`;

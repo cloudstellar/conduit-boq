@@ -86,7 +86,9 @@ Stop immediately when any of these occurs:
    the erroneous duplicate in the candidate; never merge UUID/history.
 5. Correct/reject all 16 HDPE Crossing taxonomy conflicts.
 6. Allocate approved treatment for 20 Production-only rows.
-7. Keep 18 workbook-only rows deferred unless separate price authority exists.
+7. Keep the 17 unresolved supplement candidates deferred unless separate price
+   authority exists; treat workbook `FTW-CON-002` only as P-07 typo-shadow
+   evidence for Production `ITEM-0491`.
 8. Approve the complete AAA/TTT dictionary and allocation rules.
 9. Approve parser, payload, error-code, and canonical-hash contract.
 10. Approve database/security, threat, and official-export contracts.

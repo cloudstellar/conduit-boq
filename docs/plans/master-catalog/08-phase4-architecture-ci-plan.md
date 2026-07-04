@@ -118,7 +118,8 @@ Verified workbook facts:
 
 - 708 catalog rows and 31 item fields
 - 708 unique codes matching `AAA-TTT-###`
-- 22 `AAA` groups and 62 `AAA-TTT` groups
+- 22 `AAA` groups and 62 workbook `AAA-TTT` groups; owner decisions P-03/P-04
+  expand the implementation dictionary to 65 groups
 - No missing required item, unit, or cost values
 - Workbook `item_id` is only a row sequence: all 708 values change when the
   same items are sorted on the `02_Item_Master_By_Code` sheet
@@ -134,16 +135,19 @@ Read-only comparison with the current 710-row Production catalog found:
 - 16 HDPE Crossing rows are coded `CRS-GIP-018` through `CRS-GIP-033` and are
   mapped to GIP formula `K(5.6)`, conflicting with their descriptions and the
   workbook's own HDPE rule `K(5.2.3)`
-- `FTW-CON-002` contains a repeated Thai phrase and requires text correction
+- workbook `FTW-CON-002` contains a repeated Thai phrase and is resolved by P-07
+  as a typo shadow of Production `ITEM-0491`
 
 `FINAL` inside the workbook is author-supplied workbook status; it does not
 override the Production baseline or the reconciliation gate defined below.
 
 For the first structured-code release, all 42 workbook/Production price
-differences resolve to “preserve Production price.” The workbook-only 18 rows
-remain candidates outside the published catalog until separate price authority
-is approved. The Production-only 20 rows remain in the catalog and must receive
-approved canonical-code decisions.
+differences resolve to “preserve Production price.” Raw workbook evidence still
+contains 18 workbook-only records, but P-07 resolves workbook `FTW-CON-002` as a
+typo shadow, leaving 17 unresolved supplement candidates outside the published
+catalog until separate item and price authority is approved. The Production-only
+20 rows remain in the catalog and must receive approved canonical-code
+decisions.
 
 ---
 
@@ -307,15 +311,18 @@ Required reconciliation artifact:
 The first mechanical draft is now recorded in
 [the Phase 4 reconciliation report](./11-phase4-reconciliation-report.md) and
 [its 728-record CSV evidence](./evidence/phase4-reconciliation-draft.csv). It
-covers all 710 Production rows plus 18 workbook-only candidates, but remains a
-blocking draft until the owner/reviewers complete row decisions and sign-off.
+covers all 710 Production rows plus 18 raw workbook-only records. P-07 resolves
+one raw workbook record as the `ITEM-0491` typo shadow, leaving 17 unresolved
+supplement candidates. The draft remains blocking until owner/reviewer
+sign-off and publication gates are complete.
 
 Blocking decisions:
 
 1. Record all 42 price differences as `preserve_production`; they do not become
    price-change candidates in the first structured-code release.
-2. Mark the 18 workbook-only rows as deferred candidates unless separate
-   approved price evidence exists.
+2. Preserve the 18 raw workbook-only evidence rows; defer the 17 unresolved
+   supplement candidates unless separate approved item and price evidence
+   exists.
 3. Retain all 20 Production-only rows and assign an approved canonical code or
    a documented temporary legacy-code decision.
 4. Resolve the `ITEM-0131` / `ITEM-0139` duplicate without merging UUIDs or
@@ -323,8 +330,9 @@ Blocking decisions:
    or retire the erroneous row in the candidate version.
 5. Correct or explicitly approve the taxonomy of the 16 HDPE Crossing rows;
    their unapproved K mapping remains excluded.
-6. Correct the repeated phrase in `FTW-CON-002` or record why Production wording
-   is retained.
+6. Apply P-07: retain Production `ITEM-0491` wording for canonical
+   `FTW-CON-002`, reject the workbook repeated-phrase row as a typo shadow, and
+   keep any whitespace-only Production cleanup outside `2568.1.0`.
 7. Produce a final one-to-one legacy-code/canonical-code/identity mapping and
    confirm that no canonical code is reused.
 
@@ -502,8 +510,12 @@ meaning is versioned by the group row; `TTT` is interpreted only within its
 Add nullable `price_list.code_group_id` for compatibility. The legacy
 `2568.0.0` rows may remain null until the approved reconciliation is applied;
 every item in a newly published structured-code version must have a valid code
-group. The server validates that the explicit group matches the approved
-canonical code but application pricing logic never parses the code string.
+group except a recorded owner-approved temporary legacy-code exception. For
+P-06, the only approved exception is `ITEM-0139` in `2568.1.0`; publish
+validation must assert that no other active structured-version row has
+`code_group_id is null`. The server validates that the explicit group matches
+the approved canonical code but application pricing logic never parses the code
+string.
 Use composite foreign key `(version_id, code_group_id) ->
 catalog_code_groups (version_id, id)` so an item cannot reference another
 version's taxonomy row.
@@ -515,7 +527,8 @@ and populate it from the selected category in every write RPC.
 #### Reason
 
 The display category preserves current BOQ grouping while the code-group table
-preserves the 22/62 AAA-TTT dictionary. One small additional table avoids
+preserves the owner-approved 22/65 AAA-TTT dictionary. One small additional
+table avoids
 overloading category meaning or repeatedly parsing business codes, without
 forcing a destructive application cutover.
 
@@ -718,8 +731,9 @@ The first rollout does not import workbook prices:
    byte/numerically equal to the Production baseline.
 4. Apply only the approved legacy-code/canonical-code/category/code-group
    reconciliation.
-5. Keep the 18 workbook-only rows outside the draft unless separate approved
-   evidence authorizes them.
+5. Keep the 17 unresolved supplement candidates outside the draft unless
+   separate approved evidence authorizes them; keep the raw workbook
+   `FTW-CON-002` record as P-07 typo-shadow evidence, not an imported item.
 6. Keep the 20 Production-only rows and resolve their canonical codes.
 7. Review the complete recode/classification diff before approval and publish.
 
@@ -1300,9 +1314,10 @@ Production wording exactly.
 - Record a new read-only Production baseline.
 - Generate the 710-row reconciliation artifact from the Production baseline and
   candidate item-code workbook.
-- Lock all 42 price differences to Production values; defer the 18 workbook-only
-  rows; retain/code the 20 Production-only rows; resolve the duplicate pair,
-  16 Crossing taxonomy conflicts, and identified text error.
+- Lock all 42 price differences to Production values; defer the 17 unresolved
+  supplement candidates while preserving the raw 18-row workbook evidence;
+  retain/code the 20 Production-only rows; resolve the duplicate pair, 16
+  Crossing taxonomy conflicts, and P-07 `FTW-CON-002` typo-shadow disposition.
 - Freeze the approved legacy-code/canonical-code/identity mapping and code
   allocation rules.
 - Approve the code dictionary, reconciliation report, change request, and
@@ -1324,9 +1339,9 @@ but semantically wrong workbook from becoming the official catalog.
 - Create the versioned code-group dictionary.
 - Backfill 710 baseline identities/legacy codes and 52 display categories from
   the verified Production baseline.
-- Seed or freeze canonical code groups and candidate mappings only after the
-  relevant owner/taxonomy decisions are recorded; pending P-02 through P-07
-  must not be silently guessed during schema work.
+- Seed or freeze canonical code groups and candidate mappings only from recorded
+  owner/taxonomy decisions. P-02 through P-07 are recorded; any later P-08
+  through P-15 gate must not be silently guessed during schema work.
 - Add full-snapshot audit contracts and item-history indexes.
 - Add indexes, composite foreign keys, RLS, grants, and private functions.
 - Add and validate the unit-cost constraint.
@@ -1453,8 +1468,9 @@ Do not advance when any gate fails:
 - Candidate `2568.1.0` clones all 710 Production rows with identical name, unit,
   material cost, labor cost, and unit cost
 - All 42 workbook price differences resolve to preserved Production values
-- The 18 workbook-only rows are excluded unless separate approved evidence is
-  supplied; the 20 Production-only rows remain present
+- The 17 unresolved supplement candidates are excluded unless separate approved
+  evidence is supplied; workbook `FTW-CON-002` is kept only as P-07 typo-shadow
+  evidence; the 20 Production-only rows remain present
 - Workbook `item_id` is ignored
 - Legacy and canonical codes resolve to one stable identity and no code is
   reused
@@ -1615,7 +1631,8 @@ Do not advance when any gate fails:
    meanings, allocation/no-reuse rules, and review status.
 5. **[Reconciliation report](./11-phase4-reconciliation-report.md)** plus
    [728-record CSV](./evidence/phase4-reconciliation-draft.csv) — 710
-   Production outcomes and 18 workbook-only candidates.
+   Production outcomes, 18 raw workbook-only records, and 17 unresolved
+   supplement candidates after P-07.
 6. **[Deployment and rollback runbook](./12-phase4-production-runbook.md)** —
    checkpoints, expected counts, flag/pointer steps, backups, and aborts.
 7. **[Verification report](./13-phase4-verification-report.md)** — local,
@@ -1712,7 +1729,9 @@ data freeze, Production migration, feature enablement, or publication.
 - [ ] Owner approves Production price precedence for the candidate scope.
 - [ ] 710-row reconciliation and code dictionary are approved.
 - [ ] Duplicate and 16 Crossing decisions are recorded.
-- [ ] Production-only 20 rows and workbook-only 18 rows have recorded decisions.
+- [ ] Production-only 20 rows and raw workbook-only 18 rows have recorded
+  decisions; only 17 unresolved supplement candidates remain deferred after
+  P-07.
 - [ ] Any external analysis or quick-decision guide has been reconciled into the
   Decision Register; proposed outcomes are not treated as approved data.
 - [ ] Owner-approved legacy `2568.0.0` publication metadata is available; no

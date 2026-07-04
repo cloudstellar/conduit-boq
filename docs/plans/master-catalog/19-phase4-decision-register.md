@@ -79,27 +79,29 @@ Analysis memos and quick-decision guides may recommend outcomes, but they do
 not become authority until the owner records the exact outcome and evidence in
 this register. In particular:
 
-- `ITEM-0139` must not be retired merely because it is the likely duplicate
-  candidate. Retire only the row the owner/data custodian confirms is
-  erroneous; otherwise retain both published identities.
-- HDPE Crossing prefixes such as `CRS-H06`/`CRS-H08` are proposals until the
-  engineering data custodian approves the exact canonical groups, codes, and
-  reserved sequences.
-- AAA/TTT governance or format may be approved separately, but final group
-  meanings for publication remain pending until the related row-level conflicts
-  are resolved.
+- P-02 approved retaining both `ITEM-0131` and `ITEM-0139` in `2568.1.0`;
+  `ITEM-0139` is only a future-retirement candidate under the recorded
+  evidence gates.
+- P-03 approved splitting HDPE Crossing into `CRS-H06`/`CRS-H08` and rejecting
+  the prior HDPE-as-GIP classification.
+- P-06 approved the 22/65 group meanings for backfill with the `ITEM-0139`
+  temporary-legacy safeguard. Publication still requires the remaining
+  publication gates.
+- P-07 approved using Production `ITEM-0491` wording for canonical
+  `FTW-CON-002`; the workbook row is a typo shadow, not a separate supplement
+  candidate.
 - Named NT font/logo derivatives require an asset/license inventory before they
   are approved for repository or Production use.
 
 | ID | Decision required | Current evidence/default recommendation | Owner | Due before | Status |
 |---|---|---|---|---|---|
 | P-01 | Approve ADR-004, Change Request, architecture Revision 8, DB/security contract, threat model, parser/hash spec, export spec, Post-Factor-F adjustment plan, and Implementation Execution Pack for implementation/local rehearsal | Approved together after owner review; this does not authorize Production migration, deploy, enablement, publication, or P-02 through P-15 data/records/visual decisions | Owner | Phase 4A implementation | Approved 2026-07-04 |
-| P-02 | Decide whether `ITEM-0131` and `ITEM-0139` remain justified distinct items or which erroneous duplicate is retired in the candidate | Both receive distinct baseline identities by default; if duplicate is confirmed, retire only the proven erroneous row; UUID/history merge is prohibited | Owner + data custodian | Candidate reconciliation freeze | Pending |
-| P-03 | Approve corrected canonical groups/codes for 16 HDPE Crossing rows | Reject current GIP candidates; use an approved HDPE classification; exact prefixes/sequences remain proposals until approved | Owner + engineering data custodian | Candidate code freeze | Pending |
-| P-04 | Assign/approve canonical codes and groups for 20 Production-only rows | Retain all 20 and preserve Production values | Owner + data custodian | Candidate 710-row freeze | Pending |
-| P-05 | Decide disposition of 18 workbook-only rows | Defer by default; add only with separate item and price authority | Owner | First structured candidate freeze | Pending |
-| P-06 | Approve all 22 work-context (`AAA`) and 62 item-type (`AAA-TTT`) group meanings | Treat workbook dictionary as candidate only; partial approval of format/governance does not approve unresolved group meanings | Owner + engineering data custodian | Code-group backfill | Pending |
-| P-07 | Approve correction of repeated Thai phrase in `FTW-CON-002` | Do not mix the correction into taxonomy-only version unless separately approved | Owner | Candidate scope freeze | Pending |
+| P-02 | Decide whether `ITEM-0131` and `ITEM-0139` remain justified distinct items or which erroneous duplicate is retired in the candidate | Retain both as distinct valid items in `2568.1.0`. `ITEM-0139` is only a future-retirement candidate if live preflight confirms BOQ refs = 0 and the data custodian/owner confirms it is the erroneous duplicate; UUID/history merge remains prohibited and any future correction must be retire-only. | Owner + data custodian | Candidate reconciliation freeze | Approved 2026-07-04 |
+| P-03 | Approve corrected canonical groups/codes for 16 HDPE Crossing rows | Reject `CRS-GIP-018` through `CRS-GIP-033` as GIP classifications; split HDPE Crossing into `CRS-H06` and `CRS-H08` as taxonomy recodes only. Preserve Production names, units, prices, identities, and BOQ history; defer workbook-only `CRS-GIP-025` under P-05; handle retained `ITEM-0139` under P-04; K fields remain excluded and draft code names/sequences may still be corrected before publication. | Owner + engineering data custodian | Candidate code freeze | Approved 2026-07-04 |
+| P-04 | Assign/approve canonical codes and groups for 20 Production-only rows | Retain all 20 Production-only rows; assign canonical codes to 19 rows (`FTW-CON-002`, `CIC-H06-001` through `CIC-H06-010`, `JNT-PVC-013`, `RSR-PL0-040` through `RSR-PL0-046`); keep `ITEM-0139` as temporary legacy code under P-02 controls. Preserve Production names, units, costs, identities, and BOQ history; add no workbook-only rows. | Owner + data custodian | Candidate 710-row freeze | Approved 2026-07-04 |
+| P-05 | Decide disposition of 18 workbook-only evidence rows | Raw workbook evidence remains 18 rows, but P-07 resolves workbook `FTW-CON-002` as a typo shadow of Production `ITEM-0491`, not a separate supplement candidate. Defer the remaining 17 unresolved workbook-only rows from `2568.1.0` and open a separate supplement intake. They are future candidates only until item authority, price authority, corrected taxonomy/code allocation, owner/data-custodian approval, import preview/reconciliation, and dataset-hash/publish verification are recorded. Default target for a true new supplement is `2568.2.0` unless approved evidence classifies the change differently under ADR-003. `CRS-GIP-025` must not publish as GIP. | Owner | First structured candidate freeze | Approved 2026-07-04 |
+| P-06 | Approve all 22 work-context (`AAA`) and 65 item-type (`AAA-TTT`) group meanings | Approve the 22 `AAA` and 65 `AAA-TTT` group meanings for code-group dictionary/backfill/implementation. This is not import approval, row-count approval, workbook-only approval, K-mapping approval, or P-07 wording correction. Approve revised main codes `DRL→COR`, `FND→PAD`, and `FTP→FTW`. `ITEM-0139` is an approved temporary legacy-code exception for `2568.1.0` only; DB/publish validation must allow `code_group_id is null` only for that row and assert no other active structured-version row has a null group. If that cannot be audited, stop and return to owner; developers must not infer a canonical code. | Owner + engineering data custodian | Code-group backfill | Approved 2026-07-04 |
+| P-07 | Approve correction of repeated Thai phrase in workbook `FTW-CON-002` | Use Production `ITEM-0491` wording for canonical code `FTW-CON-002`. Reject the workbook-only repeated-phrase row as a typo shadow, not a separate candidate; do not import workbook wording, do not create a duplicate item, and do not touch `ITEM-0491` identity/history because snapshot evidence shows 8 BOQ references. Any whitespace-only Production wording cleanup requires a separate wording correction/change request. | Owner | Candidate scope freeze | Approved 2026-07-04 |
 | P-08 | Provide truthful baseline publication metadata for legacy `2568.0.0` | Required: effective date, approval reference/document date, readable publisher/owner snapshot; never invent | Owner/records custodian | Validate Phase 4 publication-completeness constraint | Pending |
 | P-09 | Approve exact candidate version, effective date, approval reference, and physical archive reference | `2568.1.0` is a planning example, not authority | Owner | Candidate draft/publish rehearsal | Pending |
 | P-10 | Approve which NT fonts/logo derivatives may be committed and deployed | Use only necessary optimized runtime assets derived from local `/CI/`; require asset names, source, license/permission, and intended runtime path before approval | Owner/brand custodian | Phase 4B UI implementation | Pending |
@@ -130,8 +132,9 @@ this register. In particular:
 For P-02 through P-07, record the final answer in:
 
 1. this register;
-2. the [Reconciliation Report](./11-phase4-reconciliation-report.md) and
-   affected rows in `evidence/phase4-reconciliation-draft.csv`;
+2. the [Reconciliation Report](./11-phase4-reconciliation-report.md) and either
+   affected rows in `evidence/phase4-reconciliation-draft.csv` or the generated
+   frozen decision overlay when preserving raw evidence is required;
 3. the [Code Dictionary](./10-phase4-structured-code-dictionary.md), when code
    meaning/allocation changes;
 4. parser/golden fixtures and database seed/backfill generated from the frozen
@@ -173,7 +176,7 @@ Production migration, deploy, feature enablement, or publication.
 | Phase 4 Change Request | Approved for implementation/local rehearsal | Missing decision at its due gate is a stop condition; Production migration, deploy, enablement, publication, Factor F work, and unauthorized Production name/unit/price changes remain unauthorized | Owner chat approval, 2026-07-04 |
 | Database/security contract | Approved for implementation/local rehearsal | Additive `016+`, explicit grants/RLS, private definer boundary, direct-write revocation, lock order, Factor F/BOQ immutability, local DB/security/advisor verification, and forward-fix-only recovery are accepted | Owner chat approval, 2026-07-04 |
 | Threat model | Approved as threat/control baseline for implementation/local rehearsal | Required security tests, advisors, malicious fixtures, BOQ/Factor F regression, residual-risk acceptance, and re-review triggers are mandatory before Production | Owner chat approval, 2026-07-04 |
-| Decision Register | Approved as Phase 4 decision source of truth | Current locked/pending/deferred model, recording procedure, and "chat acknowledgement is not approval" control are accepted; P-02 through P-15 remain unresolved unless separately approved | Owner chat approval, 2026-07-04 |
+| Decision Register | Approved as Phase 4 decision source of truth | Current locked/pending/deferred model, recording procedure, and "chat acknowledgement is not approval" control are accepted; P-02 through P-07 are now separately approved, while P-08 through P-15 remain unresolved unless separately approved | Owner chat approval, 2026-07-04 |
 | Parser/hash spec | Approved for implementation/local rehearsal | Deterministic single parser profile, server revalidation, file/row/payload limits, stable error contract, K-exclusion, decimal-string money, canonical hash contract, golden/cross-runtime tests, and independent filed-source rehash before publication are accepted | Owner chat approval, 2026-07-04 |
 | Official export spec | Approved for implementation/local rehearsal | Dataset-hash versus binary-hash model, selected-version server export, fail-closed count/hash checks, five-sheet Excel architecture, visible canonical verification, PDF server-verified stamp, draft markings, Factor F exclusion, accessibility, filing evidence, and failure behavior are accepted; P-10/P-11 and reviewer sign-offs remain separate | Owner chat approval, 2026-07-04 |
 
@@ -181,8 +184,8 @@ Production migration, deploy, feature enablement, or publication.
 
 | Approval package | Decision | Owner | Timestamp | Evidence |
 |---|---|---|---|---|
-| Architecture + local implementation/rehearsal | Approved | Owner | 2026-07-04 | P-01; Production and P-02 through P-15 remain separate |
-| Frozen 710-row identity/code reconciliation | Pending |  |  | P-02–P-07 |
+| Architecture + local implementation/rehearsal | Approved | Owner | 2026-07-04 | P-01; Production and remaining P-08 through P-15 gates remain separate |
+| Frozen 710-row identity/code reconciliation | Approved | Owner | 2026-07-04 | P-02-P-07; implementation must preserve raw evidence and generated decision overlay |
 | Legacy baseline publication metadata | Pending |  |  | P-08 |
 | Official export format | Pending |  |  | P-11 |
 | Production migration | Not requested |  |  | P-12 |

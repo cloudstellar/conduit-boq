@@ -42,8 +42,8 @@ blocking gate stops the rollout.
 | Official export specification | Owner | Approved for implementation/local rehearsal | 2026-07-04 | Owner chat approval; P-10/P-11, reviewer sign-offs, and Production publication separate |
 | Post-Factor-F Adjustment Plan reviewed | Owner | Approved for implementation/local rehearsal | 2026-07-04 | Owner chat approval; Production gates separate |
 | Implementation Execution Pack reviewed | Owner | Approved for WP-0 through WP-8 | 2026-07-04 | Owner chat approval; WP-9 separate |
-| Code dictionary | Owner | Approved as candidate dictionary/governance framework; final taxonomy decisions pending | 2026-07-04 | Owner chat approval; P-02 through P-07 separate |
-| Row reconciliation | Owner | Approved as draft evidence/framework; final row-level decisions pending | 2026-07-04 | Owner chat approval; P-02 through P-07 separate |
+| Code dictionary | Owner | Approved as candidate dictionary/governance framework; P-02 through P-07 row/code decisions now recorded separately | 2026-07-04 | Owner chat approval; publication gates separate |
+| Row reconciliation | Owner | Approved as draft evidence/framework; P-02 through P-07 row-level outcomes now recorded separately | 2026-07-04 | Owner chat approval; raw CSV is evidence, not import authority |
 | Production migration |  | Not requested |  |  |
 | Application deployment |  | Not requested |  |  |
 | Feature enablement |  | Not requested |  |  |
@@ -125,10 +125,13 @@ snapshot states.
 | Workbook rows with outcome | 708 |  | Pending |
 | Exact price matches reproduced | 648 |  | Pending |
 | Price-difference matches reproduced | 42 |  | Pending |
-| Production-only decisions | 20 |  | Pending |
-| Workbook-only deferred/approved decisions | 18 |  | Pending |
-| HDPE Crossing blockers unresolved | 0 |  | Pending |
-| Duplicate identity decision unresolved | 0 |  | Pending |
+| Production-only decisions | 20 | P-04 owner decision: retain all 20 Production-only rows; assign 19 canonical codes and keep `ITEM-0139` as temporary legacy code under P-02 controls | Approved |
+| Workbook-only deferred/approved decisions | 18 raw / 17 unresolved | P-05/P-07 owner decisions: raw workbook evidence has 18 workbook-only rows; workbook `FTW-CON-002` is a typo shadow of Production `ITEM-0491`, so only 17 unresolved supplement candidates remain deferred with item authority, price authority, corrected taxonomy/code, approval, import preview/reconciliation, and hash/publish verification gates | Approved |
+| HDPE Crossing blockers unresolved | 0 | P-03 owner decision: reject GIP classification; split HDPE Crossing to `CRS-H06`/`CRS-H08`; defer workbook-only `CRS-GIP-025`; `ITEM-0139` handled under P-04 | Approved |
+| Duplicate identity decision unresolved | 0 | P-02 owner decision: retain both `ITEM-0131` and `ITEM-0139`; `ITEM-0139` future retirement requires live BOQ refs = 0 plus owner/data-custodian confirmation; no UUID/history merge | Approved |
+| AAA/TTT group meanings approved | 22 `AAA` / 65 `AAA-TTT` | P-06 owner decision: approve group meanings for dictionary/backfill; not import, row-count, workbook-only, K-mapping, or P-07 wording approval | Approved |
+| Temporary legacy-code null group exceptions | 1 | P-06 owner decision: only `ITEM-0139` in `2568.1.0` may have `code_group_id is null`; assert no other active structured-version row has a null group | Approved |
+| `FTW-CON-002` wording disposition | 1 | P-07 owner decision: use Production `ITEM-0491` wording for canonical `FTW-CON-002`; reject workbook repeated-phrase row as typo shadow; do not import workbook wording, create a duplicate item, change identity/history, or clean Production whitespace without a separate wording correction | Approved |
 | Canonical code reused across identity | 0 |  | Pending |
 | Missing reviewer/date on exceptions | 0 |  | Pending |
 

@@ -296,8 +296,9 @@ still dominate:
 - resolve duplicate identity treatment;
 - approve HDPE Crossing code decisions;
 - approve Production-only 20 canonical codes;
-- confirm workbook-only 18 remain deferred unless separate price authority is
-  supplied;
+- confirm the 17 unresolved supplement candidates remain deferred unless
+  separate price authority is supplied, with workbook `FTW-CON-002` treated only
+  as P-07 typo-shadow evidence for Production `ITEM-0491`;
 - approve AAA/TTT dictionary meanings;
 - provide truthful baseline metadata for `2568.0.0`;
 - approve official export sample.
