@@ -4,6 +4,15 @@ import { useEffect, useState, useCallback, useMemo } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { UserProfileWithOrg } from '@/lib/types/auth'
 
+type SupabaseProfileError = {
+  code?: string
+  message?: string
+}
+
+function shouldLogProfileError(error: SupabaseProfileError) {
+  return error.code !== 'PGRST116'
+}
+
 export function useUser() {
   const [user, setUser] = useState<UserProfileWithOrg | null>(null)
   const [isLoading, setIsLoading] = useState(true)
@@ -20,16 +29,25 @@ export function useUser() {
           sector:sectors!user_profiles_sector_id_fkey(id, code, name, full_name)
         `)
         .eq('id', userId)
-        .single()
+        .maybeSingle()
 
       if (error) {
-        console.error('useUser: Error fetching profile:', error)
+        if (shouldLogProfileError(error)) {
+          console.warn('useUser: Profile unavailable; treating session as signed out:', {
+            code: error.code,
+            message: error.message,
+          })
+        }
+        return null
+      }
+
+      if (!data) {
         return null
       }
 
       return data as UserProfileWithOrg
-    } catch (error) {
-      console.error('useUser: Error in fetchProfile:', error)
+    } catch {
+      console.warn('useUser: Profile request failed; treating session as signed out')
       return null
     }
   }, [supabase])
@@ -42,7 +60,7 @@ export function useUser() {
         setUser(profile)
       }
     } catch (err) {
-      console.error('useUser: Error refreshing profile:', err)
+      console.warn('useUser: Error refreshing profile:', err instanceof Error ? err.message : err)
     }
   }, [supabase, fetchProfile])
 
@@ -106,4 +124,3 @@ export function useUser() {
     refreshProfile,
   }
 }
-
