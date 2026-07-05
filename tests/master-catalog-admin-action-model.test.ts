@@ -258,6 +258,18 @@ describe('Master Catalog admin action model', () => {
       versionId: VERSION_ID,
       changeSetId: 'restore-change-set-id',
     });
+
+    expect(mapCatalogRpcActionResponse({
+      ok: false,
+      error: {
+        code: 'VERSION_NOT_RESTORABLE',
+        message: 'Target catalog version must be active and published',
+      },
+    }, 'unused')).toMatchObject({
+      status: 'error',
+      code: 'VERSION_NOT_RESTORABLE',
+      message: 'Target catalog version must be active and published',
+    });
   });
 
   it('sanitizes internal or unknown RPC errors before they reach the UI', () => {

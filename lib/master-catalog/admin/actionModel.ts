@@ -102,6 +102,7 @@ const SAFE_RPC_ACTION_ERROR_CODES = new Set([
   'TARGET_VERSION_NOT_PUBLISHED',
   'VALIDATION_FAILED',
   'VERSION_NOT_PUBLISHABLE',
+  'VERSION_NOT_RESTORABLE',
 ]);
 const RPC_TRANSPORT_ERROR_MESSAGES = {
   applyCatalogImport: 'Apply import ไม่สำเร็จจากระบบฐานข้อมูล',

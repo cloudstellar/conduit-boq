@@ -94,14 +94,14 @@ function createOverviewClientWithFactorPointerError(): Parameters<typeof loadCat
 }
 
 describe('Master Catalog admin read model helpers', () => {
-  it('parses catalog_admin_enabled values conservatively', () => {
+  it('requires the catalog_admin_enabled value to be JSON boolean true', () => {
     expect(isCatalogAdminEnabled(true)).toBe(true);
-    expect(isCatalogAdminEnabled('true')).toBe(true);
-    expect(isCatalogAdminEnabled(' TRUE ')).toBe(true);
-    expect(isCatalogAdminEnabled(1)).toBe(true);
 
     expect(isCatalogAdminEnabled(false)).toBe(false);
+    expect(isCatalogAdminEnabled('true')).toBe(false);
+    expect(isCatalogAdminEnabled(' TRUE ')).toBe(false);
     expect(isCatalogAdminEnabled('false')).toBe(false);
+    expect(isCatalogAdminEnabled(1)).toBe(false);
     expect(isCatalogAdminEnabled(0)).toBe(false);
     expect(isCatalogAdminEnabled(null)).toBe(false);
     expect(isCatalogAdminEnabled({ enabled: true })).toBe(false);
@@ -190,7 +190,7 @@ describe('Master Catalog admin gate', () => {
     const gate = await loadCatalogAdminGate(createGateClient({
       user: { id: 'user-admin' },
       profile: activeAdminProfile,
-      setting: { value: 'true' },
+      setting: { value: true },
     }));
 
     expect(gate).toMatchObject({
