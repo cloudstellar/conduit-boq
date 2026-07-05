@@ -12,6 +12,7 @@
     "db:local:smoke-auth": "node --env-file=.env.development.local scripts/smoke-local-auth.mjs",
     "db:local:smoke-master-catalog": "node --env-file=.env.development.local scripts/smoke-master-catalog-phase2.mjs",
     "db:local:smoke-master-catalog-wp4": "node --env-file=.env.development.local --env-file=supabase/.env.local scripts/smoke-master-catalog-wp4.mjs",
+    "db:local:smoke-master-catalog-wp5": "node --env-file=.env.development.local --env-file=supabase/.env.local scripts/smoke-master-catalog-wp5.mjs",
     "build": "next build",
     "start": "next start",
     "lint": "eslint",

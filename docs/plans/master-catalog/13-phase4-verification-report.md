@@ -254,19 +254,19 @@ Also verify:
 
 | Test | Expected | Result/evidence |
 |---|---|---|
-| Missing approval evidence | Rejected | Pending |
-| Stale base pointer | `DRAFT_BASE_STALE` | Pending |
-| Duplicate publish request ID | No duplicate effect | Pending |
-| Publish transaction | Atomic | Pending |
-| Publish invalid status transition | Rejected without pointer movement | Pending |
-| Dataset count/hash from DB | Stored | Pending |
-| Pointer and `is_default` sync | Exact | Pending |
-| Previous version remains readable | Yes | Pending |
-| Former current version after publish | Still Published/Active; immutable; not automatically archived | Pending |
-| Published row mutation | Rejected | Pending |
-| Pointer restore | Audited; BOQs unchanged | Pending |
-| Factor F pointer after catalog publish | Unchanged from preflight | Pending |
-| BOQ Factor F bindings after catalog publish | No mutation | Pending |
+| Missing approval evidence | Rejected | Passed in Local WP-5 smoke: `PUBLICATION_METADATA_REQUIRED`; pointer stayed on `2568.0.0` |
+| Stale base pointer | `DRAFT_BASE_STALE` | Implementation branch present in migration `018`; dedicated runtime stale-base fixture still pending before WP-5 complete |
+| Duplicate publish request ID | No duplicate effect | Passed in Local WP-5 smoke; duplicate publish returned `duplicateRequest=true` |
+| Publish transaction | Atomic | Passed in Local WP-5 smoke; rejected publish attempts did not move pointer, successful publish moved pointer/metadata/audit together |
+| Publish invalid status transition | Rejected without pointer movement | Passed in Local WP-5 smoke: active-version republish rejected as `VERSION_NOT_PUBLISHABLE` |
+| Dataset count/hash from DB | Stored | Passed in Local WP-5 smoke and canonical hash readback: `item_count=710`, `dataset_hash=sha256:40e2611ae57eec4f6918c1b1a3e2e2113ef9594afd18a53ed80f81ecb87d9f32`; JS canonical hash matched DB hash |
+| Pointer and `is_default` sync | Exact | Passed in Local WP-5 smoke: publish moved pointer/default to `2568.1.0`; restore moved both back to `2568.0.0` |
+| Previous version remains readable | Yes | Passed in Local WP-5 smoke: former current `2568.0.0` remained `active` and readable |
+| Former current version after publish | Still Published/Active; immutable; not automatically archived | Passed in Local WP-5 smoke: `2568.0.0` stayed `active`, non-default after publish, then restored |
+| Published row mutation | Rejected | Passed in Local WP-5 smoke: service-role row update blocked by `CATALOG_PUBLISHED_ROW_IMMUTABLE` |
+| Pointer restore | Audited; BOQs unchanged | Passed in Local WP-5 smoke: restore change set inserted and BOQ count/version-factor binding split unchanged |
+| Factor F pointer after catalog publish | Unchanged from preflight | Passed in Local WP-5 smoke: Factor F default/version/hash/count unchanged (`2569.0.0`, 36 rows) |
+| BOQ Factor F bindings after catalog publish | No mutation | Passed in Local WP-5 smoke: BOQ count and catalog/factor binding split unchanged |
 
 ## 13. Canonical hash and export
 

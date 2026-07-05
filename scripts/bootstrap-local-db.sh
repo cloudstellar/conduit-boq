@@ -49,6 +49,7 @@ docker cp migrations/014_factor_f_publish_2569_0_0.sql "$DB_CONTAINER:/tmp/014.s
 docker cp migrations/015_factor_f_repair_legacy_snapshot_metadata.sql "$DB_CONTAINER:/tmp/015.sql"
 docker cp migrations/016_master_catalog_phase4_foundation.sql "$DB_CONTAINER:/tmp/016.sql"
 docker cp migrations/017_master_catalog_phase4_draft_mutation.sql "$DB_CONTAINER:/tmp/017.sql"
+docker cp migrations/018_master_catalog_phase4_publish_pointer.sql "$DB_CONTAINER:/tmp/018.sql"
 docker exec "$DB_CONTAINER" psql -v ON_ERROR_STOP=1 -U postgres -d postgres -f /tmp/009.sql
 docker exec "$DB_CONTAINER" psql -v ON_ERROR_STOP=1 -U postgres -d postgres -f /tmp/010.sql
 
@@ -70,6 +71,7 @@ docker exec "$DB_CONTAINER" psql -v ON_ERROR_STOP=1 -U postgres -d postgres -f /
 docker exec "$DB_CONTAINER" psql -v ON_ERROR_STOP=1 -U postgres -d postgres -f /tmp/015.sql
 docker exec "$DB_CONTAINER" psql -v ON_ERROR_STOP=1 -U postgres -d postgres -f /tmp/016.sql
 docker exec "$DB_CONTAINER" psql -v ON_ERROR_STOP=1 -U postgres -d postgres -f /tmp/017.sql
+docker exec "$DB_CONTAINER" psql -v ON_ERROR_STOP=1 -U postgres -d postgres -f /tmp/018.sql
 
 npm run db:local:seed-users
 npm run db:local:smoke-auth

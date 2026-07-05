@@ -1,6 +1,6 @@
 # Master Catalog Phase 4 Execution Progress Tracker
 
-**Status:** WP-4 local-only draft/import implementation ready for owner review
+**Status:** WP-5 local-only publish/pointer implementation in progress
 **Purpose:** Owner-facing progress tracker for Master Catalog Phase 4 local
 implementation and rehearsal. This file is for quick status review; authority
 remains in the Decision Register, Execution Pack, DB Contract, Runbook, and
@@ -28,13 +28,13 @@ Allowed statuses:
 |---|---|
 | Current branch | `codex/master-catalog-phase4` |
 | Current commit | See git HEAD for the latest committed checkpoint |
-| Current work package | WP-4 |
+| Current work package | WP-5 |
 | Current environment | Local only |
 | Production write allowed | No |
 | Feature flag default | Disabled |
-| Latest owner decision needed | Accept/reject WP-4 owner review note before WP-5 publish/pointer work |
-| Next owner review point | WP-4 review before publish/pointer/restore implementation |
-| Last updated | 2026-07-05 21:43 +07 |
+| Latest owner decision needed | Review WP-5 publish/pointer evidence before treating publish path as ready |
+| Next owner review point | WP-5 review before WP-6 export implementation |
+| Last updated | 2026-07-05 22:07 +07 |
 
 ## 3. Work package checklist
 
@@ -44,8 +44,8 @@ Allowed statuses:
 | WP-1 | Additive database foundation `016+` on Local | Complete | Draft root migration `016`, Local bootstrap, schema/RLS/grants/RPC evidence, tests, local DB lint, FK index coverage verified, reviewer pass recorded | Reviewed before next implementation WP |
 | WP-2 | Parser and canonical hash implementation | Complete | Golden hash, parser/profile tests, normalized payload validation/hash tests, browser-style workbook adapter tests, Production-derived Local count/hash evidence; payload/DB contract mismatch patched and verified; committed as `0d94188` | Owner approved continuing to WP-3 |
 | WP-3 | Admin read/draft UI shell behind disabled flag | Complete | Read-only server UI shell, hidden admin entry while flag disabled, server-side auth/role/flag gate tests, local auth/user/flag facts, unauthenticated in-app browser redirect smoke, authenticated local HTTP gate smoke, authenticated in-app browser login/gate proof, WP-3 review cleanup for flag parsing/email edge cases/Factor F warnings, test/lint/typecheck/build evidence | Owner approved continuing to WP-4 |
-| WP-4 | Draft mutation, import, manual edit, and history | Ready for owner review | Draft/manual/import/history tests, clean Local WP-4 smoke, browser manual edit proof, browser import render/validate proof, RPC error sanitization, local auth credential parser proof, and [WP-4 Owner Review Note](./26-phase4-wp4-owner-review-note.md) | Owner accept/hold before WP-5 publish/pointer work |
-| WP-5 | Publish, pointer restore, and audit on Local | Not started | Local publish/restore tests, pointer/immutability checks | Review before treating publish path as ready |
+| WP-4 | Draft mutation, import, manual edit, and history | Complete | Draft/manual/import/history tests, clean Local WP-4 smoke, browser manual edit proof, browser import render/validate proof, RPC error sanitization, local auth credential parser proof, and [WP-4 Owner Review Note](./26-phase4-wp4-owner-review-note.md) | Owner accepted 2026-07-05 21:47 +07 |
+| WP-5 | Publish, pointer restore, and audit on Local | In progress | Backend DB/RPC slice passed: migration `018`, Local publish/restore smoke, DB hash readback, immutability checks, and [Verification Report publication evidence](./13-phase4-verification-report.md#12-publication-tests). Dedicated stale-base fixture and any admin UI/browser controls remain before WP-5 complete | Review before treating publish path as ready |
 | WP-6 | Official Excel/PDF export | Not started | DB-generated export, count/hash, visual/accessibility checks | Final P-11 artifact acceptance pending |
 | WP-7 | BOQ and Factor F regression preservation | Not started | BOQ save/print/export regression, Factor F before/after assertions | Required before WP-8 complete |
 | WP-8 | Clean Local rehearsal and Verification Report | Not started | Clean reset, full workflow, test/lint/build/advisor evidence | Required before any P-12 request |
@@ -119,6 +119,8 @@ Allowed statuses:
 | 2026-07-05 19:06 +07 | WP-4 | Closed manual workbook upload proof and hardened local review failure surfaces | Passed proof | Browser manual proof on `http://localhost:3000/admin/master-catalog/import`: owner selected `tmp/wp4-import-manual-proof.xlsx`, previewed 1 supplement row, Server validate succeeded with import `781d6b3e-b436-43b3-8b82-f9112fa895ce`, UI showed `validated`, `Apply import` was not clicked, and no console errors were present. Local readback: `catalog_imports.status=validated`, `applied_at=null`, source SHA-256 `0f45289d34b42ae3029b386ddcf4af0867e8b4a5de7416ed7ff554eb4b99d34f`, normalized payload hash `9be2f88f874813a812b216ffca7deade21050d59c4fa4f0dbba62a96a98604c2`, `catalog_admin_enabled=false`, default `2568.0.0` remains active/default with 710 rows, and `2568.1.0` remains draft/non-default at lock 5. Added a shared local env parser so `LOCAL_TEST_PASSWORD` inline `#` comments are handled consistently across seed/smoke scripts; added RPC transport error sanitization so the UI does not display raw DB/PostgREST messages. Checks: `npm test -- tests/local-env.test.ts tests/master-catalog-admin-action-model.test.ts`; `npm test` 16 files/82 tests passed; `npx tsc --noEmit --pretty false`; `npm run lint` 0 errors/12 existing warnings; `git diff --check`; sandbox `npm run build` failed only on blocked Google Fonts fetch and escalated `npm run build` passed; `npm run db:local:seed-users`; `npm run db:local:smoke-auth`. Production touched: No |
 | 2026-07-05 21:37 +07 | WP-4 | Prepared owner review package and refreshed read-only Local evidence | Ready for owner review | Added [WP-4 Owner Review Note](./26-phase4-wp4-owner-review-note.md). Fresh read-only Local readback confirmed `catalog_admin_enabled=false`, manual proof import `781d6b3e-b436-43b3-8b82-f9112fa895ce` remains `validated` with `applied_at=null`, `2568.0.0` remains active/default with 710 rows, and `2568.1.0` remains draft/non-default at lock 5. No blocking WP-4 review finding was found. Next owner action is accept/hold WP-4 before WP-5 local-only publish/pointer work. Production touched: No |
 | 2026-07-05 21:43 +07 | WP-4 | Finalized owner review package checks | Ready for owner review | Review-package checks passed: `git diff --check`, `npm test` 16 files/82 tests, `npx tsc --noEmit --pretty false`, and `npm run lint` with 0 errors / 12 existing warnings. WP-4 remains ready for owner review; WP-5 has not started. Production touched: No |
+| 2026-07-05 21:47 +07 | WP-4/WP-5 | Owner accepted WP-4 review and authorized WP-5 local-only start | In progress | Owner approved the recommended boundary: mark WP-4 Complete and start WP-5 local-only publish/pointer implementation and rehearsal. This does not authorize Production write, Production feature enablement, Production catalog publication, or Factor F work. Authority docs and relevant Supabase/Postgres/Next/React/data-quality skills were read before implementation. Production touched: No |
+| 2026-07-05 22:07 +07 | WP-5 | Implemented and verified local-only publish/pointer backend slice | Passed slice | Added migration `018` for local publish/restore RPCs, DB-side canonical count/hash, baseline `2568.0.0` hash/published metadata closure, advisory-lock pointer movement, idempotency, audit, and published-version immutability triggers. Added WP-5 smoke and bootstrap coverage. Clean Local bootstrap passed through `018`; WP-5 smoke published `2568.1.0` locally with `item_count=710`, `dataset_hash=sha256:40e2611ae57eec4f6918c1b1a3e2e2113ef9594afd18a53ed80f81ecb87d9f32`, duplicate publish/restore idempotency, missing metadata/stale lock/active republish rejection, row/metadata immutability, audited restore to `2568.0.0`, BOQ binding split unchanged, and Factor F default/version/hash/count unchanged. Local DB lint passed with no schema errors. JS canonical hash readback matched DB-stored hash with `471777` bytes and repeat hash matched. Checks: `npm test` 16 files/83 tests, `npx tsc --noEmit --pretty false`, `npm run lint` 0 errors/12 existing warnings, sandbox `npm run build` failed only on Google Fonts fetch, escalated `npm run build` passed. WP-5 remains in progress: dedicated stale-base fixture and any admin UI/browser controls remain before marking complete. Production touched: No |
 
 ## 6. Blocker log
 
@@ -143,15 +145,15 @@ Allowed statuses:
 Use this template at the end of each implementation session:
 
 ```text
-Current WP: WP-4
-Status: Ready for owner review after import preview/apply UI, server-validation, manual browser upload proof, local password parser fix, RPC error sanitization, and owner review package
+Current WP: WP-5
+Status: In progress after local-only publish/pointer backend slice passed; WP-5 is not complete yet
 Branch: codex/master-catalog-phase4
-Latest commit: See git HEAD for the committed owner review package; implementation reviewed through `a787ffb`
-Files changed: docs/plans/master-catalog/26-phase4-wp4-owner-review-note.md; docs/plans/master-catalog/25-phase4-execution-progress-tracker.md
-Evidence produced: WP-4 owner review note; fresh read-only Local readback confirmed `catalog_imports.status=validated`, `applied_at=null`, `catalog_admin_enabled=false`, default `2568.0.0` still active/default, and draft `2568.1.0` still non-default draft; prior WP-4 tests/browser/DB smoke evidence summarized for owner decision
-Tests/checks run: Fresh read-only Local DB readback; git diff --check; npm test; npx tsc --noEmit --pretty false; npm run lint with 0 errors / 12 existing warnings
-Blockers: existing advisor baseline still needs later triage; fresh approved Production snapshot source not taken for later clean rehearsal; 2568.0.0 dataset_hash/published_at metadata write deferred until publish implementation; NT CI runtime derivatives not generated yet; repeatable automated file-picker proof would require dedicated e2e/browser tooling if owner wants it
-Owner decisions needed: accept/hold WP-4 owner review note before authorizing WP-5 local-only publish/pointer work; decide whether manual browser upload proof plus unit/workbook/server-validation tests and Local DB smoke are enough for import upload behavior; approve CI derivative generation path before P-10/official export acceptance
-Next safe step: owner reviews and accepts/holds WP-4; only after acceptance mark WP-4 Complete and start WP-5 local-only publish/pointer work
+Latest commit: 31902f0 docs: add master catalog wp4 owner review
+Files changed: migrations/018_master_catalog_phase4_publish_pointer.sql; scripts/bootstrap-local-db.sh; scripts/smoke-master-catalog-wp5.mjs; scripts/master-catalog-local-canonical-hash.mjs; package.json; tests/master-catalog-migrations.test.ts; docs/04_data/MIGRATIONS.md; docs/plans/master-catalog/13-phase4-verification-report.md; docs/plans/master-catalog/25-phase4-execution-progress-tracker.md
+Evidence produced: Local publish/restore migration and smoke; `2568.0.0` baseline hash/published metadata closure; local publish of `2568.1.0`; audited restore to `2568.0.0`; canonical hash cross-check; Verification Report publication-test rows updated with local evidence
+Tests/checks run: npm test -- tests/master-catalog-migrations.test.ts; clean npm run db:local:bootstrap; npm run db:local:smoke-master-catalog-wp5; npx supabase db lint --local; node scripts/master-catalog-local-canonical-hash.mjs; npm test; npx tsc --noEmit --pretty false; npm run lint; git diff --check; npm run build (sandbox failed only on Google Fonts fetch, escalated build passed)
+Blockers: existing advisor baseline still needs later triage; fresh approved Production snapshot source not taken in this session; NT CI runtime derivatives not generated yet; dedicated stale-base pointer runtime fixture remains before WP-5 complete; admin UI/browser publish/restore controls are not implemented yet
+Owner decisions needed: review WP-5 publish/pointer evidence before treating publish path as ready; approve CI derivative generation path before P-10/official export acceptance
+Next safe step: commit this WP-5 backend slice, then continue WP-5 with a dedicated stale-base fixture and local admin publish/restore UI/action/browser proof
 Production touched: No
 ```

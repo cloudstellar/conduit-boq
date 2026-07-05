@@ -197,7 +197,7 @@ async function buildEvidence() {
   }
 
   return {
-    source: 'Local Supabase restored from production-derived public snapshot plus root migrations 009-016',
+    source: 'Local Supabase restored from production-derived public snapshot plus root migrations 009-018',
     productionAuthorityVersion: '2568.0.0',
     localDbContainer: DB_CONTAINER,
     version: first.version,
