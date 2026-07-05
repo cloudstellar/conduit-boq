@@ -1,5 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import {
+  buildPublishCatalogVersionArgs,
+  buildRestoreCatalogPointerArgs,
   buildManualCatalogChangeArgs,
   createCatalogRpcTransportError,
   mapCatalogRpcActionResponse,
@@ -45,6 +47,65 @@ describe('Master Catalog admin action model', () => {
           identityOutcome: 'retire',
         }],
       },
+    });
+  });
+
+  it('builds publish and restore RPC payloads with approval metadata', () => {
+    const publishArgs = buildPublishCatalogVersionArgs(form({
+      versionId: VERSION_ID,
+      expectedLockVersion: '3',
+      effectiveDate: '2026-07-05',
+      approvalReference: 'LOCAL-WP5-REHEARSAL-ONLY-NOT-PRODUCTION',
+      approvalDocumentDate: '2026-07-05',
+      publishedByDisplayName: 'Local WP-5 Rehearsal Publisher',
+      reason: 'WP-5 local-only publish',
+    }), REQUEST_ID);
+
+    expect(publishArgs).toMatchObject({
+      p_version_id: VERSION_ID,
+      p_expected_lock_version: 3,
+      p_approval_metadata: {
+        effectiveDate: '2026-07-05',
+        approvalReference: 'LOCAL-WP5-REHEARSAL-ONLY-NOT-PRODUCTION',
+        approvalDocumentDate: '2026-07-05',
+        publishedByDisplayName: 'Local WP-5 Rehearsal Publisher',
+      },
+      p_reason: 'WP-5 local-only publish',
+      p_request_id: REQUEST_ID,
+    });
+
+    const restoreArgs = buildRestoreCatalogPointerArgs(form({
+      targetVersionId: VERSION_ID,
+      reason: 'WP-5 local-only pointer restore',
+    }), REQUEST_ID);
+
+    expect(restoreArgs).toMatchObject({
+      p_target_version_id: VERSION_ID,
+      p_reason: 'WP-5 local-only pointer restore',
+      p_request_id: REQUEST_ID,
+    });
+  });
+
+  it('rejects incomplete publish and restore forms before RPC execution', () => {
+    expect(buildPublishCatalogVersionArgs(form({
+      versionId: VERSION_ID,
+      expectedLockVersion: '3',
+      effectiveDate: '07/05/2026',
+      approvalReference: 'LOCAL-WP5-REHEARSAL-ONLY-NOT-PRODUCTION',
+      approvalDocumentDate: '2026-07-05',
+      publishedByDisplayName: 'Local WP-5 Rehearsal Publisher',
+      reason: 'WP-5 local-only publish',
+    }), REQUEST_ID)).toMatchObject({
+      status: 'error',
+      message: 'effective date ต้องอยู่ในรูป YYYY-MM-DD',
+    });
+
+    expect(buildRestoreCatalogPointerArgs(form({
+      targetVersionId: 'not-a-uuid',
+      reason: 'WP-5 local-only pointer restore',
+    }), REQUEST_ID)).toMatchObject({
+      status: 'error',
+      message: 'target version id ไม่ถูกต้อง',
     });
   });
 
@@ -173,6 +234,30 @@ describe('Master Catalog admin action model', () => {
       code: 'DRAFT_LOCK_CONFLICT',
       message: 'Draft lock version is stale',
     });
+
+    expect(mapCatalogRpcActionResponse({
+      ok: false,
+      error: {
+        code: 'PUBLICATION_METADATA_REQUIRED',
+        message: 'Publication metadata is required',
+      },
+    }, 'unused')).toMatchObject({
+      status: 'error',
+      code: 'PUBLICATION_METADATA_REQUIRED',
+      message: 'Publication metadata is required',
+    });
+
+    expect(mapCatalogRpcActionResponse({
+      ok: true,
+      data: {
+        targetVersionId: VERSION_ID,
+        changeSetId: 'restore-change-set-id',
+      },
+    }, 'Restore catalog pointer แล้ว')).toMatchObject({
+      status: 'success',
+      versionId: VERSION_ID,
+      changeSetId: 'restore-change-set-id',
+    });
   });
 
   it('sanitizes internal or unknown RPC errors before they reach the UI', () => {
@@ -192,6 +277,12 @@ describe('Master Catalog admin action model', () => {
       status: 'error',
       code: 'INTERNAL_ERROR',
       message: 'บันทึก import validation ไม่สำเร็จจากระบบฐานข้อมูล',
+    });
+
+    expect(createCatalogRpcTransportError('publishCatalogVersion')).toMatchObject({
+      status: 'error',
+      code: 'INTERNAL_ERROR',
+      message: 'Publish catalog version ไม่สำเร็จจากระบบฐานข้อมูล',
     });
   });
 

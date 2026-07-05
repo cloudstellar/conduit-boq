@@ -7,6 +7,8 @@ export interface CatalogMutationState {
   versionId?: string;
   lockVersion?: number;
   changeSetId?: string;
+  itemCount?: number;
+  datasetHash?: string;
   importId?: string;
   importStatus?: string;
   normalizedPayloadHash?: string;
@@ -27,6 +29,9 @@ export interface CatalogRpcActionResponse {
     versionId?: string;
     lockVersion?: number;
     changeSetId?: string;
+    targetVersionId?: string;
+    itemCount?: number;
+    datasetHash?: string;
     importId?: string;
     status?: string;
     normalizedPayloadHash?: string;
@@ -54,8 +59,28 @@ export interface CatalogManualChangeArgs {
   p_import_id: null;
 }
 
+export interface CatalogPublishVersionArgs {
+  p_version_id: string;
+  p_expected_lock_version: number;
+  p_approval_metadata: {
+    effectiveDate: string;
+    approvalReference: string;
+    approvalDocumentDate: string;
+    publishedByDisplayName: string;
+  };
+  p_reason: string;
+  p_request_id: string;
+}
+
+export interface CatalogRestorePointerArgs {
+  p_target_version_id: string;
+  p_reason: string;
+  p_request_id: string;
+}
+
 const UUID_PATTERN =
   /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+const DATE_PATTERN = /^\d{4}-\d{2}-\d{2}$/;
 const CANDIDATE_CODE_PATTERN = /^[A-Z0-9]{3}-[A-Z0-9]{3}-[0-9]{3}$/;
 const CODE_GROUP_PATTERN = /^[A-Z0-9]{3}$/;
 const MONEY_PATTERN = /^(0|[1-9][0-9]*)\.[0-9]{2}$/;
@@ -70,14 +95,21 @@ const SAFE_RPC_ACTION_ERROR_CODES = new Set([
   'IMPORT_PRICE_AUTHORITY_REQUIRED',
   'IMPORT_RECONCILIATION_REQUIRED',
   'IMPORT_RETIREMENT_APPROVAL_REQUIRED',
+  'POINTER_ALREADY_CURRENT',
+  'PUBLICATION_METADATA_REQUIRED',
+  'PUBLICATION_VALIDATION_FAILED',
   'REQUEST_ALREADY_PROCESSED',
+  'TARGET_VERSION_NOT_PUBLISHED',
   'VALIDATION_FAILED',
+  'VERSION_NOT_PUBLISHABLE',
 ]);
 const RPC_TRANSPORT_ERROR_MESSAGES = {
   applyCatalogImport: 'Apply import ไม่สำเร็จจากระบบฐานข้อมูล',
   applyCatalogManualChange: 'บันทึก draft change set ไม่สำเร็จจากระบบฐานข้อมูล',
   createCatalogDraft: 'สร้าง draft ไม่สำเร็จจากระบบฐานข้อมูล',
   previewCatalogImport: 'บันทึก import validation ไม่สำเร็จจากระบบฐานข้อมูล',
+  publishCatalogVersion: 'Publish catalog version ไม่สำเร็จจากระบบฐานข้อมูล',
+  restoreCatalogPointer: 'Restore catalog pointer ไม่สำเร็จจากระบบฐานข้อมูล',
 } as const;
 
 type ManualAction = typeof MANUAL_ACTIONS[number];
@@ -124,9 +156,11 @@ export function mapCatalogRpcActionResponse(
   return {
     status: 'success',
     message: successMessage,
-    versionId: response.data?.versionId,
+    versionId: response.data?.versionId ?? response.data?.targetVersionId,
     lockVersion: response.data?.lockVersion,
     changeSetId: response.data?.changeSetId,
+    itemCount: response.data?.itemCount,
+    datasetHash: response.data?.datasetHash,
     importId: response.data?.importId,
     importStatus: response.data?.status,
     normalizedPayloadHash: response.data?.normalizedPayloadHash,
@@ -134,6 +168,86 @@ export function mapCatalogRpcActionResponse(
     retiredByFullImportOmission: response.data?.retiredByFullImportOmission,
     duplicateRequest: response.data?.duplicateRequest,
   };
+}
+
+export function buildPublishCatalogVersionArgs(
+  formData: FormData,
+  requestId: string,
+): CatalogPublishVersionArgs | CatalogMutationState {
+  try {
+    const versionId = readRequiredText(formData, 'versionId', 'version id');
+    if (!UUID_PATTERN.test(versionId)) {
+      return createCatalogMutationError('version id ไม่ถูกต้อง');
+    }
+
+    if (!UUID_PATTERN.test(requestId)) {
+      return createCatalogMutationError('request id ไม่ถูกต้อง');
+    }
+
+    const expectedLockVersion = readInteger(formData, 'expectedLockVersion', 'lock version');
+    if (expectedLockVersion instanceof Error) {
+      return createCatalogMutationError(expectedLockVersion.message);
+    }
+
+    const effectiveDate = readRequiredDate(formData, 'effectiveDate', 'effective date');
+    if (isCatalogMutationState(effectiveDate)) return effectiveDate;
+
+    const approvalDocumentDate = readRequiredDate(
+      formData,
+      'approvalDocumentDate',
+      'approval document date',
+    );
+    if (isCatalogMutationState(approvalDocumentDate)) return approvalDocumentDate;
+
+    return {
+      p_version_id: versionId,
+      p_expected_lock_version: expectedLockVersion,
+      p_approval_metadata: {
+        effectiveDate,
+        approvalReference: readRequiredText(formData, 'approvalReference', 'approval reference'),
+        approvalDocumentDate,
+        publishedByDisplayName: readRequiredText(
+          formData,
+          'publishedByDisplayName',
+          'published by display name',
+        ),
+      },
+      p_reason: readRequiredText(formData, 'reason', 'reason'),
+      p_request_id: requestId,
+    };
+  } catch (error) {
+    if (error instanceof RequiredFieldError) {
+      return createCatalogMutationError(error.message);
+    }
+    throw error;
+  }
+}
+
+export function buildRestoreCatalogPointerArgs(
+  formData: FormData,
+  requestId: string,
+): CatalogRestorePointerArgs | CatalogMutationState {
+  try {
+    const targetVersionId = readRequiredText(formData, 'targetVersionId', 'target version id');
+    if (!UUID_PATTERN.test(targetVersionId)) {
+      return createCatalogMutationError('target version id ไม่ถูกต้อง');
+    }
+
+    if (!UUID_PATTERN.test(requestId)) {
+      return createCatalogMutationError('request id ไม่ถูกต้อง');
+    }
+
+    return {
+      p_target_version_id: targetVersionId,
+      p_reason: readRequiredText(formData, 'reason', 'reason'),
+      p_request_id: requestId,
+    };
+  } catch (error) {
+    if (error instanceof RequiredFieldError) {
+      return createCatalogMutationError(error.message);
+    }
+    throw error;
+  }
 }
 
 function readSafeRpcActionErrorMessage(
@@ -382,6 +496,20 @@ function readInteger(formData: FormData, key: string, label: string): number | E
   }
 
   return parsed;
+}
+
+function readRequiredDate(
+  formData: FormData,
+  key: string,
+  label: string,
+): string | CatalogMutationState {
+  const value = readRequiredText(formData, key, label);
+
+  if (!DATE_PATTERN.test(value)) {
+    return createCatalogMutationError(`${label} ต้องอยู่ในรูป YYYY-MM-DD`);
+  }
+
+  return value;
 }
 
 class RequiredFieldError extends Error {}

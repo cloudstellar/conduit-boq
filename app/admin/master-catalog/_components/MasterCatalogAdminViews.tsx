@@ -43,6 +43,7 @@ import {
 import {
   MasterCatalogDraftCreatePanel,
   MasterCatalogManualMutationPanel,
+  MasterCatalogPublishRestorePanel,
 } from './MasterCatalogMutationPanel';
 import { MasterCatalogImportPanel } from './MasterCatalogImportPanel';
 import type {
@@ -121,9 +122,13 @@ export function MasterCatalogOverviewView({
   gate: CatalogAdminGate;
   overview: CatalogAdminOverview;
 }) {
-  const phase4Draft = overview.versions.find(
-    (version) => version.versionString === '2568.1.0' && version.status === 'draft',
+  const phase4Version = overview.versions.find(
+    (version) => version.versionString === '2568.1.0',
   ) ?? null;
+  const phase4Draft = phase4Version?.status === 'draft' ? phase4Version : null;
+  const restorableVersions = overview.versions.filter(
+    (version) => version.status === 'active' && !version.isDefault,
+  );
 
   return (
     <MasterCatalogFrame activeSection="overview" gate={gate}>
@@ -157,7 +162,13 @@ export function MasterCatalogOverviewView({
 
       <MasterCatalogDraftCreatePanel
         defaultVersionString={overview.defaultVersion?.versionString ?? null}
+        draftVersion={phase4Version}
+      />
+
+      <MasterCatalogPublishRestorePanel
         draftVersion={phase4Draft}
+        currentVersionString={overview.defaultVersion?.versionString ?? null}
+        restorableVersions={restorableVersions}
       />
 
       <div className="grid gap-4 xl:grid-cols-[minmax(0,1fr)_380px]">

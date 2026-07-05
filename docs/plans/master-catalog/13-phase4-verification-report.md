@@ -257,16 +257,16 @@ Also verify:
 | Missing approval evidence | Rejected | Passed in Local WP-5 smoke: `PUBLICATION_METADATA_REQUIRED`; pointer stayed on `2568.0.0` |
 | Stale base pointer | `DRAFT_BASE_STALE` | Passed in Local WP-5 smoke: a transient local-only active pointer fixture moved the singleton pointer under an existing draft; publish returned `DRAFT_BASE_STALE`, did not move the fixture pointer, and cleanup restored the pointer to `2568.0.0` before the real local publish |
 | Duplicate publish request ID | No duplicate effect | Passed in Local WP-5 smoke; duplicate publish returned `duplicateRequest=true` |
-| Publish transaction | Atomic | Passed in Local WP-5 smoke; rejected publish attempts did not move pointer, successful publish moved pointer/metadata/audit together |
+| Publish transaction | Atomic | Passed in Local WP-5 smoke and browser proof; rejected publish attempts did not move pointer, successful publish moved pointer/metadata/audit together, and the admin UI showed publish change-set evidence after submit |
 | Publish invalid status transition | Rejected without pointer movement | Passed in Local WP-5 smoke: active-version republish rejected as `VERSION_NOT_PUBLISHABLE` |
-| Dataset count/hash from DB | Stored | Passed in Local WP-5 smoke and canonical hash readback after clean Local bootstrap: `item_count=710`, `dataset_hash=sha256:07c1cf935a720d6d1314becb479eb1f2acb761f2ccbe9a51ccb84a424f57d120`; JS canonical hash matched DB hash with `471777` canonical JSON bytes |
-| Pointer and `is_default` sync | Exact | Passed in Local WP-5 smoke: publish moved pointer/default to `2568.1.0`; restore moved both back to `2568.0.0` |
+| Dataset count/hash from DB | Stored | Passed in Local WP-5 smoke and browser proof after clean Local bootstrap: browser proof published `2568.1.0` with `item_count=710`, `dataset_hash=sha256:4a2a5fcc75f1510c5e037426a19c3110234856485157e5de6f3bd2eee459d1e8`; `2568.0.0` and `2568.1.0` matched after publish/restore. Note: Local clean-reset hashes are point-in-time environment fingerprints because Phase 4 identity UUIDs are generated during local migration |
+| Pointer and `is_default` sync | Exact | Passed in Local WP-5 smoke and browser proof: publish moved pointer/default to `2568.1.0`; restore moved both back to `2568.0.0` |
 | Previous version remains readable | Yes | Passed in Local WP-5 smoke: former current `2568.0.0` remained `active` and readable |
 | Former current version after publish | Still Published/Active; immutable; not automatically archived | Passed in Local WP-5 smoke: `2568.0.0` stayed `active`, non-default after publish, then restored |
 | Published row mutation | Rejected | Passed in Local WP-5 smoke: service-role row update blocked by `CATALOG_PUBLISHED_ROW_IMMUTABLE` |
-| Pointer restore | Audited; BOQs unchanged | Passed in Local WP-5 smoke: restore change set inserted and BOQ count/version-factor binding split unchanged |
-| Factor F pointer after catalog publish | Unchanged from preflight | Passed in Local WP-5 smoke: Factor F default/version/hash/count unchanged (`2569.0.0`, 36 rows) |
-| BOQ Factor F bindings after catalog publish | No mutation | Passed in Local WP-5 smoke: BOQ count and catalog/factor binding split unchanged |
+| Pointer restore | Audited; BOQs unchanged | Passed in Local WP-5 smoke and browser proof: restore change set inserted, pointer returned to `2568.0.0`, `2568.1.0` remained active/non-default, and BOQ count stayed `198` |
+| Factor F pointer after catalog publish | Unchanged from preflight | Passed in Local WP-5 smoke and browser proof: Factor F default/version/hash/count unchanged (`2569.0.0`, 36 rows, `sha256:4f35b267bde3007439aebb193be1e53bdcea5a7acce95b5a7bbf5828018ef1a6`) |
+| BOQ Factor F bindings after catalog publish | No mutation | Passed in Local WP-5 smoke and browser proof: BOQ count and catalog/factor binding split unchanged; final readback after browser publish/restore showed BOQ count `198` |
 
 ## 13. Canonical hash and export
 

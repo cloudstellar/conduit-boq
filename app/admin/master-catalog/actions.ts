@@ -17,6 +17,8 @@ import {
   type CatalogRpcTransportOperation,
   type CatalogMutationState,
   type CatalogRpcActionResponse,
+  buildPublishCatalogVersionArgs,
+  buildRestoreCatalogPointerArgs,
   buildManualCatalogChangeArgs,
   createCatalogMutationError,
   createCatalogRpcTransportError,
@@ -251,6 +253,76 @@ export async function applyCatalogImportAction(
 
   if (result.status === 'success') {
     revalidateMasterCatalogPaths(result.versionId ?? validated.payload.versionId);
+  }
+
+  return result;
+}
+
+export async function publishCatalogVersionAction(
+  _previousState: CatalogMutationState,
+  formData: FormData,
+): Promise<CatalogMutationState> {
+  const supabase = await createClient();
+  const gate = await loadCatalogAdminGate(supabase);
+
+  if (gate.state !== 'enabled') {
+    return createCatalogMutationError('Master Catalog admin gate ยังไม่เปิด', 'FORBIDDEN');
+  }
+
+  const args = buildPublishCatalogVersionArgs(formData, randomUUID());
+
+  if ('status' in args) {
+    return args;
+  }
+
+  const { data, error } = await supabase.rpc('publish_catalog_version', args);
+
+  if (error) {
+    return mapRpcTransportError('publishCatalogVersion', error);
+  }
+
+  const result = mapCatalogRpcActionResponse(
+    data as CatalogRpcActionResponse,
+    'Publish catalog version แล้ว',
+  );
+
+  if (result.status === 'success') {
+    revalidateMasterCatalogPaths(result.versionId ?? args.p_version_id);
+  }
+
+  return result;
+}
+
+export async function restoreCatalogPointerAction(
+  _previousState: CatalogMutationState,
+  formData: FormData,
+): Promise<CatalogMutationState> {
+  const supabase = await createClient();
+  const gate = await loadCatalogAdminGate(supabase);
+
+  if (gate.state !== 'enabled') {
+    return createCatalogMutationError('Master Catalog admin gate ยังไม่เปิด', 'FORBIDDEN');
+  }
+
+  const args = buildRestoreCatalogPointerArgs(formData, randomUUID());
+
+  if ('status' in args) {
+    return args;
+  }
+
+  const { data, error } = await supabase.rpc('restore_catalog_pointer', args);
+
+  if (error) {
+    return mapRpcTransportError('restoreCatalogPointer', error);
+  }
+
+  const result = mapCatalogRpcActionResponse(
+    data as CatalogRpcActionResponse,
+    'Restore catalog pointer แล้ว',
+  );
+
+  if (result.status === 'success') {
+    revalidateMasterCatalogPaths(result.versionId ?? args.p_target_version_id);
   }
 
   return result;

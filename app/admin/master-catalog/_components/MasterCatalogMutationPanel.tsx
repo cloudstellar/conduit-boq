@@ -11,6 +11,7 @@ import {
   PenLine,
   Plus,
   RotateCcw,
+  ShieldCheck,
 } from 'lucide-react';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Badge } from '@/components/ui/badge';
@@ -39,6 +40,8 @@ import type {
 import {
   applyCatalogManualChangeAction,
   createCatalogDraftAction,
+  publishCatalogVersionAction,
+  restoreCatalogPointerAction,
 } from '../actions';
 
 type DraftCreatePanelProps = {
@@ -64,6 +67,23 @@ type MutationPanelProps = {
     unit: string;
     category: string | null;
     isActive: boolean;
+  }>;
+};
+
+type PublishRestorePanelProps = {
+  draftVersion: {
+    id: string;
+    versionString: string;
+    lockVersion: number;
+    itemCount: number | null;
+    datasetHash: string | null;
+  } | null;
+  currentVersionString: string | null;
+  restorableVersions: Array<{
+    id: string;
+    versionString: string;
+    itemCount: number | null;
+    datasetHash: string | null;
   }>;
 };
 
@@ -97,14 +117,14 @@ export function MasterCatalogDraftCreatePanel({
         {draftVersion ? (
           <Alert>
             <CheckCircle2 />
-            <AlertTitle>มี draft สำหรับรอบนี้แล้ว</AlertTitle>
+            <AlertTitle>มีเวอร์ชันสำหรับรอบนี้แล้ว</AlertTitle>
             <AlertDescription>
               <div className="flex flex-wrap items-center gap-2">
                 <Badge variant="secondary">{draftVersion.versionString}</Badge>
                 <Badge variant="outline">lock {draftVersion.lockVersion}</Badge>
                 <Button variant="outline" size="sm" asChild>
                   <Link href={`/admin/master-catalog/versions/${draftVersion.id}`}>
-                    เปิด draft
+                    เปิดเวอร์ชัน
                   </Link>
                 </Button>
               </div>
@@ -137,6 +157,169 @@ export function MasterCatalogDraftCreatePanel({
               </SubmitButton>
             </CardFooter>
           </form>
+        )}
+      </CardContent>
+    </Card>
+  );
+}
+
+export function MasterCatalogPublishRestorePanel({
+  draftVersion,
+  currentVersionString,
+  restorableVersions,
+}: PublishRestorePanelProps) {
+  const [publishState, publishAction] = useActionState(publishCatalogVersionAction, initialState);
+  const [restoreState, restoreAction] = useActionState(restoreCatalogPointerAction, initialState);
+  const [selectedRestoreTargetId, setSelectedRestoreTargetId] = useState('');
+  const router = useRouter();
+  const firstRestorableVersionId = restorableVersions[0]?.id ?? '';
+  const restoreTargetId = restorableVersions.some(
+    (version) => version.id === selectedRestoreTargetId,
+  ) ? selectedRestoreTargetId : firstRestorableVersionId;
+
+  useEffect(() => {
+    if (publishState.status === 'success' || restoreState.status === 'success') {
+      router.refresh();
+    }
+  }, [publishState.status, restoreState.status, router]);
+
+  if (!draftVersion && restorableVersions.length === 0) {
+    return null;
+  }
+
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle className="flex items-center gap-2">
+          <ShieldCheck />
+          Publish / restore
+        </CardTitle>
+        <CardDescription>
+          Current default: {currentVersionString ?? '-'}
+        </CardDescription>
+      </CardHeader>
+      <CardContent className="grid gap-5 lg:grid-cols-2">
+        {draftVersion ? (
+          <form action={publishAction} className="grid gap-4">
+            <ActionStateAlert state={publishState} />
+            <input type="hidden" name="versionId" value={draftVersion.id} />
+            <input type="hidden" name="expectedLockVersion" value={draftVersion.lockVersion} />
+            <div className="flex flex-wrap items-center gap-2">
+              <Badge variant="secondary">{draftVersion.versionString}</Badge>
+              <Badge variant="outline">lock {draftVersion.lockVersion}</Badge>
+              {draftVersion.itemCount != null ? (
+                <Badge variant="outline">{draftVersion.itemCount.toLocaleString('th-TH')} rows</Badge>
+              ) : null}
+            </div>
+            <div className="grid gap-2">
+              <Label htmlFor="publish-effective-date">Effective date</Label>
+              <Input
+                id="publish-effective-date"
+                name="effectiveDate"
+                type="date"
+                defaultValue="2026-07-05"
+                required
+              />
+            </div>
+            <div className="grid gap-2">
+              <Label htmlFor="publish-approval-reference">Approval reference</Label>
+              <Input
+                id="publish-approval-reference"
+                name="approvalReference"
+                defaultValue="LOCAL-WP5-REHEARSAL-ONLY-NOT-PRODUCTION"
+                required
+              />
+            </div>
+            <div className="grid gap-2">
+              <Label htmlFor="publish-approval-document-date">Approval document date</Label>
+              <Input
+                id="publish-approval-document-date"
+                name="approvalDocumentDate"
+                type="date"
+                defaultValue="2026-07-05"
+                required
+              />
+            </div>
+            <div className="grid gap-2">
+              <Label htmlFor="publish-by-display-name">Published by display name</Label>
+              <Input
+                id="publish-by-display-name"
+                name="publishedByDisplayName"
+                defaultValue="Local WP-5 Rehearsal Publisher"
+                required
+              />
+            </div>
+            <div className="grid gap-2">
+              <Label htmlFor="publish-reason">Reason</Label>
+              <Input
+                id="publish-reason"
+                name="reason"
+                defaultValue="WP-5 local-only publish"
+                required
+              />
+            </div>
+            <div className="flex flex-wrap items-center gap-2">
+              <SubmitButton label="Publish local version" pendingLabel="กำลัง publish">
+                <ShieldCheck data-icon="inline-start" />
+              </SubmitButton>
+              <Badge variant="secondary">Production touched: No</Badge>
+            </div>
+          </form>
+        ) : (
+          <Alert>
+            <CheckCircle2 />
+            <AlertTitle>ไม่มี draft ที่ publish ได้</AlertTitle>
+            <AlertDescription>Draft `2568.1.0` ต้องอยู่ในสถานะ draft ก่อน publish</AlertDescription>
+          </Alert>
+        )}
+
+        {restorableVersions.length > 0 ? (
+          <form action={restoreAction} className="grid gap-4">
+            <ActionStateAlert state={restoreState} />
+            <div className="grid gap-2">
+              <Label htmlFor="restore-target-version">Target version</Label>
+              <Select value={restoreTargetId} onValueChange={setSelectedRestoreTargetId}>
+                <SelectTrigger id="restore-target-version">
+                  <SelectValue placeholder="เลือกเวอร์ชัน" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectGroup>
+                    {restorableVersions.map((version) => (
+                      <SelectItem key={version.id} value={version.id}>
+                        {version.versionString}
+                      </SelectItem>
+                    ))}
+                  </SelectGroup>
+                </SelectContent>
+              </Select>
+              <input type="hidden" name="targetVersionId" value={restoreTargetId} />
+            </div>
+            <div className="grid gap-2">
+              <Label htmlFor="restore-reason">Reason</Label>
+              <Input
+                id="restore-reason"
+                name="reason"
+                defaultValue="WP-5 local-only pointer restore"
+                required
+              />
+            </div>
+            <div className="flex flex-wrap items-center gap-2">
+              <SubmitButton
+                label="Restore pointer"
+                pendingLabel="กำลัง restore"
+                disabled={!restoreTargetId}
+              >
+                <RotateCcw data-icon="inline-start" />
+              </SubmitButton>
+              <Badge variant="secondary">BOQ unchanged</Badge>
+            </div>
+          </form>
+        ) : (
+          <Alert>
+            <CheckCircle2 />
+            <AlertTitle>ไม่มี active non-default version</AlertTitle>
+            <AlertDescription>Restore จะพร้อมเมื่อมี published version ที่ไม่ได้เป็น current default</AlertDescription>
+          </Alert>
         )}
       </CardContent>
     </Card>
@@ -352,15 +535,17 @@ function SubmitButton({
   label,
   pendingLabel,
   children,
+  disabled = false,
 }: {
   label: string;
   pendingLabel: string;
   children: React.ReactNode;
+  disabled?: boolean;
 }) {
   const { pending } = useFormStatus();
 
   return (
-    <Button type="submit" disabled={pending}>
+    <Button type="submit" disabled={pending || disabled}>
       {pending ? <Loader2 data-icon="inline-start" className="animate-spin" /> : children}
       {pending ? pendingLabel : label}
     </Button>
