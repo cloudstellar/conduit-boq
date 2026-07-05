@@ -1,5 +1,8 @@
 import type { SupabaseClient } from '@supabase/supabase-js';
 import type { UserRole } from '@/lib/types/auth';
+import { isCatalogAdminEnabled } from './flags';
+
+export { isCatalogAdminEnabled } from './flags';
 
 export type CatalogAdminSection = 'overview' | 'versions' | 'import' | 'history';
 export type CatalogVersionStatus = 'draft' | 'active' | 'archived';
@@ -165,18 +168,6 @@ const CHANGE_SET_COLUMNS = [
   'created_at',
 ].join(',');
 
-export function isCatalogAdminEnabled(value: unknown): boolean {
-  if (value === true) return true;
-  if (value === false || value == null) return false;
-  if (typeof value === 'string') {
-    return value.trim().toLowerCase() === 'true';
-  }
-  if (typeof value === 'number') {
-    return value === 1;
-  }
-  return false;
-}
-
 export function isActiveAdminProfile(profile: {
   role?: string | null;
   status?: string | null;
@@ -302,7 +293,7 @@ export async function loadCatalogAdminOverview(
         .select(CHANGE_SET_COLUMNS)
         .order('created_at', { ascending: false })
         .limit(6),
-      loadFactorFDefaultSummary(supabase),
+      loadFactorFDefaultSummary(supabase, warnings),
     ]);
 
   pushError(warnings, versionsResult.error, 'โหลดรายการเวอร์ชันไม่สำเร็จ');
@@ -501,6 +492,7 @@ async function loadVersionChangeSets(
 
 async function loadFactorFDefaultSummary(
   supabase: SupabaseClient,
+  warnings: string[],
 ): Promise<FactorFDefaultSummary> {
   const { data: pointer, error: pointerError } = await supabase
     .from('factor_reference_default_version')
@@ -508,15 +500,19 @@ async function loadFactorFDefaultSummary(
     .eq('id', true)
     .maybeSingle();
 
+  pushError(warnings, pointerError, 'โหลด Factor F default pointer ไม่สำเร็จ');
+
   if (pointerError || !pointer?.version_id) {
     return { versionId: null, versionString: null, status: null };
   }
 
-  const { data: version } = await supabase
+  const { data: version, error: versionError } = await supabase
     .from('factor_reference_versions')
     .select('id,version_string,status')
     .eq('id', pointer.version_id)
     .maybeSingle();
+
+  pushError(warnings, versionError, 'โหลด Factor F default version ไม่สำเร็จ');
 
   return {
     versionId: String(pointer.version_id),

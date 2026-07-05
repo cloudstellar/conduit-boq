@@ -4,6 +4,7 @@ import {
   isActiveAdminProfile,
   isCatalogAdminEnabled,
   loadCatalogAdminGate,
+  loadCatalogAdminOverview,
   shortHash,
 } from '../lib/master-catalog/admin/readModel';
 
@@ -53,6 +54,43 @@ function createGateClient(options: GateClientOptions): Parameters<typeof loadCat
       return query;
     },
   } as unknown as Parameters<typeof loadCatalogAdminGate>[0];
+}
+
+function createOverviewClientWithFactorPointerError(): Parameters<typeof loadCatalogAdminOverview>[0] {
+  const queryResult = (table: string) => {
+    if (table === 'factor_reference_default_version') {
+      return {
+        data: null,
+        error: new Error('factor pointer unavailable'),
+      };
+    }
+
+    if (table === 'price_list_default_version') {
+      return { data: null, error: null };
+    }
+
+    if (table === 'catalog_item_identities' || table === 'catalog_item_codes') {
+      return { count: 0, error: null };
+    }
+
+    return { data: [], error: null };
+  };
+
+  return {
+    from: (table: string) => {
+      const query = {
+        select: () => query,
+        order: () => query,
+        limit: () => query,
+        eq: () => query,
+        maybeSingle: async () => queryResult(table),
+        then: (resolve: (value: unknown) => unknown, reject?: (reason: unknown) => unknown) =>
+          Promise.resolve(queryResult(table)).then(resolve, reject),
+      };
+
+      return query;
+    },
+  } as unknown as Parameters<typeof loadCatalogAdminOverview>[0];
 }
 
 describe('Master Catalog admin read model helpers', () => {
@@ -163,5 +201,18 @@ describe('Master Catalog admin gate', () => {
         status: 'active',
       },
     });
+  });
+});
+
+describe('Master Catalog admin overview', () => {
+  it('surfaces Factor F default read errors as warnings', async () => {
+    const overview = await loadCatalogAdminOverview(createOverviewClientWithFactorPointerError());
+
+    expect(overview.factorFDefault).toEqual({
+      versionId: null,
+      versionString: null,
+      status: null,
+    });
+    expect(overview.warnings).toContain('โหลด Factor F default pointer ไม่สำเร็จ');
   });
 });

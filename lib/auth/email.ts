@@ -22,12 +22,19 @@ export function getOrganizationEmailDomainError(
   }
 
   const trimmedEmail = email.trim()
-  const emailDomain = trimmedEmail.split('@')[1]?.toLowerCase()
+
+  if (!trimmedEmail.includes('@')) {
+    return null
+  }
+
+  const emailParts = trimmedEmail.split('@')
+  const [localPart, emailDomain] = emailParts
 
   if (
-    trimmedEmail.includes('@')
-    && emailDomain
-    && emailDomain !== ORGANIZATION_EMAIL_DOMAIN
+    emailParts.length !== 2
+    || !localPart
+    || !emailDomain
+    || emailDomain.toLowerCase() !== ORGANIZATION_EMAIL_DOMAIN
   ) {
     return 'domain email ไม่ถูกต้อง'
   }

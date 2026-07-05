@@ -11,6 +11,7 @@ import { createClient } from '@/lib/supabase/client'
 import { useAuth } from '@/lib/context/AuthContext'
 import { UserRole } from '@/lib/types/auth'
 import { getRoleLabel } from '@/lib/permissions'
+import { isCatalogAdminEnabled } from '@/lib/master-catalog/admin/flags'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Alert, AlertDescription } from '@/components/ui/alert'
@@ -110,7 +111,7 @@ function AdminContent() {
           const restrictValue = settings.get('restrict_email_domain')
           const catalogAdminValue = settings.get('catalog_admin_enabled')
           setRestrictEmailDomain(restrictValue === true || restrictValue === 'true')
-          setCatalogAdminEnabled(catalogAdminValue === true || catalogAdminValue === 'true')
+          setCatalogAdminEnabled(isCatalogAdminEnabled(catalogAdminValue))
         }
       } catch (err) {
         console.error('Load error:', err)
