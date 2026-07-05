@@ -4,6 +4,7 @@ import {
   loadCatalogAdminGate,
   loadCatalogAdminHistory,
 } from '@/lib/master-catalog/admin/readModel';
+import { loadCatalogImportContext } from '@/lib/master-catalog/admin/importContext';
 import {
   MasterCatalogGateView,
   MasterCatalogImportView,
@@ -23,11 +24,18 @@ export default async function MasterCatalogImportPage() {
     return <MasterCatalogGateView gate={gate} activeSection="import" />;
   }
 
-  const history = await loadCatalogAdminHistory(supabase);
+  const [history, importContext] = await Promise.all([
+    loadCatalogAdminHistory(supabase),
+    loadCatalogImportContext(supabase),
+  ]);
   return (
     <MasterCatalogImportView
       gate={gate}
-      history={{ imports: history.imports, warnings: history.warnings }}
+      history={{
+        imports: history.imports,
+        warnings: [...history.warnings, ...importContext.warnings],
+      }}
+      importContext={importContext}
     />
   );
 }

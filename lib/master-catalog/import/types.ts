@@ -132,6 +132,7 @@ export interface CatalogImportApplyPayloadV1 extends CatalogImportPayloadV1 {
 
 export interface ParseContext {
   legacyItemCodeByCanonicalCode?: Readonly<Record<string, string>>
+  categoryCodeByCanonicalCode?: Readonly<Record<string, string>>
   categoryCodeByGroup?: Readonly<Record<string, string>>
   identityOutcomeByCanonicalCode?: Readonly<Record<string, CatalogImportIdentityOutcome>>
   priceAuthorityReferenceByCanonicalCode?: Readonly<Record<string, string>>

@@ -7,7 +7,18 @@ export interface CatalogMutationState {
   versionId?: string;
   lockVersion?: number;
   changeSetId?: string;
+  importId?: string;
+  importStatus?: string;
+  normalizedPayloadHash?: string;
+  changedItems?: number;
+  retiredByFullImportOmission?: number;
   duplicateRequest?: boolean;
+  diagnostics?: Array<{
+    row?: number;
+    field?: string;
+    code: string;
+    message: string;
+  }>;
 }
 
 export interface CatalogRpcActionResponse {
@@ -16,12 +27,18 @@ export interface CatalogRpcActionResponse {
     versionId?: string;
     lockVersion?: number;
     changeSetId?: string;
+    importId?: string;
+    status?: string;
+    normalizedPayloadHash?: string;
+    changedItems?: number;
+    retiredByFullImportOmission?: number;
     duplicateRequest?: boolean;
   };
   error?: {
     code?: string;
     message?: string;
     retryable?: boolean;
+    diagnostics?: CatalogMutationState['diagnostics'];
   };
 }
 
@@ -53,8 +70,9 @@ export function createIdleCatalogMutationState(): CatalogMutationState {
 export function createCatalogMutationError(
   message: string,
   code = 'VALIDATION_FAILED',
+  diagnostics?: CatalogMutationState['diagnostics'],
 ): CatalogMutationState {
-  return { status: 'error', message, code };
+  return { status: 'error', message, code, diagnostics };
 }
 
 export function mapCatalogRpcActionResponse(
@@ -69,6 +87,7 @@ export function mapCatalogRpcActionResponse(
     return createCatalogMutationError(
       response.error?.message ?? 'Master Catalog RPC ปฏิเสธรายการนี้',
       response.error?.code ?? 'VALIDATION_FAILED',
+      response.error?.diagnostics,
     );
   }
 
@@ -78,6 +97,11 @@ export function mapCatalogRpcActionResponse(
     versionId: response.data?.versionId,
     lockVersion: response.data?.lockVersion,
     changeSetId: response.data?.changeSetId,
+    importId: response.data?.importId,
+    importStatus: response.data?.status,
+    normalizedPayloadHash: response.data?.normalizedPayloadHash,
+    changedItems: response.data?.changedItems,
+    retiredByFullImportOmission: response.data?.retiredByFullImportOmission,
     duplicateRequest: response.data?.duplicateRequest,
   };
 }

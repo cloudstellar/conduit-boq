@@ -3,7 +3,6 @@ import {
   ArrowLeft,
   BookOpen,
   Database,
-  FileClock,
   FileSpreadsheet,
   History,
   LockKeyhole,
@@ -45,6 +44,12 @@ import {
   MasterCatalogDraftCreatePanel,
   MasterCatalogManualMutationPanel,
 } from './MasterCatalogMutationPanel';
+import { MasterCatalogImportPanel } from './MasterCatalogImportPanel';
+import type {
+  CatalogImportDraftOption,
+  CatalogImportEvidenceCounts,
+} from '@/lib/master-catalog/admin/importContext';
+import type { ParseContext } from '@/lib/master-catalog/import/types';
 
 const sectionLinks: Array<{
   section: CatalogAdminSection;
@@ -302,20 +307,24 @@ export function MasterCatalogVersionDetailView({
 export function MasterCatalogImportView({
   gate,
   history,
+  importContext,
 }: {
   gate: CatalogAdminGate;
   history: { imports: CatalogImportSummary[]; warnings: string[] };
+  importContext: {
+    draft: CatalogImportDraftOption | null;
+    parseContext: ParseContext;
+    evidenceCounts: CatalogImportEvidenceCounts;
+  };
 }) {
   return (
     <MasterCatalogFrame activeSection="import" gate={gate}>
       <Warnings warnings={history.warnings} />
-      <Alert>
-        <FileClock />
-        <AlertTitle>Import workbook flow ยังอยู่ระหว่าง WP-4</AlertTitle>
-        <AlertDescription>
-          หน้านี้ยังคงแสดงหลักฐาน import แบบ read-only จนกว่า preview/validate/apply UI จะผ่าน review แยก
-        </AlertDescription>
-      </Alert>
+      <MasterCatalogImportPanel
+        draft={importContext.draft}
+        parseContext={importContext.parseContext}
+        evidenceCounts={importContext.evidenceCounts}
+      />
       <RecentImports imports={history.imports} />
     </MasterCatalogFrame>
   );

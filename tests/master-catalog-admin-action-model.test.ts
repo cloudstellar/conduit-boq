@@ -173,4 +173,22 @@ describe('Master Catalog admin action model', () => {
       message: 'Draft lock version is stale',
     });
   });
+
+  it('maps import validation metadata from RPC success payloads', () => {
+    expect(mapCatalogRpcActionResponse({
+      ok: true,
+      data: {
+        versionId: VERSION_ID,
+        importId: '00000000-0000-4000-8000-000000000202',
+        status: 'validated',
+        normalizedPayloadHash: 'a'.repeat(64),
+      },
+    }, 'บันทึก import validation แล้ว')).toMatchObject({
+      status: 'success',
+      versionId: VERSION_ID,
+      importId: '00000000-0000-4000-8000-000000000202',
+      importStatus: 'validated',
+      normalizedPayloadHash: 'a'.repeat(64),
+    });
+  });
 });

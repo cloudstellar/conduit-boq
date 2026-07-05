@@ -129,7 +129,8 @@ export function normalizeNtItemMaster2568Row(
 
   const groupKey = `${workContextCode}-${itemTypeCode}`
   const categoryCode = readContextText(
-    context.categoryCodeByGroup?.[groupKey],
+    context.categoryCodeByCanonicalCode?.[canonicalCode] ??
+      context.categoryCodeByGroup?.[groupKey],
     'categoryCode',
     'IMPORT_RECONCILIATION_REQUIRED',
     'Category reconciliation is required for the AAA-TTT group',

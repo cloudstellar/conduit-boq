@@ -231,6 +231,23 @@ describe('Master Catalog parser profile nt-item-master-2568 v1', () => {
     expect(normalized).not.toHaveProperty('factor_f_version')
   })
 
+  it('prefers canonical-code category context over group fallback context', () => {
+    const normalized = NT_ITEM_MASTER_2568_PROFILE.normalizeRow(
+      makeWorkbookRow(),
+      {
+        ...VALID_PARSE_CONTEXT,
+        categoryCodeByCanonicalCode: {
+          'AAA-BBB-001': '2.2',
+        },
+        categoryCodeByGroup: {
+          'AAA-BBB': '1.1',
+        },
+      },
+    )
+
+    expect(normalized.categoryCode).toBe('2.2')
+  })
+
   it('rejects formula, error, numeric money, invalid sum, and missing reconciliation context', () => {
     expect(() => NT_ITEM_MASTER_2568_PROFILE.normalizeRow(
       makeWorkbookRow({ material_cost: { kind: 'formula', formula: '1+1' } }),
