@@ -3,10 +3,12 @@ import {
   ArrowLeft,
   BookOpen,
   Database,
+  Download,
   FileSpreadsheet,
   History,
   LockKeyhole,
   PackageOpen,
+  Printer,
   ShieldAlert,
 } from 'lucide-react';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
@@ -224,6 +226,20 @@ export function MasterCatalogVersionDetailView({
               {version.isDefault ? <Badge variant="secondary">Current default</Badge> : null}
             </CardTitle>
             <CardDescription>{version.name}</CardDescription>
+            <div className="flex flex-wrap gap-2 pt-2">
+              <Button size="sm" asChild>
+                <a href={`/api/master-catalog/export/excel/${version.id}`}>
+                  <Download data-icon="inline-start" />
+                  ส่งออก Excel
+                </a>
+              </Button>
+              <Button variant="outline" size="sm" asChild>
+                <Link href={`/admin/master-catalog/versions/${version.id}/print`}>
+                  <Printer data-icon="inline-start" />
+                  พิมพ์ / บันทึก PDF
+                </Link>
+              </Button>
+            </div>
           </CardHeader>
           <CardContent className="grid gap-3 text-sm sm:grid-cols-2">
             <KeyValue label="Effective date" value={formatThaiDate(version.effectiveDate)} />
@@ -231,7 +247,7 @@ export function MasterCatalogVersionDetailView({
             <KeyValue label="Published by" value={version.publishedByDisplayName ?? '-'} />
             <KeyValue label="Lock version" value={formatThaiNumber(version.lockVersion)} />
             <KeyValue label="Approval ref" value={version.approvalReference ?? '-'} />
-            <KeyValue label="Dataset hash" value={shortHash(version.datasetHash)} />
+            <KeyValue label="Dataset hash" value={version.datasetHash ?? shortHash(version.datasetHash)} />
           </CardContent>
         </Card>
         <Card>

@@ -272,22 +272,22 @@ Also verify:
 
 | Check | Expected | Actual | Result |
 |---|---|---|---|
-| Golden fixture hash | `sha256:0e90d8974960a5ccd52b22b02eb0a6c60797f9234baeaefc32af8c1f9fa719b5` |  | Pending |
-| Published item count | Approved count |  | Pending |
-| Published dataset hash | One stored value |  | Pending |
-| Excel visible business-row count | Exact match |  | Pending |
-| Excel `_canonical_row_json` reconstruction | Exact UTF-8 dataset hash |  | Pending |
-| PDF server-verified printed count/hash | Exact match |  | Pending |
+| Golden fixture hash | `sha256:0e90d8974960a5ccd52b22b02eb0a6c60797f9234baeaefc32af8c1f9fa719b5` | Passed in canonical hash tests; full suite includes the golden fixture | Passed |
+| Published item count | Approved count | Local browser print smoke for selected `2568.0.0` displayed 710 rows/count from DB; selected-version data loader test fails closed on item-count mismatch | Passed for Local smoke; final filed artifacts pending |
+| Published dataset hash | One stored value | Local `2568.0.0` print smoke displayed `sha256:4a2a5fcc75f1510c5e037426a19c3110234856485157e5de6f3bd2eee459d1e8`; data loader recomputes and fails closed on mismatch | Passed for Local smoke; final filed artifacts pending |
+| Excel visible business-row count | Exact match | Excel workbook unit fixture writes one visible row per canonical row; real DB-generated workbook file not yet filed/inspected | Passed automated fixture; final artifact pending |
+| Excel `_canonical_row_json` reconstruction | Exact UTF-8 dataset hash | `tests/master-catalog-export-excel.test.ts` reconstructs `[` + ordered `_canonical_row_json` + `]\n` and rehashes to the dataset hash | Passed automated fixture; final artifact pending |
+| PDF server-verified printed count/hash | Exact match | Server-rendered print route reuses selected-version export loader; browser smoke showed title, full hash, 710-row count, 710 table rows, and no item-code column for Local `2568.0.0` | Passed for Local smoke; saved-PDF artifact pending |
 | Older-version export | Uses selected version |  | Pending |
 | Draft export status mark | `DRAFT – ห้ามใช้อ้างอิง` |  | Pending |
-| PDF price-disclaimer watermark | Matches approved three-line wording and style from `files/รายการบัญชีราคามาตรฐานงานก่อสร้างท่อร้อยสาย 2568.pdf`: `รายการบัญชีราคานี้ไม่ใช่ราคาก่อสร้างที่แท้จริงหรือถูกต้องตรงกับราคาก่อสร้าง`; `แต่เป็นเพียงราคาโดยประมาณซึ่งใกล้เคียงกับราคาก่อสร้างจริงเท่านั้น`; `(สำหรับกิจการ บมจ.โทรคมนาคมแห่งชาติ เท่านั้น มิให้เผยแพร่ก่อนได้รับอนุญาต)` |  | Pending |
-| Published stamp | Version/effective date/published at/by/count/hash |  | Pending |
-| Excel numeric cell types | Numeric, formatted |  | Pending |
-| Excel exact 5 sheets/headers; no formulas/external links | Exact |  | Pending |
-| Formula-control text safety | Malicious strings remain inert text |  | Pending |
-| PDF Thai font/header/page/clipping | Correct |  | Pending |
+| PDF price-disclaimer watermark | Matches approved three-line wording and style from `files/รายการบัญชีราคามาตรฐานงานก่อสร้างท่อร้อยสาย 2568.pdf`: `รายการบัญชีราคานี้ไม่ใช่ราคาก่อสร้างที่แท้จริงหรือถูกต้องตรงกับราคาก่อสร้าง`; `แต่เป็นเพียงราคาโดยประมาณซึ่งใกล้เคียงกับราคาก่อสร้างจริงเท่านั้น`; `(สำหรับกิจการ บมจ.โทรคมนาคมแห่งชาติ เท่านั้น มิให้เผยแพร่ก่อนได้รับอนุญาต)` | Browser smoke confirmed the three approved lines appear in the print route | Passed for Local smoke; visual style artifact pending |
+| Published stamp | Version/effective date/published at/by/count/hash | Browser smoke confirmed Local `2568.0.0` stamp includes version, Published status, Current Default, effective date, approval ref/date, published by, exported at/by, count, and full hash | Passed for Local smoke; final artifact pending |
+| Excel numeric cell types | Numeric, formatted | `tests/master-catalog-export-excel.test.ts` confirms price cost cells are numeric and formatted `#,##0.00` | Passed automated fixture |
+| Excel exact 5 sheets/headers; no formulas/external links | Exact | `tests/master-catalog-export-excel.test.ts` confirms exact five sheets/order, business headers, verification headers, and no formula/hyperlink cell values | Passed automated fixture |
+| Formula-control text safety | Malicious strings remain inert text | `tests/master-catalog-export-excel.test.ts` covers formula-looking item text and confirms no formula/hyperlink cell values | Passed automated fixture |
+| PDF Thai font/header/page/clipping | Correct | Browser smoke confirmed Thai header/table text renders and table counts are present; saved-PDF page numbering, clipping, and final CI asset acceptance not yet inspected | Partial; final visual artifact pending |
 | Short dataset hash | Exactly `sha256:` + first 12 hex + `…`; full hash also present |  | Pending |
-| Catalog export dataset/hash excludes Factor F rows | Confirmed |  | Pending |
+| Catalog export dataset/hash excludes Factor F rows | Confirmed | `tests/master-catalog-export-data.test.ts` verifies the selected-version export loader calls no BOQ or Factor F tables in the normal published export path | Passed automated fixture |
 | BOQ print/export regression | Catalog version and Factor F version/snapshot labels still correct |  | Pending |
 
 Official export file/reference and binary SHA-256 (different from dataset hash):
