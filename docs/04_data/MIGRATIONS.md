@@ -32,6 +32,7 @@
 | `013_factor_f_seed_current_baseline.sql` | Seed audited current 37-row `factor_reference` baseline as Factor F `2566.0.0` and move the default pointer | **Applied to Production 2026-06-29** (`20260628190357`) — no legacy BOQ backfill |
 | `014_factor_f_publish_2569_0_0.sql` | Publish Factor F `2569.0.0` from กค 0433.2/ว 481 and move the default pointer | **Applied to Production 2026-06-29** (`20260628190621`) — no legacy BOQ backfill |
 | `015_factor_f_repair_legacy_snapshot_metadata.sql` | Repair missing legacy Factor F snapshot metadata for BOQs whose saved `factor_f` exactly matches `2566.0.0`; does not bind legacy BOQs to a version | **Applied to Production 2026-06-29** (`20260628190757`) — no reprice and no legacy version backfill |
+| `016_master_catalog_phase4_foundation.sql` | Master Catalog Phase 4 additive governance foundation: metadata columns, identities, code registry, categories/groups, import/change audit tables, RLS/grants, disabled feature flag, rejecting RPC stubs | **Draft — Local only, not applied to Production** |
 | `016+_master_catalog_phase4_*.sql` | Master Catalog Phase 4 database migrations | **Planned — next database migration range after completed Factor F rollout** |
 
 ### Local Schema Baseline (`supabase/local/`)
@@ -78,7 +79,8 @@ at a time outside an explicit transaction.
 Use `npm run db:local:bootstrap`. It resets Local Supabase to the schema-only
 Production baseline, restores scrubbed snapshots, applies root migrations
 `009` and `010`, applies all four `010a` concurrent indexes individually, then
-applies `011`, Factor F `012` through `015`, and runs the Phase 2 smoke tests.
+applies `011`, Factor F `012` through `015`, the draft local-only Phase 4
+foundation `016`, and runs the smoke tests.
 
 The CLI remains intentionally unlinked from Production. Do not use `db push`,
 `db pull`, or linked diff commands from this worktree. Local migration history

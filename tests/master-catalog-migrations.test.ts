@@ -63,12 +63,14 @@ describe('Master Catalog migration contracts', () => {
     expect(bootstrap).toContain('migrations/013_factor_f_seed_current_baseline.sql')
     expect(bootstrap).toContain('migrations/014_factor_f_publish_2569_0_0.sql')
     expect(bootstrap).toContain('migrations/015_factor_f_repair_legacy_snapshot_metadata.sql')
+    expect(bootstrap).toContain('migrations/016_master_catalog_phase4_foundation.sql')
     expect(bootstrap).toContain('supabase/local/production-baseline.sql')
     expect(bootstrap).toContain('PUBLIC_DATA_SNAPSHOT=')
     expect(bootstrap).toContain('docker cp "$PUBLIC_DATA_SNAPSHOT"')
     expect(bootstrap).toContain('psql -v ON_ERROR_STOP=1 -U postgres -d postgres -f /tmp/011.sql')
     expect(bootstrap).toContain('psql -v ON_ERROR_STOP=1 -U postgres -d postgres -f /tmp/014.sql')
     expect(bootstrap).toContain('psql -v ON_ERROR_STOP=1 -U postgres -d postgres -f /tmp/015.sql')
+    expect(bootstrap).toContain('psql -v ON_ERROR_STOP=1 -U postgres -d postgres -f /tmp/016.sql')
     expect(bootstrap).toContain("'factor_f_default_version'")
     expect(bootstrap).toContain("'factor_f_2569_row_count'")
     expect(bootstrap).toContain("'factor_f_partial_legacy_snapshots_remaining'")
@@ -105,6 +107,76 @@ describe('Master Catalog migration contracts', () => {
     expect(sql).not.toContain('SET factor_reference_version_id')
     expect(sql).not.toContain('total_with_factor_f =')
     expect(sql).not.toContain('total_with_vat =')
+  })
+
+  it('adds the Phase 4 foundation without publishing or touching Factor F', () => {
+    const sql = readMigration('016_master_catalog_phase4_foundation.sql')
+
+    expect(sql).toContain('Migration 016: Master Catalog Phase 4 Foundation')
+    expect(sql).toContain("SET LOCAL lock_timeout = '10s'")
+    expect(sql).toContain("SET LOCAL statement_timeout = '60s'")
+
+    expect(sql).toContain('ADD COLUMN IF NOT EXISTS based_on_version_id uuid')
+    expect(sql).toContain('ADD COLUMN IF NOT EXISTS effective_date date')
+    expect(sql).toContain('ADD COLUMN IF NOT EXISTS dataset_hash text')
+    expect(sql).toContain('ADD COLUMN IF NOT EXISTS lock_version integer NOT NULL DEFAULT 0')
+    expect(sql).toContain('ADD COLUMN IF NOT EXISTS identity_id uuid')
+    expect(sql).toContain('ADD COLUMN IF NOT EXISTS category_id uuid')
+    expect(sql).toContain('ADD COLUMN IF NOT EXISTS code_group_id uuid')
+    expect(sql).toContain('ADD COLUMN IF NOT EXISTS display_order integer')
+
+    for (const table of [
+      'catalog_item_identities',
+      'catalog_item_codes',
+      'price_list_categories',
+      'catalog_code_groups',
+      'catalog_imports',
+      'catalog_change_sets',
+      'catalog_change_items',
+    ]) {
+      expect(sql).toContain(`CREATE TABLE IF NOT EXISTS public.${table}`)
+      expect(sql).toContain(`ALTER TABLE public.${table} ENABLE ROW LEVEL SECURITY`)
+    }
+
+    expect(sql).toContain('REVOKE ALL\n    ON TABLE\n      public.catalog_item_identities')
+    expect(sql).toContain('GRANT SELECT\n    ON TABLE\n      public.catalog_item_identities')
+    expect(sql).toContain("p.id = (SELECT auth.uid())")
+    expect(sql).toContain("p.role = 'admin'")
+    expect(sql).toContain("p.status = 'active'")
+
+    for (const index of [
+      'idx_price_list_versions_created_by',
+      'idx_price_list_versions_published_by',
+      'idx_catalog_item_identities_created_by',
+      'idx_catalog_item_codes_created_by',
+      'idx_catalog_imports_created_by',
+      'idx_catalog_change_sets_actor',
+      'idx_price_list_identity_id',
+      'idx_price_list_item_code_identity',
+    ]) {
+      expect(sql).toContain(`CREATE INDEX IF NOT EXISTS ${index}`)
+    }
+
+    expect(sql).toContain("'catalog_admin_enabled'")
+    expect(sql).toContain("'false'::jsonb")
+    expect(sql).toContain("WHERE key = 'catalog_admin_enabled'")
+
+    expect(sql).toContain('CREATE OR REPLACE FUNCTION public.create_catalog_draft')
+    expect(sql).toContain('CREATE OR REPLACE FUNCTION public.apply_catalog_changes')
+    expect(sql).toContain('CREATE OR REPLACE FUNCTION public.publish_catalog_version')
+    expect(sql).toContain('CREATE OR REPLACE FUNCTION public.restore_catalog_pointer')
+    expect(sql.match(/^\s+SECURITY INVOKER$/gm)).toHaveLength(4)
+    expect(sql).not.toContain('SECURITY DEFINER')
+    expect(sql).toContain('CATALOG_RPC_NOT_IMPLEMENTED')
+    expect(sql).toContain('FROM PUBLIC, anon')
+    expect(sql).toContain('TO authenticated')
+
+    expect(sql).toContain("v.version_string = '2568.0.0'")
+    expect(sql).not.toContain("version_string = '2568.1.0'")
+    expect(sql).not.toContain('ALTER TABLE public.boq')
+    expect(sql).not.toContain('UPDATE public.price_list_default_version')
+    expect(sql).not.toMatch(/\b(?:UPDATE|INSERT INTO|DELETE FROM)\s+public\.factor_/i)
+    expect(sql).not.toContain('SET factor_reference_version_id')
   })
 
   it('keeps the Production snapshot outside the Supabase remote migration ledger', () => {
