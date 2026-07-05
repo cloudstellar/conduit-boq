@@ -1,6 +1,6 @@
 # Master Catalog Phase 4 Verification Report
 
-**Status:** In progress — WP-0 through WP-5 local implementation evidence recorded; WP-6+ and Production gates pending
+**Status:** In progress — WP-0 through WP-6 local implementation evidence recorded; final export artifacts and Production gates pending
 **Prepared:** 2026-06-22
 **Production project:** `otlssvssvgkohqwuuiir`
 **Candidate version:** `2568.1.0` (pending owner approval)
@@ -275,6 +275,7 @@ Also verify:
 | Golden fixture hash | `sha256:0e90d8974960a5ccd52b22b02eb0a6c60797f9234baeaefc32af8c1f9fa719b5` | Passed in canonical hash tests; full suite includes the golden fixture | Passed |
 | Published item count | Approved count | Local browser print smoke for selected `2568.0.0` displayed 710 rows/count from DB; selected-version data loader test fails closed on item-count mismatch | Passed for Local smoke; final filed artifacts pending |
 | Published dataset hash | One stored value | Local `2568.0.0` print smoke displayed `sha256:4a2a5fcc75f1510c5e037426a19c3110234856485157e5de6f3bd2eee459d1e8`; data loader recomputes and fails closed on mismatch | Passed for Local smoke; final filed artifacts pending |
+| Selected-version export paging | No silent fixed-limit truncation before count/hash verification | Export data loader now reads selected price rows, categories, code groups, change sets, imports, and change items through deterministic paged queries; `tests/master-catalog-export-data.test.ts` covers a 1,001-row selected version and verifies all rows are counted/hashed | Passed automated fixture |
 | Excel visible business-row count | Exact match | Excel workbook unit fixture writes one visible row per canonical row; real DB-generated workbook file not yet filed/inspected | Passed automated fixture; final artifact pending |
 | Excel `_canonical_row_json` reconstruction | Exact UTF-8 dataset hash | `tests/master-catalog-export-excel.test.ts` reconstructs `[` + ordered `_canonical_row_json` + `]\n` and rehashes to the dataset hash | Passed automated fixture; final artifact pending |
 | PDF server-verified printed count/hash | Exact match | Server-rendered print route reuses selected-version export loader; browser smoke showed title, full hash, 710-row count, 710 table rows, and no item-code column for Local `2568.0.0` | Passed for Local smoke; saved-PDF artifact pending |

@@ -208,11 +208,21 @@ const IMPORT_COLUMNS = [
   'created_at',
   'applied_at',
 ].join(',');
-const CHANGE_ITEM_COLUMNS = 'change_set_id,action';
+const CHANGE_ITEM_COLUMNS = 'id,change_set_id,identity_id,action';
 
 const UUID_PATTERN =
   /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 const DATE_PATTERN = /^\d{4}-\d{2}-\d{2}$/;
+const CATALOG_EXPORT_QUERY_PAGE_SIZE = 1000;
+
+type PagedQueryResult = {
+  data: unknown;
+  error: unknown;
+};
+
+type PagedQuery = {
+  range: (from: number, to: number) => PromiseLike<PagedQueryResult>;
+};
 
 export async function loadCatalogExportDataset(
   supabase: SupabaseClient,
@@ -525,91 +535,86 @@ async function loadPriceRows(
   supabase: SupabaseClient,
   versionId: string,
 ): Promise<Record<string, unknown>[]> {
-  const { data, error } = await supabase
-    .from('price_list')
-    .select(PRICE_LIST_COLUMNS)
-    .eq('version_id', versionId)
-    .order('item_code', { ascending: true })
-    .order('identity_id', { ascending: true })
-    .limit(5000);
-
-  if (error) {
-    throw queryError('CATALOG_EXPORT_ROWS_QUERY_FAILED', 'Could not load catalog rows');
-  }
-
-  return rowsFromResult(data);
+  return loadPagedRows(
+    () => supabase
+      .from('price_list')
+      .select(PRICE_LIST_COLUMNS)
+      .eq('version_id', versionId)
+      .order('item_code', { ascending: true })
+      .order('identity_id', { ascending: true }) as unknown as PagedQuery,
+    'CATALOG_EXPORT_ROWS_QUERY_FAILED',
+    'Could not load catalog rows',
+  );
 }
 
 async function loadCategories(
   supabase: SupabaseClient,
   versionId: string,
 ): Promise<Map<string, Record<string, unknown>>> {
-  const { data, error } = await supabase
-    .from('price_list_categories')
-    .select(CATEGORY_COLUMNS)
-    .eq('version_id', versionId)
-    .order('display_order', { ascending: true })
-    .limit(5000);
+  const rows = await loadPagedRows(
+    () => supabase
+      .from('price_list_categories')
+      .select(CATEGORY_COLUMNS)
+      .eq('version_id', versionId)
+      .order('display_order', { ascending: true })
+      .order('id', { ascending: true }) as unknown as PagedQuery,
+    'CATALOG_EXPORT_CATEGORIES_QUERY_FAILED',
+    'Could not load catalog categories',
+  );
 
-  if (error) {
-    throw queryError('CATALOG_EXPORT_CATEGORIES_QUERY_FAILED', 'Could not load catalog categories');
-  }
-
-  return new Map(rowsFromResult(data).map((row) => [String(row.id), row]));
+  return new Map(rows.map((row) => [String(row.id), row]));
 }
 
 async function loadCodeGroups(
   supabase: SupabaseClient,
   versionId: string,
 ): Promise<Map<string, Record<string, unknown>>> {
-  const { data, error } = await supabase
-    .from('catalog_code_groups')
-    .select(CODE_GROUP_COLUMNS)
-    .eq('version_id', versionId)
-    .order('display_order', { ascending: true })
-    .limit(5000);
+  const rows = await loadPagedRows(
+    () => supabase
+      .from('catalog_code_groups')
+      .select(CODE_GROUP_COLUMNS)
+      .eq('version_id', versionId)
+      .order('display_order', { ascending: true })
+      .order('id', { ascending: true }) as unknown as PagedQuery,
+    'CATALOG_EXPORT_CODE_GROUPS_QUERY_FAILED',
+    'Could not load catalog code groups',
+  );
 
-  if (error) {
-    throw queryError('CATALOG_EXPORT_CODE_GROUPS_QUERY_FAILED', 'Could not load catalog code groups');
-  }
-
-  return new Map(rowsFromResult(data).map((row) => [String(row.id), row]));
+  return new Map(rows.map((row) => [String(row.id), row]));
 }
 
 async function loadChangeSummary(
   supabase: SupabaseClient,
   versionId: string,
 ): Promise<CatalogExportChangeSet[]> {
-  const [changeSetsResult, importsResult] = await Promise.all([
-    supabase
-      .from('catalog_change_sets')
-      .select(CHANGE_SET_COLUMNS)
-      .eq('version_id', versionId)
-      .order('created_at', { ascending: true })
-      .limit(1000),
-    supabase
-      .from('catalog_imports')
-      .select(IMPORT_COLUMNS)
-      .eq('version_id', versionId)
-      .order('created_at', { ascending: true })
-      .limit(1000),
-  ]);
-
-  if (changeSetsResult.error || importsResult.error) {
-    throw queryError(
+  const [changeSetRows, importRows] = await Promise.all([
+    loadPagedRows(
+      () => supabase
+        .from('catalog_change_sets')
+        .select(CHANGE_SET_COLUMNS)
+        .eq('version_id', versionId)
+        .order('created_at', { ascending: true })
+        .order('id', { ascending: true }) as unknown as PagedQuery,
       'CATALOG_EXPORT_CHANGE_SUMMARY_QUERY_FAILED',
       'Could not load catalog change summary',
-    );
-  }
+    ),
+    loadPagedRows(
+      () => supabase
+        .from('catalog_imports')
+        .select(IMPORT_COLUMNS)
+        .eq('version_id', versionId)
+        .order('created_at', { ascending: true })
+        .order('id', { ascending: true }) as unknown as PagedQuery,
+      'CATALOG_EXPORT_CHANGE_SUMMARY_QUERY_FAILED',
+      'Could not load catalog change summary',
+    ),
+  ]);
 
-  const changeSetRows = rowsFromResult(changeSetsResult.data);
   const changeItemCounts = await loadChangeItemCounts(
     supabase,
     changeSetRows.map((row) => String(row.id)),
   );
-  const importsById = new Map(
-    rowsFromResult(importsResult.data).map((row) => [String(row.id), row]),
-  );
+  const importsById = new Map(importRows.map((row) => [String(row.id), row]));
 
   return changeSetRows.map((row) => {
     const importId = toNullableString(row.import_id);
@@ -640,22 +645,21 @@ async function loadChangeItemCounts(
     return new Map();
   }
 
-  const { data, error } = await supabase
-    .from('catalog_change_items')
-    .select(CHANGE_ITEM_COLUMNS)
-    .in('change_set_id', changeSetIds)
-    .limit(10000);
-
-  if (error) {
-    throw queryError(
-      'CATALOG_EXPORT_CHANGE_ITEMS_QUERY_FAILED',
-      'Could not load catalog change item counts',
-    );
-  }
+  const rows = await loadPagedRows(
+    () => supabase
+      .from('catalog_change_items')
+      .select(CHANGE_ITEM_COLUMNS)
+      .in('change_set_id', changeSetIds)
+      .order('change_set_id', { ascending: true })
+      .order('identity_id', { ascending: true })
+      .order('id', { ascending: true }) as unknown as PagedQuery,
+    'CATALOG_EXPORT_CHANGE_ITEMS_QUERY_FAILED',
+    'Could not load catalog change item counts',
+  );
 
   const counts = new Map<string, CatalogExportChangeActionCounts>();
 
-  for (const row of rowsFromResult(data)) {
+  for (const row of rows) {
     const changeSetId = String(row.change_set_id ?? '');
     const action = String(row.action ?? '');
     const current = counts.get(changeSetId) ?? emptyActionCounts();
@@ -668,6 +672,30 @@ async function loadChangeItemCounts(
   }
 
   return counts;
+}
+
+async function loadPagedRows(
+  buildQuery: () => PagedQuery,
+  errorCode: string,
+  errorMessage: string,
+): Promise<Record<string, unknown>[]> {
+  const rows: Record<string, unknown>[] = [];
+
+  for (let from = 0; ; from += CATALOG_EXPORT_QUERY_PAGE_SIZE) {
+    const to = from + CATALOG_EXPORT_QUERY_PAGE_SIZE - 1;
+    const { data, error } = await buildQuery().range(from, to);
+
+    if (error) {
+      throw queryError(errorCode, errorMessage);
+    }
+
+    const pageRows = rowsFromResult(data);
+    rows.push(...pageRows);
+
+    if (pageRows.length < CATALOG_EXPORT_QUERY_PAGE_SIZE) {
+      return rows;
+    }
+  }
 }
 
 function emptyActionCounts(): CatalogExportChangeActionCounts {

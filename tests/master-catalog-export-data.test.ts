@@ -62,6 +62,20 @@ describe('Master Catalog export data loader', () => {
       });
   });
 
+  it('loads all selected rows with paged queries before verifying official count/hash', async () => {
+    const canonicalRows = makeCanonicalRows(1001);
+    const datasetHash = await hashCanonicalCatalogDatasetRows(canonicalRows);
+    const calls: string[] = [];
+    const client = createExportClient({ canonicalRows, datasetHash }, calls);
+
+    const dataset = await loadCatalogExportDataset(client, VERSION_ID);
+
+    expect(dataset.counts.rowCount).toBe(1001);
+    expect(dataset.canonicalDatasetHash).toBe(datasetHash);
+    expect(calls).toContain('range:price_list:0-999');
+    expect(calls).toContain('range:price_list:1000-1999');
+  });
+
   it('keeps draft export behind the active-admin feature gate', async () => {
     const datasetHash = await hashCanonicalCatalogDatasetRows([CANONICAL_ROW]);
     const client = createExportClient({
@@ -84,6 +98,7 @@ describe('Master Catalog export data loader', () => {
 });
 
 type ExportClientOptions = {
+  canonicalRows?: CanonicalCatalogDatasetRow[];
   datasetHash: string;
   featureFlag?: boolean;
   versionOverrides?: Record<string, unknown>;
@@ -106,7 +121,7 @@ function createExportClient(
     published_at: '2026-06-22T02:00:00.000Z',
     published_by_display_name: 'Publisher',
     dataset_hash: options.datasetHash,
-    item_count: 1,
+    item_count: options.canonicalRows?.length ?? 1,
     lock_version: 1,
     created_at: '2026-06-21T02:00:00.000Z',
     updated_at: '2026-06-22T02:00:00.000Z',
@@ -126,6 +141,7 @@ function createExportClient(
     from: (table: string) => {
       calls.push(`from:${table}`);
       const filters = new Map<string, unknown>();
+      let range: { from: number; to: number } | null = null;
       const query = {
         select: () => query,
         eq: (column: string, value: unknown) => {
@@ -138,11 +154,16 @@ function createExportClient(
           filters.set(column, values);
           return query;
         },
+        range: (from: number, to: number) => {
+          range = { from, to };
+          calls.push(`range:${table}:${from}-${to}`);
+          return query;
+        },
         maybeSingle: async () => maybeSingle(table, filters, versionRow, baseVersionRow, options),
         then: (
           resolve: (value: unknown) => unknown,
           reject?: (reason: unknown) => unknown,
-        ) => Promise.resolve(listRows(table)).then(resolve, reject),
+        ) => Promise.resolve(listRows(table, options, range)).then(resolve, reject),
       };
 
       return query;
@@ -190,24 +211,14 @@ function maybeSingle(
   throw new CatalogExportError('TEST_UNEXPECTED_TABLE', `Unexpected table: ${table}`);
 }
 
-function listRows(table: string) {
+function listRows(
+  table: string,
+  options: ExportClientOptions,
+  range: { from: number; to: number } | null,
+) {
   if (table === 'price_list') {
     return {
-      data: [{
-        id: 'price-row-1',
-        identity_id: CANONICAL_ROW.identity_id,
-        item_code: CANONICAL_ROW.item_code,
-        item_name: CANONICAL_ROW.item_name,
-        unit: CANONICAL_ROW.unit,
-        material_cost: 100,
-        labor_cost: 25,
-        unit_cost: 125,
-        category: '1.1',
-        category_id: 'cat-1',
-        code_group_id: 'group-1',
-        is_active: true,
-        display_order: CANONICAL_ROW.display_order,
-      }],
+      data: sliceRange(toPriceRows(options.canonicalRows ?? [CANONICAL_ROW]), range),
       error: null,
     };
   }
@@ -245,4 +256,46 @@ function listRows(table: string) {
   }
 
   throw new CatalogExportError('TEST_UNEXPECTED_TABLE', `Unexpected table: ${table}`);
+}
+
+function makeCanonicalRows(count: number): CanonicalCatalogDatasetRow[] {
+  return Array.from({ length: count }, (_, index) => {
+    const sequence = index + 1;
+
+    return {
+      ...CANONICAL_ROW,
+      identity_id: `00000000-0000-4000-8000-${String(sequence).padStart(12, '0')}`,
+      item_code: `AAA-BBB-${String(sequence).padStart(4, '0')}`,
+      display_order: index,
+    };
+  });
+}
+
+function toPriceRows(rows: CanonicalCatalogDatasetRow[]): Record<string, unknown>[] {
+  return rows.map((row, index) => ({
+    id: `price-row-${index + 1}`,
+    identity_id: row.identity_id,
+    item_code: row.item_code,
+    item_name: row.item_name,
+    unit: row.unit,
+    material_cost: row.material_cost,
+    labor_cost: row.labor_cost,
+    unit_cost: row.unit_cost,
+    category: row.category_code,
+    category_id: 'cat-1',
+    code_group_id: 'group-1',
+    is_active: row.is_active,
+    display_order: row.display_order,
+  }));
+}
+
+function sliceRange(
+  rows: Record<string, unknown>[],
+  range: { from: number; to: number } | null,
+): Record<string, unknown>[] {
+  if (!range) {
+    return rows;
+  }
+
+  return rows.slice(range.from, range.to + 1);
 }

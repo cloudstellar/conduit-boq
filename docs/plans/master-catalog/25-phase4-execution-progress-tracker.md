@@ -1,6 +1,6 @@
 # Master Catalog Phase 4 Execution Progress Tracker
 
-**Status:** WP-6 official export implementation in progress; export mechanics implemented, final artifacts pending
+**Status:** WP-6 official export implementation in progress; export mechanics hardened, final artifacts pending
 **Purpose:** Owner-facing progress tracker for Master Catalog Phase 4 local
 implementation and rehearsal. This file is for quick status review; authority
 remains in the Decision Register, Execution Pack, DB Contract, Runbook, and
@@ -34,7 +34,7 @@ Allowed statuses:
 | Feature flag default | Disabled |
 | Latest owner decision needed | Review real DB-generated Excel/PDF before final P-11 artifact acceptance |
 | Next owner review point | WP-6 export evidence review before treating official artifacts as accepted |
-| Last updated | 2026-07-05 23:47 +07 |
+| Last updated | 2026-07-06 00:03 +07 |
 
 ## 3. Work package checklist
 
@@ -46,7 +46,7 @@ Allowed statuses:
 | WP-3 | Admin read/draft UI shell behind disabled flag | Complete | Read-only server UI shell, hidden admin entry while flag disabled, server-side auth/role/flag gate tests, local auth/user/flag facts, unauthenticated in-app browser redirect smoke, authenticated local HTTP gate smoke, authenticated in-app browser login/gate proof, WP-3 review cleanup for flag parsing/email edge cases/Factor F warnings, test/lint/typecheck/build evidence | Owner approved continuing to WP-4 |
 | WP-4 | Draft mutation, import, manual edit, and history | Complete | Draft/manual/import/history tests, clean Local WP-4 smoke, browser manual edit proof, browser import render/validate proof, RPC error sanitization, local auth credential parser proof, and [WP-4 Owner Review Note](./26-phase4-wp4-owner-review-note.md) | Owner accepted 2026-07-05 21:47 +07 |
 | WP-5 | Publish, pointer restore, and audit on Local | Ready for owner review | Backend DB/RPC slice passed: migration `018`, Local publish/restore smoke including stale-base pointer fixture, DB hash readback, immutability checks, active-admin publish/restore UI controls, browser create/publish/restore proof, final DB readback, owner-review cleanup, and [Verification Report publication evidence](./13-phase4-verification-report.md#12-publication-tests). Hash-portability review note remains for WP-8/P-15 | Owner accepted continuing to WP-6 local-only implementation |
-| WP-6 | Official Excel/PDF export | In progress | Selected-version export core, Excel Route Handler, 5-sheet workbook generator, server-verified PDF/print route, admin action links, unit coverage, build/lint/typecheck, and local browser print smoke implemented. No final export artifact accepted yet | Final P-11 artifact acceptance pending |
+| WP-6 | Official Excel/PDF export | In progress | Selected-version export core, paged export data reads without silent fixed-limit truncation, Excel Route Handler, 5-sheet workbook generator, server-verified PDF/print route, admin action links, unit coverage, build/lint/typecheck, and local browser print smoke implemented. No final export artifact accepted yet | Final P-11 artifact acceptance pending |
 | WP-7 | BOQ and Factor F regression preservation | Not started | BOQ save/print/export regression, Factor F before/after assertions | Required before WP-8 complete |
 | WP-8 | Clean Local rehearsal and Verification Report | Not started | Clean reset, full workflow, test/lint/build/advisor evidence | Required before any P-12 request |
 | WP-9 | Production migration/deploy/enable/publish | Not authorized | P-12 through P-15 sequential approvals | Separate Production readiness review required |
@@ -129,6 +129,7 @@ Allowed statuses:
 | 2026-07-05 23:10 +07 | WP-6 | Started official Excel/PDF export implementation | In progress | Owner authorized continuing according to recommendation. Scope is local-only selected-version export implementation and verification: DB re-fetch, count/hash match, five-sheet Excel, server-verified PDF/print route, P-11 visual direction, no Production write, no deploy, no feature enablement, no publish, and no Factor F/BOQ dataset inclusion. Production touched: No |
 | 2026-07-05 23:47 +07 | WP-6 | Implemented local-only selected-version official export mechanics | Passed implementation checks | Added read-only export data loader with authenticated selected-version re-fetch, draft/admin gate, count/hash fail-closed checks, canonical row JSON, dictionary/change summary data, and Factor F/BOQ dataset exclusion; added Excel Route Handler with exact five-sheet workbook; added server-rendered A4 portrait print route with field-facing columns, full hash stamp, currency note, and approved watermark wording; added admin detail export actions. Production touched: No |
 | 2026-07-05 23:47 +07 | WP-6 | Export verification checks and browser smoke | Passed with open visual/download limitations | Focused export tests passed 2 files/5 tests; full `npm test` passed 18 files/90 tests; `npx tsc --noEmit --pretty false` passed; `npm run lint` passed with 0 errors/12 existing warnings; sandbox `npm run build` failed only on blocked Google Fonts fetch and escalated `npm run build` passed. Browser smoke on local `2568.0.0` print route showed 710 data rows, 52 category headings, title, full hash, watermark, currency note, and expected PDF table headers. In-app browser could not prove the attachment download event for the Excel route, so route evidence is unit/build coverage until a manual or stronger e2e download proof is produced. Production touched: No |
+| 2026-07-06 00:03 +07 | WP-6 | Owner-style export hardening review closed fixed-limit risk | Passed hardening checks | Replaced fixed `.limit(...)` export data reads with deterministic paged reads for selected price rows, categories, code groups, change sets, imports, and change items so official count/hash verification cannot silently truncate when row counts grow. Added a 1,001-row paged-loader regression test proving all selected rows are read before official count/hash verification. Checks: focused export tests passed 2 files/6 tests; full `npm test` passed 18 files/91 tests; `npx tsc --noEmit --pretty false`; `git diff --check`; `npm run lint` 0 errors/12 existing warnings; sandbox `npm run build` failed only on blocked Google Fonts fetch and escalated `npm run build` passed. Production touched: No |
 
 ## 6. Blocker log
 
@@ -156,12 +157,12 @@ Use this template at the end of each implementation session:
 
 ```text
 Current WP: WP-6
-Status: In progress after implementing local-only official Excel/PDF export mechanics; final artifacts not accepted
+Status: In progress after implementing and hardening local-only official Excel/PDF export mechanics; final artifacts not accepted
 Branch: codex/master-catalog-phase4
 Latest commit: See git HEAD for the latest committed checkpoint
 Files changed: export data/workbook modules, Excel API route, PDF print route/client toolbar, admin version-detail export actions, WP-6 export tests, tracker, and verification report
-Evidence produced: selected-version data loader, count/hash fail-closed checks, exact 5-sheet Excel workbook tests, server-rendered print route browser smoke with local `2568.0.0` 710-row evidence
-Tests/checks run: `npm test -- tests/master-catalog-export-excel.test.ts tests/master-catalog-export-data.test.ts`; `npm test`; `npx tsc --noEmit --pretty false`; `npm run lint`; `npm run build` after network escalation for existing Google Fonts fetch
+Evidence produced: selected-version paged data loader, count/hash fail-closed checks, 1,001-row no-truncation regression test, exact 5-sheet Excel workbook tests, server-rendered print route browser smoke with local `2568.0.0` 710-row evidence
+Tests/checks run: `npm test -- tests/master-catalog-export-excel.test.ts tests/master-catalog-export-data.test.ts`; `npm test`; `npx tsc --noEmit --pretty false`; `git diff --check`; `npm run lint`; `npm run build` after network escalation for existing Google Fonts fetch
 Blockers: existing advisor baseline still needs later triage; fresh approved Production snapshot source not taken in this session; NT CI runtime derivatives not generated yet; local clean-reset hash portability needs owner/reviewer confirmation before WP-8/P-15; browser download proof and saved-PDF page numbering/visual acceptance still pending
 Owner decisions needed: final P-11 artifact acceptance after real DB-generated Excel/PDF; confirm whether canonical `identity_id` hash portability is acceptable or should be amended before final count/hash/export acceptance; approve CI derivative generation path before P-10/official export acceptance; decide whether stronger e2e/download/PDF tooling is required before P-11 final acceptance
 Next safe step: produce/review real local DB-generated Excel/PDF artifacts or continue WP-6 hardening without starting WP-7 until owner accepts WP-6 evidence boundary
