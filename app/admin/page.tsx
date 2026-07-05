@@ -32,7 +32,7 @@ import {
 } from '@/components/ui/select'
 import { Switch } from '@/components/ui/switch'
 import { Label } from '@/components/ui/label'
-import { Loader2, ArrowLeft, Check, X, Trash2 } from 'lucide-react'
+import { Loader2, ArrowLeft, Check, X, Trash2, Database } from 'lucide-react'
 
 interface UserProfile {
   id: string
@@ -62,6 +62,7 @@ function AdminContent() {
   const [deletingUser, setDeletingUser] = useState<string | null>(null)
   const [approvingUser, setApprovingUser] = useState<string | null>(null)
   const [restrictEmailDomain, setRestrictEmailDomain] = useState(false)
+  const [catalogAdminEnabled, setCatalogAdminEnabled] = useState(false)
   const [savingSettings, setSavingSettings] = useState(false)
 
   const supabase = useMemo(() => createClient(), [])
@@ -89,7 +90,10 @@ function AdminContent() {
             requested_department:departments!user_profiles_requested_department_id_fkey(id, name),
             requested_sector:sectors!user_profiles_requested_sector_id_fkey(id, name)
           `).order('created_at', { ascending: false }),
-          supabase.from('app_settings').select('key, value').eq('key', 'restrict_email_domain').single()
+          supabase
+            .from('app_settings')
+            .select('key, value')
+            .in('key', ['restrict_email_domain', 'catalog_admin_enabled'])
         ])
 
         if (cancelled) return
@@ -100,7 +104,13 @@ function AdminContent() {
           setUsers((usersRes.data || []) as unknown as UserProfile[])
         }
         if (settingsRes.data) {
-          setRestrictEmailDomain(settingsRes.data.value === true || settingsRes.data.value === 'true')
+          const settings = new Map(
+            settingsRes.data.map((setting) => [setting.key, setting.value])
+          )
+          const restrictValue = settings.get('restrict_email_domain')
+          const catalogAdminValue = settings.get('catalog_admin_enabled')
+          setRestrictEmailDomain(restrictValue === true || restrictValue === 'true')
+          setCatalogAdminEnabled(catalogAdminValue === true || catalogAdminValue === 'true')
         }
       } catch (err) {
         console.error('Load error:', err)
@@ -341,6 +351,32 @@ function AdminContent() {
       </header>
 
       <main className="max-w-7xl mx-auto px-4 py-6 sm:px-6 lg:px-8">
+        {catalogAdminEnabled ? (
+          <Card className="mb-6">
+            <CardHeader>
+              <CardTitle>Master Catalog</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                <div className="flex items-start gap-3">
+                  <div className="flex size-10 items-center justify-center rounded-md border bg-background text-muted-foreground">
+                    <Database className="size-4" />
+                  </div>
+                  <div>
+                    <div className="font-medium">จัดการบัญชีราคามาตรฐาน</div>
+                    <div className="text-sm text-muted-foreground">
+                      Master Catalog Phase 4 admin shell
+                    </div>
+                  </div>
+                </div>
+                <Button asChild>
+                  <Link href="/admin/master-catalog">เปิด Master Catalog</Link>
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        ) : null}
+
         {/* Settings Section */}
         <Card className="mb-6">
           <CardHeader>

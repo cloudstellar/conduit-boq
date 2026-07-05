@@ -12,6 +12,10 @@ import { Card, CardContent } from '@/components/ui/card'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Separator } from '@/components/ui/separator'
 import { Loader2 } from 'lucide-react'
+import {
+  getOrganizationEmailDomainError,
+  normalizeOrganizationEmail,
+} from '@/lib/auth/email'
 
 function LoginForm() {
   const router = useRouter()
@@ -25,17 +29,20 @@ function LoginForm() {
   const [error, setError] = useState<string | null>(null)
   const [success, setSuccess] = useState<string | null>(null)
   const [mode, setMode] = useState<'login' | 'signup' | 'forgot'>('login')
-  const [isEmailRestricted, setIsEmailRestricted] = useState(false)
+  const [isEmailRestricted, setIsEmailRestricted] = useState(true)
   const [emailDomainError, setEmailDomainError] = useState<string | null>(null)
 
   // Fetch email domain restriction setting
   useEffect(() => {
     const fetchSetting = async () => {
-      const { data } = await supabase
+      const { data, error } = await supabase
         .from('app_settings')
         .select('value')
         .eq('key', 'restrict_email_domain')
         .single()
+      if (error || !data) {
+        return
+      }
       setIsEmailRestricted(data?.value === true || data?.value === 'true')
     }
     fetchSetting()
@@ -43,18 +50,9 @@ function LoginForm() {
 
   // Validate email domain
   const validateEmailDomain = (emailValue: string) => {
-    if (!isEmailRestricted) {
-      setEmailDomainError(null)
-      return true
-    }
-
-    const emailDomain = emailValue.split('@')[1]?.toLowerCase()
-    if (emailValue.includes('@') && emailDomain && emailDomain !== 'ntplc.co.th') {
-      setEmailDomainError('domain email ไม่ถูกต้อง')
-      return false
-    }
-    setEmailDomainError(null)
-    return true
+    const domainError = getOrganizationEmailDomainError(emailValue, isEmailRestricted)
+    setEmailDomainError(domainError)
+    return !domainError
   }
 
   const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -65,21 +63,29 @@ function LoginForm() {
 
   // Auto-append @ntplc.co.th when domain restriction is enabled
   const handleEmailBlur = () => {
-    if (isEmailRestricted && email && !email.includes('@')) {
-      const newEmail = email + '@ntplc.co.th'
+    const newEmail = normalizeOrganizationEmail(email, isEmailRestricted)
+    if (newEmail !== email) {
       setEmail(newEmail)
       validateEmailDomain(newEmail)
+      return
     }
+
+    validateEmailDomain(newEmail)
   }
 
   // Check if form is valid
-  const isFormValid = !emailDomainError && email && (mode === 'forgot' || password)
+  const isFormValid = !emailDomainError && Boolean(email.trim()) && (mode === 'forgot' || Boolean(password))
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
 
+    const emailForAuth = normalizeOrganizationEmail(email, isEmailRestricted)
+    if (emailForAuth !== email) {
+      setEmail(emailForAuth)
+    }
+
     // Final validation before submit
-    if (!validateEmailDomain(email)) {
+    if (!validateEmailDomain(emailForAuth)) {
       return
     }
 
@@ -90,7 +96,7 @@ function LoginForm() {
     try {
       if (mode === 'login') {
         const { error } = await supabase.auth.signInWithPassword({
-          email,
+          email: emailForAuth,
           password,
         })
         if (error) throw error
@@ -99,14 +105,14 @@ function LoginForm() {
       } else if (mode === 'signup') {
         // Check email domain restriction (double check)
         if (isEmailRestricted) {
-          const emailDomain = email.split('@')[1]?.toLowerCase()
+          const emailDomain = emailForAuth.split('@')[1]?.toLowerCase()
           if (emailDomain !== 'ntplc.co.th') {
             throw new Error('ระบบจำกัดการสมัครเฉพาะอีเมล @ntplc.co.th เท่านั้น')
           }
         }
 
         const { error } = await supabase.auth.signUp({
-          email,
+          email: emailForAuth,
           password,
           options: {
             emailRedirectTo: `${window.location.origin}/auth/callback`,
@@ -115,7 +121,7 @@ function LoginForm() {
         if (error) throw error
         setSuccess('กรุณาตรวจสอบอีเมลเพื่อยืนยันการสมัคร')
       } else if (mode === 'forgot') {
-        const { error } = await supabase.auth.resetPasswordForEmail(email, {
+        const { error } = await supabase.auth.resetPasswordForEmail(emailForAuth, {
           redirectTo: `${window.location.origin}/auth/callback?next=/profile`,
         })
         if (error) throw error
@@ -168,8 +174,9 @@ function LoginForm() {
                 <Input
                   id="email"
                   name="email"
-                  type="email"
-                  autoComplete="email"
+                  type={isEmailRestricted ? 'text' : 'email'}
+                  autoComplete={isEmailRestricted ? 'username' : 'email'}
+                  inputMode="email"
                   required
                   value={email}
                   onChange={handleEmailChange}
