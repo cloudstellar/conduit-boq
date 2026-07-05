@@ -41,6 +41,10 @@ import {
   formatThaiNumber,
   shortHash,
 } from '@/lib/master-catalog/admin/readModel';
+import {
+  MasterCatalogDraftCreatePanel,
+  MasterCatalogManualMutationPanel,
+} from './MasterCatalogMutationPanel';
 
 const sectionLinks: Array<{
   section: CatalogAdminSection;
@@ -112,6 +116,10 @@ export function MasterCatalogOverviewView({
   gate: CatalogAdminGate;
   overview: CatalogAdminOverview;
 }) {
+  const phase4Draft = overview.versions.find(
+    (version) => version.versionString === '2568.1.0' && version.status === 'draft',
+  ) ?? null;
+
   return (
     <MasterCatalogFrame activeSection="overview" gate={gate}>
       <Warnings warnings={overview.warnings} />
@@ -141,6 +149,11 @@ export function MasterCatalogOverviewView({
           icon={FileSpreadsheet}
         />
       </div>
+
+      <MasterCatalogDraftCreatePanel
+        defaultVersionString={overview.defaultVersion?.versionString ?? null}
+        draftVersion={phase4Draft}
+      />
 
       <div className="grid gap-4 xl:grid-cols-[minmax(0,1fr)_380px]">
         <VersionTable versions={overview.versions.slice(0, 8)} />
@@ -220,7 +233,23 @@ export function MasterCatalogVersionDetailView({
         </Card>
       </div>
 
-      <Card>
+      <MasterCatalogManualMutationPanel
+        version={{
+          id: version.id,
+          versionString: version.versionString,
+          status: version.status,
+          lockVersion: version.lockVersion,
+        }}
+        sampleItems={detail.items.map((item) => ({
+          itemCode: item.itemCode,
+          itemName: item.itemName,
+          unit: item.unit,
+          category: item.category,
+          isActive: item.isActive,
+        }))}
+      />
+
+      <Card className="min-w-0">
         <CardHeader>
           <CardTitle>รายการตัวอย่าง</CardTitle>
           <CardDescription>20 รายการแรกตาม display order</CardDescription>
@@ -282,9 +311,9 @@ export function MasterCatalogImportView({
       <Warnings warnings={history.warnings} />
       <Alert>
         <FileClock />
-        <AlertTitle>Import mutation ยังไม่เปิดใน WP-3</AlertTitle>
+        <AlertTitle>Import workbook flow ยังอยู่ระหว่าง WP-4</AlertTitle>
         <AlertDescription>
-          หน้านี้แสดงหลักฐาน import แบบ read-only เท่านั้น การ validate/apply จะเริ่มใน WP-4 หลัง review
+          หน้านี้ยังคงแสดงหลักฐาน import แบบ read-only จนกว่า preview/validate/apply UI จะผ่าน review แยก
         </AlertDescription>
       </Alert>
       <RecentImports imports={history.imports} />
@@ -338,7 +367,7 @@ function MasterCatalogFrame({
   const canShowSections = gate.state === 'enabled';
 
   return (
-    <div className="min-h-dvh bg-muted/30">
+    <div className="min-h-dvh overflow-x-hidden bg-muted/30">
       <header className="border-b bg-background">
         <div className="mx-auto flex max-w-7xl flex-col gap-4 px-4 py-4 sm:px-6 lg:px-8">
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
@@ -406,7 +435,7 @@ function MetricCard({
   icon: typeof Database;
 }) {
   return (
-    <Card>
+    <Card className="min-w-0">
       <CardContent className="flex min-h-[120px] items-start justify-between gap-3 p-5">
         <div className="min-w-0">
           <p className="text-sm font-medium text-muted-foreground">{title}</p>
@@ -423,7 +452,7 @@ function MetricCard({
 
 function VersionTable({ versions }: { versions: CatalogVersionSummary[] }) {
   return (
-    <Card>
+    <Card className="min-w-0">
       <CardHeader>
         <CardTitle>Catalog versions</CardTitle>
         <CardDescription>Read-only version register</CardDescription>
@@ -501,7 +530,7 @@ function RecentImports({
   }
 
   return (
-    <Card>
+    <Card className="min-w-0">
       <CardHeader>
         <CardTitle className="flex items-center gap-2 text-base">
           <FileSpreadsheet className="size-4" />
