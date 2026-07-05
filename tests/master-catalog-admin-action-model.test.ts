@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import {
   buildManualCatalogChangeArgs,
+  createCatalogRpcTransportError,
   mapCatalogRpcActionResponse,
 } from '../lib/master-catalog/admin/actionModel';
 
@@ -171,6 +172,26 @@ describe('Master Catalog admin action model', () => {
       status: 'error',
       code: 'DRAFT_LOCK_CONFLICT',
       message: 'Draft lock version is stale',
+    });
+  });
+
+  it('sanitizes internal or unknown RPC errors before they reach the UI', () => {
+    expect(mapCatalogRpcActionResponse({
+      ok: false,
+      error: {
+        code: 'INTERNAL_ERROR',
+        message: 'duplicate key value violates unique constraint "catalog_change_sets_request_id_key"',
+      },
+    }, 'unused')).toMatchObject({
+      status: 'error',
+      code: 'INTERNAL_ERROR',
+      message: 'Master Catalog RPC ปฏิเสธรายการนี้',
+    });
+
+    expect(createCatalogRpcTransportError('previewCatalogImport')).toMatchObject({
+      status: 'error',
+      code: 'INTERNAL_ERROR',
+      message: 'บันทึก import validation ไม่สำเร็จจากระบบฐานข้อมูล',
     });
   });
 

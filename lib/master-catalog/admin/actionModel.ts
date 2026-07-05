@@ -60,8 +60,28 @@ const CANDIDATE_CODE_PATTERN = /^[A-Z0-9]{3}-[A-Z0-9]{3}-[0-9]{3}$/;
 const CODE_GROUP_PATTERN = /^[A-Z0-9]{3}$/;
 const MONEY_PATTERN = /^(0|[1-9][0-9]*)\.[0-9]{2}$/;
 const MANUAL_ACTIONS = ['retire', 'update', 'recode', 'add'] as const;
+const SAFE_RPC_ACTION_ERROR_CODES = new Set([
+  'CATALOG_CODE_CAPACITY_REVIEW_REQUIRED',
+  'DRAFT_BASE_STALE',
+  'DRAFT_LOCK_CONFLICT',
+  'DRAFT_NOT_EDITABLE',
+  'DRAFT_NOT_FOUND',
+  'FORBIDDEN',
+  'IMPORT_PRICE_AUTHORITY_REQUIRED',
+  'IMPORT_RECONCILIATION_REQUIRED',
+  'IMPORT_RETIREMENT_APPROVAL_REQUIRED',
+  'REQUEST_ALREADY_PROCESSED',
+  'VALIDATION_FAILED',
+]);
+const RPC_TRANSPORT_ERROR_MESSAGES = {
+  applyCatalogImport: 'Apply import ไม่สำเร็จจากระบบฐานข้อมูล',
+  applyCatalogManualChange: 'บันทึก draft change set ไม่สำเร็จจากระบบฐานข้อมูล',
+  createCatalogDraft: 'สร้าง draft ไม่สำเร็จจากระบบฐานข้อมูล',
+  previewCatalogImport: 'บันทึก import validation ไม่สำเร็จจากระบบฐานข้อมูล',
+} as const;
 
 type ManualAction = typeof MANUAL_ACTIONS[number];
+export type CatalogRpcTransportOperation = keyof typeof RPC_TRANSPORT_ERROR_MESSAGES;
 
 export function createIdleCatalogMutationState(): CatalogMutationState {
   return { status: 'idle', message: '' };
@@ -75,6 +95,15 @@ export function createCatalogMutationError(
   return { status: 'error', message, code, diagnostics };
 }
 
+export function createCatalogRpcTransportError(
+  operation: CatalogRpcTransportOperation,
+): CatalogMutationState {
+  return createCatalogMutationError(
+    RPC_TRANSPORT_ERROR_MESSAGES[operation],
+    'INTERNAL_ERROR',
+  );
+}
+
 export function mapCatalogRpcActionResponse(
   response: CatalogRpcActionResponse | null | undefined,
   successMessage: string,
@@ -84,9 +113,10 @@ export function mapCatalogRpcActionResponse(
   }
 
   if (!response.ok) {
+    const code = response.error?.code ?? 'VALIDATION_FAILED';
     return createCatalogMutationError(
-      response.error?.message ?? 'Master Catalog RPC ปฏิเสธรายการนี้',
-      response.error?.code ?? 'VALIDATION_FAILED',
+      readSafeRpcActionErrorMessage(code, response.error?.message),
+      code,
       response.error?.diagnostics,
     );
   }
@@ -104,6 +134,17 @@ export function mapCatalogRpcActionResponse(
     retiredByFullImportOmission: response.data?.retiredByFullImportOmission,
     duplicateRequest: response.data?.duplicateRequest,
   };
+}
+
+function readSafeRpcActionErrorMessage(
+  code: string,
+  message: string | undefined,
+): string {
+  if (message && SAFE_RPC_ACTION_ERROR_CODES.has(code)) {
+    return message;
+  }
+
+  return 'Master Catalog RPC ปฏิเสธรายการนี้';
 }
 
 export function buildManualCatalogChangeArgs(

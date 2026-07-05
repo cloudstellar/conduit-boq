@@ -14,15 +14,24 @@ import {
   validateCatalogImportAgainstDraft,
 } from '@/lib/master-catalog/admin/importValidation';
 import {
+  type CatalogRpcTransportOperation,
   type CatalogMutationState,
   type CatalogRpcActionResponse,
   buildManualCatalogChangeArgs,
   createCatalogMutationError,
+  createCatalogRpcTransportError,
   mapCatalogRpcActionResponse,
 } from '@/lib/master-catalog/admin/actionModel';
 
 const UUID_PATTERN =
   /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+
+type SupabaseActionError = {
+  code?: string;
+  details?: string;
+  hint?: string;
+  message?: string;
+};
 
 export async function createCatalogDraftAction(
   _previousState: CatalogMutationState,
@@ -63,7 +72,7 @@ export async function createCatalogDraftAction(
   });
 
   if (error) {
-    return createCatalogMutationError(error.message, 'INTERNAL_ERROR');
+    return mapRpcTransportError('createCatalogDraft', error);
   }
 
   const result = mapCatalogRpcActionResponse(
@@ -98,7 +107,7 @@ export async function applyCatalogManualChangeAction(
   const { data, error } = await supabase.rpc('apply_catalog_changes', args);
 
   if (error) {
-    return createCatalogMutationError(error.message, 'INTERNAL_ERROR');
+    return mapRpcTransportError('applyCatalogManualChange', error);
   }
 
   const result = mapCatalogRpcActionResponse(
@@ -149,7 +158,7 @@ export async function previewCatalogImportAction(
   });
 
   if (error) {
-    return createCatalogMutationError(error.message, 'INTERNAL_ERROR');
+    return mapRpcTransportError('previewCatalogImport', error);
   }
 
   const result = mapCatalogRpcActionResponse(
@@ -232,7 +241,7 @@ export async function applyCatalogImportAction(
   });
 
   if (error) {
-    return createCatalogMutationError(error.message, 'INTERNAL_ERROR');
+    return mapRpcTransportError('applyCatalogImport', error);
   }
 
   const result = mapCatalogRpcActionResponse(
@@ -326,4 +335,19 @@ function revalidateMasterCatalogPaths(versionId: string | undefined) {
   if (versionId) {
     revalidatePath(`/admin/master-catalog/versions/${versionId}`);
   }
+}
+
+function mapRpcTransportError(
+  operation: CatalogRpcTransportOperation,
+  error: SupabaseActionError,
+): CatalogMutationState {
+  console.error('Master Catalog RPC transport failed', {
+    code: error.code,
+    details: error.details,
+    hint: error.hint,
+    message: error.message,
+    operation,
+  });
+
+  return createCatalogRpcTransportError(operation);
 }

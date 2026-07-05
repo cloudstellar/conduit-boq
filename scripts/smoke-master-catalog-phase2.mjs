@@ -1,8 +1,10 @@
 import { createClient } from '@supabase/supabase-js'
+import { readLocalEnvFile } from './local-env.mjs'
 
+const localEnv = readLocalEnvFile()
 const url = process.env.NEXT_PUBLIC_SUPABASE_URL
 const publishableKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
-const password = process.env.LOCAL_TEST_PASSWORD
+const password = localEnv.LOCAL_TEST_PASSWORD ?? process.env.LOCAL_TEST_PASSWORD
 
 if (!url || !publishableKey || !password) {
   throw new Error('Local Supabase URL, publishable key, and LOCAL_TEST_PASSWORD are required')

@@ -1,13 +1,12 @@
 import { randomUUID } from 'node:crypto'
-import { readFileSync } from 'node:fs'
-import { resolve } from 'node:path'
 import { createClient } from '@supabase/supabase-js'
+import { readLocalEnvFile } from './local-env.mjs'
 
 const url = process.env.NEXT_PUBLIC_SUPABASE_URL
 const publishableKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
-const literalLocalEnv = readLiteralLocalEnvFile()
-const secretKey = literalLocalEnv.LOCAL_SUPABASE_SECRET_KEY ?? process.env.LOCAL_SUPABASE_SECRET_KEY
-const password = literalLocalEnv.LOCAL_TEST_PASSWORD ?? process.env.LOCAL_TEST_PASSWORD
+const localEnv = readLocalEnvFile()
+const secretKey = localEnv.LOCAL_SUPABASE_SECRET_KEY ?? process.env.LOCAL_SUPABASE_SECRET_KEY
+const password = localEnv.LOCAL_TEST_PASSWORD ?? process.env.LOCAL_TEST_PASSWORD
 
 if (!url || !publishableKey || !secretKey || !password) {
   throw new Error('Local Supabase URL, publishable key, secret key, and LOCAL_TEST_PASSWORD are required')
@@ -24,26 +23,6 @@ const supabase = createClient(url, publishableKey, {
 const service = createClient(url, secretKey, {
   auth: { autoRefreshToken: false, persistSession: false },
 })
-
-function readLiteralLocalEnvFile() {
-  try {
-    const raw = readFileSync(resolve(process.cwd(), 'supabase/.env.local'), 'utf8')
-    return Object.fromEntries(
-      raw
-        .split(/\r?\n/)
-        .map((line) => line.trim())
-        .filter((line) => line && !line.startsWith('#'))
-        .map((line) => {
-          const separator = line.indexOf('=')
-          if (separator < 0) return null
-          return [line.slice(0, separator).trim(), line.slice(separator + 1).trim()]
-        })
-        .filter(Boolean),
-    )
-  } catch {
-    return {}
-  }
-}
 
 function assert(condition, message) {
   if (!condition) throw new Error(message)

@@ -1,8 +1,10 @@
 import { createClient } from '@supabase/supabase-js'
+import { readLocalEnvFile } from './local-env.mjs'
 
+const localEnv = readLocalEnvFile()
 const url = process.env.LOCAL_SUPABASE_URL || 'http://127.0.0.1:55321'
-const secretKey = process.env.LOCAL_SUPABASE_SECRET_KEY
-const password = process.env.LOCAL_TEST_PASSWORD
+const secretKey = localEnv.LOCAL_SUPABASE_SECRET_KEY ?? process.env.LOCAL_SUPABASE_SECRET_KEY
+const password = localEnv.LOCAL_TEST_PASSWORD ?? process.env.LOCAL_TEST_PASSWORD
 
 if (!/^http:\/\/(127\.0\.0\.1|localhost):/.test(url)) {
   throw new Error(`Refusing to seed a non-local Supabase URL: ${url}`)
