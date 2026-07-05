@@ -140,6 +140,8 @@ describe('Master Catalog browser XLSX workbook adapter', () => {
 
     expect(normalized).toMatchObject({
       canonicalCode: 'AAA-BBB-001',
+      workContextNameTh: 'กลุ่มงานทดสอบ',
+      itemTypeNameTh: 'ชนิดทดสอบ',
       materialCost: '100.00',
       laborCost: '25.00',
       unitCost: '125.00',

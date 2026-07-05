@@ -113,7 +113,9 @@ export function normalizeNtItemMaster2568Row(
   const headers = NT_ITEM_MASTER_2568_REQUIRED_HEADERS
   const canonicalCode = readTextCell(row, headers.itemCode, 'item_code', 64)
   const workContextCode = readTextCell(row, headers.workContextCode, 'AAA', 16)
+  const workContextNameTh = readTextCell(row, headers.workContextNameTh, 'AAA_name_th', 200)
   const itemTypeCode = readTextCell(row, headers.itemTypeCode, 'TTT', 16)
+  const itemTypeNameTh = readTextCell(row, headers.itemTypeNameTh, 'TTT_name_th', 200)
   const sourceSheet = readTextCell(row, headers.sourceSheet, 'source_sheet', 128)
   const sourceRow = readSourceRow(row, headers.sourceRow)
   const materialCost = readMoneyCell(row, headers.materialCost, 'material_cost')
@@ -142,7 +144,9 @@ export function normalizeNtItemMaster2568Row(
     ),
     canonicalCode,
     workContextCode,
+    workContextNameTh,
     itemTypeCode,
+    itemTypeNameTh,
     itemName: readTextCell(row, headers.itemName, 'description_th', MAX_ITEM_NAME_LENGTH),
     unit: readTextCell(row, headers.unit, 'unit', 64),
     materialCost,

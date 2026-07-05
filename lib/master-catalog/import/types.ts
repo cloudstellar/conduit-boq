@@ -92,7 +92,9 @@ export interface NormalizedCatalogRowCandidate {
   legacyItemCode: string | null
   canonicalCode: string
   workContextCode: string
+  workContextNameTh: string
   itemTypeCode: string
+  itemTypeNameTh: string
   itemName: string
   unit: string
   materialCost: string

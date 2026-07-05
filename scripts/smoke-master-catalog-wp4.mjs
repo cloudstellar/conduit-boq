@@ -71,6 +71,14 @@ function assertActionCode(result, label, code) {
   return result.data
 }
 
+function moneyText(value) {
+  const amount = Number(value)
+  if (!Number.isFinite(amount)) {
+    throw new Error(`Expected numeric money value, got ${value}`)
+  }
+  return amount.toFixed(2)
+}
+
 async function readFactorSummary() {
   const { data: pointer, error: pointerError } = await supabase
     .from('factor_reference_default_version')
@@ -206,15 +214,17 @@ try {
   if (rowCountError) throw rowCountError
   assert(draftRows === 710, `Draft row count expected 710, got ${draftRows}`)
 
-  const { data: activeRow, error: activeRowError } = await supabase
+  const { data: activeRows, error: activeRowError } = await supabase
     .from('price_list')
-    .select('item_code')
+    .select('item_code, item_name, unit, material_cost, labor_cost, unit_cost, category')
     .eq('version_id', draft.id)
     .eq('is_active', true)
     .order('item_code')
-    .limit(1)
-    .single()
+    .limit(4)
   if (activeRowError) throw activeRowError
+  assert(activeRows?.length === 4, 'WP-4 smoke needs four active draft rows')
+
+  const [activeRow, editRow, recodeRow, importRow] = activeRows
 
   const manualRequestId = randomUUID()
   const manualData = assertActionOk(
@@ -255,15 +265,85 @@ try {
   )
   assert(duplicateManual.duplicateRequest === true, 'Duplicate manual request was not idempotent')
 
-  const { data: importRow, error: importRowError } = await supabase
-    .from('price_list')
-    .select('item_code')
-    .eq('version_id', draft.id)
-    .eq('is_active', true)
-    .order('item_code')
-    .limit(1)
-    .single()
-  if (importRowError) throw importRowError
+  const addRequestId = randomUUID()
+  const addData = assertActionOk(
+    await supabase.rpc('apply_catalog_changes', {
+      p_version_id: draft.id,
+      p_change_payload: {
+        operation: 'manual',
+        changes: [{
+          action: 'add',
+          canonicalCode: 'SMK-ADD-001',
+          workContextCode: 'SMK',
+          workContextNameTh: 'กลุ่มงานทดสอบ smoke',
+          itemTypeCode: 'ADD',
+          itemTypeNameTh: 'งานเพิ่ม smoke',
+          itemName: 'รายการทดสอบ WP-4 เพิ่มใหม่',
+          unit: 'รายการ',
+          materialCost: '10.00',
+          laborCost: '5.00',
+          unitCost: '15.00',
+          categoryCode: 'SMOKE',
+          identityOutcome: 'candidate_add',
+          priceAuthorityReference: 'local-wp4-smoke-price-authority',
+        }],
+      },
+      p_expected_lock_version: manualData.lockVersion,
+      p_reason: 'WP-4 local-only manual add smoke',
+      p_request_id: addRequestId,
+      p_import_id: null,
+    }),
+    'apply_catalog_changes manual add',
+  )
+  assert(addData.changedItems === 1, 'Manual add did not audit exactly one item')
+
+  const editRequestId = randomUUID()
+  const editData = assertActionOk(
+    await supabase.rpc('apply_catalog_changes', {
+      p_version_id: draft.id,
+      p_change_payload: {
+        operation: 'manual',
+        changes: [{
+          action: 'update',
+          legacyItemCode: editRow.item_code,
+          itemName: `${editRow.item_name} (WP-4 smoke edit)`,
+          priceAuthorityReference: 'local-wp4-smoke-name-authority',
+        }],
+      },
+      p_expected_lock_version: addData.lockVersion,
+      p_reason: 'WP-4 local-only manual edit smoke',
+      p_request_id: editRequestId,
+      p_import_id: null,
+    }),
+    'apply_catalog_changes manual edit',
+  )
+  assert(editData.changedItems === 1, 'Manual edit did not audit exactly one item')
+
+  const recodeRequestId = randomUUID()
+  const recodeData = assertActionOk(
+    await supabase.rpc('apply_catalog_changes', {
+      p_version_id: draft.id,
+      p_change_payload: {
+        operation: 'manual',
+        changes: [{
+          action: 'recode',
+          legacyItemCode: recodeRow.item_code,
+          canonicalCode: 'SMK-RCD-001',
+          workContextCode: 'SMK',
+          workContextNameTh: 'กลุ่มงานทดสอบ smoke',
+          itemTypeCode: 'RCD',
+          itemTypeNameTh: 'งานเปลี่ยนรหัส smoke',
+          identityOutcome: 'recode',
+        }],
+      },
+      p_expected_lock_version: editData.lockVersion,
+      p_reason: 'WP-4 local-only manual recode smoke',
+      p_request_id: recodeRequestId,
+      p_import_id: null,
+    }),
+    'apply_catalog_changes manual recode',
+  )
+  assert(recodeData.changedItems === 1, 'Manual recode did not audit exactly one item')
 
   const importValidationRequestId = randomUUID()
   const normalizedPayloadHash = 'b'.repeat(64)
@@ -273,7 +353,7 @@ try {
     parserProfileVersion: '1',
     mode: 'supplement',
     versionId: draft.id,
-    expectedLockVersion: manualData.lockVersion,
+    expectedLockVersion: recodeData.lockVersion,
     requestId: importValidationRequestId,
     reason: 'WP-4 local-only import smoke',
     source: {
@@ -288,8 +368,19 @@ try {
       sourceRow: 2,
       sourceReference: 'wp4-smoke:2',
       legacyItemCode: importRow.item_code,
-      canonicalCode: 'AAA-AAA-001',
+      canonicalCode: 'SMK-IMP-001',
+      workContextCode: 'SMK',
+      workContextNameTh: 'กลุ่มงานทดสอบ smoke',
+      itemTypeCode: 'IMP',
+      itemTypeNameTh: 'งานนำเข้า smoke',
+      itemName: importRow.item_name,
+      unit: importRow.unit,
+      materialCost: moneyText(importRow.material_cost),
+      laborCost: moneyText(importRow.labor_cost),
+      unitCost: moneyText(importRow.unit_cost),
+      categoryCode: importRow.category ?? 'SMOKE',
       identityOutcome: 'retire',
+      priceAuthorityReference: null,
     }],
   }
 
@@ -301,7 +392,7 @@ try {
         payload: importPayload,
         normalizedPayloadHash,
       },
-      p_expected_lock_version: manualData.lockVersion,
+      p_expected_lock_version: recodeData.lockVersion,
       p_reason: 'WP-4 local-only import validation smoke',
       p_request_id: importValidationRequestId,
       p_import_id: null,
@@ -319,7 +410,7 @@ try {
         payload: importPayload,
         normalizedPayloadHash,
       },
-      p_expected_lock_version: manualData.lockVersion,
+      p_expected_lock_version: recodeData.lockVersion,
       p_reason: 'WP-4 local-only import apply smoke',
       p_request_id: importApplyRequestId,
       p_import_id: importValidation.importId,
@@ -336,7 +427,7 @@ try {
         payload: importPayload,
         normalizedPayloadHash,
       },
-      p_expected_lock_version: manualData.lockVersion,
+      p_expected_lock_version: recodeData.lockVersion,
       p_reason: 'WP-4 local-only import apply smoke',
       p_request_id: importApplyRequestId,
       p_import_id: importValidation.importId,
@@ -379,6 +470,41 @@ try {
   if (changeItemError) throw changeItemError
   assert(changeItemCount === 1, 'Manual change set did not create one change item')
 
+  const { data: actionRows, error: actionRowsError } = await supabase
+    .from('catalog_change_items')
+    .select('action')
+    .in('change_set_id', [
+      manualData.changeSetId,
+      addData.changeSetId,
+      editData.changeSetId,
+      recodeData.changeSetId,
+      importApply.changeSetId,
+    ])
+  if (actionRowsError) throw actionRowsError
+  const actions = actionRows.map((row) => row.action).sort()
+  assert(
+    JSON.stringify(actions) === JSON.stringify(['add', 'recode', 'retire', 'retire', 'update']),
+    `Unexpected WP-4 audited actions: ${JSON.stringify(actions)}`,
+  )
+
+  const { data: recodedRow, error: recodedRowError } = await supabase
+    .from('price_list')
+    .select('item_code, code_group_id')
+    .eq('version_id', draft.id)
+    .eq('item_code', 'SMK-RCD-001')
+    .single()
+  if (recodedRowError) throw recodedRowError
+  assert(recodedRow.code_group_id, 'Manual recode did not attach a code group')
+
+  const { data: addedRow, error: addedRowError } = await supabase
+    .from('price_list')
+    .select('item_code, code_group_id, is_active')
+    .eq('version_id', draft.id)
+    .eq('item_code', 'SMK-ADD-001')
+    .single()
+  if (addedRowError) throw addedRowError
+  assert(addedRow.is_active === true && addedRow.code_group_id, 'Manual add did not create an active grouped row')
+
   const publishResult = await supabase.rpc('publish_catalog_version', {
     p_version_id: draft.id,
     p_expected_lock_version: importApply.lockVersion,
@@ -402,10 +528,17 @@ try {
     draft_version: draft.version_string,
     draft_rows: draftRows,
     retired_item_code: activeRow.item_code,
+    added_item_code: 'SMK-ADD-001',
+    edited_item_code: editRow.item_code,
+    recoded_item_code: 'SMK-RCD-001',
     imported_retired_item_code: importRow.item_code,
     manual_change_set: manualData.changeSetId,
+    add_change_set: addData.changeSetId,
+    edit_change_set: editData.changeSetId,
+    recode_change_set: recodeData.changeSetId,
     import_change_set: importApply.changeSetId,
     final_lock_version: importApply.lockVersion,
+    audited_actions: actions,
     stale_lock_rejected: true,
     import_applied: true,
     publish_blocked: true,
