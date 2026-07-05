@@ -255,11 +255,11 @@ Also verify:
 | Test | Expected | Result/evidence |
 |---|---|---|
 | Missing approval evidence | Rejected | Passed in Local WP-5 smoke: `PUBLICATION_METADATA_REQUIRED`; pointer stayed on `2568.0.0` |
-| Stale base pointer | `DRAFT_BASE_STALE` | Implementation branch present in migration `018`; dedicated runtime stale-base fixture still pending before WP-5 complete |
+| Stale base pointer | `DRAFT_BASE_STALE` | Passed in Local WP-5 smoke: a transient local-only active pointer fixture moved the singleton pointer under an existing draft; publish returned `DRAFT_BASE_STALE`, did not move the fixture pointer, and cleanup restored the pointer to `2568.0.0` before the real local publish |
 | Duplicate publish request ID | No duplicate effect | Passed in Local WP-5 smoke; duplicate publish returned `duplicateRequest=true` |
 | Publish transaction | Atomic | Passed in Local WP-5 smoke; rejected publish attempts did not move pointer, successful publish moved pointer/metadata/audit together |
 | Publish invalid status transition | Rejected without pointer movement | Passed in Local WP-5 smoke: active-version republish rejected as `VERSION_NOT_PUBLISHABLE` |
-| Dataset count/hash from DB | Stored | Passed in Local WP-5 smoke and canonical hash readback: `item_count=710`, `dataset_hash=sha256:40e2611ae57eec4f6918c1b1a3e2e2113ef9594afd18a53ed80f81ecb87d9f32`; JS canonical hash matched DB hash |
+| Dataset count/hash from DB | Stored | Passed in Local WP-5 smoke and canonical hash readback after clean Local bootstrap: `item_count=710`, `dataset_hash=sha256:07c1cf935a720d6d1314becb479eb1f2acb761f2ccbe9a51ccb84a424f57d120`; JS canonical hash matched DB hash with `471777` canonical JSON bytes |
 | Pointer and `is_default` sync | Exact | Passed in Local WP-5 smoke: publish moved pointer/default to `2568.1.0`; restore moved both back to `2568.0.0` |
 | Previous version remains readable | Yes | Passed in Local WP-5 smoke: former current `2568.0.0` remained `active` and readable |
 | Former current version after publish | Still Published/Active; immutable; not automatically archived | Passed in Local WP-5 smoke: `2568.0.0` stayed `active`, non-default after publish, then restored |

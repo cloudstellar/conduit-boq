@@ -133,6 +133,73 @@ async function readCatalogVersionById(versionId) {
   return data
 }
 
+async function assertStaleBasePublishRejected(draftVersion, baseVersionId) {
+  let fixtureVersionId = null
+  const fixturePatch = (Number.parseInt(randomUUID().slice(0, 6), 16) % 100000) + 1
+
+  try {
+    // Transient local-only pointer target for the stale-base branch; deleted before the real publish.
+    const { data: fixture, error: fixtureError } = await service
+      .from('price_list_versions')
+      .insert({
+        major: 9999,
+        minor: 5,
+        patch: fixturePatch,
+        name: 'Local WP-5 stale-base pointer fixture',
+        status: 'active',
+        is_default: false,
+      })
+      .select('id, version_string')
+      .single()
+    if (fixtureError) throw fixtureError
+
+    fixtureVersionId = fixture.id
+
+    const { error: pointerMoveError } = await service
+      .from('price_list_default_version')
+      .update({ version_id: fixtureVersionId })
+      .eq('id', true)
+    if (pointerMoveError) throw pointerMoveError
+
+    assert(await readCurrentCatalogPointer() === fixtureVersionId, 'Stale-base fixture pointer did not move')
+
+    assertActionCode(
+      await supabase.rpc('publish_catalog_version', {
+        p_version_id: draftVersion.id,
+        p_expected_lock_version: draftVersion.lock_version,
+        p_approval_metadata: {
+          effectiveDate: '2026-07-05',
+          approvalReference: 'LOCAL-WP5-REHEARSAL-ONLY-NOT-PRODUCTION',
+          approvalDocumentDate: '2026-07-05',
+          publishedByDisplayName: 'Local WP-5 Rehearsal Publisher',
+        },
+        p_reason: 'WP-5 stale base pointer reject smoke',
+        p_request_id: randomUUID(),
+      }),
+      'publish_catalog_version stale base pointer',
+      'DRAFT_BASE_STALE',
+    )
+
+    assert(await readCurrentCatalogPointer() === fixtureVersionId, 'Pointer moved after rejected stale-base publish')
+  } finally {
+    if (fixtureVersionId) {
+      const { error: pointerRestoreError } = await service
+        .from('price_list_default_version')
+        .update({ version_id: baseVersionId })
+        .eq('id', true)
+      if (pointerRestoreError) throw pointerRestoreError
+
+      const { error: fixtureDeleteError } = await service
+        .from('price_list_versions')
+        .delete()
+        .eq('id', fixtureVersionId)
+      if (fixtureDeleteError) throw fixtureDeleteError
+    }
+  }
+
+  assert(await readCurrentCatalogPointer() === baseVersionId, 'Stale-base fixture did not restore the pointer to base')
+}
+
 try {
   const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
     email: 'local.admin@ntplc.co.th',
@@ -208,6 +275,8 @@ try {
     'DRAFT_LOCK_CONFLICT',
   )
   assert(await readCurrentCatalogPointer() === baseVersion.id, 'Pointer moved after rejected stale-lock publish')
+
+  await assertStaleBasePublishRejected(draftBeforePublish, baseVersion.id)
 
   const publishRequestId = randomUUID()
   const publishData = assertActionOk(
@@ -369,6 +438,7 @@ try {
     duplicate_restore_idempotent: true,
     missing_metadata_rejected: true,
     stale_lock_rejected: true,
+    stale_base_rejected: true,
     active_republish_rejected: true,
     published_row_mutation_blocked: true,
     published_metadata_mutation_blocked: true,
