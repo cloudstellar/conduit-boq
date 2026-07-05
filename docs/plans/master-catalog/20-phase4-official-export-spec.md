@@ -113,13 +113,13 @@ Every published Excel and PDF contains:
 
 | Field | Display rule |
 |---|---|
-| Organization/document title | `รายการบัญชีราคามาตรฐานงานก่อสร้างท่อร้อยสายสื่อสารใต้ดิน` |
+| Organization/document title | `รายการบัญชีราคามาตรฐานงานก่อสร้างท่อร้อยสายสื่อสารใต้ดิน`; field-facing PDF header appends `ประจำปี {catalog year}` from the version major year, for example `ประจำปี 2568` |
 | Catalog version | Full version string, for example `2568.1.0` |
 | Publication status | `Published` plus separate `Current Default: Yes/No` |
 | Effective date | Thai-readable date plus unambiguous ISO `YYYY-MM-DD` in metadata sheet/summary |
 | Approval reference | Exact immutable database value |
 | Approval document date | Thai-readable plus ISO value |
-| Published at/by | ICT display time and immutable publisher display-name snapshot |
+| Approved by / published snapshot | PDF displays `เห็นชอบโดย` using the immutable publisher display-name snapshot; Excel/metadata may keep the technical published-at/by wording for audit traceability |
 | Exported at/by | ICT display time and authenticated exporter display name |
 | Item count | Exact active/included count covered by the dataset hash |
 | Dataset SHA-256 | Full `sha256:<64 lowercase hex>` on summary/metadata, Excel verification sheet, and release/filing manifest. The field-facing PDF footer must not show a truncated hash. A short hash may appear only in admin/export screens or audit manifests as an identifier, never as proof. |
@@ -369,7 +369,8 @@ custody is required.
   release/filing evidence.
 - Table headers repeat on every data page.
 - Footer repeats department name, page number as `x/y`, and version/status or
-  version/effective-date. Draft right footer example:
+  version/effective-date. The left footer department text is
+  `ส่วนวิศวกรรมท่อร้อยสาย (วทฐฐ.)`. Draft right footer example:
   `v2568.1.0 | Draft`. Published right footer example:
   `v2568.1.0 | 1 ม.ค. 2570`.
 - The field-facing PDF footer must not show a truncated dataset hash. Full

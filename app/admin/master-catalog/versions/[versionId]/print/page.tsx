@@ -1,12 +1,14 @@
-import Image from 'next/image';
+/* eslint-disable @next/next/no-img-element -- Plain public images keep the print/PDF table headers stable. */
 import { redirect } from 'next/navigation';
+import localFont from 'next/font/local';
 import { createClient } from '@/lib/supabase/server';
 import {
   CATALOG_EXPORT_APP_NAME,
-  CATALOG_EXPORT_DOCUMENT_TITLE,
+  CATALOG_EXPORT_DEPARTMENT_FOOTER,
   CATALOG_EXPORT_SPEC_REVISION,
   CatalogExportError,
   loadCatalogExportDataset,
+  makeCatalogExportDocumentTitle,
   makeCatalogExportFilename,
   type CatalogExportDataset,
   type CatalogExportRow,
@@ -15,6 +17,31 @@ import { MasterCatalogPrintToolbar } from './PrintToolbar';
 
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
+
+const ntDocumentFont = localFont({
+  src: [
+    {
+      path: '../../../../../fonts/nt/NT-Regular.woff2',
+      weight: '400',
+      style: 'normal',
+    },
+    {
+      path: '../../../../../fonts/nt/NT-Bold.woff2',
+      weight: '700',
+      style: 'normal',
+    },
+  ],
+  display: 'swap',
+});
+
+const DOCUMENT_FONT_FAMILY = `${ntDocumentFont.style.fontFamily}, "TH Sarabun New", Arial, sans-serif`;
+const WATERMARK_NOTICE_LINES = [
+  'รายการบัญชีราคานี้ไม่ใช่ราคาก่อสร้างที่แท้จริงหรือถูกต้องตรงกับราคาก่อสร้าง',
+  'แต่เป็นเพียงราคาโดยประมาณซึ่งใกล้เคียงกับราคาก่อสร้างจริงเท่านั้น',
+  '(สำหรับกิจการ บมจ.โทรคมนาคมแห่งชาติ เท่านั้น มิให้เผยแพร่ก่อนได้รับอนุญาต)',
+];
+const WATERMARK_NOTICE_TEXT = WATERMARK_NOTICE_LINES.join('\n');
+const PRICE_PAGE_ROW_LIMIT = 35;
 
 export default async function MasterCatalogPrintPage({
   params,
@@ -42,7 +69,7 @@ export default async function MasterCatalogPrintPage({
 }
 
 function PrintDocument({ dataset }: { dataset: CatalogExportDataset }) {
-  const groupedRows = groupRowsByCategory(dataset.rows);
+  const pricePages = paginatePriceRows(dataset.rows);
   const filename = makeCatalogExportFilename(dataset, 'pdf');
   const statusText = dataset.isDraftExport
     ? 'Draft'
@@ -52,28 +79,29 @@ function PrintDocument({ dataset }: { dataset: CatalogExportDataset }) {
   const footerRight = dataset.isDraftExport
     ? `v${dataset.version.versionString} | Draft`
     : `v${dataset.version.versionString} | ${formatThaiDate(dataset.version.effectiveDate)}`;
+  const priceListTitle = makeCatalogExportDocumentTitle(dataset.version.versionString);
 
   return (
-    <main className="print-root">
+    <main className={`${ntDocumentFont.className} print-root`}>
       <style>{`
-        @page {
-          size: A4 portrait;
-          margin: 13mm 10mm 16mm;
-          @bottom-left {
-            content: "ฝ่ายท่อร้อยสาย (ทฐฐ.)";
-            font-family: "TH Sarabun New", Arial, sans-serif;
-            font-size: 10pt;
-          }
-          @bottom-center {
-            content: "หน้า " counter(page) "/" counter(pages);
-            font-family: "TH Sarabun New", Arial, sans-serif;
-            font-size: 10pt;
-          }
-          @bottom-right {
-            content: "${cssString(footerRight)}";
-            font-family: "TH Sarabun New", Arial, sans-serif;
-            font-size: 10pt;
-          }
+	        @page {
+	          size: A4 portrait;
+	          margin: 12mm 8mm 16mm;
+	          @bottom-left {
+	            content: "${cssString(CATALOG_EXPORT_DEPARTMENT_FOOTER)}";
+	            font-family: ${DOCUMENT_FONT_FAMILY};
+	            font-size: 10pt;
+	          }
+	          @bottom-center {
+	            content: "หน้า " counter(page) "/" counter(pages);
+	            font-family: ${DOCUMENT_FONT_FAMILY};
+	            font-size: 10pt;
+	          }
+	          @bottom-right {
+	            content: "${cssString(footerRight)}";
+	            font-family: ${DOCUMENT_FONT_FAMILY};
+	            font-size: 10pt;
+	          }
         }
         * { box-sizing: border-box; }
         @font-face {
@@ -91,12 +119,12 @@ function PrintDocument({ dataset }: { dataset: CatalogExportDataset }) {
           font-display: swap;
         }
         body { margin: 0; background: #f3f4f6; }
-        .print-root {
-          min-height: 100vh;
-          color: #111827;
-          font-family: "TH Sarabun New", Arial, sans-serif;
-          font-size: 14pt;
-          line-height: 1.25;
+	        .print-root {
+	          min-height: 100vh;
+	          color: #111827;
+	          font-family: ${DOCUMENT_FONT_FAMILY};
+	          font-size: 11.4pt;
+	          line-height: 1.06;
         }
         .toolbar {
           display: flex;
@@ -123,45 +151,50 @@ function PrintDocument({ dataset }: { dataset: CatalogExportDataset }) {
           padding: 8px 12px;
           text-decoration: none;
         }
-        .sheet {
-          position: relative;
-          width: 210mm;
-          min-height: 297mm;
-          margin: 14px auto;
-          overflow: hidden;
-          background: white;
-          padding: 12mm 10mm 16mm;
+	        .sheet {
+	          position: relative;
+	          width: 210mm;
+	          min-height: 297mm;
+	          margin: 14px auto;
+	          overflow: hidden;
+	          background: white;
+	          padding: 12mm 8mm 16mm;
           box-shadow: 0 8px 24px rgba(15, 23, 42, 0.12);
         }
-        .watermark {
-          position: fixed;
-          inset: 30% 4%;
-          z-index: 0;
-          display: flex;
-          align-items: center;
-          justify-content: center;
+        .price-watermark {
+          position: absolute;
+          top: 97mm;
+          right: -10mm;
+          left: -10mm;
+          z-index: 2;
           pointer-events: none;
           transform: rotate(-24deg);
           text-align: center;
-          color: rgba(185, 28, 28, 0.16);
-          font-size: 28pt;
+          color: rgba(185, 28, 28, 0.18);
+          font-size: 18pt;
           font-weight: 700;
-          line-height: 1.2;
-          white-space: pre-line;
+          line-height: 1.35;
+          white-space: pre;
         }
         .content { position: relative; z-index: 1; }
         .doc-header {
-          display: grid;
-          grid-template-columns: 64px minmax(0, 1fr);
+          display: flex;
+          flex-direction: column;
           align-items: center;
-          gap: 12px;
+          gap: 4mm;
+          text-align: center;
           border-bottom: 3px solid #ffd100;
-          padding-bottom: 8px;
+          padding-bottom: 8mm;
         }
-        .doc-logo { width: 64px; height: auto; }
+        .doc-logo {
+          display: block;
+          width: 56mm;
+          height: auto;
+        }
         h1 {
           margin: 0;
           font-size: 20pt;
+          font-weight: 700;
           line-height: 1.1;
         }
         .subtitle {
@@ -201,39 +234,91 @@ function PrintDocument({ dataset }: { dataset: CatalogExportDataset }) {
           font-size: 8.5pt;
           line-height: 1.25;
         }
-        .price-section { margin-top: 12px; break-before: page; }
-        .currency-note {
-          margin: 0 0 4px;
-          text-align: right;
-          font-size: 12pt;
-          font-weight: 700;
+        .price-section {
+          margin-top: 12px;
+          min-height: calc(297mm - 28mm);
+          break-before: page;
         }
-        table {
-          width: 100%;
-          border-collapse: collapse;
-          table-layout: fixed;
+	        table {
+	          width: 194mm;
+	          max-width: 100%;
+	          margin: 0 auto;
+	          border-collapse: collapse;
+	          table-layout: fixed;
         }
         thead { display: table-header-group; }
         tfoot { display: table-footer-group; }
-        th, td {
-          border: 1px solid #737373;
-          padding: 2.2mm 1.8mm;
-          vertical-align: top;
-        }
+	        th, td {
+	          border: 0.75pt solid #111827;
+	          padding: 1mm 0.95mm;
+	          vertical-align: top;
+	        }
         th {
-          background: #f3f4f6;
+          background: white;
+          color: #111827;
           font-weight: 700;
           text-align: center;
         }
+	        .col-seq { width: 8mm; }
+	        .col-item { width: 117mm; }
+	        .col-unit { width: 14mm; }
+	        .col-money { width: 17.5mm; }
+	        .col-total { width: 20mm; }
+        .repeat-doc-cell {
+          border: 0;
+          padding: 0 0 4mm;
+          background: white;
+        }
+        .repeat-doc-header {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          gap: 3mm;
+          color: #111827;
+        }
+        .repeat-logo {
+          display: block;
+          width: 56mm;
+          height: auto;
+        }
+        .repeat-title {
+          font-size: 15.5pt;
+          font-weight: 700;
+          line-height: 1.15;
+          text-align: center;
+        }
+        .currency-row th {
+          border: 0;
+          padding: 0 0 2mm;
+          background: white;
+          font-size: 10pt;
+          font-weight: 400;
+          text-align: right;
+        }
+	        .column-header-row th {
+	          background: #fff1a8;
+	          border-top-width: 1.1pt;
+	          border-bottom-width: 1.1pt;
+	          font-size: 11.5pt;
+          line-height: 1.1;
+          white-space: nowrap;
+        }
         tr { break-inside: avoid; page-break-inside: avoid; }
         .category-row td {
-          background: #fff7cc;
+          background: #f3f4f6;
           font-weight: 700;
+          border-top-width: 1.1pt;
+          border-bottom-width: 1.1pt;
         }
-        .seq { width: 10mm; text-align: center; }
-        .unit { width: 17mm; text-align: center; }
-        .money { width: 24mm; text-align: right; font-variant-numeric: tabular-nums; }
-        .item-name { width: auto; }
+        .seq { text-align: center; }
+        .unit { padding-left: 1.4mm; padding-right: 1.4mm; text-align: center; }
+	        .money { text-align: right; font-variant-numeric: tabular-nums; }
+	        .item-name {
+	          width: auto;
+	          hyphens: none;
+	          overflow-wrap: normal;
+	          word-break: normal;
+	        }
         .footer-fallback {
           display: none;
           margin-top: 8mm;
@@ -252,29 +337,24 @@ function PrintDocument({ dataset }: { dataset: CatalogExportDataset }) {
             padding: 0;
             box-shadow: none;
           }
-          .price-section { break-before: page; }
+          .price-section {
+            min-height: calc(297mm - 28mm);
+            break-before: page;
+          }
           .footer-fallback { display: none; }
         }
       `}</style>
       <MasterCatalogPrintToolbar filename={filename} versionId={dataset.version.id} />
       <article className="sheet">
-        <div className="watermark" aria-hidden="true">
-          รายการบัญชีราคานี้ไม่ใช่ราคาก่อสร้างที่แท้จริงหรือถูกต้องตรงกับราคาก่อสร้าง{'\n'}
-          แต่เป็นเพียงราคาโดยประมาณซึ่งใกล้เคียงกับราคาก่อสร้างจริงเท่านั้น{'\n'}
-          (สำหรับกิจการ บมจ.โทรคมนาคมแห่งชาติ เท่านั้น มิให้เผยแพร่ก่อนได้รับอนุญาต)
-        </div>
         <div className="content">
           <header className="doc-header">
-            <Image
-              src="/nt_logo.png"
+            <img
+              src="/brand/nt/nt-logo-company-lockup.png"
               alt="NT"
-              width={64}
-              height={64}
               className="doc-logo"
-              priority
             />
             <div>
-              <h1>{CATALOG_EXPORT_DOCUMENT_TITLE}</h1>
+              <h1>{priceListTitle}</h1>
               <div className="subtitle">
                 v{dataset.version.versionString} | {statusText} | Current Default:{' '}
                 {dataset.version.isCurrentDefault ? 'Yes' : 'No'}
@@ -292,7 +372,7 @@ function PrintDocument({ dataset }: { dataset: CatalogExportDataset }) {
             <StampRow label="วันที่มีผล" value={displayDateWithIso(dataset.version.effectiveDate)} />
             <StampRow label="เลขที่อนุมัติ" value={dataset.version.approvalReference ?? '-'} />
             <StampRow label="วันที่เอกสารอนุมัติ" value={displayDateWithIso(dataset.version.approvalDocumentDate)} />
-            <StampRow label="เผยแพร่โดย" value={dataset.version.publishedByDisplayName ?? '-'} />
+            <StampRow label="เห็นชอบโดย" value={dataset.version.publishedByDisplayName ?? '-'} />
             <StampRow label="Exported at/by" value={`${formatThaiDateTime(dataset.exportedAtIso)} / ${dataset.exportedBy.displayName}`} />
             <StampRow label="จำนวนรายการ" value={dataset.counts.rowCount.toLocaleString('th-TH')} />
             <StampRow label="Dataset SHA-256" value={dataset.canonicalDatasetHash} hash />
@@ -300,40 +380,19 @@ function PrintDocument({ dataset }: { dataset: CatalogExportDataset }) {
           </section>
         </div>
       </article>
-      <article className="sheet price-section">
-        <div className="watermark" aria-hidden="true">
-          รายการบัญชีราคานี้ไม่ใช่ราคาก่อสร้างที่แท้จริงหรือถูกต้องตรงกับราคาก่อสร้าง{'\n'}
-          แต่เป็นเพียงราคาโดยประมาณซึ่งใกล้เคียงกับราคาก่อสร้างจริงเท่านั้น{'\n'}
-          (สำหรับกิจการ บมจ.โทรคมนาคมแห่งชาติ เท่านั้น มิให้เผยแพร่ก่อนได้รับอนุญาต)
-        </div>
-        <div className="content">
-          <p className="currency-note">(หน่วยเงิน: บาท)</p>
-          <table>
-            <thead>
-              <tr>
-                <th className="seq">ลำดับ</th>
-                <th className="item-name">รายการ</th>
-                <th className="unit">หน่วยนับ</th>
-                <th className="money">ค่าวัสดุ</th>
-                <th className="money">ค่าแรง</th>
-                <th className="money">ราคาต่อหน่วย</th>
-              </tr>
-            </thead>
-            <tbody>
-              {groupedRows.map((group) => (
-                <PriceGroup
-                  key={group.category}
-                  category={group.category}
-                  rows={group.rows}
-                />
-              ))}
-            </tbody>
-          </table>
-          <div className="footer-fallback">
-            ฝ่ายท่อร้อยสาย (ทฐฐ.) | {footerRight}
+      {pricePages.map((page, index) => (
+        <article className="sheet price-section" key={`price-page-${index}`}>
+          <div className="price-watermark" aria-hidden="true">
+            {WATERMARK_NOTICE_TEXT}
           </div>
-        </div>
-      </article>
+          <div className="content">
+            <PricePageTable entries={page.entries} priceListTitle={priceListTitle} />
+            <div className="footer-fallback">
+              {CATALOG_EXPORT_DEPARTMENT_FOOTER} | {footerRight}
+            </div>
+          </div>
+        </article>
+      ))}
     </main>
   );
 }
@@ -355,29 +414,79 @@ function StampRow({
   );
 }
 
-function PriceGroup({
-  category,
-  rows,
+function PricePageTable({
+  entries,
+  priceListTitle,
 }: {
-  category: string;
-  rows: CatalogExportRow[];
+  entries: PricePageEntry[];
+  priceListTitle: string;
 }) {
   return (
-    <>
-      <tr className="category-row">
-        <td colSpan={6}>{category}</td>
-      </tr>
-      {rows.map((row) => (
-        <tr key={row.id}>
-          <td className="seq">{row.sequence.toLocaleString('th-TH')}</td>
-          <td className="item-name">{row.itemName}</td>
-          <td className="unit">{row.unit}</td>
-          <td className="money">{formatMoney(row.materialCost)}</td>
-          <td className="money">{formatMoney(row.laborCost)}</td>
-          <td className="money">{formatMoney(row.unitCost)}</td>
+    <table>
+      <colgroup>
+        <col className="col-seq" />
+        <col className="col-item" />
+        <col className="col-unit" />
+        <col className="col-money" />
+        <col className="col-money" />
+        <col className="col-total" />
+      </colgroup>
+      <thead>
+        <tr className="repeat-doc-row">
+          <th colSpan={6} className="repeat-doc-cell">
+            <div className="repeat-doc-header">
+              <img
+                src="/brand/nt/nt-logo-company-lockup.png"
+                alt="NT"
+                className="repeat-logo"
+              />
+              <div className="repeat-title">{priceListTitle}</div>
+            </div>
+          </th>
         </tr>
-      ))}
-    </>
+        <tr className="currency-row">
+          <th colSpan={6}>(หน่วยเงิน: บาท)</th>
+        </tr>
+        <tr className="column-header-row">
+          <th className="seq">ที่</th>
+          <th className="item-name">รายการวัสดุ</th>
+          <th className="unit">หน่วยนับ</th>
+          <th className="money">ค่าวัสดุ</th>
+          <th className="money">ค่าแรง</th>
+          <th className="money">ราคาต่อหน่วย</th>
+        </tr>
+      </thead>
+      <tbody>
+        {entries.map((entry) =>
+          entry.kind === 'category' ? (
+            <CategoryRow key={entry.key} category={entry.category} />
+          ) : (
+            <PriceRow key={entry.row.id} row={entry.row} />
+          ),
+        )}
+      </tbody>
+    </table>
+  );
+}
+
+function CategoryRow({ category }: { category: string }) {
+  return (
+    <tr className="category-row">
+      <td colSpan={6}>{category}</td>
+    </tr>
+  );
+}
+
+function PriceRow({ row }: { row: CatalogExportRow }) {
+  return (
+    <tr>
+      <td className="seq">{row.sequence.toLocaleString('th-TH')}</td>
+      <td className="item-name">{row.itemName}</td>
+      <td className="unit">{row.unit}</td>
+      <td className="money">{formatMoney(row.materialCost)}</td>
+      <td className="money">{formatMoney(row.laborCost)}</td>
+      <td className="money">{formatMoney(row.unitCost)}</td>
+    </tr>
   );
 }
 
@@ -414,29 +523,85 @@ function PrintError({ error }: { error: unknown }) {
   );
 }
 
-function groupRowsByCategory(rows: readonly CatalogExportRow[]) {
-  const groups = new Map<string, { category: string; rows: CatalogExportRow[]; minDisplayOrder: number }>();
+function groupRowsByCategoryRun(rows: readonly CatalogExportRow[]) {
+  const groups: Array<{ key: string; category: string; rows: CatalogExportRow[] }> = [];
+  let current: { key: string; category: string; rows: CatalogExportRow[] } | null = null;
 
-  for (const row of [...rows].sort(compareDisplayRows)) {
+  for (const row of displayOrderedRows(rows)) {
     const category = row.categoryName ?? row.categoryCode ?? 'ไม่ระบุหมวดหมู่';
-    const group = groups.get(category) ?? {
-      category,
-      rows: [],
-      minDisplayOrder: row.displayOrder,
-    };
-    group.rows.push(row);
-    group.minDisplayOrder = Math.min(group.minDisplayOrder, row.displayOrder);
-    groups.set(category, group);
+    if (!current || current.category !== category) {
+      current = {
+        key: `${category}-${row.sequence}`,
+        category,
+        rows: [],
+      };
+      groups.push(current);
+    }
+
+    current.rows.push(row);
   }
 
-  return [...groups.values()]
-    .sort((left, right) => left.minDisplayOrder - right.minDisplayOrder)
-    .map(({ category, rows }) => ({ category, rows }));
+  return groups;
+}
+
+type PricePageEntry =
+  | { kind: 'category'; key: string; category: string }
+  | { kind: 'row'; row: CatalogExportRow };
+
+function paginatePriceRows(rows: readonly CatalogExportRow[]) {
+  const pages: Array<{ entries: PricePageEntry[] }> = [];
+  let entries: PricePageEntry[] = [];
+  let rowUnits = 0;
+
+  const pushPage = () => {
+    if (entries.length > 0) {
+      pages.push({ entries });
+      entries = [];
+      rowUnits = 0;
+    }
+  };
+  const addCategory = (category: string, suffix = '') => {
+    entries.push({
+      kind: 'category',
+      key: `category-${pages.length}-${entries.length}-${category}${suffix}`,
+      category,
+    });
+    rowUnits += 1;
+  };
+
+  for (const group of groupRowsByCategoryRun(rows)) {
+    if (rowUnits + 2 > PRICE_PAGE_ROW_LIMIT) {
+      pushPage();
+    }
+
+    addCategory(group.category);
+
+    for (const row of group.rows) {
+      if (rowUnits + 1 > PRICE_PAGE_ROW_LIMIT) {
+        pushPage();
+        addCategory(group.category, '-continued');
+      }
+
+      entries.push({ kind: 'row', row });
+      rowUnits += 1;
+    }
+  }
+
+  pushPage();
+  return pages;
+}
+
+function displayOrderedRows(rows: readonly CatalogExportRow[]): CatalogExportRow[] {
+  return [...rows].sort(compareDisplayRows);
 }
 
 function compareDisplayRows(left: CatalogExportRow, right: CatalogExportRow): number {
   if (left.displayOrder !== right.displayOrder) {
     return left.displayOrder - right.displayOrder;
+  }
+
+  if (left.sequence !== right.sequence) {
+    return left.sequence - right.sequence;
   }
 
   return left.itemCode.localeCompare(right.itemCode, 'en');

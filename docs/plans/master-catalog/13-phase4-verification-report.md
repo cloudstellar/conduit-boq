@@ -172,7 +172,7 @@ Approved dictionary fingerprint: `_______________________________`
 | Published baseline identity merges | 0 |  | Pending |
 | Category backfill | Approved count |  | Pending |
 | Display-order backfill | Unique `ITEM-####` numeric suffix; 710 covered |  | Pending |
-| New-item display order | Prior maximum + 1 |  | Pending |
+| New-item display order | Current mechanical default is prior maximum + 1; P-18 must resolve owner/data-custodian placement governance before any added/supplement rows are published | WP-6 owner review identified append-at-end behavior as a Master Catalog governance gap; Decision Register P-18 recorded 2026-07-06 | Pending P-18 |
 | Import parser profile ID/version stored | Exact |  | Pending |
 | Code allocation at sequence 900 | Blocking capacity-review error |  | Pending |
 | New structured version rows | 710 before approved add/retire |  | Pending |
@@ -273,30 +273,31 @@ Also verify:
 | Check | Expected | Actual | Result |
 |---|---|---|---|
 | Golden fixture hash | `sha256:0e90d8974960a5ccd52b22b02eb0a6c60797f9234baeaefc32af8c1f9fa719b5` | Passed in canonical hash tests; full suite includes the golden fixture | Passed |
-| Published item count | Approved count | Local browser print smoke for selected `2568.0.0` displayed 710 rows/count from DB; selected-version data loader test fails closed on item-count mismatch | Passed for Local smoke; final filed artifacts pending |
-| Published dataset hash | One stored value | Local `2568.0.0` print smoke displayed `sha256:4a2a5fcc75f1510c5e037426a19c3110234856485157e5de6f3bd2eee459d1e8`; data loader recomputes and fails closed on mismatch | Passed for Local smoke; final filed artifacts pending |
+| Published item count | Approved count | Local browser print smoke for selected `2568.0.0` displayed 710 rows/count from DB; real Local DB-generated route proof exported `2568.0.0` with `itemCount=710`; selected-version data loader test fails closed on item-count mismatch | Passed for Local artifact proof; final owner/file acceptance pending |
+| Published dataset hash | One stored value | Local `2568.0.0` print smoke and real Local DB-generated route proof used `sha256:4a2a5fcc75f1510c5e037426a19c3110234856485157e5de6f3bd2eee459d1e8`; data loader recomputes and fails closed on mismatch | Passed for Local artifact proof; final owner/file acceptance pending |
 | Selected-version export paging | No silent fixed-limit truncation before count/hash verification | Export data loader now reads selected price rows, categories, code groups, change sets, imports, and change items through deterministic paged queries; `tests/master-catalog-export-data.test.ts` covers a 1,001-row selected version and verifies all rows are counted/hashed | Passed automated fixture |
-| Excel visible business-row count | Exact match | Excel workbook unit fixture writes one visible row per canonical row; real DB-generated workbook file not yet filed/inspected | Passed automated fixture; final artifact pending |
-| Excel `_canonical_row_json` reconstruction | Exact UTF-8 dataset hash | `tests/master-catalog-export-excel.test.ts` reconstructs `[` + ordered `_canonical_row_json` + `]\n` and rehashes to the dataset hash | Passed automated fixture; final artifact pending |
-| PDF server-verified printed count/hash | Exact match | Server-rendered print route reuses selected-version export loader; browser smoke showed title, full hash, 710-row count, 710 table rows, and no item-code column for Local `2568.0.0` | Passed for Local smoke; saved-PDF artifact pending |
+| Excel visible business-row count/order | Exact match | Real Local DB-generated workbook `output/master-catalog/wp6-artifact-proof/NT-Master-Catalog-v2568.0.0-20260101.xlsx` has 710 price data rows and 710 verification rows; all 5 expected sheets visible and in order; price-list visible sequence check has `priceSequenceBreakCount=0` | Passed Local artifact inspection |
+| Excel `_canonical_row_json` reconstruction | Exact UTF-8 dataset hash | `tests/master-catalog-export-excel.test.ts` and `tmp/wp6-artifact-proof/inspect-excel.mjs` reconstruct `[` + ordered `_canonical_row_json` + `]\n`; real workbook rehash matched `sha256:4a2a5fcc75f1510c5e037426a19c3110234856485157e5de6f3bd2eee459d1e8` | Passed automated fixture and Local artifact inspection |
+| PDF server-verified printed count/hash/order | Exact match | Server-rendered print route reuses selected-version export loader; live-route PDF proof loaded Local `2568.0.0`, DOM row count 710, first/last sequence 1/710, unique sequence count 710, `sequenceBreakCount=0`, title present, full hash present, and watermark present before printing | Passed Local live-route PDF proof |
+| New/supplement item placement acceptance | Owner/data-custodian approved position before publish; no official version relies only on append-at-end ordering for added/supplement rows | P-18 recorded after WP-6 review. Baseline `2568.0.0` export proof covers the existing 710-row order; any version containing add/supplement rows still needs placement preview/review or a held publish path before P-15 | Pending P-18 |
 | Older-version export | Uses selected version |  | Pending |
 | Draft export status mark | `DRAFT – ห้ามใช้อ้างอิง` |  | Pending |
-| PDF price-disclaimer watermark | Matches approved three-line wording and style from `files/รายการบัญชีราคามาตรฐานงานก่อสร้างท่อร้อยสาย 2568.pdf`: `รายการบัญชีราคานี้ไม่ใช่ราคาก่อสร้างที่แท้จริงหรือถูกต้องตรงกับราคาก่อสร้าง`; `แต่เป็นเพียงราคาโดยประมาณซึ่งใกล้เคียงกับราคาก่อสร้างจริงเท่านั้น`; `(สำหรับกิจการ บมจ.โทรคมนาคมแห่งชาติ เท่านั้น มิให้เผยแพร่ก่อนได้รับอนุญาต)` | Browser smoke confirmed the three approved lines appear in the print route | Passed for Local smoke; visual style artifact pending |
-| Published stamp | Version/effective date/published at/by/count/hash | Browser smoke confirmed Local `2568.0.0` stamp includes version, Published status, Current Default, effective date, approval ref/date, published by, exported at/by, count, and full hash | Passed for Local smoke; final artifact pending |
+| PDF price-disclaimer watermark | Matches approved three-line wording and style from `files/รายการบัญชีราคามาตรฐานงานก่อสร้างท่อร้อยสาย 2568.pdf`: `รายการบัญชีราคานี้ไม่ใช่ราคาก่อสร้างที่แท้จริงหรือถูกต้องตรงกับราคาก่อสร้าง`; `แต่เป็นเพียงราคาโดยประมาณซึ่งใกล้เคียงกับราคาก่อสร้างจริงเท่านั้น`; `(สำหรับกิจการ บมจ.โทรคมนาคมแห่งชาติ เท่านั้น มิให้เผยแพร่ก่อนได้รับอนุญาต)` | Latest live-route PDF was regenerated after owner review. Cover page has no watermark. Price pages use one per-page three-line red overlay watermark above the table with reduced opacity; rendered pages 2 and 31 show the watermark visible without the previous fixed-position bleed or repeating-background artifact | Passed Local visual artifact proof; final owner acceptance pending |
+| Published stamp | Version/effective date/approved-by snapshot/count/hash | Browser/PDF proof confirmed Local `2568.0.0` cover includes version, Published status, Current Default, effective date, approval ref/date, `เห็นชอบโดย`, exported at/by, count, and full hash | Passed Local artifact proof; final owner acceptance pending |
 | Excel numeric cell types | Numeric, formatted | `tests/master-catalog-export-excel.test.ts` confirms price cost cells are numeric and formatted `#,##0.00` | Passed automated fixture |
 | Excel exact 5 sheets/headers; no formulas/external links | Exact | `tests/master-catalog-export-excel.test.ts` confirms exact five sheets/order, business headers, verification headers, and no formula/hyperlink cell values | Passed automated fixture |
 | Formula-control text safety | Malicious strings remain inert text | `tests/master-catalog-export-excel.test.ts` covers formula-looking item text and confirms no formula/hyperlink cell values | Passed automated fixture |
-| PDF Thai font/header/page/clipping | Correct | Browser smoke confirmed Thai header/table text renders and table counts are present; saved-PDF page numbering, clipping, and final CI asset acceptance not yet inspected | Partial; final visual artifact pending |
+| PDF Thai font/header/page/clipping | Correct | Latest live-route PDF metadata shows A4, 31 pages, no form/JavaScript/encryption; `pdffonts` shows embedded/subset/unicode `NTRegular` and `NTBold` plus `Menlo-Regular` for the SHA line. Rendered pages 1, 2, and 31 show the NT company lockup, field-facing title `รายการบัญชีราคามาตรฐานงานก่อสร้างท่อร้อยสายสื่อสารใต้ดิน ประจำปี 2568`, repeated table header, Thai table/footer text, `หน้า 1/31`, `หน้า 2/31`, `หน้า 31/31`, no Chrome default header, no right-edge table clipping, `หน่วยนับ` spacing improved, and left footer `ส่วนวิศวกรรมท่อร้อยสาย (วทฐฐ.)` | Passed Local visual artifact proof; final owner/CI acceptance pending |
 | Short dataset hash | Exactly `sha256:` + first 12 hex + `…`; full hash also present |  | Pending |
 | Catalog export dataset/hash excludes Factor F rows | Confirmed | `tests/master-catalog-export-data.test.ts` verifies the selected-version export loader calls no BOQ or Factor F tables in the normal published export path | Passed automated fixture |
 | BOQ print/export regression | Catalog version and Factor F version/snapshot labels still correct |  | Pending |
 
 Official export file/reference and binary SHA-256 (different from dataset hash):
 
-- Excel: `__________________________________________________________`
-- Excel binary SHA-256: `____________________________________________`
-- PDF: `____________________________________________________________`
-- PDF binary SHA-256: `______________________________________________`
+- Excel: `output/master-catalog/wp6-artifact-proof/NT-Master-Catalog-v2568.0.0-20260101.xlsx`
+- Excel binary SHA-256: `6996c1a6ce811fdfe9cae9942a0c930e38b85fe9ea00d755fd57f4dd2715baba`
+- PDF: `output/master-catalog/wp6-artifact-proof/NT-Master-Catalog-v2568.0.0-20260101.pdf`
+- PDF binary SHA-256: `5b86eae5b478a16713acbdd5032a9f2d70857fc6f24e2424428932591cd4a507`
 
 ## 14. Application regression and UI/UX
 
@@ -316,7 +317,7 @@ Official export file/reference and binary SHA-256 (different from dataset hash):
 | Catalog version list/detail |  |  | Pending |
 | Import/diff/manual/history |  |  | Pending |
 | Keyboard/focus/errors/contrast |  |  | Pending |
-| NT font/logo/color/spacing |  |  | Pending |
+| NT font/logo/color/spacing | Local export artifact proof | PDF uses `next/font/local` runtime derivatives from approved NT Regular/Bold sources and the full NT company lockup derivative; Excel sets the NT font family and remains hash-stable at the dataset level | Passed for WP-6 export artifact proof; app-wide/primary-logo provenance reconciliation remains pending under P-10 |
 | Browser console/server errors |  |  | Pending |
 
 Dashboard personal/system labels must remain unchanged unless a separate change
@@ -326,9 +327,10 @@ request approves them.
 
 | Gate | Expected | Actual | Result |
 |---|---|---|---|
-| `npm test` | Exit 0 |  | Pending |
-| `npm run lint` | Exit 0 |  | Pending |
-| `npm run build` | Exit 0 |  | Pending |
+| `npm test` | Exit 0 | 2026-07-06 02:00 +07: 18 files / 92 tests passed | Passed |
+| `npx tsc --noEmit --pretty false` | Exit 0 | 2026-07-06 02:00 +07: passed | Passed |
+| `npm run lint` | Exit 0 | 2026-07-06 02:04 +07: exit 0 with 10 existing warnings after excluding generated `tmp/`, `output/`, `files/`, `CI/`, and nested `node_modules` artifacts from lint scope | Passed with existing warnings |
+| `npm run build` | Exit 0 | 2026-07-06 02:02 +07: sandbox build failed only on blocked Google Fonts fetch; escalated build passed, including `/admin/master-catalog/versions/[versionId]/print` and `/api/master-catalog/export/excel/[versionId]` | Passed |
 | `npm run audit:prod` | No unaccepted Production vulnerability |  | Pending |
 | Security advisor | No new blocker |  | Pending |
 | Performance advisor | No rollout blocker |  | Pending |

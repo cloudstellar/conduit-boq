@@ -12,8 +12,14 @@ export const CATALOG_EXPORT_SPEC_REVISION = 'phase4-official-export-spec-2026-06
 export const CATALOG_CANONICALIZATION_REVISION = 'phase4-canonical-dataset-v1';
 export const CATALOG_EXPORT_DOCUMENT_TITLE =
   'รายการบัญชีราคามาตรฐานงานก่อสร้างท่อร้อยสายสื่อสารใต้ดิน';
+export const CATALOG_EXPORT_DEPARTMENT_FOOTER =
+  'ส่วนวิศวกรรมท่อร้อยสาย (วทฐฐ.)';
 export const CATALOG_EXPORT_APP_NAME = 'Conduit BOQ';
 export const CATALOG_EXPORT_ICT_TIME_ZONE = 'Asia/Bangkok';
+
+export function makeCatalogExportDocumentTitle(versionString: string): string {
+  return `${CATALOG_EXPORT_DOCUMENT_TITLE} ประจำปี ${catalogYearFromVersion(versionString)}`;
+}
 
 export type CatalogExportVersionStatus = 'draft' | 'active' | 'archived';
 
@@ -916,6 +922,11 @@ function sanitizeVersionForFilename(value: string): string {
 
 function sanitizeDateForFilename(value: string): string {
   return value.slice(0, 10).replace(/[^0-9]/g, '');
+}
+
+function catalogYearFromVersion(versionString: string): string {
+  const [year] = versionString.split('.');
+  return /^\d{4}$/.test(year) ? year : versionString;
 }
 
 function formatIctDateIso(date: Date): string {

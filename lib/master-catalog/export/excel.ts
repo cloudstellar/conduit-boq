@@ -9,6 +9,7 @@ import type {
 import {
   CATALOG_CANONICALIZATION_REVISION,
   CATALOG_EXPORT_APP_NAME,
+  CATALOG_EXPORT_DEPARTMENT_FOOTER,
   CATALOG_EXPORT_DOCUMENT_TITLE,
   CATALOG_EXPORT_SPEC_REVISION,
   type CatalogExportChangeActionCounts,
@@ -17,7 +18,7 @@ import {
   verificationSheetHeaders,
 } from './data';
 
-const DEFAULT_FONT = 'TH Sarabun New';
+const DEFAULT_FONT = 'NT Regular';
 const MONEY_FORMAT = '#,##0.00';
 const HEADER_FILL: Fill = {
   type: 'pattern',
@@ -132,6 +133,8 @@ function createDocumentInfoSheet(workbook: Workbook, dataset: CatalogExportDatas
     sheet.getCell(rowIndex, 2).value = 'Draft dataset hash - not an official publication hash';
     styleKeyValueRow(sheet, rowIndex, DRAFT_FILL);
   }
+
+  setFooter(sheet, dataset);
 }
 
 function createPriceListSheet(workbook: Workbook, dataset: CatalogExportDataset) {
@@ -197,7 +200,7 @@ function createPriceListSheet(workbook: Workbook, dataset: CatalogExportDataset)
   });
   rowIndex += 1;
 
-  for (const row of dataset.rows) {
+  for (const row of displayOrderedRows(dataset.rows)) {
     writePriceRow(sheet, rowIndex, row);
     rowIndex += 1;
   }
@@ -525,7 +528,7 @@ function setFooter(sheet: Worksheet, dataset: CatalogExportDataset) {
       ? formatThaiDate(dataset.version.effectiveDate)
       : displayStatus(dataset);
   sheet.headerFooter.oddFooter =
-    `&Lฝ่ายท่อร้อยสาย (ทฐฐ.)&CPage &P of &N&Rv${dataset.version.versionString} | ${statusOrDate}`;
+    `&L${CATALOG_EXPORT_DEPARTMENT_FOOTER}&CPage &P of &N&Rv${dataset.version.versionString} | ${statusOrDate}`;
   sheet.headerFooter.evenFooter = sheet.headerFooter.oddFooter;
 }
 
@@ -578,6 +581,20 @@ function totalActionCounts(dataset: CatalogExportDataset): CatalogExportChangeAc
     }),
     { add: 0, update: 0, retire: 0, recode: 0 },
   );
+}
+
+function displayOrderedRows(rows: readonly CatalogExportRow[]): CatalogExportRow[] {
+  return [...rows].sort((left, right) => {
+    if (left.displayOrder !== right.displayOrder) {
+      return left.displayOrder - right.displayOrder;
+    }
+
+    if (left.sequence !== right.sequence) {
+      return left.sequence - right.sequence;
+    }
+
+    return left.itemCode.localeCompare(right.itemCode, 'en');
+  });
 }
 
 function safeText(value: string): string {

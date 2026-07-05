@@ -1,7 +1,9 @@
 import { describe, expect, it } from 'vitest';
 import {
+  CATALOG_EXPORT_DOCUMENT_TITLE,
   CatalogExportError,
   loadCatalogExportDataset,
+  makeCatalogExportDocumentTitle,
   makeCatalogExportFilename,
 } from '../lib/master-catalog/export/data';
 import {
@@ -31,6 +33,13 @@ const CANONICAL_ROW: CanonicalCatalogDatasetRow = {
 };
 
 describe('Master Catalog export data loader', () => {
+  it('builds field-facing document titles from the version major year', () => {
+    expect(makeCatalogExportDocumentTitle('2568.0.0'))
+      .toBe(`${CATALOG_EXPORT_DOCUMENT_TITLE} ประจำปี 2568`);
+    expect(makeCatalogExportDocumentTitle('2569.1.0'))
+      .toBe(`${CATALOG_EXPORT_DOCUMENT_TITLE} ประจำปี 2569`);
+  });
+
   it('loads a selected published version, verifies count/hash, and avoids BOQ/Factor F tables', async () => {
     const datasetHash = await hashCanonicalCatalogDatasetRows([CANONICAL_ROW]);
     const calls: string[] = [];

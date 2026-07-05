@@ -242,6 +242,14 @@ The following manifest is recommended for Phase 4 Core:
 | Primary NT mark PNG | `CI/NT_1_v3.png` | `public/brand/nt/nt-logo-primary.png` | App shell, compact Master Catalog header, and other places where full company lockup is too small to read | Owner approves this exact runtime logo derivative; preserve aspect ratio, transparency, clear space, and Vital Sign/wordmark relationship |
 | Full NT company lockup PNG | `CI/NT_4_v3.png` | `public/brand/nt/nt-logo-company-lockup.png` | Login, official PDF/print/export header, and formal document identity | Owner approves this exact runtime logo derivative; preserve aspect ratio, transparency, clear space, and minimum readable size |
 
+Implemented WP-6 runtime derivative evidence:
+
+| Runtime asset | Source SHA-256 | Runtime SHA-256 | Implementation evidence |
+|---|---|---|---|
+| `app/fonts/nt/NT-Regular.woff2` | `77420e3622ba097c1d18f894c1d7e1b64c737a9522932468e26d6b8e9afb627b` | `dbb2f8434191537cdc8f3ab42d497ac34e3a5690440e150e93b5669c751efd5b` | Generated from `CI/NT Regular.ttf`; used by the Master Catalog PDF/print route through `next/font/local`; latest `pdffonts` proof shows embedded `NTRegular` |
+| `app/fonts/nt/NT-Bold.woff2` | `07dbeb5ea19f678ab7d1cee52c9a6498179aed655a92a4a51a280e48e9197038` | `d2a022492a949e7dfb4b74aa1b1e3efad1be57fc9086088a41172726367667e2` | Generated from `CI/NT Bold.ttf`; used for PDF headings/emphasis through `next/font/local`; latest `pdffonts` proof shows embedded `NTBold` |
+| `public/brand/nt/nt-logo-company-lockup.png` | `2d19ae57a7523eb1ecaeafbdb8623f97e4e2ae5e946f916b2c5b66e761c24e0f` | `2d19ae57a7523eb1ecaeafbdb8623f97e4e2ae5e946f916b2c5b66e761c24e0f` | Copied from `CI/NT_4_v3.png` for the formal Master Catalog PDF/print header; latest rendered PDF pages show the full company lockup at a readable size |
+
 Not recommended for Phase 4 Core unless separately approved:
 
 - original guideline PDFs;
@@ -262,9 +270,10 @@ with derivatives from `CI/NT_4_v3.png`. They should not silently remain as
 
 ## 6. Current implementation gaps
 
-The current codebase is not yet aligned with the P-10 runtime asset model:
+The current codebase is partially aligned with the P-10 runtime asset model for
+WP-6 export artifacts. Remaining gaps:
 
-- `app/layout.tsx` loads Google `IBM_Plex_Sans_Thai`; Phase 4 CI
+- `app/layout.tsx` still loads Google `IBM_Plex_Sans_Thai`; Phase 4 CI
   implementation should switch Master Catalog surfaces to approved local NT
   fonts through `next/font/local`, while avoiding an unrelated app-wide redesign
   unless that is separately approved.
@@ -279,6 +288,10 @@ The current codebase is not yet aligned with the P-10 runtime asset model:
   print. Phase 4 must either retain this asset through P-10 provenance
   reconciliation or migrate Master Catalog-only references to the new approved
   derivatives.
+- WP-6 official PDF/print now uses `app/fonts/nt/NT-Regular.woff2`,
+  `app/fonts/nt/NT-Bold.woff2`, and
+  `public/brand/nt/nt-logo-company-lockup.png`; this resolves only the official
+  export artifact slice, not app-wide CI completeness.
 - `public/nt_logo.png` is a small full company lockup. It is suitable for
   larger login/export contexts, but squeezing the full lockup into very small
   app chrome makes the company name unreadable. Compact contexts should use the

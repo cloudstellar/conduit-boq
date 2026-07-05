@@ -118,6 +118,13 @@ this register. In particular:
   not combine Production gates by default; pause for owner/verifier readiness
   review after local rehearsal, then request each Production decision only when
   its evidence is complete and green.
+- P-18 records an owner-identified governance gap discovered during WP-6
+  artifact review: new/supplement items must not become official merely by
+  being appended to the end of the catalog. The current Phase 4 Core contract
+  has a mechanical `max(display_order) + 1` default and no reorder UI; that
+  remains the implemented baseline until P-18 is resolved. Do not publish a
+  version containing added/supplement rows unless the owner/data custodian has
+  approved its display placement or the add/supplement publish path is held.
 
 | ID | Decision required | Current evidence/default recommendation | Owner | Due before | Status |
 |---|---|---|---|---|---|
@@ -138,6 +145,7 @@ this register. In particular:
 | P-15 | Approve publication of the exact named catalog version and its final diff/count/hash | Migration/deploy/enablement approval does not imply publish approval. Requires exact final version metadata, effective date, approval reference/date, physical archive reference, approver/publisher snapshot, final diff totals, item count, dataset hash, official Excel/PDF evidence, and owner go/no-go. | Owner | Production publication | Not requested |
 | P-16 | Schedule Supabase legacy API-key migration | Separate maintenance change; complete before provider retirement and after inventory/rehearsal | Owner + developer | Separate security window | Pending |
 | P-17 | Record completed Factor F F0-F4 gates before Master Catalog Phase 4 | Completed before Master Catalog Phase 4. ADR-005 and the separate Factor F CR governed the rollout; current baseline from `FACTOR F 2566_7.PDF` is active as `2566.0.0`, the 26 June 2026 source-table annex is current default `2569.0.0`, legacy BOQs were not backfilled, and `015` repaired only missing legacy snapshot metadata without repricing or binding old BOQs | Owner + factor data custodian | Before Master Catalog Phase 4 Production migration | Completed 2026-06-29; see Factor F closeout |
+| P-18 | Decide display-order placement governance for newly added or supplement catalog items | Owner identified the core reason for Master Catalog governance during WP-6: future rows must be placed into their correct category/neighborhood instead of appearing at the end simply because they were added later. Recommended decision: keep append-only item codes and stable identities, but add a draft placement/review gate for add/supplement rows using explicit `display_order` changes, adjacent-row preview, and owner/data-custodian acceptance before publish; until implemented, block publication of any version containing add/supplement rows or explicitly disable that publish path in Production. | Owner + data custodian | Before Production enablement of add/supplement workflow and before P-15 for any version with added/supplement rows | Pending; recorded 2026-07-06 |
 
 ## 4. Deferred decisions
 
