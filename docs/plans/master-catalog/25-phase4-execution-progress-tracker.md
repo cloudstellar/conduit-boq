@@ -1,6 +1,6 @@
 # Master Catalog Phase 4 Execution Progress Tracker
 
-**Status:** WP-3 ready for owner review
+**Status:** WP-4 local-only draft/import implementation in progress
 **Purpose:** Owner-facing progress tracker for Master Catalog Phase 4 local
 implementation and rehearsal. This file is for quick status review; authority
 remains in the Decision Register, Execution Pack, DB Contract, Runbook, and
@@ -27,14 +27,14 @@ Allowed statuses:
 | Field | Current value |
 |---|---|
 | Current branch | `codex/master-catalog-phase4` |
-| Current commit | `0d94188` |
-| Current work package | WP-3 |
+| Current commit | See git HEAD for the latest committed checkpoint |
+| Current work package | WP-4 |
 | Current environment | Local only |
 | Production write allowed | No |
 | Feature flag default | Disabled |
-| Latest owner decision needed | Review WP-3 admin UI shell, browser-auth evidence, and review-cleanup patch before WP-4 draft mutation/import work |
-| Next owner review point | WP-3 cleanup review before draft mutation/import implementation |
-| Last updated | 2026-07-05 15:21 +07 |
+| Latest owner decision needed | Review WP-4 draft mutation/import/history evidence before WP-5 publish/pointer work |
+| Next owner review point | WP-4 review before publish/pointer/restore implementation |
+| Last updated | 2026-07-05 15:42 +07 |
 
 ## 3. Work package checklist
 
@@ -43,8 +43,8 @@ Allowed statuses:
 | WP-0 | Branch, dependency, codebase, docs, and read-only DB readiness | Complete | Branch `codex/master-catalog-phase4`, git state, codebase inspection, read-only DB preflight, advisor baseline, local checks, snapshot plan | Completed before WP-1 |
 | WP-1 | Additive database foundation `016+` on Local | Complete | Draft root migration `016`, Local bootstrap, schema/RLS/grants/RPC evidence, tests, local DB lint, FK index coverage verified, reviewer pass recorded | Reviewed before next implementation WP |
 | WP-2 | Parser and canonical hash implementation | Complete | Golden hash, parser/profile tests, normalized payload validation/hash tests, browser-style workbook adapter tests, Production-derived Local count/hash evidence; payload/DB contract mismatch patched and verified; committed as `0d94188` | Owner approved continuing to WP-3 |
-| WP-3 | Admin read/draft UI shell behind disabled flag | Ready for WP-4 start review | Read-only server UI shell, hidden admin entry while flag disabled, server-side auth/role/flag gate tests, local auth/user/flag facts, unauthenticated in-app browser redirect smoke, authenticated local HTTP gate smoke, authenticated in-app browser login/gate proof, WP-3 review cleanup for flag parsing/email edge cases/Factor F warnings, test/lint/typecheck/build evidence | Owner review before WP-4; e2e/browser tooling can be added later if owner wants durable CI coverage |
-| WP-4 | Draft mutation, import, manual edit, and history | Not started | Draft apply tests, audit snapshots, stale/duplicate request tests | Review on data-contract mismatch |
+| WP-3 | Admin read/draft UI shell behind disabled flag | Complete | Read-only server UI shell, hidden admin entry while flag disabled, server-side auth/role/flag gate tests, local auth/user/flag facts, unauthenticated in-app browser redirect smoke, authenticated local HTTP gate smoke, authenticated in-app browser login/gate proof, WP-3 review cleanup for flag parsing/email edge cases/Factor F warnings, test/lint/typecheck/build evidence | Owner approved continuing to WP-4 |
+| WP-4 | Draft mutation, import, manual edit, and history | In progress | Draft apply tests, audit snapshots, stale/duplicate request tests | Review on data-contract mismatch |
 | WP-5 | Publish, pointer restore, and audit on Local | Not started | Local publish/restore tests, pointer/immutability checks | Review before treating publish path as ready |
 | WP-6 | Official Excel/PDF export | Not started | DB-generated export, count/hash, visual/accessibility checks | Final P-11 artifact acceptance pending |
 | WP-7 | BOQ and Factor F regression preservation | Not started | BOQ save/print/export regression, Factor F before/after assertions | Required before WP-8 complete |
@@ -105,6 +105,8 @@ Allowed statuses:
 | 2026-07-05 13:27 +07 | WP-3 | Local browser origin/auth review for `localhost` vs `127.0.0.1` | Captured | Dev server environment resolves `NEXT_PUBLIC_SUPABASE_URL=http://127.0.0.1:55321`; the served dev client chunk references Local Supabase, not Production; local Node auth smoke passes for `local.admin@ntplc.co.th`; Supabase auth health is reachable from both `127.0.0.1:55321` and `localhost:55321`; a one-shot local SSR login proved an authenticated session can reach `/admin/master-catalog` on `127.0.0.1:3000` and render the expected disabled Master Catalog gate. Observed browser form behavior still differs by app origin, so treat manual login as an origin/site-data/tooling gap, not as evidence that the local password or seed is wrong |
 | 2026-07-05 13:44 +07 | WP-3 | Patched and verified local browser login for username-only NT admin auth | Passed | `app/login/page.tsx` now fails closed to organization email restriction if anonymous settings fetch fails, uses a text input while restriction is active so browser native email validation does not block username-only submit, and normalizes `local.admin` to `local.admin@ntplc.co.th` before sign-in/sign-up/reset. Added `lib/auth/email.ts` plus focused tests. In-app browser on `http://localhost:3000/login?redirectTo=%2Fadmin%2Fmaster-catalog` successfully logged in with username-only local admin credentials and redirected to `/admin/master-catalog`, showing the expected disabled Master Catalog gate with `Production touched: No`. Checks: `npm test -- tests/auth-email.test.ts`, `npx tsc --noEmit --pretty false`, focused lint, local auth smoke, `npm test` 13 files/65 tests, `npm run lint` 0 errors/12 existing warnings, `git diff --check` |
 | 2026-07-05 15:21 +07 | WP-3 | Patched non-blocking WP-3 review findings before WP-4 | Passed | Closed the flag parsing mismatch by sharing `isCatalogAdminEnabled()` between admin navigation and the server read model; added malformed/uppercase organization email edge tests and stricter restricted-email validation; surfaced Factor F default pointer/version read failures as overview warnings and added regression coverage. No WP-4 mutation/import work started, no Production write, no Factor F write/backfill/binding. Checks: `npm test -- tests/auth-email.test.ts tests/master-catalog-admin-read-model.test.ts` passed 2 files/15 tests; `npm test` passed 13 files/68 tests; `npx tsc --noEmit --pretty false` passed; `npm run lint` passed with 0 errors/12 existing warnings; `npm run build` passed after escalated network access for existing Google Fonts fetch; `git diff --check` passed |
+| 2026-07-05 15:24 +07 | WP-4 | Started local-only draft mutation/import/history implementation | In progress | Scope limited to draft create/mutation/import/manual/history on Local app + DB. WP-5 publish/pointer restore remains not started; no Production write; no feature enablement; no catalog publish; no Factor F write/pointer/backfill/binding. Authority docs and relevant Supabase/Next/React/shadcn/UI/data-quality skills reviewed before implementation |
+| 2026-07-05 15:40 +07 | WP-4 | Implemented first local-only draft/import mutation slice and clean Local smoke | Passed slice | Added root migration `017` with private draft create/apply implementation and public invoker wrappers; publish/restore remain blocked until WP-5. Local clean bootstrap applied migrations `009`-`017`; `npm run db:local:smoke-master-catalog-wp4` passed: created draft `2568.1.0` with 710 rows, manual retire audited 1 row, import validate/apply audited 1 row and marked import applied, duplicate requests idempotent, stale lock rejected, publish blocked, Factor F unchanged, BOQ count unchanged. Checks: `npm test` 13 files/69 tests, `npx tsc --noEmit --pretty false`, `npm run lint` 0 errors/12 existing warnings, `npx supabase db lint --local` no schema errors/results empty, `npm run build` passed after escalated Google Fonts fetch, `git diff --check` passed |
 
 ## 6. Blocker log
 
@@ -120,21 +122,22 @@ Allowed statuses:
 | 2026-07-05 13:04 +07 | WP-3 | Authenticated in-app browser smoke could not complete because the browser runtime did not trigger React controlled input state and the repo has no Playwright dependency | Owner/reviewer accept fallback local HTTP gate smoke plus unit coverage for WP-3 review, or approve adding e2e/browser tooling before marking WP-3 complete | Resolved 2026-07-05 13:44 +07; in-app browser login proof passed after login normalization/fail-closed patch |
 | 2026-07-05 13:27 +07 | WP-3 | Browser login behavior differs between `localhost:3000` and `127.0.0.1:3000`: one origin can submit but reports invalid credentials, while the other did not reliably enable the controlled login button during in-app browser interaction | Standardize the local review origin and clear site data for both origins, or approve adding browser/e2e tooling before treating manual form login as WP-3 acceptance evidence | Resolved 2026-07-05 13:44 +07 for WP-3 browser acceptance; root causes were username-only native email validation, fail-open settings fetch, and an earlier test parser that included an inline env comment in the password |
 | 2026-07-05 13:04 +07 | P-10/WP-3 | NT CI runtime derivatives are not generated yet; `/CI/` source assets remain local-only/uncommitted and current tooling lacks WOFF2/font conversion support | Owner provide/approve generated runtime derivatives or approve installing a conversion tool before P-10/official export acceptance | Open; not blocking read-only WP-3 shell review, but blocks claiming CI artifact completeness |
+| 2026-07-05 15:40 +07 | WP-4 | Normalized import payload currently carries `workContextCode`/`itemTypeCode` but not the approved Thai group names needed to create authoritative `catalog_code_groups` rows | Before marking import/recode ready for publish validation, decide whether to amend payload spec to include group names or load the approved P-06 dictionary server-side | Open; current migration accepts optional group names and leaves `code_group_id` null when names are absent, which is safe for draft smoke but must be closed before WP-4 complete/WP-5 publish validation |
 
 ## 7. Handoff note template
 
 Use this template at the end of each implementation session:
 
 ```text
-Current WP: WP-3
-Status: Ready for WP-4 start review after cleanup
+Current WP: WP-4
+Status: In progress after first local-only draft/import mutation slice
 Branch: codex/master-catalog-phase4
-Latest commit: 5c082f8 before WP-3 cleanup patch
-Files changed: app/admin/page.tsx; app/globals.css; app/login/page.tsx; app/admin/master-catalog/page.tsx; app/admin/master-catalog/versions/page.tsx; app/admin/master-catalog/versions/[versionId]/page.tsx; app/admin/master-catalog/import/page.tsx; app/admin/master-catalog/history/page.tsx; app/admin/master-catalog/_components/MasterCatalogAdminViews.tsx; lib/auth/email.ts; lib/master-catalog/admin/flags.ts; lib/master-catalog/admin/readModel.ts; tests/auth-email.test.ts; tests/master-catalog-admin-read-model.test.ts; docs/plans/master-catalog/25-phase4-execution-progress-tracker.md
-Evidence produced: WP-3 read-only admin shell behind disabled flag; server-side admin gate/read model; hidden admin entry while flag disabled; local auth/user/flag facts; in-app unauthenticated redirect/login render smoke; authenticated local HTTP gate smoke for active admin and active staff; authenticated in-app browser username-only local admin login proof to disabled Master Catalog gate; WP-3 review cleanup for flag parsing/email edge cases/Factor F warning visibility; CI/P-10 derivative gap recorded; no mutation/publish/Production/Factor F writes
-Tests/checks run: npm test -- tests/master-catalog-admin-read-model.test.ts; npm test -- tests/auth-email.test.ts; npm test -- tests/auth-email.test.ts tests/master-catalog-admin-read-model.test.ts; npm test; npx tsc --noEmit --pretty false; npm run lint; npm run build; git diff --check; local HTTP gate smoke; Local DB read-only app_settings/user_profile facts; local auth smoke; in-app browser login/gate smoke
-Blockers: existing advisor baseline still needs later triage; fresh approved Production snapshot source not taken for later clean rehearsal; 2568.0.0 dataset_hash/published_at metadata write deferred until publish implementation; NT CI runtime derivatives not generated yet
-Owner decisions needed: review WP-3 cleanup evidence and approve/hold starting WP-4 draft mutation/import work; decide whether durable e2e/browser tooling should be added as later CI/polish; approve CI derivative generation path before P-10/official export acceptance
-Next safe step: commit WP-3 cleanup checkpoint; owner reviews WP-3; if accepted, start WP-4 local-only draft mutation/import implementation without publish/pointer/Production/Factor F writes
+Latest commit: cc95bc4 before WP-4 local changes
+Files changed: migrations/017_master_catalog_phase4_draft_mutation.sql; scripts/bootstrap-local-db.sh; scripts/smoke-master-catalog-wp4.mjs; package.json; tests/master-catalog-migrations.test.ts; docs/plans/master-catalog/25-phase4-execution-progress-tracker.md
+Evidence produced: WP-4 migration 017 draft create/apply implementation; public invoker wrappers with private definer implementation; publish/restore still blocked; Local clean bootstrap through migrations 009-017; authenticated local admin smoke for draft create, manual retire, import validate/apply, idempotency, stale lock, publish blocked, Factor F unchanged, BOQ count unchanged; group-name payload gap recorded
+Tests/checks run: npm test -- tests/master-catalog-migrations.test.ts; npm run db:local:bootstrap; npm run db:local:smoke-master-catalog-wp4; npm test; npx tsc --noEmit --pretty false; npm run lint; npx supabase db lint --local; npm run build; git diff --check
+Blockers: existing advisor baseline still needs later triage; fresh approved Production snapshot source not taken for later clean rehearsal; 2568.0.0 dataset_hash/published_at metadata write deferred until publish implementation; NT CI runtime derivatives not generated yet; normalized import payload lacks authoritative group names needed for complete recode/publish validation
+Owner decisions needed: decide payload/dictionary path for `catalog_code_groups` names before WP-4 complete; review whether this WP-4 slice can be committed before continuing add/edit/recode/UI action work; approve CI derivative generation path before P-10/official export acceptance
+Next safe step: commit this WP-4 local-only slice, then continue WP-4 add/edit/recode/import preview UI/action coverage without publish/pointer/Production/Factor F writes
 Production touched: No
 ```
