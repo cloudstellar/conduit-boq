@@ -65,7 +65,7 @@ agents do not infer missing context.
 | 2026-06-28 | Aligned F1 active-version metadata constraint so local re-apply and F2 can publish the PDF-backed baseline while still allowing future legacy exceptions. | `migrations/012_factor_f_version_foundation.sql` | None |
 | 2026-06-28 | Created F2 seed migration for owner-confirmed baseline version `2566.0.0`, sourced from `FACTOR F 2566_7.PDF`, with row-count/hash preflight and no BOQ backfill. | `migrations/013_factor_f_seed_current_baseline.sql` | None |
 | 2026-06-29 | Added F4 repair migration for missing legacy snapshot metadata, guarded by `2566.0.0` hash and saved-factor equality. | `migrations/015_factor_f_repair_legacy_snapshot_metadata.sql` | None |
-| 2026-06-29 | Updated no-maintenance rollout plan and shifted Master Catalog Phase 4 migration numbering to `016+`. | `docs/04_data/MIGRATIONS.md`, `docs/plans/factor-f/08-production-inventory-readiness.md`, Master Catalog planning docs | None |
+| 2026-06-29 | Updated no-maintenance rollout plan and shifted Master Catalog Phase 4 migration numbering to `017+`. | `docs/04_data/MIGRATIONS.md`, `docs/plans/factor-f/08-production-inventory-readiness.md`, Master Catalog planning docs | None |
 | 2026-06-29 | Added detailed Production no-maintenance runbook for Factor F `012` through `015`, including preflight SQL, staged app deploy, smoke tests, and failure handling. | `docs/plans/factor-f/09-production-no-maintenance-runbook.md` | None |
 | 2026-06-29 | Applied Factor F Production rollout and recorded closeout state. | `migrations/012_factor_f_version_foundation.sql`, `migrations/013_factor_f_seed_current_baseline.sql`, `migrations/014_factor_f_publish_2569_0_0.sql`, `migrations/015_factor_f_repair_legacy_snapshot_metadata.sql`, `docs/plans/factor-f/10-production-rollout-closeout.md` | Production default Factor F is now `2569.0.0`; legacy BOQs remain unbound |
 
@@ -128,7 +128,7 @@ F1 must not:
 ## Next Review Items
 
 - Resume Master Catalog Phase 4 planning with database migration numbers
-  `016+`.
+  `017+`.
 - Monitor support cases for legacy BOQs missing Factor F snapshots; the correct
   user path is duplicate/reprice, not mutating the original BOQ.
 - Treat full Factor F admin/import UI as a future enhancement after the

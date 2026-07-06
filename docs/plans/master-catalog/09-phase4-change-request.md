@@ -78,7 +78,7 @@ Production migration ledger includes:
 Supabase MCP verified after the Factor F rollout that root migrations `012`
 through `015` are applied, current Factor F default is `2569.0.0`, and legacy
 BOQs were not backfilled with a guessed Factor F version. Master Catalog Phase
-4 database migrations start at `016+`.
+4 database migrations start at `017+`.
 
 The detailed post-Factor-F difficulty assessment and adjusted implementation
 sequence are recorded in the

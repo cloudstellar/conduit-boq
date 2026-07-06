@@ -1,7 +1,7 @@
 # Migrations
 ## Conduit BOQ System
 
-**Last Updated:** 2026-06-29
+**Last Updated:** 2026-07-06
 **Status:** Canonical
 
 ---
@@ -32,10 +32,11 @@
 | `013_factor_f_seed_current_baseline.sql` | Seed audited current 37-row `factor_reference` baseline as Factor F `2566.0.0` and move the default pointer | **Applied to Production 2026-06-29** (`20260628190357`) — no legacy BOQ backfill |
 | `014_factor_f_publish_2569_0_0.sql` | Publish Factor F `2569.0.0` from กค 0433.2/ว 481 and move the default pointer | **Applied to Production 2026-06-29** (`20260628190621`) — no legacy BOQ backfill |
 | `015_factor_f_repair_legacy_snapshot_metadata.sql` | Repair missing legacy Factor F snapshot metadata for BOQs whose saved `factor_f` exactly matches `2566.0.0`; does not bind legacy BOQs to a version | **Applied to Production 2026-06-29** (`20260628190757`) — no reprice and no legacy version backfill |
-| `016_master_catalog_phase4_foundation.sql` | Master Catalog Phase 4 additive governance foundation: metadata columns, identities, code registry, categories/groups, import/change audit tables, RLS/grants, disabled feature flag, rejecting RPC stubs | **Draft — Local only, not applied to Production** |
-| `017_master_catalog_phase4_draft_mutation.sql` | Master Catalog Phase 4 local draft create, manual/import mutation, idempotency, audit, and history RPC implementation; publish/restore remain blocked | **Draft — Local only, not applied to Production** |
-| `018_master_catalog_phase4_publish_pointer.sql` | Master Catalog Phase 4 local publish, pointer restore, catalog-only DB count/hash, baseline metadata/hash closure, and published-version immutability guards | **Draft — Local only, not applied to Production** |
-| `016+_master_catalog_phase4_*.sql` | Master Catalog Phase 4 database migrations | **Planned — next database migration range after completed Factor F rollout** |
+| `016_hotfix_preserve_boq_item_suffix.sql` | Redeploy `save_boq_with_routes` to preserve approved BOQ item suffix labels while keeping catalog-backed unit, price, category, and version checks authoritative | **Applied to Production 2026-07-06** (`20260706090246`) |
+| `017_master_catalog_phase4_foundation.sql` | Master Catalog Phase 4 additive governance foundation: metadata columns, identities, code registry, categories/groups, import/change audit tables, RLS/grants, disabled feature flag, rejecting RPC stubs | **Draft — Local only, not applied to Production** |
+| `018_master_catalog_phase4_draft_mutation.sql` | Master Catalog Phase 4 local draft create, manual/import mutation, idempotency, audit, and history RPC implementation; publish/restore remain blocked | **Draft — Local only, not applied to Production** |
+| `019_master_catalog_phase4_publish_pointer.sql` | Master Catalog Phase 4 local publish, pointer restore, catalog-only DB count/hash, baseline metadata/hash closure, and published-version immutability guards | **Draft — Local only, not applied to Production** |
+| `017+_master_catalog_phase4_*.sql` | Master Catalog Phase 4 database migrations | **Planned — next database migration range after completed Factor F rollout and hotfix 016** |
 
 ### Local Schema Baseline (`supabase/local/`)
 
@@ -66,7 +67,9 @@ remote migrations `012` through `015` are applied, current default Factor F is
 for legacy BOQs, and partial legacy Factor F snapshots remaining is `0`. The
 post-rollout closeout is recorded in
 [10-production-rollout-closeout.md](../plans/factor-f/10-production-rollout-closeout.md).
-Master Catalog Phase 4 database migrations start at `016+`.
+Hotfix `016` is a production issue patch that runs before Master Catalog Phase
+4. Master Catalog Phase 4 database migrations start at `017+` after Phase 4
+rebases/merges this hotfix from `main`.
 
 `010a_master_catalog_phase1a_indexes.sql` is an operational runbook rather than
 a transactional migration. Run its `CREATE INDEX CONCURRENTLY` statements one
@@ -81,8 +84,8 @@ at a time outside an explicit transaction.
 Use `npm run db:local:bootstrap`. It resets Local Supabase to the schema-only
 Production baseline, restores scrubbed snapshots, applies root migrations
 `009` and `010`, applies all four `010a` concurrent indexes individually, then
-applies `011`, Factor F `012` through `015`, the draft local-only Phase 4
-scripts `016` through `018`, and runs the smoke tests.
+applies `011`, Factor F `012` through `015`, hotfix `016`, the draft
+local-only Phase 4 scripts `017` through `019`, and runs the smoke tests.
 
 The CLI remains intentionally unlinked from Production. Do not use `db push`,
 `db pull`, or linked diff commands from this worktree. Local migration history

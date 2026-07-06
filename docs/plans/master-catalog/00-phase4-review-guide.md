@@ -11,7 +11,7 @@
   `2569.0.0` และ BOQ เก่าไม่ได้ถูก backfill**
 - Phase 4 Admin/Import/Publish/Official Export: **ยังไม่เริ่ม implement**
 - รอบถัดไปของ Phase 4: **เริ่มจาก baseline หลัง Factor F `012-015` และ
-  migration ถัดไปคือ `016+`**
+  migration ถัดไปคือ `017+`**
 - เอกสาร Phase 4 ต้องใช้ live preflight count เสมอ เพราะ BOQ ใหม่อาจเพิ่ม
   ระหว่างรอ implement
 

@@ -15,7 +15,7 @@ Auth + RLS             P0 security containment       Default 2569.0.0           
 BOQ + Multi-route      Version 2568.0.0              Baseline 2566.0.0          Stable identity/history
 710-price catalog      Singleton default pointer     No legacy backfill         Publish + official export
 Factor F snapshots     Version-locked BOQs           Snapshot repair only       Audited pointer restore
-Admin onboarding       Phase 1B hardening            MC starts at 016+          NT CI catalog UI
+Admin onboarding       Phase 1B hardening            MC starts at 017+          NT CI catalog UI
 ```
 
 Product enhancements such as notification, PWA, smart estimation, and wider

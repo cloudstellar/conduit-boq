@@ -10,7 +10,7 @@ migration approval remain separate gates
 
 **Owner decision recorded:** 2026-07-04 — approved according to the
 recommendation as the technical backbone for Phase 4A and every Phase 4 write
-path. The owner accepts the additive `016+` migration contract, explicit
+path. The owner accepts the additive `017+` migration contract, explicit
 grants/RLS, private `SECURITY DEFINER` boundary, direct-write revocation,
 publish/restore lock order, Factor F/BOQ immutability boundary, required local
 DB/security/advisor verification, and forward-fix-only migration recovery. This
@@ -44,7 +44,7 @@ This document does not authorize a Production migration.
 Supabase MCP verified Production on 2026-06-29 after Factor F rollout: root
 migrations `012`, `013`, `014`, and `015` were applied for Factor F, current
 default Factor F is `2569.0.0`, and legacy BOQs were not version-backfilled.
-Master Catalog Phase 4 database migrations start at `016+`.
+Master Catalog Phase 4 database migrations start at `017+`.
 
 ## 2. Verified Production baseline
 
@@ -76,7 +76,7 @@ Current Factor F version tables remain separate reference data outside
 contract. Factor F work is outside the Master Catalog Phase 4 approval path.
 
 Phase 4 implementation must treat the Factor F rollout as existing Production
-state. Migration `016+` may depend on the presence of
+state. Migration `017+` may depend on the presence of
 `boq.factor_reference_version_id`, but must not change its values, drop its
 foreign key/index, disable its immutability trigger, or repoint
 `factor_reference_default_version`.

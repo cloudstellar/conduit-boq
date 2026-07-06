@@ -82,6 +82,7 @@ try {
     .eq('version_id', version.id)
     .eq('is_active', true)
     .not('category', 'is', null)
+    .or('item_name.ilike.งานวางท่อ 1-%,item_name.ilike.งานดันท่อ%1-%')
     .order('item_code')
     .limit(1)
     .single()
@@ -112,6 +113,7 @@ try {
   const totalMaterial = Number(priceItem.material_cost) * quantity
   const totalLabor = Number(priceItem.labor_cost) * quantity
   const totalCost = Number(priceItem.unit_cost) * quantity
+  const specialItemName = `${priceItem.item_name} (Steel Pole)`
 
   const { error: saveError } = await supabase.rpc('save_boq_with_routes', {
     p_boq_id: sourceBoq.id,
@@ -144,7 +146,7 @@ try {
       items: [{
         item_order: 1,
         price_list_id: priceItem.id,
-        item_name: priceItem.item_name,
+        item_name: specialItemName,
         quantity,
         unit: priceItem.unit,
         material_cost_per_unit: Number(priceItem.material_cost),
@@ -166,8 +168,12 @@ try {
     .eq('boq_id', sourceBoq.id)
     .single()
   if (savedItemError) throw savedItemError
+  assert(savedItem.item_name === specialItemName, 'Saved item lost its BOQ-specific special suffix')
   assert(savedItem.category === priceItem.category, 'Saved item category snapshot does not match the catalog')
   assert(savedItem.price_list?.version_id === version.id, 'Saved item crossed catalog versions')
+  assert(Number(savedItem.material_cost_per_unit) === Number(priceItem.material_cost), 'Saved item material cost did not come from the catalog')
+  assert(Number(savedItem.labor_cost_per_unit) === Number(priceItem.labor_cost), 'Saved item labor cost did not come from the catalog')
+  assert(Number(savedItem.unit_cost) === Number(priceItem.unit_cost), 'Saved item unit cost did not come from the catalog')
 
   const { data: duplicateBoq, error: duplicateError } = await supabase
     .from('boq')
@@ -251,7 +257,9 @@ try {
     catalog_version: version.version_string,
     price_item: priceItem.item_code,
     create_version_preserved: true,
+    save_suffix_preserved: true,
     save_category_preserved: true,
+    save_catalog_costs_authoritative: true,
     duplicate_version_preserved: true,
     duplicate_category_preserved: true,
   }))

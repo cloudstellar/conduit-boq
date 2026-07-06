@@ -1,4 +1,4 @@
--- Migration 018: Master Catalog Phase 4 Publish and Pointer Restore
+-- Migration 019: Master Catalog Phase 4 Publish and Pointer Restore
 -- Scope:
 -- - Implements local-rehearsal publish and pointer-restore RPCs.
 -- - Computes catalog-only count/hash from database rows.

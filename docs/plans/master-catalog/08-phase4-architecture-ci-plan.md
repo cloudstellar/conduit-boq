@@ -1604,7 +1604,7 @@ Do not advance when any gate fails:
   CR explicitly authorizes the change.
 - Migration numbering follows actual execution order. Factor F used root
   migrations `012`, `013`, `014`, and `015`; Master Catalog Phase 4 database
-  migrations start at `016+`. Do not create parallel migrations with the same
+  migrations start at `017+`. Do not create parallel migrations with the same
   logical order.
 - No paid Supabase branch or additional hosted project is created.
 - Compatibility columns are retained through the first stable Production cycle.
@@ -1713,7 +1713,7 @@ data freeze, Production migration, feature enablement, or publication.
   implementation decisions that depend on them.
 - [ ] Existing Supabase server/browser clients are reused, and the plan for
   generated database types is current.
-- [ ] Migration design is additive and starts at `016+`; it uses explicit
+- [ ] Migration design is additive and starts at `017+`; it uses explicit
   grants/RLS, indexed foreign keys and hot filters, safe constraint creation,
   bounded lock/statement timeouts, and `NOT VALID`/`VALIDATE` where appropriate.
 - [ ] Phase 4 migration design has no Factor F table write, Factor F pointer

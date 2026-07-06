@@ -80,7 +80,7 @@ unbound by design. Factor F used:
 - `014_factor_f_publish_2569_0_0.sql`
 - `015_factor_f_repair_legacy_snapshot_metadata.sql`
 
-Master Catalog Phase 4 database migrations therefore start at `016+`.
+Master Catalog Phase 4 database migrations therefore start at `017+`.
 
 ## 3. In scope
 

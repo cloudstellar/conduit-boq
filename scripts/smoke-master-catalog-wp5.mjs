@@ -224,8 +224,8 @@ try {
   const baseVersion = await readCatalogVersionById(baseVersionId)
   assert(baseVersion.version_string === '2568.0.0', 'WP-5 smoke must start from 2568.0.0')
   assert(baseVersion.status === 'active' && baseVersion.is_default === true, 'Base catalog is not active/default')
-  assert(/^sha256:[0-9a-f]{64}$/.test(baseVersion.dataset_hash ?? ''), 'Base catalog hash was not backfilled by migration 018')
-  assert(baseVersion.published_at, 'Base catalog published_at was not backfilled by migration 018')
+  assert(/^sha256:[0-9a-f]{64}$/.test(baseVersion.dataset_hash ?? ''), 'Base catalog hash was not backfilled by migration 019')
+  assert(baseVersion.published_at, 'Base catalog published_at was not backfilled by migration 019')
 
   const createRequestId = randomUUID()
   const createData = assertActionOk(

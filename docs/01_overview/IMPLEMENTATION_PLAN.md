@@ -101,7 +101,7 @@ official stamped Excel/PDF, and audited pointer restore require the separate
 [Phase 4 Change Request](../plans/master-catalog/09-phase4-change-request.md).
 Implementation/local rehearsal, Production migration, deploy, enablement, and
 publication each have explicit approval gates. Because Factor F shipped first,
-Master Catalog Phase 4 database migrations start at `016+`, and every Phase 4
+Master Catalog Phase 4 database migrations start at `017+`, and every Phase 4
 preflight must preserve Factor F version bindings and live legacy snapshot
 state.
 
@@ -135,7 +135,7 @@ Start review from the
 | 013_factor_f_seed_current_baseline | Seed audited current Factor F baseline `2566.0.0` | ✅ Production 2026-06-29; no legacy BOQ backfill |
 | 014_factor_f_publish_2569_0_0 | Publish Factor F `2569.0.0` from ว 481 source | ✅ Production 2026-06-29 |
 | 015_factor_f_repair_legacy_snapshot_metadata | Repair legacy Factor F snapshot metadata without repricing or binding old BOQs | ✅ Production 2026-06-29 |
-| 016+_master_catalog_phase4_* | Master Catalog Phase 4 DB migrations | Planned after completed Factor F rollout |
+| 017+_master_catalog_phase4_* | Master Catalog Phase 4 DB migrations | Planned after completed Factor F rollout |
 
 ---
 

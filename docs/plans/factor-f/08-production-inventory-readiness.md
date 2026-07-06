@@ -99,7 +99,7 @@ This must be described as **legacy snapshot metadata repair**, not repricing:
 - Abort if any mismatch is found.
 
 This repair is approved. Reserve root migration `015` for Factor F repair and
-shift Master Catalog Phase 4 migrations to `016+`.
+shift Master Catalog Phase 4 migrations to `017+`.
 
 ## No-Maintenance Release Sequence
 

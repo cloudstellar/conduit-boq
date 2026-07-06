@@ -86,7 +86,7 @@ declare them before editing and keep migration ordering unambiguous.
 
 Supabase MCP verified Production on 2026-06-29 after rollout: root migration
 numbers `012`, `013`, `014`, and `015` were used for Factor F. Master Catalog
-Phase 4 database migrations must start at `016+`. Never reuse a number or
+Phase 4 database migrations must start at `017+`. Never reuse a number or
 create parallel migrations with the same logical order.
 
 | Area | Expected files |

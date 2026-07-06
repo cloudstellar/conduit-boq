@@ -1,4 +1,4 @@
--- Migration 017: Master Catalog Phase 4 Draft Mutation
+-- Migration 018: Master Catalog Phase 4 Draft Mutation
 -- Scope:
 -- - Implements local-rehearsal draft create and draft mutation/import audit RPCs.
 -- - Keeps publish and pointer restore disabled for WP-5.

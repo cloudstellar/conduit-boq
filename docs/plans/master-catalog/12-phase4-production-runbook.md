@@ -79,7 +79,7 @@ Stop immediately when any of these occurs:
 1. Confirm Factor F rollout closeout before scheduling any Master Catalog Phase
    4 database migration. Factor F `012` through `015` completed on 2026-06-29;
    current default Factor F is `2569.0.0`, legacy BOQs were not version
-   backfilled, and Master Catalog Phase 4 migrations must start at `016+`.
+   backfilled, and Master Catalog Phase 4 migrations must start at `017+`.
    Live BOQ counts may drift after the closeout; record current counts at every
    Production gate instead of reusing the closeout count.
 2. Record owner approval of ADR-004 and implementation/local-rehearsal CR gate.

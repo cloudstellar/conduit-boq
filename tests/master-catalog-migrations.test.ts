@@ -63,9 +63,10 @@ describe('Master Catalog migration contracts', () => {
     expect(bootstrap).toContain('migrations/013_factor_f_seed_current_baseline.sql')
     expect(bootstrap).toContain('migrations/014_factor_f_publish_2569_0_0.sql')
     expect(bootstrap).toContain('migrations/015_factor_f_repair_legacy_snapshot_metadata.sql')
-    expect(bootstrap).toContain('migrations/016_master_catalog_phase4_foundation.sql')
-    expect(bootstrap).toContain('migrations/017_master_catalog_phase4_draft_mutation.sql')
-    expect(bootstrap).toContain('migrations/018_master_catalog_phase4_publish_pointer.sql')
+    expect(bootstrap).toContain('migrations/016_hotfix_preserve_boq_item_suffix.sql')
+    expect(bootstrap).toContain('migrations/017_master_catalog_phase4_foundation.sql')
+    expect(bootstrap).toContain('migrations/018_master_catalog_phase4_draft_mutation.sql')
+    expect(bootstrap).toContain('migrations/019_master_catalog_phase4_publish_pointer.sql')
     expect(bootstrap).toContain('supabase/local/production-baseline.sql')
     expect(bootstrap).toContain('PUBLIC_DATA_SNAPSHOT=')
     expect(bootstrap).toContain('docker cp "$PUBLIC_DATA_SNAPSHOT"')
@@ -75,6 +76,7 @@ describe('Master Catalog migration contracts', () => {
     expect(bootstrap).toContain('psql -v ON_ERROR_STOP=1 -U postgres -d postgres -f /tmp/016.sql')
     expect(bootstrap).toContain('psql -v ON_ERROR_STOP=1 -U postgres -d postgres -f /tmp/017.sql')
     expect(bootstrap).toContain('psql -v ON_ERROR_STOP=1 -U postgres -d postgres -f /tmp/018.sql')
+    expect(bootstrap).toContain('psql -v ON_ERROR_STOP=1 -U postgres -d postgres -f /tmp/019.sql')
     expect(bootstrap).toContain("'factor_f_default_version'")
     expect(bootstrap).toContain("'factor_f_2569_row_count'")
     expect(bootstrap).toContain("'factor_f_partial_legacy_snapshots_remaining'")
@@ -113,10 +115,38 @@ describe('Master Catalog migration contracts', () => {
     expect(sql).not.toContain('total_with_vat =')
   })
 
-  it('adds the Phase 4 foundation without publishing or touching Factor F', () => {
-    const sql = readMigration('016_master_catalog_phase4_foundation.sql')
+  it('preserves BOQ item special suffixes while keeping catalog values authoritative', () => {
+    const sql = readMigration('016_hotfix_preserve_boq_item_suffix.sql')
 
-    expect(sql).toContain('Migration 016: Master Catalog Phase 4 Foundation')
+    expect(sql).toContain('Migration 016: Hotfix Preserve BOQ Item Suffix Labels')
+    expect(sql).toContain('Phase 4 migrations must be rebased/renumbered to 017+')
+    expect(sql).toContain("v_allowed_special_suffixes constant text[] := ARRAY[")
+    expect(sql).toContain("' (Main Duct)'")
+    expect(sql).toContain("' (Riser)'")
+    expect(sql).toContain("' (Steel Pole)'")
+    expect(sql).toContain("' (Riser Service)'")
+    expect(sql).toContain("v_requested_item_name = v_pl_item_name")
+    expect(sql).toContain("v_requested_item_name = v_pl_item_name || allowed_suffix.suffix")
+    expect(sql).toContain("RAISE EXCEPTION 'รายการ % มีชื่อไม่ตรงกับบัญชีราคากลางของ BOQ นี้'")
+    expect(sql).toContain('v_item_name_to_save,')
+    expect(sql).toContain('v_pl_unit,')
+    expect(sql).toContain('v_pl_material,')
+    expect(sql).toContain('v_pl_labor,')
+    expect(sql).toContain('v_pl_unit_cost,')
+    expect(sql).toContain('v_category')
+    expect(sql).toContain('Hotfix 016 postcondition failed: save_boq_with_routes was not found')
+    expect(sql).toContain("has_function_privilege(\n    'anon',")
+    expect(sql).toContain("has_function_privilege(\n    'authenticated',")
+    expect(sql).toContain("WHERE config IN ('search_path=', 'search_path=\"\"')")
+    expect(sql).not.toContain('UPDATE public.price_list')
+    expect(sql).not.toContain('UPDATE public.factor_reference_default_version')
+    expect(sql).not.toContain('SET factor_reference_version_id')
+  })
+
+  it('adds the Phase 4 foundation without publishing or touching Factor F', () => {
+    const sql = readMigration('017_master_catalog_phase4_foundation.sql')
+
+    expect(sql).toContain('Migration 017: Master Catalog Phase 4 Foundation')
     expect(sql).toContain("SET LOCAL lock_timeout = '10s'")
     expect(sql).toContain("SET LOCAL statement_timeout = '60s'")
 
@@ -184,9 +214,9 @@ describe('Master Catalog migration contracts', () => {
   })
 
   it('implements WP-4 draft mutation without publish, pointer, BOQ, or Factor F writes', () => {
-    const sql = readMigration('017_master_catalog_phase4_draft_mutation.sql')
+    const sql = readMigration('018_master_catalog_phase4_draft_mutation.sql')
 
-    expect(sql).toContain('Migration 017: Master Catalog Phase 4 Draft Mutation')
+    expect(sql).toContain('Migration 018: Master Catalog Phase 4 Draft Mutation')
     expect(sql).toContain("SET LOCAL lock_timeout = '10s'")
     expect(sql).toContain("SET LOCAL statement_timeout = '60s'")
     expect(sql).toContain('CREATE OR REPLACE FUNCTION private.create_catalog_draft_impl')
@@ -217,9 +247,9 @@ describe('Master Catalog migration contracts', () => {
   })
 
   it('implements WP-5 publish and pointer restore without BOQ or Factor F writes', () => {
-    const sql = readMigration('018_master_catalog_phase4_publish_pointer.sql')
+    const sql = readMigration('019_master_catalog_phase4_publish_pointer.sql')
 
-    expect(sql).toContain('Migration 018: Master Catalog Phase 4 Publish and Pointer Restore')
+    expect(sql).toContain('Migration 019: Master Catalog Phase 4 Publish and Pointer Restore')
     expect(sql).toContain("SET LOCAL lock_timeout = '10s'")
     expect(sql).toContain("SET LOCAL statement_timeout = '60s'")
     expect(sql).toContain('CREATE OR REPLACE FUNCTION private.catalog_compute_version_dataset')

@@ -31,7 +31,7 @@ Overall difficulty by area:
 | Area | Difficulty | Why |
 |---|---|---|
 | Documentation and approvals | Medium | Existing docs are mostly updated, but owner gates must explicitly include the new two-axis baseline. |
-| Database migration `016+` | Medium-high | Additive catalog schema is normal, but migration must preserve Factor F FK, triggers, pointer, RLS, and existing mixed BOQ states. |
+| Database migration `017+` | Medium-high | Additive catalog schema is normal, but migration must preserve Factor F FK, triggers, pointer, RLS, and existing mixed BOQ states. |
 | Admin catalog UI | Medium | Mostly new isolated UI; must not accidentally reuse BOQ Factor F flows or current-factor defaults. |
 | BOQ regression | High attention, medium implementation | Existing create/edit/duplicate/print/export are already Factor-F-aware, but Phase 4 can break them if it replaces save/duplicate/export paths. |
 | Import/hash/export | Medium | Catalog hash must remain catalog-only; Factor F must be shown only in BOQ documents, not catalog exports. |
@@ -88,7 +88,7 @@ Keep:
 
 Adjust:
 
-- migration order starts at `016+`;
+- migration order starts at `017+`;
 - every preflight includes Factor F pointer/version/snapshot checks;
 - every BOQ regression proves both version axes are preserved;
 - catalog dataset hash/export excludes Factor F rows and metadata;
@@ -99,7 +99,7 @@ Adjust:
 
 | Plan area | Previous assumption | Adjusted plan |
 |---|---|---|
-| Migration numbering | Phase 4 could follow `011` directly | Phase 4 database files start at `016+` after Factor F `012-015`. |
+| Migration numbering | Phase 4 could follow `011` directly | Phase 4 database files start at `017+` after Factor F `012-015`. |
 | Production baseline | Catalog-only baseline was enough | Baseline must record catalog state plus Factor F default, active factor versions, row hashes, BOQ binding split, and legacy snapshot states. |
 | New BOQ creation | Bind current catalog version | Bind current catalog version and current Factor F version independently. |
 | BOQ duplicate | Preserve catalog version and item snapshots | Preserve catalog version, Factor F version, and Factor F snapshots. |
@@ -141,7 +141,7 @@ Goal: add catalog governance without disturbing BOQs or Factor F.
 Required work:
 
 - Create migration with Supabase CLI, using the next generated filename for
-  logical migration `016`.
+  logical migration `017`.
 - Add Phase 4 catalog tables and metadata columns:
   identities, code registry, categories, code groups, imports, change sets,
   change items, lineage, approval, count/hash, lock version.
@@ -205,7 +205,7 @@ workflow.
 Rehearsal path:
 
 1. Restore refreshed Production data locally.
-2. Apply Phase 4 `016+` migrations.
+2. Apply Phase 4 `017+` migrations.
 3. Record before/after catalog counts.
 4. Record before/after Factor F pointer, active versions, row counts, and
    hashes.
@@ -264,7 +264,7 @@ Keep existing tests and add/confirm these gates before Production:
 
 | Test group | Required checks |
 |---|---|
-| Migration contract | `016+` does not update `factor_reference_default_version`, `factor_reference_rows`, or `boq.factor_reference_version_id`. |
+| Migration contract | `017+` does not update `factor_reference_default_version`, `factor_reference_rows`, or `boq.factor_reference_version_id`. |
 | RLS/grants | New catalog tables have RLS and explicit grants; Factor F table grants remain unchanged. |
 | BOQ create | New BOQ binds both current catalog pointer and current Factor F pointer. |
 | BOQ preserve duplicate | Copy keeps catalog version, Factor F version, item snapshots, and Factor F snapshots. |

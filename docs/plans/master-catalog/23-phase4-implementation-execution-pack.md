@@ -42,7 +42,7 @@ review before requesting P-12.
 Start allowed:
 
 - local branch/worktree work;
-- additive `016+` migration design;
+- additive `017+` migration design;
 - local Supabase reset/rehearsal;
 - parser/canonical-hash implementation;
 - admin UI behind disabled feature flag;
@@ -110,7 +110,7 @@ freeze, approved backfill, export acceptance, and publication where applicable.
 | WP | Name | Environment | Can start after | Blocks |
 |---|---|---|---|---|
 | WP-0 | Branch, dependency, and evidence setup | Local | P-01 | None |
-| WP-1 | Additive database foundation `016+` | Local Supabase | WP-0 | WP-4, WP-8 |
+| WP-1 | Additive database foundation `017+` | Local Supabase | WP-0 | WP-4, WP-8 |
 | WP-2 | Catalog canonicalizer and parser | Local app/tests | WP-0 | WP-4, WP-6 |
 | WP-3 | Catalog admin read/draft UI shell | Local app | WP-0 | WP-4 |
 | WP-4 | Draft mutation, import, manual edit, history | Local app + DB | WP-1, WP-2, WP-3 | WP-5 |
@@ -153,14 +153,14 @@ Exit gate:
 - no untriaged Phase 4 advisor finding exists;
 - implementation branch scope is clear.
 
-## 6. WP-1 additive database foundation `016+`
+## 6. WP-1 additive database foundation `017+`
 
 Goal: add Phase 4 catalog governance without changing existing BOQ or Factor F
 semantics.
 
 Migration expectations:
 
-- next root migration is logical `016+`;
+- next root migration is logical `017+`;
 - additive first, destructive never;
 - RLS enabled on every new public table;
 - explicit `REVOKE` and exact `GRANT`;
@@ -397,7 +397,7 @@ Run order:
 1. Clean local reset from migrations.
 2. Load approved baseline fixture/snapshot.
 3. Record catalog count/hash and Factor F baseline.
-4. Apply Phase 4 `016+` migrations.
+4. Apply Phase 4 `017+` migrations.
 5. Run DB/security tests.
 6. Run parser/hash tests.
 7. Run admin UI workflow tests.
@@ -490,7 +490,7 @@ implementation finds a cleaner existing home.
 
 | Area | Likely targets |
 |---|---|
-| Supabase migration | `migrations/016_*.sql` or timestamped Supabase migration matching logical `016+` |
+| Supabase migration | `migrations/017_*.sql` or timestamped Supabase migration matching logical `017+` |
 | DB helpers/types | `lib/catalog/*`, `lib/supabase.ts`, generated/hand-maintained types |
 | Parser/canonicalizer | `lib/catalog/parser/*`, `lib/catalog/hash/*` |
 | Admin pages | `app/admin/master-catalog/**` |
@@ -508,7 +508,7 @@ Before asking for code review:
 
 - [ ] No Factor F table/pointer/write path is modified.
 - [ ] No legacy BOQ is backfilled with a guessed Factor F version.
-- [ ] Phase 4 migration is additive and starts at `016+`.
+- [ ] Phase 4 migration is additive and starts at `017+`.
 - [ ] Every new public table has RLS enabled.
 - [ ] New grants are explicit and least-privilege.
 - [ ] Privileged functions have narrow execute grants and safe `search_path`.

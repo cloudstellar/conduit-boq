@@ -1,5 +1,5 @@
 -- =============================================================================
--- Migration 016: Master Catalog Phase 4 Foundation
+-- Migration 017: Master Catalog Phase 4 Foundation
 -- Status: DRAFT - LOCAL REHEARSAL ONLY UNTIL OWNER PRODUCTION GATE
 -- Source: docs/plans/master-catalog/17-phase4-database-security-contract.md
 --
@@ -898,7 +898,7 @@ BEGIN;
       p_reason,
       p_request_id;
 
-    RAISE EXCEPTION 'CATALOG_RPC_NOT_IMPLEMENTED: create_catalog_draft is reserved by migration 016 and disabled until Phase 4 mutation implementation is reviewed';
+    RAISE EXCEPTION 'CATALOG_RPC_NOT_IMPLEMENTED: create_catalog_draft is reserved by migration 017 and disabled until Phase 4 mutation implementation is reviewed';
   END;
   $function$;
 
@@ -924,7 +924,7 @@ BEGIN;
       p_request_id,
       p_import_id;
 
-    RAISE EXCEPTION 'CATALOG_RPC_NOT_IMPLEMENTED: apply_catalog_changes is reserved by migration 016 and disabled until Phase 4 mutation implementation is reviewed';
+    RAISE EXCEPTION 'CATALOG_RPC_NOT_IMPLEMENTED: apply_catalog_changes is reserved by migration 017 and disabled until Phase 4 mutation implementation is reviewed';
   END;
   $function$;
 
@@ -948,7 +948,7 @@ BEGIN;
       p_reason,
       p_request_id;
 
-    RAISE EXCEPTION 'CATALOG_RPC_NOT_IMPLEMENTED: publish_catalog_version is reserved by migration 016 and disabled until Phase 4 publish implementation is reviewed';
+    RAISE EXCEPTION 'CATALOG_RPC_NOT_IMPLEMENTED: publish_catalog_version is reserved by migration 017 and disabled until Phase 4 publish implementation is reviewed';
   END;
   $function$;
 
@@ -968,7 +968,7 @@ BEGIN;
       p_reason,
       p_request_id;
 
-    RAISE EXCEPTION 'CATALOG_RPC_NOT_IMPLEMENTED: restore_catalog_pointer is reserved by migration 016 and disabled until Phase 4 pointer restore implementation is reviewed';
+    RAISE EXCEPTION 'CATALOG_RPC_NOT_IMPLEMENTED: restore_catalog_pointer is reserved by migration 017 and disabled until Phase 4 pointer restore implementation is reviewed';
   END;
   $function$;
 

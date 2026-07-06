@@ -18,7 +18,7 @@ exact source-version evidence stay unbound. Valid saved snapshots remain usable
 for print/export, and missing Factor F snapshots fail closed until the user
 creates a new BOQ copy/revision and chooses an active Factor F version.
 
-Master Catalog Phase 4 database migrations therefore start at `016+`.
+Master Catalog Phase 4 database migrations therefore start at `017+`.
 
 ## 2. Applied Production Migrations
 
@@ -82,7 +82,7 @@ row, matching the reviewed ว481 source table.
 
 1. Keep `files/` source PDFs/images outside git as the physical source archive.
 2. Resume Master Catalog Phase 4 planning/implementation with database migration
-   numbers `016+`.
+   numbers `017+`.
 3. If users need to continue an old project under a different Factor F table,
    use the duplicate/reprice path rather than mutating the old BOQ.
 4. Treat a full Factor F admin/import UI as a future enhancement after the
