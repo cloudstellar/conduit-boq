@@ -153,12 +153,20 @@ With feature flag disabled by default:
 4. Apply approved code/category decisions; K fields must remain absent.
 5. Test one manual add, edit, retire, and recode with reasons.
 6. Test Full and Supplement imports.
-7. Test duplicate request ID, stale lock version, stale base pointer, invalid
+7. Before WP-7, prove the WP-6.5 P-18 guard rejects publishing any draft with
+   add/supplement identities absent from the base version, returning
+   `P18_PLACEMENT_REVIEW_REQUIRED` without pointer movement.
+8. Before WP-7, prove the WP-6.5 structured-code guard rejects any first
+   structured-code candidate whose active legacy `ITEM-####` rows exceed the
+   recorded `ITEM-0139` exception.
+9. Test duplicate request ID, stale lock version, stale base pointer, invalid
    price delta, invalid identity/code reuse, and unauthorized role.
-8. Verify item history across a recode.
-9. Publish in Local, generate Excel/PDF, and compare count/hash.
-10. Test audited pointer restore and verify historical BOQs are unchanged.
-11. Rebuild from a clean Local reset and repeat the critical path.
+10. Verify item history across a recode.
+11. Publish only an identity-unchanged approved path in Local, generate
+    Excel/PDF, and compare count/hash.
+12. Test audited pointer restore and verify historical BOQs are unchanged.
+13. Rebuild from a clean Local reset and repeat the critical path only after
+    the owner approves the Local Supabase reset.
 
 ### 6.4 Repository gates
 
@@ -385,9 +393,16 @@ Disable the flag immediately if any smoke test fails.
    physical archive reference, reason, and approver.
 9. If import was used, have the verifier independently hash the filed source
    workbook and match the recorded client-computed fingerprint.
-10. Confirm expected lock version and current pointer/base match.
-11. Generate pre-publish verification preview.
-12. Obtain explicit owner approval to publish exactly `2568.1.0`, including
+10. Confirm no add/supplement/new identity rows are present unless P-18
+    placement governance is approved and the WP-6.5 guard evidence is accepted.
+11. If any inactive/retired rows are present, confirm P-19 official PDF
+    rendering/exclusion policy before filing field-facing artifacts.
+12. Confirm the WP-6.5 structured-code guard evidence for the exact candidate,
+    including the approved temporary `ITEM-0139` exception and no other active
+    legacy `ITEM-####` rows.
+13. Confirm expected lock version and current pointer/base match.
+14. Generate pre-publish verification preview.
+15. Obtain explicit owner approval to publish exactly `2568.1.0`, including
     any mass-retirement total.
 
 ## 13. Publish and immediate closeout
@@ -417,6 +432,9 @@ Disable the flag immediately if any smoke test fails.
 | Application regression | Revert deployment; schema remains compatible |
 | Feature-only UI issue | Disable feature flag |
 | Candidate validation fails | Keep draft; correct through audited change; do not publish |
+| Add/supplement/new identity rows lack P-18 placement approval | Keep draft reviewable; do not publish; guard must reject with `P18_PLACEMENT_REVIEW_REQUIRED` |
+| Structured-code candidate has unapproved active legacy `ITEM-####` rows | Keep draft; correct mappings or return to owner; do not publish |
+| Inactive/retired rows lack P-19 PDF policy | Do not file official field-facing PDF; get owner/data-custodian policy first |
 | Publish fails in transaction | No pointer change; inspect request/result and retry only when safe |
 | Published version is business-invalid | Audited pointer restore to prior published version; create correction version |
 | Export hash mismatch | Do not distribute; investigate canonicalizer/export and regenerate |

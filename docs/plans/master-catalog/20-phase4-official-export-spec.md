@@ -367,6 +367,11 @@ custody is required.
 - `item_code` is not a dedicated column in the field-facing PDF price table.
   Legacy/canonical codes remain available in the Excel workbook and
   release/filing evidence.
+- The field-facing PDF baseline visual direction assumes an all-active price
+  list. Excel includes the visible `สถานะ` column (`ใช้งาน` / `ยกเลิกใช้`),
+  but PDF does not. Before filing an official PDF for any version with
+  inactive/retired rows, P-19 must approve whether those rows are excluded,
+  visibly marked, or moved to a separate appendix.
 - Table headers repeat on every data page.
 - Footer repeats department name, page number as `x/y`, and version/status or
   version/effective-date. The left footer department text is
@@ -465,7 +470,8 @@ On the export screen:
 - headers/footers/page numbering repeat correctly;
 - Thai wrapping has no clipping or orphaned marks;
 - long descriptions, zero costs, maximum costs, null optional English labels,
-  inactive rows, and category page breaks render correctly;
+  inactive rows under the approved P-19 policy, and category page breaks render
+  correctly;
 - saved PDF text is searchable and official stamp matches the selected version;
 - field-facing PDF footer uses department name, `x/y` page numbering, and
   version/status or version/effective-date, without a truncated hash;

@@ -6,8 +6,8 @@ migration approval remain separate gates
 
 **Prepared:** 2026-06-22
 
-**Last updated:** 2026-07-06 after production hotfix `016` was merged into the
-Phase 4 migration chain
+**Last updated:** 2026-07-07 to add WP-6.5 publish-boundary guard sequencing
+after production hotfix `016` was merged into the Phase 4 migration chain
 
 **Owner decision recorded:** 2026-07-04 — approved according to the
 recommendation as the technical backbone for Phase 4A and every Phase 4 write
@@ -248,7 +248,9 @@ Constraints after verified backfill:
   recorded temporary legacy-code exception. For P-06, the only approved
   exception is `ITEM-0139` in `2568.1.0`, backed by P-02/P-04/P-06 owner
   decisions. Publish validation must assert exactly that exception and fail if
-  any other active structured-version row has `code_group_id is null`;
+  any other active structured-version row has `code_group_id is null`. WP-6.5
+  must make this explicit at the publish boundary; exposing a
+  `legacyActiveRows` quality count is not sufficient by itself;
 - nonnegative material/labor/unit costs;
 - `unit_cost = material_cost + labor_cost`;
 - nonnegative `display_order`;
@@ -263,6 +265,12 @@ order, and do not add a Phase 4 Core reorder UI.
 
 This rule is deliberately mechanical: it reproduces the legacy business code
 sequence without treating an unstable source row position as authority.
+It is a draft allocation fallback, not publication approval. Until P-18
+placement governance is approved, `publish_catalog_version` must reject any
+draft whose `price_list.identity_id` does not exist in the draft's
+`based_on_version_id` rows, returning the stable safe code
+`P18_PLACEMENT_REVIEW_REQUIRED`. The full placement/review workflow is outside
+Phase 4 Core unless separately approved.
 
 Phase 4 should set `material_cost`, `labor_cost`, `unit_cost`, `is_active`,
 `created_at`, and `updated_at` to `NOT NULL` only after the preflight confirms
@@ -550,12 +558,19 @@ secret values, raw workbook cells, or internal policy details.
 4. Reject stale base or lock version.
 5. Validate reconciliation, codes, identities, categories/groups, prices,
    approval metadata, row count, and no K fields.
-6. Read canonical rows in deterministic order and compute count/hash.
-7. Set immutable publication metadata and `active` status.
-8. Update singleton pointer.
-9. Set all legacy `is_default = false`, then target `true`, inside the same
+6. Enforce the P-18 publish guard: reject any target draft row whose
+   `identity_id` is absent from the base version rows with
+   `P18_PLACEMENT_REVIEW_REQUIRED`. Do not infer this solely from
+   `catalog_change_sets.change_type`.
+7. Enforce the structured-code legacy exception guard: for the first
+   structured-code candidate, active legacy `ITEM-####` rows with null
+   `code_group_id` must be exactly the approved `ITEM-0139` exception.
+8. Read canonical rows in deterministic order and compute count/hash.
+9. Set immutable publication metadata and `active` status.
+10. Update singleton pointer.
+11. Set all legacy `is_default = false`, then target `true`, inside the same
    transaction.
-10. Append publish change set and commit.
+12. Append publish change set and commit.
 
 ### Pointer restore
 

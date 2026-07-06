@@ -2,8 +2,9 @@
 
 **Status:** Ready for owner review
 **Prepared:** 2026-07-06 16:47 +07
+**Updated:** 2026-07-07 01:17 +07 for WP-6.5 publish-boundary guard sequencing
 **Branch:** `codex/master-catalog-phase4`
-**Reviewed baseline commit:** `72f2c05 merge: integrate hotfix 016 into phase4`
+**Reviewed baseline commit:** Original WP-6 artifact review used `72f2c05 merge: integrate hotfix 016 into phase4`; use git HEAD for the latest committed checkpoint
 **Environment:** Local only
 **Production touched:** No
 
@@ -16,9 +17,10 @@ pagination/table proof and automated coverage cleanup.
 
 This is not a Production approval, not a Production deployment approval, not a
 catalog publication approval, and not approval to publish any add/supplement
-version. P-18 display-order placement governance remains open and must be
-resolved before any version containing added or supplement rows is treated as
-Production-ready.
+version. P-18 display-order placement governance remains open. The plan now
+inserts WP-6.5 before WP-7 to add publish-boundary guards that hold any
+add/supplement/new-identity version until placement governance is approved and
+that enforce the first structured-code rollout's `ITEM-0139` legacy exception.
 
 Recommended owner decision:
 
@@ -27,8 +29,9 @@ Recommended owner decision:
 | Accept WP-6 baseline export implementation evidence | Accept, if owner visually accepts the filed artifacts | Local-only `2568.0.0` baseline export evidence |
 | Accept the current Excel/PDF artifact proof as sufficient for P-11 baseline review | Accept, if owner does not require stronger browser download automation | Final P-11 artifact acceptance still belongs to owner |
 | Mark WP-6 complete after owner acknowledgement | Accept after owner review | Tracker can move to `Complete` only after owner accepts |
-| Start WP-7 BOQ and Factor F regression preservation after WP-6 acceptance | Accept for Local only | No Production write, no Factor F change, no hotfix scope expansion |
-| Keep P-18 open and hold add/supplement publication | Required | No add/supplement publish path until placement governance is approved |
+| Start WP-6.5 publish-boundary guard hardening after WP-6 acceptance | Accept for Local only | No Production write, no placement UI, no Factor F change, no hotfix scope expansion |
+| Start WP-7 BOQ and Factor F regression preservation | Only after WP-6.5 guard evidence | Regression-only; no new Factor F workflow |
+| Keep P-18 open and hold add/supplement publication | Required | No add/supplement publish path until guard evidence and placement governance are approved |
 
 ## 2. Authority Basis Checked
 
@@ -36,7 +39,7 @@ Recommended owner decision:
 |---|---|
 | Migration ledger | Phase 4 stays local-only at `017`-`019`; hotfix `016` is already merged before Phase 4 scripts |
 | Implementation Execution Pack | WP-6 must generate selected-version official Excel/PDF and stop before Production gates |
-| Decision Register | P-11 visual direction is approved for implementation; final artifact acceptance remains pending; P-18 remains pending |
+| Decision Register | P-11 visual direction is approved for implementation; final artifact acceptance remains pending; P-18 remains pending with WP-6.5 guard planned; P-06 allows only the `ITEM-0139` temporary legacy exception; P-19 is pending for future inactive/retired-row versions |
 | Official Export Spec | Server-selected version, fail-closed count/hash, exact five-sheet Excel, server-verified PDF stamp, draft marking, and Factor F exclusion are required |
 | Verification Report | WP-6 evidence must distinguish dataset hash from binary file hash and keep final owner/file acceptance separate |
 | Admin Operating Procedure | Official exports must be generated from the published selected version, then binary hashes filed separately |
@@ -122,6 +125,8 @@ None found for the local-only 710-row baseline export artifact evidence.
 |---|---|---:|---|
 | Final P-11 artifact acceptance remains owner-held | High | Yes, for marking WP-6 complete | WP-6 complete/P-11 acceptance |
 | P-18 display-order placement governance remains open | High for add/supplement versions | No for baseline `2568.0.0` export | Any add/supplement publication readiness |
+| WP-6.5 publish-boundary guards not implemented yet | High for add/supplement and structured-code publication safety | No for baseline `2568.0.0` export | Before WP-7 and before add/supplement or structured-code path readiness |
+| P-19 inactive/retired PDF policy pending | Medium for future retired-row versions | No for current all-active baseline proof | Any official PDF filing for a version with inactive/retired rows |
 | Optional stronger Excel attachment-download proof remains open | Medium | No if owner accepts unit/build/manual artifact proof | Only if owner requires browser-download automation |
 | Local clean-reset identity hash portability remains open | Medium | No for this artifact review | WP-8/P-15 readiness decision |
 | BOQ and Factor F regression preservation not started | High for Production readiness | No for WP-6 export review | WP-7/WP-8 |
@@ -137,26 +142,33 @@ Please review these decisions explicitly:
 | 1 | Do you accept the WP-6 local-only baseline export evidence for `2568.0.0`? | Yes, if the Excel/PDF artifacts are visually acceptable |
 | 2 | Do you accept the current artifact proof instead of requiring stronger browser attachment-download automation now? | Yes |
 | 3 | Do you approve marking WP-6 `Complete` in the tracker after this review? | Yes, after owner acknowledgement |
-| 4 | Do you approve starting WP-7 local-only BOQ and Factor F regression preservation after WP-6 is complete? | Yes, Local only |
-| 5 | Do you confirm P-18 remains open and add/supplement publication stays held until placement governance is approved? | Yes |
+| 4 | Do you approve starting WP-6.5 local-only publish-boundary guard hardening after WP-6 is complete? | Yes, Local only |
+| 5 | Do you approve starting WP-7 only after WP-6.5 guard evidence is recorded? | Yes |
+| 6 | Do you confirm P-18 remains open and add/supplement publication stays held until guard evidence and placement governance are approved? | Yes |
 
 Recommended owner response if accepted:
 
 ```text
-Accept WP-6 local-only baseline export evidence and final P-11 artifacts for the `2568.0.0` proof. Mark WP-6 Complete. Start WP-7 local-only BOQ and Factor F regression preservation. No Production write, no Production migration/deploy/feature enablement/catalog publication, no Factor F change, and no add/supplement publication are authorized. Keep P-18 open until display-order placement governance is approved.
+Accept WP-6 local-only baseline export evidence and final P-11 artifacts for the `2568.0.0` proof. Mark WP-6 Complete. Start WP-6.5 local-only publish-boundary guard hardening before WP-7, including P-18 new-identity rejection and structured-code `ITEM-0139` exception enforcement. No Production write, no Production migration/deploy/feature enablement/catalog publication, no Factor F change, no placement UI/reorder workflow, and no add/supplement publication are authorized. Keep P-18 open until guard evidence and display-order placement governance are approved.
 ```
 
-## 7. Proposed WP-7 Local-Only Start Plan
+## 7. Proposed WP-6.5 Then WP-7 Local-Only Start Plan
 
-If the owner accepts WP-6, the next safe WP-7 sequence is:
+If the owner accepts WP-6, the next safe sequence is:
 
-1. Update the tracker to WP-6 `Complete` and WP-7 `In progress`.
-2. Re-read BOQ, Factor F, hotfix `016`, and post-Factor-F authority docs.
-3. Add/refresh regression tests for BOQ save/edit/duplicate/print/export version labels and preserved item suffix labels.
-4. Add/refresh assertions that new BOQs bind the current catalog pointer and current Factor F pointer.
-5. Add/refresh assertions that existing BOQ edit/save preserves `price_list_version_id`, `factor_reference_version_id`, item snapshots, and Factor F snapshots.
-6. Verify Factor F pointer, rows, and hashes are unchanged by Master Catalog workflows.
-7. Run focused and full local verification without resetting Local Supabase unless the owner explicitly approves a bootstrap.
+1. Update the tracker to WP-6 `Complete` and WP-6.5 `In progress`.
+2. Re-read the publish pointer migration, DB contract, Decision Register P-18, and Verification Report publication tests.
+3. Add the DB publish guard to reject draft rows whose `identity_id` is absent from the base version with `P18_PLACEMENT_REVIEW_REQUIRED`.
+4. Add the structured-code publish guard so active legacy `ITEM-####` rows in `2568.1.0` are limited to the approved `ITEM-0139` exception.
+5. Add safe UI/server-action error mapping for the P-18 code.
+6. Add static and Local smoke evidence proving rejections are atomic and unchanged 710-row publish/restore still works.
+7. After WP-6.5 evidence is recorded, start WP-7 local-only BOQ and Factor F regression preservation.
+8. Re-read BOQ, Factor F, hotfix `016`, and post-Factor-F authority docs.
+9. Add/refresh regression tests for BOQ save/edit/duplicate/print/export version labels and preserved item suffix labels.
+10. Add/refresh assertions that new BOQs bind the current catalog pointer and current Factor F pointer.
+11. Add/refresh assertions that existing BOQ edit/save preserves `price_list_version_id`, `factor_reference_version_id`, item snapshots, and Factor F snapshots.
+12. Verify Factor F pointer, rows, and hashes are unchanged by Master Catalog workflows.
+13. Run focused and full local verification without resetting Local Supabase unless the owner explicitly approves a bootstrap.
 
 WP-7 must remain regression-only. It must not add a new Factor F workflow,
 change Factor F rows/pointers, backfill old BOQs, reprice historical BOQs, or
@@ -165,15 +177,15 @@ reopen the production hotfix scope without approval.
 ## 8. Handoff
 
 ```text
-Current WP: WP-6
-Status: Ready for owner review after closing automated export-evidence gaps; final owner P-11 artifact acceptance pending
+Current WP: WP-6.5 planning
+Status: WP-6 remains ready for owner review after closing automated export-evidence gaps; WP-6.5 publish-boundary guard hardening is now the next planned slice; final owner P-11 artifact acceptance pending
 Branch: codex/master-catalog-phase4
-Latest commit: 72f2c05 merge: integrate hotfix 016 into phase4
-Files changed in this review package: admin short-hash helpers, export/read-model tests, Verification Report, Progress Tracker, WP-6 Owner Review Note
-Evidence produced: older selected-version export coverage, draft export marking coverage, spec-aligned short dataset hash formatting, full test/typecheck/lint/build verification, and owner-review package
-Tests/checks run: focused export/read-model tests; npm test; npx tsc --noEmit --pretty false; npm run lint; git diff --check; npm run build after network escalation for existing Google Fonts fetch
-Blockers: final P-11 artifact acceptance; P-18 placement governance for add/supplement versions; WP-7 BOQ/Factor F regression still pending; advisor/snapshot/hash-portability gates remain for WP-8/P-12+
-Owner decisions needed: accept/reject WP-6 baseline artifacts; accept/require stronger download automation; approve marking WP-6 complete; approve starting WP-7 local-only regression; keep/resolve P-18
-Next safe step: owner reviews this WP-6 package and the generated Excel/PDF artifacts, then either accepts WP-6 or requests targeted artifact fixes
+Latest commit: See git HEAD for the latest committed checkpoint
+Files changed in this review package: WP-6 export implementation/evidence plus later authority-doc alignment for WP-6.5 sequencing
+Evidence produced: older selected-version export coverage, draft export marking coverage, spec-aligned short dataset hash formatting, full test/typecheck/lint/build verification, owner-review package, and WP-6.5 publish-boundary planning alignment
+Tests/checks run: focused export/read-model tests from WP-6; targeted doc grep; git diff --check; npm test -- tests/master-catalog-migrations.test.ts
+Blockers: final P-11 artifact acceptance; WP-6.5 publish-boundary guards not implemented; P-18 placement governance for add/supplement versions; P-19 inactive/retired PDF policy for future retired-row versions; WP-7 BOQ/Factor F regression still pending; advisor/snapshot/hash-portability gates remain for WP-8/P-12+
+Owner decisions needed: accept/reject WP-6 baseline artifacts; accept/require stronger download automation; approve marking WP-6 complete; approve starting WP-6.5 local-only publish-boundary guard hardening; keep/resolve P-18/P-19
+Next safe step: owner reviews this WP-6 package and the generated Excel/PDF artifacts, then either accepts WP-6 and starts WP-6.5 or requests targeted artifact fixes
 Production touched: No
 ```

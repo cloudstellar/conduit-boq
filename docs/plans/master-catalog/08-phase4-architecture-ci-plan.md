@@ -438,6 +438,13 @@ does not add a reorder UI. Do not use physical database order or candidate
 workbook row order. `display_order` is included in the canonical dataset hash
 and official presentation contract.
 
+This append-at-end rule is draft allocation only. After P-18, a version with
+new add/supplement identities must not publish until placement governance is
+approved. WP-6.5 adds a publish guard that rejects draft rows whose
+`identity_id` is absent from the base version with
+`P18_PLACEMENT_REVIEW_REQUIRED`; the later placement/review UI remains outside
+Phase 4 Core unless separately approved.
+
 Backfill the current 710 rows one-to-one. A recoded item receives a new registry
 row pointing to the same identity. A code can never move to another identity.
 The approved reconciliation artifact, not workbook row order or workbook
@@ -515,7 +522,8 @@ P-06, the only approved exception is `ITEM-0139` in `2568.1.0`; publish
 validation must assert that no other active structured-version row has
 `code_group_id is null`. The server validates that the explicit group matches
 the approved canonical code but application pricing logic never parses the code
-string.
+string. WP-6.5 hardens this at the publish boundary alongside the P-18
+new-identity guard so the exception cannot remain only a reviewer checklist.
 Use composite foreign key `(version_id, code_group_id) ->
 catalog_code_groups (version_id, id)` so an item cannot reference another
 version's taxonomy row.
@@ -936,12 +944,16 @@ Within one transaction:
 3. Lock and verify the singleton pointer still matches the draft base.
 4. Recheck request idempotency, expected lock version, catalog invariants, and
    approval requirements.
-5. Read active items in deterministic order.
-6. Build canonical dataset JSON using fixed keys and numeric formatting.
-7. Compute SHA-256 `dataset_hash` and `item_count`.
-8. Set publish metadata and status.
-9. Move the singleton pointer and synchronize legacy `is_default` flags.
-10. Append the publish change set.
+5. Reject P-18 add/supplement publication if any target draft `identity_id` is
+   absent from the base version rows.
+6. Reject incomplete structured-code publication if active legacy `ITEM-####`
+   rows exceed the recorded `ITEM-0139` exception.
+7. Read active items in deterministic order.
+8. Build canonical dataset JSON using fixed keys and numeric formatting.
+9. Compute SHA-256 `dataset_hash` and `item_count`.
+10. Set publish metadata and status.
+11. Move the singleton pointer and synchronize legacy `is_default` flags.
+12. Append the publish change set.
 
 #### Reason
 

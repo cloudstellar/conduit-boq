@@ -101,10 +101,15 @@ Start blocked:
 | P-10 runtime CI assets | CI implementation/deploy | Decision Register |
 | P-11 official export visual sample | Export acceptance | Decision Register |
 | P-12 to P-15 | Production migration/deploy/enable/publish | Decision Register |
+| P-18 add/supplement placement governance | Add/supplement publish readiness | Decision Register |
+| P-19 inactive/retired export policy | Publication/filing of any version with inactive rows | Decision Register |
 
 Rule: unresolved P-02 through P-11 does not block generic additive schema,
 parser, UI shell, tests, or local rehearsal. It blocks final candidate data
 freeze, approved backfill, export acceptance, and publication where applicable.
+Unresolved P-18 blocks publishing any version with add/supplement/new identity
+rows. Unresolved P-19 blocks official field-facing PDF filing for any version
+with inactive/retired rows.
 
 ## 4. Work package map
 
@@ -117,8 +122,9 @@ freeze, approved backfill, export acceptance, and publication where applicable.
 | WP-4 | Draft mutation, import, manual edit, history | Local app + DB | WP-1, WP-2, WP-3 | WP-5 |
 | WP-5 | Publish, pointer restore, and audit | Local app + DB | WP-4 | WP-6, WP-8 |
 | WP-6 | Official Excel/PDF export | Local app | WP-2, WP-5, P-11 for final visual | WP-8 |
-| WP-7 | BOQ regression preservation | Local app/tests | WP-0 | WP-8 |
-| WP-8 | Clean local rehearsal and verification report | Local reset | WP-1 to WP-7 | Production approval |
+| WP-6.5 | Publish-boundary guard hardening | Local app + DB/tests | WP-5, P-18 recorded, P-06 structured-code exception recorded | WP-7, WP-8 |
+| WP-7 | BOQ and Factor F regression preservation | Local app/tests | WP-0, WP-6.5 | WP-8 |
+| WP-8 | Clean local rehearsal and verification report | Local reset | WP-1 to WP-7, including WP-6.5 | Production approval |
 | WP-9 | Production migration/deploy/enable/publish | Production | P-12 to P-15 | Closeout |
 
 ## 5. WP-0 branch and evidence setup
@@ -367,9 +373,56 @@ Exit gate:
 - draft export cannot look official;
 - visual sample accepted by P-11 before Production publication.
 
-## 12. WP-7 BOQ regression preservation
+## 12. WP-6.5 publish-boundary guard hardening
+
+Goal: prevent draft-only add/supplement mechanics and incomplete structured
+coding from becoming accidental official publication paths.
+
+Boundary:
+
+- keep draft add/edit/import mechanics available for Local review;
+- do not build a reorder/placement UI in this slice;
+- do not renumber stable item codes or change identity history;
+- do not infer extra legacy-code exceptions beyond the explicit P-06 record;
+- do not expand hotfix `016` beyond regression evidence;
+- do not add any new Factor F workflow.
+
+Required behavior:
+
+| Scenario | Expected |
+|---|---|
+| Draft cloned from base with unchanged identities | Existing publish behavior still works |
+| Draft contains any `price_list.identity_id` absent from `based_on_version_id` | Publish rejects before pointer movement |
+| Rejected add/supplement publish | Returns safe code `P18_PLACEMENT_REVIEW_REQUIRED` |
+| Rejected add/supplement publish | No publication metadata, pointer, legacy `is_default`, BOQ, or Factor F state changes |
+| Structured-code candidate has active legacy `ITEM-####` rows other than the approved `ITEM-0139` exception | Publish rejects before pointer movement |
+| Structured-code exception check | Positive fixture with only `ITEM-0139` legacy exception passes; negative fixture with any other active legacy row fails |
+| UI/server action receives guard code | Shows safe operator-facing message and keeps draft reviewable |
+
+Implementation note: the guard must compare the target draft rows to the base
+version rows by `identity_id`; do not infer the condition only from
+`catalog_change_sets.change_type` because manual/import audit grouping is not
+the authority for publication safety. The structured-code guard must inspect
+published-candidate rows directly and assert the active legacy exception set,
+not merely expose `legacyActiveRows` in quality JSON.
+
+Exit gate:
+
+- migration/static contract tests cover the guard shape and error code;
+- local publish smoke proves add/supplement publish is rejected atomically;
+- local/static evidence proves the structured-code legacy exception is exactly
+  `ITEM-0139` for `2568.1.0`;
+- unchanged 710-row baseline publish/restore smoke still passes;
+- Verification Report publication section records WP-6.5 evidence.
+
+## 13. WP-7 BOQ and Factor F regression preservation
 
 Goal: prove Phase 4 did not disturb current BOQ behavior.
+
+Factor F is already completed outside Master Catalog Phase 4. WP-7 is
+regression-only: it proves current BOQ/Factor F behavior is preserved; it must
+not introduce a new Factor F workflow, move Factor F pointers, modify Factor F
+rows, reprice historical BOQs, or reopen hotfix `016` scope without approval.
 
 Required scenarios:
 
@@ -391,7 +444,7 @@ Exit gate:
 - BOQ create/edit/duplicate/print/export regression suite passes;
 - pre/post BOQ binding query shows zero unexpected mutations.
 
-## 13. WP-8 clean local rehearsal
+## 14. WP-8 clean local rehearsal
 
 Goal: prove the full plan works from a clean state.
 
@@ -405,7 +458,8 @@ Run order:
 5. Run DB/security tests.
 6. Run parser/hash tests.
 7. Run admin UI workflow tests.
-8. Run publish/export tests.
+8. Run publish/export tests, including the WP-6.5 P-18 and structured-code
+   rejection paths.
 9. Run BOQ regression tests.
 10. Run pointer restore rehearsal.
 11. Run `npm test`.
@@ -422,7 +476,7 @@ Exit gate:
 - Production approval P-12 can be requested after the readiness evidence below
   is reviewed.
 
-## 13.1 Production readiness review
+## 14.1 Production readiness review
 
 Goal: make sure the rollout is genuinely ready before any Production gate is
 requested.
@@ -438,6 +492,13 @@ current evidence for:
 - BOQ regression preservation, including price-list version links;
 - Factor F before/after assertions proving no pointer, row, hash, grant, RLS,
   or BOQ binding change;
+- WP-6.5 guard evidence showing add/supplement/new-identity publish is rejected
+  until placement governance is approved and structured-code legacy exceptions
+  are limited to the recorded `ITEM-0139` case;
+- P-19 inactive/retired row official export policy, if the candidate contains
+  any inactive/retired rows;
+- structured-code completeness evidence for the exact candidate, including the
+  approved temporary `ITEM-0139` exception and no other active legacy rows;
 - Supabase security/performance advisor results with no unresolved blocker;
 - feature flag disabled by default;
 - P-11 export preview/count/hash evidence;
@@ -452,12 +513,13 @@ Normal Production sequencing:
 
 Publication requires exact final `2568.1.0` metadata, approval reference,
 effective date, physical archive reference, final diff, item count, dataset
-hash, official Excel/PDF evidence, and owner approval.
+hash, official Excel/PDF evidence, P-18/P-19 evidence when applicable,
+structured-code completeness evidence, and owner approval.
 
 Do not request the next Production gate if any evidence is missing, stale,
 failed, ambiguous, or different from the reviewed plan.
 
-## 14. WP-9 Production execution
+## 15. WP-9 Production execution
 
 This package cannot start from this document alone. It requires P-12 through
 P-15, the Production Runbook, and a completed Verification Report from WP-8.
@@ -485,9 +547,13 @@ Hard stop:
 - any unapproved Production price/name/unit change;
 - any new/untriaged Supabase advisor finding from the Phase 4 change set;
 - export count/hash mismatch;
+- add/supplement/new-identity publish attempted before P-18 placement
+  governance or guard evidence is accepted;
+- inactive/retired-row official PDF filing attempted before P-19 policy is
+  approved;
 - backup restore not proven.
 
-## 15. Implementation file targets
+## 16. Implementation file targets
 
 These are expected targets, not a mandate to create all files if the local
 implementation finds a cleaner existing home.
@@ -506,7 +572,7 @@ implementation finds a cleaner existing home.
 Do not put raw workbook files, Production backups, secrets, or `/CI/` source
 assets into committed runtime paths.
 
-## 16. Minimum implementation review checklist
+## 17. Minimum implementation review checklist
 
 Before asking for code review:
 
@@ -518,6 +584,10 @@ Before asking for code review:
 - [ ] Privileged functions have narrow execute grants and safe `search_path`.
 - [ ] New foreign keys and hot filters are indexed or intentionally documented.
 - [ ] Published data is immutable.
+- [ ] WP-6.5 guard rejects add/supplement/new-identity publication until
+  placement governance is approved.
+- [ ] WP-6.5 guard enforces the structured-code legacy exception set before
+  publication.
 - [ ] Draft mutation and import are audited.
 - [ ] Manual and import workflows share validation and audit controls.
 - [ ] Canonical dataset hash excludes non-catalog data.
@@ -527,7 +597,7 @@ Before asking for code review:
 - [ ] Supabase advisor baseline is recorded and no new untriaged finding exists.
 - [ ] Verification Report is updated with evidence links/commands.
 
-## 17. What to do when blocked
+## 18. What to do when blocked
 
 | Blocker | Action |
 |---|---|
@@ -535,6 +605,8 @@ Before asking for code review:
 | P-08/P-09 missing | P-08 is currently approved in the Decision Register; if superseded or missing, continue local draft mechanics but do not validate publication-completeness. If P-09 is missing, continue local draft/publish mechanics but do not publish Production |
 | P-10 missing or superseded | Current Decision Register records P-10 approved limited runtime CI assets; if superseded or missing, use placeholder-safe local styling only and do not deploy CI assets |
 | P-11 missing | Build export mechanics; do not accept official export visual |
+| P-18 unresolved | Keep draft add/supplement review available, but block publication of versions with new identities until guard evidence and placement governance are accepted |
+| P-19 unresolved | Do not file a field-facing official PDF for versions with inactive/retired rows; publish only if owner explicitly approves the rendering/exclusion policy |
 | Advisor warning from pre-existing system | Add to advisor baseline with owner/remediation metadata |
 | New advisor warning from Phase 4 | Stop and fix or get explicit accepted-risk signoff |
 | Live BOQ count differs from closeout evidence | Expected drift; record fresh count and continue only if invariants hold |
@@ -542,7 +614,7 @@ Before asking for code review:
 | Workbook data conflicts with Production price | Preserve Production price unless separate price authority exists |
 | Candidate code conflict unresolved | Keep as candidate/rejected; do not publish |
 
-## 18. Final start decision
+## 19. Final start decision
 
 Recommended next action:
 

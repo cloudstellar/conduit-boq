@@ -71,6 +71,15 @@ Hotfix `016` is a production issue patch that runs before Master Catalog Phase
 4. Master Catalog Phase 4 database migrations start at `017+` after Phase 4
 rebases/merges this hotfix from `main`.
 
+WP-6.5 is planned before WP-7 to harden the local-only Phase 4 publish path:
+before any Production request, the draft `019` publish/pointer migration line
+must reject add/supplement/new-identity publication with
+`P18_PLACEMENT_REVIEW_REQUIRED` until P-18 placement governance is approved,
+and must enforce that the first structured-code candidate has no active legacy
+`ITEM-####` row except the approved `ITEM-0139` exception. This is not a new
+Production hotfix and must not be applied to Production without the normal
+Phase 4 P-12+ approvals.
+
 `010a_master_catalog_phase1a_indexes.sql` is an operational runbook rather than
 a transactional migration. Run its `CREATE INDEX CONCURRENTLY` statements one
 at a time outside an explicit transaction.

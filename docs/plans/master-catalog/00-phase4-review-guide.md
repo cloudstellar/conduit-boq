@@ -10,7 +10,8 @@
 - Factor F versioning: **เสร็จแล้วก่อน Phase 4; default ปัจจุบันคือ
   `2569.0.0` และ BOQ เก่าไม่ได้ถูก backfill**
 - Phase 4 Admin/Import/Publish/Official Export: **local implementation ถึง
-  WP-6 พร้อม owner review; WP-7/WP-8 และ Production gates ยังไม่เริ่ม**
+  WP-6 พร้อม owner review; WP-6.5 publish guard, WP-7/WP-8 และ Production
+  gates ยังไม่เริ่ม**
 - รอบถัดไปของ Phase 4: **เริ่มจาก baseline หลัง Factor F `012-015` และ
   production hotfix `016`; Phase 4 migrations คือ `017+`**
 - เอกสาร Phase 4 ต้องใช้ live preflight count เสมอ เพราะ BOQ ใหม่อาจเพิ่ม
@@ -74,6 +75,8 @@
 | Runtime font/logo derivative ใด commit/deploy ได้ | P-10 approved แบบจำกัด; ใช้เฉพาะ runtime derivatives ตาม Decision Register และ [Doc #24](./24-phase4-nt-ci-runtime-asset-analysis.md) |
 | Metadata จริงของ baseline `2568.0.0` | P-08 approved: effective `2026-01-01`; approval ref `เอ็นที วทฐฐ./405 ลงวันที่ 27 พ.ย. 2568`; publisher `ผู้จัดการฝ่ายท่อร้อยสาย (ทฐฐ.)` |
 | รูปแบบตัวอย่าง Excel/PDF ตาม Export Spec | ยังปิดงาน export acceptance ไม่ได้ |
+| P-18 placement governance สำหรับ add/supplement และ structured-code exception | ต้องทำ WP-6.5 publish-boundary guard ก่อน WP-7; ห้าม publish version ที่มี identity ใหม่จนกว่า guard และ placement decision พร้อม และ `2568.1.0` ต้องมี active legacy `ITEM-####` ได้เฉพาะ `ITEM-0139` |
+| P-19 PDF policy สำหรับรายการยกเลิกใช้ | ถ้า version ใดมี inactive/retired rows ต้องตัดสินใจว่าจะ exclude/mark/appendix ก่อน filed PDF |
 | Live Production preflight หลัง Factor F rollout | ต้อง refresh ก่อนทุก Production gate; ห้ามใช้ BOQ count จาก closeout เป็นค่าตายตัว |
 
 ## ตัวเลข reconciliation ที่ต้องใช้เป็นจุดตรวจ

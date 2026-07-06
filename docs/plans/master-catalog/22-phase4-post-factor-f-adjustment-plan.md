@@ -198,6 +198,9 @@ Application rules:
 - Catalog export must never query Factor F tables for dataset construction.
 - BOQ print/export may show Factor F version/snapshot labels, but that is a
   BOQ document concern, not a catalog export concern.
+- WP-7 is regression preservation only. It must not add a new Factor F admin
+  workflow, publish Factor F data, move Factor F pointers, or reopen hotfix
+  `016` scope without separate approval.
 
 ### 5.4 Phase 4C local rehearsal
 

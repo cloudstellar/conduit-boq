@@ -64,6 +64,9 @@ Use when one approved item must be added without replacing a workbook.
 6. Review the before/after preview and save.
 
 The item is not usable by ordinary users until the draft is published/current.
+Under P-18, any draft containing a newly added/supplement identity must remain
+unpublishable until placement governance is approved. The WP-6.5 guard should
+return `P18_PLACEMENT_REVIEW_REQUIRED` and keep the draft available for review.
 
 ## 5. Manual edit
 
@@ -169,9 +172,14 @@ Publication is high impact.
 3. Enter/confirm approval reference, approval document date, effective date,
    physical archive reference, and publish reason.
 4. Review final diff totals, item count, and warning acknowledgements.
-5. Confirm the version number and current base/pointer.
-6. Obtain explicit owner approval for this exact version.
-7. Type/confirm the version when prompted and publish once.
+5. Confirm no add/supplement/new identity rows are present unless P-18
+   placement governance and guard evidence are approved.
+6. Confirm the structured-code guard evidence shows no active legacy
+   `ITEM-####` row except the approved `ITEM-0139` exception for `2568.1.0`.
+7. If any inactive/retired rows are present, confirm P-19 official PDF policy.
+8. Confirm the version number and current base/pointer.
+9. Obtain explicit owner approval for this exact version.
+10. Type/confirm the version when prompted and publish once.
 
 If publication succeeds, the version is immutable and the pointer moves
 atomically. Do not attempt to edit it.

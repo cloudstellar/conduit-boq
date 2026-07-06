@@ -53,7 +53,8 @@ Read-only Production evidence relevant to disputed findings:
 | Public invoker/private definer wording differs from current functions | **Accepted as clarification, not architecture defect** | Section 7.1 is now labeled Phase 4 target. Current legacy functions remain out of scope; new catalog functions follow the safer private-definer boundary. |
 | Published immutability is not implemented today | **Accepted as clarification, not architecture defect** | Section 4.5 is now labeled post-Phase 4A target. The current-state section already said it was missing, but the new label prevents isolated quotation from being misleading. |
 | `merge_duplicate` has no audit semantics | **Accepted with a safer resolution** | Removed identity merge completely. Both published baseline rows keep distinct UUIDs; an erroneous duplicate is retired in a later version. This preserves unique constraints and historical BOQ lineage. |
-| `display_order` source is unclear | **Accepted** | Legacy order is the verified unique numeric suffix of `ITEM-####`; clones preserve it and new items append. Physical/workbook row order is prohibited. |
+| `display_order` source is unclear | **Accepted** | Legacy order is the verified unique numeric suffix of `ITEM-####`; clones preserve it and new items append for draft allocation only. Physical/workbook row order is prohibited. P-18/WP-6.5 now requires a publish guard before any add/supplement/new-identity version can become official. |
+| Structured-code exception could remain a checklist instead of a publish invariant | **Accepted** | WP-6.5 now includes a publish-boundary guard so the first structured-code version may keep only the approved active legacy `ITEM-0139` exception; any other active legacy `ITEM-####` row must block publication. |
 
 ## 4. Disposition of “should specify” findings
 
