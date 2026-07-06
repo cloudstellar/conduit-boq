@@ -57,6 +57,23 @@ describe('Master Catalog export data loader', () => {
     expect(calls.some((table) => table.includes('factor_'))).toBe(false);
   });
 
+  it('exports an older selected published version without following the current pointer', async () => {
+    const datasetHash = await hashCanonicalCatalogDatasetRows([CANONICAL_ROW]);
+    const client = createExportClient({
+      datasetHash,
+      currentDefaultVersionId: VERSION_ID,
+    });
+
+    const dataset = await loadCatalogExportDataset(client, BASE_VERSION_ID);
+
+    expect(dataset.version.id).toBe(BASE_VERSION_ID);
+    expect(dataset.version.versionString).toBe('2568.0.0');
+    expect(dataset.version.isCurrentDefault).toBe(false);
+    expect(dataset.canonicalDatasetHash).toBe(datasetHash);
+    expect(makeCatalogExportFilename(dataset, 'xlsx'))
+      .toBe('NT-Master-Catalog-v2568.0.0-20260622.xlsx');
+  });
+
   it('fails closed when published item_count does not match selected rows', async () => {
     const datasetHash = await hashCanonicalCatalogDatasetRows([CANONICAL_ROW]);
     const client = createExportClient({
@@ -104,10 +121,37 @@ describe('Master Catalog export data loader', () => {
         status: 403,
       });
   });
+
+  it('loads an active-admin draft as a marked non-official export', async () => {
+    const datasetHash = await hashCanonicalCatalogDatasetRows([CANONICAL_ROW]);
+    const client = createExportClient({
+      datasetHash,
+      featureFlag: true,
+      versionOverrides: {
+        status: 'draft',
+        dataset_hash: null,
+        item_count: null,
+        effective_date: null,
+        approval_reference: null,
+        approval_document_date: null,
+        published_at: null,
+        published_by_display_name: null,
+      },
+    });
+
+    const dataset = await loadCatalogExportDataset(client, VERSION_ID);
+
+    expect(dataset.isDraftExport).toBe(true);
+    expect(dataset.isOfficialPublishedExport).toBe(false);
+    expect(dataset.canonicalDatasetHash).toBe(datasetHash);
+    expect(makeCatalogExportFilename(dataset, 'pdf'))
+      .toMatch(/^DRAFT-NT-Master-Catalog-v2568\.1\.0-\d{8}\.pdf$/);
+  });
 });
 
 type ExportClientOptions = {
   canonicalRows?: CanonicalCatalogDatasetRow[];
+  currentDefaultVersionId?: string | null;
   datasetHash: string;
   featureFlag?: boolean;
   versionOverrides?: Record<string, unknown>;
@@ -210,7 +254,10 @@ function maybeSingle(
   }
 
   if (table === 'price_list_default_version') {
-    return { data: { version_id: VERSION_ID }, error: null };
+    return {
+      data: { version_id: options.currentDefaultVersionId ?? VERSION_ID },
+      error: null,
+    };
   }
 
   if (table === 'app_settings') {

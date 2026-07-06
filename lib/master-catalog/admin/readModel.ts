@@ -177,9 +177,10 @@ export function isActiveAdminProfile(profile: {
 
 export function shortHash(hash: string | null | undefined): string {
   if (!hash) return 'ยังไม่มี hash';
-  const normalized = hash.startsWith('sha256:') ? hash.slice('sha256:'.length) : hash;
-  if (normalized.length <= 16) return hash;
-  return `${normalized.slice(0, 12)}…${normalized.slice(-8)}`;
+  const prefix = hash.startsWith('sha256:') ? 'sha256:' : '';
+  const normalized = prefix ? hash.slice(prefix.length) : hash;
+  if (normalized.length <= 12) return hash;
+  return `${prefix}${normalized.slice(0, 12)}…`;
 }
 
 export function formatThaiDate(value: string | null | undefined): string {

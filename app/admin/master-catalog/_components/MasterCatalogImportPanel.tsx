@@ -550,6 +550,8 @@ function KeyValue({ label, value }: { label: string; value: string }) {
 }
 
 function shortHash(value: string): string {
-  if (value.length <= 16) return value;
-  return `${value.slice(0, 12)}…${value.slice(-8)}`;
+  const prefix = value.startsWith('sha256:') ? 'sha256:' : '';
+  const normalized = prefix ? value.slice(prefix.length) : value;
+  if (normalized.length <= 12) return value;
+  return `${prefix}${normalized.slice(0, 12)}…`;
 }

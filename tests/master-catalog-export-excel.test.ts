@@ -132,9 +132,23 @@ describe('Master Catalog official Excel export', () => {
       });
     });
   });
+
+  it('marks draft workbooks as non-official reference artifacts', async () => {
+    const dataset = await makeDataset({ draft: true });
+    const workbook = await loadWorkbook(await buildCatalogExportWorkbookBuffer(dataset));
+    const documentSheet = workbook.getWorksheet('ข้อมูลเอกสาร')!;
+    const priceSheet = workbook.getWorksheet('รายการราคา')!;
+    const documentValues = collectSheetValues(documentSheet);
+
+    expect(documentValues).toContain('DRAFT – ห้ามใช้อ้างอิง');
+    expect(documentValues).toContain('Draft dataset hash');
+    expect(documentValues).toContain('Draft dataset hash - not an official publication hash');
+    expect(priceSheet.getCell(1, 1).value)
+      .toBe(`DRAFT – ห้ามใช้อ้างอิง | ${CATALOG_EXPORT_DOCUMENT_TITLE}`);
+  });
 });
 
-async function makeDataset(): Promise<CatalogExportDataset> {
+async function makeDataset(options: { draft?: boolean } = {}): Promise<CatalogExportDataset> {
   const canonicalJson = canonicalizeCatalogDatasetRows(CANONICAL_ROWS);
   const canonicalDatasetHash = await hashCanonicalCatalogDatasetRows(CANONICAL_ROWS);
   const orderedRows = JSON.parse(canonicalJson) as CanonicalCatalogDatasetRow[];
@@ -167,18 +181,18 @@ async function makeDataset(): Promise<CatalogExportDataset> {
       id: '00000000-0000-4000-8000-000000000100',
       versionString: '2568.1.0',
       name: 'Phase 4 test catalog',
-      status: 'active',
-      isDefaultMirror: true,
-      isCurrentDefault: true,
+      status: options.draft ? 'draft' : 'active',
+      isDefaultMirror: !options.draft,
+      isCurrentDefault: !options.draft,
       basedOnVersionId: '00000000-0000-4000-8000-000000000099',
       basedOnVersionString: '2568.0.0',
-      effectiveDate: '2026-06-22',
-      approvalReference: 'TEST-APPROVAL',
-      approvalDocumentDate: '2026-06-21',
-      publishedAt: '2026-06-22T02:00:00.000Z',
-      publishedByDisplayName: 'Publisher',
-      datasetHash: canonicalDatasetHash,
-      itemCount: exportRows.length,
+      effectiveDate: options.draft ? null : '2026-06-22',
+      approvalReference: options.draft ? null : 'TEST-APPROVAL',
+      approvalDocumentDate: options.draft ? null : '2026-06-21',
+      publishedAt: options.draft ? null : '2026-06-22T02:00:00.000Z',
+      publishedByDisplayName: options.draft ? null : 'Publisher',
+      datasetHash: options.draft ? null : canonicalDatasetHash,
+      itemCount: options.draft ? null : exportRows.length,
       lockVersion: 1,
       createdAt: '2026-06-21T02:00:00.000Z',
       updatedAt: '2026-06-22T02:00:00.000Z',
@@ -231,8 +245,8 @@ async function makeDataset(): Promise<CatalogExportDataset> {
       inactiveRows: 1,
       dictionaryGroups: 1,
     },
-    isOfficialPublishedExport: true,
-    isDraftExport: false,
+    isOfficialPublishedExport: !options.draft,
+    isDraftExport: Boolean(options.draft),
   };
 }
 
@@ -248,6 +262,14 @@ async function loadWorkbook(buffer: Buffer): Promise<ExcelJS.Workbook> {
 
 function readRowValues(sheet: ExcelJS.Worksheet, rowIndex: number, columns: number): unknown[] {
   return Array.from({ length: columns }, (_, index) => sheet.getCell(rowIndex, index + 1).value);
+}
+
+function collectSheetValues(sheet: ExcelJS.Worksheet): unknown[] {
+  const values: unknown[] = [];
+  sheet.eachRow((row) => {
+    row.eachCell((cell) => values.push(cell.value));
+  });
+  return values;
 }
 
 function isFormulaOrHyperlink(value: ExcelJS.CellValue): boolean {

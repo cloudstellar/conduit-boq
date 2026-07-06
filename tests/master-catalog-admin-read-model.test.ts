@@ -118,9 +118,9 @@ describe('Master Catalog admin read model helpers', () => {
     expect(shortHash(null)).toBe('ยังไม่มี hash');
     expect(shortHash('abc123')).toBe('abc123');
     expect(shortHash('sha256:6e5bc5cd61b370a5988a4374758cd60b77a5dc1c22e04d81fd1520378c4b0fe0'))
-      .toBe('6e5bc5cd61b3…8c4b0fe0');
+      .toBe('sha256:6e5bc5cd61b3…');
     expect(shortHash('6e5bc5cd61b370a5988a4374758cd60b77a5dc1c22e04d81fd1520378c4b0fe0'))
-      .toBe('6e5bc5cd61b3…8c4b0fe0');
+      .toBe('6e5bc5cd61b3…');
   });
 
   it('formats nullable Thai numbers for admin metrics', () => {
