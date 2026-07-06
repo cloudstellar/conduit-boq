@@ -41,7 +41,9 @@ const WATERMARK_NOTICE_LINES = [
   '(สำหรับกิจการ บมจ.โทรคมนาคมแห่งชาติ เท่านั้น มิให้เผยแพร่ก่อนได้รับอนุญาต)',
 ];
 const WATERMARK_NOTICE_TEXT = WATERMARK_NOTICE_LINES.join('\n');
-const PRICE_PAGE_ROW_LIMIT = 35;
+// Keep print pages below the measured Chrome PDF overflow threshold because long
+// Thai item names wrap and can otherwise spill into sparse overflow pages.
+const PRICE_PAGE_ROW_LIMIT = 45;
 
 export default async function MasterCatalogPrintPage({
   params,
@@ -86,7 +88,7 @@ function PrintDocument({ dataset }: { dataset: CatalogExportDataset }) {
       <style>{`
 	        @page {
 	          size: A4 portrait;
-	          margin: 12mm 8mm 16mm;
+	          margin: 12mm 5mm 16mm;
 	          @bottom-left {
 	            content: "${cssString(CATALOG_EXPORT_DEPARTMENT_FOOTER)}";
 	            font-family: ${DOCUMENT_FONT_FAMILY};
@@ -158,7 +160,7 @@ function PrintDocument({ dataset }: { dataset: CatalogExportDataset }) {
 	          margin: 14px auto;
 	          overflow: hidden;
 	          background: white;
-	          padding: 12mm 8mm 16mm;
+	          padding: 12mm 5mm 16mm;
           box-shadow: 0 8px 24px rgba(15, 23, 42, 0.12);
         }
         .price-watermark {
@@ -240,17 +242,19 @@ function PrintDocument({ dataset }: { dataset: CatalogExportDataset }) {
           break-before: page;
         }
 	        table {
-	          width: 194mm;
+	          width: 198mm;
 	          max-width: 100%;
 	          margin: 0 auto;
 	          border-collapse: collapse;
 	          table-layout: fixed;
+          font-size: 10.2pt;
+          line-height: 1;
         }
         thead { display: table-header-group; }
         tfoot { display: table-footer-group; }
 	        th, td {
 	          border: 0.75pt solid #111827;
-	          padding: 1mm 0.95mm;
+	          padding: 0.55mm 0.65mm;
 	          vertical-align: top;
 	        }
         th {
@@ -259,10 +263,10 @@ function PrintDocument({ dataset }: { dataset: CatalogExportDataset }) {
           font-weight: 700;
           text-align: center;
         }
-	        .col-seq { width: 8mm; }
-	        .col-item { width: 117mm; }
-	        .col-unit { width: 14mm; }
-	        .col-money { width: 17.5mm; }
+	        .col-seq { width: 7.5mm; }
+	        .col-item { width: 124mm; }
+	        .col-unit { width: 12.5mm; }
+	        .col-money { width: 17mm; }
 	        .col-total { width: 20mm; }
         .repeat-doc-cell {
           border: 0;
@@ -299,7 +303,7 @@ function PrintDocument({ dataset }: { dataset: CatalogExportDataset }) {
 	          background: #fff1a8;
 	          border-top-width: 1.1pt;
 	          border-bottom-width: 1.1pt;
-	          font-size: 11.5pt;
+	          font-size: 10.4pt;
           line-height: 1.1;
           white-space: nowrap;
         }
@@ -312,7 +316,11 @@ function PrintDocument({ dataset }: { dataset: CatalogExportDataset }) {
         }
         .seq { text-align: center; }
         .unit { padding-left: 1.4mm; padding-right: 1.4mm; text-align: center; }
-	        .money { text-align: right; font-variant-numeric: tabular-nums; }
+	        .money {
+          font-size: 9.9pt;
+          text-align: right;
+          font-variant-numeric: tabular-nums;
+        }
 	        .item-name {
 	          width: auto;
 	          hyphens: none;
@@ -338,6 +346,7 @@ function PrintDocument({ dataset }: { dataset: CatalogExportDataset }) {
             box-shadow: none;
           }
           .price-section {
+            margin-top: 0;
             min-height: calc(297mm - 28mm);
             break-before: page;
           }
