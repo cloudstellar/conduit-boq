@@ -86,6 +86,12 @@ closeout, so every Phase 4 Production gate must use the live preflight table
 below as the source of truth for total BOQs, bound Factor F BOQs, and legacy
 snapshot states.
 
+Production hotfix `016_hotfix_preserve_boq_item_suffix.sql` was applied and
+merged into the Phase 4 branch on 2026-07-06 after PR #6 merged to `main`.
+Post-hotfix Phase 4 evidence must prove the clean Local path applies
+`009`-`015`, then hotfix `016`, then Phase 4 `017+`; pre-hotfix Local evidence
+is not sufficient for WP-7/WP-8 readiness.
+
 ## 5. Fresh Production preflight
 
 | Check | Expected | Actual | Timestamp/source | Result |
@@ -105,7 +111,7 @@ snapshot states.
 | Factor F pointer mutation plan | No Phase 4 step may change it |  |  | Pending |
 | Supabase advisor baseline | No new or untriaged Phase 4 security/performance finding |  |  | Pending |
 | Unexpected active admin activity | 0 |  |  | Pending |
-| Migration ledger drift | Latest includes Factor F `015`; no unexpected newer migration |  |  | Pending |
+| Migration ledger drift | Latest includes Factor F `015` and hotfix `016`; no unexpected newer migration |  |  | Pending |
 
 ## 6. Backup and restore
 
@@ -132,6 +138,7 @@ fixed and reviewed.
 | Repository/deployment fingerprint | Exact branch, commit, CI, and deploy artifact recorded |  | Pending |
 | Fresh Production preflight | Live counts, pointer, Factor F, BOQ split, and drift recorded |  | Pending |
 | Backup/restore gate | Fresh backup manifest and clean Local restore test pass |  | Pending |
+| Hotfix `016` / migration order | Remote ledger includes `016`; clean Local bootstrap applies `009`-`015`, hotfix `016`, then Phase 4 `017+` before WP-8 evidence is accepted |  | Pending |
 | BOQ regression | Current BOQ flows and historical version links unchanged |  | Pending |
 | Factor F before/after assertion | Pointer, rows, hashes, grants, RLS, and BOQ bindings unchanged |  | Pending |
 | Advisors | No unresolved Phase 4 blocker |  | Pending |
@@ -167,7 +174,7 @@ Approved dictionary fingerprint: `_______________________________`
 
 | Check | Expected | Actual/evidence | Result |
 |---|---|---|---|
-| Clean reset + migrations | Success |  | Pending |
+| Clean reset + migrations | Success, including `009`-`015`, hotfix `016`, and Phase 4 `017+` in order |  | Pending |
 | 710 identities/legacy code registrations | Exact |  | Pending |
 | Published baseline identity merges | 0 |  | Pending |
 | Category backfill | Approved count |  | Pending |
@@ -187,7 +194,7 @@ Approved dictionary fingerprint: `_______________________________`
 | Publish/restore advisory lock behavior | Serialized; no competing pointer mutation |  | Pending |
 | `boq.factor_reference_version_id` FK/index/immutability trigger | Preserved |  | Pending |
 | Factor F version tables/pointer/RLS/grants | Unchanged by Phase 4 migration |  | Pending |
-| `save_boq_with_routes` replacement, if any | Preserves price version and Factor F version contracts |  | Pending |
+| `save_boq_with_routes` replacement, if any | Preserves price version, Factor F version, and hotfix `016` BOQ item suffix contracts |  | Pending |
 
 ## 9. RLS and authorization matrix
 
@@ -291,6 +298,7 @@ Also verify:
 | Short dataset hash | Exactly `sha256:` + first 12 hex + `…`; full hash also present | Admin/export short-hash helper now preserves the `sha256:` prefix and emits only the first 12 hash hex characters plus `…` for dataset hashes, while full hashes remain on the version detail/export stamp and official Excel/PDF proof artifacts; covered by `tests/master-catalog-admin-read-model.test.ts` | Passed automated fixture |
 | Catalog export dataset/hash excludes Factor F rows | Confirmed | `tests/master-catalog-export-data.test.ts` verifies the selected-version export loader calls no BOQ or Factor F tables in the normal published export path | Passed automated fixture |
 | BOQ print/export regression | Catalog version and Factor F version/snapshot labels still correct |  | Pending |
+| BOQ item suffix preservation | Saving BOQ items preserves approved suffix labels such as `(Main Duct)` and `(Riser)` while catalog unit, price, and category remain authoritative |  | Pending WP-7 |
 
 Official export file/reference and binary SHA-256 (different from dataset hash):
 
@@ -308,6 +316,7 @@ Official export file/reference and binary SHA-256 (different from dataset hash):
 | BOQ list/search |  |  | Pending |
 | Create BOQ |  |  | Pending |
 | Edit/save BOQ |  |  | Pending |
+| BOQ item suffix preservation on save |  |  | Pending |
 | Duplicate Preserve |  |  | Pending |
 | Print “แบบ ปร.1” |  |  | Pending |
 | Existing BOQ export |  |  | Pending |

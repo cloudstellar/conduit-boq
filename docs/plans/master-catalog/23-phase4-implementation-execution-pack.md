@@ -11,8 +11,9 @@ enablement, and publication remain normal sequential owner decisions.
 recommendation for WP-0 through WP-8 only. Mandatory gates include disabled
 feature flag by default, BOQ regression preservation, Factor F before/after
 assertions, `save_boq_with_routes` contract/regression coverage inherited from
-the approved Post-Factor-F plan, live Production preflight before Production
-gates, and Decision Register authority for P-02 through P-11 data decisions.
+production hotfix `016` and the approved Post-Factor-F plan, live Production
+preflight before Production gates, and Decision Register authority for P-02
+through P-11 data decisions.
 This approval does not authorize WP-9, Production migration, deploy, feature
 enablement, catalog publication, or any Factor F write/pointer/backfill.
 
@@ -42,7 +43,7 @@ review before requesting P-12.
 Start allowed:
 
 - local branch/worktree work;
-- additive `017+` migration design;
+- additive `017+` migration design after production hotfix `016`;
 - local Supabase reset/rehearsal;
 - parser/canonical-hash implementation;
 - admin UI behind disabled feature flag;
@@ -137,7 +138,8 @@ Steps:
    - `supabase --version` if using CLI
 5. Record current Production read-only evidence using Supabase MCP or approved
    SQL:
-   - migration ledger latest includes Factor F `015`;
+   - migration ledger latest includes Factor F `015` and production hotfix
+     `016`;
    - `price_list` row count;
    - default catalog version;
    - Factor F default and active version row counts/hashes;
@@ -160,7 +162,7 @@ semantics.
 
 Migration expectations:
 
-- next root migration is logical `017+`;
+- next root migration is logical `017+` after hotfix `016`;
 - additive first, destructive never;
 - RLS enabled on every new public table;
 - explicit `REVOKE` and exact `GRANT`;
@@ -375,6 +377,7 @@ Required scenarios:
 |---|---|
 | New BOQ | binds current catalog pointer and current Factor F pointer |
 | Existing BOQ edit/save | preserves `price_list_version_id` and `factor_reference_version_id` |
+| BOQ item suffix save | preserves approved suffix labels such as `(Main Duct)` and `(Riser)` while catalog unit, price, and category stay authoritative |
 | Duplicate preserve | copies catalog version, Factor F version, item snapshots, and Factor F snapshots |
 | Copy to selected Factor F | creates new BOQ, resets Factor F snapshots, does not mutate original |
 | Version-bound print/export | reads bound Factor F version rows |
@@ -394,10 +397,11 @@ Goal: prove the full plan works from a clean state.
 
 Run order:
 
-1. Clean local reset from migrations.
+1. Clean local reset from the canonical bootstrap chain, including `009`-`015`,
+   production hotfix `016`, and Phase 4 `017+`.
 2. Load approved baseline fixture/snapshot.
 3. Record catalog count/hash and Factor F baseline.
-4. Apply Phase 4 `017+` migrations.
+4. Confirm Phase 4 `017+` migrations apply only after hotfix `016`.
 5. Run DB/security tests.
 6. Run parser/hash tests.
 7. Run admin UI workflow tests.

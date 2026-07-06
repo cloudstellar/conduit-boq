@@ -1603,9 +1603,10 @@ Do not advance when any gate fails:
   state, and legacy snapshot behavior are unchanged unless a separate Factor F
   CR explicitly authorizes the change.
 - Migration numbering follows actual execution order. Factor F used root
-  migrations `012`, `013`, `014`, and `015`; Master Catalog Phase 4 database
-  migrations start at `017+`. Do not create parallel migrations with the same
-  logical order.
+  migrations `012`, `013`, `014`, and `015`; production hotfix `016` preserves
+  approved BOQ item suffix labels in the save RPC; Master Catalog Phase 4
+  database migrations start at `017+`. Do not create parallel migrations with
+  the same logical order.
 - No paid Supabase branch or additional hosted project is created.
 - Compatibility columns are retained through the first stable Production cycle.
 - Local CI sources remain uncommitted; only approved runtime derivatives may be

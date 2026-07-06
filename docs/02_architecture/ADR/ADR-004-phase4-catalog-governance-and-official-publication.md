@@ -266,9 +266,11 @@ authorize Production execution.
 
 The immediate Factor F rollout completed before Master Catalog Phase 4. Root
 migrations `012` through `015` are applied, current Factor F default is
-`2569.0.0`, and legacy BOQs were not version-backfilled. Master Catalog Phase 4
-therefore proceeds on top of that completed Factor F baseline in a separate
-window. Factor F work is not part of Master Catalog Phase 4.
+`2569.0.0`, and legacy BOQs were not version-backfilled. Production hotfix
+`016` then preserved approved BOQ item suffix labels in the save RPC. Master
+Catalog Phase 4 therefore proceeds on top of that completed Factor F baseline
+and hotfix in a separate window. Factor F work is not part of Master Catalog
+Phase 4.
 
 ## References
 

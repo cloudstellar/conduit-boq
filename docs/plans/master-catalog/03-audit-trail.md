@@ -189,6 +189,7 @@
 | **v48** | **F0 approved: ADR-005 status changed to Accepted, CR approval gate recorded with F1/F2 foundation scope, F3 requires separate approval after baseline audit/diff/hash/owner review** | ✅ |
 | **v49** | **Owner approved no-maintenance Factor F rollout with legacy snapshot metadata repair: reserve FF `012`/`013`/`014`/`015` and move MC Phase 4 to `017+`** | ✅ |
 | **v50** | **Factor F Production rollout completed: `012`/`013`/`014`/`015` applied, default Factor F is `2569.0.0`, baseline `2566.0.0` remains active, legacy BOQs were not version-backfilled, partial legacy snapshots remaining = 0, and MC Phase 4 remains `017+`** | ✅ |
+| **v51** | **Production hotfix `016` applied to preserve approved BOQ item suffix labels; MC Phase 4 keeps `017+` numbering and Local bootstrap must apply `009`-`015`, hotfix `016`, then Phase 4 `017+`** | ✅ |
 
 ---
 
@@ -299,11 +300,11 @@ invalidation is required.
 | **[v30] PN6 count** | **ฐานปัจจุบันที่เอกสารอ้างอิงคือ 710 rows** | เดิม 682 + PN6 28; refresh ผ่าน authenticated SQL/MCP ก่อน execution window |
 | **[v31] Factor F approval gate** | **ตรวจทั้งตาราง ไม่ใช่แค่ 30M/40M** | Factor F ผิดแถวเดียวทำให้ BOQ ในช่วงค่างานนั้นผิดได้ จึงต้องใช้ full-table checksum และ row-level review ถ้า checksum เปลี่ยน |
 | **[v40] Factor F versioning track** | **ทำ Factor F เป็น reference version แยกจาก Master Catalog; seed current baseline สำหรับ BOQ ใหม่เท่านั้น ไม่ backfill BOQ เก่าแบบเดา** | เจ้าของต้องการปรับ Factor F ตอนนี้ จึงต้องมี F0-F3 gate ก่อนเปลี่ยน live factor values |
-| **[v44] Migration ordering** | **เลข migration ของ Factor F และ Master Catalog ต้องเดินตามลำดับ execution จริง** | v49 ยืนยันว่า Factor F ใช้ `012`/`013`/`014`/`015` และ Master Catalog Phase 4 เริ่ม `017+` |
+| **[v44] Migration ordering** | **เลข migration ของ Factor F, hotfix, และ Master Catalog ต้องเดินตามลำดับ execution จริง** | v49 ยืนยันว่า Factor F ใช้ `012`/`013`/`014`/`015`; v51 ยืนยันว่า hotfix `016` มาก่อน Master Catalog Phase 4 `017+` |
 | **[v45] New Factor F source** | **ใช้ `รวมในรูป Factor` จากตาราง 26 มิถุนายน 2569 เป็น `factor` และให้ Factor F track มาก่อน MC Phase 4** | รูปที่ owner ส่งมี 36 visible rows และไม่มี operation/profit/total_expense รายแถว จึงต้อง validate source/hash และห้ามเดาค่าที่ไม่มีในตาราง |
 | **[v46] Factor condition metadata** | **เก็บ advance payment, retention, loan interest, และ VAT เป็น version-level metadata** | print/export ปัจจุบัน hardcode ดอกเบี้ย 7% แต่ source 26 มิถุนายน 2569 ระบุ 6%; F1 ต้องอ่านจาก metadata |
 | **[v47] Owner F3 source confirmations** | **effective date/source reference ยืนยันแล้ว แต่ F3 ยังต้องรอ diff/hash approval** | เอกสารตัวจริงเก็บภายนอกโดย owner/NT และไม่ commit `files/` โดยปริยาย |
-| **[v48/v49] Production migration order** | **Factor F uses root migrations `012`/`013`/`014`/`015`; Master Catalog Phase 4 moves to `017+`** | Supabase MCP production ledger verified `011` as latest and owner approved legacy snapshot metadata repair as Factor F `015` |
+| **[v48/v49/v51] Production migration order** | **Factor F uses root migrations `012`/`013`/`014`/`015`; hotfix `016` follows; Master Catalog Phase 4 moves to `017+`** | Supabase MCP production ledger verified `011` before Factor F, owner approved legacy snapshot metadata repair as Factor F `015`, and hotfix `016` is now the required pre-Phase-4 link |
 | **[v32/v33] Version numbering** | **เริ่ม Master Catalog ที่ `2568.0.0`; อนาคตกำหนดปีเริ่มใช้งานได้ เช่น `2570.0.0`** | ใช้ปี พ.ศ. ที่ owner กำหนดให้เป็นปีเริ่มใช้งานเป็น segment แรก และใช้ revision/patch ตามหลัก SemVer-style; ไม่ใช้ 4-part key เพราะ schema และ convention ปัจจุบันคือ `major.minor.patch` |
 | **[v34] Item code governance** | **`item_code` เป็น identity ของรายการใน catalog version** | ห้ามใช้ `item_code` เป็นลำดับแสดงผลหรือ reuse ความหมายใหม่; การเพิ่ม/แก้/renumber หลัง active ต้องมี version bump และ audit/mapping ตามระดับผลกระทบ |
 | **[v35] Structured item codes** | **รองรับรหัสอนาคต เช่น `CIC-PVC-001`** | ใช้ได้เป็น approved taxonomy ของ catalog version ใหม่ แต่ต้องมี dictionary/validation และไม่ให้แอป parse string เป็น business logic โดยไม่มี metadata |

@@ -146,7 +146,11 @@ Migration numbering follows execution order. Factor F used:
 - `migrations/014_factor_f_publish_2569_0_0.sql`
 - `migrations/015_factor_f_repair_legacy_snapshot_metadata.sql`
 
-Master Catalog Phase 4 database migrations must therefore start at `017+`.
+Production hotfix `migrations/016_hotfix_preserve_boq_item_suffix.sql` was
+applied after the Factor F rollout to preserve approved BOQ item suffix labels
+while keeping catalog-backed unit, price, category, and version checks
+authoritative. Master Catalog Phase 4 database migrations must therefore start
+at `017+`.
 Closeout evidence is recorded in
 [docs/plans/factor-f/10-production-rollout-closeout.md](./plans/factor-f/10-production-rollout-closeout.md).
 

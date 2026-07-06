@@ -76,10 +76,12 @@ Stop immediately when any of these occurs:
 
 ## 5. Phase 4-0 — documentation and data decisions
 
-1. Confirm Factor F rollout closeout before scheduling any Master Catalog Phase
-   4 database migration. Factor F `012` through `015` completed on 2026-06-29;
-   current default Factor F is `2569.0.0`, legacy BOQs were not version
-   backfilled, and Master Catalog Phase 4 migrations must start at `017+`.
+1. Confirm Factor F rollout closeout and production hotfix `016` before
+   scheduling any Master Catalog Phase 4 database migration. Factor F `012`
+   through `015` completed on 2026-06-29; hotfix
+   `016_hotfix_preserve_boq_item_suffix.sql` completed on 2026-07-06; current
+   default Factor F is `2569.0.0`, legacy BOQs were not version backfilled, and
+   Master Catalog Phase 4 migrations must start at `017+`.
    Live BOQ counts may drift after the closeout; record current counts at every
    Production gate instead of reusing the closeout count.
 2. Record owner approval of ADR-004 and implementation/local-rehearsal CR gate.
@@ -125,8 +127,11 @@ major image at an incompatible existing data directory.
 
 ### 6.2 Rehearse additive migration
 
-1. Start from a clean Local reset/bootstrap.
-2. Apply reviewed Phase 4A migration(s) locally.
+1. Start from a clean Local reset/bootstrap that applies the root chain
+   `009`-`015`, production hotfix `016`, and the current Phase 4 scripts
+   `017`-`019`.
+2. If applying SQL manually for a focused rehearsal, apply hotfix `016` before
+   any reviewed Phase 4A migration(s).
 3. Verify all new tables, constraints, indexes, grants, RLS policies, functions,
    and triggers.
 4. Confirm explicit Data API grants for required roles; new Supabase tables may
@@ -181,6 +186,8 @@ Before requesting P-12, record:
 - WP-8 verification report evidence for clean Local reset and full workflow;
 - current branch/commit, migration filename, migration SHA-256, and deployment
   artifact fingerprint;
+- hotfix `016` evidence in the remote ledger and clean Local bootstrap path
+  before any Phase 4 `017+` evidence is accepted;
 - fresh read-only Production baseline and schema drift result;
 - fresh logical backup manifest plus restore-test evidence;
 - BOQ regression evidence, including price-list version links and Factor F

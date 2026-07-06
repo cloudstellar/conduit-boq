@@ -19,12 +19,13 @@ local admin, exercises create/save/duplicate version and category contracts,
 and removes every BOQ, route, and item that it creates.
 
 Run `npm run db:local:bootstrap` only when the local database should be rebuilt
-from the captured production snapshot. It resets the local database, restores
-business data and scrubbed auth metadata, applies Master Catalog migrations
-`009`, `010`, `010a`, and `011`, seeds local-only role accounts, then runs auth
-and Master Catalog workflow smoke tests. The canonical rebuild includes `011`
-because the Phase 2 application and rendered Local UI were verified on
-2026-06-21.
+from the captured production snapshot. This is destructive for the Local
+Supabase database: it resets the local stack, restores business data and
+scrubbed auth metadata, applies the canonical root chain `009` through `015`,
+production hotfix `016`, and the current Phase 4 local scripts `017` through
+`019`, seeds local-only role accounts, then runs auth and Master Catalog
+workflow smoke tests. Get owner approval before using this command as evidence
+when preserving existing Local state matters.
 
 ```bash
 npm run db:local:bootstrap
@@ -61,8 +62,11 @@ Do not run `supabase link`, `supabase db push`, `supabase db pull`, or
 The canonical Local rebuild is `npm run db:local:bootstrap`. The schema-only
 snapshot is stored at `supabase/local/production-baseline.sql`, outside the
 Supabase CLI migration directory, so `db push` cannot treat it as a Production
-migration. Master Catalog scripts `009`, `010`, the four `010a` index
-statements, and `011` are also applied explicitly by the bootstrap script.
+migration. The bootstrap script applies the explicit root sequence `009` through
+`015`, then production hotfix `016_hotfix_preserve_boq_item_suffix.sql`, then
+the current Phase 4 scripts `017_master_catalog_phase4_foundation.sql`,
+`018_master_catalog_phase4_draft_mutation.sql`, and
+`019_master_catalog_phase4_publish_pointer.sql`.
 Consequently, `supabase db diff --local` will show the rehearsed schema as drift
 from an empty CLI migration ledger. Do not generate a new migration from that
 expected diff.

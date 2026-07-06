@@ -6,11 +6,13 @@ migration approval remain separate gates
 
 **Prepared:** 2026-06-22
 
-**Last updated:** 2026-06-29 after completed Factor F rollout
+**Last updated:** 2026-07-06 after production hotfix `016` was merged into the
+Phase 4 migration chain
 
 **Owner decision recorded:** 2026-07-04 — approved according to the
 recommendation as the technical backbone for Phase 4A and every Phase 4 write
-path. The owner accepts the additive `017+` migration contract, explicit
+path. The owner accepts the additive `017+` migration contract after production
+hotfix `016`, explicit
 grants/RLS, private `SECURITY DEFINER` boundary, direct-write revocation,
 publish/restore lock order, Factor F/BOQ immutability boundary, required local
 DB/security/advisor verification, and forward-fix-only migration recovery. This
@@ -44,7 +46,9 @@ This document does not authorize a Production migration.
 Supabase MCP verified Production on 2026-06-29 after Factor F rollout: root
 migrations `012`, `013`, `014`, and `015` were applied for Factor F, current
 default Factor F is `2569.0.0`, and legacy BOQs were not version-backfilled.
-Master Catalog Phase 4 database migrations start at `017+`.
+Production hotfix `016` was then applied on 2026-07-06 to preserve approved BOQ
+item suffix labels in `save_boq_with_routes`. Master Catalog Phase 4 database
+migrations start at `017+`.
 
 ## 2. Verified Production baseline
 
@@ -76,7 +80,8 @@ Current Factor F version tables remain separate reference data outside
 contract. Factor F work is outside the Master Catalog Phase 4 approval path.
 
 Phase 4 implementation must treat the Factor F rollout as existing Production
-state. Migration `017+` may depend on the presence of
+state and hotfix `016` as an already-applied BOQ save contract. Migration
+`017+` may depend on the presence of
 `boq.factor_reference_version_id`, but must not change its values, drop its
 foreign key/index, disable its immutability trigger, or repoint
 `factor_reference_default_version`.
@@ -156,6 +161,9 @@ Rules:
   `boq.factor_reference_version_id`, keep the bound version immutable, save
   snapshot fields only from the BOQ's bound version, and fail closed for legacy
   BOQs that have no usable snapshot.
+- It must also preserve the hotfix `016` BOQ item-label contract: approved item
+  suffix labels such as `(Main Duct)` and `(Riser)` remain on saved BOQ items,
+  while catalog-backed unit, price, and category values remain authoritative.
 - New BOQ creation must bind both independent references: the current price
   catalog pointer and the current Factor F pointer. These bindings are not
   derived from each other.

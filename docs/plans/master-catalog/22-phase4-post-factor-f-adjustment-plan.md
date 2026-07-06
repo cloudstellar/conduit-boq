@@ -88,7 +88,7 @@ Keep:
 
 Adjust:
 
-- migration order starts at `017+`;
+- after production hotfix `016`, Phase 4 migration order starts at `017+`;
 - every preflight includes Factor F pointer/version/snapshot checks;
 - every BOQ regression proves both version axes are preserved;
 - catalog dataset hash/export excludes Factor F rows and metadata;
@@ -99,7 +99,7 @@ Adjust:
 
 | Plan area | Previous assumption | Adjusted plan |
 |---|---|---|
-| Migration numbering | Phase 4 could follow `011` directly | Phase 4 database files start at `017+` after Factor F `012-015`. |
+| Migration numbering | Phase 4 could follow `011` directly | Production hotfix `016` occupies the pre-Phase-4 slot; Phase 4 database files start at `017+` after Factor F `012-015` and hotfix `016`. |
 | Production baseline | Catalog-only baseline was enough | Baseline must record catalog state plus Factor F default, active factor versions, row hashes, BOQ binding split, and legacy snapshot states. |
 | New BOQ creation | Bind current catalog version | Bind current catalog version and current Factor F version independently. |
 | BOQ duplicate | Preserve catalog version and item snapshots | Preserve catalog version, Factor F version, and Factor F snapshots. |
@@ -119,8 +119,10 @@ Required work:
 
 - Confirm owner approval for P-01 still applies after Factor F completion.
 - Treat this plan as a companion to Revision 8, not as a replacement.
-- Freeze the exact expected migration order: next Master Catalog migration is
-  `016`.
+- Confirm production hotfix `016_hotfix_preserve_boq_item_suffix.sql` is
+  applied and merged into the Phase 4 branch before any clean Local rehearsal.
+- Freeze the exact expected migration order: hotfix `016` is the pre-Phase-4
+  slot, and Master Catalog Phase 4 migrations start at `017+`.
 - Refresh local docs to say Factor F rollout is complete and not bundled into
   Phase 4.
 - Confirm the Master Catalog Production window contains no Factor F work.
@@ -128,7 +130,7 @@ Required work:
 
 Exit criteria:
 
-- Latest Production ledger includes Factor F `015`.
+- Latest Production ledger includes Factor F `015` and production hotfix `016`.
 - Current Factor F default is recorded.
 - Active Factor F versions and dataset hashes are recorded.
 - BOQ Factor F binding split is recorded.
@@ -205,7 +207,7 @@ workflow.
 Rehearsal path:
 
 1. Restore refreshed Production data locally.
-2. Apply Phase 4 `017+` migrations.
+2. Apply production hotfix `016`, then Phase 4 `017+` migrations.
 3. Record before/after catalog counts.
 4. Record before/after Factor F pointer, active versions, row counts, and
    hashes.

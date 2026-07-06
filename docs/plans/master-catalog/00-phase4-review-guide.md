@@ -9,9 +9,10 @@
 - Current Master Catalog: **`2568.0.0`, 710 รายการ**
 - Factor F versioning: **เสร็จแล้วก่อน Phase 4; default ปัจจุบันคือ
   `2569.0.0` และ BOQ เก่าไม่ได้ถูก backfill**
-- Phase 4 Admin/Import/Publish/Official Export: **ยังไม่เริ่ม implement**
+- Phase 4 Admin/Import/Publish/Official Export: **local implementation ถึง
+  WP-6 พร้อม owner review; WP-7/WP-8 และ Production gates ยังไม่เริ่ม**
 - รอบถัดไปของ Phase 4: **เริ่มจาก baseline หลัง Factor F `012-015` และ
-  migration ถัดไปคือ `017+`**
+  production hotfix `016`; Phase 4 migrations คือ `017+`**
 - เอกสาร Phase 4 ต้องใช้ live preflight count เสมอ เพราะ BOQ ใหม่อาจเพิ่ม
   ระหว่างรอ implement
 

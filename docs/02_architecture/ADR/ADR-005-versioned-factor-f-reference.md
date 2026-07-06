@@ -116,7 +116,9 @@ not share a silent combined window with Master Catalog publication.
 The 2026-06-29 Production rollout completed this sequence for the first
 versioned Factor F change: `2566.0.0` remains the active historical baseline,
 `2569.0.0` is the current default, legacy BOQs were not version-backfilled, and
-Master Catalog Phase 4 migration numbering starts at `017+`. See
+production hotfix `016` later preserved approved BOQ item suffix labels without
+changing Factor F publication state. Master Catalog Phase 4 migration numbering
+starts at `017+`. See
 [Factor F Production Rollout Closeout](../../plans/factor-f/10-production-rollout-closeout.md).
 
 ## Consequences
