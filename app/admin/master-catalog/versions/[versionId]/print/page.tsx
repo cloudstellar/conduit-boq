@@ -3,9 +3,8 @@ import { redirect } from 'next/navigation';
 import localFont from 'next/font/local';
 import { createClient } from '@/lib/supabase/server';
 import {
-  CATALOG_EXPORT_APP_NAME,
+  CATALOG_EXPORT_DOCUMENT_TITLE,
   CATALOG_EXPORT_DEPARTMENT_FOOTER,
-  CATALOG_EXPORT_SPEC_REVISION,
   CatalogExportError,
   loadCatalogExportDataset,
   makeCatalogExportDocumentTitle,
@@ -13,6 +12,12 @@ import {
   type CatalogExportDataset,
   type CatalogExportRow,
 } from '@/lib/master-catalog/export/data';
+import {
+  buildFieldFacingPdfStamp,
+  getFieldFacingPdfStatus,
+  getNonCurrentPdfNotice,
+  makeFieldFacingPdfYearLabel,
+} from '@/lib/master-catalog/export/pdfPresentation';
 import { MasterCatalogPrintToolbar } from './PrintToolbar';
 
 export const dynamic = 'force-dynamic';
@@ -73,15 +78,23 @@ export default async function MasterCatalogPrintPage({
 function PrintDocument({ dataset }: { dataset: CatalogExportDataset }) {
   const pricePages = paginatePriceRows(dataset.rows);
   const filename = makeCatalogExportFilename(dataset, 'pdf');
-  const statusText = dataset.isDraftExport
-    ? 'Draft'
-    : dataset.version.status === 'archived'
-      ? 'Archived'
-      : 'Published';
+  const statusText = getFieldFacingPdfStatus(dataset.version.status);
+  const nonCurrentNotice = getNonCurrentPdfNotice(
+    dataset.isDraftExport,
+    dataset.version.isCurrentDefault,
+  );
+  const stampRows = buildFieldFacingPdfStamp({
+    versionString: dataset.version.versionString,
+    statusText,
+    effectiveDate: displayDateWithIso(dataset.version.effectiveDate),
+    itemCount: dataset.counts.rowCount,
+    canonicalDatasetHash: dataset.canonicalDatasetHash,
+  });
   const footerRight = dataset.isDraftExport
     ? `v${dataset.version.versionString} | Draft`
     : `v${dataset.version.versionString} | ${formatThaiDate(dataset.version.effectiveDate)}`;
   const priceListTitle = makeCatalogExportDocumentTitle(dataset.version.versionString);
+  const coverYearLabel = makeFieldFacingPdfYearLabel(dataset.version.versionString);
 
   return (
     <main className={`${ntDocumentFont.className} print-root`}>
@@ -179,30 +192,48 @@ function PrintDocument({ dataset }: { dataset: CatalogExportDataset }) {
           white-space: pre;
         }
         .content { position: relative; z-index: 1; }
+        .cover-content {
+          min-height: 245mm;
+          display: flex;
+          flex-direction: column;
+          justify-content: flex-start;
+          padding-top: 22mm;
+        }
         .doc-header {
           display: flex;
           flex-direction: column;
           align-items: center;
-          gap: 4mm;
+          gap: 6mm;
           text-align: center;
           border-bottom: 3px solid #ffd100;
           padding-bottom: 8mm;
         }
+        .cover-content .doc-header {
+          width: 176mm;
+          max-width: 100%;
+          align-self: center;
+        }
         .doc-logo {
           display: block;
-          width: 56mm;
+          width: 64mm;
           height: auto;
+        }
+        .cover-title-block {
+          display: flex;
+          flex-direction: column;
+          gap: 2mm;
         }
         h1 {
           margin: 0;
-          font-size: 20pt;
+          font-size: 18pt;
           font-weight: 700;
           line-height: 1.1;
         }
-        .subtitle {
-          margin-top: 3px;
-          color: #52525b;
-          font-size: 13pt;
+        .cover-year {
+          color: #111827;
+          font-size: 18pt;
+          font-weight: 700;
+          line-height: 1.1;
         }
         .draft-banner {
           margin-top: 8px;
@@ -213,11 +244,23 @@ function PrintDocument({ dataset }: { dataset: CatalogExportDataset }) {
           text-align: center;
           font-weight: 700;
         }
+        .non-current-banner {
+          margin-top: 8px;
+          border: 1px solid #fcd34d;
+          background: #fffbeb;
+          color: #92400e;
+          padding: 6px 8px;
+          text-align: center;
+          font-weight: 700;
+        }
         .stamp-grid {
           display: grid;
           grid-template-columns: 36mm minmax(0, 1fr);
           gap: 0;
-          margin-top: 10px;
+          width: 176mm;
+          max-width: 100%;
+          align-self: center;
+          margin: 10mm auto 0;
           border: 1px solid #d4d4d8;
           border-bottom: 0;
         }
@@ -355,37 +398,28 @@ function PrintDocument({ dataset }: { dataset: CatalogExportDataset }) {
       `}</style>
       <MasterCatalogPrintToolbar filename={filename} versionId={dataset.version.id} />
       <article className="sheet">
-        <div className="content">
+        <div className="content cover-content">
           <header className="doc-header">
             <img
               src="/brand/nt/nt-logo-company-lockup.png"
               alt="NT"
               className="doc-logo"
             />
-            <div>
-              <h1>{priceListTitle}</h1>
-              <div className="subtitle">
-                v{dataset.version.versionString} | {statusText} | Current Default:{' '}
-                {dataset.version.isCurrentDefault ? 'Yes' : 'No'}
-              </div>
+            <div className="cover-title-block">
+              <h1>{CATALOG_EXPORT_DOCUMENT_TITLE}</h1>
+              <div className="cover-year">{coverYearLabel}</div>
             </div>
           </header>
           {dataset.isDraftExport ? (
             <div className="draft-banner">DRAFT – ห้ามใช้อ้างอิง</div>
           ) : null}
+          {nonCurrentNotice ? (
+            <div className="non-current-banner">{nonCurrentNotice}</div>
+          ) : null}
           <section className="stamp-grid" aria-label="Official document summary">
-            <StampRow label="หน่วยงาน" value="บริษัท โทรคมนาคมแห่งชาติ จำกัด (มหาชน)" />
-            <StampRow label="เวอร์ชัน" value={dataset.version.versionString} />
-            <StampRow label="สถานะ" value={statusText} />
-            <StampRow label="Current Default" value={dataset.version.isCurrentDefault ? 'Yes' : 'No'} />
-            <StampRow label="วันที่มีผล" value={displayDateWithIso(dataset.version.effectiveDate)} />
-            <StampRow label="เลขที่อนุมัติ" value={dataset.version.approvalReference ?? '-'} />
-            <StampRow label="วันที่เอกสารอนุมัติ" value={displayDateWithIso(dataset.version.approvalDocumentDate)} />
-            <StampRow label="เห็นชอบโดย" value={dataset.version.publishedByDisplayName ?? '-'} />
-            <StampRow label="Exported at/by" value={`${formatThaiDateTime(dataset.exportedAtIso)} / ${dataset.exportedBy.displayName}`} />
-            <StampRow label="จำนวนรายการ" value={dataset.counts.rowCount.toLocaleString('th-TH')} />
-            <StampRow label="Dataset SHA-256" value={dataset.canonicalDatasetHash} hash />
-            <StampRow label="Generated by" value={`${CATALOG_EXPORT_APP_NAME} | ${CATALOG_EXPORT_SPEC_REVISION}`} />
+            {stampRows.map((row) => (
+              <StampRow key={row.label} {...row} />
+            ))}
           </section>
         </div>
       </article>
@@ -629,18 +663,6 @@ function formatThaiDate(value: string | null): string {
     month: 'short',
     day: 'numeric',
   }).format(new Date(`${value.slice(0, 10)}T00:00:00+07:00`));
-}
-
-function formatThaiDateTime(value: string | null): string {
-  if (!value) return '-';
-  return new Intl.DateTimeFormat('th-TH', {
-    timeZone: 'Asia/Bangkok',
-    year: 'numeric',
-    month: 'short',
-    day: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit',
-  }).format(new Date(value));
 }
 
 function formatMoney(value: number): string {

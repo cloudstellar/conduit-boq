@@ -18,7 +18,11 @@ export const CATALOG_EXPORT_APP_NAME = 'Conduit BOQ';
 export const CATALOG_EXPORT_ICT_TIME_ZONE = 'Asia/Bangkok';
 
 export function makeCatalogExportDocumentTitle(versionString: string): string {
-  return `${CATALOG_EXPORT_DOCUMENT_TITLE} ประจำปี ${catalogYearFromVersion(versionString)}`;
+  return `${CATALOG_EXPORT_DOCUMENT_TITLE} ${makeCatalogExportYearLabel(versionString)}`;
+}
+
+export function makeCatalogExportYearLabel(versionString: string): string {
+  return `ประจำปี ${catalogYearFromVersion(versionString)}`;
 }
 
 export type CatalogExportVersionStatus = 'draft' | 'active' | 'archived';

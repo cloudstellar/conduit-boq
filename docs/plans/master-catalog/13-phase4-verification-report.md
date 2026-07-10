@@ -294,9 +294,11 @@ Also verify:
 | Older-version export | Uses selected version | `tests/master-catalog-export-data.test.ts` now covers requesting an older selected published version while the current pointer remains on another version; the loader keeps `version.id`, `versionString`, count/hash, Current Default status, and filename tied to the explicit selected version | Passed automated fixture |
 | Draft export status mark | `DRAFT – ห้ามใช้อ้างอิง` | `tests/master-catalog-export-data.test.ts` covers active-admin draft export as non-official with a `DRAFT-` filename; `tests/master-catalog-export-excel.test.ts` verifies the workbook document sheet and price sheet include `DRAFT – ห้ามใช้อ้างอิง` plus non-official draft hash wording | Passed automated fixture |
 | PDF price-disclaimer watermark | Matches approved three-line wording and style from `files/รายการบัญชีราคามาตรฐานงานก่อสร้างท่อร้อยสาย 2568.pdf`: `รายการบัญชีราคานี้ไม่ใช่ราคาก่อสร้างที่แท้จริงหรือถูกต้องตรงกับราคาก่อสร้าง`; `แต่เป็นเพียงราคาโดยประมาณซึ่งใกล้เคียงกับราคาก่อสร้างจริงเท่านั้น`; `(สำหรับกิจการ บมจ.โทรคมนาคมแห่งชาติ เท่านั้น มิให้เผยแพร่ก่อนได้รับอนุญาต)` | Latest live-route PDF was regenerated after owner review. Cover page has no watermark. Price pages use one per-page three-line red overlay watermark above the table with reduced opacity; rendered pages 15, 18, and 19 show the watermark visible without the previous fixed-position bleed or repeating-background artifact | Passed Local visual artifact proof; final owner acceptance pending |
-| Published stamp | Version/effective date/approved-by snapshot/count/hash | Browser/PDF proof confirmed Local `2568.0.0` cover includes version, Published status, Current Default, effective date, approval ref/date, `เห็นชอบโดย`, exported at/by, count, and full hash | Passed Local artifact proof; final owner acceptance pending |
+| Published stamp | Field-facing PDF cover shows organization, `ฉบับบัญชีราคา`, Thai status, effective date, item count, and full hash. It excludes Current Default, approval reference/date, approved-by/publisher, exported at/by, generated-by, and export-spec fields; a non-current published version instead shows a Thai retrospective-reference warning. | Fresh Local route/PDF proof on 2026-07-11 confirmed only retained fields appear; count/hash/order/watermark checks passed. | Passed Local review; final owner/file acceptance pending |
+| PDF cover layout refinement | Larger top-centered NT company lockup, document title, and a distinct `ประจำปี 2568` line of the same title size and weight; a separate centered upper-middle metadata table contains only `ฉบับบัญชีราคา`, Thai status, effective date, item count, and full hash. No duplicate company/status text appears in the header. | Fresh Local `2568.0.0` route/PDF proof passed after the final terminology/title refinement: 19 pages/18 price sections, 710 DOM/PDF rows, sequence 1-710 with no breaks, full hash, watermark, and no page-clipping regression. The unfiled Local review PDF binary SHA-256 is `05b7d71b9076daa9374405a8104fec2fb2503d04f0a7db0ba31fb6f87f83553c`. | Passed Local visual proof; final owner/file acceptance pending |
 | Excel numeric cell types | Numeric, formatted | `tests/master-catalog-export-excel.test.ts` confirms price cost cells are numeric and formatted `#,##0.00` | Passed automated fixture |
 | Excel exact 5 sheets/headers; no formulas/external links | Exact | `tests/master-catalog-export-excel.test.ts` confirms exact five sheets/order, business headers, verification headers, and no formula/hyperlink cell values | Passed automated fixture |
+| Excel document-language alignment | Thai title/year lines of equal size and Thai user-facing metadata labels; canonical verification identifiers unchanged | Fresh Local workbook visual review confirmed `ข้อมูลเอกสาร` and `รายการราคา` show the title and `ประจำปี 2568` as separate equal-size lines, `ฉบับบัญชีราคา` is used on all user-facing summary sheets, and `ข้อมูลตรวจสอบ` retains canonical identifiers. Excel binary SHA-256 is `e58dc3d9b1472665dbfaf692a238e504321f75f0f86b66a277a69dcbb0ea7df3`. | Passed Local visual proof; final owner/file acceptance pending |
 | Formula-control text safety | Malicious strings remain inert text | `tests/master-catalog-export-excel.test.ts` covers formula-looking item text and confirms no formula/hyperlink cell values | Passed automated fixture |
 | PDF Thai font/header/page/clipping | Correct | Latest live-route PDF metadata shows A4, 19 pages, no form/JavaScript/encryption. PDF resource inspection shows embedded/subset `/NTRegular`, `/NTBold`, and `/Menlo-Regular`. Rendered pages 1, 15, 18, and 19 show the NT company lockup, field-facing title `รายการบัญชีราคามาตรฐานงานก่อสร้างท่อร้อยสายสื่อสารใต้ดิน ประจำปี 2568`, repeated table header, Thai table/footer text, `หน้า 1/19`, `หน้า 15/19`, `หน้า 18/19`, `หน้า 19/19`, no Chrome default header, no right-edge table clipping, row 527 on one line, dense middle pages, and acceptable natural whitespace on the final page | Passed Local visual artifact proof; final owner/CI acceptance pending |
 | Short dataset hash | Exactly `sha256:` + first 12 hex + `…`; full hash also present | Admin/export short-hash helper now preserves the `sha256:` prefix and emits only the first 12 hash hex characters plus `…` for dataset hashes, while full hashes remain on the version detail/export stamp and official Excel/PDF proof artifacts; covered by `tests/master-catalog-admin-read-model.test.ts` | Passed automated fixture |
@@ -305,6 +307,11 @@ Also verify:
 | BOQ item suffix preservation | Saving BOQ items preserves approved suffix labels such as `(Main Duct)` and `(Riser)` while catalog unit, price, and category remain authoritative |  | Pending WP-7 |
 
 Official export file/reference and binary SHA-256 (different from dataset hash):
+
+The following retained file hashes describe the pre-2026-07-10 PDF metadata
+layout and must not be used as the final P-11 acceptance artifact. Regenerate
+and file the selected final Excel/PDF pair after owner visual acceptance of the
+refined PDF cover.
 
 - Excel: `output/master-catalog/wp6-artifact-proof/NT-Master-Catalog-v2568.0.0-20260101.xlsx`
 - Excel binary SHA-256: `1d1f1bc80982feaed231cb1e2c388b4f08fa81d2eb2b31a0b75ddf8d1a5131d9`
@@ -340,10 +347,10 @@ request approves them.
 
 | Gate | Expected | Actual | Result |
 |---|---|---|---|
-| `npm test` | Exit 0 | 2026-07-06 16:44 +07: 18 files / 96 tests passed | Passed |
+| `npm test` | Exit 0 | 2026-07-11 01:00 +07: 19 files / 100 tests passed after the final PDF/Excel title and terminology alignment | Passed |
 | `npx tsc --noEmit --pretty false` | Exit 0 | 2026-07-06 16:44 +07: passed | Passed |
 | `npm run lint` | Exit 0 | 2026-07-06 16:44 +07: exit 0 with 10 existing warnings after excluding generated `tmp/`, `output/`, `files/`, `CI/`, and nested `node_modules` artifacts from lint scope | Passed with existing warnings |
-| `npm run build` | Exit 0 | 2026-07-06 16:45 +07: sandbox build failed only on blocked Google Fonts fetch; escalated build passed, including `/admin/master-catalog/versions/[versionId]/print` and `/api/master-catalog/export/excel/[versionId]` | Passed |
+| `npm run build` | Exit 0 | 2026-07-11 01:01 +07: escalated build passed, including `/admin/master-catalog/versions/[versionId]/print` and `/api/master-catalog/export/excel/[versionId]` | Passed |
 | `npm run audit:prod` | No unaccepted Production vulnerability |  | Pending |
 | Security advisor | No new blocker |  | Pending |
 | Performance advisor | No rollout blocker |  | Pending |

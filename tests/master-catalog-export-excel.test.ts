@@ -3,6 +3,7 @@ import { describe, expect, it } from 'vitest';
 import { buildCatalogExportWorkbookBuffer } from '../lib/master-catalog/export/excel';
 import {
   CATALOG_EXPORT_DOCUMENT_TITLE,
+  makeCatalogExportDocumentTitle,
   type CatalogExportDataset,
   type CatalogExportRow,
 } from '../lib/master-catalog/export/data';
@@ -61,11 +62,21 @@ describe('Master Catalog official Excel export', () => {
       'สรุปการเปลี่ยนแปลง',
       'ข้อมูลตรวจสอบ',
     ]);
-    expect(workbook.title).toBe(CATALOG_EXPORT_DOCUMENT_TITLE);
+    expect(workbook.title).toBe(makeCatalogExportDocumentTitle(dataset.version.versionString));
+
+    const documentSheet = workbook.getWorksheet('ข้อมูลเอกสาร');
+    expect(documentSheet).toBeDefined();
+    expect(documentSheet!.getCell(1, 1).value).toBe(CATALOG_EXPORT_DOCUMENT_TITLE);
+    expect(documentSheet!.getCell(2, 1).value).toBe('ประจำปี 2568');
+    expect(documentSheet!.getCell(1, 1).font?.size).toBe(18);
+    expect(documentSheet!.getCell(2, 1).font?.size).toBe(18);
 
     const priceSheet = workbook.getWorksheet('รายการราคา');
     expect(priceSheet).toBeDefined();
-    expect(readRowValues(priceSheet!, 3, 13)).toEqual([
+    expect(priceSheet!.getCell(2, 1).value).toBe('ประจำปี 2568');
+    expect(priceSheet!.getCell(1, 1).font?.size).toBe(16);
+    expect(priceSheet!.getCell(2, 1).font?.size).toBe(16);
+    expect(readRowValues(priceSheet!, 4, 13)).toEqual([
       'ลำดับ',
       'รหัสรายการ',
       'รายการ',
@@ -80,8 +91,8 @@ describe('Master Catalog official Excel export', () => {
       'ชนิดรายการ',
       'สถานะ',
     ]);
-    expect(priceSheet!.getCell(4, 5).value).toBe(100);
-    expect(priceSheet!.getCell(4, 5).numFmt).toBe('#,##0.00');
+    expect(priceSheet!.getCell(5, 5).value).toBe(100);
+    expect(priceSheet!.getCell(5, 5).numFmt).toBe('#,##0.00');
 
     const verificationSheet = workbook.getWorksheet('ข้อมูลตรวจสอบ');
     expect(verificationSheet).toBeDefined();
@@ -103,6 +114,10 @@ describe('Master Catalog official Excel export', () => {
       'display_order',
       '_canonical_row_json',
     ]);
+    expect(verificationSheet!.properties.defaultRowHeight).toBe(15);
+    expect(verificationSheet!.getColumn(16).width).toBe(56);
+    expect(verificationSheet!.autoFilter).toBeUndefined();
+    expect(verificationSheet!.getCell(2, 16).alignment?.wrapText).not.toBe(true);
 
     const canonicalRowJsonValues = dataset.rows.map((_, index) =>
       String(verificationSheet!.getCell(index + 2, 16).value),
@@ -121,7 +136,7 @@ describe('Master Catalog official Excel export', () => {
     const priceSheet = workbook.getWorksheet('รายการราคา')!;
     const verificationSheet = workbook.getWorksheet('ข้อมูลตรวจสอบ')!;
 
-    expect(priceSheet.getCell(5, 3).value).toBe('\'=HYPERLINK("https://example.invalid","bad")');
+    expect(priceSheet.getCell(6, 3).value).toBe('\'=HYPERLINK("https://example.invalid","bad")');
     expect(verificationSheet.getCell(3, 3).value).toBe('=HYPERLINK("https://example.invalid","bad")');
 
     workbook.eachSheet((sheet) => {
@@ -141,10 +156,29 @@ describe('Master Catalog official Excel export', () => {
     const documentValues = collectSheetValues(documentSheet);
 
     expect(documentValues).toContain('DRAFT – ห้ามใช้อ้างอิง');
-    expect(documentValues).toContain('Draft dataset hash');
-    expect(documentValues).toContain('Draft dataset hash - not an official publication hash');
+    expect(documentValues).toContain('ค่าแฮชชุดข้อมูลฉบับร่าง');
+    expect(documentValues).toContain('ค่าแฮชชุดข้อมูลฉบับร่างไม่ใช่ค่าแฮชสำหรับการเผยแพร่อย่างเป็นทางการ');
     expect(priceSheet.getCell(1, 1).value)
       .toBe(`DRAFT – ห้ามใช้อ้างอิง | ${CATALOG_EXPORT_DOCUMENT_TITLE}`);
+  });
+
+  it('uses Thai document-sheet labels while retaining canonical technical identifiers', async () => {
+    const workbook = await loadWorkbook(await buildCatalogExportWorkbookBuffer(await makeDataset()));
+    const documentSheet = workbook.getWorksheet('ข้อมูลเอกสาร')!;
+    const documentValues = collectSheetValues(documentSheet);
+
+    expect(documentValues).toContain('วัตถุประสงค์เอกสาร');
+    expect(documentValues).toContain('ฉบับบัญชีราคา');
+    expect(documentValues).toContain('ฉบับที่ใช้งานปัจจุบัน');
+    expect(documentValues).toContain('สถานะการเผยแพร่');
+    expect(documentValues).toContain('เผยแพร่แล้ว');
+    expect(documentValues).toContain('ค่าแฮชชุดข้อมูล SHA-256');
+    expect(documentValues.some((value) => String(value).includes('_canonical_row_json'))).toBe(true);
+
+    const changeSummaryValues = collectSheetValues(workbook.getWorksheet('สรุปการเปลี่ยนแปลง')!);
+    expect(changeSummaryValues).toContain('ฉบับตั้งต้น');
+    expect(changeSummaryValues).toContain('ที่มาชุดการเปลี่ยนแปลง');
+    expect(changeSummaryValues).toContain('แก้ไขด้วยตนเอง');
   });
 });
 

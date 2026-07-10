@@ -2,7 +2,7 @@
 
 **Status:** Ready for owner review
 **Prepared:** 2026-07-06 16:47 +07
-**Updated:** 2026-07-07 01:17 +07 for WP-6.5 publish-boundary guard sequencing
+**Updated:** 2026-07-11 00:59 +07 for Local proof of the final PDF/Excel terminology and title hierarchy
 **Branch:** `codex/master-catalog-phase4`
 **Reviewed baseline commit:** Original WP-6 artifact review used `72f2c05 merge: integrate hotfix 016 into phase4`; use git HEAD for the latest committed checkpoint
 **Environment:** Local only
@@ -14,6 +14,30 @@ WP-6 official export evidence is ready for owner review for the 710-row
 baseline `2568.0.0` Local DB-generated Excel/PDF artifacts. I found no
 blocking WP-6 export defect in the evidence reviewed after the latest
 pagination/table proof and automated coverage cleanup.
+
+The 2026-07-10 owner metadata refinement supersedes the previous PDF cover for
+final P-11 review. The field-facing cover now keeps only organization, version,
+Thai status, effective date, item count, and full dataset hash; it excludes
+Current Default, approval reference/date, approved-by/publisher, exported
+at/by, generated-by, and export-spec fields. These removed fields remain in
+Excel metadata and release/filing evidence. A non-current published version
+shows a Thai retrospective-reference warning instead of a technical field.
+
+Further owner layout refinement on 2026-07-10 gives the cover a clearer
+document hierarchy: a larger top-centered NT company lockup, then the document
+title and a distinct `ประจำปี 2568` line of the same title size and weight,
+with one centered upper-middle table containing `ฉบับบัญชีราคา`, Thai status,
+effective date, item count, and full dataset hash. The header does not repeat
+version/status, and the table does not repeat the company name already present
+in the lockup.
+
+Fresh Local route/PDF proof passed after this terminology/title refinement.
+Both title lines remain legible; the PDF has `19` pages and `18` price
+sections; all 710 rows, sequence/hash, and watermark evidence remain intact.
+The companion Local workbook has five visible sheets, 710 price rows, 710
+verification rows, reconstructed dataset-hash match, and Thai user-facing
+labels while canonical verification identifiers remain unchanged. Final P-11
+visual/file acceptance is still owner-held.
 
 This is not a Production approval, not a Production deployment approval, not a
 catalog publication approval, and not approval to publish any add/supplement
@@ -62,10 +86,10 @@ Recommended owner decision:
 
 | Artifact | Evidence |
 |---|---|
-| Excel file | `output/master-catalog/wp6-artifact-proof/NT-Master-Catalog-v2568.0.0-20260101.xlsx` |
-| Excel binary SHA-256 | `1d1f1bc80982feaed231cb1e2c388b4f08fa81d2eb2b31a0b75ddf8d1a5131d9` |
-| PDF file | `output/master-catalog/wp6-artifact-proof/NT-Master-Catalog-v2568.0.0-20260101.pdf` |
-| PDF binary SHA-256 | `60374773a9bd4e92dfd79515f131221d9b7d30d1a240ba3a0568eb24733efec6` |
+| Excel file | Unfiled Local review artifact regenerated 2026-07-11 for the final title/terminology alignment |
+| Excel binary SHA-256 | `e58dc3d9b1472665dbfaf692a238e504321f75f0f86b66a277a69dcbb0ea7df3` |
+| PDF file | Unfiled Local review artifact regenerated 2026-07-11 for the final title/terminology alignment |
+| PDF binary SHA-256 | `05b7d71b9076daa9374405a8104fec2fb2503d04f0a7db0ba31fb6f87f83553c` |
 | Dataset hash | `sha256:4a2a5fcc75f1510c5e037426a19c3110234856485157e5de6f3bd2eee459d1e8` |
 
 The latest artifact proof records 710 Excel price rows, 710 verification rows,
@@ -78,6 +102,10 @@ first/last sequence 1/710, unique sequence count 710, `sequenceBreakCount=0`,
 full hash present, price-disclaimer watermark present, row 527 on one line,
 right table border restored, and embedded/subset `/NTRegular`, `/NTBold`, and
 `/Menlo-Regular`.
+
+These Local-review artifacts are not filed final P-11 evidence. After owner
+visual acceptance, regenerate and file the chosen final pair and record their
+binary hashes in the release/filing manifest.
 
 ### 3.3 Automated export coverage
 
@@ -106,12 +134,12 @@ right table border restored, and embedded/subset `/NTRegular`, `/NTBold`, and
 
 | Check | Result |
 |---|---|
-| `npm test -- tests/master-catalog-admin-read-model.test.ts tests/master-catalog-export-data.test.ts tests/master-catalog-export-excel.test.ts` | Passed, 3 files / 19 tests |
-| `npm test` | Passed, 18 files / 96 tests |
-| `npx tsc --noEmit --pretty false` | Passed |
+| `npm test -- tests/master-catalog-pdf-presentation.test.ts tests/master-catalog-export-data.test.ts tests/master-catalog-export-excel.test.ts` | Passed, 3 files / 14 tests after the final cover hierarchy refinement |
+| `npm test` | Passed, 19 files / 100 tests |
+| `npx tsc --noEmit --pretty false` | Passed in the immediately preceding WP-6 evidence set; the 2026-07-10 `npm run build` TypeScript phase also passed |
 | `npm run lint` | Passed with 0 errors / 10 existing warnings |
 | `git diff --check` | Passed |
-| `npm run build` | Sandbox failed only on blocked Google Fonts fetch; escalated build passed |
+| `npm run build` | 2026-07-11 escalated build passed |
 
 ## 5. Findings
 
@@ -145,6 +173,7 @@ Please review these decisions explicitly:
 | 4 | Do you approve starting WP-6.5 local-only publish-boundary guard hardening after WP-6 is complete? | Yes, Local only |
 | 5 | Do you approve starting WP-7 only after WP-6.5 guard evidence is recorded? | Yes |
 | 6 | Do you confirm P-18 remains open and add/supplement publication stays held until guard evidence and placement governance are approved? | Yes |
+| 7 | Do you accept the refined field-facing PDF cover that omits approval/publisher/export/generator metadata and uses a plain Thai warning only for non-current published versions? | Yes, after visual review of the regenerated cover |
 
 Recommended owner response if accepted:
 
