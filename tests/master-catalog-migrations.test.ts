@@ -240,6 +240,7 @@ describe('Master Catalog migration contracts', () => {
     expect(sql).toContain('catalog_admin_enabled')
     expect(sql).toContain('private.catalog_version_transition_valid')
     expect(sql).toContain('VERSION_TRANSITION_INVALID')
+    expect(sql).toContain("v_existing_change.change_type IS DISTINCT FROM (\n             CASE")
     expect(sql).not.toContain('Only rehearsal catalog version 2568.1.0')
     expect(sql).toContain('DRAFT_LOCK_CONFLICT')
     expect(sql).toContain('IMPORT_RETIREMENT_APPROVAL_REQUIRED')

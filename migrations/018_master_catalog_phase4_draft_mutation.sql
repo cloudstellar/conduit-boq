@@ -790,10 +790,12 @@ BEGIN;
       IF FOUND THEN
         IF v_existing_change.actor_id IS DISTINCT FROM v_actor_id
            OR v_existing_change.request_fingerprint IS DISTINCT FROM v_request_fingerprint
-           OR v_existing_change.change_type IS DISTINCT FROM CASE
-             WHEN v_operation = 'import_apply' THEN 'import'
-             ELSE 'manual'
-           END THEN
+           OR v_existing_change.change_type IS DISTINCT FROM (
+             CASE
+               WHEN v_operation = 'import_apply' THEN 'import'
+               ELSE 'manual'
+             END
+           ) THEN
           RETURN private.catalog_action_error(
             p_request_id,
             'REQUEST_ID_PAYLOAD_MISMATCH',
