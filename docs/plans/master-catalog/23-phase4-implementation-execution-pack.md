@@ -419,7 +419,7 @@ Required sub-gates:
 
 | Slice | Required outcome |
 |---|---|
-| WP-6.5A End-to-end idempotency | Client/form creates one operation UUID for create/manual/import-apply/publish/restore, preserves it through an uncertain result, reuses it on retry, and replaces it only after a definitive terminal result or explicit new operation. Test timeout-after-commit and same-ID/different-payload rejection. |
+| WP-6.5A End-to-end idempotency | Client/form creates one operation UUID for create/manual/import-apply/publish/restore, preserves it through an uncertain result, reuses it on retry, and replaces it only after a definitive terminal result or explicit new operation. Submitted non-secret editable values remain visible after uncertain/rejected results and reset only after success, so retry does not require reconstructing the payload. Test timeout-after-commit and same-ID/different-payload rejection. |
 | WP-6.5B Publish guards and early UX | Keep DB P-18 and structured-code guards as final invariants; show the same publication blockers in draft/import preview before apply/publish, with Thai reason and remediation. Warn separately when inactive rows require the still-pending P-19 PDF policy; do not silently turn that filing decision into a new DB publish rule. A user must not discover the blocker only after completing the draft. |
 | WP-6.5C Hash portability | Resolve P-20 and update migration, DB/hash/export contracts and fixtures atomically. No clean-reset/cross-environment equivalence claim until the selected contract passes. |
 | WP-6.5D Reusable version lifecycle | Remove `2568.1.0` hardcoding from reusable action/RPC validation. Validate ADR-003 annual/revision/patch rules and prove at least one additional valid version plus duplicate/nonmonotonic rejection. Keep `2568.1.0` only as the exact first-candidate fixture. |
@@ -477,6 +477,8 @@ Exit gate:
 - export and documentation verification run from tracked code in a clean
   checkout;
 - operator failure states and logs expose safe correlation evidence;
+- browser recovery proves the uncertain message, retained form values, untouched
+  same-payload resubmit, one audit effect, and reset-after-success behavior;
 - Verification Report records each sub-gate separately.
 
 ## 13. WP-7 permanent BOQ/hotfix `016` and Factor F regression preservation

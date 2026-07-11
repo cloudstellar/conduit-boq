@@ -149,10 +149,11 @@ validation records `validated` or `rejected`.
    comparison; the raw workbook still stays local and is not uploaded.
 4. The screen creates and retains one apply operation ID; the validated import
    transitions once to `applied`.
-5. If the result is uncertain, refresh import/change history before retrying;
-   retry the same intended apply with the same operation ID so the prior result
-   is returned. Do not start a new operation ID until the prior result is known
-   or the operator explicitly begins a different apply.
+5. If the result is uncertain, confirm that the submitted editable values remain
+   visible, then refresh import/change history before retrying. Retry the same
+   intended apply with the same operation ID so the prior result is returned.
+   Do not reconstruct the payload from memory or start a new operation ID until
+   the prior result is known or the operator explicitly begins a different apply.
 6. Review the created change set and item histories.
 
 K-formula columns are ignored/excluded in Phase 4 Core.
@@ -256,7 +257,7 @@ Use only when a published current version must stop being used for new BOQs.
 | Export hash mismatch | Do not distribute; report with request/version/hash details |
 | Placement review required | Keep the draft; do not publish. Obtain approved item placement under P-18 and rerun readiness checks |
 | Retired-row PDF policy required | Keep the draft; do not file the field-facing PDF until P-19 is approved |
-| Result uncertain / timed out | Do not repeatedly create new submissions. Copy the request ID, refresh audit/state, and retry only through the same operation when instructed |
+| Result uncertain / timed out | Do not repeatedly create new submissions. Confirm the submitted values remain visible, copy the request ID, refresh audit/state, and retry only through the same operation when instructed; report any cleared field before retrying |
 | Factor F change requested | Out of scope for this procedure; do not edit Master Catalog data, Factor F data, or legacy BOQs |
 
 ## 14. Prohibited actions
@@ -301,7 +302,9 @@ recognizing the message and completing the recovery through the UI.
 4. review diff totals, item history, and publication readiness without SQL;
 5. locate version/status/count/hash in Excel/PDF and distinguish dataset hash
    from binary file hash;
-6. handle an uncertain-response example using the same request ID;
+6. handle an uncertain-response example using the same request ID, verify that
+   submitted fields remain unchanged before retry, and confirm they reset only
+   after success;
 7. restore to a safe screen without an irreversible mistake or developer help.
 
 Record task completion, misunderstood wording, recovery outcome, elapsed time,

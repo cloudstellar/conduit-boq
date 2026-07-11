@@ -158,9 +158,10 @@ describe('Master Catalog authority consistency', () => {
     const tracker = read(
       'docs/plans/master-catalog/25-phase4-execution-progress-tracker.md',
     )
-    expect(tracker).toMatch(/\| WP-6\.5 \|[^\n]+\| In progress \|/)
+    expect(tracker).toMatch(/\| WP-6\.5 \|[^\n]+\| Ready for owner review \|/)
     expect(tracker).toMatch(/\| WP-7 \|[^\n]+\| Not started \|/)
     expect(tracker).toMatch(/\| WP-8 \|[^\n]+\| Not started \|/)
+    expect(tracker).toContain('independent intended-admin UAT remains WP-8')
     expect(tracker).toContain('| Production write allowed | No |')
   })
 

@@ -702,6 +702,10 @@ migration and tests must create them.
   retry. Generate a new ID only after a definitive terminal result or an
   explicit new operation. Server Actions must not create a fresh ID for every
   retryable invocation.
+- An uncertain or rejected result keeps the submitted non-secret editable form
+  values visible so the operator can verify or correct the same operation. The
+  form resets only after definitive success; an uncertain retry must not depend
+  on the operator reconstructing the prior payload from memory.
 - Every newly published structured-code row has identity, category, and code
   group mappings.
 - K-formula fields are not written by Phase 4 Core.
