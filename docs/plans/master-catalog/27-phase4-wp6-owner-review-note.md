@@ -1,8 +1,8 @@
 # Master Catalog Phase 4 WP-6 Owner Review Note
 
-**Status:** Exact TH Sarabun New 16 pt replacement pair generated and technically verified; owner visual acceptance pending
+**Status:** Accepted — exact TH Sarabun New 16 pt replacement pair is final Local P-11/WP-6 artifact evidence
 **Prepared:** 2026-07-06 16:47 +07
-**Updated:** 2026-07-11 22:04 +07 after replacement artifact verification
+**Updated:** 2026-07-11 22:20 +07 after owner visual/content acceptance
 **Branch:** `codex/master-catalog-phase4`
 **Artifact source commit:** `777df7598c8aa96a17f3665db5131e5fb5397b96`
 **Environment:** Local only
@@ -16,7 +16,10 @@ workbook inspection. Every one of 20,808 populated Excel cells uses
 `TH Sarabun New` at 16 pt or larger; titles retain an 18-20 pt hierarchy. The
 PDF keeps its embedded NT fonts and all 19 rendered pages are pixel-output
 identical to the prior approved visual proof. I found no blocking technical
-WP-6 export defect in the replacement pair.
+WP-6 export defect in the replacement pair. The owner reviewed the replacement
+format and confirmed `รูปแบบ pdf excel ok เลยครับ` at 2026-07-11 22:20 +07.
+The exact named pair is accepted as final Local P-11/WP-6 artifact evidence;
+WP-6 is complete.
 
 The 2026-07-10 owner metadata refinement supersedes the previous PDF cover for
 final P-11 review. The field-facing cover now keeps only organization, version,
@@ -42,8 +45,8 @@ verification rows, reconstructed dataset-hash match, and Thai user-facing
 labels while canonical verification identifiers remain unchanged. The owner
 accepted the PDF visual/content direction on 2026-07-11 and refined the Excel
 font on the same date. P-20, semantic verification, and five-sheet visual QA
-now pass for the replacement binaries. Only the owner's short visual/content
-confirmation of these named files remains before WP-6 completion.
+pass for the replacement binaries, and the owner has now accepted those exact
+files. Production filing remains a separate later gate.
 
 This is not a Production approval, not a Production deployment approval, not a
 catalog publication approval, and not approval to publish any add/supplement
@@ -70,8 +73,8 @@ Recorded owner decision:
 |---|---|---|
 | Accept WP-6 baseline export implementation evidence | Accepted for visual/content direction | Local-only `2568.0.0` baseline export implementation |
 | Accept the current Excel/PDF visual/content direction | Accepted with Excel refinement | Exact replacement implements TH Sarabun New with 16 pt body baseline; PDF retains NT fonts |
-| Mark WP-6 complete now | Held | Replacement pair, tracked verification, and hashes exist; owner visual/content confirmation remains |
-| Start WP-6.5 reliability and publish-boundary hardening | Authorized for Local only while WP-6 final binary remains pending | Follow Execution Pack sub-gates; no unannounced reset, Production write, placement UI, Factor F change, or hotfix scope expansion |
+| Mark WP-6 complete now | Accepted | Owner accepted the exact replacement pair at 2026-07-11 22:20 +07; Production filing remains separate |
+| Start WP-6.5 reliability and publish-boundary hardening | Authorized for Local only; authorization was granted before final WP-6 acceptance and remains in force | Follow Execution Pack sub-gates; no unannounced reset, Production write, placement UI, Factor F change, or hotfix scope expansion |
 | Implement P-20 deterministic identity | Approved: baseline identity equals immutable Production-derived `price_list.id`; keep `identity_id` in the lineage hash | Passed across two independent clean rebuilds; rerun at WP-8/P-15 or after migration changes |
 | Start WP-7 BOQ and Factor F regression preservation | Only after all applicable WP-6.5 evidence, including P-20, is green | Regression-only; no new Factor F workflow |
 | Keep P-18 open and hold add/supplement publication | Required | No add/supplement publish path until guard evidence and placement governance are approved |
@@ -82,9 +85,9 @@ Recorded owner decision:
 |---|---|
 | Migration ledger | Phase 4 stays local-only at `017`-`019`; hotfix `016` is already merged before Phase 4 scripts |
 | Implementation Execution Pack | WP-6 must generate selected-version official Excel/PDF and stop before Production gates |
-| Decision Register | P-11 visual/content direction and replacement technical evidence are accepted while owner binary acceptance remains pending; P-18/P-19 are workflow gates; P-20 deterministic `price_list.id` mapping is approved/proven for WP-6.5 and must rerun at later gates; P-06 allows only the `ITEM-0139` temporary legacy exception |
+| Decision Register | P-11 exact replacement binaries are owner-accepted and WP-6 is complete; P-18/P-19 are workflow gates; P-20 deterministic `price_list.id` mapping is approved/proven for WP-6.5 and must rerun at later gates; P-06 allows only the `ITEM-0139` temporary legacy exception |
 | Official Export Spec | Server-selected version, fail-closed count/hash, exact five-sheet Excel, server-verified PDF stamp, draft marking, and Factor F exclusion are required |
-| Verification Report | WP-6 evidence must distinguish dataset hash from binary file hash and keep final owner/file acceptance separate |
+| Verification Report | WP-6 evidence distinguishes dataset hash from binary file hash, records Local owner/file acceptance, and keeps Production filing separate |
 | Admin Operating Procedure | Official exports must be generated from the published selected version, then binary hashes filed separately |
 | Production Runbook | Official export filing happens only after approved Production publish, not during this Local review |
 | Post-Factor-F Plan | Master Catalog export must not include or mutate Factor F rows, metadata, BOQ snapshots, or BOQ totals |
@@ -138,10 +141,9 @@ superseded as owner-acceptance evidence. The later clean-baseline pair under
 owner-approved TH Sarabun New refinement. Do not use either earlier pair for
 P-11.
 
-The replacement pair above is retained Local P-11 evidence but is not a
-Production filing. If the owner accepts it, preserve these binaries and hashes;
-do not regenerate them. Official Production filing remains a later
-P-15/release gate.
+The replacement pair above is accepted Local P-11/WP-6 evidence but is not a
+Production filing. Preserve these binaries and hashes; do not regenerate them.
+Official Production filing remains a later P-15/release gate.
 
 ### 3.3 Automated export coverage
 
@@ -180,44 +182,47 @@ P-15/release gate.
 
 ## 5. Findings
 
-### Blocking findings for WP-6 owner review
+### Blocking findings at WP-6 acceptance
 
 None found for the local-only 710-row baseline export artifact evidence.
 
 ### Residual risks and next-gate items
 
-| Item | Severity | Blocks WP-6 baseline review? | Required before |
+| Item | Severity | Invalidates accepted WP-6 evidence? | Required before |
 |---|---|---:|---|
-| Final P-11 artifact acceptance remains owner-held | High | Yes, for marking WP-6 complete | WP-6 complete/P-11 acceptance |
 | P-18 display-order placement governance remains open | High for add/supplement versions | No for baseline `2568.0.0` export | Any add/supplement publication readiness |
 | WP-6.5 core live DB/rebuild evidence passed; browser retry/UAT and lifecycle negatives remain | High for mutation/publication reliability | No for baseline `2568.0.0` artifact acceptance | Before WP-6.5 closeout/WP-7 |
 | P-19 inactive/retired PDF policy pending | Medium for future retired-row versions | No for current all-active baseline proof | Any official PDF filing for a version with inactive/retired rows |
 | Optional stronger Excel attachment-download proof remains open | Medium | No if owner accepts unit/build/manual artifact proof | Only if owner requires browser-download automation |
 | P-20 two-run proof passed; a rerun remains required after migration changes and at WP-8/P-15 | Medium | No | WP-8/migration fingerprint/P-15 |
-| Exact replacement pair passed technical verification; owner has not yet accepted the named binaries | High for WP-6 closeout | Yes | P-11/WP-6 owner acceptance |
 | BOQ and Factor F regression preservation not started | High for Production readiness | No for WP-6 export review | WP-7/WP-8 |
 | Advisor baseline and approved fresh Production snapshot source remain open | Medium | No for WP-6 export review | WP-8/P-12 |
 | App-wide/legacy NT logo provenance remains partially open under P-10 | Medium | No for WP-6 artifact proof | P-10/Production deploy readiness |
 
 ## 6. Recorded Decisions And Remaining Review
 
-The staged decisions are recorded above. The remaining owner review is limited
-to the replacement retained pair and later affected-workflow decisions:
+The staged decisions are recorded above. P-11/WP-6 review is complete; later
+owner review is limited to affected-workflow and Production decisions:
 
 | # | Question | Recommended answer |
 |---|---|---|
 | 1 | Is the visual/content direction accepted? | Recorded yes on 2026-07-11 |
 | 2 | May WP-6.5 proceed Local-only before the final pair? | Recorded yes on 2026-07-11 |
 | 3 | May WP-7 start before WP-6.5/P-20 evidence is green? | No |
-| 4 | Is WP-6 complete now? | No; review and accept the exact replacement pair, its manifest, verifier result, and binary hashes |
+| 4 | Is WP-6 complete now? | Yes; owner accepted the exact replacement pair at 2026-07-11 22:20 +07 |
 | 5 | Is P-18 placement approved? | No; keep add/supplement publication blocked |
 | 6 | Is P-19 retired-row PDF treatment approved? | No; do not file an affected PDF as final |
 
-Recommended final-pair response:
+Recorded final-pair response:
 
 ```text
-Accept the exact retained Local `2568.0.0` PDF/Excel pair, its manifest, semantic verification result, and filed binary hashes as final P-11/WP-6 artifact evidence. This does not approve Production migration, deploy, feature enablement, catalog publication, P-18 placement, P-19 retired-row PDF treatment, or any Factor F change.
+รูปแบบ pdf excel ok เลยครับ
 ```
+
+This accepts the exact retained Local `2568.0.0` pair, manifest, semantic
+verification result, and recorded binary hashes as final P-11/WP-6 artifact
+evidence. It does not approve Production filing/migration/deploy/enablement,
+catalog publication, P-18/P-19, or any Factor F change.
 
 ## 7. WP-6.5 To WP-7 Gate
 
@@ -237,14 +242,14 @@ reopen the production hotfix scope without approval.
 
 ```text
 Current WP: WP-6.5 reliability and publish-boundary hardening
-Status: Core live Local/P-20 evidence and the TH Sarabun New 16 pt replacement P-11 pair passed technically; owner visual acceptance plus remaining browser/UAT/lifecycle gates are pending before closeout/WP-7
+Status: WP-6/P-11 complete; core live Local/P-20 and accepted export evidence passed; remaining browser/UAT/lifecycle gates are pending before WP-6.5 closeout/WP-7
 Branch: codex/master-catalog-phase4
 Artifact source commit: 777df7598c8aa96a17f3665db5131e5fb5397b96
 Files changed in this checkpoint: Excel typography generator/tests and aligned authority documents; generated/reference artifacts remain untracked
 Evidence produced: exact replacement PDF/Excel pair, manifest, semantic verifier, all-sheet workbook QA, 19-page PDF comparison, and unchanged post-export Local readback
 Tests/checks run: See the latest Tracker/Verification Report entry
-Blockers: owner acceptance of the exact replacement binaries; browser timeout/retry and intended-admin UAT; live duplicate/nonmonotonic lifecycle negatives; P-18 placement; P-19 retired-row PDF policy; WP-7 BOQ/Factor F regressions; WP-8 advisor/snapshot/UAT/performance gates
-Owner decisions needed: review the exact replacement pair; P-18/P-19 when affected; Production P-12-P-15 remain separate
-Next safe step: present the exact replacement pair for owner visual confirmation; do not regenerate it if accepted
+Blockers: browser timeout/retry and intended-admin UAT; live duplicate/nonmonotonic lifecycle negatives; P-18 placement; P-19 retired-row PDF policy; WP-7 BOQ/Factor F regressions; WP-8 advisor/snapshot/UAT/performance gates
+Owner decisions needed: P-18/P-19 when affected; Production P-12-P-15 remain separate
+Next safe step: finish remaining non-destructive WP-6.5 browser/UAT and lifecycle-negative evidence, then return for closeout; no Local reset without explicit approval
 Production touched: No
 ```

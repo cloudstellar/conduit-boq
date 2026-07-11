@@ -144,7 +144,7 @@ describe('Master Catalog authority consistency', () => {
       'docs/plans/master-catalog/19-phase4-decision-register.md',
     )
     expect(decisions).toContain(
-      'TH Sarabun New 16 pt replacement pair technically passed 2026-07-11; owner acceptance and WP-6 completion pending',
+      'Accepted 2026-07-11 22:20 +07; WP-6 complete; Production filing remains separate',
     )
     expect(decisions).toContain(
       'Placement decision pending; guard implemented for Local verification 2026-07-11',
