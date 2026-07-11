@@ -590,7 +590,7 @@ async function assertDuplicateCodePayloadRollsBack(draft, context) {
     .from('catalog_change_sets')
     .select('id', { count: 'exact', head: true })
     .eq('request_id', requestId)
-  if (error) throw error
+  if (error) throw localDataError('count rejected mutation change sets', error)
   assert(count === 0, 'Rejected multi-row mutation left a change set')
 }
 
@@ -628,20 +628,29 @@ async function assertApplyIdempotency(target, draft, baselineRow) {
 }
 
 async function readMutationCounts(versionId) {
-  const [rows, changes, identities, codes] = await Promise.all([
-    countRows('price_list', (query) => query.eq('version_id', versionId)),
-    countRows('catalog_change_sets', (query) => query.eq('version_id', versionId)),
-    countRows('catalog_item_identities'),
-    countRows('catalog_item_codes'),
-  ])
+  const rows = await countRows('price_list', (query) => query.eq('version_id', versionId))
+  const changes = await countRows(
+    'catalog_change_sets',
+    (query) => query.eq('version_id', versionId),
+  )
+  const identities = await countRows('catalog_item_identities')
+  const codes = await countRows('catalog_item_codes')
   return { rows, changes, identities, codes }
 }
 
 async function countRows(table, scope = (query) => query) {
   const query = service.from(table).select('id', { count: 'exact', head: true })
   const { count, error } = await scope(query)
-  if (error) throw error
+  if (error) throw localDataError(`count ${table}`, error)
   return count
+}
+
+function localDataError(label, error) {
+  const code = typeof error?.code === 'string' ? ` [${error.code.slice(0, 64)}]` : ''
+  const message = typeof error?.message === 'string' && error.message
+    ? `: ${error.message}`
+    : ': Local data client returned an empty error'
+  return new Error(`${label}${code}${message}`)
 }
 
 async function readFactorSummary() {
