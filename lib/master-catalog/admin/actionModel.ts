@@ -148,6 +148,12 @@ export function shouldBeginNewCatalogOperation(
     );
 }
 
+export function shouldPreserveCatalogOperationInput(
+  state: CatalogMutationState,
+): boolean {
+  return state.status !== 'success';
+}
+
 export function createCatalogMutationError(
   message: string,
   code = 'VALIDATION_FAILED',

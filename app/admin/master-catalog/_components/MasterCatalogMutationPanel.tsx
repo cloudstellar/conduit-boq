@@ -106,7 +106,7 @@ export function MasterCatalogDraftCreatePanel({
   const suggestedVersionString = suggestedVersion
     ? `${suggestedVersion.major}.${suggestedVersion.minor}.${suggestedVersion.patch}`
     : null;
-  const [requestIdInputRef, prepareOperation] = useStableCatalogOperation(
+  const [requestIdInputRef, prepareOperation, preserveSubmittedInput] = useStableCatalogOperation(
     state,
     `${defaultVersionString ?? 'no-base'}:${suggestedVersionString ?? 'no-suggestion'}`,
   );
@@ -150,6 +150,7 @@ export function MasterCatalogDraftCreatePanel({
           <form
             action={formAction}
             className="grid gap-4"
+            onReset={preserveSubmittedInput}
             onSubmitCapture={prepareOperation}
           >
             <input ref={requestIdInputRef} type="hidden" name="requestId" />
@@ -244,11 +245,19 @@ export function MasterCatalogPublishRestorePanel({
   const restoreTargetId = restorableVersions.some(
     (version) => version.id === selectedRestoreTargetId,
   ) ? selectedRestoreTargetId : firstRestorableVersionId;
-  const [publishRequestIdInputRef, preparePublishOperation] = useStableCatalogOperation(
+  const [
+    publishRequestIdInputRef,
+    preparePublishOperation,
+    preservePublishInput,
+  ] = useStableCatalogOperation(
     publishState,
     draftVersion?.id ?? 'no-publish-draft',
   );
-  const [restoreRequestIdInputRef, prepareRestoreOperation] = useStableCatalogOperation(
+  const [
+    restoreRequestIdInputRef,
+    prepareRestoreOperation,
+    preserveRestoreInput,
+  ] = useStableCatalogOperation(
     restoreState,
     restoreTargetId || 'no-restore-target',
   );
@@ -280,6 +289,7 @@ export function MasterCatalogPublishRestorePanel({
           <form
             action={publishAction}
             className="grid gap-4"
+            onReset={preservePublishInput}
             onSubmitCapture={preparePublishOperation}
           >
             <input ref={publishRequestIdInputRef} type="hidden" name="requestId" />
@@ -375,6 +385,7 @@ export function MasterCatalogPublishRestorePanel({
           <form
             action={restoreAction}
             className="grid gap-4"
+            onReset={preserveRestoreInput}
             onSubmitCapture={prepareRestoreOperation}
           >
             <input ref={restoreRequestIdInputRef} type="hidden" name="requestId" />
@@ -498,7 +509,7 @@ export function MasterCatalogManualMutationPanel({
 }: MutationPanelProps) {
   const [action, setAction] = useState<'retire' | 'update' | 'recode' | 'add'>('retire');
   const [state, formAction] = useActionState(applyCatalogManualChangeAction, initialState);
-  const [requestIdInputRef, prepareOperation] = useStableCatalogOperation(
+  const [requestIdInputRef, prepareOperation, preserveSubmittedInput] = useStableCatalogOperation(
     state,
     `${version.id}:${action}`,
   );
@@ -539,6 +550,7 @@ export function MasterCatalogManualMutationPanel({
         <form
           action={formAction}
           className="grid gap-5"
+          onReset={preserveSubmittedInput}
           onSubmitCapture={prepareOperation}
         >
           <input ref={requestIdInputRef} type="hidden" name="requestId" />

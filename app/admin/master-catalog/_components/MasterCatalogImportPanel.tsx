@@ -420,7 +420,11 @@ function PreparedPreview({
   applyState: CatalogMutationState;
   applyAction: (formData: FormData) => void;
 }) {
-  const [applyRequestIdInputRef, prepareApplyOperation] = useStableCatalogOperation(
+  const [
+    applyRequestIdInputRef,
+    prepareApplyOperation,
+    preserveApplyInput,
+  ] = useStableCatalogOperation(
     applyState,
     prepared.normalizedPayloadHash,
   );
@@ -494,6 +498,7 @@ function PreparedPreview({
         <form
           action={applyAction}
           className="flex flex-wrap items-center gap-2"
+          onReset={preserveApplyInput}
           onSubmitCapture={prepareApplyOperation}
         >
           <input ref={applyRequestIdInputRef} type="hidden" name="requestId" />

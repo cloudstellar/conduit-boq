@@ -1,8 +1,9 @@
 'use client';
 
-import { useCallback, useEffect, useRef } from 'react';
+import { useCallback, useEffect, useRef, type FormEvent } from 'react';
 import {
   shouldBeginNewCatalogOperation,
+  shouldPreserveCatalogOperationInput,
   type CatalogMutationState,
 } from '@/lib/master-catalog/admin/actionModel';
 
@@ -14,6 +15,8 @@ export function useStableCatalogOperation(
   const activeRequestId = useRef('');
   const lastHandledState = useRef<CatalogMutationState | null>(null);
   const lastScopeKey = useRef(scopeKey);
+  const submittedForm = useRef<HTMLFormElement | null>(null);
+  const allowFormReset = useRef(false);
 
   const beginNewOperation = useCallback(() => {
     activeRequestId.current = crypto.randomUUID();
@@ -22,12 +25,24 @@ export function useStableCatalogOperation(
     }
   }, []);
 
-  const prepareOperation = useCallback(() => {
+  const prepareOperation = useCallback((event: FormEvent<HTMLFormElement>) => {
+    submittedForm.current = event.currentTarget;
     if (!activeRequestId.current) {
       activeRequestId.current = crypto.randomUUID();
     }
     if (requestIdInputRef.current) {
       requestIdInputRef.current.value = activeRequestId.current;
+    }
+  }, []);
+
+  const preserveSubmittedInput = useCallback((event: FormEvent<HTMLFormElement>) => {
+    if (allowFormReset.current) {
+      allowFormReset.current = false;
+      return;
+    }
+
+    if (submittedForm.current === event.currentTarget) {
+      event.preventDefault();
     }
   }, []);
 
@@ -47,5 +62,15 @@ export function useStableCatalogOperation(
     }
   }, [beginNewOperation, scopeKey, state]);
 
-  return [requestIdInputRef, prepareOperation] as const;
+  useEffect(() => {
+    if (shouldPreserveCatalogOperationInput(state) || !submittedForm.current) {
+      return;
+    }
+
+    allowFormReset.current = true;
+    submittedForm.current.reset();
+    submittedForm.current = null;
+  }, [state]);
+
+  return [requestIdInputRef, prepareOperation, preserveSubmittedInput] as const;
 }

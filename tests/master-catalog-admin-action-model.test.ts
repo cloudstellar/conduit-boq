@@ -7,6 +7,7 @@ import {
   isDefinitiveCatalogMutationOutcome,
   mapCatalogRpcActionResponse,
   shouldBeginNewCatalogOperation,
+  shouldPreserveCatalogOperationInput,
 } from '../lib/master-catalog/admin/actionModel';
 
 const VERSION_ID = '00000000-0000-4000-8000-000000000001';
@@ -349,5 +350,13 @@ describe('Master Catalog admin action model', () => {
     expect(shouldBeginNewCatalogOperation(idle, uncertain, 'draft-a', 'draft-a')).toBe(false);
     expect(shouldBeginNewCatalogOperation(uncertain, rejected, 'draft-a', 'draft-a')).toBe(true);
     expect(shouldBeginNewCatalogOperation(idle, idle, 'draft-a', 'draft-b')).toBe(true);
+
+    expect(shouldPreserveCatalogOperationInput(idle)).toBe(true);
+    expect(shouldPreserveCatalogOperationInput(uncertain)).toBe(true);
+    expect(shouldPreserveCatalogOperationInput(rejected)).toBe(true);
+    expect(shouldPreserveCatalogOperationInput({
+      status: 'success',
+      message: 'saved',
+    })).toBe(false);
   });
 });
