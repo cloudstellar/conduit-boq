@@ -280,14 +280,16 @@ Phase 4 should set `material_cost`, `labor_cost`, `unit_cost`, `is_active`,
 `created_at`, and `updated_at` to `NOT NULL` only after the preflight confirms
 zero nulls and Local rehearsal proves current application compatibility.
 
-P-20 must make baseline stable identities deterministic across the approved
-clean-rehearsal environments or explicitly revise the hash model before the
-migration fingerprint is frozen and before WP-6.5 exits/WP-7 starts. The
-preferred initialization uses each
-existing immutable baseline `price_list.id` as the one-to-one starting
-`catalog_item_identities.id`, after collision/coverage assertions, and then
-reuses that stable identity for clones. Do not alter the applied Production
-hotfix `016` or silently remove `identity_id` from the canonical hash.
+P-20 approves deterministic baseline identity initialization. Migration `017`
+uses each existing immutable Production-derived baseline `price_list.id` as
+the one-to-one starting `catalog_item_identities.id`, after non-empty-baseline,
+collision, prior-assignment, and coverage assertions, and then reuses that
+stable identity for clones. The migration must not rewrite an already assigned
+non-deterministic identity; that state requires an approved clean rebuild.
+Independent rebuild evidence remains required before the migration fingerprint
+is frozen and before WP-6.5 exits/WP-7 starts. Do not alter the applied
+Production hotfix `016`, introduce a second Phase 4 hash, or silently remove
+`identity_id` from the canonical hash.
 
 ## 6. New tables
 
@@ -519,10 +521,14 @@ on every retry does not satisfy this contract.
 | `public.create_catalog_draft` | Clone a published base into a new draft | base/version numbers, name, reason, request ID |
 | `public.apply_catalog_changes` | Apply validated manual/import changes | version ID, change JSON or import payload hash, expected lock, reason, request ID, optional import ID |
 | `public.publish_catalog_version` | Validate/hash/publish/move pointer | version ID, expected lock, approval metadata, reason, request ID |
+| `public.get_catalog_publish_readiness` | Return bounded P-18, structured-code, and P-19 filing-warning counts from the same private helper used by publish | version ID |
 | `public.restore_catalog_pointer` | Move pointer to prior published version | target version ID, reason, request ID |
 
-Wrappers are thin `SECURITY INVOKER` functions with schema-qualified calls and
-are granted only to `authenticated`. They do not trust caller-supplied actor
+Mutation wrappers are thin `SECURITY INVOKER` functions with schema-qualified
+calls and are granted only to `authenticated`. The read-only readiness RPC is a
+bounded `SECURITY DEFINER` facade because its private helper is intentionally not
+executable by application roles; it repeats active-admin and feature-flag checks,
+uses `SET search_path = ''`, and exposes counts/status only. These functions do not trust caller-supplied actor
 ID/display name. They derive identity from the authenticated request and
 current profile. Concurrency safety comes from explicit row/advisory locks,
 constraints, lock versions, and idempotency; this contract does not falsely
@@ -565,9 +571,14 @@ secret values, raw workbook cells, or internal policy details.
 5. Validate draft status, code ownership, categories/groups, costs, and mode.
    For Full import, enforce the exact mass-retirement threshold and persisted
    approval reference.
-6. Apply item rows in deterministic order.
-7. Append change set/items and increment lock version.
-8. Mark import applied when applicable.
+6. Reject duplicate desired canonical codes before the first write. Allocate a
+   code under a transaction-scoped per-code advisory lock.
+7. Apply item rows in deterministic order inside a nested PL/pgSQL transaction
+   block. Any structured rejection after the change-set insert raises a local
+   abort; the exception handler returns a safe action error only after all rows,
+   code/identity allocations, and audit writes in that block roll back.
+8. Append change set/items and increment lock version.
+9. Mark import applied when applicable.
 
 ### Publish
 
@@ -581,9 +592,10 @@ secret values, raw workbook cells, or internal policy details.
    `identity_id` is absent from the base version rows with
    `P18_PLACEMENT_REVIEW_REQUIRED`. Do not infer this solely from
    `catalog_change_sets.change_type`.
-7. Enforce the structured-code legacy exception guard: for the first
-   structured-code candidate, active legacy `ITEM-####` rows with null
-   `code_group_id` must be exactly the approved `ITEM-0139` exception.
+7. Enforce the structured-code legacy exception guard when the target draft has
+   at least one active canonical `AAA-TTT-NNN` row. In that rollout state,
+   active legacy `ITEM-####` rows must be exactly the approved `ITEM-0139`
+   exception. A legacy-only unchanged clone does not activate this guard.
 8. Read canonical rows in deterministic order and compute count/hash.
 9. Set immutable publication metadata and `active` status.
 10. Update singleton pointer.
@@ -597,7 +609,11 @@ Use the same advisory lock and pointer/version lock order as publish. Target
 must already be published. Update pointer and legacy flags, append restore
 change set, and never mutate price rows or historical BOQs.
 
-Set bounded `lock_timeout` and `statement_timeout`. Keep transactions short.
+Set migration DDL timeouts and runtime function timeouts separately. The Local
+implementation uses `lock_timeout = '5s'` and `statement_timeout = '30s'` on
+private create/apply/publish/restore functions. Keep transactions short; a
+runtime timeout is an uncertain client outcome and must reuse the same request
+ID on retry.
 
 ## 11. Immutability and append-only enforcement
 

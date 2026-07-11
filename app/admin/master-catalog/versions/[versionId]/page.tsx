@@ -1,4 +1,4 @@
-import { redirect } from 'next/navigation';
+import { notFound, redirect } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
 import {
   loadCatalogAdminGate,
@@ -6,7 +6,6 @@ import {
 } from '@/lib/master-catalog/admin/readModel';
 import {
   MasterCatalogGateView,
-  MasterCatalogMissingVersionView,
   MasterCatalogVersionDetailView,
 } from '../../_components/MasterCatalogAdminViews';
 
@@ -31,7 +30,7 @@ export default async function MasterCatalogVersionPage({
 
   const detail = await loadCatalogVersionDetail(supabase, versionId);
   if (!detail) {
-    return <MasterCatalogMissingVersionView gate={gate} />;
+    notFound();
   }
 
   return <MasterCatalogVersionDetailView gate={gate} detail={detail} />;

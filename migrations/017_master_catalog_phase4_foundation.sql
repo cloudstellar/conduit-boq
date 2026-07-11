@@ -249,6 +249,8 @@ BEGIN;
     status text NOT NULL CHECK (status IN ('validated', 'applied', 'rejected')),
     error_summary jsonb,
     request_id uuid NOT NULL,
+    request_fingerprint text NOT NULL
+      CHECK (request_fingerprint ~ '^[0-9a-f]{64}$'),
     created_by uuid NOT NULL REFERENCES auth.users(id) ON DELETE RESTRICT,
     created_at timestamptz NOT NULL DEFAULT now(),
     applied_at timestamptz,
@@ -276,6 +278,8 @@ BEGIN;
       CHECK (change_type IN ('clone', 'import', 'manual', 'publish', 'restore')),
     reason text NOT NULL CHECK (btrim(reason) <> '' AND length(reason) <= 500),
     request_id uuid NOT NULL,
+    request_fingerprint text NOT NULL
+      CHECK (request_fingerprint ~ '^[0-9a-f]{64}$'),
     actor_id uuid NOT NULL REFERENCES auth.users(id) ON DELETE RESTRICT,
     actor_display_name text NOT NULL
       CHECK (btrim(actor_display_name) <> '' AND length(actor_display_name) <= 200),
@@ -327,14 +331,67 @@ BEGIN;
   SET display_order = substring(item_code from '^ITEM-([0-9]{4})$')::integer - 1
   WHERE display_order IS NULL;
 
+  DO $phase4_identity_preflight$
+  DECLARE
+    v_price_rows integer;
+    v_baseline_rows integer;
+    v_nondeterministic_baseline_rows integer;
+    v_identity_collisions integer;
+  BEGIN
+    SELECT
+      count(*)::integer,
+      count(*) FILTER (WHERE v.version_string = '2568.0.0')::integer
+    INTO v_price_rows, v_baseline_rows
+    FROM public.price_list pl
+    LEFT JOIN public.price_list_versions v ON v.id = pl.version_id;
+
+    IF v_price_rows = 0 OR v_baseline_rows <> v_price_rows THEN
+      RAISE EXCEPTION
+        'P20 deterministic identity blocked: expected only the non-empty 2568.0.0 baseline before Phase 4 identity initialization (baseline %, total %)',
+        v_baseline_rows,
+        v_price_rows;
+    END IF;
+
+    SELECT count(*)::integer
+    INTO v_nondeterministic_baseline_rows
+    FROM public.price_list pl
+    JOIN public.price_list_versions v ON v.id = pl.version_id
+    WHERE v.version_string = '2568.0.0'
+      AND pl.identity_id IS NOT NULL
+      AND pl.identity_id IS DISTINCT FROM pl.id;
+
+    IF v_nondeterministic_baseline_rows <> 0 THEN
+      RAISE EXCEPTION
+        'P20 deterministic identity blocked: % baseline rows already have non-deterministic identities; use an approved clean rebuild instead of rewriting lineage',
+        v_nondeterministic_baseline_rows;
+    END IF;
+
+    SELECT count(*)::integer
+    INTO v_identity_collisions
+    FROM public.price_list pl
+    JOIN public.price_list_versions v ON v.id = pl.version_id
+    JOIN public.catalog_item_identities identity_row ON identity_row.id = pl.id
+    WHERE v.version_string = '2568.0.0'
+      AND pl.identity_id IS NULL;
+
+    IF v_identity_collisions <> 0 THEN
+      RAISE EXCEPTION
+        'P20 deterministic identity blocked: % baseline price_list.id values collide with pre-existing unassigned identities',
+        v_identity_collisions;
+    END IF;
+  END;
+  $phase4_identity_preflight$;
+
   CREATE TEMP TABLE phase4_identity_backfill
   ON COMMIT DROP
   AS
   SELECT
     pl.id AS price_list_id,
-    gen_random_uuid() AS identity_id
+    pl.id AS identity_id
   FROM public.price_list pl
-  WHERE pl.identity_id IS NULL
+  JOIN public.price_list_versions v ON v.id = pl.version_id
+  WHERE v.version_string = '2568.0.0'
+    AND pl.identity_id IS NULL
   ORDER BY pl.version_id, pl.item_code;
 
   INSERT INTO public.catalog_item_identities (id, created_by)
@@ -1007,6 +1064,7 @@ BEGIN;
     v_identity_rows integer;
     v_code_rows integer;
     v_missing_identity integer;
+    v_nondeterministic_baseline_identity integer;
     v_missing_category integer;
     v_missing_display_order integer;
   BEGIN
@@ -1018,6 +1076,13 @@ BEGIN;
     INTO v_missing_identity
     FROM public.price_list
     WHERE identity_id IS NULL;
+
+    SELECT count(*)
+    INTO v_nondeterministic_baseline_identity
+    FROM public.price_list pl
+    JOIN public.price_list_versions v ON v.id = pl.version_id
+    WHERE v.version_string = '2568.0.0'
+      AND pl.identity_id IS DISTINCT FROM pl.id;
 
     SELECT count(*)
     INTO v_missing_category
@@ -1034,6 +1099,12 @@ BEGIN;
     IF v_missing_identity <> 0 THEN
       RAISE EXCEPTION 'Phase 4 foundation postcondition failed: % price rows lack identity_id',
         v_missing_identity;
+    END IF;
+
+    IF v_nondeterministic_baseline_identity <> 0 THEN
+      RAISE EXCEPTION
+        'P20 deterministic identity postcondition failed: % baseline rows do not use price_list.id as identity_id',
+        v_nondeterministic_baseline_identity;
     END IF;
 
     IF v_missing_category <> 0 THEN

@@ -66,6 +66,7 @@ import {
   applyCatalogImportAction,
   previewCatalogImportAction,
 } from '../actions';
+import { useStableCatalogOperation } from './useStableCatalogOperation';
 
 type ImportMode = CatalogImportPayloadV1['mode'];
 
@@ -77,6 +78,11 @@ interface PreparedImportPreview {
   sourceFileSize: number;
   sourceFileSha256: string;
   mode: ImportMode;
+  newIdentityCount: number;
+  activeCanonicalCodeCount: number;
+  structuredCodeGuardApplies: boolean;
+  unapprovedLegacyActiveCount: number;
+  retirementCandidateCount: number;
 }
 
 const initialState: CatalogMutationState = { status: 'idle', message: '' };
@@ -127,7 +133,7 @@ export function MasterCatalogImportPanel({
     setDiagnostics([]);
 
     if (!draft) {
-      setPrepareError('ต้องสร้าง draft 2568.1.0 ก่อน import');
+      setPrepareError('ต้องสร้างฉบับร่างก่อน import');
       return;
     }
 
@@ -189,6 +195,12 @@ export function MasterCatalogImportPanel({
         rows,
       };
       const validated = await validateCatalogImportPayloadV1(payload);
+      const activeCanonicalCodeCount = validated.payload.rows.filter(
+        (row) =>
+          row.identityOutcome !== 'retire' &&
+          /^[A-Z0-9]{3}-[A-Z0-9]{3}-[0-9]{3}$/.test(row.canonicalCode),
+      ).length;
+      const structuredCodeGuardApplies = activeCanonicalCodeCount > 0;
 
       setPrepared({
         payloadJson: validated.normalizedPayloadJson,
@@ -198,6 +210,22 @@ export function MasterCatalogImportPanel({
         sourceFileSize: parsed.source.sizeBytes,
         sourceFileSha256: parsed.source.sha256,
         mode,
+        newIdentityCount: validated.payload.rows.filter(
+          (row) => row.identityOutcome === 'candidate_add',
+        ).length,
+        activeCanonicalCodeCount,
+        structuredCodeGuardApplies,
+        unapprovedLegacyActiveCount: structuredCodeGuardApplies
+          ? validated.payload.rows.filter(
+              (row) =>
+                row.identityOutcome !== 'retire' &&
+                /^ITEM-[0-9]{4}$/.test(row.canonicalCode) &&
+                row.canonicalCode !== 'ITEM-0139',
+            ).length
+          : 0,
+        retirementCandidateCount: validated.payload.rows.filter(
+          (row) => row.identityOutcome === 'retire',
+        ).length,
       });
     } catch (error) {
       if (
@@ -229,7 +257,7 @@ export function MasterCatalogImportPanel({
         <CardContent>
           <Alert>
             <ShieldAlert />
-            <AlertTitle>ยังไม่มี draft 2568.1.0</AlertTitle>
+            <AlertTitle>ยังไม่มีฉบับร่าง</AlertTitle>
             <AlertDescription>สร้าง draft จาก current default ก่อนใช้งาน import</AlertDescription>
           </Alert>
         </CardContent>
@@ -392,6 +420,11 @@ function PreparedPreview({
   applyState: CatalogMutationState;
   applyAction: (formData: FormData) => void;
 }) {
+  const [applyRequestIdInputRef, prepareApplyOperation] = useStableCatalogOperation(
+    applyState,
+    prepared.normalizedPayloadHash,
+  );
+
   return (
     <div className="grid gap-4 rounded-md border bg-background p-4">
       <div className="grid gap-3 text-sm md:grid-cols-2">
@@ -403,6 +436,54 @@ function PreparedPreview({
         <KeyValue label="Payload SHA-256" value={shortHash(prepared.normalizedPayloadHash)} />
       </div>
 
+      {prepared.newIdentityCount > 0 ? (
+        <Alert>
+          <ShieldAlert />
+          <AlertTitle>มีรายการเพิ่มใหม่ที่ต้องพิจารณาตำแหน่ง</AlertTitle>
+          <AlertDescription>
+            พบ {prepared.newIdentityCount.toLocaleString('th-TH')} รายการ สามารถ apply
+            เข้า draft เพื่อทบทวนได้ แต่ publish guard จะยังปิดไว้จนกว่า P-18 จะได้รับการอนุมัติ
+          </AlertDescription>
+        </Alert>
+      ) : null}
+
+      {prepared.unapprovedLegacyActiveCount > 0 ? (
+        <Alert variant="destructive">
+          <ShieldAlert />
+          <AlertTitle>พบรหัสเดิมที่ยังเผยแพร่ไม่ได้</AlertTitle>
+          <AlertDescription>
+            ในไฟล์นี้มี ITEM-#### ที่ยัง active และไม่ใช่ข้อยกเว้น ITEM-0139 จำนวน{' '}
+            {prepared.unapprovedLegacyActiveCount.toLocaleString('th-TH')} รายการ
+          </AlertDescription>
+        </Alert>
+      ) : null}
+
+      {prepared.structuredCodeGuardApplies ? (
+        <Alert>
+          <ShieldAlert />
+          <AlertTitle>การนำเข้านี้เริ่มหรือดำเนิน structured-code rollout ต่อ</AlertTitle>
+          <AlertDescription>
+            ไฟล์นี้มีรหัส canonical ที่ active{' '}
+            {prepared.activeCanonicalCodeCount.toLocaleString('th-TH')} รายการ
+            {prepared.mode === 'supplement'
+              ? ' ตัวเลขนี้ไม่รวมรายการเดิมนอกไฟล์; ก่อนเผยแพร่ระบบจะตรวจทั้งฉบับร่างและยอมให้ ITEM-0139 เป็นรหัสเดิมได้เพียงรายการเดียว'
+              : ' ก่อนเผยแพร่ระบบจะตรวจทั้งฉบับร่างและยอมให้ ITEM-0139 เป็นรหัสเดิมได้เพียงรายการเดียว'}
+          </AlertDescription>
+        </Alert>
+      ) : null}
+
+      {prepared.retirementCandidateCount > 0 ? (
+        <Alert>
+          <ShieldAlert />
+          <AlertTitle>มีรายการยกเลิกใช้ที่ต้องพิจารณานโยบาย PDF</AlertTitle>
+          <AlertDescription>
+            พบอย่างน้อย {prepared.retirementCandidateCount.toLocaleString('th-TH')} รายการ
+            หลัง apply ต้องตรวจจำนวนจริงอีกครั้ง และยังห้ามรับรอง PDF เป็นฉบับทางการจนกว่า P-19
+            จะได้รับอนุมัติ
+          </AlertDescription>
+        </Alert>
+      ) : null}
+
       <form action={previewAction} className="flex flex-wrap items-center gap-2">
         <input type="hidden" name="payloadJson" value={prepared.payloadJson} />
         <ImportSubmitButton label="Server validate" pendingLabel="กำลัง validate" />
@@ -410,10 +491,18 @@ function PreparedPreview({
       <ActionStateAlert state={previewState} />
 
       {previewState.status === 'success' && previewState.importId ? (
-        <form action={applyAction} className="flex flex-wrap items-center gap-2">
+        <form
+          action={applyAction}
+          className="flex flex-wrap items-center gap-2"
+          onSubmitCapture={prepareApplyOperation}
+        >
+          <input ref={applyRequestIdInputRef} type="hidden" name="requestId" />
           <input type="hidden" name="payloadJson" value={prepared.payloadJson} />
           <input type="hidden" name="importId" value={previewState.importId} />
-          <ImportSubmitButton label="Apply import" pendingLabel="กำลัง apply" />
+          <ImportSubmitButton
+            label="Apply import"
+            pendingLabel="กำลัง apply"
+          />
           <Badge variant="outline">Validated import {shortHash(previewState.importId)}</Badge>
         </form>
       ) : null}
@@ -425,14 +514,16 @@ function PreparedPreview({
 function ImportSubmitButton({
   label,
   pendingLabel,
+  disabled = false,
 }: {
   label: string;
   pendingLabel: string;
+  disabled?: boolean;
 }) {
   const { pending } = useFormStatus();
 
   return (
-    <Button type="submit" disabled={pending}>
+    <Button type="submit" disabled={pending || disabled}>
       {pending ? <Loader2 data-icon="inline-start" className="animate-spin" /> : <CheckCircle2 data-icon="inline-start" />}
       {pending ? pendingLabel : label}
     </Button>
@@ -455,6 +546,7 @@ function ActionStateAlert({ state }: { state: CatalogMutationState }) {
             {state.lockVersion != null ? <Badge variant="outline">lock {state.lockVersion}</Badge> : null}
             {state.changedItems != null ? <Badge variant="outline">{state.changedItems} changed</Badge> : null}
             {state.duplicateRequest ? <Badge variant="outline">duplicate request</Badge> : null}
+            {state.requestId ? <Badge variant="outline">request {state.requestId.slice(0, 8)}</Badge> : null}
           </div>
         </AlertDescription>
       </Alert>
@@ -468,6 +560,7 @@ function ActionStateAlert({ state }: { state: CatalogMutationState }) {
       <AlertDescription>
         <div className="grid gap-3">
           <p>{state.message}</p>
+          {state.requestId ? <p>Request ID: {state.requestId}</p> : null}
           <DiagnosticTable diagnostics={state.diagnostics ?? []} />
         </div>
       </AlertDescription>

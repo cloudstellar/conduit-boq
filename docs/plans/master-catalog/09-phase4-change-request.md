@@ -257,14 +257,14 @@ scope.
 | Code reused for another item | Low | High | Append-only code registry | Any code→identity conflict |
 | Stale draft overwrites newer current catalog | Low | High | Base-pointer and lock-version checks | Pointer differs from draft base |
 | RLS/grant misconfiguration | Medium | Critical | Explicit grants, RLS tests, advisors | Unauthorized read/write succeeds |
-| Publish partially succeeds | Low | Critical | One short transaction | Any invariant/audit step fails |
+| Publish or mutation partially succeeds | Low | Critical | One short transaction; mutation writes use a rollback subtransaction and structured abort | Any invariant/audit step fails or rejected action leaves row/code/change-set drift |
 | Official exports differ from DB | Low | High | Canonical hash/count verification | Export hash/count mismatch |
 | Existing BOQ regression | Low | High | Feature flag and full regression suite | Create/edit/print/export failure |
 | Legacy `is_default` becomes stale | Medium | Medium | Sync in publish/restore transaction | Pointer/flag mismatch |
 | Oversized payload fails unpredictably | Low | Medium | 750 KB application cap, tested error | Payload exceeds cap |
 | Factor F change hidden inside catalog work | Medium | High | Completed Factor F closeout is treated as a protected baseline; Phase 4 has no Factor F write path | Any Factor F row/value/pointer change in this CR |
 | Retry after timeout creates a second business effect | Medium | High | Client-owned stable operation ID plus timeout-after-commit test | Same intended retry reaches DB with a new ID or creates a second change set |
-| Clean rebuild hash cannot be reconciled | High until P-20 | High | Deterministic baseline identity or explicitly approved dual-hash contract | P-20 unresolved or clean approved environments disagree |
+| Clean rebuild hash cannot be reconciled | Medium until independent P-20 proof | High | Approved deterministic Production-derived `price_list.id` baseline mapping plus tracked two-run comparator | Independent clean approved environments disagree or evidence does not match the reviewed commit |
 | Future version needs a code hotfix | High with hardcoding | High | Generic ADR-003 version validation and multi-version fixtures | Reusable path requires a `2568.1.0` code change |
 | Hotfix behavior regresses despite static tests | Medium | High | Permanent live DB/RPC suffix/authority/rollback suite | Any approved suffix or authoritative catalog field behaves incorrectly |
 | Admin learns a business blocker only at publish | Medium | Medium | Early preview/readiness warning plus final DB guard and UAT | UAT cannot identify/remediate placement or retired-row hold before publish |

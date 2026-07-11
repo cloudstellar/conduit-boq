@@ -1,3 +1,4 @@
+import { randomUUID } from 'node:crypto';
 import { createClient } from '@/lib/supabase/server';
 import {
   CatalogExportError,
@@ -5,6 +6,7 @@ import {
   makeCatalogExportFilename,
 } from '@/lib/master-catalog/export/data';
 import { buildCatalogExportWorkbookBuffer } from '@/lib/master-catalog/export/excel';
+import { logMasterCatalogOperation } from '@/lib/master-catalog/observability';
 
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
@@ -13,8 +15,13 @@ export async function GET(
   _request: Request,
   { params }: { params: Promise<{ versionId: string }> },
 ) {
+  const startedAt = Date.now();
+  const requestId = randomUUID();
+  let selectedVersionId: string | undefined;
+
   try {
     const { versionId } = await params;
+    selectedVersionId = versionId;
     const supabase = await createClient();
     const dataset = await loadCatalogExportDataset(supabase, versionId);
     const buffer = await buildCatalogExportWorkbookBuffer(dataset);
@@ -24,6 +31,15 @@ export async function GET(
       buffer.byteOffset + buffer.byteLength,
     ) as ArrayBuffer;
 
+    logMasterCatalogOperation({
+      operation: 'exportCatalogExcel',
+      outcome: 'success',
+      startedAt,
+      requestId,
+      versionId,
+      versionString: dataset.version.versionString,
+    });
+
     return new Response(body, {
       status: 200,
       headers: {
@@ -31,16 +47,27 @@ export async function GET(
         'Content-Disposition': `attachment; filename="${filename}"`,
         'Cache-Control': 'private, no-store',
         'X-Content-Type-Options': 'nosniff',
+        'X-Request-ID': requestId,
       },
     });
   } catch (error) {
     const mappedError = mapCatalogExportError(error);
+
+    logMasterCatalogOperation({
+      operation: 'exportCatalogExcel',
+      outcome: mappedError.status >= 500 ? 'failed' : 'rejected',
+      startedAt,
+      requestId,
+      versionId: selectedVersionId,
+      code: mappedError.code,
+    });
 
     return Response.json(
       {
         error: {
           code: mappedError.code,
           message: mappedError.message,
+          requestId,
         },
       },
       {
@@ -48,6 +75,7 @@ export async function GET(
         headers: {
           'Cache-Control': 'private, no-store',
           'X-Content-Type-Options': 'nosniff',
+          'X-Request-ID': requestId,
         },
       },
     );

@@ -66,7 +66,8 @@ Tracker/Verification Report เพื่อหลีกเลี่ยง self-r
 การเปลี่ยน schema, permission, canonical hash, publish gate, migration order,
 rollback หรือ official export ต้องแก้ authority, acceptance test และ
 verification template ใน change set เดียวกัน. WP-6.5 ต้องเพิ่ม automated
-consistency check สำหรับ contract ที่ตรวจด้วยเครื่องได้.
+consistency check สำหรับ contract ที่ตรวจด้วยเครื่องได้; tracked test นี้
+implemented แล้วและต้อง rerun ในทุก reliability/rehearsal checkpoint.
 
 [แผนย้าย Supabase API key](../security/01-supabase-api-key-migration-change-request.md)
 เป็น maintenance แยก ไม่ต้องรวมใน Production change เดียวกับ Phase 4 และไม่
@@ -100,10 +101,10 @@ consistency check สำหรับ contract ที่ตรวจด้วย�
 | Runtime font/logo derivative ใด commit/deploy ได้ | P-10 approved แบบจำกัด; ใช้เฉพาะ runtime derivatives ตาม Decision Register และ [Doc #24](./24-phase4-nt-ci-runtime-asset-analysis.md) |
 | Metadata จริงของ baseline `2568.0.0` | P-08 approved: effective `2026-01-01`; approval ref `เอ็นที วทฐฐ./405 ลงวันที่ 27 พ.ย. 2568`; publisher `ผู้จัดการฝ่ายท่อร้อยสาย (ทฐฐ.)` |
 | รูปแบบตัวอย่าง Excel/PDF ตาม Export Spec | ยังปิดงาน export acceptance ไม่ได้ |
-| P-18 placement governance สำหรับ add/supplement และ structured-code exception | ต้องทำ WP-6.5 publish-boundary guard ก่อน WP-7; ห้าม publish version ที่มี identity ใหม่จนกว่า guard และ placement decision พร้อม และ `2568.1.0` ต้องมี active legacy `ITEM-####` ได้เฉพาะ `ITEM-0139` |
+| P-18 placement governance สำหรับ add/supplement และ structured-code exception | WP-6.5 guard/readiness implementation พร้อมสำหรับ Local verification แล้ว แต่ยังต้องมี live evidence ก่อน WP-7; ห้าม publish version ที่มี identity ใหม่จนกว่า P-18 จะปิด และเมื่อ draft เริ่ม structured-code rollout แล้ว active legacy `ITEM-####` ต้องเหลือได้เฉพาะ `ITEM-0139` |
 | P-19 PDF policy สำหรับรายการยกเลิกใช้ | ถ้า version ใดมี inactive/retired rows ต้องตัดสินใจว่าจะ exclude/mark/appendix ก่อน filed PDF |
-| P-20 canonical hash portability | ต้องตัดสินใจ deterministic baseline identity หรือปรับ hash contract ก่อน WP-6.5 exit/WP-7 และ WP-8/P-15; ห้ามอ้าง hash ต่าง environment ว่าเท่ากันขณะยังไม่ปิด decision |
-| Version lifecycle ตาม ADR-003 | ADR-003 รองรับ annual/revision/patch อยู่แล้ว; WP-6.5 ต้องเอา hardcoded `2568.1.0` ออกจาก reusable action/RPC path และพิสูจน์รุ่นอื่นด้วย test ไม่ใช่รอ business decision ใหม่ |
+| P-20 canonical hash portability | Owner approved deterministic baseline identity จาก Production-derived `price_list.id` และ implementation/comparator พร้อมแล้ว; ยังห้ามอ้าง cross-environment equivalence จนกว่าจะผ่าน independent clean-rebuild evidence ก่อน WP-6.5 exit/WP-7 และ WP-8/P-15 |
+| Version lifecycle ตาม ADR-003 | Reusable action/RPC path ไม่ hardcode `2568.1.0` แล้วและ unit/static fixtures รองรับ annual/revision/patch; ยังต้องพิสูจน์ live additional version และ invalid transitions ก่อน WP-6.5 exit |
 | Live Production preflight หลัง Factor F rollout | ต้อง refresh ก่อนทุก Production gate; ห้ามใช้ BOQ count จาก closeout เป็นค่าตายตัว |
 
 ## ตัวเลข reconciliation ที่ต้องใช้เป็นจุดตรวจ

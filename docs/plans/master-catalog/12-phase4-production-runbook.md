@@ -70,8 +70,9 @@ Stop immediately when any of these occurs:
   Factor F metadata, BOQ snapshots, or BOQ totals;
 - anonymous/non-admin access succeeds unexpectedly;
 - migration, test, build, smoke, hash, or export gate fails;
-- P-20 identity/hash portability remains unresolved when clean-rehearsal or
-  migration-fingerprint evidence is being accepted;
+- approved P-20 identity/hash implementation or independent clean-rebuild
+  evidence is missing/mismatched when clean-rehearsal or migration-fingerprint
+  evidence is being accepted;
 - a retryable UI/action path generates a fresh request ID after an uncertain
   response;
 - reusable version logic remains hardcoded to `2568.1.0` contrary to ADR-003;
@@ -161,12 +162,14 @@ With feature flag disabled by default:
 4. Apply approved code/category decisions; K fields must remain absent.
 5. Test one manual add, edit, retire, and recode with reasons.
 6. Test Full and Supplement imports.
-7. Before WP-7, prove the WP-6.5 P-18 guard rejects publishing any draft with
+7. Before WP-7, run the implemented WP-6.5 P-18 guard and prove it rejects
+   publishing any draft with
    add/supplement identities absent from the base version, returning
    `P18_PLACEMENT_REVIEW_REQUIRED` without pointer movement.
-8. Before WP-7, prove the WP-6.5 structured-code guard rejects any first
-   structured-code candidate whose active legacy `ITEM-####` rows exceed the
-   recorded `ITEM-0139` exception.
+8. Before WP-7, prove an unchanged legacy-only clone can publish, then prove
+   the WP-6.5 structured-code guard activates once the draft contains an active
+   canonical `AAA-TTT-NNN` code and rejects a candidate whose active legacy
+   `ITEM-####` rows exceed the recorded `ITEM-0139` exception.
 9. Test duplicate request ID, stale lock version, stale base pointer, invalid
    price delta, invalid identity/code reuse, and unauthorized role.
 10. Simulate an uncertain response after commit and prove the UI/action retry
@@ -421,13 +424,15 @@ Disable the flag immediately if any smoke test fails.
    physical archive reference, reason, and approver.
 9. If import was used, have the verifier independently hash the filed source
    workbook and match the recorded client-computed fingerprint.
-10. Confirm no add/supplement/new identity rows are present unless P-18
-    placement governance is approved and the WP-6.5 guard evidence is accepted.
+10. Confirm no add/supplement/new identity rows are present. Keep publication
+    blocked until P-18 placement governance is approved and the WP-6.5 guard
+    evidence is accepted.
 11. If any inactive/retired rows are present, confirm P-19 official PDF
     rendering/exclusion policy before filing field-facing artifacts.
-12. Confirm the WP-6.5 structured-code guard evidence for the exact candidate,
-    including the approved temporary `ITEM-0139` exception and no other active
-    legacy `ITEM-####` rows.
+12. If the exact candidate begins structured-code rollout, confirm the WP-6.5
+    guard evidence, including the approved temporary `ITEM-0139` exception and
+    no other active legacy `ITEM-####` rows. Do not apply this rollout-specific
+    rule to an unchanged legacy-only clone.
 13. Confirm expected lock version and current pointer/base match.
 14. Confirm P-20 identity/hash portability evidence matches the exact reviewed
     migration/candidate contract.

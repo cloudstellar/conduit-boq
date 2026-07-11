@@ -103,7 +103,9 @@ After a version is published:
 - Production currently has 710 distinct item codes, zero required-value gaps,
   and zero unit-cost mismatches
 - Published catalog row immutability, stable item identity, normalized
-  categories, import audit, and official catalog export are not implemented yet
+  categories, import audit, and official catalog export are not deployed to
+  Production. Their Phase 4 Local implementation/evidence status is owned by
+  the Progress Tracker.
 
 Read-only Supabase MCP recheck on 2026-06-22 confirmed the 710/710 row/code
 count, one active/default version and singleton pointer, zero missing required
@@ -445,12 +447,13 @@ does not add a reorder UI. Do not use physical database order or candidate
 workbook row order. `display_order` is included in the canonical dataset hash
 and official presentation contract.
 
-This append-at-end rule is draft allocation only. After P-18, a version with
-new add/supplement identities must not publish until placement governance is
-approved. WP-6.5 adds a publish guard that rejects draft rows whose
+This append-at-end rule is draft allocation only. Until P-18 placement
+governance is approved, a version with new add/supplement identities must not
+publish. WP-6.5 implements a publish guard that rejects draft rows whose
 `identity_id` is absent from the base version with
 `P18_PLACEMENT_REVIEW_REQUIRED`; the later placement/review UI remains outside
-Phase 4 Core unless separately approved.
+Phase 4 Core unless separately approved. Static evidence exists; live Local
+guard evidence remains an exit gate.
 
 Backfill the current 710 rows one-to-one. A recoded item receives a new registry
 row pointing to the same identity. A code can never move to another identity.
@@ -524,13 +527,16 @@ meaning is versioned by the group row; `TTT` is interpreted only within its
 Add nullable `price_list.code_group_id` for compatibility. The legacy
 `2568.0.0` rows may remain null until the approved reconciliation is applied;
 every item in a newly published structured-code version must have a valid code
-group except a recorded owner-approved temporary legacy-code exception. For
-P-06, the only approved exception is `ITEM-0139` in `2568.1.0`; publish
-validation must assert that no other active structured-version row has
-`code_group_id is null`. The server validates that the explicit group matches
+group except a recorded owner-approved temporary legacy-code exception. The
+guard becomes applicable when a draft contains at least one active canonical
+`AAA-TTT-NNN` code, so an unchanged legacy-only baseline clone remains a valid
+positive control. For P-06, the only approved exception in the first candidate
+is `ITEM-0139`; publish validation must assert that no other active legacy
+`ITEM-####` row remains. The server validates that the explicit group matches
 the approved canonical code but application pricing logic never parses the code
-string. WP-6.5 hardens this at the publish boundary alongside the P-18
-new-identity guard so the exception cannot remain only a reviewer checklist.
+string. WP-6.5 implements this at the publish boundary alongside the P-18
+new-identity guard so the exception cannot remain only a reviewer checklist;
+live Local evidence remains required.
 Use composite foreign key `(version_id, code_group_id) ->
 catalog_code_groups (version_id, id)` so an item cannot reference another
 version's taxonomy row.
@@ -722,6 +728,9 @@ Relational and migration rules:
   preflight, then `VALIDATE CONSTRAINT`.
 - Migration transactions use bounded `lock_timeout` and `statement_timeout`;
   concurrent indexes are separate nontransactional migration steps when needed.
+- Private create/apply/publish/restore functions independently set bounded
+  runtime lock/statement timeouts (`5s`/`30s` in the Local implementation);
+  migration-time settings do not govern later Data API calls.
 - New `public` tables receive explicit least-privilege Data API grants in the
   migration in addition to RLS. Do not rely on automatic default grants; the
   Supabase 2026 rollout makes new-table exposure an explicit project setting.
@@ -897,8 +906,11 @@ workbook:
 5. Submit expected `lock_version` and a unique `request_id`.
 6. The server validates authorization, feature flag, draft status, identity,
    code registry, category, code group, nonnegative costs, and unit-cost sum.
-7. One private database function locks the draft, applies the change, increments
-   `lock_version`, and appends the full-snapshot audit rows atomically.
+7. One private database function locks the draft and desired canonical codes,
+   validates the complete payload before writing, then applies the change inside
+   a subtransaction. A mutation-time structured rejection rolls back the whole
+   change set before returning a safe error; success increments `lock_version`
+   and appends full-snapshot audit rows atomically.
 8. Return the saved row and refreshed diff summary.
 
 Manual-only drafts do not require a source filename, workbook hash, or physical
@@ -958,8 +970,10 @@ Within one transaction:
    approval requirements.
 5. Reject P-18 add/supplement publication if any target draft `identity_id` is
    absent from the base version rows.
-6. Reject incomplete structured-code publication if active legacy `ITEM-####`
-   rows exceed the recorded `ITEM-0139` exception.
+6. When the draft contains at least one active canonical `AAA-TTT-NNN` row,
+   reject incomplete structured-code publication if active legacy `ITEM-####`
+   rows exceed the recorded `ITEM-0139` exception. Do not activate this rollout
+   guard for an unchanged legacy-only clone.
 7. Read active items in deterministic order.
 8. Build canonical dataset JSON using fixed keys and numeric formatting.
 9. Compute SHA-256 `dataset_hash` and `item_count`.
@@ -1009,19 +1023,18 @@ excluded. The complete contract and mandatory golden hash are in the
 
 ### 6.1.2 Cross-environment identity/hash portability gate
 
-Current Local migration evidence creates baseline stable identities with random
-UUIDs on each clean bootstrap. Because `identity_id` is included, the hash is
-repeatable only while the same identity mapping is preserved; it is not yet a
-cross-environment business-equivalence proof.
+P-20 was approved on 2026-07-11. Migration `017` initializes each legacy
+baseline stable identity directly from the immutable Production-derived
+`price_list.id` and keeps identity in the lineage hash. It fails closed when
+the input is not the non-empty `2568.0.0` baseline, a baseline identity was
+already assigned differently, a target UUID collides, or post-backfill
+coverage differs from the approved one-to-one mapping. Cloned version rows
+reuse that identity and do not derive identity from their own row UUID.
 
-P-20 must close before WP-6.5 exits/WP-7 starts, WP-8, and migration fingerprint
-freeze. The preferred
-path is to initialize each baseline stable identity from a reviewed deterministic
-mapping, such as the immutable existing Production `price_list.id`, and keep
-identity in the lineage hash. A dual business-content/lineage-hash model is an
-acceptable alternative only if the DB, parser/hash, export, release-note, and
-verification contracts are revised together. Do not silently remove
-`identity_id` or describe environment-specific hashes as equivalent.
+Implementation and independent clean-rebuild proof must close before WP-6.5
+exits/WP-7 starts, WP-8, and migration fingerprint freeze. Do not add a dual
+hash in Phase 4, silently remove `identity_id`, or describe environment-specific
+hashes as equivalent.
 
 ### 6.2 Official stamp
 
@@ -1204,9 +1217,9 @@ Components. Do not use Server Actions as GET endpoints.
 ### 7.3 Export interfaces
 
 - Authenticated Excel Route Handler:
-  `/api/catalog/[versionId]/export/xlsx`
+  `/api/master-catalog/export/excel/[versionId]`
 - Server-rendered print route:
-  `/price-list/[versionId]/print`
+  `/admin/master-catalog/versions/[versionId]/print`
 
 Published exports follow normal catalog read permission. Draft exports require
 active admin authorization.

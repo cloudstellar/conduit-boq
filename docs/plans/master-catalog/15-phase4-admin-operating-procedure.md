@@ -68,6 +68,8 @@ The item is not usable by ordinary users until the draft is published/current.
 Under P-18, any draft containing a newly added/supplement identity must remain
 unpublishable until placement governance is approved. The WP-6.5 guard should
 return `P18_PLACEMENT_REVIEW_REQUIRED` and keep the draft available for review.
+The Local WP-6.5 implementation now exposes this count from the same DB helper
+used by publish; live Local evidence is still required before the gate closes.
 The draft/import preview must show this publication hold immediately after the
 new identity appears, together with the placement decision needed; do not wait
 until the final Publish click to inform the operator.
@@ -189,8 +191,10 @@ Publication is high impact.
 4. Review final diff totals, item count, and warning acknowledgements.
 5. Confirm no add/supplement/new identity rows are present unless P-18
    placement governance and guard evidence are approved.
-6. Confirm the structured-code guard evidence shows no active legacy
-   `ITEM-####` row except the approved `ITEM-0139` exception for `2568.1.0`.
+6. If the draft has begun the structured-code rollout by containing any active
+   canonical `AAA-TTT-NNN` row, confirm no active legacy `ITEM-####` row remains
+   except the approved `ITEM-0139` exception. An unchanged legacy-only clone does
+   not activate this rollout guard.
 7. If any inactive/retired rows are present, confirm P-19 official PDF policy.
 8. Confirm the version number and current base/pointer.
 9. Obtain explicit owner approval for this exact version.
@@ -213,6 +217,15 @@ atomically. Do not attempt to edit it.
 6. After each final file exists, calculate its binary SHA-256 and record it
    separately from the dataset hash in the release note.
 7. File both copies in the approved physical/digital filing location.
+
+For retained Local P-11 evidence only, commit the reviewed implementation first,
+run `npm run artifacts:master-catalog:generate` against the Local app, and retain
+the resulting new directory only when its tracked semantic verification says
+`passed`. The generator refuses a dirty tracked tree and never overwrites an
+existing evidence directory. Rerun an existing pair with
+`npm run artifacts:master-catalog:verify -- <artifact-manifest.json>`. These
+commands do not authorize Production publication or replace final owner visual
+confirmation.
 
 Draft exports must show `DRAFT – ห้ามใช้อ้างอิง` and cannot be treated as
 official references.

@@ -4,7 +4,9 @@ import {
   buildRestoreCatalogPointerArgs,
   buildManualCatalogChangeArgs,
   createCatalogRpcTransportError,
+  isDefinitiveCatalogMutationOutcome,
   mapCatalogRpcActionResponse,
+  shouldBeginNewCatalogOperation,
 } from '../lib/master-catalog/admin/actionModel';
 
 const VERSION_ID = '00000000-0000-4000-8000-000000000001';
@@ -285,16 +287,21 @@ describe('Master Catalog admin action model', () => {
       message: 'Master Catalog RPC ปฏิเสธรายการนี้',
     });
 
-    expect(createCatalogRpcTransportError('previewCatalogImport')).toMatchObject({
+    expect(createCatalogRpcTransportError('previewCatalogImport', REQUEST_ID)).toMatchObject({
       status: 'error',
       code: 'INTERNAL_ERROR',
-      message: 'บันทึก import validation ไม่สำเร็จจากระบบฐานข้อมูล',
+      message: expect.stringContaining('ผลลัพธ์อาจถูกบันทึกแล้ว'),
+      requestId: REQUEST_ID,
+      retryable: true,
+      outcomeUncertain: true,
     });
 
-    expect(createCatalogRpcTransportError('publishCatalogVersion')).toMatchObject({
+    expect(createCatalogRpcTransportError('publishCatalogVersion', REQUEST_ID)).toMatchObject({
       status: 'error',
       code: 'INTERNAL_ERROR',
-      message: 'Publish catalog version ไม่สำเร็จจากระบบฐานข้อมูล',
+      message: expect.stringContaining('ผลลัพธ์อาจถูกบันทึกแล้ว'),
+      requestId: REQUEST_ID,
+      outcomeUncertain: true,
     });
   });
 
@@ -314,5 +321,33 @@ describe('Master Catalog admin action model', () => {
       importStatus: 'validated',
       normalizedPayloadHash: 'a'.repeat(64),
     });
+  });
+
+  it('rotates a client request ID only after a definitive outcome', () => {
+    const idle = { status: 'idle', message: '' } as const;
+    const uncertain = {
+      status: 'error',
+      message: 'transport uncertain',
+      outcomeUncertain: true,
+    } as const;
+    const rejected = {
+      status: 'error',
+      message: 'validation rejected',
+      outcomeUncertain: false,
+    } as const;
+
+    expect(isDefinitiveCatalogMutationOutcome(idle)).toBe(false);
+    expect(isDefinitiveCatalogMutationOutcome(uncertain)).toBe(false);
+    expect(isDefinitiveCatalogMutationOutcome(rejected)).toBe(true);
+    expect(isDefinitiveCatalogMutationOutcome({
+      status: 'success',
+      message: 'saved',
+    })).toBe(true);
+
+    expect(shouldBeginNewCatalogOperation(null, idle, 'draft-a', 'draft-a')).toBe(true);
+    expect(shouldBeginNewCatalogOperation(idle, idle, 'draft-a', 'draft-a')).toBe(false);
+    expect(shouldBeginNewCatalogOperation(idle, uncertain, 'draft-a', 'draft-a')).toBe(false);
+    expect(shouldBeginNewCatalogOperation(uncertain, rejected, 'draft-a', 'draft-a')).toBe(true);
+    expect(shouldBeginNewCatalogOperation(idle, idle, 'draft-a', 'draft-b')).toBe(true);
   });
 });

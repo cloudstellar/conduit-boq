@@ -89,8 +89,22 @@ export interface FactorFDefaultSummary {
   status: string | null;
 }
 
+export interface CatalogPublishReadiness {
+  versionFound: boolean;
+  versionStatus: CatalogVersionStatus | null;
+  basedOnVersionId: string | null;
+  newIdentityCount: number;
+  activeCanonicalCodeCount: number;
+  structuredCodeGuardApplies: boolean;
+  unapprovedLegacyActiveCount: number;
+  inactiveRowCount: number;
+  retiredPdfPolicyRequired: boolean;
+  canPublish: boolean;
+}
+
 export interface CatalogAdminOverview {
   defaultVersion: CatalogVersionSummary | null;
+  draftPublishReadiness: CatalogPublishReadiness | null;
   factorFDefault: FactorFDefaultSummary;
   versions: CatalogVersionSummary[];
   recentImports: CatalogImportSummary[];
@@ -103,6 +117,19 @@ export interface CatalogAdminOverview {
     codeGroups: number | null;
   };
   warnings: string[];
+}
+
+export function selectWorkingCatalogDraft(
+  versions: CatalogVersionSummary[],
+  currentVersionId: string | null,
+): CatalogVersionSummary | null {
+  if (!currentVersionId) return null;
+
+  return versions.find(
+    (version) =>
+      version.status === 'draft'
+      && version.basedOnVersionId === currentVersionId,
+  ) ?? null;
 }
 
 export interface CatalogVersionDetail {
@@ -307,6 +334,7 @@ export async function loadCatalogAdminOverview(
   const defaultVersion =
     versions.find((version) => version.id === defaultVersionId) ??
     (defaultVersionId ? await loadCatalogVersionById(supabase, defaultVersionId, warnings) : null);
+  const draftVersion = selectWorkingCatalogDraft(versions, defaultVersion?.id ?? null);
 
   const [
     activeDefaultRows,
@@ -314,6 +342,7 @@ export async function loadCatalogAdminOverview(
     itemCodes,
     categories,
     codeGroups,
+    draftPublishReadiness,
   ] = await Promise.all([
     defaultVersion
       ? countPriceListRows(supabase, defaultVersion.id, true, warnings, 'นับรายการ active ของ current default ไม่สำเร็จ')
@@ -326,10 +355,14 @@ export async function loadCatalogAdminOverview(
     defaultVersion
       ? countVersionedTable(supabase, 'catalog_code_groups', defaultVersion.id, warnings, 'นับ code groups ไม่สำเร็จ')
       : Promise.resolve(null),
+    draftVersion
+      ? loadCatalogPublishReadiness(supabase, draftVersion.id, warnings)
+      : Promise.resolve(null),
   ]);
 
   return {
     defaultVersion,
+    draftPublishReadiness,
     factorFDefault,
     versions,
     recentImports: rowsFromResult(importsResult.data).map(mapImportSummary),
@@ -342,6 +375,46 @@ export async function loadCatalogAdminOverview(
       codeGroups,
     },
     warnings,
+  };
+}
+
+async function loadCatalogPublishReadiness(
+  supabase: SupabaseClient,
+  versionId: string,
+  warnings: string[],
+): Promise<CatalogPublishReadiness | null> {
+  const { data, error } = await supabase.rpc('get_catalog_publish_readiness', {
+    p_version_id: versionId,
+  });
+
+  if (error) {
+    pushError(warnings, error, 'ตรวจความพร้อมก่อนเผยแพร่ไม่สำเร็จ');
+    return null;
+  }
+
+  const row = rowFromResult(data);
+
+  if (!row) {
+    warnings.push('ผลตรวจความพร้อมก่อนเผยแพร่ไม่อยู่ในรูปแบบที่รองรับ');
+    return null;
+  }
+
+  return {
+    versionFound: row.versionFound === true,
+    versionStatus:
+      row.versionStatus === 'draft' ||
+      row.versionStatus === 'active' ||
+      row.versionStatus === 'archived'
+        ? row.versionStatus
+        : null,
+    basedOnVersionId: toNullableString(row.basedOnVersionId),
+    newIdentityCount: toNullableNumber(row.newIdentityCount) ?? 0,
+    activeCanonicalCodeCount: toNullableNumber(row.activeCanonicalCodeCount) ?? 0,
+    structuredCodeGuardApplies: row.structuredCodeGuardApplies === true,
+    unapprovedLegacyActiveCount: toNullableNumber(row.unapprovedLegacyActiveCount) ?? 0,
+    inactiveRowCount: toNullableNumber(row.inactiveRowCount) ?? 0,
+    retiredPdfPolicyRequired: row.retiredPdfPolicyRequired === true,
+    canPublish: row.canPublish === true,
   };
 }
 

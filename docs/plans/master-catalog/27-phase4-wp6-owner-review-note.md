@@ -1,8 +1,8 @@
 # Master Catalog Phase 4 WP-6 Owner Review Note
 
-**Status:** Ready for owner review
+**Status:** Visual/content direction accepted; final retained binary pair pending
 **Prepared:** 2026-07-06 16:47 +07
-**Updated:** 2026-07-11 00:59 +07 for Local proof of the final PDF/Excel terminology and title hierarchy
+**Updated:** 2026-07-11 13:09 +07 for the WP-6.5 implementation checkpoint; live Local evidence remains pending
 **Branch:** `codex/master-catalog-phase4`
 **Reviewed baseline commit:** Original WP-6 artifact review used `72f2c05 merge: integrate hotfix 016 into phase4`; use git HEAD for the latest committed checkpoint
 **Environment:** Local only
@@ -36,8 +36,10 @@ Both title lines remain legible; the PDF has `19` pages and `18` price
 sections; all 710 rows, sequence/hash, and watermark evidence remain intact.
 The companion Local workbook has five visible sheets, 710 price rows, 710
 verification rows, reconstructed dataset-hash match, and Thai user-facing
-labels while canonical verification identifiers remain unchanged. Final P-11
-visual/file acceptance is still owner-held.
+labels while canonical verification identifiers remain unchanged. The owner
+accepted this visual/content direction on 2026-07-11. Final acceptance of an
+exact retained PDF/Excel binary pair remains pending after P-20 and the tracked
+semantic verifier.
 
 This is not a Production approval, not a Production deployment approval, not a
 catalog publication approval, and not approval to publish any add/supplement
@@ -47,14 +49,24 @@ guards plus end-to-end retry IDs, P-20 hash portability, reusable ADR-003
 versioning, live DB/concurrency evidence, tracked export verification, operator
 failure states/logging, and documentation consistency.
 
-Recommended owner decision:
+The tracked WP-6.5 implementation now includes deterministic baseline identity,
+actor+payload request fingerprints, stable client operation IDs, shared DB
+readiness/guards, generic ADR-003 version transitions, atomic mutation abort,
+runtime timeouts, semantic artifact generation/verification, route failure
+states, bounded logs, and a Local DB/concurrency/P-20 harness. This note does not
+claim those live DB gates passed: the amended migrations have not been applied by
+a new owner-approved Local reset, and the final retained P-11 pair has not been
+generated from the resulting clean committed state.
 
-| Decision | Recommendation | Boundary |
+Recorded owner decision:
+
+| Decision | Outcome | Boundary |
 |---|---|---|
-| Accept WP-6 baseline export implementation evidence | Accept, if owner visually accepts the filed artifacts | Local-only `2568.0.0` baseline export evidence |
-| Accept the current Excel/PDF artifact proof as sufficient for P-11 baseline review | Accept, if owner does not require stronger browser download automation | Final P-11 artifact acceptance still belongs to owner |
-| Mark WP-6 complete after owner acknowledgement | Accept after owner review | Tracker can move to `Complete` only after owner accepts |
-| Start WP-6.5 reliability and publish-boundary hardening after WP-6 acceptance | Accept for Local only | Follow Execution Pack sub-gates; no Production write, placement UI, Factor F change, or hotfix scope expansion |
+| Accept WP-6 baseline export implementation evidence | Accepted for visual/content direction | Local-only `2568.0.0` baseline export implementation |
+| Accept the current Excel/PDF visual/content direction | Accepted | Exact retained final binaries remain a separate gate |
+| Mark WP-6 complete now | Held | Requires P-20-compliant retained pair, tracked verification, filed hashes, and short final visual confirmation |
+| Start WP-6.5 reliability and publish-boundary hardening | Authorized for Local only while WP-6 final binary remains pending | Follow Execution Pack sub-gates; no unannounced reset, Production write, placement UI, Factor F change, or hotfix scope expansion |
+| Implement P-20 deterministic identity | Approved: baseline identity equals immutable Production-derived `price_list.id`; keep `identity_id` in the lineage hash | Cross-rebuild evidence remains required before WP-6.5 exit/WP-7 |
 | Start WP-7 BOQ and Factor F regression preservation | Only after all applicable WP-6.5 evidence, including P-20, is green | Regression-only; no new Factor F workflow |
 | Keep P-18 open and hold add/supplement publication | Required | No add/supplement publish path until guard evidence and placement governance are approved |
 
@@ -64,7 +76,7 @@ Recommended owner decision:
 |---|---|
 | Migration ledger | Phase 4 stays local-only at `017`-`019`; hotfix `016` is already merged before Phase 4 scripts |
 | Implementation Execution Pack | WP-6 must generate selected-version official Excel/PDF and stop before Production gates |
-| Decision Register | P-11 final artifact acceptance remains pending; P-18/P-19 are workflow gates; P-20 hash portability is required before WP-6.5 exit/WP-7; P-06 allows only the `ITEM-0139` temporary legacy exception |
+| Decision Register | P-11 visual/content direction is accepted while final retained binaries remain pending; P-18/P-19 are workflow gates; P-20 deterministic `price_list.id` mapping is approved and must be proven before WP-6.5 exit/WP-7; P-06 allows only the `ITEM-0139` temporary legacy exception |
 | Official Export Spec | Server-selected version, fail-closed count/hash, exact five-sheet Excel, server-verified PDF stamp, draft marking, and Factor F exclusion are required |
 | Verification Report | WP-6 evidence must distinguish dataset hash from binary file hash and keep final owner/file acceptance separate |
 | Admin Operating Procedure | Official exports must be generated from the published selected version, then binary hashes filed separately |
@@ -154,38 +166,38 @@ None found for the local-only 710-row baseline export artifact evidence.
 |---|---|---:|---|
 | Final P-11 artifact acceptance remains owner-held | High | Yes, for marking WP-6 complete | WP-6 complete/P-11 acceptance |
 | P-18 display-order placement governance remains open | High for add/supplement versions | No for baseline `2568.0.0` export | Any add/supplement publication readiness |
-| WP-6.5 reliability sub-gates not implemented yet | High for mutation/publication reliability | No for baseline `2568.0.0` export | Before WP-7, including P-20 |
+| WP-6.5 code/static slices implemented but live DB/rebuild/UAT evidence not run | High for mutation/publication reliability | No for baseline `2568.0.0` visual direction | Before WP-7, including P-20 |
 | P-19 inactive/retired PDF policy pending | Medium for future retired-row versions | No for current all-active baseline proof | Any official PDF filing for a version with inactive/retired rows |
 | Optional stronger Excel attachment-download proof remains open | Medium | No if owner accepts unit/build/manual artifact proof | Only if owner requires browser-download automation |
-| P-20 Local clean-reset identity/hash portability remains open | High for cross-environment proof | No for this artifact review | WP-6.5 exit/WP-7, WP-8/migration fingerprint/P-15 |
-| Export artifact verifier is not yet tracked/semantic | Medium | No for visual review | Final reproducible P-11/WP-8 evidence |
+| P-20 implementation exists; two clean-rebuild outputs remain open | High for cross-environment proof | No for this artifact review | WP-6.5 exit/WP-7, WP-8/migration fingerprint/P-15 |
+| Tracked semantic verifier/generator exists; final retained pair has not run from the clean committed P-20 state | Medium | No for visual direction | Final reproducible P-11/WP-8 evidence |
 | BOQ and Factor F regression preservation not started | High for Production readiness | No for WP-6 export review | WP-7/WP-8 |
 | Advisor baseline and approved fresh Production snapshot source remain open | Medium | No for WP-6 export review | WP-8/P-12 |
 | App-wide/legacy NT logo provenance remains partially open under P-10 | Medium | No for WP-6 artifact proof | P-10/Production deploy readiness |
 
-## 6. Owner Review Questions
+## 6. Recorded Decisions And Remaining Review
 
-Please review these decisions explicitly:
+The staged decisions are recorded above. The remaining owner review is limited
+to the exact retained pair and later affected-workflow decisions:
 
 | # | Question | Recommended answer |
 |---|---|---|
-| 1 | Do you accept the WP-6 local-only baseline export evidence for `2568.0.0`? | Yes, if the Excel/PDF artifacts are visually acceptable |
-| 2 | Do you accept the current artifact proof instead of requiring stronger browser attachment-download automation now? | Yes |
-| 3 | Do you approve marking WP-6 `Complete` in the tracker after this review? | Yes, after owner acknowledgement |
-| 4 | Do you approve starting WP-6.5 local-only reliability hardening after WP-6 is complete? | Yes, Local only, using the Execution Pack sub-gates |
-| 5 | Do you approve starting WP-7 only after all applicable WP-6.5 evidence, including P-20, is recorded? | Yes |
-| 6 | Do you confirm P-18 remains open and add/supplement publication stays held until guard evidence and placement governance are approved? | Yes |
-| 7 | Do you accept the refined field-facing PDF cover that omits approval/publisher/export/generator metadata and uses a plain Thai warning only for non-current published versions? | Yes, after visual review of the regenerated cover |
+| 1 | Is the visual/content direction accepted? | Recorded yes on 2026-07-11 |
+| 2 | May WP-6.5 proceed Local-only before the final pair? | Recorded yes on 2026-07-11 |
+| 3 | May WP-7 start before WP-6.5/P-20 evidence is green? | No |
+| 4 | Is WP-6 complete now? | No; review the exact retained P-20-compliant pair, manifest, verifier result, and filed binary hashes |
+| 5 | Is P-18 placement approved? | No; keep add/supplement publication blocked |
+| 6 | Is P-19 retired-row PDF treatment approved? | No; do not file an affected PDF as final |
 
-Recommended owner response if accepted:
+Recommended final-pair response when that evidence exists:
 
 ```text
-Accept WP-6 local-only baseline export evidence and final P-11 artifacts for the `2568.0.0` proof. Mark WP-6 Complete. Start WP-6.5 local-only reliability hardening before WP-7 according to the Execution Pack, including end-to-end retry IDs, publish guards, P-20, reusable versioning, live DB/concurrency, tracked export verification, failure UX/logging, and documentation consistency. No Production write, Production migration/deploy/feature enablement/catalog publication, Factor F change, placement UI/reorder workflow, or add/supplement publication is authorized. Keep P-18/P-19 at their stated gates.
+Accept the exact retained Local `2568.0.0` PDF/Excel pair, its manifest, semantic verification result, and filed binary hashes as final P-11/WP-6 artifact evidence. This does not approve Production migration, deploy, feature enablement, catalog publication, P-18 placement, P-19 retired-row PDF treatment, or any Factor F change.
 ```
 
-## 7. Proposed WP-6.5 Then WP-7 Local-Only Start Plan
+## 7. WP-6.5 To WP-7 Gate
 
-If the owner accepts WP-6, use
+WP-6.5 is already authorized for Local implementation. Use
 [Execution Pack WP-6.5](./23-phase4-implementation-execution-pack.md#12-wp-65-reliability-and-publish-boundary-hardening)
 as the single implementation sequence and the
 [Tracker](./25-phase4-execution-progress-tracker.md) as the current-status
@@ -200,15 +212,15 @@ reopen the production hotfix scope without approval.
 ## 8. Handoff
 
 ```text
-Current WP: WP-6.5 reliability hardening planning
-Status: WP-6 remains ready for owner review; WP-6.5 reliability gates are the next planned slice; final owner P-11 artifact acceptance pending
+Current WP: WP-6.5 reliability and publish-boundary hardening
+Status: Code/static implementation checkpoint in progress; live Local harness, two-run P-20 proof, and exact retained P-11 pair pending before WP-7
 Branch: codex/master-catalog-phase4
 Latest commit: See git HEAD for the latest committed checkpoint
-Files changed in this review package: WP-6 export implementation/evidence plus later authority-doc alignment for WP-6.5 sequencing
-Evidence produced: older selected-version export coverage, draft export marking coverage, spec-aligned short dataset hash formatting, full test/typecheck/lint/build verification, owner-review package, and the latest WP-6.5 reliability-plan alignment
-Tests/checks run: focused export/read-model tests from WP-6; targeted doc grep; git diff --check; npm test -- tests/master-catalog-migrations.test.ts
-Blockers: final P-11 artifact acceptance; WP-6.5 reliability gates; P-18 placement; P-19 retired-row PDF policy; P-20 hash portability; WP-7 BOQ/Factor F regression; advisor/snapshot/UAT/performance gates
-Owner decisions needed: accept/reject WP-6 baseline artifacts; approve marking WP-6 complete; P-20 before WP-6.5 exit/WP-7; P-18/P-19 when affected
-Next safe step: owner reviews this WP-6 package and the generated Excel/PDF artifacts, then either accepts WP-6 and starts WP-6.5 or requests targeted artifact fixes
+Files changed in this checkpoint: WP-6.5 DB/action/UI reliability, tracked evidence tools/tests, and aligned authority documents; generated/reference artifacts remain untracked
+Evidence produced: static/unit implementation evidence only; no new clean-reset/live DB or final retained binary evidence is claimed
+Tests/checks run: See the latest Tracker/Verification Report entry
+Blockers: owner-approved Local reset/live harness; two-run P-20 proof; final retained P-11 pair; P-18 placement; P-19 retired-row PDF policy; WP-7 BOQ/Factor F regressions; advisor/snapshot/UAT/performance gates
+Owner decisions needed: later approve the destructive Local reset; review final retained pair; P-18/P-19 when affected; Production P-12-P-15 remain separate
+Next safe step: finish repository verification and commit; then ask before Local bootstrap, execute WP-6.5 live evidence, and generate the exact retained pair from the clean reviewed commit
 Production touched: No
 ```

@@ -40,6 +40,7 @@ import {
   formatThaiDate,
   formatThaiDateTime,
   formatThaiNumber,
+  selectWorkingCatalogDraft,
   shortHash,
 } from '@/lib/master-catalog/admin/readModel';
 import {
@@ -53,6 +54,7 @@ import type {
   CatalogImportEvidenceCounts,
 } from '@/lib/master-catalog/admin/importContext';
 import type { ParseContext } from '@/lib/master-catalog/import/types';
+import { suggestNextCatalogRevision } from '@/lib/master-catalog/versioning';
 
 const sectionLinks: Array<{
   section: CatalogAdminSection;
@@ -124,10 +126,13 @@ export function MasterCatalogOverviewView({
   gate: CatalogAdminGate;
   overview: CatalogAdminOverview;
 }) {
-  const phase4Version = overview.versions.find(
-    (version) => version.versionString === '2568.1.0',
-  ) ?? null;
-  const phase4Draft = phase4Version?.status === 'draft' ? phase4Version : null;
+  const phase4Draft = selectWorkingCatalogDraft(
+    overview.versions,
+    overview.defaultVersion?.id ?? null,
+  );
+  const suggestedVersion = suggestNextCatalogRevision(
+    overview.defaultVersion?.versionString ?? null,
+  );
   const restorableVersions = overview.versions.filter(
     (version) => version.status === 'active' && !version.isDefault,
   );
@@ -164,11 +169,13 @@ export function MasterCatalogOverviewView({
 
       <MasterCatalogDraftCreatePanel
         defaultVersionString={overview.defaultVersion?.versionString ?? null}
-        draftVersion={phase4Version}
+        draftVersion={phase4Draft}
+        suggestedVersion={suggestedVersion}
       />
 
       <MasterCatalogPublishRestorePanel
         draftVersion={phase4Draft}
+        draftReadiness={overview.draftPublishReadiness}
         currentVersionString={overview.defaultVersion?.versionString ?? null}
         restorableVersions={restorableVersions}
       />
@@ -375,18 +382,6 @@ export function MasterCatalogHistoryView({
         <RecentChangeSets changeSets={history.changeSets} />
         <RecentImports imports={history.imports} />
       </div>
-    </MasterCatalogFrame>
-  );
-}
-
-export function MasterCatalogMissingVersionView({ gate }: { gate: CatalogAdminGate }) {
-  return (
-    <MasterCatalogFrame activeSection="versions" gate={gate}>
-      <Alert variant="destructive">
-        <ShieldAlert />
-        <AlertTitle>ไม่พบเวอร์ชันที่เลือก</AlertTitle>
-        <AlertDescription>ตรวจสอบ version id หรือกลับไปเลือกจากรายการเวอร์ชัน</AlertDescription>
-      </Alert>
     </MasterCatalogFrame>
   );
 }

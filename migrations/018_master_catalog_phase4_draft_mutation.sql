@@ -2,7 +2,7 @@
 -- Scope:
 -- - Implements local-rehearsal draft create and draft mutation/import audit RPCs.
 -- - Keeps publish and pointer restore disabled for WP-5.
--- - Does not move the catalog pointer, publish 2568.1.0, touch BOQ rows, or
+-- - Does not move the catalog pointer, publish any catalog version, touch BOQ rows, or
 --   touch Factor F rows/pointers/bindings/backfill.
 
 BEGIN;
@@ -76,6 +76,72 @@ BEGIN;
   AS $function$
     SELECT COALESCE(
       p_value ~ '^(0|[1-9][0-9]*)\.[0-9]{2}$',
+      false
+    );
+  $function$;
+
+  CREATE OR REPLACE FUNCTION private.catalog_request_fingerprint(
+    p_operation text,
+    p_payload jsonb
+  )
+  RETURNS text
+  LANGUAGE sql
+  IMMUTABLE
+  SECURITY DEFINER
+  SET search_path = ''
+  AS $function$
+    SELECT encode(
+      extensions.digest(
+        pg_catalog.convert_to(
+          jsonb_build_object(
+            'operation', p_operation,
+            'payload', COALESCE(p_payload, 'null'::jsonb)
+          )::text,
+          'UTF8'
+        ),
+        'sha256'
+      ),
+      'hex'
+    );
+  $function$;
+
+  CREATE OR REPLACE FUNCTION private.catalog_version_transition_valid(
+    p_base_major integer,
+    p_base_minor integer,
+    p_base_patch integer,
+    p_candidate_major integer,
+    p_candidate_minor integer,
+    p_candidate_patch integer
+  )
+  RETURNS boolean
+  LANGUAGE sql
+  IMMUTABLE
+  SECURITY DEFINER
+  SET search_path = ''
+  AS $function$
+    SELECT COALESCE(
+      p_candidate_major > 0
+      AND p_candidate_minor >= 0
+      AND p_candidate_patch >= 0
+      AND (
+        (
+          p_candidate_major > p_base_major
+          AND p_candidate_minor = 0
+          AND p_candidate_patch = 0
+        )
+        OR
+        (
+          p_candidate_major = p_base_major
+          AND p_candidate_minor > p_base_minor
+          AND p_candidate_patch = 0
+        )
+        OR
+        (
+          p_candidate_major = p_base_major
+          AND p_candidate_minor = p_base_minor
+          AND p_candidate_patch > p_base_patch
+        )
+      ),
       false
     );
   $function$;
@@ -282,6 +348,8 @@ BEGIN;
   LANGUAGE plpgsql
   SECURITY DEFINER
   SET search_path = ''
+  SET lock_timeout = '5s'
+  SET statement_timeout = '30s'
   AS $function$
   DECLARE
     v_actor_id uuid;
@@ -291,6 +359,8 @@ BEGIN;
     v_base public.price_list_versions%ROWTYPE;
     v_current_version_id uuid;
     v_existing_version public.price_list_versions%ROWTYPE;
+    v_existing_change public.catalog_change_sets%ROWTYPE;
+    v_request_fingerprint text;
     v_new_version_id uuid;
     v_change_set_id uuid;
   BEGIN
@@ -313,18 +383,44 @@ BEGIN;
       RETURN private.catalog_action_error(p_request_id, 'VALIDATION_FAILED', 'Draft name, reason, and request ID are required', false);
     END IF;
 
-    IF p_version_major <> 2568 OR p_version_minor <> 1 OR p_version_patch <> 0 THEN
-      RETURN private.catalog_action_error(p_request_id, 'VALIDATION_FAILED', 'Only rehearsal catalog version 2568.1.0 is approved for Phase 4 draft work', false);
-    END IF;
+    v_request_fingerprint := private.catalog_request_fingerprint(
+      'create_draft',
+      jsonb_build_object(
+        'baseVersionId', p_base_version_id,
+        'major', p_version_major,
+        'minor', p_version_minor,
+        'patch', p_version_patch,
+        'name', v_name,
+        'reason', v_reason
+      )
+    );
 
-    SELECT v.*
-    INTO v_existing_version
-    FROM public.catalog_change_sets cs
-    JOIN public.price_list_versions v ON v.id = cs.version_id
-    WHERE cs.request_id = p_request_id
-      AND cs.change_type = 'clone';
+    PERFORM pg_catalog.pg_advisory_xact_lock(
+      pg_catalog.hashtextextended('master_catalog_request:' || p_request_id::text, 0)
+    );
+
+    SELECT *
+    INTO v_existing_change
+    FROM public.catalog_change_sets
+    WHERE request_id = p_request_id;
 
     IF FOUND THEN
+      IF v_existing_change.change_type IS DISTINCT FROM 'clone'
+         OR v_existing_change.actor_id IS DISTINCT FROM v_actor_id
+         OR v_existing_change.request_fingerprint IS DISTINCT FROM v_request_fingerprint THEN
+        RETURN private.catalog_action_error(
+          p_request_id,
+          'REQUEST_ID_PAYLOAD_MISMATCH',
+          'Request ID was already used with a different catalog operation or payload',
+          false
+        );
+      END IF;
+
+      SELECT *
+      INTO v_existing_version
+      FROM public.price_list_versions
+      WHERE id = v_existing_change.version_id;
+
       RETURN private.catalog_action_success(
         p_request_id,
         jsonb_build_object(
@@ -336,12 +432,13 @@ BEGIN;
       );
     END IF;
 
-    IF EXISTS (
-      SELECT 1 FROM public.catalog_change_sets WHERE request_id = p_request_id
-      UNION ALL
-      SELECT 1 FROM public.catalog_imports WHERE request_id = p_request_id
-    ) THEN
-      RETURN private.catalog_action_error(p_request_id, 'REQUEST_ALREADY_PROCESSED', 'Request ID already belongs to another catalog operation', false);
+    IF EXISTS (SELECT 1 FROM public.catalog_imports WHERE request_id = p_request_id) THEN
+      RETURN private.catalog_action_error(
+        p_request_id,
+        'REQUEST_ID_PAYLOAD_MISMATCH',
+        'Request ID was already used with a different catalog operation or payload',
+        false
+      );
     END IF;
 
     SELECT version_id
@@ -362,6 +459,22 @@ BEGIN;
 
     IF v_current_version_id IS DISTINCT FROM p_base_version_id OR v_base.status <> 'active' THEN
       RETURN private.catalog_action_error(p_request_id, 'DRAFT_BASE_STALE', 'Drafts can only be created from the current active catalog default', false);
+    END IF;
+
+    IF NOT private.catalog_version_transition_valid(
+      v_base.major,
+      v_base.minor,
+      v_base.patch,
+      p_version_major,
+      p_version_minor,
+      p_version_patch
+    ) THEN
+      RETURN private.catalog_action_error(
+        p_request_id,
+        'VERSION_TRANSITION_INVALID',
+        'Catalog version must be a later ADR-003 annual, revision, or patch transition from its base',
+        false
+      );
     END IF;
 
     IF EXISTS (
@@ -480,6 +593,7 @@ BEGIN;
       change_type,
       reason,
       request_id,
+      request_fingerprint,
       actor_id,
       actor_display_name,
       before_lock_version,
@@ -490,6 +604,7 @@ BEGIN;
       'clone',
       v_reason,
       p_request_id,
+      v_request_fingerprint,
       v_actor_id,
       v_actor_display_name,
       NULL,
@@ -522,6 +637,8 @@ BEGIN;
   LANGUAGE plpgsql
   SECURITY DEFINER
   SET search_path = ''
+  SET lock_timeout = '5s'
+  SET statement_timeout = '30s'
   AS $function$
   DECLARE
     v_actor_id uuid;
@@ -533,6 +650,7 @@ BEGIN;
     v_source jsonb;
     v_mode text;
     v_normalized_hash text;
+    v_request_fingerprint text;
     v_import public.catalog_imports%ROWTYPE;
     v_draft public.price_list_versions%ROWTYPE;
     v_current_version_id uuid;
@@ -543,6 +661,7 @@ BEGIN;
     v_changed_count integer := 0;
     v_seen_identity_ids uuid[] := ARRAY[]::uuid[];
     v_validation_seen_identity_ids uuid[] := ARRAY[]::uuid[];
+    v_validation_seen_item_codes text[] := ARRAY[]::text[];
     v_active_count integer;
     v_retire_count integer := 0;
     v_retire_threshold integer;
@@ -575,6 +694,8 @@ BEGIN;
     v_price_authority text;
     v_code_suffix integer;
     v_old_snapshot jsonb;
+    v_abort_code text;
+    v_abort_message text;
   BEGIN
     SELECT actor_id, actor_display_name
     INTO v_actor_id, v_actor_display_name
@@ -608,6 +729,21 @@ BEGIN;
       RETURN private.catalog_action_error(p_request_id, 'VALIDATION_FAILED', 'Change operation is not recognized', false);
     END IF;
 
+    v_request_fingerprint := private.catalog_request_fingerprint(
+      v_operation,
+      jsonb_build_object(
+        'versionId', p_version_id,
+        'expectedLockVersion', p_expected_lock_version,
+        'reason', v_reason,
+        'importId', p_import_id,
+        'changePayload', p_change_payload
+      )
+    );
+
+    PERFORM pg_catalog.pg_advisory_xact_lock(
+      pg_catalog.hashtextextended('master_catalog_request:' || p_request_id::text, 0)
+    );
+
     IF v_operation = 'import_validate' THEN
       SELECT *
       INTO v_import
@@ -615,6 +751,16 @@ BEGIN;
       WHERE request_id = p_request_id;
 
       IF FOUND THEN
+        IF v_import.created_by IS DISTINCT FROM v_actor_id
+           OR v_import.request_fingerprint IS DISTINCT FROM v_request_fingerprint THEN
+          RETURN private.catalog_action_error(
+            p_request_id,
+            'REQUEST_ID_PAYLOAD_MISMATCH',
+            'Request ID was already used with a different catalog operation or payload',
+            false
+          );
+        END IF;
+
         RETURN private.catalog_action_success(
           p_request_id,
           jsonb_build_object(
@@ -626,6 +772,15 @@ BEGIN;
           )
         );
       END IF;
+
+      IF EXISTS (SELECT 1 FROM public.catalog_change_sets WHERE request_id = p_request_id) THEN
+        RETURN private.catalog_action_error(
+          p_request_id,
+          'REQUEST_ID_PAYLOAD_MISMATCH',
+          'Request ID was already used with a different catalog operation or payload',
+          false
+        );
+      END IF;
     ELSE
       SELECT *
       INTO v_existing_change
@@ -633,6 +788,20 @@ BEGIN;
       WHERE request_id = p_request_id;
 
       IF FOUND THEN
+        IF v_existing_change.actor_id IS DISTINCT FROM v_actor_id
+           OR v_existing_change.request_fingerprint IS DISTINCT FROM v_request_fingerprint
+           OR v_existing_change.change_type IS DISTINCT FROM CASE
+             WHEN v_operation = 'import_apply' THEN 'import'
+             ELSE 'manual'
+           END THEN
+          RETURN private.catalog_action_error(
+            p_request_id,
+            'REQUEST_ID_PAYLOAD_MISMATCH',
+            'Request ID was already used with a different catalog operation or payload',
+            false
+          );
+        END IF;
+
         RETURN private.catalog_action_success(
           p_request_id,
           jsonb_build_object(
@@ -641,6 +810,15 @@ BEGIN;
             'lockVersion', v_existing_change.after_lock_version,
             'duplicateRequest', true
           )
+        );
+      END IF;
+
+      IF EXISTS (SELECT 1 FROM public.catalog_imports WHERE request_id = p_request_id) THEN
+        RETURN private.catalog_action_error(
+          p_request_id,
+          'REQUEST_ID_PAYLOAD_MISMATCH',
+          'Request ID was already used with a different catalog operation or payload',
+          false
         );
       END IF;
     END IF;
@@ -724,6 +902,7 @@ BEGIN;
         normalized_payload_hash,
         status,
         request_id,
+        request_fingerprint,
         created_by
       )
       VALUES (
@@ -739,6 +918,7 @@ BEGIN;
         v_normalized_hash,
         'validated',
         p_request_id,
+        v_request_fingerprint,
         v_actor_id
       )
       RETURNING * INTO v_import;
@@ -882,6 +1062,17 @@ BEGIN;
         IF v_code_suffix >= 900 THEN
           RETURN private.catalog_action_error(p_request_id, 'CATALOG_CODE_CAPACITY_REVIEW_REQUIRED', 'Catalog code sequence capacity review is required', false);
         END IF;
+
+        IF v_new_code = ANY(v_validation_seen_item_codes) THEN
+          RETURN private.catalog_action_error(
+            p_request_id,
+            'IMPORT_RECONCILIATION_REQUIRED',
+            'Change payload assigns the same canonical code more than once',
+            false
+          );
+        END IF;
+
+        v_validation_seen_item_codes := array_append(v_validation_seen_item_codes, v_new_code);
       END IF;
 
       IF v_action = 'add' THEN
@@ -995,184 +1186,155 @@ BEGIN;
     v_before_lock := v_draft.lock_version;
     v_after_lock := v_before_lock + 1;
 
-    INSERT INTO public.catalog_change_sets (
-      version_id,
-      import_id,
-      change_type,
-      reason,
-      request_id,
-      actor_id,
-      actor_display_name,
-      before_lock_version,
-      after_lock_version
-    )
-    VALUES (
-      p_version_id,
-      CASE WHEN v_operation = 'import_apply' THEN p_import_id ELSE NULL END,
-      CASE WHEN v_operation = 'import_apply' THEN 'import' ELSE 'manual' END,
-      v_reason,
-      p_request_id,
-      v_actor_id,
-      v_actor_display_name,
-      v_before_lock,
-      v_after_lock
-    )
-    RETURNING id INTO v_change_set_id;
+    BEGIN
+      INSERT INTO public.catalog_change_sets (
+        version_id,
+        import_id,
+        change_type,
+        reason,
+        request_id,
+        request_fingerprint,
+        actor_id,
+        actor_display_name,
+        before_lock_version,
+        after_lock_version
+      )
+      VALUES (
+        p_version_id,
+        CASE WHEN v_operation = 'import_apply' THEN p_import_id ELSE NULL END,
+        CASE WHEN v_operation = 'import_apply' THEN 'import' ELSE 'manual' END,
+        v_reason,
+        p_request_id,
+        v_request_fingerprint,
+        v_actor_id,
+        v_actor_display_name,
+        v_before_lock,
+        v_after_lock
+      )
+      RETURNING id INTO v_change_set_id;
 
-    FOR v_row IN SELECT value FROM jsonb_array_elements(v_rows) AS t(value) LOOP
-      v_identity_outcome := v_row->>'identityOutcome';
-      v_action := COALESCE(NULLIF(btrim(v_row->>'action'), ''), CASE
-        WHEN v_identity_outcome = 'candidate_add' THEN 'add'
-        WHEN v_identity_outcome = 'retire' THEN 'retire'
-        WHEN v_identity_outcome = 'recode' THEN 'recode'
-        ELSE 'update'
-      END);
-      v_legacy_code := NULLIF(btrim(v_row->>'legacyItemCode'), '');
-      v_new_code := NULLIF(btrim(COALESCE(v_row->>'canonicalCode', v_row->>'itemCode')), '');
-      v_price_authority := NULLIF(btrim(v_row->>'priceAuthorityReference'), '');
+      -- Any structured rejection after this point must raise CATALOG_MUTATION_ABORT
+      -- so this subtransaction removes the change set and every partial row write.
+      FOR v_row IN SELECT value FROM jsonb_array_elements(v_rows) AS t(value) LOOP
+        v_identity_outcome := v_row->>'identityOutcome';
+        v_action := COALESCE(NULLIF(btrim(v_row->>'action'), ''), CASE
+          WHEN v_identity_outcome = 'candidate_add' THEN 'add'
+          WHEN v_identity_outcome = 'retire' THEN 'retire'
+          WHEN v_identity_outcome = 'recode' THEN 'recode'
+          ELSE 'update'
+        END);
+        v_legacy_code := NULLIF(btrim(v_row->>'legacyItemCode'), '');
+        v_new_code := NULLIF(btrim(COALESCE(v_row->>'canonicalCode', v_row->>'itemCode')), '');
 
-      IF v_action NOT IN ('add', 'update', 'retire', 'recode') THEN
-        RETURN private.catalog_action_error(p_request_id, 'VALIDATION_FAILED', 'Draft change action is not recognized', false);
-      END IF;
+        IF v_action = 'add' THEN
+          PERFORM pg_catalog.pg_advisory_xact_lock(
+            pg_catalog.hashtextextended('master_catalog_code:' || v_new_code, 0)
+          );
 
-      IF v_new_code IS NOT NULL THEN
-        IF v_new_code !~ '^[A-Z0-9]{3}-[A-Z0-9]{3}-[0-9]{3}$' THEN
-          RETURN private.catalog_action_error(p_request_id, 'VALIDATION_FAILED', 'Canonical item code is not in the approved format', false);
-        END IF;
+          SELECT identity_id
+          INTO v_existing_code_identity_id
+          FROM public.catalog_item_codes
+          WHERE item_code = v_new_code;
 
-        v_code_suffix := substring(v_new_code from '-([0-9]{3})$')::integer;
+          IF FOUND THEN
+            v_abort_code := 'IMPORT_RECONCILIATION_REQUIRED';
+            v_abort_message := 'Catalog code was allocated while applying the draft mutation';
+            RAISE EXCEPTION 'CATALOG_MUTATION_ABORT';
+          END IF;
 
-        IF v_code_suffix >= 900 THEN
-          RETURN private.catalog_action_error(p_request_id, 'CATALOG_CODE_CAPACITY_REVIEW_REQUIRED', 'Catalog code sequence capacity review is required', false);
-        END IF;
-      END IF;
+          v_item_name := NULLIF(btrim(v_row->>'itemName'), '');
+          v_unit := NULLIF(btrim(v_row->>'unit'), '');
+          v_material := (v_row->>'materialCost')::numeric;
+          v_labor := (v_row->>'laborCost')::numeric;
+          v_unit_cost := (v_row->>'unitCost')::numeric;
 
-      IF v_action = 'add' THEN
-        IF v_new_code IS NULL THEN
-          RETURN private.catalog_action_error(p_request_id, 'VALIDATION_FAILED', 'New catalog rows require a canonical item code', false);
-        END IF;
+          v_category_code := NULLIF(btrim(v_row->>'categoryCode'), '');
+          v_work_context_code := NULLIF(btrim(v_row->>'workContextCode'), '');
+          v_item_type_code := NULLIF(btrim(v_row->>'itemTypeCode'), '');
+          v_work_context_name_th := NULLIF(btrim(v_row->>'workContextNameTh'), '');
+          v_item_type_name_th := NULLIF(btrim(v_row->>'itemTypeNameTh'), '');
+          v_category_id := private.catalog_ensure_category(p_version_id, v_category_code);
+          v_code_group_id := private.catalog_ensure_code_group(
+            p_version_id,
+            v_work_context_code,
+            v_item_type_code,
+            v_work_context_name_th,
+            v_item_type_name_th
+          );
 
-        IF v_price_authority IS NULL THEN
-          RETURN private.catalog_action_error(p_request_id, 'IMPORT_PRICE_AUTHORITY_REQUIRED', 'New catalog rows require price authority evidence', false);
-        END IF;
+          INSERT INTO public.catalog_item_identities (created_by)
+          VALUES (v_actor_id)
+          RETURNING id INTO v_identity_id;
 
-        SELECT identity_id
-        INTO v_existing_code_identity_id
-        FROM public.catalog_item_codes
-        WHERE item_code = v_new_code;
+          INSERT INTO public.catalog_item_codes (
+            item_code,
+            identity_id,
+            code_kind,
+            first_seen_version_id,
+            created_by
+          )
+          VALUES (
+            v_new_code,
+            v_identity_id,
+            'canonical',
+            p_version_id,
+            v_actor_id
+          );
 
-        IF FOUND THEN
-          RETURN private.catalog_action_error(p_request_id, 'IMPORT_RECONCILIATION_REQUIRED', 'Catalog code is already allocated to an identity', false);
-        END IF;
+          INSERT INTO public.price_list (
+            item_code,
+            item_name,
+            unit,
+            material_cost,
+            labor_cost,
+            unit_cost,
+            category,
+            is_active,
+            version_id,
+            identity_id,
+            category_id,
+            code_group_id,
+            display_order
+          )
+          VALUES (
+            v_new_code,
+            v_item_name,
+            v_unit,
+            v_material,
+            v_labor,
+            v_unit_cost,
+            v_category_code,
+            true,
+            p_version_id,
+            v_identity_id,
+            v_category_id,
+            v_code_group_id,
+            COALESCE((
+              SELECT max(display_order) + 1
+              FROM public.price_list
+              WHERE version_id = p_version_id
+            ), 0)
+          )
+          RETURNING * INTO v_after;
 
-        v_item_name := NULLIF(btrim(v_row->>'itemName'), '');
-        v_unit := NULLIF(btrim(v_row->>'unit'), '');
-        v_material_text := NULLIF(btrim(v_row->>'materialCost'), '');
-        v_labor_text := NULLIF(btrim(v_row->>'laborCost'), '');
-        v_unit_text := NULLIF(btrim(v_row->>'unitCost'), '');
+          INSERT INTO public.catalog_change_items (
+            change_set_id,
+            identity_id,
+            action,
+            old_values,
+            new_values
+          )
+          VALUES (
+            v_change_set_id,
+            v_identity_id,
+            'add',
+            NULL,
+            private.catalog_price_row_snapshot(v_after)
+          );
 
-        IF v_item_name IS NULL OR v_unit IS NULL
-           OR NOT private.catalog_is_money(v_material_text)
-           OR NOT private.catalog_is_money(v_labor_text)
-           OR NOT private.catalog_is_money(v_unit_text) THEN
-          RETURN private.catalog_action_error(p_request_id, 'VALIDATION_FAILED', 'New catalog rows require complete item, unit, and money fields', false);
-        END IF;
-
-        v_material := v_material_text::numeric;
-        v_labor := v_labor_text::numeric;
-        v_unit_cost := v_unit_text::numeric;
-
-        IF v_material + v_labor <> v_unit_cost THEN
-          RETURN private.catalog_action_error(p_request_id, 'VALIDATION_FAILED', 'Material and labor costs must equal unit cost', false);
-        END IF;
-
-        v_category_code := NULLIF(btrim(v_row->>'categoryCode'), '');
-        v_work_context_code := NULLIF(btrim(v_row->>'workContextCode'), '');
-        v_item_type_code := NULLIF(btrim(v_row->>'itemTypeCode'), '');
-        v_work_context_name_th := NULLIF(btrim(v_row->>'workContextNameTh'), '');
-        v_item_type_name_th := NULLIF(btrim(v_row->>'itemTypeNameTh'), '');
-        v_category_id := private.catalog_ensure_category(p_version_id, v_category_code);
-        v_code_group_id := private.catalog_ensure_code_group(
-          p_version_id,
-          v_work_context_code,
-          v_item_type_code,
-          v_work_context_name_th,
-          v_item_type_name_th
-        );
-
-        INSERT INTO public.catalog_item_identities (created_by)
-        VALUES (v_actor_id)
-        RETURNING id INTO v_identity_id;
-
-        INSERT INTO public.catalog_item_codes (
-          item_code,
-          identity_id,
-          code_kind,
-          first_seen_version_id,
-          created_by
-        )
-        VALUES (
-          v_new_code,
-          v_identity_id,
-          'canonical',
-          p_version_id,
-          v_actor_id
-        );
-
-        INSERT INTO public.price_list (
-          item_code,
-          item_name,
-          unit,
-          material_cost,
-          labor_cost,
-          unit_cost,
-          category,
-          is_active,
-          version_id,
-          identity_id,
-          category_id,
-          code_group_id,
-          display_order
-        )
-        VALUES (
-          v_new_code,
-          v_item_name,
-          v_unit,
-          v_material,
-          v_labor,
-          v_unit_cost,
-          v_category_code,
-          true,
-          p_version_id,
-          v_identity_id,
-          v_category_id,
-          v_code_group_id,
-          COALESCE((
-            SELECT max(display_order) + 1
-            FROM public.price_list
-            WHERE version_id = p_version_id
-          ), 0)
-        )
-        RETURNING * INTO v_after;
-
-        INSERT INTO public.catalog_change_items (
-          change_set_id,
-          identity_id,
-          action,
-          old_values,
-          new_values
-        )
-        VALUES (
-          v_change_set_id,
-          v_identity_id,
-          'add',
-          NULL,
-          private.catalog_price_row_snapshot(v_after)
-        );
-
-        v_changed_count := v_changed_count + 1;
-        v_seen_identity_ids := array_append(v_seen_identity_ids, v_identity_id);
-      ELSE
+          v_changed_count := v_changed_count + 1;
+          v_seen_identity_ids := array_append(v_seen_identity_ids, v_identity_id);
+        ELSE
         SELECT *
         INTO v_existing
         FROM public.price_list
@@ -1186,7 +1348,9 @@ BEGIN;
         FOR UPDATE;
 
         IF NOT FOUND THEN
-          RETURN private.catalog_action_error(p_request_id, 'IMPORT_RECONCILIATION_REQUIRED', 'Existing draft row could not be resolved from the supplied code', false);
+          v_abort_code := 'IMPORT_RECONCILIATION_REQUIRED';
+          v_abort_message := 'Existing draft row changed while applying the mutation';
+          RAISE EXCEPTION 'CATALOG_MUTATION_ABORT';
         END IF;
 
         IF v_action = 'retire' THEN
@@ -1223,29 +1387,9 @@ BEGIN;
           v_labor_text := NULLIF(btrim(v_row->>'laborCost'), '');
           v_unit_text := NULLIF(btrim(v_row->>'unitCost'), '');
 
-          IF (v_material_text IS NOT NULL AND NOT private.catalog_is_money(v_material_text))
-             OR (v_labor_text IS NOT NULL AND NOT private.catalog_is_money(v_labor_text))
-             OR (v_unit_text IS NOT NULL AND NOT private.catalog_is_money(v_unit_text)) THEN
-            RETURN private.catalog_action_error(p_request_id, 'VALIDATION_FAILED', 'Money fields must be two-decimal strings', false);
-          END IF;
-
           v_material := COALESCE(v_material_text::numeric, v_existing.material_cost);
           v_labor := COALESCE(v_labor_text::numeric, v_existing.labor_cost);
           v_unit_cost := COALESCE(v_unit_text::numeric, v_existing.unit_cost);
-
-          IF v_material + v_labor <> v_unit_cost THEN
-            RETURN private.catalog_action_error(p_request_id, 'VALIDATION_FAILED', 'Material and labor costs must equal unit cost', false);
-          END IF;
-
-          IF (
-            v_item_name IS DISTINCT FROM v_existing.item_name
-            OR v_unit IS DISTINCT FROM v_existing.unit
-            OR v_material IS DISTINCT FROM v_existing.material_cost
-            OR v_labor IS DISTINCT FROM v_existing.labor_cost
-            OR v_unit_cost IS DISTINCT FROM v_existing.unit_cost
-          ) AND v_price_authority IS NULL THEN
-            RETURN private.catalog_action_error(p_request_id, 'IMPORT_PRICE_AUTHORITY_REQUIRED', 'Name, unit, or price changes require explicit authority evidence', false);
-          END IF;
 
           v_category_code := COALESCE(NULLIF(btrim(v_row->>'categoryCode'), ''), v_existing.category);
           v_work_context_code := NULLIF(btrim(v_row->>'workContextCode'), '');
@@ -1272,13 +1416,19 @@ BEGIN;
           END IF;
 
           IF v_new_code IS DISTINCT FROM v_existing.item_code THEN
+            PERFORM pg_catalog.pg_advisory_xact_lock(
+              pg_catalog.hashtextextended('master_catalog_code:' || v_new_code, 0)
+            );
+
             SELECT identity_id
             INTO v_existing_code_identity_id
             FROM public.catalog_item_codes
             WHERE item_code = v_new_code;
 
             IF FOUND AND v_existing_code_identity_id IS DISTINCT FROM v_existing.identity_id THEN
-              RETURN private.catalog_action_error(p_request_id, 'IMPORT_RECONCILIATION_REQUIRED', 'Catalog code is already allocated to a different identity', false);
+              v_abort_code := 'IMPORT_RECONCILIATION_REQUIRED';
+              v_abort_message := 'Catalog code was allocated while applying the draft mutation';
+              RAISE EXCEPTION 'CATALOG_MUTATION_ABORT';
             END IF;
 
             INSERT INTO public.catalog_item_codes (
@@ -1377,7 +1527,9 @@ BEGIN;
     END IF;
 
     IF v_changed_count = 0 THEN
-      RETURN private.catalog_action_error(p_request_id, 'VALIDATION_FAILED', 'Draft mutation did not produce any audited item changes', false);
+      v_abort_code := 'VALIDATION_FAILED';
+      v_abort_message := 'Draft mutation did not produce any audited item changes';
+      RAISE EXCEPTION 'CATALOG_MUTATION_ABORT';
     END IF;
 
     UPDATE public.price_list_versions
@@ -1410,6 +1562,19 @@ BEGIN;
         'duplicateRequest', false
       )
     );
+    EXCEPTION
+      WHEN raise_exception THEN
+        IF SQLERRM = 'CATALOG_MUTATION_ABORT' THEN
+          RETURN private.catalog_action_error(
+            p_request_id,
+            v_abort_code,
+            v_abort_message,
+            false
+          );
+        END IF;
+
+        RAISE;
+    END;
   END;
   $function$;
 

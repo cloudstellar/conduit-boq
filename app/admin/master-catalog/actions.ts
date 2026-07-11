@@ -1,6 +1,5 @@
 'use server';
 
-import { randomUUID } from 'node:crypto';
 import { revalidatePath } from 'next/cache';
 import { createClient } from '@/lib/supabase/server';
 import { loadCatalogAdminGate } from '@/lib/master-catalog/admin/readModel';
@@ -24,21 +23,22 @@ import {
   createCatalogRpcTransportError,
   mapCatalogRpcActionResponse,
 } from '@/lib/master-catalog/admin/actionModel';
+import { logMasterCatalogOperation } from '@/lib/master-catalog/observability';
 
 const UUID_PATTERN =
   /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 
 type SupabaseActionError = {
   code?: string;
-  details?: string;
-  hint?: string;
-  message?: string;
 };
 
 export async function createCatalogDraftAction(
   _previousState: CatalogMutationState,
   formData: FormData,
 ): Promise<CatalogMutationState> {
+  const requestId = readOperationRequestId(formData);
+  if (typeof requestId !== 'string') return requestId;
+
   const supabase = await createClient();
   const gate = await loadCatalogAdminGate(supabase);
 
@@ -48,9 +48,15 @@ export async function createCatalogDraftAction(
 
   const name = readRequiredActionText(formData, 'name', 'draft name');
   const reason = readRequiredActionText(formData, 'reason', 'reason');
+  const versionMajor = readVersionSegment(formData, 'versionMajor', 'effective year');
+  const versionMinor = readVersionSegment(formData, 'versionMinor', 'revision');
+  const versionPatch = readVersionSegment(formData, 'versionPatch', 'patch');
 
   if (typeof name !== 'string') return name;
   if (typeof reason !== 'string') return reason;
+  if (typeof versionMajor !== 'number') return versionMajor;
+  if (typeof versionMinor !== 'number') return versionMinor;
+  if (typeof versionPatch !== 'number') return versionPatch;
 
   const { data: pointer, error: pointerError } = await supabase
     .from('price_list_default_version')
@@ -62,25 +68,36 @@ export async function createCatalogDraftAction(
     return createCatalogMutationError('อ่าน current catalog default ไม่สำเร็จ', 'DRAFT_BASE_STALE');
   }
 
-  const requestId = randomUUID();
+  const startedAt = Date.now();
   const { data, error } = await supabase.rpc('create_catalog_draft', {
     p_base_version_id: pointer.version_id,
-    p_version_major: 2568,
-    p_version_minor: 1,
-    p_version_patch: 0,
+    p_version_major: versionMajor,
+    p_version_minor: versionMinor,
+    p_version_patch: versionPatch,
     p_name: name,
     p_reason: reason,
     p_request_id: requestId,
   });
 
   if (error) {
-    return mapRpcTransportError('createCatalogDraft', error);
+    return mapRpcTransportError('createCatalogDraft', error, requestId, {
+      startedAt,
+      versionId: String(pointer.version_id),
+    });
   }
 
   const result = mapCatalogRpcActionResponse(
     data as CatalogRpcActionResponse,
-    'สร้าง draft 2568.1.0 แล้ว',
+    `สร้าง draft ${versionMajor}.${versionMinor}.${versionPatch} แล้ว`,
   );
+  logMasterCatalogOperation({
+    operation: 'createCatalogDraft',
+    outcome: result.status === 'success' ? 'success' : 'rejected',
+    startedAt,
+    requestId: result.requestId ?? requestId,
+    versionId: result.versionId ?? String(pointer.version_id),
+    code: result.code,
+  });
 
   if (result.status === 'success') {
     revalidateMasterCatalogPaths(result.versionId);
@@ -93,6 +110,9 @@ export async function applyCatalogManualChangeAction(
   _previousState: CatalogMutationState,
   formData: FormData,
 ): Promise<CatalogMutationState> {
+  const requestId = readOperationRequestId(formData);
+  if (typeof requestId !== 'string') return requestId;
+
   const supabase = await createClient();
   const gate = await loadCatalogAdminGate(supabase);
 
@@ -100,22 +120,34 @@ export async function applyCatalogManualChangeAction(
     return createCatalogMutationError('Master Catalog admin gate ยังไม่เปิด', 'FORBIDDEN');
   }
 
-  const args = buildManualCatalogChangeArgs(formData, randomUUID());
+  const args = buildManualCatalogChangeArgs(formData, requestId);
 
   if ('status' in args) {
     return args;
   }
 
+  const startedAt = Date.now();
   const { data, error } = await supabase.rpc('apply_catalog_changes', args);
 
   if (error) {
-    return mapRpcTransportError('applyCatalogManualChange', error);
+    return mapRpcTransportError('applyCatalogManualChange', error, requestId, {
+      startedAt,
+      versionId: args.p_version_id,
+    });
   }
 
   const result = mapCatalogRpcActionResponse(
     data as CatalogRpcActionResponse,
     'บันทึก draft change set แล้ว',
   );
+  logMasterCatalogOperation({
+    operation: 'applyCatalogManualChange',
+    outcome: result.status === 'success' ? 'success' : 'rejected',
+    startedAt,
+    requestId: result.requestId ?? requestId,
+    versionId: result.versionId ?? args.p_version_id,
+    code: result.code,
+  });
 
   if (result.status === 'success') {
     revalidateMasterCatalogPaths(result.versionId ?? args.p_version_id);
@@ -146,6 +178,7 @@ export async function previewCatalogImportAction(
     return mapImportValidationError(error);
   }
 
+  const startedAt = Date.now();
   const { data, error } = await supabase.rpc('apply_catalog_changes', {
     p_version_id: validated.payload.versionId,
     p_change_payload: {
@@ -160,13 +193,26 @@ export async function previewCatalogImportAction(
   });
 
   if (error) {
-    return mapRpcTransportError('previewCatalogImport', error);
+    return mapRpcTransportError(
+      'previewCatalogImport',
+      error,
+      validated.payload.requestId,
+      { startedAt, versionId: validated.payload.versionId },
+    );
   }
 
   const result = mapCatalogRpcActionResponse(
     data as CatalogRpcActionResponse,
     'บันทึก import validation แล้ว',
   );
+  logMasterCatalogOperation({
+    operation: 'previewCatalogImport',
+    outcome: result.status === 'success' ? 'success' : 'rejected',
+    startedAt,
+    requestId: result.requestId ?? validated.payload.requestId,
+    versionId: result.versionId ?? validated.payload.versionId,
+    code: result.code,
+  });
 
   if (result.status === 'success') {
     revalidateMasterCatalogPaths(result.versionId ?? validated.payload.versionId);
@@ -179,6 +225,9 @@ export async function applyCatalogImportAction(
   _previousState: CatalogMutationState,
   formData: FormData,
 ): Promise<CatalogMutationState> {
+  const requestId = readOperationRequestId(formData);
+  if (typeof requestId !== 'string') return requestId;
+
   const supabase = await createClient();
   const gate = await loadCatalogAdminGate(supabase);
 
@@ -228,7 +277,7 @@ export async function applyCatalogImportAction(
     return mapImportValidationError(error);
   }
 
-  const applyRequestId = randomUUID();
+  const startedAt = Date.now();
   const { data, error } = await supabase.rpc('apply_catalog_changes', {
     p_version_id: validated.payload.versionId,
     p_change_payload: {
@@ -238,18 +287,29 @@ export async function applyCatalogImportAction(
     },
     p_expected_lock_version: validated.payload.expectedLockVersion,
     p_reason: validated.payload.reason,
-    p_request_id: applyRequestId,
+    p_request_id: requestId,
     p_import_id: importId,
   });
 
   if (error) {
-    return mapRpcTransportError('applyCatalogImport', error);
+    return mapRpcTransportError('applyCatalogImport', error, requestId, {
+      startedAt,
+      versionId: validated.payload.versionId,
+    });
   }
 
   const result = mapCatalogRpcActionResponse(
     data as CatalogRpcActionResponse,
     'Apply import เข้า draft แล้ว',
   );
+  logMasterCatalogOperation({
+    operation: 'applyCatalogImport',
+    outcome: result.status === 'success' ? 'success' : 'rejected',
+    startedAt,
+    requestId: result.requestId ?? requestId,
+    versionId: result.versionId ?? validated.payload.versionId,
+    code: result.code,
+  });
 
   if (result.status === 'success') {
     revalidateMasterCatalogPaths(result.versionId ?? validated.payload.versionId);
@@ -262,6 +322,9 @@ export async function publishCatalogVersionAction(
   _previousState: CatalogMutationState,
   formData: FormData,
 ): Promise<CatalogMutationState> {
+  const requestId = readOperationRequestId(formData);
+  if (typeof requestId !== 'string') return requestId;
+
   const supabase = await createClient();
   const gate = await loadCatalogAdminGate(supabase);
 
@@ -269,22 +332,34 @@ export async function publishCatalogVersionAction(
     return createCatalogMutationError('Master Catalog admin gate ยังไม่เปิด', 'FORBIDDEN');
   }
 
-  const args = buildPublishCatalogVersionArgs(formData, randomUUID());
+  const args = buildPublishCatalogVersionArgs(formData, requestId);
 
   if ('status' in args) {
     return args;
   }
 
+  const startedAt = Date.now();
   const { data, error } = await supabase.rpc('publish_catalog_version', args);
 
   if (error) {
-    return mapRpcTransportError('publishCatalogVersion', error);
+    return mapRpcTransportError('publishCatalogVersion', error, requestId, {
+      startedAt,
+      versionId: args.p_version_id,
+    });
   }
 
   const result = mapCatalogRpcActionResponse(
     data as CatalogRpcActionResponse,
     'Publish catalog version แล้ว',
   );
+  logMasterCatalogOperation({
+    operation: 'publishCatalogVersion',
+    outcome: result.status === 'success' ? 'success' : 'rejected',
+    startedAt,
+    requestId: result.requestId ?? requestId,
+    versionId: result.versionId ?? args.p_version_id,
+    code: result.code,
+  });
 
   if (result.status === 'success') {
     revalidateMasterCatalogPaths(result.versionId ?? args.p_version_id);
@@ -297,6 +372,9 @@ export async function restoreCatalogPointerAction(
   _previousState: CatalogMutationState,
   formData: FormData,
 ): Promise<CatalogMutationState> {
+  const requestId = readOperationRequestId(formData);
+  if (typeof requestId !== 'string') return requestId;
+
   const supabase = await createClient();
   const gate = await loadCatalogAdminGate(supabase);
 
@@ -304,22 +382,34 @@ export async function restoreCatalogPointerAction(
     return createCatalogMutationError('Master Catalog admin gate ยังไม่เปิด', 'FORBIDDEN');
   }
 
-  const args = buildRestoreCatalogPointerArgs(formData, randomUUID());
+  const args = buildRestoreCatalogPointerArgs(formData, requestId);
 
   if ('status' in args) {
     return args;
   }
 
+  const startedAt = Date.now();
   const { data, error } = await supabase.rpc('restore_catalog_pointer', args);
 
   if (error) {
-    return mapRpcTransportError('restoreCatalogPointer', error);
+    return mapRpcTransportError('restoreCatalogPointer', error, requestId, {
+      startedAt,
+      versionId: args.p_target_version_id,
+    });
   }
 
   const result = mapCatalogRpcActionResponse(
     data as CatalogRpcActionResponse,
     'Restore catalog pointer แล้ว',
   );
+  logMasterCatalogOperation({
+    operation: 'restoreCatalogPointer',
+    outcome: result.status === 'success' ? 'success' : 'rejected',
+    startedAt,
+    requestId: result.requestId ?? requestId,
+    versionId: result.versionId ?? args.p_target_version_id,
+    code: result.code,
+  });
 
   if (result.status === 'success') {
     revalidateMasterCatalogPaths(result.versionId ?? args.p_target_version_id);
@@ -341,6 +431,32 @@ function readRequiredActionText(
   }
 
   return text;
+}
+
+function readOperationRequestId(formData: FormData): string | CatalogMutationState {
+  const requestId = readRequiredActionText(formData, 'requestId', 'request id');
+  if (typeof requestId !== 'string') return requestId;
+  if (!UUID_PATTERN.test(requestId)) {
+    return createCatalogMutationError('request id ไม่ถูกต้อง');
+  }
+  return requestId;
+}
+
+function readVersionSegment(
+  formData: FormData,
+  key: string,
+  label: string,
+): number | CatalogMutationState {
+  const value = formData.get(key);
+  const text = typeof value === 'string' ? value.trim() : '';
+  if (!/^(0|[1-9][0-9]*)$/.test(text)) {
+    return createCatalogMutationError(`${label} ต้องเป็นจำนวนเต็มตั้งแต่ 0 ขึ้นไป`);
+  }
+  const segment = Number(text);
+  if (!Number.isSafeInteger(segment)) {
+    return createCatalogMutationError(`${label} มีค่ามากเกินไป`);
+  }
+  return segment;
 }
 
 async function readValidatedImportPayload(
@@ -412,14 +528,20 @@ function revalidateMasterCatalogPaths(versionId: string | undefined) {
 function mapRpcTransportError(
   operation: CatalogRpcTransportOperation,
   error: SupabaseActionError,
+  requestId: string,
+  context: {
+    startedAt: number;
+    versionId?: string;
+  },
 ): CatalogMutationState {
-  console.error('Master Catalog RPC transport failed', {
-    code: error.code,
-    details: error.details,
-    hint: error.hint,
-    message: error.message,
+  logMasterCatalogOperation({
     operation,
+    outcome: 'transport_error',
+    startedAt: context.startedAt,
+    requestId,
+    versionId: context.versionId,
+    code: error.code,
   });
 
-  return createCatalogRpcTransportError(operation);
+  return createCatalogRpcTransportError(operation, requestId);
 }

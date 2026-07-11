@@ -243,6 +243,95 @@ BEGIN;
   END;
   $function$;
 
+  CREATE OR REPLACE FUNCTION private.catalog_publish_readiness(p_version_id uuid)
+  RETURNS jsonb
+  LANGUAGE plpgsql
+  STABLE
+  SECURITY DEFINER
+  SET search_path = ''
+  AS $function$
+  DECLARE
+    v_version public.price_list_versions%ROWTYPE;
+    v_new_identity_count integer;
+    v_active_canonical_code_count integer;
+    v_unapproved_legacy_active_count integer;
+    v_inactive_row_count integer;
+  BEGIN
+    SELECT *
+    INTO v_version
+    FROM public.price_list_versions
+    WHERE id = p_version_id;
+
+    IF NOT FOUND THEN
+      RETURN jsonb_build_object(
+        'versionFound', false,
+        'versionStatus', null,
+        'basedOnVersionId', null,
+        'newIdentityCount', 0,
+        'activeCanonicalCodeCount', 0,
+        'structuredCodeGuardApplies', false,
+        'unapprovedLegacyActiveCount', 0,
+        'inactiveRowCount', 0,
+        'retiredPdfPolicyRequired', false,
+        'canPublish', false
+      );
+    END IF;
+
+    SELECT
+      count(*) FILTER (
+        WHERE NOT EXISTS (
+          SELECT 1
+          FROM public.price_list base
+          WHERE base.version_id = v_version.based_on_version_id
+            AND base.identity_id = candidate.identity_id
+        )
+      )::integer,
+      count(*) FILTER (
+        WHERE candidate.is_active = true
+          AND candidate.item_code ~ '^[A-Z0-9]{3}-[A-Z0-9]{3}-[0-9]{3}$'
+      )::integer,
+      count(*) FILTER (
+        WHERE candidate.is_active = true
+          AND candidate.item_code ~ '^ITEM-[0-9]{4}$'
+          AND candidate.item_code <> 'ITEM-0139'
+      )::integer,
+      count(*) FILTER (
+        WHERE candidate.is_active = false
+      )::integer
+    INTO
+      v_new_identity_count,
+      v_active_canonical_code_count,
+      v_unapproved_legacy_active_count,
+      v_inactive_row_count
+    FROM public.price_list candidate
+    WHERE candidate.version_id = p_version_id;
+
+    RETURN jsonb_build_object(
+      'versionFound', true,
+      'versionStatus', v_version.status,
+      'basedOnVersionId', v_version.based_on_version_id,
+      'newIdentityCount', COALESCE(v_new_identity_count, 0),
+      'activeCanonicalCodeCount', COALESCE(v_active_canonical_code_count, 0),
+      'structuredCodeGuardApplies', COALESCE(v_active_canonical_code_count, 0) > 0,
+      'unapprovedLegacyActiveCount', CASE
+        WHEN COALESCE(v_active_canonical_code_count, 0) > 0
+          THEN COALESCE(v_unapproved_legacy_active_count, 0)
+        ELSE 0
+      END,
+      'inactiveRowCount', COALESCE(v_inactive_row_count, 0),
+      'retiredPdfPolicyRequired', COALESCE(v_inactive_row_count, 0) > 0,
+      'canPublish',
+        v_version.status = 'draft'
+        AND v_version.based_on_version_id IS NOT NULL
+        AND COALESCE(v_new_identity_count, 0) = 0
+        AND (
+          COALESCE(v_active_canonical_code_count, 0) = 0
+          OR COALESCE(v_unapproved_legacy_active_count, 0) = 0
+        )
+    );
+  END;
+  $function$;
+
   CREATE OR REPLACE FUNCTION private.publish_catalog_version_impl(
     p_version_id uuid,
     p_expected_lock_version integer,
@@ -254,6 +343,8 @@ BEGIN;
   LANGUAGE plpgsql
   SECURITY DEFINER
   SET search_path = ''
+  SET lock_timeout = '5s'
+  SET statement_timeout = '30s'
   AS $function$
   DECLARE
     v_actor_id uuid;
@@ -265,10 +356,15 @@ BEGIN;
     v_published_by_display_name text;
     v_current_version_id uuid;
     v_draft public.price_list_versions%ROWTYPE;
+    v_base public.price_list_versions%ROWTYPE;
     v_existing_change public.catalog_change_sets%ROWTYPE;
+    v_request_fingerprint text;
     v_change_set_id uuid;
     v_snapshot jsonb;
     v_quality jsonb;
+    v_readiness jsonb;
+    v_new_identity_count integer;
+    v_unapproved_legacy_active_count integer;
     v_before_lock integer;
     v_after_lock integer;
   BEGIN
@@ -318,13 +414,29 @@ BEGIN;
     v_effective_date := (p_approval_metadata->>'effectiveDate')::date;
     v_approval_document_date := (p_approval_metadata->>'approvalDocumentDate')::date;
 
+    v_request_fingerprint := private.catalog_request_fingerprint(
+      'publish',
+      jsonb_build_object(
+        'versionId', p_version_id,
+        'expectedLockVersion', p_expected_lock_version,
+        'approvalMetadata', p_approval_metadata,
+        'reason', v_reason
+      )
+    );
+
+    PERFORM pg_catalog.pg_advisory_xact_lock(
+      pg_catalog.hashtextextended('master_catalog_request:' || p_request_id::text, 0)
+    );
+
     SELECT *
     INTO v_existing_change
     FROM public.catalog_change_sets
     WHERE request_id = p_request_id;
 
     IF FOUND THEN
-      IF v_existing_change.change_type = 'publish' THEN
+      IF v_existing_change.change_type = 'publish'
+         AND v_existing_change.actor_id IS NOT DISTINCT FROM v_actor_id
+         AND v_existing_change.request_fingerprint IS NOT DISTINCT FROM v_request_fingerprint THEN
         SELECT *
         INTO v_draft
         FROM public.price_list_versions
@@ -344,13 +456,23 @@ BEGIN;
         );
       END IF;
 
-      RETURN private.catalog_action_error(p_request_id, 'REQUEST_ALREADY_PROCESSED', 'Request ID already belongs to another catalog operation', false);
+      RETURN private.catalog_action_error(
+        p_request_id,
+        'REQUEST_ID_PAYLOAD_MISMATCH',
+        'Request ID was already used with a different catalog operation or payload',
+        false
+      );
     END IF;
 
     IF EXISTS (
       SELECT 1 FROM public.catalog_imports WHERE request_id = p_request_id
     ) THEN
-      RETURN private.catalog_action_error(p_request_id, 'REQUEST_ALREADY_PROCESSED', 'Request ID already belongs to another catalog operation', false);
+      RETURN private.catalog_action_error(
+        p_request_id,
+        'REQUEST_ID_PAYLOAD_MISMATCH',
+        'Request ID was already used with a different catalog operation or payload',
+        false
+      );
     END IF;
 
     PERFORM pg_catalog.pg_advisory_xact_lock(pg_catalog.hashtextextended('master_catalog_publish_pointer', 0));
@@ -375,16 +497,71 @@ BEGIN;
       RETURN private.catalog_action_error(p_request_id, 'VERSION_NOT_PUBLISHABLE', 'Only draft catalog versions can be published', false);
     END IF;
 
-    IF v_draft.version_string <> '2568.1.0' THEN
-      RETURN private.catalog_action_error(p_request_id, 'VALIDATION_FAILED', 'Only rehearsal catalog version 2568.1.0 is approved for Phase 4 local publish work', false);
-    END IF;
-
     IF v_draft.based_on_version_id IS DISTINCT FROM v_current_version_id THEN
       RETURN private.catalog_action_error(p_request_id, 'DRAFT_BASE_STALE', 'Draft base is no longer the current catalog default', false);
     END IF;
 
     IF v_draft.lock_version <> p_expected_lock_version THEN
       RETURN private.catalog_action_error(p_request_id, 'DRAFT_LOCK_CONFLICT', 'Draft lock version is stale', true);
+    END IF;
+
+    SELECT *
+    INTO v_base
+    FROM public.price_list_versions
+    WHERE id = v_draft.based_on_version_id;
+
+    IF NOT FOUND OR NOT private.catalog_version_transition_valid(
+      v_base.major,
+      v_base.minor,
+      v_base.patch,
+      v_draft.major,
+      v_draft.minor,
+      v_draft.patch
+    ) THEN
+      RETURN private.catalog_action_error(
+        p_request_id,
+        'VERSION_TRANSITION_INVALID',
+        'Catalog version must be a later ADR-003 annual, revision, or patch transition from its base',
+        false
+      );
+    END IF;
+
+    v_readiness := private.catalog_publish_readiness(p_version_id);
+    v_new_identity_count := COALESCE((v_readiness->>'newIdentityCount')::integer, 0);
+
+    IF v_new_identity_count <> 0 THEN
+      RETURN private.catalog_action_error(
+        p_request_id,
+        'P18_PLACEMENT_REVIEW_REQUIRED',
+        'New or supplement catalog identities require approved placement review before publish',
+        false,
+        jsonb_build_array(jsonb_build_object(
+          'field', 'displayOrder',
+          'code', 'P18_PLACEMENT_REVIEW_REQUIRED',
+          'message', 'Keep the draft for placement review; no pointer or publication metadata was changed',
+          'newIdentityCount', v_new_identity_count
+        ))
+      );
+    END IF;
+
+    v_unapproved_legacy_active_count := COALESCE(
+      (v_readiness->>'unapprovedLegacyActiveCount')::integer,
+      0
+    );
+
+    IF v_unapproved_legacy_active_count <> 0 THEN
+      RETURN private.catalog_action_error(
+        p_request_id,
+        'STRUCTURED_CODE_EXCEPTION_REVIEW_REQUIRED',
+        'Active structured catalog rows may retain only the approved ITEM-0139 legacy exception',
+        false,
+        jsonb_build_array(jsonb_build_object(
+          'field', 'itemCode',
+          'code', 'STRUCTURED_CODE_EXCEPTION_REVIEW_REQUIRED',
+          'message', 'Resolve every other active ITEM-#### code before publish',
+          'unapprovedLegacyActiveCount', v_unapproved_legacy_active_count
+        ))
+      );
     END IF;
 
     v_snapshot := private.catalog_compute_version_dataset(p_version_id);
@@ -458,6 +635,7 @@ BEGIN;
       change_type,
       reason,
       request_id,
+      request_fingerprint,
       actor_id,
       actor_display_name,
       before_lock_version,
@@ -468,6 +646,7 @@ BEGIN;
       'publish',
       v_reason,
       p_request_id,
+      v_request_fingerprint,
       v_actor_id,
       v_actor_display_name,
       v_before_lock,
@@ -502,6 +681,8 @@ BEGIN;
   LANGUAGE plpgsql
   SECURITY DEFINER
   SET search_path = ''
+  SET lock_timeout = '5s'
+  SET statement_timeout = '30s'
   AS $function$
   DECLARE
     v_actor_id uuid;
@@ -510,6 +691,7 @@ BEGIN;
     v_current_version_id uuid;
     v_target public.price_list_versions%ROWTYPE;
     v_existing_change public.catalog_change_sets%ROWTYPE;
+    v_request_fingerprint text;
     v_change_set_id uuid;
   BEGIN
     SELECT actor_id, actor_display_name
@@ -530,13 +712,27 @@ BEGIN;
       RETURN private.catalog_action_error(p_request_id, 'VALIDATION_FAILED', 'Reason and request ID are required', false);
     END IF;
 
+    v_request_fingerprint := private.catalog_request_fingerprint(
+      'restore',
+      jsonb_build_object(
+        'targetVersionId', p_target_version_id,
+        'reason', v_reason
+      )
+    );
+
+    PERFORM pg_catalog.pg_advisory_xact_lock(
+      pg_catalog.hashtextextended('master_catalog_request:' || p_request_id::text, 0)
+    );
+
     SELECT *
     INTO v_existing_change
     FROM public.catalog_change_sets
     WHERE request_id = p_request_id;
 
     IF FOUND THEN
-      IF v_existing_change.change_type = 'restore' THEN
+      IF v_existing_change.change_type = 'restore'
+         AND v_existing_change.actor_id IS NOT DISTINCT FROM v_actor_id
+         AND v_existing_change.request_fingerprint IS NOT DISTINCT FROM v_request_fingerprint THEN
         SELECT *
         INTO v_target
         FROM public.price_list_versions
@@ -553,13 +749,23 @@ BEGIN;
         );
       END IF;
 
-      RETURN private.catalog_action_error(p_request_id, 'REQUEST_ALREADY_PROCESSED', 'Request ID already belongs to another catalog operation', false);
+      RETURN private.catalog_action_error(
+        p_request_id,
+        'REQUEST_ID_PAYLOAD_MISMATCH',
+        'Request ID was already used with a different catalog operation or payload',
+        false
+      );
     END IF;
 
     IF EXISTS (
       SELECT 1 FROM public.catalog_imports WHERE request_id = p_request_id
     ) THEN
-      RETURN private.catalog_action_error(p_request_id, 'REQUEST_ALREADY_PROCESSED', 'Request ID already belongs to another catalog operation', false);
+      RETURN private.catalog_action_error(
+        p_request_id,
+        'REQUEST_ID_PAYLOAD_MISMATCH',
+        'Request ID was already used with a different catalog operation or payload',
+        false
+      );
     END IF;
 
     PERFORM pg_catalog.pg_advisory_xact_lock(pg_catalog.hashtextextended('master_catalog_publish_pointer', 0));
@@ -615,6 +821,7 @@ BEGIN;
       change_type,
       reason,
       request_id,
+      request_fingerprint,
       actor_id,
       actor_display_name,
       before_lock_version,
@@ -625,6 +832,7 @@ BEGIN;
       'restore',
       v_reason,
       p_request_id,
+      v_request_fingerprint,
       v_actor_id,
       v_actor_display_name,
       NULL,
@@ -741,6 +949,32 @@ BEGIN;
   END;
   $function$;
 
+  CREATE OR REPLACE FUNCTION public.get_catalog_publish_readiness(p_version_id uuid)
+  RETURNS jsonb
+  LANGUAGE plpgsql
+  STABLE
+  SECURITY DEFINER
+  SET search_path = ''
+  AS $function$
+  DECLARE
+    v_actor_id uuid;
+  BEGIN
+    SELECT actor_id
+    INTO v_actor_id
+    FROM private.catalog_admin_context();
+
+    IF v_actor_id IS NULL THEN
+      RAISE EXCEPTION 'CATALOG_FORBIDDEN: active admin profile is required';
+    END IF;
+
+    IF NOT private.catalog_admin_enabled() THEN
+      RAISE EXCEPTION 'CATALOG_FORBIDDEN: Master Catalog admin gate is disabled';
+    END IF;
+
+    RETURN private.catalog_publish_readiness(p_version_id);
+  END;
+  $function$;
+
   CREATE OR REPLACE FUNCTION public.restore_catalog_pointer(
     p_target_version_id uuid,
     p_reason text,
@@ -813,6 +1047,8 @@ BEGIN;
     FROM PUBLIC, anon, authenticated;
   REVOKE EXECUTE ON FUNCTION private.catalog_compute_version_dataset(uuid)
     FROM PUBLIC, anon, authenticated;
+  REVOKE EXECUTE ON FUNCTION private.catalog_publish_readiness(uuid)
+    FROM PUBLIC, anon, authenticated;
   REVOKE EXECUTE ON FUNCTION private.publish_catalog_version_impl(
     uuid, integer, jsonb, text, uuid
   ) FROM PUBLIC, anon;
@@ -834,6 +1070,8 @@ BEGIN;
   REVOKE EXECUTE ON FUNCTION public.publish_catalog_version(
     uuid, integer, jsonb, text, uuid
   ) FROM PUBLIC, anon;
+  REVOKE EXECUTE ON FUNCTION public.get_catalog_publish_readiness(uuid)
+    FROM PUBLIC, anon;
   REVOKE EXECUTE ON FUNCTION public.restore_catalog_pointer(
     uuid, text, uuid
   ) FROM PUBLIC, anon;
@@ -841,6 +1079,8 @@ BEGIN;
   GRANT EXECUTE ON FUNCTION public.publish_catalog_version(
     uuid, integer, jsonb, text, uuid
   ) TO authenticated;
+  GRANT EXECUTE ON FUNCTION public.get_catalog_publish_readiness(uuid)
+    TO authenticated;
   GRANT EXECUTE ON FUNCTION public.restore_catalog_pointer(
     uuid, text, uuid
   ) TO authenticated;

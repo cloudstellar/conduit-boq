@@ -15,6 +15,9 @@ export interface CatalogMutationState {
   changedItems?: number;
   retiredByFullImportOmission?: number;
   duplicateRequest?: boolean;
+  requestId?: string;
+  retryable?: boolean;
+  outcomeUncertain?: boolean;
   diagnostics?: Array<{
     row?: number;
     field?: string;
@@ -25,6 +28,7 @@ export interface CatalogMutationState {
 
 export interface CatalogRpcActionResponse {
   ok?: boolean;
+  requestId?: string;
   data?: {
     versionId?: string;
     lockVersion?: number;
@@ -96,13 +100,17 @@ const SAFE_RPC_ACTION_ERROR_CODES = new Set([
   'IMPORT_RECONCILIATION_REQUIRED',
   'IMPORT_RETIREMENT_APPROVAL_REQUIRED',
   'POINTER_ALREADY_CURRENT',
+  'P18_PLACEMENT_REVIEW_REQUIRED',
   'PUBLICATION_METADATA_REQUIRED',
   'PUBLICATION_VALIDATION_FAILED',
   'REQUEST_ALREADY_PROCESSED',
+  'REQUEST_ID_PAYLOAD_MISMATCH',
+  'STRUCTURED_CODE_EXCEPTION_REVIEW_REQUIRED',
   'TARGET_VERSION_NOT_PUBLISHED',
   'VALIDATION_FAILED',
   'VERSION_NOT_PUBLISHABLE',
   'VERSION_NOT_RESTORABLE',
+  'VERSION_TRANSITION_INVALID',
 ]);
 const RPC_TRANSPORT_ERROR_MESSAGES = {
   applyCatalogImport: 'Apply import ไม่สำเร็จจากระบบฐานข้อมูล',
@@ -120,20 +128,47 @@ export function createIdleCatalogMutationState(): CatalogMutationState {
   return { status: 'idle', message: '' };
 }
 
+export function isDefinitiveCatalogMutationOutcome(
+  state: CatalogMutationState,
+): boolean {
+  return state.status !== 'idle' && state.outcomeUncertain !== true;
+}
+
+export function shouldBeginNewCatalogOperation(
+  previousState: CatalogMutationState | null,
+  nextState: CatalogMutationState,
+  previousScopeKey: string,
+  nextScopeKey: string,
+): boolean {
+  return previousState === null
+    || previousScopeKey !== nextScopeKey
+    || (
+      previousState !== nextState
+      && isDefinitiveCatalogMutationOutcome(nextState)
+    );
+}
+
 export function createCatalogMutationError(
   message: string,
   code = 'VALIDATION_FAILED',
   diagnostics?: CatalogMutationState['diagnostics'],
+  metadata: Pick<
+    CatalogMutationState,
+    'requestId' | 'retryable' | 'outcomeUncertain'
+  > = {},
 ): CatalogMutationState {
-  return { status: 'error', message, code, diagnostics };
+  return { status: 'error', message, code, diagnostics, ...metadata };
 }
 
 export function createCatalogRpcTransportError(
   operation: CatalogRpcTransportOperation,
+  requestId: string,
 ): CatalogMutationState {
   return createCatalogMutationError(
-    RPC_TRANSPORT_ERROR_MESSAGES[operation],
+    `${RPC_TRANSPORT_ERROR_MESSAGES[operation]} ผลลัพธ์อาจถูกบันทึกแล้ว กรุณาลองซ้ำด้วย Request ID เดิม`,
     'INTERNAL_ERROR',
+    undefined,
+    { requestId, retryable: true, outcomeUncertain: true },
   );
 }
 
@@ -151,6 +186,11 @@ export function mapCatalogRpcActionResponse(
       readSafeRpcActionErrorMessage(code, response.error?.message),
       code,
       response.error?.diagnostics,
+      {
+        requestId: response.requestId,
+        retryable: response.error?.retryable,
+        outcomeUncertain: false,
+      },
     );
   }
 
@@ -168,6 +208,8 @@ export function mapCatalogRpcActionResponse(
     changedItems: response.data?.changedItems,
     retiredByFullImportOmission: response.data?.retiredByFullImportOmission,
     duplicateRequest: response.data?.duplicateRequest,
+    requestId: response.requestId,
+    outcomeUncertain: false,
   };
 }
 

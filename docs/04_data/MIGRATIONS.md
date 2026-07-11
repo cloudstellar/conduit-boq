@@ -33,10 +33,10 @@
 | `014_factor_f_publish_2569_0_0.sql` | Publish Factor F `2569.0.0` from กค 0433.2/ว 481 and move the default pointer | **Applied to Production 2026-06-29** (`20260628190621`) — no legacy BOQ backfill |
 | `015_factor_f_repair_legacy_snapshot_metadata.sql` | Repair missing legacy Factor F snapshot metadata for BOQs whose saved `factor_f` exactly matches `2566.0.0`; does not bind legacy BOQs to a version | **Applied to Production 2026-06-29** (`20260628190757`) — no reprice and no legacy version backfill |
 | `016_hotfix_preserve_boq_item_suffix.sql` | Redeploy `save_boq_with_routes` to preserve approved BOQ item suffix labels while keeping catalog-backed unit, price, category, and version checks authoritative | **Applied to Production 2026-07-06** (`20260706090246`) |
-| `017_master_catalog_phase4_foundation.sql` | Master Catalog Phase 4 additive governance foundation: metadata columns, identities, code registry, categories/groups, import/change audit tables, RLS/grants, disabled feature flag, rejecting RPC stubs | **Draft — Local only, not applied to Production** |
-| `018_master_catalog_phase4_draft_mutation.sql` | Master Catalog Phase 4 local draft create, manual/import mutation, idempotency, audit, and history RPC implementation; publish/restore remain blocked | **Draft — Local only, not applied to Production** |
-| `019_master_catalog_phase4_publish_pointer.sql` | Master Catalog Phase 4 local publish, pointer restore, catalog-only DB count/hash, baseline metadata/hash closure, and published-version immutability guards | **Draft — Local only, not applied to Production** |
-| `017+_master_catalog_phase4_*.sql` | Master Catalog Phase 4 database migrations | **Planned — next database migration range after completed Factor F rollout and hotfix 016** |
+| `017_master_catalog_phase4_foundation.sql` | Master Catalog Phase 4 additive governance foundation, including P-20 deterministic baseline identity from Production-derived `price_list.id`, request fingerprints, RLS/grants, and disabled feature flag | **Draft — Local only, not applied to Production** |
+| `018_master_catalog_phase4_draft_mutation.sql` | Draft create/manual/import RPCs with actor+payload request fingerprints, per-request/per-code locks, bounded runtime timeouts, full-payload preflight, audited mutation subtransaction rollback, and reusable ADR-003 transitions | **Draft — Local only, not applied to Production** |
+| `019_master_catalog_phase4_publish_pointer.sql` | Publish/restore, shared admin publish-readiness RPC, P-18 and structured-rollout boundary guards, P-19 inactive-row filing warning, catalog-only DB count/hash, runtime timeouts, and published immutability | **Draft — Local only, not applied to Production** |
+| `017+_master_catalog_phase4_*.sql` | Umbrella reference for the Phase 4 migration range now materialized as `017`-`019` | **Local-only range — no Production approval** |
 
 ### Local Schema Baseline (`supabase/local/`)
 
@@ -71,12 +71,15 @@ Hotfix `016` is a production issue patch that runs before Master Catalog Phase
 4. Master Catalog Phase 4 database migrations start at `017+` after Phase 4
 rebases/merges this hotfix from `main`.
 
-WP-6.5 is planned before WP-7 to harden the local-only Phase 4 mutation and
+WP-6.5 is in progress before WP-7 to harden the local-only Phase 4 mutation and
 publish path. Migration-facing work includes the P-18 new-identity publish
 guard, the `ITEM-0139` structured-code exception guard, idempotency/concurrency
-behavior, and resolution of P-20 baseline-identity/hash portability before the
-Phase 4 migration fingerprint is frozen. Draft migrations `017`-`019` may be
-amended while they remain Local only; applied hotfix `016` must not be edited.
+behavior, and the approved P-20 deterministic baseline identity mapping from
+Production-derived `price_list.id` before the Phase 4 migration fingerprint is
+frozen. The code and tracked Local/P-20 evidence harness now exist, but clean
+rebuild/live DB evidence is not accepted until the owner-approved reset runs.
+Draft migrations `017`-`019` may be amended while they remain Local
+only; applied hotfix `016` must not be edited.
 This is not a new Production hotfix and must not be applied to Production
 without the normal Phase 4 P-12+ approvals.
 
@@ -90,11 +93,22 @@ at a time outside an explicit transaction.
 
 ### Local rehearsal
 
-Use `npm run db:local:bootstrap`. It resets Local Supabase to the schema-only
+After telling the owner that the command destroys/rebuilds the whole Local
+Supabase stack and receiving explicit approval, use
+`npm run db:local:bootstrap`. It resets Local Supabase to the schema-only
 Production baseline, restores scrubbed snapshots, applies root migrations
 `009` and `010`, applies all four `010a` concurrent indexes individually, then
 applies `011`, Factor F `012` through `015`, hotfix `016`, the draft
 local-only Phase 4 scripts `017` through `019`, and runs the smoke tests.
+
+After a reviewed clean commit, run
+`npm run db:local:smoke-master-catalog-wp65` separately to capture request
+fingerprint, rollback, role, readiness, publish/restore race, P-20 mapping, BOQ,
+and Factor F evidence. Run it after each of two separately approved clean
+rebuilds and compare the JSON outputs with
+`npm run db:local:verify-master-catalog-p20 -- <first.json> <second.json>`.
+The comparator checks reproducibility; the Tracker must still record that the
+two inputs came from independent rebuilds.
 
 The CLI remains intentionally unlinked from Production. Do not use `db push`,
 `db pull`, or linked diff commands from this worktree. Local migration history

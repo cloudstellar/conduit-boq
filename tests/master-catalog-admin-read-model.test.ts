@@ -5,6 +5,7 @@ import {
   isCatalogAdminEnabled,
   loadCatalogAdminGate,
   loadCatalogAdminOverview,
+  selectWorkingCatalogDraft,
   shortHash,
 } from '../lib/master-catalog/admin/readModel';
 
@@ -127,6 +128,28 @@ describe('Master Catalog admin read model helpers', () => {
     expect(formatThaiNumber(710)).toBe('710');
     expect(formatThaiNumber(1200)).toBe('1,200');
     expect(formatThaiNumber(null)).toBe('-');
+  });
+
+  it('selects only a draft based on the current catalog pointer', () => {
+    const version = (
+      id: string,
+      status: 'draft' | 'active',
+      basedOnVersionId: string | null,
+    ) => ({
+      id,
+      status,
+      basedOnVersionId,
+    }) as Parameters<typeof selectWorkingCatalogDraft>[0][number];
+    const versions = [
+      version('stale-draft', 'draft', 'old-default'),
+      version('current-draft', 'draft', 'current-default'),
+      version('current-default', 'active', 'old-default'),
+    ];
+
+    expect(selectWorkingCatalogDraft(versions, 'current-default')?.id)
+      .toBe('current-draft');
+    expect(selectWorkingCatalogDraft(versions, 'missing-default')).toBeNull();
+    expect(selectWorkingCatalogDraft(versions, null)).toBeNull();
   });
 });
 

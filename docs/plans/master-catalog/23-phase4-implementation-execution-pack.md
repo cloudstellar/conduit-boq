@@ -23,6 +23,12 @@ publish guards into the reliability gate defined below; WP-7/WP-8 keep their
 business-regression and clean-rehearsal responsibilities. No Local reset or
 Production action is authorized by this amendment.
 
+**WP-6.5 Local implementation authorized:** 2026-07-11 — owner approved the
+P-11 staged-acceptance/P-20 sequence and authorized Local-only implementation.
+Current implementation/evidence status is maintained only in
+[the Tracker](./25-phase4-execution-progress-tracker.md). This authorization
+still does not permit an unannounced Local reset or any Production action.
+
 **Purpose:** Turn the reviewed Phase 4 architecture into an execution checklist
 that an implementer can follow without re-deciding scope, sequencing, database
 boundaries, or verification gates.
@@ -380,6 +386,9 @@ Export rules:
 - draft exports are admin-only and visibly marked `DRAFT – ห้ามใช้อ้างอิง`;
 - Excel includes canonical reconstruction sheet/fields per export spec;
 - PDF is server-verified and searchable;
+- retained evidence is generated only from a clean tracked tree into a new
+  non-overwriting directory, then accepted atomically after the tracked
+  semantic verifier passes;
 - Factor F rows/metadata and BOQ data are never included in catalog export
   dataset/hash.
 
@@ -388,7 +397,9 @@ Exit gate:
 - Excel and PDF generated for selected published version;
 - older published version export uses its own data;
 - draft export cannot look official;
-- visual sample accepted by P-11 before Production publication.
+- visual sample accepted by P-11 before Production publication;
+- final P-11 completion uses one P-20-compliant retained PDF/Excel pair with
+  filed binary hashes; older untracked previews do not satisfy this gate.
 
 ## 12. WP-6.5 reliability and publish-boundary hardening
 
@@ -409,7 +420,7 @@ Required sub-gates:
 | Slice | Required outcome |
 |---|---|
 | WP-6.5A End-to-end idempotency | Client/form creates one operation UUID for create/manual/import-apply/publish/restore, preserves it through an uncertain result, reuses it on retry, and replaces it only after a definitive terminal result or explicit new operation. Test timeout-after-commit and same-ID/different-payload rejection. |
-| WP-6.5B Publish guards and early UX | Keep DB P-18 and structured-code guards as final invariants; show the same publication blockers in draft/import preview before apply/publish, with Thai reason and remediation. A user must not discover the blocker only after completing the draft. |
+| WP-6.5B Publish guards and early UX | Keep DB P-18 and structured-code guards as final invariants; show the same publication blockers in draft/import preview before apply/publish, with Thai reason and remediation. Warn separately when inactive rows require the still-pending P-19 PDF policy; do not silently turn that filing decision into a new DB publish rule. A user must not discover the blocker only after completing the draft. |
 | WP-6.5C Hash portability | Resolve P-20 and update migration, DB/hash/export contracts and fixtures atomically. No clean-reset/cross-environment equivalence claim until the selected contract passes. |
 | WP-6.5D Reusable version lifecycle | Remove `2568.1.0` hardcoding from reusable action/RPC validation. Validate ADR-003 annual/revision/patch rules and prove at least one additional valid version plus duplicate/nonmonotonic rejection. Keep `2568.1.0` only as the exact first-candidate fixture. |
 | WP-6.5E Reproducible export evidence | Commit a semantic verifier under `scripts/` or tests. Discover headers by exact names, derive ranges, and verify schema version, sheets, row count/order, canonical hash, numeric cells, formula/link absence, PDF count/hash/pages, and binary hashes. Generated files remain untracked. |
@@ -425,7 +436,8 @@ Required behavior:
 | Draft contains any `price_list.identity_id` absent from `based_on_version_id` | Publish rejects before pointer movement |
 | Rejected add/supplement publish | Returns safe code `P18_PLACEMENT_REVIEW_REQUIRED` |
 | Rejected add/supplement publish | No publication metadata, pointer, legacy `is_default`, BOQ, or Factor F state changes |
-| Structured-code candidate has active legacy `ITEM-####` rows other than the approved `ITEM-0139` exception | Publish rejects before pointer movement |
+| Draft has at least one active canonical `AAA-TTT-NNN` row and also has active legacy `ITEM-####` rows other than the approved `ITEM-0139` exception | Publish rejects before pointer movement |
+| Unchanged legacy-only clone has no active canonical structured code | Structured-code rollout guard does not activate; normal publication quality rules still apply |
 | Structured-code exception check | Positive fixture with only `ITEM-0139` legacy exception passes; negative fixture with any other active legacy row fails |
 | UI/server action receives guard code | Shows safe operator-facing message and keeps draft reviewable |
 
@@ -433,8 +445,18 @@ Implementation note: the guard must compare the target draft rows to the base
 version rows by `identity_id`; do not infer the condition only from
 `catalog_change_sets.change_type` because manual/import audit grouping is not
 the authority for publication safety. The structured-code guard must inspect
-published-candidate rows directly and assert the active legacy exception set,
-not merely expose `legacyActiveRows` in quality JSON.
+published-candidate rows directly, activate when the draft contains at least one
+active canonical structured code, and then assert the active legacy exception
+set. It must not merely expose `legacyActiveRows` in quality JSON or block an
+unchanged legacy-only clone.
+
+All create/apply/publish/restore request fingerprints are checked under a
+per-request advisory lock. Canonical-code allocation also uses a per-code lock.
+After a change set starts writing, a structured rejection must raise into a
+PL/pgSQL subtransaction so the whole change set, item rows, identities, and code
+registrations roll back before a safe action error is returned. Private runtime
+functions carry bounded lock/statement timeouts; migration-time timeouts alone
+are not runtime evidence.
 
 Exit gate:
 

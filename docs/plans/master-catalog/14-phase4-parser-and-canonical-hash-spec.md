@@ -5,10 +5,11 @@ rehearsal; Production import/publication remains separately gated
 **Prepared:** 2026-06-22
 **Purpose:** Make import, publish, Excel, and PDF verification deterministic
 
-**Portability note:** P-20 is pending. The field/key/serialization contract
-remains approved, but clean-reset/cross-environment equality is not accepted
-until baseline stable identities are deterministic or an explicitly revised
-dual-hash contract is approved and implemented.
+**Portability note:** P-20 was approved on 2026-07-11. Legacy baseline stable
+identities initialize directly from the immutable Production-derived
+`price_list.id`, and `identity_id` remains in the canonical lineage hash.
+Clean-reset/cross-environment equality is not accepted until WP-6.5C proves the
+mapping and resulting hash across the approved independent rebuild scope.
 
 **Owner decision recorded:** 2026-07-04 — approved according to the
 recommendation for implementation/local rehearsal. This approval accepts the
@@ -414,19 +415,21 @@ deterministic. Current Local migration `017` generates new baseline identity
 UUIDs on each clean bootstrap, so two otherwise identical environments can
 produce different canonical dataset hashes.
 
-P-20 must choose and document one model before WP-6.5 exits and WP-7 starts:
+P-20 selects one model for Phase 4: deterministically initialize each legacy
+baseline stable identity directly from the existing immutable
+Production-derived `price_list.id`, then keep `identity_id` in this lineage
+hash. Migration `017` must reject a non-empty non-baseline input, an already
+assigned non-deterministic baseline identity, target-ID collision, incomplete
+coverage, or any postcondition where baseline `identity_id <> price_list.id`.
+Cloned versions continue to reuse the baseline identity rather than their new
+version-row UUID.
 
-1. **Preferred:** deterministically initialize each baseline stable identity
-   from the existing immutable Production `price_list.id` or another reviewed
-   one-to-one mapping, then keep `identity_id` in this lineage hash.
-2. **Alternative:** define separate business-content and lineage hashes with
-   distinct field contracts, labels, storage, export, and verification rules.
-
-Do not silently remove `identity_id`, reinterpret the current hash, or use an
-environment-specific hash as proof that two independently rebuilt datasets are
-business-equivalent. Any selected change updates this spec, DB contract,
-migrations, canonicalizer, Excel verification fields, export spec, release-note
-template, golden fixtures, and Verification Report together.
+Do not add a second business-content hash, silently remove `identity_id`,
+reinterpret the current hash, or use an environment-specific hash as proof
+that two independently rebuilt datasets are business-equivalent. The approved
+mapping updates this spec, DB contract, migrations, export verification,
+fixtures, and Verification Report together. Cross-rebuild evidence remains
+pending until WP-6.5C executes against the approved clean scope.
 
 ## 11. Required tests
 

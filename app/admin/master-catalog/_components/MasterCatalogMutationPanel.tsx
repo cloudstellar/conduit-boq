@@ -37,15 +37,22 @@ import {
 import type {
   CatalogMutationState,
 } from '@/lib/master-catalog/admin/actionModel';
+import type { CatalogPublishReadiness } from '@/lib/master-catalog/admin/readModel';
 import {
   applyCatalogManualChangeAction,
   createCatalogDraftAction,
   publishCatalogVersionAction,
   restoreCatalogPointerAction,
 } from '../actions';
+import { useStableCatalogOperation } from './useStableCatalogOperation';
 
 type DraftCreatePanelProps = {
   defaultVersionString: string | null;
+  suggestedVersion: {
+    major: number;
+    minor: number;
+    patch: number;
+  } | null;
   draftVersion: {
     id: string;
     versionString: string;
@@ -78,6 +85,7 @@ type PublishRestorePanelProps = {
     itemCount: number | null;
     datasetHash: string | null;
   } | null;
+  draftReadiness: CatalogPublishReadiness | null;
   currentVersionString: string | null;
   restorableVersions: Array<{
     id: string;
@@ -91,9 +99,17 @@ const initialState: CatalogMutationState = { status: 'idle', message: '' };
 
 export function MasterCatalogDraftCreatePanel({
   defaultVersionString,
+  suggestedVersion,
   draftVersion,
 }: DraftCreatePanelProps) {
   const [state, formAction] = useActionState(createCatalogDraftAction, initialState);
+  const suggestedVersionString = suggestedVersion
+    ? `${suggestedVersion.major}.${suggestedVersion.minor}.${suggestedVersion.patch}`
+    : null;
+  const [requestIdInputRef, prepareOperation] = useStableCatalogOperation(
+    state,
+    `${defaultVersionString ?? 'no-base'}:${suggestedVersionString ?? 'no-suggestion'}`,
+  );
   const router = useRouter();
 
   useEffect(() => {
@@ -107,7 +123,7 @@ export function MasterCatalogDraftCreatePanel({
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <FilePlus2 />
-          Draft 2568.1.0
+          สร้างฉบับร่าง
         </CardTitle>
         <CardDescription>
           Current base: {defaultVersionString ?? '-'}
@@ -130,15 +146,58 @@ export function MasterCatalogDraftCreatePanel({
               </div>
             </AlertDescription>
           </Alert>
-        ) : (
-          <form action={formAction} className="grid gap-4">
+        ) : suggestedVersion ? (
+          <form
+            action={formAction}
+            className="grid gap-4"
+            onSubmitCapture={prepareOperation}
+          >
+            <input ref={requestIdInputRef} type="hidden" name="requestId" />
             <ActionStateAlert state={state} />
+            <div className="grid gap-4 sm:grid-cols-3">
+              <div className="grid gap-2">
+                <Label htmlFor="draft-version-major">ปี พ.ศ. ที่มีผล</Label>
+                <Input
+                  id="draft-version-major"
+                  name="versionMajor"
+                  type="number"
+                  min="0"
+                  step="1"
+                  defaultValue={suggestedVersion.major}
+                  required
+                />
+              </div>
+              <div className="grid gap-2">
+                <Label htmlFor="draft-version-minor">Revision</Label>
+                <Input
+                  id="draft-version-minor"
+                  name="versionMinor"
+                  type="number"
+                  min="0"
+                  step="1"
+                  defaultValue={suggestedVersion.minor}
+                  required
+                />
+              </div>
+              <div className="grid gap-2">
+                <Label htmlFor="draft-version-patch">Patch</Label>
+                <Input
+                  id="draft-version-patch"
+                  name="versionPatch"
+                  type="number"
+                  min="0"
+                  step="1"
+                  defaultValue={suggestedVersion.patch}
+                  required
+                />
+              </div>
+            </div>
             <div className="grid gap-2">
               <Label htmlFor="draft-name">Draft name</Label>
               <Input
                 id="draft-name"
                 name="name"
-                defaultValue="Local rehearsal draft 2568.1.0"
+                defaultValue={`Local rehearsal draft ${suggestedVersionString}`}
                 required
               />
             </div>
@@ -152,11 +211,19 @@ export function MasterCatalogDraftCreatePanel({
               />
             </div>
             <CardFooter className="px-0">
-              <SubmitButton label="สร้าง draft" pendingLabel="กำลังสร้าง">
+              <SubmitButton
+                label="สร้าง draft"
+                pendingLabel="กำลังสร้าง"
+              >
                 <Plus data-icon="inline-start" />
               </SubmitButton>
             </CardFooter>
           </form>
+        ) : (
+          <Alert variant="destructive">
+            <AlertTitle>อ่านเลขฉบับตั้งต้นไม่สำเร็จ</AlertTitle>
+            <AlertDescription>ยังไม่สามารถเสนอเลขฉบับร่างตาม ADR-003 ได้</AlertDescription>
+          </Alert>
         )}
       </CardContent>
     </Card>
@@ -165,6 +232,7 @@ export function MasterCatalogDraftCreatePanel({
 
 export function MasterCatalogPublishRestorePanel({
   draftVersion,
+  draftReadiness,
   currentVersionString,
   restorableVersions,
 }: PublishRestorePanelProps) {
@@ -176,6 +244,15 @@ export function MasterCatalogPublishRestorePanel({
   const restoreTargetId = restorableVersions.some(
     (version) => version.id === selectedRestoreTargetId,
   ) ? selectedRestoreTargetId : firstRestorableVersionId;
+  const [publishRequestIdInputRef, preparePublishOperation] = useStableCatalogOperation(
+    publishState,
+    draftVersion?.id ?? 'no-publish-draft',
+  );
+  const [restoreRequestIdInputRef, prepareRestoreOperation] = useStableCatalogOperation(
+    restoreState,
+    restoreTargetId || 'no-restore-target',
+  );
+  const publishBlocked = !draftReadiness?.canPublish;
 
   useEffect(() => {
     if (publishState.status === 'success' || restoreState.status === 'success') {
@@ -200,7 +277,12 @@ export function MasterCatalogPublishRestorePanel({
       </CardHeader>
       <CardContent className="grid gap-5 lg:grid-cols-2">
         {draftVersion ? (
-          <form action={publishAction} className="grid gap-4">
+          <form
+            action={publishAction}
+            className="grid gap-4"
+            onSubmitCapture={preparePublishOperation}
+          >
+            <input ref={publishRequestIdInputRef} type="hidden" name="requestId" />
             <ActionStateAlert state={publishState} />
             <input type="hidden" name="versionId" value={draftVersion.id} />
             <input type="hidden" name="expectedLockVersion" value={draftVersion.lockVersion} />
@@ -211,6 +293,18 @@ export function MasterCatalogPublishRestorePanel({
                 <Badge variant="outline">{draftVersion.itemCount.toLocaleString('th-TH')} rows</Badge>
               ) : null}
             </div>
+            <PublishReadinessAlert readiness={draftReadiness} />
+            {draftReadiness?.retiredPdfPolicyRequired ? (
+              <Alert>
+                <ShieldCheck />
+                <AlertTitle>ต้องพิจารณานโยบาย PDF สำหรับรายการยกเลิกใช้</AlertTitle>
+                <AlertDescription>
+                  ฉบับร่างมีรายการยกเลิกใช้{' '}
+                  {draftReadiness.inactiveRowCount.toLocaleString('th-TH')} รายการ
+                  จึงยังห้ามรับรองหรือจัดเก็บ PDF เป็นฉบับทางการจนกว่า P-19 จะได้รับอนุมัติ
+                </AlertDescription>
+              </Alert>
+            ) : null}
             <div className="grid gap-2">
               <Label htmlFor="publish-effective-date">Effective date</Label>
               <Input
@@ -259,7 +353,11 @@ export function MasterCatalogPublishRestorePanel({
               />
             </div>
             <div className="flex flex-wrap items-center gap-2">
-              <SubmitButton label="Publish local version" pendingLabel="กำลัง publish">
+              <SubmitButton
+                label="Publish local version"
+                pendingLabel="กำลัง publish"
+                disabled={publishBlocked}
+              >
                 <ShieldCheck data-icon="inline-start" />
               </SubmitButton>
               <Badge variant="secondary">Production touched: No</Badge>
@@ -269,12 +367,17 @@ export function MasterCatalogPublishRestorePanel({
           <Alert>
             <CheckCircle2 />
             <AlertTitle>ไม่มี draft ที่ publish ได้</AlertTitle>
-            <AlertDescription>Draft `2568.1.0` ต้องอยู่ในสถานะ draft ก่อน publish</AlertDescription>
+            <AlertDescription>ต้องมีฉบับร่างสถานะ draft ก่อน publish</AlertDescription>
           </Alert>
         )}
 
         {restorableVersions.length > 0 ? (
-          <form action={restoreAction} className="grid gap-4">
+          <form
+            action={restoreAction}
+            className="grid gap-4"
+            onSubmitCapture={prepareRestoreOperation}
+          >
+            <input ref={restoreRequestIdInputRef} type="hidden" name="requestId" />
             <ActionStateAlert state={restoreState} />
             <div className="grid gap-2">
               <Label htmlFor="restore-target-version">Target version</Label>
@@ -326,12 +429,79 @@ export function MasterCatalogPublishRestorePanel({
   );
 }
 
+function PublishReadinessAlert({
+  readiness,
+}: {
+  readiness: CatalogPublishReadiness | null;
+}) {
+  if (!readiness) {
+    return (
+      <Alert variant="destructive">
+        <ShieldCheck />
+        <AlertTitle>ยังยืนยันความพร้อมไม่ได้</AlertTitle>
+        <AlertDescription>
+          ปิดการเผยแพร่ไว้ก่อนจนกว่าจะอ่านผลตรวจจากฐานข้อมูลได้สำเร็จ
+        </AlertDescription>
+      </Alert>
+    );
+  }
+
+  if (readiness.canPublish) {
+    return (
+      <Alert>
+        <CheckCircle2 />
+        <AlertTitle>ผ่าน publish guard เบื้องต้น</AlertTitle>
+        <AlertDescription>
+          ไม่พบรายการเพิ่มใหม่ที่รอจัดลำดับ และไม่พบรหัสเดิมที่ยังไม่ได้รับข้อยกเว้น
+        </AlertDescription>
+      </Alert>
+    );
+  }
+
+  return (
+    <Alert variant="destructive">
+      <ShieldCheck />
+      <AlertTitle>ฉบับร่างยังเผยแพร่ไม่ได้</AlertTitle>
+      <AlertDescription>
+        <div className="grid gap-2">
+          {!readiness.versionFound || readiness.versionStatus !== 'draft' ? (
+            <p>ไม่พบฉบับร่างที่อยู่ในสถานะพร้อมตรวจ</p>
+          ) : null}
+          {readiness.newIdentityCount > 0 ? (
+            <p>
+              มีรายการเพิ่มใหม่ {readiness.newIdentityCount.toLocaleString('th-TH')} รายการ
+              ที่ต้องผ่านการพิจารณาตำแหน่งตาม P-18
+            </p>
+          ) : null}
+          {readiness.unapprovedLegacyActiveCount > 0 ? (
+            <p>
+              มีรหัส ITEM-#### ที่ยัง active และไม่ได้รับข้อยกเว้น{' '}
+              {readiness.unapprovedLegacyActiveCount.toLocaleString('th-TH')} รายการ
+            </p>
+          ) : null}
+          {readiness.structuredCodeGuardApplies ? (
+            <p>
+              ตรวจ structured-code rollout จากรหัส canonical ที่ active{' '}
+              {readiness.activeCanonicalCodeCount.toLocaleString('th-TH')} รายการ
+            </p>
+          ) : null}
+          <p>ข้อมูลยังเก็บใน draft ได้ และยังไม่มีการเปลี่ยน current default</p>
+        </div>
+      </AlertDescription>
+    </Alert>
+  );
+}
+
 export function MasterCatalogManualMutationPanel({
   version,
   sampleItems,
 }: MutationPanelProps) {
   const [action, setAction] = useState<'retire' | 'update' | 'recode' | 'add'>('retire');
   const [state, formAction] = useActionState(applyCatalogManualChangeAction, initialState);
+  const [requestIdInputRef, prepareOperation] = useStableCatalogOperation(
+    state,
+    `${version.id}:${action}`,
+  );
   const router = useRouter();
   const activeItems = useMemo(
     () => sampleItems.filter((item) => item.isActive).slice(0, 12),
@@ -366,7 +536,12 @@ export function MasterCatalogManualMutationPanel({
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <form action={formAction} className="grid gap-5">
+        <form
+          action={formAction}
+          className="grid gap-5"
+          onSubmitCapture={prepareOperation}
+        >
+          <input ref={requestIdInputRef} type="hidden" name="requestId" />
           <ActionStateAlert state={state} />
           <input type="hidden" name="versionId" value={version.id} />
           <input type="hidden" name="expectedLockVersion" value={version.lockVersion} />
@@ -520,7 +695,10 @@ export function MasterCatalogManualMutationPanel({
           ) : null}
 
           <div className="flex flex-wrap items-center gap-2">
-            <SubmitButton label="บันทึก change set" pendingLabel="กำลังบันทึก">
+            <SubmitButton
+              label="บันทึก change set"
+              pendingLabel="กำลังบันทึก"
+            >
               <RotateCcw data-icon="inline-start" />
             </SubmitButton>
             <Badge variant="secondary">Production touched: No</Badge>
@@ -565,6 +743,7 @@ function ActionStateAlert({ state }: { state: CatalogMutationState }) {
         <AlertDescription>
           lock {state.lockVersion ?? '-'}
           {state.changeSetId ? ` · change set ${state.changeSetId}` : ''}
+          {state.requestId ? ` · request ${state.requestId.slice(0, 8)}` : ''}
         </AlertDescription>
       </Alert>
     );
@@ -573,7 +752,10 @@ function ActionStateAlert({ state }: { state: CatalogMutationState }) {
   return (
     <Alert variant="destructive" aria-live="polite">
       <AlertTitle>{state.code ?? 'VALIDATION_FAILED'}</AlertTitle>
-      <AlertDescription>{state.message}</AlertDescription>
+      <AlertDescription>
+        {state.message}
+        {state.requestId ? ` · request ${state.requestId.slice(0, 8)}` : ''}
+      </AlertDescription>
     </Alert>
   );
 }

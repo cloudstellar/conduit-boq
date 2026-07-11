@@ -494,8 +494,14 @@ On the export screen:
 - a committed semantic verifier discovers headers by exact names and derives
   data ranges; it does not assume a fixed title/header row number;
 - the verifier checks workbook schema version, exact sheets/headers, count/order,
-  canonical reconstruction, numeric cell types, formula/link absence, PDF
-  count/hash/page structure, and binary hashes from a clean checkout;
+  canonical reconstruction, visible price/verification fields against canonical
+  JSON, numeric cell types, formula/link absence, PDF count/hash/page structure,
+  regular same-directory files, and binary hashes from a clean checkout;
+- `npm run artifacts:master-catalog:generate` is Local-loopback only, refuses a
+  dirty tracked tree, writes to a unique staging directory, and renames the
+  evidence directory into place only after semantic verification passes;
+- `npm run artifacts:master-catalog:verify -- <artifact-manifest.json>` reruns
+  verification using only tracked code and paths relative to the manifest;
 - P-20 identity/hash portability passes before a clean-environment hash is used
   as cross-environment equivalence evidence.
 
@@ -528,6 +534,11 @@ Record in the [Release Note](./16-phase4-release-note-template.md):
 - exported/filed by and timestamp;
 - physical archive location/reference;
 - verification result and verifier.
+
+Final P-11 completion retains exactly one reviewed P-20-compliant PDF/Excel pair
+plus manifest/verification evidence. Preview binaries and failed/staging
+directories are not filed evidence. Generated artifacts remain untracked; the
+generator and verifier source are tracked.
 
 ## 9. Failure behavior
 

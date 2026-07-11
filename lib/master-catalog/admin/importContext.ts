@@ -69,15 +69,28 @@ async function loadPhase4Draft(
   supabase: SupabaseClient,
   warnings: string[],
 ): Promise<CatalogImportDraftOption | null> {
+  const { data: pointer, error: pointerError } = await supabase
+    .from('price_list_default_version')
+    .select('version_id')
+    .eq('id', true)
+    .maybeSingle();
+
+  if (pointerError || !pointer?.version_id) {
+    warnings.push('โหลด current default สำหรับเลือกฉบับร่าง import ไม่สำเร็จ');
+    return null;
+  }
+
   const { data, error } = await supabase
     .from('price_list_versions')
-    .select('id,version_string,status,lock_version')
-    .eq('version_string', '2568.1.0')
+    .select('id,version_string,status,lock_version,based_on_version_id,created_at')
     .eq('status', 'draft')
+    .eq('based_on_version_id', pointer.version_id)
+    .order('created_at', { ascending: false })
+    .limit(1)
     .maybeSingle();
 
   if (error) {
-    warnings.push('โหลด draft 2568.1.0 สำหรับ import ไม่สำเร็จ');
+    warnings.push('โหลดฉบับร่างล่าสุดสำหรับ import ไม่สำเร็จ');
     return null;
   }
 
