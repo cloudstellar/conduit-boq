@@ -1,6 +1,6 @@
 # Master Catalog Phase 4 Execution Progress Tracker
 
-**Status:** P-20 and core WP-6.5 Local DB evidence passed; the prior exact P-11 pair was superseded by the approved Excel TH Sarabun New 16 pt refinement, so replacement artifact evidence and remaining UI/lifecycle gates are pending before WP-7
+**Status:** P-20, core WP-6.5 Local DB evidence, and the TH Sarabun New 16 pt replacement P-11 pair passed technically; owner visual acceptance and remaining UI/lifecycle gates are pending before WP-7
 **Purpose:** Owner-facing progress tracker for Master Catalog Phase 4 local
 implementation and rehearsal. This file is the authority for current WP status,
 blockers, next safe step, and the authority/evidence index. Detailed decisions,
@@ -33,14 +33,14 @@ Allowed statuses:
 | Field | Current value |
 |---|---|
 | Current branch | `codex/master-catalog-phase4` |
-| Named evidence commits | `1ad01b9268cec64c621266c3eb33b16a4325e627` produced the WP-6.5/P-20 live evidence; `edf3570a86300036cc4c16c82f5459282cde4cab` produced the superseded P-11 technical pair; use git HEAD for the current documentation checkpoint |
+| Named evidence commits | `1ad01b9268cec64c621266c3eb33b16a4325e627` produced the WP-6.5/P-20 live evidence; `777df7598c8aa96a17f3665db5131e5fb5397b96` produced the TH Sarabun New 16 pt replacement P-11 pair; `edf3570a` is superseded history |
 | Current work package | WP-6.5 reliability and publish-boundary hardening |
 | Current environment | Local only |
 | Production write allowed | No |
 | Feature flag default | Disabled |
-| Latest owner decision needed | Review the replacement P-20-compliant PDF/Excel pair after TH Sarabun New 16 pt generation/verification; resolve P-18 placement and P-19 retired-row PDF policy before affected workflows publish |
-| Next owner review point | Visually inspect the replacement P-11 pair; remaining WP-6.5 UI/lifecycle evidence is a separate closeout review |
-| Last updated | 2026-07-11 21:49 +07 |
+| Latest owner decision needed | Accept or reject the exact TH Sarabun New 16 pt replacement PDF/Excel pair; resolve P-18 placement and P-19 retired-row PDF policy before affected workflows publish |
+| Next owner review point | Visually inspect the named replacement P-11 pair; remaining WP-6.5 UI/lifecycle evidence is a separate closeout review |
+| Last updated | 2026-07-11 22:04 +07 |
 
 ## 2.1 Canonical authority and evidence manifest
 
@@ -63,12 +63,12 @@ Current evidence baseline:
   `1ad01b9268cec64c621266c3eb33b16a4325e627`;
 - two owner-approved independent clean rebuilds on that commit reproduced the
   `2568.0.0` dataset hash and deterministic identity mapping exactly;
-- superseded P-11 technical artifact source commit:
-  `edf3570a86300036cc4c16c82f5459282cde4cab`;
-- the pair under
-  `output/master-catalog/review-artifacts/20260711T141050812Z-edf3570a/`
-  passed technically but was superseded by the owner-approved Excel
-  `TH Sarabun New` 16-point refinement before final acceptance;
+- replacement P-11 artifact source commit:
+  `777df7598c8aa96a17f3665db5131e5fb5397b96`;
+- the TH Sarabun New 16 pt pair under
+  `output/master-catalog/review-artifacts/20260711T145832108Z-777df759/`
+  passed embedded/independent semantic verification and file QA;
+- the prior `edf3570a` pair remains superseded point-in-time history;
 - Production-applied root sequence: `009`-`015`, hotfix `016`;
 - Phase 4 Local-only drafts: `017`, `018`, `019`;
 - Local bootstrap authority order: `009`-`015`, `016`, `017`-`019`;
@@ -86,7 +86,7 @@ Current evidence baseline:
 | WP-3 | Admin read/draft UI shell behind disabled flag | Complete | Read-only server UI shell, hidden admin entry while flag disabled, server-side auth/role/flag gate tests, local auth/user/flag facts, unauthenticated in-app browser redirect smoke, authenticated local HTTP gate smoke, authenticated in-app browser login/gate proof, WP-3 review cleanup for flag parsing/email edge cases/Factor F warnings, test/lint/typecheck/build evidence | Owner approved continuing to WP-4 |
 | WP-4 | Draft mutation, import, manual edit, and history | Complete | Draft/manual/import/history tests, clean Local WP-4 smoke, browser manual edit proof, browser import render/validate proof, RPC error sanitization, local auth credential parser proof, and [WP-4 Owner Review Note](./26-phase4-wp4-owner-review-note.md) | Owner accepted 2026-07-05 21:47 +07 |
 | WP-5 | Publish, pointer restore, and audit on Local | Ready for owner review | Backend DB/RPC slice passed: migration `019`, Local publish/restore smoke including stale-base pointer fixture, DB hash readback, immutability checks, active-admin publish/restore UI controls, browser create/publish/restore proof, final DB readback, owner-review cleanup, and [Verification Report publication evidence](./13-phase4-verification-report.md#12-publication-tests). Hash-portability review note remains for WP-8/P-15 | Owner accepted continuing to WP-6 local-only implementation |
-| WP-6 | Official Excel/PDF export | In progress | Selected-version export core, paged export data reads, older-version coverage, draft marking, Excel/PDF generators, verification, and prior technical artifact proof exist. The owner then approved `TH Sarabun New` with a 16-point Excel body baseline; the prior `edf3570a` pair is superseded. | Commit the typography contract/implementation, generate and verify a replacement exact pair, then obtain owner visual/content acceptance before `Complete` |
+| WP-6 | Official Excel/PDF export | Ready for owner review | Selected-version export core, paged export data reads, older-version coverage, draft marking, Excel/PDF generators, and tracked verification exist. The exact replacement pair from `777df75` uses TH Sarabun New on all 20,808 populated Excel cells at 16 pt or larger and passed semantic, five-sheet workbook, 19-page PDF, and unchanged Local readback checks. | Obtain owner visual/content acceptance of the named replacement binaries before `Complete`; preserve them without regeneration if accepted |
 | WP-6.5 | Reliability and publish-boundary hardening | In progress | Code/static implementation for A-H, two owner-approved clean Local rebuilds, P-20 comparison, live DB role/fingerprint/rollback/guard/race/invariant evidence on `1ad01b9`, and exact export-pair technical evidence on `edf3570a` passed. See the sub-gate table below. | Core technical evidence passed; owner artifact acceptance, browser retry/UAT, and remaining reusable-lifecycle negatives remain before closeout/WP-7 |
 | WP-7 | Permanent BOQ/hotfix `016` and Factor F regression preservation | Not started | Live DB behavior for all approved BOQ suffixes and authoritative catalog fields, rollback/role/version negatives, BOQ save/print/export regressions, and Factor F before/after assertions; suite is reusable in CI/rehearsal | Required before WP-8 complete |
 | WP-8 | Clean Local rehearsal, admin UAT, performance baseline, and Verification Report | Not started | Owner-approved Local reset, full workflow, DB integration/concurrency, test/lint/build/audit/advisor evidence, tracked export verification, admin UAT without developer/SQL assistance, and measured 710-row performance | Required before any P-12 request |
@@ -100,7 +100,7 @@ Current evidence baseline:
 | B Publish guards/early UX | Shared DB readiness helper/RPC, P-18 guard, structured-rollout guard, import/publish warnings, and P-19 inactive-row filing warning implemented; live unchanged-clone positive, P-18 negative, structured negative, and rejected-publication atomicity passed twice | Intended-admin browser UAT and final candidate rerun when structured rollout is proposed |
 | C P-20 portability | Passed: two owner-approved independent clean rebuilds on commit `1ad01b9` reproduced 710 identities, dataset hash `sha256:2e3571ea7135fbc0bbb84c8cc330af1173e4c1d2345e5eb59958dc76e45558b8`, and identity mapping SHA-256 `5f68993ce5aa5c7735b0d9e6de6d27946b4846fb8a6eb77d1b6b3bd6c4a73de7` | None for WP-6.5C; rerun after any reviewed migration change and during WP-8 |
 | D Reusable lifecycle | Generic UI/RPC ADR-003 transition rules and annual/revision/patch unit fixtures implemented; reusable `2568.1.0` hardcoding removed; live high-revision create/publish path passed twice | Live duplicate/nonmonotonic transition negatives before P-14 |
-| E Reproducible export evidence | Generator/verifier tooling passed; the clean `edf3570a` pair passed semantic/PDF/workbook QA but was superseded before owner acceptance by the Excel TH Sarabun New 16 pt refinement | Commit the typography change, generate a replacement pair from the clean Local baseline, rerun semantic and five-sheet visual QA, record new hashes, and obtain owner confirmation |
+| E Reproducible export evidence | Passed technically: clean Local baseline at `777df75` produced the TH Sarabun New 16 pt replacement pair; embedded/independent verification passed, all five workbook sheets and all 19 PDF pages passed QA, and post-export DB readback was unchanged | Owner visual/content confirmation; rerun during WP-8, but do not regenerate an owner-accepted pair |
 | F DB integration/concurrency | Passed twice on independent clean Local rebuilds for anonymous/non-admin denial, fingerprints, duplicate-code rollback, readiness, publish/restore races, lock timeout configuration, P-20, pointer restore, BOQ invariants, and Factor F invariants | WP-8 rerun; WP-7 separately owns permanent hotfix `016`/BOQ suffix/Factor F regression coverage |
 | G Operator UX/observability | Route loading/error/not-found states, safe Thai recovery, stable request IDs across form reset/uncertain retry, current-base draft selection, Supplement whole-draft warning, bounded mutation/export logs, and Excel request correlation implemented | Browser failure/retry/accessibility checks and intended-admin UAT |
 | H Documentation consistency | Authority documents aligned with named live evidence; tracked consistency test passed 4 checks, full suite passed 25 files/120 tests, TypeScript passed, lint exited 0 with 10 existing warnings, four evidence scripts passed syntax checks, and Local DB lint found no schema errors | Commit review and WP-8 rerun |
@@ -129,6 +129,7 @@ Current evidence baseline:
 
 | Date/time | WP | Evidence | Result | Notes |
 |---|---|---|---|---|
+| 2026-07-11 22:04 +07 | WP-6/P-11/WP-6.5E | Generated and verified the exact TH Sarabun New 16 pt replacement owner-review pair | Passed technically; owner visual acceptance pending | Source commit `777df7598c8aa96a17f3665db5131e5fb5397b96`; no DB reset or harness rerun. Evidence directory `output/master-catalog/review-artifacts/20260711T145832108Z-777df759/`; Excel 166,439 bytes/SHA-256 `9e7622fb1a269ebe96c45af69d339162b32f42143ce304caa13a520587ae3a07`; PDF 1,941,259 bytes/SHA-256 `e9e793c4880956fede05b7dee098e24fb0c6bc1b25c8e74f843f1afcfad76eff`; print HTML SHA-256 `58fbbff501f97d8b4c64c03b4b481098af1bc429269ad3cabc06e7e155bbeeff`; dataset hash unchanged. Embedded and independent semantic verification passed. Artifact-tool rendered all five sheets with no formula errors; direct binary inspection found 20,808 populated cells, all `TH Sarabun New`, minimum 16 pt, zero bad typography/formulas/hyperlinks, and verification fixed row height 22. The prior renderer-only `62` display artifact was absent from actual blank cells. All 19 PDF page renders were byte-identical to the prior approved visual proof. Post-export Local readback remained zero change sets/items/imports, pointer `2568.0.0`, flag false, 198 BOQs/1,547 items, and Factor F default `2569.0.0`/36 rows. Production touched: No. |
 | 2026-07-11 21:49 +07 | WP-6/P-11 | Owner refined editable Excel typography to TH Sarabun New with a 16-point body baseline | Approved; replacement exact pair pending | Generator contract now distinguishes media: populated Excel cells use `TH Sarabun New` at 16 pt or larger while PDF/UI retain NT runtime fonts. The previously generated `20260711T141050812Z-edf3570a` pair remains valid point-in-time technical evidence but is superseded for final acceptance. No DB reset, Production access/write, Factor F workflow change, or hotfix scope change was authorized. |
 | 2026-07-11 21:22 +07 | WP-6/P-11/WP-6.5E | Generated and verified the exact retained owner-review pair after an explicitly approved clean Local bootstrap | Passed technically; owner visual acceptance pending | The first post-harness pair under `20260711T125426128Z-edf3570a/` was rejected as acceptance evidence because its change-summary sheet correctly contained two WP-6.5 restore audit rows. The owner then approved a clean bootstrap at `edf3570a`; authority order `009`-`015`, hotfix `016`, then `017`-`019` and all bootstrap smoke checks passed. Pre-export readback had zero change sets/items/imports, pointer `2568.0.0`, 710 rows, P-20 hash `sha256:2e3571ea7135fbc0bbb84c8cc330af1173e4c1d2345e5eb59958dc76e45558b8`, and flag disabled. Exact evidence directory: `output/master-catalog/review-artifacts/20260711T141050812Z-edf3570a/`; Excel SHA-256 `1426df732504c38609aa97903729c6a9ff6f1c0dc487ff686a68a7b1d9386396`; PDF SHA-256 `6909cd428756d9ae980f942a7513c0b5fa9b636582c151063c96febb1d76aaae`; print HTML SHA-256 `fb8425c82581f5b7c158b8b891802068919f9e41a510284f4494c9ab8aff4243`. Embedded and independent semantic verification passed with no failures. PDF QA covered all 19 pages; workbook QA covered all five sheets, 710 price and verification rows, exact reconstructed hash, and no WP-6.5 audit rows. Post-export readback was unchanged: zero change sets/items/imports, pointer/hash/flag intact, 198 BOQs/1,547 BOQ items, and Factor F default `2569.0.0`. Production touched: No. |
 | 2026-07-11 19:47 +07 | WP-6.5H | Reconciled Tracker and Verification Report to the named live evidence and reran repository/schema checks | Passed | `npm test`: 25 files/120 tests; `npx tsc --noEmit --pretty false`: passed; `npm run lint`: exit 0 with 10 existing out-of-scope warnings; authority consistency: 4 checks passed; four tracked evidence `.mjs` scripts passed `node --check`; `npx supabase db lint --local --level error --fail-on error`: no schema errors/results empty; `git diff --check`: passed before commit. No artifact generation, Production access/write, Factor F workflow change, or hotfix scope expansion. |
@@ -238,7 +239,7 @@ Current evidence baseline:
 | 2026-07-11 01:36 +07 | WP-6.5 | Reusable actions created a new UUID on each submission, so an uncertain retry could bypass the intended database idempotency key | Client/form owns the operation ID; DB stores actor+payload fingerprints and rejects changed reuse; bounded timeout is configured | DB exact replay and changed-payload rejection passed live on 2026-07-11; browser/UI timeout-after-commit proof remains required. |
 | 2026-07-11 01:36 +07 | WP-6.5/WP-7 | CI did not run migration/RPC/RLS/hotfix behavior against a live Local database | Tracked WP-6.5 Local DB/concurrency harness now exists; WP-7 still owns permanent BOQ suffix/Factor F cases | Resolved for the WP-6.5 scope by two live runs on 2026-07-11; permanent WP-7 regression coverage and WP-8 rerun remain open. |
 | 2026-07-11 01:36 +07 | WP-6.5 | Reusable create/publish validation was partially hardcoded to `2568.1.0` despite ADR-003 | Generic version UI/RPC validation and unit fixtures implemented; exact candidate remains fixture/approval data only | Live generic high-revision create/publish passed on 2026-07-11; live duplicate/nonmonotonic negatives remain before P-14. |
-| 2026-07-11 01:36 +07 | WP-6.5/P-11 | Artifact verification lived under untracked temp paths and used fixed header coordinates | Tracked semantic verifier and atomic clean-tree generator implemented; generated files stay untracked | Tooling resolved. The `edf3570a` pair passed technical evidence, then was superseded by the owner-approved Excel typography refinement; replacement pair and owner confirmation remain. |
+| 2026-07-11 01:36 +07 | WP-6.5/P-11 | Artifact verification lived under untracked temp paths and used fixed header coordinates | Tracked semantic verifier and atomic clean-tree generator implemented; generated files stay untracked | Technical evidence resolved for the replacement `777df75` pair; owner visual confirmation remains. |
 | 2026-07-11 01:36 +07 | WP-6.5/WP-8 | Route failure states, Thai recovery copy, correlation logging, admin UAT, and measured performance were incomplete | Loading/error/not-found and bounded mutation/export logs implemented; request ID shown for uncertain/error paths | Partially resolved 2026-07-11; browser/accessibility UAT and 710-row performance remain WP-8/P-14 gates |
 
 ## 7. Handoff note template
@@ -247,14 +248,14 @@ Use this template at the end of each implementation session:
 
 ```text
 Current WP: WP-6.5 reliability and publish-boundary hardening
-Status: P-20 and core WP-6.5 Local DB/concurrency evidence passed; the prior P-11 pair was superseded by the approved Excel typography refinement; replacement artifact evidence, browser retry/UAT, lifecycle negatives, and closeout review remain before WP-7
+Status: P-20, core WP-6.5 Local DB/concurrency evidence, and the TH Sarabun New 16 pt replacement P-11 pair passed technically; owner artifact acceptance, browser retry/UAT, lifecycle negatives, and closeout review remain before WP-7
 Branch: codex/master-catalog-phase4
-Latest evidence commits: 1ad01b9268cec64c621266c3eb33b16a4325e627 for live WP-6.5/P-20; edf3570a86300036cc4c16c82f5459282cde4cab for the exact P-11 pair
+Latest evidence commits: 1ad01b9268cec64c621266c3eb33b16a4325e627 for live WP-6.5/P-20; 777df7598c8aa96a17f3665db5131e5fb5397b96 for the replacement P-11 pair
 Files changed: WP-6.5 migrations/actions/UI, readiness/observability/version helpers, tracked DB/P-20/export evidence tools, tests, and aligned authority docs; untracked `files/`, `tmp/`, and `output/` remain ignored
-Evidence produced: two independent clean rebuilds on one reviewed commit; reproducible P-20 dataset/identity hashes; live role denial, request fingerprints/replay, rollback, guards/readiness, generic publish, publish/restore races, pointer restoration, and BOQ/Factor F invariants; the prior PDF/Excel pair remains superseded point-in-time technical evidence
+Evidence produced: two independent clean rebuilds on one reviewed commit; reproducible P-20 dataset/identity hashes; live role denial, request fingerprints/replay, rollback, guards/readiness, generic publish, publish/restore races, pointer restoration, and BOQ/Factor F invariants; exact replacement PDF/Excel pair with TH Sarabun New 16 pt workbook, manifest, semantic verifier, PDF/workbook QA, and unchanged Local readback
 Tests/checks run: See latest WP-6.5 evidence-log row and Verification Report
-Blockers: replacement TH Sarabun New 16 pt P-11 pair and owner acceptance; browser timeout/retry and intended-admin UAT; live duplicate/nonmonotonic lifecycle negatives; P-18 placement; P-19 retired-row PDF policy; WP-7 BOQ/Factor F regressions; WP-8 UAT/performance/advisors
+Blockers: owner acceptance of the exact TH Sarabun New 16 pt P-11 binaries; browser timeout/retry and intended-admin UAT; live duplicate/nonmonotonic lifecycle negatives; P-18 placement; P-19 retired-row PDF policy; WP-7 BOQ/Factor F regressions; WP-8 UAT/performance/advisors
 Owner decisions needed: final P-11 binary acceptance; P-18/P-19 when affected; Production P-12 through P-15 remain separate
-Next safe step: commit the approved typography contract/implementation, generate and verify the replacement P-20-compliant pair without rerunning the DB harness, then present it for owner confirmation
+Next safe step: present the exact replacement P-20-compliant pair for owner visual confirmation; preserve it without regeneration if accepted
 Production touched: No
 ```

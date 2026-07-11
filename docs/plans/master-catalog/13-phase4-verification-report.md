@@ -1,6 +1,6 @@
 # Master Catalog Phase 4 Verification Report
 
-**Status:** In progress — WP-0 through WP-6 Local evidence recorded; WP-6.5 P-20/core live Local DB passed; prior P-11 artifact evidence passed technically but was superseded by the approved Excel TH Sarabun New 16 pt refinement; replacement artifacts, owner acceptance, remaining UI/lifecycle gates, WP-7, WP-8/UAT, and Production gates pending
+**Status:** In progress — WP-0 through WP-6 Local evidence recorded; WP-6.5 P-20/core live Local DB and the TH Sarabun New 16 pt replacement P-11 pair passed technically; owner artifact acceptance, remaining UI/lifecycle gates, WP-7, WP-8/UAT, and Production gates pending
 **Prepared:** 2026-06-22
 **Production project:** `otlssvssvgkohqwuuiir`
 **Candidate version:** `2568.1.0` (version string reserved; publication metadata/P-15 pending)
@@ -48,7 +48,7 @@ should link here rather than copy volatile evidence.
 | Post-Factor-F Adjustment Plan reviewed | Owner | Approved for implementation/local rehearsal | 2026-07-04 | Owner chat approval; Production gates separate |
 | Implementation Execution Pack reviewed | Owner | Approved for WP-0 through WP-8 | 2026-07-04 | Owner chat approval; Production gates remain separate |
 | Reliability plan/authority alignment | Owner | Approved for docs-only alignment | 2026-07-11 | Expanded WP-6.5/WP-7/WP-8 gates and P-20; no Local reset or Production authorization |
-| P-11 staged artifact acceptance | Owner | Visual/content direction accepted with later Excel typography refinement; replacement retained pair pending | 2026-07-11 21:49 +07 | The `edf3570a` pair passed technical QA but was superseded before owner acceptance; replacement Excel must use TH Sarabun New with a 16 pt body baseline while PDF keeps NT fonts |
+| P-11 staged artifact acceptance | Owner | Visual/content direction and Excel TH Sarabun New 16 pt refinement accepted; replacement pair technically verified and awaiting owner confirmation | 2026-07-11 22:04 +07 | Exact replacement pair from `777df75` passed semantic and visual file QA; WP-6 remains ready for owner review until the owner accepts the named binaries |
 | P-20 identity/hash portability | Owner | Approved deterministic baseline identity from immutable Production-derived `price_list.id`; retain `identity_id` in lineage hash | 2026-07-11 12:11 +07 | WP-6.5C passed on 2026-07-11 with two owner-approved independent clean rebuilds on exact commit `1ad01b9`; rerun remains required after migration changes and at WP-8/P-15 |
 | WP-6.5 Local-only start | Owner | Authorized | 2026-07-11 12:11 +07 | No unannounced Local reset, Production access/write, Factor F workflow change, hotfix scope expansion, placement UI, deploy, enablement, or publication |
 | WP-6.5 destructive Local rebuilds | Owner | Two separate clean Local resets authorized | 2026-07-11 | Both approved rebuilds completed on exact commit `1ad01b9`; evidence provenance and hashes are recorded in Section 6.4 and the Tracker; Production touched: No |
@@ -56,7 +56,7 @@ should link here rather than copy volatile evidence.
 | Code dictionary | Owner | Approved as candidate dictionary/governance framework; P-02 through P-07 row/code decisions now recorded separately | 2026-07-04 | Owner chat approval; publication gates separate |
 | Row reconciliation | Owner | Approved as draft evidence/framework; P-02 through P-07 row-level outcomes now recorded separately | 2026-07-04 | Owner chat approval; raw CSV is evidence, not import authority |
 | Legacy `2568.0.0` publication metadata | Owner/records custodian | Approved via P-08 for baseline metadata backfill | 2026-07-04 | Effective `2026-01-01`; approval ref `เอ็นที วทฐฐ./405 ลงวันที่ 27 พ.ย. 2568`; approval doc date `2025-11-27`; publisher `ผู้จัดการฝ่ายท่อร้อยสาย (ทฐฐ.)` |
-| NT CI runtime asset scope | Owner/brand custodian | Approved via P-10 for limited runtime derivatives | 2026-07-04 | Use [Doc #24](./24-phase4-nt-ci-runtime-asset-analysis.md); owner confirms NT CI asset rights for business use; `/CI/` source remains local-only; final P-11 artifacts still pending |
+| NT CI runtime asset scope | Owner/brand custodian | Approved via P-10 for limited runtime derivatives | 2026-07-04 | Use [Doc #24](./24-phase4-nt-ci-runtime-asset-analysis.md); owner confirms NT CI asset rights for business use; `/CI/` source remains local-only; final P-11 owner acceptance remains pending |
 | Production migration | Owner | Not requested; request after WP-8 evidence review |  | P-12 requires green evidence, fresh baseline/drift check, backup/restore, reviewed fingerprints, and owner go/no-go |
 | Application deployment | Owner | Not requested; request after migration verification |  | P-13 requires CI/deployment fingerprint, disabled feature flag, smoke checks, and owner go/no-go |
 | Feature enablement | Owner | Not requested; request after deploy/admin-only smoke verification |  | P-14 requires authorization checks, non-admin denial tests, and owner go/no-go |
@@ -158,7 +158,7 @@ completed only after the fixes.
 | B Guards/readiness | Shared private readiness helper/public admin RPC; P-18 new-identity guard; structured guard activates only after canonical rollout starts; inactive-row P-19 filing warning; import/publish Thai warnings | Live unchanged legacy-only clone passed; P-18 add and structured-recode drafts were blocked; rejected publication left status/metadata/pointer unchanged; passed twice | Intended-admin UAT; rerun on the final structured candidate |
 | C P-20 | `017` maps baseline identity to `price_list.id`, fails on prior mismatch/collision/coverage defects, retains lineage hash; tracked two-run comparator | Passed: both independent clean rebuilds reproduced base `2568.0.0`, 710 rows, dataset hash `sha256:2e3571ea7135fbc0bbb84c8cc330af1173e4c1d2345e5eb59958dc76e45558b8`, and mapping SHA-256 `5f68993ce5aa5c7735b0d9e6de6d27946b4846fb8a6eb77d1b6b3bd6c4a73de7` on the same reviewed commit | Rerun after migration change and at WP-8/P-15 |
 | D ADR-003 lifecycle | Generic version fields and reusable DB transition helper; annual/revision/patch, duplicate/backward/mixed tests | Unit/static negatives passed; live dynamically allocated high-revision create/publish passed twice | Live duplicate/nonmonotonic transition negatives before P-14 |
-| E Export evidence | Tracked clean-tree atomic generator; semantic verifier locates headers, cross-checks visible/canonical fields, count/order/hash/types/formulas/links/PDF pages, regular paths, and binary hashes | The `edf3570a` pair passed technically, then was superseded by the approved Excel TH Sarabun New 16 pt refinement before owner acceptance | Commit typography change; generate replacement pair; rerun semantic, 19-page PDF, and five-sheet workbook QA; obtain owner confirmation |
+| E Export evidence | Tracked clean-tree atomic generator; semantic verifier locates headers, cross-checks visible/canonical fields, count/order/hash/types/formulas/links/PDF pages, regular paths, and binary hashes | Passed technically: exact replacement pair at `777df75`, embedded/independent verifier, 19-page PDF comparison, five-sheet workbook QA, typography scan, and unchanged post-export readback | Owner visual/content confirmation; rerun at WP-8 without replacing an accepted pair |
 | F DB/concurrency | Tracked Local-only harness covers P-20 mapping, role denial, fingerprints, partial-write counts, readiness, publish/restore races, runtime timeout acceptance, pointer/BOQ/Factor F invariants | Passed twice on independent clean rebuilds; anonymous/non-admin denial, duplicate-code rollback, races, pointer restoration, 198 BOQs/1,547 BOQ items, and Factor F default `2569.0.0`/36 rows remained exact | WP-8 rerun; WP-7 owns permanent hotfix `016`/BOQ suffix/Factor F regressions |
 | G UX/observability | Route loading/error/not-found; safe Thai recovery; bounded mutation/Excel/print operation logs and request correlation; current-base draft selection; Supplement whole-draft guard warning | Unit/type/full-build evidence passed | Browser failure/retry/accessibility and intended-admin UAT |
 | H Documentation | Decision/architecture/DB/export/runbook/tracker/report alignment plus tracked consistency test | Authority test passed 4 checks across core links/table shapes/order/decisions/scripts; report updated with named live evidence | Final repository consistency rerun, commit review, and WP-8 rerun |
@@ -176,7 +176,7 @@ Retained Local evidence outputs (untracked by policy):
   no comparison failures; the separate owner approvals and rebuild provenance
   are recorded in the Tracker.
 
-Superseded P-11 Local artifact evidence (untracked by policy):
+P-11 replacement and superseded Local artifact evidence (untracked by policy):
 
 - a first post-harness pair under `20260711T125426128Z-edf3570a/` correctly
   showed two WP-6.5 restore audit rows and was rejected/superseded as
@@ -190,6 +190,11 @@ Superseded P-11 Local artifact evidence (untracked by policy):
   passed embedded and independent semantic verification with no failures, but
   was superseded before owner acceptance by the Excel TH Sarabun New 16 pt
   refinement;
+- the exact replacement pair under
+  `output/master-catalog/review-artifacts/20260711T145832108Z-777df759/`
+  came from commit `777df7598c8aa96a17f3665db5131e5fb5397b96` without
+  another DB reset or harness run and passed embedded/independent semantic,
+  five-sheet workbook, typography, and 19-page PDF QA;
 - post-export Local readback remained zero change sets/items/imports with
   pointer `2568.0.0`, dataset hash
   `sha256:2e3571ea7135fbc0bbb84c8cc330af1173e4c1d2345e5eb59958dc76e45558b8`,
@@ -214,7 +219,7 @@ fixed and reviewed.
 | Live DB integration/concurrency | Migrations, RPC/RLS/roles, rollback, two-session publish/restore, and lock timeout pass | WP-6.5 harness passed twice on independent clean rebuilds; lock timeout configuration accepted and races had one deterministic winner | Passed WP-6.5; rerun WP-8 |
 | P-20 hash portability | Approved clean-reset/cross-environment identity/hash model passes | Two clean rebuilds on the same reviewed commit reproduced the 710-row dataset and identity mapping hashes exactly | Passed WP-6.5; rerun WP-8/P-15 |
 | ADR-003 reusable version lifecycle | Another valid annual/revision/patch version passes; no reusable hardcoding to `2568.1.0` | Generic implementation/unit fixtures pass; live dynamically allocated high-revision create/publish passed twice | Partial; live invalid transitions pending |
-| Tracked export verifier | Clean-checkout semantic Excel/PDF verification passes | Tooling and the superseded `edf3570a` pair passed; replacement typography pair has not yet been generated | Pending replacement WP-6/P-11 run; WP-8 rerun later |
+| Tracked export verifier | Clean-checkout semantic Excel/PDF verification passes | Exact `777df75` replacement pair passed embedded generation verification and independent rerun with no failures; manifest contains regular paths, binary hashes, 710 rows, and P-20 dataset hash | Passed technically; owner P-11 acceptance and WP-8 rerun pending |
 | Admin UAT and recovery | Intended admin completes core workflow and representative failures without developer/SQL assistance |  | Pending WP-8 |
 | 710-row performance baseline | Import preview, readiness, export, and admin interactions meet reviewed budget |  | Pending WP-8 |
 | Authority/document consistency | Migration/WP order, decision IDs, authority links, and Markdown table shapes agree | Tracked consistency test passed 4 checks across the core authority set | Passed checkpoint; rerun at WP-8 |
@@ -370,9 +375,9 @@ Also verify:
 | Published item count | Approved count | Exact Local P-11 pair for selected `2568.0.0` contains 710 workbook price rows, 710 verification rows, and 710 PDF DOM rows; selected-version data loader fails closed on item-count mismatch | Passed technically; owner file acceptance pending |
 | Published dataset hash | One stored value | Exact Local P-11 pair and manifest contain `sha256:2e3571ea7135fbc0bbb84c8cc330af1173e4c1d2345e5eb59958dc76e45558b8`; workbook reconstruction, PDF proof, DB readback, and tracked verifier agree. Historical pre-P-20 visual hashes are superseded for final acceptance. | Passed for exact pair; owner acceptance pending |
 | Selected-version export paging | No silent fixed-limit truncation before count/hash verification | Export data loader now reads selected price rows, categories, code groups, change sets, imports, and change items through deterministic paged queries; `tests/master-catalog-export-data.test.ts` covers a 1,001-row selected version and verifies all rows are counted/hashed | Passed automated fixture |
-| Excel visible business-row count/order | Exact match | Superseded workbook under `review-artifacts/20260711T141050812Z-edf3570a/` has 710 price data rows and 710 verification rows; all five expected sheets are visible and ordered; `priceSequenceBreakCount=0`; the clean change summary has no WP-6.5 harness audit rows | Passed point-in-time proof; replacement typography artifact pending |
+| Excel visible business-row count/order | Exact match | Exact replacement workbook under `review-artifacts/20260711T145832108Z-777df759/` has 710 price data rows and 710 verification rows; all five expected sheets are visible and ordered; `priceSequenceBreakCount=0`; the clean change summary has no WP-6.5 harness audit rows | Passed exact Local artifact inspection; owner acceptance pending |
 | Excel `_canonical_row_json` reconstruction | Exact UTF-8 dataset hash | Tracked verifier reconstructs `[` + ordered `_canonical_row_json` + `]\n`; exact workbook rehash matched `sha256:2e3571ea7135fbc0bbb84c8cc330af1173e4c1d2345e5eb59958dc76e45558b8` | Passed automated fixture and exact Local artifact inspection |
-| PDF server-verified printed count/hash/order | Exact match | Superseded pair's PDF proof loaded Local `2568.0.0`, DOM row count 710, first/last sequence 1/710, unique sequence count 710, `sequenceBreakCount=0`, 18 price sections/19 physical pages, title/full hash/watermark present, and embedded verifier passed | Passed point-in-time proof; replacement pair pending |
+| PDF server-verified printed count/hash/order | Exact match | Exact replacement PDF proof loaded Local `2568.0.0`, DOM row count 710, first/last sequence 1/710, unique sequence count 710, `sequenceBreakCount=0`, 18 price sections/19 physical pages, title/full hash/watermark present, and embedded verifier passed | Passed exact Local artifact proof; owner acceptance pending |
 | New/supplement item placement acceptance | Owner/data-custodian approved position before publish; no official version relies only on append-at-end ordering for added/supplement rows | P-18 recorded after WP-6 review. The live WP-6.5 guard now prevents publication of add/supplement/new-identity drafts. Placement preview/review remains a separate governance workflow. | Guard passed; P-18 placement pending when applicable |
 | Inactive/retired row official PDF policy | Any version with inactive/retired rows has an approved field-facing PDF rendering/exclusion policy before final filing | P-19 recorded 2026-07-07. Current 710-row `2568.0.0` proof has no inactive rows; future retired-row versions require owner/data-custodian policy before P-15 filing | Pending P-19 when applicable |
 | Structured-code completeness before candidate publication | Once a draft contains an active canonical `AAA-TTT-NNN` code, active rows have approved code groups except the recorded temporary `ITEM-0139` exception; no other active legacy `ITEM-####` row may publish | Live unchanged-clone positive control and structured-recode rejection passed twice. The approved final structured candidate must still be validated against the exact dictionary/data fingerprint before P-15. | WP-6.5 guard passed; final candidate pending |
@@ -380,11 +385,11 @@ Also verify:
 | Draft export status mark | `DRAFT – ห้ามใช้อ้างอิง` | `tests/master-catalog-export-data.test.ts` covers active-admin draft export as non-official with a `DRAFT-` filename; `tests/master-catalog-export-excel.test.ts` verifies the workbook document sheet and price sheet include `DRAFT – ห้ามใช้อ้างอิง` plus non-official draft hash wording | Passed automated fixture |
 | PDF price-disclaimer watermark | Matches approved three-line wording and style from `files/รายการบัญชีราคามาตรฐานงานก่อสร้างท่อร้อยสาย 2568.pdf`: `รายการบัญชีราคานี้ไม่ใช่ราคาก่อสร้างที่แท้จริงหรือถูกต้องตรงกับราคาก่อสร้าง`; `แต่เป็นเพียงราคาโดยประมาณซึ่งใกล้เคียงกับราคาก่อสร้างจริงเท่านั้น`; `(สำหรับกิจการ บมจ.โทรคมนาคมแห่งชาติ เท่านั้น มิให้เผยแพร่ก่อนได้รับอนุญาต)` | Exact retained PDF has no cover watermark and one three-line red overlay watermark per price page; all 19 pages were rendered, inspected, and found free of clipping/blank-page anomalies | Passed exact Local visual artifact proof; owner acceptance pending |
 | Published stamp | Field-facing PDF cover shows organization, `ฉบับบัญชีราคา`, Thai status, effective date, item count, and full hash. It excludes Current Default, approval reference/date, approved-by/publisher, exported at/by, generated-by, and export-spec fields; a non-current published version instead shows a Thai retrospective-reference warning. | Fresh Local route/PDF proof on 2026-07-11 confirmed only retained fields appear; count/hash/order/watermark checks passed. | Passed Local review; final owner/file acceptance pending |
-| PDF cover layout refinement | Larger top-centered NT company lockup, document title, and a distinct `ประจำปี 2568` line of the same title size and weight; a separate centered upper-middle metadata table contains only `ฉบับบัญชีราคา`, Thai status, effective date, item count, and full hash. No duplicate company/status text appears in the header. | Superseded pair's Local `2568.0.0` PDF passed route/render proof: 19 pages/18 price sections, 710 rows, sequence 1-710 without breaks, full hash, watermark, and no clipping regression. Historical PDF SHA-256 is `6909cd428756d9ae980f942a7513c0b5fa9b636582c151063c96febb1d76aaae`. | Passed point-in-time proof; replacement pair pending |
+| PDF cover layout refinement | Larger top-centered NT company lockup, document title, and a distinct `ประจำปี 2568` line of the same title size and weight; a separate centered upper-middle metadata table contains only `ฉบับบัญชีราคา`, Thai status, effective date, item count, and full hash. No duplicate company/status text appears in the header. | Exact replacement Local `2568.0.0` PDF passed route/render proof: 19 pages/18 price sections, 710 rows, sequence 1-710 without breaks, full hash, watermark, and no clipping regression. All rendered pages were byte-identical to the prior visual proof. PDF SHA-256 is `e9e793c4880956fede05b7dee098e24fb0c6bc1b25c8e74f843f1afcfad76eff`. | Passed technically; owner file acceptance pending |
 | Excel numeric cell types | Numeric, formatted | `tests/master-catalog-export-excel.test.ts` confirms price cost cells are numeric and formatted `#,##0.00` | Passed automated fixture |
 | Excel exact 5 sheets/headers; no formulas/external links | Exact | `tests/master-catalog-export-excel.test.ts` confirms exact five sheets/order, business headers, verification headers, and no formula/hyperlink cell values | Passed automated fixture |
-| Tracked semantic artifact verifier | Runs from clean checkout; finds headers by name; derives ranges; verifies schema/sheets/count/order/hash/types/visible-field consistency/formulas/links/PDF pages and binary hashes | Superseded `edf3570a` manifest passed with no failures; replacement TH Sarabun New 16 pt pair has not yet run | Pending replacement pair and later WP-8 rerun |
-| Excel document-language and typography alignment | Thai title/year hierarchy, Thai user-facing metadata labels, canonical verification identifiers unchanged, and every populated cell uses TH Sarabun New with body size at least 16 pt | Generator and focused unit coverage implement the approved typography; exact replacement workbook visual proof and binary hash pending | Pending replacement workbook QA |
+| Tracked semantic artifact verifier | Runs from clean checkout; finds headers by name; derives ranges; verifies schema/sheets/count/order/hash/types/visible-field consistency/formulas/links/PDF pages and binary hashes | Exact `777df75` manifest passed embedded verification and independent `npm run artifacts:master-catalog:verify -- output/master-catalog/review-artifacts/20260711T145832108Z-777df759/artifact-manifest.json`; failures were empty | Passed technically; owner visual confirmation and WP-8 rerun pending |
+| Excel document-language and typography alignment | Thai title/year hierarchy, Thai user-facing metadata labels, canonical verification identifiers unchanged, and every populated cell uses TH Sarabun New with body size at least 16 pt | Artifact-tool rendered all five sheets without formula errors or clipping. Direct binary inspection found 20,808 populated cells, all TH Sarabun New, minimum 16 pt, zero bad typography/formulas/hyperlinks, verification fixed row height 22, and actual blank structured cells remained empty. Excel SHA-256 is `9e7622fb1a269ebe96c45af69d339162b32f42143ce304caa13a520587ae3a07`. | Passed technically; owner file acceptance pending |
 | Formula-control text safety | Malicious strings remain inert text | `tests/master-catalog-export-excel.test.ts` covers formula-looking item text and confirms no formula/hyperlink cell values | Passed automated fixture |
 | PDF Thai font/header/page/clipping | Correct | Exact PDF metadata shows A4, 19 pages, tagged, and no form/JavaScript/encryption. Resources include embedded/subset `/NTRegular`, `/NTBold`, and `/Menlo-Regular`. All 19 Poppler-rendered pages stayed inside safe bounds with no edge clipping or anomalous blank page; inspected content retains lockup, title, repeated headers, Thai footer/page numbers, row 527 on one line, and acceptable final-page whitespace. | Passed exact Local visual artifact proof; owner acceptance pending |
 | Short dataset hash | Exactly `sha256:` + first 12 hex + `…`; full hash also present | Admin/export short-hash helper now preserves the `sha256:` prefix and emits only the first 12 hash hex characters plus `…` for dataset hashes, while full hashes remain on the version detail/export stamp and official Excel/PDF proof artifacts; covered by `tests/master-catalog-admin-read-model.test.ts` | Passed automated fixture |
@@ -394,26 +399,26 @@ Also verify:
 
 Official export file/reference and binary SHA-256 (different from dataset hash):
 
-The following Local P-11 pair passed technical verification but was superseded
-before owner acceptance by the Excel TH Sarabun New 16 pt refinement. Preserve
-it only as point-in-time history; do not use its hashes for final P-11 or
-Production filing. A replacement pair is pending from the committed typography
-change and unchanged clean Local baseline.
+The following exact Local P-11 replacement pair is technically verified but is
+not a Production filing. If the owner accepts these binaries, preserve them and
+their hashes without regeneration; Production filing remains a later
+P-15/release gate.
 
-- directory: `output/master-catalog/review-artifacts/20260711T141050812Z-edf3570a/`
-- source commit: `edf3570a86300036cc4c16c82f5459282cde4cab`
+- directory: `output/master-catalog/review-artifacts/20260711T145832108Z-777df759/`
+- source commit: `777df7598c8aa96a17f3665db5131e5fb5397b96`
 - Excel: `NT-Master-Catalog-v2568.0.0-20260101.xlsx`
-- Excel binary SHA-256: `1426df732504c38609aa97903729c6a9ff6f1c0dc487ff686a68a7b1d9386396`
+- Excel binary SHA-256: `9e7622fb1a269ebe96c45af69d339162b32f42143ce304caa13a520587ae3a07`
 - PDF: `NT-Master-Catalog-v2568.0.0-20260101.pdf`
-- PDF binary SHA-256: `6909cd428756d9ae980f942a7513c0b5fa9b636582c151063c96febb1d76aaae`
-- print HTML SHA-256: `fb8425c82581f5b7c158b8b891802068919f9e41a510284f4494c9ab8aff4243`
+- PDF binary SHA-256: `e9e793c4880956fede05b7dee098e24fb0c6bc1b25c8e74f843f1afcfad76eff`
+- print HTML SHA-256: `58fbbff501f97d8b4c64c03b4b481098af1bc429269ad3cabc06e7e155bbeeff`
 - dataset hash: `sha256:2e3571ea7135fbc0bbb84c8cc330af1173e4c1d2345e5eb59958dc76e45558b8`
 
-The earlier post-harness pair under `20260711T125426128Z-edf3570a/` is
-explicitly rejected/superseded for owner acceptance because its workbook
-correctly includes two WP-6.5 restore audit rows. Historical pre-P-20 and
-pre-cover-refinement hashes elsewhere in this report remain point-in-time
-history and must not be substituted for the exact pair above.
+The earlier post-harness pair under `20260711T125426128Z-edf3570a/` is rejected
+because its workbook correctly includes two WP-6.5 restore audit rows. The
+later `20260711T141050812Z-edf3570a/` pair passed technically but is superseded
+by the approved Excel typography refinement. Historical hashes elsewhere in
+this report remain point-in-time history and must not be substituted for the
+exact replacement pair above.
 
 ## 14. Application regression and UI/UX
 
@@ -460,7 +465,7 @@ request approves them.
 | `npm run audit:prod` | No unaccepted Production vulnerability |  | Pending |
 | Live Local DB integration/concurrency | Migration/RPC/RLS/role/rollback/race/timeout gates pass | Harness passed twice on independent clean rebuilds at `1ad01b9`; named outputs and hashes recorded in 6.4; `npx supabase db lint --local --level error --fail-on error` found no schema errors | Passed WP-6.5; rerun WP-8 |
 | Permanent hotfix `016`/BOQ/Factor F suite | Real RPC behavior and pre/post invariants pass |  | Pending WP-7 |
-| Tracked export artifact verification | Semantic verifier passes from clean checkout | Superseded `edf3570a` pair and five verifier fixtures pass; replacement typography pair pending | Pending replacement WP-6/P-11 run and later WP-8 rerun |
+| Tracked export artifact verification | Semantic verifier passes from clean checkout | Exact `777df75` replacement pair passed embedded and independent semantic verification; five verifier fixtures also pass | Passed technically; owner P-11 acceptance and WP-8 rerun pending |
 | Documentation consistency | Authority links/table shapes, migration order, WP order, and decisions agree | `tests/master-catalog-authority-consistency.test.ts`: 4 checks passed | Passed checkpoint; rerun at WP-8 |
 | Security advisor | No new blocker |  | Pending |
 | Performance advisor | No rollout blocker |  | Pending |

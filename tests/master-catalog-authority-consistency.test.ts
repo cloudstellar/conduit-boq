@@ -144,7 +144,7 @@ describe('Master Catalog authority consistency', () => {
       'docs/plans/master-catalog/19-phase4-decision-register.md',
     )
     expect(decisions).toContain(
-      'Visual/content direction including Excel TH Sarabun New 16 pt accepted 2026-07-11; replacement retained binary pair and WP-6 completion pending',
+      'TH Sarabun New 16 pt replacement pair technically passed 2026-07-11; owner acceptance and WP-6 completion pending',
     )
     expect(decisions).toContain(
       'Placement decision pending; guard implemented for Local verification 2026-07-11',
