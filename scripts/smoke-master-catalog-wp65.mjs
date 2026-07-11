@@ -69,6 +69,12 @@ try {
 
   currentStage = 'run unchanged-clone publish race and request idempotency'
   const raceDraft = await createDraft(adminA, base, versions[0], 'publish race')
+  currentStage = 'verify duplicate and nonmonotonic version transitions'
+  const lifecycleNegatives = await assertVersionLifecycleNegatives(
+    adminA,
+    base,
+    raceDraft,
+  )
   const raceReadiness = await readReadiness(adminA, raceDraft.versionId)
   assert(raceReadiness.canPublish === true, 'Unchanged clone did not pass boundary readiness')
   assert(raceReadiness.newIdentityCount === 0, 'Unchanged clone reported a new identity')
@@ -218,6 +224,7 @@ try {
     baseVersion: base.version_string,
     baselineDatasetHash: base.dataset_hash,
     ...p20,
+    ...lifecycleNegatives,
     unchangedCloneReadiness: raceReadiness,
     p18Readiness,
     structuredReadiness,
@@ -388,6 +395,92 @@ async function createDraftWithIdempotencyChecks(target, base, version) {
     'REQUEST_ID_PAYLOAD_MISMATCH',
   )
   return draft
+}
+
+async function assertVersionLifecycleNegatives(target, base, existingDraft) {
+  const before = await readVersionLifecycleCounts()
+  const cases = [
+    {
+      label: 'duplicate version',
+      version: existingDraft.version,
+      expectedCode: 'VALIDATION_FAILED',
+    },
+    {
+      label: 'backward annual version',
+      version: {
+        major: Number(base.major) - 1,
+        minor: 0,
+        patch: 0,
+      },
+      expectedCode: 'VERSION_TRANSITION_INVALID',
+    },
+    {
+      label: 'mixed annual version',
+      version: {
+        major: Number(base.major) + 1,
+        minor: 1,
+        patch: 0,
+      },
+      expectedCode: 'VERSION_TRANSITION_INVALID',
+    },
+    {
+      label: 'mixed revision and patch version',
+      version: {
+        major: Number(base.major),
+        minor: Number(base.minor) + 1,
+        patch: 1,
+      },
+      expectedCode: 'VERSION_TRANSITION_INVALID',
+    },
+  ]
+  const results = []
+
+  for (const testCase of cases) {
+    const rejection = actionCode(
+      await target.rpc('create_catalog_draft', {
+        p_base_version_id: base.id,
+        p_version_major: testCase.version.major,
+        p_version_minor: testCase.version.minor,
+        p_version_patch: testCase.version.patch,
+        p_name: `Local WP-6.5 ${testCase.label}`,
+        p_reason: `WP-6.5 lifecycle negative: ${testCase.label}`,
+        p_request_id: randomUUID(),
+      }),
+      testCase.label,
+      testCase.expectedCode,
+    )
+    results.push({
+      case: testCase.label,
+      code: rejection.error.code,
+    })
+  }
+
+  const after = await readVersionLifecycleCounts()
+  assert(
+    stableJson(after) === stableJson(before),
+    'Rejected version transitions changed catalog version, row, taxonomy, or audit counts',
+  )
+  assert(
+    await readCurrentPointer() === base.id,
+    'Rejected version transition moved the current catalog pointer',
+  )
+
+  return {
+    lifecycleDuplicateRejected: true,
+    lifecycleNonmonotonicRejected: true,
+    lifecycleNegativeCases: results,
+  }
+}
+
+async function readVersionLifecycleCounts() {
+  const [versions, rows, categories, codeGroups, changeSets] = await Promise.all([
+    countRows('price_list_versions'),
+    countRows('price_list'),
+    countRows('price_list_categories'),
+    countRows('catalog_code_groups'),
+    countRows('catalog_change_sets'),
+  ])
+  return { versions, rows, categories, codeGroups, changeSets }
 }
 
 async function readReadiness(target, versionId) {

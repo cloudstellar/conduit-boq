@@ -173,6 +173,9 @@ describe('Master Catalog authority consistency', () => {
       'db:local:smoke-master-catalog-wp65': expect.stringContaining(
         'scripts/smoke-master-catalog-wp65.mjs',
       ),
+      'db:local:proxy-master-catalog-wp65-response-loss': expect.stringContaining(
+        'scripts/proxy-master-catalog-wp65-response-loss.mjs',
+      ),
       'db:local:verify-master-catalog-p20': expect.stringContaining(
         'scripts/verify-master-catalog-p20-evidence.mjs',
       ),
@@ -189,6 +192,7 @@ describe('Master Catalog authority consistency', () => {
       'app/admin/master-catalog/error.tsx',
       'app/admin/master-catalog/versions/[versionId]/not-found.tsx',
       'scripts/smoke-master-catalog-wp65.mjs',
+      'scripts/proxy-master-catalog-wp65-response-loss.mjs',
       'scripts/verify-master-catalog-p20-evidence.mjs',
       'scripts/generate-master-catalog-artifact-proof.mjs',
       'scripts/verify-master-catalog-artifacts.mjs',
@@ -201,6 +205,13 @@ describe('Master Catalog authority consistency', () => {
     expect(wp65Harness).toContain("flag: 'wx'")
     expect(wp65Harness).toContain('formatHarnessError(currentStage, error)')
     expect(wp65Harness).toContain("select('*', { count: 'exact', head: true })")
+
+    const responseLossProxy = read('scripts/proxy-master-catalog-wp65-response-loss.mjs')
+    expect(responseLossProxy).toContain("state.status = 'awaiting_same_id_retry'")
+    expect(responseLossProxy).toContain('state.sameRequestId')
+    expect(responseLossProxy).toContain('state.responseRequestIdMatches')
+    expect(responseLossProxy).toContain('state.duplicateRequest')
+    expect(responseLossProxy).toContain('assertTrackedTreeClean()')
   })
 
   it('keeps core authority links resolvable', () => {

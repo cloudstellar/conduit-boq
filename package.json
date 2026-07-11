@@ -14,6 +14,7 @@
     "db:local:smoke-master-catalog-wp4": "node --env-file=.env.development.local --env-file=supabase/.env.local scripts/smoke-master-catalog-wp4.mjs",
     "db:local:smoke-master-catalog-wp5": "node --env-file=.env.development.local --env-file=supabase/.env.local scripts/smoke-master-catalog-wp5.mjs",
     "db:local:smoke-master-catalog-wp65": "node --env-file=.env.development.local --env-file=supabase/.env.local scripts/smoke-master-catalog-wp65.mjs",
+    "db:local:proxy-master-catalog-wp65-response-loss": "node scripts/proxy-master-catalog-wp65-response-loss.mjs",
     "db:local:verify-master-catalog-p20": "node scripts/verify-master-catalog-p20-evidence.mjs",
     "artifacts:master-catalog:generate": "node --env-file=.env.development.local --env-file=supabase/.env.local scripts/generate-master-catalog-artifact-proof.mjs",
     "artifacts:master-catalog:verify": "node scripts/verify-master-catalog-artifacts.mjs",
