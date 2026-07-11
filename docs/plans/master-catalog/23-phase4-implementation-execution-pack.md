@@ -452,6 +452,11 @@ unchanged legacy-only clone.
 
 All create/apply/publish/restore request fingerprints are checked under a
 per-request advisory lock. Canonical-code allocation also uses a per-code lock.
+Timeout-after-commit evidence must use tracked loopback-only fault injection
+outside the application/RPC implementation: observe a successful upstream
+commit, withhold that response once, then prove that the same request ID returns
+the prior duplicate result. Do not add a test-only bypass, delay, or failure
+branch to a Production application or database path.
 After a change set starts writing, a structured rejection must raise into a
 PL/pgSQL subtransaction so the whole change set, item rows, identities, and code
 registrations roll back before a safe action error is returned. Private runtime

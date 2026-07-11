@@ -290,6 +290,10 @@ Use only when a published current version must stop being used for new BOQs.
 An intended active admin/data custodian, not the implementer, must complete this
 script on the approved Local/preview environment:
 
+Developer DB/transport fault-injection evidence may prepare and verify the
+uncertain-response example, but it does not substitute for the intended admin
+recognizing the message and completing the recovery through the UI.
+
 1. create a draft using an ADR-003-valid version and identify its base;
 2. preview an approved workbook and explain Full versus Supplement impact;
 3. recognize and recover from at least three representative safe failures,
