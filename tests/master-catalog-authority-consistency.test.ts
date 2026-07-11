@@ -212,6 +212,8 @@ describe('Master Catalog authority consistency', () => {
     expect(responseLossProxy).toContain('state.responseRequestIdMatches')
     expect(responseLossProxy).toContain('state.duplicateRequest')
     expect(responseLossProxy).toContain('assertTrackedTreeClean()')
+    expect(responseLossProxy).toContain("'apply_catalog_changes'")
+    expect(responseLossProxy).toContain('ALLOWED_RPC_NAMES.has(value)')
   })
 
   it('keeps core authority links resolvable', () => {

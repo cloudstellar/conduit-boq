@@ -5,7 +5,12 @@ import { dirname, isAbsolute, relative, resolve } from 'node:path'
 
 const MAX_REQUEST_BYTES = 2 * 1024 * 1024
 const MAX_RESPONSE_BYTES = 32 * 1024 * 1024
-const RPC_PATH = '/rest/v1/rpc/create_catalog_draft'
+const ALLOWED_RPC_NAMES = new Set([
+  'create_catalog_draft',
+  'apply_catalog_changes',
+  'publish_catalog_version',
+  'restore_catalog_pointer',
+])
 const STATUS_PATH = '/__wp65/status'
 const HEALTH_PATH = '/__wp65/health'
 
@@ -13,6 +18,8 @@ const options = readOptions(process.argv.slice(2))
 assertTrackedTreeClean()
 const upstream = readLoopbackOrigin('upstream', options.upstream)
 const listen = readLoopbackOrigin('listen', options.listen)
+const rpcName = readRpcName(options.rpc)
+const rpcPath = `/rest/v1/rpc/${rpcName}`
 const outputPath = options.output ? readEvidenceOutputPath(options.output) : null
 const gitCommit = currentCommit()
 const state = {
@@ -22,7 +29,7 @@ const state = {
   gitCommit,
   proxyOrigin: listen.origin,
   upstreamOrigin: upstream.origin,
-  rpcPath: RPC_PATH,
+  rpcPath,
   injectedAt: null,
   firstRequestId: null,
   firstResponseRequestId: null,
@@ -59,7 +66,7 @@ const server = createServer(async (request, response) => {
 
     const requestBody = await readBody(request, MAX_REQUEST_BYTES)
     const upstreamResponse = await forwardRequest(request, requestBody)
-    const isTarget = request.method === 'POST' && requestUrl.pathname === RPC_PATH
+    const isTarget = request.method === 'POST' && requestUrl.pathname === rpcPath
 
     if (!isTarget) {
       forwardResponse(response, upstreamResponse)
@@ -131,7 +138,7 @@ const server = createServer(async (request, response) => {
 server.listen(Number(listen.port), listen.hostname, () => {
   console.log(`WP-6.5 response-loss proxy listening on ${listen.origin}`)
   console.log(`Forwarding Local Supabase requests to ${upstream.origin}`)
-  console.log(`One committed ${RPC_PATH} response will be withheld`)
+  console.log(`One committed ${rpcPath} response will be withheld`)
 })
 
 for (const signal of ['SIGINT', 'SIGTERM']) {
@@ -251,20 +258,28 @@ function readOptions(args) {
   const values = {
     listen: 'http://127.0.0.1:55431',
     upstream: 'http://127.0.0.1:54321',
+    rpc: 'create_catalog_draft',
     output: null,
   }
 
   for (let index = 0; index < args.length; index += 2) {
     const flag = args[index]
     const value = args[index + 1]
-    if (!value || !['--listen', '--upstream', '--output'].includes(flag)) {
+    if (!value || !['--listen', '--upstream', '--rpc', '--output'].includes(flag)) {
       throw new Error(
-        'Usage: proxy-master-catalog-wp65-response-loss.mjs [--listen http://127.0.0.1:55431] [--upstream http://127.0.0.1:54321] [--output tmp/master-catalog/wp65-evidence/<run>.json]',
+        'Usage: proxy-master-catalog-wp65-response-loss.mjs [--listen http://127.0.0.1:55431] [--upstream http://127.0.0.1:54321] [--rpc create_catalog_draft|apply_catalog_changes|publish_catalog_version|restore_catalog_pointer] [--output tmp/master-catalog/wp65-evidence/<run>.json]',
       )
     }
     values[flag.slice(2)] = value
   }
   return values
+}
+
+function readRpcName(value) {
+  if (!ALLOWED_RPC_NAMES.has(value)) {
+    throw new Error('rpc must be one of the reviewed Master Catalog mutation RPC names')
+  }
+  return value
 }
 
 function readEvidenceOutputPath(value) {
