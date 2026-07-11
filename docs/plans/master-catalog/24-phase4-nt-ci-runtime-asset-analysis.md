@@ -227,8 +227,11 @@ already sets the correct direction:
 Important caveat:
 
 Excel does not reliably embed or distribute web fonts the same way a browser
-does. The official Excel export may set the NT font family, but it must remain
-usable in Excel installations that fall back to a supported Thai font.
+does. Owner refinement under P-11 therefore uses `TH Sarabun New` with a
+16-point body baseline for the editable official Excel export, while the UI
+and PDF retain the approved NT runtime fonts. Supported review workstations
+must have TH Sarabun New installed; visual QA must still catch substitution,
+clipping, or layout drift.
 
 ## 5. Approved P-10 runtime asset manifest
 

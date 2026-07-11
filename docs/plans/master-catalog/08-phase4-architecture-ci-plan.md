@@ -259,7 +259,11 @@ by the CI PDFs and remain subject to owner visual acceptance.
 
 Rules:
 
-- Use NT Regular for body text and NT Bold for headings/emphasis.
+- Use NT Regular for application/PDF body text and NT Bold for
+  application/PDF headings/emphasis. Owner-approved P-11 refinement makes the
+  editable Excel export the explicit exception: use `TH Sarabun New` with a
+  16-point body baseline and larger title hierarchy for government-facing
+  interoperability; keep the PDF on embedded NT runtime fonts.
 - Load approved WOFF2 assets with `font-display: swap` and use a Thai-capable
   fallback stack: `system-ui`, `Leelawadee UI`, Tahoma, sans-serif.
 - Apply `font-variant-numeric: tabular-nums` to prices, counts, hashes, and

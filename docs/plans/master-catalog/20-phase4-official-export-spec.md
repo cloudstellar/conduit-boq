@@ -335,7 +335,13 @@ Rules:
 
 ### 4.7 Excel metadata and print settings
 
-- use NT-approved runtime fonts with a safe Thai-capable fallback;
+- use `TH Sarabun New` on every populated Excel cell, with a 16-point body
+  baseline and larger title hierarchy; do not mix the NT worksheet font into
+  the editable workbook. The font is referenced by family name rather than
+  embedded, so supported review workstations must have it installed and visual
+  QA must catch viewer substitution or clipped Thai text. This is an
+  owner-approved P-11 Excel exception; the PDF remains on embedded NT runtime
+  fonts;
 - include document title, subject, creator/application, selected version, and
   full dataset hash in workbook properties where supported;
 - do not place secrets or source filesystem paths in workbook properties;

@@ -144,7 +144,7 @@ describe('Master Catalog authority consistency', () => {
       'docs/plans/master-catalog/19-phase4-decision-register.md',
     )
     expect(decisions).toContain(
-      'Visual/content direction accepted 2026-07-11; final retained binary pair and WP-6 completion pending',
+      'Visual/content direction including Excel TH Sarabun New 16 pt accepted 2026-07-11; replacement retained binary pair and WP-6 completion pending',
     )
     expect(decisions).toContain(
       'Placement decision pending; guard implemented for Local verification 2026-07-11',
@@ -152,7 +152,7 @@ describe('Master Catalog authority consistency', () => {
     expect(decisions).toContain('P-19')
     expect(decisions).toContain('Pending; recorded 2026-07-07')
     expect(decisions).toContain(
-      'Approved and implemented in code 2026-07-11; independent clean-rebuild evidence pending WP-6.5C',
+      'Approved; two-run WP-6.5C proof passed 2026-07-11; WP-8/P-15 reruns pending',
     )
 
     const tracker = read(

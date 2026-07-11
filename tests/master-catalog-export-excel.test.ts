@@ -1,6 +1,10 @@
 import ExcelJS from 'exceljs';
 import { describe, expect, it } from 'vitest';
-import { buildCatalogExportWorkbookBuffer } from '../lib/master-catalog/export/excel';
+import {
+  buildCatalogExportWorkbookBuffer,
+  CATALOG_EXPORT_EXCEL_BODY_FONT_SIZE,
+  CATALOG_EXPORT_EXCEL_FONT,
+} from '../lib/master-catalog/export/excel';
 import {
   CATALOG_EXPORT_DOCUMENT_TITLE,
   makeCatalogExportDocumentTitle,
@@ -68,14 +72,16 @@ describe('Master Catalog official Excel export', () => {
     expect(documentSheet).toBeDefined();
     expect(documentSheet!.getCell(1, 1).value).toBe(CATALOG_EXPORT_DOCUMENT_TITLE);
     expect(documentSheet!.getCell(2, 1).value).toBe('ประจำปี 2568');
-    expect(documentSheet!.getCell(1, 1).font?.size).toBe(18);
-    expect(documentSheet!.getCell(2, 1).font?.size).toBe(18);
+    expect(documentSheet!.getCell(1, 1).font?.size).toBe(20);
+    expect(documentSheet!.getCell(2, 1).font?.size).toBe(20);
+    expect(documentSheet!.getCell(4, 1).font?.size).toBe(CATALOG_EXPORT_EXCEL_BODY_FONT_SIZE);
 
     const priceSheet = workbook.getWorksheet('รายการราคา');
     expect(priceSheet).toBeDefined();
     expect(priceSheet!.getCell(2, 1).value).toBe('ประจำปี 2568');
-    expect(priceSheet!.getCell(1, 1).font?.size).toBe(16);
-    expect(priceSheet!.getCell(2, 1).font?.size).toBe(16);
+    expect(priceSheet!.getCell(1, 1).font?.size).toBe(18);
+    expect(priceSheet!.getCell(2, 1).font?.size).toBe(18);
+    expect(priceSheet!.getCell(3, 1).font?.size).toBe(CATALOG_EXPORT_EXCEL_BODY_FONT_SIZE);
     expect(readRowValues(priceSheet!, 4, 13)).toEqual([
       'ลำดับ',
       'รหัสรายการ',
@@ -114,7 +120,7 @@ describe('Master Catalog official Excel export', () => {
       'display_order',
       '_canonical_row_json',
     ]);
-    expect(verificationSheet!.properties.defaultRowHeight).toBe(15);
+    expect(verificationSheet!.properties.defaultRowHeight).toBe(22);
     expect(verificationSheet!.getColumn(16).width).toBe(56);
     expect(verificationSheet!.autoFilter).toBeUndefined();
     expect(verificationSheet!.getCell(2, 16).alignment?.wrapText).not.toBe(true);
@@ -128,6 +134,19 @@ describe('Master Catalog official Excel export', () => {
     expect(reconstructedCanonicalJson).toBe(dataset.canonicalJson);
     await expect(hashCanonicalCatalogDatasetRows(reconstructedRows))
       .resolves.toBe(dataset.canonicalDatasetHash);
+
+    workbook.eachSheet((sheet) => {
+      sheet.eachRow((row) => {
+        row.eachCell({ includeEmpty: false }, (cell) => {
+          expect(cell.font?.name, `${sheet.name}!${cell.address}`).toBe(
+            CATALOG_EXPORT_EXCEL_FONT,
+          );
+          expect(cell.font?.size, `${sheet.name}!${cell.address}`).toBeGreaterThanOrEqual(
+            CATALOG_EXPORT_EXCEL_BODY_FONT_SIZE,
+          );
+        });
+      });
+    });
   });
 
   it('keeps formula-looking strings inert and avoids formulas or hyperlinks', async () => {

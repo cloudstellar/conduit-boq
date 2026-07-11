@@ -20,7 +20,12 @@ import {
   verificationSheetHeaders,
 } from './data';
 
-const DEFAULT_FONT = 'NT Regular';
+export const CATALOG_EXPORT_EXCEL_FONT = 'TH Sarabun New';
+export const CATALOG_EXPORT_EXCEL_BODY_FONT_SIZE = 16;
+const BODY_ROW_HEIGHT = 24;
+const VERIFICATION_ROW_HEIGHT = 22;
+const TITLE_ROW_HEIGHT = 30;
+const HEADER_ROW_HEIGHT = 32;
 const MONEY_FORMAT = '#,##0.00';
 const HEADER_FILL: Fill = {
   type: 'pattern',
@@ -63,6 +68,7 @@ export async function buildCatalogExportWorkbookBuffer(
   createDictionarySheet(workbook, dataset);
   createChangeSummarySheet(workbook, dataset);
   createVerificationSheet(workbook, dataset);
+  applyWorkbookTypography(workbook);
 
   const buffer = await workbook.xlsx.writeBuffer();
   return Buffer.from(buffer);
@@ -71,7 +77,10 @@ export async function buildCatalogExportWorkbookBuffer(
 function createDocumentInfoSheet(workbook: Workbook, dataset: CatalogExportDataset) {
   const sheet = workbook.addWorksheet('ข้อมูลเอกสาร', {
     pageSetup: portraitPageSetup(),
-    properties: { tabColor: { argb: 'FFFFD100' } },
+    properties: {
+      tabColor: { argb: 'FFFFD100' },
+      defaultRowHeight: BODY_ROW_HEIGHT,
+    },
   });
 
   sheet.columns = [
@@ -84,22 +93,24 @@ function createDocumentInfoSheet(workbook: Workbook, dataset: CatalogExportDatas
   sheet.mergeCells(rowIndex, 1, rowIndex, 2);
   const title = sheet.getCell(rowIndex, 1);
   title.value = CATALOG_EXPORT_DOCUMENT_TITLE;
-  title.font = font({ bold: true, size: 18 });
+  title.font = font({ bold: true, size: 20 });
   title.alignment = { horizontal: 'center', vertical: 'middle', wrapText: true };
+  sheet.getRow(rowIndex).height = TITLE_ROW_HEIGHT;
   rowIndex += 1;
 
   sheet.mergeCells(rowIndex, 1, rowIndex, 2);
   const year = sheet.getCell(rowIndex, 1);
   year.value = makeCatalogExportYearLabel(dataset.version.versionString);
-  year.font = font({ bold: true, size: 18 });
+  year.font = font({ bold: true, size: 20 });
   year.alignment = { horizontal: 'center', vertical: 'middle' };
+  sheet.getRow(rowIndex).height = TITLE_ROW_HEIGHT;
   rowIndex += 1;
 
   if (dataset.isDraftExport) {
     sheet.mergeCells(rowIndex, 1, rowIndex, 2);
     const draft = sheet.getCell(rowIndex, 1);
     draft.value = 'DRAFT – ห้ามใช้อ้างอิง';
-    draft.font = font({ bold: true, size: 16, color: 'FFB91C1C' });
+    draft.font = font({ bold: true, size: 18, color: 'FFB91C1C' });
     draft.fill = DRAFT_FILL;
     draft.alignment = { horizontal: 'center', vertical: 'middle' };
     rowIndex += 1;
@@ -149,7 +160,10 @@ function createDocumentInfoSheet(workbook: Workbook, dataset: CatalogExportDatas
 function createPriceListSheet(workbook: Workbook, dataset: CatalogExportDataset) {
   const sheet = workbook.addWorksheet('รายการราคา', {
     pageSetup: landscapePageSetup(),
-    properties: { tabColor: { argb: 'FFFFD100' } },
+    properties: {
+      tabColor: { argb: 'FFFFD100' },
+      defaultRowHeight: BODY_ROW_HEIGHT,
+    },
   });
 
   sheet.columns = [
@@ -175,20 +189,22 @@ function createPriceListSheet(workbook: Workbook, dataset: CatalogExportDataset)
     dataset.isDraftExport
       ? `DRAFT – ห้ามใช้อ้างอิง | ${CATALOG_EXPORT_DOCUMENT_TITLE}`
       : CATALOG_EXPORT_DOCUMENT_TITLE;
-  sheet.getCell(rowIndex, 1).font = font({ bold: true, size: 16 });
+  sheet.getCell(rowIndex, 1).font = font({ bold: true, size: 18 });
   sheet.getCell(rowIndex, 1).alignment = { horizontal: 'center', vertical: 'middle' };
+  sheet.getRow(rowIndex).height = TITLE_ROW_HEIGHT;
   rowIndex += 1;
 
   sheet.mergeCells(rowIndex, 1, rowIndex, 13);
   sheet.getCell(rowIndex, 1).value = makeCatalogExportYearLabel(dataset.version.versionString);
-  sheet.getCell(rowIndex, 1).font = font({ bold: true, size: 16 });
+  sheet.getCell(rowIndex, 1).font = font({ bold: true, size: 18 });
   sheet.getCell(rowIndex, 1).alignment = { horizontal: 'center', vertical: 'middle' };
+  sheet.getRow(rowIndex).height = TITLE_ROW_HEIGHT;
   rowIndex += 1;
 
   sheet.mergeCells(rowIndex, 1, rowIndex, 13);
   sheet.getCell(rowIndex, 1).value =
     `ฉบับบัญชีราคา ${dataset.version.versionString} | ${displayStatusThai(dataset)} | จำนวนรายการ ${dataset.counts.rowCount.toLocaleString('th-TH')} | ${dataset.canonicalDatasetHash}`;
-  sheet.getCell(rowIndex, 1).font = font({ size: 12 });
+  sheet.getCell(rowIndex, 1).font = font();
   sheet.getCell(rowIndex, 1).alignment = { horizontal: 'center', vertical: 'middle' };
   rowIndex += 1;
 
@@ -213,6 +229,7 @@ function createPriceListSheet(workbook: Workbook, dataset: CatalogExportDataset)
     cell.value = header;
     applyHeaderCellStyle(cell);
   });
+  sheet.getRow(headerRow).height = HEADER_ROW_HEIGHT;
   rowIndex += 1;
 
   for (const row of displayOrderedRows(dataset.rows)) {
@@ -231,7 +248,10 @@ function createPriceListSheet(workbook: Workbook, dataset: CatalogExportDataset)
 function createDictionarySheet(workbook: Workbook, dataset: CatalogExportDataset) {
   const sheet = workbook.addWorksheet('พจนานุกรมรหัส', {
     pageSetup: landscapePageSetup(),
-    properties: { tabColor: { argb: 'FF005BBB' } },
+    properties: {
+      tabColor: { argb: 'FF005BBB' },
+      defaultRowHeight: BODY_ROW_HEIGHT,
+    },
   });
   sheet.columns = [
     { width: 18 },
@@ -288,7 +308,10 @@ function createDictionarySheet(workbook: Workbook, dataset: CatalogExportDataset
 function createChangeSummarySheet(workbook: Workbook, dataset: CatalogExportDataset) {
   const sheet = workbook.addWorksheet('สรุปการเปลี่ยนแปลง', {
     pageSetup: landscapePageSetup(),
-    properties: { tabColor: { argb: 'FF4D4D4D' } },
+    properties: {
+      tabColor: { argb: 'FF4D4D4D' },
+      defaultRowHeight: BODY_ROW_HEIGHT,
+    },
   });
   sheet.columns = [
     { width: 24 },
@@ -307,8 +330,9 @@ function createChangeSummarySheet(workbook: Workbook, dataset: CatalogExportData
 
   sheet.mergeCells(1, 1, 1, 12);
   sheet.getCell(1, 1).value = 'สรุปการเปลี่ยนแปลง';
-  sheet.getCell(1, 1).font = font({ bold: true, size: 16 });
+  sheet.getCell(1, 1).font = font({ bold: true, size: 18 });
   sheet.getCell(1, 1).alignment = { horizontal: 'center' };
+  sheet.getRow(1).height = TITLE_ROW_HEIGHT;
 
   const totalCounts = totalActionCounts(dataset);
   const metadataRows: Array<[string, string]> = [
@@ -405,7 +429,7 @@ function createVerificationSheet(workbook: Workbook, dataset: CatalogExportDatas
       tabColor: { argb: 'FFB91C1C' },
       // Canonical JSON stays selectable in a visible audit sheet, while fixed-height
       // rows avoid costly layout work for long values during open and scroll.
-      defaultRowHeight: 15,
+      defaultRowHeight: VERIFICATION_ROW_HEIGHT,
     },
   });
   const headers = verificationSheetHeaders();
@@ -504,6 +528,7 @@ function writeHeaderRow(sheet: Worksheet, rowIndex: number, headers: readonly st
     cell.value = header;
     applyHeaderCellStyle(cell);
   });
+  sheet.getRow(rowIndex).height = HEADER_ROW_HEIGHT;
 }
 
 function applyHeaderCellStyle(cell: Cell) {
@@ -574,14 +599,32 @@ function font(options: {
   color?: string;
 } = {}) {
   return {
-    name: DEFAULT_FONT,
-    family: 4,
-    scheme: 'minor' as const,
-    size: options.size ?? 13,
+    name: CATALOG_EXPORT_EXCEL_FONT,
+    family: 2,
+    charset: 222,
+    size: options.size ?? CATALOG_EXPORT_EXCEL_BODY_FONT_SIZE,
     bold: options.bold,
     italic: options.italic,
     color: options.color ? { argb: options.color } : undefined,
   };
+}
+
+function applyWorkbookTypography(workbook: Workbook) {
+  workbook.eachSheet((sheet) => {
+    sheet.eachRow((row) => {
+      row.eachCell({ includeEmpty: false }, (cell) => {
+        const existingFont = { ...cell.font };
+        delete existingFont.scheme;
+        cell.font = {
+          ...existingFont,
+          name: CATALOG_EXPORT_EXCEL_FONT,
+          family: 2,
+          charset: 222,
+          size: existingFont.size ?? CATALOG_EXPORT_EXCEL_BODY_FONT_SIZE,
+        };
+      });
+    });
+  });
 }
 
 function totalActionCounts(dataset: CatalogExportDataset): CatalogExportChangeActionCounts {
