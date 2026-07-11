@@ -40,6 +40,8 @@ catalog to roll back.
 - [Architecture Review Disposition](./21-phase4-architecture-review-disposition.md)
 - [Post-Factor-F Adjustment Plan](./22-phase4-post-factor-f-adjustment-plan.md)
 - [Implementation Execution Pack](./23-phase4-implementation-execution-pack.md)
+- [Owner/Developer Capability Completeness Audit](./29-phase4-owner-dev-completeness-audit.md)
+- [P-18 Placement Governance Review Note](./28-phase4-p18-placement-governance-review-note.md)
 - [Execution Progress Tracker authority/evidence index](./25-phase4-execution-progress-tracker.md)
 - [Verification Report](./13-phase4-verification-report.md)
 - [Admin Operating Procedure](./15-phase4-admin-operating-procedure.md)
@@ -78,6 +80,11 @@ Stop immediately when any of these occurs:
 - reusable version logic remains hardcoded to `2568.1.0` contrary to ADR-003;
 - live DB/RPC/RLS/concurrency, tracked artifact verification, admin UAT, or
   documented recovery evidence required for the next gate is missing;
+- any Audit #29 C-01 through C-12 capability is visible as supported without
+  its authoritative WP-6.6 implementation/evidence;
+- an item/import path creates free-form taxonomy, accepts caller-owned code
+  allocation/publisher identity, silently chooses a draft, or presents partial
+  diff/readiness as final authority;
 - Supabase advisors show a new or untriaged security/performance finding for
   the Phase 4 change set;
 - unexpected active admin activity or simultaneous catalog edit is detected;
@@ -113,6 +120,8 @@ Stop immediately when any of these occurs:
 12. Confirm `/CI/` is excluded from commits and identify approved derivative
    fonts/logo assets.
 13. Complete the Phase 4 verification template baseline section.
+14. Accept Audit #29 as the corrected capability gate and confirm WP-6.6 is
+    scheduled before WP-7; this does not itself authorize migration/reset.
 
 **Exit gate:** All documents have owner/reviewer decisions; no unresolved row
 or taxonomy blocker.
@@ -139,6 +148,9 @@ major image at an incompatible existing data directory.
 1. Start from a clean Local reset/bootstrap that applies the root chain
    `009`-`015`, production hotfix `016`, and the current Phase 4 scripts
    `017`-`019`.
+   After reviewed implementation only, add WP-6.6 `020`; add P-18/WP-7.5 `021`
+   only after its separate acceptance. Never assume a planned file is already in
+   the authority path.
 2. If applying SQL manually for a focused rehearsal, apply hotfix `016` before
    any reviewed Phase 4A migration(s).
 3. Verify all new tables, constraints, indexes, grants, RLS policies, functions,
@@ -160,28 +172,38 @@ With feature flag disabled by default:
 2. Clone `2568.0.0` to draft `2568.1.0`.
 3. Assert all 710 name/unit/material/labor/unit values are identical.
 4. Apply approved code/category decisions; K fields must remain absent.
-5. Test one manual add, edit, retire, and recode with reasons.
-6. Test Full and Supplement imports.
-7. Before WP-7, run the implemented WP-6.5 P-18 guard and prove it rejects
+5. Complete WP-6.6 before WP-7: load/search the full catalog; expose exact item
+   history/diff; explicitly select among all drafts; make stale drafts read-only;
+   resolve only approved versioned category/P-06 group IDs; allocate codes on
+   the server; show complete
+   server import diff/omissions with supported price evidence; derive publisher
+   identity; require version archive reference; align readiness with publish;
+   prove reactivate/withdraw and required schema constraints.
+6. Test one manual add, edit, retire, recode, reactivate, and eligible withdraw
+   with reasons.
+7. Test Full and Supplement imports, including complete authoritative diff,
+   exact omissions, and approved/missing new-row price evidence.
+8. Before WP-7, run the implemented WP-6.5 P-18 guard and prove it rejects
    publishing any draft with
    add/supplement identities absent from the base version, returning
    `P18_PLACEMENT_REVIEW_REQUIRED` without pointer movement.
-8. Before WP-7, prove an unchanged legacy-only clone can publish, then prove
+9. Before WP-7, prove an unchanged legacy-only clone can publish, then prove
    the WP-6.5 structured-code guard activates once the draft contains an active
    canonical `AAA-TTT-NNN` code and rejects a candidate whose active legacy
    `ITEM-####` rows exceed the recorded `ITEM-0139` exception.
-9. Test duplicate request ID, stale lock version, stale base pointer, invalid
+10. Test duplicate request ID, stale lock version, stale base pointer, invalid
    price delta, invalid identity/code reuse, and unauthorized role.
-10. Simulate an uncertain response after commit and prove the UI/action retry
+11. Simulate an uncertain response after commit and prove the UI/action retry
     reuses the same operation ID and returns the prior result.
-11. Run two-session publish/restore contention and bounded timeout fixtures.
-12. Verify item history across a recode.
-13. Prove another ADR-003-valid annual/revision/patch version through reusable
+12. Run two-session publish/restore contention and bounded timeout fixtures.
+13. Verify item history across a recode and correction action.
+14. Prove another ADR-003-valid annual/revision/patch version through reusable
     validation without replacing the exact `2568.1.0` rehearsal candidate.
-14. Publish only an identity-unchanged approved path in Local, generate
+15. Publish only an identity-unchanged approved path in Local until P-18 is
+    accepted. After WP-7.5, separately prove a placed new-identity path; generate
     Excel/PDF, and compare count/hash.
-15. Test audited pointer restore and verify historical BOQs are unchanged.
-16. Rebuild from a clean Local reset and repeat the critical path only after
+16. Test audited pointer restore and verify historical BOQs are unchanged.
+17. Rebuild from a clean Local reset and repeat the critical path only after
     the owner approves the Local Supabase reset.
 
 ### 6.4 Repository gates
@@ -228,6 +250,8 @@ Before requesting P-12, record:
 - tracked semantic artifact-verifier output;
 - route failure-state, Thai recovery message, intended-admin UAT, and 710-row
   performance evidence;
+- Audit #29 capability matrix showing C-01 through C-12 implemented/evidenced
+  or an affected control explicitly excluded from release visibility;
 - authority/document consistency result;
 - security/performance advisor results with no unresolved Phase 4 blocker;
 - feature flag state proving the Phase 4 UI remains disabled by default;
@@ -415,18 +439,22 @@ Disable the flag immediately if any smoke test fails.
 2. Run the 710-row preservation assertion before applying codes.
 3. Apply the approved reconciliation only.
 4. Confirm Full/Supplement mode and row outcomes.
-5. Review diff totals for add/update/retire/recode/price.
+5. Review the complete server-recomputed diff for
+   add/update/retire/recode/unchanged/price and exact Full omissions.
 6. For Full import, confirm every omission. If retirement count reaches
    `max(10, ceil(2% of active base))`—15 for 710 rows—match the typed count and
    stored owner approval reference.
 7. Require price-change total = 0 for this rollout.
 8. Complete approval reference, approval document date, effective date,
-   physical archive reference, reason, and approver.
+   version-level physical archive reference, reason, and any separately governed
+   business approver. Confirm the publisher actor snapshot comes from the
+   authenticated active-admin profile.
 9. If import was used, have the verifier independently hash the filed source
    workbook and match the recorded client-computed fingerprint.
-10. Confirm no add/supplement/new identity rows are present. Keep publication
-    blocked until P-18 placement governance is approved and the WP-6.5 guard
-    evidence is accepted.
+10. If add/supplement/new identity rows are present, require accepted P-18,
+    WP-7.5 placement revision/review, inherited-relative-order and exact export
+    evidence. Otherwise keep publication blocked by the WP-6.5 guard and hide
+    Add/Supplement at feature enablement.
 11. If any inactive/retired rows are present, confirm P-19 official PDF
     rendering/exclusion policy before filing field-facing artifacts.
 12. If the exact candidate begins structured-code rollout, confirm the WP-6.5
@@ -447,7 +475,8 @@ Disable the flag immediately if any smoke test fails.
 1. Prepare one operation request ID before publish and execute once. If the
    response is uncertain, preserve that ID and inspect audit/state before retry;
    never generate a second ID for the same intended publish.
-2. Record result, item count, dataset hash, actor, and timestamp.
+2. Record result, item count, dataset hash, authenticated actor snapshot,
+   version archive reference, and timestamp.
 3. Verify one singleton pointer to `2568.1.0` and synchronized legacy flags.
 4. Verify the prior version remains readable and immutable.
 5. Generate official Excel and PDF from the published database version.

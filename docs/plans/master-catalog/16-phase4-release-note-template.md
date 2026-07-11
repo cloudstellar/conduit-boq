@@ -5,7 +5,7 @@
 **Based on version:** `________________`
 **Effective date:** `________________`
 **Published at (ICT):** `________________`
-**Published by:** `________________`
+**Published by (authenticated actor snapshot):** `________________`
 
 ## Approval and source
 
@@ -13,6 +13,7 @@
 |---|---|
 | Approval reference |  |
 | Approval document date |  |
+| Business approver/authority, if separately required |  |
 | Physical archive reference |  |
 | Change Request |  |
 | Reconciliation fingerprint |  |
@@ -44,6 +45,9 @@
 | Updated description/unit/category |  |  |
 | Recoded |  |  |
 | Retired |  |  |
+| Reactivated |  |  |
+| Withdrawn before first publication |  |  |
+| Placement/order rows changed, if P-18 applies |  |  |
 | Material price changed |  |  |
 | Labor price changed |  |  |
 | Unit price changed |  |  |
@@ -65,6 +69,9 @@
 - Factor F reference changed by this release: `No` unless separately approved
 - K-formula mapping included: `No` for Phase 4 Core
 - Existing BOQ regression suite passed: `Yes / No`
+- WP-6.6 capability matrix passed for every visible release action: `Yes / No`
+- P-18 placement review current or Add/Supplement hidden: `Yes / No / N/A`
+- P-19 retired-row PDF policy satisfied or Retire hidden: `Yes / No / N/A`
 
 ## Rollback/current-pointer information
 

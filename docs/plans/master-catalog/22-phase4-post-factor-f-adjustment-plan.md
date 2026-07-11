@@ -14,6 +14,12 @@ not authorize any Factor F pointer movement, Factor F row change, legacy BOQ
 Factor F backfill, Production migration, deploy, feature enablement, or catalog
 publication.
 
+**Capability-completeness amendment:** 2026-07-12 — the Factor F boundary and
+no-redesign conclusion remain valid, but Audit #29 found additional Master
+Catalog operator/authority work. WP-6.6 now precedes WP-7, migration `020` is
+reserved for that hardening, and proposed placement uses WP-7.5/`021`. This is
+documentation alignment only; no reset or Production action is authorized.
+
 ## 1. Difficulty assessment
 
 This is **moderate difficulty**, not a full redesign.
@@ -49,6 +55,12 @@ Practical estimate for a careful implementation:
 
 The schedule risk is driven more by business decisions on the 710-row mapping
 than by Factor F.
+
+The table above is the original whole-phase estimate. After completed WP-6/
+WP-6.5 evidence, the corrected **remaining** full path in Audit #29 is about
+9-15 focused engineering days, commonly 2-3 calendar weeks with decisions,
+review, reset approval, and intended-admin UAT. Factor F remains regression
+scope only and is not the source of the added work.
 
 ## 2. What Factor F changed
 
@@ -204,9 +216,10 @@ Application rules:
 - WP-7 is regression preservation only. It must not add a new Factor F admin
   workflow, publish Factor F data, move Factor F pointers, or reopen hotfix
   `016` scope without separate approval.
-- Start WP-7 only after the WP-6.5 reliability exit gates in the Execution Pack
-  are green. The hotfix `016` fixtures become a permanent live DB regression
-  suite, not a one-time SQL text check.
+- Start WP-7 only after the WP-6.5 bounded reliability evidence and the new
+  WP-6.6 capability/authority exit gates in the Execution Pack are green. The
+  hotfix `016` fixtures become a permanent live DB regression suite, not a
+  one-time SQL text check.
 
 ### 5.4 Phase 4C local rehearsal
 
@@ -217,13 +230,17 @@ Rehearsal path:
 
 1. Restore refreshed Production data locally.
 2. Use the canonical bootstrap order `009`-`015`, production hotfix `016`, then
-   Phase 4 `017`-`019`.
+   Phase 4 `017`-`020`; include `021` only after P-18/WP-7.5 is accepted and
+   implemented. Until new files are reviewed, the current authority path remains
+   `017`-`019`.
 3. Record before/after catalog counts.
 4. Record before/after Factor F pointer, active versions, row counts, and
    hashes.
 5. Clone `2568.0.0` to candidate `2568.1.0`.
 6. Apply approved code/classification changes only.
-7. After P-20 and WP-6.5 evidence pass, publish `2568.1.0` in Local rehearsal.
+7. After P-20, WP-6.5, WP-6.6, and WP-7 evidence pass, publish `2568.1.0` in
+   Local rehearsal. If new identities are included, require P-18/WP-7.5; if
+   deferred, keep Add/Supplement hidden and the guard active.
 8. Export official catalog Excel/PDF and verify count/hash.
 9. Verify new BOQ creation binds:
    - price catalog `2568.1.0`;

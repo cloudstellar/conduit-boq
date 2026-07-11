@@ -8,6 +8,14 @@
 **Environment:** Local only
 **Production touched:** No
 
+**Current-sequence note (2026-07-12):** This document remains the historical
+WP-6/P-11 artifact acceptance record. Its older WP-6.5-to-WP-7 handoff text is
+superseded for current execution by
+[Audit #29](./29-phase4-owner-dev-completeness-audit.md), the
+[Execution Pack](./23-phase4-implementation-execution-pack.md), and the
+[Tracker](./25-phase4-execution-progress-tracker.md), which now require WP-6.6
+before WP-7. Historical evidence below is not rewritten.
+
 ## 1. Reviewer Verdict
 
 The exact 710-row `2568.0.0` Local replacement pair generated at `777df75`

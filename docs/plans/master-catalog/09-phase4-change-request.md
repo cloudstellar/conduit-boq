@@ -21,6 +21,23 @@ plan documents before further implementation. WP-6.5/WP-7/WP-8 now include the
 permanent safety, UAT, and drift controls in the Execution Pack. This docs-only
 amendment does not authorize Local reset or Production action.
 
+**P-18 planning amendment recorded:** 2026-07-12 — owner authorized adding a
+narrow placement proposal and WP-7.5 to the plan after reviewing the incomplete
+Add/Supplement operator path. Exact P-18 business rules remain pending in
+[Review Note #28](./28-phase4-p18-placement-governance-review-note.md). This
+planning approval does not authorize migration `021`, a Local reset, or any
+Production action.
+
+**Capability-completeness amendment recorded:** 2026-07-12 —
+[Audit #29](./29-phase4-owner-dev-completeness-audit.md) found that the current
+fail-closed implementation is not yet a complete intended-admin workflow.
+WP-6.6 is now required before WP-7 to close full browse/history, exact draft
+selection, dictionary/code authority, import diff/evidence, publication
+provenance/readiness, correction paths, schema constraints, and Thai workflow
+clarity. Migration `020` is reserved for that fix-forward work; proposed P-18
+placement moves to `021`. This docs alignment does not authorize either
+migration, a Local reset, or Production action.
+
 ## 1. Decision requested
 
 Approve detailed implementation and local rehearsal of Master Catalog Phase 4.
@@ -96,18 +113,24 @@ evidence for the Factor F rollout, not a fixed Phase 4 preflight expectation.
 Every Production Phase 4 gate must record fresh live counts and the current
 split between legacy snapshot-only BOQs and version-bound Factor F BOQs.
 
-The previous P0 → 1A → 2 → 1B change is complete. Phase 4 Local implementation
-is through WP-6 owner review; Phase 4 Production has not started.
+The previous P0 → 1A → 2 → 1B change is complete. Current Phase 4 Local status
+is maintained only in the
+[Execution Progress Tracker](./25-phase4-execution-progress-tracker.md); Phase 4
+Production has not started.
 
 ## 3. Business outcome
 
 After completion, an active admin can:
 
 - view all catalog versions and the current pointer;
+- explicitly select the exact current-base draft and see stale drafts read-only;
 - clone a published version into a draft;
 - add, edit, retire, or recode an item without Excel;
+- after P-18/WP-7.5 acceptance, add several new identities to one draft and
+  confirm their category/neighborhood placement as one batch before publishing;
 - import a Full or Supplement workbook through a fixed parser profile;
 - review row-level diff, warnings, and blocking errors;
+- search/filter the complete current catalog and inspect field-level item history;
 - view item history across versions and code changes;
 - attach approval/reference metadata without storing the raw file online;
 - publish an immutable official version;
@@ -124,6 +147,8 @@ After completion, an active admin can:
 - No merging of identities that coexist in published `2568.0.0`; duplicate
   correction occurs by audited retirement in a later version
 - Version lineage, approval metadata, item count, dataset hash, and lock version
+- Server-derived publisher actor snapshot and version-level physical archive
+  reference for every Phase 4-created publication
 - Versioned display categories and `AAA/TTT` code groups
 - Import metadata, change sets, and complete old/new snapshots
 - Draft-only manual/import mutation
@@ -131,12 +156,20 @@ After completion, an active admin can:
 - Idempotent high-impact writes and stale-draft protection
 - Transactional pointer change plus legacy `is_default` synchronization
 - Explicit grants, RLS, indexed foreign keys, and private mutation functions
+- Proposed after P-18 acceptance: placement revision, append-only placement
+  review, unique contiguous order, and inherited-base relative-order invariant
 
 ### Application
 
 - NT CI-compliant Master Catalog admin screens
 - Version list, version detail, diff, item history, manual edit, import, publish,
   exports, and pointer restore
+- Full-catalog search/filter, exact item editor, explicit draft selection, and
+  stale-draft read-only recovery
+- Resolve-only Production-derived versioned categories/P-06 code-group controls
+  and locked next-code allocation
+- Authoritative import diff/omission preview and a supported price-authority path
+- Audited reactivate and narrowly scoped never-published-row withdrawal
 - Fixed parser profile with browser-side raw-file handling
 - Full-import mass-retirement gate at the greater of 10 rows or 2% of the
   active base, with typed count and owner approval reference
@@ -148,6 +181,11 @@ After completion, an active admin can:
   hardcoding
 - Early publish-block warnings, route failure/recovery states, Thai support
   correlation, and bounded structured logs
+- Thai-first production-capable forms with no rehearsal placeholders, clear
+  draft-save versus whole-version publish hierarchy, and support IDs demoted
+  from primary content
+- Proposed after P-18 acceptance: keyboard-complete batch placement for new
+  identities using category plus same-category before/after anchor
 
 ### Evidence and operations
 
@@ -175,6 +213,12 @@ After completion, an active admin can:
 - Factor F reference changes, Factor F pointer changes, legacy BOQ
   factor-version backfill, mutation of `boq.factor_reference_version_id`, or
   automatic repricing of existing BOQs
+- Arbitrary reordering of identities inherited from the base version; this
+  requires a separate Change Request
+- Item-code renumbering or a multi-stage placement approval engine
+- General category/code-group dictionary authoring; future taxonomy changes
+  require a separate audited governance decision
+- Stale-draft automatic rebase/merge or destructive audit deletion
 
 ## 6. Data-source rule
 
@@ -212,6 +256,9 @@ scope.
 | 4-0 | Approve ADR/CR, dictionary, reconciliation, specs, backup/runbook | None |
 | 4A Local | Build additive schema/functions and backfill on Local | None |
 | 4B Local | Build UI/import/manual/history/publish/export behind flag | None |
+| WP-6.6 Local | Close Audit #29 operator/authority gaps with fix-forward migration `020`, RPC/UI/tests, and owner review | None |
+| WP-7 Local | Preserve BOQ/hotfix `016` and Factor F behavior through permanent regression tests only | None |
+| 4B.5 Local / WP-7.5 | After P-18 acceptance, add DB-backed placement for new identities only | None |
 | 4C Rehearsal | Full local workflow from refreshed Production data | None |
 | 4A Production | Apply additive migration with feature flag disabled | Schema only; existing reads remain compatible |
 | 4B Production | Deploy compatible application with flag disabled | No user-visible change |
@@ -268,6 +315,14 @@ scope.
 | Future version needs a code hotfix | High with hardcoding | High | Generic ADR-003 version validation and multi-version fixtures | Reusable path requires a `2568.1.0` code change |
 | Hotfix behavior regresses despite static tests | Medium | High | Permanent live DB/RPC suffix/authority/rollback suite | Any approved suffix or authoritative catalog field behaves incorrectly |
 | Admin learns a business blocker only at publish | Medium | Medium | Early preview/readiness warning plus final DB guard and UAT | UAT cannot identify/remediate placement or retired-row hold before publish |
+| Add/Supplement is visible but cannot complete | High if enabled before P-18 | Medium | Implement WP-7.5 before WP-8/P-14, or hide/disable both controls while retaining the DB guard | Intended admin can create a new identity but has no supported path to publication |
+| Admin can see only a sample or cannot identify the exact draft/item/history | High in current UI | High | WP-6.6 full browse/item history and explicit draft selection; stale drafts read-only | Intended admin needs developer/SQL help or mutates the wrong target |
+| Free-form taxonomy or item code bypasses P-06 authority | Medium | High | Resolve-only dictionary IDs and locked next-never-issued allocator | Unknown group/category is created or caller-selected suffix is accepted as authority |
+| Import preview is not the final DB diff or cannot carry new-row price evidence | High for Supplement | High | Server-recomputed full diff/omission set and supported bounded authority reference | Admin cannot explain exact effects or an approved new row cannot complete safely |
+| Draft reconciliation evidence becomes runtime business authority | Medium | High | Freeze approved first-rollout mapping in reviewed seed/database authority; future imports use exact selected draft and approved dictionaries | Application reads `docs/*draft.csv` to decide a live mutation |
+| Publication actor/archive/readiness evidence is misleading or incomplete | Medium | High | Server-derived actor snapshot, version archive reference, and shared complete readiness helper | Caller-authored actor is stored, manual-only filing reference is absent, or UI shows false green |
+| Mistaken retire/add has no explicit correction path | Medium | Medium | Audited reactivate and base-absent withdraw while retaining identity/code/audit | Admin must discard/rebuild a draft or publish an unintended inactive row |
+| UI-only reorder corrupts official order/audit | Medium without DB contract | High | Draft-only placement RPC, placement revision/review, unique contiguous order, base relative-order invariant, one transaction | Direct `display_order` write, duplicate/gapped order, inherited-row move, or missing review succeeds |
 | Documents/evidence disagree | Medium | High | Tracker authority index and automated consistency check | Migration/WP/decision/rollback facts conflict |
 
 ## 11. Preconditions before implementation/local rehearsal
@@ -283,6 +338,32 @@ scope.
 This gate is P-01. It permits local implementation, scaffolding, automated
 tests, and rehearsal. It does not permit Production migration, deploy,
 feature enablement, final catalog publication, or silent business-data choices.
+
+### Additional preconditions before WP-6.6 implementation/closeout
+
+- [ ] P-21 explicitly authorizes WP-6.6 Local-only implementation scope/start
+- [ ] Audit #29 C-01 through C-12 are mapped to exact DB/UI/test owners
+- [ ] WP-6.5 reliability evidence remains preserved and is not relabeled as a
+      full operator-completeness certificate
+- [ ] Planned DB changes use additive migration `020`; `017`-`019` remain
+      unchanged
+- [ ] Unsupported Add/Supplement/Retire controls remain hidden at release unless
+      their downstream gates pass
+- [ ] A separate owner decision is obtained before any Local bootstrap/reset
+
+### Additional preconditions before WP-7.5 placement implementation
+
+- [ ] Owner/data custodian accepts or amends all five P-18 V1 choices in
+      [Review Note #28](./28-phase4-p18-placement-governance-review-note.md)
+- [ ] DB/security, threat, parser/hash, export, runbook, verification, admin
+      procedure, execution pack, tracker, and consistency-test contracts agree
+- [ ] Scope remains new identities only; inherited baseline reorder and
+      item-code renumbering remain excluded
+- [ ] Proposed migration is append-only `021`; `017`-`020` remain unchanged
+- [ ] A separate owner decision is obtained before any Local bootstrap/reset
+
+Until these checks pass, the existing P-18 DB guard remains authoritative and
+Add/Supplement is not a complete publishable workflow.
 
 ### Additional preconditions before final data backfill/candidate freeze
 
@@ -319,9 +400,13 @@ pretend a publishable candidate has been approved.
 - [ ] Stable request-ID timeout/retry and two-session concurrency tests pass
 - [ ] ADR-003 reusable version path passes beyond `2568.1.0`
 - [ ] Permanent live DB hotfix `016`/BOQ/Factor F regressions pass
+- [ ] WP-6.6 C-01 through C-12 close with authoritative automated/browser/UAT
+      evidence, or affected controls are removed from release visibility
 - [ ] Tracked export verifier and documentation consistency checks pass
 - [ ] Intended-admin UAT, safe Thai recovery/log correlation, and 710-row
       performance evidence pass
+- [ ] Full Add/Supplement release either passes WP-7.5 placement evidence or the
+      controls are hidden/disabled while the P-18 DB guard remains active
 - [ ] Owner explicitly approves the Production migration window
 
 When all checks above are green, package the evidence for owner/verifier review
@@ -341,7 +426,9 @@ plan.
 - [ ] Excel/PDF generation passes against the candidate in rehearsal
 - [ ] P-20-compliant dataset hash and tracked semantic artifact verification pass
 - [ ] Stable publish operation ID/concurrency evidence is recorded
-- [ ] P-18/P-19 decisions/holds are satisfied for the exact candidate
+- [ ] P-18/P-19 decisions/holds are satisfied for the exact candidate; any new
+      identity has a current accepted placement revision and exact ordered
+      export evidence
 - [ ] Full-import below/at mass-retirement threshold tests pass and required
       approval evidence is persisted
 - [ ] Owner explicitly approves publication of the named version
@@ -367,11 +454,20 @@ Detailed execution is in the
 
 - All 710 Production items have stable identity, legacy code, category, and
   approved structured-code outcome.
+- Intended admins can search/filter all rows, select the exact draft/item, see
+  stale drafts read-only, and inspect field-level identity history.
+- Ordinary item/import changes resolve only approved versioned categories/P-06
+  code groups and
+  use server-owned next-never-issued code allocation.
 - Published catalogs are immutable.
 - Manual and Excel changes produce equivalent audit evidence.
+- Import preview presents the complete server-recomputed diff/omission set and
+  approved new rows have a supported price-authority evidence path.
 - Item history follows identity across recodes.
 - Unauthorized roles cannot read administrative audit details or mutate data.
 - Stale/duplicate requests fail safely.
+- Mistaken retirement and never-published addition have explicit audited
+  reactivate/withdraw correction paths without deleting identity/code/audit.
 - Uncertain retries reuse one operation ID and cannot create duplicate effects.
 - Official Excel/PDF hash and count match the selected published version.
 - The P-20 hash model reproduces across the approved clean-rehearsal scope.
@@ -380,6 +476,14 @@ Detailed execution is in the
   regressions pass permanently.
 - Intended admins can complete and recover from the workflow without
   developer/SQL assistance.
+- Production-capable forms are Thai-first, contain no rehearsal placeholders,
+  and clearly separate saving draft changes from publishing the whole version.
+- Publisher snapshot is derived from the authenticated actor, every Phase
+  4-created publication has a version-level physical archive reference, and
+  readiness uses the same complete DB result as final publish.
+- Under the full P-18 release, multiple new identities can be placed in one
+  audited batch while inherited base relative order remains unchanged; if P-18
+  is deferred, Add/Supplement remains hidden/disabled.
 - Existing BOQs and current user flows pass regression checks.
 - Pointer restore is audited and does not rewrite historical BOQs.
 - No Factor F value is changed, and no old BOQ is backfilled with a guessed

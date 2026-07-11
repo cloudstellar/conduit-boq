@@ -31,7 +31,15 @@ field-facing footer; the final field-facing PDF does not append a technical
 verification page; and QR code is deferred as post-Core polish unless a stable
 owner-approved verification URL exists. This records export direction for
 implementation. Final P-11 acceptance still requires real database-generated
-Excel/PDF artifacts.
+Excel/PDF artifacts. That exact replacement pair was later accepted on
+2026-07-11 as recorded in the Decision Register and Tracker.
+
+**P-18 ordering amendment proposed:** 2026-07-12 — if WP-7.5 is accepted,
+numeric positions of inherited rows may shift when new identities are inserted,
+while their relative order remains unchanged. The final accepted order is part
+of the existing canonical dataset hash and must match Excel/PDF sequence. This
+does not authorize P-18 implementation or replace final candidate export
+evidence.
 
 ## 1. Purpose and authority
 
@@ -121,7 +129,8 @@ only the small subset that helps a reader identify and use the price list.
 | Current-default state | Admin/export screen and Excel metadata sheet | Do not show the technical field. If a published export is not the current default, show `เอกสารอ้างอิงย้อนหลัง - ไม่ใช่รุ่นใช้งานปัจจุบัน`. |
 | Effective date | All official artifacts; Excel metadata also carries ISO `YYYY-MM-DD` | Show |
 | Approval reference / approval document date | Exact immutable database values; Excel metadata sheet and release/filing manifest | Do not show |
-| Approved-by / publisher snapshot | Immutable database value; Excel metadata sheet and release/filing manifest | Do not show |
+| Approved-by / publisher snapshot | Publisher actor/display snapshot is derived from the authenticated profile and stored immutably; a separately governed business approver, if required, uses a distinct field; Excel metadata sheet and release/filing manifest retain the result | Do not show |
+| Physical archive reference | Required version-level immutable publication/custody value for every Phase 4-created version, including manual-only publication; an import-level source reference may additionally identify a workbook | Do not show |
 | Exported at/by | Release/filing manifest and audit log | Do not show |
 | Item count | Exact active/included count covered by the dataset hash | Show |
 | Dataset SHA-256 | Full `sha256:<64 lowercase hex>` on PDF summary, Excel verification sheet, and release/filing manifest. The field-facing PDF footer must not show a truncated hash. A short hash may appear only in admin/export screens or audit manifests as an identifier, never as proof. | Show full hash on the summary |
@@ -510,6 +519,9 @@ On the export screen:
   verification using only tracked code and paths relative to the manifest;
 - P-20 identity/hash portability passes before a clean-environment hash is used
   as cross-environment equivalence evidence.
+- After P-18 acceptance, placement tests prove the workbook/PDF sequence equals
+  the unique contiguous final `display_order`; shifted inherited rows remain in
+  base-relative order and the canonical hash changes to the exact final values.
 
 ### 8.2 Visual/manual
 
@@ -545,6 +557,12 @@ Final P-11 completion retains exactly one reviewed P-20-compliant PDF/Excel pair
 plus manifest/verification evidence. Preview binaries and failed/staging
 directories are not filed evidence. Generated artifacts remain untracked; the
 generator and verifier source are tracked.
+
+The accepted P-11 `2568.0.0` pair remains historical visual/semantic evidence
+and is not regenerated merely because WP-7.5 is planned. Any later candidate
+that changes `display_order` requires its own exact final count/hash, Excel/PDF
+pair, verifier output, and P-15 filing approval; it must not overwrite the P-11
+baseline evidence directory.
 
 ## 9. Failure behavior
 

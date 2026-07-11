@@ -1,8 +1,9 @@
 # Master Catalog Phase 4: Lean Architecture, CI and Official Export Plan
 
-**Status:** Revision 8 — Owner-approved as Phase 4 Core architecture authority
-for implementation/local rehearsal; Production migration, deploy, enablement,
-and publish still require separate approvals
+**Status:** Revision 8 remains the owner-approved Phase 4 Core direction;
+2026-07-12 capability audit adds required WP-6.6 closure and a proposed
+P-18/WP-7.5 extension. Production migration, deploy, enablement, and publish
+still require separate approvals
 
 **Date:** 2026-06-22
 
@@ -11,6 +12,23 @@ idempotency, publish-block UX, P-20 hash portability, ADR-003 reusable
 versioning, live DB/concurrency evidence, tracked export verification,
 operator failure states/logging, and documentation consistency before WP-7.
 This is local planning only and does not authorize Production.
+
+**P-18 planning amendment:** 2026-07-12 — owner review found that the current
+Add/Supplement guard is safe but leaves an incomplete operator workflow. The
+recommended plan inserts WP-7.5 for DB-backed placement of new identities after
+the shared WP-6.6 operator/authority hardening and before WP-8. The exact P-18 contract
+remains pending in
+[Review Note #28](./28-phase4-p18-placement-governance-review-note.md); no Local
+reset, migration implementation, or Production action is authorized here.
+
+**Capability-completeness amendment:** 2026-07-12 —
+[Audit #29](./29-phase4-owner-dev-completeness-audit.md) corrects the earlier
+overbroad completeness claim. The implemented safety core remains valid, but
+full browse/history, exact draft selection, controlled dictionary/code
+allocation, authoritative import diff/evidence, publication provenance and
+readiness parity, correction actions, schema constraints, and Thai operator UX
+must close in WP-6.6 before WP-7. This is a planning gate, not implementation or
+Production approval.
 
 **Owner decision recorded:** 2026-07-04 — approved according to the
 recommendation for Phase 4 Core/local implementation. This approval does not
@@ -91,8 +109,9 @@ After a version is published:
 ### Current verified state
 
 - Production Phase 0 → 1A → 2 → 1B completed and was verified on 2026-06-21;
-  Phase 4 Local implementation is through WP-6 owner review, while Phase 4
-  Production has not started
+  current Phase 4 Local WP status is maintained only in the
+  [Execution Progress Tracker](./25-phase4-execution-progress-tracker.md), while
+  Phase 4 Production has not started
 - Current default version: `2568.0.0`
 - Catalog rows: 710
 - Categories: 52, with no missing category
@@ -181,6 +200,7 @@ decisions.
 | Dataset hash and item count | Keep | Makes Excel/PDF exports verifiable against the published version |
 | Feature flag, local rehearsal, logical backup | Keep | Reduces Production rollout risk without another paid project |
 | NT CI foundation for catalog UI/exports | Keep | Required product identity and document consistency |
+| New-identity placement before publication | Proposed WP-7.5, pending P-18 | Completes Add/Supplement without allowing arbitrary reorder of the inherited baseline |
 
 ### Simplify in Phase 4 Core
 
@@ -208,6 +228,8 @@ decisions.
   is approved separately.
 - Export-event logging unless a later compliance requirement needs permanent
   download history.
+- Arbitrary reordering of identities inherited from the base version; if later
+  required, use a separate Change Request with hash/export/audit impact review.
 
 ### Why defer these items
 
@@ -389,7 +411,9 @@ Add to `price_list_versions`:
 - `approval_document_date date`
 - `published_at timestamptz`
 - `published_by uuid`
-- `published_by_display_name text`
+- `published_by_display_name text` derived by the server from the authenticated
+  actor profile, never accepted as caller-authored actor evidence
+- `physical_archive_reference text`
 - `dataset_hash text`
 - `item_count integer`
 - `lock_version integer not null default 0`
@@ -408,6 +432,11 @@ Version rules:
   nonofficial read-only comparison artifact and can never be promoted.
 - Multiple drafts may exist, but version numbers are unique and a stale-base
   draft cannot be promoted.
+- The UI requires an explicit exact draft selection and renders stale drafts
+  read-only; it never silently chooses one of several drafts for mutation/import.
+- Every Phase 4-created publication has a bounded version-level physical archive
+  reference even when no workbook import exists. The approved historical
+  baseline is the only recorded exception.
 - `active` means published. The singleton pointer separately identifies which
   published version is current for new BOQs.
 
@@ -455,9 +484,11 @@ This append-at-end rule is draft allocation only. Until P-18 placement
 governance is approved, a version with new add/supplement identities must not
 publish. WP-6.5 implements a publish guard that rejects draft rows whose
 `identity_id` is absent from the base version with
-`P18_PLACEMENT_REVIEW_REQUIRED`; the later placement/review UI remains outside
-Phase 4 Core unless separately approved. Static evidence exists; live Local
-guard evidence remains an exit gate.
+`P18_PLACEMENT_REVIEW_REQUIRED`; Local guard/atomicity evidence has passed. The
+proposed WP-7.5 extension remains separately gated by P-18 and is defined in
+[Review Note #28](./28-phase4-p18-placement-governance-review-note.md). Until
+that gate closes, keep the guard and do not expose Add/Supplement as a
+Production-capable workflow.
 
 Backfill the current 710 rows one-to-one. A recoded item receives a new registry
 row pointing to the same identity. A code can never move to another identity.
@@ -491,6 +522,36 @@ Registry rules:
 The registry is one small table that prevents an irreversible lineage error.
 This is lower cost than repairing ambiguous item history after a second catalog
 has been published.
+
+### 4.2.1 Proposed P-18 placement authority
+
+This subsection is a reviewed proposal, not a recorded P-18 business decision.
+If the owner/data custodian accepts the five choices in Review Note #28, WP-7.5
+adds a DB-backed placement revision and append-only placement review for drafts
+containing identities absent from their base version.
+
+The V1 invariant is intentionally narrow:
+
+- only new identities may be inserted into a different presentation position;
+- numeric positions of inherited rows may shift around an insertion, but after
+  filtering new identities out, the relative order of all inherited base
+  identities is unchanged;
+- the admin selects the new item's category and a same-category before/after
+  anchor and confirms all pending placements as one audited batch;
+- `(version_id, display_order)` is unique and the complete draft order is a
+  contiguous zero-based range;
+- add or placement-relevant changes make the prior review stale;
+- publish accepts new identities only when the current placement revision has a
+  matching accepted review and all order invariants pass;
+- general baseline reorder, code renumbering, and a multi-stage approval engine
+  remain out of scope.
+
+The proposed implementation appends migration `021`, after WP-6.6 migration
+`020`, and adds a narrowly scoped
+`catalog_placement_reviews` table, extends existing change-set/item actions for
+placement, and adds one idempotent draft-only placement RPC. It introduces no
+second catalog-equivalence hash: the existing canonical dataset hash remains
+authoritative and already includes `display_order`.
 
 ### 4.3 Versioned categories
 
@@ -615,6 +676,11 @@ Add `catalog_change_items`:
 - `old_values jsonb`
 - `new_values jsonb`
 
+If P-18 is accepted, WP-7.5 extends the change-set type with `placement`, the
+item action with `place`, and adds the append-only placement-review authority
+defined in Section 4.2.1. Do not infer accepted placement from old/new JSON
+alone.
+
 Clone records one `clone` change set and no 710 artificial `add` change items:
 unchanged cloned rows are connected by `based_on_version_id` and stable
 `identity_id`. Item rows are appended only when a field actually changes. This
@@ -708,6 +774,10 @@ migration and tests must create them.
   on the operator reconstructing the prior payload from memory.
 - Every newly published structured-code row has identity, category, and code
   group mappings.
+- A draft with new identities remains unpublishable unless the P-18 extension is
+  accepted and its current placement revision has an accepted DB review.
+- Placement confirmation preserves inherited base relative order and validates
+  unique contiguous `display_order`; no client-only reorder is authoritative.
 - K-formula fields are not written by Phase 4 Core.
 - External calls and file parsing occur before database transactions. Database
   transactions contain only validation, locking, writes, hash/count work, and
@@ -774,6 +844,12 @@ The first rollout does not import workbook prices:
 6. Keep the 20 Production-only rows and resolve their canonical codes.
 7. Review the complete recode/classification diff before approval and publish.
 
+Freeze the approved first-rollout reconciliation into reviewed seed/import
+authority before runtime. The application must not read a file named
+`*draft.csv` under `docs/` as mutable business authority; that file remains
+review evidence. Later Supplement/Full imports reconcile against the exact
+selected draft plus approved versioned category/code-group rows.
+
 Any unexpected name, unit, or price difference blocks this initial rollout.
 
 #### Reason
@@ -819,6 +895,8 @@ calculate the diff, and build the official catalog.
   source and compares it with the recorded fingerprint when an import was used.
 - The server treats all normalized rows as untrusted input and validates every
   field, price, code, identity, category, and row count.
+- Runtime reconciliation uses the exact selected draft and reviewed
+  implementation/database mapping authority, not the draft evidence CSV.
 - The server calculates `normalized_payload_hash` from canonical validated
   rows.
 - At publish, the server reads the completed draft from the database and
@@ -1185,8 +1263,12 @@ Phase 4 UI.
 - `saveDraftCatalogItemAction`
 - `retireDraftCatalogItemAction`
 - `recodeDraftCatalogItemAction`
+- `reactivateDraftCatalogItemAction`
+- `withdrawDraftCatalogItemAction` for a never-published identity absent from
+  the draft base
 - `publishCatalogVersionAction`
 - `restoreCatalogPointerAction`
+- Proposed after P-18: `placeDraftCatalogItemsAction`
 
 Every exported action:
 
@@ -1304,6 +1386,14 @@ this authorization matrix.
 - Item history timeline across all versions and codes
 - Old/new field comparison, actor, time, reason, and source evidence
 
+Proposed after P-18 acceptance:
+`/admin/master-catalog/versions/[versionId]/placement`
+
+- Pending new identities only
+- Category and searchable same-category before/after anchor controls
+- Batch neighborhood/order preview and one audited confirmation
+- No arbitrary inherited-row reorder and no drag-only interaction
+
 `/admin/master-catalog/import`
 
 - Import staging and validation for a selected draft
@@ -1317,6 +1407,10 @@ this authorization matrix.
 ### Table behavior
 
 - Load and filter the current 710-row version client-side.
+- Fetch the complete selected-version dataset through deterministic paged reads
+  before client filtering so a PostgREST/API max-row setting cannot silently
+  truncate it. This is a data-integrity read pattern, not user-visible server
+  pagination.
 - Search item code/name and filter category/status/change type.
 - Filter by legacy/canonical code, work context, and item type.
 - Use sticky headers and tabular numeric alignment.
@@ -1329,6 +1423,13 @@ this authorization matrix.
 - Errors identify source row, field, value, and correction.
 - No generic column mapper.
 - Publish remains separate from import.
+- The admin explicitly selects the exact current-base draft before parsing.
+- Server validation returns the complete add/update/recode/retire/unchanged
+  diff plus exact Full-import omission identities/count; the UI does not infer
+  this result from client-only parsing.
+- New-row price authority is a supported bounded input. Use one import-level
+  reference when it applies to the batch and explicit per-row override only
+  when the evidence actually differs.
 - Show price changes in a dedicated high-visibility section; never mix them into
   a generic “updated rows” total.
 - Initial structured-code import displays “Production prices will be preserved”
@@ -1337,13 +1438,40 @@ this authorization matrix.
 ### Manual edit UX
 
 - Draft-only “เพิ่มรายการ”, “แก้ไข”, “ยกเลิกใช้”, and “เปลี่ยนรหัส” actions.
+- Select the exact item from full search/filter and prefill current values.
+- Category and `AAA/TTT` are selected from the approved versioned dictionary;
+  ordinary item mutation cannot create taxonomy entries from free text.
+- The server allocates the next never-issued code inside the selected approved
+  group under lock; ordinary operators do not choose an arbitrary suffix.
 - Require a reason before save and show approval requirements for price edits.
+- Require price authority only when name, unit, or money changes, not for an
+  unrelated controlled classification change.
 - Display calculated `unit_cost` beside material/labor inputs and block mismatch.
 - Show a confirmation summary for retire/recode and identify affected code
   history; historical BOQs are explicitly stated as unchanged.
 - On lock conflict, preserve unsaved form values and ask the admin to reload the
   latest draft before resubmitting.
 - After save, update the diff and history timeline without implying publication.
+- Support audited `reactivate`; support `withdraw` only for a never-published
+  identity absent from the base, while preserving its identity/code reservation
+  and audit evidence.
+- Thai is the primary operator language. Remove rehearsal-only default values
+  from production-capable fields and keep draft save linguistically distinct
+  from whole-version publish.
+- Keep lock versions, UUIDs, request IDs, and change-set IDs available in compact
+  support details rather than presenting them as the primary success message.
+
+### Proposed placement UX
+
+- Manual Add handles one or a few exceptions; Supplement remains the bulk path.
+- Both paths create provisional new identities in the same draft and converge on
+  one pending-placement list.
+- The admin places all pending rows, reviews the affected neighborhoods, and
+  confirms one batch. The draft/version ID does not change per item.
+- A later add or placement-relevant change clearly returns the draft to
+  **รอจัดตำแหน่ง** and blocks publication again.
+- Keyboard users can complete category, anchor, before/after, preview, and
+  confirmation without drag and drop.
 
 ### History UX
 
@@ -1445,11 +1573,36 @@ reviewed fix-forward, not an assumed destructive reverse operation.
 - Complete WP-6.5 end-to-end request-id, publish-guard/early-warning,
   P-20 portability, DB integration/concurrency, route failure-state,
   observability, tracked export-verifier, and documentation-consistency gates.
+- Complete WP-6.6 from Audit #29: full catalog browse/item history, explicit
+  draft selection/stale read-only state, resolve-only versioned categories/P-06
+  code groups and
+  server code allocator, complete import diff/evidence, server-derived publisher
+  plus version archive metadata, complete readiness parity, correction actions,
+  fix-forward schema constraints, and Thai-first operator comprehension.
+- Append reviewed WP-6.6 migration `020`; do not rewrite evidence-backed
+  `017`-`019`.
 - Replace only the four hardcoded year/version fragments.
 - Keep the feature flag disabled.
 
 **Reason:** The whole user workflow is rehearsed while hidden from Production
 users.
+
+### Phase 4B.5 — Proposed P-18 placement extension (WP-7.5)
+
+- Start implementation only after the owner/data custodian accepts the P-18 V1
+  decisions in Review Note #28.
+- Append migration `021`; do not rewrite or renumber `017`-`020`.
+- Add placement revision/review authority, exact grants/RLS, the idempotent
+  placement RPC, Thai batch UI, audit/history integration, and publish-readiness
+  enforcement.
+- Preserve inherited base relative order, stable codes, identities, BOQs,
+  hotfix `016`, and Factor F state.
+- Run Local DB role, rollback, concurrency, order, hash/export, and browser tests
+  before WP-8.
+
+**Reason:** This completes the already exposed Add/Supplement business outcome
+without turning a UI-only reorder into hidden technical debt. If P-18 is
+deferred, hide/disable Add and Supplement and retain the current DB guard.
 
 ### Phase 4C — Local rehearsal and Production rollout
 
@@ -1458,6 +1611,8 @@ users.
   units, and prices remain unchanged before applying approved codes.
 - Rehearse a manual-only correction through audit, approval, publish, and
   official export without workbook metadata.
+- When P-18 is accepted, rehearse multiple new identities through one placement
+  batch, stale-placement recovery, publication, and exact ordered exports.
 - Test publish, immutable rows, pointer restore, Excel export, and PDF export.
 - Run intended-admin UAT without developer/SQL assistance and record recovery
   from representative validation errors.
@@ -1484,6 +1639,8 @@ human-readable stamped exports are captured immediately after publication.
 - Server pagination if thresholds are reached
 - Removal of compatibility columns and legacy audit table after a stable cycle
 - Wider CI migration
+- General reordering of inherited catalog identities, subject to a separate
+  approved Change Request
 
 These items do not block the first official Master Catalog release.
 
@@ -1513,8 +1670,17 @@ Do not advance when any gate fails:
   and related owner decisions are complete for the exact candidate scope.
 - **Phase 4A → 4B:** Local schema reset/migration succeeds; backfill counts,
   constraints, RLS/grants, and advisors pass.
-- **Phase 4B → 4C:** Manual edit, import, history, publish, export, stale-draft,
-  and rollback automated tests pass with the feature flag off.
+- **WP-6.6 → WP-7:** Every C-01 through C-12 finding in Audit #29 has an
+  implemented authoritative control and evidence, or the affected capability is
+  explicitly removed from release visibility. WP-6.5 reliability evidence
+  remains valid but does not replace this gate.
+- **WP-7 → Phase 4C/WP-8:** Manual edit, import, history, publish, export,
+  stale-draft, rollback, permanent BOQ/hotfix `016`/Factor F regressions, and
+  owner-comprehension tests pass with the feature flag off.
+- **WP-7.5 → WP-8 for full Add/Supplement release:** P-18 is recorded; migration,
+  RPC/RLS/audit/order/concurrency/browser tests pass; inherited relative order
+  is unchanged. If deferred, Add/Supplement are hidden/disabled and the DB guard
+  remains a tested release condition.
 - **Production publish:** Approval evidence is complete, local rehearsal matches
   Production baseline, pre-deploy backup exists, smoke tests pass, and the owner
   gives explicit publish approval.
@@ -1528,12 +1694,17 @@ Do not advance when any gate fails:
 ### Database and security
 
 - Identity, code-registry, and category backfills cover all 710 rows.
+- Production-derived versioned categories and the approved P-06 22/65 code
+  groups are frozen; ordinary item mutation rejects unknown input instead of
+  creating it.
 - Draft lineage points to the expected base version; publishing a stale-base
   draft is rejected.
 - No duplicate version/item-code or version/identity pairs.
 - A code cannot be assigned to another identity.
 - Legacy/canonical format validation, next-sequence allocation, retired-gap
   reservation, and sequence-900 capacity warning work as documented.
+- Required `price_list` values and supported order invariants are enforced by
+  fix-forward constraints after zero-null/compatibility proof.
 - Newly published structured-code items have valid code-group mappings.
 - Unit-cost preflight and validated constraint pass.
 - Active/archived rows and published metadata cannot be mutated.
@@ -1551,6 +1722,12 @@ Do not advance when any gate fails:
 - Two independent DB sessions prove publish/restore advisory-lock ordering,
   deterministic winner/conflict behavior, bounded lock timeout, and one pointer.
 - Pointer restore leaves historical BOQs unchanged.
+- When P-18 is accepted, a deferrable unique order constraint and publish checks
+  reject duplicate/gapped/non-contiguous positions; a valid placement batch
+  preserves inherited relative order.
+- Placement replay, changed-payload reuse, stale lock, concurrent confirmation,
+  invalid/cross-category anchor, inherited-row move, and mid-operation failure
+  are atomic and leave BOQ/Factor F state unchanged.
 
 ### Import and audit
 
@@ -1575,14 +1752,18 @@ Do not advance when any gate fails:
 - Recoded item mapping
 - Category parsing/manual confirmation
 - Full-import suspicious retirement threshold
+- Complete server-recomputed row diff and exact Full-import omission list/count
 - Source SHA-256, physical archive reference, actor, reason, and row diff
+- Batch/per-row price-authority evidence permits an approved supplement add and
+  rejects missing, fictional, or mismatched evidence
 - Client tampering with normalized values is rejected by server validation
 - K-formula fields are rejected/ignored according to the explicit Phase 4 Core
   contract and never silently stored
 
 ### Manual edit and item history
 
-- Add, update, retire, and recode work only on drafts
+- Add, update, retire, recode, reactivate, and narrowly scoped withdraw work only
+  on exact current-base drafts
 - Each manual change requires reason, request ID, expected lock version, actor,
   timestamp, and full old/new snapshots
 - Duplicate submission with the same request ID has one effect and one audit
@@ -1590,16 +1771,24 @@ Do not advance when any gate fails:
 - Lock conflict rejects the write without losing the other admin's data
 - Price edits validate material + labor = unit cost and require publish approval
 - Manual-only draft can publish without Excel metadata but not without approval
+- Manual-only draft cannot publish without a version-level physical archive
+  reference; publisher snapshot is derived from the authenticated actor
 - Published/archived items cannot be edited
 - History follows `identity_id` through legacy and canonical codes
 - History displays source, version, actor, reason, timestamp, and field-level
   old/new values
 - Audit history cannot be edited or deleted
+- Full 710-row browse/search and item history expose field-level old/new values;
+  stale drafts are read-only and no mutation/import silently selects a draft
+- New identities from manual Add and Supplement converge on one pending placement
+  batch; confirming that batch does not create a new catalog version per item
 
 ### Publish and export
 
 - Publish without evidence, confirmation, or matching lock version fails
 - Publish fails when the current pointer no longer matches the draft base
+- Preliminary readiness and final publish consume the same stale-base and full
+  canonical-quality result; the UI cannot show a false green state
 - Dataset hash and item count are computed from database rows
 - Excel row count/hash exactly match the published version
 - PDF row count/hash exactly match the published version
@@ -1617,6 +1806,10 @@ Do not advance when any gate fails:
   a hardcoded `2568.1.0` path
 - Tracked semantic verifier remains correct when title rows move and fails
   closed on missing/renamed headers, wrong counts/types/hash, formulas, or links
+- A new-identity draft rejects before P-18 placement; after accepted placement,
+  the exact `display_order`, dataset hash, Excel sequence, and PDF sequence agree
+- Any new add or placement-relevant change after confirmation makes placement
+  stale and blocks publication again
 
 ### Regression and CI
 
@@ -1636,6 +1829,8 @@ Do not advance when any gate fails:
 - Catalog loading/error/not-found states render correctly
 - Operator messages are Thai-first, include a safe error code/request ID where
   useful, and give a recovery path without exposing SQL/internal details
+- Production-capable forms contain no WP/local-rehearsal placeholder defaults;
+  draft save and whole-version publish are unambiguous to an intended admin
 - Structured logs include request ID, operation, outcome, duration and version,
   with bounded/redacted values
 - Intended-admin UAT completes create/import/review/publish-readiness/export and
@@ -1652,13 +1847,23 @@ Do not advance when any gate fails:
 - Published Master Catalog is immutable and is the system of record.
 - The singleton pointer resolves to the intended current version.
 - Every published version has approval metadata, item count, and dataset hash.
+- Every Phase 4-created published version has a version-level physical archive
+  reference and a server-derived publisher actor/display snapshot.
 - Every import/edit/publish/restore has actor, reason, request ID, and diff.
+- Every accepted new-identity placement has actor, reason, request ID, revision,
+  and append-only review evidence.
 - The same user operation retains one request ID across uncertain retry and
   cannot create a second effect after timeout.
 - Every item exposes read-only history across versions and recodes using stable
   identity and full old/new row snapshots.
+- An admin can search/filter the complete current catalog, select the exact item
+  and draft, and see stale drafts as read-only without developer assistance.
+- Ordinary item/import workflows resolve only approved categories/code groups;
+  code allocation is server-owned and never reuses a retired sequence.
 - An admin can add, edit, retire, or recode a draft item without uploading an
   Excel workbook.
+- Under the full P-18 release, an admin can add several identities to one draft,
+  place them in one batch, and publish once without reordering inherited rows.
 - When an import is used, the physical source workbook can be identified by
   filename, SHA-256, and archive reference.
 - Excel and PDF exports are generated from the selected database version.
@@ -1679,6 +1884,11 @@ Do not advance when any gate fails:
   and prices exactly.
 - Manual-only and import-based versions both satisfy the same approval,
   immutability, hash, export, and audit controls.
+- Import preview displays the complete authoritative diff/omission set and has a
+  supported price-authority path for approved new rows.
+- An admin can reactivate a mistaken retirement and withdraw a never-published
+  added row through explicit audited correction actions without deleting
+  identity/code/audit history.
 - A stale-base draft cannot become current.
 - P-20 establishes and proves the intended cross-environment identity/hash
   semantics before clean rehearsal or Production hash acceptance.
@@ -1689,6 +1899,9 @@ Do not advance when any gate fails:
   permanent release gates.
 - Admin UAT, safe Thai error recovery, structured correlation logs, and the
   reviewed 710-row performance baseline pass before feature enablement.
+- If P-18 is deferred, Add and Supplement are hidden/disabled at feature
+  enablement and the DB new-identity guard remains active; a half-complete
+  operator workflow is not an accepted release state.
 
 ---
 
@@ -1740,6 +1953,9 @@ Do not advance when any gate fails:
   clearly reviewed price diff.
 - AAA/TTT code-group metadata and display categories remain separate concepts.
 - Manual-only publication does not require fictional workbook metadata.
+- P-18 does not authorize arbitrary reordering. Its proposed V1 extension is
+  limited to placing identities absent from the base while retaining base
+  relative order; exact acceptance remains in the Decision Register.
 
 ---
 

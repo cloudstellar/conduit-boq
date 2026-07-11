@@ -11,6 +11,11 @@ identities initialize directly from the immutable Production-derived
 Clean-reset/cross-environment equality is not accepted until WP-6.5C proves the
 mapping and resulting hash across the approved independent rebuild scope.
 
+**WP-6.6 completeness amendment:** 2026-07-12 — server validation must return
+the complete authoritative diff/omission result and support real new-row price
+authority evidence. Client diagnostics remain advisory. See
+[Audit #29](./29-phase4-owner-dev-completeness-audit.md).
+
 **Owner decision recorded:** 2026-07-04 — approved according to the
 recommendation for implementation/local rehearsal. This approval accepts the
 deterministic parser profile, file/row/payload limits, browser-as-convenience
@@ -149,6 +154,7 @@ export interface CatalogImportPayloadV1 {
     sha256: string
     physicalArchiveReference: string
   }
+  priceAuthorityReference: string | null
   retirementApprovalReference: string | null
   retirementConfirmedCount: number | null
   rows: NormalizedCatalogRowCandidate[]
@@ -178,6 +184,13 @@ export interface NormalizedCatalogRowCandidate {
   priceAuthorityReference: string | null
 }
 ```
+
+`priceAuthorityReference` is a bounded batch default for approved new rows.
+`NormalizedCatalogRowCandidate.priceAuthorityReference` is an explicit override
+only when a row has different evidence. Effective authority is the row override
+or batch default; a `candidate_add` with neither is rejected. The server and DB
+store the effective reference in the validated/audited outcome rather than
+trusting a browser-only lookup map.
 
 `CatalogImportPayloadV1.requestId` identifies the server-validation request.
 `CatalogImportApplyPayloadV1.applyRequestId` identifies the later mutation
@@ -224,7 +237,10 @@ when an import contributes to the version.
 - File selection, Web Crypto hashing, and client diff progress are transient
   UI states; they do not create `catalog_imports` rows.
 - `previewCatalogImportAction` performs server validation. It records
-  `validated` on success or `rejected` with bounded diagnostics on failure.
+  `validated` on success or `rejected` with bounded diagnostics on failure. A
+  successful result includes bounded totals and the complete paged/expandable
+  add/update/recode/retire/unchanged diff plus exact Full-import omissions; the
+  UI must display this server result before Apply.
 - The payload `requestId` identifies that validation request.
 - `applyCatalogImportAction` accepts the validated import ID, a new apply
   request ID, and the normalized payload/source metadata again. It recomputes
@@ -256,8 +272,11 @@ The server must independently:
     when `retire_count >= max(10, ceil(active_base_item_count * 0.02))`, require
     a nonblank `retirementApprovalReference` and
     `retirementConfirmedCount === retire_count`;
-13. recompute normalized payload hash;
-14. call the exact database mutation function only after validation passes.
+13. resolve effective batch/per-row price authority for every new row and reject
+    missing or unapproved evidence;
+14. return the complete authoritative diff/omission result and recompute the
+    normalized payload hash;
+15. call the exact database mutation function only after validation passes.
 
 Step 3 validates source metadata shape and declared limits but does not claim
 to rehash unseen raw workbook bytes.
@@ -363,6 +382,10 @@ No version metadata, timestamp, actor, version-row UUID such as
 - Money is a two-decimal string such as `"125.00"`.
 - Boolean is JSON `true`/`false`.
 - `display_order` is a nonnegative JSON integer.
+- For publishable versions, `display_order` is unique within the version and the
+  complete row set forms a contiguous zero-based range. If P-18 is accepted,
+  inserting a new identity may shift inherited numeric values; every shifted
+  value is part of the canonical dataset and audit.
 - Work-context/item-type codes and Thai names come from the same version's
   approved code-group row. All four are JSON `null` only for a legacy version
   that explicitly permits no structured group.
@@ -411,9 +434,9 @@ exactly before Production publication is allowed.
 ### 10.6 Cross-environment identity portability
 
 The canonical algorithm is deterministic only when its input identities are
-deterministic. Current Local migration `017` generates new baseline identity
-UUIDs on each clean bootstrap, so two otherwise identical environments can
-produce different canonical dataset hashes.
+deterministic. Migration `017` now initializes the baseline identity from the
+Production-derived version-row UUID. Earlier random-identity Local evidence is
+superseded; the current P-20 contract below is authoritative.
 
 P-20 selects one model for Phase 4: deterministically initialize each legacy
 baseline stable identity directly from the existing immutable
@@ -428,8 +451,22 @@ Do not add a second business-content hash, silently remove `identity_id`,
 reinterpret the current hash, or use an environment-specific hash as proof
 that two independently rebuilt datasets are business-equivalent. The approved
 mapping updates this spec, DB contract, migrations, export verification,
-fixtures, and Verification Report together. Cross-rebuild evidence remains
-pending until WP-6.5C executes against the approved clean scope.
+fixtures, and Verification Report together. WP-6.5C passed two independent
+approved clean rebuilds; rerun remains mandatory after any migration change and
+at WP-8/P-15.
+
+### 10.7 P-18 placement and hash behavior
+
+P-18 does not create a second catalog-equivalence hash. The proposed placement
+revision is workflow freshness only. The existing dataset hash changes whenever
+any canonical row's `display_order` changes, including inherited rows shifted by
+inserting a new identity.
+
+“Preserve inherited relative order” means that after filtering new identities
+out of the candidate, the remaining identity sequence equals the base sequence.
+It does not mean inherited numeric `display_order` values remain unchanged.
+Publish, Excel, PDF, and the tracked verifier must use the exact final accepted
+values.
 
 ## 11. Required tests
 
@@ -439,7 +476,8 @@ pending until WP-6.5C executes against the approved clean scope.
 - Thai Unicode NFC equivalence
 - Decimal formatting and no floating-point drift
 - Full versus Supplement omission semantics
-- Price-authority and K-field rejection
+- Complete server diff totals/rows and exact Full-import omission set
+- Batch/per-row price-authority resolution and K-field rejection
 - Client-tampered payload rejection
 - Stable error-code mapping without sensitive details
 - Canonical key/order/null/decimal/LF behavior
@@ -448,5 +486,7 @@ pending until WP-6.5C executes against the approved clean scope.
   identity mapping
 - P-20 clean-reset/cross-environment fixture proves the selected identity/hash
   portability model
+- After P-18 acceptance, insertion/renumber fixtures prove unique contiguous
+  order, preserved inherited relative order, and a matching changed dataset hash
 - Excel `_canonical_row_json` reconstructs the published database hash
 - PDF generation rechecks database count/hash and prints the matching values

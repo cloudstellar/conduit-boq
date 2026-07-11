@@ -11,6 +11,19 @@ reduce drift after production hotfix `016`. This authorizes this docs-only plan
 amendment; it does not resolve pending business decisions or authorize any
 Local reset or Production action.
 
+**P-18 planning alignment recorded:** 2026-07-12 — owner authorized adding the
+proposed P-18 review contract and WP-7.5 to the plan after the Admin UI review.
+This records a plan path, not acceptance of the five placement business rules,
+not authorization to implement migration `021`, and not a Local reset or
+Production decision.
+
+**Capability-completeness alignment recorded:** 2026-07-12 — owner requested a
+full owner/developer audit and plan correction. Audit #29 adds WP-6.6 before
+WP-7 and reserves migration `020` for fix-forward authority/workflow hardening;
+P-18 placement is renumbered to planned migration `021`. This records the plan
+and corrected meaning of completeness; it does not authorize implementation,
+Local reset, or Production action.
+
 **Owner decision recorded:** 2026-07-04 — approved according to the
 recommendation as the Phase 4 governance backbone and source of truth for
 locked, pending, and deferred decisions. This approval accepts the recording
@@ -80,11 +93,16 @@ change only application code or SQL.
 | L-40 | A mutation request is fingerprinted by operation, actor, and canonical payload; the same request ID with changed content is rejected, and mutation-time structured aborts roll back the whole change set in a subtransaction | Prevents uncertain retries from duplicating effects and prevents a multi-row error from committing a partial draft/audit record |
 | L-41 | Publish-readiness UI consumes the same database helper used by publish for P-18 and structured-code boundary counts; UI may warn earlier but never replaces the final DB invariant | Prevents duplicated business rules from drifting between browser and database |
 | L-42 | Private create/apply/publish/restore functions carry bounded runtime lock and statement timeouts; a timeout is an uncertain transport outcome and the client retries with the same request ID | Keeps concurrent admin operations bounded without weakening idempotency |
+| L-43 | Operator-facing Master Catalog forms are Thai-first, contain no rehearsal-only default evidence, separate draft save from whole-version publish, and keep support IDs available without making them primary content | Owner review found the technically safe Local UI confusing; WP-6.6 must close comprehension before WP-7 |
+| L-44 | A capability is complete only when its exact route/UI, selected entity, Server Action, RPC/schema authority, audit/correction path, readiness/export effect, tests, and operator procedure are implemented or explicitly not applicable | Prevents a safe DB rejection or a passing component test from being mislabeled as an end-to-end operator workflow; [Audit #29](./29-phase4-owner-dev-completeness-audit.md) |
+| L-45 | Ordinary item/import mutation resolves only Production-derived approved versioned categories and P-06 code groups, and uses a server-owned next-never-issued code allocator; creating future taxonomy is separate governance | Prevents free-form caller text or suffix choice from becoming catalog authority |
+| L-46 | Phase 4 publication derives the publisher actor snapshot from authentication, requires a version-level physical archive reference, and exposes the same stale-base/full-quality readiness result consumed by final publish | Prevents spoofed provenance, missing manual-only filing custody, and false-green UI readiness |
+| L-47 | Draft correction uses explicit audited `reactivate` and base-absent `withdraw`; identity, code reservation, and prior audit are never deleted | Gives admins a safe correction path without direct SQL or destructive undo |
 
 ## 3. Pending owner/data decisions
 
 P-01 authorizes only local implementation/rehearsal of the reviewed
-architecture and contracts. It did not itself resolve P-02 through P-15; the
+architecture and contracts. It did not itself resolve P-02 through P-21; the
 current recorded resolutions below refine that original approval. Work may
 continue on generic additive schema, parser/canonicalizer, UI, tests, and local
 fixture rehearsal while remaining decisions are pending, but final approved
@@ -144,11 +162,15 @@ this register. In particular:
   remains the implemented baseline until P-18 is resolved. Do not publish a
   version containing added/supplement rows unless the owner/data custodian has
   approved its display placement or the add/supplement publish path is held.
-  Phase 4 now inserts WP-6.5 before WP-7 to harden this boundary with a
+  Phase 4 inserted WP-6.5 to harden this boundary with a
   publish-time guard. WP-6.5 also hardens the P-06 structured-code legacy
   exception so only `ITEM-0139` may remain active as `ITEM-####` in
   `2568.1.0`. These guards are safety holds, not substitutes for the later
-  placement/review workflow or final P-15 owner approval.
+  placement/review workflow or final P-15 owner approval. The 2026-07-12 plan
+  capability audit later inserts WP-6.6 before WP-7, then proposes WP-7.5 for
+  new identities only, preserving inherited relative order;
+  exact acceptance remains pending in
+  [Review Note #28](./28-phase4-p18-placement-governance-review-note.md).
 
 | ID | Decision required | Current evidence/default recommendation | Owner | Due before | Status |
 |---|---|---|---|---|---|
@@ -166,12 +188,13 @@ this register. In particular:
 | P-12 | Approve the named Production migration window | Request only after WP-8 evidence review is complete: Local evidence green, remote migration ledger includes hotfix `016`, clean Local bootstrap has applied `009`-`015`, `016`, and Phase 4 `017+`, fresh read-only Production baseline and schema drift check match, backup/restore evidence complete, P-20 portability and reviewed migration fingerprint match, live DB/RPC/RLS/concurrency and permanent BOQ/Factor F regressions pass, advisors have no unresolved blocker, and owner gives go/no-go for the actual window. | Owner | Production migration | Not requested; request after WP-8 evidence review |
 | P-13 | Approve application deploy and admin-only smoke window | Request only after P-12 migration verification passes, CI/deployment fingerprint matches, current user flows and Factor F/BOQ invariants remain unchanged, and the Phase 4 feature flag stays disabled by default. | Owner | Production deploy | Not requested; request after migration verification |
 | P-14 | Approve feature enablement | Request only after P-13 deploy and admin-only smoke pass, authorization/UI/accessibility/error-recovery checks, intended-admin UAT, reusable ADR-003 version evidence, structured logs, performance baseline, and non-admin denial tests pass. Enable admin scope only; do not publish a catalog version under P-14. | Owner | User visibility | Not requested; request after deploy/admin smoke verification |
-| P-15 | Approve publication of the exact named catalog version and its final diff/count/hash | Migration/deploy/enablement approval does not imply publish approval. Requires exact final version metadata, effective date, approval reference/date, physical archive reference, approver/publisher snapshot, final diff totals, item count, P-20-compliant dataset hash, tracked-verifier official Excel/PDF evidence, stable request-ID/concurrency evidence, WP-6.5 P-18 add/supplement guard evidence when relevant, WP-6.5 structured-code exception guard evidence, P-19 inactive-row export policy when relevant, and owner go/no-go. | Owner | Production publication | Not requested |
+| P-15 | Approve publication of the exact named catalog version and its final diff/count/hash | Migration/deploy/enablement approval does not imply publish approval. Requires WP-6.6 capability evidence, exact final version metadata, effective date, approval reference/date, version-level physical archive reference, authenticated publisher snapshot, final diff totals, item count, P-20-compliant dataset hash, tracked-verifier official Excel/PDF evidence, stable request-ID/concurrency evidence, WP-6.5 P-18 add/supplement guard evidence when relevant, WP-6.5 structured-code exception guard evidence, P-19 inactive-row export policy when relevant, and owner go/no-go. | Owner | Production publication | Not requested |
 | P-16 | Schedule Supabase legacy API-key migration | Separate maintenance change; complete before provider retirement and after inventory/rehearsal | Owner + developer | Separate security window | Pending |
 | P-17 | Record completed Factor F F0-F4 gates before Master Catalog Phase 4 | Completed before Master Catalog Phase 4. ADR-005 and the separate Factor F CR governed the rollout; current baseline from `FACTOR F 2566_7.PDF` is active as `2566.0.0`, the 26 June 2026 source-table annex is current default `2569.0.0`, legacy BOQs were not backfilled, and `015` repaired only missing legacy snapshot metadata without repricing or binding old BOQs. Production hotfix `016` followed as a BOQ save regression fix, not a Factor F publication. | Owner + factor data custodian | Before Master Catalog Phase 4 Production migration | Completed 2026-06-29; hotfix follow-up 2026-07-06; see Factor F closeout and migration ledger |
-| P-18 | Decide display-order placement governance for newly added or supplement catalog items | Owner identified the core reason for Master Catalog governance during WP-6: future rows must be placed into their correct category/neighborhood instead of appearing at the end simply because they were added later. Keep append-only item codes and stable identities and keep draft add/supplement creation available for controlled review. WP-6.5 now implements a Local-only DB publish guard and shared readiness warning that reject versions containing identities absent from the base with `P18_PLACEMENT_REVIEW_REQUIRED`; live Local evidence remains required. The full placement/review workflow remains deferred until separately approved. | Owner + data custodian | Before Production enablement of add/supplement workflow and before P-15 for any version with added/supplement rows | Placement decision pending; guard implemented for Local verification 2026-07-11 |
+| P-18 | Decide display-order placement governance for newly added or supplement catalog items | Keep the proven DB hold until a supported workflow exists. Proposed V1: place only identities absent from the base; choose category plus same-category before/after anchor; confirm all pending rows in one audited batch; one active admin/data custodian may confirm under the existing publisher model; preserve inherited base relative order; arbitrary reorder remains a separate CR. Implement after WP-6.6 through append-only migration `021`, DB placement revision/review, exact RPC/RLS/audit/concurrency controls, Thai UI, and WP-8 UAT. See [Review Note #28](./28-phase4-p18-placement-governance-review-note.md). | Owner + data custodian | Before WP-7.5 implementation, before P-14 full Add/Supplement enablement, and before P-15 for any version with new identities | Proposed V1 documented 2026-07-12; owner/data-custodian acceptance pending; current Local guard evidence passed |
 | P-19 | Decide official export/rendering policy for inactive or retired catalog rows | Excel already carries `ใช้งาน` / `ยกเลิกใช้`, but the field-facing PDF price table intentionally omits the status column for the baseline visual direction. Before publishing any version with inactive/retired rows, owner must approve whether the official PDF excludes retired rows, visibly marks them, or uses a separate appendix. Until then, do not file a field-facing PDF for such a version as final. | Owner + data custodian | Before P-15 for any version with inactive/retired rows | Pending; recorded 2026-07-07 |
-| P-20 | Decide the cross-environment canonical hash/identity portability contract | Approved contract: initialize each legacy baseline `catalog_item_identities.id` directly from its existing immutable Production-derived `price_list.id`, then keep `identity_id` in the canonical lineage hash. The restored public snapshot carries explicit `price_list.id` values, so clean environments using the same approved snapshot have the same deterministic identity mapping. Migration `017` fails closed on nulls, duplicate/colliding mappings, incomplete coverage, or a pre-existing non-deterministic assignment; repeated execution does not replace an assigned identity. Do not introduce a second business-content hash, silently remove identity, or accept environment-specific hashes as equivalent in Phase 4. The tracked comparator passed two owner-approved independent clean rebuilds on `1ad01b9`; rerun remains required after migration changes and at WP-8/P-15. | Owner + database/data-governance reviewer | Implementation before WP-6.5 exit/WP-7; proof before WP-8 clean rehearsal, migration fingerprint freeze, and P-15 hash acceptance | Approved; two-run WP-6.5C proof passed 2026-07-11; WP-8/P-15 reruns pending |
+| P-20 | Decide the cross-environment canonical hash/identity portability contract | Approved contract: initialize each legacy baseline `catalog_item_identities.id` directly from its existing immutable Production-derived `price_list.id`, then keep `identity_id` in the canonical lineage hash. The restored public snapshot carries explicit `price_list.id` values, so clean environments using the same approved snapshot have the same deterministic identity mapping. Migration `017` fails closed on nulls, duplicate/colliding mappings, incomplete coverage, or a pre-existing non-deterministic assignment; repeated execution does not replace an assigned identity. Do not introduce a second business-content hash, silently remove identity, or accept environment-specific hashes as equivalent in Phase 4. The tracked comparator passed two owner-approved independent clean rebuilds on `1ad01b9`; rerun remains required after migration changes and at WP-8/P-15. | Owner + database/data-governance reviewer | Initial implementation before WP-6.5 exit (passed); rerun after WP-6.6/placement migration changes and before WP-8 clean rehearsal, migration fingerprint freeze, and P-15 hash acceptance | Approved; two-run WP-6.5C proof passed 2026-07-11; WP-8/P-15 reruns pending |
+| P-21 | Approve the exact WP-6.6 capability-completeness scope and Local-only implementation start | Recommended full scope is Audit #29 C-01 through C-12 and Execution Pack slices A-G. Preserve WP-6.5 evidence, use fix-forward migration `020`, keep current bootstrap at `017`-`019` until reviewed implementation exists, and hide any unsupported release control. This decision does not approve a Local reset, P-18/`021`, WP-7, or Production. | Owner + developer | Before any WP-6.6 code/migration `020` implementation | Planning correction recorded 2026-07-12; implementation authorization pending |
 
 ### P-11 cover-layout refinement (2026-07-10, revised 2026-07-11)
 
@@ -233,7 +256,7 @@ For P-02 through P-07, record the final answer in:
 4. parser/golden fixtures and database seed/backfill generated from the frozen
    approved data.
 
-For P-08 through P-20, record the evidence in the Change Request, Runbook,
+For P-08 through P-21, record the evidence in the Change Request, Runbook,
 Verification Report, and per-version Release Note as applicable. P-18 through
 P-20 also require the affected architecture/spec/test contract to be updated in
 the same reviewed change.
@@ -286,6 +309,7 @@ Production migration, deploy, feature enablement, or publication.
 | Runtime NT CI assets | Approved | Owner/brand custodian | 2026-07-04 | P-10 limited approval; implement with [Doc #24](./24-phase4-nt-ci-runtime-asset-analysis.md); `/CI/` source remains local-only; exact P-11 replacement artifacts accepted 2026-07-11 |
 | Official export format | Exact TH Sarabun New 16 pt replacement pair accepted; WP-6 complete | Owner | 2026-07-11 22:20 +07 | P-11; exact replacement DB-generated Excel/PDF passed count/hash, typography, visual QA, and owner confirmation; Production filing remains separate |
 | Reliability plan/authority alignment | Approved for docs-only amendment | Owner | 2026-07-11 | Add WP-6.5 end-to-end hardening, permanent hotfix regression, UAT, authority hierarchy, and P-20 decision gate; no Local reset or Production authorization |
+| WP-6.6 capability scope/start | Planning correction recorded; implementation not yet authorized | Owner | 2026-07-12 | P-21; Audit #29 and aligned plan only; reset/Production/P-18/WP-7 remain separate |
 | Production migration | Not requested |  |  | P-12; request after WP-8 evidence review |
 | Deploy / feature enable | Not requested |  |  | P-13–P-14; request only after preceding Production gate passes |
 | Publish named version | Not requested |  |  | P-15 |

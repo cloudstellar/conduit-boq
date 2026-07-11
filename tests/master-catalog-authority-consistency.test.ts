@@ -126,7 +126,24 @@ describe('Master Catalog authority consistency', () => {
       '`017_master_catalog_phase4_foundation.sql`',
       '`018_master_catalog_phase4_draft_mutation.sql`',
       '`019_master_catalog_phase4_publish_pointer.sql`',
+      '`020_master_catalog_phase4_admin_workflow_hardening.sql`',
+      '`021_master_catalog_phase4_placement_governance.sql`',
     ])
+
+    expect(migrations).toContain(
+      '**Planned only — file does not exist; not in bootstrap**',
+    )
+    expect(migrations).toContain(
+      '**Proposed only — P-18 pending; file does not exist; not in bootstrap**',
+    )
+    expect(existsSync(resolve(
+      root,
+      'migrations/020_master_catalog_phase4_admin_workflow_hardening.sql',
+    ))).toBe(false)
+    expect(existsSync(resolve(
+      root,
+      'migrations/021_master_catalog_phase4_placement_governance.sql',
+    ))).toBe(false)
   })
 
   it('keeps work-package sequencing and owner decisions explicit', () => {
@@ -136,8 +153,10 @@ describe('Master Catalog authority consistency', () => {
     expectInOrder(executionPack, [
       '## 11. WP-6 official Excel/PDF export',
       '## 12. WP-6.5 reliability and publish-boundary hardening',
-      '## 13. WP-7 permanent BOQ/hotfix `016` and Factor F regression preservation',
-      '## 14. WP-8 clean local rehearsal',
+      '## 13. WP-6.6 admin workflow completeness and authority hardening',
+      '## 14. WP-7 permanent BOQ/hotfix `016` and Factor F regression preservation',
+      '## 15. WP-7.5 P-18 new-identity placement governance',
+      '## 16. WP-8 clean local rehearsal',
     ])
 
     const decisions = read(
@@ -147,22 +166,30 @@ describe('Master Catalog authority consistency', () => {
       'Accepted 2026-07-11 22:20 +07; WP-6 complete; Production filing remains separate',
     )
     expect(decisions).toContain(
-      'Placement decision pending; guard implemented for Local verification 2026-07-11',
+      'Proposed V1 documented 2026-07-12; owner/data-custodian acceptance pending; current Local guard evidence passed',
     )
     expect(decisions).toContain('P-19')
     expect(decisions).toContain('Pending; recorded 2026-07-07')
     expect(decisions).toContain(
       'Approved; two-run WP-6.5C proof passed 2026-07-11; WP-8/P-15 reruns pending',
     )
+    expect(decisions).toContain(
+      'Planning correction recorded 2026-07-12; implementation authorization pending',
+    )
 
     const tracker = read(
       'docs/plans/master-catalog/25-phase4-execution-progress-tracker.md',
     )
     expect(tracker).toMatch(/\| WP-6\.5 \|[^\n]+\| Ready for owner review \|/)
+    expect(tracker).toMatch(/\| WP-6\.6 \|[^\n]+\| Not started \|/)
     expect(tracker).toMatch(/\| WP-7 \|[^\n]+\| Not started \|/)
+    expect(tracker).toMatch(/\| WP-7\.5 \|[^\n]+\| Not started \|/)
     expect(tracker).toMatch(/\| WP-8 \|[^\n]+\| Not started \|/)
     expect(tracker).toContain('independent intended-admin UAT remains WP-8')
     expect(tracker).toContain('| Production write allowed | No |')
+    expect(tracker).toContain(
+      'P-21: accept/amend Audit #29 and authorize WP-6.6 Local-only implementation',
+    )
   })
 
   it('keeps reliability commands and route recovery files tracked by contract', () => {
@@ -219,6 +246,8 @@ describe('Master Catalog authority consistency', () => {
 
   it('keeps core authority links resolvable', () => {
     for (const path of [
+      'docs/01_overview/IMPLEMENTATION_PLAN.md',
+      'docs/01_overview/ROADMAP.md',
       'docs/04_data/MIGRATIONS.md',
       'docs/plans/master-catalog/00-phase4-review-guide.md',
       'docs/plans/master-catalog/08-phase4-architecture-ci-plan.md',
@@ -226,14 +255,18 @@ describe('Master Catalog authority consistency', () => {
       'docs/plans/master-catalog/12-phase4-production-runbook.md',
       'docs/plans/master-catalog/13-phase4-verification-report.md',
       'docs/plans/master-catalog/15-phase4-admin-operating-procedure.md',
+      'docs/plans/master-catalog/16-phase4-release-note-template.md',
       'docs/plans/master-catalog/17-phase4-database-security-contract.md',
       'docs/plans/master-catalog/18-phase4-threat-model.md',
       'docs/plans/master-catalog/19-phase4-decision-register.md',
       'docs/plans/master-catalog/20-phase4-official-export-spec.md',
       'docs/plans/master-catalog/21-phase4-architecture-review-disposition.md',
+      'docs/plans/master-catalog/22-phase4-post-factor-f-adjustment-plan.md',
       'docs/plans/master-catalog/23-phase4-implementation-execution-pack.md',
       'docs/plans/master-catalog/25-phase4-execution-progress-tracker.md',
       'docs/plans/master-catalog/27-phase4-wp6-owner-review-note.md',
+      'docs/plans/master-catalog/28-phase4-p18-placement-governance-review-note.md',
+      'docs/plans/master-catalog/29-phase4-owner-dev-completeness-audit.md',
     ]) {
       expectRelativeMarkdownLinksToExist(path)
       expectMarkdownTablesToBeWellShaped(path)

@@ -1,6 +1,8 @@
 # Master Catalog Phase 4 Execution Progress Tracker
 
-**Status:** WP-6/P-11 complete; all applicable WP-6.5 technical gates passed and are ready for owner closeout before WP-7; independent intended-admin UAT remains WP-8
+**Status:** WP-6/P-11 complete and WP-6.5 bounded reliability gates passed;
+owner/developer audit found operator/authority release gaps. WP-6.6 is planned
+before WP-7; no Local reset, WP-6.6 migration, or Production action is authorized
 **Purpose:** Owner-facing progress tracker for Master Catalog Phase 4 local
 implementation and rehearsal. This file is the authority for current WP status,
 blockers, next safe step, and the authority/evidence index. Detailed decisions,
@@ -34,13 +36,13 @@ Allowed statuses:
 |---|---|
 | Current branch | `codex/master-catalog-phase4` |
 | Named evidence commits | `1ad01b9268cec64c621266c3eb33b16a4325e627` produced the two clean WP-6.5/P-20 rebuilds; `54233731b121c32723bb8efcc6889f70f3f2dcef` produced live lifecycle-negative evidence; `e782459ce17b2bda90d7f34efd4e15c28565ad07` produced transport response-loss evidence; `9becdf675386b03a3aeff717cebccd6e88f8b664` produced browser same-ID/input-preservation evidence; `777df7598c8aa96a17f3665db5131e5fb5397b96` produced the accepted P-11 pair; `edf3570a` is superseded history |
-| Current work package | WP-6.5 reliability and publish-boundary hardening |
+| Current work package | WP-6.6 planning/authority alignment after completed capability audit |
 | Current environment | Local only |
 | Production write allowed | No |
 | Feature flag default | Disabled |
-| Latest owner decision needed | Review/accept WP-6.5 closeout and authorize WP-7 Local-only work; resolve P-18 placement and P-19 retired-row PDF policy before affected workflows publish |
-| Next owner review point | WP-6.5 closeout review before WP-7 |
-| Last updated | 2026-07-12 00:30 +07 |
+| Latest owner decision needed | P-21: accept/amend Audit #29 and authorize WP-6.6 Local-only implementation; P-18 placement and P-19 retired-row PDF policy remain separate affected-workflow gates |
+| Next owner review point | WP-6.6 scope/start review before any migration `020` implementation; no reset implied |
+| Last updated | 2026-07-12 01:37 +07 |
 
 ## 2.1 Canonical authority and evidence manifest
 
@@ -55,6 +57,7 @@ Allowed statuses:
 | Production operation/recovery | [Production Runbook](./12-phase4-production-runbook.md) | Requires exact gate approval; no ad hoc reverse SQL |
 | Excel/PDF presentation and filing | [Official Export Specification](./20-phase4-official-export-spec.md) | P-11/P-19 decisions update the spec first |
 | Admin workflow/UAT | [Admin Operating Procedure](./15-phase4-admin-operating-procedure.md) | Must match implemented messages and recovery paths before P-14 |
+| End-to-end capability completeness/release visibility | [Owner/Developer Capability Audit #29](./29-phase4-owner-dev-completeness-audit.md) | Every visible capability closes its route-to-evidence matrix or is removed from release scope |
 
 Current evidence baseline:
 
@@ -84,6 +87,8 @@ Current evidence baseline:
 - Production-applied root sequence: `009`-`015`, hotfix `016`;
 - Phase 4 Local-only drafts: `017`, `018`, `019`;
 - Local bootstrap authority order: `009`-`015`, `016`, `017`-`019`;
+- planned migration `020` (WP-6.6) and proposed `021` (P-18/WP-7.5) do not
+  exist and are not in bootstrap;
 - Production write authorization: **No**;
 - generated/reference artifacts under `files/`, `tmp/`, and `output/` remain
   untracked and are not evidence automation source code.
@@ -99,9 +104,11 @@ Current evidence baseline:
 | WP-4 | Draft mutation, import, manual edit, and history | Complete | Draft/manual/import/history tests, clean Local WP-4 smoke, browser manual edit proof, browser import render/validate proof, RPC error sanitization, local auth credential parser proof, and [WP-4 Owner Review Note](./26-phase4-wp4-owner-review-note.md) | Owner accepted 2026-07-05 21:47 +07 |
 | WP-5 | Publish, pointer restore, and audit on Local | Ready for owner review | Backend DB/RPC slice passed: migration `019`, Local publish/restore smoke including stale-base pointer fixture, DB hash readback, immutability checks, active-admin publish/restore UI controls, browser create/publish/restore proof, final DB readback, owner-review cleanup, and [Verification Report publication evidence](./13-phase4-verification-report.md#12-publication-tests). Hash-portability review note remains for WP-8/P-15 | Owner accepted continuing to WP-6 local-only implementation |
 | WP-6 | Official Excel/PDF export | Complete | Selected-version export core, paged export data reads, older-version coverage, draft marking, Excel/PDF generators, and tracked verification exist. The exact replacement pair from `777df75` uses TH Sarabun New on all 20,808 populated Excel cells at 16 pt or larger and passed semantic, five-sheet workbook, 19-page PDF, and unchanged Local readback checks. | Owner accepted the exact Local replacement pair at 2026-07-11 22:20 +07; preserve it without regeneration; Production filing remains separate |
-| WP-6.5 | Reliability and publish-boundary hardening | Ready for owner review | Code/static implementation for A-H, two owner-approved clean Local rebuilds/P-20 evidence on `1ad01b9`, live lifecycle negatives on `5423373`, transport response-loss recovery on `e782459`, browser same-ID/input-preservation proof on `9becdf6`, and owner-accepted export evidence on `777df75` passed. See the sub-gate table below. | All applicable technical gates passed; owner closeout is required before WP-7. Independent intended-admin UAT remains WP-8 and is not replaced by developer proof. |
-| WP-7 | Permanent BOQ/hotfix `016` and Factor F regression preservation | Not started | Live DB behavior for all approved BOQ suffixes and authoritative catalog fields, rollback/role/version negatives, BOQ save/print/export regressions, and Factor F before/after assertions; suite is reusable in CI/rehearsal | Required before WP-8 complete |
-| WP-8 | Clean Local rehearsal, admin UAT, performance baseline, and Verification Report | Not started | Owner-approved Local reset, full workflow, DB integration/concurrency, test/lint/build/audit/advisor evidence, tracked export verification, admin UAT without developer/SQL assistance, and measured 710-row performance | Required before any P-12 request |
+| WP-6.5 | Reliability and publish-boundary hardening | Ready for owner review | Code/static implementation for A-H, two owner-approved clean Local rebuilds/P-20 evidence on `1ad01b9`, live lifecycle negatives on `5423373`, transport response-loss recovery on `e782459`, browser same-ID/input-preservation proof on `9becdf6`, and owner-accepted export evidence on `777df75` passed. See the sub-gate table below. | Accept only as bounded reliability evidence. It is not a full operator-completeness certificate and no longer leads directly to WP-7; WP-6.6 is next. |
+| WP-6.6 | Admin workflow completeness and authority hardening | Not started | Audit #29 C-01 through C-12: full browse/history, exact draft/item, versioned categories/P-06 groups/allocator, authoritative import diff/evidence, publication provenance/readiness, correction actions, schema and Thai UX with DB/browser/UAT evidence | P-21 owner authorization required before implementation; required before WP-7 |
+| WP-7 | Permanent BOQ/hotfix `016` and Factor F regression preservation | Not started | Live DB behavior for all approved BOQ suffixes and authoritative catalog fields, rollback/role/version negatives, BOQ save/print/export regressions, and Factor F before/after assertions; suite is reusable in CI/rehearsal | Starts only after WP-6.6 closeout; required before WP-7.5/WP-8 |
+| WP-7.5 | P-18 new-identity placement governance | Not started | Conditional migration `021`, placement revision/review, exact RPC/RLS/audit/order/concurrency/hash/export/browser evidence | P-18 acceptance required; otherwise Add/Supplement hidden and DB guard retained for WP-8 |
+| WP-8 | Clean Local rehearsal, admin UAT, performance baseline, and Verification Report | Not started | Owner-approved Local reset, full supported workflow, DB integration/concurrency, test/lint/build/audit/advisor evidence, tracked export verification, admin UAT without developer/SQL assistance, and measured 710-row performance | Requires WP-6.6/WP-7 plus WP-7.5 or hidden Add/Supplement; required before any P-12 request |
 | WP-9 | Production migration/deploy/enable/publish | Not authorized | P-12 through P-15 sequential approvals | Separate Production readiness review required |
 
 ### 3.1 WP-6.5 sub-gates
@@ -117,6 +124,18 @@ Current evidence baseline:
 | G Operator UX/observability | Route states, Thai recovery, stable request IDs, current-base selection, warnings, and bounded logs implemented. Browser proof on `9becdf6` used labelled controls, retained the attempted values through the uncertain state, retried without refilling, showed one success/change set, and had no console warning/error. | Passed WP-6.5 technical gate; independent intended-admin UAT and accessibility/recovery rerun remain WP-8 |
 | H Documentation consistency | Authority documents aligned with named live evidence; tracked consistency test passed 4 checks, full suite passed 25 files/120 tests, TypeScript passed, lint exited 0 with 10 existing warnings, tracked evidence scripts passed syntax checks, and Local DB lint found no schema errors | Commit review and WP-8 rerun |
 
+### 3.2 WP-6.6 capability gates
+
+| Slice | Current status | Exit evidence |
+|---|---|---|
+| A Full browse/history | Not started | Full-version search/filter, exact item route, stable-identity field diff for first/middle/last rows |
+| B Exact draft/stale state | Not started | All drafts explicitly selectable; stale draft read-only before mutation/import |
+| C Category/group/code allocation | Not started | Production-derived categories and approved P-06 22/65 groups frozen, unknown-entry denial, next-never-issued race/gap/900 tests |
+| D Import diff/evidence | Not started | Complete server diff/omissions and supported approved/missing price-authority cases |
+| E Publication provenance/readiness | Not started | Authenticated publisher snapshot, version archive reference, shared full readiness/publish result |
+| F Correction/editor | Not started | Prefilled exact item, field-aware authority, reactivate/base-absent-withdraw identity/code/audit proof |
+| G Schema/Thai/evidence | Not started | Fix-forward `020`, constraints, RLS/rollback/concurrency, Thai browser/accessibility and authority consistency |
+
 ## 4. Owner pause points
 
 | Pause point | Trigger | Required owner action |
@@ -129,7 +148,8 @@ Current evidence baseline:
 | Structured-code publish guard | Before WP-7 and before any first structured-code publication readiness claim | Review WP-6.5 evidence that only the approved `ITEM-0139` legacy exception remains active |
 | P-18 display placement | Any draft/version contains added or supplement catalog rows | Approve placement governance or keep publication blocked |
 | P-19 inactive/retired export policy | Any candidate version contains inactive/retired rows | Approve PDF rendering/exclusion policy before official filing |
-| P-20 hash portability | Before WP-6.5 exit/WP-7 and before any clean-reset evidence or migration fingerprint freezes | Implement the approved `price_list.id` baseline mapping and prove identical identity/hash output across the approved independent rebuild scope |
+| P-20 hash portability | Initial WP-6.5 proof passed; rerun after WP-6.6/WP-7.5 migration changes and before WP-8/migration fingerprint acceptance | Prove identical identity/hash output across the approved independent rebuild scope |
+| P-21 / WP-6.6 start and closeout | Before migration `020` implementation and again before WP-7 | Accept exact Audit #29 scope/start; later review C-01 through C-12 evidence or require affected controls hidden |
 | Reusable version path | Before P-14 feature enablement | Local positive and duplicate/nonmonotonic evidence passed 2026-07-11; rerun the generic ADR-003 set at WP-8/P-14 |
 | WP-8 completion | Clean Local rehearsal passes | Review readiness evidence before any P-12 request |
 | P-12 | Production migration window requested | Approve or reject Production migration |
@@ -141,6 +161,7 @@ Current evidence baseline:
 
 | Date/time | WP | Evidence | Result | Notes |
 |---|---|---|---|---|
+| 2026-07-12 01:49 +07 | WP-6.6 planning/H | Completed route-to-DB-to-evidence capability audit and aligned overview, ADR/architecture/CR, migrations, specs, runbook, procedure, execution pack, tracker, and consistency test | Passed documentation/plan verification; implementation not started | Audit #29 records C-01 through C-12 and corrects the prior broad completeness claim while retaining WP-6.5 bounded evidence. Plan reserves `020` for WP-6.6, moves proposed P-18 placement to `021`, and keeps bootstrap at `017`-`019`. Checks: authority consistency 4/4, full Vitest 25 files/120 tests, TypeScript, lint 0 errors/10 existing warnings, and `git diff --check`. Browser tabs were stuck on a policy-blocked error URL after the prior server stopped, so no new visual acceptance claim was made; source/contract evidence was used. No Local reset/DB mutation, Production access/write, Factor F workflow, or hotfix expansion. |
 | 2026-07-12 00:23 +07 | WP-6.5A/G | Fixed form-value loss found by the first browser diagnostic and completed same-ID browser recovery proof | Passed; WP-6.5 ready for owner closeout | Commit `9becdf675386b03a3aeff717cebccd6e88f8b664` preserves submitted editable values for uncertain/rejected outcomes and resets only after success across create/manual/import-apply/publish/restore forms. Full checks before commit: 25 files/120 tests, TypeScript, production build, lint 0 errors/10 existing warnings, and `git diff --check`. Browser used Reason `WP-6.5 browser preserved-input response-loss evidence` and `ITEM-0004`; after upstream HTTP 200 plus simulated lost response, the red Thai uncertain alert and both values remained visible. Retry occurred without refilling; request/response ID `18c669c5-a60f-498a-9f68-986fa346b0cb` matched, `duplicateRequest=true`, one change set moved lock `3 → 4`, and the form then reset. JSON evidence SHA-256 `1d10690f6d487d1188a221e5d484fb30db278da1236fce05cb00302aadf5b029`; uncertain/success screenshot SHA-256 values `9422237bea8c65c69bf49f2cba8f995e5b75fd726cd5e4e8399458359c2aed29` / `d4764d9d4137d0c95dfa1442118bbf1285ed88f4efecb8c0441ce929dfbea515`. Browser console had no warning/error. Final Local readback: flag false; pointer `2568.0.0`, 710 rows/P-20 hash exact; 198 BOQs/1,547 items; Factor F `2569.0.0`/36 rows. The earlier `8558652` run is diagnostic only because it required field reconstruction. No reset, Production access/write, Factor F workflow change, or hotfix expansion. Independent intended-admin UAT remains WP-8. |
 | 2026-07-11 23:49 +07 | WP-6.5A/D/F/G/H | Completed live lifecycle negatives, transport response-loss proof, partial browser pre-UAT, final invariant readback, and repository/schema verification | Lifecycle/transport/repository passed; browser same-ID UI recovery remains | Clean-tree lifecycle harness output `tmp/master-catalog/wp65-evidence/20260711T232920-5423373.json`, SHA-256 `8c687f63e11cc07ea4a56fe9e961b76e439c1c3b1ac0e68b7ce8a88d9c96752f`, passed four invalid transition cases and all prior WP-6.5 checks. Response-loss output `tmp/master-catalog/wp65-evidence/20260711T234500-transport-response-loss-e782459.json`, SHA-256 `41f75d046c6deafe3d2526294e712a6415e5ed6bde1149c4d91732109e10a2cf`, observed upstream HTTP 200, matching request/response ID `e5f60876...`, same recovered version, and `duplicateRequest=true`; feature flag was restored in `finally`. In-app browser login/admin rendering passed and exposed current/guard/P-19 state, but Browser URL policy blocked reload after the test server restart; no alternate browser workaround or UI-retry claim was used. Final readback: flag false, pointer `2568.0.0`, 710 rows/P-20 hash exact, 198 BOQs/1,547 items, Factor F `2569.0.0`/36 rows. `npm test` 25 files/120 tests, TypeScript, lint (10 existing warnings), escalated network build, script syntax, `git diff --check`, and Local DB lint passed. No Local reset, Production access/write, new Factor F workflow, or hotfix scope expansion. |
 | 2026-07-11 22:20 +07 | WP-6/P-11 | Owner reviewed the replacement PDF/Excel format and confirmed `รูปแบบ pdf excel ok เลยครับ` | Accepted; WP-6 complete | Acceptance applies to the exact Local pair sourced from `777df7598c8aa96a17f3665db5131e5fb5397b96` under `20260711T145832108Z-777df759/`, including its manifest, verifier result, and recorded binary hashes. Preserve those binaries without regeneration. This does not approve Production filing, migration, deploy, feature enablement, catalog publication, P-18 placement, P-19 retired-row policy, Factor F changes, or hotfix scope expansion. Production touched: No. |
@@ -256,21 +277,22 @@ Current evidence baseline:
 | 2026-07-11 01:36 +07 | WP-6.5 | Reusable create/publish validation was partially hardcoded to `2568.1.0` despite ADR-003 | Generic version UI/RPC validation and unit fixtures implemented; exact candidate remains fixture/approval data only | Resolved for WP-6.5D on 2026-07-11: live generic publish plus duplicate/backward/mixed transition negatives passed; rerun at WP-8/P-14. |
 | 2026-07-11 01:36 +07 | WP-6.5/P-11 | Artifact verification lived under untracked temp paths and used fixed header coordinates | Tracked semantic verifier and atomic clean-tree generator implemented; generated files stay untracked | Resolved for WP-6/P-11: replacement `777df75` pair passed technical evidence and owner confirmation on 2026-07-11 22:20 +07; WP-8 rerun remains. |
 | 2026-07-11 01:36 +07 | WP-6.5/WP-8 | Route failure states, Thai recovery copy, correlation logging, admin UAT, and measured performance were incomplete | Loading/error/not-found and bounded mutation/export logs implemented; request ID shown for uncertain/error paths | Browser same-ID/value-preservation recovery passed on 2026-07-12; independent intended-admin UAT, broader accessibility rerun, and 710-row performance remain WP-8/P-14 gates. |
+| 2026-07-12 01:37 +07 | WP-6.6 planning | End-to-end owner/developer capability trace found C-01 through C-12 despite the bounded WP-6.5 safety evidence | Accept Audit #29/WP-6.6 scope before implementation; keep unsupported controls out of release visibility | Open for implementation authorization. Plan reserves fix-forward `020`, moves P-18 placement to `021`, and preserves current bootstrap `017`-`019`. No Local reset, Production access/write, Factor F workflow, or hotfix expansion occurred. |
 
 ## 7. Handoff note template
 
 Use this template at the end of each implementation session:
 
 ```text
-Current WP: WP-6.5 reliability and publish-boundary hardening
-Status: WP-6/P-11 complete; P-20, Local DB/concurrency, lifecycle negatives, transport/browser same-ID recovery, and accepted export evidence passed; WP-6.5 is ready for owner closeout before WP-7; independent intended-admin UAT remains WP-8
+Current WP: WP-6.6 planning/authority alignment
+Status: WP-6/P-11 complete and WP-6.5 bounded reliability evidence passed; Audit #29 found C-01 through C-12 operator/authority gaps, so WP-6.6 must close before WP-7
 Branch: codex/master-catalog-phase4
 Latest evidence commits: 1ad01b9268cec64c621266c3eb33b16a4325e627 for clean WP-6.5/P-20; 54233731b121c32723bb8efcc6889f70f3f2dcef for lifecycle negatives; e782459ce17b2bda90d7f34efd4e15c28565ad07 for transport response loss; 9becdf675386b03a3aeff717cebccd6e88f8b664 for browser same-ID/input preservation; 777df7598c8aa96a17f3665db5131e5fb5397b96 for P-11
-Files changed: WP-6.5 migrations/actions/UI, readiness/observability/version helpers, tracked DB/P-20/export evidence tools, tests, and aligned authority docs; untracked `files/`, `tmp/`, and `output/` remain ignored
-Evidence produced: two independent clean rebuilds/P-20; live role denial, fingerprints/replay, rollback, guards, races, lifecycle positives/negatives, pointer/BOQ/Factor F invariants; tracked response-loss commit/retry proof; browser uncertain-message, retained-input, untouched same-ID retry, reset-after-success proof; accepted PDF/Excel pair
-Tests/checks run: See latest WP-6.5 evidence-log row and Verification Report
-Blockers: owner WP-6.5 closeout before WP-7; P-18 placement/P-19 retired-row policy when affected; WP-7 BOQ/Factor F regressions; WP-8 independent intended-admin UAT, performance, and advisors
-Owner decisions needed: P-18/P-19 when affected; Production P-12 through P-15 remain separate
-Next safe step: owner reviews and accepts WP-6.5 closeout, then explicitly authorizes WP-7 Local-only regression work. Independent intended-admin UAT runs in WP-8 after WP-7; do not reset Local without explicit approval
+Files changed: Audit #29, authority/runbook/spec/tracker alignment, and consistency test only; untracked `files/`, `tmp/`, and `output/` remain ignored
+Evidence produced: source trace across routes/read models/actions/RPC/migrations/tests/docs; current UI implementation gaps recorded without invalidating historical WP-6.5 evidence
+Tests/checks run: See latest WP-6.6 planning evidence-log row and Verification Report
+Blockers: owner P-21 WP-6.6 scope/start review; P-18 placement/P-19 retired-row policy when affected; WP-7 BOQ/Factor F regressions; WP-8 independent intended-admin UAT, performance, and advisors
+Owner decisions needed: P-21 authorizes WP-6.6 Local-only implementation; P-18/P-19 when affected; Production P-12 through P-15 remain separate
+Next safe step: owner accepts/amends Audit #29 and records P-21 authorization for WP-6.6 slices A-G. Do not implement migration `020`, reset Local, or begin WP-7 before that gate
 Production touched: No
 ```

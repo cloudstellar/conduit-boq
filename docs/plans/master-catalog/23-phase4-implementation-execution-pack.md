@@ -29,6 +29,14 @@ Current implementation/evidence status is maintained only in
 [the Tracker](./25-phase4-execution-progress-tracker.md). This authorization
 still does not permit an unannounced Local reset or any Production action.
 
+**Capability-completeness alignment recorded:** 2026-07-12 — owner requested
+the full audit and plan correction in
+[Audit #29](./29-phase4-owner-dev-completeness-audit.md). WP-6.5 keeps its
+bounded reliability evidence; new WP-6.6 must close C-01 through C-12 before
+WP-7. Migration `020` is reserved for WP-6.6 and proposed P-18 placement moves
+to `021`/WP-7.5. This alignment authorizes documentation only, not migration
+implementation, Local reset, or Production action.
+
 **Purpose:** Turn the reviewed Phase 4 architecture into an execution checklist
 that an implementer can follow without re-deciding scope, sequencing, database
 boundaries, or verification gates.
@@ -103,6 +111,10 @@ Start blocked:
     operation ID after an uncertain response.
 14. SQL text-shape tests and untracked artifact scripts are supporting checks,
     not substitutes for live DB behavior or reproducible release evidence.
+15. "Complete" requires a capability trace across route/UI, exact selected
+    entity, Server Action, RPC/schema authority, audit/correction, readiness/
+    export effect, tests, and operator procedure. A fail-closed DB guard alone
+    is safety evidence, not a complete user workflow.
 
 ## 3. Required owner decisions before each work band
 
@@ -122,7 +134,8 @@ Start blocked:
 | P-12 to P-15 | Production migration/deploy/enable/publish | Decision Register |
 | P-18 add/supplement placement governance | Add/supplement publish readiness | Decision Register |
 | P-19 inactive/retired export policy | Publication/filing of any version with inactive rows | Decision Register |
-| P-20 canonical hash/identity portability | WP-6.5 exit/WP-7, WP-8 clean rehearsal, and migration fingerprint freeze | Decision Register |
+| P-20 canonical hash/identity portability | Initial WP-6.5 exit and rerun after WP-6.6/WP-7.5 migration changes, WP-8 clean rehearsal, and migration fingerprint freeze | Decision Register |
+| P-21 Audit #29 WP-6.6 scope/start | WP-6.6 implementation and any migration `020` execution | Decision Register / Completeness Audit |
 
 Rule: unresolved P-02 through P-11 does not block generic additive schema,
 parser, UI shell, tests, or local rehearsal. It blocks final candidate data
@@ -143,9 +156,11 @@ acceptance, migration fingerprint freeze, and P-15 hash acceptance.
 | WP-4 | Draft mutation, import, manual edit, history | Local app + DB | WP-1, WP-2, WP-3 | WP-5 |
 | WP-5 | Publish, pointer restore, and audit | Local app + DB | WP-4 | WP-6, WP-8 |
 | WP-6 | Official Excel/PDF export | Local app | WP-2, WP-5, P-11 for final visual | WP-8 |
-| WP-6.5 | Reliability and publish-boundary hardening | Local app + DB/tests | WP-5, P-18 recorded, P-06 structured-code exception recorded | WP-7, WP-8 |
-| WP-7 | Permanent BOQ/hotfix `016` and Factor F regression preservation | Local app + DB/tests | WP-0, WP-6.5 | WP-8 |
-| WP-8 | Clean local rehearsal, admin UAT, performance, and verification report | Local reset + app | WP-1 to WP-7, including WP-6.5 and P-20 | Production approval |
+| WP-6.5 | Reliability and publish-boundary hardening | Local app + DB/tests | WP-5, P-18 recorded, P-06 structured-code exception recorded | WP-6.6, WP-8 |
+| WP-6.6 | Admin workflow completeness and authority hardening | Local app + DB/tests | WP-6.5, P-21 | WP-7, WP-7.5, WP-8 |
+| WP-7 | Permanent BOQ/hotfix `016` and Factor F regression preservation | Local app + DB/tests | WP-0, WP-6.6 | WP-7.5, WP-8 |
+| WP-7.5 | P-18 new-identity placement governance | Local app + DB/tests | WP-7, P-18 accepted | WP-8 full Add/Supplement release |
+| WP-8 | Clean local rehearsal, admin UAT, performance, and verification report | Local reset + app | WP-1 to WP-7; WP-7.5 or hidden Add/Supplement; P-20 | Production approval |
 | WP-9 | Production migration/deploy/enable/publish | Production | P-12 to P-15 | Closeout |
 
 ## 5. WP-0 branch and evidence setup
@@ -481,7 +496,62 @@ Exit gate:
   same-payload resubmit, one audit effect, and reset-after-success behavior;
 - Verification Report records each sub-gate separately.
 
-## 13. WP-7 permanent BOQ/hotfix `016` and Factor F regression preservation
+## 13. WP-6.6 admin workflow completeness and authority hardening
+
+Goal: close every Audit #29 gap so an intended admin can complete each visible
+workflow without developer/SQL assistance and without caller-authored authority.
+
+Boundary:
+
+- preserve WP-6.5 reliability evidence and existing `017`-`019` migrations;
+- implement accepted DB changes only through fix-forward migration
+  `020_master_catalog_phase4_admin_workflow_hardening.sql`;
+- do not implement P-18 placement in `020`; placement remains WP-7.5/`021`;
+- do not add general inherited reorder, taxonomy authoring, workflow engine,
+  Factor F work, BOQ Rebase, or hotfix expansion;
+- do not reset Local Supabase without separately telling the owner that the
+  whole Local stack will be rebuilt and receiving explicit approval.
+
+Required slices:
+
+| Slice | Required outcome |
+|---|---|
+| A Browse/history | Use deterministic paged data reads to defeat API row caps, then read/filter all rows client-side within the measured threshold; search/filter code/name/category/status/group; exact item route; paged version/audit registers; stable-identity timeline with field-level old/new values. |
+| B Draft targeting | List/select every current-base draft explicitly; mark stale drafts before action and render them read-only with create-new/reapply recovery. No overview/import hidden draft choice. |
+| C Dictionary/code authority | Freeze Production-derived versioned categories and approved P-06 22/65 code groups; ordinary mutation resolves existing IDs only; server allocator locks the approved group, uses next never-issued sequence, does not fill retired gaps, and stops at 900. |
+| D Import completion | Move the approved first-rollout mapping out of runtime `docs/*draft.csv` authority; reconcile future imports against the exact draft/dictionaries. Server returns complete add/update/recode/retire/unchanged diff and exact Full omissions; UI displays it before Apply; support real bounded batch/per-row price authority. |
+| E Publication provenance/readiness | Derive publisher UUID/display snapshot from authenticated profile; semantically validate ISO dates; require version-level archive reference including manual-only publication; readiness and publish consume one full stale-base/canonical-quality result. |
+| F Correction/editor | Prefill exact current item; require price authority only for name/unit/money changes; add audited `reactivate` and base-absent `withdraw` preserving identity/code/audit. |
+| G Schema/UX/evidence | After zero-null compatibility proof, add required null/order constraints; Thai-first copy, no synthetic Local/WP evidence, support IDs demoted; DB/role/race/browser/accessibility/authority tests pass. |
+
+Required behavior:
+
+- unknown category/group or caller-selected arbitrary code cannot create catalog
+  authority;
+- two concurrent allocations in one group cannot receive the same code;
+- source preview and final Apply use the same exact draft/payload fingerprint;
+- stale draft controls are unavailable before a user can submit;
+- preliminary readiness cannot be greener than final publish for base/quality;
+- `withdraw` cannot remove an identity inherited from the base or any published
+  identity/code/audit row;
+- all current rows and history are discoverable, not only a sample;
+- unsupported Add/Supplement/Retire controls are hidden at release when their
+  downstream P-18/P-19 gates are not accepted.
+
+Exit gate:
+
+- Audit #29 C-01 through C-12 each have an implementation/evidence reference in
+  the Verification Report;
+- migration `020` static/Local DB, RLS/grant, rollback, concurrency, null/order,
+  and P-20 rerun evidence passes after an explicitly approved reset;
+- browser QA and owner review prove exact draft/item targeting and Thai workflow;
+- no visible in-scope action requires developer/SQL assistance to complete or
+  recover;
+- authority consistency tests cover WP order, reserved migration numbers, core
+  links, and release-visibility rule;
+- owner accepts WP-6.6 closeout before WP-7 begins.
+
+## 14. WP-7 permanent BOQ/hotfix `016` and Factor F regression preservation
 
 Goal: prove Phase 4 did not disturb current BOQ behavior.
 
@@ -519,23 +589,48 @@ Exit gate:
 - the suite is tracked and wired into the appropriate PR/rehearsal CI gate, not
   retained as one-time Local evidence.
 
-## 14. WP-8 clean local rehearsal
+## 15. WP-7.5 P-18 new-identity placement governance
+
+Goal: complete Add/Supplement publication for new identities without enabling
+arbitrary reorder of inherited rows.
+
+Start only after P-18 accepts the five V1 choices in
+[Review Note #28](./28-phase4-p18-placement-governance-review-note.md) and WP-7
+passes. Implement only in append-only migration
+`021_master_catalog_phase4_placement_governance.sql` plus its exact RPC/UI/audit
+and tests.
+
+Exit gate:
+
+- one/many new identities remain blocked before accepted placement;
+- one audited batch assigns category and same-category before/after anchors;
+- inherited identities keep relative order although shifted numeric positions
+  are all audited;
+- stale review, invalid order/anchor, direct write, race, replay mismatch, and
+  injected failure are fail-closed/atomic;
+- canonical hash, Excel order, PDF order, and verifier agree;
+- if this WP is deferred, Add/Supplement remain hidden and the P-18 DB guard is
+  retained/tested for WP-8/P-14.
+
+## 16. WP-8 clean local rehearsal
 
 Goal: prove the full plan works from a clean state.
 
 Run order:
 
 1. Clean local reset from the canonical bootstrap chain, including `009`-`015`,
-   production hotfix `016`, and Phase 4 `017+`.
+   production hotfix `016`, Phase 4 `017`-`020`, and `021` only when P-18/WP-7.5
+   is accepted/implemented. Until those files exist, the authority path remains
+   exactly `017`-`019`.
 2. Load approved baseline fixture/snapshot.
 3. Record catalog count/hash and Factor F baseline.
 4. Confirm Phase 4 `017+` migrations apply only after hotfix `016`.
 5. Run DB/security tests.
 6. Run parser/hash tests.
-7. Run admin UI workflow tests.
+7. Run the complete WP-6.6 capability matrix and admin UI workflow tests.
 8. Run end-to-end idempotency and two-session concurrency/timeout tests.
-9. Run publish/export tests, including WP-6.5 guards and the tracked semantic
-   artifact verifier.
+9. Run publish/export tests, including WP-6.5 guards, WP-6.6 readiness/provenance,
+   conditional WP-7.5 placement, and the tracked semantic artifact verifier.
 10. Run permanent hotfix `016`/BOQ/Factor F regression tests.
 11. Run pointer restore rehearsal.
 12. Run operator UAT with an intended admin/data custodian without developer or
@@ -563,7 +658,7 @@ Exit gate:
 - Production approval P-12 can be requested after the readiness evidence below
   is reviewed.
 
-## 14.1 Production readiness review
+## 16.1 Production readiness review
 
 Goal: make sure the rollout is genuinely ready before any Production gate is
 requested.
@@ -615,7 +710,7 @@ code remains governed by ADR-003.
 Do not request the next Production gate if any evidence is missing, stale,
 failed, ambiguous, or different from the reviewed plan.
 
-## 15. WP-9 Production execution
+## 17. WP-9 Production execution
 
 This package cannot start from this document alone. It requires P-12 through
 P-15, the Production Runbook, and a completed Verification Report from WP-8.
@@ -649,14 +744,14 @@ Hard stop:
   approved;
 - backup restore not proven.
 
-## 16. Implementation file targets
+## 18. Implementation file targets
 
 These are expected targets, not a mandate to create all files if the local
 implementation finds a cleaner existing home.
 
 | Area | Likely targets |
 |---|---|
-| Supabase migration | `migrations/017_*.sql` or timestamped Supabase migration matching logical `017+` |
+| Supabase migration | Existing `migrations/017_*`-`019_*`; planned WP-6.6 `020_*`; conditional P-18/WP-7.5 `021_*` |
 | DB helpers/types | `lib/catalog/*`, `lib/supabase.ts`, generated/hand-maintained types |
 | Parser/canonicalizer | `lib/catalog/parser/*`, `lib/catalog/hash/*` |
 | Admin pages | `app/admin/master-catalog/**` |
@@ -668,7 +763,7 @@ implementation finds a cleaner existing home.
 Do not put raw workbook files, Production backups, secrets, or `/CI/` source
 assets into committed runtime paths.
 
-## 17. Minimum implementation review checklist
+## 19. Minimum implementation review checklist
 
 Before asking for code review:
 
@@ -680,6 +775,16 @@ Before asking for code review:
 - [ ] Privileged functions have narrow execute grants and safe `search_path`.
 - [ ] New foreign keys and hot filters are indexed or intentionally documented.
 - [ ] Published data is immutable.
+- [ ] Audit #29 C-01 through C-12 have exact implementation/evidence references
+  or the affected capability is excluded from release visibility.
+- [ ] Full catalog/item history and exact multi-draft/stale targeting work.
+- [ ] Ordinary mutations resolve approved versioned categories/P-06 groups and use the
+  server-owned next-never-issued allocator.
+- [ ] Import displays complete server diff/omissions and supports real approved
+  new-row price evidence.
+- [ ] Publisher snapshot is authenticated, version archive reference is stored,
+  and readiness/publish share full base/quality authority.
+- [ ] Reactivate/base-absent-withdraw and required null/order constraints pass.
 - [ ] WP-6.5 guard rejects add/supplement/new-identity publication until
   placement governance is approved.
 - [ ] WP-6.5 guard enforces the structured-code legacy exception set before
@@ -705,7 +810,7 @@ Before asking for code review:
 - [ ] Supabase advisor baseline is recorded and no new untriaged finding exists.
 - [ ] Verification Report is updated with evidence links/commands.
 
-## 18. What to do when blocked
+## 20. What to do when blocked
 
 | Blocker | Action |
 |---|---|
@@ -716,6 +821,7 @@ Before asking for code review:
 | P-18 unresolved | Keep draft add/supplement review available, but block publication of versions with new identities until guard evidence and placement governance are accepted |
 | P-19 unresolved | Do not file a field-facing official PDF for versions with inactive/retired rows; publish only if owner explicitly approves the rendering/exclusion policy |
 | P-20 unresolved | Continue non-hash-changing reliability work, but do not accept WP-8 clean-reset hash evidence, freeze the migration fingerprint, or request P-15 |
+| Any Audit #29 C-01 through C-12 gap unresolved | Do not start WP-7 or claim full operator readiness. Implement WP-6.6 or remove the affected control from release visibility according to the audit |
 | Reusable path still hardcodes `2568.1.0` | Treat as implementation nonconformance with ADR-003; fix and test another valid annual/revision/patch version before P-14 |
 | Advisor warning from pre-existing system | Add to advisor baseline with owner/remediation metadata |
 | New advisor warning from Phase 4 | Stop and fix or get explicit accepted-risk signoff |
@@ -724,14 +830,16 @@ Before asking for code review:
 | Workbook data conflicts with Production price | Preserve Production price unless separate price authority exists |
 | Candidate code conflict unresolved | Keep as candidate/rejected; do not publish |
 
-## 19. Final start decision
+## 21. Final start decision
 
 Recommended next action:
 
 1. Owner reviews the Phase 4 authority documents in the Review Guide order.
 2. Owner approves P-01 for implementation/local rehearsal only.
-3. Implement WP-0 through WP-8.
-4. After WP-8 passes, pause for readiness review, then request Production
+3. Preserve completed evidence, implement/accept WP-6.6, then WP-7; implement
+   WP-7.5 only after P-18 or keep Add/Supplement hidden.
+4. Complete WP-8.
+5. After WP-8 passes, pause for readiness review, then request Production
    approvals sequentially.
 
 Do not wait for all Production data decisions before starting generic local

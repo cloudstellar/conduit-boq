@@ -1,0 +1,169 @@
+# Phase 4 Owner/Developer Capability Completeness Audit
+
+**Status:** Planning correction accepted for documentation alignment on
+2026-07-12; implementation remains Local-only and requires the normal work-package
+gates
+
+**Environment:** Source/document audit only. No Local database reset, Production
+access/write, feature enablement, publication, new Factor F workflow, or hotfix
+scope expansion was performed or authorized by this audit.
+
+## 1. Correction to the earlier completeness statement
+
+The earlier statement that the Phase 4 architecture was "complete" was too
+broad. What had actually been demonstrated was a strong bounded safety core:
+version lineage, stable identity, RLS/function boundaries, request idempotency,
+publish immutability, canonical hash/export verification, and fail-closed P-18
+and structured-code guards.
+
+That evidence did not prove that every owner/admin workflow was complete from
+screen to database to audit and recovery. The implementation was reviewed one
+work package at a time, but the plan did not require a final capability trace
+across route, UI, Server Action, RPC, schema invariant, audit evidence, and
+operator procedure for every promised business action. This audit adds that
+missing cross-cutting gate.
+
+The correction is therefore:
+
+- the existing safety architecture remains reusable and should not be rebuilt;
+- WP-6.5 evidence remains valid for its stated reliability scope;
+- Phase 4 is not yet operator-complete or release-ready;
+- WP-6.6 must close the capability gaps below before WP-7/WP-8 can support a
+  full Master Catalog release claim.
+
+## 2. Audit method
+
+Each Change Request capability was traced through these layers:
+
+1. operator route and visible workflow;
+2. read model and exact selected draft/version/item;
+3. Server Action and untrusted-input validation;
+4. public wrapper and private database implementation;
+5. RLS, grants, constraints, locks, and idempotency;
+6. complete old/new audit and correction path;
+7. publish-readiness parity and official export effect;
+8. automated evidence, browser evidence, and intended-admin UAT;
+9. operating procedure, runbook, and decision ownership.
+
+A capability is complete only when all applicable layers are implemented and
+the same rule is proved at its authoritative layer. A DB rejection is a valid
+safety control, but it does not by itself make the operator workflow complete.
+
+## 3. What remains sound
+
+Keep and extend these implemented foundations:
+
+- immutable published catalog versions and singleton current pointer;
+- stable UUID identity and non-reusable business-code registry;
+- base-version lineage and stale-base rejection;
+- active-admin/function-only mutations with RLS and explicit grants;
+- stable request IDs, fingerprints, optimistic locks, advisory locks, and
+  atomic rollback;
+- complete row snapshots for currently supported change actions;
+- canonical dataset count/hash and independently verifiable Excel export;
+- P-18 new-identity hold and structured-code exception guard;
+- separation from BOQ history, hotfix `016`, and Factor F governance.
+
+These controls explain why the current Local implementation fails safely. They
+do not remove the need for the operator-completeness work below.
+
+## 4. Release-blocking capability gaps
+
+| ID | Finding and current evidence | Required closure before full release |
+|---|---|---|
+| C-01 | Version detail reads only the first 20 price rows; the editor offers at most 12 active samples. Version/history reads also stop at fixed 25/50-row limits without pagination. There is no full-catalog search/filter route or item-detail/identity timeline route promised by the architecture. | Use deterministic paged data reads so PostgREST row caps cannot truncate the dataset, then load/filter all current items client-side within the measured 2,000-row threshold. Add exact item detail/field-level identity history and paginate version/audit registers instead of silently truncating them. |
+| C-02 | Multiple drafts are allowed by architecture, but overview/import silently select one current-base draft. A stale draft still renders mutation controls and fails only after submit. | Make exact draft selection explicit, show all valid/stale drafts, and render stale drafts read-only with a clear create-new-draft recovery path. |
+| C-03 | Manual/import mutation accepts free-form category and `AAA/TTT` names. Database helpers create missing categories/groups from caller text, although display categories must follow the Production-derived versioned set and P-06 approved a controlled 22/65 code-group dictionary. | Freeze the approved versioned categories and P-06 code groups, resolve existing IDs only, and move any future taxonomy creation to a separate audited governance decision. |
+| C-04 | Architecture requires the next never-issued sequence in an approved group, but the UI/RPC requires an arbitrary full `AAA-TTT-NNN` code. | Add a locked server allocator that selects the approved group, uses the next never-issued sequence, never fills retired gaps, and blocks at 900. Exact frozen first-rollout mappings remain a reviewed migration/import exception. |
+| C-05 | Import preview shows summary counts and diagnostics, not the complete server-recomputed add/update/recode/retire/unchanged diff or exact full-import omissions. Runtime context reads the draft reconciliation CSV from `docs/`, always supplies an empty price-authority map, and is not a version-owned reusable authority. | Seed/freeze the approved first-rollout mapping into reviewed implementation/database authority; keep the draft CSV as evidence only. Reconcile future imports against the exact selected draft and approved dictionaries, return/display the authoritative diff/omission set, and support bounded import-level price authority with explicit per-row override only when required. |
+| C-06 | Publication asks the admin to type `publishedByDisplayName` and stores it even though the DB contract defines an immutable authenticated actor snapshot. Date strings are regex-checked and then cast, so an impossible calendar date can escape the stable validation contract. | Derive publisher identity/display snapshot from the active authenticated profile and semantically validate ISO dates into stable errors before any cast/write. If a separate business approver is required, model and label it as separate approval metadata. |
+| C-07 | Physical archive reference exists only on import records. A manual-only version can publish without a version-level filing reference despite the Change Request/runbook requirement. | Add bounded version-level `physical_archive_reference`, require it for Phase 4-created publication, and retain the approved legacy-baseline exception. |
+| C-08 | The preliminary readiness RPC reports P-18/structured/P-19 counts but omits current-pointer base parity and the full dataset quality checks used later by publish. The UI can appear ready before the final DB function rejects. | Make readiness and publish consume the same complete private result, including stale base and canonical dataset quality. P-19 remains an explicit filing policy, not an invented DB publish rule. |
+| C-09 | Retire has no same-draft reactivation path. A mistaken newly added identity cannot be withdrawn before first publication without leaving an inactive row and a P-19 hold. | Add audited `reactivate` for an inherited inactive identity and narrowly scoped `withdraw` for an identity absent from the base. Withdrawal removes the draft row atomically but preserves identity/code reservation and audit. |
+| C-10 | Manual edit is a generic free-form form, is not prefilled from an exact item, and requires price authority even for a category-only change. | Use an exact item editor with current values, field-level diff, controlled selects, and require price authority only when name, unit, or money changes. |
+| C-11 | Many labels/statuses remain English; production-capable forms contain Local/WP placeholder evidence; UUID/lock/change-set details are primary success content. | Make the workflow Thai-first, remove synthetic defaults, separate draft save from whole-version publish, and move copyable technical IDs to support details. |
+| C-12 | The DB contract promised post-preflight nullability/order hardening, but `price_list` still permits nullable required fields/display order and has no per-version unique order constraint. | In an additive fix-forward migration, prove compatibility then enforce required nullability and the order constraints owned by the accepted scope. Do not rewrite migrations `017`-`019`. |
+
+P-18 placement and P-19 retired-row PDF policy are already recorded gates, not
+new discoveries from this audit. WP-7 BOQ/hotfix `016`/Factor F regression and
+WP-8 clean rehearsal/UAT/performance/advisors also remain required.
+
+## 5. Corrected work-package sequence
+
+| Order | Work package | Exit meaning |
+|---:|---|---|
+| 1 | WP-6.5 reliability and publish-boundary hardening | Preserve passed evidence for idempotency, concurrency, fail-closed guards, portability, and recovery. It is not an operator-completeness certificate. |
+| 2 | WP-6.6 admin workflow completeness and authority hardening | Close C-01 through C-12 with migration/RPC/UI/audit/tests and owner browser review. No Local reset is implied by planning this work. |
+| 3 | WP-7 permanent BOQ/hotfix `016` and Factor F regression preservation | Regression-only; no new Factor F or hotfix workflow. |
+| 4 | P-18 decision and WP-7.5 placement governance | Required for full Add/Supplement release; preserve inherited relative order while auditing every shifted numeric position. |
+| 5 | P-19 decision when Retire is in release scope | Resolve official PDF treatment before filing a candidate with inactive rows. |
+| 6 | WP-8 clean Local rehearsal and intended-admin UAT | Owner-approved reset, full workflow without developer/SQL help, performance, advisors, build/tests, and exact candidate evidence. |
+| 7 | P-12 through P-15 | Separate Production migration, deploy, enablement, and publication approvals. |
+
+WP-6.6 should be delivered in reviewable slices:
+
+- A: full catalog browse, exact item editor, and identity history/diff;
+- B: explicit draft selection and stale-draft read-only recovery;
+- C: resolve-only versioned categories/P-06 code groups and server code allocation;
+- D: authoritative import diff/omission preview and price evidence;
+- E: publisher/archive metadata and complete readiness parity;
+- F: `reactivate` and draft-only-new `withdraw` correction actions;
+- G: schema constraints, Thai workflow cleanup, observability, and full
+  DB/browser/UAT evidence.
+
+## 6. Migration and authority order
+
+Do not edit evidence-backed Local migrations `017`-`019`.
+
+- Reserve `020_master_catalog_phase4_admin_workflow_hardening.sql` for the
+  accepted WP-6.6 database changes.
+- Reserve `021_master_catalog_phase4_placement_governance.sql` for the later
+  P-18/WP-7.5 extension.
+- Keep `scripts/bootstrap-local-db.sh` at `009`-`015`, hotfix `016`, then
+  `017`-`019` until each new migration exists, is reviewed, and its bootstrap
+  inclusion is deliberately approved.
+- Any migration change invalidates the prior clean-rebuild fingerprint for the
+  new candidate and requires P-20/WP-7/WP-8 reruns. It does not erase the
+  historical evidence for the earlier reviewed commit.
+
+## 7. Deliberate deferrals and control visibility
+
+The following may remain outside Phase 4 without hidden debt only when the UI
+does not imply they are supported:
+
+- arbitrary reorder of inherited published identities;
+- creation/editing of new category or `AAA/TTT` dictionary definitions;
+- a second-person or multi-stage approval engine;
+- draft cancel/abandon lifecycle, stale-draft rebase/merge, and destructive
+  audit deletion; stale drafts remain filterable read-only comparison records
+  until a separate lifecycle decision exists;
+- server pagination/virtualization before the measured threshold;
+- BOQ Rebase, K-formula governance, new Factor F workflow, or hotfix expansion.
+
+If the owner chooses a limited first release, hide Add, Supplement, and Retire
+until their gates close. Update/recode may be released only after the shared
+WP-6.6 browse, draft, authority, publication metadata, readiness, and UAT gates
+pass. A disabled control with a truthful reason is acceptable; a visible path
+that can never finish is not.
+
+## 8. Effort and confidence
+
+The corrected full path is approximately **9-15 focused engineering days**,
+usually **2-3 calendar weeks** once owner decisions, review, reset approval, and
+intended-admin UAT are included. This is an effort range, not permission to skip
+gates or a guaranteed date.
+
+The confidence is higher than the earlier estimate because the work is now
+enumerated by capability and authoritative layer. Residual unknowns must be
+recorded as findings during each slice; no future document may call the feature
+"complete" without a capability matrix showing implementation and evidence for
+every in-scope row.
+
+## 9. Approval boundary
+
+The owner requested this full audit and plan alignment on 2026-07-12. That
+authorizes documentation correction and sequencing only. Decision P-21 in the
+Decision Register must explicitly authorize WP-6.6 Local-only implementation.
+It does not authorize a Local database reset, migration execution, Production
+access/write, feature enablement, publication, new Factor F work, or expansion
+of hotfix `016`.

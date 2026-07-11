@@ -7,12 +7,23 @@ verification remain separate gates
 **Prepared:** 2026-06-22
 
 **Owner decision recorded:** 2026-07-04 — approved according to the
-recommendation. The owner accepts the 26-threat control register, residual
+recommendation. The owner accepts the original threat/control baseline, residual
 Medium risk framing, incident-response procedure, required security tests, and
 re-review triggers. Required security tests, Supabase advisors, RLS/grants and
 function checks, import/export malicious fixtures, BOQ/Factor F regression,
 residual-risk acceptance, and re-review triggers are mandatory gates before
 Production. This approval does not authorize Production change.
+
+**P-18 threat amendment proposed:** 2026-07-12 — T-33 through T-36 define the
+minimum controls for proposed WP-7.5 and the owner-found comprehension
+gap. P-18 business acceptance and implementation remain pending; no Local reset
+or Production action is authorized.
+
+**Capability-audit amendment:** 2026-07-12 — T-37 through T-42 add the WP-6.6
+operator/authority threats found by
+[Audit #29](./29-phase4-owner-dev-completeness-audit.md). These are release
+gates, not evidence that Production has been touched or that migration `020` is
+implemented.
 
 **Applies to:** Master Catalog administration, local Excel parsing, draft
 changes, publication, history, and official Excel/PDF exports
@@ -36,6 +47,7 @@ In scope:
 - normalized import payload validation and apply;
 - publish and pointer restore;
 - item history and change evidence;
+- proposed new-identity placement confirmation after P-18 acceptance;
 - server-generated official Excel and print/PDF output;
 - Supabase Data API, RLS, grants, and function boundaries.
 
@@ -162,6 +174,16 @@ Risk is the residual risk after the listed controls are implemented and tested.
 | T-30 | Status, migration order, hashes, or rollback instructions drift across documents | Tracker authority/evidence index; single-owner facts; docs consistency check; fix-forward wording in migration/runbook authority | Automated authority-link/order/decision check plus reviewer grep/diff | Low after WP-6.5 |
 | T-31 | Hotfix `016` appears protected because SQL text tests pass while live BOQ save behavior regresses | Permanent Local DB/RPC suite covers all approved suffixes, catalog-authoritative fields, role/version negatives, and atomic rollback; run on relevant PR/rehearsal gates | Execute real `save_boq_with_routes` scenarios and Factor F/BOQ before/after snapshots | Medium until WP-7 closes |
 | T-32 | A multi-row mutation returns a safe validation error after an earlier row/change set already committed | Validate full payload before writes; fingerprint request/payload; lock desired codes; mutation writes run in a nested transaction block whose structured abort rolls back item, identity, code, and audit writes before returning the error | Live duplicate/collision and injected mutation-time failure prove row/code/change-set counts and lock version remain unchanged | Low after WP-6.5 live rollback evidence |
+| T-33 | A UI or privileged caller changes `display_order` without accepted placement governance, reorders inherited identities, or creates duplicate/gapped order | Direct writes revoked; exact placement RPC; active-admin check; deferrable unique `(version_id, display_order)`; contiguous-range and inherited-relative-order validation; publish rechecks the same invariants | Direct-write denial plus valid insertion, inherited swap, duplicate, gap, and cross-category anchor tests | Low after P-18/WP-7.5 |
+| T-34 | A placement was accepted, then a new identity/category/order change makes it stale while readiness still reports green | DB-owned placement revision increments on every placement-relevant mutation; append-only review must match current revision and exact new-identity coverage; publish uses the same private helper | Confirm placement, then add/change a row; readiness and publish return `P18_PLACEMENT_REVIEW_REQUIRED` until reconfirmed | Low after P-18/WP-7.5 |
+| T-35 | Inserting one row shifts hundreds of inherited numeric positions and partially commits, loses audit, or races another admin | One short transaction; draft/version lock plus request fingerprint and expected lock; deferrable uniqueness; deterministic renumber; complete old/new `place` snapshots for every shifted row; rollback on any rejection | Concurrent and injected-failure tests prove one outcome and zero partial rows/revisions/reviews/change items; performance measured at 710+ rows | Low after P-18/WP-7.5 |
+| T-36 | Technically safe UI language, rehearsal defaults, or prominent UUID/lock details cause an admin to mistake draft save for publication or submit fictional evidence | Thai-first labels/actions/status; no WP/local placeholder defaults; clear draft-save versus whole-version publish hierarchy; support details demoted but copyable; intended-admin comprehension UAT | Browser review and UAT explain version/draft/publish, complete one save, recover from an error, and identify real required evidence without developer help | Medium until WP-6.6/WP-8 UAT close |
+| T-37 | A partial 20-row view or hidden automatic draft choice causes the admin to miss an item, edit the wrong draft, or discover stale base only after submit | Full-catalog read within measured threshold; exact item/draft selection; all current/stale drafts visible; stale drafts read-only; server still verifies exact version/base/lock | Browser/UAT search first/middle/last rows, switch two drafts, and prove stale controls are disabled before submit | Medium until WP-6.6 |
+| T-38 | Free-form category/group names or caller-selected codes create unapproved taxonomy, collide, or refill a retired sequence | Freeze Production-derived versioned categories and P-06 code groups; resolve existing IDs only; locked server allocator uses next never-issued sequence and stops at 900; future dictionary authoring is separate governance | Unknown category/group denial, concurrent allocation, retired-gap, collision, capacity, and exact frozen-rollout fixtures | Medium until WP-6.6 |
+| T-39 | Client preview omits exact effects/omissions, runtime treats a draft docs CSV as authority, or no supported new-row price evidence exists, so approval is uninformed or Supplement cannot complete | Freeze first-rollout mapping in reviewed implementation/database authority; future reconciliation uses exact draft/dictionaries; server-recomputed complete diff/omission set; persisted preview fingerprint; bounded batch authority with per-row override only when needed | Evidence-file non-authority, add/update/recode/retire/unchanged, below/at-threshold omission, and approved/missing/mismatched authority tests | Medium until WP-6.6 |
+| T-40 | Caller types a misleading publisher name, impossible date escapes stable validation, manual-only publication lacks an archive reference, or preliminary readiness reports green while final publish rejects quality/stale base | Derive actor snapshot from authenticated profile; semantically parse dates; require version archive reference; one private readiness result owns stale-base/full-quality/P-18/structured counts and is consumed by UI and publish | Caller actor spoof, invalid-calendar-date, manual-only archive negative/positive, and readiness/publish parity fixtures | Medium until WP-6.6 |
+| T-41 | Mistaken retire or never-published add has no correction path, encouraging direct SQL, audit deletion, or needless draft reconstruction | Explicit audited reactivate; base-absent withdraw removes only draft row while preserving identity/code/audit; direct writes remain denied | Valid/invalid correction, published/base identity denial, replay, stale lock, rollback, and history tests | Medium until WP-6.6 |
+| T-42 | Nullable required price/order fields or duplicate/gapped order survive ordinary writes and fail only at publication | Post-preflight fix-forward nullability/order constraints plus shared quality checks; P-18 adds deferrable unique/contiguous placement order when accepted | Zero-null preflight, constraint violation, compatibility, clone, import, publication, and placement tests | Medium until WP-6.6/P-18 |
 
 ## 6. Validation boundaries and safe limits
 
@@ -236,6 +258,16 @@ measured operational or compliance needs justify it.
 - malicious/malformed/oversized workbook fixtures;
 - formula/external-link export fixture;
 - replay, stale-lock, stale-base, and concurrent publish tests;
+- full-catalog browse/history and explicit multi-draft/stale read-only tests;
+- versioned-category/P-06-group resolve-only and next-never-issued allocator role/race/capacity
+  tests;
+- complete import diff/omission and price-authority evidence tests;
+- authenticated publisher/version-archive/readiness-publish parity tests;
+- reactivate/withdraw identity-code-audit preservation and schema-constraint
+  tests;
+- after P-18 acceptance, placement role/direct-write, stale-review, invalid
+  anchor/order, inherited-relative-order, full shifted-row audit, rollback, and
+  concurrent confirmation tests;
 - immutable published rows, code registry, audit, and import evidence tests;
 - export row-count/hash mismatch fail-closed tests;
 - secret/client-bundle and browser-network inspection;
@@ -259,6 +291,8 @@ Re-review this model when any of these changes:
 - payload grows beyond the current limits or server-side parsing is introduced;
 - new external integration, webhook, scheduled job, or background worker;
 - a security incident, advisor blocker, or control failure.
+- new placement/reorder scope, a second approver role, or permission to reorder
+  inherited identities.
 
 ## 11. Approval record
 

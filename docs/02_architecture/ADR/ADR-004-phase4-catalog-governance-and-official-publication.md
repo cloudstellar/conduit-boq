@@ -16,6 +16,22 @@ separate from Master Catalog governance, and this approval does not authorize
 Production migration, deploy, feature enablement, publication, Factor F work,
 or legacy BOQ Factor F backfill.
 
+**P-18 planning amendment recorded:** 2026-07-12 — the owner authorized adding
+a narrow new-identity placement proposal and WP-7.5 to the Phase 4 plan. The
+exact P-18 business rules remain pending owner/data-custodian acceptance in
+[Review Note #28](../../plans/master-catalog/28-phase4-p18-placement-governance-review-note.md).
+This planning amendment does not authorize schema implementation, a Local reset,
+or any Production action and does not reopen Factor F or hotfix `016`.
+
+**Capability-completeness correction recorded:** 2026-07-12 — the existing ADR
+remains the approved governance direction, but the prior claim that Phase 4 was
+architecturally complete was broader than the end-to-end evidence. The safety
+core is retained; [Completeness Audit #29](../../plans/master-catalog/29-phase4-owner-dev-completeness-audit.md)
+adds WP-6.6 before WP-7 to close catalog browsing/history, exact draft
+selection, dictionary/code authority, import diff/evidence, publication
+provenance/readiness, correction paths, schema hardening, and operator UX. This
+is a planning correction, not Local reset or Production authorization.
+
 ## Context
 
 Production completed Master Catalog Phase 0 → 1A → 2 → 1B on 2026-06-21.
@@ -263,6 +279,21 @@ gate proceeds.
 Production migration, feature enablement, and catalog publication each require
 separate explicit owner approval. Approval of this ADR or P-01 alone does not
 authorize Production execution.
+
+### P-18 placement extension gate
+
+The current Local publish guard correctly blocks a draft containing identities
+absent from its base version. That hold remains the authority until P-18 is
+accepted and a DB-backed placement workflow passes Local evidence. The proposed
+WP-7.5 extension is deliberately narrow: it places only new identities by
+category and before/after anchor, preserves the inherited base relative order,
+uses the existing active-admin/audit/idempotency boundary, and leaves general
+reordering to a separate future Change Request.
+
+Do not infer placement approval from `max(display_order) + 1`, UI state, or
+free-form audit text. If P-18 is deferred for the first Production enablement,
+Add and Supplement must remain hidden/disabled in addition to the DB publish
+guard so operators are not offered a workflow they cannot complete.
 
 The immediate Factor F rollout completed before Master Catalog Phase 4. Root
 migrations `012` through `015` are applied, current Factor F default is

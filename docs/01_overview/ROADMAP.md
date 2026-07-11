@@ -61,33 +61,23 @@ Completed in Production on 2026-06-29:
 Evidence:
 [Factor F Production Rollout Closeout](../plans/factor-f/10-production-rollout-closeout.md).
 
-## Master Catalog Phase 4 — planned, not started
+## Master Catalog Phase 4 — Local implementation in progress; Production not started
 
-### Phase 4-0: decisions and safety
+### Completed Local evidence bands
 
-- [ ] Owner approves ADR-004 and Phase 4 Change Request
-- [ ] Approve AAA/TTT dictionary
-- [ ] Approve 710-row reconciliation outcomes
-- [ ] Resolve duplicate and 16 HDPE Crossing conflicts
-- [ ] Verify backup/restore and fresh Local rehearsal base
+- [x] WP-0 through WP-6 implementation slices and P-11 official-export visual evidence
+- [x] WP-6.5 bounded idempotency, guard, P-20, concurrency, recovery, and verifier evidence
+- [x] Production hotfix `016` incorporated before Local Phase 4 `017`-`019`
 
-### Phase 4A: additive data foundation
+These checks do not mean the complete operator workflow is release-ready.
 
-- [ ] Stable item identity and append-only code registry
-- [ ] Versioned categories and code groups
-- [ ] Import/change-set/full-snapshot audit tables
-- [ ] Approval/hash/count/lineage/lock metadata
-- [ ] Explicit grants, RLS, private functions, indexes, and constraints
+### Required remaining Local bands
 
-### Phase 4B: application and official outputs
-
-- [ ] NT CI-compliant catalog administration UI
-- [ ] Manual add/edit/retire/recode without Excel
-- [ ] Fixed-profile Full/Supplement import and row diff
-- [ ] Item history across versions/recodes
-- [ ] Evidence-gated immutable publish
-- [ ] Official stamped Excel/PDF with dataset hash
-- [ ] Audited pointer restore
+- [ ] WP-6.6 closes Capability Audit #29 C-01 through C-12
+- [ ] WP-7 permanent BOQ/hotfix `016` and Factor F regression preservation
+- [ ] P-18 decision plus WP-7.5 placement, or hide Add/Supplement and retain the guard
+- [ ] P-19 retired-row PDF policy when Retire is in release scope
+- [ ] WP-8 clean Local rehearsal, intended-admin UAT, performance, and advisors
 
 ### Phase 4C: rehearsal and controlled Production rollout
 
@@ -103,6 +93,8 @@ Plan and approval documents:
 - [Phase 4 review guide](../plans/master-catalog/00-phase4-review-guide.md)
 - [Phase 4 architecture plan](../plans/master-catalog/08-phase4-architecture-ci-plan.md)
 - [Phase 4 Change Request](../plans/master-catalog/09-phase4-change-request.md)
+- [Phase 4 capability completeness audit](../plans/master-catalog/29-phase4-owner-dev-completeness-audit.md)
+- [Phase 4 execution tracker](../plans/master-catalog/25-phase4-execution-progress-tracker.md)
 - [ADR-004](../02_architecture/ADR/ADR-004-phase4-catalog-governance-and-official-publication.md)
 
 ## Deferred Phase 4.2

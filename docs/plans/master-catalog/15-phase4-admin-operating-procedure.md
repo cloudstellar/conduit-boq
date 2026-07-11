@@ -1,6 +1,8 @@
 # Master Catalog Phase 4 Admin Operating Procedure
 
-**Status:** Draft procedure pending WP-6.5 implementation and intended-admin UAT
+**Status:** Target procedure pending WP-6.6 implementation, P-18/P-19 where
+applicable, and intended-admin WP-8 UAT. The current Local UI must not be treated
+as procedure-complete until those gates pass.
 **Audience:** Active Master Catalog administrators
 **Rule:** A draft is not official; published versions are immutable
 
@@ -29,6 +31,7 @@ factor version by assumption.
 | Draft | Working copy; not official | Yes, by active admin | No |
 | Published/Active | Official immutable version | No | Only when singleton pointer selects it |
 | Archived | Official historical version | No | No, but readable/exportable |
+| Stale Draft | Draft whose base is no longer Current; comparison only | No | No |
 
 The “current” badge follows the singleton pointer, not a screen-local choice.
 Phase 4 Core has no Archive action. A former current version remains
@@ -39,11 +42,13 @@ approved maintenance capability.
 
 1. Open **Master Catalog → Versions**.
 2. Confirm the version marked current.
-3. Select **Create draft from current version**.
-4. Enter the owner-approved proposed version under ADR-003
+3. Review all existing drafts and select the exact target. The application must
+   not silently choose one draft on your behalf.
+4. Select **Create draft from current version**.
+5. Enter the owner-approved proposed version under ADR-003
    annual/revision/patch rules, effective date, and reason.
-5. Review the base version and expected row count.
-6. Confirm creation once.
+6. Review the base version and expected row count.
+7. Confirm creation once.
 
 The new draft records `based_on_version_id`. If the current pointer changes
 later, the draft becomes stale and cannot publish. Create a new draft from the
@@ -58,18 +63,21 @@ all 710 names, units, and prices are unchanged before applying mappings.
 Use when one approved item must be added without replacing a workbook.
 
 1. Open the draft and choose **Add item**.
-2. Allocate/enter an approved code and code group.
-3. Enter item name, unit, category, material cost, and labor cost.
-4. Confirm calculated unit cost.
-5. Enter a specific reason and approval reference when price authority applies.
-6. Review the before/after preview and save.
+2. Select an approved category and `AAA/TTT` code group. Do not type a new
+   taxonomy name or choose a numeric suffix.
+3. Let the server reserve the next never-issued sequence in that group; stop if
+   capacity review is required at 900.
+4. Enter item name, unit, material cost, and labor cost.
+5. Confirm calculated unit cost.
+6. Enter a specific reason and real price-authority reference.
+7. Review the before/after preview and save.
 
 The item is not usable by ordinary users until the draft is published/current.
 Under P-18, any draft containing a newly added/supplement identity must remain
 unpublishable until placement governance is approved. The WP-6.5 guard should
 return `P18_PLACEMENT_REVIEW_REQUIRED` and keep the draft available for review.
-The Local WP-6.5 implementation now exposes this count from the same DB helper
-used by publish; live Local evidence is still required before the gate closes.
+The Local WP-6.5 guard safely exposes this count, but WP-6.6 and WP-7.5 must
+complete the operator path before it is release-ready.
 The draft/import preview must show this publication hold immediately after the
 new identity appears, together with the placement decision needed; do not wait
 until the final Publish click to inform the operator.
@@ -77,10 +85,11 @@ until the final Publish click to inform the operator.
 ## 5. Manual edit
 
 1. Search by legacy code, canonical code, or item name.
-2. Open the item and verify its identity/history.
+2. Confirm the search covers the complete selected version, then open the exact
+   item and verify its identity/history/current values.
 3. Choose **Edit in this draft**.
 4. Change only approved fields.
-5. Enter the reason; price changes also require price authority.
+5. Enter the reason; name, unit, or money changes also require price authority.
 6. Review highlighted field differences and save.
 
 If another admin saved first, the system returns a lock conflict. Refresh,
@@ -104,12 +113,24 @@ before the operator proceeds to publication readiness.
 
 1. Open item history and confirm stable identity.
 2. Choose **Recode in this draft**.
-3. Enter a never-issued approved canonical code and group.
+3. Select the approved group and let the server allocate the next never-issued
+   code. Do not reuse a gap or type an arbitrary suffix.
 4. Confirm the legacy code remains registered to the same identity.
 5. Enter reason and review the recode diff.
 6. Save.
 
 Never reuse a retired code or change a published row in place.
+
+### 7.1 Correct a mistaken draft action
+
+- Use **Reactivate in this draft** when an inherited identity was retired by
+  mistake. Confirm the same identity/code and review the old/new active state.
+- Use **Withdraw new draft item** only when the identity was created in this
+  draft and has never existed in the base/published catalog. This removes the
+  provisional draft row but retains identity, code reservation, and audit.
+- Never correct a mistake by deleting audit, reusing the code, or direct SQL.
+- If the action is not eligible, keep the draft and create a deliberate new
+  change/draft under the displayed recovery instruction.
 
 ## 8. Excel import
 
@@ -117,7 +138,8 @@ Never reuse a retired code or change a published row in place.
 
 1. Use only the approved workbook/profile.
 2. Confirm the raw file is filed physically and obtain its archive reference.
-3. Choose **Full** or **Supplement**:
+3. Explicitly select the exact current-base draft.
+4. Choose **Full** or **Supplement**:
    - Full: omitted current items are proposed for retirement.
    - Supplement: omitted items remain unchanged.
 
@@ -130,11 +152,15 @@ baseline—obtain an owner approval reference for the exact count before apply.
 1. Select the local `.xlsx`; the raw file stays in the browser.
 2. Wait for sheet/header/profile and source hash validation.
 3. Enter physical archive reference and reason.
-4. Review summary counts and row-level diff.
+4. Review the complete server-recomputed row diff, not only browser summary
+   counts. Confirm add/update/recode/retire/unchanged rows and every exact Full
+   omission.
 5. Filter errors, warnings, price differences, adds, retires, and recodes.
 6. Review publication holds for new-identity placement and retired-row PDF
    policy before applying; the UI must not present apply as publication-ready.
-7. Resolve every blocking row.
+7. For approved new rows, enter the real batch price-authority reference and
+   any explicit row override where the evidence differs.
+8. Resolve every blocking row.
 
 Browser validation is only a preview. The server revalidates the submitted
 normalized data. Browser-only preview creates no import record; server
@@ -173,6 +199,10 @@ Before requesting publication, verify:
 - unit cost equals material plus labor;
 - each change has actor, reason, time, and source;
 - approval/effective/archive references are complete;
+- the exact selected draft is current-base and all required rows are visible;
+- categories resolve to the Production-derived versioned set; code groups
+  resolve to the approved P-06 dictionary; allocation
+  evidence contains no caller-created suffix/taxonomy;
 - P-18/P-19 publication holds are visible before publish and include the
   required recovery/decision path;
 - the displayed request ID can be copied for support when a mutation result is
@@ -189,6 +219,8 @@ Publication is high impact.
 2. Resolve all blocking errors.
 3. Enter/confirm approval reference, approval document date, effective date,
    physical archive reference, and publish reason.
+   The publisher actor/name is shown from the signed-in profile and is not a
+   free-text evidence field.
 4. Review final diff totals, item count, and warning acknowledgements.
 5. Confirm no add/supplement/new identity rows are present unless P-18
    placement governance and guard evidence are approved.
@@ -249,11 +281,14 @@ Use only when a published current version must stop being used for new BOQs.
 | Profile not recognized | Confirm exact workbook/sheet/header version; do not map columns manually |
 | Payload/file/row too large | Stop and contact development; do not split data informally |
 | Price authority required | Preserve Production price or attach separately approved price change |
+| Unknown category/code group | Stop; select an approved versioned category or P-06 code group. Do not create taxonomy through an item form |
+| Code capacity review required | Stop automatic allocation at sequence 900 and obtain a separate owner/data-custodian decision |
 | Reconciliation required | Complete identity/code decision in the approved artifact |
 | Retirement approval required | Verify Full-import mode, type the exact retirement count, and enter the real owner approval reference |
 | Draft lock conflict | Refresh and reconcile the other admin's change |
 | Draft base stale | Create a new draft from Current and reapply approved changes; do not publish/rebase the stale draft |
 | Publish evidence required | Complete real approval metadata; do not use placeholder text |
+| Draft is stale/read-only | Select/create a current-base draft and deliberately reapply approved changes; do not rebase or force the stale draft |
 | Export hash mismatch | Do not distribute; report with request/version/hash details |
 | Placement review required | Keep the draft; do not publish. Obtain approved item placement under P-18 and rerun readiness checks |
 | Retired-row PDF policy required | Keep the draft; do not file the field-facing PDF until P-19 is approved |
@@ -265,6 +300,8 @@ Use only when a published current version must stop being used for new BOQs.
 - Direct database/table edits outside approved migration/functions
 - Editing or deleting a published version
 - Reusing an item code
+- Typing a new category/code-group definition or arbitrary code suffix through
+  an ordinary item/import workflow
 - Treating workbook row number/`item_id` as identity
 - Publishing workbook price/K changes without authority
 - Changing Factor F through Master Catalog tools
@@ -279,6 +316,8 @@ Use only when a published current version must stop being used for new BOQs.
 - [ ] Version/base/effective date confirmed
 - [ ] Source/approval/physical archive references complete
 - [ ] Diff and warning totals reviewed
+- [ ] Exact draft/item selected; complete catalog/history available
+- [ ] Versioned category/P-06 code group and server-allocated code confirmed where relevant
 - [ ] Full-import retirement count/reference verified when threshold applies
 - [ ] Price authority confirmed or no price change
 - [ ] Request completed with recorded request ID
@@ -295,17 +334,24 @@ Developer DB/transport fault-injection evidence may prepare and verify the
 uncertain-response example, but it does not substitute for the intended admin
 recognizing the message and completing the recovery through the UI.
 
-1. create a draft using an ADR-003-valid version and identify its base;
-2. preview an approved workbook and explain Full versus Supplement impact;
-3. recognize and recover from at least three representative safe failures,
+1. view all drafts, identify stale/current-base state, create/select an exact
+   ADR-003-valid draft, and identify its base;
+2. search the complete catalog including first/middle/last rows and inspect one
+   item's field-level history;
+3. preview an approved workbook and explain Full versus Supplement impact,
+   complete row diff/omissions, and price authority;
+4. recognize and recover from at least three representative safe failures,
    including stale lock/base, placement/retirement hold, or invalid authority;
-4. review diff totals, item history, and publication readiness without SQL;
-5. locate version/status/count/hash in Excel/PDF and distinguish dataset hash
+5. perform one eligible reactivate or never-published withdraw correction and
+   explain what identity/code/audit evidence remains;
+6. review diff totals, item history, authenticated publisher/archive evidence,
+   and publication readiness without SQL;
+7. locate version/status/count/hash in Excel/PDF and distinguish dataset hash
    from binary file hash;
-6. handle an uncertain-response example using the same request ID, verify that
+8. handle an uncertain-response example using the same request ID, verify that
    submitted fields remain unchanged before retry, and confirm they reset only
    after success;
-7. restore to a safe screen without an irreversible mistake or developer help.
+9. restore to a safe screen without an irreversible mistake or developer help.
 
 Record task completion, misunderstood wording, recovery outcome, elapsed time,
 browser/device, and reviewer. A failed or developer-dependent critical task

@@ -6,9 +6,11 @@ migration approval remain separate gates
 
 **Prepared:** 2026-06-22
 
-**Last updated:** 2026-07-11 to expand WP-6.5 reliability gates, add P-20
-identity/hash portability, and enforce reusable ADR-003 version paths after
-production hotfix `016` was merged into the Phase 4 migration chain
+**Last updated:** 2026-07-12 to record the WP-6.6 capability/authority hardening
+from [Audit #29](./29-phase4-owner-dev-completeness-audit.md) and the proposed
+P-18/WP-7.5 placement extension. Existing `017`-`019` remain the implemented
+Local contract; WP-6.6 migration `020` is planned, while P-18 rules and
+placement migration `021` remain pending owner/data-custodian approval
 
 **Owner decision recorded:** 2026-07-04 — approved according to the
 recommendation as the technical backbone for Phase 4A and every Phase 4 write
@@ -105,10 +107,13 @@ erDiagram
     CATALOG_IMPORTS o|--o{ CATALOG_CHANGE_SETS : produces
     CATALOG_CHANGE_SETS ||--o{ CATALOG_CHANGE_ITEMS : contains
     CATALOG_ITEM_IDENTITIES ||--o{ CATALOG_CHANGE_ITEMS : follows
+    PRICE_LIST_VERSIONS ||--o{ CATALOG_PLACEMENT_REVIEWS : accepts
+    CATALOG_CHANGE_SETS ||--o| CATALOG_PLACEMENT_REVIEWS : records
 ```
 
-The diagram is semantic. Exact foreign keys and deletion behavior are defined
-below.
+The diagram is semantic. `CATALOG_PLACEMENT_REVIEWS` is proposed for WP-7.5 and
+does not exist until P-18 is accepted and migration `021` is implemented. Exact
+foreign keys and deletion behavior are defined below.
 
 ## 4. Design principles
 
@@ -187,7 +192,8 @@ Add:
 | `approval_document_date` | `date null` | Required before publish |
 | `published_at` | `timestamptz null` | Set only by publish function |
 | `published_by` | `uuid null` | FK to `auth.users(id) ON DELETE SET NULL` |
-| `published_by_display_name` | `text null` | Immutable readable actor snapshot; required before publish |
+| `published_by_display_name` | `text null` | Immutable readable actor snapshot derived from the authenticated active-admin profile; never caller-authored actor evidence |
+| `physical_archive_reference` | `text null` | Trimmed/bounded version-level filing reference; required for Phase 4-created publication even without import |
 | `dataset_hash` | `text null` | `sha256:` plus 64 lowercase hex characters |
 | `item_count` | `integer null` | Positive count computed by publish function |
 | `lock_version` | `integer not null default 0` | Optimistic concurrency token; nonnegative |
@@ -207,7 +213,12 @@ Rules:
 - Phase 4-created drafts require a valid `based_on_version_id` referencing a
   published version.
 - A newly active/archived Phase 4 version requires complete publication
-  metadata, hash, count, and approval evidence.
+  metadata, hash, count, approval evidence, and version-level physical archive
+  reference.
+- Publish derives `published_by` and `published_by_display_name` from the same
+  authenticated profile context used for the change set. If business later
+  requires a separate approver name, add a separately named/authorized field;
+  do not overload the actor snapshot.
 - Current legacy `2568.0.0` must receive owner-approved baseline metadata before
   the new publication-completeness constraint is validated. Do not invent an
   approval reference or effective date.
@@ -273,8 +284,10 @@ It is a draft allocation fallback, not publication approval. Until P-18
 placement governance is approved, `publish_catalog_version` must reject any
 draft whose `price_list.identity_id` does not exist in the draft's
 `based_on_version_id` rows, returning the stable safe code
-`P18_PLACEMENT_REVIEW_REQUIRED`. The full placement/review workflow is outside
-Phase 4 Core unless separately approved.
+`P18_PLACEMENT_REVIEW_REQUIRED`. The proposed separately gated WP-7.5 workflow
+is defined in
+[Review Note #28](./28-phase4-p18-placement-governance-review-note.md); until
+accepted and implemented, the current guard remains unchanged.
 
 Phase 4 should set `material_cost`, `labor_cost`, `unit_cost`, `is_active`,
 `created_at`, and `updated_at` to `NOT NULL` only after the preflight confirms
@@ -434,13 +447,62 @@ changes append item snapshots. This avoids 710 false “add” history entries.
 | `id` | `uuid` | PK |
 | `change_set_id` | `uuid` | FK change set, `ON DELETE RESTRICT` |
 | `identity_id` | `uuid` | FK identity, `ON DELETE RESTRICT` |
-| `action` | `text` | `add`, `update`, `retire`, or `recode` |
+| `action` | `text` | `add`, `update`, `retire`, `recode`, `reactivate`, or `withdraw`; proposed P-18 also adds `place` |
 | `old_values` | `jsonb null` | Null only for `add` |
-| `new_values` | `jsonb null` | Null only for `retire` |
+| `new_values` | `jsonb null` | Null only for `retire` or base-absent `withdraw` |
 
 Snapshots use the fixed canonical keys defined in the
 [parser/hash specification](./14-phase4-parser-and-canonical-hash-spec.md).
 Functions, not ad hoc client code, create these append-only rows.
+`reactivate` keeps the same identity/code and records complete old/new
+snapshots. `withdraw` is allowed only when the identity does not exist in the
+draft base; it atomically removes the provisional draft price row while
+retaining the allocated identity, code reservation, change set, and old
+snapshot. Neither action edits or deletes prior audit.
+
+### 6.8 Proposed `catalog_placement_reviews` (P-18 / WP-7.5)
+
+This table and the related columns/actions are a proposed contract pending the
+five owner/data-custodian decisions in Review Note #28. Do not implement them or
+weaken the current new-identity publish guard before that decision is recorded.
+
+Add `price_list_versions.placement_revision integer not null default 0` with a
+nonnegative check. Increment it only through reviewed draft functions whenever a
+new identity is added or category/order/active state can invalidate an accepted
+new-identity placement. Ordinary non-placement edits do not increment it.
+
+Proposed table:
+
+| Column | Type | Constraint |
+|---|---|---|
+| `id` | `uuid` | PK, `default gen_random_uuid()` |
+| `version_id` | `uuid` | Draft version FK, `ON DELETE RESTRICT`, not null |
+| `placement_revision` | `integer` | Nonnegative; unique with version |
+| `change_set_id` | `uuid` | Unique FK to a `placement` change set, `ON DELETE RESTRICT` |
+| `new_identity_count` | `integer` | Positive and equal to the reviewed current new-identity set |
+| `request_id` | `uuid` | Unique idempotency key/fingerprint authority |
+| `actor_id` | `uuid` | FK auth user, `ON DELETE RESTRICT` |
+| `actor_display_name` | `text` | Immutable bounded snapshot |
+| `reason` | `text` | Trimmed nonblank, bounded |
+| `created_at` | `timestamptz` | `not null default now()` |
+
+The table is append-only. Pending placement is represented by a draft whose
+current `placement_revision` has no matching accepted review; do not add a
+mutable client-controlled approval flag. Extend `catalog_change_sets.change_type`
+with `placement` and `catalog_change_items.action` with `place` for explicitly
+placed new identities and every inherited row whose `display_order` changes.
+Each changed row retains the normal complete old/new snapshot contract; do not
+hide deterministic shifts from audit. The review/change set records the affected
+range/count and resulting accepted revision.
+
+Add a deferrable unique constraint on `(version_id, display_order)` so an atomic
+renumber can defer intermediate collisions until transaction end. Placement and
+publish also validate `min(display_order) = 0`,
+`max(display_order) = row_count - 1`, and distinct-order count equals row count.
+The placement function must prove that filtering the candidate to base identities
+produces the same relative order as the base version. Existing rows after an
+insertion may receive different numeric `display_order` values; those shifts are
+expected and every changed row receives a `place` audit snapshot.
 
 ## 7. Index contract
 
@@ -456,6 +518,7 @@ Create and verify at minimum:
 | `catalog_imports` | `(version_id, created_at desc)`, unique `(request_id)` |
 | `catalog_change_sets` | `(version_id, created_at desc)`, `(import_id)`, unique `(request_id)` |
 | `catalog_change_items` | `(change_set_id)`, `(identity_id, change_set_id)` |
+| Proposed `catalog_placement_reviews` | unique `(version_id, placement_revision)`, unique `(change_set_id)`, unique `(request_id)`, `(actor_id)` |
 
 Every new FK must be checked for a supporting index after migration. Avoid
 duplicate indexes already covered by a unique key or another leftmost prefix.
@@ -476,6 +539,7 @@ automatic Data API exposure is never assumed.
 | Draft catalog data | No | No | Select permitted | None |
 | Identities/code registry | No | Select only as needed for published views | Select all | None |
 | Imports/change sets/change items | No | No | Select | None |
+| Proposed placement reviews | No | No | Select after P-18/WP-7.5 | None |
 | Public wrapper functions | No execute | No high-impact execute unless wrapper self-check rejects | Exact execute | Function-controlled |
 | Private schema/functions | No access | No Data API exposure | Invoked only through exact wrapper path | Function-controlled |
 
@@ -519,9 +583,10 @@ on every retry does not satisfy this contract.
 | Function | Purpose | Minimum inputs |
 |---|---|---|
 | `public.create_catalog_draft` | Clone a published base into a new draft | base/version numbers, name, reason, request ID |
-| `public.apply_catalog_changes` | Apply validated manual/import changes | version ID, change JSON or import payload hash, expected lock, reason, request ID, optional import ID |
+| `public.apply_catalog_changes` | Apply validated manual/import add/update/retire/recode/reactivate/withdraw changes | exact version ID, change JSON or import payload hash, expected lock, reason, request ID, optional import ID |
 | `public.publish_catalog_version` | Validate/hash/publish/move pointer | version ID, expected lock, approval metadata, reason, request ID |
-| `public.get_catalog_publish_readiness` | Return bounded P-18, structured-code, and P-19 filing-warning counts from the same private helper used by publish | version ID |
+| `public.get_catalog_publish_readiness` | Return stale-base state, complete canonical dataset quality, P-18, structured-code, and P-19 filing-warning counts from the exact private result consumed by publish | version ID |
+| Proposed `public.place_catalog_items` | Validate and confirm one batch of pending new-identity placements in a draft | version ID, expected lock, ordered new-identity/category/anchor/relation payload, reason, request ID |
 | `public.restore_catalog_pointer` | Move pointer to prior published version | target version ID, reason, request ID |
 
 Mutation wrappers are thin `SECURITY INVOKER` functions with schema-qualified
@@ -568,16 +633,25 @@ secret values, raw workbook cells, or internal policy details.
 2. Lock draft version.
 3. Compare expected and stored `lock_version`.
 4. Lock affected identity/code rows in ascending identity/code order.
-5. Validate draft status, code ownership, categories/groups, costs, and mode.
-   For Full import, enforce the exact mass-retirement threshold and persisted
-   approval reference.
-6. Reject duplicate desired canonical codes before the first write. Allocate a
-   code under a transaction-scoped per-code advisory lock.
+5. Validate draft status and current base. Resolve category/group IDs only from
+   the approved versioned dictionary; ordinary item mutation must reject unknown
+   taxonomy rather than create it from caller text. Initial mapping authority is
+   frozen in reviewed seed/database data, not read from a runtime `docs/*draft.csv`
+   file. Validate costs and mode. For
+   Full import, enforce the exact mass-retirement threshold and persist the
+   approval reference plus exact server-computed omission set.
+6. Reject duplicate desired canonical codes before the first write. For normal
+   add/recode, lock the approved `AAA/TTT` group and allocate the next
+   never-issued sequence; do not fill retired gaps and stop before sequence 900.
+   A frozen exact first-rollout mapping is accepted only through its separately
+   reviewed reconciliation/import contract.
 7. Apply item rows in deterministic order inside a nested PL/pgSQL transaction
    block. Any structured rejection after the change-set insert raises a local
    abort; the exception handler returns a safe action error only after all rows,
    code/identity allocations, and audit writes in that block roll back.
-8. Append change set/items and increment lock version.
+8. Append change set/items and increment lock version. `reactivate` keeps the
+   identity/code; `withdraw` is limited to an identity absent from the base and
+   preserves identity/code/audit while removing only its draft price row.
 9. Mark import applied when applicable.
 
 ### Publish
@@ -586,8 +660,11 @@ secret values, raw workbook cells, or internal policy details.
 2. Acquire a transaction-scoped advisory lock using a constant publish key.
 3. Lock singleton pointer, then draft version, using the same order everywhere.
 4. Reject stale base or lock version.
-5. Validate reconciliation, codes, identities, categories/groups, prices,
-   approval metadata, row count, and no K fields.
+5. Load the exact shared readiness result and validate current base,
+   reconciliation, codes, identities, approved categories/groups, prices,
+   version-level archive reference, server-derived actor snapshot, row count,
+   complete canonical quality, semantically valid calendar dates, and no K
+   fields. Invalid date text returns a stable validation error before any cast.
 6. Enforce the P-18 publish guard: reject any target draft row whose
    `identity_id` is absent from the base version rows with
    `P18_PLACEMENT_REVIEW_REQUIRED`. Do not infer this solely from
@@ -602,6 +679,32 @@ secret values, raw workbook cells, or internal policy details.
 11. Set all legacy `is_default = false`, then target `true`, inside the same
    transaction.
 12. Append publish change set and commit.
+
+After P-18 is accepted and WP-7.5 passes, replace step 6 with the reviewed rule:
+when new identities exist, require the current nonnegative placement revision to
+have a matching append-only review; validate exact new-identity coverage,
+unique/contiguous order, same-category anchors, and unchanged inherited relative
+order. A later new identity or placement-relevant mutation increments the
+revision and makes the old review stale. The safe error code remains
+`P18_PLACEMENT_REVIEW_REQUIRED` for missing/stale review and uses separate stable
+codes for malformed order or scope violations.
+
+### Proposed placement confirmation (WP-7.5)
+
+1. Authorize active admin, feature flag, and accepted P-18 capability.
+2. Claim/fingerprint the request ID under the existing per-request advisory lock.
+3. Lock the draft version and compare expected `lock_version`.
+4. Load base/candidate identities and validate complete unique pending-new-item
+   input, categories, same-category anchors, and before/after relations.
+5. Construct the resulting total order while preserving inherited relative
+   order. Assign contiguous zero-based values; shifted inherited numeric values
+   are expected.
+6. Update all changed draft rows under the deferrable unique-order constraint,
+   append complete `place` old/new snapshots for every shifted row, append the
+   placement change set/review, and increment both placement and draft lock
+   versions in one short transaction.
+7. Return the accepted revision and prior idempotent result when replayed with
+   the same payload. Any rejection rolls back rows, revisions, audit, and review.
 
 ### Pointer restore
 
@@ -651,6 +754,18 @@ When implementation begins:
 11. Run Local reset, DB tests, RLS matrix, advisors, and query-plan checks.
 12. Record migration SHA-256 and obtain separate Production approval.
 
+Implement the accepted Audit #29 DB corrections only in additive fix-forward
+migration `020_master_catalog_phase4_admin_workflow_hardening.sql`. It owns the
+WP-6.6 authority/readiness/correction/constraint changes; it must not rewrite
+`017`-`019`, hotfix `016`, BOQ behavior, or Factor F state. Add `020` to
+`scripts/bootstrap-local-db.sh` only with its reviewed implementation/tests.
+
+If P-18 is accepted, implement the placement extension only in append-only
+migration `021_master_catalog_phase4_placement_governance.sql`. Do not edit or
+renumber `017`-`020`. Add `021` to bootstrap only in the same reviewed
+implementation change, then rerun P-20, WP-7, order, RLS, concurrency, export,
+and WP-8 clean-rebuild evidence.
+
 Do not edit an applied migration file. Forward-fix with a new reviewed
 migration.
 
@@ -676,12 +791,25 @@ migration.
 - anonymous reads/writes and function calls fail;
 - staff see only approved published data;
 - active admins see drafts/audit and can mutate only through functions;
+- all current-base drafts are explicitly selectable, stale drafts are
+  nonmutable, and no import/mutation silently chooses one draft;
+- Production-derived versioned categories and approved P-06 code groups are
+  frozen/resolved without free-form creation,
+  and server allocation never reuses a retired sequence;
+- readiness and publish agree on stale-base and complete dataset quality;
+- Phase 4-created publication stores a version-level archive reference and
+  authenticated actor snapshot;
+- reactivate/base-absent-withdraw correction paths preserve identity/code/audit
+  and are atomic;
 - pointer and legacy `is_default` mirror agree;
 - current app flows remain unchanged while feature flag is disabled;
 - clean-reset identity/hash output matches the P-20 approved portability model;
 - reusable version functions pass ADR-003 fixtures beyond `2568.1.0`;
 - same-ID timeout/retry and two-session publish/restore behavior pass live Local
   DB tests;
+- after P-18/WP-7.5, valid placement shifts numeric positions atomically while
+  preserving inherited relative order; invalid/stale/concurrent placement has no
+  partial row, audit, revision, pointer, BOQ, or Factor F effect;
 - security/performance advisors have no unresolved blocker.
 
 ## 14. Retention and deletion
@@ -706,6 +834,8 @@ migration.
 - No event sourcing framework beyond the three lean audit tables
 - No server pagination or table partitioning at 710 rows
 - No automatic destructive rollback
+- No arbitrary reorder of identities inherited from the base version under the
+  proposed P-18 V1 extension
 
 ## 16. Approval record
 
