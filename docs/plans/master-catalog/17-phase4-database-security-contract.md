@@ -6,8 +6,9 @@ migration approval remain separate gates
 
 **Prepared:** 2026-06-22
 
-**Last updated:** 2026-07-07 to add WP-6.5 publish-boundary guard sequencing
-after production hotfix `016` was merged into the Phase 4 migration chain
+**Last updated:** 2026-07-11 to expand WP-6.5 reliability gates, add P-20
+identity/hash portability, and enforce reusable ADR-003 version paths after
+production hotfix `016` was merged into the Phase 4 migration chain
 
 **Owner decision recorded:** 2026-07-04 — approved according to the
 recommendation as the technical backbone for Phase 4A and every Phase 4 write
@@ -194,6 +195,9 @@ Add:
 Rules:
 
 - Existing version-number uniqueness remains `UNIQUE (major, minor, patch)`.
+- Reusable draft/publish functions accept and validate ADR-003 CalVer-first
+  annual/revision/patch versions. `2568.1.0` is an exact rehearsal candidate,
+  not a hardcoded function constraint.
 - Status remains `draft`, `active`, or `archived` in Phase 4 Core.
 - Phase 4 Core publishes to `active` and does not expose a new archive
   transition. Former current versions remain active/published; the singleton
@@ -275,6 +279,15 @@ Phase 4 Core unless separately approved.
 Phase 4 should set `material_cost`, `labor_cost`, `unit_cost`, `is_active`,
 `created_at`, and `updated_at` to `NOT NULL` only after the preflight confirms
 zero nulls and Local rehearsal proves current application compatibility.
+
+P-20 must make baseline stable identities deterministic across the approved
+clean-rehearsal environments or explicitly revise the hash model before the
+migration fingerprint is frozen and before WP-6.5 exits/WP-7 starts. The
+preferred initialization uses each
+existing immutable baseline `price_list.id` as the one-to-one starting
+`catalog_item_identities.id`, after collision/coverage assertions, and then
+reuses that stable identity for clones. Do not alter the applied Production
+hotfix `016` or silently remove `identity_id` from the canonical hash.
 
 ## 6. New tables
 
@@ -493,6 +506,12 @@ secret/service role: server-only, never NEXT_PUBLIC
 Exact SQL types may be refined before migration review, but names, authority,
 idempotency, and transaction behavior are locked by this contract.
 
+The application caller creates one operation UUID before first submission and
+reuses it for the same payload after an uncertain response. Public/private
+functions return the prior safe result for a completed same-payload request and
+reject reuse with a different operation payload. A fresh server-generated UUID
+on every retry does not satisfy this contract.
+
 ### Public wrappers
 
 | Function | Purpose | Minimum inputs |
@@ -643,6 +662,10 @@ migration.
 - active admins see drafts/audit and can mutate only through functions;
 - pointer and legacy `is_default` mirror agree;
 - current app flows remain unchanged while feature flag is disabled;
+- clean-reset identity/hash output matches the P-20 approved portability model;
+- reusable version functions pass ADR-003 fixtures beyond `2568.1.0`;
+- same-ID timeout/retry and two-session publish/restore behavior pass live Local
+  DB tests;
 - security/performance advisors have no unresolved blocker.
 
 ## 14. Retention and deletion

@@ -16,6 +16,11 @@ migration, application deploy, feature enablement, publication of `2568.1.0`,
 Factor F changes, legacy BOQ Factor F backfill, or any unauthorized
 Production name/unit/price change.
 
+**Reliability amendment recorded:** 2026-07-11 — owner approved aligning the
+plan documents before further implementation. WP-6.5/WP-7/WP-8 now include the
+permanent safety, UAT, and drift controls in the Execution Pack. This docs-only
+amendment does not authorize Local reset or Production action.
+
 ## 1. Decision requested
 
 Approve detailed implementation and local rehearsal of Master Catalog Phase 4.
@@ -74,11 +79,13 @@ Production migration ledger includes:
 - `20260628190357_factor_f_seed_current_baseline`
 - `20260628190621_factor_f_publish_2569_0_0`
 - `20260628190757_factor_f_repair_legacy_snapshot_metadata`
+- `20260706090246_hotfix_preserve_boq_item_suffix`
 
 Supabase MCP verified after the Factor F rollout that root migrations `012`
 through `015` are applied, current Factor F default is `2569.0.0`, and legacy
 BOQs were not backfilled with a guessed Factor F version. Master Catalog Phase
-4 database migrations start at `017+`.
+4 database migrations start at `017+`; current Phase 4 drafts `017`-`019`
+remain Local only.
 
 The detailed post-Factor-F difficulty assessment and adjusted implementation
 sequence are recorded in the
@@ -89,7 +96,8 @@ evidence for the Factor F rollout, not a fixed Phase 4 preflight expectation.
 Every Production Phase 4 gate must record fresh live counts and the current
 split between legacy snapshot-only BOQs and version-bound Factor F BOQs.
 
-The previous P0 → 1A → 2 → 1B change is complete. Phase 4 has not started.
+The previous P0 → 1A → 2 → 1B change is complete. Phase 4 Local implementation
+is through WP-6 owner review; Phase 4 Production has not started.
 
 ## 3. Business outcome
 
@@ -135,6 +143,11 @@ After completion, an active admin can:
 - Server-side payload revalidation and stable error codes
 - Generated database types and reuse of existing Supabase client utilities
 - Feature flag defaulting to disabled
+- Stable client-owned operation IDs across uncertain retries
+- ADR-003 reusable annual/revision/patch version path without candidate
+  hardcoding
+- Early publish-block warnings, route failure/recovery states, Thai support
+  correlation, and bounded structured logs
 
 ### Evidence and operations
 
@@ -142,6 +155,9 @@ After completion, an active admin can:
 - Logical backup and restore verification
 - Row-level reconciliation and code dictionary approval
 - Official export verification
+- Live Local DB/RPC/RLS/concurrency and permanent hotfix `016` regression suite
+- Tracked semantic artifact verifier, authority consistency check, intended-admin
+  UAT, and 710-row performance baseline
 - Production runbook, verification report, admin procedure, and release note
 
 ## 5. Explicitly out of scope
@@ -227,8 +243,10 @@ scope.
 - File parsing occurs outside database transactions.
 - Publish uses a transaction-scoped lock and deterministic lock ordering.
 - `lock_version` rejects stale draft changes.
-- `request_id` makes apply/publish/restore retries idempotent.
+- A client/form-owned `request_id` makes create/manual/apply/publish/restore
+  retries idempotent only when the same ID is reused after an uncertain result.
 - Migration lock and statement timeouts are bounded.
+- Two-session Local DB tests prove advisory-lock ordering and timeout behavior.
 
 ## 10. Risk assessment
 
@@ -245,6 +263,12 @@ scope.
 | Legacy `is_default` becomes stale | Medium | Medium | Sync in publish/restore transaction | Pointer/flag mismatch |
 | Oversized payload fails unpredictably | Low | Medium | 750 KB application cap, tested error | Payload exceeds cap |
 | Factor F change hidden inside catalog work | Medium | High | Completed Factor F closeout is treated as a protected baseline; Phase 4 has no Factor F write path | Any Factor F row/value/pointer change in this CR |
+| Retry after timeout creates a second business effect | Medium | High | Client-owned stable operation ID plus timeout-after-commit test | Same intended retry reaches DB with a new ID or creates a second change set |
+| Clean rebuild hash cannot be reconciled | High until P-20 | High | Deterministic baseline identity or explicitly approved dual-hash contract | P-20 unresolved or clean approved environments disagree |
+| Future version needs a code hotfix | High with hardcoding | High | Generic ADR-003 version validation and multi-version fixtures | Reusable path requires a `2568.1.0` code change |
+| Hotfix behavior regresses despite static tests | Medium | High | Permanent live DB/RPC suffix/authority/rollback suite | Any approved suffix or authoritative catalog field behaves incorrectly |
+| Admin learns a business blocker only at publish | Medium | Medium | Early preview/readiness warning plus final DB guard and UAT | UAT cannot identify/remediate placement or retired-row hold before publish |
+| Documents/evidence disagree | Medium | High | Tracker authority index and automated consistency check | Migration/WP/decision/rollback facts conflict |
 
 ## 11. Preconditions before implementation/local rehearsal
 
@@ -291,6 +315,13 @@ pretend a publishable candidate has been approved.
 - [ ] Security and performance advisors have no unresolved blocker
 - [ ] `npm test`, `npm run lint`, `npm run build`, and production audit pass
 - [ ] Feature flag defaults to disabled
+- [ ] P-20 identity/hash portability is approved and proven
+- [ ] Stable request-ID timeout/retry and two-session concurrency tests pass
+- [ ] ADR-003 reusable version path passes beyond `2568.1.0`
+- [ ] Permanent live DB hotfix `016`/BOQ/Factor F regressions pass
+- [ ] Tracked export verifier and documentation consistency checks pass
+- [ ] Intended-admin UAT, safe Thai recovery/log correlation, and 710-row
+      performance evidence pass
 - [ ] Owner explicitly approves the Production migration window
 
 When all checks above are green, package the evidence for owner/verifier review
@@ -308,6 +339,9 @@ plan.
 - [ ] Diff totals and all blocking warnings are accepted
 - [ ] Draft base still equals the current pointer
 - [ ] Excel/PDF generation passes against the candidate in rehearsal
+- [ ] P-20-compliant dataset hash and tracked semantic artifact verification pass
+- [ ] Stable publish operation ID/concurrency evidence is recorded
+- [ ] P-18/P-19 decisions/holds are satisfied for the exact candidate
 - [ ] Full-import below/at mass-retirement threshold tests pass and required
       approval evidence is persisted
 - [ ] Owner explicitly approves publication of the named version
@@ -338,7 +372,14 @@ Detailed execution is in the
 - Item history follows identity across recodes.
 - Unauthorized roles cannot read administrative audit details or mutate data.
 - Stale/duplicate requests fail safely.
+- Uncertain retries reuse one operation ID and cannot create duplicate effects.
 - Official Excel/PDF hash and count match the selected published version.
+- The P-20 hash model reproduces across the approved clean-rehearsal scope.
+- Reusable version creation follows ADR-003 beyond the first candidate.
+- Live DB hotfix `016`, role/version, transaction rollback, and concurrency
+  regressions pass permanently.
+- Intended admins can complete and recover from the workflow without
+  developer/SQL assistance.
 - Existing BOQs and current user flows pass regression checks.
 - Pointer restore is audited and does not rewrite historical BOQs.
 - No Factor F value is changed, and no old BOQ is backfilled with a guessed

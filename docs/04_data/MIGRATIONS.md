@@ -1,7 +1,7 @@
 # Migrations
 ## Conduit BOQ System
 
-**Last Updated:** 2026-07-06
+**Last Updated:** 2026-07-11
 **Status:** Canonical
 
 ---
@@ -71,14 +71,14 @@ Hotfix `016` is a production issue patch that runs before Master Catalog Phase
 4. Master Catalog Phase 4 database migrations start at `017+` after Phase 4
 rebases/merges this hotfix from `main`.
 
-WP-6.5 is planned before WP-7 to harden the local-only Phase 4 publish path:
-before any Production request, the draft `019` publish/pointer migration line
-must reject add/supplement/new-identity publication with
-`P18_PLACEMENT_REVIEW_REQUIRED` until P-18 placement governance is approved,
-and must enforce that the first structured-code candidate has no active legacy
-`ITEM-####` row except the approved `ITEM-0139` exception. This is not a new
-Production hotfix and must not be applied to Production without the normal
-Phase 4 P-12+ approvals.
+WP-6.5 is planned before WP-7 to harden the local-only Phase 4 mutation and
+publish path. Migration-facing work includes the P-18 new-identity publish
+guard, the `ITEM-0139` structured-code exception guard, idempotency/concurrency
+behavior, and resolution of P-20 baseline-identity/hash portability before the
+Phase 4 migration fingerprint is frozen. Draft migrations `017`-`019` may be
+amended while they remain Local only; applied hotfix `016` must not be edited.
+This is not a new Production hotfix and must not be applied to Production
+without the normal Phase 4 P-12+ approvals.
 
 `010a_master_catalog_phase1a_indexes.sql` is an operational runbook rather than
 a transactional migration. Run its `CREATE INDEX CONCURRENTLY` statements one
@@ -131,7 +131,13 @@ Currently, only one rollback script exists:
 
 - **`002_rollback_multi_route_support.sql`**: Removes `boq_routes` table and `route_id` from `boq_items`, restoring the system to single-route mode. Any multi-route BOQs created after migration 002 will be lost.
 
-For other migrations, rollback must be performed manually by reversing the specific DDL/DML changes.
+For every other applied Production migration, do not improvise a manual reverse
+operation. Follow the owning runbook: keep/disable the feature flag, restore an
+audited business pointer when applicable, revert the compatible application
+deployment when needed, and fix forward with a separately reviewed migration.
+A destructive rollback is allowed only when an explicit rollback migration or
+script has been reviewed, restore-tested, fingerprinted, and approved for that
+exact incident/window. Never edit an applied migration file.
 
 ---
 

@@ -10,8 +10,8 @@
 - Factor F versioning: **เสร็จแล้วก่อน Phase 4; default ปัจจุบันคือ
   `2569.0.0` และ BOQ เก่าไม่ได้ถูก backfill**
 - Phase 4 Admin/Import/Publish/Official Export: **local implementation ถึง
-  WP-6 พร้อม owner review; WP-6.5 publish guard, WP-7/WP-8 และ Production
-  gates ยังไม่เริ่ม**
+  WP-6 พร้อม owner review; WP-6.5 reliability hardening, WP-7/WP-8 และ
+  Production gates ยังไม่เริ่ม**
 - รอบถัดไปของ Phase 4: **เริ่มจาก baseline หลัง Factor F `012-015` และ
   production hotfix `016`; Phase 4 migrations คือ `017+`**
 - เอกสาร Phase 4 ต้องใช้ live preflight count เสมอ เพราะ BOQ ใหม่อาจเพิ่ม
@@ -42,6 +42,31 @@
 เป็น dashboard อ่านเร็วสำหรับ owner และใช้
 [Verification Report](./13-phase4-verification-report.md) เป็นหลักฐานละเอียด
 ตาม gate.
+
+## Authority และกฎป้องกัน drift
+
+เอกสารแต่ละฉบับมีหน้าที่เดียวเป็นหลัก หากข้อมูลขัดกันให้หยุดและแก้ authority
+ต้นทางก่อนแก้ implementation:
+
+| เรื่อง | Authority |
+|---|---|
+| Architecture, trust boundary และ invariant | [Architecture Plan](./08-phase4-architecture-ci-plan.md), ADR-003/ADR-004 และ [DB Contract](./17-phase4-database-security-contract.md) |
+| Owner/data decision | [Decision Register](./19-phase4-decision-register.md) |
+| Work-package status, blocker และ next safe step | [Execution Progress Tracker](./25-phase4-execution-progress-tracker.md) |
+| Detailed test/result/hash evidence | [Verification Report](./13-phase4-verification-report.md) |
+| Local/Production execution and recovery | [Production Runbook](./12-phase4-production-runbook.md) และ [MIGRATIONS.md](../../04_data/MIGRATIONS.md) |
+| Excel/PDF presentation contract | [Official Export Specification](./20-phase4-official-export-spec.md) |
+| Admin workflow and UAT | [Admin Operating Procedure](./15-phase4-admin-operating-procedure.md) |
+
+ห้ามคัดลอก volatile status, latest commit, artifact hash หรือ test result ไป
+หลายเอกสารโดยไม่จำเป็น ให้เอกสารอื่นลิงก์ไป authority ข้างต้นแทน Current Git
+HEAD เป็น authority ของ commit ปัจจุบัน; commit ที่สร้างหลักฐานแล้วจึงบันทึกใน
+Tracker/Verification Report เพื่อหลีกเลี่ยง self-referential SHA drift.
+
+การเปลี่ยน schema, permission, canonical hash, publish gate, migration order,
+rollback หรือ official export ต้องแก้ authority, acceptance test และ
+verification template ใน change set เดียวกัน. WP-6.5 ต้องเพิ่ม automated
+consistency check สำหรับ contract ที่ตรวจด้วยเครื่องได้.
 
 [แผนย้าย Supabase API key](../security/01-supabase-api-key-migration-change-request.md)
 เป็น maintenance แยก ไม่ต้องรวมใน Production change เดียวกับ Phase 4 และไม่
@@ -77,6 +102,8 @@
 | รูปแบบตัวอย่าง Excel/PDF ตาม Export Spec | ยังปิดงาน export acceptance ไม่ได้ |
 | P-18 placement governance สำหรับ add/supplement และ structured-code exception | ต้องทำ WP-6.5 publish-boundary guard ก่อน WP-7; ห้าม publish version ที่มี identity ใหม่จนกว่า guard และ placement decision พร้อม และ `2568.1.0` ต้องมี active legacy `ITEM-####` ได้เฉพาะ `ITEM-0139` |
 | P-19 PDF policy สำหรับรายการยกเลิกใช้ | ถ้า version ใดมี inactive/retired rows ต้องตัดสินใจว่าจะ exclude/mark/appendix ก่อน filed PDF |
+| P-20 canonical hash portability | ต้องตัดสินใจ deterministic baseline identity หรือปรับ hash contract ก่อน WP-6.5 exit/WP-7 และ WP-8/P-15; ห้ามอ้าง hash ต่าง environment ว่าเท่ากันขณะยังไม่ปิด decision |
+| Version lifecycle ตาม ADR-003 | ADR-003 รองรับ annual/revision/patch อยู่แล้ว; WP-6.5 ต้องเอา hardcoded `2568.1.0` ออกจาก reusable action/RPC path และพิสูจน์รุ่นอื่นด้วย test ไม่ใช่รอ business decision ใหม่ |
 | Live Production preflight หลัง Factor F rollout | ต้อง refresh ก่อนทุก Production gate; ห้ามใช้ BOQ count จาก closeout เป็นค่าตายตัว |
 
 ## ตัวเลข reconciliation ที่ต้องใช้เป็นจุดตรวจ

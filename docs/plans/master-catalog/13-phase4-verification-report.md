@@ -1,6 +1,6 @@
 # Master Catalog Phase 4 Verification Report
 
-**Status:** In progress — WP-0 through WP-6 local implementation evidence recorded; final export artifacts and Production gates pending
+**Status:** In progress — WP-0 through WP-6 Local evidence recorded; WP-6.5 reliability, WP-7 permanent regressions, WP-8/UAT, final artifacts, and Production gates pending
 **Prepared:** 2026-06-22
 **Production project:** `otlssvssvgkohqwuuiir`
 **Candidate version:** `2568.1.0` (pending owner approval)
@@ -11,6 +11,11 @@ Fill every applicable evidence cell. Use `Passed`, `Failed`, `Blocked`, or
 `Not applicable` with a reason; do not leave an executed gate ambiguous.
 Point-in-time counts must include timestamp/time zone and source. A failed
 blocking gate stops the rollout.
+
+Use the authority/evidence index in the
+[Execution Progress Tracker](./25-phase4-execution-progress-tracker.md). This
+report owns detailed executed results, commands, counts, and hashes; other plans
+should link here rather than copy volatile evidence.
 
 ## 2. Execution summary
 
@@ -42,6 +47,7 @@ blocking gate stops the rollout.
 | Official export specification | Owner | Approved for implementation/local rehearsal | 2026-07-04 | Owner chat approval; P-10/P-11, reviewer sign-offs, and Production publication separate |
 | Post-Factor-F Adjustment Plan reviewed | Owner | Approved for implementation/local rehearsal | 2026-07-04 | Owner chat approval; Production gates separate |
 | Implementation Execution Pack reviewed | Owner | Approved for WP-0 through WP-8 | 2026-07-04 | Owner chat approval; Production gates remain separate |
+| Reliability plan/authority alignment | Owner | Approved for docs-only alignment | 2026-07-11 | Expanded WP-6.5/WP-7/WP-8 gates and P-20; no Local reset or Production authorization |
 | Code dictionary | Owner | Approved as candidate dictionary/governance framework; P-02 through P-07 row/code decisions now recorded separately | 2026-07-04 | Owner chat approval; publication gates separate |
 | Row reconciliation | Owner | Approved as draft evidence/framework; P-02 through P-07 row-level outcomes now recorded separately | 2026-07-04 | Owner chat approval; raw CSV is evidence, not import authority |
 | Legacy `2568.0.0` publication metadata | Owner/records custodian | Approved via P-08 for baseline metadata backfill | 2026-07-04 | Effective `2026-01-01`; approval ref `เอ็นที วทฐฐ./405 ลงวันที่ 27 พ.ย. 2568`; approval doc date `2025-11-27`; publisher `ผู้จัดการฝ่ายท่อร้อยสาย (ทฐฐ.)` |
@@ -139,6 +145,14 @@ fixed and reviewed.
 | Fresh Production preflight | Live counts, pointer, Factor F, BOQ split, and drift recorded |  | Pending |
 | Backup/restore gate | Fresh backup manifest and clean Local restore test pass |  | Pending |
 | Hotfix `016` / migration order | Remote ledger includes `016`; clean Local bootstrap applies `009`-`015`, hotfix `016`, then Phase 4 `017+` before WP-8 evidence is accepted |  | Pending |
+| End-to-end request idempotency | UI/action/DB reuse one operation ID after timeout; changed payload with same ID rejects |  | Pending WP-6.5 |
+| Live DB integration/concurrency | Migrations, RPC/RLS/roles, rollback, two-session publish/restore, and lock timeout pass |  | Pending WP-6.5 |
+| P-20 hash portability | Approved clean-reset/cross-environment identity/hash model passes |  | Pending decision/WP-6.5 |
+| ADR-003 reusable version lifecycle | Another valid annual/revision/patch version passes; no reusable hardcoding to `2568.1.0` |  | Pending WP-6.5 |
+| Tracked export verifier | Clean-checkout semantic Excel/PDF verification passes |  | Pending WP-6.5/P-11 |
+| Admin UAT and recovery | Intended admin completes core workflow and representative failures without developer/SQL assistance |  | Pending WP-8 |
+| 710-row performance baseline | Import preview, readiness, export, and admin interactions meet reviewed budget |  | Pending WP-8 |
+| Authority/document consistency | Migration/WP order, decision IDs, and authority links agree |  | Pending WP-6.5/WP-8 |
 | BOQ regression | Current BOQ flows and historical version links unchanged |  | Pending |
 | Factor F before/after assertion | Pointer, rows, hashes, grants, RLS, and BOQ bindings unchanged |  | Pending |
 | Advisors | No unresolved Phase 4 blocker |  | Pending |
@@ -238,6 +252,7 @@ Also verify:
 | Unauthorized price delta | Rejected | Pending |
 | Client-tampered payload | Server rejection | Pending |
 | Duplicate request ID | One effect/consistent result | Pending |
+| Timeout after import apply commit | Retry reuses same client-owned apply ID and returns prior result | Pending WP-6.5 |
 | Import status lifecycle | UI-only preview; `validated/rejected`; one transition to `applied` | Pending |
 | Import invalid status transition | Rejected without partial apply | Pending |
 | Validation/apply request IDs | Separate and idempotent | Pending |
@@ -256,6 +271,7 @@ Also verify:
 | History through recode | Same identity timeline | Pending |
 | Actor/display name/timestamp/source | Complete | Pending |
 | Audit update/delete | Rejected | Pending |
+| Manual/create uncertain retry | Same operation ID, payload, effect, and audit result after timeout; changed payload with same ID rejected | Pending WP-6.5 |
 
 ## 12. Publication tests
 
@@ -264,11 +280,14 @@ Also verify:
 | Missing approval evidence | Rejected | Passed in Local WP-5 smoke: `PUBLICATION_METADATA_REQUIRED`; pointer stayed on `2568.0.0` |
 | Stale base pointer | `DRAFT_BASE_STALE` | Passed in Local WP-5 smoke: a transient local-only active pointer fixture moved the singleton pointer under an existing draft; publish returned `DRAFT_BASE_STALE`, did not move the fixture pointer, and cleanup restored the pointer to `2568.0.0` before the real local publish |
 | Duplicate publish request ID | No duplicate effect | Passed in Local WP-5 smoke; duplicate publish returned `duplicateRequest=true` |
+| UI/action publish retry after uncertain response | Same client-owned request ID reaches DB and returns the prior result | Pending WP-6.5; current DB duplicate behavior alone is insufficient |
+| Two-session publish/restore race | One deterministic outcome, one stable conflict/timeout, singleton pointer remains exact | Pending WP-6.5 live DB concurrency evidence |
 | Publish transaction | Atomic | Passed in Local WP-5 smoke and browser proof; rejected publish attempts did not move pointer, successful publish moved pointer/metadata/audit together, and the admin UI showed publish change-set evidence after submit |
 | Publish invalid status transition | Rejected without pointer movement | Passed in Local WP-5 smoke: active-version republish rejected as `VERSION_NOT_PUBLISHABLE` |
 | P-18 add/supplement publish guard | Draft with any `identity_id` absent from its base version rejects with `P18_PLACEMENT_REVIEW_REQUIRED`; no pointer, metadata, BOQ, or Factor F state changes | Pending WP-6.5 implementation and Local smoke |
 | Structured-code legacy exception guard | First structured-code candidate rejects if active legacy `ITEM-####` rows exceed the recorded `ITEM-0139` exception; positive and negative fixtures prove the boundary | Pending WP-6.5 implementation and Local/static evidence |
 | Dataset count/hash from DB | Stored | Passed in Local WP-5 smoke and browser proof after clean Local bootstrap: browser proof published `2568.1.0` with `item_count=710`, `dataset_hash=sha256:4a2a5fcc75f1510c5e037426a19c3110234856485157e5de6f3bd2eee459d1e8`; `2568.0.0` and `2568.1.0` matched after publish/restore. Note: Local clean-reset hashes are point-in-time environment fingerprints because Phase 4 identity UUIDs are generated during local migration |
+| ADR-003 reusable version path | Create/publish validation supports another valid annual/revision/patch fixture without reusable `2568.1.0` hardcoding | Pending WP-6.5 |
 | Pointer and `is_default` sync | Exact | Passed in Local WP-5 smoke and browser proof: publish moved pointer/default to `2568.1.0`; restore moved both back to `2568.0.0` |
 | Previous version remains readable | Yes | Passed in Local WP-5 smoke: former current `2568.0.0` remained `active` and readable |
 | Former current version after publish | Still Published/Active; immutable; not automatically archived | Passed in Local WP-5 smoke: `2568.0.0` stayed `active`, non-default after publish, then restored |
@@ -282,6 +301,7 @@ Also verify:
 | Check | Expected | Actual | Result |
 |---|---|---|---|
 | Golden fixture hash | `sha256:0e90d8974960a5ccd52b22b02eb0a6c60797f9234baeaefc32af8c1f9fa719b5` | Passed in canonical hash tests; full suite includes the golden fixture | Passed |
+| P-20 identity/hash portability | Approved deterministic baseline identity or dual-hash model reproduces across clean approved environments | Current clean bootstraps generate different baseline identity UUIDs; same-environment count/hash proof remains valid but is not cross-environment equivalence | Pending P-20/WP-6.5; blocks WP-8 hash acceptance |
 | Published item count | Approved count | Local browser print smoke for selected `2568.0.0` displayed 710 rows/count from DB; real Local DB-generated route proof exported `2568.0.0` with `itemCount=710`; selected-version data loader test fails closed on item-count mismatch | Passed for Local artifact proof; final owner/file acceptance pending |
 | Published dataset hash | One stored value | Local `2568.0.0` print smoke and real Local DB-generated route proof used `sha256:4a2a5fcc75f1510c5e037426a19c3110234856485157e5de6f3bd2eee459d1e8`; data loader recomputes and fails closed on mismatch | Passed for Local artifact proof; final owner/file acceptance pending |
 | Selected-version export paging | No silent fixed-limit truncation before count/hash verification | Export data loader now reads selected price rows, categories, code groups, change sets, imports, and change items through deterministic paged queries; `tests/master-catalog-export-data.test.ts` covers a 1,001-row selected version and verifies all rows are counted/hashed | Passed automated fixture |
@@ -298,6 +318,7 @@ Also verify:
 | PDF cover layout refinement | Larger top-centered NT company lockup, document title, and a distinct `ประจำปี 2568` line of the same title size and weight; a separate centered upper-middle metadata table contains only `ฉบับบัญชีราคา`, Thai status, effective date, item count, and full hash. No duplicate company/status text appears in the header. | Fresh Local `2568.0.0` route/PDF proof passed after the final terminology/title refinement: 19 pages/18 price sections, 710 DOM/PDF rows, sequence 1-710 with no breaks, full hash, watermark, and no page-clipping regression. The unfiled Local review PDF binary SHA-256 is `05b7d71b9076daa9374405a8104fec2fb2503d04f0a7db0ba31fb6f87f83553c`. | Passed Local visual proof; final owner/file acceptance pending |
 | Excel numeric cell types | Numeric, formatted | `tests/master-catalog-export-excel.test.ts` confirms price cost cells are numeric and formatted `#,##0.00` | Passed automated fixture |
 | Excel exact 5 sheets/headers; no formulas/external links | Exact | `tests/master-catalog-export-excel.test.ts` confirms exact five sheets/order, business headers, verification headers, and no formula/hyperlink cell values | Passed automated fixture |
+| Tracked semantic artifact verifier | Runs from clean checkout; finds headers by name; derives ranges; verifies schema/sheets/count/order/hash/types/formulas/links/PDF pages and binary hashes | Current detailed artifact inspection relies partly on untracked `tmp/` tooling and previously broke when a title row moved | Pending WP-6.5; required for final reproducible P-11 evidence |
 | Excel document-language alignment | Thai title/year lines of equal size and Thai user-facing metadata labels; canonical verification identifiers unchanged | Fresh Local workbook visual review confirmed `ข้อมูลเอกสาร` and `รายการราคา` show the title and `ประจำปี 2568` as separate equal-size lines, `ฉบับบัญชีราคา` is used on all user-facing summary sheets, and `ข้อมูลตรวจสอบ` retains canonical identifiers. Excel binary SHA-256 is `e58dc3d9b1472665dbfaf692a238e504321f75f0f86b66a277a69dcbb0ea7df3`. | Passed Local visual proof; final owner/file acceptance pending |
 | Formula-control text safety | Malicious strings remain inert text | `tests/master-catalog-export-excel.test.ts` covers formula-looking item text and confirms no formula/hyperlink cell values | Passed automated fixture |
 | PDF Thai font/header/page/clipping | Correct | Latest live-route PDF metadata shows A4, 19 pages, no form/JavaScript/encryption. PDF resource inspection shows embedded/subset `/NTRegular`, `/NTBold`, and `/Menlo-Regular`. Rendered pages 1, 15, 18, and 19 show the NT company lockup, field-facing title `รายการบัญชีราคามาตรฐานงานก่อสร้างท่อร้อยสายสื่อสารใต้ดิน ประจำปี 2568`, repeated table header, Thai table/footer text, `หน้า 1/19`, `หน้า 15/19`, `หน้า 18/19`, `หน้า 19/19`, no Chrome default header, no right-edge table clipping, row 527 on one line, dense middle pages, and acceptable natural whitespace on the final page | Passed Local visual artifact proof; final owner/CI acceptance pending |
@@ -336,9 +357,18 @@ refined PDF cover.
 | Existing legacy missing-Factor-F BOQ failure state |  |  | Pending |
 | Catalog version list/detail |  |  | Pending |
 | Import/diff/manual/history |  |  | Pending |
+| Add/retire blocker shown before apply/publish |  |  | Pending WP-6.5/P-18/P-19 |
+| Loading/error/not-found and retry/back paths |  |  | Pending WP-6.5 |
+| Thai user message + safe code/request ID |  |  | Pending WP-6.5 |
 | Keyboard/focus/errors/contrast |  |  | Pending |
 | NT font/logo/color/spacing | Local export artifact proof | PDF uses `next/font/local` runtime derivatives from approved NT Regular/Bold sources and the full NT company lockup derivative; Excel sets the NT font family and remains hash-stable at the dataset level | Passed for WP-6 export artifact proof; app-wide/primary-logo provenance reconciliation remains pending under P-10 |
 | Browser console/server errors |  |  | Pending |
+| Intended-admin UAT without developer/SQL help |  |  | Pending WP-8 |
+| 710-row interaction/import/export performance |  |  | Pending WP-8 |
+
+Structured log review must show operation, outcome, duration, version and
+request ID for representative failure/success cases without raw workbook rows,
+normalized payload, cookie/key, SQL, or approval-document content.
 
 Dashboard personal/system labels must remain unchanged unless a separate change
 request approves them.
@@ -352,6 +382,10 @@ request approves them.
 | `npm run lint` | Exit 0 | 2026-07-06 16:44 +07: exit 0 with 10 existing warnings after excluding generated `tmp/`, `output/`, `files/`, `CI/`, and nested `node_modules` artifacts from lint scope | Passed with existing warnings |
 | `npm run build` | Exit 0 | 2026-07-11 01:01 +07: escalated build passed, including `/admin/master-catalog/versions/[versionId]/print` and `/api/master-catalog/export/excel/[versionId]` | Passed |
 | `npm run audit:prod` | No unaccepted Production vulnerability |  | Pending |
+| Live Local DB integration/concurrency | Migration/RPC/RLS/role/rollback/race/timeout gates pass |  | Pending WP-6.5 |
+| Permanent hotfix `016`/BOQ/Factor F suite | Real RPC behavior and pre/post invariants pass |  | Pending WP-7 |
+| Tracked export artifact verification | Semantic verifier passes from clean checkout |  | Pending WP-6.5/P-11 |
+| Documentation consistency | Authority links, migration order, WP order, and decisions agree |  | Pending WP-6.5 |
 | Security advisor | No new blocker |  | Pending |
 | Performance advisor | No rollout blocker |  | Pending |
 | CI exact commit | Passed |  | Pending |

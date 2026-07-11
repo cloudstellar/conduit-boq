@@ -5,6 +5,11 @@ rehearsal; Production import/publication remains separately gated
 **Prepared:** 2026-06-22
 **Purpose:** Make import, publish, Excel, and PDF verification deterministic
 
+**Portability note:** P-20 is pending. The field/key/serialization contract
+remains approved, but clean-reset/cross-environment equality is not accepted
+until baseline stable identities are deterministic or an explicitly revised
+dual-hash contract is approved and implemented.
+
 **Owner decision recorded:** 2026-07-04 — approved according to the
 recommendation for implementation/local rehearsal. This approval accepts the
 deterministic parser profile, file/row/payload limits, browser-as-convenience
@@ -344,8 +349,9 @@ Every row is an object whose keys occur in this exact order:
 14. `is_active`
 15. `display_order`
 
-No version metadata, timestamp, actor, database row UUID, or export timestamp is
-included. Those values may differ without changing catalog content.
+No version metadata, timestamp, actor, version-row UUID such as
+`price_list.id`, or export timestamp is included. Stable logical
+`identity_id` is included as field 1 and is part of lineage equivalence.
 
 ### 10.2 Value rules
 
@@ -401,6 +407,27 @@ sha256:0e90d8974960a5ccd52b22b02eb0a6c60797f9234baeaefc32af8c1f9fa719b5
 Implementations in browser/server/database test tooling must reproduce it
 exactly before Production publication is allowed.
 
+### 10.6 Cross-environment identity portability
+
+The canonical algorithm is deterministic only when its input identities are
+deterministic. Current Local migration `017` generates new baseline identity
+UUIDs on each clean bootstrap, so two otherwise identical environments can
+produce different canonical dataset hashes.
+
+P-20 must choose and document one model before WP-6.5 exits and WP-7 starts:
+
+1. **Preferred:** deterministically initialize each baseline stable identity
+   from the existing immutable Production `price_list.id` or another reviewed
+   one-to-one mapping, then keep `identity_id` in this lineage hash.
+2. **Alternative:** define separate business-content and lineage hashes with
+   distinct field contracts, labels, storage, export, and verification rules.
+
+Do not silently remove `identity_id`, reinterpret the current hash, or use an
+environment-specific hash as proof that two independently rebuilt datasets are
+business-equivalent. Any selected change updates this spec, DB contract,
+migrations, canonicalizer, Excel verification fields, export spec, release-note
+template, golden fixtures, and Verification Report together.
+
 ## 11. Required tests
 
 - Exact and rejected profile detection
@@ -414,6 +441,9 @@ exactly before Production publication is allowed.
 - Stable error-code mapping without sensitive details
 - Canonical key/order/null/decimal/LF behavior
 - Golden fixture hash in every runtime using the canonicalizer
-- 710-row Production clone hash stable across repeat runs
+- 710-row Production clone hash stable across repeat reads with the same frozen
+  identity mapping
+- P-20 clean-reset/cross-environment fixture proves the selected identity/hash
+  portability model
 - Excel `_canonical_row_json` reconstructs the published database hash
 - PDF generation rechecks database count/hash and prints the matching values

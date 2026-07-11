@@ -1,6 +1,6 @@
 # Master Catalog Phase 4 Admin Operating Procedure
 
-**Status:** Draft procedure for UI implementation and training
+**Status:** Draft procedure pending WP-6.5 implementation and intended-admin UAT
 **Audience:** Active Master Catalog administrators
 **Rule:** A draft is not official; published versions are immutable
 
@@ -40,7 +40,8 @@ approved maintenance capability.
 1. Open **Master Catalog → Versions**.
 2. Confirm the version marked current.
 3. Select **Create draft from current version**.
-4. Enter the proposed version, effective date, and reason.
+4. Enter the owner-approved proposed version under ADR-003
+   annual/revision/patch rules, effective date, and reason.
 5. Review the base version and expected row count.
 6. Confirm creation once.
 
@@ -67,6 +68,9 @@ The item is not usable by ordinary users until the draft is published/current.
 Under P-18, any draft containing a newly added/supplement identity must remain
 unpublishable until placement governance is approved. The WP-6.5 guard should
 return `P18_PLACEMENT_REVIEW_REQUIRED` and keep the draft available for review.
+The draft/import preview must show this publication hold immediately after the
+new identity appears, together with the placement decision needed; do not wait
+until the final Publish click to inform the operator.
 
 ## 5. Manual edit
 
@@ -90,6 +94,9 @@ review their change, and reapply deliberately. Do not overwrite blindly.
 
 Retirement removes the item from the new version's active set; it does not
 delete identity, code registry, history, prior versions, or historical BOQs.
+Until P-19 is approved, show that a draft with retired rows cannot produce a
+final field-facing PDF and identify the required owner/data-custodian policy
+before the operator proceeds to publication readiness.
 
 ## 7. Recode an item
 
@@ -123,7 +130,9 @@ baseline—obtain an owner approval reference for the exact count before apply.
 3. Enter physical archive reference and reason.
 4. Review summary counts and row-level diff.
 5. Filter errors, warnings, price differences, adds, retires, and recodes.
-6. Resolve every blocking row.
+6. Review publication holds for new-identity placement and retired-row PDF
+   policy before applying; the UI must not present apply as publication-ready.
+7. Resolve every blocking row.
 
 Browser validation is only a preview. The server revalidates the submitted
 normalized data. Browser-only preview creates no import record; server
@@ -136,10 +145,12 @@ validation records `validated` or `rejected`.
    enter the owner approval reference.
 3. Apply once. The system resubmits the normalized payload for server hash
    comparison; the raw workbook still stays local and is not uploaded.
-4. A separate request ID protects this mutation; the validated import
+4. The screen creates and retains one apply operation ID; the validated import
    transitions once to `applied`.
 5. If the result is uncertain, refresh import/change history before retrying;
-   request ID prevents duplicate effects.
+   retry the same intended apply with the same operation ID so the prior result
+   is returned. Do not start a new operation ID until the prior result is known
+   or the operator explicitly begins a different apply.
 6. Review the created change set and item histories.
 
 K-formula columns are ignored/excluded in Phase 4 Core.
@@ -158,7 +169,11 @@ Before requesting publication, verify:
 - category and code group are complete;
 - unit cost equals material plus labor;
 - each change has actor, reason, time, and source;
-- approval/effective/archive references are complete.
+- approval/effective/archive references are complete;
+- P-18/P-19 publication holds are visible before publish and include the
+  required recovery/decision path;
+- the displayed request ID can be copied for support when a mutation result is
+  uncertain.
 
 Use item history to inspect any suspicious change. History follows identity
 through codes and versions.
@@ -179,7 +194,8 @@ Publication is high impact.
 7. If any inactive/retired rows are present, confirm P-19 official PDF policy.
 8. Confirm the version number and current base/pointer.
 9. Obtain explicit owner approval for this exact version.
-10. Type/confirm the version when prompted and publish once.
+10. Type/confirm the version when prompted and publish once. The screen retains
+    this publish operation ID until a definitive result.
 
 If publication succeeds, the version is immutable and the pointer moves
 atomically. Do not attempt to edit it.
@@ -188,8 +204,10 @@ atomically. Do not attempt to edit it.
 
 1. Open the published version, not merely “current.”
 2. Choose **ส่งออก Excel** and **พิมพ์ / บันทึก PDF**.
-3. Verify stamp includes version, effective date, published time/by, item count,
-   and full dataset hash.
+3. Verify the field-facing PDF cover includes only organization,
+   `ฉบับบัญชีราคา`, Thai status, effective date, item count, and full dataset
+   hash. Verify complete approval/publication/export metadata separately in
+   Excel/release/filing evidence.
 4. Confirm both export count/hash equal the version detail.
 5. Visually inspect Thai text, columns, page headers, and numeric formats.
 6. After each final file exists, calculate its binary SHA-256 and record it
@@ -223,6 +241,9 @@ Use only when a published current version must stop being used for new BOQs.
 | Draft base stale | Create a new draft from Current and reapply approved changes; do not publish/rebase the stale draft |
 | Publish evidence required | Complete real approval metadata; do not use placeholder text |
 | Export hash mismatch | Do not distribute; report with request/version/hash details |
+| Placement review required | Keep the draft; do not publish. Obtain approved item placement under P-18 and rerun readiness checks |
+| Retired-row PDF policy required | Keep the draft; do not file the field-facing PDF until P-19 is approved |
+| Result uncertain / timed out | Do not repeatedly create new submissions. Copy the request ID, refresh audit/state, and retry only through the same operation when instructed |
 | Factor F change requested | Out of scope for this procedure; do not edit Master Catalog data, Factor F data, or legacy BOQs |
 
 ## 14. Prohibited actions
@@ -250,3 +271,22 @@ Use only when a published current version must stop being used for new BOQs.
 - [ ] Item count/dataset hash recorded after publish
 - [ ] Excel/PDF verified; binary file hashes recorded; copies filed
 - [ ] Verification/release note updated
+
+## 16. Intended-admin UAT before feature enablement
+
+An intended active admin/data custodian, not the implementer, must complete this
+script on the approved Local/preview environment:
+
+1. create a draft using an ADR-003-valid version and identify its base;
+2. preview an approved workbook and explain Full versus Supplement impact;
+3. recognize and recover from at least three representative safe failures,
+   including stale lock/base, placement/retirement hold, or invalid authority;
+4. review diff totals, item history, and publication readiness without SQL;
+5. locate version/status/count/hash in Excel/PDF and distinguish dataset hash
+   from binary file hash;
+6. handle an uncertain-response example using the same request ID;
+7. restore to a safe screen without an irreversible mistake or developer help.
+
+Record task completion, misunderstood wording, recovery outcome, elapsed time,
+browser/device, and reviewer. A failed or developer-dependent critical task
+blocks P-14 until the UX/procedure is corrected and rerun.

@@ -40,6 +40,7 @@ catalog to roll back.
 - [Architecture Review Disposition](./21-phase4-architecture-review-disposition.md)
 - [Post-Factor-F Adjustment Plan](./22-phase4-post-factor-f-adjustment-plan.md)
 - [Implementation Execution Pack](./23-phase4-implementation-execution-pack.md)
+- [Execution Progress Tracker authority/evidence index](./25-phase4-execution-progress-tracker.md)
 - [Verification Report](./13-phase4-verification-report.md)
 - [Admin Operating Procedure](./15-phase4-admin-operating-procedure.md)
 - Reviewed migration SQL and file SHA-256
@@ -69,6 +70,13 @@ Stop immediately when any of these occurs:
   Factor F metadata, BOQ snapshots, or BOQ totals;
 - anonymous/non-admin access succeeds unexpectedly;
 - migration, test, build, smoke, hash, or export gate fails;
+- P-20 identity/hash portability remains unresolved when clean-rehearsal or
+  migration-fingerprint evidence is being accepted;
+- a retryable UI/action path generates a fresh request ID after an uncertain
+  response;
+- reusable version logic remains hardcoded to `2568.1.0` contrary to ADR-003;
+- live DB/RPC/RLS/concurrency, tracked artifact verification, admin UAT, or
+  documented recovery evidence required for the next gate is missing;
 - Supabase advisors show a new or untriaged security/performance finding for
   the Phase 4 change set;
 - unexpected active admin activity or simultaneous catalog edit is detected;
@@ -161,11 +169,16 @@ With feature flag disabled by default:
    recorded `ITEM-0139` exception.
 9. Test duplicate request ID, stale lock version, stale base pointer, invalid
    price delta, invalid identity/code reuse, and unauthorized role.
-10. Verify item history across a recode.
-11. Publish only an identity-unchanged approved path in Local, generate
+10. Simulate an uncertain response after commit and prove the UI/action retry
+    reuses the same operation ID and returns the prior result.
+11. Run two-session publish/restore contention and bounded timeout fixtures.
+12. Verify item history across a recode.
+13. Prove another ADR-003-valid annual/revision/patch version through reusable
+    validation without replacing the exact `2568.1.0` rehearsal candidate.
+14. Publish only an identity-unchanged approved path in Local, generate
     Excel/PDF, and compare count/hash.
-12. Test audited pointer restore and verify historical BOQs are unchanged.
-13. Rebuild from a clean Local reset and repeat the critical path only after
+15. Test audited pointer restore and verify historical BOQs are unchanged.
+16. Rebuild from a clean Local reset and repeat the critical path only after
     the owner approves the Local Supabase reset.
 
 ### 6.4 Repository gates
@@ -177,8 +190,11 @@ Run and record:
 - `npm run build`
 - `npm run audit:prod`
 - database/security tests
+- live DB/RPC/RLS/concurrency and timeout tests
 - desktop/mobile browser QA
-- Excel/PDF visual and hash verification
+- tracked semantic Excel/PDF visual/hash verification
+- documentation/authority consistency verification
+- intended-admin UAT and 710-row performance evidence
 
 **Exit gate:** Rehearsal and fresh reset both pass; no unresolved advisor or
 regression blocker.
@@ -202,6 +218,14 @@ Before requesting P-12, record:
   version/snapshot invariants;
 - Factor F before/after assertion plan showing no Master Catalog step mutates
   Factor F default pointer, rows, hashes, grants, RLS, or BOQ bindings;
+- stable operation-ID timeout/retry, structured log, and two-session
+  concurrency evidence;
+- P-20 clean-reset identity/hash portability evidence;
+- ADR-003 reusable version evidence beyond the exact first candidate;
+- tracked semantic artifact-verifier output;
+- route failure-state, Thai recovery message, intended-admin UAT, and 710-row
+  performance evidence;
+- authority/document consistency result;
 - security/performance advisor results with no unresolved Phase 4 blocker;
 - feature flag state proving the Phase 4 UI remains disabled by default;
 - owner go/no-go for P-12 Production migration.
@@ -373,8 +397,12 @@ left in place and the feature flag stays disabled.
 2. Enable for active admins only.
 3. Verify route/menu authorization, empty/loading/error states, responsive UI,
    keyboard/focus behavior, and NT CI assets.
-4. Create and discard a test draft; do not move the Production pointer.
-5. Verify non-admin users cannot access admin data/actions.
+4. Verify Thai failure/recovery messages and request-ID support correlation.
+5. Have an intended admin complete the approved UAT script without developer or
+   SQL assistance.
+6. Create and discard a test draft using an ADR-003-valid version; do not move
+   the Production pointer.
+7. Verify non-admin users cannot access admin data/actions.
 
 Disable the flag immediately if any smoke test fails.
 
@@ -401,13 +429,19 @@ Disable the flag immediately if any smoke test fails.
     including the approved temporary `ITEM-0139` exception and no other active
     legacy `ITEM-####` rows.
 13. Confirm expected lock version and current pointer/base match.
-14. Generate pre-publish verification preview.
-15. Obtain explicit owner approval to publish exactly `2568.1.0`, including
+14. Confirm P-20 identity/hash portability evidence matches the exact reviewed
+    migration/candidate contract.
+15. Confirm the reusable version path follows ADR-003 and the exact candidate
+    version is supplied by approved release metadata, not a code constant.
+16. Generate pre-publish verification preview.
+17. Obtain explicit owner approval to publish exactly `2568.1.0`, including
     any mass-retirement total.
 
 ## 13. Publish and immediate closeout
 
-1. Execute publish once with a new request ID.
+1. Prepare one operation request ID before publish and execute once. If the
+   response is uncertain, preserve that ID and inspect audit/state before retry;
+   never generate a second ID for the same intended publish.
 2. Record result, item count, dataset hash, actor, and timestamp.
 3. Verify one singleton pointer to `2568.1.0` and synchronized legacy flags.
 4. Verify the prior version remains readable and immutable.
@@ -435,7 +469,8 @@ Disable the flag immediately if any smoke test fails.
 | Add/supplement/new identity rows lack P-18 placement approval | Keep draft reviewable; do not publish; guard must reject with `P18_PLACEMENT_REVIEW_REQUIRED` |
 | Structured-code candidate has unapproved active legacy `ITEM-####` rows | Keep draft; correct mappings or return to owner; do not publish |
 | Inactive/retired rows lack P-19 PDF policy | Do not file official field-facing PDF; get owner/data-custodian policy first |
-| Publish fails in transaction | No pointer change; inspect request/result and retry only when safe |
+| Publish fails in transaction | No pointer change; inspect request/result and retry only when safe with the same operation ID for the same intended payload |
+| Publish response is lost after commit | Inspect pointer/change set by request ID; retry only with the same ID so the prior result is returned |
 | Published version is business-invalid | Audited pointer restore to prior published version; create correction version |
 | Export hash mismatch | Do not distribute; investigate canonicalizer/export and regenerate |
 
@@ -451,6 +486,7 @@ Pointer restore must:
 - Completed [verification report](./13-phase4-verification-report.md)
 - Completed [release note](./16-phase4-release-note-template.md)
 - Migration/deployment identifiers and file/commit fingerprints
+- Authority/document consistency result and tracked artifact-verifier version
 - Pre/post row counts and invariant results
 - Advisor results and accepted exceptions
 - Feature flag and pointer final state
@@ -459,3 +495,5 @@ Pointer restore must:
   applies
 - Pre/post logical backup manifests
 - Owner/executor/verifier signatures
+- UAT reviewer, representative task results, error-recovery result, and
+  performance baseline

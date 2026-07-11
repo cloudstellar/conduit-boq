@@ -191,6 +191,9 @@ Required work:
   - legacy snapshot-only print/export;
   - legacy missing Factor F fail-closed state;
   - old catalog version export after a new catalog publish.
+  - live `save_boq_with_routes` behavior for the exact base item name, all four
+    hotfix `016` suffixes, catalog-authoritative fields, role/version denial,
+    and atomic rollback.
 
 Application rules:
 
@@ -201,6 +204,9 @@ Application rules:
 - WP-7 is regression preservation only. It must not add a new Factor F admin
   workflow, publish Factor F data, move Factor F pointers, or reopen hotfix
   `016` scope without separate approval.
+- Start WP-7 only after the WP-6.5 reliability exit gates in the Execution Pack
+  are green. The hotfix `016` fixtures become a permanent live DB regression
+  suite, not a one-time SQL text check.
 
 ### 5.4 Phase 4C local rehearsal
 
@@ -210,13 +216,14 @@ workflow.
 Rehearsal path:
 
 1. Restore refreshed Production data locally.
-2. Apply production hotfix `016`, then Phase 4 `017+` migrations.
+2. Use the canonical bootstrap order `009`-`015`, production hotfix `016`, then
+   Phase 4 `017`-`019`.
 3. Record before/after catalog counts.
 4. Record before/after Factor F pointer, active versions, row counts, and
    hashes.
 5. Clone `2568.0.0` to candidate `2568.1.0`.
 6. Apply approved code/classification changes only.
-7. Publish `2568.1.0`.
+7. After P-20 and WP-6.5 evidence pass, publish `2568.1.0` in Local rehearsal.
 8. Export official catalog Excel/PDF and verify count/hash.
 9. Verify new BOQ creation binds:
    - price catalog `2568.1.0`;

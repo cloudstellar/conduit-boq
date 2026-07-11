@@ -17,6 +17,12 @@ through P-11 data decisions.
 This approval does not authorize WP-9, Production migration, deploy, feature
 enablement, catalog publication, or any Factor F write/pointer/backfill.
 
+**Reliability alignment recorded:** 2026-07-11 — owner instructed a docs-only
+plan alignment before further implementation. WP-6.5 is expanded from two
+publish guards into the reliability gate defined below; WP-7/WP-8 keep their
+business-regression and clean-rehearsal responsibilities. No Local reset or
+Production action is authorized by this amendment.
+
 **Purpose:** Turn the reviewed Phase 4 architecture into an execution checklist
 that an implementer can follow without re-deciding scope, sequencing, database
 boundaries, or verification gates.
@@ -44,7 +50,8 @@ Start allowed:
 
 - local branch/worktree work;
 - additive `017+` migration design after production hotfix `016`;
-- local Supabase reset/rehearsal;
+- local Supabase reset/rehearsal only after telling the owner it resets the
+  entire Local Supabase stack and receiving explicit approval for that reset;
 - parser/canonical-hash implementation;
 - admin UI behind disabled feature flag;
 - local tests, build, lint, advisors, and verification report filling.
@@ -84,6 +91,12 @@ Start blocked:
     backfill, export, and publish code must read the recorded Decision Register
     outcome, not infer final choices such as retiring `ITEM-0139`, approving
     `CRS-H06`/`CRS-H08`, or deploying named CI assets from an analysis note.
+12. ADR-003 already defines reusable annual/revision/patch catalog versions.
+    `2568.1.0` is an exact rehearsal candidate, not a reusable-path constant.
+13. Database idempotency is end-to-end only when the UI reuses the same
+    operation ID after an uncertain response.
+14. SQL text-shape tests and untracked artifact scripts are supporting checks,
+    not substitutes for live DB behavior or reproducible release evidence.
 
 ## 3. Required owner decisions before each work band
 
@@ -103,13 +116,15 @@ Start blocked:
 | P-12 to P-15 | Production migration/deploy/enable/publish | Decision Register |
 | P-18 add/supplement placement governance | Add/supplement publish readiness | Decision Register |
 | P-19 inactive/retired export policy | Publication/filing of any version with inactive rows | Decision Register |
+| P-20 canonical hash/identity portability | WP-6.5 exit/WP-7, WP-8 clean rehearsal, and migration fingerprint freeze | Decision Register |
 
 Rule: unresolved P-02 through P-11 does not block generic additive schema,
 parser, UI shell, tests, or local rehearsal. It blocks final candidate data
 freeze, approved backfill, export acceptance, and publication where applicable.
 Unresolved P-18 blocks publishing any version with add/supplement/new identity
 rows. Unresolved P-19 blocks official field-facing PDF filing for any version
-with inactive/retired rows.
+with inactive/retired rows. Unresolved P-20 blocks clean-rehearsal hash
+acceptance, migration fingerprint freeze, and P-15 hash acceptance.
 
 ## 4. Work package map
 
@@ -122,9 +137,9 @@ with inactive/retired rows.
 | WP-4 | Draft mutation, import, manual edit, history | Local app + DB | WP-1, WP-2, WP-3 | WP-5 |
 | WP-5 | Publish, pointer restore, and audit | Local app + DB | WP-4 | WP-6, WP-8 |
 | WP-6 | Official Excel/PDF export | Local app | WP-2, WP-5, P-11 for final visual | WP-8 |
-| WP-6.5 | Publish-boundary guard hardening | Local app + DB/tests | WP-5, P-18 recorded, P-06 structured-code exception recorded | WP-7, WP-8 |
-| WP-7 | BOQ and Factor F regression preservation | Local app/tests | WP-0, WP-6.5 | WP-8 |
-| WP-8 | Clean local rehearsal and verification report | Local reset | WP-1 to WP-7, including WP-6.5 | Production approval |
+| WP-6.5 | Reliability and publish-boundary hardening | Local app + DB/tests | WP-5, P-18 recorded, P-06 structured-code exception recorded | WP-7, WP-8 |
+| WP-7 | Permanent BOQ/hotfix `016` and Factor F regression preservation | Local app + DB/tests | WP-0, WP-6.5 | WP-8 |
+| WP-8 | Clean local rehearsal, admin UAT, performance, and verification report | Local reset + app | WP-1 to WP-7, including WP-6.5 and P-20 | Production approval |
 | WP-9 | Production migration/deploy/enable/publish | Production | P-12 to P-15 | Closeout |
 
 ## 5. WP-0 branch and evidence setup
@@ -356,9 +371,11 @@ Export rules:
 - route accepts explicit selected version;
 - server re-queries selected version;
 - generated count/hash must match stored dataset hash;
-- official stamp includes Catalog version, status, current-default status,
-  effective date, approval refs, published timestamp/by, export timestamp/by,
-  item count, and SHA-256;
+- Excel carries complete filing/verification metadata required by the Export
+  Spec. The field-facing PDF cover carries only the P-11-approved organization,
+  `ฉบับบัญชีราคา`, Thai status, effective date, item count, and full dataset
+  hash; non-current published versions use the approved Thai retrospective
+  warning instead of a technical Current Default field;
 - filename follows `NT-Master-Catalog-v{version}-{effective-date}.{ext}`;
 - draft exports are admin-only and visibly marked `DRAFT – ห้ามใช้อ้างอิง`;
 - Excel includes canonical reconstruction sheet/fields per export spec;
@@ -373,10 +390,10 @@ Exit gate:
 - draft export cannot look official;
 - visual sample accepted by P-11 before Production publication.
 
-## 12. WP-6.5 publish-boundary guard hardening
+## 12. WP-6.5 reliability and publish-boundary hardening
 
-Goal: prevent draft-only add/supplement mechanics and incomplete structured
-coding from becoming accidental official publication paths.
+Goal: close the gap between the approved architecture and executable safety
+net before adding more workflow surface or accepting WP-8 evidence.
 
 Boundary:
 
@@ -386,6 +403,19 @@ Boundary:
 - do not infer extra legacy-code exceptions beyond the explicit P-06 record;
 - do not expand hotfix `016` beyond regression evidence;
 - do not add any new Factor F workflow.
+
+Required sub-gates:
+
+| Slice | Required outcome |
+|---|---|
+| WP-6.5A End-to-end idempotency | Client/form creates one operation UUID for create/manual/import-apply/publish/restore, preserves it through an uncertain result, reuses it on retry, and replaces it only after a definitive terminal result or explicit new operation. Test timeout-after-commit and same-ID/different-payload rejection. |
+| WP-6.5B Publish guards and early UX | Keep DB P-18 and structured-code guards as final invariants; show the same publication blockers in draft/import preview before apply/publish, with Thai reason and remediation. A user must not discover the blocker only after completing the draft. |
+| WP-6.5C Hash portability | Resolve P-20 and update migration, DB/hash/export contracts and fixtures atomically. No clean-reset/cross-environment equivalence claim until the selected contract passes. |
+| WP-6.5D Reusable version lifecycle | Remove `2568.1.0` hardcoding from reusable action/RPC validation. Validate ADR-003 annual/revision/patch rules and prove at least one additional valid version plus duplicate/nonmonotonic rejection. Keep `2568.1.0` only as the exact first-candidate fixture. |
+| WP-6.5E Reproducible export evidence | Commit a semantic verifier under `scripts/` or tests. Discover headers by exact names, derive ranges, and verify schema version, sheets, row count/order, canonical hash, numeric cells, formula/link absence, PDF count/hash/pages, and binary hashes. Generated files remain untracked. |
+| WP-6.5F DB integration and concurrency harness | Establish a tracked Local DB suite for migrations, RPC/RLS/role denial, transaction rollback, two-session publish/restore races, lock timeout, stale state, and uncertain-response retry. WP-7 adds the permanent BOQ/hotfix/Factor F cases to this harness. |
+| WP-6.5G Operator UX and observability | Add route-level loading/error/not-found states, consistent Thai user messages with stable technical code/request ID, bounded structured logs containing operation/outcome/duration/version/request ID, and no raw payload/SQL detail. |
+| WP-6.5H Documentation consistency | Add a tracked check for canonical migration order, WP sequencing, pending decision IDs, and authority links. Volatile hashes/results remain only in the Tracker/Verification Report. |
 
 Required behavior:
 
@@ -408,14 +438,21 @@ not merely expose `legacyActiveRows` in quality JSON.
 
 Exit gate:
 
-- migration/static contract tests cover the guard shape and error code;
-- local publish smoke proves add/supplement publish is rejected atomically;
-- local/static evidence proves the structured-code legacy exception is exactly
-  `ITEM-0139` for `2568.1.0`;
-- unchanged 710-row baseline publish/restore smoke still passes;
-- Verification Report publication section records WP-6.5 evidence.
+- all WP-6.5A-H applicable evidence is green;
+- migration/static checks and live Local DB tests cover both guard shape and
+  behavior;
+- local publish smoke proves add/supplement and structured-code rejections are
+  atomic, and unchanged 710-row publish/restore still passes;
+- P-20 is recorded and implemented before WP-6.5 exits/WP-7 starts and before
+  any WP-8 clean-reset hash evidence;
+- reusable create/publish paths pass ADR-003 version fixtures without a
+  `2568.1.0` production-code constant;
+- export and documentation verification run from tracked code in a clean
+  checkout;
+- operator failure states and logs expose safe correlation evidence;
+- Verification Report records each sub-gate separately.
 
-## 13. WP-7 BOQ and Factor F regression preservation
+## 13. WP-7 permanent BOQ/hotfix `016` and Factor F regression preservation
 
 Goal: prove Phase 4 did not disturb current BOQ behavior.
 
@@ -430,7 +467,10 @@ Required scenarios:
 |---|---|
 | New BOQ | binds current catalog pointer and current Factor F pointer |
 | Existing BOQ edit/save | preserves `price_list_version_id` and `factor_reference_version_id` |
-| BOQ item suffix save | preserves approved suffix labels such as `(Main Duct)` and `(Riser)` while catalog unit, price, and category stay authoritative |
+| BOQ item suffix save | Live RPC test preserves exact base name and every approved suffix `(Main Duct)`, `(Riser)`, `(Steel Pole)`, and `(Riser Service)` while catalog unit, material/labor/unit price, category, and version stay authoritative |
+| Invalid or misleading suffix/name | Rejected or normalized only according to the explicit hotfix `016` allowlist; cannot override catalog authority |
+| Bad item in a multi-item save | Whole transaction rolls back; no partial route/item replacement |
+| Role/version boundary | Unauthorized caller and cross-version item are rejected without mutation |
 | Duplicate preserve | copies catalog version, Factor F version, item snapshots, and Factor F snapshots |
 | Copy to selected Factor F | creates new BOQ, resets Factor F snapshots, does not mutate original |
 | Version-bound print/export | reads bound Factor F version rows |
@@ -441,8 +481,14 @@ Required scenarios:
 
 Exit gate:
 
-- BOQ create/edit/duplicate/print/export regression suite passes;
-- pre/post BOQ binding query shows zero unexpected mutations.
+- BOQ create/edit/duplicate/print/export regression suite runs against the live
+  Local DB and passes;
+- all hotfix `016` positive/negative suffix fixtures pass through the actual RPC;
+- rollback, authorization, and cross-version negative fixtures pass;
+- pre/post BOQ and Factor F pointer/row/hash/grant/RLS/binding snapshots show
+  zero unexpected mutations;
+- the suite is tracked and wired into the appropriate PR/rehearsal CI gate, not
+  retained as one-time Local evidence.
 
 ## 14. WP-8 clean local rehearsal
 
@@ -458,19 +504,31 @@ Run order:
 5. Run DB/security tests.
 6. Run parser/hash tests.
 7. Run admin UI workflow tests.
-8. Run publish/export tests, including the WP-6.5 P-18 and structured-code
-   rejection paths.
-9. Run BOQ regression tests.
-10. Run pointer restore rehearsal.
-11. Run `npm test`.
-12. Run `npm run lint`.
-13. Run `npm run build`.
-14. Run security/performance advisors or MCP equivalents.
-15. Fill Verification Report with evidence references.
+8. Run end-to-end idempotency and two-session concurrency/timeout tests.
+9. Run publish/export tests, including WP-6.5 guards and the tracked semantic
+   artifact verifier.
+10. Run permanent hotfix `016`/BOQ/Factor F regression tests.
+11. Run pointer restore rehearsal.
+12. Run operator UAT with an intended admin/data custodian without developer or
+    SQL assistance; record comprehension and recovery from at least three safe
+    validation errors.
+13. Measure agreed 710-row import preview, publish-readiness, export, and admin
+    interaction baselines; investigate material regression.
+14. Run `npm test`.
+15. Run `npm run lint`.
+16. Run `npm run build`.
+17. Run `npm run audit:prod` under the accepted vulnerability policy.
+18. Run security/performance advisors or MCP equivalents.
+19. Run documentation/authority consistency verification.
+20. Fill Verification Report with evidence references.
 
 Exit gate:
 
 - all gates pass;
+- P-20 hash portability evidence passes across the approved clean-reset scope;
+- admin UAT has no irreversible mistake or developer-only recovery path;
+- performance measurements are within the reviewed budget or carry an explicit
+  accepted-risk owner/remediation record;
 - accepted warnings have owner, technical rationale, remediation owner, and due
   date;
 - Production approval P-12 can be requested after the readiness evidence below
@@ -487,6 +545,12 @@ current evidence for:
 - clean Local reset and full workflow success;
 - reviewed migration filename and SHA-256;
 - exact branch/commit and deployment artifact fingerprint;
+- stable operation-ID timeout/retry and structured-log evidence;
+- live Local DB migration/RPC/RLS/concurrency evidence;
+- P-20 cross-environment hash/identity portability evidence;
+- ADR-003 reusable version lifecycle evidence without hardcoded candidate logic;
+- tracked semantic Excel/PDF verifier output;
+- admin UAT, route failure-state, Thai error/recovery, and performance evidence;
 - fresh read-only Production baseline and schema drift check;
 - fresh logical backup plus restore-test evidence;
 - BOQ regression preservation, including price-list version links;
@@ -502,6 +566,7 @@ current evidence for:
 - Supabase security/performance advisor results with no unresolved blocker;
 - feature flag disabled by default;
 - P-11 export preview/count/hash evidence;
+- authority/document consistency check;
 - owner/verifier readiness review outcome.
 
 Normal Production sequencing:
@@ -511,10 +576,12 @@ Normal Production sequencing:
 - request P-14 admin feature enablement after deploy/admin-only smoke is green;
 - request P-15 publication only after final candidate evidence is complete.
 
-Publication requires exact final `2568.1.0` metadata, approval reference,
+Publication requires exact final named-version metadata, approval reference,
 effective date, physical archive reference, final diff, item count, dataset
-hash, official Excel/PDF evidence, P-18/P-19 evidence when applicable,
-structured-code completeness evidence, and owner approval.
+hash, official Excel/PDF evidence, P-18/P-19/P-20 evidence when applicable,
+structured-code completeness evidence, and owner approval. For the first
+candidate the reserved rehearsal version is `2568.1.0`, but reusable workflow
+code remains governed by ADR-003.
 
 Do not request the next Production gate if any evidence is missing, stale,
 failed, ambiguous, or different from the reviewed plan.
@@ -588,12 +655,24 @@ Before asking for code review:
   placement governance is approved.
 - [ ] WP-6.5 guard enforces the structured-code legacy exception set before
   publication.
+- [ ] Client/form retains the same operation ID through an uncertain response
+  and the DB returns the prior result for a same-payload retry.
+- [ ] Reusable version actions/RPCs follow ADR-003 and do not hardcode
+  `2568.1.0` outside exact fixtures.
+- [ ] P-20 hash/identity portability contract is implemented consistently in
+  migration, canonicalizer, DB hash, export, and tests.
 - [ ] Draft mutation and import are audited.
 - [ ] Manual and import workflows share validation and audit controls.
 - [ ] Canonical dataset hash excludes non-catalog data.
 - [ ] Official export count/hash is rechecked server-side.
+- [ ] Export verification runs from tracked semantic code; generated artifacts
+  and reference/temp paths remain untracked.
 - [ ] Feature flag default is disabled.
-- [ ] BOQ regression scenarios pass.
+- [ ] Live Local DB/RPC/RLS/concurrency and hotfix `016` BOQ regression scenarios
+  pass.
+- [ ] Route failure states, Thai recovery messages, bounded structured logs,
+  admin UAT, and performance evidence pass their gate.
+- [ ] Authority/document consistency check passes.
 - [ ] Supabase advisor baseline is recorded and no new untriaged finding exists.
 - [ ] Verification Report is updated with evidence links/commands.
 
@@ -607,6 +686,8 @@ Before asking for code review:
 | P-11 missing | Build export mechanics; do not accept official export visual |
 | P-18 unresolved | Keep draft add/supplement review available, but block publication of versions with new identities until guard evidence and placement governance are accepted |
 | P-19 unresolved | Do not file a field-facing official PDF for versions with inactive/retired rows; publish only if owner explicitly approves the rendering/exclusion policy |
+| P-20 unresolved | Continue non-hash-changing reliability work, but do not accept WP-8 clean-reset hash evidence, freeze the migration fingerprint, or request P-15 |
+| Reusable path still hardcodes `2568.1.0` | Treat as implementation nonconformance with ADR-003; fix and test another valid annual/revision/patch version before P-14 |
 | Advisor warning from pre-existing system | Add to advisor baseline with owner/remediation metadata |
 | New advisor warning from Phase 4 | Stop and fix or get explicit accepted-risk signoff |
 | Live BOQ count differs from closeout evidence | Expected drift; record fresh count and continue only if invariants hold |

@@ -1,10 +1,11 @@
 # Master Catalog Phase 4 Execution Progress Tracker
 
-**Status:** WP-6 official export ready for owner review; WP-6.5 publish-boundary guard hardening inserted before WP-7
+**Status:** WP-6 official export ready for owner review; WP-6.5 reliability and publish-boundary hardening planned before WP-7
 **Purpose:** Owner-facing progress tracker for Master Catalog Phase 4 local
-implementation and rehearsal. This file is for quick status review; authority
-remains in the Decision Register, Execution Pack, DB Contract, Runbook, and
-Verification Report.
+implementation and rehearsal. This file is the authority for current WP status,
+blockers, next safe step, and the authority/evidence index. Detailed decisions,
+contracts, execution steps, and test evidence remain in their named sources
+below.
 
 ## 1. Update rules
 
@@ -13,6 +14,11 @@ blocker appears, or evidence is produced.
 
 Do not mark a work package complete unless its exit gate is satisfied and the
 evidence reference is recorded here or in the Verification Report.
+
+Do not copy volatile status, current HEAD, artifact hashes, or latest test
+results into another plan unless that plan owns the fact. Link to this tracker
+or the Verification Report. Git is the authority for current HEAD; record an
+exact commit here only after that commit exists and produced named evidence.
 
 Allowed statuses:
 
@@ -28,13 +34,39 @@ Allowed statuses:
 |---|---|
 | Current branch | `codex/master-catalog-phase4` |
 | Current commit | See git HEAD for the latest committed checkpoint |
-| Current work package | WP-6.5 planning |
+| Current work package | WP-6.5 reliability hardening planning |
 | Current environment | Local only |
 | Production write allowed | No |
 | Feature flag default | Disabled |
-| Latest owner decision needed | Review real DB-generated Excel/PDF before final P-11 artifact acceptance; approve/hold WP-6.5 local publish-boundary guard implementation before WP-7; resolve P-18 placement governance before any add/supplement publication |
-| Next owner review point | WP-6 export evidence review, then WP-6.5 guard evidence review before treating add/supplement publication or structured-code candidate publication as safe |
-| Last updated | 2026-07-11 01:01 +07 |
+| Latest owner decision needed | Review real DB-generated Excel/PDF for final P-11 acceptance; resolve P-20 hash portability before WP-6.5 exit/WP-7; resolve P-18 placement and P-19 retired-row PDF policy before affected workflows publish |
+| Next owner review point | WP-6 artifact acceptance, then P-20 contract decision and WP-6.5 reliability evidence before WP-7 |
+| Last updated | 2026-07-11 02:13 +07 |
+
+## 2.1 Canonical authority and evidence manifest
+
+| Fact or contract | Single authority | Update rule |
+|---|---|---|
+| Current WP/status/blocker/next safe step | This Tracker | Update whenever work pauses or a gate changes |
+| Owner/data decision and due gate | [Decision Register](./19-phase4-decision-register.md) | Never infer from chat/analysis alone; record the exact decision |
+| Architecture, idempotency, hash, security and test contract | [Architecture Plan](./08-phase4-architecture-ci-plan.md), [Parser/Hash Spec](./14-phase4-parser-and-canonical-hash-spec.md), [DB Contract](./17-phase4-database-security-contract.md), [Threat Model](./18-phase4-threat-model.md) | Change contract and required tests together |
+| Work-package order and exit gates | [Implementation Execution Pack](./23-phase4-implementation-execution-pack.md) | Tracker mirrors status only; it does not redefine scope |
+| Migration sequence/status | [MIGRATIONS.md](../../04_data/MIGRATIONS.md) and `scripts/bootstrap-local-db.sh` | Script and ledger must agree before clean rehearsal |
+| Detailed commands/results/counts/hashes | [Verification Report](./13-phase4-verification-report.md) | Preserve point-in-time source/timestamp; supersede, do not rewrite history silently |
+| Production operation/recovery | [Production Runbook](./12-phase4-production-runbook.md) | Requires exact gate approval; no ad hoc reverse SQL |
+| Excel/PDF presentation and filing | [Official Export Specification](./20-phase4-official-export-spec.md) | P-11/P-19 decisions update the spec first |
+| Admin workflow/UAT | [Admin Operating Procedure](./15-phase4-admin-operating-procedure.md) | Must match implemented messages and recovery paths before P-14 |
+
+Current evidence baseline:
+
+- branch: `codex/master-catalog-phase4`;
+- latest implementation checkpoint before this docs-only alignment:
+  `f07b87b feat: refine master catalog export presentation`;
+- Production-applied root sequence: `009`-`015`, hotfix `016`;
+- Phase 4 Local-only drafts: `017`, `018`, `019`;
+- Local bootstrap authority order: `009`-`015`, `016`, `017`-`019`;
+- Production write authorization: **No**;
+- generated/reference artifacts under `files/`, `tmp/`, and `output/` remain
+  untracked and are not evidence automation source code.
 
 ## 3. Work package checklist
 
@@ -47,9 +79,9 @@ Allowed statuses:
 | WP-4 | Draft mutation, import, manual edit, and history | Complete | Draft/manual/import/history tests, clean Local WP-4 smoke, browser manual edit proof, browser import render/validate proof, RPC error sanitization, local auth credential parser proof, and [WP-4 Owner Review Note](./26-phase4-wp4-owner-review-note.md) | Owner accepted 2026-07-05 21:47 +07 |
 | WP-5 | Publish, pointer restore, and audit on Local | Ready for owner review | Backend DB/RPC slice passed: migration `019`, Local publish/restore smoke including stale-base pointer fixture, DB hash readback, immutability checks, active-admin publish/restore UI controls, browser create/publish/restore proof, final DB readback, owner-review cleanup, and [Verification Report publication evidence](./13-phase4-verification-report.md#12-publication-tests). Hash-portability review note remains for WP-8/P-15 | Owner accepted continuing to WP-6 local-only implementation |
 | WP-6 | Official Excel/PDF export | Ready for owner review | Selected-version export core, paged export data reads without silent fixed-limit truncation, older-version selected export coverage, draft/non-official export marking, spec-aligned short dataset hash display, Excel Route Handler, 5-sheet workbook generator, server-verified PDF/print route, admin action links, unit coverage, build/lint/typecheck, browser smoke, real Local DB-generated Excel/PDF artifact proof with visual/order fixes, and [WP-6 Owner Review Note](./27-phase4-wp6-owner-review-note.md). Owner's 2026-07-10 cover hierarchy refinement uses a larger top lockup and distinct year line; fresh Local visual proof passed. | Final P-11 artifact acceptance pending |
-| WP-6.5 | Publish-boundary guard hardening | Planned | DB publish guard must reject any draft version containing identities absent from its base version with `P18_PLACEMENT_REVIEW_REQUIRED`; structured-code guard must allow only the approved active legacy exception `ITEM-0139` in `2568.1.0`; UI error mapping and tests must prove no pointer move; no placement UI/reorder workflow is implemented in this slice | Required before WP-7 start and before add/supplement or structured-code publication readiness |
-| WP-7 | BOQ and Factor F regression preservation | Not started | BOQ save/print/export regression, Factor F before/after assertions | Required before WP-8 complete |
-| WP-8 | Clean Local rehearsal and Verification Report | Not started | Clean reset, full workflow, test/lint/build/advisor evidence | Required before any P-12 request |
+| WP-6.5 | Reliability and publish-boundary hardening | Planned | Stable client-owned request IDs across uncertain retries; structured logs/error mapping; P-18 and `ITEM-0139` publish guards plus early UI warnings; P-20 hash decision implemented; ADR-003 reusable version path without `2568.1.0` hardcoding; tracked semantic export verifier; Local DB integration/concurrency harness; route error/loading/not-found states; documentation consistency check | All applicable sub-gates, including P-20, required before WP-7 start |
+| WP-7 | Permanent BOQ/hotfix `016` and Factor F regression preservation | Not started | Live DB behavior for all approved BOQ suffixes and authoritative catalog fields, rollback/role/version negatives, BOQ save/print/export regressions, and Factor F before/after assertions; suite is reusable in CI/rehearsal | Required before WP-8 complete |
+| WP-8 | Clean Local rehearsal, admin UAT, performance baseline, and Verification Report | Not started | Owner-approved Local reset, full workflow, DB integration/concurrency, test/lint/build/audit/advisor evidence, tracked export verification, admin UAT without developer/SQL assistance, and measured 710-row performance | Required before any P-12 request |
 | WP-9 | Production migration/deploy/enable/publish | Not authorized | P-12 through P-15 sequential approvals | Separate Production readiness review required |
 
 ## 4. Owner pause points
@@ -64,6 +96,8 @@ Allowed statuses:
 | Structured-code publish guard | Before WP-7 and before any first structured-code publication readiness claim | Review WP-6.5 evidence that only the approved `ITEM-0139` legacy exception remains active |
 | P-18 display placement | Any draft/version contains added or supplement catalog rows | Approve placement governance or keep publication blocked |
 | P-19 inactive/retired export policy | Any candidate version contains inactive/retired rows | Approve PDF rendering/exclusion policy before official filing |
+| P-20 hash portability | Before WP-6.5 exit/WP-7 and before any clean-reset evidence or migration fingerprint freezes | Approve deterministic baseline identity or revised dual-hash contract; update all affected specs/tests together |
+| Reusable version path | Before P-14 feature enablement | Verify create/publish supports ADR-003 annual/revision/patch versions and no reusable path is hardcoded to `2568.1.0` |
 | WP-8 completion | Clean Local rehearsal passes | Review readiness evidence before any P-12 request |
 | P-12 | Production migration window requested | Approve or reject Production migration |
 | P-13 | Deploy requested after migration verification | Approve or reject deployment |
@@ -74,6 +108,7 @@ Allowed statuses:
 
 | Date/time | WP | Evidence | Result | Notes |
 |---|---|---|---|---|
+| 2026-07-11 02:13 +07 | WP-6.5 planning | Reconciled authority hierarchy and expanded reliability plan after owner/developer review of hotfix lessons | Passed docs-only alignment | Tracker becomes the status/evidence index; WP-6.5 now covers end-to-end idempotency, early publish-block UX, P-20 hash portability, ADR-003 reusable versioning, tracked export verification, DB integration/concurrency, route states/logging, and document consistency. WP-7 permanently covers live hotfix `016`/BOQ/Factor F regressions; WP-8 adds admin UAT/performance. Checks passed: local link targets, Markdown table shapes, targeted authority grep, `git diff --check`, and 4 focused Vitest files/28 tests. No Local bootstrap/reset and no Production touched. |
 | 2026-07-07 01:17 +07 | WP-6.5 planning | Expanded WP-6.5 from P-18-only guard to publish-boundary hardening | Passed doc alignment | WP-6.5 now includes both the P-18 add/supplement/new-identity guard and the structured-code legacy-exception guard for `ITEM-0139`. This keeps the publish-boundary fixes together before WP-7. No Local bootstrap/reset and no Production touched. |
 | 2026-07-07 01:01 +07 | WP-6.5 planning | Initial P-18 guard alignment before WP-7 | Superseded by 2026-07-07 01:17 +07 wording | Initial alignment treated hotfix `016` as baseline/regression evidence only, kept Factor F workflow closed/regression-only, inserted WP-6.5 for a DB-level add/supplement publish guard, and recorded P-19 inactive/retired PDF policy. The 01:17 update moved structured-code exception enforcement into WP-6.5 too. Checks: targeted doc grep, `git diff --check`, `npm test -- tests/master-catalog-migrations.test.ts`. No Local bootstrap/reset and no Production touched. |
 | 2026-07-06 17:17 +07 | Hotfix doc propagation | Updated Local Supabase, overview, ADR/audit, runbook, decision, DB contract, execution-pack, and verification docs so hotfix `016` is an explicit required link before Phase 4 `017+` evidence | Passed doc update | No Local reset/bootstrap run; no Production touched. `016` treated as applied hotfix evidence, not edited as an applied migration file. |
@@ -168,26 +203,31 @@ Allowed statuses:
 | 2026-07-05 18:29 +07 | WP-4 | Current Browser plugin runtime cannot automate binary workbook selection for the import file input because the supported Playwright API lacks `setInputFiles` and page evaluate lacks binary/file constructors | If owner requires repeatable browser-level file-picker proof before WP-4 review, approve adding dedicated e2e/browser tooling; otherwise accept manual in-app browser upload proof plus unit/workbook/server-validation tests and clean Local DB smoke as import behavior evidence | Resolved for WP-4 review 2026-07-05 19:06 +07 by manual in-app browser upload proof; automation limitation remains for repeatable e2e evidence unless dedicated browser tooling is approved |
 | 2026-07-05 13:04 +07 | P-10/WP-3 | NT CI runtime derivatives were not generated yet; `/CI/` source assets remain local-only/uncommitted and current tooling initially lacked WOFF2/font conversion support | Owner provide/approve generated runtime derivatives or approve installing a conversion tool before P-10/official export acceptance | Partially resolved for WP-6 export artifacts: `app/fonts/nt/NT-Regular.woff2`, `app/fonts/nt/NT-Bold.woff2`, and `public/brand/nt/nt-logo-company-lockup.png` were generated/used with recorded hashes. Still open for full P-10 app-wide CI completeness, primary mark derivative, and legacy `public/nt_logo.*` provenance reconciliation |
 | 2026-07-05 15:40 +07 | WP-4 | Normalized import payload currently carries `workContextCode`/`itemTypeCode` but not the approved Thai group names needed to create authoritative `catalog_code_groups` rows | Before marking import/recode ready for publish validation, decide whether to amend payload spec to include group names or load the approved P-06 dictionary server-side | Resolved 2026-07-05 16:36 +07; implemented the payload-spec path by carrying `workContextNameTh`/`itemTypeNameTh` from already-required workbook headers into normalized payloads and Local DB smoke proved grouped add/recode rows without Production/Factor F writes |
-| 2026-07-05 22:38 +07 | WP-5/WP-8 | Local clean-reset dataset hashes changed across separate clean bootstraps because Phase 4 identity UUIDs are generated during Local migration `017` and `identity_id` is part of the approved canonical dataset hash | Owner/reviewer confirm per-environment DB-generated identity hash behavior is acceptable before WP-8/P-15, or request deterministic identity IDs/hash-key amendment before final count/hash/export acceptance | Open; not blocking WP-5 local UI proof, but must be called out before Production readiness and final publish/export hash approval |
+| 2026-07-05 22:38 +07 | WP-5/WP-8/P-20 | Local clean-reset dataset hashes changed across separate clean bootstraps because Phase 4 identity UUIDs are generated during Local migration `017` and `identity_id` is part of the approved canonical dataset hash | Resolve P-20: prefer deterministic baseline stable identities while preserving the lineage hash, or approve a revised dual-hash contract; update migration/spec/export/tests together | Open; blocks WP-6.5 exit/WP-7, WP-8 hash portability acceptance, migration fingerprint freeze, and P-15 hash acceptance |
 | 2026-07-05 23:47 +07 | WP-6/P-11 | In-app browser control could render/smoke the print route but could not prove the Excel attachment download event; final owner acceptance is still required for real filed artifacts | Owner/reviewer accept unit/build/manual proof for this slice or approve stronger e2e/download/PDF artifact tooling before final P-11 acceptance | Partially resolved by live-route Local artifact proof: saved PDF page numbering, NT font embed, title, watermark, table clipping, and Excel workbook inspection are verified from generated files. Still open for final owner acceptance and optional stronger browser attachment-download proof |
 | 2026-07-06 01:20 +07 | WP-6/P-18 | Current approved Phase 4 Core mechanics place newly added/supplement items at the end (`max(display_order) + 1`) and provide no owner placement/reorder review before publish | Implement WP-6.5 publish-boundary guards first; later owner/data custodian decide whether to amend Phase 4 Core with draft placement controls | Open; does not block 710-row baseline artifact proof, but blocks treating add/supplement workflow as Production-ready and blocks P-15 for any version containing added/supplement rows until guard evidence and placement decision are recorded |
 | 2026-07-07 01:01 +07 | P-19 | Field-facing PDF currently omits row status while Excel includes `ใช้งาน` / `ยกเลิกใช้` | Owner/data custodian decide whether inactive/retired rows are excluded, visibly marked, or placed in an appendix before filing an official PDF for any version that contains them | Open; not blocking the current 710-row active baseline proof |
 | 2026-07-07 01:01 +07 | WP-6.5/P-15 | Structured-code completeness is documented for the first structured version, including the temporary `ITEM-0139` exception, but current publish validation must explicitly enforce/test the exception set | Add WP-6.5 guard and tests before WP-7 so active legacy `ITEM-####` rows in `2568.1.0` are limited to the recorded `ITEM-0139` exception; retain final candidate evidence for P-15 | Open; publish-boundary hardening gate, not a WP-6 artifact blocker |
+| 2026-07-11 01:36 +07 | WP-6.5 | Reusable actions create a new UUID on each create/manual/publish/restore submission, so an uncertain retry can bypass the intended database idempotency key | Make the client/form own and persist one operation ID until a definitive result; test timeout-after-commit and same-ID retry | Open; blocks WP-6.5 exit and Production enablement |
+| 2026-07-11 01:36 +07 | WP-6.5/WP-7 | CI currently proves SQL/text and unit behavior but does not run the migration/RPC/RLS/hotfix contract against a live Local database | Add a tracked Local DB integration/concurrency harness in WP-6.5 and permanent BOQ suffix/Factor F scenarios in WP-7 | Open; blocks WP-8 and P-12 readiness |
+| 2026-07-11 01:36 +07 | WP-6.5 | Reusable catalog create/publish validation is partially hardcoded to `2568.1.0` despite ADR-003 already defining annual/revision/patch lifecycle | Generalize reusable action/RPC validation and test another ADR-003-valid version; retain `2568.1.0` only as exact rehearsal fixture | Open; blocks P-14 feature enablement |
+| 2026-07-11 01:36 +07 | WP-6.5/P-11 | Current artifact verifier logic lives under untracked temp paths and previously depended on fixed header-row coordinates | Commit a semantic verifier that locates headers by exact names and validates schema/count/order/hash/types; keep generated artifacts untracked | Open; blocks reproducible final export evidence |
+| 2026-07-11 01:36 +07 | WP-6.5/WP-8 | Catalog route failure states, Thai operator error copy, correlation logging, admin UAT, and measured 710-row performance are not yet complete evidence | Implement route-level loading/error/not-found states, structured bounded logs, UAT script, and performance baseline | Open; blocks P-14 feature enablement/readiness |
 
 ## 7. Handoff note template
 
 Use this template at the end of each implementation session:
 
 ```text
-Current WP: WP-6.5 planning
-Status: WP-6 remains ready for owner review; WP-6.5 publish-boundary guard hardening is inserted before WP-7; final artifacts not accepted; P-18 placement governance and P-19 inactive-row export policy remain pending
+Current WP: WP-6.5 reliability hardening planning
+Status: WP-6 remains ready for owner review; WP-6.5 end-to-end reliability hardening is required before WP-7; P-11, P-18, P-19, and P-20 remain at their stated gates
 Branch: codex/master-catalog-phase4
 Latest commit: See git HEAD for the latest committed checkpoint
-Files changed: authority docs/plans for WP-6.5/P-18/P-19 alignment; local proof artifacts under untracked `output/`/`tmp/` remain ignored
-Evidence produced: doc-plan alignment that separates hotfix `016`, Factor F regression-only work, P-18 publish guard, structured-code exception guard, and P-19 inactive-row export policy
-Tests/checks run: targeted doc grep; `git diff --check`; `npm test -- tests/master-catalog-migrations.test.ts`
-Blockers: existing advisor baseline still needs later triage; fresh approved Production snapshot source not taken in this session; P-10 remains partially open for primary mark/app-wide/legacy-logo provenance after WP-6 font/company-lockup proof; local clean-reset hash portability needs owner/reviewer confirmation before WP-8/P-15; final owner artifact acceptance and optional stronger browser attachment-download proof remain pending; WP-6.5 publish-boundary guards not implemented yet; P-18 placement governance blocks add/supplement publication readiness; P-19 blocks official PDF filing for any future inactive/retired-row version until policy is approved
-Owner decisions needed: final P-11 artifact acceptance after real DB-generated Excel/PDF; approve/hold WP-6.5 local publish-boundary guard implementation; confirm whether canonical `identity_id` hash portability is acceptable or should be amended before final count/hash/export acceptance; approve CI derivative generation path before P-10/official export acceptance; decide whether stronger e2e/download/PDF tooling is required before P-11 final acceptance; resolve P-18/P-19 before affected publication paths
-Next safe step: owner-review the 710-row baseline local Excel/PDF artifacts and WP-6 note, then implement WP-6.5 local-only publish-boundary guards before starting WP-7 regression; do not run Local bootstrap unless owner explicitly approves the reset
+Files changed: docs-only authority alignment; untracked `files/`, `tmp/`, and `output/` artifacts remain ignored
+Evidence produced: authority/evidence index, expanded WP-6.5/WP-7/WP-8 gates, P-20 hash decision, rollback alignment, and permanent hotfix/UAT/UX requirements
+Tests/checks run: local link targets; Markdown table shapes; targeted authority grep; `git diff --check`; 4 focused Vitest files / 28 tests
+Blockers: P-11 artifact acceptance; P-18 placement; P-19 retired-row PDF policy; P-20 hash portability; stable retry IDs, live DB integration/concurrency, reusable version path, tracked export verifier, route failure UX/logging, WP-7 BOQ/Factor F regression, advisor/snapshot/UAT/performance gates
+Owner decisions needed: final P-11 artifact acceptance; P-20 before WP-6.5 exit/WP-7; P-18/P-19 when affected; Production P-12 through P-15 remain separate
+Next safe step: finish and review this docs-only alignment, then implement WP-6.5 locally without running bootstrap unless owner explicitly approves the Local Supabase reset
 Production touched: No
 ```

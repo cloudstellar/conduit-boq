@@ -6,6 +6,12 @@ and publish still require separate approvals
 
 **Date:** 2026-06-22
 
+**Reliability amendment:** 2026-07-11 — WP-6.5 now closes end-to-end
+idempotency, publish-block UX, P-20 hash portability, ADR-003 reusable
+versioning, live DB/concurrency evidence, tracked export verification,
+operator failure states/logging, and documentation consistency before WP-7.
+This is local planning only and does not authorize Production.
+
 **Owner decision recorded:** 2026-07-04 — approved according to the
 recommendation for Phase 4 Core/local implementation. This approval does not
 authorize Production migration, deploy, feature enablement, candidate data
@@ -85,7 +91,8 @@ After a version is published:
 ### Current verified state
 
 - Production Phase 0 → 1A → 2 → 1B completed and was verified on 2026-06-21;
-  Phase 4 has not started
+  Phase 4 Local implementation is through WP-6 owner review, while Phase 4
+  Production has not started
 - Current default version: `2568.0.0`
 - Catalog rows: 710
 - Categories: 52, with no missing category
@@ -680,6 +687,11 @@ migration and tests must create them.
 - Use `lock_version` for draft edit, import apply, and publish.
 - Use `request_id` for manual changes, import preview/apply, publish, and pointer
   restore so a retry cannot create duplicate effects.
+- The UI/form owns the operation `request_id`: create it before first submit,
+  retain it while the result is uncertain, and reuse it for the same payload on
+  retry. Generate a new ID only after a definitive terminal result or an
+  explicit new operation. Server Actions must not create a fresh ID for every
+  retryable invocation.
 - Every newly published structured-code row has identity, category, and code
   group mappings.
 - K-formula fields are not written by Phase 4 Core.
@@ -990,24 +1002,41 @@ compact UTF-8 JSON with exactly one trailing LF and no BOM, then compute
 SHA-256. The hash is stored as `sha256:<lowercase hex>`.
 
 The shared canonicalizer is used for publish and Excel/PDF verification.
-Timestamps, actor names, database row UUIDs, and export metadata are excluded.
-The complete contract and mandatory golden hash are in the
+The stable logical `identity_id` above is intentionally included. Version-row
+UUIDs such as `price_list.id`, timestamps, actor names, and export metadata are
+excluded. The complete contract and mandatory golden hash are in the
 [parser/hash specification](./14-phase4-parser-and-canonical-hash-spec.md).
+
+### 6.1.2 Cross-environment identity/hash portability gate
+
+Current Local migration evidence creates baseline stable identities with random
+UUIDs on each clean bootstrap. Because `identity_id` is included, the hash is
+repeatable only while the same identity mapping is preserved; it is not yet a
+cross-environment business-equivalence proof.
+
+P-20 must close before WP-6.5 exits/WP-7 starts, WP-8, and migration fingerprint
+freeze. The preferred
+path is to initialize each baseline stable identity from a reviewed deterministic
+mapping, such as the immutable existing Production `price_list.id`, and keep
+identity in the lineage hash. A dual business-content/lineage-hash model is an
+acceptable alternative only if the DB, parser/hash, export, release-note, and
+verification contracts are revised together. Do not silently remove
+`identity_id` or describe environment-specific hashes as equivalent.
 
 ### 6.2 Official stamp
 
-Every official Excel/PDF export includes:
+Every official export identifies the selected Catalog version, status,
+effective date, item count, and full dataset SHA-256. Excel carries the complete
+approval/publication/export/filing metadata and canonical verification fields
+defined in the Official Export Specification.
 
-- NT logo and catalog title
-- Catalog version string, not Factor F version, for example `2568.1.0`
-- Status: Published; current-default status shown separately
-- Effective date
-- Approval reference and approval document date
-- Published timestamp and publisher
-- Export timestamp and exporter
-- Item count
-- Dataset SHA-256
-- Page number on PDF
+The P-11 field-facing PDF intentionally uses a smaller human-facing set: NT
+organization/lockup, document title/year, `ฉบับบัญชีราคา`, Thai status,
+effective date, item count, full dataset hash, and page numbers. It does not
+show technical Current Default, approval reference/date, approved-by/publisher,
+exported-at/by, generated-by, or export-spec fields. A selected non-current
+published version carries the approved plain Thai retrospective-reference
+warning. Those excluded values remain in Excel/admin/release/filing evidence.
 
 Draft exports:
 
@@ -1062,13 +1091,14 @@ Reuse the existing BOQ print approach:
 - Dedicated server-rendered catalog print route
 - Fetch selected version and items again from the database
 - A4 print CSS with repeated table headers
-- Version stamp and page number on every page
+- Department, selected-version/status or version/effective-date context, and
+  page number in the field-facing footer; no truncated dataset hash in footer
 - “พิมพ์ / บันทึก PDF” action
-- Full hash in document metadata/summary and `sha256:` plus the first 12
-  lowercase hexadecimal characters followed by `…` in the repeated footer
+- Full dataset hash on the cover/summary and in filing evidence
 
-The 12-hex prefix is a human cross-check only (48 displayed bits); official
-verification always uses the full 64-hex dataset hash.
+A 12-hex prefix may appear in admin/audit UI as a human cross-check only (48
+displayed bits); official document verification always uses the full 64-hex
+dataset hash.
 
 #### Reason
 
@@ -1081,8 +1111,14 @@ service while still producing a version-stamped reference document.
 - Recomputed export dataset hash must equal
   `price_list_versions.dataset_hash`.
 - Export fails closed if either comparison differs.
+- Artifact verification code is committed under `scripts/` or the test suite and
+  runs from a clean checkout. It locates sheets/headers semantically, derives
+  data ranges, and verifies schema version, count/order/hash, numeric cell types,
+  formula/link absence, PDF count/hash/page structure, and binary file hashes.
+  Fixed row coordinates and untracked temp scripts are not release evidence.
 - Do not add an export-log table in Phase 4 Core; exporter and export timestamp
-  are stamped at generation time.
+  are retained in Excel/admin/release/filing evidence at generation time, not
+  printed on the field-facing PDF cover.
 
 ---
 
@@ -1144,6 +1180,8 @@ Every exported action:
 5. Validates every argument and returns a serializable result.
 6. Reveals no SQL or internal error details.
 7. Revalidates affected catalog routes after a successful mutation.
+8. Accepts the client-owned operation ID for retryable mutations and passes it
+   unchanged to the database; it does not replace it with a new server UUID.
 
 Every action returns the discriminated, serializable
 `CatalogActionResult<T>` contract and stable error codes defined in the
@@ -1151,6 +1189,12 @@ Every action returns the discriminated, serializable
 Expected validation/authorization conflicts are returned without SQL, stack,
 or secret details; unexpected technical context is logged server-side against
 the request ID.
+
+Every mutation/export failure log uses a bounded structured event with operation,
+outcome, duration, selected version ID/string when known, and request ID. Never
+log raw normalized payloads, workbook cells, cookies, keys, SQL, or approval
+document content. User-facing Thai messages include a safe technical code and
+copyable request ID where support correlation is useful.
 
 Manual edits use the same change-set/audit path as imports and require a reason.
 
@@ -1360,8 +1404,9 @@ but semantically wrong workbook from becoming the official catalog.
 - Add active/archived catalog immutability.
 - Keep compatibility columns and legacy tables.
 
-**Reason:** This phase is additive and reversible; no current application read
-path is removed.
+**Reason:** This phase is additive and keeps current application reads
+compatible. After an applied Production commit, recovery is feature-off plus
+reviewed fix-forward, not an assumed destructive reverse operation.
 
 ### Phase 4B — CI, read UI, import, and publish
 
@@ -1372,7 +1417,13 @@ path is removed.
   evidence-gated publish.
 - Implement clone-from-current, manual add/edit/retire/recode, stale-draft
   protection, and item history timeline.
+- Implement reusable ADR-003 annual/revision/patch version creation; reserve
+  `2568.1.0` for the exact first-candidate rehearsal rather than hardcoding it
+  in reusable paths.
 - Implement official Excel and PDF exports.
+- Complete WP-6.5 end-to-end request-id, publish-guard/early-warning,
+  P-20 portability, DB integration/concurrency, route failure-state,
+  observability, tracked export-verifier, and documentation-consistency gates.
 - Replace only the four hardcoded year/version fragments.
 - Keep the feature flag disabled.
 
@@ -1387,6 +1438,10 @@ users.
 - Rehearse a manual-only correction through audit, approval, publish, and
   official export without workbook metadata.
 - Test publish, immutable rows, pointer restore, Excel export, and PDF export.
+- Run intended-admin UAT without developer/SQL assistance and record recovery
+  from representative validation errors.
+- Record 710-row import/export/admin performance baselines and investigate
+  material regression before Production readiness.
 - Run tests, build, security advisor, and performance advisor.
 - Apply additive Production migrations with the flag disabled.
 - Deploy the compatible application.
@@ -1469,7 +1524,11 @@ Do not advance when any gate fails:
 - Browser bundles contain no service-role/secret key.
 - Request idempotency works for manual edit/retire/recode,
   preview/apply/publish/restore.
+- Timeout-after-commit simulation proves a client retry uses the same request ID
+  and returns the prior result; same ID with a changed payload is rejected.
 - Optimistic lock conflicts reject stale draft writes.
+- Two independent DB sessions prove publish/restore advisory-lock ordering,
+  deterministic winner/conflict behavior, bounded lock timeout, and one pointer.
 - Pointer restore leaves historical BOQs unchanged.
 
 ### Import and audit
@@ -1530,11 +1589,21 @@ Do not advance when any gate fails:
 - PDF repeats headers, version stamp, and page number without clipping
 - Shared canonicalizer produces the same dataset hash for publish, Excel, and
   PDF verification
+- P-20 clean-reset/cross-environment fixture proves the approved baseline
+  identity/hash portability model
+- Reusable version create/publish accepts another ADR-003-valid
+  annual/revision/patch version and rejects duplicates/invalid ordering without
+  a hardcoded `2568.1.0` path
+- Tracked semantic verifier remains correct when title rows move and fails
+  closed on missing/renamed headers, wrong counts/types/hash, formulas, or links
 
 ### Regression and CI
 
 - Existing BOQs retain versions and totals
 - Create/edit/duplicate Preserve/print/export BOQ flows still pass
+- Live Local DB `save_boq_with_routes` tests cover the exact base name, all four
+  hotfix `016` suffixes, invalid suffix/name, catalog-authoritative unit/prices/
+  category/version, unauthorized/cross-version calls, and atomic rollback
 - Dashboard wording remains unchanged apart from dynamic year/version
 - “แบบ ปร.1” remains unchanged
 - NT font/logo/color usage matches the supplied CI
@@ -1544,6 +1613,15 @@ Do not advance when any gate fails:
 - ExcelJS is absent from initial catalog client bundles and loads dynamically
   only on import interaction
 - Catalog loading/error/not-found states render correctly
+- Operator messages are Thai-first, include a safe error code/request ID where
+  useful, and give a recovery path without exposing SQL/internal details
+- Structured logs include request ID, operation, outcome, duration and version,
+  with bounded/redacted values
+- Intended-admin UAT completes create/import/review/publish-readiness/export and
+  representative error recovery without developer/SQL assistance
+- 710-row import/export/admin performance baselines meet the reviewed budget
+- Documentation consistency check confirms authority links, migration order,
+  WP order, and pending-decision IDs
 - `npm test`, `npm run lint`, and `npm run build` pass
 
 ---
@@ -1554,6 +1632,8 @@ Do not advance when any gate fails:
 - The singleton pointer resolves to the intended current version.
 - Every published version has approval metadata, item count, and dataset hash.
 - Every import/edit/publish/restore has actor, reason, request ID, and diff.
+- The same user operation retains one request ID across uncertain retry and
+  cannot create a second effect after timeout.
 - Every item exposes read-only history across versions and recodes using stable
   identity and full old/new row snapshots.
 - An admin can add, edit, retire, or recode a draft item without uploading an
@@ -1562,6 +1642,7 @@ Do not advance when any gate fails:
   filename, SHA-256, and archive reference.
 - Excel and PDF exports are generated from the selected database version.
 - Export count/hash match the published dataset or the export fails.
+- Export evidence is reproducible from tracked semantic verification code.
 - Published Excel/PDF carries a complete version stamp and can be used as an
   immediate reference copy.
 - Staff see the new catalog only after publication.
@@ -1578,6 +1659,15 @@ Do not advance when any gate fails:
 - Manual-only and import-based versions both satisfy the same approval,
   immutability, hash, export, and audit controls.
 - A stale-base draft cannot become current.
+- P-20 establishes and proves the intended cross-environment identity/hash
+  semantics before clean rehearsal or Production hash acceptance.
+- Reusable catalog version creation follows ADR-003 beyond `2568.1.0`.
+- Publish blockers are visible before the user invests in apply/publish, while
+  the database remains the final enforcing boundary.
+- Live DB hotfix `016`, RLS/RPC, transaction rollback and concurrency tests are
+  permanent release gates.
+- Admin UAT, safe Thai error recovery, structured correlation logs, and the
+  reviewed 710-row performance baseline pass before feature enablement.
 
 ---
 
@@ -1701,6 +1791,14 @@ versioning, publish gates, canonical hash fields, or rollback behavior must
 update this plan, the relevant ADR/runbook, tests, and verification report in
 the same pull request or release change set.
 
+Use the authority/evidence index in the
+[Execution Progress Tracker](./25-phase4-execution-progress-tracker.md). The
+Tracker owns current status/blockers, the Decision Register owns owner/data
+decisions, and the Verification Report owns detailed point-in-time results and
+hashes. Other documents link to those facts instead of copying them. A tracked
+consistency check must cover migration order, WP ordering, pending decision IDs,
+and required authority links before WP-8.
+
 ---
 
 ## 14. Gate-Specific Checklists
@@ -1761,8 +1859,15 @@ data freeze, Production migration, feature enablement, or publication.
 - [ ] Manual-only and Excel workflows both pass audit and publish tests.
 - [ ] Item history follows identity across recodes.
 - [ ] Stale draft, lock conflict, request retry, and pointer restore tests pass.
+- [ ] Timeout-after-commit retry reuses one client-owned request ID; concurrent
+  two-session publish/restore tests pass.
+- [ ] P-20 identity/hash portability decision is implemented and proven.
+- [ ] Reusable version workflow follows ADR-003 without candidate hardcoding.
 - [ ] Official Excel/PDF visual sample, hash, and count verification pass.
+- [ ] Export verification runs from tracked semantic code in a clean checkout.
 - [ ] Existing BOQ create/edit/duplicate/print/export regressions pass.
+- [ ] Live Local DB hotfix `016` suffix/authority/rollback/role/version fixtures
+  pass.
 
 ### 14.3 Before Production migration / deploy / publish
 
@@ -1774,6 +1879,9 @@ data freeze, Production migration, feature enablement, or publication.
 - [ ] Verification Report documents the rollback/fix-forward plan and proves
   RLS/grants, advisory lock behavior, publish/import status transitions, export
   formula-safety, and BOQ/Factor F regression gates.
+- [ ] Admin UAT, route failure-state, Thai error/recovery, structured-log, and
+  710-row performance evidence are accepted.
+- [ ] Authority/document consistency verification passes.
 - [ ] Security and performance advisors have no unresolved rollout blockers;
   pre-existing warnings are baselined or separately accepted with owner and
   remediation metadata.

@@ -491,6 +491,13 @@ On the export screen:
 - hash/count mismatch prevents a response;
 - malicious strings beginning with formula-control characters remain inert;
 - export uses fixed ICT/ISO date rules and no server-locale ambiguity.
+- a committed semantic verifier discovers headers by exact names and derives
+  data ranges; it does not assume a fixed title/header row number;
+- the verifier checks workbook schema version, exact sheets/headers, count/order,
+  canonical reconstruction, numeric cell types, formula/link absence, PDF
+  count/hash/page structure, and binary hashes from a clean checkout;
+- P-20 identity/hash portability passes before a clean-environment hash is used
+  as cross-environment equivalence evidence.
 
 ### 8.2 Visual/manual
 
