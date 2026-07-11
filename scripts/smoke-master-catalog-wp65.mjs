@@ -639,7 +639,7 @@ async function readMutationCounts(versionId) {
 }
 
 async function countRows(table, scope = (query) => query) {
-  const query = service.from(table).select('id', { count: 'exact', head: true })
+  const query = service.from(table).select('*', { count: 'exact', head: true })
   const { count, error } = await scope(query)
   if (error) throw localDataError(`count ${table}`, error)
   return count

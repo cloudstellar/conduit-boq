@@ -200,6 +200,7 @@ describe('Master Catalog authority consistency', () => {
     expect(wp65Harness).toContain("args[0] !== '--output'")
     expect(wp65Harness).toContain("flag: 'wx'")
     expect(wp65Harness).toContain('formatHarnessError(currentStage, error)')
+    expect(wp65Harness).toContain("select('*', { count: 'exact', head: true })")
   })
 
   it('keeps core authority links resolvable', () => {
