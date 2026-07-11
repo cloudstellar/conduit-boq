@@ -102,7 +102,8 @@ applies `011`, Factor F `012` through `015`, hotfix `016`, the draft
 local-only Phase 4 scripts `017` through `019`, and runs the smoke tests.
 
 After a reviewed clean commit, run
-`npm run db:local:smoke-master-catalog-wp65` separately to capture request
+`npm run db:local:smoke-master-catalog-wp65 -- --output tmp/master-catalog/wp65-evidence/<run>.json`
+separately to capture request
 fingerprint, rollback, role, readiness, publish/restore race, P-20 mapping, BOQ,
 and Factor F evidence. Run it after each of two separately approved clean
 rebuilds and compare the JSON outputs with

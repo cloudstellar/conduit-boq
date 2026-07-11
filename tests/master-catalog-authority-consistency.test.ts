@@ -195,6 +195,11 @@ describe('Master Catalog authority consistency', () => {
     ]) {
       expect(existsSync(resolve(root, path))).toBe(true)
     }
+
+    const wp65Harness = read('scripts/smoke-master-catalog-wp65.mjs')
+    expect(wp65Harness).toContain("args[0] !== '--output'")
+    expect(wp65Harness).toContain("flag: 'wx'")
+    expect(wp65Harness).toContain('formatHarnessError(currentStage, error)')
   })
 
   it('keeps core authority links resolvable', () => {

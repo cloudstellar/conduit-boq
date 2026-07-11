@@ -1,5 +1,7 @@
 import { createHash, randomUUID } from 'node:crypto'
 import { execFileSync } from 'node:child_process'
+import { mkdir, writeFile } from 'node:fs/promises'
+import { dirname, isAbsolute, relative, resolve } from 'node:path'
 import { createClient } from '@supabase/supabase-js'
 import { readLocalEnvFile } from './local-env.mjs'
 
@@ -8,6 +10,7 @@ const url = readLoopbackOrigin('NEXT_PUBLIC_SUPABASE_URL', process.env.NEXT_PUBL
 const publishableKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
 const secretKey = localEnv.LOCAL_SUPABASE_SECRET_KEY ?? process.env.LOCAL_SUPABASE_SECRET_KEY
 const password = localEnv.LOCAL_TEST_PASSWORD ?? process.env.LOCAL_TEST_PASSWORD
+const evidenceOutputPath = readEvidenceOutputPath(process.argv.slice(2))
 
 if (!publishableKey || !secretKey || !password) {
   throw new Error('Local publishable key, secret key, and LOCAL_TEST_PASSWORD are required')
@@ -29,12 +32,15 @@ const approvalMetadata = {
 
 let originalFlagValue
 let originalPointerId
+let currentStage = 'initialize Local clients'
 
 try {
+  currentStage = 'sign in Local test users'
   await signIn(adminA, 'local.admin@ntplc.co.th')
   await signIn(adminB, 'local.admin@ntplc.co.th')
   await signIn(staff, 'local.staff@ntplc.co.th')
 
+  currentStage = 'enable the Local catalog admin flag'
   const { data: setting, error: settingError } = await service
     .from('app_settings')
     .select('value')
@@ -44,6 +50,7 @@ try {
   originalFlagValue = setting.value
   await setCatalogAdminEnabled(true)
 
+  currentStage = 'read baseline BOQ, Factor F, pointer, and catalog facts'
   const beforeFactor = await readFactorSummary()
   const beforeBoq = await readBoqSummary()
   originalPointerId = await readCurrentPointer()
@@ -51,12 +58,16 @@ try {
   assert(base.version_string === '2568.0.0', 'WP-6.5 smoke must start from baseline 2568.0.0')
   assert(base.status === 'active' && base.is_default === true, 'Baseline is not active/default')
 
+  currentStage = 'verify P-20 baseline identity mapping'
   const p20 = await verifyP20Baseline(base)
+  currentStage = 'verify anonymous and non-admin role denial'
   await verifyRoleDenial(base)
 
+  currentStage = 'allocate generic version and code fixtures'
   const versions = await allocateRevisionVersions(base, 4)
   const contextCode = await allocateCodeContext()
 
+  currentStage = 'run unchanged-clone publish race and request idempotency'
   const raceDraft = await createDraft(adminA, base, versions[0], 'publish race')
   const raceReadiness = await readReadiness(adminA, raceDraft.versionId)
   assert(raceReadiness.canPublish === true, 'Unchanged clone did not pass boundary readiness')
@@ -103,9 +114,11 @@ try {
   )
   assert(await readCurrentPointer() === raceDraft.versionId, 'Concurrent publish pointer is incorrect')
 
+  currentStage = 'run pointer restore race and idempotency'
   await restorePointer(adminA, base.id, 'WP-6.5 restore after publish race')
   await assertRestoreRace(base.id, raceDraft.versionId)
 
+  currentStage = 'run P-18 readiness and publish rejection'
   const p18Draft = await createDraft(adminA, base, versions[1], 'P-18 guard')
   const p18Apply = actionOk(
     await adminA.rpc('apply_catalog_changes', {
@@ -137,6 +150,7 @@ try {
   )
   await assertRejectedDraftStayedUnpublished(p18Draft.versionId, base.id)
 
+  currentStage = 'run structured-code readiness and publish rejection'
   const structuredDraft = await createDraft(adminA, base, versions[2], 'structured guard')
   const baselineRow = await readBaselineItem(base.id)
   const structuredApply = actionOk(
@@ -182,17 +196,20 @@ try {
   )
   await assertRejectedDraftStayedUnpublished(structuredDraft.versionId, base.id)
 
+  currentStage = 'verify duplicate-code mutation rollback'
   const atomicDraft = await createDraftWithIdempotencyChecks(adminA, base, versions[3])
   await assertDuplicateCodePayloadRollsBack(atomicDraft, contextCode)
+  currentStage = 'verify apply idempotency and changed-payload rejection'
   await assertApplyIdempotency(adminA, atomicDraft, baselineRow)
 
+  currentStage = 'verify final pointer, BOQ, and Factor F invariants'
   assert(await readCurrentPointer() === base.id, 'WP-6.5 smoke did not restore the baseline pointer')
   const afterFactor = await readFactorSummary()
   const afterBoq = await readBoqSummary()
   assert(stableJson(afterFactor) === stableJson(beforeFactor), 'Factor F changed during WP-6.5 smoke')
   assert(stableJson(afterBoq) === stableJson(beforeBoq), 'BOQ bindings changed during WP-6.5 smoke')
 
-  console.log(JSON.stringify({
+  const evidence = {
     schemaVersion: 1,
     status: 'passed',
     generatedAt: new Date().toISOString(),
@@ -214,7 +231,18 @@ try {
     factorFUnchanged: true,
     boqUnchanged: true,
     productionTouched: false,
-  }, null, 2))
+  }
+
+  currentStage = 'write Local evidence output'
+  if (evidenceOutputPath) {
+    await mkdir(dirname(evidenceOutputPath), { recursive: true })
+    await writeFile(evidenceOutputPath, `${JSON.stringify(evidence, null, 2)}\n`, {
+      flag: 'wx',
+    })
+  }
+  console.log(JSON.stringify(evidence, null, 2))
+} catch (error) {
+  throw new Error(formatHarnessError(currentStage, error))
 } finally {
   if (originalPointerId) {
     await restoreOriginalPointer(originalPointerId).catch(() => {})
@@ -652,6 +680,40 @@ function currentCommit() {
     cwd: process.cwd(),
     encoding: 'utf8',
   }).trim()
+}
+
+function readEvidenceOutputPath(args) {
+  if (args.length === 0) return null
+  if (args.length !== 2 || args[0] !== '--output') {
+    throw new Error('Usage: smoke-master-catalog-wp65.mjs [--output tmp/master-catalog/wp65-evidence/<run>.json]')
+  }
+
+  const value = args[1]
+  if (!value || isAbsolute(value)) {
+    throw new Error('WP-6.5 evidence output must be a relative path under tmp/master-catalog/wp65-evidence')
+  }
+  const evidenceRoot = resolve('tmp/master-catalog/wp65-evidence')
+  const outputPath = resolve(value)
+  const pathFromRoot = relative(evidenceRoot, outputPath)
+  if (pathFromRoot === '..' || pathFromRoot.startsWith(`..${process.platform === 'win32' ? '\\' : '/'}`)) {
+    throw new Error('WP-6.5 evidence output must stay under tmp/master-catalog/wp65-evidence')
+  }
+  if (!outputPath.endsWith('.json')) {
+    throw new Error('WP-6.5 evidence output must use a .json filename')
+  }
+  return outputPath
+}
+
+function formatHarnessError(stage, error) {
+  const code = error && typeof error === 'object' && typeof error.code === 'string'
+    ? ` [${error.code.slice(0, 64)}]`
+    : ''
+  const message = error instanceof Error
+    ? error.message
+    : error && typeof error === 'object' && typeof error.message === 'string'
+      ? error.message
+      : ''
+  return `WP-6.5 stage failed: ${stage}${code}: ${message || 'no safe error message returned'}`
 }
 
 function assertTrackedTreeClean() {
