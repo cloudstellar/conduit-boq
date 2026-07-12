@@ -435,14 +435,14 @@ async function verifyFrozenAuthority() {
 async function verifyFrozenAuthorityRoleDenial() {
   const { data: adminRows, error: adminError } = await adminA
     .from('catalog_code_group_dictionary')
-    .select('id')
+    .select('work_context_code,item_type_code')
     .limit(1)
   if (adminError) throw adminError
   assert(adminRows.length === 1, 'Active admin could not read frozen authority')
 
   const { data: staffRows, error: staffError } = await staff
     .from('catalog_code_group_dictionary')
-    .select('id')
+    .select('work_context_code,item_type_code')
     .limit(1)
   if (staffError) throw staffError
   assert(staffRows.length === 0, 'Non-admin read frozen authority through RLS')
@@ -770,12 +770,20 @@ async function readSignedInProfile(target) {
   const { data: userData, error: userError } = await target.auth.getUser()
   if (userError) throw userError
   const { data, error } = await service
-    .from('profiles')
-    .select('id,display_name')
+    .from('user_profiles')
+    .select('id,first_name,last_name,email')
     .eq('id', userData.user.id)
     .single()
   if (error) throw error
-  return data
+  return {
+    id: data.id,
+    display_name: [data.first_name, data.last_name]
+      .filter((value) => typeof value === 'string' && value.trim())
+      .join(' ')
+      .trim()
+      || data.email?.trim()
+      || data.id,
+  }
 }
 
 async function restorePointer(target, versionId, reason) {
