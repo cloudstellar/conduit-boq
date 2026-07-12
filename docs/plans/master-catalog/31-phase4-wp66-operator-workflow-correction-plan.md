@@ -1,7 +1,8 @@
 # Master Catalog Phase 4 WP-6.6 Operator Workflow Correction Plan
 
-**Status:** P-22 owner-approved for documentation and Local-only implementation
-planning on 2026-07-12; implementation/evidence pending
+**Status:** P-22 owner-approved; source implementation and repository/static
+verification completed on `ac31feb` on 2026-07-12. G1/G2 replacement Local
+evidence, G3 owner closeout, and G4 bootstrap/WP-7 sequencing remain pending
 
 **Production touched:** No
 
@@ -224,3 +225,27 @@ candidate `020` separately until the new owner closeout accepts it.
 | G4 | Only after G3, add accepted `020` to bootstrap and separately authorize any WP-7 execution |
 
 Production P-12 through P-15 remain separate and unrequested.
+
+## 10. Repository/static checkpoint
+
+Exact implementation commit: `ac31feb`.
+
+Completed without Local DB mutation or Production access:
+
+- candidate `020` now enforces one draft per base, guarded create, audited
+  idempotent abandon, immutable abandoned rows/metadata, and least-privilege
+  grants/postconditions;
+- the admin flow is item-first, preserves list/review return context, and moves
+  publication behind a complete identity-based final snapshot review carrying
+  the exact reviewed lock;
+- abandon uses a two-step destructive confirmation and retains the full
+  snapshot/history;
+- the WP-6.6 smoke harness now covers create race/replay, abandon lifecycle,
+  retained rows/audit, replacement, and serialized allocator retry, but was not
+  executed before G1;
+- `npm test` passed 29 files / 147 tests; TypeScript passed; lint exited 0 with
+  10 pre-existing out-of-scope warnings; production build passed and includes
+  the final-review route; `node --check` and `git diff --check` passed.
+
+This checkpoint does not satisfy G1/G2 DB/concurrency/browser/P-20 evidence and
+does not authorize `npm run db:local:bootstrap`.

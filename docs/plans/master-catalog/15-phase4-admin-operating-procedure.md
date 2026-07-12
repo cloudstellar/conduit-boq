@@ -1,10 +1,11 @@
 # Master Catalog Phase 4 Admin Operating Procedure
 
-**Status:** Procedure amended under P-22; WP-6.6 closeout is on Hold while the
-one-working-draft, audited-abandon, item-first, and final snapshot-review flow is
-implemented and reverified. Prior `3bfc74e` evidence is historical. P-18/P-19
-where applicable and independent intended-admin WP-8 UAT remain pending. The
-current Local UI must not be treated as Production-ready until those gates pass.
+**Status:** Procedure amended under P-22; source/static implementation of the
+one-working-draft, audited-abandon, item-first, and final snapshot-review flow
+passed on `ac31feb`. WP-6.6 closeout remains on Hold for G1/G2 Local evidence
+and G3 owner review. Prior `3bfc74e` evidence is historical. P-18/P-19 where
+applicable and independent intended-admin WP-8 UAT remain pending. The current
+Local UI must not be treated as Production-ready until those gates pass.
 **Audience:** Active Master Catalog administrators
 **Rule:** A draft is not official; published versions are immutable
 

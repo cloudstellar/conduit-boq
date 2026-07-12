@@ -47,11 +47,11 @@ until that closeout is accepted.
 **P-22 operator-workflow correction authorized:** 2026-07-12 — intended-admin
 review placed WP-6.6 closeout on Hold and accepted
 [Correction Plan #31](./31-phase4-wp66-operator-workflow-correction-plan.md).
-Amend candidate `020` before freeze for one mutable draft per base and audited
-abandon; make the full item workspace precede a lock-bound final snapshot
-review. Prior `3bfc74e` evidence remains historical but is superseded for
-revised closeout. G1/G2 Local resets and every Production action remain separate
-decisions.
+Candidate `020`, the item-first workspace, and lock-bound final snapshot review
+were implemented and passed repository/static checks on `ac31feb`. Prior
+`3bfc74e` evidence remains historical but is superseded for revised closeout.
+G1/G2 Local resets, G3 owner closeout, G4 bootstrap/WP-7 sequencing, and every
+Production action remain separate decisions.
 
 **Purpose:** Turn the reviewed Phase 4 architecture into an execution checklist
 that an implementer can follow without re-deciding scope, sequencing, database
@@ -152,7 +152,7 @@ Start blocked:
 | P-19 inactive/retired export policy | Publication/filing of any version with inactive rows | Decision Register |
 | P-20 canonical hash/identity portability | Initial WP-6.5 exit and rerun after WP-6.6/WP-7.5 migration changes, WP-8 clean rehearsal, and migration fingerprint freeze | Decision Register |
 | P-21 Audit #29 WP-6.6 scope/start | WP-6.6 implementation and any migration `020` execution | Decision Register / Completeness Audit |
-| P-22 operator-workflow correction | Amending candidate `020`, item-first workspace, final snapshot review, and revised WP-6.6 closeout | Decision Register / Correction Plan #31 |
+| P-22 operator-workflow correction | Amended candidate `020` and source/static item-first/final-review implementation on `ac31feb`; G1/G2/G3 replacement closeout remains | Decision Register / Correction Plan #31 |
 
 Rule: unresolved P-02 through P-11 does not block generic additive schema,
 parser, UI shell, tests, or local rehearsal. It blocks final candidate data

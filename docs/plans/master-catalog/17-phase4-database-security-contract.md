@@ -10,9 +10,11 @@ migration approval remain separate gates
 from [Audit #29](./29-phase4-owner-dev-completeness-audit.md), the P-22
 [Operator Workflow Correction](./31-phase4-wp66-operator-workflow-correction-plan.md),
 and the proposed P-18/WP-7.5 placement extension. Existing `017`-`019` remain
-the reviewed Local/bootstrap contract. Candidate `020` is being amended under
-P-22; its `3bfc74e` evidence remains historical but is superseded for revised
-closeout. It remains outside bootstrap and has not been applied to Production.
+the reviewed Local/bootstrap contract. Candidate `020` was amended under P-22
+on source commit `ac31feb` and passed repository/static verification; its
+`3bfc74e` evidence remains historical but is superseded for revised closeout.
+The amended candidate has not been applied for G1/G2 evidence, remains outside
+bootstrap, and has not been applied to Production.
 P-18 rules and placement migration `021` remain pending owner/data-custodian
 approval.
 

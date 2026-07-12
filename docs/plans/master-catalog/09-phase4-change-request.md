@@ -45,8 +45,8 @@ The bounded Local correction enforces one mutable draft per base, adds audited
 abandon/read-only retained history, makes the complete item workspace primary,
 and requires an authoritative lock-bound final snapshot review before publish.
 Candidate `020` is amended before freeze; prior `3bfc74e` evidence is historical
-and superseded for revised closeout. Local resets and Production remain
-separately gated.
+and superseded for revised closeout. Source/static implementation passed on
+`ac31feb`; Local resets and Production remain separately gated.
 
 ## 1. Decision requested
 
@@ -367,6 +367,8 @@ feature enablement, final catalog publication, or silent business-data choices.
       full operator-completeness certificate
 - [x] Planned DB changes amend still-unaccepted candidate `020`; `017`-`019`
       remain unchanged
+- [x] P-22 source/static implementation passed on `ac31feb` without applying
+      candidate `020`, resetting Local, changing bootstrap, or touching Production
 - [x] Unsupported Add/Supplement/Retire controls remain hidden at release unless
       their downstream gates pass
 - [ ] A separate owner decision is obtained before any Local bootstrap/reset

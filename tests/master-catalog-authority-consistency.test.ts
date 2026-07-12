@@ -131,7 +131,7 @@ describe('Master Catalog authority consistency', () => {
     ])
 
     expect(migrations).toContain(
-      '**Candidate being amended under P-22; prior `3bfc74e` evidence is historical/superseded for closeout; not in bootstrap or Production**',
+      '**P-22-amended candidate on `ac31feb`; repository/static passed, G1/G2 replacement Local evidence pending; not in bootstrap or Production**',
     )
     expect(migrations).toContain(
       '**Proposed only — P-18 pending; file does not exist; not in bootstrap**',
@@ -188,7 +188,7 @@ describe('Master Catalog authority consistency', () => {
       'Implementation/Local evidence passed 2026-07-12; owner closeout pending',
     )
     expect(decisions).toContain(
-      'Approved for docs and Local-only implementation planning 2026-07-12; G1/G2 Local resets and G3 closeout pending',
+      'G0 approved 2026-07-12; source/static passed on `ac31feb`; G1/G2 Local resets and G3 closeout pending',
     )
 
     const tracker = read(

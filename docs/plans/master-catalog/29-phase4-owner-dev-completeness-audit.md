@@ -1,9 +1,9 @@
 # Phase 4 Owner/Developer Capability Completeness Audit
 
-**Status:** P-22 operator-workflow correction accepted for docs and Local-only
-implementation planning on 2026-07-12. Earlier P-21 evidence on `3bfc74e`
-remains historical but is superseded for closeout once candidate migration
-`020` changes; revised evidence and owner closeout remain before WP-7.
+**Status:** P-22 operator-workflow correction accepted; source/static
+implementation passed on `ac31feb` on 2026-07-12. Earlier P-21 evidence on
+`3bfc74e` remains historical and is superseded for revised closeout; G1/G2
+replacement Local evidence and G3 owner closeout remain before WP-7.
 
 **Environment:** Source/document audit only. No Local database reset, Production
 access/write, feature enablement, publication, new Factor F workflow, or hotfix

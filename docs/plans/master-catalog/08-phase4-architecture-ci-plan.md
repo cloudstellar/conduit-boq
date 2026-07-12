@@ -38,7 +38,9 @@ read-only retained history, an item-first workspace, and an authoritative final
 draft-versus-base snapshot review bound to publish `lock_version`. This remains
 the existing one-publisher model, not a multi-stage approval engine. Candidate
 `020` is amended before freeze; its old `3bfc74e` evidence is historical and
-superseded for revised closeout. No reset or Production action is authorized.
+superseded for revised closeout. Source/static implementation passed on
+`ac31feb`; G1/G2 Local DB/browser/P-20 evidence and G3 closeout remain. No reset
+or Production action is authorized by this checkpoint.
 
 **Owner decision recorded:** 2026-07-04 — approved according to the
 recommendation for Phase 4 Core/local implementation. This approval does not

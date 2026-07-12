@@ -1,9 +1,12 @@
 # Master Catalog Phase 4 WP-6.6 Owner Review Note
 
-**Status:** Hold under P-22 operator-workflow correction; prior evidence is
-historical and revised closeout evidence is pending
+**Status:** Hold under P-22 operator-workflow correction; source/static passed
+on `ac31feb`, while G1/G2 replacement Local evidence and G3 owner closeout are
+pending
 **Review environment:** Local only
-**Implementation evidence commit:**
+**Current correction source commit:**
+`ac31feb`
+**Historical implementation/evidence commit:**
 `3bfc74ea00843033ad3cfd2afac43820b18c0124`
 **Local auth guard commit:**
 `59b17d3c3e7ed6180445ac5dc5e0b75db9fe9452`
@@ -34,14 +37,14 @@ Recorded owner response:
 | Scope | Passed evidence | Remaining later gate |
 |---|---|---|
 | C-01 browse/history | 1,201-row paging fixture; Local 710-row first/middle/last search; exact item and stable identity/code history | Independent operator comprehension at WP-8 |
-| C-02 draft targeting | Exact draft registers, explicit browser targeting, import never auto-selected a draft, stale fail-closed tests | Superseded for closeout by P-22: one mutable draft per base plus audited abandon/replacement evidence required |
+| C-02 draft targeting | Exact draft registers, explicit browser targeting, import never auto-selected a draft, stale fail-closed tests; source/static one-draft/abandon contract passed on `ac31feb` | G1/G2 live create race, replay, abandon/replacement, retained-history, role, and rollback evidence required |
 | C-03/C-04 authority/allocator | 710 mappings, 65 groups, 17 exclusions; unknown/caller-code denial; concurrent unique allocation; never-reuse; sequence-900 boundary | Rerun in WP-8 |
 | C-05 import evidence | Complete 710-row rollout, 709 structured changes plus approved `ITEM-0139`, stable validation replay, explicit import draft selection | Full intended-admin import UAT at WP-8 |
 | C-06/C-07 provenance | Authenticated publisher snapshot; physical archive reference; invalid-date and missing-archive denials | Final candidate metadata/P-15 |
 | C-08 readiness | Shared full 710-row quality result, exact count/hash, successful Local publication proof, pointer restored | Final candidate and WP-8 rerun |
 | C-09/C-10 correction | Retire/reactivate, eligible withdraw, inherited-withdraw denial, preserved identity/code/audit, exact browser item action | P-19 if an official version contains inactive rows |
-| C-11/C-12 schema/UX | `020` constraints/RLS/grants/role denial; Thai desktop/mobile technical QA; no page overflow or app console error | P-22 item-first/review-flow correction plus formal accessibility, performance, and independent UAT remain |
-| C-13 final review | Not part of the retained `3bfc74e` evidence | Authoritative final snapshot diff, stale-review recovery, publish ordering, and owner browser acceptance required |
+| C-11/C-12 schema/UX | Historical `020` constraints/RLS/grants/role denial and Thai desktop/mobile QA; P-22 item-first/two-step-abandon source UI build passed on `ac31feb` | Replacement Local/browser QA plus formal accessibility, performance, and independent UAT remain |
+| C-13 final review | Identity-based final diff, compound/reverted/incomplete/lock fixtures, exact-lock review route, and return context passed source/static on `ac31feb` | G1/G2 stale-review/publish/browser evidence and owner browser acceptance required |
 
 ## 3. Retained evidence
 
@@ -86,7 +89,8 @@ Final Local cleanup restored:
 
 ## 5. Recommendation
 
-Keep WP-6.6 on Hold. Implement P-22 in reviewable docs/database/read-model/UI
-slices, then rerun the revised Local evidence and intended-admin review. Do not
-add migration `020` to bootstrap or begin WP-7 until the owner explicitly
-accepts the replacement closeout evidence.
+Keep WP-6.6 on Hold. The source/static P-22 checkpoint is complete on
+`ac31feb`; the next decision is G1 approval or decline for the first destructive
+clean Local reset and replacement evidence run. Do not run the reset, add
+migration `020` to bootstrap, or begin WP-7 until the applicable later owner
+gates are explicitly accepted.

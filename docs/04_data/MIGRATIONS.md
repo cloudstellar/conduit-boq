@@ -36,7 +36,7 @@
 | `017_master_catalog_phase4_foundation.sql` | Master Catalog Phase 4 additive governance foundation, including P-20 deterministic baseline identity from Production-derived `price_list.id`, request fingerprints, RLS/grants, and disabled feature flag | **Draft — Local only, not applied to Production** |
 | `018_master_catalog_phase4_draft_mutation.sql` | Draft create/manual/import RPCs with actor+payload request fingerprints, per-request/per-code locks, bounded runtime timeouts, full-payload preflight, audited mutation subtransaction rollback, and reusable ADR-003 transitions | **Draft — Local only, not applied to Production** |
 | `019_master_catalog_phase4_publish_pointer.sql` | Publish/restore, shared admin publish-readiness RPC, P-18 and structured-rollout boundary guards, P-19 inactive-row filing warning, catalog-only DB count/hash, runtime timeouts, and published immutability | **Draft — Local only, not applied to Production** |
-| `020_master_catalog_phase4_admin_workflow_hardening.sql` | WP-6.6 frozen first-rollout authority, resolve-only dictionaries/server allocator, exact read registers, readiness/provenance parity, correction path, schema hardening, and P-22 working-draft lifecycle | **Candidate being amended under P-22; prior `3bfc74e` evidence is historical/superseded for closeout; not in bootstrap or Production** |
+| `020_master_catalog_phase4_admin_workflow_hardening.sql` | WP-6.6 frozen first-rollout authority, resolve-only dictionaries/server allocator, exact read registers, readiness/provenance parity, correction path, schema hardening, and P-22 working-draft lifecycle | **P-22-amended candidate on `ac31feb`; repository/static passed, G1/G2 replacement Local evidence pending; not in bootstrap or Production** |
 | `021_master_catalog_phase4_placement_governance.sql` | Reserved P-18/WP-7.5 new-identity placement revision/review and atomic order contract | **Proposed only — P-18 pending; file does not exist; not in bootstrap** |
 | `017+_master_catalog_phase4_*.sql` | Umbrella reference for the Local-only Phase 4 range; files currently exist as `017`-`020`, while bootstrap remains intentionally limited to reviewed `017`-`019` | **Local-only range — no Production approval** |
 
@@ -84,10 +84,12 @@ DB/RLS/concurrency/browser/P-20 evidence.
 
 P-22 later placed closeout on Hold and approved the bounded correction in
 [Operator Workflow Correction Plan #31](../plans/master-catalog/31-phase4-wp66-operator-workflow-correction-plan.md).
-Amend the still-unaccepted Local-only `020` before fingerprint freeze to add the
-one-current-base-working-draft and audited-abandon contract. The `3bfc74e`
-results remain historical evidence for the old candidate but are superseded for
-revised closeout. Keep bootstrap at `017`-`019`; rerun candidate `020`
+Commit `ac31feb` amended the still-unaccepted Local-only `020` before
+fingerprint freeze to add the one-current-base-working-draft and
+audited-abandon contract; repository/static checks passed without applying the
+migration. The `3bfc74e` results remain historical evidence for the old
+candidate but are superseded for revised closeout. Keep bootstrap at
+`017`-`019`; rerun candidate `020`
 separately only after the G1/G2 reset approvals, and add it to bootstrap only
 after G3/G4 acceptance. After P-18 acceptance, placement uses proposed `021`.
 Applied hotfix `016` must not be edited.
