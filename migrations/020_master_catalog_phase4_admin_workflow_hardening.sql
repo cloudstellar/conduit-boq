@@ -7971,7 +7971,7 @@ BEGIN;
   CREATE OR REPLACE FUNCTION private.catalog_parse_iso_date(p_value text)
   RETURNS date
   LANGUAGE plpgsql
-  IMMUTABLE
+  STABLE
   SECURITY DEFINER
   SET search_path = ''
   AS $function$

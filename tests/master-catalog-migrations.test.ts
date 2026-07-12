@@ -400,6 +400,9 @@ describe('Master Catalog migration contracts', () => {
     expect(sql).toContain('published_by_display_name = v_actor_display_name')
     expect(sql).toContain('physical_archive_reference = v_physical_archive_reference')
     expect(sql).toContain('private.catalog_parse_iso_date')
+    expect(sql).toMatch(
+      /CREATE OR REPLACE FUNCTION private\.catalog_parse_iso_date[\s\S]*?LANGUAGE plpgsql\s+STABLE\s+SECURITY DEFINER/,
+    )
     expect(sql).not.toContain("p_approval_metadata->>'publishedByDisplayName'")
 
     for (const rpc of [
