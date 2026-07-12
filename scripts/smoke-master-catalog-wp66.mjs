@@ -422,13 +422,13 @@ async function verifyFrozenAuthority() {
   assert(groupCount === 65, `Expected 65 frozen groups, found ${groupCount}`)
   assert(exclusionCount === 17, `Expected 17 exclusions, found ${exclusionCount}`)
   assert(authority.mappings.length === mappingCount, 'Tracked authority mapping count differs from DB')
-  assert(authority.groups.length === groupCount, 'Tracked authority group count differs from DB')
-  assert(authority.exclusions.length === exclusionCount, 'Tracked authority exclusions differ from DB')
+  assert(authority.code_groups.length === groupCount, 'Tracked authority group count differs from DB')
+  assert(authority.source_exclusions.length === exclusionCount, 'Tracked authority exclusions differ from DB')
   return {
     mappings: mappingCount,
     groups: groupCount,
     exclusions: exclusionCount,
-    sha256: createHash('sha256').update(JSON.stringify(authority)).digest('hex'),
+    sha256: authority.authority_sha256,
   }
 }
 
@@ -830,7 +830,7 @@ async function readFactorSummary() {
 
 async function countRows(table, scope = (query) => query) {
   const { count, error } = await scope(
-    service.from(table).select('id', { count: 'exact', head: true }),
+    service.from(table).select('*', { count: 'exact', head: true }),
   )
   if (error) throw error
   return count ?? 0
@@ -1006,7 +1006,11 @@ function readEvidenceOutputPath(args) {
 }
 
 function formatHarnessError(stage, error) {
-  const message = error instanceof Error ? error.message : String(error ?? '')
+  const message = error instanceof Error
+    ? error.message
+    : error && typeof error === 'object' && typeof error.message === 'string'
+      ? `${error.code ? `[${error.code}] ` : ''}${error.message}`
+      : JSON.stringify(error ?? '')
   return `WP-6.6 stage failed: ${stage}: ${message || 'no safe error message returned'}`
 }
 
