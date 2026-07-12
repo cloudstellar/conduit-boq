@@ -28,10 +28,10 @@ implemented.
 **P-22 operator-workflow amendment:** 2026-07-12 — T-43 and T-44 add the
 one-current-base-working-draft and final snapshot-review threats from
 [Correction Plan #31](./31-phase4-wp66-operator-workflow-correction-plan.md).
-P-22 source controls and static tests were implemented on `ac31feb`; residual
-risk remains Medium until candidate `020` and the operator flow pass separately
-approved G1/G2 Local DB/browser evidence and G3 owner review. No Production
-action is authorized.
+P-22 source controls/static tests were implemented on `ac31feb`; G1 Local
+DB/concurrency/security evidence passed on `e463270`. Residual risk remains
+Medium until the separately approved G2 clean rebuild/P-20 comparison and
+browser/G3 owner review pass. No Production action is authorized.
 
 **Applies to:** Master Catalog administration, local Excel parsing, draft
 changes, publication, history, and official Excel/PDF exports

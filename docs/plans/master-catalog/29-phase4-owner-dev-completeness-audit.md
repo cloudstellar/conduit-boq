@@ -2,8 +2,9 @@
 
 **Status:** P-22 operator-workflow correction accepted; source/static
 implementation passed on `ac31feb` on 2026-07-12. Earlier P-21 evidence on
-`3bfc74e` remains historical and is superseded for revised closeout; G1/G2
-replacement Local evidence and G3 owner closeout remain before WP-7.
+`3bfc74e` remains historical and is superseded for revised closeout. G1 Local
+DB/concurrency/P-20 input passed on final checkpoint `e463270`; G2 independent
+rebuild/comparison and G3 owner closeout remain before WP-7.
 
 **Environment:** Source/document audit only. No Local database reset, Production
 access/write, feature enablement, publication, new Factor F workflow, or hotfix

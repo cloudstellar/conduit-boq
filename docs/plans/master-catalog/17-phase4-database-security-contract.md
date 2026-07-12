@@ -13,8 +13,10 @@ and the proposed P-18/WP-7.5 placement extension. Existing `017`-`019` remain
 the reviewed Local/bootstrap contract. Candidate `020` was amended under P-22
 on source commit `ac31feb` and passed repository/static verification; its
 `3bfc74e` evidence remains historical but is superseded for revised closeout.
-The amended candidate has not been applied for G1/G2 evidence, remains outside
-bootstrap, and has not been applied to Production.
+Owner-approved G1 applied the candidate separately on Local and passed final
+DB/concurrency/lint/security evidence on `e463270`. G2 must independently clean
+rebuild/compare the exact candidate; `020` remains outside bootstrap and has
+not been applied to Production.
 P-18 rules and placement migration `021` remain pending owner/data-custodian
 approval.
 
@@ -803,7 +805,7 @@ create implementation, the partial unique index, and the audited abandon path;
 it must not rewrite `017`-`019`, hotfix `016`, BOQ behavior, or Factor F state.
 Its prior `3bfc74e` Local evidence is historical and superseded for revised
 closeout. Keep `020` outside `scripts/bootstrap-local-db.sh` until replacement
-G1/G2 evidence and G3/G4 owner closeout are recorded.
+G2 evidence and G3/G4 owner closeout are recorded; G1 passed on `e463270`.
 
 If P-18 is accepted, implement the placement extension only in append-only
 migration `021_master_catalog_phase4_placement_governance.sql`. Do not edit or

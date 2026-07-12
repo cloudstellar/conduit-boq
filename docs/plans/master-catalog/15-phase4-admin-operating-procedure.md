@@ -2,10 +2,11 @@
 
 **Status:** Procedure amended under P-22; source/static implementation of the
 one-working-draft, audited-abandon, item-first, and final snapshot-review flow
-passed on `ac31feb`. WP-6.6 closeout remains on Hold for G1/G2 Local evidence
-and G3 owner review. Prior `3bfc74e` evidence is historical. P-18/P-19 where
-applicable and independent intended-admin WP-8 UAT remain pending. The current
-Local UI must not be treated as Production-ready until those gates pass.
+passed on `ac31feb`, and G1 Local DB/concurrency evidence passed on `e463270`.
+WP-6.6 closeout remains on Hold for G2 independent rebuild/P-20 comparison and
+G3 owner review. Prior `3bfc74e` evidence is historical. P-18/P-19 where
+applicable and independent intended-admin WP-8 UAT remain pending. The Local UI
+must not be treated as Production-ready until those gates pass.
 **Audience:** Active Master Catalog administrators
 **Rule:** A draft is not official; published versions are immutable
 

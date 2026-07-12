@@ -1,8 +1,9 @@
 # Master Catalog Phase 4 WP-6.6 Operator Workflow Correction Plan
 
-**Status:** P-22 owner-approved; source implementation and repository/static
-verification completed on `ac31feb` on 2026-07-12. G1/G2 replacement Local
-evidence, G3 owner closeout, and G4 bootstrap/WP-7 sequencing remain pending
+**Status:** P-22 owner-approved; source/static completed on `ac31feb` and G1
+Local DB/concurrency/P-20 input completed on final checkpoint `e463270` on
+2026-07-12. G2 clean rebuild/P-20 comparison, G3 owner closeout, and G4
+bootstrap/WP-7 sequencing remain pending
 
 **Production touched:** No
 
@@ -219,7 +220,7 @@ candidate `020` separately until the new owner closeout accepts it.
 | Gate | Required decision/evidence |
 |---|---|
 | G0 | P-22 plan accepted for docs and Local-only implementation — accepted 2026-07-12 |
-| G1 | Owner explicitly approves first full Local reset after static implementation is ready |
+| G1 | Owner explicitly approves first full Local reset after static implementation is ready — approved and completed 2026-07-12 |
 | G2 | Owner explicitly approves the second independent clean rebuild and P-20 comparison |
 | G3 | Owner completes intended-admin workflow review and accepts or holds the revised WP-6.6 closeout |
 | G4 | Only after G3, add accepted `020` to bootstrap and separately authorize any WP-7 execution |
@@ -247,5 +248,48 @@ Completed without Local DB mutation or Production access:
   10 pre-existing out-of-scope warnings; production build passed and includes
   the final-review route; `node --check` and `git diff --check` passed.
 
-This checkpoint does not satisfy G1/G2 DB/concurrency/browser/P-20 evidence and
-does not authorize `npm run db:local:bootstrap`.
+This repository/static checkpoint did not itself satisfy G1/G2
+DB/concurrency/browser/P-20 evidence and did not authorize
+`npm run db:local:bootstrap`. G1 was later approved separately and is recorded
+below; G2 still requires a new owner decision.
+
+## 11. G1 Local checkpoint
+
+Owner approved G1 after the repository/static checkpoint. The first clean Local
+reset applied canonical `009`-`015`, hotfix `016`, and `017`-`019`; candidate
+`020` was applied separately and remained outside bootstrap.
+
+G1 found and resolved two bounded source issues before final evidence:
+
+- `17ec6cc` makes the reusable WP-6.5 regression harness close blocked draft
+  fixtures through audited abandon, so it remains compatible with one working
+  draft per base and leaves zero working drafts;
+- `e463270` changes `private.catalog_parse_iso_date` from incorrectly declared
+  `IMMUTABLE` to truthful `STABLE`; Local schema was aligned and DB lint then
+  returned no findings.
+
+Final exact-commit evidence on `e463270`:
+
+- WP-6.6: `tmp/master-catalog/wp66-evidence/20260712-g1-p22-e463270.json`,
+  SHA-256 `9ccfe240772cb75b4103534d44c12d39600e2ead0ff699020ac5b6751056392d`;
+- WP-6.5/P-20 input:
+  `tmp/master-catalog/wp65-evidence/20260712-g1-p22-e463270.json`, SHA-256
+  `d4750d495adf660c3938062dd0e2e1922d350f72fb7fcb8503afb895f211ec5a`;
+- P-20 baseline remained 710 rows, dataset hash
+  `sha256:2e3571ea7135fbc0bbb84c8cc330af1173e4c1d2345e5eb59958dc76e45558b8`,
+  and identity mapping SHA-256
+  `5f68993ce5aa5c7735b0d9e6de6d27946b4846fb8a6eb77d1b6b3bd6c4a73de7`;
+- DB lint and security advisors had no findings. Performance advisors retained
+  24 pre-existing policy warnings on baseline tables only: 19 auth init-plan
+  and 5 multiple-permissive-policy findings; no `020` authority table appeared;
+- final readback restored pointer `2568.0.0`/710 rows/hash, zero working drafts,
+  all catalog flags `false`, 198 BOQs/1,547 items, and Factor F
+  `2569.0.0`/36 rows; Production touched: No;
+- 29 files/147 tests, TypeScript, lint with 0 errors/10 existing warnings,
+  authority 710/65/17, script syntax, and production build including `/review`
+  passed.
+
+The initial G1 clean reset began before the two bounded source fixes. Therefore
+G2 must, after separate owner approval, perform a fresh clean rebuild from exact
+commit `e463270` and compare its independent P-20 output with the G1 input.
+Browser owner closeout and G3 are not inferred from this DB checkpoint.

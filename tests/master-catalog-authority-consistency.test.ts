@@ -131,7 +131,7 @@ describe('Master Catalog authority consistency', () => {
     ])
 
     expect(migrations).toContain(
-      '**P-22-amended candidate on `ac31feb`; repository/static passed, G1/G2 replacement Local evidence pending; not in bootstrap or Production**',
+      '**P-22 candidate at `e463270`; G1 Local DB/concurrency/P-20 input passed, G2 clean rebuild/comparison pending; not in bootstrap or Production**',
     )
     expect(migrations).toContain(
       '**Proposed only — P-18 pending; file does not exist; not in bootstrap**',
@@ -182,13 +182,13 @@ describe('Master Catalog authority consistency', () => {
     expect(decisions).toContain('P-19')
     expect(decisions).toContain('Pending; recorded 2026-07-07')
     expect(decisions).toContain(
-      'Approved; WP-6.5C and post-`020` WP-6.6 reruns passed; WP-8/P-15 reruns pending',
+      'Approved; revised-candidate G1 input passed on `e463270`; G2 comparison and WP-8/P-15 reruns pending',
     )
     expect(decisions).toContain(
       'Implementation/Local evidence passed 2026-07-12; owner closeout pending',
     )
     expect(decisions).toContain(
-      'G0 approved 2026-07-12; source/static passed on `ac31feb`; G1/G2 Local resets and G3 closeout pending',
+      'G0/G1 completed 2026-07-12; final G1 evidence on `e463270`; G2 clean rebuild/P-20 comparison and G3 closeout pending',
     )
 
     const tracker = read(
@@ -202,7 +202,7 @@ describe('Master Catalog authority consistency', () => {
     expect(tracker).toContain('independent intended-admin UAT remains WP-8')
     expect(tracker).toContain('| Production write allowed | No |')
     expect(tracker).toContain(
-      'P-22/G0 accepted for docs and Local-only implementation',
+      'P-22/G0 accepted and G1 Local evidence passed on `e463270`',
     )
     expect(existsSync(resolve(
       root,

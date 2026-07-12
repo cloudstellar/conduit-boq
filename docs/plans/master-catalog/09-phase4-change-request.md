@@ -46,7 +46,8 @@ abandon/read-only retained history, makes the complete item workspace primary,
 and requires an authoritative lock-bound final snapshot review before publish.
 Candidate `020` is amended before freeze; prior `3bfc74e` evidence is historical
 and superseded for revised closeout. Source/static implementation passed on
-`ac31feb`; Local resets and Production remain separately gated.
+`ac31feb`; owner-approved G1 Local DB/concurrency/P-20 input passed on
+`e463270`. G2 reset/comparison and Production remain separately gated.
 
 ## 1. Decision requested
 
@@ -361,7 +362,7 @@ feature enablement, final catalog publication, or silent business-data choices.
 
 - [x] P-21 explicitly authorizes WP-6.6 Local-only implementation scope/start
 - [x] P-22/G0 authorizes the bounded operator-workflow docs and Local-only
-      implementation; G1/G2 resets remain separate
+      implementation; G1/G2 require separate approvals, and G1 is now complete
 - [x] Audit #29 C-01 through C-13 are mapped to exact DB/UI/test owners
 - [x] WP-6.5 reliability evidence remains preserved and is not relabeled as a
       full operator-completeness certificate
@@ -369,6 +370,8 @@ feature enablement, final catalog publication, or silent business-data choices.
       remain unchanged
 - [x] P-22 source/static implementation passed on `ac31feb` without applying
       candidate `020`, resetting Local, changing bootstrap, or touching Production
+- [x] G1 Local reset/apply/harness evidence passed on `e463270`; `020` remains
+      outside bootstrap and G2/G3/G4 remain separately gated
 - [x] Unsupported Add/Supplement/Retire controls remain hidden at release unless
       their downstream gates pass
 - [ ] A separate owner decision is obtained before any Local bootstrap/reset
