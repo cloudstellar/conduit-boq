@@ -131,7 +131,7 @@ describe('Master Catalog authority consistency', () => {
     ])
 
     expect(migrations).toContain(
-      '**Local evidence passed on `3bfc74e`; owner closeout pending; not in bootstrap or Production**',
+      '**Candidate being amended under P-22; prior `3bfc74e` evidence is historical/superseded for closeout; not in bootstrap or Production**',
     )
     expect(migrations).toContain(
       '**Proposed only — P-18 pending; file does not exist; not in bootstrap**',
@@ -187,23 +187,30 @@ describe('Master Catalog authority consistency', () => {
     expect(decisions).toContain(
       'Implementation/Local evidence passed 2026-07-12; owner closeout pending',
     )
+    expect(decisions).toContain(
+      'Approved for docs and Local-only implementation planning 2026-07-12; G1/G2 Local resets and G3 closeout pending',
+    )
 
     const tracker = read(
       'docs/plans/master-catalog/25-phase4-execution-progress-tracker.md',
     )
     expect(tracker).toMatch(/\| WP-6\.5 \|[^\n]+\| Ready for owner review \|/)
-    expect(tracker).toMatch(/\| WP-6\.6 \|[^\n]+\| Ready for owner review \|/)
+    expect(tracker).toMatch(/\| WP-6\.6 \|[^\n]+\| In progress \|/)
     expect(tracker).toMatch(/\| WP-7 \|[^\n]+\| Not started \|/)
     expect(tracker).toMatch(/\| WP-7\.5 \|[^\n]+\| Not started \|/)
     expect(tracker).toMatch(/\| WP-8 \|[^\n]+\| Not started \|/)
     expect(tracker).toContain('independent intended-admin UAT remains WP-8')
     expect(tracker).toContain('| Production write allowed | No |')
     expect(tracker).toContain(
-      'Accept or hold WP-6.6 closeout for Audit #29 C-01 through C-12',
+      'P-22/G0 accepted for docs and Local-only implementation',
     )
     expect(existsSync(resolve(
       root,
       'docs/plans/master-catalog/30-phase4-wp66-owner-review-note.md',
+    ))).toBe(true)
+    expect(existsSync(resolve(
+      root,
+      'docs/plans/master-catalog/31-phase4-wp66-operator-workflow-correction-plan.md',
     ))).toBe(true)
   })
 

@@ -1,9 +1,9 @@
 # Phase 4 Owner/Developer Capability Completeness Audit
 
-**Status:** Planning correction accepted on 2026-07-12; P-21-authorized
-Local-only remediation passed repository and separately approved Local
-DB/RLS/concurrency/browser evidence on `3bfc74e`; owner closeout remains before
-WP-7
+**Status:** P-22 operator-workflow correction accepted for docs and Local-only
+implementation planning on 2026-07-12. Earlier P-21 evidence on `3bfc74e`
+remains historical but is superseded for closeout once candidate migration
+`020` changes; revised evidence and owner closeout remain before WP-7.
 
 **Environment:** Source/document audit only. No Local database reset, Production
 access/write, feature enablement, publication, new Factor F workflow, or hotfix
@@ -73,7 +73,7 @@ do not remove the need for the operator-completeness work below.
 | ID | Finding and current evidence | Required closure before full release |
 |---|---|---|
 | C-01 | Version detail reads only the first 20 price rows; the editor offers at most 12 active samples. Version/history reads also stop at fixed 25/50-row limits without pagination. There is no full-catalog search/filter route or item-detail/identity timeline route promised by the architecture. | Use deterministic paged data reads so PostgREST row caps cannot truncate the dataset, then load/filter all current items client-side within the measured 2,000-row threshold. Add exact item detail/field-level identity history and paginate version/audit registers instead of silently truncating them. |
-| C-02 | Multiple drafts are allowed by architecture, but overview/import silently select one current-base draft. A stale draft still renders mutation controls and fails only after submit. | Make exact draft selection explicit, show all valid/stale drafts, and render stale drafts read-only with a clear create-new-draft recovery path. |
+| C-02 | The implemented architecture permits multiple mutable drafts from the same current base. Exact selection prevents hidden targeting, but the intended V1 operator model is one release workspace at a time and has no safe abandon/replacement lifecycle. | Enforce at most one mutable draft per base in the database, expose one current working draft, retain stale/abandoned versions read-only, and add audited idempotent abandon before replacement. |
 | C-03 | Manual/import mutation accepts free-form category and `AAA/TTT` names. Database helpers create missing categories/groups from caller text, although display categories must follow the Production-derived versioned set and P-06 approved a controlled 22/65 code-group dictionary. | Freeze the approved versioned categories and P-06 code groups, resolve existing IDs only, and move any future taxonomy creation to a separate audited governance decision. |
 | C-04 | Architecture requires the next never-issued sequence in an approved group, but the UI/RPC requires an arbitrary full `AAA-TTT-NNN` code. | Add a locked server allocator that selects the approved group, uses the next never-issued sequence, never fills retired gaps, and blocks at 900. Exact frozen first-rollout mappings remain a reviewed migration/import exception. |
 | C-05 | Import preview shows summary counts and diagnostics, not the complete server-recomputed add/update/recode/retire/unchanged diff or exact full-import omissions. Runtime context reads the draft reconciliation CSV from `docs/`, always supplies an empty price-authority map, and is not a version-owned reusable authority. | Seed/freeze the approved first-rollout mapping into reviewed implementation/database authority; keep the draft CSV as evidence only. Reconcile future imports against the exact selected draft and approved dictionaries, return/display the authoritative diff/omission set, and support bounded import-level price authority with explicit per-row override only when required. |
@@ -84,6 +84,7 @@ do not remove the need for the operator-completeness work below.
 | C-10 | Manual edit is a generic free-form form, is not prefilled from an exact item, and requires price authority even for a category-only change. | Use an exact item editor with current values, field-level diff, controlled selects, and require price authority only when name, unit, or money changes. |
 | C-11 | Many labels/statuses remain English; production-capable forms contain Local/WP placeholder evidence; UUID/lock/change-set details are primary success content. | Make the workflow Thai-first, remove synthetic defaults, separate draft save from whole-version publish, and move copyable technical IDs to support details. |
 | C-12 | The DB contract promised post-preflight nullability/order hardening, but `price_list` still permits nullable required fields/display order and has no per-version unique order constraint. | In an additive fix-forward migration, prove compatibility then enforce required nullability and the order constraints owned by the accepted scope. Do not rewrite migrations `017`-`019`. |
+| C-13 | The publish panel appears before the full item workspace, and the only complete diff is import-specific. Manual plus import changes have no authoritative final draft-versus-base comparison immediately before publication. | Make the complete searchable catalog the primary workspace; compute final snapshot diff by stable identity; show overlapping change groups/old-new values/readiness; carry the reviewed expected lock into publish and require a fresh review after any mutation. |
 
 P-18 placement and P-19 retired-row PDF policy are already recorded gates, not
 new discoveries from this audit. WP-7 BOQ/hotfix `016`/Factor F regression and
@@ -94,7 +95,7 @@ WP-8 clean rehearsal/UAT/performance/advisors also remain required.
 | Order | Work package | Exit meaning |
 |---:|---|---|
 | 1 | WP-6.5 reliability and publish-boundary hardening | Preserve passed evidence for idempotency, concurrency, fail-closed guards, portability, and recovery. It is not an operator-completeness certificate. |
-| 2 | WP-6.6 admin workflow completeness and authority hardening | Close C-01 through C-12 with migration/RPC/UI/audit/tests and owner browser review. No Local reset is implied by planning this work. |
+| 2 | WP-6.6 admin workflow completeness and authority hardening | Close C-01 through C-13 with migration/RPC/UI/audit/tests and owner browser review. No Local reset is implied by planning this work. |
 | 3 | WP-7 permanent BOQ/hotfix `016` and Factor F regression preservation | Regression-only; no new Factor F or hotfix workflow. |
 | 4 | P-18 decision and WP-7.5 placement governance | Required for full Add/Supplement release; preserve inherited relative order while auditing every shifted numeric position. |
 | 5 | P-19 decision when Retire is in release scope | Resolve official PDF treatment before filing a candidate with inactive rows. |
@@ -111,6 +112,9 @@ WP-6.6 should be delivered in reviewable slices:
 - F: `reactivate` and draft-only-new `withdraw` correction actions;
 - G: schema constraints, Thai workflow cleanup, observability, and full
   DB/browser/UAT evidence.
+- H: one-current-base-working-draft invariant and audited abandon lifecycle;
+- I: item-first workspace and authoritative final snapshot review before
+  publish.
 
 ## 6. Migration and authority order
 
@@ -123,9 +127,10 @@ Do not edit evidence-backed Local migrations `017`-`019`.
 - Keep `scripts/bootstrap-local-db.sh` at `009`-`015`, hotfix `016`, then
   `017`-`019` until each new migration exists, is reviewed, and its bootstrap
   inclusion is deliberately approved.
-- Any migration change invalidates the prior clean-rebuild fingerprint for the
-  new candidate and requires P-20/WP-7/WP-8 reruns. It does not erase the
-  historical evidence for the earlier reviewed commit.
+- P-22 amends the still-unaccepted Local-only `020` before fingerprint freeze.
+  This supersedes the `3bfc74e` migration fingerprint/evidence for closeout and
+  requires new P-20/WP-7/WP-8 reruns. It does not erase the historical evidence
+  for the earlier reviewed commit.
 
 ## 7. Deliberate deferrals and control visibility
 
@@ -135,9 +140,8 @@ does not imply they are supported:
 - arbitrary reorder of inherited published identities;
 - creation/editing of new category or `AAA/TTT` dictionary definitions;
 - a second-person or multi-stage approval engine;
-- draft cancel/abandon lifecycle, stale-draft rebase/merge, and destructive
-  audit deletion; stale drafts remain filterable read-only comparison records
-  until a separate lifecycle decision exists;
+- stale-draft rebase/merge and destructive audit deletion; P-22 adds only
+  audited abandon while stale/abandoned drafts remain read-only history;
 - server pagination/virtualization before the measured threshold;
 - BOQ Rebase, K-formula governance, new Factor F workflow, or hotfix expansion.
 
@@ -162,9 +166,10 @@ every in-scope row.
 
 ## 9. Approval boundary
 
-The owner requested this full audit and plan alignment on 2026-07-12. That
-authorizes documentation correction and sequencing only. Decision P-21 in the
-Decision Register must explicitly authorize WP-6.6 Local-only implementation.
-It does not authorize a Local database reset, migration execution, Production
-access/write, feature enablement, publication, new Factor F work, or expansion
-of hotfix `016`.
+The owner requested this full audit and plan alignment on 2026-07-12. P-21
+authorized the first Local-only implementation and P-22 now authorizes the
+operator-workflow correction described in
+[Doc #31](./31-phase4-wp66-operator-workflow-correction-plan.md). Neither
+decision authorizes a Local database reset, Production access/write, feature
+enablement, publication, new Factor F work, P-18/`021`, or expansion of hotfix
+`016`.

@@ -25,6 +25,13 @@ operator/authority threats found by
 gates, not evidence that Production has been touched or that migration `020` is
 implemented.
 
+**P-22 operator-workflow amendment:** 2026-07-12 — T-43 and T-44 add the
+one-current-base-working-draft and final snapshot-review threats from
+[Correction Plan #31](./31-phase4-wp66-operator-workflow-correction-plan.md).
+P-22 authorizes docs and Local-only implementation planning only. Candidate
+`020` evidence must be replaced after separate G1/G2 reset approvals; no
+Production action is authorized.
+
 **Applies to:** Master Catalog administration, local Excel parsing, draft
 changes, publication, history, and official Excel/PDF exports
 
@@ -43,9 +50,11 @@ In scope:
 
 - authenticated catalog reads;
 - active-admin draft creation and manual changes;
+- audited draft abandon and immutable abandoned history;
 - browser-local parsing of the approved Excel profile;
 - normalized import payload validation and apply;
 - publish and pointer restore;
+- authoritative final draft-versus-base snapshot review bound to publish lock;
 - item history and change evidence;
 - proposed new-identity placement confirmation after P-18 acceptance;
 - server-generated official Excel and print/PDF output;
@@ -178,12 +187,14 @@ Risk is the residual risk after the listed controls are implemented and tested.
 | T-34 | A placement was accepted, then a new identity/category/order change makes it stale while readiness still reports green | DB-owned placement revision increments on every placement-relevant mutation; append-only review must match current revision and exact new-identity coverage; publish uses the same private helper | Confirm placement, then add/change a row; readiness and publish return `P18_PLACEMENT_REVIEW_REQUIRED` until reconfirmed | Low after P-18/WP-7.5 |
 | T-35 | Inserting one row shifts hundreds of inherited numeric positions and partially commits, loses audit, or races another admin | One short transaction; draft/version lock plus request fingerprint and expected lock; deferrable uniqueness; deterministic renumber; complete old/new `place` snapshots for every shifted row; rollback on any rejection | Concurrent and injected-failure tests prove one outcome and zero partial rows/revisions/reviews/change items; performance measured at 710+ rows | Low after P-18/WP-7.5 |
 | T-36 | Technically safe UI language, rehearsal defaults, or prominent UUID/lock details cause an admin to mistake draft save for publication or submit fictional evidence | Thai-first labels/actions/status; no WP/local placeholder defaults; clear draft-save versus whole-version publish hierarchy; support details demoted but copyable; intended-admin comprehension UAT | Browser review and UAT explain version/draft/publish, complete one save, recover from an error, and identify real required evidence without developer help | Medium until WP-6.6/WP-8 UAT close |
-| T-37 | A partial 20-row view or hidden automatic draft choice causes the admin to miss an item, edit the wrong draft, or discover stale base only after submit | Full-catalog read within measured threshold; exact item/draft selection; all current/stale drafts visible; stale drafts read-only; server still verifies exact version/base/lock | Browser/UAT search first/middle/last rows, switch two drafts, and prove stale controls are disabled before submit | Medium until WP-6.6 |
+| T-37 | A partial 20-row view or hidden automatic draft choice causes the admin to miss an item, edit the wrong draft, or discover stale base only after submit | Full-catalog read within measured threshold; database-enforced one mutable draft per base; exact item/draft selection; stale/abandoned drafts visible read-only; server verifies exact version/base/lock | Browser/UAT search first/middle/last rows, prove one current workspace, and prove stale/abandoned controls are disabled before submit | Medium until WP-6.6 |
 | T-38 | Free-form category/group names or caller-selected codes create unapproved taxonomy, collide, or refill a retired sequence | Freeze Production-derived versioned categories and P-06 code groups; resolve existing IDs only; locked server allocator uses next never-issued sequence and stops at 900; future dictionary authoring is separate governance | Unknown category/group denial, concurrent allocation, retired-gap, collision, capacity, and exact frozen-rollout fixtures | Medium until WP-6.6 |
 | T-39 | Client preview omits exact effects/omissions, runtime treats a draft docs CSV as authority, or no supported new-row price evidence exists, so approval is uninformed or Supplement cannot complete | Freeze first-rollout mapping in reviewed implementation/database authority; future reconciliation uses exact draft/dictionaries; server-recomputed complete diff/omission set; persisted preview fingerprint; bounded batch authority with per-row override only when needed | Evidence-file non-authority, add/update/recode/retire/unchanged, below/at-threshold omission, and approved/missing/mismatched authority tests | Medium until WP-6.6 |
 | T-40 | Caller types a misleading publisher name, impossible date escapes stable validation, manual-only publication lacks an archive reference, or preliminary readiness reports green while final publish rejects quality/stale base | Derive actor snapshot from authenticated profile; semantically parse dates; require version archive reference; one private readiness result owns stale-base/full-quality/P-18/structured counts and is consumed by UI and publish | Caller actor spoof, invalid-calendar-date, manual-only archive negative/positive, and readiness/publish parity fixtures | Medium until WP-6.6 |
 | T-41 | Mistaken retire or never-published add has no correction path, encouraging direct SQL, audit deletion, or needless draft reconstruction | Explicit audited reactivate; base-absent withdraw removes only draft row while preserving identity/code/audit; direct writes remain denied | Valid/invalid correction, published/base identity denial, replay, stale lock, rollback, and history tests | Medium until WP-6.6 |
 | T-42 | Nullable required price/order fields or duplicate/gapped order survive ordinary writes and fail only at publication | Post-preflight fix-forward nullability/order constraints plus shared quality checks; P-18 adds deferrable unique/contiguous placement order when accepted | Zero-null preflight, constraint violation, compatibility, clone, import, publication, and placement tests | Medium until WP-6.6/P-18 |
+| T-43 | Two current-base drafts race or an admin deletes/repurposes a draft to start over, splitting intent and losing trustworthy lineage | Partial unique draft-per-base index; pointer/base locks; stable `DRAFT_ALREADY_EXISTS`; audited idempotent `draft -> abandoned`; no row/audit deletion; abandoned rows immutable and nonpublishable | Same-request replay, different-request duplicate, two-session create, valid/invalid/replayed/concurrent abandon, role denial, rollback, and zero-partial-effect tests | Medium until P-22 closes |
+| T-44 | Import and manual changes combine into a final state the admin never sees, or a draft changes after review but before publish | Complete database snapshot diff by stable identity; compound/reverted/incomplete-read fixtures; readiness and governance warnings on review; reviewed `lock_version` passed to publish; mutation increments lock and forces fresh review | Browser/UAT verifies counts and old/new values, modifies after review, observes `DRAFT_LOCK_CONFLICT`, reviews again, and publishes only the exact reviewed state | Medium until P-22/WP-8 UAT close |
 
 ## 6. Validation boundaries and safe limits
 
@@ -258,7 +269,12 @@ measured operational or compliance needs justify it.
 - malicious/malformed/oversized workbook fixtures;
 - formula/external-link export fixture;
 - replay, stale-lock, stale-base, and concurrent publish tests;
-- full-catalog browse/history and explicit multi-draft/stale read-only tests;
+- full-catalog browse/history, one-current-base-draft, and stale/abandoned
+  read-only tests;
+- create/abandon role, idempotency, fingerprint, lock, race, rollback, and
+  immutable-history tests;
+- final snapshot diff compound/reverted/incomplete-read and stale-review publish
+  tests;
 - versioned-category/P-06-group resolve-only and next-never-issued allocator role/race/capacity
   tests;
 - complete import diff/omission and price-authority evidence tests;

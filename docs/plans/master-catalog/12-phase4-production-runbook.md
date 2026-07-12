@@ -80,11 +80,14 @@ Stop immediately when any of these occurs:
 - reusable version logic remains hardcoded to `2568.1.0` contrary to ADR-003;
 - live DB/RPC/RLS/concurrency, tracked artifact verification, admin UAT, or
   documented recovery evidence required for the next gate is missing;
-- any Audit #29 C-01 through C-12 capability is visible as supported without
+- any Audit #29 C-01 through C-13 capability is visible as supported without
   its authoritative WP-6.6 implementation/evidence;
 - an item/import path creates free-form taxonomy, accepts caller-owned code
   allocation/publisher identity, silently chooses a draft, or presents partial
   diff/readiness as final authority;
+- two mutable drafts can exist for one base, a draft/abandon action loses audit
+  history, or publication can proceed without the exact final snapshot/lock
+  state the operator reviewed;
 - Supabase advisors show a new or untriaged security/performance finding for
   the Phase 4 change set;
 - unexpected active admin activity or simultaneous catalog edit is detected;
@@ -250,7 +253,7 @@ Before requesting P-12, record:
 - tracked semantic artifact-verifier output;
 - route failure-state, Thai recovery message, intended-admin UAT, and 710-row
   performance evidence;
-- Audit #29 capability matrix showing C-01 through C-12 implemented/evidenced
+- Audit #29 capability matrix showing C-01 through C-13 implemented/evidenced
   or an affected control explicitly excluded from release visibility;
 - authority/document consistency result;
 - security/performance advisor results with no unresolved Phase 4 blocker;

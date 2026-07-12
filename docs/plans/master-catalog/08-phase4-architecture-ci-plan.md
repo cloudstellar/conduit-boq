@@ -30,6 +30,16 @@ readiness parity, correction actions, schema constraints, and Thai operator UX
 must close in WP-6.6 before WP-7. This is a planning gate, not implementation or
 Production approval.
 
+**P-22 operator-workflow amendment:** 2026-07-12 — intended-admin review placed
+WP-6.6 closeout on Hold and accepted
+[Correction Plan #31](./31-phase4-wp66-operator-workflow-correction-plan.md).
+Phase 4 Core has at most one mutable draft per base, audited abandon with
+read-only retained history, an item-first workspace, and an authoritative final
+draft-versus-base snapshot review bound to publish `lock_version`. This remains
+the existing one-publisher model, not a multi-stage approval engine. Candidate
+`020` is amended before freeze; its old `3bfc74e` evidence is historical and
+superseded for revised closeout. No reset or Production action is authorized.
+
 **Owner decision recorded:** 2026-07-04 — approved according to the
 recommendation for Phase 4 Core/local implementation. This approval does not
 authorize Production migration, deploy, feature enablement, candidate data
@@ -430,10 +440,13 @@ Version rules:
   new draft from the new current version and deliberately reapply the still
   approved changes through new audited change sets. The stale draft remains a
   nonofficial read-only comparison artifact and can never be promoted.
-- Multiple drafts may exist, but version numbers are unique and a stale-base
-  draft cannot be promoted.
-- The UI requires an explicit exact draft selection and renders stale drafts
-  read-only; it never silently chooses one of several drafts for mutation/import.
+- At most one mutable `draft` may exist per `based_on_version_id`; the database
+  enforces this invariant. Version numbers remain globally unique.
+- The UI opens the one current-base working draft explicitly. Stale and
+  abandoned drafts remain visible read-only; it never silently targets another
+  version for mutation/import.
+- Starting over requires an audited `draft -> abandoned` action. It never
+  deletes draft rows/audit or reuses `archived` published semantics.
 - Every Phase 4-created publication has a bounded version-level physical archive
   reference even when no workbook import exists. The approved historical
   baseline is the only recorded exception.
@@ -657,8 +670,8 @@ Add `catalog_change_sets`:
 - `id uuid primary key`
 - `version_id uuid not null`
 - `import_id uuid`
-- `change_type text` constrained to `clone`, `import`, `manual`, `publish`, or
-  `restore`
+- `change_type text` constrained to `clone`, `import`, `manual`, `abandon`,
+  `publish`, or `restore`
 - `reason text not null`
 - `request_id uuid unique`
 - `actor_id uuid not null`
@@ -984,7 +997,7 @@ Invalid input creates no uploaded file and no cleanup obligation.
 An active admin may change a draft through item forms without selecting a
 workbook:
 
-1. Open an existing draft or clone the current published version.
+1. Open the one current-base working draft or clone Current when none exists.
 2. Choose add, edit, retire, or recode.
 3. Enter the proposed values and a mandatory reason.
 4. For price changes, show old/new material, labor, and unit costs together and
@@ -1002,9 +1015,9 @@ workbook:
 Manual-only drafts do not require a source filename, workbook hash, or physical
 archive reference. They still require real approval evidence before publish.
 
-Published or archived rows never expose edit controls. Correcting a published
-item means cloning a new draft and recording a new change set; history is not
-rewritten.
+Published, archived, stale, or abandoned rows never expose edit controls.
+Correcting a published item means cloning a new draft and recording a new
+change set; history is not rewritten.
 
 ### 5.6 Item history contract
 
@@ -1014,7 +1027,7 @@ For each `identity_id`, the system shows a chronological timeline containing:
 - Item code before and after the change
 - Field-level old/new values
 - Actor, timestamp, and reason
-- Source type: clone, manual, import, publish, or restore
+- Source type: clone, manual, import, abandon, publish, or restore
 - Import filename/hash/archive reference when applicable
 - Approval reference of the published version
 
@@ -1039,6 +1052,9 @@ Publish requires:
   sets and approval evidence are the source record.
 - Typed version-string confirmation matches.
 - Expected lock version matches.
+- The admin has reviewed the complete final database snapshot diff against the
+  exact base at that same lock version. A later mutation requires a fresh
+  review; no separate approval table is introduced in V1.
 - At least one applied import/change set exists.
 - Item count is greater than zero.
 - Every active row has identity/category mapping and, for structured-code
@@ -1258,6 +1274,7 @@ client factories. Generate reviewed database types at
 Phase 4 UI.
 
 - `createCatalogDraftAction`
+- `abandonCatalogDraftAction`
 - `previewCatalogImportAction`
 - `applyCatalogImportAction`
 - `saveDraftCatalogItemAction`
@@ -1460,6 +1477,10 @@ Proposed after P-18 acceptance:
   from whole-version publish.
 - Keep lock versions, UUIDs, request IDs, and change-set IDs available in compact
   support details rather than presenting them as the primary success message.
+- Place the complete searchable item workspace before publication controls.
+  Publication is available from a dedicated final-review surface that compares
+  draft/base snapshots by stable identity, shows compound old/new changes and
+  readiness/governance warnings, and carries the exact reviewed lock.
 
 ### Proposed placement UX
 
@@ -1574,13 +1595,14 @@ reviewed fix-forward, not an assumed destructive reverse operation.
   P-20 portability, DB integration/concurrency, route failure-state,
   observability, tracked export-verifier, and documentation-consistency gates.
 - Complete WP-6.6 from Audit #29: full catalog browse/item history, explicit
-  draft selection/stale read-only state, resolve-only versioned categories/P-06
+  current-base workspace plus stale/abandoned read-only history, resolve-only versioned categories/P-06
   code groups and
   server code allocator, complete import diff/evidence, server-derived publisher
   plus version archive metadata, complete readiness parity, correction actions,
-  fix-forward schema constraints, and Thai-first operator comprehension.
-- Append reviewed WP-6.6 migration `020`; do not rewrite evidence-backed
-  `017`-`019`.
+  fix-forward schema constraints, one-draft/abandon lifecycle, authoritative
+  final snapshot review, and Thai-first operator comprehension.
+- Amend still-unaccepted candidate WP-6.6 migration `020`; do not rewrite
+  evidence-backed `017`-`019`.
 - Replace only the four hardcoded year/version fragments.
 - Keep the feature flag disabled.
 
@@ -1670,7 +1692,7 @@ Do not advance when any gate fails:
   and related owner decisions are complete for the exact candidate scope.
 - **Phase 4A → 4B:** Local schema reset/migration succeeds; backfill counts,
   constraints, RLS/grants, and advisors pass.
-- **WP-6.6 → WP-7:** Every C-01 through C-12 finding in Audit #29 has an
+- **WP-6.6 → WP-7:** Every C-01 through C-13 finding in Audit #29 has an
   implemented authoritative control and evidence, or the affected capability is
   explicitly removed from release visibility. WP-6.5 reliability evidence
   remains valid but does not replace this gate.
@@ -1699,6 +1721,8 @@ Do not advance when any gate fails:
   creating it.
 - Draft lineage points to the expected base version; publishing a stale-base
   draft is rejected.
+- A partial unique constraint prevents two mutable drafts for one base;
+  abandoned drafts retain immutable rows/audit and cannot publish or restore.
 - No duplicate version/item-code or version/identity pairs.
 - A code cannot be assigned to another identity.
 - Legacy/canonical format validation, next-sequence allocation, retired-gap
@@ -1715,10 +1739,13 @@ Do not advance when any gate fails:
   wrappers and grants work for active admins.
 - Browser bundles contain no service-role/secret key.
 - Request idempotency works for manual edit/retire/recode,
-  preview/apply/publish/restore.
+  create/abandon/preview/apply/publish/restore.
 - Timeout-after-commit simulation proves a client retry uses the same request ID
   and returns the prior result; same ID with a changed payload is rejected.
 - Optimistic lock conflicts reject stale draft writes.
+- Complete final snapshot diff fixtures cover compound and reverted changes;
+  incomplete/changing reads fail closed, and publish rejects a draft mutated
+  after review.
 - Two independent DB sessions prove publish/restore advisory-lock ordering,
   deterministic winner/conflict behavior, bounded lock timeout, and one pointer.
 - Pointer restore leaves historical BOQs unchanged.
@@ -1835,6 +1862,8 @@ Do not advance when any gate fails:
   with bounded/redacted values
 - Intended-admin UAT completes create/import/review/publish-readiness/export and
   representative error recovery without developer/SQL assistance
+- Intended-admin UAT can abandon/recreate a working draft, inspect all final
+  changes before publication, and recover from stale review without SQL
 - 710-row import/export/admin performance baselines meet the reviewed budget
 - Documentation consistency check confirms authority links, migration order,
   WP order, and pending-decision IDs
@@ -1890,6 +1919,10 @@ Do not advance when any gate fails:
   added row through explicit audited correction actions without deleting
   identity/code/audit history.
 - A stale-base draft cannot become current.
+- A second current-base mutable draft cannot be created; audited abandon retains
+  the old attempt as read-only history.
+- The item-first workspace and authoritative final snapshot review make every
+  cumulative manual/import effect visible before the publish form.
 - P-20 establishes and proves the intended cross-environment identity/hash
   semantics before clean rehearsal or Production hash acceptance.
 - Reusable catalog version creation follows ADR-003 beyond `2568.1.0`.
@@ -1915,6 +1948,8 @@ Do not advance when any gate fails:
   data and publishes the authoritative dataset.
 - Published database versions and their stamped exports are official.
 - Draft manual edits require a reason.
+- Phase 4 Core allows at most one mutable working draft per base; stale and
+  abandoned drafts are retained read-only.
 - Production is the authoritative initial source for name, unit, material cost,
   labor cost, and unit cost.
 - The first structured-code candidate is based on all 710 Production rows; the

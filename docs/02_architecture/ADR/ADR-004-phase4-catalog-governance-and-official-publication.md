@@ -32,6 +32,16 @@ selection, dictionary/code authority, import diff/evidence, publication
 provenance/readiness, correction paths, schema hardening, and operator UX. This
 is a planning correction, not Local reset or Production authorization.
 
+**P-22 operator-workflow correction recorded:** 2026-07-12 — owner review of
+the implemented Local flow accepts one mutable current-base working draft,
+audited abandon/read-only history, an item-first workspace, and an authoritative
+final draft-versus-base snapshot comparison before publication. Review remains
+inside the existing one-authorized-publisher model and is bound to the expected
+draft lock; it is not a second-person approval engine. See
+[Correction Plan #31](../../plans/master-catalog/31-phase4-wp66-operator-workflow-correction-plan.md).
+This authorizes docs and Local-only implementation planning, not a Local reset,
+P-18/`021`, P-19, WP-7, Factor F/hotfix expansion, or Production.
+
 ## Context
 
 Production completed Master Catalog Phase 0 → 1A → 2 → 1B on 2026-06-21.
@@ -129,6 +139,12 @@ publish, and pointer restore use the same controls:
 
 There is no unaudited manual-edit backdoor.
 
+For the V1 operator model, there is at most one mutable working draft for each
+base version. Pointer changes may leave a stale draft for read-only audit, and
+an admin may explicitly abandon a never-published draft through an audited
+function before creating a replacement from the same base. Draft rows and
+history are never deleted to make room for another attempt.
+
 ### 6. Import trust boundary
 
 The browser reads and normalizes the approved workbook profile locally. Raw
@@ -150,14 +166,23 @@ Publication is one short database transaction that:
    singleton pointer;
 5. validates counts, identity, codes, categories, code groups, costs, and
    approval evidence;
-6. computes canonical dataset hash and item count from database rows;
-7. marks the version published/active;
-8. moves the singleton pointer;
-9. synchronizes legacy `is_default` flags while that column remains;
-10. appends the publish change set.
+6. rejects a lock version that differs from the exact state reviewed by the
+   operator;
+7. computes canonical dataset hash and item count from database rows;
+8. marks the version published/active;
+9. moves the singleton pointer;
+10. synchronizes legacy `is_default` flags while that column remains;
+11. appends the publish change set.
 
 Phase 4 Core does not rebase stale drafts. The admin creates a new draft from
 Current and reapplies still-approved changes through new audited change sets.
+
+Before the publish form is offered, the application compares the final draft
+snapshot with its exact base by stable identity and shows all changed fields,
+counts, and readiness/governance warnings. This final comparison is not derived
+only from audit events because an item may have been changed repeatedly or
+returned to its original value. Any mutation after review increments the draft
+lock and requires review again before publish.
 
 External calls, workbook parsing, PDF generation, and Excel generation do not
 run inside this transaction.
@@ -242,7 +267,7 @@ These omissions are intentional scope control, not missing architecture.
 | Edit the active catalog directly | It would invalidate official exports and historical audit |
 | Use application-only authorization | RLS/database functions are required defense in depth |
 | Parse `AAA/TTT` at runtime for pricing | Codes are business identifiers, not executable pricing logic |
-| Add a workflow engine or multi-stage approval subsystem now | One authorized publisher plus real approval evidence meets the present requirement |
+| Add a workflow engine or multi-stage approval subsystem now | One authorized publisher plus real approval evidence and a lock-bound final comparison meet the present requirement |
 | Fold Factor F into `price_list_versions` | Factor F changes for different policy reasons than item prices and needs its own provenance without forcing a price catalog version bump |
 | Backfill old BOQs with the current Factor F version | It would create false provenance unless exact source evidence exists for each BOQ |
 

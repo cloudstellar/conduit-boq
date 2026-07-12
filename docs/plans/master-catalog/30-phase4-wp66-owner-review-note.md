@@ -1,6 +1,7 @@
 # Master Catalog Phase 4 WP-6.6 Owner Review Note
 
-**Status:** Ready for owner review
+**Status:** Hold under P-22 operator-workflow correction; prior evidence is
+historical and revised closeout evidence is pending
 **Review environment:** Local only
 **Implementation evidence commit:**
 `3bfc74ea00843033ad3cfd2afac43820b18c0124`
@@ -8,39 +9,45 @@
 `59b17d3c3e7ed6180445ac5dc5e0b75db9fe9452`
 **Production touched:** No
 
-## 1. Decision requested
+## 1. Decision recorded
 
-Accept or hold the WP-6.6 closeout for Audit #29 C-01 through C-12. Acceptance
-means the admin workflow/authority hardening is sufficient to proceed to the
-next reviewed Phase 4 step. It does not itself authorize WP-7 execution,
-P-18/`021`, P-19, a new Factor F workflow, hotfix `016` expansion, or any
-Production action.
+The owner placed WP-6.6 closeout on Hold after intended-operator review found a
+reproducible workflow gap beyond Audit #29 C-01 through C-12: multiple mutable
+current-base drafts do not match the intended V1 operating model, and the
+publish form precedes the full item workspace without an authoritative final
+draft-versus-base comparison.
 
-Recommended owner response:
+P-22 accepts [Correction Plan #31](./31-phase4-wp66-operator-workflow-correction-plan.md)
+for docs and Local-only implementation planning. Revised closeout must also
+close C-13 and rerun the affected migration/DB/browser/P-20 evidence. This does
+not authorize WP-7 execution, P-18/`021`, P-19, a new Factor F workflow, hotfix
+`016` expansion, a Local reset, or any Production action.
 
-> รับรอง WP-6.6 closeout ตามหลักฐาน Local ที่บันทึกไว้ และให้ปรับสถานะ
-> WP-6.6 เป็น Complete ได้ โดยยังไม่อนุมัติ WP-7 execution, P-18/021,
-> P-19, Factor F workflow, hotfix expansion หรือ Production
+Recorded owner response:
 
-To hold instead, identify the exact C-01 through C-12 finding or operator flow
-that must be corrected. Do not use a general hold without a reproducible gap.
+> Hold WP-6.6 closeout; implement P-22 one-current-base-working-draft,
+> audited abandon, item-first workspace, and final snapshot review before
+> publication. Require fresh Local evidence and owner review before WP-7.
 
 ## 2. Evidence summary
 
 | Scope | Passed evidence | Remaining later gate |
 |---|---|---|
 | C-01 browse/history | 1,201-row paging fixture; Local 710-row first/middle/last search; exact item and stable identity/code history | Independent operator comprehension at WP-8 |
-| C-02 draft targeting | Exact draft registers, explicit browser targeting, import never auto-selected a draft, stale fail-closed tests | Intended-admin stale recovery at WP-8 |
+| C-02 draft targeting | Exact draft registers, explicit browser targeting, import never auto-selected a draft, stale fail-closed tests | Superseded for closeout by P-22: one mutable draft per base plus audited abandon/replacement evidence required |
 | C-03/C-04 authority/allocator | 710 mappings, 65 groups, 17 exclusions; unknown/caller-code denial; concurrent unique allocation; never-reuse; sequence-900 boundary | Rerun in WP-8 |
 | C-05 import evidence | Complete 710-row rollout, 709 structured changes plus approved `ITEM-0139`, stable validation replay, explicit import draft selection | Full intended-admin import UAT at WP-8 |
 | C-06/C-07 provenance | Authenticated publisher snapshot; physical archive reference; invalid-date and missing-archive denials | Final candidate metadata/P-15 |
 | C-08 readiness | Shared full 710-row quality result, exact count/hash, successful Local publication proof, pointer restored | Final candidate and WP-8 rerun |
 | C-09/C-10 correction | Retire/reactivate, eligible withdraw, inherited-withdraw denial, preserved identity/code/audit, exact browser item action | P-19 if an official version contains inactive rows |
-| C-11/C-12 schema/UX | `020` constraints/RLS/grants/role denial; Thai desktop/mobile QA; no page overflow or app console error | Formal accessibility, performance, and independent UAT at WP-8 |
+| C-11/C-12 schema/UX | `020` constraints/RLS/grants/role denial; Thai desktop/mobile technical QA; no page overflow or app console error | P-22 item-first/review-flow correction plus formal accessibility, performance, and independent UAT remain |
+| C-13 final review | Not part of the retained `3bfc74e` evidence | Authoritative final snapshot diff, stale-review recovery, publish ordering, and owner browser acceptance required |
 
 ## 3. Retained evidence
 
-These evidence files remain untracked under `tmp/` by repository policy:
+These historical evidence files remain untracked under `tmp/` by repository
+policy. They continue to prove the named `3bfc74e` implementation, but they do
+not close the revised P-22 candidate:
 
 | Evidence | File SHA-256 |
 |---|---|
@@ -79,8 +86,7 @@ Final Local cleanup restored:
 
 ## 5. Recommendation
 
-Accept WP-6.6 closeout. The bounded technical evidence closes Audit #29 C-01
-through C-12 without weakening the P-18/P-19 controls or crossing the BOQ,
-Factor F, hotfix, or Production boundaries. Keep the independent operator and
-performance checks in WP-8 rather than claiming they were completed by the
-developer-led browser proof.
+Keep WP-6.6 on Hold. Implement P-22 in reviewable docs/database/read-model/UI
+slices, then rerun the revised Local evidence and intended-admin review. Do not
+add migration `020` to bootstrap or begin WP-7 until the owner explicitly
+accepts the replacement closeout evidence.

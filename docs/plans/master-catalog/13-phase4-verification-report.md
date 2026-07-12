@@ -1,10 +1,11 @@
 # Master Catalog Phase 4 Verification Report
 
 **Status:** In progress — WP-6/P-11 complete; WP-6.5 passed its bounded
-reliability scope; WP-6.6 repository, Local DB/RLS/concurrency, post-change
-P-20, and browser technical evidence passed and awaits owner closeout. WP-7,
-proposed WP-7.5, WP-8 including independent intended-admin UAT, and Production
-gates remain
+reliability scope. P-22 placed WP-6.6 closeout on Hold and supersedes the
+`3bfc74e` candidate evidence for revised closeout while preserving it as
+historical evidence. Repository/static correction is in progress; G1/G2 Local
+resets, G3 owner review, WP-7, proposed WP-7.5, WP-8, and Production gates
+remain.
 **Prepared:** 2026-06-22
 **Production project:** `otlssvssvgkohqwuuiir`
 **Candidate version:** `2568.1.0` (version string reserved; publication metadata/P-15 pending)
@@ -26,9 +27,9 @@ should link here rather than copy volatile evidence.
 | Phase | Environment | Executor | Started | Completed | Result | Evidence |
 |---|---|---|---|---|---|---|
 | 4-0 documents/data decisions | Repository | Owner + developer | 2026-07-04 |  | In progress | P-01 through P-11/P-17/P-20 approved as recorded; P-09 publication metadata, P-18/P-19, and Production gates remain separate |
-| 4A additive schema | Local | Codex + owner/developer | 2026-07-05 | 2026-07-12 | Passed through WP-6.6 technical scope | `017`-`019` canonical bootstrap plus separate reviewed `020` evidence passed; bootstrap integration and WP-8 rerun remain |
-| 4B application/workflows | Local | Codex + owner/developer | 2026-07-05 | 2026-07-12 | Passed supported WP-6.6 technical scope | Unsupported Add/Retire remain gated; P-18/WP-7.5 is conditional and independent intended-admin UAT remains WP-8 |
-| WP-6.6 admin workflow/authority hardening | Local | Codex + owner/developer | 2026-07-12 | 2026-07-12 | Ready for owner review | P-21-authorized slices A-G passed repository, separately approved migration `020` DB/RLS/concurrency, post-change P-20, browser technical QA, and Local auth regression evidence. `020` remains outside bootstrap and Production. |
+| 4A additive schema | Local | Codex + owner/developer | 2026-07-05 |  | In progress under P-22 | `017`-`019` canonical bootstrap remains reviewed; candidate `020` is being amended and requires replacement G1/G2 evidence before integration |
+| 4B application/workflows | Local | Codex + owner/developer | 2026-07-05 |  | In progress under P-22 | One-working-draft, audited-abandon, item-first, and final snapshot-review correction pending static/Local/browser evidence |
+| WP-6.6 admin workflow/authority hardening | Local | Codex + owner/developer | 2026-07-12 |  | Hold / in progress | P-21 slices A-G evidence on `3bfc74e` is retained history. P-22 adds slices H-I/C-13; `020` remains outside bootstrap and Production. |
 | WP-7 permanent BOQ/hotfix/Factor F regression | Local |  |  |  | Not started | Regression-only |
 | WP-7.5 P-18 placement | Local |  |  |  | Decision pending | P-18 Review Note #28 |
 | 4C clean rehearsal | Local |  |  |  | Pending |  |
@@ -58,7 +59,8 @@ should link here rather than copy volatile evidence.
 | Capability-completeness plan alignment | Owner | Requested full audit and documentation correction | 2026-07-12 | Audit #29 adds WP-6.6, reserves `020`, moves proposed placement to `021`; no reset/implementation/Production authorization |
 | P-21 WP-6.6 Local-only implementation start | Owner | Authorized | 2026-07-12 | Owner approved Audit #29 C-01 through C-12/slices A-G; does not imply Local reset/apply, P-18/`021`, WP-7, or Production |
 | WP-6.6 destructive Local evidence runs | Owner | Authorized and completed | 2026-07-12 | Canonical bootstrap through `019`, separate Local-only `020` apply, retained DB/concurrency/P-20 evidence, and browser technical QA completed on `3bfc74e`; Production touched: No |
-| WP-6.6 owner closeout | Owner | Pending |  | Review [WP-6.6 Owner Review Note](./30-phase4-wp66-owner-review-note.md); acceptance does not approve WP-7 execution, P-18/`021`, P-19, Factor F workflow changes, hotfix expansion, or Production |
+| P-22 operator-workflow correction G0 | Owner | Authorized for docs and Local-only source implementation | 2026-07-12 | [Correction Plan #31](./31-phase4-wp66-operator-workflow-correction-plan.md); no Local reset, WP-7, P-18/`021`, P-19, Factor F/hotfix expansion, or Production |
+| WP-6.6 owner closeout / P-22 G3 | Owner | Hold; replacement evidence pending | 2026-07-12 | Review [WP-6.6 Owner Review Note](./30-phase4-wp66-owner-review-note.md) after G1/G2 evidence; acceptance remains separate from WP-7 and Production |
 | P-11 exact artifact acceptance | Owner | Accepted exact TH Sarabun New 16 pt replacement PDF/Excel pair; WP-6 complete | 2026-07-11 22:20 +07 | Owner confirmed `รูปแบบ pdf excel ok เลยครับ` for the `777df75` pair after semantic and visual file QA; Production filing and P-12-P-15 remain separate |
 | P-20 identity/hash portability | Owner | Approved deterministic baseline identity from immutable Production-derived `price_list.id`; retain `identity_id` in lineage hash | 2026-07-11 12:11 +07 | WP-6.5C passed on `1ad01b9`; the required post-`020` rerun also passed two independent clean inputs on `3bfc74e`. WP-8/P-15 reruns remain. |
 | WP-6.5 Local-only start | Owner | Authorized | 2026-07-11 12:11 +07 | No unannounced Local reset, Production access/write, Factor F workflow change, hotfix scope expansion, placement UI, deploy, enablement, or publication |
@@ -178,7 +180,7 @@ completed only after the fixes.
 WP-6.5 evidence remains valid for the rows above. It does not prove the complete
 operator capability matrix added after owner review; in particular, the former
 WP-6.5G browser evidence proves uncertain-response recovery for one form, not
-full 710-row browse/history, multi-draft selection, import completion, or
+full 710-row browse/history, one-working-draft lifecycle, import completion, or
 publication provenance.
 
 ### 6.4.1 WP-6.6 capability completeness checkpoint
@@ -186,19 +188,22 @@ publication provenance.
 | Audit finding | Required evidence | Result |
 |---|---|---|
 | C-01 full browse/item history | First/middle/last-row search, filters, exact item route, stable-identity field diff, and >1,000-row paged-read fixture proving no API-cap truncation | Passed: deterministic 1,201-row `500/500/201` fixture plus Local browser first/middle/last search, exact item route, and identity/code history |
-| C-02 exact draft/stale state | Multiple current-base drafts selectable; stale draft read-only before submit | Passed technical gate: exact draft registers/fail-closed stale tests and browser explicit draft/import targeting; independent operator recovery UAT remains WP-8 |
+| C-02 exact draft/stale state | One mutable draft per base; audited abandon/replacement; stale/abandoned drafts read-only before submit | P-22 replacement evidence pending. Prior exact-register/stale evidence on `3bfc74e` is historical but does not prove the new invariant/lifecycle. |
 | C-03/C-04 dictionary and allocator | P-06 seed/freeze, unknown-entry denial, next-never-issued concurrency/gap/900 fixtures | Passed Local DB: 710 mappings/65 groups/17 exclusions, role/unknown/caller-code denial, two unique concurrent allocations, never-reuse, and capacity boundary |
 | C-05 import diff/evidence | Complete server add/update/recode/retire/unchanged diff, exact omissions, approved/missing price evidence | Passed Local DB: complete 710-row first rollout, 709 changed/structured rows plus approved `ITEM-0139` legacy row, stable validation replay; browser required explicit draft selection. Full intended-admin import UAT remains WP-8. |
 | C-06/C-07 publication provenance | Authenticated actor snapshot and required version archive reference including manual-only publication | Passed Local DB/browser: authenticated publisher snapshot, physical archive reference, invalid-date and missing-archive denials, and rendered provenance/readiness state |
 | C-08 readiness parity | Same stale-base/full-quality/P-18/structured result in readiness and publish | Passed Local DB: one full 710-row canonical-quality result fed readiness/publication; pointer restored after physical-archive publish proof |
 | C-09/C-10 correction/editor | Prefilled exact item; field-aware authority; reactivate/base-absent withdraw with preserved identity/code/audit | Passed Local DB/browser: retire/reactivate, inherited-withdraw denial, exact inactive item/action, and preserved identity/code/history |
 | C-11/C-12 UX/schema | Thai-first/no synthetic defaults/support details plus zero-null/order constraint compatibility | Passed technical gate: `020` constraints/RLS/grants/role denial, Thai desktop/mobile render with no page overflow, and no app console error. Formal accessibility/intended-admin UAT remains WP-8. |
+| C-13 final snapshot review | Item-first full workspace; complete identity-based draft/base diff; compound/reverted/incomplete-read fixtures; exact reviewed-lock publish and stale-review recovery | P-22 implementation and evidence pending |
 
-After separate owner authorization, the canonical bootstrap through `019` was
+The following is historical pre-P-22 evidence. After separate owner
+authorization, the canonical bootstrap through `019` was
 run on two independent clean Local rebuilds at exact commit
 `3bfc74ea00843033ad3cfd2afac43820b18c0124`; `020` was then applied separately
-for evidence. Migration `020` remains outside bootstrap until owner closeout
-and has not been applied to Production.
+for evidence. P-22 now amends candidate `020`, so these results are superseded
+for revised closeout. Migration `020` remains outside bootstrap and has not been
+applied to Production.
 
 Retained Local evidence outputs (untracked by policy):
 
@@ -302,12 +307,12 @@ fixed and reviewed.
 | Check | Expected | Evidence | Result |
 |---|---|---|---|
 | WP-8 clean Local rehearsal | Passed with no unresolved blocker |  | Pending |
-| WP-6.6 capability matrix | Audit #29 C-01 through C-12 implemented/evidenced, or unsupported controls removed from release visibility | Repository, separately approved `020` Local DB/RLS/concurrency, post-change P-20, browser technical QA, and Local auth regression passed on `3bfc74e`/`59b17d3`; unsupported Add/Retire controls remain capability-gated | Passed technical gate; owner closeout pending |
+| WP-6.6 capability matrix | Audit #29 C-01 through C-13 implemented/evidenced, or unsupported controls removed from release visibility | P-22 correction and replacement G1/G2/G3 evidence pending; `3bfc74e` remains historical only for the revised candidate | Hold / pending |
 | Reviewed migration fingerprint | Filename and SHA-256 match approved file |  | Pending |
 | Repository/deployment fingerprint | Exact branch, commit, CI, and deploy artifact recorded |  | Pending |
 | Fresh Production preflight | Live counts, pointer, Factor F, BOQ split, and drift recorded |  | Pending |
 | Backup/restore gate | Fresh backup manifest and clean Local restore test pass |  | Pending |
-| Hotfix `016` / migration order | Remote ledger includes `016`; clean Local bootstrap applies `009`-`015`, hotfix `016`, then Phase 4 `017+` before WP-8 evidence is accepted | Local authority order passed in prior evidence and both `3bfc74e` rebuilds; `020` was applied separately after `019` for review and remains outside bootstrap. Fresh Production ledger check has not run. | Local WP-6.6 order passed; integrated WP-8/Production checks pending |
+| Hotfix `016` / migration order | Remote ledger includes `016`; clean Local bootstrap applies `009`-`015`, hotfix `016`, then reviewed Phase 4 migrations before WP-8 evidence is accepted | Bootstrap remains through `019`; amended candidate `020` must be applied separately for G1/G2 and enters bootstrap only after G3/G4. Fresh Production ledger check has not run. | Pending revised Local evidence and later Production check |
 | End-to-end request idempotency | UI/action/DB reuse one operation ID after timeout; changed payload with same ID rejects | DB replay/mismatch and tracked transport proof passed. Browser proof on `9becdf6` retained the original Reason/target through the uncertain state, retried without refilling, matched the full request ID in both responses, returned `duplicateRequest=true`, and created one change set. | Passed WP-6.5; rerun WP-8 |
 | Live DB integration/concurrency | Migrations, RPC/RLS/roles, rollback, two-session publish/restore, and lock timeout pass | WP-6.5 harness passed previously; post-`020` WP-6.6 evidence added constraints/grants/role denial, server-allocation concurrency/never-reuse/900 boundary, correction and publication negatives, exact registers, and pointer/BOQ/Factor F cleanup | Passed WP-6.6 technical gate; rerun WP-8 |
 | P-20 hash portability | Approved clean-reset/cross-environment identity/hash model passes | Two post-`020` independent clean inputs on exact commit `3bfc74e` again reproduced 710 rows, dataset hash `sha256:2e3571ea7135fbc0bbb84c8cc330af1173e4c1d2345e5eb59958dc76e45558b8`, and identity mapping SHA-256 `5f68993ce5aa5c7735b0d9e6de6d27946b4846fb8a6eb77d1b6b3bd6c4a73de7` with no comparator failures | Passed post-`020`; rerun WP-8/P-15 |
@@ -546,7 +551,8 @@ exact replacement pair above.
 | Catalog version list/detail | Five exact version rows, Thai statuses, current marker, selected 710-row draft, readiness, and exact item route rendered | Version/item pages at 390x844 had `scrollWidth=clientWidth=390` and no overlap | Passed WP-6.6 technical QA |
 | Import/diff/manual/history | Import required explicit draft selection and stayed disabled before selection; exact item correction/history and append-only register rendered | Mobile import/history not claimed in this proof | Passed desktop technical QA; full intended-admin/responsive UAT remains WP-8 |
 | Complete catalog search/filter + item history | Browser found first `ITEM-0001`, middle `ITEM-0355`, and last `ITEM-0710`; exact inactive-item route showed stable identity/code history | Exact item page remained readable without page overflow at 390x844 | Passed WP-6.6 technical QA; intended-admin comprehension remains WP-8 |
-| Multiple draft selection + stale read-only state | Multiple drafts rendered with explicit targeting; import never auto-selected; fail-closed stale tests passed | Version/detail route remained responsive | Passed technical QA; stale recovery UAT remains WP-8 |
+| One working draft + stale/abandoned history | One mutable draft per base; duplicate/concurrent create denied; audited abandon/replacement; stale/abandoned views read-only | P-22 implementation/browser evidence pending; prior exact targeting proof is historical | Pending |
+| Final snapshot review + reviewed-lock publish | Complete cumulative draft/base diff, compound/reverted behavior, readiness/warnings, edit return path, and stale-review recovery | P-22 implementation/browser evidence pending | Pending |
 | Thai-first forms/no rehearsal defaults/support details | Thai navigation/status/action/readiness/error copy rendered; Local synthetic defaults were absent from operator fields | Mobile version/item views had no overlap; formal keyboard/focus/accessibility audit remains WP-8 | Passed visual technical QA; formal accessibility pending WP-8 |
 | Add/retire blocker shown before apply/publish | With capability flags false, Add was absent, retirement controls were hidden/denied, and the inactive item exposed only Reactivate; readiness showed the separate P-19 warning | Exact inactive-item action remained responsive | Passed release-visibility gate; P-18/P-19 decisions remain separate |
 | Loading/error/not-found and retry/back paths | Route states implemented; user-opened Local tab completed response-loss recovery on `9becdf6` | Browser proof retained submitted values, retried untouched payload, then reset after success | Passed WP-6.5 checkpoint; full representative rerun WP-8 |
@@ -575,7 +581,7 @@ request approves them.
 | `npm run audit:prod` | No unaccepted Production vulnerability |  | Pending |
 | Live Local DB integration/concurrency | Migration/RPC/RLS/role/rollback/race/timeout gates pass | Prior WP-6.5 evidence plus `3bfc74e` `020` constraints/RLS/grants/allocator concurrency/correction/publication evidence passed; 2026-07-12 11:19 +07 Local DB lint returned no findings; final pointer/gates/BOQ/Factor F readback was exact | Passed technical WP-6.6; rerun WP-8 |
 | Permanent hotfix `016`/BOQ/Factor F suite | Real RPC behavior and pre/post invariants pass |  | Pending WP-7 |
-| WP-6.6 capability suite | Audit #29 C-01 through C-12 DB/UI/browser evidence pass | Repository, `020` Local DB/RLS/concurrency, post-change P-20, browser technical QA, and Local auth regression passed on `3bfc74e`/`59b17d3`; unsupported Add/Retire controls remained fail-closed | Passed technical gate; owner closeout pending |
+| WP-6.6 capability suite | Audit #29 C-01 through C-13 DB/UI/browser evidence pass | P-22 source implementation and replacement Local/browser/P-20 evidence pending; prior `3bfc74e`/`59b17d3` evidence retained as history | Hold / pending |
 | Tracked export artifact verification | Semantic verifier passes from clean checkout | Exact `777df75` replacement pair passed embedded and independent semantic verification; five verifier fixtures also pass; owner accepted the exact pair | Passed/accepted P-11; WP-8 rerun pending |
 | Documentation consistency | Authority links/table shapes, migration order, WP order, and decisions agree | 2026-07-12 11:17 +07: authority consistency passed 5/5 after status/evidence sync; generated authority check passed 710/65/17 with SHA-256 `28675e6244c65d485dda7142634b381db729a139bccdf189ad51563251a2e12a`; bootstrap remains intentionally through `019` pending owner closeout | Passed WP-6.6 checkpoint; rerun at WP-8 |
 | Security advisor | No new blocker |  | Pending |

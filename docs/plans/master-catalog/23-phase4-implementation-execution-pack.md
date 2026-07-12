@@ -32,7 +32,7 @@ still does not permit an unannounced Local reset or any Production action.
 **Capability-completeness alignment recorded:** 2026-07-12 — owner requested
 the full audit and plan correction in
 [Audit #29](./29-phase4-owner-dev-completeness-audit.md). WP-6.5 keeps its
-bounded reliability evidence; new WP-6.6 must close C-01 through C-12 before
+bounded reliability evidence; new WP-6.6 must close C-01 through C-13 before
 WP-7. Migration `020` is reserved for WP-6.6 and proposed P-18 placement moves
 to `021`/WP-7.5. This alignment authorizes documentation only, not migration
 implementation, Local reset, or Production action.
@@ -43,6 +43,15 @@ Repository, migration `020` DB/RLS/concurrency, post-change P-20, and browser
 technical QA passed on `3bfc74e`. Current status and owner closeout remain in
 [the Tracker](./25-phase4-execution-progress-tracker.md); WP-7 must not start
 until that closeout is accepted.
+
+**P-22 operator-workflow correction authorized:** 2026-07-12 — intended-admin
+review placed WP-6.6 closeout on Hold and accepted
+[Correction Plan #31](./31-phase4-wp66-operator-workflow-correction-plan.md).
+Amend candidate `020` before freeze for one mutable draft per base and audited
+abandon; make the full item workspace precede a lock-bound final snapshot
+review. Prior `3bfc74e` evidence remains historical but is superseded for
+revised closeout. G1/G2 Local resets and every Production action remain separate
+decisions.
 
 **Purpose:** Turn the reviewed Phase 4 architecture into an execution checklist
 that an implementer can follow without re-deciding scope, sequencing, database
@@ -143,6 +152,7 @@ Start blocked:
 | P-19 inactive/retired export policy | Publication/filing of any version with inactive rows | Decision Register |
 | P-20 canonical hash/identity portability | Initial WP-6.5 exit and rerun after WP-6.6/WP-7.5 migration changes, WP-8 clean rehearsal, and migration fingerprint freeze | Decision Register |
 | P-21 Audit #29 WP-6.6 scope/start | WP-6.6 implementation and any migration `020` execution | Decision Register / Completeness Audit |
+| P-22 operator-workflow correction | Amending candidate `020`, item-first workspace, final snapshot review, and revised WP-6.6 closeout | Decision Register / Correction Plan #31 |
 
 Rule: unresolved P-02 through P-11 does not block generic additive schema,
 parser, UI shell, tests, or local rehearsal. It blocks final candidate data
@@ -164,7 +174,7 @@ acceptance, migration fingerprint freeze, and P-15 hash acceptance.
 | WP-5 | Publish, pointer restore, and audit | Local app + DB | WP-4 | WP-6, WP-8 |
 | WP-6 | Official Excel/PDF export | Local app | WP-2, WP-5, P-11 for final visual | WP-8 |
 | WP-6.5 | Reliability and publish-boundary hardening | Local app + DB/tests | WP-5, P-18 recorded, P-06 structured-code exception recorded | WP-6.6, WP-8 |
-| WP-6.6 | Admin workflow completeness and authority hardening | Local app + DB/tests | WP-6.5, P-21 | WP-7, WP-7.5, WP-8 |
+| WP-6.6 | Admin workflow completeness and authority hardening | Local app + DB/tests | WP-6.5, P-21, P-22 | WP-7, WP-7.5, WP-8 |
 | WP-7 | Permanent BOQ/hotfix `016` and Factor F regression preservation | Local app + DB/tests | WP-0, WP-6.6 | WP-7.5, WP-8 |
 | WP-7.5 | P-18 new-identity placement governance | Local app + DB/tests | WP-7, P-18 accepted | WP-8 full Add/Supplement release |
 | WP-8 | Clean local rehearsal, admin UAT, performance, and verification report | Local reset + app | WP-1 to WP-7; WP-7.5 or hidden Add/Supplement; P-20 | Production approval |
@@ -511,7 +521,7 @@ workflow without developer/SQL assistance and without caller-authored authority.
 Boundary:
 
 - preserve WP-6.5 reliability evidence and existing `017`-`019` migrations;
-- implement accepted DB changes only through fix-forward migration
+- implement accepted DB changes only by amending the still-unaccepted candidate
   `020_master_catalog_phase4_admin_workflow_hardening.sql`;
 - do not implement P-18 placement in `020`; placement remains WP-7.5/`021`;
 - do not add general inherited reorder, taxonomy authoring, workflow engine,
@@ -524,12 +534,14 @@ Required slices:
 | Slice | Required outcome |
 |---|---|
 | A Browse/history | Use deterministic paged data reads to defeat API row caps, then read/filter all rows client-side within the measured threshold; search/filter code/name/category/status/group; exact item route; paged version/audit registers; stable-identity timeline with field-level old/new values. |
-| B Draft targeting | List/select every current-base draft explicitly; mark stale drafts before action and render them read-only with create-new/reapply recovery. No overview/import hidden draft choice. |
+| B Draft targeting | Enforce one mutable draft per base; expose the one current-base workspace; retain stale/abandoned drafts read-only with clear recovery; no overview/import hidden draft choice. |
 | C Dictionary/code authority | Freeze Production-derived versioned categories and approved P-06 22/65 code groups; ordinary mutation resolves existing IDs only; server allocator locks the approved group, uses next never-issued sequence, does not fill retired gaps, and stops at 900. |
 | D Import completion | Move the approved first-rollout mapping out of runtime `docs/*draft.csv` authority; reconcile future imports against the exact draft/dictionaries. Server returns complete add/update/recode/retire/unchanged diff and exact Full omissions; UI displays it before Apply; support real bounded batch/per-row price authority. |
 | E Publication provenance/readiness | Derive publisher UUID/display snapshot from authenticated profile; semantically validate ISO dates; require version-level archive reference including manual-only publication; readiness and publish consume one full stale-base/canonical-quality result. |
 | F Correction/editor | Prefill exact current item; require price authority only for name/unit/money changes; add audited `reactivate` and base-absent `withdraw` preserving identity/code/audit. |
 | G Schema/UX/evidence | After zero-null compatibility proof, add required null/order constraints; Thai-first copy, no synthetic Local/WP evidence, support IDs demoted; DB/role/race/browser/accessibility/authority tests pass. |
+| H Working-draft lifecycle | Partial unique draft-per-base invariant; safe concurrent create conflict; audited idempotent abandon with immutable retained rows/history; replacement starts from a fresh clone. |
+| I Final snapshot review | Make the full searchable item workspace primary; compare complete draft/base snapshots by stable identity; show compound old/new changes/readiness; publish only the exact reviewed lock and force rereview after mutation. |
 
 Required behavior:
 
@@ -538,20 +550,27 @@ Required behavior:
 - two concurrent allocations in one group cannot receive the same code;
 - source preview and final Apply use the same exact draft/payload fingerprint;
 - stale draft controls are unavailable before a user can submit;
+- a second mutable draft for the same base and any destructive draft deletion
+  are impossible through UI, RPC, or concurrent callers;
+- an abandoned draft is read-only, nonpublishable, and retained with its audit;
 - preliminary readiness cannot be greener than final publish for base/quality;
 - `withdraw` cannot remove an identity inherited from the base or any published
   identity/code/audit row;
 - all current rows and history are discoverable, not only a sample;
+- final review reflects cumulative database state rather than only import or
+  change-event summaries, and a stale reviewed lock cannot publish;
 - unsupported Add/Supplement/Retire controls are hidden at release when their
   downstream P-18/P-19 gates are not accepted.
 
 Exit gate:
 
-- Audit #29 C-01 through C-12 each have an implementation/evidence reference in
+- Audit #29 C-01 through C-13 each have an implementation/evidence reference in
   the Verification Report;
 - migration `020` static/Local DB, RLS/grant, rollback, concurrency, null/order,
   and P-20 rerun evidence passes after an explicitly approved reset;
-- browser QA and owner review prove exact draft/item targeting and Thai workflow;
+- browser QA and owner review prove the one-workspace item-first flow, exact
+  item targeting, authoritative final diff, stale-review recovery, and Thai
+  workflow;
 - no visible in-scope action requires developer/SQL assistance to complete or
   recover;
 - authority consistency tests cover WP order, reserved migration numbers, core
@@ -789,9 +808,14 @@ Before asking for code review:
 - [ ] Privileged functions have narrow execute grants and safe `search_path`.
 - [ ] New foreign keys and hot filters are indexed or intentionally documented.
 - [ ] Published data is immutable.
-- [ ] Audit #29 C-01 through C-12 have exact implementation/evidence references
+- [ ] Audit #29 C-01 through C-13 have exact implementation/evidence references
   or the affected capability is excluded from release visibility.
-- [ ] Full catalog/item history and exact multi-draft/stale targeting work.
+- [ ] Full catalog/item history, one current-base workspace, and
+  stale/abandoned read-only targeting work.
+- [ ] Draft create/abandon idempotency, lock, role, race, rollback, immutable
+  history, and zero-partial-effect tests pass.
+- [ ] Final database snapshot diff covers compound/reverted changes and publish
+  rejects a lock changed after review.
 - [ ] Ordinary mutations resolve approved versioned categories/P-06 groups and use the
   server-owned next-never-issued allocator.
 - [ ] Import displays complete server diff/omissions and supports real approved
@@ -835,7 +859,7 @@ Before asking for code review:
 | P-18 unresolved | Keep draft add/supplement review available, but block publication of versions with new identities until guard evidence and placement governance are accepted |
 | P-19 unresolved | Do not file a field-facing official PDF for versions with inactive/retired rows; publish only if owner explicitly approves the rendering/exclusion policy |
 | P-20 unresolved | Continue non-hash-changing reliability work, but do not accept WP-8 clean-reset hash evidence, freeze the migration fingerprint, or request P-15 |
-| Any Audit #29 C-01 through C-12 gap unresolved | Do not start WP-7 or claim full operator readiness. Implement WP-6.6 or remove the affected control from release visibility according to the audit |
+| Any Audit #29 C-01 through C-13 gap unresolved | Do not start WP-7 or claim full operator readiness. Implement WP-6.6 or remove the affected control from release visibility according to the audit |
 | Reusable path still hardcodes `2568.1.0` | Treat as implementation nonconformance with ADR-003; fix and test another valid annual/revision/patch version before P-14 |
 | Advisor warning from pre-existing system | Add to advisor baseline with owner/remediation metadata |
 | New advisor warning from Phase 4 | Stop and fix or get explicit accepted-risk signoff |

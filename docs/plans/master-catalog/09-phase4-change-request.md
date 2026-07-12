@@ -38,6 +38,16 @@ clarity. Migration `020` is reserved for that fix-forward work; proposed P-18
 placement moves to `021`. This docs alignment does not authorize either
 migration, a Local reset, or Production action.
 
+**P-22 operator-workflow amendment recorded:** 2026-07-12 — intended-admin
+review placed WP-6.6 closeout on Hold and accepted
+[Correction Plan #31](./31-phase4-wp66-operator-workflow-correction-plan.md).
+The bounded Local correction enforces one mutable draft per base, adds audited
+abandon/read-only retained history, makes the complete item workspace primary,
+and requires an authoritative lock-bound final snapshot review before publish.
+Candidate `020` is amended before freeze; prior `3bfc74e` evidence is historical
+and superseded for revised closeout. Local resets and Production remain
+separately gated.
+
 ## 1. Decision requested
 
 Approve detailed implementation and local rehearsal of Master Catalog Phase 4.
@@ -123,13 +133,16 @@ Production has not started.
 After completion, an active admin can:
 
 - view all catalog versions and the current pointer;
-- explicitly select the exact current-base draft and see stale drafts read-only;
+- open the one current-base working draft and see stale/abandoned drafts
+  read-only;
 - clone a published version into a draft;
+- abandon a never-published draft with a reason while retaining its rows/history;
 - add, edit, retire, or recode an item without Excel;
 - after P-18/WP-7.5 acceptance, add several new identities to one draft and
   confirm their category/neighborhood placement as one batch before publishing;
 - import a Full or Supplement workbook through a fixed parser profile;
-- review row-level diff, warnings, and blocking errors;
+- review the cumulative final draft-versus-base snapshot diff, warnings, and
+  blocking errors before publication;
 - search/filter the complete current catalog and inspect field-level item history;
 - view item history across versions and code changes;
 - attach approval/reference metadata without storing the raw file online;
@@ -152,6 +165,7 @@ After completion, an active admin can:
 - Versioned display categories and `AAA/TTT` code groups
 - Import metadata, change sets, and complete old/new snapshots
 - Draft-only manual/import mutation
+- One mutable draft per base plus audited immutable abandon history
 - Published-row and published-metadata immutability
 - Idempotent high-impact writes and stale-draft protection
 - Transactional pointer change plus legacy `is_default` synchronization
@@ -164,8 +178,10 @@ After completion, an active admin can:
 - NT CI-compliant Master Catalog admin screens
 - Version list, version detail, diff, item history, manual edit, import, publish,
   exports, and pointer restore
-- Full-catalog search/filter, exact item editor, explicit draft selection, and
-  stale-draft read-only recovery
+- Full-catalog search/filter, exact item editor, one current-base workspace, and
+  stale/abandoned read-only recovery
+- Identity-based final database snapshot comparison bound to the exact publish
+  lock version
 - Resolve-only Production-derived versioned categories/P-06 code-group controls
   and locked next-code allocation
 - Authoritative import diff/omission preview and a supported price-authority path
@@ -256,7 +272,7 @@ scope.
 | 4-0 | Approve ADR/CR, dictionary, reconciliation, specs, backup/runbook | None |
 | 4A Local | Build additive schema/functions and backfill on Local | None |
 | 4B Local | Build UI/import/manual/history/publish/export behind flag | None |
-| WP-6.6 Local | Close Audit #29 operator/authority gaps with fix-forward migration `020`, RPC/UI/tests, and owner review | None |
+| WP-6.6 Local | Close Audit #29 C-01 through C-13 with candidate migration `020`, RPC/UI/tests, final snapshot review, and owner review | None |
 | WP-7 Local | Preserve BOQ/hotfix `016` and Factor F behavior through permanent regression tests only | None |
 | 4B.5 Local / WP-7.5 | After P-18 acceptance, add DB-backed placement for new identities only | None |
 | 4C Rehearsal | Full local workflow from refreshed Production data | None |
@@ -290,7 +306,7 @@ scope.
 - File parsing occurs outside database transactions.
 - Publish uses a transaction-scoped lock and deterministic lock ordering.
 - `lock_version` rejects stale draft changes.
-- A client/form-owned `request_id` makes create/manual/apply/publish/restore
+- A client/form-owned `request_id` makes create/abandon/manual/apply/publish/restore
   retries idempotent only when the same ID is reused after an uncertain result.
 - Migration lock and statement timeouts are bounded.
 - Two-session Local DB tests prove advisory-lock ordering and timeout behavior.
@@ -316,12 +332,14 @@ scope.
 | Hotfix behavior regresses despite static tests | Medium | High | Permanent live DB/RPC suffix/authority/rollback suite | Any approved suffix or authoritative catalog field behaves incorrectly |
 | Admin learns a business blocker only at publish | Medium | Medium | Early preview/readiness warning plus final DB guard and UAT | UAT cannot identify/remediate placement or retired-row hold before publish |
 | Add/Supplement is visible but cannot complete | High if enabled before P-18 | Medium | Implement WP-7.5 before WP-8/P-14, or hide/disable both controls while retaining the DB guard | Intended admin can create a new identity but has no supported path to publication |
-| Admin can see only a sample or cannot identify the exact draft/item/history | High in current UI | High | WP-6.6 full browse/item history and explicit draft selection; stale drafts read-only | Intended admin needs developer/SQL help or mutates the wrong target |
+| Admin can see only a sample or cannot identify the exact draft/item/history | High in current UI | High | WP-6.6 full browse/item history, one current-base workspace, and stale/abandoned read-only history | Intended admin needs developer/SQL help or mutates the wrong target |
 | Free-form taxonomy or item code bypasses P-06 authority | Medium | High | Resolve-only dictionary IDs and locked next-never-issued allocator | Unknown group/category is created or caller-selected suffix is accepted as authority |
 | Import preview is not the final DB diff or cannot carry new-row price evidence | High for Supplement | High | Server-recomputed full diff/omission set and supported bounded authority reference | Admin cannot explain exact effects or an approved new row cannot complete safely |
 | Draft reconciliation evidence becomes runtime business authority | Medium | High | Freeze approved first-rollout mapping in reviewed seed/database authority; future imports use exact selected draft and approved dictionaries | Application reads `docs/*draft.csv` to decide a live mutation |
 | Publication actor/archive/readiness evidence is misleading or incomplete | Medium | High | Server-derived actor snapshot, version archive reference, and shared complete readiness helper | Caller-authored actor is stored, manual-only filing reference is absent, or UI shows false green |
 | Mistaken retire/add has no explicit correction path | Medium | Medium | Audited reactivate and base-absent withdraw while retaining identity/code/audit | Admin must discard/rebuild a draft or publish an unintended inactive row |
+| Concurrent or duplicate current-base drafts split release intent, or starting over destroys lineage | Medium | High | Partial unique draft-per-base invariant plus audited idempotent abandon; no draft/audit deletion | Two mutable drafts exist for one base or an abandoned attempt can mutate/publish |
+| Admin reaches publish without seeing cumulative manual/import effects, or publishes after the reviewed state changed | Medium | Critical | Complete identity-based snapshot diff before publish and exact reviewed `lock_version`; mutation forces rereview | Diff is incomplete/unstable or stale reviewed lock can publish |
 | UI-only reorder corrupts official order/audit | Medium without DB contract | High | Draft-only placement RPC, placement revision/review, unique contiguous order, base relative-order invariant, one transaction | Direct `display_order` write, duplicate/gapped order, inherited-row move, or missing review succeeds |
 | Documents/evidence disagree | Medium | High | Tracker authority index and automated consistency check | Migration/WP/decision/rollback facts conflict |
 
@@ -342,11 +360,13 @@ feature enablement, final catalog publication, or silent business-data choices.
 ### Additional preconditions before WP-6.6 implementation/closeout
 
 - [x] P-21 explicitly authorizes WP-6.6 Local-only implementation scope/start
-- [x] Audit #29 C-01 through C-12 are mapped to exact DB/UI/test owners
+- [x] P-22/G0 authorizes the bounded operator-workflow docs and Local-only
+      implementation; G1/G2 resets remain separate
+- [x] Audit #29 C-01 through C-13 are mapped to exact DB/UI/test owners
 - [x] WP-6.5 reliability evidence remains preserved and is not relabeled as a
       full operator-completeness certificate
-- [x] Planned DB changes use additive migration `020`; `017`-`019` remain
-      unchanged
+- [x] Planned DB changes amend still-unaccepted candidate `020`; `017`-`019`
+      remain unchanged
 - [x] Unsupported Add/Supplement/Retire controls remain hidden at release unless
       their downstream gates pass
 - [ ] A separate owner decision is obtained before any Local bootstrap/reset
@@ -400,7 +420,7 @@ pretend a publishable candidate has been approved.
 - [ ] Stable request-ID timeout/retry and two-session concurrency tests pass
 - [ ] ADR-003 reusable version path passes beyond `2568.1.0`
 - [ ] Permanent live DB hotfix `016`/BOQ/Factor F regressions pass
-- [ ] WP-6.6 C-01 through C-12 close with authoritative automated/browser/UAT
+- [ ] WP-6.6 C-01 through C-13 close with authoritative automated/browser/UAT
       evidence, or affected controls are removed from release visibility
 - [ ] Tracked export verifier and documentation consistency checks pass
 - [ ] Intended-admin UAT, safe Thai recovery/log correlation, and 710-row
@@ -468,6 +488,10 @@ Detailed execution is in the
 - Stale/duplicate requests fail safely.
 - Mistaken retirement and never-published addition have explicit audited
   reactivate/withdraw correction paths without deleting identity/code/audit.
+- One mutable current-base workspace is enforced; audited abandon preserves the
+  prior attempt as immutable read-only history.
+- The final database snapshot diff shows all cumulative manual/import effects,
+  and publication accepts only the exact lock version the admin reviewed.
 - Uncertain retries reuse one operation ID and cannot create duplicate effects.
 - Official Excel/PDF hash and count match the selected published version.
 - The P-20 hash model reproduces across the approved clean-rehearsal scope.

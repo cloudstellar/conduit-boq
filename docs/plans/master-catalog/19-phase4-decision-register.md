@@ -24,6 +24,15 @@ P-18 placement is renumbered to planned migration `021`. This records the plan
 and corrected meaning of completeness; it does not authorize implementation,
 Local reset, or Production action.
 
+**P-22 operator-workflow correction recorded:** 2026-07-12 — after reviewing
+the Local admin flow as the intended operator, the owner approved the correction
+plan in [Doc #31](./31-phase4-wp66-operator-workflow-correction-plan.md). V1 has
+at most one mutable working draft per base version, retains stale/abandoned
+drafts read-only, requires an audited abandon path, and places an authoritative
+final draft-versus-base comparison before publication. This authorizes docs and
+Local-only implementation planning; it does not authorize a Local reset,
+P-18/`021`, P-19, WP-7, Factor F/hotfix expansion, or Production.
+
 **Owner decision recorded:** 2026-07-04 — approved according to the
 recommendation as the Phase 4 governance backbone and source of truth for
 locked, pending, and deferred decisions. This approval accepts the recording
@@ -98,11 +107,13 @@ change only application code or SQL.
 | L-45 | Ordinary item/import mutation resolves only Production-derived approved versioned categories and P-06 code groups, and uses a server-owned next-never-issued code allocator; creating future taxonomy is separate governance | Prevents free-form caller text or suffix choice from becoming catalog authority |
 | L-46 | Phase 4 publication derives the publisher actor snapshot from authentication, requires a version-level physical archive reference, and exposes the same stale-base/full-quality readiness result consumed by final publish | Prevents spoofed provenance, missing manual-only filing custody, and false-green UI readiness |
 | L-47 | Draft correction uses explicit audited `reactivate` and base-absent `withdraw`; identity, code reservation, and prior audit are never deleted | Gives admins a safe correction path without direct SQL or destructive undo |
+| L-48 | At most one mutable `draft` may exist per `based_on_version_id`; stale and explicitly `abandoned` drafts remain immutable read-only history, and replacement requires an audited abandon rather than delete/archive reuse | Matches the intended one-release-workspace V1 while preserving stale/pointer-restore history and database-enforced concurrency safety; [P-22 plan](./31-phase4-wp66-operator-workflow-correction-plan.md) |
+| L-49 | Before publication, the admin reviews an authoritative final snapshot diff of the selected draft against its exact base; review carries the expected lock into publish, and any later mutation forces a fresh review | Prevents publication from preceding catalog inspection without inventing a second-person approval engine; final publish still rechecks readiness/hash in the database |
 
 ## 3. Pending owner/data decisions
 
 P-01 authorizes only local implementation/rehearsal of the reviewed
-architecture and contracts. It did not itself resolve P-02 through P-21; the
+architecture and contracts. It did not itself resolve P-02 through P-22; the
 current recorded resolutions below refine that original approval. Work may
 continue on generic additive schema, parser/canonicalizer, UI, tests, and local
 fixture rehearsal while remaining decisions are pending, but final approved
@@ -195,6 +206,7 @@ this register. In particular:
 | P-19 | Decide official export/rendering policy for inactive or retired catalog rows | Excel already carries `ใช้งาน` / `ยกเลิกใช้`, but the field-facing PDF price table intentionally omits the status column for the baseline visual direction. Before publishing any version with inactive/retired rows, owner must approve whether the official PDF excludes retired rows, visibly marks them, or uses a separate appendix. Until then, do not file a field-facing PDF for such a version as final. | Owner + data custodian | Before P-15 for any version with inactive/retired rows | Pending; recorded 2026-07-07 |
 | P-20 | Decide the cross-environment canonical hash/identity portability contract | Approved contract: initialize each legacy baseline `catalog_item_identities.id` directly from its existing immutable Production-derived `price_list.id`, then keep `identity_id` in the canonical lineage hash. The restored public snapshot carries explicit `price_list.id` values, so clean environments using the same approved snapshot have the same deterministic identity mapping. Migration `017` fails closed on nulls, duplicate/colliding mappings, incomplete coverage, or a pre-existing non-deterministic assignment; repeated execution does not replace an assigned identity. Do not introduce a second business-content hash, silently remove identity, or accept environment-specific hashes as equivalent in Phase 4. The tracked comparator first passed two owner-approved independent clean rebuilds on `1ad01b9`; after migration `020`, two further independent clean rebuild inputs on `3bfc74e` again reproduced the 710-row dataset hash `sha256:2e3571ea7135fbc0bbb84c8cc330af1173e4c1d2345e5eb59958dc76e45558b8` and identity mapping SHA-256 `5f68993ce5aa5c7735b0d9e6de6d27946b4846fb8a6eb77d1b6b3bd6c4a73de7` with no comparator failures. | Owner + database/data-governance reviewer | Initial implementation before WP-6.5 exit (passed); rerun after reviewed placement migration changes and before WP-8 clean rehearsal, migration fingerprint freeze, and P-15 hash acceptance | Approved; WP-6.5C and post-`020` WP-6.6 reruns passed; WP-8/P-15 reruns pending |
 | P-21 | Approve the exact WP-6.6 capability-completeness scope, Local-only implementation, and closeout | Approved full Audit #29 C-01 through C-12 and Execution Pack slices A-G. Preserve WP-6.5 evidence, use fix-forward migration `020`, keep current bootstrap at `017`-`019` until owner closeout, and hide unsupported release controls. The separately authorized clean Local apply/evidence runs passed repository, DB/RLS/concurrency, P-20, and browser technical QA on `3bfc74e`. Review [WP-6.6 Owner Review Note](./30-phase4-wp66-owner-review-note.md) to accept or hold closeout. Acceptance does not approve P-18/`021`, WP-7 execution, Factor F workflow changes, hotfix expansion, or Production. | Owner + developer | Closeout before WP-7 starts | Implementation/Local evidence passed 2026-07-12; owner closeout pending |
+| P-22 | Approve the WP-6.6 operator workflow correction for one current-base working draft, audited abandon, full searchable item-first workspace, and authoritative pre-publish snapshot comparison | Accept [Doc #31](./31-phase4-wp66-operator-workflow-correction-plan.md): one mutable draft per base enforced in candidate `020`; stale/abandoned versions remain read-only; final diff compares database snapshots by identity and carries the exact lock into the existing one-publisher publish path. Amend the unaccepted Local-only `020`, supersede its old evidence, and rerun only after separate reset approvals. Do not create a multi-stage approval engine or cross P-18/P-19/WP-7/Factor F/hotfix/Production boundaries. | Owner + developer | Before revised WP-6.6 closeout and before WP-7 | Approved for docs and Local-only implementation planning 2026-07-12; G1/G2 Local resets and G3 closeout pending |
 
 ### P-11 cover-layout refinement (2026-07-10, revised 2026-07-11)
 
@@ -310,6 +322,7 @@ Production migration, deploy, feature enablement, or publication.
 | Official export format | Exact TH Sarabun New 16 pt replacement pair accepted; WP-6 complete | Owner | 2026-07-11 22:20 +07 | P-11; exact replacement DB-generated Excel/PDF passed count/hash, typography, visual QA, and owner confirmation; Production filing remains separate |
 | Reliability plan/authority alignment | Approved for docs-only amendment | Owner | 2026-07-11 | Add WP-6.5 end-to-end hardening, permanent hotfix regression, UAT, authority hierarchy, and P-20 decision gate; no Local reset or Production authorization |
 | WP-6.6 capability scope/start | Authorized for Local-only implementation of Audit #29 C-01 through C-12 / slices A-G | Owner | 2026-07-12 | P-21; no Local reset/apply, Production, P-18/`021`, or WP-7 authorization |
+| WP-6.6 operator workflow correction | G0 authorized for docs and Local-only implementation of one working draft/audited abandon/final snapshot review | Owner | 2026-07-12 | P-22; G1/G2 resets, G3 closeout, G4 bootstrap/WP-7, and all Production actions remain separate |
 | Production migration | Not requested |  |  | P-12; request after WP-8 evidence review |
 | Deploy / feature enable | Not requested |  |  | P-13–P-14; request only after preceding Production gate passes |
 | Publish named version | Not requested |  |  | P-15 |

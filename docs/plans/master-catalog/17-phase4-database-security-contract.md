@@ -7,13 +7,14 @@ migration approval remain separate gates
 **Prepared:** 2026-06-22
 
 **Last updated:** 2026-07-12 to record the WP-6.6 capability/authority hardening
-from [Audit #29](./29-phase4-owner-dev-completeness-audit.md) and the proposed
-P-18/WP-7.5 placement extension. Existing `017`-`019` remain the reviewed
-Local/bootstrap contract. P-21-authorized WP-6.6 migration `020` passed
-repository and separately approved Local DB/RLS/concurrency/browser evidence
-on `3bfc74e`; it remains outside bootstrap pending owner closeout and has not
-been applied to Production. P-18 rules and placement migration `021` remain
-pending owner/data-custodian approval
+from [Audit #29](./29-phase4-owner-dev-completeness-audit.md), the P-22
+[Operator Workflow Correction](./31-phase4-wp66-operator-workflow-correction-plan.md),
+and the proposed P-18/WP-7.5 placement extension. Existing `017`-`019` remain
+the reviewed Local/bootstrap contract. Candidate `020` is being amended under
+P-22; its `3bfc74e` evidence remains historical but is superseded for revised
+closeout. It remains outside bootstrap and has not been applied to Production.
+P-18 rules and placement migration `021` remain pending owner/data-custodian
+approval.
 
 **Owner decision recorded:** 2026-07-04 — approved according to the
 recommendation as the technical backbone for Phase 4A and every Phase 4 write
@@ -207,7 +208,7 @@ Rules:
 - Reusable draft/publish functions accept and validate ADR-003 CalVer-first
   annual/revision/patch versions. `2568.1.0` is an exact rehearsal candidate,
   not a hardcoded function constraint.
-- Status remains `draft`, `active`, or `archived` in Phase 4 Core.
+- Status is `draft`, `active`, `archived`, or `abandoned` in Phase 4 Core.
 - Phase 4 Core publishes to `active` and does not expose a new archive
   transition. Former current versions remain active/published; the singleton
   pointer alone identifies Current. Existing archived rows remain
@@ -215,6 +216,14 @@ Rules:
   owner-approved maintenance contract.
 - Phase 4-created drafts require a valid `based_on_version_id` referencing a
   published version.
+- At most one mutable `draft` may exist for the same `based_on_version_id`,
+  enforced by a partial unique index. Stale drafts based on another published
+  version remain readable but are nonmutable. A never-published draft may move
+  only from `draft` to `abandoned` through the audited function contract; it is
+  never deleted or relabelled `archived` to make room for a replacement.
+- Abandoned versions retain rows and audit history, cannot be mutated,
+  published, restored, or officially exported, and cannot transition back to
+  `draft`.
 - A newly active/archived Phase 4 version requires complete publication
   metadata, hash, count, approval evidence, and version-level physical archive
   reference.
@@ -427,7 +436,7 @@ integrity meaning.
 | `id` | `uuid` | PK |
 | `version_id` | `uuid` | FK version, `ON DELETE RESTRICT` |
 | `import_id` | `uuid null` | FK import, `ON DELETE RESTRICT` |
-| `change_type` | `text` | `clone`, `import`, `manual`, `publish`, or `restore` |
+| `change_type` | `text` | `clone`, `import`, `manual`, `abandon`, `publish`, or `restore` |
 | `reason` | `text` | Required, trim-nonblank, bounded |
 | `request_id` | `uuid` | Unique |
 | `actor_id` | `uuid` | FK auth user, `ON DELETE RESTRICT` |
@@ -440,8 +449,10 @@ integrity meaning.
 other types.
 
 A clone creates one `clone` change set and zero `catalog_change_items` because
-unchanged copied rows are lineage, not business additions. Actual later field
-changes append item snapshots. This avoids 710 false “add” history entries.
+unchanged copied rows are lineage, not business additions. An abandon creates
+one version-level `abandon` change set and zero item rows because no catalog
+item changes. Actual later field changes append item snapshots. This avoids 710
+false “add” history entries.
 
 ### 6.7 `catalog_change_items`
 
@@ -586,6 +597,7 @@ on every retry does not satisfy this contract.
 | Function | Purpose | Minimum inputs |
 |---|---|---|
 | `public.create_catalog_draft` | Clone a published base into a new draft | base/version numbers, name, reason, request ID |
+| `public.abandon_catalog_draft` | Atomically make one never-published draft immutable while retaining all rows/audit | exact version ID, expected lock, reason, request ID |
 | `public.apply_catalog_changes` | Apply validated manual/import add/update/retire/recode/reactivate/withdraw changes | exact version ID, change JSON or import payload hash, expected lock, reason, request ID, optional import ID |
 | `public.publish_catalog_version` | Validate/hash/publish/move pointer | version ID, expected lock, approval metadata, reason, request ID |
 | `public.get_catalog_publish_readiness` | Return stale-base state, complete canonical dataset quality, P-18, structured-code, and P-19 filing-warning counts from the exact private result consumed by publish | version ID |
@@ -624,11 +636,31 @@ secret values, raw workbook cells, or internal policy details.
 
 1. Authorize active admin and feature flag.
 2. Claim request ID or return the prior idempotent result.
-3. Lock base version and pointer when the operation requires current base.
-4. Insert draft/versioned categories/groups/items in deterministic order.
-5. Insert one clone change set; do not insert unchanged rows as artificial
+3. Acquire the existing catalog-operation advisory lock, then lock the
+   singleton pointer and base version in the established order.
+4. Require the requested base to be Current and reject any existing mutable
+   draft for that base with stable code `DRAFT_ALREADY_EXISTS`. The partial
+   unique index is the final concurrent backstop; rejection creates no partial
+   clone or audit rows.
+5. Insert draft/versioned categories/groups/items in deterministic order.
+6. Insert one clone change set; do not insert unchanged rows as artificial
    `add` change items.
-6. Commit; no file parsing or external call occurs inside the transaction.
+7. Commit; no file parsing or external call occurs inside the transaction.
+
+### Draft abandon
+
+1. Authorize active admin and feature flag, then claim/fingerprint the request
+   ID under the same per-request advisory-lock contract.
+2. Lock the exact version and compare expected/stored `lock_version`.
+3. Require `status = 'draft'`, require the draft to be based on Current, and
+   reject published, stale, archived, or already abandoned targets without any
+   write.
+4. Append one bounded-reason `abandon` change set and atomically transition the
+   version to `abandoned`; retain every price row, identity, code, and prior
+   audit row.
+5. Same-request/same-payload replay returns the original result. Request reuse
+   with different payload, concurrent abandon, or any post-write failure rolls
+   back the transition and audit together.
 
 ### Draft mutation/import apply
 
@@ -665,7 +697,9 @@ secret values, raw workbook cells, or internal policy details.
 1. Authorize, check feature flag, and claim request ID.
 2. Acquire a transaction-scoped advisory lock using a constant publish key.
 3. Lock singleton pointer, then draft version, using the same order everywhere.
-4. Reject stale base or lock version.
+4. Reject stale base or a lock version different from the exact state reviewed
+   by the operator. Any mutation after final snapshot review increments the
+   lock and requires a fresh review.
 5. Load the exact shared readiness result and validate current base,
    reconciliation, codes, identities, approved categories/groups, prices,
    version-level archive reference, server-derived actor snapshot, row count,
@@ -720,15 +754,15 @@ change set, and never mutate price rows or historical BOQs.
 
 Set migration DDL timeouts and runtime function timeouts separately. The Local
 implementation uses `lock_timeout = '5s'` and `statement_timeout = '30s'` on
-private create/apply/publish/restore functions. Keep transactions short; a
-runtime timeout is an uncertain client outcome and must reuse the same request
-ID on retry.
+private create/abandon/apply/publish/restore functions. Keep transactions short;
+a runtime timeout is an uncertain client outcome and must reuse the same
+request ID on retry.
 
 ## 11. Immutability and append-only enforcement
 
 Database triggers/functions reject:
 
-- update/delete of active or archived `price_list` rows;
+- update/delete of active, archived, or abandoned `price_list` rows;
 - update of publication metadata after publish;
 - update/delete of code-registry rows;
 - update/delete of change sets/items;
@@ -760,13 +794,14 @@ When implementation begins:
 11. Run Local reset, DB tests, RLS matrix, advisors, and query-plan checks.
 12. Record migration SHA-256 and obtain separate Production approval.
 
-Implement the accepted Audit #29 DB corrections only in additive fix-forward
+Implement the accepted Audit #29 and P-22 DB corrections only in candidate
 migration `020_master_catalog_phase4_admin_workflow_hardening.sql`. It owns the
-WP-6.6 authority/readiness/correction/constraint changes; it must not rewrite
-`017`-`019`, hotfix `016`, BOQ behavior, or Factor F state. Add `020` to
-`scripts/bootstrap-local-db.sh` only after its Local evidence and owner
-closeout are both recorded; the Local evidence passed on `3bfc74e`, while
-owner closeout remains pending.
+WP-6.6 authority/readiness/correction/constraint changes, the replacement draft
+create implementation, the partial unique index, and the audited abandon path;
+it must not rewrite `017`-`019`, hotfix `016`, BOQ behavior, or Factor F state.
+Its prior `3bfc74e` Local evidence is historical and superseded for revised
+closeout. Keep `020` outside `scripts/bootstrap-local-db.sh` until replacement
+G1/G2 evidence and G3/G4 owner closeout are recorded.
 
 If P-18 is accepted, implement the placement extension only in append-only
 migration `021_master_catalog_phase4_placement_governance.sql`. Do not edit or
@@ -799,8 +834,9 @@ migration.
 - anonymous reads/writes and function calls fail;
 - staff see only approved published data;
 - active admins see drafts/audit and can mutate only through functions;
-- all current-base drafts are explicitly selectable, stale drafts are
-  nonmutable, and no import/mutation silently chooses one draft;
+- at most one current-base working draft exists, stale and abandoned drafts are
+  nonmutable/readable, replacement requires audited abandon, and no
+  import/mutation silently chooses a different draft;
 - Production-derived versioned categories and approved P-06 code groups are
   frozen/resolved without free-form creation,
   and server allocation never reuses a retired sequence;
@@ -814,6 +850,9 @@ migration.
 - clean-reset identity/hash output matches the P-20 approved portability model;
 - reusable version functions pass ADR-003 fixtures beyond `2568.1.0`;
 - same-ID timeout/retry and two-session publish/restore behavior pass live Local
+  DB tests;
+- duplicate/current-base creation, two-session creation, abandon replay/race,
+  role denial, rollback, and zero-partial-clone/audit assertions pass live Local
   DB tests;
 - after P-18/WP-7.5, valid placement shifts numeric positions atomically while
   preserving inherited relative order; invalid/stale/concurrent placement has no

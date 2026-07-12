@@ -11,9 +11,10 @@
   `2569.0.0` และ BOQ เก่าไม่ได้ถูก backfill**
 - Phase 4 Admin/Import/Publish/Official Export: **WP-6/P-11 complete และ
   WP-6.5 ผ่านตามขอบเขต reliability ที่พิสูจน์แล้ว แต่ capability audit พบว่า
-  admin workflow ยังไม่ครบ; WP-6.6 จึงถูกเพิ่มและตอนนี้ผ่าน Local DB/browser
-  evidence แล้ว รอ Owner closeout ก่อน WP-7, proposed WP-7.5, WP-8 และ
-  Production gates**
+  admin workflow ยังไม่ครบ; P-22 จึง Hold WP-6.6 closeout เพื่อแก้ one working
+  draft, audited abandon, item-first workspace และ final snapshot review.
+  หลักฐาน `3bfc74e` เป็นประวัติแต่ถูก supersede สำหรับ closeout รอบใหม่; ยังไม่
+  อนุมัติ Local reset, WP-7 หรือ Production**
 - รอบถัดไปของ Phase 4: **เริ่มจาก baseline หลัง Factor F `012-015` และ
   production hotfix `016`; Phase 4 migrations คือ `017+`**
 - เอกสาร Phase 4 ต้องใช้ live preflight count เสมอ เพราะ BOQ ใหม่อาจเพิ่ม
@@ -29,18 +30,19 @@
 6. [Phase 4 Change Request](./09-phase4-change-request.md) — อนุมัติ scope/ความเสี่ยง/แต่ละ Production gate
 7. [Decision Register](./19-phase4-decision-register.md) — ดูสิ่งที่ล็อกแล้ว/ยังรอตัดสินใจและ gate ที่เกี่ยวข้อง
 8. [Owner/Developer Capability Completeness Audit](./29-phase4-owner-dev-completeness-audit.md) — ดูคำแก้ไขขอบเขตคำว่า complete และ WP-6.6 release gates
-9. [WP-6.6 Owner Review Note](./30-phase4-wp66-owner-review-note.md) — รับรองหรือ hold C-01 ถึง C-12 โดยไม่รวม WP-7/P-18/Production
-10. [P-18 Placement Governance Review Note](./28-phase4-p18-placement-governance-review-note.md) — ตรวจข้อเสนอ narrow-scope สำหรับรายการใหม่ก่อนอนุมัติ WP-7.5
-11. [Reconciliation Report](./11-phase4-reconciliation-report.md) — ตรวจว่าข้อมูล 710/708 ถูกจัดการอย่างไร
-12. [Code Dictionary](./10-phase4-structured-code-dictionary.md) — ตรวจความหมาย AAA/TTT และจุดผิด 16 Crossing
-13. [Database/Security Contract](./17-phase4-database-security-contract.md) — ตรวจ schema, RLS/grants, function และ migration order
-14. [Lean Threat Model](./18-phase4-threat-model.md) — ตรวจความเสี่ยง/control/หลักฐานทดสอบ
-15. [Parser/Hash Specification](./14-phase4-parser-and-canonical-hash-spec.md) — สัญญาเชิงเทคนิคที่ทำให้ import/export ทำซ้ำได้
-16. [Official Export Specification](./20-phase4-official-export-spec.md) — อนุมัติรูปแบบ Excel/PDF, stamp และ hash
-17. [Production Runbook](./12-phase4-production-runbook.md) — ขั้นตอนจริง จุดหยุด และ rollback
-18. [Verification Report](./13-phase4-verification-report.md) — หลักฐานที่ต้องกรอกเมื่อ implement/rollout
-19. [Admin Operating Procedure](./15-phase4-admin-operating-procedure.md) — วิธีใช้งานของผู้ดูแลระบบ
-20. [Release Note Template](./16-phase4-release-note-template.md) — เอกสารต่อหนึ่งเวอร์ชันที่ publish
+9. [P-22 Operator Workflow Correction Plan](./31-phase4-wp66-operator-workflow-correction-plan.md) — ดู one working draft, abandon, item-first และ final-review contract พร้อม G0-G4
+10. [WP-6.6 Owner Review Note](./30-phase4-wp66-owner-review-note.md) — สถานะ Hold และหลักฐานที่ต้องแทนก่อน closeout
+11. [P-18 Placement Governance Review Note](./28-phase4-p18-placement-governance-review-note.md) — ตรวจข้อเสนอ narrow-scope สำหรับรายการใหม่ก่อนอนุมัติ WP-7.5
+12. [Reconciliation Report](./11-phase4-reconciliation-report.md) — ตรวจว่าข้อมูล 710/708 ถูกจัดการอย่างไร
+13. [Code Dictionary](./10-phase4-structured-code-dictionary.md) — ตรวจความหมาย AAA/TTT และจุดผิด 16 Crossing
+14. [Database/Security Contract](./17-phase4-database-security-contract.md) — ตรวจ schema, RLS/grants, function และ migration order
+15. [Lean Threat Model](./18-phase4-threat-model.md) — ตรวจความเสี่ยง/control/หลักฐานทดสอบ
+16. [Parser/Hash Specification](./14-phase4-parser-and-canonical-hash-spec.md) — สัญญาเชิงเทคนิคที่ทำให้ import/export ทำซ้ำได้
+17. [Official Export Specification](./20-phase4-official-export-spec.md) — อนุมัติรูปแบบ Excel/PDF, stamp และ hash
+18. [Production Runbook](./12-phase4-production-runbook.md) — ขั้นตอนจริง จุดหยุด และ rollback
+19. [Verification Report](./13-phase4-verification-report.md) — หลักฐานที่ต้องกรอกเมื่อ implement/rollout
+20. [Admin Operating Procedure](./15-phase4-admin-operating-procedure.md) — วิธีใช้งานของผู้ดูแลระบบ
+21. [Release Note Template](./16-phase4-release-note-template.md) — เอกสารต่อหนึ่งเวอร์ชันที่ publish
 
 ระหว่าง implementation ให้ใช้
 [Execution Progress Tracker](./25-phase4-execution-progress-tracker.md)
@@ -63,6 +65,7 @@
 | Excel/PDF presentation contract | [Official Export Specification](./20-phase4-official-export-spec.md) |
 | Admin workflow and UAT | [Admin Operating Procedure](./15-phase4-admin-operating-procedure.md) |
 | End-to-end capability completeness and release visibility | [Completeness Audit #29](./29-phase4-owner-dev-completeness-audit.md) |
+| One-working-draft, abandon และ final snapshot review | [P-22 Correction Plan #31](./31-phase4-wp66-operator-workflow-correction-plan.md) |
 
 ห้ามคัดลอก volatile status, latest commit, artifact hash หรือ test result ไป
 หลายเอกสารโดยไม่จำเป็น ให้เอกสารอื่นลิงก์ไป authority ข้างต้นแทน Current Git
@@ -112,8 +115,8 @@ checkpoint.
 | P-18 placement governance สำหรับ add/supplement | WP-6.5 guard/readiness ผ่าน Local technical evidence แล้วและยังคง block การ publish identity ใหม่; proposed WP-7.5 แยก placement workflow ออกจาก structured-code guard ตาม [Review Note #28](./28-phase4-p18-placement-governance-review-note.md). ต้องรับรองกติกา P-18 ก่อน implement; ถ้า defer ต้องซ่อน/ปิด Add และ Supplement เมื่อ enable feature |
 | P-19 PDF policy สำหรับรายการยกเลิกใช้ | ถ้า version ใดมี inactive/retired rows ต้องตัดสินใจว่าจะ exclude/mark/appendix ก่อน filed PDF |
 | P-20 canonical hash portability | Owner approved deterministic baseline identity จาก Production-derived `price_list.id`; independent two-rebuild proof ผ่านแล้ว และต้อง rerun หลัง migration change รวมถึง WP-8/P-15 |
-| WP-6.6 capability completeness | Audit #29 C-01 ถึง C-12 / slices A-G ผ่าน repository, Local DB/RLS/concurrency, P-20 rerun และ browser technical QA แล้วบน `3bfc74e`; รอ Owner closeout ก่อน WP-7 และยังต้อง rerun independent UAT/performance ที่ WP-8 |
-| P-21 อนุมัติเริ่ม WP-6.6 Local-only | Owner อนุมัติ implementation และ destructive Local evidence แยกกันแล้ว; migration `020` apply เฉพาะ Local และยังอยู่นอก bootstrap. การรับรอง closeout ไม่รวม P-18/`021`, WP-7, Factor F workflow หรือ Production |
+| WP-6.6 capability completeness | P-22 Hold closeout; ต้องปิด Audit #29 C-01 ถึง C-13 / slices A-I และสร้าง Local/browser/P-20 evidence ใหม่ก่อน WP-7. หลักฐาน `3bfc74e` ยังเป็นประวัติแต่ปิด candidate ใหม่ไม่ได้ |
+| P-21/P-22 WP-6.6 Local-only | P-21 อนุมัติ scope เดิม; P-22/G0 อนุมัติ docs และ Local-only source implementation ของ correction. Migration `020` ยังอยู่นอก bootstrap; G1/G2 reset, G3 closeout และ G4 bootstrap/WP-7 ต้องอนุมัติแยก และไม่รวม P-18/`021`, Factor F/hotfix expansion หรือ Production |
 | Version lifecycle ตาม ADR-003 | Reusable action/RPC path ไม่ hardcode `2568.1.0`; live additional version และ duplicate/backward/mixed negatives ผ่านใน WP-6.5 แล้ว และต้อง rerun ที่ WP-8/P-14 |
 | Live Production preflight หลัง Factor F rollout | ต้อง refresh ก่อนทุก Production gate; ห้ามใช้ BOQ count จาก closeout เป็นค่าตายตัว |
 

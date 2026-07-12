@@ -1,10 +1,10 @@
 # Master Catalog Phase 4 Admin Operating Procedure
 
-**Status:** Procedure aligned to WP-6.6 after repository, Local DB/RLS/
-concurrency, and browser technical QA passed on `3bfc74e`; owner closeout,
-P-18/P-19 where applicable, and independent intended-admin WP-8 UAT remain
-pending. The current Local UI must not be treated as Production-ready until
-those gates pass.
+**Status:** Procedure amended under P-22; WP-6.6 closeout is on Hold while the
+one-working-draft, audited-abandon, item-first, and final snapshot-review flow is
+implemented and reverified. Prior `3bfc74e` evidence is historical. P-18/P-19
+where applicable and independent intended-admin WP-8 UAT remain pending. The
+current Local UI must not be treated as Production-ready until those gates pass.
 **Audience:** Active Master Catalog administrators
 **Rule:** A draft is not official; published versions are immutable
 
@@ -34,6 +34,7 @@ factor version by assumption.
 | Published/Active | Official immutable version | No | Only when singleton pointer selects it |
 | Archived | Official historical version | No | No, but readable/exportable |
 | Stale Draft | Draft whose base is no longer Current; comparison only | No | No |
+| Abandoned | Never-published working attempt closed with an audited reason; history only | No | No |
 
 The “current” badge follows the singleton pointer, not a screen-local choice.
 Phase 4 Core has no Archive action. A former current version remains
@@ -44,9 +45,9 @@ approved maintenance capability.
 
 1. Open **Master Catalog → Versions**.
 2. Confirm the version marked current.
-3. Review all existing drafts and select the exact target. The application must
-   not silently choose one draft on your behalf.
-4. Select **Create draft from current version**.
+3. Check whether the Current version already has a working draft. Only one is
+   allowed; open it rather than creating a competing release workspace.
+4. When none exists, select **Create draft from current version**.
 5. Enter the owner-approved proposed version under ADR-003
    annual/revision/patch rules, effective date, and reason.
 6. Review the base version and expected row count.
@@ -56,6 +57,12 @@ The new draft records `based_on_version_id`. If the current pointer changes
 later, the draft becomes stale and cannot publish. Create a new draft from the
 new Current version and deliberately reapply still-approved changes. The stale
 draft remains read-only for comparison; Phase 4 Core does not rebase it.
+
+To start over while the same base remains Current, choose **Abandon draft**,
+confirm the exact draft/lock, and record a specific reason. The system retains
+all rows and audit history as read-only and then permits a fresh clone. Never
+delete a draft, use Archived for this purpose, or attempt to reopen an
+abandoned draft.
 
 For first structured-code rollout, clone `2568.0.0` to `2568.1.0` and confirm
 all 710 names, units, and prices are unchanged before applying mappings.
@@ -191,10 +198,14 @@ They require the separate Factor F process.
 
 ## 9. Review a draft
 
-Before requesting publication, verify:
+Open the draft's **Review changes before publication** page. It must compare the
+complete final database snapshots against the exact base by stable identity,
+not only list import events. Before requesting publication, verify:
 
 - base version is still current;
 - row counts and add/update/retire/recode totals are expected;
+- compound changes show every changed old/new field; a reverted item is not
+  counted as changed merely because history contains earlier edits;
 - all reconciliation/taxonomy decisions are resolved;
 - no unauthorized price/name/unit delta exists;
 - category and code group are complete;
@@ -210,6 +221,10 @@ Before requesting publication, verify:
 - the displayed request ID can be copied for support when a mutation result is
   uncertain.
 
+Record the displayed draft lock as part of this review. If any manual/import
+mutation occurs afterward, return to this page and review again; the prior
+review must not publish the changed draft.
+
 Use item history to inspect any suspicious change. History follows identity
 through codes and versions.
 
@@ -217,13 +232,14 @@ through codes and versions.
 
 Publication is high impact.
 
-1. Open the draft's **Publish readiness** panel.
+1. Open **Review changes before publication** from the draft workspace.
 2. Resolve all blocking errors.
 3. Enter/confirm approval reference, approval document date, effective date,
    physical archive reference, and publish reason.
    The publisher actor/name is shown from the signed-in profile and is not a
    free-text evidence field.
-4. Review final diff totals, item count, and warning acknowledgements.
+4. Review the complete final diff totals, changed rows/fields, item count, and
+   warning acknowledgements.
 5. Confirm no add/supplement/new identity rows are present unless P-18
    placement governance and guard evidence are approved.
 6. If the draft has begun the structured-code rollout by containing any active
@@ -233,8 +249,9 @@ Publication is high impact.
 7. If any inactive/retired rows are present, confirm P-19 official PDF policy.
 8. Confirm the version number and current base/pointer.
 9. Obtain explicit owner approval for this exact version.
-10. Type/confirm the version when prompted and publish once. The screen retains
-    this publish operation ID until a definitive result.
+10. Type/confirm the version when prompted and publish from this review page
+    once. The screen retains this publish operation ID until a definitive
+    result and submits the exact reviewed lock version.
 
 If publication succeeds, the version is immutable and the pointer moves
 atomically. Do not attempt to edit it.
@@ -288,6 +305,8 @@ Use only when a published current version must stop being used for new BOQs.
 | Reconciliation required | Complete identity/code decision in the approved artifact |
 | Retirement approval required | Verify Full-import mode, type the exact retirement count, and enter the real owner approval reference |
 | Draft lock conflict | Refresh and reconcile the other admin's change |
+| Working draft already exists | Open the existing Current-base workspace; abandon it with a reason only when the attempt truly must be replaced |
+| Draft review changed | The draft was edited after review. Return to final comparison, inspect the new state, and publish only with the refreshed lock |
 | Draft base stale | Create a new draft from Current and reapply approved changes; do not publish/rebase the stale draft |
 | Publish evidence required | Complete real approval metadata; do not use placeholder text |
 | Draft is stale/read-only | Select/create a current-base draft and deliberately reapply approved changes; do not rebase or force the stale draft |
@@ -301,6 +320,9 @@ Use only when a published current version must stop being used for new BOQs.
 
 - Direct database/table edits outside approved migration/functions
 - Editing or deleting a published version
+- Deleting a draft, relabelling it Archived to start over, or mutating an
+  abandoned/stale draft
+- Creating competing mutable drafts from the same base
 - Reusing an item code
 - Typing a new category/code-group definition or arbitrary code suffix through
   an ordinary item/import workflow
@@ -336,8 +358,9 @@ Developer DB/transport fault-injection evidence may prepare and verify the
 uncertain-response example, but it does not substitute for the intended admin
 recognizing the message and completing the recovery through the UI.
 
-1. view all drafts, identify stale/current-base state, create/select an exact
-   ADR-003-valid draft, and identify its base;
+1. identify the one current-base workspace, create an ADR-003-valid draft when
+   none exists, abandon/recreate one test attempt with a reason, and explain why
+   stale/abandoned drafts remain read-only;
 2. search the complete catalog including first/middle/last rows and inspect one
    item's field-level history;
 3. preview an approved workbook and explain Full versus Supplement impact,
@@ -346,14 +369,17 @@ recognizing the message and completing the recovery through the UI.
    including stale lock/base, placement/retirement hold, or invalid authority;
 5. perform one eligible reactivate or never-published withdraw correction and
    explain what identity/code/audit evidence remains;
-6. review diff totals, item history, authenticated publisher/archive evidence,
-   and publication readiness without SQL;
+6. review the authoritative final snapshot diff, compound/reverted behavior,
+   item history, authenticated publisher/archive evidence, and publication
+   readiness without SQL;
 7. locate version/status/count/hash in Excel/PDF and distinguish dataset hash
    from binary file hash;
 8. handle an uncertain-response example using the same request ID, verify that
    submitted fields remain unchanged before retry, and confirm they reset only
    after success;
 9. restore to a safe screen without an irreversible mistake or developer help.
+10. edit after opening final review, observe the stale-review conflict, and
+    complete a fresh review before any successful publication rehearsal.
 
 Record task completion, misunderstood wording, recovery outcome, elapsed time,
 browser/device, and reviewer. A failed or developer-dependent critical task
