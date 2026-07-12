@@ -38,6 +38,7 @@ let originalPointerId
 let hasHardenedCapabilities = false
 let newIdentityCapabilityGuardPassed = false
 let retirementCapabilityGuardPassed = false
+let abandonedFixtureDrafts = 0
 let currentStage = 'initialize Local clients'
 
 try {
@@ -200,6 +201,13 @@ try {
     'P18_PLACEMENT_REVIEW_REQUIRED',
   )
   await assertRejectedDraftStayedUnpublished(p18Draft.versionId, base.id)
+  if (hasHardenedCapabilities) {
+    actionOk(
+      await abandonDraft(adminA, p18Draft, p18Apply.lockVersion, 'P-18 guard fixture'),
+      'abandon P-18 guard fixture',
+    )
+    abandonedFixtureDrafts += 1
+  }
 
   currentStage = 'run structured-code readiness and publish rejection'
   const structuredDraft = await createDraft(adminA, base, versions[2], 'structured guard')
@@ -249,6 +257,18 @@ try {
     'STRUCTURED_CODE_EXCEPTION_REVIEW_REQUIRED',
   )
   await assertRejectedDraftStayedUnpublished(structuredDraft.versionId, base.id)
+  if (hasHardenedCapabilities) {
+    actionOk(
+      await abandonDraft(
+        adminA,
+        structuredDraft,
+        structuredApply.lockVersion,
+        'structured guard fixture',
+      ),
+      'abandon structured guard fixture',
+    )
+    abandonedFixtureDrafts += 1
+  }
 
   currentStage = 'verify duplicate-code mutation rollback'
   const atomicDraft = await createDraftWithIdempotencyChecks(adminA, base, versions[3])
@@ -278,9 +298,15 @@ try {
     retirementCapabilityGuardPassed = true
     await setCatalogCapability('catalog_retirement_enabled', true)
   }
-  await assertApplyIdempotency(adminA, atomicDraft, baselineRow)
+  const atomicApply = await assertApplyIdempotency(adminA, atomicDraft, baselineRow)
   if (hasHardenedCapabilities) {
     await setCatalogCapability('catalog_retirement_enabled', false)
+    actionOk(
+      await abandonDraft(adminA, atomicDraft, atomicApply.lockVersion, 'atomicity fixture'),
+      'abandon atomicity fixture',
+    )
+    abandonedFixtureDrafts += 1
+    assert(abandonedFixtureDrafts === 3, 'Hardened WP-6.5 fixtures left a working draft')
   }
 
   currentStage = 'verify final pointer, BOQ, and Factor F invariants'
@@ -310,6 +336,7 @@ try {
     roleDenialPassed: true,
     newIdentityCapabilityGuardPassed,
     retirementCapabilityGuardPassed,
+    abandonedFixtureDrafts,
     runtimeLockTimeoutConfigured: true,
     pointerRestored: true,
     factorFUnchanged: true,
@@ -478,6 +505,15 @@ async function createDraft(target, base, version, label, requestId = randomUUID(
     `create ${label} draft`,
   )
   return { versionId: data.versionId, lockVersion: data.lockVersion, requestId, version }
+}
+
+function abandonDraft(target, draft, lockVersion, label) {
+  return target.rpc('abandon_catalog_draft', {
+    p_version_id: draft.versionId,
+    p_expected_lock_version: lockVersion,
+    p_reason: `WP-6.5 close ${label}`,
+    p_request_id: randomUUID(),
+  })
 }
 
 async function createDraftWithIdempotencyChecks(target, base, version) {
@@ -910,7 +946,10 @@ async function assertApplyIdempotency(target, draft, baselineRow) {
     p_request_id: requestId,
     p_import_id: null,
   }
-  actionOk(await target.rpc('apply_catalog_changes', args), 'apply idempotency fixture')
+  const applied = actionOk(
+    await target.rpc('apply_catalog_changes', args),
+    'apply idempotency fixture',
+  )
   const duplicate = actionOk(
     await target.rpc('apply_catalog_changes', args),
     'duplicate apply idempotency fixture',
@@ -924,6 +963,7 @@ async function assertApplyIdempotency(target, draft, baselineRow) {
     'apply request ID payload mismatch',
     'REQUEST_ID_PAYLOAD_MISMATCH',
   )
+  return applied
 }
 
 async function readMutationCounts(versionId) {

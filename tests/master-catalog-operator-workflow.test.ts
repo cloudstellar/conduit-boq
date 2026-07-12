@@ -60,6 +60,10 @@ describe('Master Catalog P-22 operator workflow', () => {
     expect(panel).toContain('ยืนยันและเก็บเป็นประวัติ');
     expect(panel).toContain('expectedLockVersion');
     expect(panel).not.toContain('delete_catalog_draft');
+
+    const wp65Harness = source('scripts/smoke-master-catalog-wp65.mjs');
+    expect(wp65Harness).toContain("target.rpc('abandon_catalog_draft'");
+    expect(wp65Harness).toContain('abandonedFixtureDrafts === 3');
   });
 
   it('preserves list or review context when opening an exact item', () => {
