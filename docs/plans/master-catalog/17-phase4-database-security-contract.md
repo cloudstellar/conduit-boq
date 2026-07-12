@@ -9,10 +9,11 @@ migration approval remain separate gates
 **Last updated:** 2026-07-12 to record the WP-6.6 capability/authority hardening
 from [Audit #29](./29-phase4-owner-dev-completeness-audit.md) and the proposed
 P-18/WP-7.5 placement extension. Existing `017`-`019` remain the reviewed
-Local/bootstrap contract; P-21-authorized WP-6.6 migration `020` passed its
-repository/static checkpoint but remains unapplied and outside bootstrap, while
-P-18 rules and placement migration `021` remain pending owner/data-custodian
-approval
+Local/bootstrap contract. P-21-authorized WP-6.6 migration `020` passed
+repository and separately approved Local DB/RLS/concurrency/browser evidence
+on `3bfc74e`; it remains outside bootstrap pending owner closeout and has not
+been applied to Production. P-18 rules and placement migration `021` remain
+pending owner/data-custodian approval
 
 **Owner decision recorded:** 2026-07-04 — approved according to the
 recommendation as the technical backbone for Phase 4A and every Phase 4 write
@@ -763,7 +764,9 @@ Implement the accepted Audit #29 DB corrections only in additive fix-forward
 migration `020_master_catalog_phase4_admin_workflow_hardening.sql`. It owns the
 WP-6.6 authority/readiness/correction/constraint changes; it must not rewrite
 `017`-`019`, hotfix `016`, BOQ behavior, or Factor F state. Add `020` to
-`scripts/bootstrap-local-db.sh` only with its reviewed implementation/tests.
+`scripts/bootstrap-local-db.sh` only after its Local evidence and owner
+closeout are both recorded; the Local evidence passed on `3bfc74e`, while
+owner closeout remains pending.
 
 If P-18 is accepted, implement the placement extension only in append-only
 migration `021_master_catalog_phase4_placement_governance.sql`. Do not edit or

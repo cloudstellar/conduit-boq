@@ -37,6 +37,13 @@ WP-7. Migration `020` is reserved for WP-6.6 and proposed P-18 placement moves
 to `021`/WP-7.5. This alignment authorizes documentation only, not migration
 implementation, Local reset, or Production action.
 
+**WP-6.6 Local evidence recorded:** 2026-07-12 — P-21 later authorized the
+Local-only implementation and destructive evidence runs as separate decisions.
+Repository, migration `020` DB/RLS/concurrency, post-change P-20, and browser
+technical QA passed on `3bfc74e`. Current status and owner closeout remain in
+[the Tracker](./25-phase4-execution-progress-tracker.md); WP-7 must not start
+until that closeout is accepted.
+
 **Purpose:** Turn the reviewed Phase 4 architecture into an execution checklist
 that an implementer can follow without re-deciding scope, sequencing, database
 boundaries, or verification gates.
@@ -549,6 +556,9 @@ Exit gate:
   recover;
 - authority consistency tests cover WP order, reserved migration numbers, core
   links, and release-visibility rule;
+- the retained Local DB result is generated with
+  `npm run db:local:smoke-master-catalog-wp66 -- --output <path>` and records
+  exact commit/environment plus `productionTouched=false`;
 - owner accepts WP-6.6 closeout before WP-7 begins.
 
 ## 14. WP-7 permanent BOQ/hotfix `016` and Factor F regression preservation
@@ -627,7 +637,9 @@ Run order:
 4. Confirm Phase 4 `017+` migrations apply only after hotfix `016`.
 5. Run DB/security tests.
 6. Run parser/hash tests.
-7. Run the complete WP-6.6 capability matrix and admin UI workflow tests.
+7. Run the complete WP-6.6 capability matrix with
+   `npm run db:local:smoke-master-catalog-wp66 -- --output <path>` and the admin
+   UI workflow tests.
 8. Run end-to-end idempotency and two-session concurrency/timeout tests.
 9. Run publish/export tests, including WP-6.5 guards, WP-6.6 readiness/provenance,
    conditional WP-7.5 placement, and the tracked semantic artifact verifier.

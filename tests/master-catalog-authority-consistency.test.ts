@@ -131,7 +131,7 @@ describe('Master Catalog authority consistency', () => {
     ])
 
     expect(migrations).toContain(
-      '**Implementation candidate — repository/static checkpoint passed; not applied and not in bootstrap**',
+      '**Local evidence passed on `3bfc74e`; owner closeout pending; not in bootstrap or Production**',
     )
     expect(migrations).toContain(
       '**Proposed only — P-18 pending; file does not exist; not in bootstrap**',
@@ -182,25 +182,29 @@ describe('Master Catalog authority consistency', () => {
     expect(decisions).toContain('P-19')
     expect(decisions).toContain('Pending; recorded 2026-07-07')
     expect(decisions).toContain(
-      'Approved; two-run WP-6.5C proof passed 2026-07-11; WP-8/P-15 reruns pending',
+      'Approved; WP-6.5C and post-`020` WP-6.6 reruns passed; WP-8/P-15 reruns pending',
     )
     expect(decisions).toContain(
-      'Approved 2026-07-12 in owner chat; source/repository static checkpoint passed, reset/apply still pending',
+      'Implementation/Local evidence passed 2026-07-12; owner closeout pending',
     )
 
     const tracker = read(
       'docs/plans/master-catalog/25-phase4-execution-progress-tracker.md',
     )
     expect(tracker).toMatch(/\| WP-6\.5 \|[^\n]+\| Ready for owner review \|/)
-    expect(tracker).toMatch(/\| WP-6\.6 \|[^\n]+\| In progress \|/)
+    expect(tracker).toMatch(/\| WP-6\.6 \|[^\n]+\| Ready for owner review \|/)
     expect(tracker).toMatch(/\| WP-7 \|[^\n]+\| Not started \|/)
     expect(tracker).toMatch(/\| WP-7\.5 \|[^\n]+\| Not started \|/)
     expect(tracker).toMatch(/\| WP-8 \|[^\n]+\| Not started \|/)
     expect(tracker).toContain('independent intended-admin UAT remains WP-8')
     expect(tracker).toContain('| Production write allowed | No |')
     expect(tracker).toContain(
-      'separately approve/reject destructive clean Local reset and migration `020` apply',
+      'Accept or hold WP-6.6 closeout for Audit #29 C-01 through C-12',
     )
+    expect(existsSync(resolve(
+      root,
+      'docs/plans/master-catalog/30-phase4-wp66-owner-review-note.md',
+    ))).toBe(true)
   })
 
   it('keeps reliability commands and route recovery files tracked by contract', () => {

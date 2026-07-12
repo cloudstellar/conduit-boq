@@ -1,9 +1,10 @@
 # Master Catalog Phase 4 Verification Report
 
 **Status:** In progress — WP-6/P-11 complete; WP-6.5 passed its bounded
-reliability scope; Audit #29 requires WP-6.6 before WP-7. WP-7, proposed
-WP-7.5, WP-8 including independent intended-admin UAT, and Production gates
-remain
+reliability scope; WP-6.6 repository, Local DB/RLS/concurrency, post-change
+P-20, and browser technical evidence passed and awaits owner closeout. WP-7,
+proposed WP-7.5, WP-8 including independent intended-admin UAT, and Production
+gates remain
 **Prepared:** 2026-06-22
 **Production project:** `otlssvssvgkohqwuuiir`
 **Candidate version:** `2568.1.0` (version string reserved; publication metadata/P-15 pending)
@@ -24,10 +25,10 @@ should link here rather than copy volatile evidence.
 
 | Phase | Environment | Executor | Started | Completed | Result | Evidence |
 |---|---|---|---|---|---|---|
-| 4-0 documents/data decisions | Repository |  |  |  | Pending |  |
-| 4A additive schema | Local |  |  |  | Pending |  |
-| 4B application/workflows | Local |  |  |  | Pending |  |
-| WP-6.6 admin workflow/authority hardening | Local | Codex + owner/developer | 2026-07-12 |  | Static checkpoint passed; execution pending | P-21-authorized slices A-G passed repository checks; migration `020` remains unapplied/outside bootstrap and Local DB/browser evidence needs separate reset approval |
+| 4-0 documents/data decisions | Repository | Owner + developer | 2026-07-04 |  | In progress | P-01 through P-11/P-17/P-20 approved as recorded; P-09 publication metadata, P-18/P-19, and Production gates remain separate |
+| 4A additive schema | Local | Codex + owner/developer | 2026-07-05 | 2026-07-12 | Passed through WP-6.6 technical scope | `017`-`019` canonical bootstrap plus separate reviewed `020` evidence passed; bootstrap integration and WP-8 rerun remain |
+| 4B application/workflows | Local | Codex + owner/developer | 2026-07-05 | 2026-07-12 | Passed supported WP-6.6 technical scope | Unsupported Add/Retire remain gated; P-18/WP-7.5 is conditional and independent intended-admin UAT remains WP-8 |
+| WP-6.6 admin workflow/authority hardening | Local | Codex + owner/developer | 2026-07-12 | 2026-07-12 | Ready for owner review | P-21-authorized slices A-G passed repository, separately approved migration `020` DB/RLS/concurrency, post-change P-20, browser technical QA, and Local auth regression evidence. `020` remains outside bootstrap and Production. |
 | WP-7 permanent BOQ/hotfix/Factor F regression | Local |  |  |  | Not started | Regression-only |
 | WP-7.5 P-18 placement | Local |  |  |  | Decision pending | P-18 Review Note #28 |
 | 4C clean rehearsal | Local |  |  |  | Pending |  |
@@ -56,8 +57,10 @@ should link here rather than copy volatile evidence.
 | Reliability plan/authority alignment | Owner | Approved for docs-only alignment | 2026-07-11 | Expanded WP-6.5/WP-7/WP-8 gates and P-20; no Local reset or Production authorization |
 | Capability-completeness plan alignment | Owner | Requested full audit and documentation correction | 2026-07-12 | Audit #29 adds WP-6.6, reserves `020`, moves proposed placement to `021`; no reset/implementation/Production authorization |
 | P-21 WP-6.6 Local-only implementation start | Owner | Authorized | 2026-07-12 | Owner approved Audit #29 C-01 through C-12/slices A-G; does not imply Local reset/apply, P-18/`021`, WP-7, or Production |
+| WP-6.6 destructive Local evidence runs | Owner | Authorized and completed | 2026-07-12 | Canonical bootstrap through `019`, separate Local-only `020` apply, retained DB/concurrency/P-20 evidence, and browser technical QA completed on `3bfc74e`; Production touched: No |
+| WP-6.6 owner closeout | Owner | Pending |  | Review [WP-6.6 Owner Review Note](./30-phase4-wp66-owner-review-note.md); acceptance does not approve WP-7 execution, P-18/`021`, P-19, Factor F workflow changes, hotfix expansion, or Production |
 | P-11 exact artifact acceptance | Owner | Accepted exact TH Sarabun New 16 pt replacement PDF/Excel pair; WP-6 complete | 2026-07-11 22:20 +07 | Owner confirmed `รูปแบบ pdf excel ok เลยครับ` for the `777df75` pair after semantic and visual file QA; Production filing and P-12-P-15 remain separate |
-| P-20 identity/hash portability | Owner | Approved deterministic baseline identity from immutable Production-derived `price_list.id`; retain `identity_id` in lineage hash | 2026-07-11 12:11 +07 | WP-6.5C passed on 2026-07-11 with two owner-approved independent clean rebuilds on exact commit `1ad01b9`; rerun remains required after migration changes and at WP-8/P-15 |
+| P-20 identity/hash portability | Owner | Approved deterministic baseline identity from immutable Production-derived `price_list.id`; retain `identity_id` in lineage hash | 2026-07-11 12:11 +07 | WP-6.5C passed on `1ad01b9`; the required post-`020` rerun also passed two independent clean inputs on `3bfc74e`. WP-8/P-15 reruns remain. |
 | WP-6.5 Local-only start | Owner | Authorized | 2026-07-11 12:11 +07 | No unannounced Local reset, Production access/write, Factor F workflow change, hotfix scope expansion, placement UI, deploy, enablement, or publication |
 | WP-6.5 destructive Local rebuilds | Owner | Two separate clean Local resets authorized | 2026-07-11 | Both approved rebuilds completed on exact commit `1ad01b9`; evidence provenance and hashes are recorded in Section 6.4 and the Tracker; Production touched: No |
 | P-11 clean Local artifact rebuild | Owner | One additional clean Local reset authorized and completed | 2026-07-11 | Reset at `edf3570a` restored a no-audit canonical baseline before exact artifact generation; no WP-6.5 harness rerun and no Production access/write |
@@ -182,20 +185,53 @@ publication provenance.
 
 | Audit finding | Required evidence | Result |
 |---|---|---|
-| C-01 full browse/item history | First/middle/last-row search, filters, exact item route, stable-identity field diff, and >1,000-row paged-read fixture proving no API-cap truncation | Source/static passed including deterministic 1,201-row `500/500/201` fixture; browser pending |
-| C-02 exact draft/stale state | Multiple current-base drafts selectable; stale draft read-only before submit | Source/static passed; browser pending |
-| C-03/C-04 dictionary and allocator | P-06 seed/freeze, unknown-entry denial, next-never-issued concurrency/gap/900 fixtures | Source/static passed; DB race/gap/900 evidence pending |
-| C-05 import diff/evidence | Complete server add/update/recode/retire/unchanged diff, exact omissions, approved/missing price evidence | Source/static passed; DB/browser pending |
-| C-06/C-07 publication provenance | Authenticated actor snapshot and required version archive reference including manual-only publication | Source/static passed; DB/browser pending |
-| C-08 readiness parity | Same stale-base/full-quality/P-18/structured result in readiness and publish | Source/static passed; DB parity evidence pending |
-| C-09/C-10 correction/editor | Prefilled exact item; field-aware authority; reactivate/base-absent withdraw with preserved identity/code/audit | Source/static passed; DB/browser pending |
-| C-11/C-12 UX/schema | Thai-first/no synthetic defaults/support details plus zero-null/order constraint compatibility | Repository/static passed; DB/browser/accessibility pending |
+| C-01 full browse/item history | First/middle/last-row search, filters, exact item route, stable-identity field diff, and >1,000-row paged-read fixture proving no API-cap truncation | Passed: deterministic 1,201-row `500/500/201` fixture plus Local browser first/middle/last search, exact item route, and identity/code history |
+| C-02 exact draft/stale state | Multiple current-base drafts selectable; stale draft read-only before submit | Passed technical gate: exact draft registers/fail-closed stale tests and browser explicit draft/import targeting; independent operator recovery UAT remains WP-8 |
+| C-03/C-04 dictionary and allocator | P-06 seed/freeze, unknown-entry denial, next-never-issued concurrency/gap/900 fixtures | Passed Local DB: 710 mappings/65 groups/17 exclusions, role/unknown/caller-code denial, two unique concurrent allocations, never-reuse, and capacity boundary |
+| C-05 import diff/evidence | Complete server add/update/recode/retire/unchanged diff, exact omissions, approved/missing price evidence | Passed Local DB: complete 710-row first rollout, 709 changed/structured rows plus approved `ITEM-0139` legacy row, stable validation replay; browser required explicit draft selection. Full intended-admin import UAT remains WP-8. |
+| C-06/C-07 publication provenance | Authenticated actor snapshot and required version archive reference including manual-only publication | Passed Local DB/browser: authenticated publisher snapshot, physical archive reference, invalid-date and missing-archive denials, and rendered provenance/readiness state |
+| C-08 readiness parity | Same stale-base/full-quality/P-18/structured result in readiness and publish | Passed Local DB: one full 710-row canonical-quality result fed readiness/publication; pointer restored after physical-archive publish proof |
+| C-09/C-10 correction/editor | Prefilled exact item; field-aware authority; reactivate/base-absent withdraw with preserved identity/code/audit | Passed Local DB/browser: retire/reactivate, inherited-withdraw denial, exact inactive item/action, and preserved identity/code/history |
+| C-11/C-12 UX/schema | Thai-first/no synthetic defaults/support details plus zero-null/order constraint compatibility | Passed technical gate: `020` constraints/RLS/grants/role denial, Thai desktop/mobile render with no page overflow, and no app console error. Formal accessibility/intended-admin UAT remains WP-8. |
 
-No Local reset/apply is authorized by this checkpoint. Migration `020` is an
-unapplied implementation candidate and does not enter bootstrap until the
-separately approved destructive reset, DB evidence, and subsequent review pass.
+After separate owner authorization, the canonical bootstrap through `019` was
+run on two independent clean Local rebuilds at exact commit
+`3bfc74ea00843033ad3cfd2afac43820b18c0124`; `020` was then applied separately
+for evidence. Migration `020` remains outside bootstrap until owner closeout
+and has not been applied to Production.
 
 Retained Local evidence outputs (untracked by policy):
+
+- WP-6.6 DB run:
+  `tmp/master-catalog/wp66-evidence/20260712-clean-a-3bfc74e.json`, generated
+  `2026-07-12T03:21:47.395Z`, exact commit
+  `3bfc74ea00843033ad3cfd2afac43820b18c0124`, file SHA-256
+  `be9ffe9b0f9dc597e6152ec6151388df1b761598b2bb5a0f1b96f334ebcc2552`,
+  status `passed`, environment `local`, and `productionTouched=false`;
+- post-`020` P-20 input A:
+  `tmp/master-catalog/wp65-evidence/20260712-wp66-clean-a-3bfc74e.json`, file
+  SHA-256
+  `e3919de8dbb313d85a24025c7388d0c3a6a91d353cad90c0c75eb9c73a57587e`;
+- post-`020` P-20 input B:
+  `tmp/master-catalog/wp65-evidence/20260712-wp66-clean-b-3bfc74e.json`, file
+  SHA-256
+  `4d3158cfa254f47527ccaa347a8ec4738c11c70bac83b68382f6b9242e2738da`;
+- the post-`020` comparator passed at `2026-07-12T03:23:09.116Z` with the same
+  reviewed commit, no failures, base `2568.0.0`, 710 rows, dataset hash
+  `sha256:2e3571ea7135fbc0bbb84c8cc330af1173e4c1d2345e5eb59958dc76e45558b8`,
+  and identity mapping SHA-256
+  `5f68993ce5aa5c7735b0d9e6de6d27946b4846fb8a6eb77d1b6b3bd6c4a73de7`;
+- Local browser technical QA on the same implementation covered five version
+  rows, exact `2568.103.0` draft with 710 selected rows, first/middle/last item
+  search, exact inactive item/history/reactivate path, explicit import draft
+  selection, history register, 1440x900 desktop and 390x844 mobile without
+  page overflow, and no app console error. The existing Next image LCP warning
+  for `/nt_logo.svg` remained non-blocking;
+- Local login follow-up commit
+  `59b17d3c3e7ed6180445ac5dc5e0b75db9fe9452` rejects ambiguous unquoted `#`
+  in guarded Local secrets. Focused tests and `npm run db:local:smoke-auth`
+  passed, and normal password login worked without Magic Link. The ignored
+  `supabase/.env.local` was not staged.
 
 - run 1: `tmp/master-catalog/wp65-evidence/rebuild-1.json`, generated
   `2026-07-11T11:55:57.332Z`, file SHA-256
@@ -266,15 +302,15 @@ fixed and reviewed.
 | Check | Expected | Evidence | Result |
 |---|---|---|---|
 | WP-8 clean Local rehearsal | Passed with no unresolved blocker |  | Pending |
-| WP-6.6 capability matrix | Audit #29 C-01 through C-12 implemented/evidenced, or unsupported controls removed from release visibility | Source/repository static checkpoint passed; Local DB/browser evidence not yet authorized | Partial; Local DB/browser pending |
+| WP-6.6 capability matrix | Audit #29 C-01 through C-12 implemented/evidenced, or unsupported controls removed from release visibility | Repository, separately approved `020` Local DB/RLS/concurrency, post-change P-20, browser technical QA, and Local auth regression passed on `3bfc74e`/`59b17d3`; unsupported Add/Retire controls remain capability-gated | Passed technical gate; owner closeout pending |
 | Reviewed migration fingerprint | Filename and SHA-256 match approved file |  | Pending |
 | Repository/deployment fingerprint | Exact branch, commit, CI, and deploy artifact recorded |  | Pending |
 | Fresh Production preflight | Live counts, pointer, Factor F, BOQ split, and drift recorded |  | Pending |
 | Backup/restore gate | Fresh backup manifest and clean Local restore test pass |  | Pending |
-| Hotfix `016` / migration order | Remote ledger includes `016`; clean Local bootstrap applies `009`-`015`, hotfix `016`, then Phase 4 `017+` before WP-8 evidence is accepted | Local authority order passed in both `1ad01b9` evidence rebuilds and the clean `edf3570a` artifact rebuild; fresh Production ledger check has not run | Local passed; Production/WP-8 pending |
+| Hotfix `016` / migration order | Remote ledger includes `016`; clean Local bootstrap applies `009`-`015`, hotfix `016`, then Phase 4 `017+` before WP-8 evidence is accepted | Local authority order passed in prior evidence and both `3bfc74e` rebuilds; `020` was applied separately after `019` for review and remains outside bootstrap. Fresh Production ledger check has not run. | Local WP-6.6 order passed; integrated WP-8/Production checks pending |
 | End-to-end request idempotency | UI/action/DB reuse one operation ID after timeout; changed payload with same ID rejects | DB replay/mismatch and tracked transport proof passed. Browser proof on `9becdf6` retained the original Reason/target through the uncertain state, retried without refilling, matched the full request ID in both responses, returned `duplicateRequest=true`, and created one change set. | Passed WP-6.5; rerun WP-8 |
-| Live DB integration/concurrency | Migrations, RPC/RLS/roles, rollback, two-session publish/restore, and lock timeout pass | WP-6.5 harness passed twice on independent clean rebuilds; lock timeout configuration accepted and races had one deterministic winner | Passed WP-6.5; rerun WP-8 |
-| P-20 hash portability | Approved clean-reset/cross-environment identity/hash model passes | Two clean rebuilds on the same reviewed commit reproduced the 710-row dataset and identity mapping hashes exactly | Passed WP-6.5; rerun WP-8/P-15 |
+| Live DB integration/concurrency | Migrations, RPC/RLS/roles, rollback, two-session publish/restore, and lock timeout pass | WP-6.5 harness passed previously; post-`020` WP-6.6 evidence added constraints/grants/role denial, server-allocation concurrency/never-reuse/900 boundary, correction and publication negatives, exact registers, and pointer/BOQ/Factor F cleanup | Passed WP-6.6 technical gate; rerun WP-8 |
+| P-20 hash portability | Approved clean-reset/cross-environment identity/hash model passes | Two post-`020` independent clean inputs on exact commit `3bfc74e` again reproduced 710 rows, dataset hash `sha256:2e3571ea7135fbc0bbb84c8cc330af1173e4c1d2345e5eb59958dc76e45558b8`, and identity mapping SHA-256 `5f68993ce5aa5c7735b0d9e6de6d27946b4846fb8a6eb77d1b6b3bd6c4a73de7` with no comparator failures | Passed post-`020`; rerun WP-8/P-15 |
 | ADR-003 reusable version lifecycle | Another valid annual/revision/patch version passes; no reusable hardcoding to `2568.1.0` | Generic fixtures and live high-revision create/publish passed; duplicate/backward/mixed live attempts returned expected safe codes without count or pointer changes | Passed WP-6.5D; rerun WP-8/P-14 |
 | Tracked export verifier | Clean-checkout semantic Excel/PDF verification passes | Exact `777df75` replacement pair passed embedded generation verification and independent rerun with no failures; manifest contains regular paths, binary hashes, 710 rows, and P-20 dataset hash; owner accepted the pair | Passed/accepted P-11; WP-8 rerun pending |
 | Admin UAT and recovery | Intended admin completes core workflow and representative failures without developer/SQL assistance |  | Pending WP-8 |
@@ -315,26 +351,26 @@ Approved dictionary fingerprint: `_______________________________`
 
 | Check | Expected | Actual/evidence | Result |
 |---|---|---|---|
-| Clean reset + migrations | Success, including `009`-`015`, hotfix `016`, and Phase 4 `017+` in order | Two separately approved WP-6.5 bootstraps completed on `1ad01b9`; a third separately approved clean artifact bootstrap completed on `edf3570a`. All applied `009`-`015`, `016`, and `017`-`019` and passed bootstrap smoke. | Passed WP-6.5/P-11; rerun WP-8 |
+| Clean reset + migrations | Success, including `009`-`015`, hotfix `016`, and Phase 4 `017+` in order | Prior WP-6.5/P-11 bootstraps passed. Two additional separately approved clean rebuilds on `3bfc74e` applied canonical `009`-`015`, `016`, `017`-`019`, then applied `020` separately for WP-6.6 evidence. | Passed WP-6.6; add `020` to reviewed bootstrap only after owner closeout, then rerun WP-8 |
 | 710 identities/legacy code registrations | Exact | Both retained runs read 710 baseline rows and proved every baseline `identity_id` equals its immutable Production-derived `price_list.id`; mapping SHA-256 `5f68993ce5aa5c7735b0d9e6de6d27946b4846fb8a6eb77d1b6b3bd6c4a73de7` | Passed P-20 identity scope |
 | Published baseline identity merges | 0 | Deterministic one-row-to-one-identity mapping covered all 710 baseline rows in both clean rebuilds; no identity merge step exists in the P-20 mapping | Passed WP-6.5 |
 | Category backfill | Approved count |  | Pending |
-| P-06 code-group dictionary | Exact approved 22/65 meanings frozen; ordinary mutation cannot create unknown entries | Generated frozen authority and migration/static contract passed | Source/static passed; Local DB pending |
-| Display-order backfill | Unique `ITEM-####` numeric suffix; 710 covered |  | Pending |
+| P-06 code-group dictionary | Exact approved 22/65 meanings frozen; ordinary mutation cannot create unknown entries | Frozen authority readback passed 710 mappings/65 groups/17 exclusions; unknown category/group and caller-selected code were denied | Passed Local DB |
+| Display-order backfill | Unique `ITEM-####` numeric suffix; 710 covered | Full 710-row readiness readback had `missingDisplayOrder=0`; migration `020` required-order constraint passed | Passed Local DB |
 | New-item display order | Current mechanical default is prior maximum + 1 for draft allocation only; WP-6.5 must reject publishing any draft containing identities absent from the base version until P-18 placement governance is approved | Live add fixture reported one new identity, readiness `canPublish=false`, and publish returned `P18_PLACEMENT_REVIEW_REQUIRED` without pointer/metadata mutation in both runs | Guard passed; P-18 placement pending |
 | Import parser profile ID/version stored | Exact |  | Pending |
-| Code allocation at sequence 900 | Blocking capacity-review error | Migration/static contract implemented | Source/static passed; Local DB pending |
-| Next-code allocator | Group-locked next never-issued sequence; retired gaps not reused; concurrent callers deterministic | Server-owned locked allocator and contract tests passed | Source/static passed; Local DB race/gap evidence pending |
-| New structured version rows | 710 before approved add/retire |  | Pending |
+| Code allocation at sequence 900 | Blocking capacity-review error | Local WP-6.6 capacity-boundary fixture passed | Passed Local DB |
+| Next-code allocator | Group-locked next never-issued sequence; retired gaps not reused; concurrent callers deterministic | Two concurrent calls allocated distinct `CIC-GIP-007`/`008`; withdrawal followed by allocation produced `009`, proving no reuse | Passed Local DB |
+| New structured version rows | 710 before approved add/retire | Full rollout contained 710 rows: 709 canonical structured rows plus approved temporary legacy `ITEM-0139`; readiness found no unapproved legacy active rows | Passed Local DB |
 | New foreign keys indexed | All |  | Pending |
 | Unique version/code and version/identity | Enforced |  | Pending |
 | Unit-cost check validated | Enforced |  | Pending |
-| Required nullability/order constraints | Zero-null compatibility proof then enforced by fix-forward migration `020` | Preflight/constraints implemented in unapplied `020` | Source/static passed; Local DB compatibility evidence pending |
+| Required nullability/order constraints | Zero-null compatibility proof then enforced by fix-forward migration `020` | `required_constraints=3`, `nullable_required_columns=0`, and 710-row readiness had no missing required text/category/identity/order | Passed Local DB |
 | Published row/metadata immutability | Enforced |  | Pending |
 | Pointer/legacy `is_default` consistency | Exact | Concurrent publish/restore and cleanup restored one pointer/default to `2568.0.0` in both retained runs | Passed WP-6.5 |
-| New `catalog_admin_enabled` value type/default | JSON boolean / `false` | Clean bootstrap and final cleanup readback returned disabled/`false` | Passed WP-6.5 |
-| Private mutation functions unexposed | Confirmed |  | Pending |
-| Data API grants explicit | Confirmed |  | Pending |
+| New catalog capability values/defaults | JSON boolean / `false` for admin, new identity, and retirement | Post-`020` schema evidence counted all three disabled; final cleanup readback returned all three `false` | Passed WP-6.6 |
+| Private mutation functions unexposed | Confirmed | Authenticated role could not execute the private allocator; anonymous could not execute version registers; role-denial fixtures passed | Passed Local DB |
+| Data API grants explicit | Confirmed | All three frozen authority tables had RLS and exact policies; authenticated register execution was present while anonymous execution was absent | Passed Local DB |
 | Publish/restore advisory lock behavior | Serialized; no competing pointer mutation | Two-client publish and restore races each produced one winner and one stable rejection/lock outcome; exact duplicate winner request returned the prior result; pointer remained singular and was restored | Passed WP-6.5 |
 | `boq.factor_reference_version_id` FK/index/immutability trigger | Preserved |  | Pending |
 | Factor F version tables/pointer/RLS/grants | Unchanged by Phase 4 migration | Runtime summary was identical before/after both harnesses: default `2569.0.0`, 36 default rows; no Factor F workflow was added or changed | Runtime invariant passed; structural WP-7/WP-8 checks pending |
@@ -344,11 +380,11 @@ Approved dictionary fingerprint: `_______________________________`
 
 | Actor | Read published catalog | Read admin audit | Mutate draft | Publish/restore | Result |
 |---|---|---|---|---|---|
-| Anonymous | No | No | No | No | Partial: draft-create execution denied live twice; read/audit/publish matrix remains WP-8 |
-| Authenticated non-admin | Approved published read only | No | No | No | Partial: staff draft create returned `FORBIDDEN` and admin readiness read was denied live twice; remaining matrix is WP-8 |
+| Anonymous | No | No | No | No | Live draft-create and exact-register execution denials passed; full release matrix reruns at WP-8 |
+| Authenticated non-admin | Approved published read only | No | No | No | Staff mutation/readiness denials and WP-6.6 authority/register role boundaries passed; full release matrix reruns at WP-8 |
 | Pending/inactive admin profile | No admin access | No | No | No | Pending |
-| Active admin | Yes | Yes | Yes | Yes | Partial: two active-admin sessions created/mutated/published/restored and read readiness live; full read/audit UAT remains WP-8 |
-| Direct REST write to audit/import table | N/A | N/A | Rejected | Rejected | Pending |
+| Active admin | Yes | Yes | Yes | Yes | Two active-admin sessions exercised allocation, import, correction, publication/readiness/registers, and pointer restore live; independent read/audit UAT remains WP-8 |
+| Direct REST/private function bypass | N/A | N/A | Rejected | Rejected | Frozen authority RLS/policies and private allocator execution denial passed; complete direct-write matrix reruns at WP-8 |
 
 Also verify:
 
@@ -379,17 +415,17 @@ Also verify:
 | Full retirement below threshold | Warning + exact diff; no bulk approval required | Pending |
 | Full retirement at `max(10, ceil(2%))` | Apply blocked without typed count and owner reference | Pending |
 | Supplement omission | Leaves unchanged | Pending |
-| Complete server diff | Add/update/recode/retire/unchanged rows and totals displayed from authoritative validation | Source/static passed; Local DB/browser pending |
-| Exact Full omissions | Every omitted identity and count displayed before Apply | Source/static passed; Local DB/browser pending |
-| Approved new-row price authority | Batch default/per-row override resolves and persists; missing/mismatched evidence rejects | Source/static passed; Local DB/browser pending |
-| Reconciliation authority | Runtime does not treat `docs/*draft.csv` as mutable business authority; first rollout is frozen/reviewed and later imports use exact draft/dictionaries | Generated authority/check passed; Local DB evidence pending |
+| Complete server diff | Add/update/recode/retire/unchanged rows and totals displayed from authoritative validation | Passed technical WP-6.6 gate: full Local rollout returned complete authoritative results for 710 rows, including 709 changed/structured rows and the approved legacy exception; browser import required explicit exact-draft selection. Full intended-admin import UAT remains WP-8. |
+| Exact Full omissions | Every omitted identity and count displayed before Apply | Passed reviewed rollout case: full 710-row first-rollout input had zero silent omissions; exact omission/diff contracts passed static tests. Representative operator omission UAT remains WP-8. |
+| Approved new-row price authority | Batch default/per-row override resolves and persists; missing/mismatched evidence rejects | Correct fail-closed state: price-authority contracts passed; new-identity execution stayed capability-denied and hidden because P-18/WP-7.5 is unresolved. |
+| Reconciliation authority | Runtime does not treat `docs/*draft.csv` as mutable business authority; first rollout is frozen/reviewed and later imports use exact draft/dictionaries | Passed: generated authority check and Local DB readback returned 710 mappings/65 groups/17 exclusions with SHA-256 `28675e6244c65d485dda7142634b381db729a139bccdf189ad51563251a2e12a`. |
 | Unauthorized price delta | Rejected | Pending |
 | Client-tampered payload | Server rejection | Pending |
 | Duplicate request ID | One effect/consistent result | Local WP-4 import duplicate evidence passed; WP-6.5 create/manual apply/publish/restore exact replay also passed twice |
 | Timeout after import apply commit | Retry reuses same client-owned apply ID and returns prior result | The shared `apply_catalog_changes` transport and stable-operation form path passed timeout-after-commit through manual apply; import exact replay/mismatch passed live. Retest the import-status-specific UI path during WP-8 full workflow. |
-| Import status lifecycle | UI-only preview; `validated/rejected`; one transition to `applied` | Pending |
+| Import status lifecycle | UI-only preview; `validated/rejected`; one transition to `applied` | Passed technical gate: full rollout validation/apply completed once and validation replay returned the prior result; browser Apply stayed disabled until a draft was selected. Intended-admin UAT remains WP-8. |
 | Import invalid status transition | Rejected without partial apply | Pending |
-| Validation/apply request IDs | Separate and idempotent | Pending |
+| Validation/apply request IDs | Separate and idempotent | Passed Local DB: WP-6.6 validation replay was stable with normalized payload hash `0a912360d4c9c64502081eb6f81b6519c50d9bb25fbbadf458e73c1066534416`; shared apply idempotency remained green. |
 | Import full old/new snapshots | Complete | Pending |
 | Filed source independently rehashed | Matches recorded client fingerprint | Pending |
 
@@ -397,17 +433,17 @@ Also verify:
 
 | Test | Expected | Result/evidence |
 |---|---|---|
-| Manual add/edit/retire/recode/reactivate/eligible withdraw on exact draft | Success with reason and complete audit | Source/static passed; Local DB/browser pending |
+| Manual add/edit/retire/recode/reactivate/eligible withdraw on exact draft | Success with reason and complete audit | Passed supported WP-6.6 actions: retire/reactivate and eligible base-absent withdraw behavior passed Local DB; inherited withdraw was denied; browser exact inactive-item/reactivate/history path passed. Add remains hidden/DB-denied pending P-18. |
 | Same actions on published version | Rejected | Pending |
 | Blank reason | Rejected | Pending |
 | Stale lock version | `DRAFT_LOCK_CONFLICT` | Pending |
 | Stale base version | Old draft read-only/nonpublishable; recreate and reapply | Pending |
-| History through recode | Same identity timeline | Pending |
-| Full browse/item detail | All selected-version rows searchable/filterable; exact identity route shows field-level old/new history | Source/static and 1,201-row fixture passed; browser pending |
-| Multiple/stale drafts | Explicit selection; stale draft controls disabled/read-only before submit | Source/static passed; browser pending |
-| Withdraw preservation | Base-absent draft row removed; identity/code reservation/prior audit retained | Source/static passed; Local DB/browser pending |
-| Actor/display name/timestamp/source | Complete | Pending |
-| Audit update/delete | Rejected | Pending |
+| History through recode | Same identity timeline | Passed technical gate: exact registers and browser item detail preserved stable identity/code history across the rollout/correction evidence. |
+| Full browse/item detail | All selected-version rows searchable/filterable; exact identity route shows field-level old/new history | Passed technical gate: source 1,201-row fixture plus browser 710-row first/middle/last search and exact inactive-item route/history. Operator UAT remains WP-8. |
+| Multiple/stale drafts | Explicit selection; stale draft controls disabled/read-only before submit | Passed technical gate: multiple exact draft rows and explicit selection passed browser QA; stale fail-closed tests passed. Stale-recovery comprehension remains WP-8. |
+| Withdraw preservation | Base-absent draft row removed; identity/code reservation/prior audit retained | Passed Local DB: eligible withdraw and inherited-withdraw denial passed; allocator never reused the withdrawn code. |
+| Actor/display name/timestamp/source | Complete | Passed Local DB: authenticated Local admin snapshot and exact correction/import/publication registers passed. |
+| Audit update/delete | Rejected | Passed technical gate: frozen authority/audit role-denial and append-only register contracts passed. Full direct-write matrix reruns WP-8. |
 | Manual/create uncertain retry | Same operation ID, payload, effect, and audit result after timeout; changed payload with same ID rejected | Database replay/mismatch, transport commit/504 recovery, and browser manual retry passed. The UI retained Reason/target, required no refilling, reused request `18c669c5...`, returned the prior result, and produced one lock `3 → 4` change set. Create uses the same tracked form-operation hook; rerun the representative recovery set at WP-8. |
 
 ## 12. Publication tests
@@ -415,10 +451,10 @@ Also verify:
 | Test | Expected | Result/evidence |
 |---|---|---|
 | Missing approval evidence | Rejected | Passed in Local WP-5 smoke: `PUBLICATION_METADATA_REQUIRED`; pointer stayed on `2568.0.0` |
-| Caller-authored publisher spoof | Ignored/rejected; actor/display snapshot derived from authenticated active-admin profile | Source/static passed; Local DB/browser pending |
-| Impossible publication date | Stable validation rejection before DB cast/write | Source/static passed; Local DB pending |
-| Missing version archive reference | Phase 4-created manual/import publication rejected | Source/static passed; Local DB/browser pending |
-| Readiness/publish parity | Same stale-base and complete canonical-quality result; no false green | Source/static passed; Local DB parity evidence pending |
+| Caller-authored publisher spoof | Ignored/rejected; actor/display snapshot derived from authenticated active-admin profile | Passed Local DB: publication recorded the authenticated `Local admin` display snapshot rather than caller-authored authority. |
+| Impossible publication date | Stable validation rejection before DB cast/write | Passed Local DB: invalid semantic date was denied without publication. |
+| Missing version archive reference | Phase 4-created manual/import publication rejected | Passed Local DB: missing archive reference was denied; accepted proof stored `local/master-catalog/wp66/rehearsal-only`. |
+| Readiness/publish parity | Same stale-base and complete canonical-quality result; no false green | Passed Local DB: one complete 710-row quality/readiness result produced `canPublish=true`, then publication stored the same 710 count/hash before pointer restore. |
 | Stale base pointer | `DRAFT_BASE_STALE` | Passed in Local WP-5 smoke: a transient local-only active pointer fixture moved the singleton pointer under an existing draft; publish returned `DRAFT_BASE_STALE`, did not move the fixture pointer, and cleanup restored the pointer to `2568.0.0` before the real local publish |
 | Duplicate publish request ID | No duplicate effect | Passed in Local WP-5 smoke; duplicate publish returned `duplicateRequest=true` |
 | UI/action publish retry after uncertain response | Same client-owned request ID reaches DB and returns the prior result | DB publish replay/mismatch passed; transport and browser lost-response proof passed on the shared operation-ID/form path using manual apply. Retest the publish-specific UI path during WP-8 full workflow. |
@@ -442,7 +478,7 @@ Also verify:
 | Check | Expected | Actual | Result |
 |---|---|---|---|
 | Golden fixture hash | `sha256:0e90d8974960a5ccd52b22b02eb0a6c60797f9234baeaefc32af8c1f9fa719b5` | Passed in canonical hash tests; full suite includes the golden fixture | Passed |
-| P-20 identity/hash portability | Approved deterministic `price_list.id` baseline identity and lineage hash reproduce across clean approved environments | Two independent clean rebuilds on exact commit `1ad01b9` reproduced 710 identities, dataset hash `sha256:2e3571ea7135fbc0bbb84c8cc330af1173e4c1d2345e5eb59958dc76e45558b8`, and mapping SHA-256 `5f68993ce5aa5c7735b0d9e6de6d27946b4846fb8a6eb77d1b6b3bd6c4a73de7`; comparator had no failures | Passed WP-6.5; rerun WP-8/P-15 |
+| P-20 identity/hash portability | Approved deterministic `price_list.id` baseline identity and lineage hash reproduce across clean approved environments | After `020`, two independent clean inputs on exact commit `3bfc74e` again reproduced 710 identities, dataset hash `sha256:2e3571ea7135fbc0bbb84c8cc330af1173e4c1d2345e5eb59958dc76e45558b8`, and mapping SHA-256 `5f68993ce5aa5c7735b0d9e6de6d27946b4846fb8a6eb77d1b6b3bd6c4a73de7`; comparator had no failures | Passed post-`020`; rerun WP-8/P-15 |
 | Published item count | Approved count | Exact Local P-11 pair for selected `2568.0.0` contains 710 workbook price rows, 710 verification rows, and 710 PDF DOM rows; selected-version data loader fails closed on item-count mismatch | Passed/accepted P-11 |
 | Published dataset hash | One stored value | Exact Local P-11 pair and manifest contain `sha256:2e3571ea7135fbc0bbb84c8cc330af1173e4c1d2345e5eb59958dc76e45558b8`; workbook reconstruction, PDF proof, DB readback, and tracked verifier agree. Historical pre-P-20 visual hashes are superseded for final acceptance. | Passed/accepted P-11 |
 | Selected-version export paging | No silent fixed-limit truncation before count/hash verification | Export data loader now reads selected price rows, categories, code groups, change sets, imports, and change items through deterministic paged queries; `tests/master-catalog-export-data.test.ts` covers a 1,001-row selected version and verifies all rows are counted/hashed | Passed automated fixture |
@@ -507,17 +543,17 @@ exact replacement pair above.
 | Existing version-bound BOQ Factor F label |  |  | Pending |
 | Existing legacy snapshot-only BOQ print/export |  |  | Pending |
 | Existing legacy missing-Factor-F BOQ failure state |  |  | Pending |
-| Catalog version list/detail |  |  | Pending |
-| Import/diff/manual/history |  |  | Pending |
-| Complete catalog search/filter + item history | Source/build and 1,201-row chunk fixture passed; first/middle/last browser proof pending | Responsive exact-item workflow pending | Static passed; browser pending WP-6.6 |
-| Multiple draft selection + stale read-only state | Exact selection and fail-closed stale tests passed | Same status/action clarity pending | Static passed; browser pending WP-6.6 |
-| Thai-first forms/no rehearsal defaults/support details | Thai labels/error diagnostics, blank evidence fields, and provenance/support details implemented | Fit/accessibility pending | Static passed; browser pending WP-6.6 |
-| Add/retire blocker shown before apply/publish | In-app browser showed P-18/structured draft state and P-19 retired-row filing warning | Developer pre-UAT only | Partial; intended-admin UAT pending |
+| Catalog version list/detail | Five exact version rows, Thai statuses, current marker, selected 710-row draft, readiness, and exact item route rendered | Version/item pages at 390x844 had `scrollWidth=clientWidth=390` and no overlap | Passed WP-6.6 technical QA |
+| Import/diff/manual/history | Import required explicit draft selection and stayed disabled before selection; exact item correction/history and append-only register rendered | Mobile import/history not claimed in this proof | Passed desktop technical QA; full intended-admin/responsive UAT remains WP-8 |
+| Complete catalog search/filter + item history | Browser found first `ITEM-0001`, middle `ITEM-0355`, and last `ITEM-0710`; exact inactive-item route showed stable identity/code history | Exact item page remained readable without page overflow at 390x844 | Passed WP-6.6 technical QA; intended-admin comprehension remains WP-8 |
+| Multiple draft selection + stale read-only state | Multiple drafts rendered with explicit targeting; import never auto-selected; fail-closed stale tests passed | Version/detail route remained responsive | Passed technical QA; stale recovery UAT remains WP-8 |
+| Thai-first forms/no rehearsal defaults/support details | Thai navigation/status/action/readiness/error copy rendered; Local synthetic defaults were absent from operator fields | Mobile version/item views had no overlap; formal keyboard/focus/accessibility audit remains WP-8 | Passed visual technical QA; formal accessibility pending WP-8 |
+| Add/retire blocker shown before apply/publish | With capability flags false, Add was absent, retirement controls were hidden/denied, and the inactive item exposed only Reactivate; readiness showed the separate P-19 warning | Exact inactive-item action remained responsive | Passed release-visibility gate; P-18/P-19 decisions remain separate |
 | Loading/error/not-found and retry/back paths | Route states implemented; user-opened Local tab completed response-loss recovery on `9becdf6` | Browser proof retained submitted values, retried untouched payload, then reset after success | Passed WP-6.5 checkpoint; full representative rerun WP-8 |
 | Thai user message + safe code/request ID | Browser showed the red Thai uncertain message and short request ID `18c669c5`; proxy/server logs matched the full ID | Same-ID retry returned one success/change set with no duplicate effect | Passed WP-6.5 checkpoint; intended-admin comprehension remains WP-8 |
 | Keyboard/focus/errors/contrast |  |  | Pending |
 | Font/logo/color/spacing | Local export artifact proof | PDF uses `next/font/local` NT Regular/Bold derivatives and the full NT company lockup; approved Excel exception uses TH Sarabun New with a 16 pt body baseline while preserving dataset-hash semantics | P-11 PDF/Excel visual proof accepted; app-wide/primary-logo provenance reconciliation remains under P-10 |
-| Browser console/server errors | Browser console returned no warning/error after uncertain/retry flow | Structured server logs recorded one transport error and one recovered success with the same full request ID | Passed WP-6.5 checkpoint; rerun WP-8 |
+| Browser console/server errors | WP-6.6 browser console had no app errors; only the existing Next image LCP warning for `/nt_logo.svg` | No mobile overflow/error was observed | Passed technical QA; rerun WP-8 |
 | Intended-admin UAT without developer/SQL help |  |  | Pending WP-8 |
 | 710-row interaction/import/export performance |  |  | Pending WP-8 |
 
@@ -532,16 +568,16 @@ request approves them.
 
 | Gate | Expected | Actual | Result |
 |---|---|---|---|
-| `npm test` | Exit 0 | 2026-07-12 09:45 +07: 27 files / 132 tests passed, including 1,201-row paging, capability fail-closed, exact authority/import/action/read/migration contracts | Passed |
-| `npx tsc --noEmit --pretty false` | Exit 0 | 2026-07-12 09:45 +07: passed | Passed |
-| `npm run lint` | Exit 0 | 2026-07-12 09:45 +07: exit 0 with 10 existing warnings outside WP-6.6 | Passed with existing warnings |
+| `npm test` | Exit 0 | 2026-07-12 11:17 +07: 27 files / 133 tests passed, including authority/document consistency, Local secret fail-closed behavior, 1,201-row paging, capability fail-closed, and exact authority/import/action/read/migration contracts | Passed |
+| `npx tsc --noEmit --pretty false` | Exit 0 | 2026-07-12 11:17 +07: passed | Passed |
+| `npm run lint` | Exit 0 | 2026-07-12 11:17 +07: exit 0 with 10 existing warnings outside WP-6.6 | Passed with existing warnings |
 | `npm run build` | Exit 0 | 2026-07-12 09:45 +07: sandbox attempt failed only on blocked Google Fonts; network-enabled build compiled/typechecked and included the exact item route | Passed |
 | `npm run audit:prod` | No unaccepted Production vulnerability |  | Pending |
-| Live Local DB integration/concurrency | Migration/RPC/RLS/role/rollback/race/timeout gates pass | Two clean rebuilds at `1ad01b9` plus lifecycle run at `5423373` passed; response-loss transport run at `e782459` passed; final flag/pointer/BOQ/Factor F readback was exact; Local DB lint found no schema errors | Passed technical WP-6.5; rerun WP-8 |
+| Live Local DB integration/concurrency | Migration/RPC/RLS/role/rollback/race/timeout gates pass | Prior WP-6.5 evidence plus `3bfc74e` `020` constraints/RLS/grants/allocator concurrency/correction/publication evidence passed; 2026-07-12 11:19 +07 Local DB lint returned no findings; final pointer/gates/BOQ/Factor F readback was exact | Passed technical WP-6.6; rerun WP-8 |
 | Permanent hotfix `016`/BOQ/Factor F suite | Real RPC behavior and pre/post invariants pass |  | Pending WP-7 |
-| WP-6.6 capability suite | Audit #29 C-01 through C-12 DB/UI/browser evidence pass | Repository/static checkpoint passed; migration `020` was not executed and browser acceptance was not claimed | Partial; Local DB/browser pending separate approval |
+| WP-6.6 capability suite | Audit #29 C-01 through C-12 DB/UI/browser evidence pass | Repository, `020` Local DB/RLS/concurrency, post-change P-20, browser technical QA, and Local auth regression passed on `3bfc74e`/`59b17d3`; unsupported Add/Retire controls remained fail-closed | Passed technical gate; owner closeout pending |
 | Tracked export artifact verification | Semantic verifier passes from clean checkout | Exact `777df75` replacement pair passed embedded and independent semantic verification; five verifier fixtures also pass; owner accepted the exact pair | Passed/accepted P-11; WP-8 rerun pending |
-| Documentation consistency | Authority links/table shapes, migration order, WP order, and decisions agree | 2026-07-12 09:45 +07: authority consistency passed 5/5; generated authority check passed 710/65/17 with SHA-256 `28675e6244c65d485dda7142634b381db729a139bccdf189ad51563251a2e12a`; bootstrap remains through `019` | Passed static checkpoint; rerun after DB evidence and at WP-8 |
+| Documentation consistency | Authority links/table shapes, migration order, WP order, and decisions agree | 2026-07-12 11:17 +07: authority consistency passed 5/5 after status/evidence sync; generated authority check passed 710/65/17 with SHA-256 `28675e6244c65d485dda7142634b381db729a139bccdf189ad51563251a2e12a`; bootstrap remains intentionally through `019` pending owner closeout | Passed WP-6.6 checkpoint; rerun at WP-8 |
 | Security advisor | No new blocker |  | Pending |
 | Performance advisor | No rollout blocker |  | Pending |
 | CI exact commit | Passed |  | Pending |

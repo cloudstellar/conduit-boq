@@ -27,6 +27,11 @@ production hotfix `016`, and the current Phase 4 local scripts `017` through
 workflow smoke tests. Get owner approval before using this command as evidence
 when preserving existing Local state matters.
 
+WP-6.6 migration `020_master_catalog_phase4_admin_workflow_hardening.sql` has
+passed its separately approved Local DB/browser evidence run, but remains
+outside this canonical bootstrap until the owner accepts the WP-6.6 closeout.
+Do not append `020` to the bootstrap command ad hoc.
+
 ```bash
 npm run db:local:bootstrap
 ```
@@ -75,6 +80,13 @@ expected diff.
 
 All accounts below use the local-only password stored in the git-ignored
 `supabase/.env.local` file.
+
+Quote the complete value when `LOCAL_TEST_PASSWORD` or
+`LOCAL_SUPABASE_SECRET_KEY` contains a literal `#`, for example
+`LOCAL_TEST_PASSWORD="value-with-#-inside"`. An unquoted `#` can be interpreted
+as an inline-comment delimiter by Node env-file semantics. Local scripts fail
+closed on an ambiguous guarded secret instead of seeding one password and
+testing another. Never commit `supabase/.env.local`.
 
 - `local.admin@ntplc.co.th`
 - `local.staff@ntplc.co.th`

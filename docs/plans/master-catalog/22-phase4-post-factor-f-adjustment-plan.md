@@ -18,9 +18,11 @@ publication.
 no-redesign conclusion remain valid, but Audit #29 found additional Master
 Catalog operator/authority work. WP-6.6 now precedes WP-7, migration `020` is
 reserved for that hardening, and proposed placement uses WP-7.5/`021`. P-21
-later authorized WP-6.6 Local-only implementation; migration `020` passed its
-static checkpoint but remains unapplied and outside bootstrap. No Local
-reset/apply or Production action is authorized.
+later authorized WP-6.6 Local-only implementation and separate destructive
+Local evidence runs. Migration `020` passed repository, Local DB/RLS/
+concurrency, P-20 rerun, and browser technical QA on `3bfc74e`; owner closeout
+is pending and `020` remains outside bootstrap. No Production action, P-18/
+`021`, new Factor F workflow, or hotfix expansion is authorized.
 
 ## 1. Difficulty assessment
 
