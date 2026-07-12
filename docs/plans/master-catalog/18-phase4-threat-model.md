@@ -29,9 +29,10 @@ implemented.
 one-current-base-working-draft and final snapshot-review threats from
 [Correction Plan #31](./31-phase4-wp66-operator-workflow-correction-plan.md).
 P-22 source controls/static tests were implemented on `ac31feb`; G1 Local
-DB/concurrency/security evidence passed on `e463270`. Residual risk remains
-Medium until the separately approved G2 clean rebuild/P-20 comparison and
-browser/G3 owner review pass. No Production action is authorized.
+DB/concurrency/security evidence passed on `e463270`; pre-G2 operator/browser
+preflight passed on `c8f6dca`. Residual risk remains Medium until the separately
+approved exact-`c8f6dca` G2 clean rebuild/P-20 comparison and G3 owner review
+pass. No Production action is authorized.
 
 **Applies to:** Master Catalog administration, local Excel parsing, draft
 changes, publication, history, and official Excel/PDF exports

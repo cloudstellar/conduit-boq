@@ -14,9 +14,10 @@ the reviewed Local/bootstrap contract. Candidate `020` was amended under P-22
 on source commit `ac31feb` and passed repository/static verification; its
 `3bfc74e` evidence remains historical but is superseded for revised closeout.
 Owner-approved G1 applied the candidate separately on Local and passed final
-DB/concurrency/lint/security evidence on `e463270`. G2 must independently clean
-rebuild/compare the exact candidate; `020` remains outside bootstrap and has
-not been applied to Production.
+DB/concurrency/lint/security evidence on `e463270`. The later pre-G2 UI/source
+checkpoint `c8f6dca` did not change migration `020`. G2 must independently clean
+rebuild/compare exact executable candidate `c8f6dca`; `020` remains outside
+bootstrap and has not been applied to Production.
 P-18 rules and placement migration `021` remain pending owner/data-custodian
 approval.
 

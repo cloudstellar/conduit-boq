@@ -36,7 +36,7 @@
 | `017_master_catalog_phase4_foundation.sql` | Master Catalog Phase 4 additive governance foundation, including P-20 deterministic baseline identity from Production-derived `price_list.id`, request fingerprints, RLS/grants, and disabled feature flag | **Draft — Local only, not applied to Production** |
 | `018_master_catalog_phase4_draft_mutation.sql` | Draft create/manual/import RPCs with actor+payload request fingerprints, per-request/per-code locks, bounded runtime timeouts, full-payload preflight, audited mutation subtransaction rollback, and reusable ADR-003 transitions | **Draft — Local only, not applied to Production** |
 | `019_master_catalog_phase4_publish_pointer.sql` | Publish/restore, shared admin publish-readiness RPC, P-18 and structured-rollout boundary guards, P-19 inactive-row filing warning, catalog-only DB count/hash, runtime timeouts, and published immutability | **Draft — Local only, not applied to Production** |
-| `020_master_catalog_phase4_admin_workflow_hardening.sql` | WP-6.6 frozen first-rollout authority, resolve-only dictionaries/server allocator, exact read registers, readiness/provenance parity, correction path, schema hardening, and P-22 working-draft lifecycle | **P-22 candidate at `e463270`; G1 Local DB/concurrency/P-20 input passed, G2 clean rebuild/comparison pending; not in bootstrap or Production** |
+| `020_master_catalog_phase4_admin_workflow_hardening.sql` | WP-6.6 frozen first-rollout authority, resolve-only dictionaries/server allocator, exact read registers, readiness/provenance parity, correction path, schema hardening, and P-22 working-draft lifecycle | **P-22 executable candidate at `c8f6dca`; G1 Local DB/concurrency/P-20 input remains evidenced at `e463270`, pre-G2 UI preflight passed, and G2 clean rebuild/comparison is pending; not in bootstrap or Production** |
 | `021_master_catalog_phase4_placement_governance.sql` | Reserved P-18/WP-7.5 new-identity placement revision/review and atomic order contract | **Proposed only — P-18 pending; file does not exist; not in bootstrap** |
 | `017+_master_catalog_phase4_*.sql` | Umbrella reference for the Local-only Phase 4 range; files currently exist as `017`-`020`, while bootstrap remains intentionally limited to reviewed `017`-`019` | **Local-only range — no Production approval** |
 
@@ -91,9 +91,13 @@ audited-abandon contract. Owner-approved G1 then clean-bootstrapped through
 G1 also found and fixed WP-6.5 fixture cleanup at `17ec6cc` and corrected the
 date parser volatility at `e463270`; final G1 harnesses, DB lint, and security
 advisors passed on `e463270`. The `3bfc74e` results remain historical evidence
-for the old candidate. Keep bootstrap at `017`-`019`; G2 must clean-rebuild the
-exact `e463270` candidate and complete the P-20 comparison after separate owner
-approval. Add `020` to bootstrap only after G3/G4 acceptance. After P-18
+for the old candidate. Pre-G2 operator/browser QA then passed on UI/source
+checkpoint `c8f6dca`; migration `020` did not change, both proof drafts were
+audited-abandoned, all three catalog flags were restored to `false`, and the
+Local pointer/invariants remained unchanged. Keep bootstrap at `017`-`019`;
+G2 must clean-rebuild exact executable candidate `c8f6dca` and complete the
+P-20 comparison after separate owner approval. Add `020` to bootstrap only
+after G3/G4 acceptance. After P-18
 acceptance, placement uses proposed `021`.
 Applied hotfix `016` must not be edited.
 This is not a new Production hotfix and must not be applied to Production

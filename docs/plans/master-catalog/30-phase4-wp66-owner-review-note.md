@@ -1,11 +1,14 @@
 # Master Catalog Phase 4 WP-6.6 Owner Review Note
 
 **Status:** Hold under P-22 operator-workflow correction; source/static passed
-on `ac31feb` and G1 Local DB/concurrency/P-20 input passed on `e463270`.
-G2 clean rebuild/comparison, browser evidence, and G3 owner closeout are pending
+on `ac31feb`, G1 Local DB/concurrency/P-20 input passed on `e463270`, and the
+pre-G2 operator/browser checkpoint passed on `c8f6dca`. G2 clean
+rebuild/comparison and G3 owner closeout are pending
 **Review environment:** Local only
 **Current G1 evidence commit:**
 `e463270dfb9f23332559f31591cf338b8eeada3c`
+**Current pre-G2 executable/source checkpoint:**
+`c8f6dca282cd2729ac2b58e488b3ef516fb29713`
 **Correction source checkpoint:**
 `ac31feb`
 **Historical implementation/evidence commit:**
@@ -41,14 +44,14 @@ Recorded owner response:
 | Scope | Passed evidence | Remaining later gate |
 |---|---|---|
 | C-01 browse/history | 1,201-row paging fixture; Local 710-row first/middle/last search; exact item and stable identity/code history | Independent operator comprehension at WP-8 |
-| C-02 draft targeting | Source/static passed on `ac31feb`; G1 on `e463270` passed concurrent-create single winner, replay/mismatch/role denial, audited abandon/replay/replacement, retained immutable history, and zero working drafts after cleanup | G2 independent rebuild and browser operator comprehension required |
+| C-02 draft targeting | Source/static passed on `ac31feb`; G1 on `e463270` passed concurrent-create single winner, replay/mismatch/role denial, audited abandon/replay/replacement, retained immutable history, and zero working drafts after cleanup. Pre-G2 browser proof on `c8f6dca` created one working draft at a time and completed audited abandon/read-only history. | G2 independent rebuild and G3 owner closeout required |
 | C-03/C-04 authority/allocator | 710 mappings, 65 groups, 17 exclusions; unknown/caller-code denial; concurrent unique allocation; never-reuse; sequence-900 boundary | Rerun in WP-8 |
 | C-05 import evidence | Complete 710-row rollout, 709 structured changes plus approved `ITEM-0139`, stable validation replay, explicit import draft selection | Full intended-admin import UAT at WP-8 |
 | C-06/C-07 provenance | Authenticated publisher snapshot; physical archive reference; invalid-date and missing-archive denials | Final candidate metadata/P-15 |
 | C-08 readiness | Shared full 710-row quality result, exact count/hash, successful Local publication proof, pointer restored | Final candidate and WP-8 rerun |
 | C-09/C-10 correction | Retire/reactivate, eligible withdraw, inherited-withdraw denial, preserved identity/code/audit, exact browser item action | P-19 if an official version contains inactive rows |
-| C-11/C-12 schema/UX | P-22 item-first/two-step-abandon source UI passed on `ac31feb`; G1 constraints/RLS/grants/role denial, DB lint, and security advisors passed on `e463270` | Replacement browser QA plus formal accessibility, performance, and independent UAT remain |
-| C-13 final review | Identity-based final diff, compound/reverted/incomplete/lock fixtures, exact-lock review route, and return context passed source/static on `ac31feb`; G1 exact-lock publish/restore passed on `e463270` | G2, stale-review/browser evidence, and owner browser acceptance required |
+| C-11/C-12 schema/UX | P-22 item-first/two-step-abandon source UI passed on `ac31feb`; G1 constraints/RLS/grants/role denial, DB lint, and security advisors passed on `e463270`. Replacement desktop/mobile browser QA on `c8f6dca` passed Thai labels, live version preview, named category select, deduplicated dictionary labels, and no page-level horizontal overflow. | Formal keyboard/focus accessibility, measured performance, and independent UAT remain WP-8/G3 concerns |
+| C-13 final review | Identity-based final diff, compound/reverted/incomplete/lock fixtures, exact-lock review route, and return context passed source/static on `ac31feb`; G1 exact-lock publish/restore passed on `e463270`; pre-G2 browser proof opened the cumulative comparison and readiness path on `c8f6dca` | G2, stale-review recovery proof, and G3 owner acceptance required |
 
 ## 3. Retained evidence
 
@@ -68,10 +71,12 @@ The G1 P-20 input reproduced:
 - identity mapping SHA-256
   `5f68993ce5aa5c7735b0d9e6de6d27946b4846fb8a6eb77d1b6b3bd6c4a73de7`.
 
-G2 must independently clean-rebuild exact `e463270` before running the
-comparator. The initial G1 reset preceded the bounded harness cleanup at
-`17ec6cc` and date-parser volatility correction at `e463270`; final harnesses,
-lint, advisors, invariant readback, and repository checks ran on `e463270`.
+G2 must independently clean-rebuild exact executable candidate `c8f6dca`
+before running the comparator. The initial G1 reset preceded the bounded
+harness cleanup at `17ec6cc` and date-parser volatility correction at
+`e463270`; final G1 harnesses, lint, advisors, invariant readback, and repository
+checks remain truthfully attached to `e463270`. Migration `020` did not change
+in the later UI checkpoint.
 
 The following historical files continue to prove the named `3bfc74e`
 implementation, but they do not close the revised P-22 candidate:
@@ -103,6 +108,11 @@ Final Local cleanup restored:
 - 198 BOQs/1,547 BOQ items and Factor F `2569.0.0`/36 rows unchanged;
 - Production touched: No.
 
+The pre-G2 `c8f6dca` checkpoint additionally passed 30 test files/152 tests,
+TypeScript, lint with no errors/10 existing warnings, production build, and
+desktop/mobile operator preflight. Browser logs had no application error; the
+existing `/nt_logo.svg` LCP warning remains for later performance review.
+
 ## 4. Scope not accepted by this review
 
 - Migration `020` is not yet part of `scripts/bootstrap-local-db.sh`.
@@ -116,8 +126,8 @@ Final Local cleanup restored:
 ## 5. Recommendation
 
 Keep WP-6.6 on Hold. The source/static P-22 checkpoint is complete on
-`ac31feb` and G1 passed on `e463270`. The next decision is G2 approval or
-decline for one independent destructive clean Local rebuild and P-20
-comparison. Do not run that reset, add migration `020` to bootstrap, begin
-WP-7, or infer browser/G3 acceptance until the applicable later owner gates are
-explicitly accepted.
+`ac31feb`, G1 passed on `e463270`, and technical operator preflight passed on
+`c8f6dca`. The next decision is G2 approval or decline for one independent
+destructive clean Local rebuild of exact `c8f6dca` and P-20 comparison. Do not
+run that reset, add migration `020` to bootstrap, begin WP-7, or infer G3
+acceptance until the applicable later owner gates are explicitly accepted.

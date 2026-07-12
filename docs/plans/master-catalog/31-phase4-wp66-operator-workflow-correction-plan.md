@@ -1,9 +1,10 @@
 # Master Catalog Phase 4 WP-6.6 Operator Workflow Correction Plan
 
-**Status:** P-22 owner-approved; source/static completed on `ac31feb` and G1
-Local DB/concurrency/P-20 input completed on final checkpoint `e463270` on
-2026-07-12. G2 clean rebuild/P-20 comparison, G3 owner closeout, and G4
-bootstrap/WP-7 sequencing remain pending
+**Status:** P-22 owner-approved; source/static completed on `ac31feb`, G1
+Local DB/concurrency/P-20 input completed on `e463270`, and the pre-G2
+operator/UI checkpoint completed on `c8f6dca` on 2026-07-12. G2 clean
+rebuild/P-20 comparison, G3 owner closeout, and G4 bootstrap/WP-7 sequencing
+remain pending
 
 **Production touched:** No
 
@@ -221,7 +222,7 @@ candidate `020` separately until the new owner closeout accepts it.
 |---|---|
 | G0 | P-22 plan accepted for docs and Local-only implementation — accepted 2026-07-12 |
 | G1 | Owner explicitly approves first full Local reset after static implementation is ready — approved and completed 2026-07-12 |
-| G2 | Owner explicitly approves the second independent clean rebuild and P-20 comparison |
+| G2 | Owner explicitly approves the second independent clean rebuild of exact executable candidate `c8f6dca` and P-20 comparison |
 | G3 | Owner completes intended-admin workflow review and accepts or holds the revised WP-6.6 closeout |
 | G4 | Only after G3, add accepted `020` to bootstrap and separately authorize any WP-7 execution |
 
@@ -289,7 +290,35 @@ Final exact-commit evidence on `e463270`:
   authority 710/65/17, script syntax, and production build including `/review`
   passed.
 
-The initial G1 clean reset began before the two bounded source fixes. Therefore
-G2 must, after separate owner approval, perform a fresh clean rebuild from exact
-commit `e463270` and compare its independent P-20 output with the G1 input.
-Browser owner closeout and G3 are not inferred from this DB checkpoint.
+The initial G1 clean reset began before the two bounded source fixes. G1 DB and
+P-20 evidence therefore remains attached to exact commit `e463270`; it is not
+silently relabeled as newer evidence. The later UI-only checkpoint below did
+not change migration `020`. G2 must, after separate owner approval, perform a
+fresh clean rebuild from exact executable candidate `c8f6dca` and compare its
+independent P-20 output with the G1 input. Browser owner closeout and G3 are not
+inferred from the G1 DB checkpoint.
+
+## 12. Pre-G2 operator/UI checkpoint
+
+Exact source checkpoint: `c8f6dca282cd2729ac2b58e488b3ef516fb29713`.
+
+The Local operator preflight completed without a reset and without changing
+candidate migration `020`:
+
+- created one current-base proof draft, edited an exact catalog item, reviewed
+  the cumulative draft-versus-base snapshot, and used audited abandon; a second
+  short-lived proof draft was created only to capture reliable before/after
+  viewport evidence and was also audited-abandoned;
+- verified Thai-first draft history, a live composed version preview, a named
+  category combobox, deduplicated category labels, and bounded long controls on
+  desktop and 390x844 mobile layouts with no page-level horizontal overflow;
+- browser logs contained no application error; the existing `/nt_logo.svg`
+  Next image LCP warning remains for later performance disposition;
+- 30 test files / 152 tests, TypeScript, lint with 0 errors/10 existing
+  warnings, and the network-enabled production build passed;
+- final Local readback restored zero working drafts, all three catalog flags
+  `false`, pointer `2568.0.0`/710 rows, 198 BOQs/1,547 BOQ items, and Factor F
+  `2569.0.0`/36 rows. Production touched: No.
+
+This is technical preflight evidence, not G2 reset approval and not G3 owner
+closeout. The next action remains an explicit owner decision on G2.

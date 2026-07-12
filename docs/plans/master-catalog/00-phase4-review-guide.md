@@ -14,9 +14,11 @@
   admin workflow ยังไม่ครบ; P-22 จึง Hold WP-6.6 closeout เพื่อแก้ one working
   draft, audited abandon, item-first workspace และ final snapshot review.
   Source/static implementation ผ่านที่ `ac31feb` และ G1 Local DB/concurrency
-  ผ่านที่ `e463270`; ขั้นถัดไปคือ G2 ที่ต้องอนุมัติแยก.
+  ผ่านที่ `e463270`; pre-G2 operator/browser preflight ผ่านที่ `c8f6dca` โดย
+  migration `020` ไม่เปลี่ยน และเก็บกวาด Local กลับแล้ว; ขั้นถัดไปคือ G2 ที่
+  ต้องอนุมัติแยกและ rebuild exact `c8f6dca`.
   หลักฐาน `3bfc74e` เป็นประวัติแต่ถูก supersede สำหรับ closeout รอบใหม่; ยังไม่
-  อนุมัติ Local reset, WP-7 หรือ Production**
+  อนุมัติ G2 Local reset, WP-7 หรือ Production**
 - รอบถัดไปของ Phase 4: **เริ่มจาก baseline หลัง Factor F `012-015` และ
   production hotfix `016`; Phase 4 migrations คือ `017+`**
 - เอกสาร Phase 4 ต้องใช้ live preflight count เสมอ เพราะ BOQ ใหม่อาจเพิ่ม
@@ -117,8 +119,8 @@ checkpoint.
 | P-18 placement governance สำหรับ add/supplement | WP-6.5 guard/readiness ผ่าน Local technical evidence แล้วและยังคง block การ publish identity ใหม่; proposed WP-7.5 แยก placement workflow ออกจาก structured-code guard ตาม [Review Note #28](./28-phase4-p18-placement-governance-review-note.md). ต้องรับรองกติกา P-18 ก่อน implement; ถ้า defer ต้องซ่อน/ปิด Add และ Supplement เมื่อ enable feature |
 | P-19 PDF policy สำหรับรายการยกเลิกใช้ | ถ้า version ใดมี inactive/retired rows ต้องตัดสินใจว่าจะ exclude/mark/appendix ก่อน filed PDF |
 | P-20 canonical hash portability | Owner approved deterministic baseline identity จาก Production-derived `price_list.id`; independent two-rebuild proof ผ่านแล้ว และต้อง rerun หลัง migration change รวมถึง WP-8/P-15 |
-| WP-6.6 capability completeness | P-22 Hold closeout; source/static ผ่านที่ `ac31feb` และ G1 DB/concurrency/P-20 input ผ่านที่ `e463270`. ยังต้องทำ G2 clean rebuild/comparison และ browser/G3 ก่อน WP-7; `3bfc74e` เป็นประวัติเท่านั้น |
-| P-21/P-22 WP-6.6 Local-only | P-21 อนุมัติ scope เดิม; P-22/G0 อนุมัติ correction; G1 ผ่านที่ `e463270`. Migration `020` apply แยกเฉพาะ Local แต่ยังอยู่นอก bootstrap; G2, G3 closeout และ G4 bootstrap/WP-7 ต้องอนุมัติแยก และไม่รวม P-18/`021`, Factor F/hotfix expansion หรือ Production |
+| WP-6.6 capability completeness | P-22 Hold closeout; source/static ผ่านที่ `ac31feb`, G1 DB/concurrency/P-20 input ผ่านที่ `e463270`, และ pre-G2 operator/browser ผ่านที่ `c8f6dca`. ยังต้องทำ G2 exact-`c8f6dca` clean rebuild/comparison, stale-review proof และ G3 ก่อน WP-7; `3bfc74e` เป็นประวัติเท่านั้น |
+| P-21/P-22 WP-6.6 Local-only | P-21 อนุมัติ scope เดิม; P-22/G0 อนุมัติ correction; G1 ผ่านที่ `e463270`; pre-G2 technical checkpoint ผ่านที่ `c8f6dca`. Migration `020` apply แยกเฉพาะ Local แต่ยังอยู่นอก bootstrap; G2, G3 closeout และ G4 bootstrap/WP-7 ต้องอนุมัติแยก และไม่รวม P-18/`021`, Factor F/hotfix expansion หรือ Production |
 | Version lifecycle ตาม ADR-003 | Reusable action/RPC path ไม่ hardcode `2568.1.0`; live additional version และ duplicate/backward/mixed negatives ผ่านใน WP-6.5 แล้ว และต้อง rerun ที่ WP-8/P-14 |
 | Live Production preflight หลัง Factor F rollout | ต้อง refresh ก่อนทุก Production gate; ห้ามใช้ BOQ count จาก closeout เป็นค่าตายตัว |
 

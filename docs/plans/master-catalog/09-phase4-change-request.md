@@ -47,7 +47,9 @@ and requires an authoritative lock-bound final snapshot review before publish.
 Candidate `020` is amended before freeze; prior `3bfc74e` evidence is historical
 and superseded for revised closeout. Source/static implementation passed on
 `ac31feb`; owner-approved G1 Local DB/concurrency/P-20 input passed on
-`e463270`. G2 reset/comparison and Production remain separately gated.
+`e463270`; pre-G2 operator/browser preflight passed on executable/source
+checkpoint `c8f6dca` without changing migration `020`. G2 exact-`c8f6dca`
+reset/comparison and Production remain separately gated.
 
 ## 1. Decision requested
 
