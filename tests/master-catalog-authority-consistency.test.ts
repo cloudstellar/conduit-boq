@@ -144,6 +144,17 @@ describe('Master Catalog authority consistency', () => {
       root,
       'migrations/021_master_catalog_phase4_placement_governance.sql',
     ))).toBe(false)
+
+    const packageJson = JSON.parse(read('package.json')) as {
+      scripts?: Record<string, string>
+    }
+    expect(packageJson.scripts?.['db:local:smoke-master-catalog-wp66']).toBe(
+      'node --env-file=.env.development.local --env-file=supabase/.env.local scripts/smoke-master-catalog-wp66.mjs',
+    )
+    expect(existsSync(resolve(
+      root,
+      'scripts/smoke-master-catalog-wp66.mjs',
+    ))).toBe(true)
   })
 
   it('keeps work-package sequencing and owner decisions explicit', () => {

@@ -32,7 +32,12 @@ const approvalMetadata = {
 }
 
 let originalFlagValue
+let originalNewIdentityFlagValue
+let originalRetirementFlagValue
 let originalPointerId
+let hasHardenedCapabilities = false
+let newIdentityCapabilityGuardPassed = false
+let retirementCapabilityGuardPassed = false
 let currentStage = 'initialize Local clients'
 
 try {
@@ -51,6 +56,23 @@ try {
   originalFlagValue = setting.value
   await setCatalogAdminEnabled(true)
 
+  currentStage = 'read optional WP-6.6 capability defaults'
+  const [newIdentitySetting, retirementSetting] = await Promise.all([
+    readOptionalSetting('catalog_new_identity_enabled'),
+    readOptionalSetting('catalog_retirement_enabled'),
+  ])
+  assert(
+    newIdentitySetting.exists === retirementSetting.exists,
+    'WP-6.6 capability settings must exist together',
+  )
+  hasHardenedCapabilities = newIdentitySetting.exists
+  if (hasHardenedCapabilities) {
+    originalNewIdentityFlagValue = newIdentitySetting.value
+    originalRetirementFlagValue = retirementSetting.value
+    assert(originalNewIdentityFlagValue === false, 'New-identity capability must default to false')
+    assert(originalRetirementFlagValue === false, 'Retirement capability must default to false')
+  }
+
   currentStage = 'read baseline BOQ, Factor F, pointer, and catalog facts'
   const beforeFactor = await readFactorSummary()
   const beforeBoq = await readBoqSummary()
@@ -66,7 +88,7 @@ try {
 
   currentStage = 'allocate generic version and code fixtures'
   const versions = await allocateRevisionVersions(base, 4)
-  const contextCode = await allocateCodeContext()
+  const contextCode = hasHardenedCapabilities ? null : await allocateCodeContext()
 
   currentStage = 'run unchanged-clone publish race and request idempotency'
   const raceDraft = await createDraft(adminA, base, versions[0], 'publish race')
@@ -127,12 +149,31 @@ try {
 
   currentStage = 'run P-18 readiness and publish rejection'
   const p18Draft = await createDraft(adminA, base, versions[1], 'P-18 guard')
+  const p18Change = hasHardenedCapabilities
+    ? await approvedAddChange(p18Draft.versionId)
+    : addChange(`${contextCode}-ADD-001`, contextCode)
+  if (hasHardenedCapabilities) {
+    actionCode(
+      await adminA.rpc('apply_catalog_changes', {
+        p_version_id: p18Draft.versionId,
+        p_change_payload: { operation: 'manual', changes: [p18Change] },
+        p_expected_lock_version: p18Draft.lockVersion,
+        p_reason: 'WP-6.5 capability default-deny fixture',
+        p_request_id: randomUUID(),
+        p_import_id: null,
+      }),
+      'new-identity capability default deny',
+      'CATALOG_NEW_IDENTITY_DISABLED',
+    )
+    newIdentityCapabilityGuardPassed = true
+    await setCatalogCapability('catalog_new_identity_enabled', true)
+  }
   const p18Apply = actionOk(
     await adminA.rpc('apply_catalog_changes', {
       p_version_id: p18Draft.versionId,
       p_change_payload: {
         operation: 'manual',
-        changes: [addChange(`${contextCode}-ADD-001`, contextCode)],
+        changes: [p18Change],
       },
       p_expected_lock_version: p18Draft.lockVersion,
       p_reason: 'WP-6.5 P-18 add fixture',
@@ -141,6 +182,9 @@ try {
     }),
     'P-18 add fixture',
   )
+  if (hasHardenedCapabilities) {
+    await setCatalogCapability('catalog_new_identity_enabled', false)
+  }
   const p18Readiness = await readReadiness(adminA, p18Draft.versionId)
   assert(p18Readiness.newIdentityCount === 1, 'P-18 readiness did not count one new identity')
   assert(p18Readiness.canPublish === false, 'P-18 readiness did not block publication')
@@ -160,21 +204,24 @@ try {
   currentStage = 'run structured-code readiness and publish rejection'
   const structuredDraft = await createDraft(adminA, base, versions[2], 'structured guard')
   const baselineRow = await readBaselineItem(base.id)
+  const structuredChange = hasHardenedCapabilities
+    ? await frozenRecodeChange(structuredDraft.versionId)
+    : {
+        action: 'recode',
+        legacyItemCode: baselineRow.item_code,
+        canonicalCode: `${contextCode}-RCD-001`,
+        workContextCode: contextCode,
+        workContextNameTh: 'บริบททดสอบ WP-6.5',
+        itemTypeCode: 'RCD',
+        itemTypeNameTh: 'ชนิดทดสอบการปรับรหัส',
+        identityOutcome: 'recode',
+      }
   const structuredApply = actionOk(
     await adminA.rpc('apply_catalog_changes', {
       p_version_id: structuredDraft.versionId,
       p_change_payload: {
         operation: 'manual',
-        changes: [{
-          action: 'recode',
-          legacyItemCode: baselineRow.item_code,
-          canonicalCode: `${contextCode}-RCD-001`,
-          workContextCode: contextCode,
-          workContextNameTh: 'บริบททดสอบ WP-6.5',
-          itemTypeCode: 'RCD',
-          itemTypeNameTh: 'ชนิดทดสอบการปรับรหัส',
-          identityOutcome: 'recode',
-        }],
+        changes: [structuredChange],
       },
       p_expected_lock_version: structuredDraft.lockVersion,
       p_reason: 'WP-6.5 structured-code fixture',
@@ -205,9 +252,36 @@ try {
 
   currentStage = 'verify duplicate-code mutation rollback'
   const atomicDraft = await createDraftWithIdempotencyChecks(adminA, base, versions[3])
-  await assertDuplicateCodePayloadRollsBack(atomicDraft, contextCode)
+  await assertDuplicateTargetPayloadRollsBack(
+    atomicDraft,
+    contextCode,
+    baselineRow,
+    hasHardenedCapabilities,
+  )
   currentStage = 'verify apply idempotency and changed-payload rejection'
+  if (hasHardenedCapabilities) {
+    actionCode(
+      await adminA.rpc('apply_catalog_changes', {
+        p_version_id: atomicDraft.versionId,
+        p_change_payload: {
+          operation: 'manual',
+          changes: [retireChange(baselineRow)],
+        },
+        p_expected_lock_version: atomicDraft.lockVersion,
+        p_reason: 'WP-6.5 retirement capability default-deny fixture',
+        p_request_id: randomUUID(),
+        p_import_id: null,
+      }),
+      'retirement capability default deny',
+      'CATALOG_RETIREMENT_DISABLED',
+    )
+    retirementCapabilityGuardPassed = true
+    await setCatalogCapability('catalog_retirement_enabled', true)
+  }
   await assertApplyIdempotency(adminA, atomicDraft, baselineRow)
+  if (hasHardenedCapabilities) {
+    await setCatalogCapability('catalog_retirement_enabled', false)
+  }
 
   currentStage = 'verify final pointer, BOQ, and Factor F invariants'
   assert(await readCurrentPointer() === base.id, 'WP-6.5 smoke did not restore the baseline pointer')
@@ -234,6 +308,8 @@ try {
     requestFingerprintMismatchRejected: true,
     partialMutationRollbackPassed: true,
     roleDenialPassed: true,
+    newIdentityCapabilityGuardPassed,
+    retirementCapabilityGuardPassed,
     runtimeLockTimeoutConfigured: true,
     pointerRestored: true,
     factorFUnchanged: true,
@@ -257,6 +333,12 @@ try {
   }
   if (typeof originalFlagValue !== 'undefined') {
     await setCatalogAdminEnabled(originalFlagValue).catch(() => {})
+  }
+  if (typeof originalNewIdentityFlagValue !== 'undefined') {
+    await setCatalogCapability('catalog_new_identity_enabled', originalNewIdentityFlagValue).catch(() => {})
+  }
+  if (typeof originalRetirementFlagValue !== 'undefined') {
+    await setCatalogCapability('catalog_retirement_enabled', originalRetirementFlagValue).catch(() => {})
   }
   await Promise.all([
     adminA.auth.signOut().catch(() => {}),
@@ -324,6 +406,27 @@ async function setCatalogAdminEnabled(value) {
     .update({ value })
     .eq('key', 'catalog_admin_enabled')
   if (error) throw error
+}
+
+async function readOptionalSetting(key) {
+  const { data, error } = await service
+    .from('app_settings')
+    .select('value')
+    .eq('key', key)
+    .maybeSingle()
+  if (error) throw error
+  return data ? { exists: true, value: data.value } : { exists: false, value: undefined }
+}
+
+async function setCatalogCapability(key, value) {
+  const { data, error } = await service
+    .from('app_settings')
+    .update({ value })
+    .eq('key', key)
+    .select('key')
+    .single()
+  if (error) throw error
+  assert(data.key === key, `Capability setting ${key} was not updated`)
 }
 
 async function readCurrentPointer() {
@@ -633,10 +736,89 @@ function addChange(code, context) {
   }
 }
 
+async function approvedAddChange(versionId) {
+  const [categoryResult, groupResult] = await Promise.all([
+    service
+      .from('price_list_categories')
+      .select('id,code')
+      .eq('version_id', versionId)
+      .order('display_order')
+      .order('id')
+      .limit(1)
+      .single(),
+    service
+      .from('catalog_code_groups')
+      .select('id,work_context_code,item_type_code')
+      .eq('version_id', versionId)
+      .order('display_order')
+      .order('id')
+      .limit(1)
+      .single(),
+  ])
+  if (categoryResult.error) throw categoryResult.error
+  if (groupResult.error) throw groupResult.error
+
+  return {
+    action: 'add',
+    categoryId: categoryResult.data.id,
+    categoryCode: categoryResult.data.code,
+    codeGroupId: groupResult.data.id,
+    workContextCode: groupResult.data.work_context_code,
+    itemTypeCode: groupResult.data.item_type_code,
+    itemName: `รายการทดสอบ server allocator ${randomUUID().slice(0, 8)}`,
+    unit: 'รายการ',
+    materialCost: '10.00',
+    laborCost: '5.00',
+    unitCost: '15.00',
+    identityOutcome: 'candidate_add',
+    priceAuthorityReference: 'LOCAL-WP65-TEST-AUTHORITY',
+  }
+}
+
+async function frozenRecodeChange(versionId) {
+  const { data: mapping, error: mappingError } = await service
+    .from('catalog_first_rollout_mappings')
+    .select('identity_id,legacy_item_code,target_item_code,work_context_code,item_type_code')
+    .eq('identity_outcome', 'recode')
+    .order('target_item_code')
+    .limit(1)
+    .single()
+  if (mappingError) throw mappingError
+
+  const { data: group, error: groupError } = await service
+    .from('catalog_code_groups')
+    .select('id')
+    .eq('version_id', versionId)
+    .eq('work_context_code', mapping.work_context_code)
+    .eq('item_type_code', mapping.item_type_code)
+    .single()
+  if (groupError) throw groupError
+
+  return {
+    action: 'recode',
+    targetIdentityId: mapping.identity_id,
+    legacyItemCode: mapping.legacy_item_code,
+    canonicalCode: mapping.target_item_code,
+    codeGroupId: group.id,
+    workContextCode: mapping.work_context_code,
+    itemTypeCode: mapping.item_type_code,
+    identityOutcome: 'recode',
+  }
+}
+
+function retireChange(row) {
+  return {
+    action: 'retire',
+    targetIdentityId: row.identity_id,
+    legacyItemCode: row.item_code,
+    identityOutcome: 'retire',
+  }
+}
+
 async function readBaselineItem(versionId) {
   const { data, error } = await service
     .from('price_list')
-    .select('item_code')
+    .select('identity_id,item_code,item_name')
     .eq('version_id', versionId)
     .eq('is_active', true)
     .neq('item_code', 'ITEM-0139')
@@ -659,8 +841,35 @@ async function assertRejectedDraftStayedUnpublished(versionId, baseId) {
   assert(await readCurrentPointer() === baseId, 'Rejected publish moved the pointer')
 }
 
-async function assertDuplicateCodePayloadRollsBack(draft, context) {
-  const code = `${context}-DUP-001`
+async function assertDuplicateTargetPayloadRollsBack(
+  draft,
+  context,
+  baselineRow,
+  hardenedAuthority,
+) {
+  const duplicateChanges = hardenedAuthority
+    ? [
+        {
+          action: 'update',
+          targetIdentityId: baselineRow.identity_id,
+          legacyItemCode: baselineRow.item_code,
+          itemName: `${baselineRow.item_name} WP65`,
+          identityOutcome: 'update',
+          priceAuthorityReference: 'LOCAL-WP65-TEST-AUTHORITY',
+        },
+        {
+          action: 'update',
+          targetIdentityId: baselineRow.identity_id,
+          legacyItemCode: baselineRow.item_code,
+          itemName: `${baselineRow.item_name} WP65`,
+          identityOutcome: 'update',
+          priceAuthorityReference: 'LOCAL-WP65-TEST-AUTHORITY',
+        },
+      ]
+    : [
+        addChange(`${context}-DUP-001`, context),
+        addChange(`${context}-DUP-001`, context),
+      ]
   const before = await readMutationCounts(draft.versionId)
   const requestId = randomUUID()
   actionCode(
@@ -668,7 +877,7 @@ async function assertDuplicateCodePayloadRollsBack(draft, context) {
       p_version_id: draft.versionId,
       p_change_payload: {
         operation: 'manual',
-        changes: [addChange(code, context), addChange(code, context)],
+        changes: duplicateChanges,
       },
       p_expected_lock_version: draft.lockVersion,
       p_reason: 'WP-6.5 duplicate code rollback fixture',
@@ -694,11 +903,7 @@ async function assertApplyIdempotency(target, draft, baselineRow) {
     p_version_id: draft.versionId,
     p_change_payload: {
       operation: 'manual',
-      changes: [{
-        action: 'retire',
-        legacyItemCode: baselineRow.item_code,
-        identityOutcome: 'retire',
-      }],
+      changes: [retireChange(baselineRow)],
     },
     p_expected_lock_version: draft.lockVersion,
     p_reason: 'WP-6.5 apply idempotency fixture',
