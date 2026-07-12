@@ -5,8 +5,8 @@ import { createClient } from '@/lib/supabase/server';
 import { loadCatalogAdminGate } from '@/lib/master-catalog/admin/readModel';
 import {
   CatalogImportPayloadValidationError,
-  validateCatalogImportPayloadHashV1,
-  validateCatalogImportPayloadV1,
+  validateCatalogImportPayload,
+  validateCatalogImportPayloadHash,
 } from '@/lib/master-catalog/import/payload';
 import {
   CatalogImportServerValidationError,
@@ -43,14 +43,14 @@ export async function createCatalogDraftAction(
   const gate = await loadCatalogAdminGate(supabase);
 
   if (gate.state !== 'enabled') {
-    return createCatalogMutationError('Master Catalog admin gate ยังไม่เปิด', 'FORBIDDEN');
+    return createCatalogMutationError('ระบบบัญชีราคาสำหรับผู้ดูแลยังไม่เปิดใช้งาน', 'FORBIDDEN');
   }
 
-  const name = readRequiredActionText(formData, 'name', 'draft name');
-  const reason = readRequiredActionText(formData, 'reason', 'reason');
-  const versionMajor = readVersionSegment(formData, 'versionMajor', 'effective year');
-  const versionMinor = readVersionSegment(formData, 'versionMinor', 'revision');
-  const versionPatch = readVersionSegment(formData, 'versionPatch', 'patch');
+  const name = readRequiredActionText(formData, 'name', 'ชื่อฉบับร่าง');
+  const reason = readRequiredActionText(formData, 'reason', 'เหตุผล');
+  const versionMajor = readVersionSegment(formData, 'versionMajor', 'ปี พ.ศ. ที่มีผล');
+  const versionMinor = readVersionSegment(formData, 'versionMinor', 'ลำดับปรับปรุงหลัก');
+  const versionPatch = readVersionSegment(formData, 'versionPatch', 'ลำดับแก้ไขย่อย');
 
   if (typeof name !== 'string') return name;
   if (typeof reason !== 'string') return reason;
@@ -65,7 +65,7 @@ export async function createCatalogDraftAction(
     .maybeSingle();
 
   if (pointerError || !pointer?.version_id) {
-    return createCatalogMutationError('อ่าน current catalog default ไม่สำเร็จ', 'DRAFT_BASE_STALE');
+    return createCatalogMutationError('อ่านเวอร์ชันบัญชีราคาที่ใช้งานปัจจุบันไม่สำเร็จ', 'DRAFT_BASE_STALE');
   }
 
   const startedAt = Date.now();
@@ -88,7 +88,7 @@ export async function createCatalogDraftAction(
 
   const result = mapCatalogRpcActionResponse(
     data as CatalogRpcActionResponse,
-    `สร้าง draft ${versionMajor}.${versionMinor}.${versionPatch} แล้ว`,
+    `สร้างฉบับร่าง ${versionMajor}.${versionMinor}.${versionPatch} แล้ว`,
   );
   logMasterCatalogOperation({
     operation: 'createCatalogDraft',
@@ -117,7 +117,7 @@ export async function applyCatalogManualChangeAction(
   const gate = await loadCatalogAdminGate(supabase);
 
   if (gate.state !== 'enabled') {
-    return createCatalogMutationError('Master Catalog admin gate ยังไม่เปิด', 'FORBIDDEN');
+    return createCatalogMutationError('ระบบบัญชีราคาสำหรับผู้ดูแลยังไม่เปิดใช้งาน', 'FORBIDDEN');
   }
 
   const args = buildManualCatalogChangeArgs(formData, requestId);
@@ -138,7 +138,7 @@ export async function applyCatalogManualChangeAction(
 
   const result = mapCatalogRpcActionResponse(
     data as CatalogRpcActionResponse,
-    'บันทึก draft change set แล้ว',
+    'บันทึกการเปลี่ยนแปลงในฉบับร่างแล้ว',
   );
   logMasterCatalogOperation({
     operation: 'applyCatalogManualChange',
@@ -164,7 +164,7 @@ export async function previewCatalogImportAction(
   const gate = await loadCatalogAdminGate(supabase);
 
   if (gate.state !== 'enabled') {
-    return createCatalogMutationError('Master Catalog admin gate ยังไม่เปิด', 'FORBIDDEN');
+    return createCatalogMutationError('ระบบบัญชีราคาสำหรับผู้ดูแลยังไม่เปิดใช้งาน', 'FORBIDDEN');
   }
 
   const validated = await readValidatedImportPayload(formData);
@@ -172,8 +172,9 @@ export async function previewCatalogImportAction(
     return validated;
   }
 
+  let importPreview;
   try {
-    await validateCatalogImportAgainstDraft(supabase, validated.payload);
+    importPreview = await validateCatalogImportAgainstDraft(supabase, validated.payload);
   } catch (error) {
     return mapImportValidationError(error);
   }
@@ -203,7 +204,7 @@ export async function previewCatalogImportAction(
 
   const result = mapCatalogRpcActionResponse(
     data as CatalogRpcActionResponse,
-    'บันทึก import validation แล้ว',
+    'เซิร์ฟเวอร์ตรวจผลต่างและบันทึกผลตรวจแล้ว',
   );
   logMasterCatalogOperation({
     operation: 'previewCatalogImport',
@@ -218,7 +219,7 @@ export async function previewCatalogImportAction(
     revalidateMasterCatalogPaths(result.versionId ?? validated.payload.versionId);
   }
 
-  return result;
+  return result.status === 'success' ? { ...result, importPreview } : result;
 }
 
 export async function applyCatalogImportAction(
@@ -232,14 +233,14 @@ export async function applyCatalogImportAction(
   const gate = await loadCatalogAdminGate(supabase);
 
   if (gate.state !== 'enabled') {
-    return createCatalogMutationError('Master Catalog admin gate ยังไม่เปิด', 'FORBIDDEN');
+    return createCatalogMutationError('ระบบบัญชีราคาสำหรับผู้ดูแลยังไม่เปิดใช้งาน', 'FORBIDDEN');
   }
 
-  const importId = readRequiredActionText(formData, 'importId', 'import id');
+  const importId = readRequiredActionText(formData, 'importId', 'รหัสชุดการนำเข้า');
   if (typeof importId !== 'string') return importId;
 
   if (!UUID_PATTERN.test(importId)) {
-    return createCatalogMutationError('import id ไม่ถูกต้อง');
+    return createCatalogMutationError('รหัสชุดการนำเข้าไม่ถูกต้อง');
   }
 
   const { data: importRecord, error: importError } = await supabase
@@ -249,16 +250,16 @@ export async function applyCatalogImportAction(
     .maybeSingle();
 
   if (importError) {
-    return createCatalogMutationError('โหลด import validation ไม่สำเร็จ', 'INTERNAL_ERROR');
+    return createCatalogMutationError('โหลดผลตรวจการนำเข้าไม่สำเร็จ', 'INTERNAL_ERROR');
   }
 
   if (!importRecord) {
-    return createCatalogMutationError('ไม่พบ import validation ที่เลือก', 'VALIDATION_FAILED');
+    return createCatalogMutationError('ไม่พบผลตรวจการนำเข้าที่เลือก', 'VALIDATION_FAILED');
   }
 
   if (importRecord.status !== 'validated') {
     return createCatalogMutationError(
-      'Import batch นี้ถูก apply หรือ reject แล้ว',
+      'ชุดการนำเข้านี้ถูกบันทึกหรือปฏิเสธไปแล้ว',
       'REQUEST_ALREADY_PROCESSED',
     );
   }
@@ -300,7 +301,7 @@ export async function applyCatalogImportAction(
 
   const result = mapCatalogRpcActionResponse(
     data as CatalogRpcActionResponse,
-    'Apply import เข้า draft แล้ว',
+    'ยืนยันและบันทึกการนำเข้าลงฉบับร่างแล้ว',
   );
   logMasterCatalogOperation({
     operation: 'applyCatalogImport',
@@ -329,7 +330,7 @@ export async function publishCatalogVersionAction(
   const gate = await loadCatalogAdminGate(supabase);
 
   if (gate.state !== 'enabled') {
-    return createCatalogMutationError('Master Catalog admin gate ยังไม่เปิด', 'FORBIDDEN');
+    return createCatalogMutationError('ระบบบัญชีราคาสำหรับผู้ดูแลยังไม่เปิดใช้งาน', 'FORBIDDEN');
   }
 
   const args = buildPublishCatalogVersionArgs(formData, requestId);
@@ -350,7 +351,7 @@ export async function publishCatalogVersionAction(
 
   const result = mapCatalogRpcActionResponse(
     data as CatalogRpcActionResponse,
-    'Publish catalog version แล้ว',
+    'เผยแพร่เวอร์ชันบัญชีราคาแล้ว',
   );
   logMasterCatalogOperation({
     operation: 'publishCatalogVersion',
@@ -379,7 +380,7 @@ export async function restoreCatalogPointerAction(
   const gate = await loadCatalogAdminGate(supabase);
 
   if (gate.state !== 'enabled') {
-    return createCatalogMutationError('Master Catalog admin gate ยังไม่เปิด', 'FORBIDDEN');
+    return createCatalogMutationError('ระบบบัญชีราคาสำหรับผู้ดูแลยังไม่เปิดใช้งาน', 'FORBIDDEN');
   }
 
   const args = buildRestoreCatalogPointerArgs(formData, requestId);
@@ -400,7 +401,7 @@ export async function restoreCatalogPointerAction(
 
   const result = mapCatalogRpcActionResponse(
     data as CatalogRpcActionResponse,
-    'Restore catalog pointer แล้ว',
+    'คืนเวอร์ชันบัญชีราคาที่ใช้งานแล้ว',
   );
   logMasterCatalogOperation({
     operation: 'restoreCatalogPointer',
@@ -434,10 +435,10 @@ function readRequiredActionText(
 }
 
 function readOperationRequestId(formData: FormData): string | CatalogMutationState {
-  const requestId = readRequiredActionText(formData, 'requestId', 'request id');
+  const requestId = readRequiredActionText(formData, 'requestId', 'รหัสคำขอ');
   if (typeof requestId !== 'string') return requestId;
   if (!UUID_PATTERN.test(requestId)) {
-    return createCatalogMutationError('request id ไม่ถูกต้อง');
+    return createCatalogMutationError('รหัสคำขอไม่ถูกต้อง');
   }
   return requestId;
 }
@@ -463,22 +464,22 @@ async function readValidatedImportPayload(
   formData: FormData,
   expectedNormalizedPayloadHash?: string,
 ) {
-  const payloadJson = readRequiredActionText(formData, 'payloadJson', 'normalized import payload');
+  const payloadJson = readRequiredActionText(formData, 'payloadJson', 'ข้อมูลนำเข้าที่ผ่านการจัดรูปแบบ');
   if (typeof payloadJson !== 'string') return payloadJson;
 
   let parsed: unknown;
   try {
     parsed = JSON.parse(payloadJson);
   } catch {
-    return createCatalogMutationError('normalized import payload ต้องเป็น JSON ที่ถูกต้อง');
+    return createCatalogMutationError('ข้อมูลนำเข้าที่ผ่านการจัดรูปแบบต้องเป็น JSON ที่ถูกต้อง');
   }
 
   try {
     if (expectedNormalizedPayloadHash) {
-      return await validateCatalogImportPayloadHashV1(parsed, expectedNormalizedPayloadHash);
+      return await validateCatalogImportPayloadHash(parsed, expectedNormalizedPayloadHash);
     }
 
-    return await validateCatalogImportPayloadV1(parsed);
+    return await validateCatalogImportPayload(parsed);
   } catch (error) {
     return mapImportValidationError(error);
   }
@@ -511,7 +512,7 @@ function mapImportValidationError(error: unknown): CatalogMutationState {
     );
   }
 
-  return createCatalogMutationError('Import validation ไม่สำเร็จ', 'INTERNAL_ERROR');
+  return createCatalogMutationError('ตรวจข้อมูลนำเข้าไม่สำเร็จ', 'INTERNAL_ERROR');
 }
 
 function revalidateMasterCatalogPaths(versionId: string | undefined) {

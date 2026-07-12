@@ -78,11 +78,15 @@ function makeSnapshot(
         materialCost: '100.00',
         laborCost: '25.00',
         unitCost: '125.00',
-        category: 'SMOKE',
+        categoryCode: 'SMOKE',
+        categoryId: '00000000-0000-4000-8000-000000000301',
+        codeGroupId: null,
         isActive: true,
       },
     ],
     codeReservations: [],
+    categoryIds: ['00000000-0000-4000-8000-000000000301'],
+    codeGroupIds: ['00000000-0000-4000-8000-000000000401'],
     ...overrides,
   };
 }
@@ -135,7 +139,9 @@ describe('Master Catalog import server validation', () => {
       materialCost: '100.00',
       laborCost: '25.00',
       unitCost: '125.00',
-      category: 'SMOKE',
+      categoryCode: 'SMOKE',
+      categoryId: '00000000-0000-4000-8000-000000000301',
+      codeGroupId: null,
       isActive: true,
     }));
     const diagnostics = collectCatalogImportValidationDiagnostics(

@@ -36,9 +36,9 @@
 | `017_master_catalog_phase4_foundation.sql` | Master Catalog Phase 4 additive governance foundation, including P-20 deterministic baseline identity from Production-derived `price_list.id`, request fingerprints, RLS/grants, and disabled feature flag | **Draft — Local only, not applied to Production** |
 | `018_master_catalog_phase4_draft_mutation.sql` | Draft create/manual/import RPCs with actor+payload request fingerprints, per-request/per-code locks, bounded runtime timeouts, full-payload preflight, audited mutation subtransaction rollback, and reusable ADR-003 transitions | **Draft — Local only, not applied to Production** |
 | `019_master_catalog_phase4_publish_pointer.sql` | Publish/restore, shared admin publish-readiness RPC, P-18 and structured-rollout boundary guards, P-19 inactive-row filing warning, catalog-only DB count/hash, runtime timeouts, and published immutability | **Draft — Local only, not applied to Production** |
-| `020_master_catalog_phase4_admin_workflow_hardening.sql` | Reserved fix-forward migration for WP-6.6 authority, readiness, correction-path, and schema hardening | **Planned only — file does not exist; not in bootstrap** |
+| `020_master_catalog_phase4_admin_workflow_hardening.sql` | WP-6.6 frozen first-rollout authority, resolve-only dictionaries/server allocator, exact read registers, readiness/provenance parity, correction path, and schema hardening | **Implementation candidate — repository/static checkpoint passed; not applied and not in bootstrap** |
 | `021_master_catalog_phase4_placement_governance.sql` | Reserved P-18/WP-7.5 new-identity placement revision/review and atomic order contract | **Proposed only — P-18 pending; file does not exist; not in bootstrap** |
-| `017+_master_catalog_phase4_*.sql` | Umbrella reference for the Local-only Phase 4 range; currently implemented/applied by bootstrap only as `017`-`019` | **Local-only range — no Production approval** |
+| `017+_master_catalog_phase4_*.sql` | Umbrella reference for the Local-only Phase 4 range; files currently exist as `017`-`020`, while bootstrap remains intentionally limited to reviewed `017`-`019` | **Local-only range — no Production approval** |
 
 ### Local Schema Baseline (`supabase/local/`)
 
@@ -76,10 +76,13 @@ rebases/merges this hotfix from `main`.
 WP-6.5 reliability evidence for `017`-`019` passed its bounded Local scope.
 [Completeness Audit #29](../plans/master-catalog/29-phase4-owner-dev-completeness-audit.md)
 then found operator/authority gaps that require additive WP-6.6 work before
-WP-7. Preserve the reviewed `017`-`019` files and implement accepted DB changes
-as fix-forward migration `020`; after P-18 acceptance, placement uses `021`.
-Neither planned migration belongs in bootstrap until its file, implementation,
-and tests are reviewed. Applied hotfix `016` must not be edited.
+WP-7. Preserve the reviewed `017`-`019` files; the owner authorized WP-6.6
+Local-only implementation and fix-forward migration `020` now exists as an
+unapplied draft whose repository/static checkpoint passed on 2026-07-12. Keep
+bootstrap at `017`-`019` until `020` DB/browser review and a separate destructive
+Local-reset approval pass. After P-18
+acceptance, placement uses proposed `021`. Applied hotfix `016` must not be
+edited.
 This is not a new Production hotfix and must not be applied to Production
 without the normal Phase 4 P-12+ approvals.
 

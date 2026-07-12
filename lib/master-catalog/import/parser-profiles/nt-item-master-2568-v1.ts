@@ -68,7 +68,7 @@ export function detectNtItemMaster2568Profile(
     errors.push({
       field: 'filename',
       code: 'IMPORT_PROFILE_NOT_RECOGNIZED',
-      message: 'Workbook must use the approved .xlsx extension',
+      message: 'ไฟล์ต้องใช้นามสกุล .xlsx ที่ระบบรองรับ',
     })
   }
 
@@ -80,7 +80,7 @@ export function detectNtItemMaster2568Profile(
     errors.push({
       field: 'sheet',
       code: 'IMPORT_PROFILE_NOT_RECOGNIZED',
-      message: 'Required profile sheet is missing',
+      message: 'ไม่พบแผ่นงานที่รูปแบบนำเข้ากำหนด',
     })
   }
 
@@ -88,7 +88,7 @@ export function detectNtItemMaster2568Profile(
     errors.push({
       field: 'sheet',
       code: 'IMPORT_PROFILE_NOT_RECOGNIZED',
-      message: 'Required profile sheet appears more than once',
+      message: 'พบแผ่นงานที่กำหนดมากกว่าหนึ่งแผ่น',
     })
   }
 
@@ -111,7 +111,7 @@ export function normalizeNtItemMaster2568Row(
   context: ParseContext,
 ) {
   const headers = NT_ITEM_MASTER_2568_REQUIRED_HEADERS
-  const canonicalCode = readTextCell(row, headers.itemCode, 'item_code', 64)
+  const sourceItemCode = readTextCell(row, headers.itemCode, 'item_code', 64)
   const workContextCode = readTextCell(row, headers.workContextCode, 'AAA', 16)
   const workContextNameTh = readTextCell(row, headers.workContextNameTh, 'AAA_name_th', 200)
   const itemTypeCode = readTextCell(row, headers.itemTypeCode, 'TTT', 16)
@@ -122,28 +122,56 @@ export function normalizeNtItemMaster2568Row(
   const laborCost = readMoneyCell(row, headers.laborCost, 'labor_cost')
   const unitCost = readMoneyCell(row, headers.unitCost, 'total_cost')
 
-  assertPattern(canonicalCode, CANDIDATE_CODE_PATTERN, 'item_code')
+  assertPattern(sourceItemCode, CANDIDATE_CODE_PATTERN, 'item_code')
   assertPattern(workContextCode, CODE_GROUP_PATTERN, 'AAA')
   assertPattern(itemTypeCode, CODE_GROUP_PATTERN, 'TTT')
   assertMoneySum(materialCost, laborCost, unitCost)
 
+  if (context.sourceExclusionCodes?.includes(sourceItemCode)) {
+    throw new CatalogParserProfileError('รายการนี้ถูกเลื่อนไปจากรอบนำเข้าปัจจุบัน', [{
+      row: sourceRow,
+      field: 'item_code',
+      code: 'IMPORT_RECONCILIATION_REQUIRED',
+      message: 'รายการที่มีเฉพาะในไฟล์ต้นทางนี้ถูกเลื่อนออกและห้ามเข้าสู่รอบเผยแพร่แรก',
+    }])
+  }
+
+  const authorityRow = context.authoritativeRowBySourceCode?.[sourceItemCode]
+
+  if (authorityRow) {
+    return {
+      ...authorityRow,
+      sourceRow,
+      sourceReference: `${sourceSheet}:${sourceRow}`,
+      sourceItemCode,
+    }
+  }
+
   const groupKey = `${workContextCode}-${itemTypeCode}`
   const categoryCode = readContextText(
-    context.categoryCodeByCanonicalCode?.[canonicalCode] ??
+    context.categoryCodeByCanonicalCode?.[sourceItemCode] ??
       context.categoryCodeByGroup?.[groupKey],
     'categoryCode',
     'IMPORT_RECONCILIATION_REQUIRED',
-    'Category reconciliation is required for the AAA-TTT group',
+    'ต้องตรวจสอบหมวดงานให้ตรงกับกลุ่ม AAA-TTT',
+  )
+  const categoryId = readOptionalContextText(
+    context.categoryIdByCode?.[categoryCode],
+    'categoryId',
+  )
+  const codeGroupId = readOptionalContextText(
+    context.codeGroupIdByGroup?.[groupKey],
+    'codeGroupId',
   )
 
   return {
     sourceRow,
     sourceReference: `${sourceSheet}:${sourceRow}`,
     legacyItemCode: readOptionalContextText(
-      context.legacyItemCodeByCanonicalCode?.[canonicalCode],
+      context.legacyItemCodeByCanonicalCode?.[sourceItemCode],
       'legacyItemCode',
     ),
-    canonicalCode,
+    canonicalCode: sourceItemCode,
     workContextCode,
     workContextNameTh,
     itemTypeCode,
@@ -154,11 +182,13 @@ export function normalizeNtItemMaster2568Row(
     laborCost,
     unitCost,
     categoryCode,
+    ...(categoryId ? { categoryId } : {}),
+    ...(codeGroupId ? { codeGroupId } : {}),
     identityOutcome: readIdentityOutcome(
-      context.identityOutcomeByCanonicalCode?.[canonicalCode],
+      context.identityOutcomeByCanonicalCode?.[sourceItemCode],
     ),
     priceAuthorityReference: readOptionalContextText(
-      context.priceAuthorityReferenceByCanonicalCode?.[canonicalCode],
+      context.priceAuthorityReferenceByCanonicalCode?.[sourceItemCode],
       'priceAuthorityReference',
     ),
   }
@@ -178,7 +208,7 @@ function validateSheetHeaders(sheet: WorkbookSheetInfo): ParserDiagnostic[] {
         row: NT_ITEM_MASTER_2568_PROFILE.headerRow,
         field: header,
         code: 'IMPORT_PROFILE_NOT_RECOGNIZED',
-        message: 'Required profile header is missing',
+        message: 'ไม่พบหัวคอลัมน์ที่รูปแบบนำเข้ากำหนด',
       })
     }
   }
@@ -189,7 +219,7 @@ function validateSheetHeaders(sheet: WorkbookSheetInfo): ParserDiagnostic[] {
         row: NT_ITEM_MASTER_2568_PROFILE.headerRow,
         field: header,
         code: 'IMPORT_PROFILE_NOT_RECOGNIZED',
-        message: 'Duplicate header is not allowed',
+        message: 'ห้ามมีหัวคอลัมน์ชื่อซ้ำ',
       })
     }
   }
@@ -204,14 +234,14 @@ function validateSheetRows(sheet: WorkbookSheetInfo): ParserDiagnostic[] {
     diagnostics.push({
       row: NT_ITEM_MASTER_2568_PROFILE.firstDataRow,
       code: 'IMPORT_PROFILE_NOT_RECOGNIZED',
-      message: 'At least one candidate data row is required',
+      message: 'ต้องมีข้อมูลอย่างน้อยหนึ่งแถว',
     })
   }
 
   if (sheet.dataRows.length > NT_ITEM_MASTER_2568_PROFILE.maxRows) {
     diagnostics.push({
       code: 'IMPORT_ROW_LIMIT_EXCEEDED',
-      message: 'Parsed item row limit exceeded',
+      message: 'จำนวนแถวเกินเพดานที่ระบบรองรับ',
     })
   }
 
@@ -243,7 +273,7 @@ function readTextCell(
   const value = row[header]
 
   if (typeof value !== 'string') {
-    throw new CatalogParserProfileError('Workbook row validation failed', [{
+    throw new CatalogParserProfileError('ตรวจข้อมูลในแถวไม่ผ่าน', [{
       field,
       code: 'VALIDATION_FAILED',
       message: describeRejectedCell(value),
@@ -253,26 +283,26 @@ function readTextCell(
   const normalized = value.trim().normalize('NFC')
 
   if (normalized.length === 0) {
-    throw new CatalogParserProfileError('Workbook row validation failed', [{
+    throw new CatalogParserProfileError('ตรวจข้อมูลในแถวไม่ผ่าน', [{
       field,
       code: 'VALIDATION_FAILED',
-      message: 'Required cell is blank',
+      message: 'ช่องข้อมูลที่จำเป็นต้องไม่ว่าง',
     }])
   }
 
   if (normalized.length > maxLength) {
-    throw new CatalogParserProfileError('Workbook row validation failed', [{
+    throw new CatalogParserProfileError('ตรวจข้อมูลในแถวไม่ผ่าน', [{
       field,
       code: 'VALIDATION_FAILED',
-      message: 'Required cell text exceeds the profile limit',
+      message: 'ข้อความยาวเกินเพดานที่รูปแบบนำเข้ากำหนด',
     }])
   }
 
   if (CONTROL_CHARACTER_PATTERN.test(normalized)) {
-    throw new CatalogParserProfileError('Workbook row validation failed', [{
+    throw new CatalogParserProfileError('ตรวจข้อมูลในแถวไม่ผ่าน', [{
       field,
       code: 'VALIDATION_FAILED',
-      message: 'Control characters are not allowed',
+      message: 'ห้ามมีอักขระควบคุมในข้อความ',
     }])
   }
 
@@ -287,10 +317,10 @@ function readMoneyCell(
   const value = readTextCell(row, header, field, 32)
 
   if (!MONEY_PATTERN.test(value)) {
-    throw new CatalogParserProfileError('Workbook row validation failed', [{
+    throw new CatalogParserProfileError('ตรวจข้อมูลในแถวไม่ผ่าน', [{
       field,
       code: 'VALIDATION_FAILED',
-      message: 'Money must be a two-decimal string',
+      message: 'จำนวนเงินต้องมีทศนิยมสองตำแหน่ง',
     }])
   }
 
@@ -301,20 +331,20 @@ function readSourceRow(row: UnknownWorkbookRow, header: string): number {
   const sourceRowText = readTextCell(row, header, 'source_row', 16)
 
   if (!SOURCE_ROW_PATTERN.test(sourceRowText)) {
-    throw new CatalogParserProfileError('Workbook row validation failed', [{
+    throw new CatalogParserProfileError('ตรวจข้อมูลในแถวไม่ผ่าน', [{
       field: 'source_row',
       code: 'VALIDATION_FAILED',
-      message: 'Source row must be a positive integer string',
+      message: 'เลขแถวต้นทางต้องเป็นจำนวนเต็มบวก',
     }])
   }
 
   const sourceRow = Number(sourceRowText)
 
   if (!Number.isSafeInteger(sourceRow)) {
-    throw new CatalogParserProfileError('Workbook row validation failed', [{
+    throw new CatalogParserProfileError('ตรวจข้อมูลในแถวไม่ผ่าน', [{
       field: 'source_row',
       code: 'VALIDATION_FAILED',
-      message: 'Source row exceeds the safe integer limit',
+      message: 'เลขแถวต้นทางมีค่ามากเกินขอบเขตที่รองรับ',
     }])
   }
 
@@ -323,10 +353,10 @@ function readSourceRow(row: UnknownWorkbookRow, header: string): number {
 
 function assertPattern(value: string, pattern: RegExp, field: string): void {
   if (!pattern.test(value)) {
-    throw new CatalogParserProfileError('Workbook row validation failed', [{
+    throw new CatalogParserProfileError('ตรวจข้อมูลในแถวไม่ผ่าน', [{
       field,
       code: 'VALIDATION_FAILED',
-      message: 'Cell does not match the approved profile format',
+      message: 'ข้อมูลไม่ตรงรูปแบบที่อนุมัติ',
     }])
   }
 }
@@ -337,10 +367,10 @@ function assertMoneySum(
   unitCost: string,
 ): void {
   if (moneyToCents(materialCost) + moneyToCents(laborCost) !== moneyToCents(unitCost)) {
-    throw new CatalogParserProfileError('Workbook row validation failed', [{
+    throw new CatalogParserProfileError('ตรวจข้อมูลในแถวไม่ผ่าน', [{
       field: 'total_cost',
       code: 'VALIDATION_FAILED',
-      message: 'Material and labor costs must equal total cost',
+      message: 'ค่าวัสดุรวมกับค่าแรงต้องเท่ากับราคารวม',
     }])
   }
 }
@@ -357,7 +387,7 @@ function readContextText(
   message: string,
 ): string {
   if (typeof value !== 'string' || value.trim().length === 0) {
-    throw new CatalogParserProfileError('Workbook row validation failed', [{
+    throw new CatalogParserProfileError('ตรวจข้อมูลในแถวไม่ผ่าน', [{
       field,
       code,
       message,
@@ -376,10 +406,10 @@ function readOptionalContextText(
   }
 
   if (typeof value !== 'string' || value.trim().length === 0) {
-    throw new CatalogParserProfileError('Workbook row validation failed', [{
+    throw new CatalogParserProfileError('ตรวจข้อมูลในแถวไม่ผ่าน', [{
       field,
       code: 'VALIDATION_FAILED',
-      message: 'Optional context value must be a nonblank string when present',
+      message: 'ข้อมูลประกอบที่ระบุต้องเป็นข้อความและต้องไม่ว่าง',
     }])
   }
 
@@ -394,10 +424,10 @@ function readIdentityOutcome(
   }
 
   if (!['retain', 'recode', 'candidate_add', 'retire'].includes(value)) {
-    throw new CatalogParserProfileError('Workbook row validation failed', [{
+    throw new CatalogParserProfileError('ตรวจข้อมูลในแถวไม่ผ่าน', [{
       field: 'identityOutcome',
       code: 'VALIDATION_FAILED',
-      message: 'Identity outcome is not recognized',
+      message: 'ผลการจับคู่ตัวตนรายการไม่อยู่ในชุดที่ระบบรองรับ',
     }])
   }
 
@@ -406,26 +436,26 @@ function readIdentityOutcome(
 
 function describeRejectedCell(value: WorkbookCellValue): string {
   if (isWorkbookFormulaCell(value)) {
-    return 'Formula cells are not allowed in required fields'
+    return 'ช่องข้อมูลที่จำเป็นห้ามใช้สูตร'
   }
 
   if (isWorkbookErrorCell(value)) {
-    return 'Error cells are not allowed in required fields'
+    return 'ช่องข้อมูลที่จำเป็นต้องไม่มีค่า error จาก Excel'
   }
 
   if (value instanceof Date) {
-    return 'Date cells are not allowed in required fields'
+    return 'ช่องข้อมูลที่จำเป็นห้ามเป็นชนิดวันที่'
   }
 
   if (typeof value === 'number') {
-    return 'Number cells are not allowed in required fields'
+    return 'ช่องข้อมูลที่จำเป็นต้องจัดเก็บเป็นข้อความ ไม่ใช่ชนิดตัวเลข'
   }
 
   if (typeof value === 'boolean') {
-    return 'Boolean cells are not allowed in required fields'
+    return 'ช่องข้อมูลที่จำเป็นห้ามเป็นค่าจริง/เท็จ'
   }
 
-  return 'Required cell must be a text value'
+  return 'ช่องข้อมูลที่จำเป็นต้องเป็นข้อความ'
 }
 
 function isWorkbookFormulaCell(value: WorkbookCellValue): boolean {

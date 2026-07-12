@@ -341,13 +341,13 @@ feature enablement, final catalog publication, or silent business-data choices.
 
 ### Additional preconditions before WP-6.6 implementation/closeout
 
-- [ ] P-21 explicitly authorizes WP-6.6 Local-only implementation scope/start
-- [ ] Audit #29 C-01 through C-12 are mapped to exact DB/UI/test owners
-- [ ] WP-6.5 reliability evidence remains preserved and is not relabeled as a
+- [x] P-21 explicitly authorizes WP-6.6 Local-only implementation scope/start
+- [x] Audit #29 C-01 through C-12 are mapped to exact DB/UI/test owners
+- [x] WP-6.5 reliability evidence remains preserved and is not relabeled as a
       full operator-completeness certificate
-- [ ] Planned DB changes use additive migration `020`; `017`-`019` remain
+- [x] Planned DB changes use additive migration `020`; `017`-`019` remain
       unchanged
-- [ ] Unsupported Add/Supplement/Retire controls remain hidden at release unless
+- [x] Unsupported Add/Supplement/Retire controls remain hidden at release unless
       their downstream gates pass
 - [ ] A separate owner decision is obtained before any Local bootstrap/reset
 

@@ -3,18 +3,27 @@ import {
   CATALOG_IMPORT_NORMALIZED_PAYLOAD_LIMIT_BYTES,
   CATALOG_IMPORT_RAW_FILE_LIMIT_BYTES,
   CatalogImportPayloadValidationError,
+  buildCatalogImportRowsV2,
+  canonicalizeCatalogImportPayloadV2,
   canonicalizeCatalogImportPayloadV1,
+  validateCatalogImportPayload,
+  validateCatalogImportPayloadV2,
   validateCatalogImportPayloadHashV1,
   validateCatalogImportPayloadV1,
 } from '../lib/master-catalog/import/payload'
 import type {
   CatalogImportPayloadV1,
+  CatalogImportPayloadV2,
+  NormalizedCatalogImportRowV2,
   NormalizedCatalogRowCandidate,
 } from '../lib/master-catalog/import/types'
 
 const VERSION_ID = '00000000-0000-4000-8000-000000000001'
 const REQUEST_ID = '00000000-0000-4000-8000-000000000101'
 const SOURCE_HASH = '1111111111111111111111111111111111111111111111111111111111111111'
+const IDENTITY_ID = '00000000-0000-4000-8000-000000000201'
+const CATEGORY_ID = '00000000-0000-4000-8000-000000000301'
+const GROUP_ID = '00000000-0000-4000-8000-000000000401'
 
 function makeRow(
   overrides: Partial<NormalizedCatalogRowCandidate> = {},
@@ -228,6 +237,101 @@ describe('Master Catalog import payload validation', () => {
     )).rejects.toMatchObject({
       code: 'VALIDATION_FAILED',
       diagnostics: [expect.objectContaining({ field: 'normalizedPayloadHash' })],
+    })
+  })
+})
+
+describe('Master Catalog import payload v2 authority contract', () => {
+  function rowV2(
+    overrides: Partial<NormalizedCatalogImportRowV2> = {},
+  ): NormalizedCatalogImportRowV2 {
+    return {
+      sourceRow: 2,
+      sourceReference: '01_Item_Master_Final:2',
+      sourceItemCode: 'AAA-BBB-001',
+      legacyItemCode: 'ITEM-0001',
+      targetIdentityId: IDENTITY_ID,
+      targetItemCode: 'AAA-BBB-001',
+      workContextCode: 'AAA',
+      workContextNameTh: 'กลุ่มงานทดสอบ',
+      itemTypeCode: 'BBB',
+      itemTypeNameTh: 'ชนิดทดสอบ',
+      itemName: 'รายการทดสอบ 1',
+      unit: 'ม.',
+      materialCost: '100.00',
+      laborCost: '25.00',
+      unitCost: '125.00',
+      categoryId: CATEGORY_ID,
+      categoryCode: '1.1',
+      codeGroupId: GROUP_ID,
+      identityOutcome: 'recode',
+      priceAuthorityReference: null,
+      ...overrides,
+    }
+  }
+
+  function payloadV2(
+    overrides: Partial<CatalogImportPayloadV2> = {},
+  ): CatalogImportPayloadV2 {
+    return {
+      schemaVersion: 'catalog-import-payload/2',
+      parserProfileId: 'nt-item-master-2568',
+      parserProfileVersion: '1',
+      mode: 'full',
+      versionId: VERSION_ID,
+      expectedLockVersion: 3,
+      requestId: REQUEST_ID,
+      reason: 'ตรวจ rollout แรก',
+      source: makePayload().source,
+      priceAuthorityReference: null,
+      retirementApprovalReference: null,
+      retirementConfirmedCount: null,
+      rows: [rowV2()],
+      ...overrides,
+    }
+  }
+
+  it('hashes exact identity/category/group rows and dispatches by schema version', async () => {
+    const validated = await validateCatalogImportPayload(payloadV2())
+
+    expect(validated.payload.schemaVersion).toBe('catalog-import-payload/2')
+    expect(validated.normalizedPayloadJson).toBe(
+      canonicalizeCatalogImportPayloadV2(validated.payload as CatalogImportPayloadV2),
+    )
+    expect(validated.normalizedPayloadHash).toMatch(/^[0-9a-f]{64}$/)
+  })
+
+  it('removes caller-selected codes for new identities and keeps approved dictionary IDs', async () => {
+    const rows = buildCatalogImportRowsV2([makeRow({
+      legacyItemCode: null,
+      identityOutcome: 'candidate_add',
+      targetIdentityId: null,
+      categoryId: CATEGORY_ID,
+      codeGroupId: GROUP_ID,
+      priceAuthorityReference: 'หนังสืออนุมัติราคาใหม่',
+    })])
+
+    expect(rows[0]).toMatchObject({
+      targetIdentityId: null,
+      targetItemCode: null,
+      categoryId: CATEGORY_ID,
+      codeGroupId: GROUP_ID,
+    })
+
+    await expect(validateCatalogImportPayloadV2(payloadV2({ rows }))).resolves.toBeDefined()
+  })
+
+  it('rejects a caller-selected target code for candidate adds', async () => {
+    await expect(validateCatalogImportPayloadV2(payloadV2({
+      rows: [rowV2({
+        legacyItemCode: null,
+        targetIdentityId: null,
+        targetItemCode: 'AAA-BBB-099',
+        identityOutcome: 'candidate_add',
+        priceAuthorityReference: 'หนังสืออนุมัติราคาใหม่',
+      })],
+    }))).rejects.toMatchObject({
+      code: 'CATALOG_CODE_SERVER_ALLOCATION_REQUIRED',
     })
   })
 })

@@ -12,7 +12,12 @@ import {
 
 export const dynamic = 'force-dynamic';
 
-export default async function MasterCatalogImportPage() {
+export default async function MasterCatalogImportPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ draftId?: string }>;
+}) {
+  const { draftId } = await searchParams;
   const supabase = await createClient();
   const gate = await loadCatalogAdminGate(supabase);
 
@@ -26,7 +31,7 @@ export default async function MasterCatalogImportPage() {
 
   const [history, importContext] = await Promise.all([
     loadCatalogAdminHistory(supabase),
-    loadCatalogImportContext(supabase),
+    loadCatalogImportContext(supabase, draftId),
   ]);
   return (
     <MasterCatalogImportView

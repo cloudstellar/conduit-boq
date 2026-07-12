@@ -131,7 +131,7 @@ describe('Master Catalog authority consistency', () => {
     ])
 
     expect(migrations).toContain(
-      '**Planned only — file does not exist; not in bootstrap**',
+      '**Implementation candidate — repository/static checkpoint passed; not applied and not in bootstrap**',
     )
     expect(migrations).toContain(
       '**Proposed only — P-18 pending; file does not exist; not in bootstrap**',
@@ -139,7 +139,7 @@ describe('Master Catalog authority consistency', () => {
     expect(existsSync(resolve(
       root,
       'migrations/020_master_catalog_phase4_admin_workflow_hardening.sql',
-    ))).toBe(false)
+    ))).toBe(true)
     expect(existsSync(resolve(
       root,
       'migrations/021_master_catalog_phase4_placement_governance.sql',
@@ -174,21 +174,21 @@ describe('Master Catalog authority consistency', () => {
       'Approved; two-run WP-6.5C proof passed 2026-07-11; WP-8/P-15 reruns pending',
     )
     expect(decisions).toContain(
-      'Planning correction recorded 2026-07-12; implementation authorization pending',
+      'Approved 2026-07-12 in owner chat; source/repository static checkpoint passed, reset/apply still pending',
     )
 
     const tracker = read(
       'docs/plans/master-catalog/25-phase4-execution-progress-tracker.md',
     )
     expect(tracker).toMatch(/\| WP-6\.5 \|[^\n]+\| Ready for owner review \|/)
-    expect(tracker).toMatch(/\| WP-6\.6 \|[^\n]+\| Not started \|/)
+    expect(tracker).toMatch(/\| WP-6\.6 \|[^\n]+\| In progress \|/)
     expect(tracker).toMatch(/\| WP-7 \|[^\n]+\| Not started \|/)
     expect(tracker).toMatch(/\| WP-7\.5 \|[^\n]+\| Not started \|/)
     expect(tracker).toMatch(/\| WP-8 \|[^\n]+\| Not started \|/)
     expect(tracker).toContain('independent intended-admin UAT remains WP-8')
     expect(tracker).toContain('| Production write allowed | No |')
     expect(tracker).toContain(
-      'P-21: accept/amend Audit #29 and authorize WP-6.6 Local-only implementation',
+      'separately approve/reject destructive clean Local reset and migration `020` apply',
     )
   })
 
@@ -206,6 +206,9 @@ describe('Master Catalog authority consistency', () => {
       ),
       'db:local:verify-master-catalog-p20': expect.stringContaining(
         'scripts/verify-master-catalog-p20-evidence.mjs',
+      ),
+      'catalog:authority:check': expect.stringContaining(
+        'scripts/generate-master-catalog-wp66-authority.mjs --check',
       ),
       'artifacts:master-catalog:generate': expect.stringContaining(
         'scripts/generate-master-catalog-artifact-proof.mjs',
@@ -242,6 +245,50 @@ describe('Master Catalog authority consistency', () => {
     expect(responseLossProxy).toContain('assertTrackedTreeClean()')
     expect(responseLossProxy).toContain("'apply_catalog_changes'")
     expect(responseLossProxy).toContain('ALLOWED_RPC_NAMES.has(value)')
+  })
+
+  it('keeps WP-6.6 runtime authority explicit, frozen, and fail-closed', () => {
+    const importContext = read('lib/master-catalog/admin/importContext.ts')
+    const capabilities = read('lib/master-catalog/admin/capabilities.ts')
+    const versionWorkspace = read(
+      'app/admin/master-catalog/_components/MasterCatalogVersionWorkspace.tsx',
+    )
+    const itemEditor = read(
+      'app/admin/master-catalog/_components/MasterCatalogItemEditor.tsx',
+    )
+    const importPanel = read(
+      'app/admin/master-catalog/_components/MasterCatalogImportPanel.tsx',
+    )
+
+    expect(importContext).toContain(".from('catalog_first_rollout_mappings')")
+    expect(importContext).toContain(".from('catalog_first_rollout_source_exclusions')")
+    expect(importContext).not.toMatch(/(?:node:fs|readFile|phase4-reconciliation-draft\.csv)/)
+    expect(importContext).toContain('selectedDraftId')
+    expect(importContext).not.toContain('selectWorkingCatalogDraft')
+
+    expect(capabilities).toContain('newIdentityEnabled: false')
+    expect(capabilities).toContain('retirementEnabled: false')
+    expect(versionWorkspace).toContain('allowAdd')
+    expect(versionWorkspace).toContain('{editable && allowAdd ? (')
+    expect(itemEditor).toContain('item.capabilities.retirementEnabled')
+    expect(importPanel).toContain('key={prepared.normalizedPayloadHash}')
+    const adminViews = read(
+      'app/admin/master-catalog/_components/MasterCatalogAdminViews.tsx',
+    )
+    expect(adminViews).toContain("key={`${importContext.draft?.id ?? 'no-draft'}:${importContext.draft?.lockVersion ?? 0}`}")
+
+    expect(existsSync(resolve(
+      root,
+      'app/admin/master-catalog/versions/[versionId]/items/[identityId]/page.tsx',
+    ))).toBe(true)
+    expect(existsSync(resolve(
+      root,
+      'app/admin/master-catalog/versions/[versionId]/items/[identityId]/not-found.tsx',
+    ))).toBe(true)
+    const itemRoute = read(
+      'app/admin/master-catalog/versions/[versionId]/items/[identityId]/page.tsx',
+    )
+    expect(itemRoute).toContain('loadCatalogItemDetail(supabase, versionId, identityId)')
   })
 
   it('keeps core authority links resolvable', () => {

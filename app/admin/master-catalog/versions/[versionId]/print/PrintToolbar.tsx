@@ -13,7 +13,7 @@ export function MasterCatalogPrintToolbar({
     <div className="toolbar">
       <div>
         <strong>{filename}</strong>
-        <span> | full dataset hash verified server-side</span>
+        <span> | เซิร์ฟเวอร์ตรวจค่าแฮชของข้อมูลทั้งชุดแล้ว</span>
       </div>
       <div className="toolbar-actions">
         <Link href={`/admin/master-catalog/versions/${versionId}`}>กลับ</Link>

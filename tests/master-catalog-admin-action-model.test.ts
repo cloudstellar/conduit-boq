@@ -12,6 +12,9 @@ import {
 
 const VERSION_ID = '00000000-0000-4000-8000-000000000001';
 const REQUEST_ID = '00000000-0000-4000-8000-000000000101';
+const IDENTITY_ID = '00000000-0000-4000-8000-000000000201';
+const CATEGORY_ID = '00000000-0000-4000-8000-000000000301';
+const GROUP_ID = '00000000-0000-4000-8000-000000000401';
 
 function form(entries: Record<string, string>): FormData {
   const formData = new FormData();
@@ -27,6 +30,7 @@ function baseForm(overrides: Record<string, string> = {}) {
     expectedLockVersion: '3',
     reason: 'WP-4 local-only action',
     action: 'retire',
+    targetIdentityId: IDENTITY_ID,
     targetItemCode: 'ITEM-0001',
     ...overrides,
   });
@@ -46,8 +50,8 @@ describe('Master Catalog admin action model', () => {
         operation: 'manual',
         changes: [{
           action: 'retire',
-          legacyItemCode: 'ITEM-0001',
-          identityOutcome: 'retire',
+          targetIdentityId: IDENTITY_ID,
+          targetItemCode: 'ITEM-0001',
         }],
       },
     });
@@ -60,7 +64,7 @@ describe('Master Catalog admin action model', () => {
       effectiveDate: '2026-07-05',
       approvalReference: 'LOCAL-WP5-REHEARSAL-ONLY-NOT-PRODUCTION',
       approvalDocumentDate: '2026-07-05',
-      publishedByDisplayName: 'Local WP-5 Rehearsal Publisher',
+      physicalArchiveReference: 'archive/catalog/2568.1.0',
       reason: 'WP-5 local-only publish',
     }), REQUEST_ID);
 
@@ -71,7 +75,7 @@ describe('Master Catalog admin action model', () => {
         effectiveDate: '2026-07-05',
         approvalReference: 'LOCAL-WP5-REHEARSAL-ONLY-NOT-PRODUCTION',
         approvalDocumentDate: '2026-07-05',
-        publishedByDisplayName: 'Local WP-5 Rehearsal Publisher',
+        physicalArchiveReference: 'archive/catalog/2568.1.0',
       },
       p_reason: 'WP-5 local-only publish',
       p_request_id: REQUEST_ID,
@@ -96,11 +100,11 @@ describe('Master Catalog admin action model', () => {
       effectiveDate: '07/05/2026',
       approvalReference: 'LOCAL-WP5-REHEARSAL-ONLY-NOT-PRODUCTION',
       approvalDocumentDate: '2026-07-05',
-      publishedByDisplayName: 'Local WP-5 Rehearsal Publisher',
+      physicalArchiveReference: 'archive/catalog/2568.1.0',
       reason: 'WP-5 local-only publish',
     }), REQUEST_ID)).toMatchObject({
       status: 'error',
-      message: 'effective date ต้องอยู่ในรูป YYYY-MM-DD',
+      message: 'วันที่มีผล ต้องอยู่ในรูป YYYY-MM-DD',
     });
 
     expect(buildRestoreCatalogPointerArgs(form({
@@ -108,18 +112,15 @@ describe('Master Catalog admin action model', () => {
       reason: 'WP-5 local-only pointer restore',
     }), REQUEST_ID)).toMatchObject({
       status: 'error',
-      message: 'target version id ไม่ถูกต้อง',
+      message: 'รหัสเวอร์ชันเป้าหมายไม่ถูกต้อง',
     });
   });
 
   it('builds grouped add and recode payloads for WP-4 draft mutations', () => {
     const addArgs = buildManualCatalogChangeArgs(baseForm({
       action: 'add',
-      canonicalCode: 'SMK-ADD-001',
-      workContextCode: 'SMK',
-      workContextNameTh: 'กลุ่มงานทดสอบ smoke',
-      itemTypeCode: 'ADD',
-      itemTypeNameTh: 'งานเพิ่ม smoke',
+      categoryId: CATEGORY_ID,
+      codeGroupId: GROUP_ID,
       itemName: 'รายการเพิ่มใหม่',
       unit: 'รายการ',
       materialCost: '10.00',
@@ -134,9 +135,8 @@ describe('Master Catalog admin action model', () => {
         changes: [{
           action: 'add',
           identityOutcome: 'candidate_add',
-          canonicalCode: 'SMK-ADD-001',
-          workContextNameTh: 'กลุ่มงานทดสอบ smoke',
-          itemTypeNameTh: 'งานเพิ่ม smoke',
+          categoryId: CATEGORY_ID,
+          codeGroupId: GROUP_ID,
           unitCost: '15.00',
         }],
       },
@@ -144,21 +144,18 @@ describe('Master Catalog admin action model', () => {
 
     const recodeArgs = buildManualCatalogChangeArgs(baseForm({
       action: 'recode',
-      canonicalCode: 'SMK-RCD-001',
-      categoryCode: 'SMOKE',
-      workContextCode: 'SMK',
-      workContextNameTh: 'กลุ่มงานทดสอบ smoke',
-      itemTypeCode: 'RCD',
-      itemTypeNameTh: 'งานเปลี่ยนรหัส smoke',
+      categoryId: CATEGORY_ID,
+      codeGroupId: GROUP_ID,
     }), REQUEST_ID);
 
     expect(recodeArgs).toMatchObject({
       p_change_payload: {
         changes: [{
           action: 'recode',
-          legacyItemCode: 'ITEM-0001',
-          canonicalCode: 'SMK-RCD-001',
-          categoryCode: 'SMOKE',
+          targetIdentityId: IDENTITY_ID,
+          targetItemCode: 'ITEM-0001',
+          categoryId: CATEGORY_ID,
+          codeGroupId: GROUP_ID,
           identityOutcome: 'recode',
         }],
       },
@@ -171,25 +168,20 @@ describe('Master Catalog admin action model', () => {
 
     expect(buildManualCatalogChangeArgs(baseForm({
       action: 'update',
-      priceAuthorityReference: 'local-authority',
     }), REQUEST_ID)).toMatchObject({
       status: 'error',
-      message: 'update ต้องมีอย่างน้อยหนึ่ง field ที่ต้องการเปลี่ยน',
+      message: 'หมวดงาน ต้องไม่ว่าง',
     });
 
     expect(buildManualCatalogChangeArgs(baseForm({
       action: 'add',
-      canonicalCode: 'SMK-ADD-001',
-      workContextCode: 'SMK',
-      workContextNameTh: 'กลุ่มงานทดสอบ smoke',
-      itemTypeCode: 'ADD',
-      itemTypeNameTh: 'งานเพิ่ม smoke',
+      categoryId: CATEGORY_ID,
+      codeGroupId: GROUP_ID,
       itemName: 'รายการเพิ่มใหม่',
       unit: 'รายการ',
       materialCost: '10',
       laborCost: '5.00',
       unitCost: '15.00',
-      categoryCode: 'SMOKE',
       priceAuthorityReference: 'local-price-authority',
     }), REQUEST_ID)).toMatchObject({
       status: 'error',
@@ -198,14 +190,11 @@ describe('Master Catalog admin action model', () => {
 
     expect(buildManualCatalogChangeArgs(baseForm({
       action: 'recode',
-      canonicalCode: 'SMK-RCD-900',
-      workContextCode: 'SMK',
-      workContextNameTh: 'กลุ่มงานทดสอบ smoke',
-      itemTypeCode: 'RCD',
-      itemTypeNameTh: 'งานเปลี่ยนรหัส smoke',
+      categoryId: CATEGORY_ID,
+      codeGroupId: 'not-a-uuid',
     }), REQUEST_ID)).toMatchObject({
       status: 'error',
-      code: 'CATALOG_CODE_CAPACITY_REVIEW_REQUIRED',
+      message: 'กลุ่มรหัส ไม่ถูกต้อง',
     });
   });
 
@@ -235,7 +224,7 @@ describe('Master Catalog admin action model', () => {
     }, 'unused')).toMatchObject({
       status: 'error',
       code: 'DRAFT_LOCK_CONFLICT',
-      message: 'Draft lock version is stale',
+      message: 'ฉบับร่างถูกเปลี่ยนแปลงหลังเปิดหน้าจอนี้ กรุณาโหลดข้อมูลล่าสุดแล้วตรวจอีกครั้ง',
     });
 
     expect(mapCatalogRpcActionResponse({
@@ -247,7 +236,7 @@ describe('Master Catalog admin action model', () => {
     }, 'unused')).toMatchObject({
       status: 'error',
       code: 'PUBLICATION_METADATA_REQUIRED',
-      message: 'Publication metadata is required',
+      message: 'กรุณาระบุข้อมูลเอกสารอนุมัติและที่เก็บไฟล์ให้ครบ',
     });
 
     expect(mapCatalogRpcActionResponse({
@@ -271,7 +260,7 @@ describe('Master Catalog admin action model', () => {
     }, 'unused')).toMatchObject({
       status: 'error',
       code: 'VERSION_NOT_RESTORABLE',
-      message: 'Target catalog version must be active and published',
+      message: 'เวอร์ชันนี้ไม่เข้าเงื่อนไขสำหรับนำกลับมาใช้งาน',
     });
   });
 

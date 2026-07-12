@@ -77,6 +77,7 @@ describe('Master Catalog migration contracts', () => {
     expect(bootstrap).toContain('psql -v ON_ERROR_STOP=1 -U postgres -d postgres -f /tmp/017.sql')
     expect(bootstrap).toContain('psql -v ON_ERROR_STOP=1 -U postgres -d postgres -f /tmp/018.sql')
     expect(bootstrap).toContain('psql -v ON_ERROR_STOP=1 -U postgres -d postgres -f /tmp/019.sql')
+    expect(bootstrap).not.toContain('-f /tmp/020.sql')
     expect(bootstrap).toContain("'factor_f_default_version'")
     expect(bootstrap).toContain("'factor_f_2569_row_count'")
     expect(bootstrap).toContain("'factor_f_partial_legacy_snapshots_remaining'")
@@ -324,6 +325,88 @@ describe('Master Catalog migration contracts', () => {
     expect(sql).toContain('TO authenticated')
 
     expect(sql).not.toContain('CATALOG_RPC_NOT_IMPLEMENTED')
+    expect(sql).not.toContain("'catalog_admin_enabled',\n    'true'::jsonb")
+    expect(sql).not.toContain('ALTER TABLE public.boq')
+    expect(sql).not.toMatch(/\b(?:UPDATE|INSERT INTO|DELETE FROM)\s+public\.boq\b/i)
+    expect(sql).not.toMatch(/\b(?:UPDATE|INSERT INTO|DELETE FROM)\s+public\.factor_/i)
+    expect(sql).not.toContain('SET factor_reference_version_id')
+  })
+
+  it('hardens the complete WP-6.6 admin workflow without widening Production scope', () => {
+    const sql = readMigration('020_master_catalog_phase4_admin_workflow_hardening.sql')
+
+    expect(sql).toContain('Migration 020: Master Catalog Phase 4 Admin Workflow Hardening')
+    expect(sql).toContain('28675e6244c65d485dda7142634b381db729a139bccdf189ad51563251a2e12a')
+    expect(sql).toContain("IF v_mapping_count <> 710 OR v_group_count <> 65 OR v_exclusion_count <> 17")
+    expect(sql).toContain('CREATE TABLE IF NOT EXISTS public.catalog_code_group_dictionary')
+    expect(sql).toContain('CREATE TABLE IF NOT EXISTS public.catalog_first_rollout_mappings')
+    expect(sql).toContain('CREATE TABLE IF NOT EXISTS private.catalog_code_sequences')
+    expect(sql).toContain('ALTER TABLE public.catalog_first_rollout_mappings ENABLE ROW LEVEL SECURITY')
+    expect(sql).toContain("'catalog_new_identity_enabled',\n      'false'::jsonb")
+    expect(sql).toContain("'catalog_retirement_enabled',\n      'false'::jsonb")
+    expect(sql).toContain('CREATE OR REPLACE FUNCTION private.catalog_capability_enabled')
+
+    expect(sql).toContain('CREATE OR REPLACE FUNCTION private.catalog_resolve_category')
+    expect(sql).toContain('CREATE OR REPLACE FUNCTION private.catalog_resolve_code_group')
+    expect(sql).toContain('CREATE OR REPLACE FUNCTION private.catalog_allocate_code')
+    expect(sql).toContain('FROM private.catalog_code_sequences code_sequence')
+    expect(sql).toContain('FOR UPDATE;')
+    expect(sql).toContain('v_next_sequence >= 900')
+    expect(sql).toContain('CATALOG_CODE_SERVER_ALLOCATION_REQUIRED')
+    expect(sql).toContain('Explicit recode is allowed only for the frozen first-rollout mapping')
+    expect(sql).toContain("private.catalog_capability_enabled('catalog_new_identity_enabled')")
+    expect(sql).toContain("private.catalog_capability_enabled('catalog_retirement_enabled')")
+    expect(sql).toContain('CATALOG_NEW_IDENTITY_DISABLED')
+    expect(sql).toContain('CATALOG_RETIREMENT_DISABLED')
+
+    expect(sql).toContain("'reactivate',")
+    expect(sql).toContain("'withdraw',")
+    expect(sql).toContain("ELSIF v_action = 'reactivate' THEN")
+    expect(sql).toContain("ELSIF v_action = 'withdraw' THEN")
+    expect(sql).toContain('Only a never-published identity created in this draft can be withdrawn')
+    expect(sql).toContain("(action = 'withdraw' AND old_values IS NOT NULL AND new_values IS NULL)")
+    expect(sql).toContain("action = 'retire'")
+    expect(sql).toContain("new_values->>'isActive' = 'false'")
+    expect(sql).toContain("(action IN ('update', 'recode', 'reactivate')")
+    expect(sql).toContain('DELETE FROM public.price_list')
+    expect(sql).not.toContain('DELETE FROM public.catalog_item_identities')
+    expect(sql).not.toContain('DELETE FROM public.catalog_item_codes')
+
+    const rowValidation = sql.indexOf('FOR v_row IN SELECT value FROM jsonb_array_elements(v_rows)')
+    const validatedInsert = sql.indexOf('INSERT INTO public.catalog_imports', rowValidation)
+    expect(rowValidation).toBeGreaterThan(-1)
+    expect(validatedInsert).toBeGreaterThan(rowValidation)
+    expect(sql).toContain("v_payload_schema NOT IN ('catalog-import-payload/1', 'catalog-import-payload/2')")
+    expect(sql).toContain('price_authority_reference text')
+
+    expect(sql).toContain("'baseIsCurrent', v_base_is_current")
+    expect(sql).toContain("'qualityPassed', v_quality_passed")
+    expect(sql).toContain("v_dataset := v_readiness->'dataset'")
+    expect(sql).toContain('published_by = v_actor_id')
+    expect(sql).toContain('published_by_display_name = v_actor_display_name')
+    expect(sql).toContain('physical_archive_reference = v_physical_archive_reference')
+    expect(sql).toContain('private.catalog_parse_iso_date')
+    expect(sql).not.toContain("p_approval_metadata->>'publishedByDisplayName'")
+
+    for (const rpc of [
+      'get_catalog_versions_page',
+      'get_catalog_imports_page',
+      'get_catalog_change_sets_page',
+      'get_catalog_identity_history_page',
+    ]) {
+      expect(sql).toContain(`CREATE OR REPLACE FUNCTION public.${rpc}`)
+    }
+    expect(sql.match(/SECURITY INVOKER/g)?.length).toBeGreaterThanOrEqual(4)
+    expect(sql).toContain('CREATE INDEX IF NOT EXISTS idx_price_list_versions_created_id')
+    expect(sql).toContain('ADD CONSTRAINT uq_price_list_version_display_order')
+    expect(sql).toContain('ADD CONSTRAINT uq_catalog_change_items_set_identity')
+    expect(sql).toContain('duplicate change-set/identity audit entries exist')
+    expect(sql).toContain('ALTER COLUMN identity_id SET NOT NULL')
+    expect(sql).toContain('published derived versions need an audited physical archive reference or a clean Local rebuild')
+    expect(sql).toContain('frozen authority admin-select policies are incomplete')
+    expect(sql).toContain("AND value = 'false'::jsonb")
+    expect(sql).toContain('catalog capability flags are missing or not disabled')
+
     expect(sql).not.toContain("'catalog_admin_enabled',\n    'true'::jsonb")
     expect(sql).not.toContain('ALTER TABLE public.boq')
     expect(sql).not.toMatch(/\b(?:UPDATE|INSERT INTO|DELETE FROM)\s+public\.boq\b/i)

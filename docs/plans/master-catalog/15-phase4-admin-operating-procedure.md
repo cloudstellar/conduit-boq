@@ -1,8 +1,9 @@
 # Master Catalog Phase 4 Admin Operating Procedure
 
-**Status:** Target procedure pending WP-6.6 implementation, P-18/P-19 where
-applicable, and intended-admin WP-8 UAT. The current Local UI must not be treated
-as procedure-complete until those gates pass.
+**Status:** Procedure aligned to the WP-6.6 implementation candidate after its
+repository/static checkpoint; Local DB/browser evidence, P-18/P-19 where
+applicable, and intended-admin WP-8 UAT remain pending. The current Local UI
+must not be treated as procedure-complete until those gates pass.
 **Audience:** Active Master Catalog administrators
 **Rule:** A draft is not official; published versions are immutable
 

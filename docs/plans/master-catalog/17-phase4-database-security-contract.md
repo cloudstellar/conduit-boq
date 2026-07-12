@@ -8,9 +8,11 @@ migration approval remain separate gates
 
 **Last updated:** 2026-07-12 to record the WP-6.6 capability/authority hardening
 from [Audit #29](./29-phase4-owner-dev-completeness-audit.md) and the proposed
-P-18/WP-7.5 placement extension. Existing `017`-`019` remain the implemented
-Local contract; WP-6.6 migration `020` is planned, while P-18 rules and
-placement migration `021` remain pending owner/data-custodian approval
+P-18/WP-7.5 placement extension. Existing `017`-`019` remain the reviewed
+Local/bootstrap contract; P-21-authorized WP-6.6 migration `020` passed its
+repository/static checkpoint but remains unapplied and outside bootstrap, while
+P-18 rules and placement migration `021` remain pending owner/data-custodian
+approval
 
 **Owner decision recorded:** 2026-07-04 — approved according to the
 recommendation as the technical backbone for Phase 4A and every Phase 4 write
@@ -629,7 +631,10 @@ secret values, raw workbook cells, or internal policy details.
 
 ### Draft mutation/import apply
 
-1. Authorize and claim request ID.
+1. Authorize and claim request ID. Enforce default-false
+   `catalog_new_identity_enabled` for `add` and
+   `catalog_retirement_enabled` for explicit/full-omission retirement effects;
+   these are release/RPC gates, not substitutes for P-18/P-19 decisions.
 2. Lock draft version.
 3. Compare expected and stored `lock_version`.
 4. Lock affected identity/code rows in ascending identity/code order.

@@ -15,7 +15,7 @@ export function MasterCatalogRouteStateShell({
             <Button variant="ghost" size="sm" asChild>
               <Link href="/admin">
                 <ArrowLeft data-icon="inline-start" />
-                Admin
+                ผู้ดูแลระบบ
               </Link>
             </Button>
             <div className="h-8 border-l border-border" />
@@ -23,7 +23,7 @@ export function MasterCatalogRouteStateShell({
               <h1 className="text-lg font-semibold leading-tight text-foreground sm:text-xl">
                 Master Catalog
               </h1>
-              <p className="text-xs text-muted-foreground">NT price catalog administration</p>
+              <p className="text-xs text-muted-foreground">ระบบบริหารบัญชีราคามาตรฐานของ NT</p>
             </div>
           </div>
           <div className="h-1 rounded-full bg-nt-yellow" />

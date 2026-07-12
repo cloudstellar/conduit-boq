@@ -111,7 +111,7 @@ checkpoint.
 | P-19 PDF policy สำหรับรายการยกเลิกใช้ | ถ้า version ใดมี inactive/retired rows ต้องตัดสินใจว่าจะ exclude/mark/appendix ก่อน filed PDF |
 | P-20 canonical hash portability | Owner approved deterministic baseline identity จาก Production-derived `price_list.id`; independent two-rebuild proof ผ่านแล้ว และต้อง rerun หลัง migration change รวมถึง WP-8/P-15 |
 | WP-6.6 capability completeness | Audit #29 พบ release blockers ด้าน full browse/history, draft selection, dictionary/code allocator, import diff/evidence, publication provenance/readiness, correction path, schema และภาษา; ต้องปิดก่อน WP-7/WP-8 หรือซ่อน capability ที่ยังไม่รองรับ |
-| P-21 อนุมัติเริ่ม WP-6.6 Local-only | ตอนนี้อนุมัติเฉพาะการแก้แผน/เอกสาร; ต้องอนุมัติ P-21 ก่อนแก้ code หรือสร้าง migration `020`; การ reset Local ขอแยกอีกครั้ง |
+| P-21 อนุมัติเริ่ม WP-6.6 Local-only | Owner อนุมัติ Audit #29 C-01 ถึง C-12 / slices A-G แล้ว; migration `020` และ app ผ่าน static checkpoint แต่ยังไม่อนุมัติ reset/apply Local, P-18/`021`, WP-7 หรือ Production |
 | Version lifecycle ตาม ADR-003 | Reusable action/RPC path ไม่ hardcode `2568.1.0`; live additional version และ duplicate/backward/mixed negatives ผ่านใน WP-6.5 แล้ว และต้อง rerun ที่ WP-8/P-14 |
 | Live Production preflight หลัง Factor F rollout | ต้อง refresh ก่อนทุก Production gate; ห้ามใช้ BOQ count จาก closeout เป็นค่าตายตัว |
 

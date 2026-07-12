@@ -9,6 +9,11 @@ export type CatalogErrorCode =
   | 'IMPORT_PRICE_AUTHORITY_REQUIRED'
   | 'IMPORT_RECONCILIATION_REQUIRED'
   | 'IMPORT_RETIREMENT_APPROVAL_REQUIRED'
+  | 'CATALOG_AUTHORITY_NOT_FOUND'
+  | 'CATALOG_CODE_SERVER_ALLOCATION_REQUIRED'
+  | 'CATALOG_WITHDRAW_NOT_ALLOWED'
+  | 'CATALOG_NEW_IDENTITY_DISABLED'
+  | 'CATALOG_RETIREMENT_DISABLED'
   | 'CATALOG_CODE_CAPACITY_REVIEW_REQUIRED'
   | 'DRAFT_NOT_FOUND'
   | 'DRAFT_NOT_EDITABLE'
@@ -103,6 +108,33 @@ export interface NormalizedCatalogRowCandidate {
   categoryCode: string
   identityOutcome: CatalogImportIdentityOutcome
   priceAuthorityReference: string | null
+  sourceItemCode?: string
+  targetIdentityId?: string | null
+  categoryId?: string
+  codeGroupId?: string | null
+}
+
+export interface NormalizedCatalogImportRowV2 {
+  sourceRow: number
+  sourceReference: string
+  sourceItemCode: string
+  legacyItemCode: string | null
+  targetIdentityId: string | null
+  targetItemCode: string | null
+  workContextCode: string
+  workContextNameTh: string
+  itemTypeCode: string
+  itemTypeNameTh: string
+  itemName: string
+  unit: string
+  materialCost: string
+  laborCost: string
+  unitCost: string
+  categoryId: string
+  categoryCode: string
+  codeGroupId: string | null
+  identityOutcome: CatalogImportIdentityOutcome
+  priceAuthorityReference: string | null
 }
 
 export interface CatalogImportPayloadV1 {
@@ -130,12 +162,42 @@ export interface CatalogImportApplyPayloadV1 extends CatalogImportPayloadV1 {
   applyRequestId: string
 }
 
+export interface CatalogImportPayloadV2 {
+  schemaVersion: 'catalog-import-payload/2'
+  parserProfileId: 'nt-item-master-2568'
+  parserProfileVersion: '1'
+  mode: 'full' | 'supplement'
+  versionId: string
+  expectedLockVersion: number
+  requestId: string
+  reason: string
+  source: CatalogImportPayloadV1['source']
+  priceAuthorityReference: string | null
+  retirementApprovalReference: string | null
+  retirementConfirmedCount: number | null
+  rows: NormalizedCatalogImportRowV2[]
+}
+
+export type CatalogImportPayload = CatalogImportPayloadV1 | CatalogImportPayloadV2
+
+export interface CatalogImportAuthoritativeRow extends NormalizedCatalogRowCandidate {
+  sourceItemCode: string
+  targetIdentityId: string
+  categoryId: string
+  codeGroupId: string | null
+}
+
 export interface ParseContext {
   legacyItemCodeByCanonicalCode?: Readonly<Record<string, string>>
   categoryCodeByCanonicalCode?: Readonly<Record<string, string>>
   categoryCodeByGroup?: Readonly<Record<string, string>>
   identityOutcomeByCanonicalCode?: Readonly<Record<string, CatalogImportIdentityOutcome>>
   priceAuthorityReferenceByCanonicalCode?: Readonly<Record<string, string>>
+  authoritativeRowBySourceCode?: Readonly<Record<string, CatalogImportAuthoritativeRow>>
+  sourceExclusionCodes?: readonly string[]
+  supplementalRows?: readonly CatalogImportAuthoritativeRow[]
+  categoryIdByCode?: Readonly<Record<string, string>>
+  codeGroupIdByGroup?: Readonly<Record<string, string>>
 }
 
 export interface CatalogParserProfile {

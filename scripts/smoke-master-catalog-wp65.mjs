@@ -27,6 +27,7 @@ const approvalMetadata = {
   effectiveDate: '2026-07-11',
   approvalReference: 'LOCAL-WP65-REHEARSAL-ONLY-NOT-PRODUCTION',
   approvalDocumentDate: '2026-07-11',
+  physicalArchiveReference: 'local/master-catalog/wp65/rehearsal-only',
   publishedByDisplayName: 'Local WP-6.5 Rehearsal',
 }
 

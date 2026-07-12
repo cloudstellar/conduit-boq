@@ -228,7 +228,7 @@ Database objects to implement from the architecture/DB contract:
 | Draft/import/audit | import batch metadata, bounded source fingerprints, draft diff, append-only audit |
 | Pointer | singleton current pointer plus legacy `is_default` mirror until removal |
 | RPC/functions | draft create/update/import/apply/publish/restore/history/export lookup |
-| Feature flag | `catalog_admin_enabled` JSON boolean default `false` |
+| Feature flags | `catalog_admin_enabled`, `catalog_new_identity_enabled`, and `catalog_retirement_enabled` JSON booleans default `false`; the latter two keep P-18/P-19-affected controls hidden and RPC effects denied until their gates pass |
 
 Minimum local DB tests:
 
@@ -638,13 +638,15 @@ Run order:
     validation errors.
 13. Measure agreed 710-row import preview, publish-readiness, export, and admin
     interaction baselines; investigate material regression.
-14. Run `npm test`.
-15. Run `npm run lint`.
-16. Run `npm run build`.
-17. Run `npm run audit:prod` under the accepted vulnerability policy.
-18. Run security/performance advisors or MCP equivalents.
-19. Run documentation/authority consistency verification.
-20. Fill Verification Report with evidence references.
+14. Run `npm run catalog:authority:check` and verify the reviewed authority
+    counts/fingerprint before any migration evidence is accepted.
+15. Run `npm test`.
+16. Run `npm run lint`.
+17. Run `npm run build`.
+18. Run `npm run audit:prod` under the accepted vulnerability policy.
+19. Run security/performance advisors or MCP equivalents.
+20. Run documentation/authority consistency verification.
+21. Fill Verification Report with evidence references.
 
 Exit gate:
 

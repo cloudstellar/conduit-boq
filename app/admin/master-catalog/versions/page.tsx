@@ -2,7 +2,7 @@ import { redirect } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
 import {
   loadCatalogAdminGate,
-  loadCatalogAdminOverview,
+  loadCatalogVersionsRegisterPage,
 } from '@/lib/master-catalog/admin/readModel';
 import {
   MasterCatalogGateView,
@@ -11,7 +11,22 @@ import {
 
 export const dynamic = 'force-dynamic';
 
-export default async function MasterCatalogVersionsPage() {
+const UUID_PATTERN =
+  /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+
+export default async function MasterCatalogVersionsPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ before?: string; beforeId?: string }>;
+}) {
+  const query = await searchParams;
+  const cursor =
+    query.before
+    && query.beforeId
+    && UUID_PATTERN.test(query.beforeId)
+    && Number.isFinite(Date.parse(query.before))
+      ? { createdAt: query.before, id: query.beforeId }
+      : undefined;
   const supabase = await createClient();
   const gate = await loadCatalogAdminGate(supabase);
 
@@ -23,6 +38,6 @@ export default async function MasterCatalogVersionsPage() {
     return <MasterCatalogGateView gate={gate} activeSection="versions" />;
   }
 
-  const overview = await loadCatalogAdminOverview(supabase);
-  return <MasterCatalogVersionsView gate={gate} overview={overview} />;
+  const page = await loadCatalogVersionsRegisterPage(supabase, cursor);
+  return <MasterCatalogVersionsView gate={gate} page={page} />;
 }

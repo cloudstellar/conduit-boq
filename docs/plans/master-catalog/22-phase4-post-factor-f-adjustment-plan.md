@@ -17,8 +17,10 @@ publication.
 **Capability-completeness amendment:** 2026-07-12 — the Factor F boundary and
 no-redesign conclusion remain valid, but Audit #29 found additional Master
 Catalog operator/authority work. WP-6.6 now precedes WP-7, migration `020` is
-reserved for that hardening, and proposed placement uses WP-7.5/`021`. This is
-documentation alignment only; no reset or Production action is authorized.
+reserved for that hardening, and proposed placement uses WP-7.5/`021`. P-21
+later authorized WP-6.6 Local-only implementation; migration `020` passed its
+static checkpoint but remains unapplied and outside bootstrap. No Local
+reset/apply or Production action is authorized.
 
 ## 1. Difficulty assessment
 

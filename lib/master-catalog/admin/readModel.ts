@@ -1,6 +1,16 @@
 import type { SupabaseClient } from '@supabase/supabase-js';
 import type { UserRole } from '@/lib/types/auth';
+import {
+  loadCatalogVersionWorkspace,
+  type CatalogCategoryOption,
+  type CatalogCodeGroupOption,
+  type CatalogWorkspaceItem,
+} from './catalogWorkspace';
 import { isCatalogAdminEnabled } from './flags';
+import {
+  loadCatalogCapabilityFlags,
+  type CatalogCapabilityFlags,
+} from './capabilities';
 
 export { isCatalogAdminEnabled } from './flags';
 
@@ -34,6 +44,7 @@ export interface CatalogVersionSummary {
   effectiveDate: string | null;
   approvalReference: string | null;
   approvalDocumentDate: string | null;
+  physicalArchiveReference: string | null;
   publishedAt: string | null;
   publishedByDisplayName: string | null;
   datasetHash: string | null;
@@ -52,8 +63,10 @@ export interface CatalogImportSummary {
   sourceFilename: string;
   sourceFileSize: number;
   sourceFileSha256: string;
+  physicalArchiveReference: string | null;
   normalizedPayloadHash: string;
   status: CatalogImportStatus;
+  errorSummary: string | null;
   createdAt: string;
   appliedAt: string | null;
 }
@@ -70,19 +83,6 @@ export interface CatalogChangeSetSummary {
   createdAt: string;
 }
 
-export interface CatalogVersionItemPreview {
-  id: string;
-  itemCode: string;
-  itemName: string;
-  unit: string;
-  materialCost: number;
-  laborCost: number;
-  unitCost: number;
-  category: string | null;
-  isActive: boolean;
-  displayOrder: number | null;
-}
-
 export interface FactorFDefaultSummary {
   versionId: string | null;
   versionString: string | null;
@@ -93,12 +93,22 @@ export interface CatalogPublishReadiness {
   versionFound: boolean;
   versionStatus: CatalogVersionStatus | null;
   basedOnVersionId: string | null;
+  currentVersionId: string | null;
+  baseIsCurrent: boolean;
   newIdentityCount: number;
   activeCanonicalCodeCount: number;
   structuredCodeGuardApplies: boolean;
   unapprovedLegacyActiveCount: number;
   inactiveRowCount: number;
   retiredPdfPolicyRequired: boolean;
+  qualityPassed: boolean;
+  dataset: {
+    itemCount: number;
+    activeItemCount: number;
+    inactiveItemCount: number;
+    datasetHash: string | null;
+    quality: Record<string, number>;
+  } | null;
   canPublish: boolean;
 }
 
@@ -107,6 +117,7 @@ export interface CatalogAdminOverview {
   draftPublishReadiness: CatalogPublishReadiness | null;
   factorFDefault: FactorFDefaultSummary;
   versions: CatalogVersionSummary[];
+  drafts: CatalogVersionSummary[];
   recentImports: CatalogImportSummary[];
   recentChangeSets: CatalogChangeSetSummary[];
   counts: {
@@ -117,19 +128,6 @@ export interface CatalogAdminOverview {
     codeGroups: number | null;
   };
   warnings: string[];
-}
-
-export function selectWorkingCatalogDraft(
-  versions: CatalogVersionSummary[],
-  currentVersionId: string | null,
-): CatalogVersionSummary | null {
-  if (!currentVersionId) return null;
-
-  return versions.find(
-    (version) =>
-      version.status === 'draft'
-      && version.basedOnVersionId === currentVersionId,
-  ) ?? null;
 }
 
 export interface CatalogVersionDetail {
@@ -143,9 +141,26 @@ export interface CatalogVersionDetail {
     imports: number | null;
     changeSets: number | null;
   };
-  items: CatalogVersionItemPreview[];
+  items: CatalogWorkspaceItem[];
+  categories: CatalogCategoryOption[];
+  codeGroups: CatalogCodeGroupOption[];
+  currentVersionId: string | null;
+  isStaleDraft: boolean;
+  publishReadiness: CatalogPublishReadiness | null;
+  capabilities: CatalogCapabilityFlags;
   imports: CatalogImportSummary[];
   changeSets: CatalogChangeSetSummary[];
+  warnings: string[];
+}
+
+export interface CatalogPageCursor {
+  createdAt: string;
+  id: string;
+}
+
+export interface CatalogRegisterPage<T> {
+  rows: T[];
+  nextCursor: CatalogPageCursor | null;
   warnings: string[];
 }
 
@@ -159,6 +174,7 @@ const VERSION_COLUMNS = [
   'effective_date',
   'approval_reference',
   'approval_document_date',
+  'physical_archive_reference',
   'published_at',
   'published_by_display_name',
   'dataset_hash',
@@ -177,8 +193,10 @@ const IMPORT_COLUMNS = [
   'source_filename',
   'source_file_size',
   'source_file_sha256',
+  'physical_archive_reference',
   'normalized_payload_hash',
   'status',
+  'error_summary',
   'created_at',
   'applied_at',
 ].join(',');
@@ -299,13 +317,19 @@ export async function loadCatalogAdminOverview(
 ): Promise<CatalogAdminOverview> {
   const warnings: string[] = [];
 
-  const [versionsResult, pointerResult, importsResult, changeSetsResult, factorFDefault] =
+  const [versionsResult, draftsResult, pointerResult, importsResult, changeSetsResult, factorFDefault] =
     await Promise.all([
       supabase
         .from('price_list_versions')
         .select(VERSION_COLUMNS)
         .order('created_at', { ascending: false })
         .limit(25),
+      supabase
+        .from('price_list_versions')
+        .select(VERSION_COLUMNS)
+        .eq('status', 'draft')
+        .order('created_at', { ascending: false })
+        .order('id', { ascending: false }),
       supabase
         .from('price_list_default_version')
         .select('version_id')
@@ -325,46 +349,42 @@ export async function loadCatalogAdminOverview(
     ]);
 
   pushError(warnings, versionsResult.error, 'โหลดรายการเวอร์ชันไม่สำเร็จ');
-  pushError(warnings, pointerResult.error, 'โหลด current default catalog ไม่สำเร็จ');
-  pushError(warnings, importsResult.error, 'โหลด import ล่าสุดไม่สำเร็จ');
-  pushError(warnings, changeSetsResult.error, 'โหลด history ล่าสุดไม่สำเร็จ');
+  pushError(warnings, draftsResult.error, 'โหลดฉบับร่างทั้งหมดไม่สำเร็จ');
+  pushError(warnings, pointerResult.error, 'โหลดเวอร์ชันบัญชีราคาที่ใช้งานปัจจุบันไม่สำเร็จ');
+  pushError(warnings, importsResult.error, 'โหลดการนำเข้าล่าสุดไม่สำเร็จ');
+  pushError(warnings, changeSetsResult.error, 'โหลดประวัติล่าสุดไม่สำเร็จ');
 
   const versions = rowsFromResult(versionsResult.data).map(mapVersionSummary);
   const defaultVersionId = pointerResult.data?.version_id ? String(pointerResult.data.version_id) : null;
   const defaultVersion =
     versions.find((version) => version.id === defaultVersionId) ??
     (defaultVersionId ? await loadCatalogVersionById(supabase, defaultVersionId, warnings) : null);
-  const draftVersion = selectWorkingCatalogDraft(versions, defaultVersion?.id ?? null);
-
   const [
     activeDefaultRows,
     identities,
     itemCodes,
     categories,
     codeGroups,
-    draftPublishReadiness,
   ] = await Promise.all([
     defaultVersion
-      ? countPriceListRows(supabase, defaultVersion.id, true, warnings, 'นับรายการ active ของ current default ไม่สำเร็จ')
+      ? countPriceListRows(supabase, defaultVersion.id, true, warnings, 'นับรายการใช้งานของเวอร์ชันปัจจุบันไม่สำเร็จ')
       : Promise.resolve(null),
-    countTable(supabase, 'catalog_item_identities', 'id', warnings, 'นับ identities ไม่สำเร็จ'),
-    countTable(supabase, 'catalog_item_codes', 'item_code', warnings, 'นับ item codes ไม่สำเร็จ'),
+    countTable(supabase, 'catalog_item_identities', 'id', warnings, 'นับตัวตนรายการไม่สำเร็จ'),
+    countTable(supabase, 'catalog_item_codes', 'item_code', warnings, 'นับรหัสรายการไม่สำเร็จ'),
     defaultVersion
-      ? countVersionedTable(supabase, 'price_list_categories', defaultVersion.id, warnings, 'นับ categories ไม่สำเร็จ')
+      ? countVersionedTable(supabase, 'price_list_categories', defaultVersion.id, warnings, 'นับหมวดงานไม่สำเร็จ')
       : Promise.resolve(null),
     defaultVersion
-      ? countVersionedTable(supabase, 'catalog_code_groups', defaultVersion.id, warnings, 'นับ code groups ไม่สำเร็จ')
-      : Promise.resolve(null),
-    draftVersion
-      ? loadCatalogPublishReadiness(supabase, draftVersion.id, warnings)
+      ? countVersionedTable(supabase, 'catalog_code_groups', defaultVersion.id, warnings, 'นับกลุ่มรหัสไม่สำเร็จ')
       : Promise.resolve(null),
   ]);
 
   return {
     defaultVersion,
-    draftPublishReadiness,
+    draftPublishReadiness: null,
     factorFDefault,
     versions,
+    drafts: rowsFromResult(draftsResult.data).map(mapVersionSummary),
     recentImports: rowsFromResult(importsResult.data).map(mapImportSummary),
     recentChangeSets: rowsFromResult(changeSetsResult.data).map(mapChangeSetSummary),
     counts: {
@@ -408,12 +428,16 @@ async function loadCatalogPublishReadiness(
         ? row.versionStatus
         : null,
     basedOnVersionId: toNullableString(row.basedOnVersionId),
+    currentVersionId: toNullableString(row.currentVersionId),
+    baseIsCurrent: row.baseIsCurrent === true,
     newIdentityCount: toNullableNumber(row.newIdentityCount) ?? 0,
     activeCanonicalCodeCount: toNullableNumber(row.activeCanonicalCodeCount) ?? 0,
     structuredCodeGuardApplies: row.structuredCodeGuardApplies === true,
     unapprovedLegacyActiveCount: toNullableNumber(row.unapprovedLegacyActiveCount) ?? 0,
     inactiveRowCount: toNullableNumber(row.inactiveRowCount) ?? 0,
     retiredPdfPolicyRequired: row.retiredPdfPolicyRequired === true,
+    qualityPassed: row.qualityPassed === true,
+    dataset: mapPublishDataset(row.dataset),
     canPublish: row.canPublish === true,
   };
 }
@@ -443,25 +467,32 @@ export async function loadCatalogVersionDetail(
     codeGroups,
     imports,
     changeSets,
-    itemPreview,
+    workspace,
+    pointerResult,
+    publishReadiness,
+    capabilityResult,
   ] = await Promise.all([
-    countPriceListRows(supabase, version.id, null, warnings, 'นับ rows ไม่สำเร็จ'),
-    countPriceListRows(supabase, version.id, true, warnings, 'นับ active rows ไม่สำเร็จ'),
-    countPriceListRows(supabase, version.id, false, warnings, 'นับ inactive rows ไม่สำเร็จ'),
-    countVersionedTable(supabase, 'price_list_categories', version.id, warnings, 'นับ categories ไม่สำเร็จ'),
-    countVersionedTable(supabase, 'catalog_code_groups', version.id, warnings, 'นับ code groups ไม่สำเร็จ'),
-    countVersionedTable(supabase, 'catalog_imports', version.id, warnings, 'นับ imports ไม่สำเร็จ'),
-    countVersionedTable(supabase, 'catalog_change_sets', version.id, warnings, 'นับ change sets ไม่สำเร็จ'),
+    countPriceListRows(supabase, version.id, null, warnings, 'นับรายการทั้งหมดไม่สำเร็จ'),
+    countPriceListRows(supabase, version.id, true, warnings, 'นับรายการใช้งานไม่สำเร็จ'),
+    countPriceListRows(supabase, version.id, false, warnings, 'นับรายการยกเลิกใช้ไม่สำเร็จ'),
+    countVersionedTable(supabase, 'price_list_categories', version.id, warnings, 'นับหมวดงานไม่สำเร็จ'),
+    countVersionedTable(supabase, 'catalog_code_groups', version.id, warnings, 'นับกลุ่มรหัสไม่สำเร็จ'),
+    countVersionedTable(supabase, 'catalog_imports', version.id, warnings, 'นับชุดการนำเข้าไม่สำเร็จ'),
+    countVersionedTable(supabase, 'catalog_change_sets', version.id, warnings, 'นับชุดการเปลี่ยนแปลงไม่สำเร็จ'),
+    loadCatalogVersionWorkspace(supabase, version.id),
     supabase
-      .from('price_list')
-      .select('id,item_code,item_name,unit,material_cost,labor_cost,unit_cost,category,is_active,display_order')
-      .eq('version_id', version.id)
-      .order('display_order', { ascending: true })
-      .order('item_code', { ascending: true })
-      .limit(20),
+      .from('price_list_default_version')
+      .select('version_id')
+      .eq('id', true)
+      .maybeSingle(),
+    version.status === 'draft'
+      ? loadCatalogPublishReadiness(supabase, version.id, warnings)
+      : Promise.resolve(null),
+    loadCatalogCapabilityFlags(supabase),
   ]);
-
-  pushError(warnings, itemPreview.error, 'โหลดตัวอย่างรายการราคาไม่สำเร็จ');
+  warnings.push(...workspace.warnings);
+  pushError(warnings, pointerResult.error, 'โหลดเวอร์ชันบัญชีราคาที่ใช้งานปัจจุบันไม่สำเร็จ');
+  if (capabilityResult.warning) warnings.push(capabilityResult.warning);
 
   const [importRows, changeRows] = await Promise.all([
     loadVersionImports(supabase, version.id, 12, warnings),
@@ -479,7 +510,15 @@ export async function loadCatalogVersionDetail(
       imports,
       changeSets,
     },
-    items: rowsFromResult(itemPreview.data).map(mapItemPreview),
+    items: workspace.items,
+    categories: workspace.categories,
+    codeGroups: workspace.codeGroups,
+    currentVersionId: toNullableString(pointerResult.data?.version_id),
+    isStaleDraft:
+      version.status === 'draft'
+      && version.basedOnVersionId !== toNullableString(pointerResult.data?.version_id),
+    publishReadiness,
+    capabilities: capabilityResult.flags,
     imports: importRows,
     changeSets: changeRows,
     warnings,
@@ -507,14 +546,141 @@ export async function loadCatalogAdminHistory(
       .limit(50),
   ]);
 
-  pushError(warnings, imports.error, 'โหลด import history ไม่สำเร็จ');
-  pushError(warnings, changeSets.error, 'โหลด change history ไม่สำเร็จ');
+  pushError(warnings, imports.error, 'โหลดประวัติการนำเข้าไม่สำเร็จ');
+  pushError(warnings, changeSets.error, 'โหลดประวัติการเปลี่ยนแปลงไม่สำเร็จ');
 
   return {
     imports: rowsFromResult(imports.data).map(mapImportSummary),
     changeSets: rowsFromResult(changeSets.data).map(mapChangeSetSummary),
     warnings,
   };
+}
+
+export async function loadCatalogVersionsRegisterPage(
+  supabase: SupabaseClient,
+  cursor?: CatalogPageCursor,
+): Promise<CatalogRegisterPage<CatalogVersionSummary>> {
+  const warnings: string[] = [];
+  const { data, error } = await supabase.rpc('get_catalog_versions_page', {
+    p_limit: 25,
+    p_before_created_at: cursor?.createdAt ?? null,
+    p_before_id: cursor?.id ?? null,
+  });
+
+  if (!error) {
+    const page = parseRegisterPage(data);
+    return {
+      rows: page.rows.map(mapVersionSummary),
+      nextCursor: page.nextCursor,
+      warnings,
+    };
+  }
+
+  if (!isMissingCatalogRpc(error)) {
+    return {
+      rows: [],
+      nextCursor: null,
+      warnings: ['โหลดทะเบียนเวอร์ชันแบบแบ่งหน้าไม่สำเร็จ'],
+    };
+  }
+
+  warnings.push('Local schema ยังไม่มี RPC ทะเบียนแบบแบ่งหน้า จึงใช้ทะเบียนแบบย่อชั่วคราว');
+  let query = supabase
+    .from('price_list_versions')
+    .select(VERSION_COLUMNS)
+    .order('created_at', { ascending: false })
+    .order('id', { ascending: false })
+    .limit(26);
+  if (cursor) {
+    query = query.or(
+      `created_at.lt.${cursor.createdAt},and(created_at.eq.${cursor.createdAt},id.lt.${cursor.id})`,
+    );
+  }
+  const fallback = await query;
+  pushError(warnings, fallback.error, 'โหลดทะเบียนเวอร์ชันไม่สำเร็จ');
+  return pageFromRows(rowsFromResult(fallback.data), mapVersionSummary, warnings);
+}
+
+export async function loadCatalogImportsRegisterPage(
+  supabase: SupabaseClient,
+  cursor?: CatalogPageCursor,
+): Promise<CatalogRegisterPage<CatalogImportSummary>> {
+  const warnings: string[] = [];
+  const { data, error } = await supabase.rpc('get_catalog_imports_page', {
+    p_version_id: null,
+    p_limit: 25,
+    p_before_created_at: cursor?.createdAt ?? null,
+    p_before_id: cursor?.id ?? null,
+  });
+  if (!error) {
+    const page = parseRegisterPage(data);
+    return { rows: page.rows.map(mapImportSummary), nextCursor: page.nextCursor, warnings };
+  }
+
+  if (!isMissingCatalogRpc(error)) {
+    return {
+      rows: [],
+      nextCursor: null,
+      warnings: ['โหลดทะเบียนนำเข้าแบบแบ่งหน้าไม่สำเร็จ'],
+    };
+  }
+
+  warnings.push('Local schema ยังไม่มี RPC ทะเบียนนำเข้าแบบแบ่งหน้า');
+  let query = supabase
+    .from('catalog_imports')
+    .select(IMPORT_COLUMNS)
+    .order('created_at', { ascending: false })
+    .order('id', { ascending: false })
+    .limit(26);
+  if (cursor) {
+    query = query.or(
+      `created_at.lt.${cursor.createdAt},and(created_at.eq.${cursor.createdAt},id.lt.${cursor.id})`,
+    );
+  }
+  const fallback = await query;
+  pushError(warnings, fallback.error, 'โหลดทะเบียนนำเข้าไม่สำเร็จ');
+  return pageFromRows(rowsFromResult(fallback.data), mapImportSummary, warnings);
+}
+
+export async function loadCatalogChangeSetsRegisterPage(
+  supabase: SupabaseClient,
+  cursor?: CatalogPageCursor,
+): Promise<CatalogRegisterPage<CatalogChangeSetSummary>> {
+  const warnings: string[] = [];
+  const { data, error } = await supabase.rpc('get_catalog_change_sets_page', {
+    p_version_id: null,
+    p_limit: 25,
+    p_before_created_at: cursor?.createdAt ?? null,
+    p_before_id: cursor?.id ?? null,
+  });
+  if (!error) {
+    const page = parseRegisterPage(data);
+    return { rows: page.rows.map(mapChangeSetSummary), nextCursor: page.nextCursor, warnings };
+  }
+
+  if (!isMissingCatalogRpc(error)) {
+    return {
+      rows: [],
+      nextCursor: null,
+      warnings: ['โหลดทะเบียนการเปลี่ยนแปลงแบบแบ่งหน้าไม่สำเร็จ'],
+    };
+  }
+
+  warnings.push('Local schema ยังไม่มี RPC ทะเบียนการเปลี่ยนแปลงแบบแบ่งหน้า');
+  let query = supabase
+    .from('catalog_change_sets')
+    .select(CHANGE_SET_COLUMNS)
+    .order('created_at', { ascending: false })
+    .order('id', { ascending: false })
+    .limit(26);
+  if (cursor) {
+    query = query.or(
+      `created_at.lt.${cursor.createdAt},and(created_at.eq.${cursor.createdAt},id.lt.${cursor.id})`,
+    );
+  }
+  const fallback = await query;
+  pushError(warnings, fallback.error, 'โหลดทะเบียนการเปลี่ยนแปลงไม่สำเร็จ');
+  return pageFromRows(rowsFromResult(fallback.data), mapChangeSetSummary, warnings);
 }
 
 async function loadCatalogVersionById(
@@ -527,7 +693,7 @@ async function loadCatalogVersionById(
     .select(VERSION_COLUMNS)
     .eq('id', versionId)
     .maybeSingle();
-  pushError(warnings, error, 'โหลด current default version ไม่สำเร็จ');
+  pushError(warnings, error, 'โหลดเวอร์ชันใช้งานปัจจุบันไม่สำเร็จ');
   const row = rowFromResult(data);
   return row ? mapVersionSummary(row) : null;
 }
@@ -544,7 +710,7 @@ async function loadVersionImports(
     .eq('version_id', versionId)
     .order('created_at', { ascending: false })
     .limit(limit);
-  pushError(warnings, error, 'โหลด import ของเวอร์ชันไม่สำเร็จ');
+  pushError(warnings, error, 'โหลดการนำเข้าของเวอร์ชันไม่สำเร็จ');
   return rowsFromResult(data).map(mapImportSummary);
 }
 
@@ -560,7 +726,7 @@ async function loadVersionChangeSets(
     .eq('version_id', versionId)
     .order('created_at', { ascending: false })
     .limit(limit);
-  pushError(warnings, error, 'โหลด change sets ของเวอร์ชันไม่สำเร็จ');
+  pushError(warnings, error, 'โหลดชุดการเปลี่ยนแปลงของเวอร์ชันไม่สำเร็จ');
   return rowsFromResult(data).map(mapChangeSetSummary);
 }
 
@@ -574,7 +740,7 @@ async function loadFactorFDefaultSummary(
     .eq('id', true)
     .maybeSingle();
 
-  pushError(warnings, pointerError, 'โหลด Factor F default pointer ไม่สำเร็จ');
+  pushError(warnings, pointerError, 'โหลดตัวชี้เวอร์ชัน Factor F ที่ใช้งานไม่สำเร็จ');
 
   if (pointerError || !pointer?.version_id) {
     return { versionId: null, versionString: null, status: null };
@@ -586,7 +752,7 @@ async function loadFactorFDefaultSummary(
     .eq('id', pointer.version_id)
     .maybeSingle();
 
-  pushError(warnings, versionError, 'โหลด Factor F default version ไม่สำเร็จ');
+  pushError(warnings, versionError, 'โหลดเวอร์ชัน Factor F ที่ใช้งานไม่สำเร็จ');
 
   return {
     versionId: String(pointer.version_id),
@@ -672,6 +838,7 @@ function mapVersionSummary(row: Record<string, unknown>): CatalogVersionSummary 
     effectiveDate: toNullableString(row.effective_date),
     approvalReference: toNullableString(row.approval_reference),
     approvalDocumentDate: toNullableString(row.approval_document_date),
+    physicalArchiveReference: toNullableString(row.physical_archive_reference),
     publishedAt: toNullableString(row.published_at),
     publishedByDisplayName: toNullableString(row.published_by_display_name),
     datasetHash: toNullableString(row.dataset_hash),
@@ -692,8 +859,10 @@ function mapImportSummary(row: Record<string, unknown>): CatalogImportSummary {
     sourceFilename: String(row.source_filename ?? ''),
     sourceFileSize: toNullableNumber(row.source_file_size) ?? 0,
     sourceFileSha256: String(row.source_file_sha256 ?? ''),
+    physicalArchiveReference: toNullableString(row.physical_archive_reference),
     normalizedPayloadHash: String(row.normalized_payload_hash ?? ''),
     status: (row.status ?? 'validated') as CatalogImportStatus,
+    errorSummary: toNullableString(row.error_summary),
     createdAt: String(row.created_at ?? ''),
     appliedAt: toNullableString(row.applied_at),
   };
@@ -713,21 +882,6 @@ function mapChangeSetSummary(row: Record<string, unknown>): CatalogChangeSetSumm
   };
 }
 
-function mapItemPreview(row: Record<string, unknown>): CatalogVersionItemPreview {
-  return {
-    id: String(row.id),
-    itemCode: String(row.item_code ?? ''),
-    itemName: String(row.item_name ?? ''),
-    unit: String(row.unit ?? ''),
-    materialCost: toNullableNumber(row.material_cost) ?? 0,
-    laborCost: toNullableNumber(row.labor_cost) ?? 0,
-    unitCost: toNullableNumber(row.unit_cost) ?? 0,
-    category: toNullableString(row.category),
-    isActive: Boolean(row.is_active),
-    displayOrder: toNullableNumber(row.display_order),
-  };
-}
-
 function toNullableString(value: unknown): string | null {
   if (value == null) return null;
   const text = String(value);
@@ -739,4 +893,62 @@ function toNullableNumber(value: unknown): number | null {
   if (typeof value === 'number') return value;
   const parsed = Number(value);
   return Number.isFinite(parsed) ? parsed : null;
+}
+
+function mapPublishDataset(value: unknown): CatalogPublishReadiness['dataset'] {
+  const row = rowFromResult(value);
+  if (!row) return null;
+
+  const qualityRow = rowFromResult(row.quality) ?? {};
+  const quality = Object.fromEntries(
+    Object.entries(qualityRow)
+      .map(([key, entry]) => [key, toNullableNumber(entry)])
+      .filter((entry): entry is [string, number] => entry[1] !== null),
+  );
+
+  return {
+    itemCount: toNullableNumber(row.itemCount) ?? 0,
+    activeItemCount: toNullableNumber(row.activeItemCount) ?? 0,
+    inactiveItemCount: toNullableNumber(row.inactiveItemCount) ?? 0,
+    datasetHash: toNullableString(row.datasetHash),
+    quality,
+  };
+}
+
+function parseRegisterPage(data: unknown): {
+  rows: Record<string, unknown>[];
+  nextCursor: CatalogPageCursor | null;
+} {
+  const page = rowFromResult(data);
+  const cursor = rowFromResult(page?.nextCursor);
+  return {
+    rows: rowsFromResult(page?.rows),
+    nextCursor: cursor
+      ? {
+          createdAt: String(cursor.createdAt ?? ''),
+          id: String(cursor.id ?? ''),
+        }
+      : null,
+  };
+}
+
+function pageFromRows<T>(
+  sourceRows: Record<string, unknown>[],
+  map: (row: Record<string, unknown>) => T,
+  warnings: string[],
+): CatalogRegisterPage<T> {
+  const visibleRows = sourceRows.slice(0, 25);
+  const last = visibleRows.at(-1);
+  return {
+    rows: visibleRows.map(map),
+    nextCursor: sourceRows.length > 25 && last
+      ? { createdAt: String(last.created_at ?? ''), id: String(last.id ?? '') }
+      : null,
+    warnings,
+  };
+}
+
+function isMissingCatalogRpc(error: { code?: string; message?: string } | null): boolean {
+  return error?.code === 'PGRST202'
+    || /could not find the function.*schema cache/i.test(error?.message ?? '');
 }

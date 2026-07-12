@@ -5,7 +5,7 @@ import {
   isCatalogAdminEnabled,
   loadCatalogAdminGate,
   loadCatalogAdminOverview,
-  selectWorkingCatalogDraft,
+  loadCatalogVersionsRegisterPage,
   shortHash,
 } from '../lib/master-catalog/admin/readModel';
 
@@ -94,6 +94,29 @@ function createOverviewClientWithFactorPointerError(): Parameters<typeof loadCat
   } as unknown as Parameters<typeof loadCatalogAdminOverview>[0];
 }
 
+function createRegisterClient(error: { code: string; message: string }) {
+  let fallbackReads = 0;
+  const result = { data: [], error: null };
+  const client = {
+    rpc: async () => ({ data: null, error }),
+    from: () => {
+      fallbackReads += 1;
+      const query = {
+        select: () => query,
+        order: () => query,
+        limit: () => query,
+        lt: () => query,
+        or: () => query,
+        then: (resolve: (value: typeof result) => unknown) =>
+          Promise.resolve(result).then(resolve),
+      };
+      return query;
+    },
+  } as unknown as Parameters<typeof loadCatalogVersionsRegisterPage>[0];
+
+  return { client, fallbackReads: () => fallbackReads };
+}
+
 describe('Master Catalog admin read model helpers', () => {
   it('requires the catalog_admin_enabled value to be JSON boolean true', () => {
     expect(isCatalogAdminEnabled(true)).toBe(true);
@@ -130,27 +153,6 @@ describe('Master Catalog admin read model helpers', () => {
     expect(formatThaiNumber(null)).toBe('-');
   });
 
-  it('selects only a draft based on the current catalog pointer', () => {
-    const version = (
-      id: string,
-      status: 'draft' | 'active',
-      basedOnVersionId: string | null,
-    ) => ({
-      id,
-      status,
-      basedOnVersionId,
-    }) as Parameters<typeof selectWorkingCatalogDraft>[0][number];
-    const versions = [
-      version('stale-draft', 'draft', 'old-default'),
-      version('current-draft', 'draft', 'current-default'),
-      version('current-default', 'active', 'old-default'),
-    ];
-
-    expect(selectWorkingCatalogDraft(versions, 'current-default')?.id)
-      .toBe('current-draft');
-    expect(selectWorkingCatalogDraft(versions, 'missing-default')).toBeNull();
-    expect(selectWorkingCatalogDraft(versions, null)).toBeNull();
-  });
 });
 
 describe('Master Catalog admin gate', () => {
@@ -236,6 +238,38 @@ describe('Master Catalog admin overview', () => {
       versionString: null,
       status: null,
     });
-    expect(overview.warnings).toContain('โหลด Factor F default pointer ไม่สำเร็จ');
+    expect(overview.warnings).toContain('โหลดตัวชี้เวอร์ชัน Factor F ที่ใช้งานไม่สำเร็จ');
+  });
+});
+
+describe('Master Catalog register fallback', () => {
+  it('uses the old-schema fallback only when the cursor RPC is missing', async () => {
+    const missing = createRegisterClient({
+      code: 'PGRST202',
+      message: 'Could not find the function public.get_catalog_versions_page in the schema cache',
+    });
+
+    const page = await loadCatalogVersionsRegisterPage(missing.client);
+
+    expect(missing.fallbackReads()).toBe(1);
+    expect(page.warnings).toContain(
+      'Local schema ยังไม่มี RPC ทะเบียนแบบแบ่งหน้า จึงใช้ทะเบียนแบบย่อชั่วคราว',
+    );
+  });
+
+  it('fails closed instead of masking an operational RPC error', async () => {
+    const unavailable = createRegisterClient({
+      code: '42501',
+      message: 'permission denied',
+    });
+
+    const page = await loadCatalogVersionsRegisterPage(unavailable.client);
+
+    expect(unavailable.fallbackReads()).toBe(0);
+    expect(page).toEqual({
+      rows: [],
+      nextCursor: null,
+      warnings: ['โหลดทะเบียนเวอร์ชันแบบแบ่งหน้าไม่สำเร็จ'],
+    });
   });
 });
