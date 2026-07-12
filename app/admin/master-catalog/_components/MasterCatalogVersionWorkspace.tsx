@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { useActionState, useEffect, useMemo, useState } from 'react';
+import { useActionState, useEffect, useId, useMemo, useState } from 'react';
 import { useFormStatus } from 'react-dom';
 import { CheckCircle2, ChevronLeft, ChevronRight, Loader2, Plus, Search } from 'lucide-react';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
@@ -26,6 +26,7 @@ import type {
   CatalogWorkspaceItem,
 } from '@/lib/master-catalog/admin/catalogWorkspace';
 import type { CatalogMutationState } from '@/lib/master-catalog/admin/actionModel';
+import { formatCatalogDictionaryLabel } from '@/lib/master-catalog/admin/presentation';
 import { applyCatalogManualChangeAction } from '../actions';
 import { useStableCatalogOperation } from './useStableCatalogOperation';
 
@@ -144,7 +145,7 @@ export function MasterCatalogVersionWorkspace({
                 { value: 'all', label: 'ทุกหมวด' },
                 ...categories.map((category) => ({
                   value: category.id,
-                  label: `${category.code} ${category.name}`,
+                  label: formatCatalogDictionaryLabel(category.code, category.name),
                 })),
               ]}
             />
@@ -356,7 +357,7 @@ function CatalogAddItemForm({
               onValueChange={setCategoryId}
               options={categories.map((category) => ({
                 value: category.id,
-                label: `${category.code} ${category.name}`,
+                label: formatCatalogDictionaryLabel(category.code, category.name),
               }))}
             />
             <div className="md:col-span-2">
@@ -414,11 +415,15 @@ function ControlledSelect({
   options: Array<{ value: string; label: string }>;
   hideLabel?: boolean;
 }) {
+  const triggerId = useId();
+
   return (
     <div className="grid gap-2">
-      {hideLabel ? null : <Label>{label}</Label>}
+      {hideLabel ? null : <Label htmlFor={triggerId}>{label}</Label>}
       <Select value={value} onValueChange={onValueChange}>
-        <SelectTrigger aria-label={label}><SelectValue placeholder={label} /></SelectTrigger>
+        <SelectTrigger id={triggerId} aria-label={label} className="w-full min-w-0">
+          <SelectValue placeholder={label} />
+        </SelectTrigger>
         <SelectContent>
           <SelectGroup>
             {options.map((option) => (

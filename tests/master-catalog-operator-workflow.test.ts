@@ -82,4 +82,34 @@ describe('Master Catalog P-22 operator workflow', () => {
     expect(itemEditor).toContain('safeItemReturnHref');
     expect(itemEditor).toContain('parsed.pathname !== `${fallback}/review`');
   });
+
+  it('keeps operator labels accessible and compact on narrow screens', () => {
+    const itemEditor = source(
+      'app/admin/master-catalog/_components/MasterCatalogItemEditor.tsx',
+    );
+    const workspace = source(
+      'app/admin/master-catalog/_components/MasterCatalogVersionWorkspace.tsx',
+    );
+
+    expect(itemEditor).toContain('id="edit-category"');
+    expect(itemEditor).toContain('id="recode-code-group"');
+    expect(itemEditor).toContain('<Label htmlFor={props.id}>{props.label}</Label>');
+    expect(itemEditor).toContain('id={props.id} className="w-full min-w-0"');
+    expect(workspace).toContain('<Label htmlFor={triggerId}>{label}</Label>');
+    expect(workspace).toContain('className="w-full min-w-0"');
+  });
+
+  it('shows the composed draft version and Thai clone history label', () => {
+    const panel = source(
+      'app/admin/master-catalog/_components/MasterCatalogMutationPanel.tsx',
+    );
+    const views = source(
+      'app/admin/master-catalog/_components/MasterCatalogAdminViews.tsx',
+    );
+
+    expect(panel).toContain('เลขฉบับที่จะสร้าง:');
+    expect(panel).toContain('aria-live="polite"');
+    expect(views).toContain('key={`${overview.defaultVersion?.versionString');
+    expect(views).toContain("clone: 'สร้างฉบับร่างจากเวอร์ชันฐาน'");
+  });
 });

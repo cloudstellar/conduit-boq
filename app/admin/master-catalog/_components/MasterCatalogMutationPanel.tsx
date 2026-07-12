@@ -100,6 +100,12 @@ export function MasterCatalogDraftCreatePanel({
   const suggestedVersionString = suggestedVersion
     ? `${suggestedVersion.major}.${suggestedVersion.minor}.${suggestedVersion.patch}`
     : null;
+  const [versionMajor, setVersionMajor] = useState(String(suggestedVersion?.major ?? ''));
+  const [versionMinor, setVersionMinor] = useState(String(suggestedVersion?.minor ?? ''));
+  const [versionPatch, setVersionPatch] = useState(String(suggestedVersion?.patch ?? ''));
+  const versionPreview = [versionMajor, versionMinor, versionPatch]
+    .map((part) => part.trim() || '–')
+    .join('.');
   const [requestIdInputRef, prepareOperation, preserveSubmittedInput] = useStableCatalogOperation(
     state,
     `${defaultVersionString ?? 'no-base'}:${suggestedVersionString ?? 'no-suggestion'}`,
@@ -169,7 +175,8 @@ export function MasterCatalogDraftCreatePanel({
                   type="number"
                   min="0"
                   step="1"
-                  defaultValue={suggestedVersion.major}
+                  value={versionMajor}
+                  onChange={(event) => setVersionMajor(event.target.value)}
                   required
                 />
               </div>
@@ -181,7 +188,8 @@ export function MasterCatalogDraftCreatePanel({
                   type="number"
                   min="0"
                   step="1"
-                  defaultValue={suggestedVersion.minor}
+                  value={versionMinor}
+                  onChange={(event) => setVersionMinor(event.target.value)}
                   required
                 />
               </div>
@@ -193,11 +201,16 @@ export function MasterCatalogDraftCreatePanel({
                   type="number"
                   min="0"
                   step="1"
-                  defaultValue={suggestedVersion.patch}
+                  value={versionPatch}
+                  onChange={(event) => setVersionPatch(event.target.value)}
                   required
                 />
               </div>
             </div>
+            <p className="text-sm text-muted-foreground" aria-live="polite">
+              เลขฉบับที่จะสร้าง:{' '}
+              <strong className="font-mono text-foreground">{versionPreview}</strong>
+            </p>
             <div className="grid gap-2">
               <Label htmlFor="draft-name">ชื่อฉบับร่าง</Label>
               <Input

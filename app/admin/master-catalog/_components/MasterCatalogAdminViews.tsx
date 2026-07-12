@@ -179,6 +179,7 @@ export function MasterCatalogOverviewView({
       </div>
 
       <MasterCatalogDraftCreatePanel
+        key={`${overview.defaultVersion?.versionString ?? 'no-base'}:${suggestedVersion?.major ?? 'none'}.${suggestedVersion?.minor ?? 'none'}.${suggestedVersion?.patch ?? 'none'}`}
         defaultVersionString={overview.defaultVersion?.versionString ?? null}
         draftVersions={currentBaseDrafts}
         suggestedVersion={suggestedVersion}
@@ -949,6 +950,7 @@ function importStatusLabel(status: string): string {
 function changeTypeLabel(changeType: string): string {
   return ({
     create_draft: 'สร้างฉบับร่าง',
+    clone: 'สร้างฉบับร่างจากเวอร์ชันฐาน',
     manual: 'แก้ไขรายรายการ',
     import: 'นำเข้า',
     abandon: 'ยกเลิกฉบับร่าง',

@@ -24,6 +24,7 @@ import type {
   CatalogIdentityHistoryPage,
   CatalogItemDetail,
 } from '@/lib/master-catalog/admin/catalogWorkspace';
+import { formatCatalogDictionaryLabel } from '@/lib/master-catalog/admin/presentation';
 import { applyCatalogManualChangeAction } from '../actions';
 import { useStableCatalogOperation } from './useStableCatalogOperation';
 
@@ -167,12 +168,13 @@ export function MasterCatalogItemEditor({
                         <Input id="edit-unit" name="unit" value={unit} onChange={(event) => setUnit(event.target.value)} required />
                       </div>
                       <DictionarySelect
+                        id="edit-category"
                         label="หมวดงาน"
                         value={categoryId}
                         onValueChange={setCategoryId}
                         options={item.categories.map((category) => ({
                           value: category.id,
-                          label: `${category.code} ${category.name}`,
+                          label: formatCatalogDictionaryLabel(category.code, category.name),
                         }))}
                       />
                       <MoneyField id="edit-material" name="materialCost" label="ค่าวัสดุ" value={materialCost} onChange={setMaterialCost} />
@@ -182,7 +184,7 @@ export function MasterCatalogItemEditor({
                         <Input id="edit-unit-cost" value={unitCost} readOnly />
                       </div>
                       <div className="grid gap-2 md:col-span-2">
-                        <Label htmlFor="edit-authority">
+                        <Label htmlFor="edit-authority" className="min-w-0 leading-snug">
                           เอกสารอ้างอิงชื่อ หน่วย หรือราคา{authorityChanged ? '' : ' (ไม่จำเป็นเมื่อเปลี่ยนเฉพาะหมวด)'}
                         </Label>
                         <Input id="edit-authority" name="priceAuthorityReference" required={authorityChanged} />
@@ -196,6 +198,7 @@ export function MasterCatalogItemEditor({
                     <input type="hidden" name="categoryId" value={item.categoryId} />
                     <input type="hidden" name="codeGroupId" value={codeGroupId} />
                     <DictionarySelect
+                      id="recode-code-group"
                       label="กลุ่มรหัสใหม่"
                       value={codeGroupId}
                       onValueChange={setCodeGroupId}
@@ -293,6 +296,7 @@ function actionLabel(action: ItemAction): string {
 }
 
 function DictionarySelect(props: {
+  id: string;
   label: string;
   value: string;
   onValueChange: (value: string) => void;
@@ -300,9 +304,9 @@ function DictionarySelect(props: {
 }) {
   return (
     <div className="grid gap-2">
-      <Label>{props.label}</Label>
+      <Label htmlFor={props.id}>{props.label}</Label>
       <Select value={props.value} onValueChange={props.onValueChange}>
-        <SelectTrigger><SelectValue /></SelectTrigger>
+        <SelectTrigger id={props.id} className="w-full min-w-0"><SelectValue /></SelectTrigger>
         <SelectContent>
           <SelectGroup>
             {props.options.map((option) => <SelectItem key={option.value} value={option.value}>{option.label}</SelectItem>)}
