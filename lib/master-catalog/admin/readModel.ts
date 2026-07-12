@@ -2,10 +2,15 @@ import type { SupabaseClient } from '@supabase/supabase-js';
 import type { UserRole } from '@/lib/types/auth';
 import {
   loadCatalogVersionWorkspace,
+  loadCatalogVersionItemsSnapshot,
   type CatalogCategoryOption,
   type CatalogCodeGroupOption,
   type CatalogWorkspaceItem,
 } from './catalogWorkspace';
+import {
+  buildCatalogFinalReviewSnapshot,
+  type CatalogFinalReviewSnapshot,
+} from './catalogDiff';
 import { isCatalogAdminEnabled } from './flags';
 import {
   loadCatalogCapabilityFlags,
@@ -15,9 +20,9 @@ import {
 export { isCatalogAdminEnabled } from './flags';
 
 export type CatalogAdminSection = 'overview' | 'versions' | 'import' | 'history';
-export type CatalogVersionStatus = 'draft' | 'active' | 'archived';
+export type CatalogVersionStatus = 'draft' | 'active' | 'archived' | 'abandoned';
 export type CatalogImportStatus = 'validated' | 'applied' | 'rejected';
-export type CatalogChangeType = 'clone' | 'import' | 'manual' | 'publish' | 'restore';
+export type CatalogChangeType = 'clone' | 'import' | 'manual' | 'abandon' | 'publish' | 'restore';
 
 export interface CatalogAdminProfile {
   id: string;
@@ -150,6 +155,17 @@ export interface CatalogVersionDetail {
   capabilities: CatalogCapabilityFlags;
   imports: CatalogImportSummary[];
   changeSets: CatalogChangeSetSummary[];
+  warnings: string[];
+}
+
+export interface CatalogVersionReview {
+  version: CatalogVersionSummary;
+  baseVersion: CatalogVersionSummary;
+  currentVersionId: string | null;
+  isCurrentBase: boolean;
+  snapshot: CatalogFinalReviewSnapshot;
+  publishReadiness: CatalogPublishReadiness | null;
+  canPublishReviewedState: boolean;
   warnings: string[];
 }
 
@@ -359,6 +375,10 @@ export async function loadCatalogAdminOverview(
   const defaultVersion =
     versions.find((version) => version.id === defaultVersionId) ??
     (defaultVersionId ? await loadCatalogVersionById(supabase, defaultVersionId, warnings) : null);
+  const drafts = rowsFromResult(draftsResult.data).map(mapVersionSummary);
+  if (drafts.filter((draft) => draft.basedOnVersionId === defaultVersionId).length > 1) {
+    warnings.push('พบฉบับร่างที่กำลังทำงานจากเวอร์ชันฐานเดียวกันมากกว่าหนึ่งฉบับ จึงต้องแก้ฐานข้อมูลก่อนใช้งานต่อ');
+  }
   const [
     activeDefaultRows,
     identities,
@@ -384,7 +404,7 @@ export async function loadCatalogAdminOverview(
     draftPublishReadiness: null,
     factorFDefault,
     versions,
-    drafts: rowsFromResult(draftsResult.data).map(mapVersionSummary),
+    drafts,
     recentImports: rowsFromResult(importsResult.data).map(mapImportSummary),
     recentChangeSets: rowsFromResult(changeSetsResult.data).map(mapChangeSetSummary),
     counts: {
@@ -424,7 +444,8 @@ async function loadCatalogPublishReadiness(
     versionStatus:
       row.versionStatus === 'draft' ||
       row.versionStatus === 'active' ||
-      row.versionStatus === 'archived'
+      row.versionStatus === 'archived' ||
+      row.versionStatus === 'abandoned'
         ? row.versionStatus
         : null,
     basedOnVersionId: toNullableString(row.basedOnVersionId),
@@ -521,6 +542,139 @@ export async function loadCatalogVersionDetail(
     capabilities: capabilityResult.flags,
     imports: importRows,
     changeSets: changeRows,
+    warnings,
+  };
+}
+
+export async function loadCatalogVersionReview(
+  supabase: SupabaseClient,
+  versionId: string,
+): Promise<CatalogVersionReview | null> {
+  const warnings: string[] = [];
+  const { data: initialData, error: initialError } = await supabase
+    .from('price_list_versions')
+    .select(VERSION_COLUMNS)
+    .eq('id', versionId)
+    .maybeSingle();
+
+  pushError(warnings, initialError, 'โหลดฉบับร่างสำหรับตรวจสอบไม่สำเร็จ');
+  const initialRow = rowFromResult(initialData);
+  if (!initialRow) return null;
+
+  const version = mapVersionSummary(initialRow);
+  if (!version.basedOnVersionId) return null;
+
+  const [baseResult, baseSnapshot, draftSnapshot, publishReadiness] =
+    await Promise.all([
+      supabase
+        .from('price_list_versions')
+        .select(VERSION_COLUMNS)
+        .eq('id', version.basedOnVersionId)
+        .maybeSingle(),
+      loadCatalogVersionItemsSnapshot(supabase, version.basedOnVersionId),
+      loadCatalogVersionItemsSnapshot(supabase, version.id),
+      version.status === 'draft'
+        ? loadCatalogPublishReadiness(supabase, version.id, warnings)
+        : Promise.resolve(null),
+    ]);
+
+  pushError(warnings, baseResult.error, 'โหลดเวอร์ชันฐานสำหรับเปรียบเทียบไม่สำเร็จ');
+  warnings.push(...baseSnapshot.warnings, ...draftSnapshot.warnings);
+
+  const baseRow = rowFromResult(baseResult.data);
+  if (!baseRow) {
+    throw new Error('ไม่พบเวอร์ชันฐานสำหรับเปรียบเทียบฉบับร่าง');
+  }
+  const baseVersion = mapVersionSummary(baseRow);
+
+  const [finalVersionResult, pointerResult] = await Promise.all([
+    supabase
+      .from('price_list_versions')
+      .select('id,status,lock_version,based_on_version_id')
+      .eq('id', version.id)
+      .maybeSingle(),
+    supabase
+      .from('price_list_default_version')
+      .select('version_id')
+      .eq('id', true)
+      .maybeSingle(),
+  ]);
+  const { data: finalData, error: finalError } = finalVersionResult;
+  pushError(warnings, finalError, 'ตรวจรุ่นแก้ไขหลังโหลดผลเปรียบเทียบไม่สำเร็จ');
+  pushError(warnings, pointerResult.error, 'โหลดเวอร์ชันบัญชีราคาที่ใช้งานปัจจุบันไม่สำเร็จ');
+  const finalRow = rowFromResult(finalData);
+
+  const versionChangedDuringRead = Boolean(
+    finalRow
+    && (
+      String(finalRow.status ?? '') !== version.status
+      || toNullableString(finalRow.based_on_version_id) !== version.basedOnVersionId
+    )
+  );
+
+  const snapshotReadIssues = [
+    ...(!baseSnapshot.complete ? [{
+      code: 'BASE_SNAPSHOT_INCOMPLETE' as const,
+      message: 'โหลดรายการของเวอร์ชันฐานไม่ครบ จึงปิดการเผยแพร่ไว้ก่อน',
+    }] : []),
+    ...(!draftSnapshot.complete ? [{
+      code: 'DRAFT_SNAPSHOT_INCOMPLETE' as const,
+      message: 'โหลดรายการของฉบับร่างไม่ครบ จึงปิดการเผยแพร่ไว้ก่อน',
+    }] : []),
+  ];
+
+  const snapshot: CatalogFinalReviewSnapshot = snapshotReadIssues.length > 0
+    ? {
+        state: 'incomplete',
+        reviewedLockVersion: null,
+        diff: null,
+        issues: snapshotReadIssues,
+      }
+    : !finalRow || finalError
+    ? {
+        state: 'incomplete',
+        reviewedLockVersion: null,
+        diff: null,
+        issues: [{
+          code: 'DRAFT_SNAPSHOT_INCOMPLETE',
+          message: 'ตรวจยืนยันรุ่นแก้ไขของฉบับร่างหลังโหลดข้อมูลไม่สำเร็จ',
+        }],
+      }
+    : versionChangedDuringRead
+      ? {
+          state: 'stale',
+          reviewedLockVersion: null,
+          diff: null,
+          issues: [{
+            code: 'DRAFT_CHANGED_DURING_REVIEW',
+            message: 'สถานะหรือเวอร์ชันฐานเปลี่ยนระหว่างโหลดผลเปรียบเทียบ กรุณาตรวจใหม่',
+          }],
+        }
+      : buildCatalogFinalReviewSnapshot({
+          baseItems: baseSnapshot.items,
+          draftItems: draftSnapshot.items,
+          expectedBaseItemCount: baseVersion.itemCount ?? baseSnapshot.totalItems,
+          expectedDraftItemCount: version.itemCount ?? draftSnapshot.totalItems,
+          beforeLockVersion: version.lockVersion,
+          afterLockVersion: toNullableNumber(finalRow.lock_version) ?? -1,
+        });
+
+  const currentVersionId = toNullableString(pointerResult.data?.version_id);
+  const isCurrentBase = version.basedOnVersionId === currentVersionId;
+
+  return {
+    version,
+    baseVersion,
+    currentVersionId,
+    isCurrentBase,
+    snapshot,
+    publishReadiness,
+    canPublishReviewedState:
+      version.status === 'draft'
+      && isCurrentBase
+      && snapshot.state === 'ready'
+      && snapshot.reviewedLockVersion !== null
+      && publishReadiness?.canPublish === true,
     warnings,
   };
 }

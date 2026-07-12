@@ -25,7 +25,7 @@ export function makeCatalogExportYearLabel(versionString: string): string {
   return `ประจำปี ${catalogYearFromVersion(versionString)}`;
 }
 
-export type CatalogExportVersionStatus = 'draft' | 'active' | 'archived';
+export type CatalogExportVersionStatus = 'draft' | 'active' | 'archived' | 'abandoned';
 
 export interface CatalogExportProfile {
   id: string;

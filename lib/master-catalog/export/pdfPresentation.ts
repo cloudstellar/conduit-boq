@@ -17,6 +17,7 @@ export function getFieldFacingPdfStatus(
   status: CatalogExportVersionStatus,
 ): string {
   if (status === 'draft') return 'ฉบับร่าง';
+  if (status === 'abandoned') return 'ยกเลิกฉบับร่าง';
   return status === 'active' ? 'เผยแพร่แล้ว' : 'จัดเก็บถาวร';
 }
 

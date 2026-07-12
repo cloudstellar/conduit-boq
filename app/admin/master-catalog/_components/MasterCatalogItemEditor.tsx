@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useActionState, useEffect, useState } from 'react';
 import { useFormStatus } from 'react-dom';
 import { ArrowLeft, CheckCircle2, History, Loader2, Save, ShieldAlert } from 'lucide-react';
@@ -38,6 +38,11 @@ export function MasterCatalogItemEditor({
   item: CatalogItemDetail;
   history: CatalogIdentityHistoryPage;
 }) {
+  const searchParams = useSearchParams();
+  const returnHref = safeItemReturnHref(
+    searchParams.get('returnTo'),
+    item.versionId,
+  );
   const editable =
     item.mutationReady
     &&
@@ -72,17 +77,17 @@ export function MasterCatalogItemEditor({
   useEffect(() => {
     if (state.status !== 'success') return;
     if (action === 'withdraw') {
-      router.replace(`/admin/master-catalog/versions/${item.versionId}`);
+      router.replace(returnHref);
       return;
     }
     router.refresh();
-  }, [action, item.versionId, router, state.status]);
+  }, [action, returnHref, router, state.status]);
 
   return (
     <div className="flex w-full flex-col gap-4">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <Button variant="ghost" size="sm" asChild>
-          <Link href={`/admin/master-catalog/versions/${item.versionId}`}>
+          <Link href={returnHref}>
             <ArrowLeft />กลับไปเวอร์ชัน {item.versionString}
           </Link>
         </Button>
@@ -241,6 +246,24 @@ export function MasterCatalogItemEditor({
       <IdentityTimeline item={item} history={history} />
     </div>
   );
+}
+
+function safeItemReturnHref(value: string | null, versionId: string) {
+  const fallback = `/admin/master-catalog/versions/${versionId}`;
+  if (!value) return fallback;
+
+  const expectedPrefix = `${fallback}`;
+  if (!value.startsWith(expectedPrefix)) return fallback;
+  if (value.startsWith('//') || value.includes('://') || value.includes('\\')) return fallback;
+
+  try {
+    const parsed = new URL(value, 'http://local.invalid');
+    if (parsed.origin !== 'http://local.invalid') return fallback;
+    if (parsed.pathname !== fallback && parsed.pathname !== `${fallback}/review`) return fallback;
+    return `${parsed.pathname}${parsed.search}`;
+  } catch {
+    return fallback;
+  }
 }
 
 function availableActions(item: CatalogItemDetail): ItemAction[] {

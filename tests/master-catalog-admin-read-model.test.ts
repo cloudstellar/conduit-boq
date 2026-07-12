@@ -5,6 +5,7 @@ import {
   isCatalogAdminEnabled,
   loadCatalogAdminGate,
   loadCatalogAdminOverview,
+  loadCatalogVersionReview,
   loadCatalogVersionsRegisterPage,
   shortHash,
 } from '../lib/master-catalog/admin/readModel';
@@ -115,6 +116,181 @@ function createRegisterClient(error: { code: string; message: string }) {
   } as unknown as Parameters<typeof loadCatalogVersionsRegisterPage>[0];
 
   return { client, fallbackReads: () => fallbackReads };
+}
+
+function createVersionReviewClient({
+  finalLockVersion = 7,
+  pointerMovesAfterSnapshots = false,
+}: {
+  finalLockVersion?: number;
+  pointerMovesAfterSnapshots?: boolean;
+} = {}) {
+  const draftId = '11111111-1111-4111-8111-111111111111';
+  const baseId = '22222222-2222-4222-8222-222222222222';
+  const otherPointerId = '33333333-3333-4333-8333-333333333333';
+  let snapshotPageReads = 0;
+  let pointerReadAfterSnapshots = false;
+  const versionRows: Record<string, Record<string, unknown>> = {
+    [draftId]: {
+      id: draftId,
+      version_string: '2568.1.0',
+      name: 'ฉบับร่างทดสอบ',
+      status: 'draft',
+      is_default: false,
+      based_on_version_id: baseId,
+      item_count: 1,
+      lock_version: 7,
+      created_at: '2026-07-12T00:00:00.000Z',
+      updated_at: '2026-07-12T00:00:00.000Z',
+    },
+    [baseId]: {
+      id: baseId,
+      version_string: '2568.0.0',
+      name: 'บัญชีราคาใช้งาน',
+      status: 'active',
+      is_default: true,
+      based_on_version_id: null,
+      item_count: 1,
+      lock_version: 2,
+      created_at: '2026-07-01T00:00:00.000Z',
+      updated_at: '2026-07-01T00:00:00.000Z',
+    },
+  };
+  const itemRows: Record<string, Record<string, unknown>[]> = {
+    [baseId]: [{
+      id: 'base-row',
+      identity_id: '44444444-4444-4444-8444-444444444444',
+      item_code: 'ITEM-0001',
+      item_name: 'รายการฐาน',
+      unit: 'รายการ',
+      material_cost: 10,
+      labor_cost: 5,
+      unit_cost: 15,
+      category: 'CAT-A',
+      category_id: '55555555-5555-4555-8555-555555555555',
+      code_group_id: null,
+      is_active: true,
+      display_order: 0,
+    }],
+    [draftId]: [{
+      id: 'draft-row',
+      identity_id: '44444444-4444-4444-8444-444444444444',
+      item_code: 'ITEM-0001',
+      item_name: 'รายการแก้ไข',
+      unit: 'รายการ',
+      material_cost: 10,
+      labor_cost: 5,
+      unit_cost: 15,
+      category: 'CAT-A',
+      category_id: '66666666-6666-4666-8666-666666666666',
+      code_group_id: null,
+      is_active: true,
+      display_order: 0,
+    }],
+  };
+
+  const client = {
+    rpc: async () => ({
+      data: {
+        versionFound: true,
+        versionStatus: 'draft',
+        basedOnVersionId: baseId,
+        currentVersionId: baseId,
+        baseIsCurrent: true,
+        newIdentityCount: 0,
+        activeCanonicalCodeCount: 0,
+        structuredCodeGuardApplies: false,
+        unapprovedLegacyActiveCount: 0,
+        inactiveRowCount: 0,
+        retiredPdfPolicyRequired: false,
+        qualityPassed: true,
+        dataset: {
+          itemCount: 1,
+          activeItemCount: 1,
+          datasetHash: 'sha256:test',
+          canonicalJsonBytes: 100,
+        },
+        canPublish: true,
+      },
+      error: null,
+    }),
+    from: (table: string) => {
+      const state: {
+        columns?: string;
+        head?: boolean;
+        filters: Record<string, unknown>;
+        from?: number;
+        to?: number;
+      } = { filters: {} };
+
+      const result = () => {
+        if (table === 'price_list_versions') {
+          const versionId = String(state.filters.id ?? '');
+          const row = versionRows[versionId] ?? null;
+          if (state.columns === 'id,status,lock_version,based_on_version_id' && row) {
+            return {
+              data: { ...row, lock_version: finalLockVersion },
+              error: null,
+            };
+          }
+          return { data: row, error: null };
+        }
+
+        if (table === 'price_list_default_version') {
+          pointerReadAfterSnapshots = snapshotPageReads === 2;
+          return {
+            data: {
+              version_id: pointerMovesAfterSnapshots ? otherPointerId : baseId,
+            },
+            error: null,
+          };
+        }
+
+        if (table === 'price_list') {
+          const versionId = String(state.filters.version_id ?? '');
+          const rows = itemRows[versionId] ?? [];
+          if (state.head) return { data: null, count: rows.length, error: null };
+          snapshotPageReads += 1;
+          return {
+            data: rows.slice(state.from ?? 0, (state.to ?? rows.length - 1) + 1),
+            error: null,
+          };
+        }
+
+        throw new Error(`Unexpected table: ${table}`);
+      };
+
+      const query = {
+        select: (columns: string, options?: { head?: boolean }) => {
+          state.columns = columns;
+          state.head = options?.head;
+          return query;
+        },
+        eq: (column: string, value: unknown) => {
+          state.filters[column] = value;
+          return query;
+        },
+        order: () => query,
+        range: (from: number, to: number) => {
+          state.from = from;
+          state.to = to;
+          return query;
+        },
+        maybeSingle: async () => result(),
+        then: (
+          resolve: (value: ReturnType<typeof result>) => unknown,
+          reject?: (reason: unknown) => unknown,
+        ) => Promise.resolve(result()).then(resolve, reject),
+      };
+      return query;
+    },
+  } as unknown as Parameters<typeof loadCatalogVersionReview>[0];
+
+  return {
+    client,
+    draftId,
+    pointerReadAfterSnapshots: () => pointerReadAfterSnapshots,
+  };
 }
 
 describe('Master Catalog admin read model helpers', () => {
@@ -239,6 +415,49 @@ describe('Master Catalog admin overview', () => {
       status: null,
     });
     expect(overview.warnings).toContain('โหลดตัวชี้เวอร์ชัน Factor F ที่ใช้งานไม่สำเร็จ');
+  });
+});
+
+describe('Master Catalog final version review', () => {
+  it('carries the exact stable lock only after complete snapshots and a final pointer read', async () => {
+    const fixture = createVersionReviewClient();
+
+    const review = await loadCatalogVersionReview(fixture.client, fixture.draftId);
+
+    expect(fixture.pointerReadAfterSnapshots()).toBe(true);
+    expect(review).toMatchObject({
+      isCurrentBase: true,
+      canPublishReviewedState: true,
+      snapshot: {
+        state: 'ready',
+        reviewedLockVersion: 7,
+        diff: { summary: { affectedItemCount: 1, detailsCount: 1 } },
+      },
+    });
+  });
+
+  it('fails closed when the draft lock or current pointer changes during review', async () => {
+    const changedLock = createVersionReviewClient({ finalLockVersion: 8 });
+    const movedPointer = createVersionReviewClient({ pointerMovesAfterSnapshots: true });
+
+    const [lockReview, pointerReview] = await Promise.all([
+      loadCatalogVersionReview(changedLock.client, changedLock.draftId),
+      loadCatalogVersionReview(movedPointer.client, movedPointer.draftId),
+    ]);
+
+    expect(lockReview).toMatchObject({
+      canPublishReviewedState: false,
+      snapshot: {
+        state: 'stale',
+        reviewedLockVersion: null,
+        issues: [{ code: 'DRAFT_CHANGED_DURING_REVIEW' }],
+      },
+    });
+    expect(pointerReview).toMatchObject({
+      isCurrentBase: false,
+      canPublishReviewedState: false,
+      snapshot: { state: 'ready', reviewedLockVersion: 7 },
+    });
   });
 });
 

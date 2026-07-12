@@ -102,6 +102,10 @@ export async function loadCatalogImportContext(
       isCurrentBase: currentVersionId !== null && basedOnVersionId === currentVersionId,
     };
   });
+  const currentBaseDrafts = drafts.filter((candidate) => candidate.isCurrentBase);
+  if (currentBaseDrafts.length > 1) {
+    warnings.push('พบฉบับร่างที่กำลังทำงานจากเวอร์ชันฐานเดียวกันมากกว่าหนึ่งฉบับ จึงปิดการนำเข้าไว้ก่อน');
+  }
   const draft = selectedDraftId
     ? drafts.find((candidate) => candidate.id === selectedDraftId) ?? null
     : null;
@@ -124,6 +128,18 @@ export async function loadCatalogImportContext(
 
   if (!draft.isCurrentBase) {
     warnings.push('ฉบับร่างนี้อ้างอิงฐานเก่า จึงเปิดดูได้อย่างเดียวและห้ามสร้างการนำเข้าใหม่');
+    return {
+      drafts,
+      draft,
+      parseContext: {},
+      evidenceCounts: EMPTY_COUNTS,
+      authorityReady: false,
+      capabilities: capabilityResult.flags,
+      warnings,
+    };
+  }
+
+  if (currentBaseDrafts.length !== 1) {
     return {
       drafts,
       draft,

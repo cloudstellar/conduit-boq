@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useActionState, useEffect, useState } from 'react';
 import { useFormStatus } from 'react-dom';
 import {
+  ArchiveX,
   CheckCircle2,
   FilePlus2,
   Loader2,
@@ -23,6 +24,16 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import {
@@ -38,6 +49,7 @@ import type {
 } from '@/lib/master-catalog/admin/actionModel';
 import type { CatalogPublishReadiness } from '@/lib/master-catalog/admin/readModel';
 import {
+  abandonCatalogDraftAction,
   createCatalogDraftAction,
   publishCatalogVersionAction,
   restoreCatalogPointerAction,
@@ -112,10 +124,17 @@ export function MasterCatalogDraftCreatePanel({
         </CardDescription>
       </CardHeader>
       <CardContent className="grid gap-4">
-        {draftVersions.length > 0 ? (
+        {draftVersions.length > 1 ? (
+          <Alert variant="destructive">
+            <AlertTitle>พบฉบับร่างที่กำลังทำงานมากกว่าหนึ่งฉบับ</AlertTitle>
+            <AlertDescription>
+              ปิดการสร้างและแก้ไขไว้ก่อนจนกว่าจะใช้ฐานข้อมูลที่ผ่าน P-22 และตรวจประวัติฉบับร่างครบ
+            </AlertDescription>
+          </Alert>
+        ) : draftVersions.length === 1 ? (
           <Alert>
             <CheckCircle2 />
-            <AlertTitle>ฉบับร่างที่อ้างอิงฐานปัจจุบัน</AlertTitle>
+            <AlertTitle>ฉบับร่างที่กำลังทำงาน</AlertTitle>
             <AlertDescription>
               <div className="grid gap-2">
                 {draftVersions.map((draftVersion) => (
@@ -215,6 +234,99 @@ export function MasterCatalogDraftCreatePanel({
   );
 }
 
+export function MasterCatalogDraftAbandonPanel({
+  draftVersion,
+}: {
+  draftVersion: {
+    id: string;
+    versionString: string;
+    lockVersion: number;
+  };
+}) {
+  const [state, formAction] = useActionState(abandonCatalogDraftAction, initialState);
+  const [requestIdInputRef, prepareOperation, preserveSubmittedInput] =
+    useStableCatalogOperation(state, `${draftVersion.id}:abandon`);
+  const router = useRouter();
+
+  useEffect(() => {
+    if (state.status === 'success') {
+      router.replace('/admin/master-catalog');
+      router.refresh();
+    }
+  }, [router, state.status]);
+
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle className="flex items-center gap-2 text-base">
+          <ArchiveX />
+          ยกเลิกฉบับร่างนี้
+        </CardTitle>
+        <CardDescription>
+          ปิดฉบับร่าง {draftVersion.versionString} เพื่อเริ่มใหม่จากเวอร์ชันฐานเดิม โดยระบบจะเก็บรายการและประวัติทั้งหมดไว้อ่านย้อนหลัง
+        </CardDescription>
+      </CardHeader>
+      <CardContent>
+        <ActionStateAlert state={state} />
+        <Dialog>
+          <DialogTrigger asChild>
+            <Button variant="destructive" className="mt-4">
+              <ArchiveX data-icon="inline-start" />
+              ยกเลิกฉบับร่าง
+            </Button>
+          </DialogTrigger>
+          <DialogContent>
+            <form
+              action={formAction}
+              className="grid gap-4"
+              onReset={preserveSubmittedInput}
+              onSubmitCapture={prepareOperation}
+            >
+              <input ref={requestIdInputRef} type="hidden" name="requestId" />
+              <input type="hidden" name="versionId" value={draftVersion.id} />
+              <input
+                type="hidden"
+                name="expectedLockVersion"
+                value={draftVersion.lockVersion}
+              />
+              <DialogHeader>
+                <DialogTitle>ยืนยันการยกเลิกฉบับร่าง {draftVersion.versionString}</DialogTitle>
+                <DialogDescription>
+                  หลังยืนยันจะกลับมาแก้ฉบับนี้ไม่ได้ ระบบจะเก็บ snapshot และประวัติทั้งหมดไว้อ่านย้อนหลัง
+                </DialogDescription>
+              </DialogHeader>
+              <div className="grid gap-2">
+                <Label htmlFor={`abandon-reason-${draftVersion.id}`}>
+                  เหตุผลที่ยกเลิกฉบับร่าง
+                </Label>
+                <Input
+                  id={`abandon-reason-${draftVersion.id}`}
+                  name="reason"
+                  maxLength={500}
+                  autoComplete="off"
+                  required
+                />
+              </div>
+              <DialogFooter>
+                <DialogClose asChild>
+                  <Button type="button" variant="outline">กลับไปแก้ไขต่อ</Button>
+                </DialogClose>
+                <SubmitButton
+                  label="ยืนยันและเก็บเป็นประวัติ"
+                  pendingLabel="กำลังยกเลิกฉบับร่าง"
+                  variant="destructive"
+                >
+                  <ArchiveX data-icon="inline-start" />
+                </SubmitButton>
+              </DialogFooter>
+            </form>
+          </DialogContent>
+        </Dialog>
+      </CardContent>
+    </Card>
+  );
+}
+
 export function MasterCatalogPublishRestorePanel({
   draftVersion,
   draftReadiness,
@@ -257,18 +369,26 @@ export function MasterCatalogPublishRestorePanel({
     return null;
   }
 
+  const panelTitle = draftVersion && restorableVersions.length > 0
+    ? 'เผยแพร่หรือคืนเวอร์ชันใช้งาน'
+    : draftVersion
+      ? 'เผยแพร่ฉบับที่ตรวจแล้ว'
+      : 'คืนเวอร์ชันใช้งาน';
+
   return (
     <Card>
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <ShieldCheck />
-          เผยแพร่หรือคืนเวอร์ชันใช้งาน
+          {panelTitle}
         </CardTitle>
         <CardDescription>
           เวอร์ชันใช้งานปัจจุบัน: {currentVersionString ?? 'ดูจากทะเบียนเวอร์ชัน'}
         </CardDescription>
       </CardHeader>
-      <CardContent className="grid gap-5 lg:grid-cols-2">
+      <CardContent className={draftVersion && restorableVersions.length > 0
+        ? 'grid gap-5 lg:grid-cols-2'
+        : 'grid gap-5'}>
         {draftVersion ? (
           <form
             action={publishAction}
@@ -351,13 +471,7 @@ export function MasterCatalogPublishRestorePanel({
               </SubmitButton>
             </div>
           </form>
-        ) : (
-          <Alert>
-            <CheckCircle2 />
-            <AlertTitle>ไม่มีฉบับร่างที่พร้อมเผยแพร่</AlertTitle>
-            <AlertDescription>ต้องมีฉบับร่างที่ผ่านเงื่อนไขก่อนจึงจะเผยแพร่ได้</AlertDescription>
-          </Alert>
-        )}
+        ) : null}
 
         {restorableVersions.length > 0 ? (
           <form
@@ -404,13 +518,7 @@ export function MasterCatalogPublishRestorePanel({
               </SubmitButton>
             </div>
           </form>
-        ) : (
-          <Alert>
-            <CheckCircle2 />
-            <AlertTitle>ไม่มีเวอร์ชันเผยแพร่เดิมให้เลือก</AlertTitle>
-            <AlertDescription>จะคืนเวอร์ชันใช้งานได้เมื่อมีเวอร์ชันที่เผยแพร่แล้วและไม่ได้ใช้งานอยู่ในปัจจุบัน</AlertDescription>
-          </Alert>
-        )}
+        ) : null}
       </CardContent>
     </Card>
   );
@@ -490,16 +598,18 @@ function SubmitButton({
   pendingLabel,
   children,
   disabled = false,
+  variant = 'default',
 }: {
   label: string;
   pendingLabel: string;
   children: React.ReactNode;
   disabled?: boolean;
+  variant?: 'default' | 'destructive';
 }) {
   const { pending } = useFormStatus();
 
   return (
-    <Button type="submit" disabled={pending || disabled}>
+    <Button type="submit" variant={variant} disabled={pending || disabled}>
       {pending ? <Loader2 data-icon="inline-start" className="animate-spin" /> : children}
       {pending ? pendingLabel : label}
     </Button>
@@ -516,21 +626,33 @@ function ActionStateAlert({ state }: { state: CatalogMutationState }) {
       <Alert aria-live="polite">
         <CheckCircle2 />
         <AlertTitle>{state.message}</AlertTitle>
-        <AlertDescription>
-          รุ่นแก้ไข {state.lockVersion ?? '-'}
-          {state.changeSetId ? ` · ชุดการเปลี่ยนแปลง ${state.changeSetId}` : ''}
-          {state.requestId ? ` · คำขอ ${state.requestId.slice(0, 8)}` : ''}
-        </AlertDescription>
+        {state.lockVersion != null || state.changeSetId || state.requestId ? (
+          <AlertDescription>
+            <details className="mt-1 text-xs text-muted-foreground">
+              <summary className="cursor-pointer">ข้อมูลสำหรับติดตามรายการ</summary>
+              <div className="mt-2 grid gap-1 break-all">
+                {state.lockVersion != null ? <span>รุ่นแก้ไข {state.lockVersion}</span> : null}
+                {state.changeSetId ? <span>ชุดการเปลี่ยนแปลง {state.changeSetId}</span> : null}
+                {state.requestId ? <span>รหัสคำขอ {state.requestId}</span> : null}
+              </div>
+            </details>
+          </AlertDescription>
+        ) : null}
       </Alert>
     );
   }
 
   return (
     <Alert variant="destructive" aria-live="polite">
-      <AlertTitle>{state.code ?? 'VALIDATION_FAILED'}</AlertTitle>
+      <AlertTitle>{state.message}</AlertTitle>
       <AlertDescription>
-        {state.message}
-        {state.requestId ? ` · คำขอ ${state.requestId.slice(0, 8)}` : ''}
+        <details className="mt-1 text-xs">
+          <summary className="cursor-pointer">ข้อมูลสำหรับติดตามปัญหา</summary>
+          <div className="mt-2 grid gap-1 break-all">
+            <span>รหัส {state.code ?? 'VALIDATION_FAILED'}</span>
+            {state.requestId ? <span>รหัสคำขอ {state.requestId}</span> : null}
+          </div>
+        </details>
       </AlertDescription>
     </Alert>
   );

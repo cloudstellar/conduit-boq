@@ -33,6 +33,7 @@ describe('Master Catalog field-facing PDF presentation', () => {
     expect(getFieldFacingPdfStatus('draft')).toBe('ฉบับร่าง');
     expect(getFieldFacingPdfStatus('active')).toBe('เผยแพร่แล้ว');
     expect(getFieldFacingPdfStatus('archived')).toBe('จัดเก็บถาวร');
+    expect(getFieldFacingPdfStatus('abandoned')).toBe('ยกเลิกฉบับร่าง');
     expect(getNonCurrentPdfNotice(false, true)).toBeNull();
     expect(getNonCurrentPdfNotice(true, false)).toBeNull();
     expect(getNonCurrentPdfNotice(false, false))

@@ -47,6 +47,13 @@ export interface CatalogVersionWorkspace {
   warnings: string[];
 }
 
+export interface CatalogVersionItemsSnapshot {
+  items: CatalogWorkspaceItem[];
+  totalItems: number;
+  complete: boolean;
+  warnings: string[];
+}
+
 export interface CatalogItemDetail extends CatalogWorkspaceItem {
   versionId: string;
   versionString: string;
@@ -108,12 +115,8 @@ export async function loadCatalogVersionWorkspace(
   supabase: SupabaseClient,
   versionId: string,
 ): Promise<CatalogVersionWorkspace> {
-  const warnings: string[] = [];
-  const [totalResult, categoriesResult, groupsResult] = await Promise.all([
-    supabase
-      .from('price_list')
-      .select('id', { count: 'exact', head: true })
-      .eq('version_id', versionId),
+  const [snapshot, categoriesResult, groupsResult] = await Promise.all([
+    loadCatalogVersionItemsSnapshot(supabase, versionId),
     supabase
       .from('price_list_categories')
       .select('id,code,name,display_order')
@@ -129,29 +132,52 @@ export async function loadCatalogVersionWorkspace(
       .order('item_type_code', { ascending: true }),
   ]);
 
-  if (totalResult.error) warnings.push('นับรายการของเวอร์ชันไม่สำเร็จ');
+  const warnings = [...snapshot.warnings];
   if (categoriesResult.error) warnings.push('โหลดหมวดงานที่อนุมัติไว้ไม่สำเร็จ');
   if (groupsResult.error) warnings.push('โหลดกลุ่มรหัสที่อนุมัติไว้ไม่สำเร็จ');
 
-  const totalItems = totalResult.count ?? 0;
+  return {
+    items: snapshot.items,
+    categories: mapCategories(categoriesResult.data),
+    codeGroups: mapCodeGroups(groupsResult.data),
+    totalItems: snapshot.totalItems,
+    warnings,
+  };
+}
 
-  if (totalItems > CATALOG_CLIENT_FILTER_ROW_LIMIT) {
-    warnings.push(
-      `เวอร์ชันมี ${totalItems.toLocaleString('th-TH')} รายการ เกินเพดาน `
-      + `${CATALOG_CLIENT_FILTER_ROW_LIMIT.toLocaleString('th-TH')} รายการสำหรับการค้นหาฝั่งหน้าจอ`,
-    );
+export async function loadCatalogVersionItemsSnapshot(
+  supabase: SupabaseClient,
+  versionId: string,
+): Promise<CatalogVersionItemsSnapshot> {
+  const warnings: string[] = [];
+  const totalResult = await supabase
+    .from('price_list')
+    .select('id', { count: 'exact', head: true })
+    .eq('version_id', versionId);
 
+  if (totalResult.error) {
     return {
       items: [],
-      categories: mapCategories(categoriesResult.data),
-      codeGroups: mapCodeGroups(groupsResult.data),
+      totalItems: 0,
+      complete: false,
+      warnings: ['นับรายการของเวอร์ชันไม่สำเร็จ'],
+    };
+  }
+
+  const totalItems = totalResult.count ?? 0;
+  if (totalItems > CATALOG_CLIENT_FILTER_ROW_LIMIT) {
+    return {
+      items: [],
       totalItems,
-      warnings,
+      complete: false,
+      warnings: [
+        `เวอร์ชันมี ${totalItems.toLocaleString('th-TH')} รายการ เกินเพดาน `
+        + `${CATALOG_CLIENT_FILTER_ROW_LIMIT.toLocaleString('th-TH')} รายการสำหรับการค้นหาฝั่งหน้าจอ`,
+      ],
     };
   }
 
   const items: CatalogWorkspaceItem[] = [];
-
   for (let offset = 0; offset < totalItems; offset += ITEM_PAGE_SIZE) {
     const { data, error } = await supabase
       .from('price_list')
@@ -178,9 +204,8 @@ export async function loadCatalogVersionWorkspace(
 
   return {
     items,
-    categories: mapCategories(categoriesResult.data),
-    codeGroups: mapCodeGroups(groupsResult.data),
     totalItems,
+    complete: items.length === totalItems,
     warnings,
   };
 }

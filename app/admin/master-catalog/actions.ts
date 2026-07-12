@@ -16,6 +16,7 @@ import {
   type CatalogRpcTransportOperation,
   type CatalogMutationState,
   type CatalogRpcActionResponse,
+  buildAbandonCatalogDraftArgs,
   buildPublishCatalogVersionArgs,
   buildRestoreCatalogPointerArgs,
   buildManualCatalogChangeArgs,
@@ -101,6 +102,56 @@ export async function createCatalogDraftAction(
 
   if (result.status === 'success') {
     revalidateMasterCatalogPaths(result.versionId);
+  }
+
+  return result;
+}
+
+export async function abandonCatalogDraftAction(
+  _previousState: CatalogMutationState,
+  formData: FormData,
+): Promise<CatalogMutationState> {
+  const requestId = readOperationRequestId(formData);
+  if (typeof requestId !== 'string') return requestId;
+
+  const supabase = await createClient();
+  const gate = await loadCatalogAdminGate(supabase);
+
+  if (gate.state !== 'enabled') {
+    return createCatalogMutationError(
+      'ระบบบัญชีราคาสำหรับผู้ดูแลยังไม่เปิดใช้งาน',
+      'FORBIDDEN',
+    );
+  }
+
+  const args = buildAbandonCatalogDraftArgs(formData, requestId);
+  if ('status' in args) return args;
+
+  const startedAt = Date.now();
+  const { data, error } = await supabase.rpc('abandon_catalog_draft', args);
+
+  if (error) {
+    return mapRpcTransportError('abandonCatalogDraft', error, requestId, {
+      startedAt,
+      versionId: args.p_version_id,
+    });
+  }
+
+  const result = mapCatalogRpcActionResponse(
+    data as CatalogRpcActionResponse,
+    'ยกเลิกฉบับร่างและเก็บไว้เป็นประวัติแล้ว',
+  );
+  logMasterCatalogOperation({
+    operation: 'abandonCatalogDraft',
+    outcome: result.status === 'success' ? 'success' : 'rejected',
+    startedAt,
+    requestId: result.requestId ?? requestId,
+    versionId: result.versionId ?? args.p_version_id,
+    code: result.code,
+  });
+
+  if (result.status === 'success') {
+    revalidateMasterCatalogPaths(result.versionId ?? args.p_version_id);
   }
 
   return result;
@@ -523,6 +574,7 @@ function revalidateMasterCatalogPaths(versionId: string | undefined) {
 
   if (versionId) {
     revalidatePath(`/admin/master-catalog/versions/${versionId}`);
+    revalidatePath(`/admin/master-catalog/versions/${versionId}/review`);
   }
 }
 

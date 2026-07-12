@@ -147,6 +147,21 @@ describe('Master Catalog export data loader', () => {
     expect(makeCatalogExportFilename(dataset, 'pdf'))
       .toMatch(/^DRAFT-NT-Master-Catalog-v2568\.1\.0-\d{8}\.pdf$/);
   });
+
+  it('keeps an abandoned draft as non-exportable audit history', async () => {
+    const datasetHash = await hashCanonicalCatalogDatasetRows([CANONICAL_ROW]);
+    const client = createExportClient({
+      datasetHash,
+      featureFlag: true,
+      versionOverrides: { status: 'abandoned' },
+    });
+
+    await expect(loadCatalogExportDataset(client, VERSION_ID))
+      .rejects.toMatchObject({
+        code: 'CATALOG_EXPORT_UNSUPPORTED_STATUS',
+        status: 409,
+      });
+  });
 });
 
 type ExportClientOptions = {

@@ -77,7 +77,7 @@ export interface PriceListVersion {
   patch: number;
   version_string: string;
   name: string;
-  status: 'draft' | 'active' | 'archived';
+  status: 'draft' | 'active' | 'archived' | 'abandoned';
   is_default: boolean;
   created_at: string;
   updated_at: string;

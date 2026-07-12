@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useActionState, useEffect, useMemo, useState } from 'react';
 import { useFormStatus } from 'react-dom';
 import { CheckCircle2, ChevronLeft, ChevronRight, Loader2, Plus, Search } from 'lucide-react';
@@ -49,11 +49,28 @@ export function MasterCatalogVersionWorkspace({
   editable: boolean;
   allowAdd: boolean;
 }) {
-  const [query, setQuery] = useState('');
-  const [status, setStatus] = useState('all');
-  const [categoryId, setCategoryId] = useState('all');
-  const [codeGroupId, setCodeGroupId] = useState('all');
-  const [page, setPage] = useState(0);
+  const searchParams = useSearchParams();
+  const initialCategoryId = searchParams.get('category');
+  const initialCodeGroupId = searchParams.get('group');
+  const initialStatus = searchParams.get('status');
+  const initialPage = Number(searchParams.get('page'));
+  const [query, setQuery] = useState(searchParams.get('q') ?? '');
+  const [status, setStatus] = useState(
+    initialStatus === 'active' || initialStatus === 'inactive' ? initialStatus : 'all',
+  );
+  const [categoryId, setCategoryId] = useState(
+    initialCategoryId && categories.some((category) => category.id === initialCategoryId)
+      ? initialCategoryId
+      : 'all',
+  );
+  const [codeGroupId, setCodeGroupId] = useState(
+    initialCodeGroupId && codeGroups.some((group) => group.id === initialCodeGroupId)
+      ? initialCodeGroupId
+      : 'all',
+  );
+  const [page, setPage] = useState(
+    Number.isInteger(initialPage) && initialPage > 0 ? initialPage - 1 : 0,
+  );
   const groupById = useMemo(
     () => new Map(codeGroups.map((group) => [group.id, group])),
     [codeGroups],
@@ -187,7 +204,15 @@ export function MasterCatalogVersionWorkspace({
                     </TableCell>
                     <TableCell className="text-right">
                       <Button variant="ghost" size="sm" asChild>
-                        <Link href={`/admin/master-catalog/versions/${version.id}/items/${item.identityId}`}>
+                        <Link href={workspaceItemHref({
+                          versionId: version.id,
+                          identityId: item.identityId,
+                          query,
+                          status,
+                          categoryId,
+                          codeGroupId,
+                          page: safePage,
+                        })}>
                           รายละเอียด
                         </Link>
                       </Button>
@@ -236,6 +261,34 @@ export function MasterCatalogVersionWorkspace({
       ) : null}
     </>
   );
+}
+
+function workspaceItemHref({
+  versionId,
+  identityId,
+  query,
+  status,
+  categoryId,
+  codeGroupId,
+  page,
+}: {
+  versionId: string;
+  identityId: string;
+  query: string;
+  status: string;
+  categoryId: string;
+  codeGroupId: string;
+  page: number;
+}) {
+  const returnParams = new URLSearchParams();
+  if (query.trim()) returnParams.set('q', query.trim());
+  if (status !== 'all') returnParams.set('status', status);
+  if (categoryId !== 'all') returnParams.set('category', categoryId);
+  if (codeGroupId !== 'all') returnParams.set('group', codeGroupId);
+  if (page > 0) returnParams.set('page', String(page + 1));
+  const returnQuery = returnParams.toString();
+  const returnTo = `/admin/master-catalog/versions/${versionId}${returnQuery ? `?${returnQuery}` : ''}`;
+  return `/admin/master-catalog/versions/${versionId}/items/${identityId}?returnTo=${encodeURIComponent(returnTo)}`;
 }
 
 function CatalogAddItemForm({

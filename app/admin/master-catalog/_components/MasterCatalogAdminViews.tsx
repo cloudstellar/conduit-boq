@@ -1,7 +1,9 @@
 import Link from 'next/link';
 import {
   ArrowLeft,
+  ArchiveX,
   BookOpen,
+  ClipboardCheck,
   Database,
   Download,
   FileSpreadsheet,
@@ -37,6 +39,7 @@ import {
   CatalogImportSummary,
   CatalogRegisterPage,
   CatalogVersionDetail,
+  CatalogVersionReview,
   CatalogVersionSummary,
   formatThaiDate,
   formatThaiDateTime,
@@ -44,10 +47,12 @@ import {
   shortHash,
 } from '@/lib/master-catalog/admin/readModel';
 import {
+  MasterCatalogDraftAbandonPanel,
   MasterCatalogDraftCreatePanel,
   MasterCatalogPublishRestorePanel,
 } from './MasterCatalogMutationPanel';
 import { MasterCatalogVersionWorkspace } from './MasterCatalogVersionWorkspace';
+import { MasterCatalogFinalReviewWorkspace } from './MasterCatalogFinalReviewWorkspace';
 import { MasterCatalogImportPanel } from './MasterCatalogImportPanel';
 import type {
   CatalogImportDraftOption,
@@ -257,6 +262,15 @@ export function MasterCatalogVersionDetailView({
           </AlertDescription>
         </Alert>
       ) : null}
+      {version.status === 'abandoned' ? (
+        <Alert>
+          <ArchiveX />
+          <AlertTitle>ฉบับร่างนี้ถูกยกเลิกและเก็บเป็นประวัติแล้ว</AlertTitle>
+          <AlertDescription>
+            เปิดดูรายการและประวัติได้ แต่แก้ไข นำเข้า เผยแพร่ หรือส่งออกเป็นเอกสารทางการไม่ได้
+          </AlertDescription>
+        </Alert>
+      ) : null}
       <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_360px]">
         <Card>
           <CardHeader>
@@ -266,20 +280,22 @@ export function MasterCatalogVersionDetailView({
               {version.isDefault ? <Badge variant="secondary">ใช้งานปัจจุบัน</Badge> : null}
             </CardTitle>
             <CardDescription>{version.name}</CardDescription>
-            <div className="flex flex-wrap gap-2 pt-2">
-              <Button size="sm" asChild>
-                <a href={`/api/master-catalog/export/excel/${version.id}`}>
-                  <Download data-icon="inline-start" />
-                  ส่งออก Excel
-                </a>
-              </Button>
-              <Button variant="outline" size="sm" asChild>
-                <Link href={`/admin/master-catalog/versions/${version.id}/print`}>
-                  <Printer data-icon="inline-start" />
-                  พิมพ์ / บันทึก PDF
-                </Link>
-              </Button>
-            </div>
+            {version.status !== 'abandoned' ? (
+              <div className="flex flex-wrap gap-2 pt-2">
+                <Button size="sm" asChild>
+                  <a href={`/api/master-catalog/export/excel/${version.id}`}>
+                    <Download data-icon="inline-start" />
+                    ส่งออก Excel
+                  </a>
+                </Button>
+                <Button variant="outline" size="sm" asChild>
+                  <Link href={`/admin/master-catalog/versions/${version.id}/print`}>
+                    <Printer data-icon="inline-start" />
+                    พิมพ์ / บันทึก PDF
+                  </Link>
+                </Button>
+              </div>
+            ) : null}
           </CardHeader>
           <CardContent className="grid gap-3 text-sm sm:grid-cols-2">
             <KeyValue label="วันที่มีผล" value={formatThaiDate(version.effectiveDate)} />
@@ -306,21 +322,6 @@ export function MasterCatalogVersionDetailView({
           </CardContent>
         </Card>
       </div>
-
-      {version.status === 'draft' && !detail.isStaleDraft ? (
-        <MasterCatalogPublishRestorePanel
-          draftVersion={{
-            id: version.id,
-            versionString: version.versionString,
-            lockVersion: version.lockVersion,
-            itemCount: detail.counts.rows,
-            datasetHash: version.datasetHash,
-          }}
-          draftReadiness={detail.publishReadiness}
-          currentVersionString={null}
-          restorableVersions={[]}
-        />
-      ) : null}
 
       {version.status === 'active' && !version.isDefault ? (
         <MasterCatalogPublishRestorePanel
@@ -358,6 +359,129 @@ export function MasterCatalogVersionDetailView({
         <RecentImports imports={detail.imports} />
         <RecentChangeSets changeSets={detail.changeSets} />
       </div>
+
+      {version.status === 'draft' && !detail.isStaleDraft ? (
+        <section className="flex flex-col gap-3 border-y py-5 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <h2 className="font-semibold">ตรวจการเปลี่ยนแปลงก่อนเผยแพร่</h2>
+            <p className="text-sm text-muted-foreground">
+              ตรวจผลรวมของการแก้ไขรายรายการและการนำเข้ากับเวอร์ชันฐาน แล้วจึงกรอกข้อมูลเผยแพร่
+            </p>
+          </div>
+          <Button asChild>
+            <Link href={`/admin/master-catalog/versions/${version.id}/review`}>
+              <ClipboardCheck data-icon="inline-start" />
+              ตรวจฉบับสุดท้าย
+            </Link>
+          </Button>
+        </section>
+      ) : null}
+
+      {version.status === 'draft' && !detail.isStaleDraft ? (
+        <MasterCatalogDraftAbandonPanel
+          draftVersion={{
+            id: version.id,
+            versionString: version.versionString,
+            lockVersion: version.lockVersion,
+          }}
+        />
+      ) : null}
+    </MasterCatalogFrame>
+  );
+}
+
+export function MasterCatalogVersionReviewView({
+  gate,
+  review,
+}: {
+  gate: CatalogAdminGate;
+  review: CatalogVersionReview;
+}) {
+  const { version, baseVersion, snapshot, publishReadiness } = review;
+
+  return (
+    <MasterCatalogFrame activeSection="versions" gate={gate}>
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <Button variant="ghost" size="sm" asChild>
+          <Link href={`/admin/master-catalog/versions/${version.id}`}>
+            <ArrowLeft data-icon="inline-start" />
+            กลับไปแก้ไขฉบับร่าง
+          </Link>
+        </Button>
+        <div className="flex flex-wrap gap-2">
+          <Badge variant="secondary">ฉบับร่าง {version.versionString}</Badge>
+          <Badge variant="outline">ฐาน {baseVersion.versionString}</Badge>
+          <Badge variant="outline">รุ่นแก้ไข {version.lockVersion}</Badge>
+        </div>
+      </div>
+
+      <Warnings warnings={review.warnings} />
+
+      <section className="grid gap-2 border-b pb-4">
+        <h2 className="text-lg font-semibold">ตรวจฉบับสุดท้ายก่อนเผยแพร่</h2>
+        <p className="text-sm text-muted-foreground">
+          ผลด้านล่างมาจากรายการทั้งหมดของฉบับร่างและเวอร์ชันฐานที่อ่านจากฐานข้อมูลด้วยตัวตนรายการเดียวกัน
+        </p>
+      </section>
+
+      {snapshot.state !== 'ready' || !snapshot.diff ? (
+        <Alert variant="destructive">
+          <ShieldAlert />
+          <AlertTitle>ยังยืนยันผลเปรียบเทียบฉบับสุดท้ายไม่ได้</AlertTitle>
+          <AlertDescription>
+            <ul className="grid gap-1">
+              {snapshot.issues.map((issue) => (
+                <li key={issue.code}>{issue.message}</li>
+              ))}
+            </ul>
+          </AlertDescription>
+        </Alert>
+      ) : (
+        <MasterCatalogFinalReviewWorkspace
+          versionId={version.id}
+          baseVersionString={baseVersion.versionString}
+          draftVersionString={version.versionString}
+          diff={snapshot.diff}
+        />
+      )}
+
+      {!review.isCurrentBase ? (
+        <Alert variant="destructive">
+          <ShieldAlert />
+          <AlertTitle>ฉบับร่างนี้อ้างอิงเวอร์ชันฐานเก่า</AlertTitle>
+          <AlertDescription>
+            เปิดผลเปรียบเทียบย้อนหลังได้ แต่เผยแพร่ไม่ได้ ให้กลับไปสร้างฉบับร่างจากเวอร์ชันใช้งานปัจจุบัน
+          </AlertDescription>
+        </Alert>
+      ) : null}
+
+      {version.status === 'draft'
+        && review.isCurrentBase
+        && snapshot.state === 'ready'
+        && snapshot.reviewedLockVersion !== null ? (
+          <MasterCatalogPublishRestorePanel
+            draftVersion={{
+              id: version.id,
+              versionString: version.versionString,
+              lockVersion: snapshot.reviewedLockVersion,
+              itemCount: publishReadiness?.dataset?.itemCount ?? version.itemCount,
+              datasetHash: publishReadiness?.dataset?.datasetHash ?? version.datasetHash,
+            }}
+            draftReadiness={publishReadiness}
+            currentVersionString={review.baseVersion.versionString}
+            restorableVersions={[]}
+          />
+        ) : null}
+
+      {version.status !== 'draft' ? (
+        <Alert>
+          <ArchiveX />
+          <AlertTitle>เวอร์ชันนี้เปิดตรวจย้อนหลังเท่านั้น</AlertTitle>
+          <AlertDescription>
+            สถานะ {statusLabel(version.status)} ไม่อนุญาตให้แก้ไขหรือเผยแพร่ซ้ำ
+          </AlertDescription>
+        </Alert>
+      ) : null}
     </MasterCatalogFrame>
   );
 }
@@ -794,9 +918,18 @@ function ChangeSetRows({
 
 function StatusBadge({ status }: { status: CatalogVersionSummary['status'] }) {
   const variant =
-    status === 'active' ? 'default' : status === 'archived' ? 'outline' : 'secondary';
+    status === 'active' ? 'default' : status === 'draft' ? 'secondary' : 'outline';
 
-  return <Badge variant={variant}>{status === 'active' ? 'เผยแพร่แล้ว' : status === 'archived' ? 'เก็บถาวร' : 'ฉบับร่าง'}</Badge>;
+  return <Badge variant={variant}>{statusLabel(status)}</Badge>;
+}
+
+function statusLabel(status: CatalogVersionSummary['status']) {
+  return ({
+    active: 'เผยแพร่แล้ว',
+    archived: 'เก็บถาวร',
+    abandoned: 'ยกเลิกฉบับร่าง',
+    draft: 'ฉบับร่าง',
+  } as Record<CatalogVersionSummary['status'], string>)[status];
 }
 
 function importModeLabel(mode: string): string {
@@ -818,6 +951,7 @@ function changeTypeLabel(changeType: string): string {
     create_draft: 'สร้างฉบับร่าง',
     manual: 'แก้ไขรายรายการ',
     import: 'นำเข้า',
+    abandon: 'ยกเลิกฉบับร่าง',
     publish: 'เผยแพร่',
     restore: 'คืนเวอร์ชันใช้งาน',
   } as Record<string, string>)[changeType] ?? changeType;

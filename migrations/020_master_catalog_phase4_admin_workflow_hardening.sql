@@ -4,6 +4,7 @@
 -- - Makes categories/groups resolve-only and adds server-owned code allocation.
 -- - Adds exact admin read contracts, correction actions, publication provenance,
 --   readiness parity, and required schema constraints for WP-6.6.
+-- - Enforces one mutable draft per base and adds audited immutable abandon.
 -- - Does not implement P-18 placement, reset Local Supabase, touch BOQ rows,
 --   touch Factor F rows/pointers, enable the feature, or perform Production work.
 
@@ -7538,6 +7539,7 @@ BEGIN;
     v_null_required_count integer;
     v_duplicate_order_count integer;
     v_duplicate_change_item_count integer;
+    v_duplicate_draft_base_count integer;
     v_missing_archive_count integer;
   BEGIN
     SELECT count(*)::integer
@@ -7595,10 +7597,27 @@ BEGIN;
     END IF;
 
     SELECT count(*)::integer
+    INTO v_duplicate_draft_base_count
+    FROM (
+      SELECT based_on_version_id
+      FROM public.price_list_versions
+      WHERE status = 'draft'
+        AND based_on_version_id IS NOT NULL
+      GROUP BY based_on_version_id
+      HAVING count(*) > 1
+    ) duplicate_draft_base;
+
+    IF v_duplicate_draft_base_count <> 0 THEN
+      RAISE EXCEPTION
+        'WP-6.6 P-22 draft hardening blocked: % base versions have multiple mutable drafts',
+        v_duplicate_draft_base_count;
+    END IF;
+
+    SELECT count(*)::integer
     INTO v_missing_archive_count
     FROM public.price_list_versions
     WHERE based_on_version_id IS NOT NULL
-      AND status <> 'draft'
+      AND status NOT IN ('draft', 'abandoned')
       AND NULLIF(btrim(physical_archive_reference), '') IS NULL;
 
     IF v_missing_archive_count <> 0 THEN
@@ -7617,6 +7636,22 @@ BEGIN;
     ALTER COLUMN identity_id SET NOT NULL,
     ALTER COLUMN category_id SET NOT NULL,
     ALTER COLUMN display_order SET NOT NULL;
+
+  ALTER TABLE public.price_list_versions
+    DROP CONSTRAINT IF EXISTS price_list_versions_status_check;
+  ALTER TABLE public.price_list_versions
+    ADD CONSTRAINT price_list_versions_status_check
+    CHECK (status IN ('draft', 'active', 'archived', 'abandoned'));
+
+  ALTER TABLE public.catalog_change_sets
+    DROP CONSTRAINT IF EXISTS catalog_change_sets_change_type_check;
+  ALTER TABLE public.catalog_change_sets
+    ADD CONSTRAINT catalog_change_sets_change_type_check
+    CHECK (change_type IN ('clone', 'import', 'manual', 'abandon', 'publish', 'restore'));
+
+  CREATE UNIQUE INDEX IF NOT EXISTS uq_price_list_versions_one_draft_per_base
+    ON public.price_list_versions (based_on_version_id)
+    WHERE status = 'draft';
 
   DO $phase4_wp66_constraints$
   BEGIN
@@ -7683,7 +7718,7 @@ BEGIN;
         ADD CONSTRAINT check_phase4_published_archive_reference
         CHECK (
           based_on_version_id IS NULL
-          OR status = 'draft'
+          OR status IN ('draft', 'abandoned')
           OR physical_archive_reference IS NOT NULL
         ) NOT VALID;
     END IF;
@@ -7974,6 +8009,315 @@ BEGIN;
       FROM public.app_settings setting
       WHERE setting.key = p_key
     ), false);
+  $function$;
+
+  CREATE OR REPLACE FUNCTION private.create_catalog_draft_guarded_impl(
+    p_base_version_id uuid,
+    p_version_major integer,
+    p_version_minor integer,
+    p_version_patch integer,
+    p_name text,
+    p_reason text,
+    p_request_id uuid
+  )
+  RETURNS jsonb
+  LANGUAGE plpgsql
+  SECURITY DEFINER
+  SET search_path = ''
+  SET lock_timeout = '5s'
+  SET statement_timeout = '30s'
+  AS $function$
+  DECLARE
+    v_constraint_name text;
+  BEGIN
+    BEGIN
+      RETURN private.create_catalog_draft_impl(
+        p_base_version_id,
+        p_version_major,
+        p_version_minor,
+        p_version_patch,
+        p_name,
+        p_reason,
+        p_request_id
+      );
+    EXCEPTION
+      WHEN unique_violation THEN
+        GET STACKED DIAGNOSTICS v_constraint_name = CONSTRAINT_NAME;
+
+        IF v_constraint_name = 'uq_price_list_versions_one_draft_per_base' THEN
+          RETURN private.catalog_action_error(
+            p_request_id,
+            'DRAFT_ALREADY_EXISTS',
+            'A mutable draft already exists for this base catalog version',
+            false
+          );
+        END IF;
+
+        RAISE;
+    END;
+  END;
+  $function$;
+
+  CREATE OR REPLACE FUNCTION private.abandon_catalog_draft_impl(
+    p_version_id uuid,
+    p_expected_lock_version integer,
+    p_reason text,
+    p_request_id uuid
+  )
+  RETURNS jsonb
+  LANGUAGE plpgsql
+  SECURITY DEFINER
+  SET search_path = ''
+  SET lock_timeout = '5s'
+  SET statement_timeout = '30s'
+  AS $function$
+  DECLARE
+    v_actor_id uuid;
+    v_actor_display_name text;
+    v_reason text;
+    v_request_fingerprint text;
+    v_existing_change public.catalog_change_sets%ROWTYPE;
+    v_draft public.price_list_versions%ROWTYPE;
+    v_current_version_id uuid;
+    v_change_set_id uuid;
+    v_after_lock integer;
+  BEGIN
+    SELECT actor_id, actor_display_name
+    INTO v_actor_id, v_actor_display_name
+    FROM private.catalog_admin_context();
+
+    IF v_actor_id IS NULL THEN
+      RETURN private.catalog_action_error(
+        p_request_id,
+        'FORBIDDEN',
+        'Active admin profile is required',
+        false
+      );
+    END IF;
+
+    IF NOT private.catalog_admin_enabled() THEN
+      RETURN private.catalog_action_error(
+        p_request_id,
+        'FORBIDDEN',
+        'Master Catalog admin gate is disabled',
+        false
+      );
+    END IF;
+
+    v_reason := NULLIF(btrim(p_reason), '');
+
+    IF p_version_id IS NULL
+       OR p_request_id IS NULL
+       OR p_expected_lock_version IS NULL
+       OR p_expected_lock_version < 0
+       OR v_reason IS NULL
+       OR length(v_reason) > 500 THEN
+      RETURN private.catalog_action_error(
+        p_request_id,
+        'VALIDATION_FAILED',
+        'Draft, expected lock version, reason, and request ID are required',
+        false
+      );
+    END IF;
+
+    v_request_fingerprint := private.catalog_request_fingerprint(
+      'abandon_draft',
+      jsonb_build_object(
+        'versionId', p_version_id,
+        'expectedLockVersion', p_expected_lock_version,
+        'reason', v_reason
+      )
+    );
+
+    PERFORM pg_catalog.pg_advisory_xact_lock(
+      pg_catalog.hashtextextended('master_catalog_request:' || p_request_id::text, 0)
+    );
+
+    SELECT *
+    INTO v_existing_change
+    FROM public.catalog_change_sets
+    WHERE request_id = p_request_id;
+
+    IF FOUND THEN
+      IF v_existing_change.change_type IS DISTINCT FROM 'abandon'
+         OR v_existing_change.actor_id IS DISTINCT FROM v_actor_id
+         OR v_existing_change.request_fingerprint IS DISTINCT FROM v_request_fingerprint THEN
+        RETURN private.catalog_action_error(
+          p_request_id,
+          'REQUEST_ID_PAYLOAD_MISMATCH',
+          'Request ID was already used with a different catalog operation or payload',
+          false
+        );
+      END IF;
+
+      SELECT *
+      INTO v_draft
+      FROM public.price_list_versions
+      WHERE id = v_existing_change.version_id;
+
+      RETURN private.catalog_action_success(
+        p_request_id,
+        jsonb_build_object(
+          'versionId', v_existing_change.version_id::text,
+          'versionString', v_draft.version_string,
+          'status', v_draft.status,
+          'lockVersion', v_existing_change.after_lock_version,
+          'changeSetId', v_existing_change.id::text,
+          'duplicateRequest', true
+        )
+      );
+    END IF;
+
+    IF EXISTS (
+      SELECT 1
+      FROM public.catalog_imports
+      WHERE request_id = p_request_id
+    ) THEN
+      RETURN private.catalog_action_error(
+        p_request_id,
+        'REQUEST_ID_PAYLOAD_MISMATCH',
+        'Request ID was already used with a different catalog operation or payload',
+        false
+      );
+    END IF;
+
+    SELECT version_id
+    INTO v_current_version_id
+    FROM public.price_list_default_version
+    WHERE id = true
+    FOR UPDATE;
+
+    SELECT *
+    INTO v_draft
+    FROM public.price_list_versions
+    WHERE id = p_version_id
+    FOR UPDATE;
+
+    IF NOT FOUND THEN
+      RETURN private.catalog_action_error(
+        p_request_id,
+        'DRAFT_NOT_FOUND',
+        'Draft catalog version was not found',
+        false
+      );
+    END IF;
+
+    IF v_draft.status <> 'draft' THEN
+      RETURN private.catalog_action_error(
+        p_request_id,
+        'DRAFT_NOT_EDITABLE',
+        'Only a mutable draft can be abandoned',
+        false
+      );
+    END IF;
+
+    IF v_draft.based_on_version_id IS DISTINCT FROM v_current_version_id THEN
+      RETURN private.catalog_action_error(
+        p_request_id,
+        'DRAFT_BASE_STALE',
+        'A stale draft remains read-only and does not need abandonment before a new current-base draft',
+        false
+      );
+    END IF;
+
+    IF v_draft.lock_version IS DISTINCT FROM p_expected_lock_version THEN
+      RETURN private.catalog_action_error(
+        p_request_id,
+        'DRAFT_LOCK_CONFLICT',
+        'Draft lock version is stale',
+        true
+      );
+    END IF;
+
+    v_after_lock := v_draft.lock_version + 1;
+
+    INSERT INTO public.catalog_change_sets (
+      version_id,
+      change_type,
+      reason,
+      request_id,
+      request_fingerprint,
+      actor_id,
+      actor_display_name,
+      before_lock_version,
+      after_lock_version
+    )
+    VALUES (
+      v_draft.id,
+      'abandon',
+      v_reason,
+      p_request_id,
+      v_request_fingerprint,
+      v_actor_id,
+      v_actor_display_name,
+      v_draft.lock_version,
+      v_after_lock
+    )
+    RETURNING id INTO v_change_set_id;
+
+    UPDATE public.price_list_versions
+    SET
+      status = 'abandoned',
+      lock_version = v_after_lock,
+      updated_at = now()
+    WHERE id = v_draft.id;
+
+    RETURN private.catalog_action_success(
+      p_request_id,
+      jsonb_build_object(
+        'versionId', v_draft.id::text,
+        'versionString', v_draft.version_string,
+        'status', 'abandoned',
+        'lockVersion', v_after_lock,
+        'changeSetId', v_change_set_id::text,
+        'duplicateRequest', false
+      )
+    );
+  END;
+  $function$;
+
+  CREATE OR REPLACE FUNCTION public.create_catalog_draft(
+    p_base_version_id uuid,
+    p_version_major integer,
+    p_version_minor integer,
+    p_version_patch integer,
+    p_name text,
+    p_reason text,
+    p_request_id uuid
+  )
+  RETURNS jsonb
+  LANGUAGE sql
+  SECURITY INVOKER
+  SET search_path = ''
+  AS $function$
+    SELECT private.create_catalog_draft_guarded_impl(
+      p_base_version_id,
+      p_version_major,
+      p_version_minor,
+      p_version_patch,
+      p_name,
+      p_reason,
+      p_request_id
+    );
+  $function$;
+
+  CREATE OR REPLACE FUNCTION public.abandon_catalog_draft(
+    p_version_id uuid,
+    p_expected_lock_version integer,
+    p_reason text,
+    p_request_id uuid
+  )
+  RETURNS jsonb
+  LANGUAGE sql
+  SECURITY INVOKER
+  SET search_path = ''
+  AS $function$
+    SELECT private.abandon_catalog_draft_impl(
+      p_version_id,
+      p_expected_lock_version,
+      p_reason,
+      p_request_id
+    );
   $function$;
 
   CREATE OR REPLACE FUNCTION private.apply_catalog_changes_impl(
@@ -9950,6 +10294,46 @@ BEGIN;
   $function$;
 
 
+  CREATE OR REPLACE FUNCTION private.prevent_published_catalog_row_mutation()
+  RETURNS trigger
+  LANGUAGE plpgsql
+  SECURITY DEFINER
+  SET search_path = ''
+  AS $function$
+  DECLARE
+    v_old_status text;
+    v_new_status text;
+  BEGIN
+    IF TG_OP IN ('UPDATE', 'DELETE') THEN
+      SELECT status
+      INTO v_old_status
+      FROM public.price_list_versions
+      WHERE id = OLD.version_id;
+
+      IF v_old_status IN ('active', 'archived', 'abandoned') THEN
+        RAISE EXCEPTION 'CATALOG_IMMUTABLE_ROW: published or abandoned catalog rows cannot be changed';
+      END IF;
+    END IF;
+
+    IF TG_OP IN ('INSERT', 'UPDATE') THEN
+      SELECT status
+      INTO v_new_status
+      FROM public.price_list_versions
+      WHERE id = NEW.version_id;
+
+      IF v_new_status IN ('active', 'archived', 'abandoned') THEN
+        RAISE EXCEPTION 'CATALOG_IMMUTABLE_ROW: published or abandoned catalog rows cannot be changed';
+      END IF;
+    END IF;
+
+    IF TG_OP = 'DELETE' THEN
+      RETURN OLD;
+    END IF;
+
+    RETURN NEW;
+  END;
+  $function$;
+
   CREATE OR REPLACE FUNCTION private.prevent_published_catalog_version_metadata_mutation()
   RETURNS trigger
   LANGUAGE plpgsql
@@ -9957,6 +10341,10 @@ BEGIN;
   SET search_path = ''
   AS $function$
   BEGIN
+    IF OLD.status = 'abandoned' AND NEW IS DISTINCT FROM OLD THEN
+      RAISE EXCEPTION 'CATALOG_ABANDONED_VERSION_IMMUTABLE: abandoned catalog metadata cannot be changed';
+    END IF;
+
     IF OLD.status IN ('active', 'archived') THEN
       IF NEW.major IS DISTINCT FROM OLD.major
          OR NEW.minor IS DISTINCT FROM OLD.minor
@@ -10276,6 +10664,35 @@ BEGIN;
   -- ---------------------------------------------------------------------------
   -- 8. Explicit function privileges and migration postconditions
   -- ---------------------------------------------------------------------------
+  REVOKE EXECUTE ON FUNCTION private.create_catalog_draft_impl(
+    uuid, integer, integer, integer, text, text, uuid
+  ) FROM PUBLIC, anon, authenticated;
+  REVOKE EXECUTE ON FUNCTION private.create_catalog_draft_guarded_impl(
+    uuid, integer, integer, integer, text, text, uuid
+  ) FROM PUBLIC, anon;
+  REVOKE EXECUTE ON FUNCTION private.abandon_catalog_draft_impl(
+    uuid, integer, text, uuid
+  ) FROM PUBLIC, anon;
+  GRANT EXECUTE ON FUNCTION private.create_catalog_draft_guarded_impl(
+    uuid, integer, integer, integer, text, text, uuid
+  ) TO authenticated;
+  GRANT EXECUTE ON FUNCTION private.abandon_catalog_draft_impl(
+    uuid, integer, text, uuid
+  ) TO authenticated;
+
+  REVOKE EXECUTE ON FUNCTION public.create_catalog_draft(
+    uuid, integer, integer, integer, text, text, uuid
+  ) FROM PUBLIC, anon;
+  REVOKE EXECUTE ON FUNCTION public.abandon_catalog_draft(
+    uuid, integer, text, uuid
+  ) FROM PUBLIC, anon;
+  GRANT EXECUTE ON FUNCTION public.create_catalog_draft(
+    uuid, integer, integer, integer, text, text, uuid
+  ) TO authenticated;
+  GRANT EXECUTE ON FUNCTION public.abandon_catalog_draft(
+    uuid, integer, text, uuid
+  ) TO authenticated;
+
   REVOKE EXECUTE ON FUNCTION private.catalog_ensure_category(uuid, text)
     FROM PUBLIC, anon, authenticated;
   REVOKE EXECUTE ON FUNCTION private.catalog_ensure_code_group(uuid, text, text, text, text)
@@ -10293,6 +10710,8 @@ BEGIN;
   REVOKE EXECUTE ON FUNCTION private.catalog_capability_enabled(text)
     FROM PUBLIC, anon, authenticated;
   REVOKE EXECUTE ON FUNCTION private.catalog_publish_readiness(uuid)
+    FROM PUBLIC, anon, authenticated;
+  REVOKE EXECUTE ON FUNCTION private.prevent_published_catalog_row_mutation()
     FROM PUBLIC, anon, authenticated;
   REVOKE EXECUTE ON FUNCTION private.prevent_published_catalog_version_metadata_mutation()
     FROM PUBLIC, anon, authenticated;
@@ -10391,6 +10810,66 @@ BEGIN;
         AND constraint_row.convalidated
     ) THEN
       RAISE EXCEPTION 'WP-6.6 postcondition failed: required catalog constraints are not valid';
+    END IF;
+
+    IF NOT EXISTS (
+      SELECT 1
+      FROM pg_class index_relation
+      JOIN pg_namespace index_namespace
+        ON index_namespace.oid = index_relation.relnamespace
+      JOIN pg_index index_definition
+        ON index_definition.indexrelid = index_relation.oid
+      WHERE index_namespace.nspname = 'public'
+        AND index_relation.relname = 'uq_price_list_versions_one_draft_per_base'
+        AND index_definition.indisunique
+        AND index_definition.indisvalid
+        AND index_definition.indpred IS NOT NULL
+    ) THEN
+      RAISE EXCEPTION 'WP-6.6 P-22 postcondition failed: one-draft-per-base index is missing';
+    END IF;
+
+    IF NOT EXISTS (
+      SELECT 1
+      FROM pg_constraint constraint_row
+      WHERE constraint_row.conrelid = 'public.price_list_versions'::regclass
+        AND constraint_row.conname = 'price_list_versions_status_check'
+        AND constraint_row.convalidated
+    ) OR NOT EXISTS (
+      SELECT 1
+      FROM pg_constraint constraint_row
+      WHERE constraint_row.conrelid = 'public.catalog_change_sets'::regclass
+        AND constraint_row.conname = 'catalog_change_sets_change_type_check'
+        AND constraint_row.convalidated
+    ) THEN
+      RAISE EXCEPTION 'WP-6.6 P-22 postcondition failed: lifecycle constraints are not valid';
+    END IF;
+
+    IF to_regprocedure(
+      'public.abandon_catalog_draft(uuid,integer,text,uuid)'
+    ) IS NULL OR to_regprocedure(
+      'private.abandon_catalog_draft_impl(uuid,integer,text,uuid)'
+    ) IS NULL THEN
+      RAISE EXCEPTION 'WP-6.6 P-22 postcondition failed: abandon functions are missing';
+    END IF;
+
+    IF NOT has_function_privilege(
+      'authenticated',
+      'public.abandon_catalog_draft(uuid,integer,text,uuid)',
+      'EXECUTE'
+    ) OR has_function_privilege(
+      'anon',
+      'public.abandon_catalog_draft(uuid,integer,text,uuid)',
+      'EXECUTE'
+    ) THEN
+      RAISE EXCEPTION 'WP-6.6 P-22 postcondition failed: abandon grants are not least privilege';
+    END IF;
+
+    IF has_function_privilege(
+      'authenticated',
+      'private.create_catalog_draft_impl(uuid,integer,integer,integer,text,text,uuid)',
+      'EXECUTE'
+    ) THEN
+      RAISE EXCEPTION 'WP-6.6 P-22 postcondition failed: guarded draft creation can be bypassed';
     END IF;
 
     IF EXISTS (

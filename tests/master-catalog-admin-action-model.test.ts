@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import {
+  buildAbandonCatalogDraftArgs,
   buildPublishCatalogVersionArgs,
   buildRestoreCatalogPointerArgs,
   buildManualCatalogChangeArgs,
@@ -90,6 +91,28 @@ describe('Master Catalog admin action model', () => {
       p_target_version_id: VERSION_ID,
       p_reason: 'WP-5 local-only pointer restore',
       p_request_id: REQUEST_ID,
+    });
+  });
+
+  it('builds an audited abandon payload with the exact draft lock', () => {
+    expect(buildAbandonCatalogDraftArgs(form({
+      versionId: VERSION_ID,
+      expectedLockVersion: '3',
+      reason: 'ยกเลิกฉบับร่างเพื่อเริ่มรอบแก้ไขใหม่',
+    }), REQUEST_ID)).toEqual({
+      p_version_id: VERSION_ID,
+      p_expected_lock_version: 3,
+      p_reason: 'ยกเลิกฉบับร่างเพื่อเริ่มรอบแก้ไขใหม่',
+      p_request_id: REQUEST_ID,
+    });
+
+    expect(buildAbandonCatalogDraftArgs(form({
+      versionId: VERSION_ID,
+      expectedLockVersion: '3',
+      reason: '',
+    }), REQUEST_ID)).toMatchObject({
+      status: 'error',
+      code: 'VALIDATION_FAILED',
     });
   });
 
@@ -240,6 +263,18 @@ describe('Master Catalog admin action model', () => {
     });
 
     expect(mapCatalogRpcActionResponse({
+      ok: false,
+      error: {
+        code: 'DRAFT_ALREADY_EXISTS',
+        message: 'A mutable draft already exists for this base catalog version',
+      },
+    }, 'unused')).toMatchObject({
+      status: 'error',
+      code: 'DRAFT_ALREADY_EXISTS',
+      message: expect.stringContaining('มีฉบับร่างที่กำลังทำงานอยู่แล้ว'),
+    });
+
+    expect(mapCatalogRpcActionResponse({
       ok: true,
       data: {
         targetVersionId: VERSION_ID,
@@ -290,6 +325,14 @@ describe('Master Catalog admin action model', () => {
       status: 'error',
       code: 'INTERNAL_ERROR',
       message: expect.stringContaining('ผลลัพธ์อาจถูกบันทึกแล้ว'),
+      requestId: REQUEST_ID,
+      outcomeUncertain: true,
+    });
+
+    expect(createCatalogRpcTransportError('abandonCatalogDraft', REQUEST_ID)).toMatchObject({
+      status: 'error',
+      code: 'INTERNAL_ERROR',
+      message: expect.stringContaining('ยกเลิกฉบับร่างไม่สำเร็จ'),
       requestId: REQUEST_ID,
       outcomeUncertain: true,
     });

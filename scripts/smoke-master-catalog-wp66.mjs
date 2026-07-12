@@ -46,13 +46,17 @@ try {
 
   currentStage = 'verify migration schema and security postconditions'
   const schemaContract = readSchemaContract()
-  assert(schemaContract.required_constraints === 3, 'Required WP-6.6 constraints are incomplete')
+  assert(schemaContract.required_constraints === 5, 'Required WP-6.6 constraints are incomplete')
+  assert(schemaContract.one_draft_index === true, 'One-draft-per-base index is missing')
   assert(schemaContract.nullable_required_columns === 0, 'Required price-list columns remain nullable')
   assert(schemaContract.authority_rls_tables === 3, 'Frozen authority RLS is incomplete')
   assert(schemaContract.authority_policies === 3, 'Frozen authority policies are incomplete')
   assert(schemaContract.anon_versions_page_execute === false, 'Anon can execute the versions register')
   assert(schemaContract.auth_versions_page_execute === true, 'Authenticated register execute is missing')
   assert(schemaContract.auth_private_allocator_execute === false, 'Authenticated can execute private allocator')
+  assert(schemaContract.auth_old_create_impl_execute === false, 'Authenticated can bypass guarded draft creation')
+  assert(schemaContract.anon_abandon_execute === false, 'Anon can execute draft abandon')
+  assert(schemaContract.auth_abandon_execute === true, 'Authenticated draft abandon execute is missing')
   assert(schemaContract.disabled_capability_count === 3, 'Catalog capabilities do not default false')
 
   currentStage = 'read and enable only the admin gate'
@@ -76,22 +80,83 @@ try {
   const beforeFactor = await readFactorSummary()
   const versions = await allocateRevisionVersions(base, 4)
 
-  currentStage = 'create exact allocator and correction drafts'
-  const allocatorDraftA = await createDraft(adminA, base, versions[0], 'allocator A')
-  const allocatorDraftB = await createDraft(adminB, base, versions[1], 'allocator B')
-  const correctionDraft = await createDraft(adminA, base, versions[2], 'correction')
-  const rolloutDraft = await createDraft(adminA, base, versions[3], 'first rollout')
+  currentStage = 'verify one-current-base-draft create race and replay'
+  const createAttempts = [
+    {
+      target: adminA,
+      version: versions[0],
+      label: 'working draft race A',
+      requestId: randomUUID(),
+    },
+    {
+      target: adminB,
+      version: versions[1],
+      label: 'working draft race B',
+      requestId: randomUUID(),
+    },
+  ]
+  const createRaceResults = await Promise.all(
+    createAttempts.map((attempt) => createDraftRequest(
+      attempt.target,
+      base,
+      attempt.version,
+      attempt.label,
+      attempt.requestId,
+    )),
+  )
+  const createWinners = createRaceResults
+    .map((result, index) => ({ result, index }))
+    .filter(({ result }) => result.data?.ok === true && !result.error)
+  assert(createWinners.length === 1, 'Two-session draft creation did not produce one winner')
+  const createWinnerIndex = createWinners[0].index
+  const createLoserIndex = createWinnerIndex === 0 ? 1 : 0
+  const createWinnerAttempt = createAttempts[createWinnerIndex]
+  const createWinner = actionOk(
+    createRaceResults[createWinnerIndex],
+    'working draft create race winner',
+  )
+  actionCode(
+    createRaceResults[createLoserIndex],
+    'working draft create race loser',
+    'DRAFT_ALREADY_EXISTS',
+  )
+  const workingDraft = {
+    versionId: createWinner.versionId,
+    lockVersion: createWinner.lockVersion,
+  }
+  const createReplay = actionOk(
+    await createDraftRequest(
+      createWinnerAttempt.target,
+      base,
+      createWinnerAttempt.version,
+      createWinnerAttempt.label,
+      createWinnerAttempt.requestId,
+    ),
+    'working draft create replay',
+  )
+  assert(createReplay.versionId === workingDraft.versionId, 'Create replay returned another draft')
+  assert(createReplay.duplicateRequest === true, 'Create replay was not marked duplicate')
+  actionCode(
+    await createDraftRequest(staff, base, versions[2], 'staff denied', randomUUID()),
+    'non-admin draft create',
+    'FORBIDDEN',
+  )
+  actionCode(
+    await createDraftRequest(adminA, base, versions[2], 'duplicate current base', randomUUID()),
+    'duplicate current-base draft create',
+    'DRAFT_ALREADY_EXISTS',
+  )
 
   currentStage = 'verify new-identity default deny and resolve-only authority'
-  const addA = await approvedAddChange(allocatorDraftA.versionId, 'A')
+  const addA = await approvedAddChange(workingDraft.versionId, 'A')
   actionCode(
-    await applyManual(adminA, allocatorDraftA, [addA], 'new identity default deny'),
+    await applyManual(adminA, workingDraft, [addA], 'new identity default deny'),
     'new identity default deny',
     'CATALOG_NEW_IDENTITY_DISABLED',
   )
   await setSetting('catalog_new_identity_enabled', true)
   actionCode(
-    await applyManual(adminA, allocatorDraftA, [{
+    await applyManual(adminA, workingDraft, [{
       ...addA,
       categoryId: randomUUID(),
     }], 'unknown category denial'),
@@ -99,7 +164,7 @@ try {
     'CATALOG_AUTHORITY_NOT_FOUND',
   )
   actionCode(
-    await applyManual(adminA, allocatorDraftA, [{
+    await applyManual(adminA, workingDraft, [{
       ...addA,
       canonicalCode: `${addA.workContextCode}-${addA.itemTypeCode}-001`,
     }], 'caller code denial'),
@@ -107,46 +172,68 @@ try {
     'CATALOG_CODE_SERVER_ALLOCATION_REQUIRED',
   )
 
-  currentStage = 'verify concurrent server allocation and never reuse'
-  const addB = await approvedAddChange(allocatorDraftB.versionId, 'B')
+  currentStage = 'verify serialized server allocation and never reuse'
+  const addB = await approvedAddChange(workingDraft.versionId, 'B')
   const allocationResults = await Promise.all([
-    applyManual(adminA, allocatorDraftA, [addA], 'concurrent allocator A'),
-    applyManual(adminB, allocatorDraftB, [addB], 'concurrent allocator B'),
+    applyManual(adminA, workingDraft, [addA], 'concurrent allocator A'),
+    applyManual(adminB, workingDraft, [addB], 'concurrent allocator B'),
   ])
-  const allocationA = actionOk(allocationResults[0], 'concurrent allocator A')
-  const allocationB = actionOk(allocationResults[1], 'concurrent allocator B')
-  const rowA = await readDraftItemByName(allocatorDraftA.versionId, addA.itemName)
-  const rowB = await readDraftItemByName(allocatorDraftB.versionId, addB.itemName)
-  assert(rowA.item_code !== rowB.item_code, 'Concurrent allocators returned the same code')
+  const allocationWinnerIndex = allocationResults.findIndex(
+    (result) => result.data?.ok === true && !result.error,
+  )
+  assert(allocationWinnerIndex !== -1, 'Concurrent same-draft allocation had no winner')
+  const allocationLoserIndex = allocationWinnerIndex === 0 ? 1 : 0
+  const allocationWinner = actionOk(
+    allocationResults[allocationWinnerIndex],
+    'concurrent allocator winner',
+  )
+  actionCode(
+    allocationResults[allocationLoserIndex],
+    'concurrent allocator stale loser',
+    'DRAFT_LOCK_CONFLICT',
+  )
+  const firstAdd = allocationWinnerIndex === 0 ? addA : addB
+  const secondAdd = allocationWinnerIndex === 0 ? addB : addA
+  const rowA = await readDraftItemByName(workingDraft.versionId, firstAdd.itemName)
+  const allocationB = actionOk(
+    await applyManual(adminB, {
+      ...workingDraft,
+      lockVersion: allocationWinner.lockVersion,
+    }, [secondAdd], 'allocator retry after lock refresh'),
+    'allocator retry after lock refresh',
+  )
+  const rowB = await readDraftItemByName(workingDraft.versionId, secondAdd.itemName)
+  assert(rowA.item_code !== rowB.item_code, 'Serialized allocators returned the same code')
   assert(codeGroupPrefix(rowA.item_code) === codeGroupPrefix(rowB.item_code), 'Allocator fixtures did not use one group')
 
   const withdrawA = actionOk(
     await applyManual(adminA, {
-      ...allocatorDraftA,
-      lockVersion: allocationA.lockVersion,
+      ...workingDraft,
+      lockVersion: allocationB.lockVersion,
     }, [withdrawChange(rowA)], 'withdraw allocator A'),
     'withdraw allocator A',
   )
   actionOk(
     await applyManual(adminB, {
-      ...allocatorDraftB,
-      lockVersion: allocationB.lockVersion,
+      ...workingDraft,
+      lockVersion: withdrawA.lockVersion,
     }, [withdrawChange(rowB)], 'withdraw allocator B'),
     'withdraw allocator B',
   )
+  const withdrawBVersion = await readVersion(workingDraft.versionId)
   await assertWithdrawPreservedRegistry(rowA)
   await assertWithdrawPreservedRegistry(rowB)
 
-  const addAfterWithdraw = await approvedAddChange(allocatorDraftA.versionId, 'C')
+  const addAfterWithdraw = await approvedAddChange(workingDraft.versionId, 'C')
   const afterWithdrawApply = actionOk(
     await applyManual(adminA, {
-      ...allocatorDraftA,
-      lockVersion: withdrawA.lockVersion,
+      ...workingDraft,
+      lockVersion: withdrawBVersion.lock_version,
     }, [addAfterWithdraw], 'allocator after withdraw'),
     'allocator after withdraw',
   )
   const rowAfterWithdraw = await readDraftItemByName(
-    allocatorDraftA.versionId,
+    workingDraft.versionId,
     addAfterWithdraw.itemName,
   )
   assert(
@@ -156,9 +243,9 @@ try {
     ),
     'Allocator reused a withdrawn sequence',
   )
-  actionOk(
+  const withdrawC = actionOk(
     await applyManual(adminA, {
-      ...allocatorDraftA,
+      ...workingDraft,
       lockVersion: afterWithdrawApply.lockVersion,
     }, [withdrawChange(rowAfterWithdraw)], 'withdraw allocator C'),
     'withdraw allocator C',
@@ -168,6 +255,10 @@ try {
   await setSetting('catalog_new_identity_enabled', false)
 
   currentStage = 'verify retire, reactivate, and inherited-withdraw correction rules'
+  const correctionDraft = {
+    ...workingDraft,
+    lockVersion: withdrawC.lockVersion,
+  }
   const correctionRow = await readBaselineItem(correctionDraft.versionId)
   actionCode(
     await applyManual(adminA, correctionDraft, [retireChange(correctionRow)], 'retirement default deny'),
@@ -204,6 +295,65 @@ try {
     correctionHistory.rows.some((row) => row.action === 'reactivate' && row.old_values && row.new_values),
     'Reactivate history is missing before/after snapshots',
   )
+
+  currentStage = 'verify audited abandon, replay, immutable history, and replacement'
+  const abandonableDraft = {
+    ...workingDraft,
+    lockVersion: reactivateResult.lockVersion,
+  }
+  actionCode(
+    await abandonDraft(staff, abandonableDraft, 'non-admin abandon', randomUUID()),
+    'non-admin draft abandon',
+    'FORBIDDEN',
+  )
+  actionCode(
+    await abandonDraft(adminA, {
+      ...abandonableDraft,
+      lockVersion: Math.max(0, abandonableDraft.lockVersion - 1),
+    }, 'stale abandon', randomUUID()),
+    'stale draft abandon',
+    'DRAFT_LOCK_CONFLICT',
+  )
+  const abandonRequestId = randomUUID()
+  const abandonResult = actionOk(
+    await abandonDraft(adminA, abandonableDraft, 'replace working draft', abandonRequestId),
+    'abandon working draft',
+  )
+  const abandonReplay = actionOk(
+    await abandonDraft(adminA, abandonableDraft, 'replace working draft', abandonRequestId),
+    'abandon working draft replay',
+  )
+  assert(abandonReplay.duplicateRequest === true, 'Abandon replay was not marked duplicate')
+  assert(abandonReplay.versionId === abandonResult.versionId, 'Abandon replay changed target')
+  const abandonedVersion = await readVersion(workingDraft.versionId)
+  assert(abandonedVersion.status === 'abandoned', 'Draft did not become abandoned')
+  const abandonedSnapshotRows = await countRows(
+    'price_list',
+    (query) => query.eq('version_id', workingDraft.versionId),
+  )
+  assert(
+    abandonedSnapshotRows === 710,
+    'Abandon did not retain the full draft snapshot',
+  )
+  const abandonChangeSetCount = await countRows(
+    'catalog_change_sets',
+    (query) => query
+      .eq('version_id', workingDraft.versionId)
+      .eq('change_type', 'abandon'),
+  )
+  assert(
+    abandonChangeSetCount === 1,
+    'Abandon did not append exactly one audit change set',
+  )
+  actionCode(
+    await applyManual(adminA, {
+      ...workingDraft,
+      lockVersion: abandonResult.lockVersion,
+    }, [retireChange(correctionRow)], 'abandoned draft mutation denial'),
+    'abandoned draft mutation denial',
+    'DRAFT_NOT_EDITABLE',
+  )
+  const rolloutDraft = await createDraft(adminA, base, versions[3], 'replacement first rollout')
 
   currentStage = 'validate and apply the complete frozen first rollout'
   const importEvidence = await applyFirstRollout(adminA, rolloutDraft)
@@ -318,9 +468,25 @@ try {
     allocator: {
       concurrentCodes: [rowA.item_code, rowB.item_code],
       afterWithdrawCode: rowAfterWithdraw.item_code,
-      concurrentUnique: true,
+      serializedConflict: true,
+      sequentialUnique: true,
       neverReuse: true,
       capacityBoundary: true,
+    },
+    draftLifecycle: {
+      createRaceWinnerCount: createWinners.length,
+      duplicateDraftDenied: true,
+      createReplayDuplicate: createReplay.duplicateRequest,
+      nonAdminCreateDenied: true,
+      workingDraftVersionId: workingDraft.versionId,
+      abandonedVersionId: abandonedVersion.id,
+      abandonedStatus: abandonedVersion.status,
+      abandonedLockVersion: abandonedVersion.lock_version,
+      abandonReplayDuplicate: abandonReplay.duplicateRequest,
+      retainedSnapshotRows: abandonedSnapshotRows,
+      abandonChangeSetCount,
+      postAbandonMutationDenied: true,
+      replacementDraftVersionId: rolloutDraft.versionId,
     },
     correction: {
       retireReactivate: true,
@@ -488,16 +654,35 @@ async function allocateRevisionVersions(base, count) {
 }
 
 async function createDraft(target, base, version, label) {
-  const result = actionOk(await target.rpc('create_catalog_draft', {
+  const result = actionOk(await createDraftRequest(
+    target,
+    base,
+    version,
+    label,
+    randomUUID(),
+  ), `create ${label} draft`)
+  return { versionId: result.versionId, lockVersion: result.lockVersion }
+}
+
+function createDraftRequest(target, base, version, label, requestId) {
+  return target.rpc('create_catalog_draft', {
     p_base_version_id: base.id,
     p_version_major: version.major,
     p_version_minor: version.minor,
     p_version_patch: version.patch,
     p_name: `Local WP-6.6 ${label}`,
     p_reason: `WP-6.6 Local-only ${label}`,
-    p_request_id: randomUUID(),
-  }), `create ${label} draft`)
-  return { versionId: result.versionId, lockVersion: result.lockVersion }
+    p_request_id: requestId,
+  })
+}
+
+function abandonDraft(target, draft, reason, requestId) {
+  return target.rpc('abandon_catalog_draft', {
+    p_version_id: draft.versionId,
+    p_expected_lock_version: draft.lockVersion,
+    p_reason: `WP-6.6 ${reason}`,
+    p_request_id: requestId,
+  })
 }
 
 async function approvedAddChange(versionId, suffix) {
@@ -849,9 +1034,31 @@ function readSchemaContract() {
     SELECT json_build_object(
       'required_constraints', (
         SELECT count(*) FROM pg_constraint
-        WHERE conrelid IN ('public.price_list'::regclass, 'public.catalog_change_items'::regclass)
-          AND conname IN ('uq_price_list_version_display_order', 'check_price_list_canonical_group_required', 'uq_catalog_change_items_set_identity')
+        WHERE conrelid IN (
+          'public.price_list'::regclass,
+          'public.catalog_change_items'::regclass,
+          'public.price_list_versions'::regclass,
+          'public.catalog_change_sets'::regclass
+        )
+          AND conname IN (
+            'uq_price_list_version_display_order',
+            'check_price_list_canonical_group_required',
+            'uq_catalog_change_items_set_identity',
+            'price_list_versions_status_check',
+            'catalog_change_sets_change_type_check'
+          )
           AND convalidated
+      ),
+      'one_draft_index', EXISTS (
+        SELECT 1
+        FROM pg_class index_relation
+        JOIN pg_namespace index_namespace ON index_namespace.oid = index_relation.relnamespace
+        JOIN pg_index index_definition ON index_definition.indexrelid = index_relation.oid
+        WHERE index_namespace.nspname = 'public'
+          AND index_relation.relname = 'uq_price_list_versions_one_draft_per_base'
+          AND index_definition.indisunique
+          AND index_definition.indisvalid
+          AND index_definition.indpred IS NOT NULL
       ),
       'nullable_required_columns', (
         SELECT count(*) FROM information_schema.columns
@@ -875,6 +1082,9 @@ function readSchemaContract() {
       'anon_versions_page_execute', has_function_privilege('anon','public.get_catalog_versions_page(integer,timestamptz,uuid)','EXECUTE'),
       'auth_versions_page_execute', has_function_privilege('authenticated','public.get_catalog_versions_page(integer,timestamptz,uuid)','EXECUTE'),
       'auth_private_allocator_execute', has_function_privilege('authenticated','private.catalog_allocate_code(uuid,uuid)','EXECUTE'),
+      'auth_old_create_impl_execute', has_function_privilege('authenticated','private.create_catalog_draft_impl(uuid,integer,integer,integer,text,text,uuid)','EXECUTE'),
+      'anon_abandon_execute', has_function_privilege('anon','public.abandon_catalog_draft(uuid,integer,text,uuid)','EXECUTE'),
+      'auth_abandon_execute', has_function_privilege('authenticated','public.abandon_catalog_draft(uuid,integer,text,uuid)','EXECUTE'),
       'disabled_capability_count', (
         SELECT count(*) FROM public.app_settings
         WHERE key IN ('catalog_admin_enabled','catalog_new_identity_enabled','catalog_retirement_enabled') AND value = 'false'::jsonb

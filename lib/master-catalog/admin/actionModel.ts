@@ -79,6 +79,13 @@ export interface CatalogPublishVersionArgs {
   p_request_id: string;
 }
 
+export interface CatalogAbandonDraftArgs {
+  p_version_id: string;
+  p_expected_lock_version: number;
+  p_reason: string;
+  p_request_id: string;
+}
+
 export interface CatalogRestorePointerArgs {
   p_target_version_id: string;
   p_reason: string;
@@ -104,6 +111,7 @@ const SAFE_RPC_ACTION_ERROR_CODES = new Set([
   'CATALOG_WITHDRAW_NOT_ALLOWED',
   'CATALOG_NEW_IDENTITY_DISABLED',
   'CATALOG_RETIREMENT_DISABLED',
+  'DRAFT_ALREADY_EXISTS',
   'DRAFT_BASE_STALE',
   'DRAFT_LOCK_CONFLICT',
   'DRAFT_NOT_EDITABLE',
@@ -132,6 +140,7 @@ const RPC_ACTION_ERROR_MESSAGES_TH: Record<string, string> = {
   CATALOG_WITHDRAW_NOT_ALLOWED: 'ถอนรายการนี้ออกจากฉบับร่างไม่ได้ กรุณาตรวจประวัติการเผยแพร่ก่อน',
   CATALOG_NEW_IDENTITY_DISABLED: 'ยังไม่เปิดการเพิ่มรายการใหม่สำหรับรอบเผยแพร่นี้',
   CATALOG_RETIREMENT_DISABLED: 'ยังไม่เปิดการยกเลิกใช้รายการสำหรับรอบเผยแพร่นี้',
+  DRAFT_ALREADY_EXISTS: 'เวอร์ชันฐานนี้มีฉบับร่างที่กำลังทำงานอยู่แล้ว กรุณาเปิดฉบับร่างเดิม หรือยกเลิกฉบับร่างเดิมพร้อมระบุเหตุผลก่อนสร้างใหม่',
   DRAFT_BASE_STALE: 'ฉบับร่างนี้อ้างอิงเวอร์ชันฐานเก่า กรุณาสร้างฉบับร่างใหม่จากเวอร์ชันใช้งานปัจจุบัน',
   DRAFT_LOCK_CONFLICT: 'ฉบับร่างถูกเปลี่ยนแปลงหลังเปิดหน้าจอนี้ กรุณาโหลดข้อมูลล่าสุดแล้วตรวจอีกครั้ง',
   DRAFT_NOT_EDITABLE: 'แก้ไขได้เฉพาะฉบับร่างที่อ้างอิงเวอร์ชันใช้งานปัจจุบัน',
@@ -154,6 +163,7 @@ const RPC_ACTION_ERROR_MESSAGES_TH: Record<string, string> = {
   VERSION_TRANSITION_INVALID: 'ไม่อนุญาตให้เปลี่ยนสถานะเวอร์ชันตามลำดับนี้',
 };
 const RPC_TRANSPORT_ERROR_MESSAGES = {
+  abandonCatalogDraft: 'ยกเลิกฉบับร่างไม่สำเร็จจากระบบฐานข้อมูล',
   applyCatalogImport: 'บันทึกการนำเข้าไม่สำเร็จจากระบบฐานข้อมูล',
   applyCatalogManualChange: 'บันทึกการเปลี่ยนแปลงในฉบับร่างไม่สำเร็จจากระบบฐานข้อมูล',
   createCatalogDraft: 'สร้างฉบับร่างไม่สำเร็จจากระบบฐานข้อมูล',
@@ -303,6 +313,43 @@ export function buildPublishCatalogVersionArgs(
         ),
       },
       p_reason: readRequiredText(formData, 'reason', 'เหตุผล'),
+      p_request_id: requestId,
+    };
+  } catch (error) {
+    if (error instanceof RequiredFieldError) {
+      return createCatalogMutationError(error.message);
+    }
+    throw error;
+  }
+}
+
+export function buildAbandonCatalogDraftArgs(
+  formData: FormData,
+  requestId: string,
+): CatalogAbandonDraftArgs | CatalogMutationState {
+  try {
+    const versionId = readRequiredText(formData, 'versionId', 'รหัสฉบับร่าง');
+    if (!UUID_PATTERN.test(versionId)) {
+      return createCatalogMutationError('รหัสฉบับร่างไม่ถูกต้อง');
+    }
+
+    if (!UUID_PATTERN.test(requestId)) {
+      return createCatalogMutationError('รหัสคำขอไม่ถูกต้อง');
+    }
+
+    const expectedLockVersion = readInteger(
+      formData,
+      'expectedLockVersion',
+      'รุ่นแก้ไข',
+    );
+    if (expectedLockVersion instanceof Error) {
+      return createCatalogMutationError(expectedLockVersion.message);
+    }
+
+    return {
+      p_version_id: versionId,
+      p_expected_lock_version: expectedLockVersion,
+      p_reason: readRequiredText(formData, 'reason', 'เหตุผลที่ยกเลิกฉบับร่าง'),
       p_request_id: requestId,
     };
   } catch (error) {
