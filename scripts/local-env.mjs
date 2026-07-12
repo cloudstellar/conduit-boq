@@ -3,12 +3,40 @@ import { resolve } from 'node:path'
 
 export function readLocalEnvFile(path = resolve(process.cwd(), 'supabase/.env.local')) {
   try {
-    return parseEnvFile(readFileSync(path, 'utf8'))
+    const raw = readFileSync(path, 'utf8')
+    assertUnambiguousLocalSecrets(raw)
+    return parseEnvFile(raw)
   } catch (error) {
     if (error && typeof error === 'object' && 'code' in error && error.code === 'ENOENT') {
       return {}
     }
     throw error
+  }
+}
+
+export function assertUnambiguousLocalSecrets(raw) {
+  const guardedKeys = new Set([
+    'LOCAL_TEST_PASSWORD',
+    'LOCAL_SUPABASE_SECRET_KEY',
+  ])
+
+  for (const line of raw.split(/\r?\n/)) {
+    const trimmed = line.trim()
+    if (!trimmed || trimmed.startsWith('#')) continue
+
+    const separator = trimmed.indexOf('=')
+    if (separator < 1) continue
+
+    const key = trimmed.slice(0, separator).trim()
+    const value = trimmed.slice(separator + 1).trim()
+    if (!guardedKeys.has(key) || !value || value[0] === '"' || value[0] === "'") {
+      continue
+    }
+
+    const hashIndex = value.indexOf('#')
+    if (hashIndex > 0 && !/\s/.test(value[hashIndex - 1])) {
+      throw new Error(`${key} contains an ambiguous unquoted #; quote the complete value`)
+    }
   }
 }
 
