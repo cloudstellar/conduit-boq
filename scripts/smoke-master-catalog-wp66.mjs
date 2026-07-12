@@ -947,7 +947,11 @@ function actionOk(result, label) {
   if (result.data?.ok !== true) {
     throw new Error(`${label} returned ${JSON.stringify(result.data)}`)
   }
-  return result.data
+  assert(
+    result.data.data && typeof result.data.data === 'object',
+    `${label} returned an invalid success envelope`,
+  )
+  return result.data.data
 }
 
 function actionCode(result, label, expectedCode) {
