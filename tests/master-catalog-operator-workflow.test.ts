@@ -133,6 +133,8 @@ describe('Master Catalog P-22 operator workflow', () => {
     expect(wp65Harness).toContain('assertVersionLifecycleNegatives(adminA, base)');
     expect(wp65Harness).toContain('assertWorkingDraftGuardPrecedence(');
     expect(wp65Harness).toContain('workingDraftGuardPrecedencePassed: true');
+    expect(wp65Harness).toContain("label: 'skipped annual recovery sequence'");
+    expect(wp65Harness).toContain("label: 'annual version with patch'");
     expect(wp65Harness.indexOf('assertVersionLifecycleNegatives(adminA, base)')).toBeLessThan(
       wp65Harness.indexOf("createDraft(adminA, base, versions[0], 'publish race')"),
     );

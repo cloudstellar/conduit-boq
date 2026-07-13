@@ -561,11 +561,20 @@ async function assertVersionLifecycleNegatives(target, base) {
       expectedCode: 'VERSION_TRANSITION_INVALID',
     },
     {
-      label: 'mixed annual version',
+      label: 'skipped annual recovery sequence',
       version: {
         major: Number(base.major) + 1,
         minor: 1,
         patch: 0,
+      },
+      expectedCode: 'VERSION_SEQUENCE_STALE',
+    },
+    {
+      label: 'annual version with patch',
+      version: {
+        major: Number(base.major) + 1,
+        minor: 0,
+        patch: 1,
       },
       expectedCode: 'VERSION_TRANSITION_INVALID',
     },
