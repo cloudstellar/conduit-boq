@@ -69,6 +69,14 @@ This amends candidate `020`; prior G1/live evidence is historical. Run
 repository/static verification first, then request G1R and independent G2 clean
 rebuilds separately. No reset or Production action is authorized by this entry.
 
+**P-24 pre-G1R hardening authorized:** 2026-07-13 — before any clean rebuild,
+enforce annual base +1 through +10 in UI/server/DB, preserve safe Thai stale and
+range errors across background refresh, focus the error for keyboard/screen
+reader recovery, hide raw identifiers under support details, contextualize
+first-rollout authority copy, and keep Factor F secondary. Update candidate
+`020`, contracts, tests, and operator docs together. No Local reset or
+Production action is authorized by this entry.
+
 **Purpose:** Turn the reviewed Phase 4 architecture into an execution checklist
 that an implementer can follow without re-deciding scope, sequencing, database
 boundaries, or verification gates.
@@ -171,8 +179,9 @@ Start blocked:
 | P-20 canonical hash/identity portability | Initial WP-6.5 exit and rerun after WP-6.6/WP-7.5 migration changes, WP-8 clean rehearsal, and migration fingerprint freeze | Decision Register |
 | P-21 Audit #29 WP-6.6 scope/start | WP-6.6 implementation and any migration `020` execution | Decision Register / Completeness Audit |
 | P-22 operator-workflow correction | Earlier source/G1/operator/P-23 checkpoints are historical after P-23.1 amended candidate `020`; repository/static, G1R, independent G2, and G3 now govern closeout | Decision Register / Correction Plan #31 |
-| P-23 operator-context/navigation amendment | Working-tree persistent operator/account context, information-only global nav, exact-draft import route, explicit input/export semantics, Local marker, and static/browser evidence passed 2026-07-13; exact commit pending; no migration `020` change or reset | Decision Register / Correction Plan #31 |
+| P-23 operator-context/navigation amendment | Persistent operator/account context, information-only global nav, exact-draft import route, explicit input/export semantics, Local marker, and static/browser evidence were incorporated into exact P-23.1 source commit `31fd689`; no reset | Decision Register / Correction Plan #31 |
 | P-23.1 version-intent/item-first correction | Owner approved bounded docs/application/candidate-`020` work; repository/static verification passed 2026-07-13; separately approved G1R and G2 clean rebuilds remain because prior G1 evidence is historical | ADR-003 / Decision Register / Correction Plan #31 |
+| P-24 pre-G1R business/UX hardening | Owner approved the bounded annual-range, safe-error, durable-focus, contextual-authority, and Factor F hierarchy patch; exact post-P-24 commit and repository verification precede G1R | ADR-003 / ADR-004 / Decision Register / Correction Plan #31 |
 
 Rule: unresolved P-02 through P-11 does not block generic additive schema,
 parser, UI shell, tests, or local rehearsal. It blocks final candidate data

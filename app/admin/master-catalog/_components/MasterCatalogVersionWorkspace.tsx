@@ -29,6 +29,7 @@ import type { CatalogMutationState } from '@/lib/master-catalog/admin/actionMode
 import { formatCatalogDictionaryLabel } from '@/lib/master-catalog/admin/presentation';
 import { applyCatalogManualChangeAction } from '../actions';
 import { useStableCatalogOperation } from './useStableCatalogOperation';
+import { MasterCatalogActionErrorAlert } from './MasterCatalogActionErrorAlert';
 
 const PAGE_SIZE = 50;
 const initialState: CatalogMutationState = { status: 'idle', message: '' };
@@ -234,6 +235,7 @@ export function MasterCatalogVersionWorkspace({
                 variant="outline"
                 size="icon"
                 title="หน้าก่อน"
+                aria-label="หน้าก่อน"
                 disabled={safePage === 0}
                 onClick={() => setPage((value) => Math.max(0, value - 1))}
               >
@@ -247,6 +249,7 @@ export function MasterCatalogVersionWorkspace({
                 variant="outline"
                 size="icon"
                 title="หน้าถัดไป"
+                aria-label="หน้าถัดไป"
                 disabled={safePage >= pageCount - 1}
                 onClick={() => setPage((value) => Math.min(pageCount - 1, value + 1))}
               >
@@ -325,8 +328,8 @@ function CatalogAddItemForm({
       </CardHeader>
       <CardContent>
         <Alert className="mb-4">
-          <AlertTitle>รายการใหม่ยังเผยแพร่ไม่ได้จนกว่าจะผ่าน P-18</AlertTitle>
-          <AlertDescription>บันทึกเพื่อเตรียมและตรวจข้อมูลได้ แต่ระบบจะยังไม่อนุญาตให้เผยแพร่</AlertDescription>
+          <AlertTitle>รายการใหม่ยังไม่ได้รับการยืนยันตำแหน่ง</AlertTitle>
+          <AlertDescription>บันทึกเพื่อเตรียมและตรวจข้อมูลได้ แต่ต้องยืนยันตำแหน่งของรายการใหม่ให้ครบก่อนเผยแพร่</AlertDescription>
         </Alert>
         <form
           action={formAction}
@@ -477,10 +480,11 @@ function SubmitButton({ label }: { label: string }) {
 
 function MutationStateAlert({ state }: { state: CatalogMutationState }) {
   if (state.status === 'idle') return null;
+  if (state.status === 'error') return <MasterCatalogActionErrorAlert state={state} />;
   return (
-    <Alert variant={state.status === 'error' ? 'destructive' : 'default'}>
+    <Alert aria-live="polite">
       <CheckCircle2 />
-      <AlertTitle>{state.status === 'success' ? 'บันทึกฉบับร่างแล้ว' : state.code}</AlertTitle>
+      <AlertTitle>บันทึกฉบับร่างแล้ว</AlertTitle>
       <AlertDescription>{state.message}</AlertDescription>
     </Alert>
   );

@@ -50,6 +50,12 @@ approved the bounded ADR/UI/candidate-`020`/test/document correction. Because
 `020` changed, earlier G1 evidence is historical and no Local reset, bootstrap,
 or Production action is authorized until the new gated sequence is approved.
 
+**P-24 pre-G1R hardening:** 2026-07-13 — T-47 covers far-future year entry,
+unsafe/raw backend error disclosure, and stale-refresh feedback loss. The same
+annual base +1 through +10 rule is enforced in UI/server/DB; only allowlisted
+safe failures reach operator copy; request/code diagnostics are collapsed; and
+the error panel remains mounted and focused while registry data refreshes.
+
 **Applies to:** Master Catalog administration, local Excel parsing, draft
 changes, publication, history, and official Excel/PDF exports
 
@@ -215,6 +221,7 @@ Risk is the residual risk after the listed controls are implemented and tested.
 | T-44 | Import and manual changes combine into a final state the admin never sees, or a draft changes after review but before publish | Complete database snapshot diff by stable identity; compound/reverted/incomplete-read fixtures; readiness and governance warnings on review; reviewed `lock_version` passed to publish; mutation increments lock and forces fresh review | Browser/UAT verifies counts and old/new values, modifies after review, observes `DRAFT_LOCK_CONFLICT`, reviews again, and publishes only the exact reviewed state | Medium until P-22/WP-8 UAT close |
 | T-45 | The admin loses signed-in identity/environment context, treats a draft action as global navigation, targets the wrong draft twice, or mistakes a review export for an editable import template | Persistent operator/account context; explicit Local marker from configuration; information-only global navigation; exact draft-bound import route with no second selector; distinct approved-input versus review-export labels; server still verifies version/base/lock/profile | Source tests assert route/navigation/account contracts; P-23 browser proof entered import only from one draft, identified operator/environment, explained export versus import, and returned to the same draft. Binary preview/apply remains covered by prior evidence and must be repeated in WP-8 independent UAT. | Medium until exact-commit owner acceptance and WP-8 independent UAT close |
 | T-46 | The UI assumes revision, an admin guesses raw segments, a truncated/stale registry proposes a reused or skipped number, or abandoning `{year}.0.0` prevents a truthful annual replacement | Required annual/revision/patch business intent; owner-designated annual year; complete all-status registry or fail closed; permanent number reservation; DB-enforced next lane sequence; annual patch `0` with next revision when lower target-year identifiers are reserved; same-request replay precedes sequence rejection | Unit fixtures for all lanes/reserved annual numbers; incomplete-registry UI denial; static migration/grant checks; live out-of-sequence/race/replay/abandon/replacement cases in G1R/G2 | Medium until amended `020` passes G1R/G2 and owner UAT |
+| T-47 | A mistyped far-future year creates misleading governance state, a raw RPC failure leaks implementation detail, or background refresh removes the operator's only recovery message | Annual base +1 through +10 enforced in UI/server/private DB helper; stable allowlisted range/stale codes; Thai operator copy; technical code/request only in collapsed support details; focused error component keyed independently from registry refresh | Boundary unit tests, DB postcondition/static contract, safe-error mapping tests, source contracts for durable key/focus/ARIA; live stale/range/browser recovery in G1R/G2/G3 | Medium until G1R/G2 and owner browser acceptance |
 
 ## 6. Validation boundaries and safe limits
 

@@ -27,6 +27,7 @@ import {
 import { logMasterCatalogOperation } from '@/lib/master-catalog/observability';
 import {
   classifyCatalogVersionTransition,
+  isCatalogAnnualEffectiveYearAllowed,
   parseCatalogVersionString,
   type CatalogVersionTransition,
 } from '@/lib/master-catalog/versioning';
@@ -95,6 +96,16 @@ export async function createCatalogDraftAction(
     : null;
   if (baseVersionError || !parsedBaseVersion) {
     return createCatalogMutationError('อ่านเวอร์ชันฐานไม่สำเร็จ', 'DRAFT_BASE_STALE');
+  }
+
+  if (
+    versionIntent === 'annual'
+    && !isCatalogAnnualEffectiveYearAllowed(parsedBaseVersion, expectedVersion.major)
+  ) {
+    return createCatalogMutationError(
+      'ปี พ.ศ. ที่มีผลใช้งานต้องอยู่ภายใน 10 ปีถัดจากเวอร์ชันฐาน',
+      'VERSION_EFFECTIVE_YEAR_OUT_OF_RANGE',
+    );
   }
 
   if (classifyCatalogVersionTransition(parsedBaseVersion, expectedVersion) !== versionIntent) {

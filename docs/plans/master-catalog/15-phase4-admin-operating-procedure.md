@@ -61,7 +61,9 @@ approved maintenance capability.
 4. When none exists, choose the business intent:
    **ประจำปีใหม่**, **ปรับปรุง/เพิ่มเติม**, or **แก้ไขข้อมูลเดิม**.
 5. For **ประจำปีใหม่**, enter the owner-designated effective BE year. Do not
-   infer it from the preparation, publication, or deployment date.
+   infer it from the preparation, publication, or deployment date. It must be
+   from the year after the current base through 10 years after that base; the
+   form shows the exact allowed range.
 6. Review the system-planned version and every lower reserved number shown. The
    registry includes active, archived, draft, and abandoned versions.
 7. Enter a specific draft name and reason, then acknowledge that the number will
@@ -71,6 +73,12 @@ approved maintenance capability.
    screen reloads the registry and proposes the next valid number; review that
    new number before submitting again. Use **ลองโหลดทะเบียนใหม่** if the
    registry read itself failed. Do not resubmit a stale displayed number.
+
+If creation fails, read the red Thai message before retrying. The page may
+refresh registry data in the background, but the message must remain visible
+and receive focus. Expand **ข้อมูลสำหรับติดตามปัญหา** only when support asks
+for the problem code or request ID. Never treat those technical identifiers as
+business approval evidence.
 
 Use **ปรับปรุง/เพิ่มเติม** for newly approved price/item/policy content. Use
 **แก้ไขข้อมูลเดิม** only to restore the same approved official source. If a

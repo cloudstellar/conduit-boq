@@ -154,6 +154,9 @@ describe('Master Catalog P-22 operator workflow', () => {
     const workspace = source(
       'app/admin/master-catalog/_components/MasterCatalogVersionWorkspace.tsx',
     );
+    const importPanel = source(
+      'app/admin/master-catalog/_components/MasterCatalogImportPanel.tsx',
+    );
 
     expect(itemEditor).toContain('id="edit-category"');
     expect(itemEditor).toContain('id="recode-code-group"');
@@ -161,6 +164,40 @@ describe('Master Catalog P-22 operator workflow', () => {
     expect(itemEditor).toContain('id={props.id} className="w-full min-w-0"');
     expect(workspace).toContain('<Label htmlFor={triggerId}>{label}</Label>');
     expect(workspace).toContain('className="w-full min-w-0"');
+    expect(workspace).toContain('aria-label="หน้าก่อน"');
+    expect(workspace).toContain('aria-label="หน้าถัดไป"');
+    expect(importPanel).toContain('aria-label="หน้าก่อน"');
+    expect(importPanel).toContain('aria-label="หน้าถัดไป"');
+  });
+
+  it('keeps failures visible, understandable, and free of internal workflow labels', () => {
+    const views = source(
+      'app/admin/master-catalog/_components/MasterCatalogAdminViews.tsx',
+    );
+    const panel = source(
+      'app/admin/master-catalog/_components/MasterCatalogMutationPanel.tsx',
+    );
+    const workspace = source(
+      'app/admin/master-catalog/_components/MasterCatalogVersionWorkspace.tsx',
+    );
+    const importPanel = source(
+      'app/admin/master-catalog/_components/MasterCatalogImportPanel.tsx',
+    );
+    const itemEditor = source(
+      'app/admin/master-catalog/_components/MasterCatalogItemEditor.tsx',
+    );
+    const errorAlert = source(
+      'app/admin/master-catalog/_components/MasterCatalogActionErrorAlert.tsx',
+    );
+    const combinedOperatorSource = [panel, workspace, importPanel, itemEditor].join('\n');
+
+    expect(views).toContain("key={overview.defaultVersion?.id ?? 'no-base'}");
+    expect(views).not.toContain('key={overview.versionRegistry?.map');
+    expect(combinedOperatorSource).toContain('<MasterCatalogActionErrorAlert');
+    expect(combinedOperatorSource).not.toMatch(/P-18|P-19|Master Catalog RPC/);
+    expect(errorAlert).toContain('aria-live="assertive"');
+    expect(errorAlert).toContain('focusRef.current?.focus()');
+    expect(errorAlert).toContain('ข้อมูลสำหรับติดตามปัญหา');
   });
 
   it('requires business intent, plans from the complete registry, and opens the new workspace', () => {
@@ -178,6 +215,8 @@ describe('Master Catalog P-22 operator workflow', () => {
     expect(panel).toContain('ปรับปรุง/เพิ่มเติม');
     expect(panel).toContain('แก้ไขข้อมูลเดิม');
     expect(panel).toContain('suggestCatalogVersion');
+    expect(panel).toContain('getCatalogAnnualEffectiveYearRange');
+    expect(panel).toContain('effectiveYearRange?.max');
     expect(panel).toContain('เลขฉบับที่จะสร้าง');
     expect(panel).toContain('ระบบจึงไม่ใช้เลขเดิมซ้ำ');
     expect(panel).toContain("abandoned: 'ยกเลิกฉบับร่าง'");
@@ -191,6 +230,8 @@ describe('Master Catalog P-22 operator workflow', () => {
     expect(actions).toContain("readCatalogVersionIntent(formData)");
     expect(actions).toContain("'expectedVersionString'");
     expect(actions).toContain("'baseVersionId'");
+    expect(actions).toContain('isCatalogAnnualEffectiveYearAllowed');
+    expect(actions).toContain("'VERSION_EFFECTIVE_YEAR_OUT_OF_RANGE'");
     expect(readModel).toContain(".select('version_string,status', { count: 'exact' })");
     expect(readModel).toContain('VERSION_REGISTRY_PAGE_SIZE');
     expect(readModel).toContain('while (versionRegistryRows.length < versionRegistryCount)');

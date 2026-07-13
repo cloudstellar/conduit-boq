@@ -70,6 +70,15 @@ and G1 evidence are historical. Repository/static verification precedes new,
 separately approved G1R and G2 clean rebuilds. No reset or Production action is
 authorized by this amendment.
 
+**P-24 pre-G1R hardening recorded:** 2026-07-13 — owner approved closing the
+remaining bounded readiness gaps before G1R: annual effective year is limited
+to base +1 through +10 in UI/server/DB; stale and out-of-range failures have
+safe Thai messages and durable focused alerts; technical identifiers are
+collapsed support details; first-rollout authority wording is contextual; and
+Factor F remains separate support information. Candidate `020` changes again,
+so the first clean rebuild must use the exact post-P-24 commit. No Local reset,
+Production, P-18/`021`, P-19, WP-7, Factor F, or hotfix work is authorized.
+
 ## 1. Decision requested
 
 Approve detailed implementation and local rehearsal of Master Catalog Phase 4.

@@ -70,6 +70,7 @@ import {
   previewCatalogImportAction,
 } from '../actions';
 import { useStableCatalogOperation } from './useStableCatalogOperation';
+import { MasterCatalogActionErrorAlert } from './MasterCatalogActionErrorAlert';
 
 type ImportMode = CatalogImportPayloadV2['mode'];
 
@@ -443,7 +444,7 @@ function EvidenceCounts({ counts }: { counts: CatalogImportEvidenceCounts }) {
   const items = [
     ['รายการตามข้อมูลรับรอง', counts.mappings],
     ['จับคู่จากไฟล์', counts.workbookMatchedRows],
-    ['เติมจาก Production', counts.productionOnlyRows],
+    ['เติมจากเวอร์ชันฐาน', counts.productionOnlyRows],
     ['เลื่อนไปรอบถัดไป', counts.deferredWorkbookRows],
     ['เปลี่ยนรหัส', counts.recodeRows],
     ['คงรหัสเดิม', counts.retainedRows],
@@ -568,7 +569,7 @@ function PreparedPreview({
           <AlertTitle>มีรายการเพิ่มใหม่ที่ต้องพิจารณาตำแหน่ง</AlertTitle>
           <AlertDescription>
             พบ {prepared.newIdentityCount.toLocaleString('th-TH')} รายการ สามารถบันทึก
-            ลงฉบับร่างเพื่อทบทวนได้ แต่ระบบจะยังไม่อนุญาตให้เผยแพร่จนกว่า P-18 จะได้รับการอนุมัติ
+            ลงฉบับร่างเพื่อทบทวนได้ แต่ระบบจะยังไม่อนุญาตให้เผยแพร่จนกว่าจะยืนยันตำแหน่งรายการใหม่ครบ
           </AlertDescription>
         </Alert>
       ) : null}
@@ -604,8 +605,7 @@ function PreparedPreview({
           <AlertTitle>มีรายการยกเลิกใช้ที่ต้องพิจารณานโยบาย PDF</AlertTitle>
           <AlertDescription>
             พบอย่างน้อย {prepared.retirementCandidateCount.toLocaleString('th-TH')} รายการ
-            หลังบันทึกต้องตรวจจำนวนจริงอีกครั้ง และยังห้ามรับรอง PDF เป็นฉบับทางการจนกว่า P-19
-            จะได้รับอนุมัติ
+            หลังบันทึกต้องตรวจจำนวนจริงอีกครั้ง และต้องยืนยันนโยบายเอกสารสำหรับรายการยกเลิกใช้ก่อนรับรอง PDF เป็นฉบับทางการ
           </AlertDescription>
         </Alert>
       ) : null}
@@ -690,7 +690,7 @@ function ImportDiffTable({
       {diff.summary.authorityFieldChanges > 0 ? (
         <Alert variant="destructive">
           <ShieldAlert />
-          <AlertTitle>พบการเปลี่ยนข้อมูลที่ต้องยึดตาม Production</AlertTitle>
+          <AlertTitle>พบการเปลี่ยนข้อมูลที่ต้องมีหลักฐานอ้างอิง</AlertTitle>
           <AlertDescription>
             มี {diff.summary.authorityFieldChanges.toLocaleString('th-TH')} รายการที่เปลี่ยนชื่อ หน่วย หรือราคา ต้องมีเอกสารอ้างอิงที่ตรวจสอบได้ก่อนบันทึก
           </AlertDescription>
@@ -698,8 +698,8 @@ function ImportDiffTable({
       ) : (
         <Alert>
           <CheckCircle2 />
-          <AlertTitle>ชื่อ หน่วย และราคาจาก Production ถูกคงไว้</AlertTitle>
-          <AlertDescription>ผลตรวจจากเซิร์ฟเวอร์ไม่พบการเปลี่ยนชื่อ หน่วย หรือราคาที่ต้องมีเอกสารอ้างอิง</AlertDescription>
+          <AlertTitle>ชื่อ หน่วย และราคาตามเวอร์ชันฐานถูกคงไว้</AlertTitle>
+          <AlertDescription>ผลตรวจจากระบบไม่พบการเปลี่ยนชื่อ หน่วย หรือราคาที่ต้องมีเอกสารอ้างอิง</AlertDescription>
         </Alert>
       )}
 
@@ -761,11 +761,11 @@ function ImportDiffTable({
       <div className="flex flex-wrap items-center justify-between gap-3">
         <p className="text-sm text-muted-foreground">พบ {filtered.length.toLocaleString('th-TH')} รายการ</p>
         <div className="flex items-center gap-2">
-          <Button type="button" variant="outline" size="icon" title="หน้าก่อน" disabled={safePage === 0} onClick={() => setPage((value) => Math.max(0, value - 1))}>
+          <Button type="button" variant="outline" size="icon" title="หน้าก่อน" aria-label="หน้าก่อน" disabled={safePage === 0} onClick={() => setPage((value) => Math.max(0, value - 1))}>
             <ChevronLeft />
           </Button>
           <span className="min-w-24 text-center text-sm">หน้า {safePage + 1} / {pageCount}</span>
-          <Button type="button" variant="outline" size="icon" title="หน้าถัดไป" disabled={safePage >= pageCount - 1} onClick={() => setPage((value) => Math.min(pageCount - 1, value + 1))}>
+          <Button type="button" variant="outline" size="icon" title="หน้าถัดไป" aria-label="หน้าถัดไป" disabled={safePage >= pageCount - 1} onClick={() => setPage((value) => Math.min(pageCount - 1, value + 1))}>
             <ChevronRight />
           </Button>
         </div>
@@ -834,17 +834,9 @@ function ActionStateAlert({ state }: { state: CatalogMutationState }) {
   }
 
   return (
-    <Alert variant="destructive" aria-live="polite">
-      <ShieldAlert />
-      <AlertTitle>{state.code ?? 'VALIDATION_FAILED'}</AlertTitle>
-      <AlertDescription>
-        <div className="grid gap-3">
-          <p>{state.message}</p>
-          {state.requestId ? <p>รหัสคำขอ: {state.requestId}</p> : null}
-          <DiagnosticTable diagnostics={state.diagnostics ?? []} />
-        </div>
-      </AlertDescription>
-    </Alert>
+    <MasterCatalogActionErrorAlert state={state}>
+      <DiagnosticTable diagnostics={state.diagnostics ?? []} />
+    </MasterCatalogActionErrorAlert>
   );
 }
 

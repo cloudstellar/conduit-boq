@@ -275,6 +275,30 @@ describe('Master Catalog admin action model', () => {
     });
 
     expect(mapCatalogRpcActionResponse({
+      ok: false,
+      error: {
+        code: 'VERSION_SEQUENCE_STALE',
+        message: 'Catalog version was reserved by another operation',
+      },
+    }, 'unused')).toMatchObject({
+      status: 'error',
+      code: 'VERSION_SEQUENCE_STALE',
+      message: expect.stringContaining('ทะเบียนล่าสุดเพื่อเสนอเลขใหม่'),
+    });
+
+    expect(mapCatalogRpcActionResponse({
+      ok: false,
+      error: {
+        code: 'VERSION_EFFECTIVE_YEAR_OUT_OF_RANGE',
+        message: 'Annual catalog effective year is outside the allowed range',
+      },
+    }, 'unused')).toMatchObject({
+      status: 'error',
+      code: 'VERSION_EFFECTIVE_YEAR_OUT_OF_RANGE',
+      message: expect.stringContaining('ภายใน 10 ปีถัดจากเวอร์ชันฐาน'),
+    });
+
+    expect(mapCatalogRpcActionResponse({
       ok: true,
       data: {
         targetVersionId: VERSION_ID,
@@ -309,7 +333,7 @@ describe('Master Catalog admin action model', () => {
     }, 'unused')).toMatchObject({
       status: 'error',
       code: 'INTERNAL_ERROR',
-      message: 'Master Catalog RPC ปฏิเสธรายการนี้',
+      message: 'ระบบบัญชีราคาปฏิเสธรายการนี้',
     });
 
     expect(createCatalogRpcTransportError('previewCatalogImport', REQUEST_ID)).toMatchObject({

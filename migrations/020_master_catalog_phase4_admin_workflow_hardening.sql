@@ -8032,6 +8032,7 @@ BEGIN;
       AND (
         (
           p_candidate_major > p_base_major
+          AND p_candidate_major::bigint <= p_base_major::bigint + 10
           AND p_candidate_patch = 0
         )
         OR
@@ -8158,7 +8159,18 @@ BEGIN;
       WHERE base.id = p_base_version_id
         AND base.status = 'active';
 
-      IF FOUND
+      IF v_base.id IS NOT NULL
+         AND p_version_major > v_base.major
+         AND p_version_major::bigint > v_base.major::bigint + 10 THEN
+        RETURN private.catalog_action_error(
+          p_request_id,
+          'VERSION_EFFECTIVE_YEAR_OUT_OF_RANGE',
+          'Annual catalog effective year must be within 10 years after the current base year',
+          false
+        );
+      END IF;
+
+      IF v_base.id IS NOT NULL
          AND NOT EXISTS (
            SELECT 1
            FROM public.price_list_versions
@@ -11088,8 +11100,9 @@ BEGIN;
          'EXECUTE'
        )
        OR NOT private.catalog_version_transition_valid(2568, 0, 0, 2569, 1, 0)
-       OR private.catalog_version_transition_valid(2568, 0, 0, 2569, 0, 1) THEN
-      RAISE EXCEPTION 'WP-6.6 P-23.1 postcondition failed: version planning guard is invalid or exposed';
+       OR private.catalog_version_transition_valid(2568, 0, 0, 2569, 0, 1)
+       OR private.catalog_version_transition_valid(2568, 0, 0, 2579, 0, 0) THEN
+      RAISE EXCEPTION 'WP-6.6 P-24 postcondition failed: version planning guard is invalid or exposed';
     END IF;
 
     IF EXISTS (

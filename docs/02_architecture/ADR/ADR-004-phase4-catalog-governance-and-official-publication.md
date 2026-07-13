@@ -42,6 +42,16 @@ draft lock; it is not a second-person approval engine. See
 This authorizes docs and Local-only implementation planning, not a Local reset,
 P-18/`021`, P-19, WP-7, Factor F/hotfix expansion, or Production.
 
+**P-24 pre-G1R hardening recorded:** 2026-07-13 — before the first amended
+clean rebuild, the owner approved a bounded business/UX guard over the existing
+P-23.1 design. Annual years are limited to base year +1 through +10 in UI,
+server validation, and candidate `020`; stale-sequence and range errors use
+stable safe codes with Thai operator copy and collapsed support details; error
+focus remains visible while registry data refreshes; first-rollout Production
+authority wording is shown only when that baseline is the actual base; Factor F
+remains separate supporting context. This does not authorize a Local reset,
+P-18/`021`, P-19, WP-7, Factor F changes, hotfix expansion, or Production.
+
 ## Context
 
 Production completed Master Catalog Phase 0 → 1A → 2 → 1B on 2026-06-21.
@@ -153,7 +163,9 @@ rechecks that the candidate is the next number in the selected transition lane
 and rejects a stale sequence. If an annual `{year}.0.0` attempt was abandoned,
 the next annual attempt for that same owner-designated year uses the next
 revision with patch `0`; the cancelled number is not reused and the effective
-year is not falsified.
+year is not falsified. An annual year must be within base year +1 through +10;
+the client hint is convenience only and both the server action and database
+function fail closed when the value is outside that approved horizon.
 
 ### 6. Import trust boundary
 

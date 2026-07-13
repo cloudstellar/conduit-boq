@@ -27,6 +27,7 @@ import type {
 import { formatCatalogDictionaryLabel } from '@/lib/master-catalog/admin/presentation';
 import { applyCatalogManualChangeAction } from '../actions';
 import { useStableCatalogOperation } from './useStableCatalogOperation';
+import { MasterCatalogActionErrorAlert } from './MasterCatalogActionErrorAlert';
 
 type ItemAction = 'update' | 'recode' | 'retire' | 'reactivate' | 'withdraw';
 
@@ -356,10 +357,11 @@ function SubmitButton() {
 
 function MutationAlert({ state }: { state: CatalogMutationState }) {
   if (state.status === 'idle') return null;
+  if (state.status === 'error') return <MasterCatalogActionErrorAlert state={state} />;
   return (
-    <Alert variant={state.status === 'error' ? 'destructive' : 'default'}>
+    <Alert aria-live="polite">
       <CheckCircle2 />
-      <AlertTitle>{state.status === 'success' ? 'บันทึกฉบับร่างแล้ว' : state.code}</AlertTitle>
+      <AlertTitle>บันทึกฉบับร่างแล้ว</AlertTitle>
       <AlertDescription>{state.message}</AlertDescription>
     </Alert>
   );

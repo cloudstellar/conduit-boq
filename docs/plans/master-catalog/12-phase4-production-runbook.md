@@ -175,7 +175,9 @@ major image at an incompatible existing data directory.
 With feature flag disabled by default:
 
 1. Deploy/run the Phase 4 application locally.
-2. Choose the approved annual/revision/patch intent. For the first structured
+2. Choose the approved annual/revision/patch intent. An annual effective year
+   must be within base year +1 through +10 and must match the approved business
+   year; do not bypass this guard with direct SQL. For the first structured
    rollout choose revision from `2568.0.0`, review the complete reserved registry,
    and accept `2568.1.0` only when it remains the system-planned next number.
 3. Assert all 710 name/unit/material/labor/unit values are identical.

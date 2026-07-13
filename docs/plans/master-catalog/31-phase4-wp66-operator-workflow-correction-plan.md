@@ -6,9 +6,10 @@ operator/UI checkpoint completed on `c8f6dca` on 2026-07-12. P-23 owner-approved
 the bounded operator-context/navigation amendment on 2026-07-13, and its
 working-tree UI/static/browser checkpoint passed the same day without a Local
 reset. P-23.1 then amended candidate `020` and the create/detail/restore flow;
-its repository/static checks passed 2026-07-13. Earlier evidence remains valid
-history but cannot close the amended candidate. The replacement commit remains
-unnamed; G1R, independent G2, browser owner review, G3 closeout, and G4
+its first repository/static checks passed 2026-07-13. P-24 then approved the
+bounded annual-range/error-recovery/context hardening before G1R. Earlier
+evidence remains valid history but cannot close the amended candidate. The
+replacement commit remains unnamed; G1R, independent G2, browser owner review, G3 closeout, and G4
 bootstrap/WP-7 sequencing remain pending
 
 **Production touched:** No
@@ -295,9 +296,10 @@ candidate `020` separately until the new owner closeout accepts it.
 |---|---|
 | G0 | P-22 plan accepted for docs and Local-only implementation — accepted 2026-07-12 |
 | G1 | Owner explicitly approves first full Local reset after static implementation is ready — approved and completed 2026-07-12 |
-| G1U | P-23 operator-context/navigation amendment approved for docs and Local-only UI/static/browser work without a reset — approved and working-tree implementation evidence passed 2026-07-13; exact commit/owner checkpoint pending |
-| G1V | Passed 2026-07-13: P-23.1 explicit version-intent/sequence and item-first correction was approved and its repository/static checks passed. It changes candidate `020`, so all prior `020` fingerprints and live DB evidence remain historical. |
-| G1R | Owner explicitly approves the first clean rebuild and full DB/concurrency/browser/P-20 rerun of the exact post-P-23.1 executable candidate. No approval has been given. |
+| G1U | P-23 operator-context/navigation amendment approved for docs and Local-only UI/static/browser work without a reset; incorporated into exact source commit `31fd689` with P-23.1. |
+| G1V | Passed on exact commit `31fd689` on 2026-07-13: P-23.1 explicit version-intent/sequence and item-first correction was approved and its repository/static checks passed. It changes candidate `020`, so all prior `020` fingerprints and live DB evidence remain historical. |
+| G1W | P-24 pre-G1R hardening approved and repository/static-passed 2026-07-13; annual range, safe error, durable focus, contextual authority, and Factor F hierarchy exact implementation commit is required before G1R. No reset is approved. |
+| G1R | Owner explicitly approves the first clean rebuild and full DB/concurrency/browser/P-20 rerun of the exact post-P-24 executable candidate. No approval has been given. |
 | G2 | Owner explicitly approves a second independent clean rebuild of the same accepted candidate and P-20 comparison after G1R passes. |
 | G3 | Owner completes intended-admin workflow review and accepts or holds the revised WP-6.6 closeout |
 | G4 | Only after G3, add accepted `020` to bootstrap and separately authorize any WP-7 execution |
@@ -474,3 +476,39 @@ disabled/account-context state with zero console warnings/errors; the amended
 mutable flow still waits for G1R. No Local DB was reset or mutated. Request G1R separately
 before any Local reset; a passing G1R is
 then followed by separately approved independent G2 evidence and owner G3.
+
+## 15. P-24 pre-G1R hardening
+
+The final owner/developer audit before G1R found one bounded business guard and
+several recovery/comprehension risks that were not changes to the P-22/P-23.1
+architecture. The owner approved closing them before naming the executable
+candidate:
+
+- allow an annual effective year only from base +1 through +10, with matching
+  UI guidance, Server Action validation, private DB transition validation, and
+  stable `VERSION_EFFECTIVE_YEAR_OUT_OF_RANGE` behavior;
+- include `VERSION_SEQUENCE_STALE` in the safe response allowlist and preserve
+  the error panel while refreshed registry props arrive;
+- use one focused `aria-live` Thai error component across create, item, import,
+  and workspace actions, with raw code/request ID under collapsed support
+  details;
+- remove internal P-labels and backend naming from operator-facing copy and add
+  accessible names to icon-only pagination;
+- show Production `2568.0.0` authority wording only when that version is the
+  actual base, and keep the separate Factor F reference in support details;
+- cover mapping, annual boundaries, migration contract, durable refresh key,
+  focus/ARIA, and copy constraints in tracked tests.
+
+This amends the still-unaccepted candidate `020`, application/tests, and
+authority documents only. It does not reset or mutate Local, change bootstrap,
+implement P-18/`021` or P-19, begin WP-7, reopen Factor F/hotfix work, or touch
+Production. G1R remains a separate owner decision after repository checks and
+the exact commit are recorded.
+
+Repository/static verification passed 2026-07-13: full suite 30 files/161
+tests; focused P-24 contracts 5 files/45 tests; TypeScript; lint with 0 errors
+and 10 existing warnings; authority 710/65/17; smoke syntax; network-enabled
+production build; and `git diff --check`. Safe-state in-app browser QA passed
+desktop/mobile Local/account/disabled copy, no horizontal overflow, and zero
+console warnings/errors. Candidate `020` remained unapplied, Local DB was not
+reset or mutated, and the exact implementation commit still had to be named.

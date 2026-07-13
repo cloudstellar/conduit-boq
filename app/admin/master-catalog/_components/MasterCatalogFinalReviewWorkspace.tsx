@@ -111,7 +111,10 @@ export function MasterCatalogFinalReviewWorkspace({
             <AlertTitle>มีรายการที่ต้องตรวจหลักฐานชื่อ หน่วย หรือราคา</AlertTitle>
             <AlertDescription>
               พบ {diff.summary.authoritySensitiveCount.toLocaleString('th-TH')} รายการ
-              ที่เพิ่มใหม่หรือเปลี่ยนชื่อ หน่วย หรือราคา ซึ่ง Production 2568.0.0 เป็นแหล่งอ้างอิงหลัก
+              ที่เพิ่มใหม่หรือเปลี่ยนชื่อ หน่วย หรือราคา{' '}
+              {baseVersionString === '2568.0.0'
+                ? 'สำหรับการปรับจากบัญชีฐานนี้ ให้ยึดข้อมูล Production 2568.0.0 และเอกสารอนุมัติที่เกี่ยวข้อง'
+                : `ให้ตรวจเทียบเวอร์ชันฐาน ${baseVersionString} และเอกสารอนุมัติของการเปลี่ยนแปลงครั้งนี้`}
             </AlertDescription>
           </Alert>
         ) : null}

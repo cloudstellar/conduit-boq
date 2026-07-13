@@ -131,7 +131,7 @@ describe('Master Catalog authority consistency', () => {
     ])
 
     expect(migrations).toContain(
-      '**Amended Local-only candidate under P-23.1; repository/static verification passed 2026-07-13; prior `020` fingerprints/G1 evidence are historical; separately approved G1R and G2 clean rebuilds remain required; not in bootstrap or Production**',
+      '**Amended Local-only candidate under P-24; repository/static verification passed 2026-07-13; exact implementation commit pending; prior `020` fingerprints/G1 evidence are historical; separately approved G1R and G2 clean rebuilds remain required; not in bootstrap or Production**',
     )
     expect(migrations).toContain(
       '**Proposed only — P-18 pending; file does not exist; not in bootstrap**',
@@ -188,10 +188,10 @@ describe('Master Catalog authority consistency', () => {
       'Approved contract; historical inputs passed; amended P-23.1 candidate G1R/G2 and WP-8/P-15 reruns pending',
     )
     expect(decisions).toContain(
-      'In progress; P-23.1 repository/static passed 2026-07-13; G1R, independent G2, browser owner review, and G3 pending',
+      'P-24 pre-G1R hardening',
     )
     expect(decisions).toContain(
-      'Approved 2026-07-13 for bounded docs/application/candidate-`020`/tests; repository/static passed 2026-07-13; no reset approved; G1R/G2/browser/G3 pending',
+      'Approved and repository/static-passed 2026-07-13; exact implementation commit pending; no reset approved',
     )
 
     const tracker = read(
@@ -205,7 +205,7 @@ describe('Master Catalog authority consistency', () => {
     expect(tracker).toContain('independent intended-admin UAT remains WP-8')
     expect(tracker).toContain('| Production write allowed | No |')
     expect(tracker).toContain(
-      'P-23.1 approved bounded docs/application/candidate-`020`/test work',
+      'P-24 approved bounded pre-G1R annual base +1 through +10',
     )
     expect(tracker).toMatch(
       /pre-amendment operator\/browser preflight passed on\s+`c8f6dca`/,
@@ -322,7 +322,7 @@ describe('Master Catalog authority consistency', () => {
     expect(itemRoute).toContain('loadCatalogItemDetail(supabase, versionId, identityId)')
   })
 
-  it('keeps P-23.1 version planning and operator recovery aligned', () => {
+  it('keeps P-23.1/P-24 version planning and operator recovery aligned', () => {
     const adr = read(
       'docs/02_architecture/ADR/ADR-003-master-catalog-rollout-and-version-numbering.md',
     )
@@ -343,6 +343,8 @@ describe('Master Catalog authority consistency', () => {
       expect(source).toContain('reserved')
     }
     expect(contract).toContain('VERSION_SEQUENCE_STALE')
+    expect(contract).toContain('VERSION_EFFECTIVE_YEAR_OUT_OF_RANGE')
+    expect(adr).toContain('10 years after that base')
     expect(procedure).toContain('สร้างและเปิดพื้นที่ทำงาน')
     expect(procedure).toContain('historical BOQs do not change')
     expect(correction).toContain('| G1R |')

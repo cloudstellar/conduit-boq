@@ -120,7 +120,7 @@ export function MasterCatalogGateView({
           <Card>
             <CardHeader>
               <CardTitle>สถานะการเปิดใช้งาน</CardTitle>
-              <CardDescription>ตรวจความพร้อมเฉพาะฐานข้อมูล Local</CardDescription>
+              <CardDescription>แสดงสถานะโดยไม่เปิดเครื่องมือแก้ไขข้อมูล</CardDescription>
             </CardHeader>
             <CardContent className="grid gap-3 text-sm">
               <KeyValue label="สถานะ" value="ปิดใช้งาน" />
@@ -155,7 +155,7 @@ export function MasterCatalogOverviewView({
   return (
     <MasterCatalogFrame activeSection="overview" gate={gate}>
       <Warnings warnings={overview.warnings} />
-      <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+      <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
         <MetricCard
           title="บัญชีราคาที่ใช้งาน"
           value={overview.defaultVersion?.versionString ?? '-'}
@@ -174,16 +174,19 @@ export function MasterCatalogOverviewView({
           detail={`${formatThaiNumber(overview.counts.codeGroups)} กลุ่มรหัส`}
           icon={PackageOpen}
         />
-        <MetricCard
-          title="Factor F"
-          value={overview.factorFDefault.versionString ?? '-'}
-          detail="ชุดข้อมูลอ้างอิงแยกจากบัญชีราคา"
-          icon={FileSpreadsheet}
-        />
       </div>
 
+      <details className="border-t pt-3 text-sm text-muted-foreground">
+        <summary className="cursor-pointer font-medium text-foreground">
+          ข้อมูลอ้างอิงระบบที่แยกจากบัญชีราคา
+        </summary>
+        <p className="mt-2">
+          Factor F ใช้เวอร์ชัน {overview.factorFDefault.versionString ?? '-'} และไม่ได้ถูกแก้ไขจากพื้นที่งานนี้
+        </p>
+      </details>
+
       <MasterCatalogDraftCreatePanel
-        key={`${overview.defaultVersion?.id ?? 'no-base'}:${overview.versionRegistry?.map((entry) => `${entry.versionString}:${entry.status ?? ''}`).join('|') ?? 'registry-incomplete'}`}
+        key={overview.defaultVersion?.id ?? 'no-base'}
         defaultVersionId={overview.defaultVersion?.id ?? null}
         defaultVersionString={overview.defaultVersion?.versionString ?? null}
         draftVersions={currentBaseDrafts}

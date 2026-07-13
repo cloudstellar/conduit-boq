@@ -2,6 +2,8 @@ import { describe, expect, it } from 'vitest';
 import {
   classifyCatalogVersionTransition,
   formatCatalogVersion,
+  getCatalogAnnualEffectiveYearRange,
+  isCatalogAnnualEffectiveYearAllowed,
   parseCatalogVersionString,
   suggestCatalogVersion,
 } from '../lib/master-catalog/versioning';
@@ -88,6 +90,22 @@ describe('Master Catalog ADR-003 version lifecycle', () => {
       baseVersionString: '2568.0.0',
       transition: 'annual',
       effectiveYear: 2568,
+      registry: [],
+    })).toBeNull();
+  });
+
+  it('limits owner-designated annual years to the next ten years', () => {
+    const base = { major: 2568, minor: 0, patch: 0 };
+
+    expect(getCatalogAnnualEffectiveYearRange(base)).toEqual({ min: 2569, max: 2578 });
+    expect(isCatalogAnnualEffectiveYearAllowed(base, 2569)).toBe(true);
+    expect(isCatalogAnnualEffectiveYearAllowed(base, 2578)).toBe(true);
+    expect(isCatalogAnnualEffectiveYearAllowed(base, 2568)).toBe(false);
+    expect(isCatalogAnnualEffectiveYearAllowed(base, 2579)).toBe(false);
+    expect(suggestCatalogVersion({
+      baseVersionString: '2568.0.0',
+      transition: 'annual',
+      effectiveYear: 2579,
       registry: [],
     })).toBeNull();
   });

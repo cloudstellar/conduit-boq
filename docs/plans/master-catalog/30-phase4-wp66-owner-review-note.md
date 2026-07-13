@@ -1,16 +1,16 @@
 # Master Catalog Phase 4 WP-6.6 Owner Review Note
 
-**Status:** Hold under P-22/P-23/P-23.1 operator-workflow correction. Earlier
-source/G1/browser/P-23 checkpoints remain historical. P-23.1 amends candidate
-`020` plus the create/detail/restore flow; repository/static verification passed
-2026-07-13. A new exact commit, separately approved G1R and G2 clean rebuilds,
-browser owner review, and G3 closeout remain
+**Status:** Hold under P-22/P-23/P-23.1/P-24 correction. Earlier
+source/G1/browser/P-23 checkpoints remain historical. P-24 further amends
+candidate `020` and operator recovery before G1R. A new exact commit,
+separately approved G1R and G2 clean rebuilds, browser owner review, and G3
+closeout remain
 **Review environment:** Local only
 **Current G1 evidence commit:**
 `e463270dfb9f23332559f31591cf338b8eeada3c`
 **Pre-P-23 operator/source checkpoint:**
 `c8f6dca282cd2729ac2b58e488b3ef516fb29713`
-**Current exact executable candidate:** Pending P-23.1 commit; working-tree repository/static checks passed
+**Current exact executable candidate:** Pending P-24 implementation commit; repository/static verification passed 2026-07-13
 **Correction source checkpoint:**
 `ac31feb`
 **Historical implementation/evidence commit:**
@@ -53,6 +53,14 @@ also opens the exact created draft, places items before detailed metadata, and
 confirms current/target before pointer restore. Because candidate `020` changes,
 the former G1 evidence no longer proves the executable candidate.
 
+On 2026-07-13 the owner approved P-24 after the pre-G1R audit found a remaining
+business range and recovery gap. The correction enforces annual base +1 through
++10 in UI/server/DB, allowlists stale/range failures into Thai copy, keeps the
+focused error visible while registry data refreshes, collapses technical
+identifiers, removes internal workflow labels, contextualizes the first-rollout
+authority message, and keeps Factor F secondary. It does not authorize a reset
+or any adjacent scope.
+
 Recorded owner response:
 
 > Hold WP-6.6 closeout; implement P-22 one-current-base-working-draft,
@@ -74,6 +82,7 @@ Recorded owner response:
 | C-13 final review | Identity-based final diff, compound/reverted/incomplete/lock fixtures, exact-lock review route, and return context passed source/static on `ac31feb`; G1 exact-lock publish/restore passed on `e463270`; pre-G2 browser proof opened the cumulative comparison and readiness path on `c8f6dca` | G2, stale-review recovery proof, and G3 owner acceptance required |
 | C-14 version intent/reservation | P-23.1 source implements three explicit business intents, complete-registry fail-closed planning, reserved-number display, annual void-number recovery, and guarded next-sequence errors; repository/static checks passed 2026-07-13 | Rerun live sequence/race/replay/abandon/replacement in G1R/G2; owner browser acceptance |
 | C-15 create/item/restore flow | P-23.1 source opens the exact created workspace, renders compact context/actions before items, moves document metadata below items, and adds current-to-target restore confirmation | Fresh desktop/mobile/browser/BOQ-header smoke and G3 owner acceptance |
+| C-16 pre-G1R business/UX guard | P-24 source enforces annual base +1 through +10 in UI/server/candidate `020`, adds safe stale/range mapping, durable focused Thai error feedback, collapsed support IDs, contextual authority copy, accessible pagination labels, and secondary Factor F context; repository/static gate passed 2026-07-13 | Exact implementation commit, then live range/stale/browser recovery in G1R/G2/G3 |
 
 ## 3. Retained evidence
 
@@ -156,8 +165,8 @@ BOQs/1,547 items, and Factor F `2569.0.0`/36 rows. Production touched: No.
 
 ## 5. Recommendation
 
-Keep WP-6.6 on Hold. Review and commit the repository/static-passed P-23.1
-tracked diff before naming the executable candidate. Then request
+Keep WP-6.6 on Hold. Commit the repository/static-passed P-24 tracked diff
+before naming the executable candidate. Then request
 G1R approval or decline for the first destructive clean Local rebuild/full
 DB-browser-P-20 rerun; request independent G2 only after G1R passes. Do not run a
 reset, add migration `020` to bootstrap, begin WP-7, or infer G3 acceptance until

@@ -81,6 +81,19 @@ try {
   const beforeFactor = await readFactorSummary()
   const versions = await allocateRevisionVersions(base, 4)
 
+  currentStage = 'verify annual effective-year business range'
+  actionCode(
+    await createDraftRequest(
+      adminA,
+      base,
+      { major: Number(base.major) + 11, minor: 0, patch: 0 },
+      'out-of-range annual draft',
+      randomUUID(),
+    ),
+    'out-of-range annual draft',
+    'VERSION_EFFECTIVE_YEAR_OUT_OF_RANGE',
+  )
+
   currentStage = 'verify server-owned next version sequence'
   actionCode(
     await createDraftRequest(

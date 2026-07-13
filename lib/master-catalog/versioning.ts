@@ -18,6 +18,7 @@ export interface CatalogVersionSuggestion {
 }
 
 export const CATALOG_VERSION_SEGMENT_MAX = 2_147_483_647;
+export const CATALOG_ANNUAL_YEAR_MAX_AHEAD = 10;
 
 const VERSION_PATTERN = /^(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)$/;
 
@@ -82,9 +83,10 @@ export function suggestCatalogVersion(input: {
 
   if (input.transition === 'annual') {
     const effectiveYear = input.effectiveYear;
-    if (typeof effectiveYear !== 'number'
-        || !Number.isSafeInteger(effectiveYear)
-        || effectiveYear <= base.major) return null;
+    if (
+      typeof effectiveYear !== 'number'
+      || !isCatalogAnnualEffectiveYearAllowed(base, effectiveYear)
+    ) return null;
     const sameYear = registry.filter((entry) => entry.version.major === effectiveYear);
     version = {
       major: effectiveYear,
@@ -123,6 +125,34 @@ export function suggestCatalogVersion(input: {
     version,
     reservedVersions,
   };
+}
+
+export function getCatalogAnnualEffectiveYearRange(
+  base: CatalogVersionNumber,
+): { min: number; max: number } | null {
+  if (!isCatalogVersionNumber(base)) return null;
+
+  const min = base.major + 1;
+  if (min > CATALOG_VERSION_SEGMENT_MAX) return null;
+
+  return {
+    min,
+    max: Math.min(base.major + CATALOG_ANNUAL_YEAR_MAX_AHEAD, CATALOG_VERSION_SEGMENT_MAX),
+  };
+}
+
+export function isCatalogAnnualEffectiveYearAllowed(
+  base: CatalogVersionNumber,
+  effectiveYear: number | null | undefined,
+): boolean {
+  const range = getCatalogAnnualEffectiveYearRange(base);
+  return Boolean(
+    range
+    && typeof effectiveYear === 'number'
+    && Number.isSafeInteger(effectiveYear)
+    && effectiveYear >= range.min
+    && effectiveYear <= range.max,
+  );
 }
 
 function normalizeRegistry(registry: readonly CatalogVersionRegistryEntry[]) {

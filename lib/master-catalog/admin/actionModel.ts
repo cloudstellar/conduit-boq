@@ -131,6 +131,8 @@ const SAFE_RPC_ACTION_ERROR_CODES = new Set([
   'VALIDATION_FAILED',
   'VERSION_NOT_PUBLISHABLE',
   'VERSION_NOT_RESTORABLE',
+  'VERSION_EFFECTIVE_YEAR_OUT_OF_RANGE',
+  'VERSION_SEQUENCE_STALE',
   'VERSION_TRANSITION_INVALID',
 ]);
 const RPC_ACTION_ERROR_MESSAGES_TH: Record<string, string> = {
@@ -150,7 +152,7 @@ const RPC_ACTION_ERROR_MESSAGES_TH: Record<string, string> = {
   IMPORT_RECONCILIATION_REQUIRED: 'ข้อมูลนำเข้ายังมีจุดที่ต้องจับคู่หรือตรวจสอบให้ตรงกับฉบับร่าง',
   IMPORT_RETIREMENT_APPROVAL_REQUIRED: 'จำนวนรายการที่จะยกเลิกใช้ต้องมีหลักฐานอนุมัติและยืนยันจำนวนให้ตรงกัน',
   POINTER_ALREADY_CURRENT: 'เวอร์ชันนี้เป็นเวอร์ชันใช้งานปัจจุบันอยู่แล้ว',
-  P18_PLACEMENT_REVIEW_REQUIRED: 'รายการเพิ่มใหม่ยังต้องผ่านการพิจารณาตำแหน่งตาม P-18 ก่อนเผยแพร่',
+  P18_PLACEMENT_REVIEW_REQUIRED: 'รายการเพิ่มใหม่ยังไม่ได้รับการยืนยันตำแหน่ง จึงยังเผยแพร่ไม่ได้',
   PUBLICATION_METADATA_REQUIRED: 'กรุณาระบุข้อมูลเอกสารอนุมัติและที่เก็บไฟล์ให้ครบ',
   PUBLICATION_VALIDATION_FAILED: 'ฉบับร่างยังไม่ผ่านเงื่อนไขเผยแพร่ กรุณาตรวจผลความพร้อม',
   REQUEST_ALREADY_PROCESSED: 'คำขอนี้ถูกดำเนินการแล้ว ระบบจะไม่บันทึกซ้ำ',
@@ -160,6 +162,7 @@ const RPC_ACTION_ERROR_MESSAGES_TH: Record<string, string> = {
   VALIDATION_FAILED: 'ตรวจข้อมูลไม่ผ่าน กรุณาตรวจช่องข้อมูลและผลตรวจแล้วลองใหม่',
   VERSION_NOT_PUBLISHABLE: 'เวอร์ชันนี้ยังไม่อยู่ในสถานะที่เผยแพร่ได้',
   VERSION_NOT_RESTORABLE: 'เวอร์ชันนี้ไม่เข้าเงื่อนไขสำหรับนำกลับมาใช้งาน',
+  VERSION_EFFECTIVE_YEAR_OUT_OF_RANGE: 'ปี พ.ศ. ที่มีผลใช้งานอยู่นอกช่วงที่อนุญาต กรุณาเลือกปีภายใน 10 ปีถัดจากเวอร์ชันฐาน',
   VERSION_SEQUENCE_STALE: 'เลขฉบับนี้ถูกสงวนโดยรายการอื่นแล้ว ระบบกำลังโหลดทะเบียนล่าสุดเพื่อเสนอเลขใหม่',
   VERSION_TRANSITION_INVALID: 'ไม่อนุญาตให้เปลี่ยนสถานะเวอร์ชันตามลำดับนี้',
 };
@@ -235,7 +238,7 @@ export function mapCatalogRpcActionResponse(
   successMessage: string,
 ): CatalogMutationState {
   if (!response) {
-    return createCatalogMutationError('ไม่ได้รับผลลัพธ์จาก Master Catalog RPC', 'INTERNAL_ERROR');
+    return createCatalogMutationError('ระบบบัญชีราคาไม่ส่งผลลัพธ์กลับมา กรุณาลองใหม่', 'INTERNAL_ERROR');
   }
 
   if (!response.ok) {
@@ -396,7 +399,7 @@ function readSafeRpcActionErrorMessage(
     return RPC_ACTION_ERROR_MESSAGES_TH[code] ?? message;
   }
 
-  return 'Master Catalog RPC ปฏิเสธรายการนี้';
+  return 'ระบบบัญชีราคาปฏิเสธรายการนี้';
 }
 
 export function buildManualCatalogChangeArgs(

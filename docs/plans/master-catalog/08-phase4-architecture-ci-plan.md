@@ -66,6 +66,16 @@ current-to-target confirmation. Candidate `020` changes, so earlier G1 evidence
 is historical and separately approved G1R/G2 clean rebuilds are required before
 G3. No reset or Production action is authorized here.
 
+**P-24 pre-G1R hardening:** 2026-07-13 — the exact candidate must also enforce
+an annual effective-year horizon of base +1 through +10 at UI, Server Action,
+and DB layers; map stale/range failures through a stable safe-code allowlist;
+keep the focused Thai error visible while registry data refreshes; expose raw
+codes/request IDs only in collapsed support details; and make first-rollout
+authority copy conditional on the actual base version. Factor F is supporting
+context, not a Master Catalog workflow metric. This amends still-unaccepted
+candidate `020`, so G1R must use the post-P-24 fingerprint. It authorizes no
+reset or Production action.
+
 **Owner decision recorded:** 2026-07-04 — approved according to the
 recommendation for Phase 4 Core/local implementation. This approval does not
 authorize Production migration, deploy, feature enablement, candidate data

@@ -55,6 +55,7 @@ import type { CatalogPublishReadiness } from '@/lib/master-catalog/admin/readMod
 import {
   CATALOG_VERSION_SEGMENT_MAX,
   formatCatalogVersion,
+  getCatalogAnnualEffectiveYearRange,
   parseCatalogVersionString,
   suggestCatalogVersion,
   type CatalogVersionRegistryEntry,
@@ -67,6 +68,7 @@ import {
   restoreCatalogPointerAction,
 } from '../actions';
 import { useStableCatalogOperation } from './useStableCatalogOperation';
+import { MasterCatalogActionErrorAlert } from './MasterCatalogActionErrorAlert';
 
 type DraftCreatePanelProps = {
   defaultVersionId: string | null;
@@ -116,9 +118,12 @@ export function MasterCatalogDraftCreatePanel({
   const baseVersion = defaultVersionString
     ? parseCatalogVersionString(defaultVersionString)
     : null;
+  const effectiveYearRange = baseVersion
+    ? getCatalogAnnualEffectiveYearRange(baseVersion)
+    : null;
   const [transition, setTransition] = useState<CatalogVersionTransition | ''>('');
   const [effectiveYear, setEffectiveYear] = useState(
-    baseVersion ? String(baseVersion.major + 1) : '',
+    effectiveYearRange ? String(effectiveYearRange.min) : '',
   );
   const suggestion = transition && versionRegistry
     ? suggestCatalogVersion({
@@ -172,7 +177,7 @@ export function MasterCatalogDraftCreatePanel({
           <Alert variant="destructive">
             <AlertTitle>พบฉบับร่างที่กำลังทำงานมากกว่าหนึ่งฉบับ</AlertTitle>
             <AlertDescription>
-              ปิดการสร้างและแก้ไขไว้ก่อนจนกว่าจะใช้ฐานข้อมูลที่ผ่าน P-22 และตรวจประวัติฉบับร่างครบ
+              ปิดการสร้างและแก้ไขไว้ก่อนจนกว่าจะตรวจฐานข้อมูลและประวัติฉบับร่างครบ
             </AlertDescription>
           </Alert>
         ) : draftVersions.length === 1 ? (
@@ -248,15 +253,18 @@ export function MasterCatalogDraftCreatePanel({
                   id="draft-effective-year"
                   name="effectiveYear"
                   type="number"
-                  min={baseVersion ? baseVersion.major + 1 : 1}
-                  max={CATALOG_VERSION_SEGMENT_MAX}
+                  min={effectiveYearRange?.min ?? 1}
+                  max={effectiveYearRange?.max ?? CATALOG_VERSION_SEGMENT_MAX}
                   step="1"
                   value={effectiveYear}
                   onChange={(event) => setEffectiveYear(event.target.value)}
                   required
                 />
                 <p className="text-xs text-muted-foreground">
-                  ใช้ปีที่ owner กำหนดให้บัญชีราคามีผล ไม่ใช่ปีที่จัดทำหรือวันที่นำระบบขึ้นใช้งาน
+                  ใช้ปีที่ผู้รับผิดชอบกำหนดให้บัญชีราคามีผล ไม่ใช่ปีที่จัดทำหรือวันที่นำระบบขึ้นใช้งาน
+                  {effectiveYearRange
+                    ? ` เลือกได้ตั้งแต่ พ.ศ. ${effectiveYearRange.min} ถึง ${effectiveYearRange.max}`
+                    : ''}
                 </p>
               </div>
             ) : null}
@@ -562,7 +570,7 @@ export function MasterCatalogPublishRestorePanel({
                 <AlertDescription>
                   ฉบับร่างมีรายการยกเลิกใช้{' '}
                   {draftReadiness.inactiveRowCount.toLocaleString('th-TH')} รายการ
-                  จึงยังห้ามรับรองหรือจัดเก็บ PDF เป็นฉบับทางการจนกว่า P-19 จะได้รับอนุมัติ
+                  จึงยังห้ามรับรองหรือจัดเก็บ PDF เป็นฉบับทางการจนกว่านโยบายการแสดงรายการยกเลิกใช้จะได้รับอนุมัติ
                 </AlertDescription>
               </Alert>
             ) : null}
@@ -777,7 +785,7 @@ function PublishReadinessAlert({
           {readiness.newIdentityCount > 0 ? (
             <p>
               มีรายการเพิ่มใหม่ {readiness.newIdentityCount.toLocaleString('th-TH')} รายการ
-              ที่ต้องผ่านการพิจารณาตำแหน่งตาม P-18
+              ที่ต้องพิจารณาและยืนยันตำแหน่งในบัญชีก่อนเผยแพร่
             </p>
           ) : null}
           {readiness.unapprovedLegacyActiveCount > 0 ? (
@@ -848,18 +856,5 @@ function ActionStateAlert({ state }: { state: CatalogMutationState }) {
     );
   }
 
-  return (
-    <Alert variant="destructive" aria-live="polite">
-      <AlertTitle>{state.message}</AlertTitle>
-      <AlertDescription>
-        <details className="mt-1 text-xs">
-          <summary className="cursor-pointer">ข้อมูลสำหรับติดตามปัญหา</summary>
-          <div className="mt-2 grid gap-1 break-all">
-            <span>รหัส {state.code ?? 'VALIDATION_FAILED'}</span>
-            {state.requestId ? <span>รหัสคำขอ {state.requestId}</span> : null}
-          </div>
-        </details>
-      </AlertDescription>
-    </Alert>
-  );
+  return <MasterCatalogActionErrorAlert state={state} />;
 }

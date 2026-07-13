@@ -30,7 +30,7 @@ export function MasterCatalogHeaderUtilities({
     <div className="flex min-w-0 flex-wrap items-center justify-end gap-2">
       {appEnvironment === 'local' ? (
         <Badge variant="outline" className="border-amber-500 bg-amber-50 text-amber-900">
-          Local
+          ระบบทดสอบ (Local)
         </Badge>
       ) : null}
       {gateState ? (

@@ -16,8 +16,10 @@ P-23 first changed operator context/navigation only. Owner-approved P-23.1 then
 amended candidate `020` to enforce explicit ADR-003 intent-compatible next-number
 planning, including reserved annual identifiers. That content change makes all
 prior `020` fingerprints and live DB evidence historical. Repository/static
-verification passed on the 2026-07-13 working-tree candidate; separately
-approved G1R and G2 clean rebuilds remain required for executable evidence.
+verification passed on the first 2026-07-13 working-tree candidate. P-24 then
+amended the same unapplied candidate with the annual base +1 through +10 guard
+and stable `VERSION_EFFECTIVE_YEAR_OUT_OF_RANGE` response; separately approved
+G1R and G2 clean rebuilds remain required for executable evidence.
 `020` remains outside bootstrap and has not been applied to Production.
 P-18 rules and placement migration `021` remain pending owner/data-custodian
 approval.
@@ -217,6 +219,10 @@ Rules:
 - The create UI records explicit annual/revision/patch business intent and the
   annual owner-designated effective year. It plans from a complete all-status
   registry; raw version segments are not the primary operator input.
+- An annual effective year must be greater than the base year and no more than
+  10 years after it. UI `min`/`max` is guidance; the Server Action and private
+  transition helper enforce the same rule, with the stable safe code
+  `VERSION_EFFECTIVE_YEAR_OUT_OF_RANGE` for an out-of-range guarded create.
 - Every created tuple remains reserved under the existing
   `UNIQUE (major, minor, patch)` constraint. The guarded create path requires the
   next tuple in the selected transition lane and returns

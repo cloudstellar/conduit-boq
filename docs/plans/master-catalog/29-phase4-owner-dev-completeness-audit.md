@@ -6,9 +6,11 @@ implementation passed on `ac31feb` on 2026-07-12. Earlier P-21 evidence on
 DB/concurrency/P-20 input passed on final checkpoint `e463270`; the
 pre-amendment operator/browser preflight passed on `c8f6dca`. P-23 approved the
 remaining operator identity/navigation/contextual-import/export-semantics
-amendment. Its working-tree UI/static/browser checkpoint passed on 2026-07-13;
-owner review/commit and naming the exact candidate must precede the independent
-G2 rebuild/comparison and G3 owner closeout before WP-7.
+amendment. Its first working-tree UI/static/browser checkpoint passed on
+2026-07-13. P-23.1 and P-24 then amended candidate `020` and the operator flow;
+P-24 repository/static verification passed, while the exact implementation
+commit, G1R, independent G2, and G3 owner closeout must
+precede WP-7.
 
 **Environment:** Source/document audit only. No Local database reset, Production
 access/write, feature enablement, publication, new Factor F workflow, or hotfix
@@ -92,6 +94,7 @@ do not remove the need for the operator-completeness work below.
 | C-13 | The publish panel appears before the full item workspace, and the only complete diff is import-specific. Manual plus import changes have no authoritative final draft-versus-base comparison immediately before publication. | Make the complete searchable catalog the primary workspace; compute final snapshot diff by stable identity; show overlapping change groups/old-new values/readiness; carry the reviewed expected lock into publish and require a fresh review after any mutation. |
 | C-14 | Draft creation always suggests a revision and exposes raw major/minor/patch inputs, although annual versus revision versus patch depends on business authority. The overview only has a 25-row display list, and an abandoned annual `{year}.0.0` can block a truthful replacement under the old transition shape. | Require explicit business intent and owner-designated annual year; load a complete all-status registry or fail closed; permanently reserve identifiers; derive/show the next lane candidate; enforce sequence in candidate `020`; permit the next patch-0 annual revision in the same target year when lower identifiers are reserved. |
 | C-15 | Successful create leaves the admin on the overview, detailed metadata delays the item workspace, and pointer restore submits without a current-to-target human confirmation. | Open the exact new draft after success; place compact context/actions then items before detailed document metadata; separate restore as recovery and confirm current/target, reason, and new-versus-historical BOQ behavior. |
+| C-16 | Annual year accepts impractical far-future values; stale-sequence error copy can fall through to raw backend text or disappear when registry refresh remounts the form; internal P-labels and technical identifiers compete with the operator task; first-rollout authority and Factor F context can read as permanent workflow content. | Enforce base +1 through +10 in UI/server/DB; allowlist stable stale/range errors with Thai copy; key refresh state independently and focus a shared error alert; collapse support identifiers; remove internal labels; contextualize first-rollout authority and demote separate Factor F details. |
 
 P-18 placement and P-19 retired-row PDF policy are already recorded gates, not
 new discoveries from this audit. WP-7 BOQ/hotfix `016`/Factor F regression and

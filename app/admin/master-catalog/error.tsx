@@ -18,14 +18,14 @@ export default function MasterCatalogError({
   useEffect(() => {
     const nextRequestId = crypto.randomUUID();
     if (requestIdElementRef.current) {
-      requestIdElementRef.current.textContent = `Request ID: ${nextRequestId}`;
+      requestIdElementRef.current.textContent = `รหัสอ้างอิง: ${error.digest ?? nextRequestId}`;
     }
     console.error({
       event: 'master_catalog_route_error',
       operation: 'renderCatalogAdminRoute',
       outcome: 'failed',
       durationMs: 0,
-      requestId: nextRequestId,
+        requestId: error.digest ?? nextRequestId,
       ...(error.digest ? { code: error.digest.slice(0, 128) } : {}),
     });
   }, [error.digest]);
@@ -34,12 +34,12 @@ export default function MasterCatalogError({
     <MasterCatalogRouteStateShell>
       <Alert variant="destructive" aria-live="assertive">
         <ShieldAlert />
-        <AlertTitle>โหลด Master Catalog ไม่สำเร็จ</AlertTitle>
+        <AlertTitle>โหลดบัญชีราคามาตรฐานไม่สำเร็จ</AlertTitle>
         <AlertDescription>
           <div className="grid gap-3">
             <p>ข้อมูลยังไม่ถูกเปลี่ยน กรุณาลองโหลดหน้านี้อีกครั้ง</p>
             <p ref={requestIdElementRef} className="font-mono text-xs" aria-live="polite">
-              Request ID: กำลังสร้าง
+              รหัสอ้างอิง: กำลังสร้าง
             </p>
             <div>
               <Button type="button" variant="outline" onClick={reset}>

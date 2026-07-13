@@ -1,6 +1,7 @@
 # ADR-003: Master Catalog Rollout Start and Version Numbering
 
-**Status:** Accepted; Production baseline rollout implemented; version-intent and reserved-number amendment accepted 2026-07-13
+**Status:** Accepted; Production baseline rollout implemented; version-intent,
+reserved-number, and bounded annual-year amendments accepted 2026-07-13
 **Date:** 2026-06-05
 **Decision Makers:** Owner, Development Team
 **Implementation status:** Production `2568.0.0`, singleton pointer, Phase 2
@@ -105,8 +106,12 @@ intent:
    current effective year; or
 3. `patch` — a correction that restores the same approved official basis.
 
-The owner-designated year is required for `annual`; the system derives the
-other segments from the complete version registry. Every created version number
+The owner-designated year is required for `annual` and must be from the year
+after the current base through 10 years after that base, inclusive. For example,
+a `2568.x.x` base permits `2569` through `2578`. This catches accidental or
+unreviewed far-future values while retaining a practical planning horizon; a
+need beyond that range requires an explicit ADR/business-rule amendment rather
+than a UI bypass. The system derives the other segments from the complete version registry. Every created version number
 is permanently reserved across `draft`, `active`, `archived`, and `abandoned`
 states. A number is never deleted or reused to hide a cancelled attempt.
 
@@ -125,9 +130,11 @@ nonzero middle segment records the reserved-number history and does not mean the
 system guessed a mid-year policy change. A year-changing candidate with a
 nonzero patch remains invalid.
 
-The UI displays the proposed number and any earlier reserved numbers before
-confirmation. The database rechecks the current base, transition shape, and
-next reserved sequence atomically enough to reject stale or tampered plans.
+The UI displays the allowed annual-year range, proposed number, and any earlier
+reserved numbers before confirmation. The application and database both
+recheck the annual-year range; the database also rechecks the current base,
+transition shape, and next reserved sequence atomically enough to reject stale
+or tampered plans.
 
 If a correction changes a numeric price because the previously entered value was
 wrong, classify it as a patch only when the correction restores the same
