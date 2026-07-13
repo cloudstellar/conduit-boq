@@ -473,7 +473,11 @@ On the export screen:
 - show selected version, Published/Draft, Current Default, effective date,
   count, and full dataset hash or clearly labeled short-hash identifier before
   download/print;
-- label actions `ส่งออก Excel` and `พิมพ์ / บันทึก PDF`;
+- group draft actions under `ส่งออกเพื่อตรวจ` and published actions under
+  `ส่งออกเอกสาร`, with choices `Excel สำหรับตรวจสอบ` and
+  `PDF สำหรับอ่าน/พิมพ์`;
+- do not imply that the generated five-sheet workbook is an import template;
+  the approved import profile remains a separate input contract;
 - warn clearly when exporting an older published version, but allow it;
 - block and explain count/hash mismatch;
 - never rename existing Production labels incidentally during Phase 4 work.

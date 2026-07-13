@@ -160,6 +160,7 @@ const RPC_ACTION_ERROR_MESSAGES_TH: Record<string, string> = {
   VALIDATION_FAILED: 'ตรวจข้อมูลไม่ผ่าน กรุณาตรวจช่องข้อมูลและผลตรวจแล้วลองใหม่',
   VERSION_NOT_PUBLISHABLE: 'เวอร์ชันนี้ยังไม่อยู่ในสถานะที่เผยแพร่ได้',
   VERSION_NOT_RESTORABLE: 'เวอร์ชันนี้ไม่เข้าเงื่อนไขสำหรับนำกลับมาใช้งาน',
+  VERSION_SEQUENCE_STALE: 'เลขฉบับนี้ถูกสงวนโดยรายการอื่นแล้ว ระบบกำลังโหลดทะเบียนล่าสุดเพื่อเสนอเลขใหม่',
   VERSION_TRANSITION_INVALID: 'ไม่อนุญาตให้เปลี่ยนสถานะเวอร์ชันตามลำดับนี้',
 };
 const RPC_TRANSPORT_ERROR_MESSAGES = {

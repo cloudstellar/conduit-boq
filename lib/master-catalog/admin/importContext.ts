@@ -35,6 +35,7 @@ export interface CatalogImportEvidenceCounts {
 export interface CatalogImportContextModel {
   drafts: CatalogImportDraftOption[];
   draft: CatalogImportDraftOption | null;
+  baseVersionString: string | null;
   parseContext: ParseContext;
   evidenceCounts: CatalogImportEvidenceCounts;
   authorityReady: boolean;
@@ -118,6 +119,7 @@ export async function loadCatalogImportContext(
     return {
       drafts,
       draft: null,
+      baseVersionString: null,
       parseContext: {},
       evidenceCounts: EMPTY_COUNTS,
       authorityReady: false,
@@ -131,6 +133,7 @@ export async function loadCatalogImportContext(
     return {
       drafts,
       draft,
+      baseVersionString: null,
       parseContext: {},
       evidenceCounts: EMPTY_COUNTS,
       authorityReady: false,
@@ -143,6 +146,7 @@ export async function loadCatalogImportContext(
     return {
       drafts,
       draft,
+      baseVersionString: null,
       parseContext: {},
       evidenceCounts: EMPTY_COUNTS,
       authorityReady: false,
@@ -151,7 +155,7 @@ export async function loadCatalogImportContext(
     };
   }
 
-  const [mappingResult, exclusionResult, workspace] = await Promise.all([
+  const [mappingResult, exclusionResult, workspace, baseVersionResult] = await Promise.all([
     supabase
       .from('catalog_first_rollout_mappings')
       .select('identity_id,legacy_item_code,source_item_code,target_item_code,identity_outcome,work_context_code,item_type_code')
@@ -161,11 +165,19 @@ export async function loadCatalogImportContext(
       .select('source_item_code')
       .order('source_item_code', { ascending: true }),
     loadCatalogVersionWorkspace(supabase, draft.id),
+    draft.basedOnVersionId
+      ? supabase
+          .from('price_list_versions')
+          .select('version_string')
+          .eq('id', draft.basedOnVersionId)
+          .maybeSingle()
+      : Promise.resolve({ data: null, error: null }),
   ]);
 
   warnings.push(...workspace.warnings);
   if (mappingResult.error) warnings.push('โหลดชุดจับคู่ที่รับรองสำหรับรอบเผยแพร่แรกไม่สำเร็จ');
   if (exclusionResult.error) warnings.push('โหลดรายการจากไฟล์ต้นทางที่เลื่อนไปรอบถัดไปไม่สำเร็จ');
+  if (baseVersionResult.error) warnings.push('โหลดเลขฉบับฐานสำหรับการนำเข้าไม่สำเร็จ');
 
   const mappings = rows(mappingResult.data) as MappingRow[];
   const exclusions = rows(exclusionResult.data)
@@ -273,6 +285,7 @@ export async function loadCatalogImportContext(
   return {
     drafts,
     draft,
+    baseVersionString: nullableString(baseVersionResult.data?.version_string),
     parseContext: {
       authoritativeRowBySourceCode,
       sourceExclusionCodes: exclusions,

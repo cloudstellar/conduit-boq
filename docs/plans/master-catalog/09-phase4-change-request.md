@@ -6,7 +6,8 @@ migration, deploy, feature enablement, or publication authorized
 **Change type:** Additive database governance, admin UI, import/manual change,
 audit history, and official Excel/PDF export
 **Production project:** `otlssvssvgkohqwuuiir`
-**Proposed first structured-code version:** `2568.1.0`
+**Proposed first structured-code version:** `2568.1.0` when still unreserved;
+the guarded planner is authoritative
 
 **Owner decision recorded:** 2026-07-04 — approved according to the
 recommendation for implementation/local rehearsal only. The gate structure,
@@ -47,9 +48,27 @@ and requires an authoritative lock-bound final snapshot review before publish.
 Candidate `020` is amended before freeze; prior `3bfc74e` evidence is historical
 and superseded for revised closeout. Source/static implementation passed on
 `ac31feb`; owner-approved G1 Local DB/concurrency/P-20 input passed on
-`e463270`; pre-G2 operator/browser preflight passed on executable/source
-checkpoint `c8f6dca` without changing migration `020`. G2 exact-`c8f6dca`
-reset/comparison and Production remain separately gated.
+`e463270`; the pre-amendment operator/browser preflight passed on
+`c8f6dca` without changing migration `020`.
+
+**P-23 operator-context amendment recorded:** 2026-07-13 — the owner approved
+persistent signed-in admin context, information-only global navigation,
+exact-draft contextual import, explicit approved-input versus review-export
+semantics, and a configured Local marker. This is Local UI/route/test/docs work
+only and does not amend migration `020` or authorize a reset. The P-23
+working-tree static/browser checkpoint passed on 2026-07-13; the exact G2
+candidate is named only after owner review and commit. G2 and Production remain
+separately gated.
+
+**P-23.1 version-intent/workspace amendment recorded:** 2026-07-13 — owner
+approved replacing raw segment entry and assumed revision with explicit
+annual/revision/patch business intent, complete-registry planning, permanent
+number reservation, a DB-enforced next sequence, direct post-create workspace
+navigation, item-first detail hierarchy, and pointer-restore confirmation.
+Candidate `020` is amended before acceptance, so all prior `020` fingerprints
+and G1 evidence are historical. Repository/static verification precedes new,
+separately approved G1R and G2 clean rebuilds. No reset or Production action is
+authorized by this amendment.
 
 ## 1. Decision requested
 
@@ -69,8 +88,9 @@ The owner is asked to confirm:
 
 1. Production `2568.0.0` remains authoritative for current names, units, and
    all price fields.
-2. `2568.1.0` begins as an exact 710-row clone and initially changes only
-   approved codes/classification.
+2. The first structured-code revision begins as an exact 710-row clone and
+   initially changes only approved codes/classification. Its expected number is
+   `2568.1.0` only when that identifier remains unreserved.
 3. The published database version is the official source of truth.
 4. System-generated stamped Excel/PDF may be used as official reference copies.
 5. Source/approval files remain in the physical filing system.
@@ -139,6 +159,8 @@ After completion, an active admin can:
 - open the one current-base working draft and see stale/abandoned drafts
   read-only;
 - clone a published version into a draft;
+- choose annual/revision/patch intent, review the all-status reserved candidate,
+  and open the exact created workspace without typing raw number segments;
 - abandon a never-published draft with a reason while retaining its rows/history;
 - add, edit, retire, or recode an item without Excel;
 - after P-18/WP-7.5 acceptance, add several new identities to one draft and
@@ -153,7 +175,7 @@ After completion, an active admin can:
 - export selected published versions to stamped Excel and PDF;
 - verify export item count and dataset hash;
 - restore the default pointer to a prior published version without rewriting
-  historical BOQs.
+  historical BOQs, after confirming current and target versions.
 
 ## 4. In scope
 
@@ -275,7 +297,7 @@ scope.
 | 4-0 | Approve ADR/CR, dictionary, reconciliation, specs, backup/runbook | None |
 | 4A Local | Build additive schema/functions and backfill on Local | None |
 | 4B Local | Build UI/import/manual/history/publish/export behind flag | None |
-| WP-6.6 Local | Close Audit #29 C-01 through C-13 with candidate migration `020`, RPC/UI/tests, final snapshot review, and owner review | None |
+| WP-6.6 Local | Close Audit #29 C-01 through C-15 with candidate migration `020`, RPC/UI/tests, final snapshot review, version planning, and owner review | None |
 | WP-7 Local | Preserve BOQ/hotfix `016` and Factor F behavior through permanent regression tests only | None |
 | 4B.5 Local / WP-7.5 | After P-18 acceptance, add DB-backed placement for new identities only | None |
 | 4C Rehearsal | Full local workflow from refreshed Production data | None |
@@ -365,7 +387,7 @@ feature enablement, final catalog publication, or silent business-data choices.
 - [x] P-21 explicitly authorizes WP-6.6 Local-only implementation scope/start
 - [x] P-22/G0 authorizes the bounded operator-workflow docs and Local-only
       implementation; G1/G2 require separate approvals, and G1 is now complete
-- [x] Audit #29 C-01 through C-13 are mapped to exact DB/UI/test owners
+- [x] Audit #29 C-01 through C-15 are mapped to exact DB/UI/test owners
 - [x] WP-6.5 reliability evidence remains preserved and is not relabeled as a
       full operator-completeness certificate
 - [x] Planned DB changes amend still-unaccepted candidate `020`; `017`-`019`
@@ -373,7 +395,10 @@ feature enablement, final catalog publication, or silent business-data choices.
 - [x] P-22 source/static implementation passed on `ac31feb` without applying
       candidate `020`, resetting Local, changing bootstrap, or touching Production
 - [x] G1 Local reset/apply/harness evidence passed on `e463270`; `020` remains
-      outside bootstrap and G2/G3/G4 remain separately gated
+      outside bootstrap; P-23.1 later made that live evidence historical
+- [x] P-23.1 repository/static verification passed 2026-07-13 without applying
+      amended candidate `020`, resetting Local, changing bootstrap, or touching
+      Production; G1R/G2/browser/G3/G4 remain separately gated
 - [x] Unsupported Add/Supplement/Retire controls remain hidden at release unless
       their downstream gates pass
 - [ ] A separate owner decision is obtained before any Local bootstrap/reset
@@ -427,7 +452,7 @@ pretend a publishable candidate has been approved.
 - [ ] Stable request-ID timeout/retry and two-session concurrency tests pass
 - [ ] ADR-003 reusable version path passes beyond `2568.1.0`
 - [ ] Permanent live DB hotfix `016`/BOQ/Factor F regressions pass
-- [ ] WP-6.6 C-01 through C-13 close with authoritative automated/browser/UAT
+- [ ] WP-6.6 C-01 through C-15 close with authoritative automated/browser/UAT
       evidence, or affected controls are removed from release visibility
 - [ ] Tracked export verifier and documentation consistency checks pass
 - [ ] Intended-admin UAT, safe Thai recovery/log correlation, and 710-row

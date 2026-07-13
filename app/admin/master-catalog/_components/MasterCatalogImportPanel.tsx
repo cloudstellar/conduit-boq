@@ -91,15 +91,15 @@ interface PreparedImportPreview {
 const initialState: CatalogMutationState = { status: 'idle', message: '' };
 
 export function MasterCatalogImportPanel({
-  drafts,
   draft,
+  baseVersionString,
   parseContext,
   evidenceCounts,
   authorityReady,
   capabilities,
 }: {
-  drafts: CatalogImportDraftOption[];
   draft: CatalogImportDraftOption | null;
+  baseVersionString: string | null;
   parseContext: ParseContext;
   evidenceCounts: CatalogImportEvidenceCounts;
   authorityReady: boolean;
@@ -109,7 +109,6 @@ export function MasterCatalogImportPanel({
   };
 }) {
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const router = useRouter();
   const [mode, setMode] = useState<ImportMode>('full');
   const [reason, setReason] = useState('');
   const [physicalArchiveReference, setPhysicalArchiveReference] =
@@ -121,17 +120,20 @@ export function MasterCatalogImportPanel({
   const [prepared, setPrepared] = useState<PreparedImportPreview | null>(null);
   const [prepareError, setPrepareError] = useState<string | null>(null);
   const [diagnostics, setDiagnostics] = useState<ParserDiagnostic[]>([]);
+  const [serverReviewed, setServerReviewed] = useState(false);
 
   function invalidatePreparedPreview() {
     setPrepared(null);
     setPrepareError(null);
     setDiagnostics([]);
+    setServerReviewed(false);
   }
 
   async function prepareImportPreview() {
     setPrepared(null);
     setPrepareError(null);
     setDiagnostics([]);
+    setServerReviewed(false);
 
     if (!draft || !authorityReady || !draft.isCurrentBase) {
       setPrepareError('ต้องเลือกฉบับร่างฐานปัจจุบันที่โหลดข้อมูลอ้างอิงครบก่อน');
@@ -258,33 +260,22 @@ export function MasterCatalogImportPanel({
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <FileSpreadsheet />
-          นำเข้าบัญชีราคา
+          นำเข้าชุดข้อมูลที่อนุมัติ
         </CardTitle>
         <CardDescription>
-          เลือกฉบับร่างให้ชัดเจนก่อนอ่านและตรวจไฟล์
+          ฉบับร่าง {draft?.versionString ?? '-'} · ฐาน {baseVersionString ?? '-'}
         </CardDescription>
       </CardHeader>
       <CardContent className="grid gap-5">
-        <div className="grid gap-2">
-          <Label htmlFor="catalog-import-draft">ฉบับร่างเป้าหมาย</Label>
-          <Select
-            value={draft?.id ?? ''}
-            onValueChange={(value) => router.push(`/admin/master-catalog/import?draftId=${value}`)}
-          >
-            <SelectTrigger id="catalog-import-draft">
-              <SelectValue placeholder="เลือกฉบับร่าง" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectGroup>
-                {drafts.map((option) => (
-                  <SelectItem key={option.id} value={option.id}>
-                    {option.versionString} · {option.isCurrentBase ? 'ฐานปัจจุบัน' : 'ฐานเก่า'}
-                  </SelectItem>
-                ))}
-              </SelectGroup>
-            </SelectContent>
-          </Select>
-        </div>
+        <ImportProgress currentStep={prepared ? (serverReviewed ? 3 : 2) : 1} />
+
+        <Alert>
+          <FileSpreadsheet />
+          <AlertTitle>ใช้ไฟล์ต้นทางตามรูปแบบ NT Item Master 2568</AlertTitle>
+          <AlertDescription>
+            ระบบรับชีต 01_Item_Master_Final สำหรับนำเข้า ไฟล์ Excel ที่ส่งออกเพื่อตรวจเป็นเอกสารคนละรูปแบบและนำกลับเข้าหน้านี้ไม่ได้
+          </AlertDescription>
+        </Alert>
 
         {!draft ? (
           <Alert>
@@ -324,6 +315,7 @@ export function MasterCatalogImportPanel({
                 setPrepared(null);
                 setPrepareError(null);
                 setDiagnostics([]);
+                setServerReviewed(false);
               }}
             />
           </div>
@@ -437,7 +429,9 @@ export function MasterCatalogImportPanel({
           <PreparedPreview
             key={prepared.normalizedPayloadHash}
             prepared={prepared}
+            draftId={draft?.id ?? ''}
             retirementEnabled={capabilities.retirementEnabled}
+            onReviewStateChange={setServerReviewed}
           />
         ) : null}
       </CardContent>
@@ -470,12 +464,61 @@ function EvidenceCounts({ counts }: { counts: CatalogImportEvidenceCounts }) {
   );
 }
 
+function ImportProgress({ currentStep }: { currentStep: 1 | 2 | 3 }) {
+  const steps = [
+    'เลือกไฟล์และหลักฐาน',
+    'ตรวจผลต่างกับเซิร์ฟเวอร์',
+    'ยืนยันบันทึกลงฉบับร่าง',
+  ] as const;
+
+  return (
+    <ol
+      aria-label="ขั้นตอนนำเข้าชุดข้อมูล"
+      className="grid gap-2 sm:grid-cols-3"
+    >
+      {steps.map((label, index) => {
+        const step = (index + 1) as 1 | 2 | 3;
+        const isComplete = step < currentStep;
+        const isCurrent = step === currentStep;
+
+        return (
+          <li
+            key={label}
+            aria-current={isCurrent ? 'step' : undefined}
+            className={[
+              'flex min-h-14 items-center gap-3 rounded-md border px-3 py-2 text-sm',
+              isCurrent ? 'border-primary bg-primary/5 font-medium' : 'bg-background',
+            ].join(' ')}
+          >
+            <span
+              className={[
+                'flex size-7 shrink-0 items-center justify-center rounded-full border text-xs font-semibold',
+                isComplete || isCurrent
+                  ? 'border-primary bg-primary text-primary-foreground'
+                  : 'text-muted-foreground',
+              ].join(' ')}
+              aria-hidden="true"
+            >
+              {isComplete ? <CheckCircle2 className="size-4" /> : step}
+            </span>
+            <span>{label}</span>
+          </li>
+        );
+      })}
+    </ol>
+  );
+}
+
 function PreparedPreview({
   prepared,
+  draftId,
   retirementEnabled,
+  onReviewStateChange,
 }: {
   prepared: PreparedImportPreview;
+  draftId: string;
   retirementEnabled: boolean;
+  onReviewStateChange: (reviewed: boolean) => void;
 }) {
   const router = useRouter();
   const [previewState, previewAction] = useActionState(
@@ -496,10 +539,17 @@ function PreparedPreview({
   );
 
   useEffect(() => {
-    if (previewState.status === 'success' || applyState.status === 'success') {
+    if (previewState.status === 'success') {
+      onReviewStateChange(true);
       router.refresh();
     }
-  }, [applyState.status, previewState.status, router]);
+    if (previewState.status === 'error') {
+      onReviewStateChange(false);
+    }
+    if (applyState.status === 'success' && draftId) {
+      router.push(`/admin/master-catalog/versions/${draftId}?notice=import-applied`);
+    }
+  }, [applyState.status, draftId, onReviewStateChange, previewState.status, router]);
 
   return (
     <div className="grid gap-4 rounded-md border bg-background p-4">

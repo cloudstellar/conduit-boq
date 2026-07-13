@@ -3,7 +3,7 @@ import {
   classifyCatalogVersionTransition,
   formatCatalogVersion,
   parseCatalogVersionString,
-  suggestNextCatalogRevision,
+  suggestCatalogVersion,
 } from '../lib/master-catalog/versioning';
 
 describe('Master Catalog ADR-003 version lifecycle', () => {
@@ -12,28 +12,83 @@ describe('Master Catalog ADR-003 version lifecycle', () => {
 
     expect(classifyCatalogVersionTransition(base, { major: 2570, minor: 0, patch: 0 }))
       .toBe('annual');
+    expect(classifyCatalogVersionTransition(base, { major: 2570, minor: 2, patch: 0 }))
+      .toBe('annual');
     expect(classifyCatalogVersionTransition(base, { major: 2568, minor: 1, patch: 0 }))
       .toBe('revision');
     expect(classifyCatalogVersionTransition(base, { major: 2568, minor: 0, patch: 1 }))
       .toBe('patch');
   });
 
-  it('rejects duplicate, backward, and mixed transitions', () => {
+  it('rejects duplicate, backward, and mixed-segment transitions', () => {
     const base = { major: 2568, minor: 1, patch: 2 };
 
     expect(classifyCatalogVersionTransition(base, base)).toBeNull();
     expect(classifyCatalogVersionTransition(base, { major: 2567, minor: 9, patch: 9 }))
       .toBeNull();
     expect(classifyCatalogVersionTransition(base, { major: 2569, minor: 1, patch: 0 }))
+      .toBe('annual');
+    expect(classifyCatalogVersionTransition(base, { major: 2569, minor: 0, patch: 1 }))
       .toBeNull();
     expect(classifyCatalogVersionTransition(base, { major: 2568, minor: 2, patch: 1 }))
       .toBeNull();
   });
 
-  it('parses, formats, and suggests the next revision without candidate hardcoding', () => {
+  it('parses and formats CalVer-first catalog versions', () => {
     expect(parseCatalogVersionString('2568.0.0')).toEqual({ major: 2568, minor: 0, patch: 0 });
     expect(parseCatalogVersionString('02568.0.0')).toBeNull();
-    expect(suggestNextCatalogRevision('2570.2.4')).toEqual({ major: 2570, minor: 3, patch: 0 });
+    expect(parseCatalogVersionString('2147483648.0.0')).toBeNull();
     expect(formatCatalogVersion({ major: 2570, minor: 3, patch: 0 })).toBe('2570.3.0');
+  });
+
+  it('plans the next revision and patch from the complete reserved registry', () => {
+    const registry = [
+      { versionString: '2568.0.0', status: 'active' },
+      { versionString: '2568.1.0', status: 'abandoned' },
+      { versionString: 'not-a-version', status: 'abandoned' },
+    ];
+
+    expect(suggestCatalogVersion({
+      baseVersionString: '2568.0.0',
+      transition: 'revision',
+      registry,
+    })).toEqual({
+      transition: 'revision',
+      version: { major: 2568, minor: 2, patch: 0 },
+      reservedVersions: [{ versionString: '2568.1.0', status: 'abandoned' }],
+    });
+    expect(suggestCatalogVersion({
+      baseVersionString: '2568.0.0',
+      transition: 'patch',
+      registry,
+    })).toEqual({
+      transition: 'patch',
+      version: { major: 2568, minor: 0, patch: 1 },
+      reservedVersions: [],
+    });
+  });
+
+  it('keeps a void annual number reserved while allowing the same effective year', () => {
+    const suggestion = suggestCatalogVersion({
+      baseVersionString: '2568.0.0',
+      transition: 'annual',
+      effectiveYear: 2569,
+      registry: [
+        { versionString: '2568.0.0', status: 'active' },
+        { versionString: '2569.0.0', status: 'abandoned' },
+      ],
+    });
+
+    expect(suggestion).toEqual({
+      transition: 'annual',
+      version: { major: 2569, minor: 1, patch: 0 },
+      reservedVersions: [{ versionString: '2569.0.0', status: 'abandoned' }],
+    });
+    expect(suggestCatalogVersion({
+      baseVersionString: '2568.0.0',
+      transition: 'annual',
+      effectiveYear: 2568,
+      registry: [],
+    })).toBeNull();
   });
 });

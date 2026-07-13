@@ -1,12 +1,17 @@
 # Master Catalog Phase 4 Admin Operating Procedure
 
-**Status:** Procedure amended under P-22; source/static implementation of the
+**Status:** Procedure amended under P-22/P-23; source/static implementation of the
 one-working-draft, audited-abandon, item-first, and final snapshot-review flow
 passed on `ac31feb`, and G1 Local DB/concurrency evidence passed on `e463270`.
-WP-6.6 closeout remains on Hold for G2 independent rebuild/P-20 comparison and
-G3 owner review. Prior `3bfc74e` evidence is historical. P-18/P-19 where
-applicable and independent intended-admin WP-8 UAT remain pending. The Local UI
-must not be treated as Production-ready until those gates pass.
+P-23 owner-approved the persistent operator identity, information-only global
+navigation, exact-draft import, and explicit review-export semantics on
+2026-07-13. Its working-tree UI/static/browser checkpoint passed and awaits
+owner review/commit before an exact G2 candidate is named. WP-6.6 closeout
+remains on Hold for G2 independent
+rebuild/P-20 comparison and G3 owner review. Prior `3bfc74e` evidence is
+historical. P-18/P-19 where applicable and independent intended-admin WP-8 UAT
+remain pending. The Local UI must not be treated as Production-ready until
+those gates pass.
 **Audience:** Active Master Catalog administrators
 **Rule:** A draft is not official; published versions are immutable
 
@@ -19,6 +24,10 @@ Confirm you are signed in with an active admin account and have:
 - the intended version/effective date;
 - permission to change price data, if any;
 - a current view of the active/default catalog.
+
+The Master Catalog header must show the signed-in admin and role. In Local it
+must also show the environment from the explicit Local configuration. Stop if
+the displayed operator or environment is not the one intended for the work.
 
 Do not continue when another admin is publishing, the current pointer is
 unexpected, or the source/approval reference is unclear.
@@ -45,15 +54,28 @@ approved maintenance capability.
 
 ## 3. Create a draft
 
-1. Open **Master Catalog → Versions**.
+1. Open **บัญชีราคามาตรฐาน → บัญชีปัจจุบัน**.
 2. Confirm the version marked current.
 3. Check whether the Current version already has a working draft. Only one is
    allowed; open it rather than creating a competing release workspace.
-4. When none exists, select **Create draft from current version**.
-5. Enter the owner-approved proposed version under ADR-003
-   annual/revision/patch rules, effective date, and reason.
-6. Review the base version and expected row count.
-7. Confirm creation once.
+4. When none exists, choose the business intent:
+   **ประจำปีใหม่**, **ปรับปรุง/เพิ่มเติม**, or **แก้ไขข้อมูลเดิม**.
+5. For **ประจำปีใหม่**, enter the owner-designated effective BE year. Do not
+   infer it from the preparation, publication, or deployment date.
+6. Review the system-planned version and every lower reserved number shown. The
+   registry includes active, archived, draft, and abandoned versions.
+7. Enter a specific draft name and reason, then acknowledge that the number will
+   remain reserved even if the draft is later abandoned.
+8. Select **สร้างและเปิดพื้นที่ทำงาน** once. A successful create opens that
+   exact draft automatically. If another admin reserves the number first, the
+   screen reloads the registry and proposes the next valid number; review that
+   new number before submitting again. Use **ลองโหลดทะเบียนใหม่** if the
+   registry read itself failed. Do not resubmit a stale displayed number.
+
+Use **ปรับปรุง/เพิ่มเติม** for newly approved price/item/policy content. Use
+**แก้ไขข้อมูลเดิม** only to restore the same approved official source. If a
+change contains both, use the higher-impact revision. Editing within the same
+unpublished draft does not create another catalog version.
 
 The new draft records `based_on_version_id`. If the current pointer changes
 later, the draft becomes stale and cannot publish. Create a new draft from the
@@ -66,8 +88,16 @@ all rows and audit history as read-only and then permits a fresh clone. Never
 delete a draft, use Archived for this purpose, or attempt to reopen an
 abandoned draft.
 
-For first structured-code rollout, clone `2568.0.0` to `2568.1.0` and confirm
-all 710 names, units, and prices are unchanged before applying mappings.
+Abandon never frees its version number. A replacement uses the next reserved
+number in the selected lane. If an annual `{year}.0.0` draft was abandoned, keep
+the truthful owner-designated year and use the next patch-0 revision proposed by
+the system; never reuse the cancelled number or change the year merely to pass
+validation.
+
+For first structured-code rollout, choose **ปรับปรุง/เพิ่มเติม** from
+`2568.0.0`; `2568.1.0` is the expected candidate only when that number has not
+already been reserved. Confirm all 710 names, units, and prices are unchanged
+before applying mappings.
 
 ## 4. Manual add
 
@@ -145,11 +175,21 @@ Never reuse a retired code or change a published row in place.
 
 ## 8. Excel import
 
+Open the exact working draft, then choose **นำเข้าชุดข้อมูล**. Import is a
+draft-scoped action, not a global Master Catalog section. The route fixes the
+target draft and the page shows its version/base context; do not choose the
+target a second time.
+
+The Excel/PDF files produced by **ส่งออกเพื่อตรวจ** are review artifacts, not
+import templates. Import accepts only the separately approved workbook/profile
+with sheet `01_Item_Master_Final` and its required headers. A future round-trip
+bulk editor requires a separate owner-approved contract.
+
 ### Prepare
 
 1. Use only the approved workbook/profile.
 2. Confirm the raw file is filed physically and obtain its archive reference.
-3. Explicitly select the exact current-base draft.
+3. Confirm the draft/version/base shown by the route is exact and current.
 4. Choose **Full** or **Supplement**:
    - Full: omitted current items are proposed for retirement.
    - Supplement: omitted items remain unchanged.
@@ -191,7 +231,8 @@ validation records `validated` or `rejected`.
    intended apply with the same operation ID so the prior result is returned.
    Do not reconstruct the payload from memory or start a new operation ID until
    the prior result is known or the operator explicitly begins a different apply.
-6. Review the created change set and item histories.
+6. After success, return to the same draft workspace and confirm the success
+   notice, created change set, item histories, and incremented draft revision.
 
 K-formula columns are ignored/excluded in Phase 4 Core.
 
@@ -200,7 +241,7 @@ They require the separate Factor F process.
 
 ## 9. Review a draft
 
-Open the draft's **Review changes before publication** page. It must compare the
+Choose **ตรวจฉบับสุดท้าย** from the draft workspace. It must compare the
 complete final database snapshots against the exact base by stable identity,
 not only list import events. Before requesting publication, verify:
 
@@ -261,7 +302,9 @@ atomically. Do not attempt to edit it.
 ## 11. Generate official exports
 
 1. Open the published version, not merely “current.”
-2. Choose **ส่งออก Excel** and **พิมพ์ / บันทึก PDF**.
+2. Choose **ส่งออกเอกสาร → Excel สำหรับตรวจสอบ** or
+   **PDF สำหรับอ่าน/พิมพ์**. On a draft the equivalent menu is
+   **ส่งออกเพื่อตรวจ** and every artifact remains non-official.
 3. Verify the field-facing PDF cover includes only organization,
    `ฉบับบัญชีราคา`, Thai status, effective date, item count, and full dataset
    hash. Verify complete approval/publication/export metadata separately in
@@ -289,9 +332,12 @@ official references.
 Use only when a published current version must stop being used for new BOQs.
 
 1. Obtain owner approval and identify the prior published target.
-2. Open target version and choose **Make current (restore)**.
-3. Review affected new-BOQ behavior; historical BOQs do not change.
-4. Enter reason/reference and confirm once.
+2. Open the exact target version and choose **คืนเวอร์ชันใช้งาน**.
+3. Enter a specific reason, then open the confirmation summary.
+4. Verify the displayed current-to-target versions and acknowledge that new
+   BOQs will use the target while historical BOQs do not change.
+   If the current version cannot be loaded, the control stays closed; reload
+   the data and do not confirm from a blank or assumed current value.
 5. Verify pointer, badges, and audit record.
 6. Create a correction catalog version; do not edit/delete the failed version.
 
@@ -310,6 +356,7 @@ Use only when a published current version must stop being used for new BOQs.
 | Working draft already exists | Open the existing Current-base workspace; abandon it with a reason only when the attempt truly must be replaced |
 | Draft review changed | The draft was edited after review. Return to final comparison, inspect the new state, and publish only with the refreshed lock |
 | Draft base stale | Create a new draft from Current and reapply approved changes; do not publish/rebase the stale draft |
+| Current restore version unavailable | Keep Restore closed, reload the version data, and verify both current and target before confirming |
 | Publish evidence required | Complete real approval metadata; do not use placeholder text |
 | Draft is stale/read-only | Select/create a current-base draft and deliberately reapply approved changes; do not rebase or force the stale draft |
 | Export hash mismatch | Do not distribute; report with request/version/hash details |

@@ -1,14 +1,7 @@
 import { redirect } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
-import {
-  loadCatalogAdminGate,
-  loadCatalogAdminHistory,
-} from '@/lib/master-catalog/admin/readModel';
-import { loadCatalogImportContext } from '@/lib/master-catalog/admin/importContext';
-import {
-  MasterCatalogGateView,
-  MasterCatalogImportView,
-} from '../_components/MasterCatalogAdminViews';
+import { loadCatalogAdminGate } from '@/lib/master-catalog/admin/readModel';
+import { MasterCatalogGateView } from '../_components/MasterCatalogAdminViews';
 
 export const dynamic = 'force-dynamic';
 
@@ -26,21 +19,12 @@ export default async function MasterCatalogImportPage({
   }
 
   if (gate.state !== 'enabled') {
-    return <MasterCatalogGateView gate={gate} activeSection="import" />;
+    return <MasterCatalogGateView gate={gate} activeSection="versions" />;
   }
 
-  const [history, importContext] = await Promise.all([
-    loadCatalogAdminHistory(supabase),
-    loadCatalogImportContext(supabase, draftId),
-  ]);
-  return (
-    <MasterCatalogImportView
-      gate={gate}
-      history={{
-        imports: history.imports,
-        warnings: [...history.warnings, ...importContext.warnings],
-      }}
-      importContext={importContext}
-    />
-  );
+  if (draftId) {
+    redirect(`/admin/master-catalog/versions/${encodeURIComponent(draftId)}/import`);
+  }
+
+  redirect('/admin/master-catalog');
 }

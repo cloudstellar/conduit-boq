@@ -3,6 +3,8 @@ import {
   ArrowLeft,
   ArchiveX,
   BookOpen,
+  CheckCircle2,
+  ChevronDown,
   ClipboardCheck,
   Database,
   Download,
@@ -12,10 +14,17 @@ import {
   PackageOpen,
   Printer,
   ShieldAlert,
+  Upload,
 } from 'lucide-react';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 import {
   Card,
   CardContent,
@@ -63,18 +72,17 @@ import type {
   CatalogIdentityHistoryPage,
   CatalogItemDetail,
 } from '@/lib/master-catalog/admin/catalogWorkspace';
-import { suggestNextCatalogRevision } from '@/lib/master-catalog/versioning';
 import { MasterCatalogItemEditor } from './MasterCatalogItemEditor';
+import { MasterCatalogHeaderUtilities } from './MasterCatalogHeaderUtilities';
 
 const sectionLinks: Array<{
   section: CatalogAdminSection;
   href: string;
   label: string;
 }> = [
-  { section: 'overview', href: '/admin/master-catalog', label: 'ภาพรวม' },
-  { section: 'versions', href: '/admin/master-catalog/versions', label: 'เวอร์ชัน' },
-  { section: 'import', href: '/admin/master-catalog/import', label: 'นำเข้า' },
-  { section: 'history', href: '/admin/master-catalog/history', label: 'ประวัติ' },
+  { section: 'overview', href: '/admin/master-catalog', label: 'บัญชีปัจจุบัน' },
+  { section: 'versions', href: '/admin/master-catalog/versions', label: 'ทะเบียนฉบับ' },
+  { section: 'history', href: '/admin/master-catalog/history', label: 'ประวัติการเปลี่ยนแปลง' },
 ];
 
 export function MasterCatalogGateView({
@@ -144,10 +152,6 @@ export function MasterCatalogOverviewView({
       version.status === 'draft'
       && version.basedOnVersionId !== overview.defaultVersion?.id,
   );
-  const suggestedVersion = suggestNextCatalogRevision(
-    overview.defaultVersion?.versionString ?? null,
-  );
-
   return (
     <MasterCatalogFrame activeSection="overview" gate={gate}>
       <Warnings warnings={overview.warnings} />
@@ -179,10 +183,11 @@ export function MasterCatalogOverviewView({
       </div>
 
       <MasterCatalogDraftCreatePanel
-        key={`${overview.defaultVersion?.versionString ?? 'no-base'}:${suggestedVersion?.major ?? 'none'}.${suggestedVersion?.minor ?? 'none'}.${suggestedVersion?.patch ?? 'none'}`}
+        key={`${overview.defaultVersion?.id ?? 'no-base'}:${overview.versionRegistry?.map((entry) => `${entry.versionString}:${entry.status ?? ''}`).join('|') ?? 'registry-incomplete'}`}
+        defaultVersionId={overview.defaultVersion?.id ?? null}
         defaultVersionString={overview.defaultVersion?.versionString ?? null}
         draftVersions={currentBaseDrafts}
-        suggestedVersion={suggestedVersion}
+        versionRegistry={overview.versionRegistry}
       />
 
       {staleDrafts.length > 0 ? (
@@ -245,14 +250,28 @@ export function MasterCatalogVersionsView({
 export function MasterCatalogVersionDetailView({
   gate,
   detail,
+  notice,
 }: {
   gate: CatalogAdminGate;
   detail: CatalogVersionDetail;
+  notice?: 'import-applied';
 }) {
   const version = detail.version;
+  const isEditableDraft = version.status === 'draft' && !detail.isStaleDraft;
+  const isCurrentVersion = detail.currentVersionId === version.id;
 
   return (
     <MasterCatalogFrame activeSection="versions" gate={gate}>
+      {notice === 'import-applied' ? (
+        <Alert>
+          <CheckCircle2 />
+          <AlertTitle>นำเข้าชุดข้อมูลลงฉบับร่างแล้ว</AlertTitle>
+          <AlertDescription>
+            ระบบบันทึกผลการนำเข้าและประวัติการเปลี่ยนแปลงไว้ในฉบับร่างนี้แล้ว
+            โปรดตรวจรายการที่เปลี่ยนก่อนตรวจฉบับสุดท้าย
+          </AlertDescription>
+        </Alert>
+      ) : null}
       <Warnings warnings={detail.warnings} />
       {detail.isStaleDraft ? (
         <Alert variant="destructive">
@@ -272,71 +291,70 @@ export function MasterCatalogVersionDetailView({
           </AlertDescription>
         </Alert>
       ) : null}
-      <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_360px]">
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex flex-wrap items-center gap-2">
-              {version.versionString}
+      <section className="grid gap-4 border-b pb-5">
+        <div className="flex flex-col justify-between gap-4 lg:flex-row lg:items-start">
+          <div className="min-w-0">
+            <div className="flex flex-wrap items-center gap-2">
+              <h2 className="text-xl font-semibold">{version.versionString}</h2>
               <StatusBadge status={version.status} />
-              {version.isDefault ? <Badge variant="secondary">ใช้งานปัจจุบัน</Badge> : null}
-            </CardTitle>
-            <CardDescription>{version.name}</CardDescription>
-            {version.status !== 'abandoned' ? (
-              <div className="flex flex-wrap gap-2 pt-2">
+              {isCurrentVersion ? <Badge variant="secondary">ใช้งานปัจจุบัน</Badge> : null}
+              {detail.baseVersion ? (
+                <Badge variant="outline">ฐาน {detail.baseVersion.versionString}</Badge>
+              ) : null}
+            </div>
+            <p className="mt-1 text-sm text-muted-foreground">{version.name}</p>
+          </div>
+          {version.status !== 'abandoned' ? (
+            <div className="flex flex-wrap gap-2">
+              {isEditableDraft ? (
                 <Button size="sm" asChild>
-                  <a href={`/api/master-catalog/export/excel/${version.id}`}>
-                    <Download data-icon="inline-start" />
-                    ส่งออก Excel
-                  </a>
-                </Button>
-                <Button variant="outline" size="sm" asChild>
-                  <Link href={`/admin/master-catalog/versions/${version.id}/print`}>
-                    <Printer data-icon="inline-start" />
-                    พิมพ์ / บันทึก PDF
+                  <Link href={`/admin/master-catalog/versions/${version.id}/review`}>
+                    <ClipboardCheck data-icon="inline-start" />
+                    ตรวจฉบับสุดท้าย
                   </Link>
                 </Button>
-              </div>
-            ) : null}
-          </CardHeader>
-          <CardContent className="grid gap-3 text-sm sm:grid-cols-2">
-            <KeyValue label="วันที่มีผล" value={formatThaiDate(version.effectiveDate)} />
-            <KeyValue label="เผยแพร่เมื่อ" value={formatThaiDateTime(version.publishedAt)} />
-            <KeyValue label="ผู้เผยแพร่" value={version.publishedByDisplayName ?? '-'} />
-            <KeyValue label="รุ่นการแก้ไข" value={formatThaiNumber(version.lockVersion)} />
-            <KeyValue label="เลขที่เอกสารอนุมัติ" value={version.approvalReference ?? '-'} />
-            <KeyValue label="วันที่เอกสารอนุมัติ" value={formatThaiDate(version.approvalDocumentDate)} />
-            <KeyValue label="ที่เก็บเอกสารและไฟล์ฉบับอนุมัติ" value={version.physicalArchiveReference ?? '-'} />
-            <KeyValue label="ค่าแฮชชุดข้อมูล" value={shortHash(version.datasetHash)} />
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader>
-            <CardTitle>จำนวนข้อมูล</CardTitle>
-            <CardDescription>สถานะของเวอร์ชันนี้</CardDescription>
-          </CardHeader>
-          <CardContent className="grid gap-3 text-sm">
-            <KeyValue label="ทั้งหมด" value={formatThaiNumber(detail.counts.rows)} />
-            <KeyValue label="ใช้งาน" value={formatThaiNumber(detail.counts.activeRows)} />
-            <KeyValue label="ยกเลิกใช้" value={formatThaiNumber(detail.counts.inactiveRows)} />
-            <KeyValue label="หมวดงาน" value={formatThaiNumber(detail.counts.categories)} />
-            <KeyValue label="กลุ่มรหัส" value={formatThaiNumber(detail.counts.codeGroups)} />
-          </CardContent>
-        </Card>
-      </div>
-
-      {version.status === 'active' && !version.isDefault ? (
-        <MasterCatalogPublishRestorePanel
-          draftVersion={null}
-          draftReadiness={null}
-          currentVersionString={null}
-          restorableVersions={[{
-            id: version.id,
-            versionString: version.versionString,
-            itemCount: version.itemCount,
-            datasetHash: version.datasetHash,
-          }]}
-        />
-      ) : null}
+              ) : null}
+              {isEditableDraft ? (
+                <Button variant="outline" size="sm" asChild>
+                  <Link href={`/admin/master-catalog/versions/${version.id}/import`}>
+                    <Upload data-icon="inline-start" />
+                    นำเข้าชุดข้อมูล
+                  </Link>
+                </Button>
+              ) : null}
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="outline" size="sm">
+                    <Download data-icon="inline-start" />
+                    {version.status === 'draft' ? 'ส่งออกเพื่อตรวจ' : 'ส่งออกเอกสาร'}
+                    <ChevronDown data-icon="inline-end" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  <DropdownMenuItem asChild>
+                    <a href={`/api/master-catalog/export/excel/${version.id}`}>
+                      <FileSpreadsheet />
+                      Excel สำหรับตรวจสอบ
+                    </a>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem asChild>
+                    <Link href={`/admin/master-catalog/versions/${version.id}/print`}>
+                      <Printer />
+                      PDF สำหรับอ่าน/พิมพ์
+                    </Link>
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </div>
+          ) : null}
+        </div>
+        <div className="flex flex-wrap gap-2 text-sm">
+          <Badge variant="outline">ทั้งหมด {formatThaiNumber(detail.counts.rows)} รายการ</Badge>
+          <Badge variant="outline">ใช้งาน {formatThaiNumber(detail.counts.activeRows)}</Badge>
+          <Badge variant="outline">ยกเลิกใช้ {formatThaiNumber(detail.counts.inactiveRows)}</Badge>
+          <Badge variant="outline">รุ่นแก้ไข {formatThaiNumber(version.lockVersion)}</Badge>
+        </div>
+      </section>
 
       <MasterCatalogVersionWorkspace
         version={{
@@ -356,27 +374,46 @@ export function MasterCatalogVersionDetailView({
         allowAdd={detail.capabilities.newIdentityEnabled}
       />
 
+      <section className="grid gap-4 border-t pt-6" aria-labelledby="version-document-heading">
+        <div>
+          <h2 id="version-document-heading" className="text-base font-semibold">
+            ข้อมูลเวอร์ชันและเอกสาร
+          </h2>
+          <p className="text-sm text-muted-foreground">
+            ข้อมูลอ้างอิงสำหรับการเผยแพร่ การตรวจสอบย้อนหลัง และการจัดเก็บเอกสาร
+          </p>
+        </div>
+        <div className="grid gap-3 text-sm sm:grid-cols-2 xl:grid-cols-3">
+          <KeyValue label="วันที่มีผล" value={formatThaiDate(version.effectiveDate)} />
+          <KeyValue label="เผยแพร่เมื่อ" value={formatThaiDateTime(version.publishedAt)} />
+          <KeyValue label="ผู้เผยแพร่" value={version.publishedByDisplayName ?? '-'} />
+          <KeyValue label="เลขที่เอกสารอนุมัติ" value={version.approvalReference ?? '-'} />
+          <KeyValue label="วันที่เอกสารอนุมัติ" value={formatThaiDate(version.approvalDocumentDate)} />
+          <KeyValue label="ที่เก็บเอกสารและไฟล์ฉบับอนุมัติ" value={version.physicalArchiveReference ?? '-'} />
+          <KeyValue label="ค่าแฮชชุดข้อมูล" value={shortHash(version.datasetHash)} />
+          <KeyValue label="หมวดงาน" value={formatThaiNumber(detail.counts.categories)} />
+          <KeyValue label="กลุ่มรหัส" value={formatThaiNumber(detail.counts.codeGroups)} />
+        </div>
+      </section>
+
+      {version.status === 'active' && !isCurrentVersion ? (
+        <MasterCatalogPublishRestorePanel
+          draftVersion={null}
+          draftReadiness={null}
+          currentVersionString={detail.currentVersion?.versionString ?? null}
+          restorableVersions={[{
+            id: version.id,
+            versionString: version.versionString,
+            itemCount: version.itemCount,
+            datasetHash: version.datasetHash,
+          }]}
+        />
+      ) : null}
+
       <div className="grid gap-4 xl:grid-cols-2">
         <RecentImports imports={detail.imports} />
         <RecentChangeSets changeSets={detail.changeSets} />
       </div>
-
-      {version.status === 'draft' && !detail.isStaleDraft ? (
-        <section className="flex flex-col gap-3 border-y py-5 sm:flex-row sm:items-center sm:justify-between">
-          <div>
-            <h2 className="font-semibold">ตรวจการเปลี่ยนแปลงก่อนเผยแพร่</h2>
-            <p className="text-sm text-muted-foreground">
-              ตรวจผลรวมของการแก้ไขรายรายการและการนำเข้ากับเวอร์ชันฐาน แล้วจึงกรอกข้อมูลเผยแพร่
-            </p>
-          </div>
-          <Button asChild>
-            <Link href={`/admin/master-catalog/versions/${version.id}/review`}>
-              <ClipboardCheck data-icon="inline-start" />
-              ตรวจฉบับสุดท้าย
-            </Link>
-          </Button>
-        </section>
-      ) : null}
 
       {version.status === 'draft' && !detail.isStaleDraft ? (
         <MasterCatalogDraftAbandonPanel
@@ -517,6 +554,7 @@ export function MasterCatalogImportView({
   importContext: {
     drafts: CatalogImportDraftOption[];
     draft: CatalogImportDraftOption | null;
+    baseVersionString: string | null;
     parseContext: ParseContext;
     evidenceCounts: CatalogImportEvidenceCounts;
     authorityReady: boolean;
@@ -526,13 +564,32 @@ export function MasterCatalogImportView({
     };
   };
 }) {
+  const draft = importContext.draft;
+
   return (
-    <MasterCatalogFrame activeSection="import" gate={gate}>
+    <MasterCatalogFrame activeSection="versions" gate={gate}>
+      {draft ? (
+        <div className="flex flex-col gap-3 border-b pb-4 sm:flex-row sm:items-center sm:justify-between">
+          <Button variant="ghost" size="sm" className="self-start" asChild>
+            <Link href={`/admin/master-catalog/versions/${draft.id}`}>
+              <ArrowLeft data-icon="inline-start" />
+              กลับพื้นที่ทำงานของฉบับร่าง
+            </Link>
+          </Button>
+          <div className="flex flex-wrap gap-2">
+            <Badge variant="secondary">ฉบับร่าง {draft.versionString}</Badge>
+            <Badge variant="outline">
+              ฐาน {importContext.baseVersionString ?? (draft.isCurrentBase ? 'ปัจจุบัน' : 'เก่า')}
+            </Badge>
+            <Badge variant="outline">รุ่นแก้ไข {draft.lockVersion}</Badge>
+          </div>
+        </div>
+      ) : null}
       <Warnings warnings={history.warnings} />
       <MasterCatalogImportPanel
         key={`${importContext.draft?.id ?? 'no-draft'}:${importContext.draft?.lockVersion ?? 0}`}
-        drafts={importContext.drafts}
         draft={importContext.draft}
+        baseVersionString={importContext.baseVersionString}
         parseContext={importContext.parseContext}
         evidenceCounts={importContext.evidenceCounts}
         authorityReady={importContext.authorityReady}
@@ -624,11 +681,7 @@ function MasterCatalogFrame({
                 </p>
               </div>
             </div>
-            <div className="flex flex-wrap items-center gap-2">
-              <Badge variant={gate.state === 'enabled' ? 'default' : 'outline'}>
-                {gate.state === 'enabled' ? 'พร้อมใช้งาน' : 'ปิดใช้งาน'}
-              </Badge>
-            </div>
+            <MasterCatalogHeaderUtilities gateState={gate.state} />
           </div>
           <div className="h-1 rounded-full bg-nt-yellow" />
           {canShowSections ? <SectionNav activeSection={activeSection} /> : null}

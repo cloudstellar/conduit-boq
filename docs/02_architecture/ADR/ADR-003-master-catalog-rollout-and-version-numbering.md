@@ -1,6 +1,6 @@
 # ADR-003: Master Catalog Rollout Start and Version Numbering
 
-**Status:** Accepted; Production baseline rollout implemented
+**Status:** Accepted; Production baseline rollout implemented; version-intent and reserved-number amendment accepted 2026-07-13
 **Date:** 2026-06-05
 **Decision Makers:** Owner, Development Team
 **Implementation status:** Production `2568.0.0`, singleton pointer, Phase 2
@@ -93,6 +93,41 @@ instead of changing the primary sortable version key.
 | Errata, typo fix, category correction, unit-label correction, or data-entry correction within the same approved revision | `2568.0.1` | Correction release, not a new official price basis |
 | Documentation-only change, application-only change, or rollout procedure change | No catalog version bump | Catalog data did not change |
 | Factor F reference change | No `price_list` catalog version bump | Factor F is a separate calculation reference governed by ADR-005; it requires its own version, change request, approval evidence, and full-table verification |
+
+### Version planning and reserved numbers
+
+The application must not infer `revision` merely because it is the most common
+next number. Before a draft is created, the active admin records one business
+intent:
+
+1. `annual` — a new owner-designated effective usage year;
+2. `revision` — newly approved prices, items, definitions, or policy within the
+   current effective year; or
+3. `patch` — a correction that restores the same approved official basis.
+
+The owner-designated year is required for `annual`; the system derives the
+other segments from the complete version registry. Every created version number
+is permanently reserved across `draft`, `active`, `archived`, and `abandoned`
+states. A number is never deleted or reused to hide a cancelled attempt.
+
+For the selected lane, the server chooses the next number after every reserved
+number, not merely after the current pointer:
+
+- annual: selected effective year plus the next unused revision and patch `0`;
+- revision: current effective year plus the next revision and patch `0`; and
+- patch: current effective year/revision plus the next patch.
+
+Normally a new annual catalog is `{year}.0.0`. If `{year}.0.0` or another lower
+revision was already reserved by an abandoned or historical attempt, the next
+annual candidate may be `{year}.1.0`, `{year}.2.0`, and so on. Relative to a
+base from an earlier effective year this remains an `annual` transition; the
+nonzero middle segment records the reserved-number history and does not mean the
+system guessed a mid-year policy change. A year-changing candidate with a
+nonzero patch remains invalid.
+
+The UI displays the proposed number and any earlier reserved numbers before
+confirmation. The database rechecks the current base, transition shape, and
+next reserved sequence atomically enough to reject stale or tampered plans.
 
 If a correction changes a numeric price because the previously entered value was
 wrong, classify it as a patch only when the correction restores the same
@@ -221,6 +256,8 @@ production release.
   revision for newly approved price policy.
 - The team must maintain an explicit import/audit trail for item-code
   renumbering or replacement.
+- Cancelled draft numbers remain visible as reserved gaps; the version register
+  and operator procedure must explain why they were not reused.
 - If structured codes become query dimensions, they may require future metadata
   columns instead of parsing `item_code` strings in application code.
 - The effective year is a business decision, so it must be recorded in the
@@ -239,13 +276,18 @@ production release.
    version and audit trail.
 5. Do not introduce a new structured item-code scheme without an approved
    segment dictionary and import validation.
-6. Do not include `factor_reference` in `price_list_versions`. Treat Factor F as
+6. Select and record annual/revision/patch business intent before creating a
+   draft; do not ask an admin to type raw version segments as the primary flow.
+7. Treat all created version numbers as reserved. If a lower annual identifier
+   was abandoned, use the next revision in the same owner-designated year rather
+   than reusing the old number or changing the effective year.
+8. Do not include `factor_reference` in `price_list_versions`. Treat Factor F as
    separate reference data with its own ADR-005 versioning/change process.
-7. Do not promote a new default version without an audit log entry and owner
+9. Do not promote a new default version without an audit log entry and owner
    approval.
-8. If catalog data changes but the version number does not, stop the rollout or
+10. If catalog data changes but the version number does not, stop the rollout or
    release process and correct the versioning decision before promotion.
-9. Do not backfill historical BOQs with a Factor F version unless exact
+11. Do not backfill historical BOQs with a Factor F version unless exact
    source/version evidence exists for those BOQs.
 
 ## References

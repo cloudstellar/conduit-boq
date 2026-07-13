@@ -54,6 +54,7 @@ try {
   assert(schemaContract.anon_versions_page_execute === false, 'Anon can execute the versions register')
   assert(schemaContract.auth_versions_page_execute === true, 'Authenticated register execute is missing')
   assert(schemaContract.auth_private_allocator_execute === false, 'Authenticated can execute private allocator')
+  assert(schemaContract.auth_version_planner_execute === false, 'Authenticated can execute private version planner')
   assert(schemaContract.auth_old_create_impl_execute === false, 'Authenticated can bypass guarded draft creation')
   assert(schemaContract.anon_abandon_execute === false, 'Anon can execute draft abandon')
   assert(schemaContract.auth_abandon_execute === true, 'Authenticated draft abandon execute is missing')
@@ -80,6 +81,19 @@ try {
   const beforeFactor = await readFactorSummary()
   const versions = await allocateRevisionVersions(base, 4)
 
+  currentStage = 'verify server-owned next version sequence'
+  actionCode(
+    await createDraftRequest(
+      adminA,
+      base,
+      versions[3],
+      'out-of-sequence draft',
+      randomUUID(),
+    ),
+    'out-of-sequence draft',
+    'VERSION_SEQUENCE_STALE',
+  )
+
   currentStage = 'verify one-current-base-draft create race and replay'
   const createAttempts = [
     {
@@ -90,7 +104,7 @@ try {
     },
     {
       target: adminB,
-      version: versions[1],
+      version: versions[0],
       label: 'working draft race B',
       requestId: randomUUID(),
     },
@@ -353,7 +367,7 @@ try {
     'abandoned draft mutation denial',
     'DRAFT_NOT_EDITABLE',
   )
-  const rolloutDraft = await createDraft(adminA, base, versions[3], 'replacement first rollout')
+  const rolloutDraft = await createDraft(adminA, base, versions[1], 'replacement first rollout')
 
   currentStage = 'validate and apply the complete frozen first rollout'
   const importEvidence = await applyFirstRollout(adminA, rolloutDraft)
@@ -465,6 +479,10 @@ try {
     baseVersion: base.version_string,
     schemaContract,
     authority: authorityEvidence,
+    versionPlanning: {
+      outOfSequenceDenied: true,
+      sameCandidateRaceNormalized: true,
+    },
     allocator: {
       concurrentCodes: [rowA.item_code, rowB.item_code],
       afterWithdrawCode: rowAfterWithdraw.item_code,
@@ -648,7 +666,7 @@ async function allocateRevisionVersions(base, count) {
   const maxMinor = Math.max(Number(base.minor), ...(data ?? []).map((row) => Number(row.minor)))
   return Array.from({ length: count }, (_, index) => ({
     major: Number(base.major),
-    minor: maxMinor + 200 + index,
+    minor: maxMinor + 1 + index,
     patch: 0,
   }))
 }
@@ -1082,6 +1100,7 @@ function readSchemaContract() {
       'anon_versions_page_execute', has_function_privilege('anon','public.get_catalog_versions_page(integer,timestamptz,uuid)','EXECUTE'),
       'auth_versions_page_execute', has_function_privilege('authenticated','public.get_catalog_versions_page(integer,timestamptz,uuid)','EXECUTE'),
       'auth_private_allocator_execute', has_function_privilege('authenticated','private.catalog_allocate_code(uuid,uuid)','EXECUTE'),
+      'auth_version_planner_execute', has_function_privilege('authenticated','private.catalog_version_candidate_is_next(integer,integer,integer,integer,integer,integer)','EXECUTE'),
       'auth_old_create_impl_execute', has_function_privilege('authenticated','private.create_catalog_draft_impl(uuid,integer,integer,integer,text,text,uuid)','EXECUTE'),
       'anon_abandon_execute', has_function_privilege('anon','public.abandon_catalog_draft(uuid,integer,text,uuid)','EXECUTE'),
       'auth_abandon_execute', has_function_privilege('authenticated','public.abandon_catalog_draft(uuid,integer,text,uuid)','EXECUTE'),

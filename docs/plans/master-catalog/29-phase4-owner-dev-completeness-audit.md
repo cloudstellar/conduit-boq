@@ -3,10 +3,12 @@
 **Status:** P-22 operator-workflow correction accepted; source/static
 implementation passed on `ac31feb` on 2026-07-12. Earlier P-21 evidence on
 `3bfc74e` remains historical and is superseded for revised closeout. G1 Local
-DB/concurrency/P-20 input passed on final checkpoint `e463270`; pre-G2
-operator/browser preflight passed on executable/source checkpoint `c8f6dca`.
-G2 independent exact-`c8f6dca` rebuild/comparison and G3 owner closeout remain
-before WP-7.
+DB/concurrency/P-20 input passed on final checkpoint `e463270`; the
+pre-amendment operator/browser preflight passed on `c8f6dca`. P-23 approved the
+remaining operator identity/navigation/contextual-import/export-semantics
+amendment. Its working-tree UI/static/browser checkpoint passed on 2026-07-13;
+owner review/commit and naming the exact candidate must precede the independent
+G2 rebuild/comparison and G3 owner closeout before WP-7.
 
 **Environment:** Source/document audit only. No Local database reset, Production
 access/write, feature enablement, publication, new Factor F workflow, or hotfix
@@ -88,6 +90,8 @@ do not remove the need for the operator-completeness work below.
 | C-11 | Many labels/statuses remain English; production-capable forms contain Local/WP placeholder evidence; UUID/lock/change-set details are primary success content. | Make the workflow Thai-first, remove synthetic defaults, separate draft save from whole-version publish, and move copyable technical IDs to support details. |
 | C-12 | The DB contract promised post-preflight nullability/order hardening, but `price_list` still permits nullable required fields/display order and has no per-version unique order constraint. | In an additive fix-forward migration, prove compatibility then enforce required nullability and the order constraints owned by the accepted scope. Do not rewrite migrations `017`-`019`. |
 | C-13 | The publish panel appears before the full item workspace, and the only complete diff is import-specific. Manual plus import changes have no authoritative final draft-versus-base comparison immediately before publication. | Make the complete searchable catalog the primary workspace; compute final snapshot diff by stable identity; show overlapping change groups/old-new values/readiness; carry the reviewed expected lock into publish and require a fresh review after any mutation. |
+| C-14 | Draft creation always suggests a revision and exposes raw major/minor/patch inputs, although annual versus revision versus patch depends on business authority. The overview only has a 25-row display list, and an abandoned annual `{year}.0.0` can block a truthful replacement under the old transition shape. | Require explicit business intent and owner-designated annual year; load a complete all-status registry or fail closed; permanently reserve identifiers; derive/show the next lane candidate; enforce sequence in candidate `020`; permit the next patch-0 annual revision in the same target year when lower identifiers are reserved. |
+| C-15 | Successful create leaves the admin on the overview, detailed metadata delays the item workspace, and pointer restore submits without a current-to-target human confirmation. | Open the exact new draft after success; place compact context/actions then items before detailed document metadata; separate restore as recovery and confirm current/target, reason, and new-versus-historical BOQ behavior. |
 
 P-18 placement and P-19 retired-row PDF policy are already recorded gates, not
 new discoveries from this audit. WP-7 BOQ/hotfix `016`/Factor F regression and
@@ -98,7 +102,7 @@ WP-8 clean rehearsal/UAT/performance/advisors also remain required.
 | Order | Work package | Exit meaning |
 |---:|---|---|
 | 1 | WP-6.5 reliability and publish-boundary hardening | Preserve passed evidence for idempotency, concurrency, fail-closed guards, portability, and recovery. It is not an operator-completeness certificate. |
-| 2 | WP-6.6 admin workflow completeness and authority hardening | Close C-01 through C-13 with migration/RPC/UI/audit/tests and owner browser review. No Local reset is implied by planning this work. |
+| 2 | WP-6.6 admin workflow completeness and authority hardening | Close C-01 through C-15 with migration/RPC/UI/audit/tests and owner browser review. No Local reset is implied by planning this work. |
 | 3 | WP-7 permanent BOQ/hotfix `016` and Factor F regression preservation | Regression-only; no new Factor F or hotfix workflow. |
 | 4 | P-18 decision and WP-7.5 placement governance | Required for full Add/Supplement release; preserve inherited relative order while auditing every shifted numeric position. |
 | 5 | P-19 decision when Retire is in release scope | Resolve official PDF treatment before filing a candidate with inactive rows. |
@@ -108,7 +112,7 @@ WP-8 clean rehearsal/UAT/performance/advisors also remain required.
 WP-6.6 should be delivered in reviewable slices:
 
 - A: full catalog browse, exact item editor, and identity history/diff;
-- B: explicit draft selection and stale-draft read-only recovery;
+- B: exact draft-bound workspace/import routes and stale-draft read-only recovery;
 - C: resolve-only versioned categories/P-06 code groups and server code allocation;
 - D: authoritative import diff/omission preview and price evidence;
 - E: publisher/archive metadata and complete readiness parity;
@@ -117,7 +121,12 @@ WP-6.6 should be delivered in reviewable slices:
   DB/browser/UAT evidence.
 - H: one-current-base-working-draft invariant and audited abandon lifecycle;
 - I: item-first workspace and authoritative final snapshot review before
-  publish.
+  publish;
+- J: persistent operator/environment context, information-only global
+  navigation, approved-input versus review-export semantics, and return to the
+  same draft after import apply.
+- K: explicit version intent/all-status reservation, post-create exact-workspace
+  navigation, item-before-metadata hierarchy, and pointer-restore confirmation.
 
 ## 6. Migration and authority order
 
@@ -134,6 +143,10 @@ Do not edit evidence-backed Local migrations `017`-`019`.
   This supersedes the `3bfc74e` migration fingerprint/evidence for closeout and
   requires new P-20/WP-7/WP-8 reruns. It does not erase the historical evidence
   for the earlier reviewed commit.
+- P-23.1 amends the still-unaccepted `020` again for the guarded next-version
+  sequence. Repository/static verification passed 2026-07-13. All earlier `020`
+  fingerprints/live evidence remain historical; G1R and independent G2 must be
+  separately approved and rerun before closeout.
 
 ## 7. Deliberate deferrals and control visibility
 
@@ -170,9 +183,9 @@ every in-scope row.
 ## 9. Approval boundary
 
 The owner requested this full audit and plan alignment on 2026-07-12. P-21
-authorized the first Local-only implementation and P-22 now authorizes the
-operator-workflow correction described in
-[Doc #31](./31-phase4-wp66-operator-workflow-correction-plan.md). Neither
-decision authorizes a Local database reset, Production access/write, feature
+authorized the first Local-only implementation; P-22/P-23/P-23.1 authorize the
+bounded operator corrections described in
+[Doc #31](./31-phase4-wp66-operator-workflow-correction-plan.md). These decisions
+do not authorize a Local database reset, Production access/write, feature
 enablement, publication, new Factor F work, P-18/`021`, or expansion of hotfix
 `016`.

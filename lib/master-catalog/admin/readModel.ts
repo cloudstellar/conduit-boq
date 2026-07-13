@@ -16,10 +16,14 @@ import {
   loadCatalogCapabilityFlags,
   type CatalogCapabilityFlags,
 } from './capabilities';
+import {
+  parseCatalogVersionString,
+  type CatalogVersionRegistryEntry,
+} from '../versioning';
 
 export { isCatalogAdminEnabled } from './flags';
 
-export type CatalogAdminSection = 'overview' | 'versions' | 'import' | 'history';
+export type CatalogAdminSection = 'overview' | 'versions' | 'history';
 export type CatalogVersionStatus = 'draft' | 'active' | 'archived' | 'abandoned';
 export type CatalogImportStatus = 'validated' | 'applied' | 'rejected';
 export type CatalogChangeType = 'clone' | 'import' | 'manual' | 'abandon' | 'publish' | 'restore';
@@ -122,6 +126,7 @@ export interface CatalogAdminOverview {
   draftPublishReadiness: CatalogPublishReadiness | null;
   factorFDefault: FactorFDefaultSummary;
   versions: CatalogVersionSummary[];
+  versionRegistry: CatalogVersionRegistryEntry[] | null;
   drafts: CatalogVersionSummary[];
   recentImports: CatalogImportSummary[];
   recentChangeSets: CatalogChangeSetSummary[];
@@ -137,6 +142,8 @@ export interface CatalogAdminOverview {
 
 export interface CatalogVersionDetail {
   version: CatalogVersionSummary;
+  baseVersion: CatalogVersionSummary | null;
+  currentVersion: CatalogVersionSummary | null;
   counts: {
     rows: number | null;
     activeRows: number | null;
@@ -228,6 +235,8 @@ const CHANGE_SET_COLUMNS = [
   'after_lock_version',
   'created_at',
 ].join(',');
+
+const VERSION_REGISTRY_PAGE_SIZE = 1_000;
 
 export function isActiveAdminProfile(profile: {
   role?: string | null;
@@ -333,13 +342,28 @@ export async function loadCatalogAdminOverview(
 ): Promise<CatalogAdminOverview> {
   const warnings: string[] = [];
 
-  const [versionsResult, draftsResult, pointerResult, importsResult, changeSetsResult, factorFDefault] =
+  const [
+    versionsResult,
+    versionRegistryResult,
+    draftsResult,
+    pointerResult,
+    importsResult,
+    changeSetsResult,
+    factorFDefault,
+  ] =
     await Promise.all([
       supabase
         .from('price_list_versions')
         .select(VERSION_COLUMNS)
         .order('created_at', { ascending: false })
         .limit(25),
+      supabase
+        .from('price_list_versions')
+        .select('version_string,status', { count: 'exact' })
+        .order('major', { ascending: true })
+        .order('minor', { ascending: true })
+        .order('patch', { ascending: true })
+        .range(0, VERSION_REGISTRY_PAGE_SIZE - 1),
       supabase
         .from('price_list_versions')
         .select(VERSION_COLUMNS)
@@ -365,16 +389,72 @@ export async function loadCatalogAdminOverview(
     ]);
 
   pushError(warnings, versionsResult.error, 'โหลดรายการเวอร์ชันไม่สำเร็จ');
+  pushError(warnings, versionRegistryResult.error, 'โหลดทะเบียนเลขเวอร์ชันไม่สำเร็จ');
   pushError(warnings, draftsResult.error, 'โหลดฉบับร่างทั้งหมดไม่สำเร็จ');
   pushError(warnings, pointerResult.error, 'โหลดเวอร์ชันบัญชีราคาที่ใช้งานปัจจุบันไม่สำเร็จ');
   pushError(warnings, importsResult.error, 'โหลดการนำเข้าล่าสุดไม่สำเร็จ');
   pushError(warnings, changeSetsResult.error, 'โหลดประวัติล่าสุดไม่สำเร็จ');
 
+  const versionRegistryRows = rowsFromResult(versionRegistryResult.data);
+  let versionRegistryLoadFailed = Boolean(versionRegistryResult.error);
+  const versionRegistryCount = versionRegistryResult.count;
+  if (!versionRegistryLoadFailed && typeof versionRegistryCount === 'number') {
+    while (versionRegistryRows.length < versionRegistryCount) {
+      const pageResult = await supabase
+        .from('price_list_versions')
+        .select('version_string,status')
+        .order('major', { ascending: true })
+        .order('minor', { ascending: true })
+        .order('patch', { ascending: true })
+        .range(
+          versionRegistryRows.length,
+          Math.min(
+            versionRegistryRows.length + VERSION_REGISTRY_PAGE_SIZE - 1,
+            versionRegistryCount - 1,
+          ),
+        );
+      if (pageResult.error) {
+        pushError(warnings, pageResult.error, 'โหลดทะเบียนเลขเวอร์ชันหน้าถัดไปไม่สำเร็จ');
+        versionRegistryLoadFailed = true;
+        break;
+      }
+      const pageRows = rowsFromResult(pageResult.data);
+      if (pageRows.length === 0) {
+        versionRegistryLoadFailed = true;
+        break;
+      }
+      versionRegistryRows.push(...pageRows);
+    }
+  }
+
+  const mappedVersionRegistry = versionRegistryRows.map((row) => ({
+    versionString: String(row.version_string ?? ''),
+    status: String(row.status ?? ''),
+  }));
+  const registryStrings = new Set(mappedVersionRegistry.map((entry) => entry.versionString));
+  let versionRegistry: CatalogVersionRegistryEntry[] | null = !versionRegistryLoadFailed
+    && typeof versionRegistryCount === 'number'
+    && versionRegistryCount === mappedVersionRegistry.length
+    && registryStrings.size === mappedVersionRegistry.length
+    && mappedVersionRegistry.every((entry) => parseCatalogVersionString(entry.versionString))
+    ? mappedVersionRegistry
+    : null;
+  if (versionRegistry === null) {
+    warnings.push('ทะเบียนเลขเวอร์ชันโหลดไม่ครบ จึงปิดการสร้างฉบับร่างไว้ก่อน');
+  }
   const versions = rowsFromResult(versionsResult.data).map(mapVersionSummary);
   const defaultVersionId = pointerResult.data?.version_id ? String(pointerResult.data.version_id) : null;
   const defaultVersion =
     versions.find((version) => version.id === defaultVersionId) ??
     (defaultVersionId ? await loadCatalogVersionById(supabase, defaultVersionId, warnings) : null);
+  if (
+    versionRegistry
+    && defaultVersion
+    && !versionRegistry.some((entry) => entry.versionString === defaultVersion.versionString)
+  ) {
+    versionRegistry = null;
+    warnings.push('ทะเบียนเลขเวอร์ชันไม่พบเวอร์ชันใช้งานปัจจุบัน จึงปิดการสร้างฉบับร่างไว้ก่อน');
+  }
   const drafts = rowsFromResult(draftsResult.data).map(mapVersionSummary);
   if (drafts.filter((draft) => draft.basedOnVersionId === defaultVersionId).length > 1) {
     warnings.push('พบฉบับร่างที่กำลังทำงานจากเวอร์ชันฐานเดียวกันมากกว่าหนึ่งฉบับ จึงต้องแก้ฐานข้อมูลก่อนใช้งานต่อ');
@@ -404,6 +484,7 @@ export async function loadCatalogAdminOverview(
     draftPublishReadiness: null,
     factorFDefault,
     versions,
+    versionRegistry,
     drafts,
     recentImports: rowsFromResult(importsResult.data).map(mapImportSummary),
     recentChangeSets: rowsFromResult(changeSetsResult.data).map(mapChangeSetSummary),
@@ -479,6 +560,13 @@ export async function loadCatalogVersionDetail(
   if (!versionRow) return null;
 
   const version = mapVersionSummary(versionRow);
+  const baseVersionQuery = version.basedOnVersionId
+    ? supabase
+        .from('price_list_versions')
+        .select(VERSION_COLUMNS)
+        .eq('id', version.basedOnVersionId)
+        .maybeSingle()
+    : Promise.resolve({ data: null, error: null });
 
   const [
     rows,
@@ -492,6 +580,7 @@ export async function loadCatalogVersionDetail(
     pointerResult,
     publishReadiness,
     capabilityResult,
+    baseVersionResult,
   ] = await Promise.all([
     countPriceListRows(supabase, version.id, null, warnings, 'นับรายการทั้งหมดไม่สำเร็จ'),
     countPriceListRows(supabase, version.id, true, warnings, 'นับรายการใช้งานไม่สำเร็จ'),
@@ -510,18 +599,33 @@ export async function loadCatalogVersionDetail(
       ? loadCatalogPublishReadiness(supabase, version.id, warnings)
       : Promise.resolve(null),
     loadCatalogCapabilityFlags(supabase),
+    baseVersionQuery,
   ]);
   warnings.push(...workspace.warnings);
   pushError(warnings, pointerResult.error, 'โหลดเวอร์ชันบัญชีราคาที่ใช้งานปัจจุบันไม่สำเร็จ');
+  pushError(warnings, baseVersionResult.error, 'โหลดเวอร์ชันฐานไม่สำเร็จ');
   if (capabilityResult.warning) warnings.push(capabilityResult.warning);
+  const baseVersionRow = rowFromResult(baseVersionResult.data);
 
   const [importRows, changeRows] = await Promise.all([
     loadVersionImports(supabase, version.id, 12, warnings),
     loadVersionChangeSets(supabase, version.id, 12, warnings),
   ]);
+  const baseVersion = baseVersionRow ? mapVersionSummary(baseVersionRow) : null;
+  const currentVersionId = toNullableString(pointerResult.data?.version_id);
+  let currentVersion: CatalogVersionSummary | null = null;
+  if (currentVersionId === version.id) {
+    currentVersion = version;
+  } else if (currentVersionId && currentVersionId === baseVersion?.id) {
+    currentVersion = baseVersion;
+  } else if (currentVersionId) {
+    currentVersion = await loadCatalogVersionById(supabase, currentVersionId, warnings);
+  }
 
   return {
     version,
+    baseVersion,
+    currentVersion,
     counts: {
       rows,
       activeRows,
@@ -534,7 +638,7 @@ export async function loadCatalogVersionDetail(
     items: workspace.items,
     categories: workspace.categories,
     codeGroups: workspace.codeGroups,
-    currentVersionId: toNullableString(pointerResult.data?.version_id),
+    currentVersionId,
     isStaleDraft:
       version.status === 'draft'
       && version.basedOnVersionId !== toNullableString(pointerResult.data?.version_id),
@@ -708,6 +812,19 @@ export async function loadCatalogAdminHistory(
     changeSets: rowsFromResult(changeSets.data).map(mapChangeSetSummary),
     warnings,
   };
+}
+
+export async function loadCatalogVersionImportHistory(
+  supabase: SupabaseClient,
+  versionId: string,
+): Promise<{
+  imports: CatalogImportSummary[];
+  warnings: string[];
+}> {
+  const warnings: string[] = [];
+  const imports = await loadVersionImports(supabase, versionId, 50, warnings);
+
+  return { imports, warnings };
 }
 
 export async function loadCatalogVersionsRegisterPage(

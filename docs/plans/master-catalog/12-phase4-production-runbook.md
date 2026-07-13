@@ -78,9 +78,12 @@ Stop immediately when any of these occurs:
 - a retryable UI/action path generates a fresh request ID after an uncertain
   response;
 - reusable version logic remains hardcoded to `2568.1.0` contrary to ADR-003;
+- version intent is not explicitly approved, the all-status registry is
+  incomplete, the reviewed candidate is no longer next, or an abandoned number
+  would be reused;
 - live DB/RPC/RLS/concurrency, tracked artifact verification, admin UAT, or
   documented recovery evidence required for the next gate is missing;
-- any Audit #29 C-01 through C-13 capability is visible as supported without
+- any Audit #29 C-01 through C-15 capability is visible as supported without
   its authoritative WP-6.6 implementation/evidence;
 - an item/import path creates free-form taxonomy, accepts caller-owned code
   allocation/publisher identity, silently chooses a draft, or presents partial
@@ -172,11 +175,13 @@ major image at an incompatible existing data directory.
 With feature flag disabled by default:
 
 1. Deploy/run the Phase 4 application locally.
-2. Clone `2568.0.0` to draft `2568.1.0`.
+2. Choose the approved annual/revision/patch intent. For the first structured
+   rollout choose revision from `2568.0.0`, review the complete reserved registry,
+   and accept `2568.1.0` only when it remains the system-planned next number.
 3. Assert all 710 name/unit/material/labor/unit values are identical.
 4. Apply approved code/category decisions; K fields must remain absent.
 5. Complete WP-6.6 before WP-7: load/search the full catalog; expose exact item
-   history/diff; explicitly select among all drafts; make stale drafts read-only;
+   history/diff; open the one exact current-base workspace; make stale drafts read-only;
    resolve only approved versioned category/P-06 group IDs; allocate codes on
    the server; show complete
    server import diff/omissions with supported price evidence; derive publisher
@@ -200,8 +205,9 @@ With feature flag disabled by default:
     reuses the same operation ID and returns the prior result.
 12. Run two-session publish/restore contention and bounded timeout fixtures.
 13. Verify item history across a recode and correction action.
-14. Prove another ADR-003-valid annual/revision/patch version through reusable
-    validation without replacing the exact `2568.1.0` rehearsal candidate.
+14. Prove all ADR-003 lanes, incomplete/stale sequence rejection, permanent
+    abandoned-number reservation, same-year annual recovery after a void lower
+    number, create race, and same-request replay.
 15. Publish only an identity-unchanged approved path in Local until P-18 is
     accepted. After WP-7.5, separately prove a placed new-identity path; generate
     Excel/PDF, and compare count/hash.
@@ -253,7 +259,7 @@ Before requesting P-12, record:
 - tracked semantic artifact-verifier output;
 - route failure-state, Thai recovery message, intended-admin UAT, and 710-row
   performance evidence;
-- Audit #29 capability matrix showing C-01 through C-13 implemented/evidenced
+- Audit #29 capability matrix showing C-01 through C-15 implemented/evidenced
   or an affected control explicitly excluded from release visibility;
 - authority/document consistency result;
 - security/performance advisor results with no unresolved Phase 4 blocker;
@@ -438,7 +444,9 @@ Disable the flag immediately if any smoke test fails.
 
 ## 12. Candidate preparation and publish gate
 
-1. Clone current `2568.0.0` into `2568.1.0`.
+1. Select the owner-approved business intent and let the guarded planner clone
+   current `2568.0.0` into the displayed next candidate. Expect `2568.1.0` only
+   when still unreserved; record the exact resulting version for every later step.
 2. Run the 710-row preservation assertion before applying codes.
 3. Apply the approved reconciliation only.
 4. Confirm Full/Supplement mode and row outcomes.
@@ -470,8 +478,8 @@ Disable the flag immediately if any smoke test fails.
 15. Confirm the reusable version path follows ADR-003 and the exact candidate
     version is supplied by approved release metadata, not a code constant.
 16. Generate pre-publish verification preview.
-17. Obtain explicit owner approval to publish exactly `2568.1.0`, including
-    any mass-retirement total.
+17. Obtain explicit owner approval to publish the exact system-planned candidate
+    shown in the final review, including any mass-retirement total.
 
 ## 13. Publish and immediate closeout
 
@@ -480,7 +488,8 @@ Disable the flag immediately if any smoke test fails.
    never generate a second ID for the same intended publish.
 2. Record result, item count, dataset hash, authenticated actor snapshot,
    version archive reference, and timestamp.
-3. Verify one singleton pointer to `2568.1.0` and synchronized legacy flags.
+3. Verify one singleton pointer to the exact approved candidate and synchronized
+   legacy flags.
 4. Verify the prior version remains readable and immutable.
 5. Generate official Excel and PDF from the published database version.
 6. Reconstruct the Excel dataset hash from `ข้อมูลตรวจสอบ`; verify PDF

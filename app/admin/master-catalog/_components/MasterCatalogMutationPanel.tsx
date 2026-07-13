@@ -6,11 +6,15 @@ import { useActionState, useEffect, useState } from 'react';
 import { useFormStatus } from 'react-dom';
 import {
   ArchiveX,
+  CalendarRange,
   CheckCircle2,
+  FilePenLine,
   FilePlus2,
+  ListPlus,
   Loader2,
   Plus,
   RotateCcw,
+  ShieldAlert,
   ShieldCheck,
 } from 'lucide-react';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
@@ -49,6 +53,14 @@ import type {
 } from '@/lib/master-catalog/admin/actionModel';
 import type { CatalogPublishReadiness } from '@/lib/master-catalog/admin/readModel';
 import {
+  CATALOG_VERSION_SEGMENT_MAX,
+  formatCatalogVersion,
+  parseCatalogVersionString,
+  suggestCatalogVersion,
+  type CatalogVersionRegistryEntry,
+  type CatalogVersionTransition,
+} from '@/lib/master-catalog/versioning';
+import {
   abandonCatalogDraftAction,
   createCatalogDraftAction,
   publishCatalogVersionAction,
@@ -57,12 +69,9 @@ import {
 import { useStableCatalogOperation } from './useStableCatalogOperation';
 
 type DraftCreatePanelProps = {
+  defaultVersionId: string | null;
   defaultVersionString: string | null;
-  suggestedVersion: {
-    major: number;
-    minor: number;
-    patch: number;
-  } | null;
+  versionRegistry: CatalogVersionRegistryEntry[] | null;
   draftVersions: Array<{
     id: string;
     versionString: string;
@@ -90,33 +99,62 @@ type PublishRestorePanelProps = {
 };
 
 const initialState: CatalogMutationState = { status: 'idle', message: '' };
+const VERSION_STATUS_LABELS: Record<string, string> = {
+  active: 'เผยแพร่แล้ว',
+  archived: 'เก็บถาวร',
+  draft: 'ฉบับร่าง',
+  abandoned: 'ยกเลิกฉบับร่าง',
+};
 
 export function MasterCatalogDraftCreatePanel({
+  defaultVersionId,
   defaultVersionString,
-  suggestedVersion,
+  versionRegistry,
   draftVersions,
 }: DraftCreatePanelProps) {
   const [state, formAction] = useActionState(createCatalogDraftAction, initialState);
-  const suggestedVersionString = suggestedVersion
-    ? `${suggestedVersion.major}.${suggestedVersion.minor}.${suggestedVersion.patch}`
+  const baseVersion = defaultVersionString
+    ? parseCatalogVersionString(defaultVersionString)
     : null;
-  const [versionMajor, setVersionMajor] = useState(String(suggestedVersion?.major ?? ''));
-  const [versionMinor, setVersionMinor] = useState(String(suggestedVersion?.minor ?? ''));
-  const [versionPatch, setVersionPatch] = useState(String(suggestedVersion?.patch ?? ''));
-  const versionPreview = [versionMajor, versionMinor, versionPatch]
-    .map((part) => part.trim() || '–')
-    .join('.');
+  const [transition, setTransition] = useState<CatalogVersionTransition | ''>('');
+  const [effectiveYear, setEffectiveYear] = useState(
+    baseVersion ? String(baseVersion.major + 1) : '',
+  );
+  const suggestion = transition && versionRegistry
+    ? suggestCatalogVersion({
+        baseVersionString: defaultVersionString,
+        transition,
+        registry: versionRegistry,
+        effectiveYear: transition === 'annual' ? Number(effectiveYear) : null,
+      })
+    : null;
+  const suggestedVersionString = suggestion
+    ? formatCatalogVersion(suggestion.version)
+    : null;
   const [requestIdInputRef, prepareOperation, preserveSubmittedInput] = useStableCatalogOperation(
     state,
-    `${defaultVersionString ?? 'no-base'}:${suggestedVersionString ?? 'no-suggestion'}`,
+    `${defaultVersionId ?? 'no-base'}:${transition || 'no-transition'}:${suggestedVersionString ?? 'no-suggestion'}`,
   );
   const router = useRouter();
 
   useEffect(() => {
     if (state.status === 'success') {
+      if (state.versionId) {
+        router.replace(`/admin/master-catalog/versions/${state.versionId}`);
+      } else {
+        router.refresh();
+      }
+    } else if (
+      state.status === 'error'
+      && (
+        state.code === 'VERSION_SEQUENCE_STALE'
+        || state.code === 'DRAFT_ALREADY_EXISTS'
+        || state.code === 'DRAFT_BASE_STALE'
+      )
+    ) {
       router.refresh();
     }
-  }, [router, state.status]);
+  }, [router, state.code, state.status, state.versionId]);
 
   return (
     <Card>
@@ -157,7 +195,7 @@ export function MasterCatalogDraftCreatePanel({
               </div>
             </AlertDescription>
           </Alert>
-        ) : suggestedVersion ? (
+        ) : defaultVersionId && defaultVersionString && versionRegistry ? (
           <form
             action={formAction}
             className="grid gap-4"
@@ -165,86 +203,180 @@ export function MasterCatalogDraftCreatePanel({
             onSubmitCapture={prepareOperation}
           >
             <input ref={requestIdInputRef} type="hidden" name="requestId" />
+            <input type="hidden" name="baseVersionId" value={defaultVersionId} />
+            <input
+              type="hidden"
+              name="expectedVersionString"
+              value={suggestedVersionString ?? ''}
+            />
             <ActionStateAlert state={state} />
-            <div className="grid gap-4 sm:grid-cols-3">
-              <div className="grid gap-2">
-                <Label htmlFor="draft-version-major">ปี พ.ศ. ที่มีผล</Label>
-                <Input
-                  id="draft-version-major"
-                  name="versionMajor"
-                  type="number"
-                  min="0"
-                  step="1"
-                  value={versionMajor}
-                  onChange={(event) => setVersionMajor(event.target.value)}
+            <fieldset className="grid gap-3">
+              <legend className="text-sm font-medium">วัตถุประสงค์ของฉบับใหม่</legend>
+              <div className="grid gap-2 md:grid-cols-3">
+                <VersionTransitionOption
+                  checked={transition === 'annual'}
+                  description="เริ่มบัญชีราคาสำหรับปีที่มีผลใช้งานใหม่"
+                  icon={CalendarRange}
+                  label="ประจำปีใหม่"
+                  onChange={() => setTransition('annual')}
                   required
+                  value="annual"
+                />
+                <VersionTransitionOption
+                  checked={transition === 'revision'}
+                  description="มีราคา รายการ หรือหลักเกณฑ์ที่อนุมัติใหม่"
+                  icon={ListPlus}
+                  label="ปรับปรุง/เพิ่มเติม"
+                  onChange={() => setTransition('revision')}
+                  value="revision"
+                />
+                <VersionTransitionOption
+                  checked={transition === 'patch'}
+                  description="แก้ข้อมูลให้ตรงหลักฐานอนุมัติเดิม"
+                  icon={FilePenLine}
+                  label="แก้ไขข้อมูลเดิม"
+                  onChange={() => setTransition('patch')}
+                  value="patch"
                 />
               </div>
-              <div className="grid gap-2">
-                <Label htmlFor="draft-version-minor">ลำดับปรับปรุงหลัก</Label>
+            </fieldset>
+
+            {transition === 'annual' ? (
+              <div className="grid gap-2 sm:max-w-xs">
+                <Label htmlFor="draft-effective-year">ปี พ.ศ. ที่มีผลใช้งาน</Label>
                 <Input
-                  id="draft-version-minor"
-                  name="versionMinor"
+                  id="draft-effective-year"
+                  name="effectiveYear"
                   type="number"
-                  min="0"
+                  min={baseVersion ? baseVersion.major + 1 : 1}
+                  max={CATALOG_VERSION_SEGMENT_MAX}
                   step="1"
-                  value={versionMinor}
-                  onChange={(event) => setVersionMinor(event.target.value)}
+                  value={effectiveYear}
+                  onChange={(event) => setEffectiveYear(event.target.value)}
                   required
                 />
+                <p className="text-xs text-muted-foreground">
+                  ใช้ปีที่ owner กำหนดให้บัญชีราคามีผล ไม่ใช่ปีที่จัดทำหรือวันที่นำระบบขึ้นใช้งาน
+                </p>
               </div>
-              <div className="grid gap-2">
-                <Label htmlFor="draft-version-patch">ลำดับแก้ไขย่อย</Label>
-                <Input
-                  id="draft-version-patch"
-                  name="versionPatch"
-                  type="number"
-                  min="0"
-                  step="1"
-                  value={versionPatch}
-                  onChange={(event) => setVersionPatch(event.target.value)}
-                  required
-                />
-              </div>
-            </div>
-            <p className="text-sm text-muted-foreground" aria-live="polite">
-              เลขฉบับที่จะสร้าง:{' '}
-              <strong className="font-mono text-foreground">{versionPreview}</strong>
-            </p>
-            <div className="grid gap-2">
-              <Label htmlFor="draft-name">ชื่อฉบับร่าง</Label>
-              <Input
-                id="draft-name"
-                name="name"
-                required
-              />
-            </div>
-            <div className="grid gap-2">
-              <Label htmlFor="draft-reason">เหตุผลที่สร้าง</Label>
-              <Input
-                id="draft-reason"
-                name="reason"
-                required
-              />
-            </div>
-            <CardFooter className="px-0">
-              <SubmitButton
-                label="สร้างฉบับร่าง"
-                pendingLabel="กำลังสร้าง"
-              >
-                <Plus data-icon="inline-start" />
-              </SubmitButton>
-            </CardFooter>
+            ) : null}
+
+            {transition && !suggestion ? (
+              <Alert variant="destructive">
+                <AlertTitle>ยังคำนวณเลขฉบับไม่ได้</AlertTitle>
+                <AlertDescription>
+                  ตรวจปีที่มีผลใช้งานและเลือกวัตถุประสงค์ให้ตรงกับเวอร์ชันฐาน
+                </AlertDescription>
+              </Alert>
+            ) : null}
+
+            {suggestion ? (
+              <>
+                <Alert aria-live="polite">
+                  <CheckCircle2 />
+                  <AlertTitle>
+                    เลขฉบับที่จะสร้าง{' '}
+                    <span className="font-mono">{suggestedVersionString}</span>
+                  </AlertTitle>
+                  <AlertDescription>
+                    ระบบคำนวณจากเวอร์ชันฐาน วัตถุประสงค์ที่เลือก และทะเบียนเลขทุกสถานะ
+                  </AlertDescription>
+                </Alert>
+                {suggestion.reservedVersions.length > 0 ? (
+                  <Alert>
+                    <ArchiveX />
+                    <AlertTitle>มีเลขก่อนหน้าที่ถูกสงวนไว้</AlertTitle>
+                    <AlertDescription>
+                      {formatReservedVersionSummary(suggestion.reservedVersions)} ระบบจึงไม่ใช้เลขเดิมซ้ำ
+                    </AlertDescription>
+                  </Alert>
+                ) : null}
+                <p className="text-sm text-muted-foreground">
+                  เมื่อสร้างแล้ว เลขฉบับนี้จะอยู่ในทะเบียนถาวร แม้ยกเลิกฉบับร่างภายหลัง
+                </p>
+                <div className="grid gap-2">
+                  <Label htmlFor="draft-name">ชื่อฉบับร่าง</Label>
+                  <Input id="draft-name" name="name" required />
+                </div>
+                <div className="grid gap-2">
+                  <Label htmlFor="draft-reason">เหตุผลที่สร้าง</Label>
+                  <Input id="draft-reason" name="reason" required />
+                </div>
+                <CardFooter className="px-0">
+                  <SubmitButton label="สร้างและเปิดพื้นที่ทำงาน" pendingLabel="กำลังสร้าง">
+                    <Plus data-icon="inline-start" />
+                  </SubmitButton>
+                </CardFooter>
+              </>
+            ) : null}
           </form>
         ) : (
           <Alert variant="destructive">
-            <AlertTitle>อ่านเลขฉบับตั้งต้นไม่สำเร็จ</AlertTitle>
-            <AlertDescription>ยังไม่สามารถเสนอเลขฉบับร่างตาม ADR-003 ได้</AlertDescription>
+            <AlertTitle>ยังวางแผนเลขฉบับไม่ได้</AlertTitle>
+            <AlertDescription>
+              <div className="grid gap-3">
+                <p>อ่านเวอร์ชันฐานหรือทะเบียนเลขเวอร์ชันไม่ครบ จึงปิดการสร้างฉบับร่างไว้ก่อน</p>
+                <Button type="button" variant="outline" className="w-fit" onClick={() => router.refresh()}>
+                  <RotateCcw data-icon="inline-start" />
+                  ลองโหลดทะเบียนใหม่
+                </Button>
+              </div>
+            </AlertDescription>
           </Alert>
         )}
       </CardContent>
     </Card>
   );
+}
+
+function VersionTransitionOption({
+  checked,
+  description,
+  icon: Icon,
+  label,
+  onChange,
+  required = false,
+  value,
+}: {
+  checked: boolean;
+  description: string;
+  icon: typeof CalendarRange;
+  label: string;
+  onChange: () => void;
+  required?: boolean;
+  value: CatalogVersionTransition;
+}) {
+  return (
+    <label className="cursor-pointer">
+      <input
+        type="radio"
+        name="versionIntent"
+        value={value}
+        checked={checked}
+        onChange={onChange}
+        required={required}
+        className="peer sr-only"
+      />
+      <span className="flex min-h-24 gap-3 rounded-md border bg-background p-3 transition-colors peer-checked:border-primary peer-checked:bg-primary/5 peer-focus-visible:outline-none peer-focus-visible:ring-2 peer-focus-visible:ring-ring peer-focus-visible:ring-offset-2">
+        <Icon className="mt-0.5 size-5 shrink-0" aria-hidden="true" />
+        <span className="grid content-start gap-1">
+          <span className="text-sm font-medium">{label}</span>
+          <span className="text-xs leading-5 text-muted-foreground">{description}</span>
+        </span>
+      </span>
+    </label>
+  );
+}
+
+function formatReservedVersionSummary(entries: CatalogVersionRegistryEntry[]): string {
+  const visible = entries.slice(0, 3).map((entry) => {
+    const statusLabel = entry.status ? VERSION_STATUS_LABELS[entry.status] : null;
+    return `${entry.versionString}${statusLabel ? ` (${statusLabel})` : ''}`;
+  });
+  const remaining = entries.length - visible.length;
+  return remaining > 0
+    ? `${visible.join(', ')} และอีก ${remaining.toLocaleString('th-TH')} เลขถูกบันทึกไว้แล้ว`
+    : `${visible.join(', ')} ถูกบันทึกไว้แล้ว`;
 }
 
 export function MasterCatalogDraftAbandonPanel({
@@ -349,11 +481,13 @@ export function MasterCatalogPublishRestorePanel({
   const [publishState, publishAction] = useActionState(publishCatalogVersionAction, initialState);
   const [restoreState, restoreAction] = useActionState(restoreCatalogPointerAction, initialState);
   const [selectedRestoreTargetId, setSelectedRestoreTargetId] = useState('');
+  const [restoreReason, setRestoreReason] = useState('');
   const router = useRouter();
   const firstRestorableVersionId = restorableVersions[0]?.id ?? '';
   const restoreTargetId = restorableVersions.some(
     (version) => version.id === selectedRestoreTargetId,
   ) ? selectedRestoreTargetId : firstRestorableVersionId;
+  const restoreTarget = restorableVersions.find((version) => version.id === restoreTargetId) ?? null;
   const [
     publishRequestIdInputRef,
     preparePublishOperation,
@@ -486,15 +620,24 @@ export function MasterCatalogPublishRestorePanel({
           </form>
         ) : null}
 
-        {restorableVersions.length > 0 ? (
-          <form
-            action={restoreAction}
-            className="grid gap-4"
-            onReset={preserveRestoreInput}
-            onSubmitCapture={prepareRestoreOperation}
-          >
-            <input ref={restoreRequestIdInputRef} type="hidden" name="requestId" />
-            <ActionStateAlert state={restoreState} />
+        {restorableVersions.length > 0 && !currentVersionString ? (
+          <Alert variant="destructive">
+            <ShieldAlert />
+            <AlertTitle>ยังยืนยันเวอร์ชันปัจจุบันไม่ได้</AlertTitle>
+            <AlertDescription>
+              <div className="grid gap-3">
+                <p>ปิดการคืนเวอร์ชันไว้ก่อนจนกว่าจะโหลดข้อมูลเวอร์ชันที่ใช้งานปัจจุบันได้ครบ</p>
+                <Button type="button" variant="outline" className="w-fit" onClick={() => router.refresh()}>
+                  <RotateCcw data-icon="inline-start" />
+                  ลองโหลดข้อมูลใหม่
+                </Button>
+              </div>
+            </AlertDescription>
+          </Alert>
+        ) : null}
+
+        {restorableVersions.length > 0 && currentVersionString ? (
+          <div className="grid gap-4">
             <div className="grid gap-2">
               <Label htmlFor="restore-target-version">เวอร์ชันเป้าหมาย</Label>
               <Select value={restoreTargetId} onValueChange={setSelectedRestoreTargetId}>
@@ -511,26 +654,76 @@ export function MasterCatalogPublishRestorePanel({
                   </SelectGroup>
                 </SelectContent>
               </Select>
-              <input type="hidden" name="targetVersionId" value={restoreTargetId} />
             </div>
             <div className="grid gap-2">
               <Label htmlFor="restore-reason">เหตุผลที่คืนเวอร์ชัน</Label>
               <Input
                 id="restore-reason"
-                name="reason"
+                value={restoreReason}
+                onChange={(event) => setRestoreReason(event.target.value)}
+                maxLength={500}
                 required
               />
             </div>
-            <div className="flex flex-wrap items-center gap-2">
-              <SubmitButton
-                label="ตั้งเป็นเวอร์ชันใช้งาน"
-                pendingLabel="กำลังเปลี่ยนเวอร์ชัน"
-                disabled={!restoreTargetId}
-              >
-                <RotateCcw data-icon="inline-start" />
-              </SubmitButton>
-            </div>
-          </form>
+            <Dialog>
+              <DialogTrigger asChild>
+                <Button
+                  type="button"
+                  disabled={!restoreTarget || restoreReason.trim().length === 0}
+                >
+                  <RotateCcw data-icon="inline-start" />
+                  ตรวจและยืนยันการคืนเวอร์ชัน
+                </Button>
+              </DialogTrigger>
+              <DialogContent>
+                <DialogHeader>
+                  <DialogTitle>
+                    ยืนยันการเปลี่ยนเวอร์ชันใช้งานเป็น {restoreTarget?.versionString ?? '-'}
+                  </DialogTitle>
+                  <DialogDescription>
+                    การเปลี่ยนนี้จะมีผลกับ BOQ ใหม่หลังยืนยัน ส่วน BOQ เดิมยังคงผูกกับเวอร์ชันที่บันทึกไว้
+                  </DialogDescription>
+                </DialogHeader>
+                <form
+                  action={restoreAction}
+                  className="grid gap-4"
+                  onReset={preserveRestoreInput}
+                  onSubmitCapture={prepareRestoreOperation}
+                >
+                  <input ref={restoreRequestIdInputRef} type="hidden" name="requestId" />
+                  <input type="hidden" name="targetVersionId" value={restoreTargetId} />
+                  <input type="hidden" name="reason" value={restoreReason} />
+                  <ActionStateAlert state={restoreState} />
+                  <div className="grid gap-3 rounded-md border p-3 text-sm sm:grid-cols-2">
+                    <div>
+                      <div className="text-xs font-medium text-muted-foreground">เวอร์ชันปัจจุบัน</div>
+                      <div className="mt-1 font-mono font-medium">{currentVersionString}</div>
+                    </div>
+                    <div>
+                      <div className="text-xs font-medium text-muted-foreground">เวอร์ชันที่จะนำกลับมาใช้</div>
+                      <div className="mt-1 font-mono font-medium">{restoreTarget?.versionString ?? '-'}</div>
+                    </div>
+                  </div>
+                  <div className="rounded-md border p-3 text-sm">
+                    <div className="text-xs font-medium text-muted-foreground">เหตุผล</div>
+                    <div className="mt-1 break-words">{restoreReason}</div>
+                  </div>
+                  <DialogFooter>
+                    <DialogClose asChild>
+                      <Button type="button" variant="outline">ยกเลิก</Button>
+                    </DialogClose>
+                    <SubmitButton
+                      label="ยืนยันเปลี่ยนเวอร์ชันใช้งาน"
+                      pendingLabel="กำลังเปลี่ยนเวอร์ชัน"
+                      disabled={!restoreTarget}
+                    >
+                      <RotateCcw data-icon="inline-start" />
+                    </SubmitButton>
+                  </DialogFooter>
+                </form>
+              </DialogContent>
+            </Dialog>
+          </div>
         ) : null}
       </CardContent>
     </Card>

@@ -6,6 +6,19 @@ export interface CatalogVersionNumber {
 
 export type CatalogVersionTransition = 'annual' | 'revision' | 'patch';
 
+export interface CatalogVersionRegistryEntry {
+  versionString: string;
+  status?: string;
+}
+
+export interface CatalogVersionSuggestion {
+  transition: CatalogVersionTransition;
+  version: CatalogVersionNumber;
+  reservedVersions: CatalogVersionRegistryEntry[];
+}
+
+export const CATALOG_VERSION_SEGMENT_MAX = 2_147_483_647;
+
 const VERSION_PATTERN = /^(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)$/;
 
 export function parseCatalogVersionString(value: string): CatalogVersionNumber | null {
@@ -33,7 +46,7 @@ export function classifyCatalogVersionTransition(
 ): CatalogVersionTransition | null {
   if (!isCatalogVersionNumber(base) || !isCatalogVersionNumber(candidate)) return null;
 
-  if (candidate.major > base.major && candidate.minor === 0 && candidate.patch === 0) {
+  if (candidate.major > base.major && candidate.patch === 0) {
     return 'annual';
   }
   if (
@@ -53,17 +66,91 @@ export function classifyCatalogVersionTransition(
   return null;
 }
 
-export function suggestNextCatalogRevision(
-  baseVersionString: string | null,
-): CatalogVersionNumber | null {
-  if (!baseVersionString) return null;
-  const base = parseCatalogVersionString(baseVersionString);
+export function suggestCatalogVersion(input: {
+  baseVersionString: string | null;
+  transition: CatalogVersionTransition;
+  registry: readonly CatalogVersionRegistryEntry[];
+  effectiveYear?: number | null;
+}): CatalogVersionSuggestion | null {
+  if (!input.baseVersionString) return null;
+  const base = parseCatalogVersionString(input.baseVersionString);
   if (!base) return null;
-  return { major: base.major, minor: base.minor + 1, patch: 0 };
+
+  const registry = normalizeRegistry(input.registry);
+  let version: CatalogVersionNumber;
+  let reservedVersions: CatalogVersionRegistryEntry[];
+
+  if (input.transition === 'annual') {
+    const effectiveYear = input.effectiveYear;
+    if (typeof effectiveYear !== 'number'
+        || !Number.isSafeInteger(effectiveYear)
+        || effectiveYear <= base.major) return null;
+    const sameYear = registry.filter((entry) => entry.version.major === effectiveYear);
+    version = {
+      major: effectiveYear,
+      minor: nextSegment(sameYear.map((entry) => entry.version.minor), -1),
+      patch: 0,
+    };
+    reservedVersions = sameYear.map(({ reference }) => reference);
+  } else if (input.transition === 'revision') {
+    const sameYear = registry.filter((entry) => entry.version.major === base.major);
+    version = {
+      major: base.major,
+      minor: nextSegment(sameYear.map((entry) => entry.version.minor), base.minor),
+      patch: 0,
+    };
+    reservedVersions = sameYear
+      .filter((entry) => entry.version.minor > base.minor)
+      .map(({ reference }) => reference);
+  } else {
+    const sameRevision = registry.filter(
+      (entry) => entry.version.major === base.major && entry.version.minor === base.minor,
+    );
+    version = {
+      major: base.major,
+      minor: base.minor,
+      patch: nextSegment(sameRevision.map((entry) => entry.version.patch), base.patch),
+    };
+    reservedVersions = sameRevision
+      .filter((entry) => entry.version.patch > base.patch)
+      .map(({ reference }) => reference);
+  }
+
+  if (classifyCatalogVersionTransition(base, version) !== input.transition) return null;
+
+  return {
+    transition: input.transition,
+    version,
+    reservedVersions,
+  };
+}
+
+function normalizeRegistry(registry: readonly CatalogVersionRegistryEntry[]) {
+  const unique = new Map<string, {
+    reference: CatalogVersionRegistryEntry;
+    version: CatalogVersionNumber;
+  }>();
+
+  for (const reference of registry) {
+    const version = parseCatalogVersionString(reference.versionString);
+    if (!version || unique.has(reference.versionString)) continue;
+    unique.set(reference.versionString, { reference, version });
+  }
+
+  return [...unique.values()].sort((left, right) =>
+    left.version.major - right.version.major
+    || left.version.minor - right.version.minor
+    || left.version.patch - right.version.patch);
+}
+
+function nextSegment(usedSegments: readonly number[], floor: number): number {
+  return Math.max(floor, ...usedSegments) + 1;
 }
 
 function isCatalogVersionNumber(value: CatalogVersionNumber): boolean {
   return [value.major, value.minor, value.patch].every(
-    (segment) => Number.isSafeInteger(segment) && segment >= 0,
+    (segment) => Number.isSafeInteger(segment)
+      && segment >= 0
+      && segment <= CATALOG_VERSION_SEGMENT_MAX,
   );
 }

@@ -25,6 +25,11 @@ import {
   mapCatalogRpcActionResponse,
 } from '@/lib/master-catalog/admin/actionModel';
 import { logMasterCatalogOperation } from '@/lib/master-catalog/observability';
+import {
+  classifyCatalogVersionTransition,
+  parseCatalogVersionString,
+  type CatalogVersionTransition,
+} from '@/lib/master-catalog/versioning';
 
 const UUID_PATTERN =
   /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
@@ -49,32 +54,62 @@ export async function createCatalogDraftAction(
 
   const name = readRequiredActionText(formData, 'name', 'ชื่อฉบับร่าง');
   const reason = readRequiredActionText(formData, 'reason', 'เหตุผล');
-  const versionMajor = readVersionSegment(formData, 'versionMajor', 'ปี พ.ศ. ที่มีผล');
-  const versionMinor = readVersionSegment(formData, 'versionMinor', 'ลำดับปรับปรุงหลัก');
-  const versionPatch = readVersionSegment(formData, 'versionPatch', 'ลำดับแก้ไขย่อย');
+  const baseVersionId = readRequiredActionText(formData, 'baseVersionId', 'เวอร์ชันฐาน');
+  const versionIntent = readCatalogVersionIntent(formData);
+  const expectedVersionString = readRequiredActionText(
+    formData,
+    'expectedVersionString',
+    'เลขฉบับที่ตรวจสอบแล้ว',
+  );
 
   if (typeof name !== 'string') return name;
   if (typeof reason !== 'string') return reason;
-  if (typeof versionMajor !== 'number') return versionMajor;
-  if (typeof versionMinor !== 'number') return versionMinor;
-  if (typeof versionPatch !== 'number') return versionPatch;
+  if (typeof baseVersionId !== 'string') return baseVersionId;
+  if (!UUID_PATTERN.test(baseVersionId)) {
+    return createCatalogMutationError('รหัสเวอร์ชันฐานไม่ถูกต้อง');
+  }
+  if (typeof versionIntent !== 'string') return versionIntent;
+  if (typeof expectedVersionString !== 'string') return expectedVersionString;
 
-  const { data: pointer, error: pointerError } = await supabase
-    .from('price_list_default_version')
-    .select('version_id')
-    .eq('id', true)
+  const expectedVersion = parseCatalogVersionString(expectedVersionString);
+  if (!expectedVersion) {
+    return createCatalogMutationError('เลขฉบับที่ตรวจสอบแล้วไม่ถูกต้อง');
+  }
+
+  if (versionIntent === 'annual') {
+    const effectiveYear = readVersionSegment(formData, 'effectiveYear', 'ปี พ.ศ. ที่มีผลใช้งาน');
+    if (typeof effectiveYear !== 'number') return effectiveYear;
+    if (effectiveYear !== expectedVersion.major) {
+      return createCatalogMutationError('ปีที่มีผลใช้งานไม่ตรงกับเลขฉบับที่ตรวจสอบแล้ว');
+    }
+  }
+
+  const { data: baseVersion, error: baseVersionError } = await supabase
+    .from('price_list_versions')
+    .select('version_string')
+    .eq('id', baseVersionId)
     .maybeSingle();
 
-  if (pointerError || !pointer?.version_id) {
-    return createCatalogMutationError('อ่านเวอร์ชันบัญชีราคาที่ใช้งานปัจจุบันไม่สำเร็จ', 'DRAFT_BASE_STALE');
+  const parsedBaseVersion = baseVersion?.version_string
+    ? parseCatalogVersionString(String(baseVersion.version_string))
+    : null;
+  if (baseVersionError || !parsedBaseVersion) {
+    return createCatalogMutationError('อ่านเวอร์ชันฐานไม่สำเร็จ', 'DRAFT_BASE_STALE');
+  }
+
+  if (classifyCatalogVersionTransition(parsedBaseVersion, expectedVersion) !== versionIntent) {
+    return createCatalogMutationError(
+      'วัตถุประสงค์ของฉบับใหม่ไม่ตรงกับเลขเวอร์ชันตาม ADR-003',
+      'VERSION_TRANSITION_INVALID',
+    );
   }
 
   const startedAt = Date.now();
   const { data, error } = await supabase.rpc('create_catalog_draft', {
-    p_base_version_id: pointer.version_id,
-    p_version_major: versionMajor,
-    p_version_minor: versionMinor,
-    p_version_patch: versionPatch,
+    p_base_version_id: baseVersionId,
+    p_version_major: expectedVersion.major,
+    p_version_minor: expectedVersion.minor,
+    p_version_patch: expectedVersion.patch,
     p_name: name,
     p_reason: reason,
     p_request_id: requestId,
@@ -83,20 +118,20 @@ export async function createCatalogDraftAction(
   if (error) {
     return mapRpcTransportError('createCatalogDraft', error, requestId, {
       startedAt,
-      versionId: String(pointer.version_id),
+      versionId: baseVersionId,
     });
   }
 
   const result = mapCatalogRpcActionResponse(
     data as CatalogRpcActionResponse,
-    `สร้างฉบับร่าง ${versionMajor}.${versionMinor}.${versionPatch} แล้ว`,
+    `สร้างฉบับร่าง ${expectedVersionString} แล้ว`,
   );
   logMasterCatalogOperation({
     operation: 'createCatalogDraft',
     outcome: result.status === 'success' ? 'success' : 'rejected',
     startedAt,
     requestId: result.requestId ?? requestId,
-    versionId: result.versionId ?? String(pointer.version_id),
+    versionId: result.versionId ?? baseVersionId,
     code: result.code,
   });
 
@@ -492,6 +527,17 @@ function readOperationRequestId(formData: FormData): string | CatalogMutationSta
     return createCatalogMutationError('รหัสคำขอไม่ถูกต้อง');
   }
   return requestId;
+}
+
+function readCatalogVersionIntent(
+  formData: FormData,
+): CatalogVersionTransition | CatalogMutationState {
+  const intent = readRequiredActionText(formData, 'versionIntent', 'วัตถุประสงค์ของฉบับใหม่');
+  if (typeof intent !== 'string') return intent;
+  if (intent !== 'annual' && intent !== 'revision' && intent !== 'patch') {
+    return createCatalogMutationError('วัตถุประสงค์ของฉบับใหม่ไม่ถูกต้อง');
+  }
+  return intent;
 }
 
 function readVersionSegment(

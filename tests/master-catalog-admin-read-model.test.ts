@@ -75,7 +75,7 @@ function createOverviewClientWithFactorPointerError(): Parameters<typeof loadCat
       return { count: 0, error: null };
     }
 
-    return { data: [], error: null };
+    return { data: [], error: null, count: 0 };
   };
 
   return {
@@ -84,6 +84,7 @@ function createOverviewClientWithFactorPointerError(): Parameters<typeof loadCat
         select: () => query,
         order: () => query,
         limit: () => query,
+        range: () => query,
         eq: () => query,
         maybeSingle: async () => queryResult(table),
         then: (resolve: (value: unknown) => unknown, reject?: (reason: unknown) => unknown) =>
@@ -93,6 +94,84 @@ function createOverviewClientWithFactorPointerError(): Parameters<typeof loadCat
       return query;
     },
   } as unknown as Parameters<typeof loadCatalogAdminOverview>[0];
+}
+
+function createOverviewClientWithPagedRegistry() {
+  const defaultVersionId = '11111111-1111-4111-8111-111111111111';
+  const registry = Array.from({ length: 1_001 }, (_, patch) => ({
+    version_string: `2568.0.${patch}`,
+    status: patch === 0 ? 'active' : 'abandoned',
+  }));
+  const defaultVersion = {
+    id: defaultVersionId,
+    version_string: '2568.0.0',
+    name: 'บัญชีราคาใช้งาน',
+    status: 'active',
+    is_default: true,
+    based_on_version_id: null,
+    item_count: 710,
+    lock_version: 0,
+    created_at: '2026-01-01T00:00:00.000Z',
+    updated_at: '2026-01-01T00:00:00.000Z',
+  };
+  let registryRangeReads = 0;
+
+  const client = {
+    from: (table: string) => {
+      const state: {
+        columns: string;
+        filters: Record<string, unknown>;
+        from: number;
+        to: number;
+      } = { columns: '', filters: {}, from: 0, to: Number.MAX_SAFE_INTEGER };
+      const result = () => {
+        if (table === 'price_list_versions') {
+          if (state.columns === 'version_string,status') {
+            registryRangeReads += 1;
+            return {
+              data: registry.slice(state.from, state.to + 1),
+              error: null,
+              count: registry.length,
+            };
+          }
+          return {
+            data: state.filters.status === 'draft' ? [] : [defaultVersion],
+            error: null,
+          };
+        }
+        if (table === 'price_list_default_version') {
+          return { data: { version_id: defaultVersionId }, error: null };
+        }
+        if (table === 'factor_reference_default_version') {
+          return { data: null, error: null };
+        }
+        return { data: [], count: 0, error: null };
+      };
+      const query = {
+        select: (columns: string) => {
+          state.columns = columns;
+          return query;
+        },
+        order: () => query,
+        limit: () => query,
+        range: (from: number, to: number) => {
+          state.from = from;
+          state.to = to;
+          return query;
+        },
+        eq: (column: string, value: unknown) => {
+          state.filters[column] = value;
+          return query;
+        },
+        maybeSingle: async () => result(),
+        then: (resolve: (value: unknown) => unknown, reject?: (reason: unknown) => unknown) =>
+          Promise.resolve(result()).then(resolve, reject),
+      };
+      return query;
+    },
+  } as unknown as Parameters<typeof loadCatalogAdminOverview>[0];
+
+  return { client, registryRangeReads: () => registryRangeReads };
 }
 
 function createRegisterClient(error: { code: string; message: string }) {
@@ -415,6 +494,22 @@ describe('Master Catalog admin overview', () => {
       status: null,
     });
     expect(overview.warnings).toContain('โหลดตัวชี้เวอร์ชัน Factor F ที่ใช้งานไม่สำเร็จ');
+  });
+
+  it('loads the complete reserved version registry across bounded pages', async () => {
+    const fixture = createOverviewClientWithPagedRegistry();
+
+    const overview = await loadCatalogAdminOverview(fixture.client);
+
+    expect(fixture.registryRangeReads()).toBe(2);
+    expect(overview.versionRegistry).toHaveLength(1_001);
+    expect(overview.versionRegistry?.at(-1)).toEqual({
+      versionString: '2568.0.1000',
+      status: 'abandoned',
+    });
+    expect(overview.warnings).not.toContain(
+      'ทะเบียนเลขเวอร์ชันโหลดไม่ครบ จึงปิดการสร้างฉบับร่างไว้ก่อน',
+    );
   });
 });
 

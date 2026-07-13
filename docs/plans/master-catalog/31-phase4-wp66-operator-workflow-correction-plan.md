@@ -2,9 +2,14 @@
 
 **Status:** P-22 owner-approved; source/static completed on `ac31feb`, G1
 Local DB/concurrency/P-20 input completed on `e463270`, and the pre-G2
-operator/UI checkpoint completed on `c8f6dca` on 2026-07-12. G2 clean
-rebuild/P-20 comparison, G3 owner closeout, and G4 bootstrap/WP-7 sequencing
-remain pending
+operator/UI checkpoint completed on `c8f6dca` on 2026-07-12. P-23 owner-approved
+the bounded operator-context/navigation amendment on 2026-07-13, and its
+working-tree UI/static/browser checkpoint passed the same day without a Local
+reset. P-23.1 then amended candidate `020` and the create/detail/restore flow;
+its repository/static checks passed 2026-07-13. Earlier evidence remains valid
+history but cannot close the amended candidate. The replacement commit remains
+unnamed; G1R, independent G2, browser owner review, G3 closeout, and G4
+bootstrap/WP-7 sequencing remain pending
 
 **Production touched:** No
 
@@ -38,6 +43,22 @@ This decision is a bounded WP-6.6 correction. It does not approve P-18/`021`,
 P-19, WP-7 execution, a new Factor F workflow, hotfix `016` expansion, a Local
 reset, or any Production action.
 
+P-23 extends only the operator-facing composition of that correction:
+
+- preserve the signed-in admin identity/account menu across Master Catalog;
+- separate global information navigation from actions on one exact draft;
+- bind import to the selected draft route instead of presenting import as a
+  peer global section with another target selector;
+- distinguish review-only Excel/PDF exports from the separately approved
+  workbook import contract;
+- keep the overall workspace iterative, while making the import sub-flow
+  explicitly `select -> server review -> apply`; and
+- show a reliable Local environment marker when `NEXT_PUBLIC_APP_ENV=local`.
+
+P-23 does not change migration `020`, database/RPC contracts, the official
+export binary contract, or the one-publisher model. It does not approve a
+round-trip spreadsheet editor.
+
 ## 2. Why the correction is needed
 
 The current code already contains the right low-level pieces:
@@ -63,6 +84,7 @@ Open the one current working draft
   -> Search/filter all draft items
   -> Open one exact identity and save an audited change
   -> Use import only for approved batch changes
+  -> Export a clearly marked review artifact when needed
   -> Review the final draft-versus-base snapshot diff
   -> Resolve readiness and filing warnings
   -> Enter external approval/archive evidence
@@ -137,12 +159,44 @@ maker-checker role is a separate architecture/threat-model decision.
 
 ## 6. UX contract
 
+Draft creation begins with a required business-intent choice rather than three
+raw version-number inputs:
+
+1. `ประจำปีใหม่` (`annual`) requires the owner-designated effective BE year;
+2. `ปรับปรุง/เพิ่มเติม` (`revision`) means newly approved catalog content; and
+3. `แก้ไขข้อมูลเดิม` (`patch`) restores the same approved source basis.
+
+The read model must load the complete reserved version registry or fail closed.
+The UI displays the server-compatible candidate and any earlier reserved
+numbers; it never silently changes a reviewed number during submit. Successful
+creation opens the exact new draft workspace directly. Candidate migration
+`020` remains authoritative for current-base, transition, next-sequence,
+concurrency, and idempotent replay checks.
+
+The global Master Catalog shell must keep the signed-in operator visible and
+use information destinations only:
+
+1. `บัญชีปัจจุบัน`;
+2. `ทะเบียนฉบับ`; and
+3. `ประวัติการเปลี่ยนแปลง`.
+
+`นำเข้า` is not a global destination. It is an action on one exact working
+draft. The legacy `/admin/master-catalog/import?draftId=...` address may remain
+only as a compatibility redirect to the contextual draft route; it must not
+restore a second target-selection workflow.
+
 The draft version page presents, in order:
 
-1. compact version/base/status/count context;
-2. the full searchable item workspace;
-3. recent import/change history;
-4. a clear command to review changes before publication.
+1. compact version/base/status/count context and the current operator identity;
+2. one action hierarchy: primary `ตรวจฉบับสุดท้าย`, secondary contextual
+   import, and a review-export menu;
+3. the full searchable item workspace; and
+4. recent import/change history plus audited abandon in the danger area.
+
+Detailed publication/document metadata belongs after the item workspace rather
+than occupying the first viewport. Pointer restore is a separate recovery
+section and requires a current-to-target confirmation that explains the effect
+on new versus historical BOQs.
 
 Use the existing semantic table, exact detail route, shadcn components, NT
 tokens, and Lucide icons. Do not add spreadsheet-style inline editing or a new
@@ -157,6 +211,25 @@ The workspace must:
 - show draft values as the primary working state and provide a clear link to the
   immutable base version;
 - keep essential code/name/status/change/action content usable on mobile.
+
+The contextual import page must:
+
+- use `/admin/master-catalog/versions/{versionId}/import` and lock the target
+  from that exact route;
+- show draft/base context without a second draft selector;
+- label the source as an approved input workbook, not an exported workbook;
+- show three ordered states: select file/evidence, server-review the complete
+  diff, then confirm apply;
+- return to the same draft workspace after a successful apply and show a
+  visible success result; and
+- preserve all existing authority, expected-lock, idempotency, stale-base, and
+  server-validation controls.
+
+Draft exports must be grouped under `ส่งออกเพื่อตรวจ` with distinct
+`Excel สำหรับตรวจสอบ` and `PDF สำหรับอ่าน/พิมพ์` choices. The UI must not imply
+that the official/review Excel workbook is an import template. A future
+round-trip bulk editor requires a separately versioned parser/conflict contract
+and owner decision.
 
 The review page must:
 
@@ -222,7 +295,10 @@ candidate `020` separately until the new owner closeout accepts it.
 |---|---|
 | G0 | P-22 plan accepted for docs and Local-only implementation — accepted 2026-07-12 |
 | G1 | Owner explicitly approves first full Local reset after static implementation is ready — approved and completed 2026-07-12 |
-| G2 | Owner explicitly approves the second independent clean rebuild of exact executable candidate `c8f6dca` and P-20 comparison |
+| G1U | P-23 operator-context/navigation amendment approved for docs and Local-only UI/static/browser work without a reset — approved and working-tree implementation evidence passed 2026-07-13; exact commit/owner checkpoint pending |
+| G1V | Passed 2026-07-13: P-23.1 explicit version-intent/sequence and item-first correction was approved and its repository/static checks passed. It changes candidate `020`, so all prior `020` fingerprints and live DB evidence remain historical. |
+| G1R | Owner explicitly approves the first clean rebuild and full DB/concurrency/browser/P-20 rerun of the exact post-P-23.1 executable candidate. No approval has been given. |
+| G2 | Owner explicitly approves a second independent clean rebuild of the same accepted candidate and P-20 comparison after G1R passes. |
 | G3 | Owner completes intended-admin workflow review and accepts or holds the revised WP-6.6 closeout |
 | G4 | Only after G3, add accepted `020` to bootstrap and separately authorize any WP-7 execution |
 
@@ -321,4 +397,80 @@ candidate migration `020`:
   `2569.0.0`/36 rows. Production touched: No.
 
 This is technical preflight evidence, not G2 reset approval and not G3 owner
-closeout. The next action remains an explicit owner decision on G2.
+closeout. P-23 subsequently identified persistent operator identity, mixed
+global/action navigation, contextual import targeting, and export/import
+semantics as unresolved comprehension controls. The next action is the bounded
+P-23 docs/UI/static/browser amendment without a Local reset. Only its accepted
+exact commit may become the separately approved G2 target.
+
+## 13. P-23 operator-context checkpoint
+
+The owner-approved P-23 working-tree checkpoint completed on 2026-07-13
+without a Local reset and without changing migration `020`:
+
+- the Master Catalog shell now retains the signed-in account menu and shows an
+  explicit `Local` marker only from `NEXT_PUBLIC_APP_ENV=local`;
+- global navigation is information-only: `บัญชีปัจจุบัน`, `ทะเบียนฉบับ`, and
+  `ประวัติการเปลี่ยนแปลง`; draft import is now bound to
+  `/versions/{versionId}/import` with no second target selector;
+- the draft workspace distinguishes `ส่งออกเพื่อตรวจ` from the approved source
+  workbook import contract and keeps `ตรวจฉบับสุดท้าย` as the primary route to
+  publication readiness;
+- import presents the three explicit states `เลือกไฟล์และหลักฐาน`,
+  `ตรวจผลต่างกับเซิร์ฟเวอร์`, and `ยืนยันบันทึกลงฉบับร่าง`;
+- browser QA found and fixed one draft-context regression: the first nested
+  import implementation showed global prior-version imports. The final route
+  queries import history by the exact draft `version_id` and the new proof
+  draft correctly showed no imports;
+- desktop and mobile browser checks passed the account menu, draft/base/lock
+  context, review-export menu, exact-draft import route, Thai labels, and
+  responsive composition. Binary upload/apply was not repeated in this bounded
+  UI checkpoint; existing parser/server/live-DB evidence remains the authority
+  for that behavior;
+- 30 test files / 154 tests, TypeScript, lint with 0 errors/10 existing
+  warnings, network-enabled production build, and `git diff --check` passed;
+- the proof draft `2568.1.0` was audited-abandoned at lock 1. Final Local
+  readback restored pointer `2568.0.0`/710 rows, zero working drafts, all three
+  catalog flags `false`, 198 BOQs/1,547 BOQ items, and Factor F
+  `2569.0.0`/36 rows. Production touched: No.
+
+This checkpoint makes P-23 ready for owner review and commit. It does not name
+the exact G2 executable candidate, approve a destructive Local rebuild, close
+G3, add `020` to bootstrap, or authorize WP-7/Production work.
+
+## 14. P-23.1 version-intent and item-first correction
+
+Owner review on 2026-07-13 found that the create form could not know whether a
+change should be annual, revision, or patch, because the UI always suggested a
+revision. The same review exposed a reserved-number edge: abandoning an annual
+`{year}.0.0` attempt made a truthful replacement for that effective year
+impossible under the old transition shape.
+
+The approved correction is bounded to ADR-003 planning, candidate `020`, the
+admin read/create/detail/restore surfaces, tests, and authority documents:
+
+- require explicit annual/revision/patch intent and owner-designated year for an
+  annual draft;
+- plan from a complete all-status registry and reserve every created number;
+- permit a year-changing annual candidate with the next revision and patch `0`
+  when lower identifiers in that year are already reserved;
+- enforce the next candidate in the guarded DB path, map create races to stable
+  errors, and preserve same-request replay before sequence rejection;
+- open the exact draft after creation, place the full item workspace before
+  document metadata, and require current-to-target pointer-restore confirmation;
+- do not change `016`-`019`, bootstrap, P-18/`021`, P-19, BOQ rows, Factor F,
+  feature flags, or Production.
+
+Because this amends candidate migration `020`, G1 evidence on `e463270` and the
+later UI-only checkpoints remain truthful historical evidence only. They cannot
+be relabeled as evidence for the amended candidate. Repository/static
+verification passed 2026-07-13: 30 test files/159 tests, focused P-23.1
+contracts 5 files/47 tests including a 1,001-version paged-registry fixture,
+TypeScript, lint with 0 errors/10 existing warnings,
+authority 710/65/17, smoke-script syntax, network-enabled production build, and
+`git diff --check`. The harness now records out-of-sequence denial and
+same-candidate race normalization. Read-only in-app browser smoke passed the
+disabled/account-context state with zero console warnings/errors; the amended
+mutable flow still waits for G1R. No Local DB was reset or mutated. Request G1R separately
+before any Local reset; a passing G1R is
+then followed by separately approved independent G2 evidence and owner G3.

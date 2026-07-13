@@ -32,7 +32,7 @@ still does not permit an unannounced Local reset or any Production action.
 **Capability-completeness alignment recorded:** 2026-07-12 — owner requested
 the full audit and plan correction in
 [Audit #29](./29-phase4-owner-dev-completeness-audit.md). WP-6.5 keeps its
-bounded reliability evidence; new WP-6.6 must close C-01 through C-13 before
+bounded reliability evidence; new WP-6.6 must close C-01 through C-15 before
 WP-7. Migration `020` is reserved for WP-6.6 and proposed P-18 placement moves
 to `021`/WP-7.5. This alignment authorizes documentation only, not migration
 implementation, Local reset, or Production action.
@@ -51,11 +51,23 @@ Candidate `020`, the item-first workspace, and lock-bound final snapshot review
 were implemented and passed repository/static checks on `ac31feb`. Prior
 `3bfc74e` evidence remains historical but is superseded for revised closeout.
 Owner-approved G1 Local DB/concurrency/P-20 input passed on final checkpoint
-`e463270`; pre-G2 operator/browser preflight passed on executable/source
-checkpoint `c8f6dca` without a reset or migration `020` change. G2 independent
-exact-`c8f6dca` clean rebuild/P-20 comparison, G3 owner closeout, G4
-bootstrap/WP-7 sequencing, and every Production action remain separate
-decisions.
+`e463270`; the pre-amendment operator/browser preflight passed on
+`c8f6dca` without a reset or migration `020` change. P-23 owner-approved the
+bounded persistent-identity, information-navigation, exact-draft import, and
+review-export semantics amendment on 2026-07-13. Its Local-only working-tree
+UI/static/browser checkpoint passed; owner-review/commit and name the exact
+replacement commit before G2.
+G2 clean rebuild/P-20 comparison, G3 owner closeout, G4 bootstrap/WP-7
+sequencing, and every Production action remain separate decisions.
+
+**P-23.1 version-intent/item-first correction authorized:** 2026-07-13 — owner
+approved explicit annual/revision/patch intent, complete all-status
+reserved-number planning, a guarded next-sequence rule including same-year
+annual recovery after a void lower number, direct post-create workspace
+navigation, item-before-metadata hierarchy, and pointer-restore confirmation.
+This amends candidate `020`; prior G1/live evidence is historical. Run
+repository/static verification first, then request G1R and independent G2 clean
+rebuilds separately. No reset or Production action is authorized by this entry.
 
 **Purpose:** Turn the reviewed Phase 4 architecture into an execution checklist
 that an implementer can follow without re-deciding scope, sequencing, database
@@ -135,6 +147,8 @@ Start blocked:
     entity, Server Action, RPC/schema authority, audit/correction, readiness/
     export effect, tests, and operator procedure. A fail-closed DB guard alone
     is safety evidence, not a complete user workflow.
+16. Version type is business intent, not a numeric guess. All created numbers
+    remain reserved, and both UI and DB must use the complete all-status sequence.
 
 ## 3. Required owner decisions before each work band
 
@@ -156,7 +170,9 @@ Start blocked:
 | P-19 inactive/retired export policy | Publication/filing of any version with inactive rows | Decision Register |
 | P-20 canonical hash/identity portability | Initial WP-6.5 exit and rerun after WP-6.6/WP-7.5 migration changes, WP-8 clean rehearsal, and migration fingerprint freeze | Decision Register |
 | P-21 Audit #29 WP-6.6 scope/start | WP-6.6 implementation and any migration `020` execution | Decision Register / Completeness Audit |
-| P-22 operator-workflow correction | Source/static on `ac31feb`, G1 Local evidence on `e463270`, and pre-G2 operator/browser checkpoint on `c8f6dca` passed; exact-`c8f6dca` G2/G3 replacement closeout remains | Decision Register / Correction Plan #31 |
+| P-22 operator-workflow correction | Earlier source/G1/operator/P-23 checkpoints are historical after P-23.1 amended candidate `020`; repository/static, G1R, independent G2, and G3 now govern closeout | Decision Register / Correction Plan #31 |
+| P-23 operator-context/navigation amendment | Working-tree persistent operator/account context, information-only global nav, exact-draft import route, explicit input/export semantics, Local marker, and static/browser evidence passed 2026-07-13; exact commit pending; no migration `020` change or reset | Decision Register / Correction Plan #31 |
+| P-23.1 version-intent/item-first correction | Owner approved bounded docs/application/candidate-`020` work; repository/static verification passed 2026-07-13; separately approved G1R and G2 clean rebuilds remain because prior G1 evidence is historical | ADR-003 / Decision Register / Correction Plan #31 |
 
 Rule: unresolved P-02 through P-11 does not block generic additive schema,
 parser, UI shell, tests, or local rehearsal. It blocks final candidate data
@@ -458,7 +474,7 @@ Required sub-gates:
 | WP-6.5A End-to-end idempotency | Client/form creates one operation UUID for create/manual/import-apply/publish/restore, preserves it through an uncertain result, reuses it on retry, and replaces it only after a definitive terminal result or explicit new operation. Submitted non-secret editable values remain visible after uncertain/rejected results and reset only after success, so retry does not require reconstructing the payload. Test timeout-after-commit and same-ID/different-payload rejection. |
 | WP-6.5B Publish guards and early UX | Keep DB P-18 and structured-code guards as final invariants; show the same publication blockers in draft/import preview before apply/publish, with Thai reason and remediation. Warn separately when inactive rows require the still-pending P-19 PDF policy; do not silently turn that filing decision into a new DB publish rule. A user must not discover the blocker only after completing the draft. |
 | WP-6.5C Hash portability | Resolve P-20 and update migration, DB/hash/export contracts and fixtures atomically. No clean-reset/cross-environment equivalence claim until the selected contract passes. |
-| WP-6.5D Reusable version lifecycle | Remove `2568.1.0` hardcoding from reusable action/RPC validation. Validate ADR-003 annual/revision/patch rules and prove at least one additional valid version plus duplicate/nonmonotonic rejection. Keep `2568.1.0` only as the exact first-candidate fixture. |
+| WP-6.5D Reusable version lifecycle | Remove `2568.1.0` hardcoding from reusable action/RPC validation. Require explicit annual/revision/patch intent, plan from the complete all-status reserved registry, and prove another valid version plus reserved annual, duplicate, stale-sequence, and nonmonotonic rejection. Keep `2568.1.0` only as the exact first-candidate fixture when unreserved. |
 | WP-6.5E Reproducible export evidence | Commit a semantic verifier under `scripts/` or tests. Discover headers by exact names, derive ranges, and verify schema version, sheets, row count/order, canonical hash, numeric cells, formula/link absence, PDF count/hash/pages, and binary hashes. Generated files remain untracked. |
 | WP-6.5F DB integration and concurrency harness | Establish a tracked Local DB suite for migrations, RPC/RLS/role denial, transaction rollback, two-session publish/restore races, lock timeout, stale state, and uncertain-response retry. WP-7 adds the permanent BOQ/hotfix/Factor F cases to this harness. |
 | WP-6.5G Operator UX and observability | Add route-level loading/error/not-found states, consistent Thai user messages with stable technical code/request ID, bounded structured logs containing operation/outcome/duration/version/request ID, and no raw payload/SQL detail. |
@@ -546,6 +562,7 @@ Required slices:
 | G Schema/UX/evidence | After zero-null compatibility proof, add required null/order constraints; Thai-first copy, no synthetic Local/WP evidence, support IDs demoted; DB/role/race/browser/accessibility/authority tests pass. |
 | H Working-draft lifecycle | Partial unique draft-per-base invariant; safe concurrent create conflict; audited idempotent abandon with immutable retained rows/history; replacement starts from a fresh clone. |
 | I Final snapshot review | Make the full searchable item workspace primary; compare complete draft/base snapshots by stable identity; show compound old/new changes/readiness; publish only the exact reviewed lock and force rereview after mutation. |
+| J Version planning and recovery UX | Require business intent and owner-designated annual year; fail closed on incomplete registry; show reserved numbers; DB enforces next sequence after idempotent replay; successful create opens the exact draft; detailed metadata follows items; restore confirms current/target and BOQ effect. |
 
 Required behavior:
 
@@ -565,13 +582,17 @@ Required behavior:
   change-event summaries, and a stale reviewed lock cannot publish;
 - unsupported Add/Supplement/Retire controls are hidden at release when their
   downstream P-18/P-19 gates are not accepted.
+- an admin cannot submit raw version segments without intent, reuse an abandoned
+  number, skip the next lane number, or silently receive a number different from
+  the one reviewed; a void annual identifier does not force a false effective year.
 
 Exit gate:
 
-- Audit #29 C-01 through C-13 each have an implementation/evidence reference in
+- Audit #29 C-01 through C-15 each have an implementation/evidence reference in
   the Verification Report;
-- migration `020` static/Local DB, RLS/grant, rollback, concurrency, null/order,
-  and P-20 rerun evidence passes after an explicitly approved reset;
+- migration `020` static verification passes, followed by explicitly approved
+  G1R Local DB/RLS/grant/rollback/concurrency/P-20/browser evidence and a second
+  separately approved independent G2 clean rebuild/comparison;
 - browser QA and owner review prove the one-workspace item-first flow, exact
   item targeting, authoritative final diff, stale-review recovery, and Thai
   workflow;
@@ -812,7 +833,7 @@ Before asking for code review:
 - [ ] Privileged functions have narrow execute grants and safe `search_path`.
 - [ ] New foreign keys and hot filters are indexed or intentionally documented.
 - [ ] Published data is immutable.
-- [ ] Audit #29 C-01 through C-13 have exact implementation/evidence references
+- [ ] Audit #29 C-01 through C-15 have exact implementation/evidence references
   or the affected capability is excluded from release visibility.
 - [ ] Full catalog/item history, one current-base workspace, and
   stale/abandoned read-only targeting work.
@@ -835,6 +856,9 @@ Before asking for code review:
   and the DB returns the prior result for a same-payload retry.
 - [ ] Reusable version actions/RPCs follow ADR-003 and do not hardcode
   `2568.1.0` outside exact fixtures.
+- [ ] Draft create requires explicit business intent, complete-registry
+  reserved-number planning, DB next-sequence enforcement, annual void-number
+  recovery, and exact post-create navigation.
 - [ ] P-20 hash/identity portability contract is implemented consistently in
   migration, canonicalizer, DB hash, export, and tests.
 - [ ] Draft mutation and import are audited.
@@ -863,7 +887,7 @@ Before asking for code review:
 | P-18 unresolved | Keep draft add/supplement review available, but block publication of versions with new identities until guard evidence and placement governance are accepted |
 | P-19 unresolved | Do not file a field-facing official PDF for versions with inactive/retired rows; publish only if owner explicitly approves the rendering/exclusion policy |
 | P-20 unresolved | Continue non-hash-changing reliability work, but do not accept WP-8 clean-reset hash evidence, freeze the migration fingerprint, or request P-15 |
-| Any Audit #29 C-01 through C-13 gap unresolved | Do not start WP-7 or claim full operator readiness. Implement WP-6.6 or remove the affected control from release visibility according to the audit |
+| Any Audit #29 C-01 through C-15 gap unresolved | Do not start WP-7 or claim full operator readiness. Implement WP-6.6 or remove the affected control from release visibility according to the audit |
 | Reusable path still hardcodes `2568.1.0` | Treat as implementation nonconformance with ADR-003; fix and test another valid annual/revision/patch version before P-14 |
 | Advisor warning from pre-existing system | Add to advisor baseline with owner/remediation metadata |
 | New advisor warning from Phase 4 | Stop and fix or get explicit accepted-risk signoff |

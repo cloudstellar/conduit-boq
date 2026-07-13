@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { ArrowLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { MasterCatalogHeaderUtilities } from './MasterCatalogHeaderUtilities';
 
 export function MasterCatalogRouteStateShell({
   children,
@@ -11,20 +12,23 @@ export function MasterCatalogRouteStateShell({
     <div className="min-h-dvh overflow-x-hidden bg-muted/30">
       <header className="border-b bg-background">
         <div className="mx-auto flex max-w-7xl flex-col gap-4 px-4 py-4 sm:px-6 lg:px-8">
-          <div className="flex items-center gap-3">
-            <Button variant="ghost" size="sm" asChild>
-              <Link href="/admin">
-                <ArrowLeft data-icon="inline-start" />
-                ผู้ดูแลระบบ
-              </Link>
-            </Button>
-            <div className="h-8 border-l border-border" />
-            <div>
-              <h1 className="text-lg font-semibold leading-tight text-foreground sm:text-xl">
-                Master Catalog
-              </h1>
-              <p className="text-xs text-muted-foreground">ระบบบริหารบัญชีราคามาตรฐานของ NT</p>
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+            <div className="flex items-center gap-3">
+              <Button variant="ghost" size="sm" asChild>
+                <Link href="/admin">
+                  <ArrowLeft data-icon="inline-start" />
+                  ผู้ดูแลระบบ
+                </Link>
+              </Button>
+              <div className="h-8 border-l border-border" />
+              <div>
+                <h1 className="text-lg font-semibold leading-tight text-foreground sm:text-xl">
+                  บัญชีราคามาตรฐาน
+                </h1>
+                <p className="text-xs text-muted-foreground">ระบบบริหารรายการ หน่วย และราคากลาง</p>
+              </div>
             </div>
+            <MasterCatalogHeaderUtilities />
           </div>
           <div className="h-1 rounded-full bg-nt-yellow" />
         </div>

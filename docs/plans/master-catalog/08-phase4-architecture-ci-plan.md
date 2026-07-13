@@ -40,10 +40,31 @@ the existing one-publisher model, not a multi-stage approval engine. Candidate
 `020` is amended before freeze; its old `3bfc74e` evidence is historical and
 superseded for revised closeout. Source/static implementation passed on
 `ac31feb`; G1 Local DB/concurrency/P-20 input then passed on final checkpoint
-`e463270`; pre-G2 operator/browser preflight passed on UI/source checkpoint
-`c8f6dca` without changing migration `020`. G2 must independently clean-rebuild
-exact `c8f6dca` for the P-20 comparison; G3 owner closeout remains. No
-Production action is authorized by this checkpoint.
+`e463270`; the pre-amendment operator/browser preflight passed on UI/source
+checkpoint `c8f6dca` without changing migration `020`.
+
+**P-23 operator-context amendment:** 2026-07-13 — keep global signed-in admin
+identity/session context, use information-only Master Catalog navigation, bind
+import to `/versions/{versionId}/import`, distinguish approved workbook input
+from review-only exports, and keep the overall workspace iterative. This is a
+route/presentation composition over existing Server Components, Server
+Actions, read models, and RPC invariants. It does not add a client REST layer,
+database migration, round-trip spreadsheet editor, or approval engine. G2 must
+independently clean-rebuild the exact post-P-23 candidate after the passed
+working-tree static/browser checkpoint is owner-reviewed, committed, and named;
+G3 owner closeout remains. No Production action is authorized by this
+checkpoint.
+
+**P-23.1 version-intent/item-first amendment:** 2026-07-13 — draft creation
+requires explicit annual/revision/patch business intent, an owner-designated
+annual year, complete all-status registry planning, permanent number
+reservation, and a guarded next-sequence check. A lower abandoned annual number
+does not block the truthful year: the next patch-0 revision remains an annual
+transition relative to the older-year base. Successful create opens the exact
+workspace; items precede detailed document metadata; restore shows a
+current-to-target confirmation. Candidate `020` changes, so earlier G1 evidence
+is historical and separately approved G1R/G2 clean rebuilds are required before
+G3. No reset or Production action is authorized here.
 
 **Owner decision recorded:** 2026-07-04 — approved according to the
 recommendation for Phase 4 Core/local implementation. This approval does not
@@ -850,7 +871,8 @@ Add `CHECK (unit_cost = material_cost + labor_cost) NOT VALID`, then run
 
 The first rollout does not import workbook prices:
 
-1. Create candidate version `2568.1.0` from current default `2568.0.0`.
+1. Choose **ปรับปรุง/เพิ่มเติม** from current default `2568.0.0`; the expected
+   candidate is `2568.1.0` only when that number remains unreserved.
 2. Clone all 710 Production rows and assign stable identities.
 3. Verify names, units, material costs, labor costs, and unit costs are byte-for-
    byte/numerically equal to the Production baseline.
@@ -1439,6 +1461,19 @@ Proposed after P-18 acceptance:
 - Add server pagination only when a measured version exceeds 2,000 rows or a
   read payload exceeds 1 MB.
 
+### Draft planning and workspace UX
+
+- Require one business intent: annual, revision, or patch. Annual additionally
+  requires the owner-designated effective BE year.
+- Load the complete all-status registry or fail closed; show the planned number
+  and any lower reserved identifiers before creation.
+- Do not expose raw major/minor/patch segments as the primary operator control.
+- The guarded DB path owns current-base, next-sequence, concurrency, and replay
+  checks; a stale proposal returns `VERSION_SEQUENCE_STALE` and creates nothing.
+- Open the exact new draft after success. Keep compact version/actions/counts
+  first, then the full item workspace, followed by document metadata, recovery,
+  history, and abandon.
+
 ### Import UX
 
 - Four explicit steps matching the workflow in Section 5.
@@ -1512,7 +1547,8 @@ Proposed after P-18 acceptance:
 
 - Distinguish Draft, Published, Current Default, Archived, and Stale Draft.
 - Draft screens and exports show “DRAFT – ห้ามใช้อ้างอิง”.
-- Publish and pointer restore require typed version confirmation.
+- Publish requires the exact reviewed lock and final snapshot. Pointer restore
+  requires a current-to-target summary, reason, and explicit confirmation.
 - Retire and recode require an explicit confirmation dialog; ordinary field
   edits do not use disruptive confirmation dialogs.
 
@@ -1592,9 +1628,10 @@ reviewed fix-forward, not an assumed destructive reverse operation.
   evidence-gated publish.
 - Implement clone-from-current, manual add/edit/retire/recode, stale-draft
   protection, and item history timeline.
-- Implement reusable ADR-003 annual/revision/patch version creation; reserve
-  `2568.1.0` for the exact first-candidate rehearsal rather than hardcoding it
-  in reusable paths.
+- Implement reusable ADR-003 annual/revision/patch version creation with
+  explicit business intent, a complete all-status reserved-number registry, and
+  DB-enforced next-sequence validation. Keep `2568.1.0` only as the exact first
+  candidate when unreserved rather than hardcoding it in reusable paths.
 - Implement official Excel and PDF exports.
 - Complete WP-6.5 end-to-end request-id, publish-guard/early-warning,
   P-20 portability, DB integration/concurrency, route failure-state,
@@ -1697,7 +1734,7 @@ Do not advance when any gate fails:
   and related owner decisions are complete for the exact candidate scope.
 - **Phase 4A → 4B:** Local schema reset/migration succeeds; backfill counts,
   constraints, RLS/grants, and advisors pass.
-- **WP-6.6 → WP-7:** Every C-01 through C-13 finding in Audit #29 has an
+- **WP-6.6 → WP-7:** Every C-01 through C-15 finding in Audit #29 has an
   implemented authoritative control and evidence, or the affected capability is
   explicitly removed from release visibility. WP-6.5 reliability evidence
   remains valid but does not replace this gate.
@@ -1836,6 +1873,9 @@ Do not advance when any gate fails:
 - Reusable version create/publish accepts another ADR-003-valid
   annual/revision/patch version and rejects duplicates/invalid ordering without
   a hardcoded `2568.1.0` path
+- Reserved-number fixtures cover abandoned revision/patch candidates, a void
+  `{year}.0.0` followed by the next same-year annual revision, stale UI plans,
+  out-of-sequence requests, create races, and same-request replay
 - Tracked semantic verifier remains correct when title rows move and fails
   closed on missing/renamed headers, wrong counts/types/hash, formulas, or links
 - A new-identity draft rejects before P-18 placement; after accepted placement,

@@ -145,6 +145,16 @@ an admin may explicitly abandon a never-published draft through an audited
 function before creating a replacement from the same base. Draft rows and
 history are never deleted to make room for another attempt.
 
+Draft creation begins with explicit ADR-003 business intent (`annual`,
+`revision`, or `patch`), not editable raw version segments or an assumed
+revision. The UI plans from the complete version registry across every status;
+all issued draft numbers remain permanently reserved. The guarded database path
+rechecks that the candidate is the next number in the selected transition lane
+and rejects a stale sequence. If an annual `{year}.0.0` attempt was abandoned,
+the next annual attempt for that same owner-designated year uses the next
+revision with patch `0`; the cancelled number is not reused and the effective
+year is not falsified.
+
 ### 6. Import trust boundary
 
 The browser reads and normalizes the approved workbook profile locally. Raw
@@ -183,6 +193,12 @@ counts, and readiness/governance warnings. This final comparison is not derived
 only from audit events because an item may have been changed repeatedly or
 returned to its original value. Any mutation after review increments the draft
 lock and requires review again before publish.
+
+Pointer restore remains a separate recovery operation. Before submit, the UI
+shows the current and target versions, the recorded reason, and the fact that
+existing BOQs retain their saved catalog version while new BOQs use the restored
+pointer. The database remains authoritative and auditable after that human
+confirmation.
 
 External calls, workbook parsing, PDF generation, and Excel generation do not
 run inside this transaction.

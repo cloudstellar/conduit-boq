@@ -1,0 +1,56 @@
+import { notFound, redirect } from 'next/navigation';
+import { createClient } from '@/lib/supabase/server';
+import {
+  loadCatalogAdminGate,
+  loadCatalogVersionImportHistory,
+} from '@/lib/master-catalog/admin/readModel';
+import { loadCatalogImportContext } from '@/lib/master-catalog/admin/importContext';
+import {
+  MasterCatalogGateView,
+  MasterCatalogImportView,
+} from '../../../_components/MasterCatalogAdminViews';
+
+export const dynamic = 'force-dynamic';
+
+const UUID_PATTERN =
+  /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+
+export default async function MasterCatalogDraftImportPage({
+  params,
+}: {
+  params: Promise<{ versionId: string }>;
+}) {
+  const { versionId } = await params;
+  if (!UUID_PATTERN.test(versionId)) notFound();
+
+  const supabase = await createClient();
+  const gate = await loadCatalogAdminGate(supabase);
+
+  if (gate.state === 'unauthenticated') {
+    redirect(`/login?redirectTo=/admin/master-catalog/versions/${versionId}/import`);
+  }
+
+  if (gate.state !== 'enabled') {
+    return <MasterCatalogGateView gate={gate} activeSection="versions" />;
+  }
+
+  const [history, importContext] = await Promise.all([
+    loadCatalogVersionImportHistory(supabase, versionId),
+    loadCatalogImportContext(supabase, versionId),
+  ]);
+
+  if (!importContext.draft) {
+    notFound();
+  }
+
+  return (
+    <MasterCatalogImportView
+      gate={gate}
+      history={{
+        imports: history.imports,
+        warnings: [...history.warnings, ...importContext.warnings],
+      }}
+      importContext={importContext}
+    />
+  );
+}

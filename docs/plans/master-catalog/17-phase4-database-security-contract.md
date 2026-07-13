@@ -6,18 +6,19 @@ migration approval remain separate gates
 
 **Prepared:** 2026-06-22
 
-**Last updated:** 2026-07-12 to record the WP-6.6 capability/authority hardening
+**Last updated:** 2026-07-13 to record the WP-6.6 capability/authority hardening
 from [Audit #29](./29-phase4-owner-dev-completeness-audit.md), the P-22
 [Operator Workflow Correction](./31-phase4-wp66-operator-workflow-correction-plan.md),
 and the proposed P-18/WP-7.5 placement extension. Existing `017`-`019` remain
 the reviewed Local/bootstrap contract. Candidate `020` was amended under P-22
-on source commit `ac31feb` and passed repository/static verification; its
-`3bfc74e` evidence remains historical but is superseded for revised closeout.
-Owner-approved G1 applied the candidate separately on Local and passed final
-DB/concurrency/lint/security evidence on `e463270`. The later pre-G2 UI/source
-checkpoint `c8f6dca` did not change migration `020`. G2 must independently clean
-rebuild/compare exact executable candidate `c8f6dca`; `020` remains outside
-bootstrap and has not been applied to Production.
+and passed historical G1 DB/concurrency/lint/security evidence on `e463270`.
+P-23 first changed operator context/navigation only. Owner-approved P-23.1 then
+amended candidate `020` to enforce explicit ADR-003 intent-compatible next-number
+planning, including reserved annual identifiers. That content change makes all
+prior `020` fingerprints and live DB evidence historical. Repository/static
+verification passed on the 2026-07-13 working-tree candidate; separately
+approved G1R and G2 clean rebuilds remain required for executable evidence.
+`020` remains outside bootstrap and has not been applied to Production.
 P-18 rules and placement migration `021` remain pending owner/data-custodian
 approval.
 
@@ -213,6 +214,16 @@ Rules:
 - Reusable draft/publish functions accept and validate ADR-003 CalVer-first
   annual/revision/patch versions. `2568.1.0` is an exact rehearsal candidate,
   not a hardcoded function constraint.
+- The create UI records explicit annual/revision/patch business intent and the
+  annual owner-designated effective year. It plans from a complete all-status
+  registry; raw version segments are not the primary operator input.
+- Every created tuple remains reserved under the existing
+  `UNIQUE (major, minor, patch)` constraint. The guarded create path requires the
+  next tuple in the selected transition lane and returns
+  `VERSION_SEQUENCE_STALE` when another operation reserved the reviewed number.
+- A year-changing annual candidate has patch `0`. Its revision is normally `0`
+  but may be the next higher revision when lower identifiers for that target
+  year are already reserved; a year-changing nonzero patch is invalid.
 - Status is `draft`, `active`, `archived`, or `abandoned` in Phase 4 Core.
 - Phase 4 Core publishes to `active` and does not expose a new archive
   transition. Former current versions remain active/published; the singleton
@@ -647,10 +658,13 @@ secret values, raw workbook cells, or internal policy details.
    draft for that base with stable code `DRAFT_ALREADY_EXISTS`. The partial
    unique index is the final concurrent backstop; rejection creates no partial
    clone or audit rows.
-5. Insert draft/versioned categories/groups/items in deterministic order.
-6. Insert one clone change set; do not insert unchanged rows as artificial
+5. Derive the transition from base/candidate, require the candidate to be the
+   next all-status reserved number in that lane, and reject a stale sequence
+   before cloning. Same-request replay is resolved before this check.
+6. Insert draft/versioned categories/groups/items in deterministic order.
+7. Insert one clone change set; do not insert unchanged rows as artificial
    `add` change items.
-7. Commit; no file parsing or external call occurs inside the transaction.
+8. Commit; no file parsing or external call occurs inside the transaction.
 
 ### Draft abandon
 
@@ -804,9 +818,9 @@ migration `020_master_catalog_phase4_admin_workflow_hardening.sql`. It owns the
 WP-6.6 authority/readiness/correction/constraint changes, the replacement draft
 create implementation, the partial unique index, and the audited abandon path;
 it must not rewrite `017`-`019`, hotfix `016`, BOQ behavior, or Factor F state.
-Its prior `3bfc74e` Local evidence is historical and superseded for revised
-closeout. Keep `020` outside `scripts/bootstrap-local-db.sh` until replacement
-G2 evidence and G3/G4 owner closeout are recorded; G1 passed on `e463270`.
+Its prior `3bfc74e` and `e463270` Local evidence is historical and superseded for
+the P-23.1 candidate. Keep `020` outside `scripts/bootstrap-local-db.sh` until
+separately approved G1R and G2 evidence plus G3/G4 owner closeout are recorded.
 
 If P-18 is accepted, implement the placement extension only in append-only
 migration `021_master_catalog_phase4_placement_governance.sql`. Do not edit or
@@ -854,6 +868,9 @@ migration.
 - current app flows remain unchanged while feature flag is disabled;
 - clean-reset identity/hash output matches the P-20 approved portability model;
 - reusable version functions pass ADR-003 fixtures beyond `2568.1.0`;
+- annual/revision/patch planning uses the complete all-status registry, never
+  reuses abandoned identifiers, rejects an out-of-sequence create, and permits
+  the next patch-0 annual revision for a target year with a void lower number;
 - same-ID timeout/retry and two-session publish/restore behavior pass live Local
   DB tests;
 - duplicate/current-base creation, two-session creation, abandon replay/race,

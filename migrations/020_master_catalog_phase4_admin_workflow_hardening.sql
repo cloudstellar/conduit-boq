@@ -8011,6 +8011,107 @@ BEGIN;
     ), false);
   $function$;
 
+  CREATE OR REPLACE FUNCTION private.catalog_version_transition_valid(
+    p_base_major integer,
+    p_base_minor integer,
+    p_base_patch integer,
+    p_candidate_major integer,
+    p_candidate_minor integer,
+    p_candidate_patch integer
+  )
+  RETURNS boolean
+  LANGUAGE sql
+  IMMUTABLE
+  SECURITY DEFINER
+  SET search_path = ''
+  AS $function$
+    SELECT COALESCE(
+      p_candidate_major > 0
+      AND p_candidate_minor >= 0
+      AND p_candidate_patch >= 0
+      AND (
+        (
+          p_candidate_major > p_base_major
+          AND p_candidate_patch = 0
+        )
+        OR
+        (
+          p_candidate_major = p_base_major
+          AND p_candidate_minor > p_base_minor
+          AND p_candidate_patch = 0
+        )
+        OR
+        (
+          p_candidate_major = p_base_major
+          AND p_candidate_minor = p_base_minor
+          AND p_candidate_patch > p_base_patch
+        )
+      ),
+      false
+    );
+  $function$;
+
+  CREATE OR REPLACE FUNCTION private.catalog_version_candidate_is_next(
+    p_base_major integer,
+    p_base_minor integer,
+    p_base_patch integer,
+    p_candidate_major integer,
+    p_candidate_minor integer,
+    p_candidate_patch integer
+  )
+  RETURNS boolean
+  LANGUAGE sql
+  STABLE
+  SECURITY DEFINER
+  SET search_path = ''
+  AS $function$
+    SELECT COALESCE(
+      private.catalog_version_transition_valid(
+        p_base_major,
+        p_base_minor,
+        p_base_patch,
+        p_candidate_major,
+        p_candidate_minor,
+        p_candidate_patch
+      )
+      AND (
+        (
+          p_candidate_major > p_base_major
+          AND p_candidate_patch = 0
+          AND p_candidate_minor = (
+            SELECT COALESCE(MAX(version.minor), -1) + 1
+            FROM public.price_list_versions version
+            WHERE version.major = p_candidate_major
+          )
+        )
+        OR
+        (
+          p_candidate_major = p_base_major
+          AND p_candidate_minor > p_base_minor
+          AND p_candidate_patch = 0
+          AND p_candidate_minor = (
+            SELECT GREATEST(p_base_minor, COALESCE(MAX(version.minor), -1)) + 1
+            FROM public.price_list_versions version
+            WHERE version.major = p_base_major
+          )
+        )
+        OR
+        (
+          p_candidate_major = p_base_major
+          AND p_candidate_minor = p_base_minor
+          AND p_candidate_patch > p_base_patch
+          AND p_candidate_patch = (
+            SELECT GREATEST(p_base_patch, COALESCE(MAX(version.patch), -1)) + 1
+            FROM public.price_list_versions version
+            WHERE version.major = p_base_major
+              AND version.minor = p_base_minor
+          )
+        )
+      ),
+      false
+    );
+  $function$;
+
   CREATE OR REPLACE FUNCTION private.create_catalog_draft_guarded_impl(
     p_base_version_id uuid,
     p_version_major integer,
@@ -8029,9 +8130,68 @@ BEGIN;
   AS $function$
   DECLARE
     v_constraint_name text;
+    v_base public.price_list_versions%ROWTYPE;
+    v_result jsonb;
   BEGIN
+    IF EXISTS (
+      SELECT 1
+      FROM private.catalog_admin_context()
+      WHERE actor_id IS NOT NULL
+    )
+       AND private.catalog_admin_enabled()
+       AND NOT EXISTS (
+         SELECT 1
+         FROM public.catalog_change_sets
+         WHERE request_id = p_request_id
+       )
+       AND NOT EXISTS (
+         SELECT 1
+         FROM public.catalog_imports
+         WHERE request_id = p_request_id
+       ) THEN
+      SELECT base.*
+      INTO v_base
+      FROM public.price_list_versions base
+      JOIN public.price_list_default_version pointer
+        ON pointer.id = true
+       AND pointer.version_id = base.id
+      WHERE base.id = p_base_version_id
+        AND base.status = 'active';
+
+      IF FOUND
+         AND NOT EXISTS (
+           SELECT 1
+           FROM public.price_list_versions
+           WHERE based_on_version_id = p_base_version_id
+             AND status = 'draft'
+         )
+         AND private.catalog_version_transition_valid(
+           v_base.major,
+           v_base.minor,
+           v_base.patch,
+           p_version_major,
+           p_version_minor,
+           p_version_patch
+         )
+         AND NOT private.catalog_version_candidate_is_next(
+           v_base.major,
+           v_base.minor,
+           v_base.patch,
+           p_version_major,
+           p_version_minor,
+           p_version_patch
+         ) THEN
+        RETURN private.catalog_action_error(
+          p_request_id,
+          'VERSION_SEQUENCE_STALE',
+          'Catalog version is no longer the next reserved number for the selected ADR-003 transition',
+          false
+        );
+      END IF;
+    END IF;
+
     BEGIN
-      RETURN private.create_catalog_draft_impl(
+      v_result := private.create_catalog_draft_impl(
         p_base_version_id,
         p_version_major,
         p_version_minor,
@@ -8040,6 +8200,24 @@ BEGIN;
         p_reason,
         p_request_id
       );
+
+      IF v_result ->> 'ok' = 'false'
+         AND v_result #>> '{error,code}' = 'VALIDATION_FAILED'
+         AND EXISTS (
+           SELECT 1
+           FROM public.price_list_versions
+           WHERE based_on_version_id = p_base_version_id
+             AND status = 'draft'
+         ) THEN
+        RETURN private.catalog_action_error(
+          p_request_id,
+          'DRAFT_ALREADY_EXISTS',
+          'A mutable draft already exists for this base catalog version',
+          false
+        );
+      END IF;
+
+      RETURN v_result;
     EXCEPTION
       WHEN unique_violation THEN
         GET STACKED DIAGNOSTICS v_constraint_name = CONSTRAINT_NAME;
@@ -8049,6 +8227,29 @@ BEGIN;
             p_request_id,
             'DRAFT_ALREADY_EXISTS',
             'A mutable draft already exists for this base catalog version',
+            false
+          );
+        END IF;
+
+        IF v_constraint_name = 'uq_major_minor_patch' THEN
+          IF EXISTS (
+            SELECT 1
+            FROM public.price_list_versions
+            WHERE based_on_version_id = p_base_version_id
+              AND status = 'draft'
+          ) THEN
+            RETURN private.catalog_action_error(
+              p_request_id,
+              'DRAFT_ALREADY_EXISTS',
+              'A mutable draft already exists for this base catalog version',
+              false
+            );
+          END IF;
+
+          RETURN private.catalog_action_error(
+            p_request_id,
+            'VERSION_SEQUENCE_STALE',
+            'Catalog version was reserved by another operation; reload the version plan',
             false
           );
         END IF;
@@ -10709,6 +10910,12 @@ BEGIN;
     FROM PUBLIC, anon, authenticated;
   REVOKE EXECUTE ON FUNCTION private.catalog_capability_enabled(text)
     FROM PUBLIC, anon, authenticated;
+  REVOKE EXECUTE ON FUNCTION private.catalog_version_transition_valid(
+    integer, integer, integer, integer, integer, integer
+  ) FROM PUBLIC, anon, authenticated;
+  REVOKE EXECUTE ON FUNCTION private.catalog_version_candidate_is_next(
+    integer, integer, integer, integer, integer, integer
+  ) FROM PUBLIC, anon, authenticated;
   REVOKE EXECUTE ON FUNCTION private.catalog_publish_readiness(uuid)
     FROM PUBLIC, anon, authenticated;
   REVOKE EXECUTE ON FUNCTION private.prevent_published_catalog_row_mutation()
@@ -10870,6 +11077,19 @@ BEGIN;
       'EXECUTE'
     ) THEN
       RAISE EXCEPTION 'WP-6.6 P-22 postcondition failed: guarded draft creation can be bypassed';
+    END IF;
+
+    IF to_regprocedure(
+      'private.catalog_version_candidate_is_next(integer,integer,integer,integer,integer,integer)'
+    ) IS NULL
+       OR has_function_privilege(
+         'authenticated',
+         'private.catalog_version_candidate_is_next(integer,integer,integer,integer,integer,integer)',
+         'EXECUTE'
+       )
+       OR NOT private.catalog_version_transition_valid(2568, 0, 0, 2569, 1, 0)
+       OR private.catalog_version_transition_valid(2568, 0, 0, 2569, 0, 1) THEN
+      RAISE EXCEPTION 'WP-6.6 P-23.1 postcondition failed: version planning guard is invalid or exposed';
     END IF;
 
     IF EXISTS (

@@ -30,9 +30,25 @@ one-current-base-working-draft and final snapshot-review threats from
 [Correction Plan #31](./31-phase4-wp66-operator-workflow-correction-plan.md).
 P-22 source controls/static tests were implemented on `ac31feb`; G1 Local
 DB/concurrency/security evidence passed on `e463270`; pre-G2 operator/browser
-preflight passed on `c8f6dca`. Residual risk remains Medium until the separately
-approved exact-`c8f6dca` G2 clean rebuild/P-20 comparison and G3 owner review
+preflight passed on `c8f6dca`. P-23.1 later amended candidate `020`, so those
+live results remain historical. Residual risk remains Medium until separately
+approved G1R and independent G2 clean rebuild/P-20 evidence plus G3 owner review
 pass. No Production action is authorized.
+
+**P-23 operator-context amendment:** 2026-07-13 — T-45 adds the remaining
+wrong-context and document-contract comprehension threat. The owner approved
+docs and Local-only UI/static/browser implementation. Migration `020`, G1 DB
+evidence, bootstrap, Factor F, hotfix `016`, P-18/P-19, and Production scope are
+unchanged. Working-tree static/browser proof passed on 2026-07-13; exact
+commit/owner acceptance and WP-8 independent UAT remain. `c8f6dca` remains
+pre-amendment evidence only.
+
+**P-23.1 version-planning amendment:** 2026-07-13 — T-46 covers guessed business
+intent, incomplete/stale version registries, out-of-sequence creation, and an
+abandoned annual identifier blocking the truthful effective year. The owner
+approved the bounded ADR/UI/candidate-`020`/test/document correction. Because
+`020` changed, earlier G1 evidence is historical and no Local reset, bootstrap,
+or Production action is authorized until the new gated sequence is approved.
 
 **Applies to:** Master Catalog administration, local Excel parsing, draft
 changes, publication, history, and official Excel/PDF exports
@@ -174,7 +190,7 @@ Risk is the residual risk after the listed controls are implemented and tested.
 | T-19 | Dependency or parser behavior changes and silently normalizes differently | Pin dependencies; fixed parser profile ID/version; golden workbook fixtures; normalized payload hash; review dependency upgrades separately | Lockfile diff review and parser/hash golden tests | Low |
 | T-20 | Deleting a user makes official history unreadable | Prefer account deactivation; actor FK deletion rules; immutable actor display-name snapshot in publication/change set | User deactivation/deletion rehearsal on copied Local data | Low |
 | T-21 | Feature flag is mistaken for authorization | Server and DB authorize every operation even when flag is enabled; seed boolean `false`; staff cannot invoke hidden functions directly | Direct RPC tests with flag both states and each role | Low |
-| T-22 | Pointer restore rewrites published data or historical BOQs | Restore moves only singleton pointer and legacy mirror, requires active admin/reason/request ID, and appends audit; no price-row mutation | Restore rehearsal and before/after BOQ version checks | Low |
+| T-22 | Pointer restore rewrites published data or historical BOQs, or an admin selects the wrong target | Restore moves only singleton pointer and legacy mirror, requires active admin/reason/request ID, appends audit, and shows current-to-target confirmation explaining that historical BOQs remain bound while new BOQs follow the pointer; no price-row mutation | Restore confirmation browser check plus rehearsal and before/after BOQ version checks | Low after G1R/G2 |
 | T-23 | Master Catalog migration accidentally changes the completed Factor F baseline | Phase 4 SQL does not write Factor F tables, default pointer, grants, RLS, or BOQ factor bindings; run before/after assertions for Factor F pointer, active versions, row counts, dataset hashes, and immutability triggers | Migration contract test plus pre/post Factor F checksum and grant/policy snapshot | Low |
 | T-24 | Catalog export/hash includes Factor F data because catalog and Factor F versions look similar | Treat catalog and Factor F as independent namespaces; official export route builds the dataset only from selected catalog rows; stamp says Catalog version and never substitutes Factor F version | Golden export/hash test confirms Factor F rows/metadata and BOQ snapshots are excluded | Low |
 | T-25 | Legacy BOQs are silently bound to the current Factor F version or existing BOQ factor bindings mutate | Do not backfill old BOQs without exact evidence; preserve `boq.factor_reference_version_id`; use the explicit copy-to-selected-Factor-F path when a user chooses a new BOQ | Regression tests for legacy snapshot-only, version-bound, missing-snapshot fail-closed, duplicate, and selected-Factor-F copy states | Low |
@@ -197,6 +213,8 @@ Risk is the residual risk after the listed controls are implemented and tested.
 | T-42 | Nullable required price/order fields or duplicate/gapped order survive ordinary writes and fail only at publication | Post-preflight fix-forward nullability/order constraints plus shared quality checks; P-18 adds deferrable unique/contiguous placement order when accepted | Zero-null preflight, constraint violation, compatibility, clone, import, publication, and placement tests | Medium until WP-6.6/P-18 |
 | T-43 | Two current-base drafts race or an admin deletes/repurposes a draft to start over, splitting intent and losing trustworthy lineage | Partial unique draft-per-base index; pointer/base locks; stable `DRAFT_ALREADY_EXISTS`; audited idempotent `draft -> abandoned`; no row/audit deletion; abandoned rows immutable and nonpublishable | Same-request replay, different-request duplicate, two-session create, valid/invalid/replayed/concurrent abandon, role denial, rollback, and zero-partial-effect tests | Medium until P-22 closes |
 | T-44 | Import and manual changes combine into a final state the admin never sees, or a draft changes after review but before publish | Complete database snapshot diff by stable identity; compound/reverted/incomplete-read fixtures; readiness and governance warnings on review; reviewed `lock_version` passed to publish; mutation increments lock and forces fresh review | Browser/UAT verifies counts and old/new values, modifies after review, observes `DRAFT_LOCK_CONFLICT`, reviews again, and publishes only the exact reviewed state | Medium until P-22/WP-8 UAT close |
+| T-45 | The admin loses signed-in identity/environment context, treats a draft action as global navigation, targets the wrong draft twice, or mistakes a review export for an editable import template | Persistent operator/account context; explicit Local marker from configuration; information-only global navigation; exact draft-bound import route with no second selector; distinct approved-input versus review-export labels; server still verifies version/base/lock/profile | Source tests assert route/navigation/account contracts; P-23 browser proof entered import only from one draft, identified operator/environment, explained export versus import, and returned to the same draft. Binary preview/apply remains covered by prior evidence and must be repeated in WP-8 independent UAT. | Medium until exact-commit owner acceptance and WP-8 independent UAT close |
+| T-46 | The UI assumes revision, an admin guesses raw segments, a truncated/stale registry proposes a reused or skipped number, or abandoning `{year}.0.0` prevents a truthful annual replacement | Required annual/revision/patch business intent; owner-designated annual year; complete all-status registry or fail closed; permanent number reservation; DB-enforced next lane sequence; annual patch `0` with next revision when lower target-year identifiers are reserved; same-request replay precedes sequence rejection | Unit fixtures for all lanes/reserved annual numbers; incomplete-registry UI denial; static migration/grant checks; live out-of-sequence/race/replay/abandon/replacement cases in G1R/G2 | Medium until amended `020` passes G1R/G2 and owner UAT |
 
 ## 6. Validation boundaries and safe limits
 

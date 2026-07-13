@@ -1,7 +1,7 @@
 # Migrations
 ## Conduit BOQ System
 
-**Last Updated:** 2026-07-12
+**Last Updated:** 2026-07-13
 **Status:** Canonical
 
 ---
@@ -36,7 +36,7 @@
 | `017_master_catalog_phase4_foundation.sql` | Master Catalog Phase 4 additive governance foundation, including P-20 deterministic baseline identity from Production-derived `price_list.id`, request fingerprints, RLS/grants, and disabled feature flag | **Draft — Local only, not applied to Production** |
 | `018_master_catalog_phase4_draft_mutation.sql` | Draft create/manual/import RPCs with actor+payload request fingerprints, per-request/per-code locks, bounded runtime timeouts, full-payload preflight, audited mutation subtransaction rollback, and reusable ADR-003 transitions | **Draft — Local only, not applied to Production** |
 | `019_master_catalog_phase4_publish_pointer.sql` | Publish/restore, shared admin publish-readiness RPC, P-18 and structured-rollout boundary guards, P-19 inactive-row filing warning, catalog-only DB count/hash, runtime timeouts, and published immutability | **Draft — Local only, not applied to Production** |
-| `020_master_catalog_phase4_admin_workflow_hardening.sql` | WP-6.6 frozen first-rollout authority, resolve-only dictionaries/server allocator, exact read registers, readiness/provenance parity, correction path, schema hardening, and P-22 working-draft lifecycle | **P-22 executable candidate at `c8f6dca`; G1 Local DB/concurrency/P-20 input remains evidenced at `e463270`, pre-G2 UI preflight passed, and G2 clean rebuild/comparison is pending; not in bootstrap or Production** |
+| `020_master_catalog_phase4_admin_workflow_hardening.sql` | WP-6.6 frozen first-rollout authority, resolve-only dictionaries/server allocator, exact read registers, readiness/provenance parity, correction path, schema hardening, P-22 working-draft lifecycle, and P-23.1 reserved version-sequence guard | **Amended Local-only candidate under P-23.1; repository/static verification passed 2026-07-13; prior `020` fingerprints/G1 evidence are historical; separately approved G1R and G2 clean rebuilds remain required; not in bootstrap or Production** |
 | `021_master_catalog_phase4_placement_governance.sql` | Reserved P-18/WP-7.5 new-identity placement revision/review and atomic order contract | **Proposed only — P-18 pending; file does not exist; not in bootstrap** |
 | `017+_master_catalog_phase4_*.sql` | Umbrella reference for the Local-only Phase 4 range; files currently exist as `017`-`020`, while bootstrap remains intentionally limited to reviewed `017`-`019` | **Local-only range — no Production approval** |
 
@@ -94,11 +94,16 @@ advisors passed on `e463270`. The `3bfc74e` results remain historical evidence
 for the old candidate. Pre-G2 operator/browser QA then passed on UI/source
 checkpoint `c8f6dca`; migration `020` did not change, both proof drafts were
 audited-abandoned, all three catalog flags were restored to `false`, and the
-Local pointer/invariants remained unchanged. Keep bootstrap at `017`-`019`;
-G2 must clean-rebuild exact executable candidate `c8f6dca` and complete the
-P-20 comparison after separate owner approval. Add `020` to bootstrap only
-after G3/G4 acceptance. After P-18
-acceptance, placement uses proposed `021`.
+Local pointer/invariants remained unchanged. P-23 then approved a bounded
+operator-context/navigation amendment without changing migration `020`.
+P-23.1 subsequently amended the candidate to require explicit business intent,
+the next all-status reserved version number, and a truthful same-year annual
+replacement after a lower identifier is abandoned. That content change makes
+`e463270`, `c8f6dca`, and the first P-23 working-tree checkpoint historical for
+the amended candidate. Repository/static verification passed 2026-07-13. Keep
+bootstrap at `017`-`019`; request G1R and later independent G2 separately before G3/G4.
+Add `020` to bootstrap only after G3/G4 acceptance. After P-18 acceptance,
+placement uses proposed `021`.
 Applied hotfix `016` must not be edited.
 This is not a new Production hotfix and must not be applied to Production
 without the normal Phase 4 P-12+ approvals.
