@@ -486,7 +486,7 @@ async function allocateRevisionVersions(base, count) {
   const maxMinor = Math.max(base.minor, ...(data ?? []).map((row) => Number(row.minor)))
   return Array.from({ length: count }, (_, index) => ({
     major: Number(base.major),
-    minor: maxMinor + 100 + index,
+    minor: maxMinor + 1 + index,
     patch: 0,
   }))
 }

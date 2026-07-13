@@ -128,6 +128,8 @@ describe('Master Catalog P-22 operator workflow', () => {
     const wp65Harness = source('scripts/smoke-master-catalog-wp65.mjs');
     expect(wp65Harness).toContain("target.rpc('abandon_catalog_draft'");
     expect(wp65Harness).toContain('abandonedFixtureDrafts === 3');
+    expect(wp65Harness).toContain('minor: maxMinor + 1 + index');
+    expect(wp65Harness).not.toContain('minor: maxMinor + 100 + index');
   });
 
   it('preserves list or review context when opening an exact item', () => {
