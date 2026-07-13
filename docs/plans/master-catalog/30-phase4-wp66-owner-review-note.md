@@ -10,7 +10,7 @@ closeout remain
 `e463270dfb9f23332559f31591cf338b8eeada3c`
 **Pre-P-23 operator/source checkpoint:**
 `c8f6dca282cd2729ac2b58e488b3ef516fb29713`
-**Current exact executable candidate:** Pending P-24 implementation commit; repository/static verification passed 2026-07-13
+**Current exact executable candidate:** `88d0711` (P-24 implementation; repository/static verification passed 2026-07-13)
 **Correction source checkpoint:**
 `ac31feb`
 **Historical implementation/evidence commit:**
@@ -165,8 +165,7 @@ BOQs/1,547 items, and Factor F `2569.0.0`/36 rows. Production touched: No.
 
 ## 5. Recommendation
 
-Keep WP-6.6 on Hold. Commit the repository/static-passed P-24 tracked diff
-before naming the executable candidate. Then request
+Keep WP-6.6 on Hold. Review exact candidate `88d0711`, then request
 G1R approval or decline for the first destructive clean Local rebuild/full
 DB-browser-P-20 rerun; request independent G2 only after G1R passes. Do not run a
 reset, add migration `020` to bootstrap, begin WP-7, or infer G3 acceptance until

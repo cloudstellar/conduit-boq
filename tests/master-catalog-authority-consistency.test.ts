@@ -131,7 +131,7 @@ describe('Master Catalog authority consistency', () => {
     ])
 
     expect(migrations).toContain(
-      '**Amended Local-only candidate under P-24; repository/static verification passed 2026-07-13; exact implementation commit pending; prior `020` fingerprints/G1 evidence are historical; separately approved G1R and G2 clean rebuilds remain required; not in bootstrap or Production**',
+      '**Amended Local-only candidate under P-24 on exact implementation commit `88d0711`; repository/static verification passed 2026-07-13; prior `020` fingerprints/G1 evidence are historical; separately approved G1R and G2 clean rebuilds remain required; not in bootstrap or Production**',
     )
     expect(migrations).toContain(
       '**Proposed only — P-18 pending; file does not exist; not in bootstrap**',
@@ -191,7 +191,7 @@ describe('Master Catalog authority consistency', () => {
       'P-24 pre-G1R hardening',
     )
     expect(decisions).toContain(
-      'Approved and repository/static-passed 2026-07-13; exact implementation commit pending; no reset approved',
+      'Approved and repository/static-passed on exact implementation commit `88d0711` on 2026-07-13; no reset approved; G1R remains separate',
     )
 
     const tracker = read(

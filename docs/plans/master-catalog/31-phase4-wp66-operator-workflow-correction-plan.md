@@ -8,8 +8,9 @@ working-tree UI/static/browser checkpoint passed the same day without a Local
 reset. P-23.1 then amended candidate `020` and the create/detail/restore flow;
 its first repository/static checks passed 2026-07-13. P-24 then approved the
 bounded annual-range/error-recovery/context hardening before G1R. Earlier
-evidence remains valid history but cannot close the amended candidate. The
-replacement commit remains unnamed; G1R, independent G2, browser owner review, G3 closeout, and G4
+evidence remains valid history but cannot close the amended candidate. Exact
+P-24 implementation commit `88d0711` is the current G1R candidate; G1R,
+independent G2, browser owner review, G3 closeout, and G4
 bootstrap/WP-7 sequencing remain pending
 
 **Production touched:** No
@@ -298,7 +299,7 @@ candidate `020` separately until the new owner closeout accepts it.
 | G1 | Owner explicitly approves first full Local reset after static implementation is ready — approved and completed 2026-07-12 |
 | G1U | P-23 operator-context/navigation amendment approved for docs and Local-only UI/static/browser work without a reset; incorporated into exact source commit `31fd689` with P-23.1. |
 | G1V | Passed on exact commit `31fd689` on 2026-07-13: P-23.1 explicit version-intent/sequence and item-first correction was approved and its repository/static checks passed. It changes candidate `020`, so all prior `020` fingerprints and live DB evidence remain historical. |
-| G1W | P-24 pre-G1R hardening approved and repository/static-passed 2026-07-13; annual range, safe error, durable focus, contextual authority, and Factor F hierarchy exact implementation commit is required before G1R. No reset is approved. |
+| G1W | Passed on exact implementation commit `88d0711` on 2026-07-13: P-24 annual range, safe error, durable focus, contextual authority, and Factor F hierarchy repository/static gate. No reset is approved. |
 | G1R | Owner explicitly approves the first clean rebuild and full DB/concurrency/browser/P-20 rerun of the exact post-P-24 executable candidate. No approval has been given. |
 | G2 | Owner explicitly approves a second independent clean rebuild of the same accepted candidate and P-20 comparison after G1R passes. |
 | G3 | Owner completes intended-admin workflow review and accepts or holds the revised WP-6.6 closeout |
@@ -510,5 +511,5 @@ tests; focused P-24 contracts 5 files/45 tests; TypeScript; lint with 0 errors
 and 10 existing warnings; authority 710/65/17; smoke syntax; network-enabled
 production build; and `git diff --check`. Safe-state in-app browser QA passed
 desktop/mobile Local/account/disabled copy, no horizontal overflow, and zero
-console warnings/errors. Candidate `020` remained unapplied, Local DB was not
-reset or mutated, and the exact implementation commit still had to be named.
+console warnings/errors. Exact implementation commit `88d0711` names the
+candidate; `020` remained unapplied and Local DB was not reset or mutated.

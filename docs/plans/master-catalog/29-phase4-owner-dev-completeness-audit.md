@@ -8,8 +8,8 @@ pre-amendment operator/browser preflight passed on `c8f6dca`. P-23 approved the
 remaining operator identity/navigation/contextual-import/export-semantics
 amendment. Its first working-tree UI/static/browser checkpoint passed on
 2026-07-13. P-23.1 and P-24 then amended candidate `020` and the operator flow;
-P-24 repository/static verification passed, while the exact implementation
-commit, G1R, independent G2, and G3 owner closeout must
+P-24 repository/static verification passed on exact implementation commit
+`88d0711`, while G1R, independent G2, and G3 owner closeout must
 precede WP-7.
 
 **Environment:** Source/document audit only. No Local database reset, Production
