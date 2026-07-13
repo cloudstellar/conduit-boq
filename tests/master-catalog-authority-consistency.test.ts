@@ -156,6 +156,7 @@ describe('Master Catalog authority consistency', () => {
       'scripts/smoke-master-catalog-wp66.mjs',
     ))).toBe(true)
     const wp66Smoke = read('scripts/smoke-master-catalog-wp66.mjs')
+    expect(wp66Smoke).toContain('schemaContract.authority_fk_indexes === 2')
     expect(wp66Smoke).toContain("'VERSION_SEQUENCE_STALE'")
     expect(wp66Smoke).toContain('sameCandidateRaceNormalized: true')
   })

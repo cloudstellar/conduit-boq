@@ -105,6 +105,11 @@ BEGIN;
     )
   );
 
+  CREATE INDEX IF NOT EXISTS idx_catalog_first_rollout_mappings_legacy_identity
+    ON public.catalog_first_rollout_mappings (legacy_item_code, identity_id);
+  CREATE INDEX IF NOT EXISTS idx_catalog_first_rollout_mappings_group
+    ON public.catalog_first_rollout_mappings (work_context_code, item_type_code);
+
   CREATE TABLE IF NOT EXISTS public.catalog_first_rollout_source_exclusions (
     source_item_code text PRIMARY KEY
       CHECK (source_item_code ~ '^[A-Z0-9]{3}-[A-Z0-9]{3}-[0-9]{3}$'),
@@ -11045,6 +11050,23 @@ BEGIN;
         AND index_definition.indpred IS NOT NULL
     ) THEN
       RAISE EXCEPTION 'WP-6.6 P-22 postcondition failed: one-draft-per-base index is missing';
+    END IF;
+
+    IF (
+      SELECT count(*)
+      FROM pg_class index_relation
+      JOIN pg_namespace index_namespace
+        ON index_namespace.oid = index_relation.relnamespace
+      JOIN pg_index index_definition
+        ON index_definition.indexrelid = index_relation.oid
+      WHERE index_namespace.nspname = 'public'
+        AND index_relation.relname IN (
+          'idx_catalog_first_rollout_mappings_legacy_identity',
+          'idx_catalog_first_rollout_mappings_group'
+        )
+        AND index_definition.indisvalid
+    ) <> 2 THEN
+      RAISE EXCEPTION 'WP-6.6 postcondition failed: frozen authority foreign-key indexes are missing';
     END IF;
 
     IF NOT EXISTS (

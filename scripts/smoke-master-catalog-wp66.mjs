@@ -48,6 +48,7 @@ try {
   const schemaContract = readSchemaContract()
   assert(schemaContract.required_constraints === 5, 'Required WP-6.6 constraints are incomplete')
   assert(schemaContract.one_draft_index === true, 'One-draft-per-base index is missing')
+  assert(schemaContract.authority_fk_indexes === 2, 'Frozen authority foreign-key indexes are missing')
   assert(schemaContract.nullable_required_columns === 0, 'Required price-list columns remain nullable')
   assert(schemaContract.authority_rls_tables === 3, 'Frozen authority RLS is incomplete')
   assert(schemaContract.authority_policies === 3, 'Frozen authority policies are incomplete')
@@ -1090,6 +1091,18 @@ function readSchemaContract() {
           AND index_definition.indisunique
           AND index_definition.indisvalid
           AND index_definition.indpred IS NOT NULL
+      ),
+      'authority_fk_indexes', (
+        SELECT count(*)
+        FROM pg_class index_relation
+        JOIN pg_namespace index_namespace ON index_namespace.oid = index_relation.relnamespace
+        JOIN pg_index index_definition ON index_definition.indexrelid = index_relation.oid
+        WHERE index_namespace.nspname = 'public'
+          AND index_relation.relname IN (
+            'idx_catalog_first_rollout_mappings_legacy_identity',
+            'idx_catalog_first_rollout_mappings_group'
+          )
+          AND index_definition.indisvalid
       ),
       'nullable_required_columns', (
         SELECT count(*) FROM information_schema.columns
