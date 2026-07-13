@@ -197,6 +197,10 @@ describe('Master Catalog P-22 operator workflow', () => {
     expect(combinedOperatorSource).not.toMatch(/P-18|P-19|Master Catalog RPC/);
     expect(errorAlert).toContain('aria-live="assertive"');
     expect(errorAlert).toContain('focusRef.current?.focus()');
+    expect(errorAlert).toContain('}, [state]);');
+    expect(errorAlert).not.toContain(
+      '[state.code, state.message, state.requestId, state.status]',
+    );
     expect(errorAlert).toContain('ข้อมูลสำหรับติดตามปัญหา');
   });
 

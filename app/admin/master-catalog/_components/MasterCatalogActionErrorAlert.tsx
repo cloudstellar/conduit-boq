@@ -18,7 +18,8 @@ export function MasterCatalogActionErrorAlert({
     if (state.status === 'error') {
       focusRef.current?.focus();
     }
-  }, [state.code, state.message, state.requestId, state.status]);
+    // A retry can return the same fields; a new state object still marks a new outcome.
+  }, [state]);
 
   if (state.status !== 'error') return null;
 

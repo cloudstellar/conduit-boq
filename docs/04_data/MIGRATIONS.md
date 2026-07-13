@@ -36,7 +36,7 @@
 | `017_master_catalog_phase4_foundation.sql` | Master Catalog Phase 4 additive governance foundation, including P-20 deterministic baseline identity from Production-derived `price_list.id`, request fingerprints, RLS/grants, and disabled feature flag | **Draft — Local only, not applied to Production** |
 | `018_master_catalog_phase4_draft_mutation.sql` | Draft create/manual/import RPCs with actor+payload request fingerprints, per-request/per-code locks, bounded runtime timeouts, full-payload preflight, audited mutation subtransaction rollback, and reusable ADR-003 transitions | **Draft — Local only, not applied to Production** |
 | `019_master_catalog_phase4_publish_pointer.sql` | Publish/restore, shared admin publish-readiness RPC, P-18 and structured-rollout boundary guards, P-19 inactive-row filing warning, catalog-only DB count/hash, runtime timeouts, and published immutability | **Draft — Local only, not applied to Production** |
-| `020_master_catalog_phase4_admin_workflow_hardening.sql` | WP-6.6 frozen first-rollout authority, resolve-only dictionaries/server allocator, exact read registers, readiness/provenance parity, correction path, schema hardening, P-22 working-draft lifecycle, P-23.1 reserved version sequence, and P-24 annual-year range guard | **Amended Local-only candidate under P-24 on exact implementation commit `88d0711`; repository/static verification passed 2026-07-13; prior `020` fingerprints/G1 evidence are historical; separately approved G1R and G2 clean rebuilds remain required; not in bootstrap or Production** |
+| `020_master_catalog_phase4_admin_workflow_hardening.sql` | WP-6.6 frozen first-rollout authority, resolve-only dictionaries/server allocator, exact read registers, readiness/provenance parity, correction path, schema hardening, P-22 working-draft lifecycle, P-23.1 reserved version sequence, and P-24 annual-year range guard | **Amended Local-only DB candidate under P-24 on exact base implementation commit `88d0711`; SHA-256 `c8fa5e7191e17ebc3a00fd18b40f38d1cd4f9e5a6db40f758f3ee5867a064d17`; same-scope UI/provenance closure does not change this file; prior `020` fingerprints/G1 evidence are historical; separately approved G1R and G2 clean rebuilds remain required; not in bootstrap or Production** |
 | `021_master_catalog_phase4_placement_governance.sql` | Reserved P-18/WP-7.5 new-identity placement revision/review and atomic order contract | **Proposed only — P-18 pending; file does not exist; not in bootstrap** |
 | `017+_master_catalog_phase4_*.sql` | Umbrella reference for the Local-only Phase 4 range; files currently exist as `017`-`020`, while bootstrap remains intentionally limited to reviewed `017`-`019` | **Local-only range — no Production approval** |
 
@@ -104,8 +104,10 @@ the amended candidate. Repository/static verification passed 2026-07-13. P-24
 then added the approved annual effective-year horizon of base +1 through +10
 and a stable out-of-range failure before any clean rebuild. This changes the
 candidate fingerprint again but does not change its migration number or
-bootstrap status. Keep bootstrap at `017`-`019`; request G1R and later
-independent G2 separately before G3/G4.
+bootstrap status. The final same-scope P-24 error-focus/provenance closure does
+not alter `020`; G1R must record final clean execution `HEAD`, implementation
+lineage, and the exact migration SHA separately. Keep bootstrap at `017`-`019`;
+request G1R and later independent G2 separately before G3/G4.
 Add `020` to bootstrap only after G3/G4 acceptance. After P-18 acceptance,
 placement uses proposed `021`.
 Applied hotfix `016` must not be edited.

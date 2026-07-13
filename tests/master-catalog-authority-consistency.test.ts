@@ -131,7 +131,7 @@ describe('Master Catalog authority consistency', () => {
     ])
 
     expect(migrations).toContain(
-      '**Amended Local-only candidate under P-24 on exact implementation commit `88d0711`; repository/static verification passed 2026-07-13; prior `020` fingerprints/G1 evidence are historical; separately approved G1R and G2 clean rebuilds remain required; not in bootstrap or Production**',
+      '**Amended Local-only DB candidate under P-24 on exact base implementation commit `88d0711`; SHA-256 `c8fa5e7191e17ebc3a00fd18b40f38d1cd4f9e5a6db40f758f3ee5867a064d17`; same-scope UI/provenance closure does not change this file; prior `020` fingerprints/G1 evidence are historical; separately approved G1R and G2 clean rebuilds remain required; not in bootstrap or Production**',
     )
     expect(migrations).toContain(
       '**Proposed only — P-18 pending; file does not exist; not in bootstrap**',
@@ -185,13 +185,13 @@ describe('Master Catalog authority consistency', () => {
     expect(decisions).toContain('P-19')
     expect(decisions).toContain('Pending; recorded 2026-07-07')
     expect(decisions).toContain(
-      'Approved contract; historical inputs passed; amended P-23.1 candidate G1R/G2 and WP-8/P-15 reruns pending',
+      'Approved contract; historical inputs passed; amended P-24 candidate G1R/G2 and WP-8/P-15 reruns pending',
     )
     expect(decisions).toContain(
       'P-24 pre-G1R hardening',
     )
     expect(decisions).toContain(
-      'Approved and repository/static-passed on exact implementation commit `88d0711` on 2026-07-13; no reset approved; G1R remains separate',
+      'same-scope repeated-error-focus/provenance closure passed the working-tree gate; no reset approved; correction commit and G1R remain separate',
     )
 
     const tracker = read(
@@ -207,16 +207,34 @@ describe('Master Catalog authority consistency', () => {
     expect(tracker).toContain(
       'P-24 approved bounded pre-G1R annual base +1 through +10',
     )
+    expect(tracker).toContain(
+      'Migration 020 SHA-256: c8fa5e7191e17ebc3a00fd18b40f38d1cd4f9e5a6db40f758f3ee5867a064d17',
+    )
+    expect(tracker).toContain(
+      'record git rev-parse HEAD from the final clean committed checkout',
+    )
+    expect(tracker).not.toContain('Blockers: exact candidate commit;')
+    expect(tracker).not.toContain('review/commit P-23.1 working-tree candidate')
     expect(tracker).toMatch(
       /pre-amendment operator\/browser preflight passed on\s+`c8f6dca`/,
     )
     expect(tracker).toMatch(
-      /G1R,\s+G2, G3, G4, and every Production action\s+remain unauthorized/,
+      /G1R,\s+G2, G3, G4, and every\s+Production action\s+remain unauthorized/,
     )
     expect(existsSync(resolve(
       root,
       'docs/plans/master-catalog/30-phase4-wp66-owner-review-note.md',
     ))).toBe(true)
+    const ownerReview = read(
+      'docs/plans/master-catalog/30-phase4-wp66-owner-review-note.md',
+    )
+    expect(ownerReview).not.toContain('A new exact commit,')
+    expect(ownerReview).toContain(
+      '**Current migration `020` SHA-256:** `c8fa5e7191e17ebc3a00fd18b40f38d1cd4f9e5a6db40f758f3ee5867a064d17`',
+    )
+    expect(ownerReview).toContain(
+      '**G1R execution checkout:** Record the final clean `git rev-parse HEAD`',
+    )
     expect(existsSync(resolve(
       root,
       'docs/plans/master-catalog/31-phase4-wp66-operator-workflow-correction-plan.md',

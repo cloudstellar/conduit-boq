@@ -7,11 +7,12 @@ the bounded operator-context/navigation amendment on 2026-07-13, and its
 working-tree UI/static/browser checkpoint passed the same day without a Local
 reset. P-23.1 then amended candidate `020` and the create/detail/restore flow;
 its first repository/static checks passed 2026-07-13. P-24 then approved the
-bounded annual-range/error-recovery/context hardening before G1R. Earlier
-evidence remains valid history but cannot close the amended candidate. Exact
-P-24 implementation commit `88d0711` is the current G1R candidate; G1R,
-independent G2, browser owner review, G3 closeout, and G4
-bootstrap/WP-7 sequencing remain pending
+bounded annual-range/error-recovery/context hardening before G1R. Base
+implementation commit `88d0711` and the later same-scope repeated-error-focus/
+execution-provenance closure passed their repository/static gates. Earlier
+evidence remains valid history but cannot close the amended candidate. Commit
+the closure before requesting G1R; G1R, independent G2, browser owner review,
+G3 closeout, and G4 bootstrap/WP-7 sequencing remain pending
 
 **Production touched:** No
 
@@ -300,6 +301,7 @@ candidate `020` separately until the new owner closeout accepts it.
 | G1U | P-23 operator-context/navigation amendment approved for docs and Local-only UI/static/browser work without a reset; incorporated into exact source commit `31fd689` with P-23.1. |
 | G1V | Passed on exact commit `31fd689` on 2026-07-13: P-23.1 explicit version-intent/sequence and item-first correction was approved and its repository/static checks passed. It changes candidate `020`, so all prior `020` fingerprints and live DB evidence remain historical. |
 | G1W | Passed on exact implementation commit `88d0711` on 2026-07-13: P-24 annual range, safe error, durable focus, contextual authority, and Factor F hierarchy repository/static gate. No reset is approved. |
+| G1X | Passed on the 2026-07-13 working tree: same-scope identical-retry focus and execution-provenance closure. Commit this closure and record the final clean checkout before G1R; migration `020` remains unchanged and unapplied. |
 | G1R | Owner explicitly approves the first clean rebuild and full DB/concurrency/browser/P-20 rerun of the exact post-P-24 executable candidate. No approval has been given. |
 | G2 | Owner explicitly approves a second independent clean rebuild of the same accepted candidate and P-20 comparison after G1R passes. |
 | G3 | Owner completes intended-admin workflow review and accepts or holds the revised WP-6.6 closeout |
@@ -512,4 +514,24 @@ and 10 existing warnings; authority 710/65/17; smoke syntax; network-enabled
 production build; and `git diff --check`. Safe-state in-app browser QA passed
 desktop/mobile Local/account/disabled copy, no horizontal overflow, and zero
 console warnings/errors. Exact implementation commit `88d0711` names the
-candidate; `020` remained unapplied and Local DB was not reset or mutated.
+P-24 base candidate; `020` remained unapplied and Local DB was not reset or
+mutated.
+
+The subsequent owner/developer approval review found two same-scope closure
+issues before G1R: an identical retry could leave focus on the submit control
+because all primitive error fields were unchanged, and the handoff text still
+treated the already-created P-24 checkpoint as pending without distinguishing
+the execution checkout from its implementation and migration fingerprints. The
+closure makes each new action-state object refocus an error even when the safe
+payload is identical, adds a focused contract, and records three separate
+provenance facts for G1R: final clean `HEAD`, P-24 implementation lineage, and
+migration `020` SHA-256
+`c8fa5e7191e17ebc3a00fd18b40f38d1cd4f9e5a6db40f758f3ee5867a064d17`.
+
+The same-scope closure passed 2026-07-13: focused operator/authority contracts
+2 files/16 tests; full suite 30 files/161 tests; TypeScript; focused and full
+lint with 0 errors and the same 10 existing warnings; authority 710/65/17;
+smoke syntax; network-enabled production build; and `git diff --check`. It does
+not change migration `020`, bootstrap, Local DB state, Production, P-18/P-19,
+WP-7, Factor F, or hotfix `016`. Commit the verified closure before requesting
+G1R; G1R remains a separate owner decision.
