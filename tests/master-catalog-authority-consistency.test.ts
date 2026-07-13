@@ -191,7 +191,7 @@ describe('Master Catalog authority consistency', () => {
       'P-24 pre-G1R hardening',
     )
     expect(decisions).toContain(
-      'same-scope repeated-error-focus/provenance closure passed the working-tree gate; no reset approved; correction commit and G1R remain separate',
+      'same-scope repeated-error-focus/provenance closure committed on exact lineage commit `050c998`; no reset approved; G1R remains separate',
     )
 
     const tracker = read(
@@ -213,7 +213,13 @@ describe('Master Catalog authority consistency', () => {
     expect(tracker).toContain(
       'record git rev-parse HEAD from the final clean committed checkout',
     )
+    expect(tracker).toContain(
+      '050c998361f3372bd3bf9fb6645dc4abd1c0bf2b` is the exact P-24 same-scope closure-lineage checkpoint',
+    )
     expect(tracker).not.toContain('Blockers: exact candidate commit;')
+    expect(tracker).not.toContain('Blockers: clean correction commit')
+    expect(tracker).not.toContain('Commit the closure before requesting G1R')
+    expect(tracker).not.toContain('must be committed before G1R')
     expect(tracker).not.toContain('review/commit P-23.1 working-tree candidate')
     expect(tracker).toMatch(
       /pre-amendment operator\/browser preflight passed on\s+`c8f6dca`/,
@@ -233,12 +239,21 @@ describe('Master Catalog authority consistency', () => {
       '**Current migration `020` SHA-256:** `c8fa5e7191e17ebc3a00fd18b40f38d1cd4f9e5a6db40f758f3ee5867a064d17`',
     )
     expect(ownerReview).toContain(
-      '**G1R execution checkout:** Record the final clean `git rev-parse HEAD`',
+      '**P-24 closure-lineage checkpoint:** `050c998361f3372bd3bf9fb6645dc4abd1c0bf2b`',
+    )
+    expect(ownerReview).toContain(
+      '**G1R execution checkout:** Capture the final clean `git rev-parse HEAD` at runtime',
     )
     expect(existsSync(resolve(
       root,
       'docs/plans/master-catalog/31-phase4-wp66-operator-workflow-correction-plan.md',
     ))).toBe(true)
+    const correctionPlan = read(
+      'docs/plans/master-catalog/31-phase4-wp66-operator-workflow-correction-plan.md',
+    )
+    expect(correctionPlan).toContain(
+      'Passed and committed on exact closure-lineage commit `050c998`',
+    )
   })
 
   it('keeps reliability commands and route recovery files tracked by contract', () => {

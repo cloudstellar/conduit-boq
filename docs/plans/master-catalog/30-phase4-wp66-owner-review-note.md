@@ -4,8 +4,9 @@
 source/G1/browser/P-23 checkpoints remain historical. P-24 further amends
 candidate `020` and operator recovery before G1R. The exact P-24 base
 implementation and same-scope repeated-error-focus/execution-provenance closure
-exist; a clean correction commit, separately approved G1R and G2 clean rebuilds,
-browser owner review, and G3 closeout remain
+exist and are committed through exact closure-lineage commit `050c998`;
+separately approved G1R and G2 clean rebuilds, browser owner review, and G3
+closeout remain
 **Review environment:** Local only
 **Current G1 evidence commit:**
 `e463270dfb9f23332559f31591cf338b8eeada3c`
@@ -13,8 +14,9 @@ browser owner review, and G3 closeout remain
 `c8f6dca282cd2729ac2b58e488b3ef516fb29713`
 **P-24 base implementation checkpoint:** `88d0711` (repository/static verification passed 2026-07-13)
 **Pre-closure documentation checkout:** `2ca4859` (must not be relabeled as the final G1R execution checkout)
+**P-24 closure-lineage checkpoint:** `050c998361f3372bd3bf9fb6645dc4abd1c0bf2b`
 **Current migration `020` SHA-256:** `c8fa5e7191e17ebc3a00fd18b40f38d1cd4f9e5a6db40f758f3ee5867a064d17`
-**G1R execution checkout:** Record the final clean `git rev-parse HEAD` after the same-scope correction is committed
+**G1R execution checkout:** Capture the final clean `git rev-parse HEAD` at runtime; do not infer it from either P-24 lineage commit
 **Correction source checkpoint:**
 `ac31feb`
 **Historical implementation/evidence commit:**
@@ -169,10 +171,10 @@ BOQs/1,547 items, and Factor F `2569.0.0`/36 rows. Production touched: No.
 
 ## 5. Recommendation
 
-Keep WP-6.6 on Hold. Review and commit the same-scope P-24 repeated-error-focus
-and execution-provenance closure, record the final clean checkout together with
-the unchanged migration `020` SHA-256 above, then request G1R approval or decline
-for the first destructive clean Local rebuild/full DB-browser-P-20 rerun. Request
-independent G2 only after G1R passes. Do not run a reset, add migration `020` to
-bootstrap, begin WP-7, or infer G3 acceptance until the applicable later owner
-gates are explicitly accepted.
+Keep WP-6.6 on Hold. Treat `050c998` as the committed same-scope P-24 closure
+lineage, then request G1R approval or decline for the first destructive clean
+Local rebuild/full DB-browser-P-20 rerun. At execution, record the final clean
+checkout and unchanged migration `020` SHA-256 above as separate evidence.
+Request independent G2 only after G1R passes. Do not run a reset, add migration
+`020` to bootstrap, begin WP-7, or infer G3 acceptance until the applicable
+later owner gates are explicitly accepted.

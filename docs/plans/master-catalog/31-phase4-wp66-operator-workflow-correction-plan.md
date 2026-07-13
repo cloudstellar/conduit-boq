@@ -9,10 +9,10 @@ reset. P-23.1 then amended candidate `020` and the create/detail/restore flow;
 its first repository/static checks passed 2026-07-13. P-24 then approved the
 bounded annual-range/error-recovery/context hardening before G1R. Base
 implementation commit `88d0711` and the later same-scope repeated-error-focus/
-execution-provenance closure passed their repository/static gates. Earlier
-evidence remains valid history but cannot close the amended candidate. Commit
-the closure before requesting G1R; G1R, independent G2, browser owner review,
-G3 closeout, and G4 bootstrap/WP-7 sequencing remain pending
+execution-provenance closure passed their repository/static gates; the closure
+is committed on exact lineage commit `050c998`. Earlier evidence remains valid
+history but cannot close the amended candidate. G1R, independent G2, browser
+owner review, G3 closeout, and G4 bootstrap/WP-7 sequencing remain pending
 
 **Production touched:** No
 
@@ -301,7 +301,7 @@ candidate `020` separately until the new owner closeout accepts it.
 | G1U | P-23 operator-context/navigation amendment approved for docs and Local-only UI/static/browser work without a reset; incorporated into exact source commit `31fd689` with P-23.1. |
 | G1V | Passed on exact commit `31fd689` on 2026-07-13: P-23.1 explicit version-intent/sequence and item-first correction was approved and its repository/static checks passed. It changes candidate `020`, so all prior `020` fingerprints and live DB evidence remain historical. |
 | G1W | Passed on exact implementation commit `88d0711` on 2026-07-13: P-24 annual range, safe error, durable focus, contextual authority, and Factor F hierarchy repository/static gate. No reset is approved. |
-| G1X | Passed on the 2026-07-13 working tree: same-scope identical-retry focus and execution-provenance closure. Commit this closure and record the final clean checkout before G1R; migration `020` remains unchanged and unapplied. |
+| G1X | Passed and committed on exact closure-lineage commit `050c998`: same-scope identical-retry focus and execution-provenance closure. G1R must capture its final clean execution checkout separately; migration `020` remains unchanged and unapplied. |
 | G1R | Owner explicitly approves the first clean rebuild and full DB/concurrency/browser/P-20 rerun of the exact post-P-24 executable candidate. No approval has been given. |
 | G2 | Owner explicitly approves a second independent clean rebuild of the same accepted candidate and P-20 comparison after G1R passes. |
 | G3 | Owner completes intended-admin workflow review and accepts or holds the revised WP-6.6 closeout |
@@ -533,5 +533,6 @@ The same-scope closure passed 2026-07-13: focused operator/authority contracts
 lint with 0 errors and the same 10 existing warnings; authority 710/65/17;
 smoke syntax; network-enabled production build; and `git diff --check`. It does
 not change migration `020`, bootstrap, Local DB state, Production, P-18/P-19,
-WP-7, Factor F, or hotfix `016`. Commit the verified closure before requesting
-G1R; G1R remains a separate owner decision.
+WP-7, Factor F, or hotfix `016`. Exact closure-lineage commit `050c998` records
+the verified result; G1R remains a separate owner decision and runtime evidence
+gate.
