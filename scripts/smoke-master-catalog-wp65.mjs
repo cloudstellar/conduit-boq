@@ -91,15 +91,15 @@ try {
   const versions = await allocateRevisionVersions(base, 4)
   const contextCode = hasHardenedCapabilities ? null : await allocateCodeContext()
 
+  currentStage = 'verify duplicate and nonmonotonic version transitions'
+  const lifecycleNegatives = await assertVersionLifecycleNegatives(adminA, base)
+
   currentStage = 'run unchanged-clone publish race and request idempotency'
   const raceDraft = await createDraft(adminA, base, versions[0], 'publish race')
-  currentStage = 'verify duplicate and nonmonotonic version transitions'
-  const lifecycleNegatives = await assertVersionLifecycleNegatives(
-    adminA,
-    base,
-    raceDraft,
-    hasHardenedCapabilities,
-  )
+  currentStage = 'verify one-working-draft guard precedence'
+  const workingDraftGuard = hasHardenedCapabilities
+    ? await assertWorkingDraftGuardPrecedence(adminA, base, raceDraft, versions[1])
+    : {}
   const raceReadiness = await readReadiness(adminA, raceDraft.versionId)
   assert(raceReadiness.canPublish === true, 'Unchanged clone did not pass boundary readiness')
   assert(raceReadiness.newIdentityCount === 0, 'Unchanged clone reported a new identity')
@@ -327,6 +327,7 @@ try {
     baselineDatasetHash: base.dataset_hash,
     ...p20,
     ...lifecycleNegatives,
+    ...workingDraftGuard,
     unchangedCloneReadiness: raceReadiness,
     p18Readiness,
     structuredReadiness,
@@ -538,18 +539,17 @@ async function createDraftWithIdempotencyChecks(target, base, version) {
   return draft
 }
 
-async function assertVersionLifecycleNegatives(
-  target,
-  base,
-  existingDraft,
-  hardenedCapabilities,
-) {
+async function assertVersionLifecycleNegatives(target, base) {
   const before = await readVersionLifecycleCounts()
   const cases = [
     {
-      label: 'duplicate version',
-      version: existingDraft.version,
-      expectedCode: hardenedCapabilities ? 'DRAFT_ALREADY_EXISTS' : 'VALIDATION_FAILED',
+      label: 'same-as-base version',
+      version: {
+        major: Number(base.major),
+        minor: Number(base.minor),
+        patch: Number(base.patch),
+      },
+      expectedCode: 'VERSION_TRANSITION_INVALID',
     },
     {
       label: 'backward annual version',
@@ -615,6 +615,61 @@ async function assertVersionLifecycleNegatives(
     lifecycleDuplicateRejected: true,
     lifecycleNonmonotonicRejected: true,
     lifecycleNegativeCases: results,
+  }
+}
+
+async function assertWorkingDraftGuardPrecedence(
+  target,
+  base,
+  existingDraft,
+  alternateVersion,
+) {
+  const before = await readVersionLifecycleCounts()
+  const cases = [
+    {
+      label: 'duplicate working-draft version',
+      version: existingDraft.version,
+    },
+    {
+      label: 'competing valid working-draft version',
+      version: alternateVersion,
+    },
+  ]
+  const results = []
+
+  for (const testCase of cases) {
+    const rejection = actionCode(
+      await target.rpc('create_catalog_draft', {
+        p_base_version_id: base.id,
+        p_version_major: testCase.version.major,
+        p_version_minor: testCase.version.minor,
+        p_version_patch: testCase.version.patch,
+        p_name: `Local WP-6.5 ${testCase.label}`,
+        p_reason: `WP-6.5 one-working-draft guard: ${testCase.label}`,
+        p_request_id: randomUUID(),
+      }),
+      testCase.label,
+      'DRAFT_ALREADY_EXISTS',
+    )
+    results.push({
+      case: testCase.label,
+      code: rejection.error.code,
+    })
+  }
+
+  const after = await readVersionLifecycleCounts()
+  assert(
+    stableJson(after) === stableJson(before),
+    'One-working-draft guard changed catalog version, row, taxonomy, or audit counts',
+  )
+  assert(
+    await readCurrentPointer() === base.id,
+    'One-working-draft guard moved the current catalog pointer',
+  )
+
+  return {
+    workingDraftGuardPrecedencePassed: true,
+    workingDraftGuardCases: results,
   }
 }
 

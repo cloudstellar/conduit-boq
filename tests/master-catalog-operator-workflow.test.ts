@@ -130,8 +130,11 @@ describe('Master Catalog P-22 operator workflow', () => {
     expect(wp65Harness).toContain('abandonedFixtureDrafts === 3');
     expect(wp65Harness).toContain('minor: maxMinor + 1 + index');
     expect(wp65Harness).not.toContain('minor: maxMinor + 100 + index');
-    expect(wp65Harness).toContain(
-      "hardenedCapabilities ? 'DRAFT_ALREADY_EXISTS' : 'VALIDATION_FAILED'",
+    expect(wp65Harness).toContain('assertVersionLifecycleNegatives(adminA, base)');
+    expect(wp65Harness).toContain('assertWorkingDraftGuardPrecedence(');
+    expect(wp65Harness).toContain('workingDraftGuardPrecedencePassed: true');
+    expect(wp65Harness.indexOf('assertVersionLifecycleNegatives(adminA, base)')).toBeLessThan(
+      wp65Harness.indexOf("createDraft(adminA, base, versions[0], 'publish race')"),
     );
   });
 
