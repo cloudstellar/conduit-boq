@@ -98,6 +98,7 @@ try {
     adminA,
     base,
     raceDraft,
+    hasHardenedCapabilities,
   )
   const raceReadiness = await readReadiness(adminA, raceDraft.versionId)
   assert(raceReadiness.canPublish === true, 'Unchanged clone did not pass boundary readiness')
@@ -537,13 +538,18 @@ async function createDraftWithIdempotencyChecks(target, base, version) {
   return draft
 }
 
-async function assertVersionLifecycleNegatives(target, base, existingDraft) {
+async function assertVersionLifecycleNegatives(
+  target,
+  base,
+  existingDraft,
+  hardenedCapabilities,
+) {
   const before = await readVersionLifecycleCounts()
   const cases = [
     {
       label: 'duplicate version',
       version: existingDraft.version,
-      expectedCode: 'VALIDATION_FAILED',
+      expectedCode: hardenedCapabilities ? 'DRAFT_ALREADY_EXISTS' : 'VALIDATION_FAILED',
     },
     {
       label: 'backward annual version',

@@ -130,6 +130,9 @@ describe('Master Catalog P-22 operator workflow', () => {
     expect(wp65Harness).toContain('abandonedFixtureDrafts === 3');
     expect(wp65Harness).toContain('minor: maxMinor + 1 + index');
     expect(wp65Harness).not.toContain('minor: maxMinor + 100 + index');
+    expect(wp65Harness).toContain(
+      "hardenedCapabilities ? 'DRAFT_ALREADY_EXISTS' : 'VALIDATION_FAILED'",
+    );
   });
 
   it('preserves list or review context when opening an exact item', () => {
