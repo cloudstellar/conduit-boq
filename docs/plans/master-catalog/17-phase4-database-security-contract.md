@@ -19,7 +19,9 @@ prior `020` fingerprints and live DB evidence historical. Repository/static
 verification passed on the first 2026-07-13 working-tree candidate. P-24 then
 amended the same unapplied candidate with the annual base +1 through +10 guard
 and stable `VERSION_EFFECTIVE_YEAR_OUT_OF_RANGE` response; separately approved
-G1R and G2 clean rebuilds remain required for executable evidence.
+G1R later passed on exact clean execution checkout `721c2c2`, including schema,
+RLS/grants, concurrency, P-20 input, lint/security advisors, and two required
+authority foreign-key covering indexes. Independent G2 remains required.
 `020` remains outside bootstrap and has not been applied to Production.
 P-18 rules and placement migration `021` remain pending owner/data-custodian
 approval.
@@ -825,8 +827,10 @@ WP-6.6 authority/readiness/correction/constraint changes, the replacement draft
 create implementation, the partial unique index, and the audited abandon path;
 it must not rewrite `017`-`019`, hotfix `016`, BOQ behavior, or Factor F state.
 Its prior `3bfc74e` and `e463270` Local evidence is historical and superseded for
-the P-23.1 candidate. Keep `020` outside `scripts/bootstrap-local-db.sh` until
-separately approved G1R and G2 evidence plus G3/G4 owner closeout are recorded.
+the P-23.1 candidate. Final G1R passed on exact `721c2c2` with migration SHA-256
+`e07e0c4161077efba7bc4f6ebf95518d0cc1bc7e4628a43a128dd899bd1aef93`.
+Keep `020` outside `scripts/bootstrap-local-db.sh` until independent G2 evidence
+plus G3/G4 owner closeout are recorded.
 
 If P-18 is accepted, implement the placement extension only in append-only
 migration `021_master_catalog_phase4_placement_governance.sql`. Do not edit or

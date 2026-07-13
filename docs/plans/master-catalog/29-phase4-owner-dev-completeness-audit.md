@@ -9,8 +9,8 @@ remaining operator identity/navigation/contextual-import/export-semantics
 amendment. Its first working-tree UI/static/browser checkpoint passed on
 2026-07-13. P-23.1 and P-24 then amended candidate `020` and the operator flow;
 P-24 repository/static verification passed on exact implementation commit
-`88d0711`, while G1R, independent G2, and G3 owner closeout must
-precede WP-7.
+`88d0711`; final owner-approved G1R then passed on exact execution checkout
+`721c2c2`. Independent G2 and G3 owner closeout must precede WP-7.
 
 **Environment:** Source/document audit only. No Local database reset, Production
 access/write, feature enablement, publication, new Factor F workflow, or hotfix
@@ -148,8 +148,10 @@ Do not edit evidence-backed Local migrations `017`-`019`.
   for the earlier reviewed commit.
 - P-23.1 amends the still-unaccepted `020` again for the guarded next-version
   sequence. Repository/static verification passed 2026-07-13. All earlier `020`
-  fingerprints/live evidence remain historical; G1R and independent G2 must be
-  separately approved and rerun before closeout.
+  fingerprints/live evidence remain historical; final G1R passed on exact
+  `721c2c2` with migration SHA-256
+  `e07e0c4161077efba7bc4f6ebf95518d0cc1bc7e4628a43a128dd899bd1aef93`.
+  Independent G2 remains separately approved before closeout.
 
 ## 7. Deliberate deferrals and control visibility
 

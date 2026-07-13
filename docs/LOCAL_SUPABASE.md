@@ -27,10 +27,14 @@ production hotfix `016`, and the current Phase 4 local scripts `017` through
 workflow smoke tests. Get owner approval before using this command as evidence
 when preserving existing Local state matters.
 
-WP-6.6 migration `020_master_catalog_phase4_admin_workflow_hardening.sql` has
-passed its separately approved Local DB/browser evidence run, but remains
-outside this canonical bootstrap until the owner accepts the WP-6.6 closeout.
-Do not append `020` to the bootstrap command ad hoc.
+WP-6.6 migration `020_master_catalog_phase4_admin_workflow_hardening.sql` passed
+the separately owner-approved G1R clean Local DB/concurrency/browser run on
+exact execution checkout `721c2c2c4a234a4fd00e5686383be9af87ee15dd`, with
+SHA-256
+`e07e0c4161077efba7bc4f6ebf95518d0cc1bc7e4628a43a128dd899bd1aef93`.
+It remains outside this canonical bootstrap until independent G2 and the
+WP-6.6 G3/G4 closeout are accepted. Do not append `020` to the bootstrap
+command ad hoc.
 
 ```bash
 npm run db:local:bootstrap

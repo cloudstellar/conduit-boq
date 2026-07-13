@@ -13,9 +13,13 @@ verification passed on the first 2026-07-13 working tree. P-24 then approved
 bounded pre-G1R annual-range/error-recovery/context hardening; exact
 base implementation commit `88d0711` passed repository/static verification.
 The same-scope repeated-error-focus/execution-provenance closure then passed and
-was committed on exact closure-lineage commit `050c998`. Candidate `020` remains
-unchanged, unapplied, and outside bootstrap. G1R, G2, G3, G4, and every
-Production action remain unauthorized.
+was committed on exact closure-lineage commit `050c998`. The owner separately
+approved G1R on 2026-07-13. The final clean rebuild, separate `020` apply,
+DB/concurrency/P-20 input, repository/advisor gates, and bounded admin browser
+flow passed on exact execution checkout `721c2c2`; Local was restored to zero
+working drafts with all catalog flags false. Candidate `020` remains outside
+bootstrap and Production. Independent G2, G3, G4, and every Production action
+remain unauthorized.
 **Purpose:** Owner-facing progress tracker for Master Catalog Phase 4 local
 implementation and rehearsal. This file is the authority for current WP status,
 blockers, next safe step, and the authority/evidence index. Detailed decisions,
@@ -48,13 +52,13 @@ Allowed statuses:
 | Field | Current value |
 |---|---|
 | Current branch | `codex/master-catalog-phase4` |
-| Named evidence commits | `050c998361f3372bd3bf9fb6645dc4abd1c0bf2b` is the exact P-24 same-scope closure-lineage checkpoint; `88d0711` is its base implementation/repository checkpoint. The reviewed checkout immediately before that closure was docs-only provenance commit `2ca4859`. G1R must record the final clean execution checkout separately from those implementation-lineage commits and the migration fingerprint. `31fd689` produced the exact P-23/P-23.1 source/repository checkpoint now superseded by P-24; `c8f6dca282cd2729ac2b58e488b3ef516fb29713` produced the pre-G2 operator/UI source checkpoint; `e463270dfb9f23332559f31591cf338b8eeada3c` produced final P-22 G1 DB/P-20 evidence; `17ec6cc` repaired reusable WP-6.5 fixture cleanup found during G1; `ac31feb` produced the P-22 source/static implementation checkpoint; `3bfc74ea00843033ad3cfd2afac43820b18c0124` produced historical WP-6.6 DB and post-`020` P-20/browser evidence now superseded for P-22 closeout; `59b17d3c3e7ed6180445ac5dc5e0b75db9fe9452` added the verified Local secret/login guard; `1ad01b9268cec64c621266c3eb33b16a4325e627` produced the two clean WP-6.5/P-20 rebuilds; `54233731b121c32723bb8efcc6889f70f3f2dcef` produced live lifecycle-negative evidence; `e782459ce17b2bda90d7f34efd4e15c28565ad07` produced transport response-loss evidence; `9becdf675386b03a3aeff717cebccd6e88f8b664` produced browser same-ID/input-preservation evidence; `777df7598c8aa96a17f3665db5131e5fb5397b96` produced the accepted P-11 pair; `edf3570a` is superseded history |
+| Named evidence commits | `721c2c2c4a234a4fd00e5686383be9af87ee15dd` is the exact clean G1R execution checkout and final pushed executable candidate; `050c998361f3372bd3bf9fb6645dc4abd1c0bf2b` is the exact P-24 same-scope closure-lineage checkpoint; `88d0711` is its base implementation/repository checkpoint. G1R diagnostics exposed and fixed stale harness assumptions at `f9f0bd7`, `bfccbb3`, `be157d4`, and `2b1ccec`; `721c2c2` added the two required authority foreign-key covering indexes. `31fd689` produced the P-23/P-23.1 source/repository checkpoint; `c8f6dca282cd2729ac2b58e488b3ef516fb29713` produced the pre-G2 operator/UI source checkpoint; `e463270dfb9f23332559f31591cf338b8eeada3c` produced historical P-22 G1 DB/P-20 evidence; `17ec6cc` repaired reusable WP-6.5 fixture cleanup found during G1; `ac31feb` produced the P-22 source/static implementation checkpoint; `3bfc74ea00843033ad3cfd2afac43820b18c0124` produced historical WP-6.6 DB and post-`020` P-20/browser evidence; `59b17d3c3e7ed6180445ac5dc5e0b75db9fe9452` added the verified Local secret/login guard; `1ad01b9268cec64c621266c3eb33b16a4325e627` produced the two clean WP-6.5/P-20 rebuilds; `54233731b121c32723bb8efcc6889f70f3f2dcef` produced live lifecycle-negative evidence; `e782459ce17b2bda90d7f34efd4e15c28565ad07` produced transport response-loss evidence; `9becdf675386b03a3aeff717cebccd6e88f8b664` produced browser same-ID/input-preservation evidence; `777df7598c8aa96a17f3665db5131e5fb5397b96` produced the accepted P-11 pair; `edf3570a` is superseded history |
 | Current work package | WP-6.6 P-22/P-23/P-23.1/P-24 operator-workflow hardening |
 | Current environment | Local only |
 | Production write allowed | No |
 | Feature flag default | Disabled |
-| Latest owner decision | P-24 approved bounded pre-G1R annual base +1 through +10, safe stale/range error, durable focused feedback, contextual authority, and secondary Factor F work in docs/application/candidate `020`/tests. No Local reset, Production, P-18/`021`, P-19, WP-7, Factor F, or hotfix expansion was approved. |
-| Next owner review point | Authorize or decline G1R for the exact pushed candidate. At execution, record the final clean checkout, P-24 lineage (`88d0711` plus `050c998`), and unchanged migration `020` SHA-256 `c8fa5e7191e17ebc3a00fd18b40f38d1cd4f9e5a6db40f758f3ee5867a064d17` as separate facts; independent G2 follows only after G1R passes. |
+| Latest owner decision | G1R was explicitly approved and completed on 2026-07-13 for the exact Local-only candidate. This did not approve G2, bootstrap inclusion, G3/G4, Production, P-18/`021`, P-19, WP-7, Factor F work, or hotfix expansion. |
+| Next owner review point | Authorize or decline independent G2 for exact executable candidate `721c2c2c4a234a4fd00e5686383be9af87ee15dd` and migration `020` SHA-256 `e07e0c4161077efba7bc4f6ebf95518d0cc1bc7e4628a43a128dd899bd1aef93`. G2 must use a second clean rebuild and compare its P-20 output with the retained G1R input. |
 | Last updated | 2026-07-13 |
 
 ## 2.1 Canonical authority and evidence manifest
@@ -116,9 +120,38 @@ Current evidence baseline:
   `sha256:2e3571ea7135fbc0bbb84c8cc330af1173e4c1d2345e5eb59958dc76e45558b8`,
   and identity mapping SHA-256
   `5f68993ce5aa5c7735b0d9e6de6d27946b4846fb8a6eb77d1b6b3bd6c4a73de7`;
-  P-23.1 changes candidate `020`, so these hashes cannot close the amended
-  candidate; repository/static checks passed 2026-07-13, while separately
-  approved G1R and independent G2 clean rebuild/comparison are required;
+  P-23.1 changes candidate `020`, so these historical files cannot close the
+  amended candidate;
+- G1R passed on exact execution checkout
+  `721c2c2c4a234a4fd00e5686383be9af87ee15dd` after an owner-approved clean
+  bootstrap through `019` and separate application of `020` SHA-256
+  `e07e0c4161077efba7bc4f6ebf95518d0cc1bc7e4628a43a128dd899bd1aef93`;
+- retained untracked G1R WP-6.6 evidence
+  `tmp/master-catalog/wp66-evidence/20260713-g1r-p24-721c2c2.json` has file
+  SHA-256
+  `98eca768bfc8334bcf6fe4ee423468bae74f69a1d5bc39ae7bdcb6d100c2e7a8`;
+  retained G1R WP-6.5/P-20 input
+  `tmp/master-catalog/wp65-evidence/20260713-g1r-p24-721c2c2.json` has file
+  SHA-256
+  `aa6791ff6b06359cb857ae3e8e2aea1504f93ee2fe34fa5da2bd7d6666053280`;
+- G1R reproduced 710 rows, dataset hash
+  `sha256:2e3571ea7135fbc0bbb84c8cc330af1173e4c1d2345e5eb59958dc76e45558b8`,
+  identity mapping SHA-256
+  `5f68993ce5aa5c7735b0d9e6de6d27946b4846fb8a6eb77d1b6b3bd6c4a73de7`,
+  and frozen authority 710 mappings/65 groups/17 exclusions with SHA-256
+  `28675e6244c65d485dda7142634b381db729a139bccdf189ad51563251a2e12a`;
+- G1R browser QA created the system-planned revision `2568.7.0`, searched the
+  first/middle/last rows, edited exact `ITEM-0355`, reviewed the complete
+  draft-versus-base snapshot, opened exact-draft import, audited-abandoned the
+  proof draft, and cancelled the restore confirmation without moving the
+  pointer. Desktop and bounded mobile checks had no page-level overflow; the
+  comparison table used its intended horizontal scroll container. The only
+  browser warning was the existing `/nt_logo.svg` LCP warning; full keyboard
+  traversal and independent UAT remain later gates;
+- final G1R cleanup restored pointer `2568.0.0`/710 rows, zero working drafts,
+  all three flags `false`, 198 BOQs/1,547 items, Factor F `2569.0.0`/36 rows,
+  and two valid frozen-authority FK indexes. Production touched: No;
+- independent G2 clean rebuild/P-20 comparison remains separately gated;
 - pre-G2 browser/operator preflight created one working draft at a time,
   exercised exact-item editing and cumulative review, audited-abandoned both
   short-lived proof drafts, passed desktop/mobile layout and accessible-select
@@ -142,8 +175,9 @@ Current evidence baseline:
   the revised WP-6.6. G1 applied the amended candidate separately and passed on
   `e463270`; the later `c8f6dca` checkpoint changed UI/tests only. P-23 changed
   UI/routes/tests/docs without changing `020`; P-23.1 then amended `020` and
-  passed repository/static verification. It remains outside bootstrap and
-  unapplied; G1R/G2/G3/G4 remain pending;
+  passed repository/static verification. G1R later applied the final candidate
+  separately and passed; it remains outside bootstrap and G2/G3/G4 remain
+  pending;
 - Local bootstrap authority order: `009`-`015`, `016`, `017`-`019`;
 - proposed `021` (P-18/WP-7.5) does not exist and is not in bootstrap;
 - Local login/password parsing was verified after commit `59b17d3`; guarded
@@ -165,7 +199,7 @@ Current evidence baseline:
 | WP-5 | Publish, pointer restore, and audit on Local | Ready for owner review | Backend DB/RPC slice passed: migration `019`, Local publish/restore smoke including stale-base pointer fixture, DB hash readback, immutability checks, active-admin publish/restore UI controls, browser create/publish/restore proof, final DB readback, owner-review cleanup, and [Verification Report publication evidence](./13-phase4-verification-report.md#12-publication-tests). Hash-portability review note remains for WP-8/P-15 | Owner accepted continuing to WP-6 local-only implementation |
 | WP-6 | Official Excel/PDF export | Complete | Selected-version export core, paged export data reads, older-version coverage, draft marking, Excel/PDF generators, and tracked verification exist. The exact replacement pair from `777df75` uses TH Sarabun New on all 20,808 populated Excel cells at 16 pt or larger and passed semantic, five-sheet workbook, 19-page PDF, and unchanged Local readback checks. | Owner accepted the exact Local replacement pair at 2026-07-11 22:20 +07; preserve it without regeneration; Production filing remains separate |
 | WP-6.5 | Reliability and publish-boundary hardening | Ready for owner review | Code/static implementation for A-H, two owner-approved clean Local rebuilds/P-20 evidence on `1ad01b9`, live lifecycle negatives on `5423373`, transport response-loss recovery on `e782459`, browser same-ID/input-preservation proof on `9becdf6`, and owner-accepted export evidence on `777df75` passed. See the sub-gate table below. | Accept only as bounded reliability evidence. It is not a full operator-completeness certificate and no longer leads directly to WP-7; WP-6.6 is next. |
-| WP-6.6 | Admin workflow completeness and authority hardening | In progress | P-21 through P-23 evidence is retained history. P-24 base commit `88d0711` plus exact closure-lineage commit `050c998` cover C-16 at repository/static level: annual range, safe durable errors including identical retries, contextual authority, accessibility labels, secondary Factor F context, and exact execution provenance. | G1R, independent G2, fresh browser/G3 intended-admin closeout, and G4 bootstrap/WP-7 sequencing remain separately gated |
+| WP-6.6 | Admin workflow completeness and authority hardening | In progress | P-24 base `88d0711` and closure lineage `050c998` are preserved; owner-approved G1R passed DB/concurrency/P-20/advisors/repository/browser on exact execution checkout `721c2c2`, including the final FK-index correction and Local cleanup. | Independent G2, G3 intended-admin closeout, and G4 bootstrap/WP-7 sequencing remain separately gated |
 | WP-7 | Permanent BOQ/hotfix `016` and Factor F regression preservation | Not started | Live DB behavior for all approved BOQ suffixes and authoritative catalog fields, rollback/role/version negatives, BOQ save/print/export regressions, and Factor F before/after assertions; suite is reusable in CI/rehearsal | Starts only after WP-6.6 closeout; required before WP-7.5/WP-8 |
 | WP-7.5 | P-18 new-identity placement governance | Not started | Conditional migration `021`, placement revision/review, exact RPC/RLS/audit/order/concurrency/hash/export/browser evidence | P-18 acceptance required; otherwise Add/Supplement hidden and DB guard retained for WP-8 |
 | WP-8 | Clean Local rehearsal, admin UAT, performance baseline, and Verification Report | Not started | Owner-approved Local reset, full supported workflow, DB integration/concurrency, test/lint/build/audit/advisor evidence, tracked export verification, admin UAT without developer/SQL assistance, and measured 710-row performance | Requires WP-6.6/WP-7 plus WP-7.5 or hidden Add/Supplement; required before any P-12 request |
@@ -189,16 +223,16 @@ Current evidence baseline:
 | Slice | Current status | Exit evidence |
 |---|---|---|
 | A Full browse/history | Passed technical WP-6.6 gate | Paged 1,201-row fixture plus Local browser first/middle/last search, 710-row selected-version view, exact item route, and identity/code history passed; rerun intended-admin comprehension at WP-8 |
-| B Exact draft/stale state | Historical G1/browser passed; G1R/G2 pending | One mutable draft, replay/race, abandon/replacement, and read-only history must rerun against amended `020`. |
-| C Category/group/code allocation | Historical Local DB gate passed; G1R/G2 pending | Frozen 710 mappings/65 groups/17 exclusions and allocator evidence must remain unchanged under the amended fingerprint. |
-| D Import diff/evidence | Historical Local DB/browser gate passed; G1R/G2 pending | Full rollout/diff/replay must rerun; independent full operator import UAT remains WP-8. |
-| E Publication provenance/readiness | Historical Local DB/browser gate passed; G1R/G2 pending | Authenticated provenance, archive/date negatives, readiness/publish, and restore invariants must rerun. |
-| F Correction/editor | Historical Local DB/browser gate passed; G1R/G2 pending | Correction identity/code/history behavior must remain unchanged. |
-| G Schema/Thai/evidence | Historical G1/browser passed; P-23.1 repository/static passed | Recheck amended `020` live constraints/grants/lint/advisors/P-20 in G1R/G2 plus fresh desktop/mobile Thai flow. |
-| H Working-draft lifecycle | Historical G1/browser passed; G1R/G2 pending | Rerun partial unique, conflict, audited abandon, immutable history, replacement, rollback, and role evidence with the next-version guard. |
-| I Final snapshot review | Historical static/DB/browser path passed; G1R/G2/G3 pending | Retain complete diff/lock behavior and rerun stale-review/browser acceptance with the amended create flow. |
-| J Operator context/import/export semantics | Historical P-23 working-tree checkpoint passed | Persistent account/environment context, information navigation, exact-draft import, review-export semantics, and three-state import passed prior browser/static QA; re-smoke with the amended flow before G3. |
-| K Version planning/create/item/restore flow | P-23.1 repository/static passed | Explicit intent, complete-registry fail-closed planning, DB next-sequence/annual void-number contract, exact post-create route, item-before-metadata, and current-to-target restore confirmation passed source/tests/build; G1R/G2/browser/G3 remain. |
+| B Exact draft/stale state | G1R passed; G2 pending | One mutable draft, replay/race, abandon/replacement, retained immutable history, and zero-draft cleanup passed against final `020`. |
+| C Category/group/code allocation | G1R passed; G2 pending | Frozen 710 mappings/65 groups/17 exclusions, allocator behavior, and two FK covering indexes passed. |
+| D Import diff/evidence | G1R DB/browser path passed; G2 pending | Full rollout/diff/replay and exact-draft import context passed; independent full operator binary import UAT remains WP-8. |
+| E Publication provenance/readiness | G1R passed; G2 pending | Authenticated provenance, archive/date negatives, readiness/publish, restore invariants, and pointer cleanup passed. |
+| F Correction/editor | G1R passed; G2 pending | Correction identity/code/history behavior and exact browser item edit passed. |
+| G Schema/Thai/evidence | G1R passed; G2 pending | Final `020` constraints/grants/lint/security/performance-advisor review, P-20 input, and desktop/mobile Thai flow passed. |
+| H Working-draft lifecycle | G1R passed; G2 pending | Partial unique, conflicts, audited abandon, immutable history, replacement, rollback, role evidence, and browser cleanup passed. |
+| I Final snapshot review | G1R DB/browser path passed; G2/G3 pending | Complete identity diff, exact lock, readiness/publish/restore, and cumulative browser comparison passed; independent intended-admin/stale-after-review UAT remains G3/WP-8. |
+| J Operator context/import/export semantics | G1R browser path passed | Account/environment context, information navigation, exact-draft import, review-export semantics, and three-state import passed; independent UAT remains WP-8. |
+| K Version planning/create/item/restore flow | G1R passed; G2/G3 pending | Explicit intent, complete registry, next sequence/annual recovery, exact workspace, item-first hierarchy, and current-to-target restore confirmation passed live and in browser. |
 
 ## 4. Owner pause points
 
@@ -214,7 +248,7 @@ Current evidence baseline:
 | P-19 inactive/retired export policy | Any candidate version contains inactive/retired rows | Approve PDF rendering/exclusion policy before official filing |
 | P-20 hash portability | Initial WP-6.5 and post-`020` WP-6.6 proofs passed; rerun after any WP-7.5 migration change and before WP-8/migration fingerprint/P-15 acceptance | Prove identical identity/hash output across the approved independent rebuild scope |
 | P-21 / WP-6.6 initial scope | Start and historical Local evidence accepted for execution 2026-07-12 | Preserve the evidence as history; it does not close the P-22-amended candidate |
-| P-22/P-23/P-23.1/P-24 / WP-6.6 operator correction | Exact P-24 candidate `88d0711` amends `020` before G1R; former G1/P-23 evidence is historical and repository/static passed | Follow [Doc #31](./31-phase4-wp66-operator-workflow-correction-plan.md): review `88d0711`, then request G1R before any reset; request independent G2 only after G1R passes, followed by fresh browser/G3/G4 |
+| P-22/P-23/P-23.1/P-24 / WP-6.6 operator correction | Exact G1R candidate `721c2c2` passed after the final `020` index and harness corrections; earlier evidence remains truthful history | Follow [Doc #31](./31-phase4-wp66-operator-workflow-correction-plan.md): request independent G2 for the same exact candidate, then G3/G4 separately |
 | Reusable version path | Before P-14 feature enablement | Local positive and duplicate/nonmonotonic evidence passed 2026-07-11; rerun the generic ADR-003 set at WP-8/P-14 |
 | WP-8 completion | Clean Local rehearsal passes | Review readiness evidence before any P-12 request |
 | P-12 | Production migration window requested | Approve or reject Production migration |
@@ -226,6 +260,7 @@ Current evidence baseline:
 
 | Date/time | WP | Evidence | Result | Notes |
 |---|---|---|---|---|
+| 2026-07-13 | WP-6.6 P-24/G1R | Completed the separately owner-approved clean Local rebuild, separate final `020` apply, live DB/concurrency/P-20 input, advisors/repository gates, bounded admin browser flow, and final cleanup | Passed on exact execution checkout `721c2c2c4a234a4fd00e5686383be9af87ee15dd`; G2 not inferred | Diagnostic runs on `7150764`, `f9f0bd7`, `bfccbb3`, `be157d4`, and `2b1ccec` truthfully exposed stale version/allocation/lifecycle assumptions and two unindexed authority foreign keys; fixes landed at `f9f0bd7`, `bfccbb3`, `be157d4`, `2b1ccec`, and final `721c2c2`. Migration `020` SHA-256 is `e07e0c4161077efba7bc4f6ebf95518d0cc1bc7e4628a43a128dd899bd1aef93`. WP-6.6/WP-6.5 evidence file SHA-256 values are `98eca768bfc8334bcf6fe4ee423468bae74f69a1d5bc39ae7bdcb6d100c2e7a8` and `aa6791ff6b06359cb857ae3e8e2aea1504f93ee2fe34fa5da2bd7d6666053280`. DB lint/security had no findings; 24 performance warnings remained pre-existing baseline policies, and the two new FK findings cleared. 30 files/161 tests, TypeScript, lint 0 errors/10 existing warnings, authority 710/65/17, `audit:prod` 0 vulnerabilities, build, smoke checks, and diff check passed. Browser covered version planning, 710-row workspace/search, exact item edit, final diff, exact-draft import, audited abandon, and cancelled restore confirmation; no publish occurred. Final Local state: pointer `2568.0.0`/710, zero drafts, all flags false, 198 BOQs/1,547 items, Factor F `2569.0.0`/36. Production touched: No. |
 | 2026-07-13 | WP-6.6 P-24 same-scope closure | Corrected focus after identical retries and separated final execution `HEAD`, implementation lineage, and migration SHA in authority handoff/evidence | Passed and committed on exact closure-lineage commit `050c998`; G1R not inferred | Focused operator/authority contracts passed 2 files/16 tests; full suite passed 30 files/161 tests; TypeScript passed; focused/full lint exited 0 with 10 existing warnings; authority remained 710 mappings/65 groups/17 exclusions with SHA-256 `28675e6244c65d485dda7142634b381db729a139bccdf189ad51563251a2e12a`; smoke syntax, network-enabled production build, and `git diff --check` passed. Migration `020` remained unchanged at SHA-256 `c8fa5e7191e17ebc3a00fd18b40f38d1cd4f9e5a6db40f758f3ee5867a064d17`, unapplied, and outside bootstrap. Local DB and Production were not touched; P-18/P-19/WP-7/Factor F/hotfix scope remained unchanged. |
 | 2026-07-13 | WP-6.6 P-24 repository/static | Completed annual range, stable safe error, durable focus, contextual authority, accessibility, Factor F hierarchy, docs, and tests without Local DB mutation | Passed on exact implementation commit `88d0711`; G1R not inferred | Focused contracts passed 5 files/45 tests; full suite passed 30 files/161 tests; TypeScript passed; lint exited 0 with 10 existing warnings; authority remained 710 mappings/65 groups/17 exclusions with SHA-256 `28675e6244c65d485dda7142634b381db729a139bccdf189ad51563251a2e12a`; smoke syntax, network-enabled production build, and `git diff --check` passed. In-app browser safe Local/disabled/account state passed at desktop and mobile with no horizontal overflow or console warnings/errors. Candidate `020` was not applied; Local DB was not reset/mutated; bootstrap remains through `019`; Production and adjacent scopes were untouched. |
 | 2026-07-13 | WP-6.6 P-24 owner decision | Owner approved bounded pre-G1R hardening after the final owner/developer audit | Approved for docs/application/candidate-`020`/tests; no reset approved | Enforce annual base +1 through +10, safe stale/range errors, durable focused Thai feedback, collapsed support IDs, contextual first-rollout authority, accessible pagination labels, and secondary Factor F context. Exact repository verification/commit precedes G1R. No Production, bootstrap, P-18/`021`, P-19, WP-7, Factor F, or hotfix expansion. |
@@ -363,16 +398,16 @@ Use this template at the end of each implementation session:
 
 ```text
 Current WP: WP-6.6 P-22/P-23/P-23.1/P-24 operator-workflow hardening
-Status: P-24 base implementation 88d0711 and exact same-scope closure-lineage commit 050c998 passed repository/static checks; candidate 020 is unapplied; earlier G1/P-23 evidence is historical; G1R/G2/browser/G3/G4 remain unauthorized
+Status: owner-approved G1R passed on exact execution checkout 721c2c2; candidate 020 passed separately applied Local DB/concurrency/P-20/advisor/browser gates and remains outside bootstrap; independent G2/G3/G4 remain unauthorized
 Branch: codex/master-catalog-phase4
-Execution provenance: record git rev-parse HEAD from the final clean committed checkout in every G1R evidence file; do not relabel implementation commit 88d0711 or pre-closure docs commit 2ca4859 as that execution checkout
-Migration 020 SHA-256: c8fa5e7191e17ebc3a00fd18b40f38d1cd4f9e5a6db40f758f3ee5867a064d17; bootstrap remains through 019
-Latest evidence commits: 050c998 for P-24 same-scope closure lineage; 88d0711 for P-24 base repository/static; 31fd689 for P-23/P-23.1 source; c8f6dca for pre-G2 operator/UI; e463270 for final P-22 G1 DB/P-20; 17ec6cc for reusable WP-6.5 fixture cleanup; ac31feb for P-22 source/static; 3bfc74e for superseded historical WP-6.6 Local evidence; 1ad01b9 for clean WP-6.5/P-20; 777df75 for accepted P-11
-Files changed: P-24 post-commit authority status/provenance docs and consistency contract only; migration 020, bootstrap, Production, Factor F, hotfix 016, and untracked files/, tmp/, output/ are unchanged
-Evidence produced: P-24 base repository/static checkpoint plus exact same-scope closure-lineage commit 050c998; prior G1/P-23/P-22 evidence remains truthful history only
-Tests/checks run: focused operator/authority contracts 2 files/16 tests; full suite 30 files/161 tests; TypeScript; focused/full lint 0 errors with 10 existing warnings; authority 710 mappings/65 groups/17 exclusions with SHA-256 28675e6244c65d485dda7142634b381db729a139bccdf189ad51563251a2e12a; smoke syntax; network-enabled production build; git diff check; live DB/browser mutation evidence still waits for G1R
-Blockers: explicit G1R approval for the destructive Local rebuild/live DB-browser-P-20 rerun; then separately approved independent G2, fresh browser/G3 owner closeout, and G4/bootstrap/WP-7; P-18/P-19 when affected; WP-8 independent UAT, performance, accessibility, and advisor disposition
-Owner decisions needed: authorize or decline G1R from the exact pushed candidate; G2 and G3 remain separate. Production P-12 through P-15 remain separate
-Next safe step: request explicit G1R approval only from a clean pushed checkout before any Local reset; do not touch Production
+Execution provenance: G1R exact checkout 721c2c2c4a234a4fd00e5686383be9af87ee15dd; P-24 base lineage 88d0711; same-scope closure lineage 050c998
+Migration 020 SHA-256: e07e0c4161077efba7bc4f6ebf95518d0cc1bc7e4628a43a128dd899bd1aef93; bootstrap remains through 019
+Latest evidence commits: 721c2c2 for exact G1R and FK-index closure; 2b1ccec/be157d4/bfccbb3/f9f0bd7 for truthful harness corrections; 050c998 for P-24 closure lineage; 88d0711 for P-24 base repository/static; 31fd689 for P-23/P-23.1 source; c8f6dca for historical operator/UI; e463270 for historical P-22 G1 DB/P-20; 777df75 for accepted P-11
+Files changed: G1R evidence authority docs and consistency contract; bootstrap, Production, Factor F, hotfix 016, and untracked files/, tmp/, output/ remain outside commits
+Evidence produced: WP-6.6 JSON SHA-256 98eca768bfc8334bcf6fe4ee423468bae74f69a1d5bc39ae7bdcb6d100c2e7a8; WP-6.5/P-20 JSON SHA-256 aa6791ff6b06359cb857ae3e8e2aea1504f93ee2fe34fa5da2bd7d6666053280; bounded browser screenshots remain untracked under tmp/
+Tests/checks run: clean bootstrap through 019 plus separate 020; WP-66/WP-65; DB lint/security/performance advisors; 30 files/161 tests; TypeScript; lint 0 errors/10 existing warnings; authority 710/65/17; audit:prod 0 vulnerabilities; production build; browser desktop/mobile flow; git diff check
+Blockers: separately approved independent G2 and P-20 comparison; then G3 owner closeout and G4/bootstrap/WP-7; P-18/P-19 when affected; WP-8 independent UAT, measured performance, formal accessibility, and final advisor disposition
+Owner decisions needed: authorize or decline G2 for exact candidate 721c2c2; G3 and Production P-12 through P-15 remain separate
+Next safe step: request explicit G2 approval before another destructive clean Local rebuild; do not touch Production
 Production touched: No
 ```

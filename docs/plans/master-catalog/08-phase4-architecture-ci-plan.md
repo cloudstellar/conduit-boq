@@ -62,9 +62,10 @@ reservation, and a guarded next-sequence check. A lower abandoned annual number
 does not block the truthful year: the next patch-0 revision remains an annual
 transition relative to the older-year base. Successful create opens the exact
 workspace; items precede detailed document metadata; restore shows a
-current-to-target confirmation. Candidate `020` changes, so earlier G1 evidence
-is historical and separately approved G1R/G2 clean rebuilds are required before
-G3. No reset or Production action is authorized here.
+current-to-target confirmation. Candidate `020` changed, so at that amendment
+checkpoint earlier G1 evidence became historical and separately approved
+G1R/G2 clean rebuilds were required before G3. The later G1R result is recorded
+below. No reset or Production action was authorized by this amendment.
 
 **P-24 pre-G1R hardening:** 2026-07-13 — the exact candidate must also enforce
 an annual effective-year horizon of base +1 through +10 at UI, Server Action,
@@ -75,6 +76,16 @@ authority copy conditional on the actual base version. Factor F is supporting
 context, not a Master Catalog workflow metric. This amends still-unaccepted
 candidate `020`, so G1R must use the post-P-24 fingerprint. It authorizes no
 reset or Production action.
+
+**G1R execution evidence:** 2026-07-13 — the owner separately authorized the
+first clean rebuild. Final candidate `020` passed separate Local application,
+DB/concurrency/P-20/advisor/repository/browser gates on exact execution checkout
+`721c2c2c4a234a4fd00e5686383be9af87ee15dd`, with migration SHA-256
+`e07e0c4161077efba7bc4f6ebf95518d0cc1bc7e4628a43a128dd899bd1aef93`.
+The result confirms rather than changes the architecture: one guarded workspace,
+reserved version lifecycle, item-first review, exact-draft import, audited
+abandon, lock-bound publish, and pointer-only restore. Independent G2, G3/G4,
+bootstrap inclusion, WP-7, and Production remain separate approvals.
 
 **Owner decision recorded:** 2026-07-04 — approved according to the
 recommendation for Phase 4 Core/local implementation. This approval does not

@@ -131,7 +131,7 @@ describe('Master Catalog authority consistency', () => {
     ])
 
     expect(migrations).toContain(
-      '**Amended Local-only DB candidate under P-24 on exact base implementation commit `88d0711`; SHA-256 `c8fa5e7191e17ebc3a00fd18b40f38d1cd4f9e5a6db40f758f3ee5867a064d17`; same-scope UI/provenance closure does not change this file; prior `020` fingerprints/G1 evidence are historical; separately approved G1R and G2 clean rebuilds remain required; not in bootstrap or Production**',
+      '**G1R-passed Local-only candidate on exact execution checkout `721c2c2c4a234a4fd00e5686383be9af87ee15dd`; SHA-256 `e07e0c4161077efba7bc4f6ebf95518d0cc1bc7e4628a43a128dd899bd1aef93`; independent G2, G3/G4, and Production approvals remain required; not in bootstrap or Production**',
     )
     expect(migrations).toContain(
       '**Proposed only — P-18 pending; file does not exist; not in bootstrap**',
@@ -186,13 +186,13 @@ describe('Master Catalog authority consistency', () => {
     expect(decisions).toContain('P-19')
     expect(decisions).toContain('Pending; recorded 2026-07-07')
     expect(decisions).toContain(
-      'Approved contract; historical inputs passed; amended P-24 candidate G1R/G2 and WP-8/P-15 reruns pending',
+      'Approved contract; final G1R input passed; independent G2 and WP-8/P-15 reruns pending',
     )
     expect(decisions).toContain(
-      'P-24 pre-G1R hardening',
+      'WP-6.6 P-24/G1R',
     )
     expect(decisions).toContain(
-      'same-scope repeated-error-focus/provenance closure committed on exact lineage commit `050c998`; no reset approved; G1R remains separate',
+      'final G1R passed on exact execution checkout `721c2c2`',
     )
 
     const tracker = read(
@@ -206,13 +206,13 @@ describe('Master Catalog authority consistency', () => {
     expect(tracker).toContain('independent intended-admin UAT remains WP-8')
     expect(tracker).toContain('| Production write allowed | No |')
     expect(tracker).toContain(
-      'P-24 approved bounded pre-G1R annual base +1 through +10',
+      'G1R was explicitly approved and completed on 2026-07-13',
     )
     expect(tracker).toContain(
-      'Migration 020 SHA-256: c8fa5e7191e17ebc3a00fd18b40f38d1cd4f9e5a6db40f758f3ee5867a064d17',
+      'Migration 020 SHA-256: e07e0c4161077efba7bc4f6ebf95518d0cc1bc7e4628a43a128dd899bd1aef93',
     )
     expect(tracker).toContain(
-      'record git rev-parse HEAD from the final clean committed checkout',
+      'G1R exact checkout 721c2c2c4a234a4fd00e5686383be9af87ee15dd',
     )
     expect(tracker).toContain(
       '050c998361f3372bd3bf9fb6645dc4abd1c0bf2b` is the exact P-24 same-scope closure-lineage checkpoint',
@@ -226,7 +226,7 @@ describe('Master Catalog authority consistency', () => {
       /pre-amendment operator\/browser preflight passed on\s+`c8f6dca`/,
     )
     expect(tracker).toMatch(
-      /G1R,\s+G2, G3, G4, and every\s+Production action\s+remain unauthorized/,
+      /independent G2, G3, G4, and every Production action\s+remain unauthorized/i,
     )
     expect(existsSync(resolve(
       root,
@@ -237,13 +237,13 @@ describe('Master Catalog authority consistency', () => {
     )
     expect(ownerReview).not.toContain('A new exact commit,')
     expect(ownerReview).toContain(
-      '**Current migration `020` SHA-256:** `c8fa5e7191e17ebc3a00fd18b40f38d1cd4f9e5a6db40f758f3ee5867a064d17`',
+      '**Current migration `020` SHA-256:** `e07e0c4161077efba7bc4f6ebf95518d0cc1bc7e4628a43a128dd899bd1aef93`',
     )
     expect(ownerReview).toContain(
       '**P-24 closure-lineage checkpoint:** `050c998361f3372bd3bf9fb6645dc4abd1c0bf2b`',
     )
     expect(ownerReview).toContain(
-      '**G1R execution checkout:** Capture the final clean `git rev-parse HEAD` at runtime',
+      '**G1R execution checkout:** `721c2c2c4a234a4fd00e5686383be9af87ee15dd`',
     )
     expect(existsSync(resolve(
       root,
@@ -254,6 +254,9 @@ describe('Master Catalog authority consistency', () => {
     )
     expect(correctionPlan).toContain(
       'Passed and committed on exact closure-lineage commit `050c998`',
+    )
+    expect(correctionPlan).toContain(
+      '| G1R | Explicitly owner-approved and passed 2026-07-13',
     )
   })
 

@@ -79,6 +79,13 @@ Factor F remains separate support information. Candidate `020` changes again,
 so the first clean rebuild must use the exact post-P-24 commit. No Local reset,
 Production, P-18/`021`, P-19, WP-7, Factor F, or hotfix work is authorized.
 
+**G1R execution recorded:** 2026-07-13 — the owner later approved G1R as a
+separate decision. The clean Local rebuild through `019`, separate final `020`
+apply, DB/concurrency/P-20/advisor/repository/browser evidence, and cleanup
+passed on exact execution checkout `721c2c2`; migration SHA-256 is
+`e07e0c4161077efba7bc4f6ebf95518d0cc1bc7e4628a43a128dd899bd1aef93`.
+This does not authorize G2, G3/G4, bootstrap inclusion, WP-7, or Production.
+
 ## 1. Decision requested
 
 Approve detailed implementation and local rehearsal of Master Catalog Phase 4.
@@ -407,10 +414,13 @@ feature enablement, final catalog publication, or silent business-data choices.
       outside bootstrap; P-23.1 later made that live evidence historical
 - [x] P-23.1 repository/static verification passed 2026-07-13 without applying
       amended candidate `020`, resetting Local, changing bootstrap, or touching
-      Production; G1R/G2/browser/G3/G4 remain separately gated
+      Production
+- [x] Separately approved G1R passed on exact `721c2c2`, including final Local
+      cleanup; no Production access/write occurred
 - [x] Unsupported Add/Supplement/Retire controls remain hidden at release unless
       their downstream gates pass
-- [ ] A separate owner decision is obtained before any Local bootstrap/reset
+- [ ] A separate owner decision is obtained before the independent G2 Local
+      bootstrap/reset
 
 ### Additional preconditions before WP-7.5 placement implementation
 
