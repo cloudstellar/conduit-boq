@@ -57,7 +57,8 @@ bounded persistent-identity, information-navigation, exact-draft import, and
 review-export semantics amendment on 2026-07-13. Its Local-only working-tree
 UI/static/browser checkpoint passed and was incorporated into the later exact
 candidate. Final owner-approved G1R then passed on execution checkout
-`721c2c2`; independent G2 clean rebuild/P-20 comparison, G3 owner closeout, G4
+`721c2c2`; the separately owner-approved independent G2 clean rebuild and P-20
+comparison then passed on the same exact candidate. G3 owner closeout, G4
 bootstrap/WP-7 sequencing, and every Production action remain separate
 decisions.
 
@@ -67,8 +68,8 @@ reserved-number planning, a guarded next-sequence rule including same-year
 annual recovery after a void lower number, direct post-create workspace
 navigation, item-before-metadata hierarchy, and pointer-restore confirmation.
 This amends candidate `020`; prior G1/live evidence is historical. Repository/
-static and final G1R evidence later passed; independent G2 remains a separate
-owner decision. No Production action is authorized by this entry.
+static and final G1R/G2 evidence later passed. G3 and every Production action
+remain separate owner decisions.
 
 **P-24 pre-G1R hardening authorized:** 2026-07-13 — before any clean rebuild,
 enforce annual base +1 through +10 in UI/server/DB, preserve safe Thai stale and
@@ -76,8 +77,8 @@ range errors across background refresh, focus the error for keyboard/screen
 reader recovery, hide raw identifiers under support details, contextualize
 first-rollout authority copy, and keep Factor F secondary. Update candidate
 `020`, contracts, tests, and operator docs together. The later separately
-approved G1R run passed on exact checkout `721c2c2`; this entry still does not
-authorize G2 or any Production action.
+approved G1R/G2 runs passed on exact checkout `721c2c2`; this entry still does
+not authorize G3/G4 or any Production action.
 
 **Purpose:** Turn the reviewed Phase 4 architecture into an execution checklist
 that an implementer can follow without re-deciding scope, sequencing, database
@@ -180,10 +181,10 @@ Start blocked:
 | P-19 inactive/retired export policy | Publication/filing of any version with inactive rows | Decision Register |
 | P-20 canonical hash/identity portability | Initial WP-6.5 exit and rerun after WP-6.6/WP-7.5 migration changes, WP-8 clean rehearsal, and migration fingerprint freeze | Decision Register |
 | P-21 Audit #29 WP-6.6 scope/start | WP-6.6 implementation and any migration `020` execution | Decision Register / Completeness Audit |
-| P-22 operator-workflow correction | Earlier source/G1/operator/P-23 checkpoints are historical after P-23.1 amended candidate `020`; final G1R passed, while independent G2 and G3 now govern closeout | Decision Register / Correction Plan #31 |
+| P-22 operator-workflow correction | Earlier source/G1/operator/P-23 checkpoints are historical after P-23.1 amended candidate `020`; final G1R/G2 passed, while G3 now governs closeout | Decision Register / Correction Plan #31 |
 | P-23 operator-context/navigation amendment | Persistent operator/account context, information-only global nav, exact-draft import route, explicit input/export semantics, Local marker, and static/browser evidence were incorporated into exact P-23.1 source commit `31fd689`; no reset | Decision Register / Correction Plan #31 |
-| P-23.1 version-intent/item-first correction | Owner approved bounded docs/application/candidate-`020` work; repository/static and final G1R passed; independent G2 remains because prior G1 evidence is historical | ADR-003 / Decision Register / Correction Plan #31 |
-| P-24 pre-G1R business/UX hardening | Owner approved the bounded annual-range, safe-error, durable-focus, contextual-authority, and Factor F hierarchy patch; base `88d0711` and closure `050c998` are lineage; final G1R passed on exact execution checkout `721c2c2` with migration SHA-256 `e07e0c4161077efba7bc4f6ebf95518d0cc1bc7e4628a43a128dd899bd1aef93` | ADR-003 / ADR-004 / Decision Register / Correction Plan #31 |
+| P-23.1 version-intent/item-first correction | Owner approved bounded docs/application/candidate-`020` work; repository/static and final G1R/G2 passed; G3 remains because prior G1 evidence is historical | ADR-003 / Decision Register / Correction Plan #31 |
+| P-24 pre-G1R business/UX hardening | Owner approved the bounded annual-range, safe-error, durable-focus, contextual-authority, and Factor F hierarchy patch; base `88d0711` and closure `050c998` are lineage; final G1R/G2 passed on exact execution checkout `721c2c2` with migration SHA-256 `e07e0c4161077efba7bc4f6ebf95518d0cc1bc7e4628a43a128dd899bd1aef93` | ADR-003 / ADR-004 / Decision Register / Correction Plan #31 |
 
 Rule: unresolved P-02 through P-11 does not block generic additive schema,
 parser, UI shell, tests, or local rehearsal. It blocks final candidate data
@@ -601,9 +602,9 @@ Exit gate:
 
 - Audit #29 C-01 through C-15 each have an implementation/evidence reference in
   the Verification Report;
-- migration `020` static verification and explicitly approved G1R Local
-  DB/RLS/grant/rollback/concurrency/P-20/browser evidence have passed; a second
-  separately approved independent G2 clean rebuild/comparison remains;
+- migration `020` static verification and explicitly approved G1R/G2 Local
+  DB/RLS/grant/rollback/concurrency/P-20 evidence have passed; G1R also passed
+  the bounded browser path and the G1R-versus-G2 comparator matched;
 - browser QA and owner review prove the one-workspace item-first flow, exact
   item targeting, authoritative final diff, stale-review recovery, and Thai
   workflow;
@@ -615,6 +616,13 @@ Exit gate:
   `npm run db:local:smoke-master-catalog-wp66 -- --output <path>` and records
   exact commit/environment plus `productionTouched=false`;
 - owner accepts WP-6.6 closeout before WP-7 begins.
+
+The G2 advisor baseline is explicit: eight authenticated-callable
+`SECURITY DEFINER` warnings are triaged (seven baseline RPCs and one guarded
+Master Catalog readiness facade, all denied to anon), alongside 24 baseline
+performance warnings and seven baseline unindexed-FK information findings.
+WP-8 owns the final least-privilege/performance disposition; G2 does not convert
+those findings into a Production waiver.
 
 ## 14. WP-7 permanent BOQ/hotfix `016` and Factor F regression preservation
 

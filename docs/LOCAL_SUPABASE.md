@@ -28,13 +28,13 @@ workflow smoke tests. Get owner approval before using this command as evidence
 when preserving existing Local state matters.
 
 WP-6.6 migration `020_master_catalog_phase4_admin_workflow_hardening.sql` passed
-the separately owner-approved G1R clean Local DB/concurrency/browser run on
-exact execution checkout `721c2c2c4a234a4fd00e5686383be9af87ee15dd`, with
-SHA-256
+the separately owner-approved G1R and independent G2 clean Local
+DB/concurrency evidence runs on exact execution checkout
+`721c2c2c4a234a4fd00e5686383be9af87ee15dd`, with SHA-256
 `e07e0c4161077efba7bc4f6ebf95518d0cc1bc7e4628a43a128dd899bd1aef93`.
-It remains outside this canonical bootstrap until independent G2 and the
-WP-6.6 G3/G4 closeout are accepted. Do not append `020` to the bootstrap
-command ad hoc.
+The P-20 G1R-versus-G2 comparison passed. It remains outside this canonical
+bootstrap until the WP-6.6 G3/G4 closeout is accepted. Do not append `020` to
+the bootstrap command ad hoc.
 
 ```bash
 npm run db:local:bootstrap

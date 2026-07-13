@@ -12,8 +12,10 @@ implementation commit `88d0711` and the later same-scope repeated-error-focus/
 execution-provenance closure passed their repository/static gates; the closure
 is committed on exact lineage commit `050c998`. Earlier evidence remains valid
 history. The separately owner-approved G1R clean DB/concurrency/P-20/advisor/
-browser gate passed on exact execution checkout `721c2c2`; independent G2, G3
-closeout, and G4 bootstrap/WP-7 sequencing remain pending
+browser gate passed on exact execution checkout `721c2c2`; the separately
+owner-approved independent G2 clean rebuild and P-20 comparison then passed on
+the same exact candidate. G3 closeout and G4 bootstrap/WP-7 sequencing remain
+pending
 
 **Production touched:** No
 
@@ -304,7 +306,7 @@ candidate `020` separately until the new owner closeout accepts it.
 | G1W | Passed on exact implementation commit `88d0711` on 2026-07-13: P-24 annual range, safe error, durable focus, contextual authority, and Factor F hierarchy repository/static gate. No reset is approved. |
 | G1X | Passed and committed on exact closure-lineage commit `050c998`: same-scope identical-retry focus and execution-provenance closure. |
 | G1R | Explicitly owner-approved and passed 2026-07-13 on exact clean execution checkout `721c2c2c4a234a4fd00e5686383be9af87ee15dd`; migration `020` SHA-256 `e07e0c4161077efba7bc4f6ebf95518d0cc1bc7e4628a43a128dd899bd1aef93`; final Local cleanup passed. |
-| G2 | Owner explicitly approves a second independent clean rebuild of the same accepted candidate and P-20 comparison after G1R passes. |
+| G2 | Explicitly owner-approved and passed 2026-07-13 on the same exact checkout `721c2c2c4a234a4fd00e5686383be9af87ee15dd`; second clean rebuild, separate unchanged `020`, WP-6.6/WP-6.5 evidence, P-20 comparator, current advisors, repository gates, and cleanup passed. |
 | G3 | Owner completes intended-admin workflow review and accepts or holds the revised WP-6.6 closeout |
 | G4 | Only after G3, add accepted `020` to bootstrap and separately authorize any WP-7 execution |
 
@@ -334,7 +336,7 @@ Completed without Local DB mutation or Production access:
 This repository/static checkpoint did not itself satisfy G1/G2
 DB/concurrency/browser/P-20 evidence and did not authorize
 `npm run db:local:bootstrap`. G1 was later approved separately and is recorded
-below; G2 still requires a new owner decision.
+below; G2 was later approved separately and is recorded in Section 17.
 
 ## 11. G1 Local checkpoint
 
@@ -377,9 +379,9 @@ P-20 evidence therefore remains attached to exact commit `e463270`; it is not
 silently relabeled as newer evidence. The later UI-only checkpoint below did
 not change migration `020`. At that historical checkpoint, `c8f6dca` was the
 intended G2 candidate; P-23.1/P-24 and the final G1R corrections superseded
-that target. G2 must now, after separate owner approval, perform a fresh clean
-rebuild from exact executable candidate `721c2c2` and compare its independent
-P-20 output with the G1R input. G3 is not inferred from G1R.
+that target. Final G2 later performed the separately approved fresh clean
+rebuild from exact executable candidate `721c2c2` and matched its independent
+P-20 output with the G1R input. G3 is not inferred from G1R/G2.
 
 ## 12. Pre-G2 operator/UI checkpoint
 
@@ -408,7 +410,8 @@ closeout. P-23 subsequently identified persistent operator identity, mixed
 global/action navigation, contextual import targeting, and export/import
 semantics as unresolved comprehension controls. The next action is the bounded
 P-23 docs/UI/static/browser amendment without a Local reset. Only its accepted
-exact commit may become the separately approved G2 target.
+exact commit could have become the separately approved G2 target at that
+historical checkpoint; P-23.1/P-24 later superseded it.
 
 ## 13. P-23 operator-context checkpoint
 
@@ -478,9 +481,9 @@ authority 710/65/17, smoke-script syntax, network-enabled production build, and
 `git diff --check`. The harness now records out-of-sequence denial and
 same-candidate race normalization. Read-only in-app browser smoke passed the
 disabled/account-context state with zero console warnings/errors; the amended
-mutable flow still waits for G1R. No Local DB was reset or mutated. Request G1R separately
-before any Local reset; a passing G1R is
-then followed by separately approved independent G2 evidence and owner G3.
+mutable flow still awaited G1R at that checkpoint. No Local DB was reset or
+mutated. The later separately approved G1R and independent G2 evidence passed;
+owner G3 remains.
 
 ## 15. P-24 pre-G1R hardening
 
@@ -563,8 +566,9 @@ Final retained evidence:
 - WP-6.5/P-20 JSON SHA-256
   `aa6791ff6b06359cb857ae3e8e2aea1504f93ee2fe34fa5da2bd7d6666053280`;
 - 710-row dataset and P-20 identity hashes reproduced exactly;
-- DB lint/security had no findings; 24 performance warnings remained
-  pre-existing baseline policy findings and the two new FK findings cleared;
+- the G1R advisor query returned no security findings; 24 performance warnings
+  remained pre-existing baseline policy findings and the two new FK findings
+  cleared. The current Studio-rule disposition is superseded by G2 below;
 - 30 test files/161 tests, TypeScript, lint, authority, dependency audit,
   production build, smoke checks, and diff check passed;
 - browser QA covered version planning, first/middle/last search, exact item
@@ -574,6 +578,45 @@ Final retained evidence:
   flags false, 198 BOQs/1,547 items, and Factor F `2569.0.0`/36 rows;
 - Production touched: No.
 
-G2 remains a separate owner decision and must clean-rebuild the same exact
-candidate independently, produce a second P-20 input, and compare it with G1R.
-G3/G4, bootstrap inclusion, WP-7, and all Production actions remain separate.
+G1R did not itself authorize G2. The owner later approved G2 separately, and
+Section 17 records the independent result. G3/G4, bootstrap inclusion, WP-7,
+and all Production actions remain separate.
+
+## 17. G2 independent reproducibility result
+
+The owner separately approved G2 on 2026-07-13. It used the same exact
+execution checkout `721c2c2c4a234a4fd00e5686383be9af87ee15dd` and unchanged
+migration `020` SHA-256
+`e07e0c4161077efba7bc4f6ebf95518d0cc1bc7e4628a43a128dd899bd1aef93`.
+The clean bootstrap again stopped at `019`; `020` was applied separately.
+
+Retained untracked evidence:
+
+- WP-6.6 JSON SHA-256
+  `d5da2ceeb5871160ac8cdf8dfe34ffdee220e20c8880e001e42c0bbaaea13f43`;
+- WP-6.5/P-20 JSON SHA-256
+  `98b9f5fb9e0135ea35a716c87e1f4916e7aa1d186ce68ed067ea02d81b0bce42`;
+- P-20 G1R-versus-G2 comparison passed on the same reviewed commit, 710-row
+  dataset hash
+  `sha256:2e3571ea7135fbc0bbb84c8cc330af1173e4c1d2345e5eb59958dc76e45558b8`,
+  and identity mapping SHA-256
+  `5f68993ce5aa5c7735b0d9e6de6d27946b4846fb8a6eb77d1b6b3bd6c4a73de7`;
+- DB lint had no schema error; current Local Studio rules reported eight
+  triaged authenticated-callable `SECURITY DEFINER` warnings, 24 baseline
+  performance warnings, and seven baseline unindexed-FK information findings.
+  All eight functions deny anon; seven are baseline RPCs and one is the
+  active-admin/feature-flag-guarded Master Catalog readiness facade. Both new
+  authority FKs are covered. WP-8 owns final least-privilege/performance
+  disposition, especially for baseline `get_user_role` and `is_admin`;
+- 30 test files/161 tests, TypeScript, lint with 0 errors/10 existing warnings,
+  authority 710/65/17, `audit:prod` with 0 vulnerabilities, production build,
+  smoke checks, and `git diff --check` passed;
+- final Local state was pointer `2568.0.0`/710 rows, zero working drafts, all
+  flags false, 198 BOQs/1,547 items, Factor F `2569.0.0`/36 rows, and two valid
+  authority FK indexes;
+- Production touched: No.
+
+G2 was the independent DB/reproducibility gate and did not repeat browser
+acceptance. G3 must now perform the intended-admin closeout, emphasizing
+stale-after-review recovery and comprehension. G4/bootstrap inclusion, WP-7,
+WP-8, and all Production actions remain separate.

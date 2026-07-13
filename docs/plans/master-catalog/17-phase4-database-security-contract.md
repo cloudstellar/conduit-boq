@@ -21,7 +21,10 @@ amended the same unapplied candidate with the annual base +1 through +10 guard
 and stable `VERSION_EFFECTIVE_YEAR_OUT_OF_RANGE` response; separately approved
 G1R later passed on exact clean execution checkout `721c2c2`, including schema,
 RLS/grants, concurrency, P-20 input, lint/security advisors, and two required
-authority foreign-key covering indexes. Independent G2 remains required.
+authority foreign-key covering indexes. The separately approved independent G2
+then repeated the clean DB/concurrency/P-20 evidence on the same exact
+candidate and the comparator passed. Current advisor-rule warnings are triaged
+below and require final WP-8 disposition rather than being hidden.
 `020` remains outside bootstrap and has not been applied to Production.
 P-18 rules and placement migration `021` remain pending owner/data-custodian
 approval.
@@ -827,10 +830,10 @@ WP-6.6 authority/readiness/correction/constraint changes, the replacement draft
 create implementation, the partial unique index, and the audited abandon path;
 it must not rewrite `017`-`019`, hotfix `016`, BOQ behavior, or Factor F state.
 Its prior `3bfc74e` and `e463270` Local evidence is historical and superseded for
-the P-23.1 candidate. Final G1R passed on exact `721c2c2` with migration SHA-256
+the P-23.1 candidate. Final G1R/G2 passed on exact `721c2c2` with migration SHA-256
 `e07e0c4161077efba7bc4f6ebf95518d0cc1bc7e4628a43a128dd899bd1aef93`.
-Keep `020` outside `scripts/bootstrap-local-db.sh` until independent G2 evidence
-plus G3/G4 owner closeout are recorded.
+Keep `020` outside `scripts/bootstrap-local-db.sh` until G3/G4 owner closeout
+is recorded.
 
 If P-18 is accepted, implement the placement extension only in append-only
 migration `021_master_catalog_phase4_placement_governance.sql`. Do not edit or
@@ -890,6 +893,17 @@ migration.
   preserving inherited relative order; invalid/stale/concurrent placement has no
   partial row, audit, revision, pointer, BOQ, or Factor F effect;
 - security/performance advisors have no unresolved blocker.
+
+The current Local Studio advisor rule set used at G2 reports eight
+authenticated-callable `SECURITY DEFINER` warnings. All eight deny anonymous
+execution. Seven are pre-existing application RPCs; the one Master Catalog RPC
+is `get_catalog_publish_readiness`, whose public facade requires the feature
+flag and active-admin private context. This is not a new untriaged G2 blocker,
+but WP-8 must review whether every authenticated grant remains necessary and
+record a least-privilege/minimization disposition, especially for baseline
+`get_user_role` and `is_admin`. The 24 performance warnings and seven
+unindexed-FK information findings are pre-existing baseline items; both new
+frozen-authority foreign keys have valid covering indexes.
 
 ## 14. Retention and deletion
 

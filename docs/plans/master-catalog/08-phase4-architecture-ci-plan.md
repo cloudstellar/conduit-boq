@@ -49,11 +49,10 @@ import to `/versions/{versionId}/import`, distinguish approved workbook input
 from review-only exports, and keep the overall workspace iterative. This is a
 route/presentation composition over existing Server Components, Server
 Actions, read models, and RPC invariants. It does not add a client REST layer,
-database migration, round-trip spreadsheet editor, or approval engine. G2 must
-independently clean-rebuild the exact post-P-23 candidate after the passed
-working-tree static/browser checkpoint is owner-reviewed, committed, and named;
-G3 owner closeout remains. No Production action is authorized by this
-checkpoint.
+database migration, round-trip spreadsheet editor, or approval engine. At that
+checkpoint G2 still had to independently clean-rebuild the later reviewed,
+committed, named candidate. Final G2 has now satisfied that requirement; G3
+owner closeout remains. No Production action is authorized by this checkpoint.
 
 **P-23.1 version-intent/item-first amendment:** 2026-07-13 — draft creation
 requires explicit annual/revision/patch business intent, an owner-designated
@@ -64,8 +63,8 @@ transition relative to the older-year base. Successful create opens the exact
 workspace; items precede detailed document metadata; restore shows a
 current-to-target confirmation. Candidate `020` changed, so at that amendment
 checkpoint earlier G1 evidence became historical and separately approved
-G1R/G2 clean rebuilds were required before G3. The later G1R result is recorded
-below. No reset or Production action was authorized by this amendment.
+G1R/G2 clean rebuilds were required before G3. The later G1R/G2 results are
+recorded below. No reset or Production action was authorized by this amendment.
 
 **P-24 pre-G1R hardening:** 2026-07-13 — the exact candidate must also enforce
 an annual effective-year horizon of base +1 through +10 at UI, Server Action,
@@ -84,8 +83,14 @@ DB/concurrency/P-20/advisor/repository/browser gates on exact execution checkout
 `e07e0c4161077efba7bc4f6ebf95518d0cc1bc7e4628a43a128dd899bd1aef93`.
 The result confirms rather than changes the architecture: one guarded workspace,
 reserved version lifecycle, item-first review, exact-draft import, audited
-abandon, lock-bound publish, and pointer-only restore. Independent G2, G3/G4,
-bootstrap inclusion, WP-7, and Production remain separate approvals.
+abandon, lock-bound publish, and pointer-only restore.
+
+**G2 reproducibility evidence:** 2026-07-13 — the owner separately authorized
+the second independent clean rebuild on the same exact execution checkout.
+Bootstrap through `019`, separate `020`, WP-6.6/WP-6.5 evidence, P-20
+comparison, repository gates, current advisor triage, and final Local invariant
+readback passed. G3/G4, bootstrap inclusion, WP-7, and Production remain
+separate approvals.
 
 **Owner decision recorded:** 2026-07-04 — approved according to the
 recommendation for Phase 4 Core/local implementation. This approval does not

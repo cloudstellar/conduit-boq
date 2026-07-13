@@ -6,12 +6,12 @@ passed on `ac31feb`, and G1 Local DB/concurrency evidence passed on `e463270`.
 P-23 owner-approved the persistent operator identity, information-only global
 navigation, exact-draft import, and explicit review-export semantics on
 2026-07-13. Its working-tree UI/static/browser checkpoint passed and awaits
-owner review/commit before an exact G2 candidate is named. WP-6.6 closeout
-remains on Hold for G2 independent
-rebuild/P-20 comparison and G3 owner review. Prior `3bfc74e` evidence is
-historical. P-18/P-19 where applicable and independent intended-admin WP-8 UAT
-remain pending. The Local UI must not be treated as Production-ready until
-those gates pass.
+owner review/commit before an exact G2 candidate is named. Final G1R and the
+separately approved independent G2 rebuild/P-20 comparison later passed on
+exact candidate `721c2c2`. WP-6.6 closeout remains on Hold for G3 owner review.
+Prior `3bfc74e` evidence is historical. P-18/P-19 where applicable and
+independent intended-admin WP-8 UAT remain pending. The Local UI must not be
+treated as Production-ready until those gates pass.
 **Audience:** Active Master Catalog administrators
 **Rule:** A draft is not official; published versions are immutable
 

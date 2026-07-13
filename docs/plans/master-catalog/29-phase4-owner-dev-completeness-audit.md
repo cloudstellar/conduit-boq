@@ -10,7 +10,9 @@ amendment. Its first working-tree UI/static/browser checkpoint passed on
 2026-07-13. P-23.1 and P-24 then amended candidate `020` and the operator flow;
 P-24 repository/static verification passed on exact implementation commit
 `88d0711`; final owner-approved G1R then passed on exact execution checkout
-`721c2c2`. Independent G2 and G3 owner closeout must precede WP-7.
+`721c2c2`. The separately approved independent G2 clean rebuild and P-20
+comparison then passed on the same exact candidate. G3 owner closeout must
+precede WP-7.
 
 **Environment:** Source/document audit only. No Local database reset, Production
 access/write, feature enablement, publication, new Factor F workflow, or hotfix
@@ -151,7 +153,8 @@ Do not edit evidence-backed Local migrations `017`-`019`.
   fingerprints/live evidence remain historical; final G1R passed on exact
   `721c2c2` with migration SHA-256
   `e07e0c4161077efba7bc4f6ebf95518d0cc1bc7e4628a43a128dd899bd1aef93`.
-  Independent G2 remains separately approved before closeout.
+  Independent G2 then reproduced the final candidate and P-20 hashes; G3
+  remains separately approved before closeout.
 
 ## 7. Deliberate deferrals and control visibility
 

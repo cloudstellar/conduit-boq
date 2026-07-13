@@ -131,7 +131,7 @@ describe('Master Catalog authority consistency', () => {
     ])
 
     expect(migrations).toContain(
-      '**G1R-passed Local-only candidate on exact execution checkout `721c2c2c4a234a4fd00e5686383be9af87ee15dd`; SHA-256 `e07e0c4161077efba7bc4f6ebf95518d0cc1bc7e4628a43a128dd899bd1aef93`; independent G2, G3/G4, and Production approvals remain required; not in bootstrap or Production**',
+      '**G1R/G2-passed Local-only candidate on exact execution checkout `721c2c2c4a234a4fd00e5686383be9af87ee15dd`; SHA-256 `e07e0c4161077efba7bc4f6ebf95518d0cc1bc7e4628a43a128dd899bd1aef93`; P-20 comparison passed; G3/G4 and Production approvals remain required; not in bootstrap or Production**',
     )
     expect(migrations).toContain(
       '**Proposed only — P-18 pending; file does not exist; not in bootstrap**',
@@ -186,13 +186,13 @@ describe('Master Catalog authority consistency', () => {
     expect(decisions).toContain('P-19')
     expect(decisions).toContain('Pending; recorded 2026-07-07')
     expect(decisions).toContain(
-      'Approved contract; final G1R input passed; independent G2 and WP-8/P-15 reruns pending',
+      'Approved contract; final G1R/G2 comparison passed; WP-8/P-15 reruns pending',
     )
     expect(decisions).toContain(
       'WP-6.6 P-24/G1R',
     )
     expect(decisions).toContain(
-      'final G1R passed on exact execution checkout `721c2c2`',
+      'final G1R/G2 passed on exact execution checkout `721c2c2`',
     )
 
     const tracker = read(
@@ -206,13 +206,19 @@ describe('Master Catalog authority consistency', () => {
     expect(tracker).toContain('independent intended-admin UAT remains WP-8')
     expect(tracker).toContain('| Production write allowed | No |')
     expect(tracker).toContain(
-      'G1R was explicitly approved and completed on 2026-07-13',
+      'Independent G2 was explicitly approved and completed on 2026-07-13',
     )
     expect(tracker).toContain(
       'Migration 020 SHA-256: e07e0c4161077efba7bc4f6ebf95518d0cc1bc7e4628a43a128dd899bd1aef93',
     )
     expect(tracker).toContain(
-      'G1R exact checkout 721c2c2c4a234a4fd00e5686383be9af87ee15dd',
+      'G1R/G2 exact checkout 721c2c2c4a234a4fd00e5686383be9af87ee15dd',
+    )
+    expect(tracker).toContain(
+      'G2 WP-6.6 JSON SHA-256 d5da2ceeb5871160ac8cdf8dfe34ffdee220e20c8880e001e42c0bbaaea13f43',
+    )
+    expect(tracker).toContain(
+      'G2 WP-6.5/P-20 JSON SHA-256 98b9f5fb9e0135ea35a716c87e1f4916e7aa1d186ce68ed067ea02d81b0bce42',
     )
     expect(tracker).toContain(
       '050c998361f3372bd3bf9fb6645dc4abd1c0bf2b` is the exact P-24 same-scope closure-lineage checkpoint',
@@ -226,7 +232,7 @@ describe('Master Catalog authority consistency', () => {
       /pre-amendment operator\/browser preflight passed on\s+`c8f6dca`/,
     )
     expect(tracker).toMatch(
-      /independent G2, G3, G4, and every Production action\s+remain unauthorized/i,
+      /G3, G4, and every\s+Production action remain unauthorized/i,
     )
     expect(existsSync(resolve(
       root,
@@ -245,6 +251,9 @@ describe('Master Catalog authority consistency', () => {
     expect(ownerReview).toContain(
       '**G1R execution checkout:** `721c2c2c4a234a4fd00e5686383be9af87ee15dd`',
     )
+    expect(ownerReview).toContain(
+      '**G2 execution checkout:** `721c2c2c4a234a4fd00e5686383be9af87ee15dd`',
+    )
     expect(existsSync(resolve(
       root,
       'docs/plans/master-catalog/31-phase4-wp66-operator-workflow-correction-plan.md',
@@ -257,6 +266,12 @@ describe('Master Catalog authority consistency', () => {
     )
     expect(correctionPlan).toContain(
       '| G1R | Explicitly owner-approved and passed 2026-07-13',
+    )
+    expect(correctionPlan).toContain(
+      '| G2 | Explicitly owner-approved and passed 2026-07-13',
+    )
+    expect(correctionPlan).toContain(
+      'G2 independent reproducibility result',
     )
   })
 

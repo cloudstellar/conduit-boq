@@ -56,9 +56,9 @@ persistent signed-in admin context, information-only global navigation,
 exact-draft contextual import, explicit approved-input versus review-export
 semantics, and a configured Local marker. This is Local UI/route/test/docs work
 only and does not amend migration `020` or authorize a reset. The P-23
-working-tree static/browser checkpoint passed on 2026-07-13; the exact G2
-candidate is named only after owner review and commit. G2 and Production remain
-separately gated.
+working-tree static/browser checkpoint passed on 2026-07-13; at that checkpoint
+the exact G2 candidate was still unnamed. The later exact candidate and G2
+result are recorded below. Production remains separately gated.
 
 **P-23.1 version-intent/workspace amendment recorded:** 2026-07-13 — owner
 approved replacing raw segment entry and assumed revision with explicit
@@ -84,7 +84,13 @@ separate decision. The clean Local rebuild through `019`, separate final `020`
 apply, DB/concurrency/P-20/advisor/repository/browser evidence, and cleanup
 passed on exact execution checkout `721c2c2`; migration SHA-256 is
 `e07e0c4161077efba7bc4f6ebf95518d0cc1bc7e4628a43a128dd899bd1aef93`.
-This does not authorize G2, G3/G4, bootstrap inclusion, WP-7, or Production.
+This did not authorize G2, G3/G4, bootstrap inclusion, WP-7, or Production.
+
+**G2 execution recorded:** 2026-07-13 — the owner separately approved the
+independent second clean Local rebuild of exact candidate `721c2c2`. Bootstrap
+through `019`, separate final `020`, WP-6.6/WP-6.5 evidence, P-20 comparison,
+repository gates, advisor triage, and final cleanup passed. This does not
+authorize G3/G4, bootstrap inclusion, WP-7, or Production.
 
 ## 1. Decision requested
 
@@ -402,7 +408,7 @@ feature enablement, final catalog publication, or silent business-data choices.
 
 - [x] P-21 explicitly authorizes WP-6.6 Local-only implementation scope/start
 - [x] P-22/G0 authorizes the bounded operator-workflow docs and Local-only
-      implementation; G1/G2 require separate approvals, and G1 is now complete
+      implementation; G1/G2 required separate approvals and are now complete
 - [x] Audit #29 C-01 through C-15 are mapped to exact DB/UI/test owners
 - [x] WP-6.5 reliability evidence remains preserved and is not relabeled as a
       full operator-completeness certificate
@@ -417,10 +423,12 @@ feature enablement, final catalog publication, or silent business-data choices.
       Production
 - [x] Separately approved G1R passed on exact `721c2c2`, including final Local
       cleanup; no Production access/write occurred
+- [x] Separately approved independent G2 passed on the same exact candidate,
+      including P-20 comparison and final Local cleanup
 - [x] Unsupported Add/Supplement/Retire controls remain hidden at release unless
       their downstream gates pass
-- [ ] A separate owner decision is obtained before the independent G2 Local
-      bootstrap/reset
+- [ ] G3 intended-admin closeout accepts or holds the revised WP-6.6 workflow
+      before G4/bootstrap/WP-7 sequencing
 
 ### Additional preconditions before WP-7.5 placement implementation
 
