@@ -110,6 +110,13 @@ version independently compared with the DB-read version before the RPC. The
 no-reset Local proof passed and cleaned up without publication. Migration
 `020`, bootstrap, WP-7, Factor F, hotfix `016`, and Production are unchanged.
 
+**G3/WP-6.6 owner closeout recorded:** 2026-07-14 23:50 +07 — the owner
+accepted G3 on exact application checkpoint
+`78e96ab3ed9993707014c4aba1d285b7592b17a1`. This closes C-01 through C-17
+for the bounded WP-6.6 operator gate. G4/bootstrap inclusion, WP-7,
+P-18/`021`, P-19, WP-8, feature enablement, publication, Factor F/hotfix
+expansion, and Production remain separately gated.
+
 ## 1. Decision requested
 
 Approve detailed implementation and local rehearsal of Master Catalog Phase 4.
@@ -453,8 +460,9 @@ feature enablement, final catalog publication, or silent business-data choices.
       on `2fd438d`
 - [x] Unsupported Add/Supplement/Retire controls remain hidden at release unless
       their downstream gates pass
-- [ ] Owner explicitly accepts or holds G3/WP-6.6 operator closeout before
-      G4/bootstrap/WP-7 sequencing
+- [x] Owner accepted G3/WP-6.6 operator closeout on exact application
+      checkpoint `78e96ab3ed9993707014c4aba1d285b7592b17a1` at
+      2026-07-14 23:50 +07; G4/bootstrap/WP-7 remains a separate gate
 
 ### Additional preconditions before WP-7.5 placement implementation
 

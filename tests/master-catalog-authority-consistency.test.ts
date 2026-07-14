@@ -131,7 +131,7 @@ describe('Master Catalog authority consistency', () => {
     ])
 
     expect(migrations).toContain(
-      '**G1R/G2-passed Local-only candidate on exact execution checkout `721c2c2c4a234a4fd00e5686383be9af87ee15dd`; SHA-256 `e07e0c4161077efba7bc4f6ebf95518d0cc1bc7e4628a43a128dd899bd1aef93`; P-20 comparison and no-reset G3 technical route passed; explicit G3 owner accept/hold and G4 remain required; not in bootstrap or Production**',
+      '**G1R/G2-passed Local-only candidate on exact execution checkout `721c2c2c4a234a4fd00e5686383be9af87ee15dd`; SHA-256 `e07e0c4161077efba7bc4f6ebf95518d0cc1bc7e4628a43a128dd899bd1aef93`; P-20 comparison and no-reset G3 route passed; G3/WP-6.6 owner-accepted on exact application checkpoint `78e96ab3ed9993707014c4aba1d285b7592b17a1`; G4 remains required; not in bootstrap or Production**',
     )
     expect(migrations).toContain(
       '**Proposed only — P-18 pending; file does not exist; not in bootstrap**',
@@ -192,30 +192,34 @@ describe('Master Catalog authority consistency', () => {
       'WP-6.6 P-24/G1R',
     )
     expect(decisions).toContain(
-      'final G1R/G2 passed on exact `721c2c2`; G3 technical execution passed on `6599c30`; owner accept/hold remains separate',
+      'final G1R/G2 passed on exact `721c2c2`; G3 closeout accepted via P-27 on exact `78e96ab`',
     )
     expect(decisions).toContain(
-      'bounded implementation/visual evidence passed; independent real-route stale-after-review technical UAT also passed on `6599c30`; explicit G3 owner acceptance remains pending',
+      'bounded visual and real-route evidence accepted through P-27',
     )
     expect(decisions).toContain('| L-56 |')
     expect(decisions).toContain('| P-26 |')
+    expect(decisions).toContain('| P-27 |')
+    expect(decisions).toContain(
+      'Accepted 2026-07-14 23:50 +07; WP-6.6 complete; G4 and all later gates remain separate',
+    )
     expect(decisions).toContain('DB-read version in the Server Action before the publish RPC')
 
     const tracker = read(
       'docs/plans/master-catalog/25-phase4-execution-progress-tracker.md',
     )
     expect(tracker).toMatch(/\| WP-6\.5 \|[^\n]+\| Ready for owner review \|/)
-    expect(tracker).toMatch(/\| WP-6\.6 \|[^\n]+\| In progress \|/)
+    expect(tracker).toMatch(/\| WP-6\.6 \|[^\n]+\| Complete \|/)
     expect(tracker).toMatch(/\| WP-7 \|[^\n]+\| Not started \|/)
     expect(tracker).toMatch(/\| WP-7\.5 \|[^\n]+\| Not started \|/)
     expect(tracker).toMatch(/\| WP-8 \|[^\n]+\| Not started \|/)
     expect(tracker).toContain('independent intended-admin UAT remains WP-8')
     expect(tracker).toContain('| Production write allowed | No |')
     expect(tracker).toContain(
-      'P-26 bounded application/tests/docs and no-reset Local human-intent proof were authorized on 2026-07-14',
+      'P-27 accepted G3/WP-6.6 on exact application checkpoint `78e96ab3ed9993707014c4aba1d285b7592b17a1` at 2026-07-14 23:50 +07',
     )
     expect(tracker).toContain(
-      'P-26 typed Publish plus Recode/Retire confirmations passed on a candidate based on `2fd438d`',
+      'G4/bootstrap inclusion approval before WP-7; WP-6.6 is complete',
     )
     expect(tracker).toContain(
       'Migration 020 SHA-256: e07e0c4161077efba7bc4f6ebf95518d0cc1bc7e4628a43a128dd899bd1aef93',
@@ -247,7 +251,7 @@ describe('Master Catalog authority consistency', () => {
       /pre-amendment operator\/browser preflight passed on\s+`c8f6dca`/,
     )
     expect(tracker).toContain(
-      'P-26 high-impact confirmation/cancel/cleanup proof passed on a candidate based on 2fd438d; candidate 020 remains outside bootstrap; explicit G3 owner decision and G4 remain pending',
+      'P-26 guards are committed at owner-accepted exact checkpoint 78e96ab3ed9993707014c4aba1d285b7592b17a1; candidate 020 remains outside bootstrap; G4 remains pending',
     )
     expect(existsSync(resolve(
       root,
@@ -275,8 +279,11 @@ describe('Master Catalog authority consistency', () => {
     expect(ownerReview).toContain(
       '**P-26 source base HEAD:** `2fd438dd3417850faca572b9e5e5561e944df345`',
     )
-    expect(ownerReview).toMatch(
-      /technical recommendation is\s+\*\*Accept G3\*\*/,
+    expect(ownerReview).toContain(
+      '**Accepted G3/WP-6.6 application checkpoint:**',
+    )
+    expect(ownerReview).toContain(
+      'The owner **accepted G3** on exact checkpoint',
     )
     expect(existsSync(resolve(
       root,
@@ -302,6 +309,9 @@ describe('Master Catalog authority consistency', () => {
     )
     expect(correctionPlan).toContain('## 20. P-26 high-impact human-intent guard')
     expect(correctionPlan).toContain('This closes Audit #29 C-17 technically.')
+    expect(correctionPlan).toContain(
+      '**Subsequent owner decision:** at 2026-07-14 23:50 +07',
+    )
   })
 
   it('keeps reliability commands and route recovery files tracked by contract', () => {

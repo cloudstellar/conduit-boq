@@ -73,7 +73,7 @@ These checks do not mean the complete operator workflow is release-ready.
 
 ### Required remaining Local bands
 
-- [ ] WP-6.6 closes Capability Audit #29 C-01 through C-17 and receives explicit owner accept/hold
+- [x] WP-6.6 closes Capability Audit #29 C-01 through C-17; owner accepted G3 on exact application checkpoint `78e96ab3ed9993707014c4aba1d285b7592b17a1` on 2026-07-14
 - [ ] WP-7 permanent BOQ/hotfix `016` and Factor F regression preservation
 - [ ] P-18 decision plus WP-7.5 placement, or hide Add/Supplement and retain the guard
 - [ ] P-19 retired-row PDF policy when Retire is in release scope

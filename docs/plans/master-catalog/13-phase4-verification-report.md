@@ -21,11 +21,13 @@ standalone Local visual evidence then passed for the 709-change final-review
 presentation without DB mutation. A bounded no-reset G3 walkthrough then
 passed the real-route stale-after-review guard, fresh-review recovery, audited
 abandon, and final Local invariant readback on source `6599c30`. Explicit owner
-accept/hold remained pending. P-26 then added and proved the separate
+accept/hold remained pending at that checkpoint. P-26 then added and proved the separate
 high-impact human-intent guard for Publish, Recode, and Retire on a working-tree
 candidate based on `2fd438d`; no publication occurred and Local returned to its
-disabled baseline. Explicit owner accept/hold, G4/bootstrap inclusion, WP-7,
-proposed WP-7.5, WP-8, and Production gates remain.
+disabled baseline. P-26 was committed at exact
+`78e96ab3ed9993707014c4aba1d285b7592b17a1`, and the owner accepted
+G3/WP-6.6 on that checkpoint at 2026-07-14 23:50 +07. G4/bootstrap inclusion,
+WP-7, proposed WP-7.5, WP-8, and Production gates remain separate.
 **Prepared:** 2026-06-22
 **Production project:** `otlssvssvgkohqwuuiir`
 **Candidate version:** System-planned ADR-003 number; `2568.1.0` only when still
@@ -49,8 +51,8 @@ should link here rather than copy volatile evidence.
 |---|---|---|---|---|---|---|
 | 4-0 documents/data decisions | Repository | Owner + developer | 2026-07-04 |  | In progress | P-01 through P-11/P-17/P-20 approved as recorded; P-09 publication metadata, P-18/P-19, and Production gates remain separate |
 | 4A additive schema | Local | Codex + owner/developer | 2026-07-05 | 2026-07-13 | G1R/G2 passed | `017`-`019` canonical bootstrap remains reviewed. Final `020` passed separate Local apply twice on exact candidate `721c2c2` and remains outside bootstrap/Production. |
-| 4B application/workflows | Local | Codex + owner/developer | 2026-07-05 |  | G3/P-26 technical paths passed; owner decision pending | Version planning, item-first edit, final review, import, abandon, restore-confirmation, real-route stale-after-review recovery, and high-impact confirmation/cancel behavior passed; broader independent UAT remains WP-8. |
-| WP-6.6 admin workflow/authority hardening | Local | Codex + owner/developer | 2026-07-12 |  | Ready for owner accept/hold | Exact G1R/G2 evidence passed on `721c2c2`; P-25 presentation passed; G3 real-route stale recovery passed on `6599c30`; P-26 typed Publish plus Recode/Retire confirmations and cleanup passed on a candidate based on `2fd438d`. Owner acceptance and G4 remain separate. |
+| 4B application/workflows | Local | Codex + owner/developer | 2026-07-05 | 2026-07-14 | G3/WP-6.6 accepted | Version planning, item-first edit, final review, import, abandon, restore-confirmation, real-route stale-after-review recovery, and high-impact confirmation/cancel behavior passed; broader independent UAT remains WP-8. |
+| WP-6.6 admin workflow/authority hardening | Local | Codex + owner/developer | 2026-07-12 | 2026-07-14 | Accepted/Complete | Exact G1R/G2 evidence passed on `721c2c2`; P-25/G3/P-26 passed; the owner accepted exact application checkpoint `78e96ab3ed9993707014c4aba1d285b7592b17a1`. G4 remains separate. |
 | WP-7 permanent BOQ/hotfix/Factor F regression | Local |  |  |  | Not started | Regression-only |
 | WP-7.5 P-18 placement | Local |  |  |  | Decision pending | P-18 Review Note #28 |
 | 4C clean rehearsal | Local |  |  |  | Pending |  |
@@ -93,7 +95,7 @@ should link here rather than copy volatile evidence.
 | P-24/G2 independent Local evidence | Owner + Codex | Explicitly authorized and passed; G3/G4 not inferred | 2026-07-13 | Repeated the clean bootstrap through `019` and separate unchanged `020` on exact checkout `721c2c2`; WP-66/WP-65, P-20 G1R-versus-G2 comparison, DB lint/current advisors, repository gates, and final invariant readback passed. Production touched: No. |
 | P-25/G3 real-route technical walkthrough | Codex + owner/developer | Passed technically; owner accept/hold not inferred | 2026-07-14 | No-reset Local run on source `6599c30`: review lock 1, second edit lock 2, stale publish denied with Thai recovery and retained fields, fresh review lock 2, audited abandon lock 3, zero publish effects, clean final invariants. Production touched: No. |
 | P-26 high-impact human-intent guard | Owner + Codex | Authorized and passed technically; owner G3 accept/hold not inferred | 2026-07-14 | No-reset Local real-route proof on a candidate based on `2fd438d`: Recode/Retire exact summaries inspected and cancelled; Publish mismatch `2568.0.2` disabled, exact DB-owned `2568.0.3` enabled, then cancelled; 390x844 title/action layout passed; proof draft audited-abandoned at lock 2; pointer `2568.0.0`/710, zero drafts, flags false, BOQ 198/1,547, Factor F `2569.0.0`/36; `publish=0`. Migration `020` and Production untouched. |
-| WP-6.6 owner closeout / P-22 G3 | Owner | Ready for explicit accept/hold | 2026-07-14 | Review [WP-6.6 Owner Review Note](./30-phase4-wp66-owner-review-note.md) and untracked G3 screenshots/report; acceptance remains separate from G4, WP-7, and Production |
+| WP-6.6 owner closeout / P-27 G3 | Owner | Accepted exact `78e96ab3ed9993707014c4aba1d285b7592b17a1`; WP-6.6 complete | 2026-07-14 23:50 +07 | [WP-6.6 Owner Review Note](./30-phase4-wp66-owner-review-note.md); G4, WP-7, WP-8, and Production remain separate |
 | P-11 exact artifact acceptance | Owner | Accepted exact TH Sarabun New 16 pt replacement PDF/Excel pair; WP-6 complete | 2026-07-11 22:20 +07 | Owner confirmed `รูปแบบ pdf excel ok เลยครับ` for the `777df75` pair after semantic and visual file QA; Production filing and P-12-P-15 remain separate |
 | P-20 identity/hash portability | Owner | Approved deterministic baseline identity from immutable Production-derived `price_list.id`; retain `identity_id` in lineage hash | 2026-07-11 12:11 +07 | WP-6.5C passed on `1ad01b9`; final candidate G1R/G2 inputs on `721c2c2` matched exactly and the comparator passed. WP-8/P-15 reruns remain. |
 | WP-6.5 Local-only start | Owner | Authorized | 2026-07-11 12:11 +07 | No unannounced Local reset, Production access/write, Factor F workflow change, hotfix scope expansion, placement UI, deploy, enablement, or publication |
@@ -208,8 +210,10 @@ network-enabled production build, evidence-manifest checksum verification, and
 The report and screenshots remain untracked at
 `output/master-catalog/g3-owner-review/20260714-6599c30-stale-after-review/`
 under repository policy. Technical result: **Passed**. Owner accept/hold:
-**Pending**. No reset, migration change, bootstrap change, WP-7/WP-8 action,
-or Production access/write occurred.
+**Pending at this technical checkpoint; subsequently accepted via P-27 on
+exact `78e96ab3ed9993707014c4aba1d285b7592b17a1`**. No reset, migration
+change, bootstrap change, WP-7/WP-8 action, or Production access/write
+occurred.
 
 ### 3.3 P-26 high-impact human-intent evidence
 
@@ -231,7 +235,8 @@ Screenshots, SHA-256 values, and `qa-report.json` remain untracked at
 `output/master-catalog/g3-owner-review/20260714-p26-human-intent/` under
 repository policy. Migration `020` was neither changed nor applied and the
 Local stack was not reset. Technical result: **Passed**. Owner G3 accept/hold:
-**Pending**.
+**Accepted via P-27 at 2026-07-14 23:50 +07 on exact
+`78e96ab3ed9993707014c4aba1d285b7592b17a1`**.
 
 ## 4. Known preparation baseline
 
@@ -346,18 +351,18 @@ publication provenance.
 | Audit finding | Required evidence | Result |
 |---|---|---|
 | C-01 full browse/item history | First/middle/last-row search, filters, exact item route, stable-identity field diff, and >1,000-row paged-read fixture proving no API-cap truncation | Passed: deterministic 1,201-row `500/500/201` fixture plus Local browser first/middle/last search, exact item route, and identity/code history |
-| C-02 exact draft/stale state | One mutable draft per base; audited abandon/replacement; stale/abandoned drafts read-only before submit | Final G1R/G2 on `721c2c2` passed the DB/concurrency contract. G3 independently created one proof draft, audited-abandoned it at lock 3, retained 710 read-only rows, and restored zero working drafts; owner accept/hold remains. |
+| C-02 exact draft/stale state | One mutable draft per base; audited abandon/replacement; stale/abandoned drafts read-only before submit | Final G1R/G2 on `721c2c2` passed the DB/concurrency contract. G3 independently created one proof draft, audited-abandoned it at lock 3, retained 710 read-only rows, and restored zero working drafts; accepted for WP-6.6, with rerun in WP-8. |
 | C-03/C-04 dictionary and allocator | P-06 seed/freeze, unknown-entry denial, next-never-issued concurrency/gap/900 fixtures | Passed Local DB: 710 mappings/65 groups/17 exclusions, role/unknown/caller-code denial, two unique concurrent allocations, never-reuse, and capacity boundary |
 | C-05 import diff/evidence | Complete server add/update/recode/retire/unchanged diff, exact omissions, approved/missing price evidence | Passed Local DB: complete 710-row first rollout, 709 changed/structured rows plus approved `ITEM-0139` legacy row, stable validation replay; browser required explicit draft selection. Full intended-admin import UAT remains WP-8. |
 | C-06/C-07 publication provenance | Authenticated actor snapshot and required version archive reference including manual-only publication | Passed Local DB/browser: authenticated publisher snapshot, physical archive reference, invalid-date and missing-archive denials, and rendered provenance/readiness state |
 | C-08 readiness parity | Same stale-base/full-quality/P-18/structured result in readiness and publish | Passed Local DB: one full 710-row canonical-quality result fed readiness/publication; pointer restored after physical-archive publish proof |
 | C-09/C-10 correction/editor | Prefilled exact item; field-aware authority; reactivate/base-absent withdraw with preserved identity/code/audit | Passed Local DB/browser: retire/reactivate, inherited-withdraw denial, exact inactive item/action, and preserved identity/code/history |
 | C-11/C-12 UX/schema | Thai-first/no synthetic defaults/support details plus zero-null/order constraint compatibility | Passed technical gate: `020` constraints/RLS/grants/role denial, Thai desktop/mobile render with no page overflow, and no app console error. Formal accessibility/intended-admin UAT remains WP-8. |
-| C-13 final snapshot review | Item-first full workspace; complete identity-based draft/base diff; compound/reverted/incomplete-read fixtures; exact reviewed-lock publish and stale-review recovery | G1R/G2 passed the DB contract, P-25 passed compound/high-volume presentation, and G3 independently rejected a stale lock-1 publish after lock advanced to 2, retained fields, created no publish effect, and reloaded the latest review. Owner accept/hold remains; broader UAT stays WP-8. |
-| C-14 version intent/reservation | Explicit annual/revision/patch intent; owner year; complete all-status registry; permanent reservation; next-sequence DB guard; same-year annual recovery after void lower number | G1R/G2 passed lifecycle cases; G3 used correction intent and retained abandoned proof number `2568.0.2` as a permanent registry entry. Owner accept/hold remains. |
-| C-15 create/item/restore flow | Exact post-create navigation; compact actions/counts then item workspace; document metadata after items; current-to-target restore confirmation with BOQ effect | G1R passed the full bounded route and G3 independently exercised real create/workspace/item/review/abandon routes. Owner accept/hold remains; broader responsive UAT stays WP-8. |
-| C-16 pre-G1R business/UX guard | Annual base +1 through +10 at UI/server/DB; safe stale/range mapping; durable focused Thai error; collapsed support IDs; no internal workflow labels; contextual authority; accessible icon pagination; secondary Factor F context | G1R/G2/P-25 passed contracts and presentation; G3 independently observed the durable Thai stale error, retained inputs, Local/account context, and disabled-gate cleanup. Owner accept/hold remains; formal accessibility stays WP-8. |
-| C-17 high-impact human-intent guard | Exact Recode/Retire summary and explicit confirm; Publish current/target/lock/count/BOQ summary; exact typed DB-read target enforced before RPC; cancel/no-write and responsive behavior | P-26 code/tests and no-reset Local proof passed. Mismatch `2568.0.2` stayed disabled, exact `2568.0.3` enabled, no Publish/Recode/Retire command was confirmed, mobile title overlap was corrected, proof draft was audited-abandoned, and Local returned to zero drafts/all flags false. Owner accept/hold remains; rerun supported workflow at WP-8. |
+| C-13 final snapshot review | Item-first full workspace; complete identity-based draft/base diff; compound/reverted/incomplete-read fixtures; exact reviewed-lock publish and stale-review recovery | G1R/G2 passed the DB contract, P-25 passed compound/high-volume presentation, and G3 independently rejected a stale lock-1 publish after lock advanced to 2, retained fields, created no publish effect, and reloaded the latest review. Accepted for WP-6.6; broader UAT stays WP-8. |
+| C-14 version intent/reservation | Explicit annual/revision/patch intent; owner year; complete all-status registry; permanent reservation; next-sequence DB guard; same-year annual recovery after void lower number | G1R/G2 passed lifecycle cases; G3 used correction intent and retained abandoned proof number `2568.0.2` as a permanent registry entry. Accepted for WP-6.6; rerun in WP-8. |
+| C-15 create/item/restore flow | Exact post-create navigation; compact actions/counts then item workspace; document metadata after items; current-to-target restore confirmation with BOQ effect | G1R passed the full bounded route and G3 independently exercised real create/workspace/item/review/abandon routes. Accepted for WP-6.6; broader responsive UAT stays WP-8. |
+| C-16 pre-G1R business/UX guard | Annual base +1 through +10 at UI/server/DB; safe stale/range mapping; durable focused Thai error; collapsed support IDs; no internal workflow labels; contextual authority; accessible icon pagination; secondary Factor F context | G1R/G2/P-25 passed contracts and presentation; G3 independently observed the durable Thai stale error, retained inputs, Local/account context, and disabled-gate cleanup. Accepted for WP-6.6; formal accessibility stays WP-8. |
+| C-17 high-impact human-intent guard | Exact Recode/Retire summary and explicit confirm; Publish current/target/lock/count/BOQ summary; exact typed DB-read target enforced before RPC; cancel/no-write and responsive behavior | P-26 code/tests and no-reset Local proof passed. Mismatch `2568.0.2` stayed disabled, exact `2568.0.3` enabled, no Publish/Recode/Retire command was confirmed, mobile title overlap was corrected, proof draft was audited-abandoned, and Local returned to zero drafts/all flags false. Accepted for WP-6.6; rerun supported workflow at WP-8. |
 
 Historical rows retain useful point-in-time evidence. The final DB-dependent
 results were rerun under G1R/G2 on exact candidate `721c2c2`; the later P-25,
@@ -393,7 +398,8 @@ WP-6.5 fixture cleanup at `17ec6cc` and truthful date-parser volatility at
 `e463270`. The later UI/source checkpoint `c8f6dca` did not change migration
 `020`; P-23.1/P-24 later superseded that prospective target. Final G1R/G2
 instead clean-rebuilt exact executable candidate `721c2c2` and the independent
-P-20 comparison passed. Those technical gates do not infer G3 owner acceptance.
+P-20 comparison passed. Those technical gates do not infer G3 owner acceptance;
+the later P-27 decision records that acceptance on exact `78e96ab`.
 
 The following is historical pre-P-22 evidence. After separate owner
 authorization, the canonical bootstrap through `019` was
@@ -505,7 +511,7 @@ fixed and reviewed.
 | Check | Expected | Evidence | Result |
 |---|---|---|---|
 | WP-8 clean Local rehearsal | Passed with no unresolved blocker |  | Pending |
-| WP-6.6 capability matrix | Audit #29 C-01 through C-17 implemented/evidenced, or unsupported controls removed from release visibility | Final G1R/G2 evidence passed on `721c2c2`; P-25 presentation and G3 real-route stale recovery passed on source `6599c30`; P-26 human-intent proof passed on a candidate based on `2fd438d`; broader UAT remains WP-8. | Ready for G3 owner accept/hold |
+| WP-6.6 capability matrix | Audit #29 C-01 through C-17 implemented/evidenced, or unsupported controls removed from release visibility | Final G1R/G2 evidence passed on `721c2c2`; P-25 presentation and G3 real-route stale recovery passed on source `6599c30`; P-26 human-intent proof is committed at owner-accepted exact checkpoint `78e96ab3ed9993707014c4aba1d285b7592b17a1`; broader UAT remains WP-8. | Accepted/Complete; WP-8 rerun pending |
 | Reviewed migration fingerprint | Filename and SHA-256 match approved file |  | Pending |
 | Repository/deployment fingerprint | Exact branch, commit, CI, and deploy artifact recorded |  | Pending |
 | Fresh Production preflight | Live counts, pointer, Factor F, BOQ split, and drift recorded |  | Pending |
@@ -749,8 +755,8 @@ exact replacement pair above.
 | Catalog version list/detail | Five exact version rows, Thai statuses, current marker, selected 710-row draft, readiness, and exact item route rendered | Version/item pages at 390x844 had `scrollWidth=clientWidth=390` and no overlap | Passed WP-6.6 technical QA |
 | Import/diff/manual/history | Import required explicit draft selection and stayed disabled before selection; exact item correction/history and append-only register rendered | Mobile import/history not claimed in this proof | Passed desktop technical QA; full intended-admin/responsive UAT remains WP-8 |
 | Complete catalog search/filter + item history | Browser found first `ITEM-0001`, middle `ITEM-0355`, and last `ITEM-0710`; exact inactive-item route showed stable identity/code history | Exact item page remained readable without page overflow at 390x844 | Passed WP-6.6 technical QA; intended-admin comprehension remains WP-8 |
-| One working draft + stale/abandoned history | One mutable draft per base; duplicate/concurrent create denied; audited abandon/replacement; stale/abandoned views read-only | Final G1R/G2 DB cases passed; G3 independently created one proof draft, audited-abandoned it at lock 3, retained 710 read-only rows, and restored zero working drafts | Technical path passed; G3 owner accept/hold pending |
-| Final snapshot review + reviewed-lock publish | Complete cumulative draft/base diff, compound/reverted behavior, high-volume scanability, readiness/warnings, edit return path, and stale-review recovery | G1R/G2 tests/DB passed complete diff and exact-lock publish/restore; P-25 passed 27/27 high-volume presentation checks. G3 then used the real route to hold review at lock 1, edit to lock 2, reject the stale publish with retained fields and no publish effect, and reload the latest review. | Technical path passed; G3 owner accept/hold pending |
+| One working draft + stale/abandoned history | One mutable draft per base; duplicate/concurrent create denied; audited abandon/replacement; stale/abandoned views read-only | Final G1R/G2 DB cases passed; G3 independently created one proof draft, audited-abandoned it at lock 3, retained 710 read-only rows, and restored zero working drafts | Accepted for WP-6.6; rerun WP-8 |
+| Final snapshot review + reviewed-lock publish | Complete cumulative draft/base diff, compound/reverted behavior, high-volume scanability, readiness/warnings, edit return path, and stale-review recovery | G1R/G2 tests/DB passed complete diff and exact-lock publish/restore; P-25 passed 27/27 high-volume presentation checks. G3 then used the real route to hold review at lock 1, edit to lock 2, reject the stale publish with retained fields and no publish effect, and reload the latest review. | Accepted for WP-6.6; rerun WP-8 |
 | Thai-first forms/no rehearsal defaults/support details | Thai navigation/status/action/readiness/error copy rendered; Local synthetic defaults were absent from operator fields | `c8f6dca` adds Thai clone history, live composed version preview, deduplicated category labels, labelled selects, and wrapping long authority text; desktop/mobile had no page-level overflow. Formal keyboard/focus audit remains WP-8. | Passed visual/accessibility-name technical QA; formal accessibility pending WP-8 |
 | Add/retire blocker shown before apply/publish | With capability flags false, Add was absent, retirement controls were hidden/denied, and the inactive item exposed only Reactivate; readiness showed the separate P-19 warning | Exact inactive-item action remained responsive | Passed release-visibility gate; P-18/P-19 decisions remain separate |
 | Loading/error/not-found and retry/back paths | Route states implemented; user-opened Local tab completed response-loss recovery on `9becdf6` | Browser proof retained submitted values, retried untouched payload, then reset after success | Passed WP-6.5 checkpoint; full representative rerun WP-8 |
@@ -781,13 +787,13 @@ request approves them.
 | `git diff --check` | Exit 0 | Passed for the P-26 working-tree candidate on 2026-07-14 | Passed |
 | In-app browser G1R | Local/admin version planning, workspace, item edit, final review, import, abandon, restore confirmation, responsive containment, and cleanup pass | Bounded flow passed; no publish/restore pointer change; final disabled screen restored. One existing `/nt_logo.svg` LCP warning; full keyboard traversal and independent UAT not claimed. | Passed G1R / later UAT pending |
 | P-25 standalone visual/interaction harness | Real final-review component at 710 total/709 affected rows; eight-field compound row; desktop 1440x1000 and mobile 390x844; no console/page error or overflow | Browser plugin runtime was unavailable with `Cannot redefine property: process`; the owner-approved Playwright fallback compiled the real component and project CSS, mocked only Next routing contexts, and passed 27/27 checks. No Local DB reset/mutation, migration, bootstrap, or Production action occurred. | Passed P-25 presentation scope; real-route stale-after-review/G3 not inferred |
-| P-26 in-app browser proof | Real Recode/Retire/Publish confirmation and cancellation, mismatched/exact target typing, desktop/390x844 layout, audited cleanup, and final disabled page | Passed on real Local routes; no Recode/Retire/Publish effect, proof draft abandoned, zero drafts/all flags false, pointer/BOQ/Factor F unchanged | Passed P-26 technical scope; owner G3 decision pending |
+| P-26 in-app browser proof | Real Recode/Retire/Publish confirmation and cancellation, mismatched/exact target typing, desktop/390x844 layout, audited cleanup, and final disabled page | Passed on real Local routes; no Recode/Retire/Publish effect, proof draft abandoned, zero drafts/all flags false, pointer/BOQ/Factor F unchanged | Passed and owner-accepted via P-27 |
 | `npm run audit:prod` | No unaccepted Production vulnerability | P-26 candidate equivalent command `npm audit --omit=dev --audit-level=moderate` passed with 0 vulnerabilities | Passed |
 | Live Local DB integration/concurrency | Migration/RPC/RLS/role/rollback/race/timeout gates pass | Final amended `020` passed WP-66 and WP-65/P-20 twice on exact `721c2c2`; G1R-versus-G2 comparator passed. | G1R/G2 passed |
 | Permanent hotfix `016`/BOQ/Factor F suite | Real RPC behavior and pre/post invariants pass |  | Pending WP-7 |
-| WP-6.6 capability suite | Audit #29 C-01 through C-17 DB/UI/browser evidence pass | Final G1R/G2 passed on `721c2c2`; P-25 presentation and G3 real-route stale recovery/cleanup passed on `6599c30`; P-26 confirmation/cancel/cleanup proof passed on a candidate based on `2fd438d`. | Ready for G3 owner accept/hold |
+| WP-6.6 capability suite | Audit #29 C-01 through C-17 DB/UI/browser evidence pass | Final G1R/G2 passed on `721c2c2`; P-25 presentation and G3 real-route stale recovery/cleanup passed on `6599c30`; P-26 confirmation/cancel/cleanup proof is committed at exact `78e96ab3ed9993707014c4aba1d285b7592b17a1`. | Accepted/Complete via P-27 |
 | Tracked export artifact verification | Semantic verifier passes from clean checkout | Exact `777df75` replacement pair passed embedded and independent semantic verification; five verifier fixtures also pass; owner accepted the exact pair | Passed/accepted P-11; WP-8 rerun pending |
-| Documentation consistency | Authority links/table shapes, migration order, WP order, decisions, and execution provenance agree | Focused authority contracts passed 7 checks; C-17/Slice L/P-26, G1R/G2, P-25/G3 source, evidence paths, P-20, bootstrap boundary, and pending owner decision are recorded separately | Passed; rerun after owner decision and at WP-8 |
+| Documentation consistency | Authority links/table shapes, migration order, WP order, decisions, and execution provenance agree | P-27 owner acceptance, exact `78e96ab` checkpoint, C-17/Slice L/P-26, G1R/G2, P-25/G3 source, evidence paths, P-20, and bootstrap/G4 boundaries are recorded separately. Focused authority consistency passed 1 file/7 tests; full suite passed 30 files/165 tests; TypeScript, lint with 0 errors/10 existing warnings, authority 710/65/17, and `git diff --check` passed. | Passed closeout; rerun at WP-8 |
 | Security advisor | No new or untriaged blocker | Current G2 Studio rules reported eight triaged `WARN` findings: seven baseline RPCs and one guarded Master Catalog readiness facade; anon execution is denied for all. | Passed G2 scope; least-privilege/minimization disposition WP-8 |
 | Performance advisor | No rollout blocker | G2 retained 24 pre-existing baseline policy warnings and seven baseline unindexed-FK information findings; both new authority FKs have covering indexes. | Passed G2 scope; disposition WP-8 |
 | CI exact commit | Passed |  | Pending |

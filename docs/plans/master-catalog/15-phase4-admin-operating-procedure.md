@@ -8,8 +8,10 @@ navigation, exact-draft import, and explicit review-export semantics on
 2026-07-13. Its working-tree UI/static/browser checkpoint passed and awaits
 owner review/commit before an exact G2 candidate is named. Final G1R and the
 separately approved independent G2 rebuild/P-20 comparison later passed on
-exact candidate `721c2c2`. WP-6.6 closeout remains on Hold for G3 owner review.
-Prior `3bfc74e` evidence is historical. P-18/P-19 where applicable and
+exact candidate `721c2c2`. The owner accepted G3/WP-6.6 on exact application
+checkpoint `78e96ab3ed9993707014c4aba1d285b7592b17a1` at
+2026-07-14 23:50 +07. Prior `3bfc74e` evidence is historical. G4,
+P-18/P-19 where applicable, and
 independent intended-admin WP-8 UAT remain pending. The Local UI must not be
 treated as Production-ready until those gates pass.
 **Audience:** Active Master Catalog administrators

@@ -16,7 +16,9 @@ precede WP-7. The bounded no-reset G3 real-route technical walkthrough passed
 on source `6599c30`. P-26 then closed the remaining human-intent gap for
 Publish, Recode, and Retire on a working-tree candidate based on `2fd438d`;
 the no-reset Local proof passed and returned Local to its disabled baseline.
-Explicit owner accept/hold remains pending.
+P-26 was committed at exact `78e96ab3ed9993707014c4aba1d285b7592b17a1`,
+and the owner accepted G3/WP-6.6 on that checkpoint at
+2026-07-14 23:50 +07. G4 and later gates remain separate.
 
 **Environment:** Source/document audit only. No Local database reset, Production
 access/write, feature enablement, publication, new Factor F workflow, or hotfix

@@ -20,8 +20,10 @@ rows without DB mutation. The no-reset G3 real-route technical walkthrough then
 passed stale-after-review recovery and clean Local closeout on source `6599c30`;
 P-26 subsequently closed the separate high-impact human-intent gap for Publish,
 Recode, and Retire on a working-tree candidate based on `2fd438d`, with a
-no-reset Local proof and clean disabled-state readback. Explicit owner
-accept/hold and G4 bootstrap/WP-7 sequencing remain pending.
+no-reset Local proof and clean disabled-state readback. P-26 was committed at
+exact `78e96ab3ed9993707014c4aba1d285b7592b17a1`; the owner accepted
+G3/WP-6.6 on that checkpoint at 2026-07-14 23:50 +07. G4 bootstrap/WP-7
+sequencing remains pending and separate.
 
 **Production touched:** No
 
@@ -323,7 +325,7 @@ candidate `020` separately until the new owner closeout accepts it.
 | G1X | Passed and committed on exact closure-lineage commit `050c998`: same-scope identical-retry focus and execution-provenance closure. |
 | G1R | Explicitly owner-approved and passed 2026-07-13 on exact clean execution checkout `721c2c2c4a234a4fd00e5686383be9af87ee15dd`; migration `020` SHA-256 `e07e0c4161077efba7bc4f6ebf95518d0cc1bc7e4628a43a128dd899bd1aef93`; final Local cleanup passed. |
 | G2 | Explicitly owner-approved and passed 2026-07-13 on the same exact checkout `721c2c2c4a234a4fd00e5686383be9af87ee15dd`; second clean rebuild, separate unchanged `020`, WP-6.6/WP-6.5 evidence, P-20 comparator, current advisors, repository gates, and cleanup passed. |
-| G3 | After passed P-25 compound/high-volume presentation, real-route stale-after-review, and P-26 high-impact confirmation evidence, owner accepts or holds the revised WP-6.6 closeout |
+| G3 | Accepted 2026-07-14 23:50 +07 on exact application checkpoint `78e96ab3ed9993707014c4aba1d285b7592b17a1` after P-25 compound/high-volume presentation, real-route stale-after-review, and P-26 high-impact confirmation evidence passed |
 | G4 | Only after G3, add accepted `020` to bootstrap and separately authorize any WP-7 execution |
 
 Production P-12 through P-15 remain separate and unrequested.
@@ -499,8 +501,9 @@ same-candidate race normalization. Read-only in-app browser smoke passed the
 disabled/account-context state with zero console warnings/errors; the amended
 mutable flow still awaited G1R at that checkpoint. No Local DB was reset or
 mutated. The later separately approved G1R and independent G2 evidence passed;
-G3 technical execution later passed on `6599c30`, while owner accept/hold
-remains separate.
+G3 technical execution later passed on `6599c30`. Owner acceptance was
+separate at that checkpoint and was later recorded through P-27 on exact
+`78e96ab`.
 
 ## 15. P-24 pre-G1R hardening
 
@@ -636,8 +639,9 @@ Retained untracked evidence:
 G2 was the independent DB/reproducibility gate and did not repeat browser
 acceptance. The later G3 real-route technical walkthrough performed the
 intended-admin stale-after-review recovery and clean closeout described in
-Section 19; explicit owner acceptance remains separate. G4/bootstrap
-inclusion, WP-7, WP-8, and all Production actions remain separate.
+Section 19. Explicit owner acceptance was later recorded through P-27 on exact
+`78e96ab`; G4/bootstrap inclusion, WP-7, WP-8, and all Production actions
+remain separate.
 
 ## 18. P-25 high-volume final-review refinement
 
@@ -686,9 +690,9 @@ Evidence result on 2026-07-14:
   occurred.
 
 This closes P-25 presentation evidence only. The independent real-route G3
-technical walkthrough is recorded below; intended-admin owner acceptance
-remains separate. G4, bootstrap inclusion, WP-7, WP-8, and Production remain
-separately gated.
+technical walkthrough is recorded below; intended-admin owner acceptance was
+later recorded through P-27 on exact `78e96ab`. G4, bootstrap inclusion,
+WP-7, WP-8, and Production remain separately gated.
 
 ## 19. G3 real-route technical walkthrough
 
@@ -777,3 +781,10 @@ retained under
 This closes Audit #29 C-17 technically. It does not change or apply migration
 `020`, add it to bootstrap, infer G3 owner acceptance, authorize G4/WP-7/WP-8,
 or authorize any Production, Factor F, hotfix, P-18, or P-19 action.
+
+**Subsequent owner decision:** at 2026-07-14 23:50 +07, the owner accepted
+G3/WP-6.6 on exact application checkpoint
+`78e96ab3ed9993707014c4aba1d285b7592b17a1`. The preceding sentence remains
+the point-in-time technical boundary of the P-26 proof; the later decision
+closes WP-6.6 but does not authorize G4, Local reset, bootstrap inclusion,
+WP-7, WP-8, or Production.

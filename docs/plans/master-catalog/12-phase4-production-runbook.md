@@ -129,8 +129,9 @@ Stop immediately when any of these occurs:
 12. Confirm `/CI/` is excluded from commits and identify approved derivative
    fonts/logo assets.
 13. Complete the Phase 4 verification template baseline section.
-14. Accept Audit #29 C-01 through C-17 as the corrected capability gate and confirm WP-6.6 is
-    scheduled before WP-7; this does not itself authorize migration/reset.
+14. Verify P-27 owner acceptance of Audit #29 C-01 through C-17 on exact
+    application checkpoint `78e96ab3ed9993707014c4aba1d285b7592b17a1`;
+    this does not itself authorize G4, migration/bootstrap, or reset.
 
 **Exit gate:** All documents have owner/reviewer decisions; no unresolved row
 or taxonomy blocker.
@@ -157,9 +158,9 @@ major image at an incompatible existing data directory.
 1. Start from a clean Local reset/bootstrap that applies the root chain
    `009`-`015`, production hotfix `016`, and the current Phase 4 scripts
    `017`-`019`.
-   After reviewed implementation only, add WP-6.6 `020`; add P-18/WP-7.5 `021`
-   only after its separate acceptance. Never assume a planned file is already in
-   the authority path.
+   Add owner-accepted WP-6.6 `020` only after separate G4 approval; add
+   P-18/WP-7.5 `021` only after its separate acceptance. Never assume a planned
+   file is already in the authority path.
 2. If applying SQL manually for a focused rehearsal, apply hotfix `016` before
    any reviewed Phase 4A migration(s).
 3. Verify all new tables, constraints, indexes, grants, RLS policies, functions,

@@ -67,8 +67,9 @@ candidate. Final owner-approved G1R then passed on execution checkout
 comparison then passed on the same exact candidate. G3 owner closeout, G4
 bootstrap/WP-7 sequencing, and every Production action remain separate
 decisions. The bounded no-reset G3 real-route technical walkthrough later
-passed on source `6599c30`; explicit owner accept/hold remains pending and does
-not infer any later gate.
+passed on source `6599c30`; P-26 was committed at exact `78e96ab`, and the
+owner accepted G3/WP-6.6 on that exact checkpoint at 2026-07-14 23:50 +07.
+G4 and every later gate remain separate.
 
 **P-23.1 version-intent/item-first correction authorized:** 2026-07-13 — owner
 approved explicit annual/revision/patch intent, complete all-status
@@ -76,9 +77,9 @@ reserved-number planning, a guarded next-sequence rule including same-year
 annual recovery after a void lower number, direct post-create workspace
 navigation, item-before-metadata hierarchy, and pointer-restore confirmation.
 This amends candidate `020`; prior G1/live evidence is historical. Repository/
-static and final G1R/G2 evidence later passed. G3 and every Production action
-remain separate owner decisions. G3 technical execution has now passed, but
-the owner closeout decision remains separate.
+static and final G1R/G2 evidence later passed. G3 technical execution and owner
+closeout have now passed; G4 and every Production action remain separate owner
+decisions.
 
 **P-24 pre-G1R hardening authorized:** 2026-07-13 — before any clean rebuild,
 enforce annual base +1 through +10 in UI/server/DB, preserve safe Thai stale and
@@ -190,10 +191,11 @@ Start blocked:
 | P-19 inactive/retired export policy | Publication/filing of any version with inactive rows | Decision Register |
 | P-20 canonical hash/identity portability | Initial WP-6.5 exit and rerun after WP-6.6/WP-7.5 migration changes, WP-8 clean rehearsal, and migration fingerprint freeze | Decision Register |
 | P-21 Audit #29 WP-6.6 scope/start | WP-6.6 implementation and any migration `020` execution | Decision Register / Completeness Audit |
-| P-22 operator-workflow correction | Earlier source/G1/operator/P-23 checkpoints are historical after P-23.1 amended candidate `020`; final G1R/G2 and G3 technical execution passed, while explicit G3 owner accept/hold now governs closeout | Decision Register / Correction Plan #31 |
+| P-22 operator-workflow correction | Earlier source/G1/operator/P-23 checkpoints are historical after P-23.1 amended candidate `020`; final G1R/G2/G3/P-26 path passed and P-27 accepted the closeout | Decision Register / Correction Plan #31 |
 | P-23 operator-context/navigation amendment | Persistent operator/account context, information-only global nav, exact-draft import route, explicit input/export semantics, Local marker, and static/browser evidence were incorporated into exact P-23.1 source commit `31fd689`; no reset | Decision Register / Correction Plan #31 |
-| P-23.1 version-intent/item-first correction | Owner approved bounded docs/application/candidate-`020` work; repository/static, final G1R/G2, and G3 technical execution passed; explicit G3 owner accept/hold remains | ADR-003 / Decision Register / Correction Plan #31 |
+| P-23.1 version-intent/item-first correction | Owner approved bounded docs/application/candidate-`020` work; repository/static, final G1R/G2/G3, and owner closeout passed | ADR-003 / Decision Register / Correction Plan #31 |
 | P-24 pre-G1R business/UX hardening | Owner approved the bounded annual-range, safe-error, durable-focus, contextual-authority, and Factor F hierarchy patch; base `88d0711` and closure `050c998` are lineage; final G1R/G2 passed on exact execution checkout `721c2c2` with migration SHA-256 `e07e0c4161077efba7bc4f6ebf95518d0cc1bc7e4628a43a128dd899bd1aef93` | ADR-003 / ADR-004 / Decision Register / Correction Plan #31 |
+| P-26/P-27 high-impact guard and G3 closeout | P-26 is committed at exact `78e96ab3ed9993707014c4aba1d285b7592b17a1`; P-27 accepted G3/WP-6.6 on that checkpoint. G4 and later gates remain separate. | Decision Register / Owner Review Note #30 |
 
 Rule: unresolved P-02 through P-11 does not block generic additive schema,
 parser, UI shell, tests, or local rehearsal. It blocks final candidate data
@@ -630,6 +632,11 @@ Exit gate:
   `npm run db:local:smoke-master-catalog-wp66 -- --output <path>` and records
   exact commit/environment plus `productionTouched=false`;
 - owner accepts WP-6.6 closeout before WP-7 begins.
+
+Exit recorded 2026-07-14 23:50 +07: the owner accepted G3/WP-6.6 on exact
+application checkpoint `78e96ab3ed9993707014c4aba1d285b7592b17a1`.
+This satisfies the WP-6.6 exit gate only; G4 must still be approved before
+adding `020` to bootstrap or starting WP-7.
 
 The G2 advisor baseline is explicit: eight authenticated-callable
 `SECURITY DEFINER` warnings are triaged (seven baseline RPCs and one guarded

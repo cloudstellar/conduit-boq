@@ -103,6 +103,13 @@ with all catalog flags false. This confirms the architecture's reviewed-lock
 contract; it does not infer owner acceptance, G4/bootstrap inclusion, WP-7,
 WP-8, or Production authorization.
 
+**G3 owner acceptance recorded:** 2026-07-14 23:50 +07 — after P-26 was
+committed, the owner accepted the revised WP-6.6 operator closeout on exact
+application checkpoint `78e96ab3ed9993707014c4aba1d285b7592b17a1`.
+This closes G3/WP-6.6 only. It does not authorize G4, bootstrap inclusion,
+WP-7, P-18/`021`, P-19, WP-8, feature enablement, publication, Factor F or
+hotfix expansion, or any Production action.
+
 **P-26 human-intent amendment:** 2026-07-14 — high-impact actions add an
 application-layer confirmation without moving database authority into the UI.
 Recode and Retire show exact item/target/reason/impact summaries. Publish shows
