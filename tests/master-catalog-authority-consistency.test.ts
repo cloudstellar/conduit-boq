@@ -236,7 +236,10 @@ describe('Master Catalog authority consistency', () => {
       'P-28 approved unchanged `020` bootstrap source inclusion and tracked WP-7 harness source on 2026-07-15',
     )
     expect(tracker).toContain(
-      'G4R bootstrap-source integration and WP-7 harness preparation; WP-6.6 is complete',
+      'G4E clean Local execution decision and live WP-7 evidence; G4R and WP-6.6 are complete',
+    )
+    expect(tracker).toContain(
+      '2c43f6b0e644171b1ecba60c14566e5856a94b63',
     )
     expect(tracker).toContain(
       'Migration 020 SHA-256: e07e0c4161077efba7bc4f6ebf95518d0cc1bc7e4628a43a128dd899bd1aef93',
@@ -268,7 +271,7 @@ describe('Master Catalog authority consistency', () => {
       /pre-amendment operator\/browser preflight passed on\s+`c8f6dca`/,
     )
     expect(tracker).toContain(
-      'P-28 approved repository/source work only; unchanged accepted 020 now follows 019 in bootstrap source; tracked WP-7 harness exists; G4E clean execution/live evidence remains pending',
+      'Status: exact G4R source checkpoint 2c43f6b0e644171b1ecba60c14566e5856a94b63 passed; unchanged accepted 020 follows 019 in bootstrap source; tracked WP-7 harness exists; G4E clean execution/live evidence remains pending',
     )
     expect(existsSync(resolve(
       root,
