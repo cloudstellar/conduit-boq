@@ -124,6 +124,14 @@ regression harness is implemented for later live execution. This approval does
 not authorize the destructive Local reset, live WP-7 evidence, P-18/`021`,
 P-19, WP-8, Factor F/hotfix expansion, or Production.
 
+**P-29/G4E execution recorded:** 2026-07-15 — the owner separately authorized
+one warned destructive reset of Local Supabase on exact pushed checkout
+`15b707d443bec701f6b3a86aa7675ca1266604ba`. The combined `009`-`020`
+bootstrap and live WP-6.6/WP-6.5/P-20/WP-7 evidence passed; final Local
+pointer, flags, BOQ, and Factor F invariants were restored. This makes WP-7
+ready for owner review and does not authorize P-18/`021`, P-19, WP-8, Factor F
+or hotfix expansion, or Production.
+
 ## 1. Decision requested
 
 Approve detailed implementation and local rehearsal of Master Catalog Phase 4.
@@ -189,8 +197,8 @@ Supabase MCP verified after the Factor F rollout that root migrations `012`
 through `015` are applied, current Factor F default is `2569.0.0`, and legacy
 BOQs were not backfilled with a guessed Factor F version. Master Catalog Phase
 4 database migrations start at `017+`; the reviewed Local-only source chain is
-now `017`-`020` under P-28. The first clean bootstrap execution of that combined
-chain remains the separate G4E gate, and none of these migrations is
+now `017`-`020` under P-28. P-29/G4E passed the first clean bootstrap execution
+of that combined chain on exact `15b707d`; none of these migrations is
 Production-approved.
 
 The detailed post-Factor-F difficulty assessment and adjusted implementation

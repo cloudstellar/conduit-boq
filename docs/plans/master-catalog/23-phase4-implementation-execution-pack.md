@@ -57,6 +57,14 @@ This is repository/source authorization only. It does not authorize or imply a
 Local reset, live WP-7 execution, P-18/`021`, P-19, WP-8, Factor F or hotfix
 scope expansion, feature enablement, publication, or Production access/write.
 
+**P-29/G4E execution recorded:** 2026-07-15 — after the exact G4R checkpoint
+was committed and pushed, the owner separately approved one destructive Local
+reset. Exact checkout `15b707d443bec701f6b3a86aa7675ca1266604ba`
+clean-bootstrapped the integrated `009`-`020` chain and passed live WP-6.6,
+WP-6.5/P-20, WP-7, advisor, repository, and final-invariant gates. This makes
+WP-7 ready for owner review; it does not approve P-18/`021`, P-19, WP-8,
+Factor F/hotfix expansion, feature enablement, publication, or Production.
+
 **P-22 operator-workflow correction authorized:** 2026-07-12 — intended-admin
 review placed WP-6.6 closeout on Hold and accepted
 [Correction Plan #31](./31-phase4-wp66-operator-workflow-correction-plan.md).
@@ -645,8 +653,9 @@ application checkpoint `78e96ab3ed9993707014c4aba1d285b7592b17a1`.
 This satisfies the WP-6.6 exit gate only; G4 must still be approved before
 adding `020` to bootstrap or starting WP-7. P-28 subsequently approved the G4
 repository/source part: `020` is now in bootstrap source and the WP-7 harness
-is tracked. Destructive clean bootstrap and live WP-7 execution remain a
-separate owner gate.
+is tracked. P-29 then separately approved and completed the destructive clean
+bootstrap/live evidence gate on exact `15b707d`; WP-7 acceptance remains a
+separate owner review.
 
 The G2 advisor baseline is explicit: eight authenticated-callable
 `SECURITY DEFINER` warnings are triaged (seven baseline RPCs and one guarded
@@ -702,6 +711,15 @@ tracked tree for evidence, exercise the real Local RPCs, and restore/remove its
 BOQ fixtures. Repository/static readiness does not satisfy this WP: the command
 and focused BOQ print/export contracts must still run after a separately
 approved clean bootstrap of the exact integration commit.
+
+Technical exit recorded 2026-07-15 under P-29/G4E: the exact integrated
+checkout `15b707d443bec701f6b3a86aa7675ca1266604ba` passed the tracked live
+harness. All approved suffixes, catalog-authoritative fields, atomic
+rollback/role/version negatives, BOQ binding/copy behavior, print/export data
+modes, publish/restore historical preservation, and BOQ/Factor F/security
+before-after invariants passed. Final Local state restored pointer `2568.0.0`,
+zero drafts, all flags false, BOQ 198/1,547, and Factor F `2569.0.0`/36. The
+Tracker owns the evidence hash and current `Ready for owner review` status.
 
 ## 15. WP-7.5 P-18 new-identity placement governance
 

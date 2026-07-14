@@ -36,9 +36,9 @@
 | `017_master_catalog_phase4_foundation.sql` | Master Catalog Phase 4 additive governance foundation, including P-20 deterministic baseline identity from Production-derived `price_list.id`, request fingerprints, RLS/grants, and disabled feature flag | **Draft — Local only, not applied to Production** |
 | `018_master_catalog_phase4_draft_mutation.sql` | Draft create/manual/import RPCs with actor+payload request fingerprints, per-request/per-code locks, bounded runtime timeouts, full-payload preflight, audited mutation subtransaction rollback, and reusable ADR-003 transitions | **Draft — Local only, not applied to Production** |
 | `019_master_catalog_phase4_publish_pointer.sql` | Publish/restore, shared admin publish-readiness RPC, P-18 and structured-rollout boundary guards, P-19 inactive-row filing warning, catalog-only DB count/hash, runtime timeouts, and published immutability | **Draft — Local only, not applied to Production** |
-| `020_master_catalog_phase4_admin_workflow_hardening.sql` | WP-6.6 frozen first-rollout authority, resolve-only dictionaries/server allocator, exact read registers, readiness/provenance parity, correction path, schema hardening, P-22 working-draft lifecycle, P-23.1 reserved version sequence, P-24 annual-year range guard, and covering indexes for both frozen-authority foreign keys | **Owner-accepted Local-only migration in bootstrap source after G4 repository approval on 2026-07-15; SHA-256 `e07e0c4161077efba7bc4f6ebf95518d0cc1bc7e4628a43a128dd899bd1aef93`; G1R/G2 separate-apply evidence passed on exact execution checkout `721c2c2c4a234a4fd00e5686383be9af87ee15dd`; G3/WP-6.6 accepted on exact application checkpoint `78e96ab3ed9993707014c4aba1d285b7592b17a1`; clean bootstrap execution on the new G4 integration commit remains separately gated; not Production-approved** |
+| `020_master_catalog_phase4_admin_workflow_hardening.sql` | WP-6.6 frozen first-rollout authority, resolve-only dictionaries/server allocator, exact read registers, readiness/provenance parity, correction path, schema hardening, P-22 working-draft lifecycle, P-23.1 reserved version sequence, P-24 annual-year range guard, and covering indexes for both frozen-authority foreign keys | **Owner-accepted Local-only migration in bootstrap source; SHA-256 `e07e0c4161077efba7bc4f6ebf95518d0cc1bc7e4628a43a128dd899bd1aef93`; G1R/G2 separate-apply evidence passed on exact checkout `721c2c2c4a234a4fd00e5686383be9af87ee15dd`; G3/WP-6.6 accepted on `78e96ab3ed9993707014c4aba1d285b7592b17a1`; owner-approved G4E combined clean bootstrap through `020` passed on exact execution checkout `15b707d443bec701f6b3a86aa7675ca1266604ba`; not Production-approved** |
 | `021_master_catalog_phase4_placement_governance.sql` | Reserved P-18/WP-7.5 new-identity placement revision/review and atomic order contract | **Proposed only — P-18 pending; file does not exist; not in bootstrap** |
-| `017+_master_catalog_phase4_*.sql` | Umbrella reference for the Local-only Phase 4 range; files currently exist as `017`-`020`, and the G4 repository source path now applies all four after hotfix `016` | **Local-only range — clean G4 execution and Production approval remain separate** |
+| `017+_master_catalog_phase4_*.sql` | Umbrella reference for the Local-only Phase 4 range; files currently exist as `017`-`020`, and the G4 repository source path applies all four after hotfix `016` | **Local-only range — owner-approved G4E combined clean execution passed; Production approval remains separate** |
 
 ### Local Schema Baseline (`supabase/local/`)
 
@@ -123,8 +123,15 @@ on 2026-07-14; G4/WP-7 sequencing remained a separate decision at that
 checkpoint.
 On 2026-07-15 the owner approved G4 repository integration and WP-7 harness
 source work without a Local reset. The canonical bootstrap source now applies
-`020` after `019`, but the first destructive clean execution of that new source
-path remains separately gated and must not be inferred from the source edit.
+`020` after `019`. The owner then separately approved P-29/G4E, and one clean
+Local reset on exact checkout
+`15b707d443bec701f6b3a86aa7675ca1266604ba` applied the combined authority
+sequence `009`-`015`, hotfix `016`, and Phase 4 `017`-`020`. Bootstrap smoke,
+WP-6.6, WP-6.5/P-20, WP-7, schema lint, advisors, repository gates, and final
+Local invariants passed. The catalog pointer returned to `2568.0.0`, all three
+catalog flags returned to `false`, BOQ/Factor F authority remained unchanged,
+and Production was not touched. WP-7 owner acceptance, WP-8, and every
+Production gate remain separate.
 After P-18 acceptance, placement uses proposed `021`.
 Applied hotfix `016` must not be edited.
 This is not a new Production hotfix and must not be applied to Production

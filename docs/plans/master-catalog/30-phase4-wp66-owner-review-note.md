@@ -319,3 +319,10 @@ without running either destructive Local bootstrap or live WP-7 evidence. This
 follow-up does not rewrite the P-27 point-in-time scope above. G4 repository
 integration is authorized; clean execution, WP-7 pass/fail, WP-8, and every
 Production gate remain separate.
+
+**Subsequent P-29/G4E result (2026-07-15):** after G4R was committed and
+pushed, the owner separately approved one warned Local-only reset. Exact
+checkout `15b707d443bec701f6b3a86aa7675ca1266604ba` passed the combined
+`009`-`020` bootstrap and live WP-6.6/WP-6.5/P-20/WP-7 evidence, with final
+pointer/flags/BOQ/Factor F cleanup. This does not rewrite the P-27/P-28
+point-in-time boundaries or infer WP-7 owner acceptance, WP-8, or Production.

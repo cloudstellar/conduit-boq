@@ -132,7 +132,7 @@ describe('Master Catalog authority consistency', () => {
     ])
 
     expect(migrations).toContain(
-      '**Owner-accepted Local-only migration in bootstrap source after G4 repository approval on 2026-07-15; SHA-256 `e07e0c4161077efba7bc4f6ebf95518d0cc1bc7e4628a43a128dd899bd1aef93`; G1R/G2 separate-apply evidence passed on exact execution checkout `721c2c2c4a234a4fd00e5686383be9af87ee15dd`; G3/WP-6.6 accepted on exact application checkpoint `78e96ab3ed9993707014c4aba1d285b7592b17a1`; clean bootstrap execution on the new G4 integration commit remains separately gated; not Production-approved**',
+      '**Owner-accepted Local-only migration in bootstrap source; SHA-256 `e07e0c4161077efba7bc4f6ebf95518d0cc1bc7e4628a43a128dd899bd1aef93`; G1R/G2 separate-apply evidence passed on exact checkout `721c2c2c4a234a4fd00e5686383be9af87ee15dd`; G3/WP-6.6 accepted on `78e96ab3ed9993707014c4aba1d285b7592b17a1`; owner-approved G4E combined clean bootstrap through `020` passed on exact execution checkout `15b707d443bec701f6b3a86aa7675ca1266604ba`; not Production-approved**',
     )
     expect(migrations).toContain(
       '**Proposed only — P-18 pending; file does not exist; not in bootstrap**',
@@ -213,11 +213,15 @@ describe('Master Catalog authority consistency', () => {
     expect(decisions).toContain('| P-26 |')
     expect(decisions).toContain('| P-27 |')
     expect(decisions).toContain('| P-28 |')
+    expect(decisions).toContain('| P-29 |')
     expect(decisions).toContain(
       'Accepted 2026-07-14 23:50 +07; WP-6.6 complete; G4 and all later gates remain separate',
     )
     expect(decisions).toContain(
-      'Approved 2026-07-15 for repository/source work only; G4 clean execution and live WP-7 remain pending',
+      'Approved 2026-07-15 for repository/source work only; G4 clean execution and live WP-7 remained pending at this point and were later decided under P-29',
+    )
+    expect(decisions).toContain(
+      'Approved and executed 2026-07-15; combined bootstrap and all named technical evidence passed; WP-7 owner accept/hold and later gates remain separate',
     )
     expect(decisions).toContain('DB-read version in the Server Action before the publish RPC')
 
@@ -227,19 +231,34 @@ describe('Master Catalog authority consistency', () => {
     expect(tracker).toMatch(/\| WP-5 \|[^\n]+\| Complete \|/)
     expect(tracker).toMatch(/\| WP-6\.5 \|[^\n]+\| Complete \|/)
     expect(tracker).toMatch(/\| WP-6\.6 \|[^\n]+\| Complete \|/)
-    expect(tracker).toMatch(/\| WP-7 \|[^\n]+\| In progress \|/)
+    expect(tracker).toMatch(/\| WP-7 \|[^\n]+\| Ready for owner review \|/)
     expect(tracker).toMatch(/\| WP-7\.5 \|[^\n]+\| Not started \|/)
     expect(tracker).toMatch(/\| WP-8 \|[^\n]+\| Not started \|/)
     expect(tracker).toContain('independent intended-admin UAT remains WP-8')
     expect(tracker).toContain('| Production write allowed | No |')
     expect(tracker).toContain(
-      'P-28 approved unchanged `020` bootstrap source inclusion and tracked WP-7 harness source on 2026-07-15',
+      'P-29 approved one warned destructive G4E reset of Local only on exact pushed checkout',
     )
     expect(tracker).toContain(
-      'G4E clean Local execution decision and live WP-7 evidence; G4R and WP-6.6 are complete',
+      'Owner review of G4E/WP-7 technical evidence; G4R and WP-6.6 are complete',
     )
     expect(tracker).toContain(
       '2c43f6b0e644171b1ecba60c14566e5856a94b63',
+    )
+    expect(tracker).toContain(
+      '15b707d443bec701f6b3a86aa7675ca1266604ba',
+    )
+    expect(tracker).toContain(
+      '2e57892c5649fe10e9dc44a885d105066261e5226fd5a23d67ec05bfa4a83e1f',
+    )
+    expect(tracker).toContain(
+      '6d9f9b50381f503fee59a54f993647e4efa4df05f19d4542703efa281a83dd60',
+    )
+    expect(tracker).toContain(
+      'aafb8282e3a3485b606b086e6a718bed60689104e1305272553a94ac7f37b220',
+    )
+    expect(tracker).toContain(
+      '42399c16108e2f7688a53d70464e743559cd705a51e0fb2509831ec1c647a8c8',
     )
     expect(tracker).toContain(
       'Migration 020 SHA-256: e07e0c4161077efba7bc4f6ebf95518d0cc1bc7e4628a43a128dd899bd1aef93',
@@ -271,7 +290,7 @@ describe('Master Catalog authority consistency', () => {
       /pre-amendment operator\/browser preflight passed on\s+`c8f6dca`/,
     )
     expect(tracker).toContain(
-      'Status: exact G4R source checkpoint 2c43f6b0e644171b1ecba60c14566e5856a94b63 passed; unchanged accepted 020 follows 019 in bootstrap source; tracked WP-7 harness exists; G4E clean execution/live evidence remains pending',
+      'Status: exact G4E execution checkout 15b707d443bec701f6b3a86aa7675ca1266604ba passed the combined 009-020 bootstrap and live WP-6.6/WP-6.5/P-20/WP-7 gates; WP-7 is Ready for owner review',
     )
     expect(existsSync(resolve(
       root,
@@ -306,6 +325,7 @@ describe('Master Catalog authority consistency', () => {
       'The owner **accepted G3** on exact checkpoint',
     )
     expect(ownerReview).toContain('**Subsequent P-28 decision (2026-07-15):**')
+    expect(ownerReview).toContain('**Subsequent P-29/G4E result (2026-07-15):**')
     expect(existsSync(resolve(
       root,
       'docs/plans/master-catalog/31-phase4-wp66-operator-workflow-correction-plan.md',
@@ -334,8 +354,9 @@ describe('Master Catalog authority consistency', () => {
       '**Subsequent owner decision:** at 2026-07-14 23:50 +07',
     )
     expect(correctionPlan).toContain('| G4R | Passed by P-28 on 2026-07-15')
-    expect(correctionPlan).toContain('| G4E | Pending:')
+    expect(correctionPlan).toContain('| G4E | Owner-approved and passed 2026-07-15')
     expect(correctionPlan).toContain('## 21. P-28 G4 repository integration')
+    expect(correctionPlan).toContain('## 22. P-29 G4E clean Local execution')
   })
 
   it('keeps reliability commands and route recovery files tracked by contract', () => {

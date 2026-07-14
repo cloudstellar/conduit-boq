@@ -127,6 +127,14 @@ architecture: source integration is complete, while destructive clean
 execution and live evidence remain a separate gate. Production and the
 P-18/P-19 decisions remain untouched.
 
+**P-29/G4E execution evidence:** 2026-07-15 — the owner separately authorized
+one destructive Local-only reset on exact pushed checkout
+`15b707d443bec701f6b3a86aa7675ca1266604ba`. The integrated `009`-`020`
+bootstrap and live WP-6.6/WP-6.5/P-20/WP-7 gates passed without changing the
+architecture or migration `020`. Final pointer/flags/BOQ/Factor F invariants
+were restored. WP-7 owner acceptance, WP-8, P-18/P-19, and Production remain
+separate.
+
 **Owner decision recorded:** 2026-07-04 — approved according to the
 recommendation for Phase 4 Core/local implementation. This approval does not
 authorize Production migration, deploy, feature enablement, candidate data

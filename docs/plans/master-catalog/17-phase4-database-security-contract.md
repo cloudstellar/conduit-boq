@@ -27,8 +27,10 @@ candidate and the comparator passed. Current advisor-rule warnings are triaged
 below and require final WP-8 disposition rather than being hidden.
 P-28/G4 repository approval subsequently placed unchanged accepted `020` in
 the canonical Local bootstrap source after `019`. The new `009`-`020` source
-chain has not yet been clean-executed on its integration commit, and `020` has
-not been applied to Production.
+chain was then clean-executed under separately owner-approved P-29/G4E on exact
+checkout `15b707d443bec701f6b3a86aa7675ca1266604ba`; schema lint, security
+advisors, WP-6.6/WP-6.5/P-20/WP-7 evidence, and final Local invariants passed.
+Migration `020` has not been applied to Production.
 P-18 rules and placement migration `021` remain pending owner/data-custodian
 approval.
 

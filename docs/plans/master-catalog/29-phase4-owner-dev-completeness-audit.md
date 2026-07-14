@@ -154,8 +154,9 @@ Do not edit evidence-backed Local migrations `017`-`019`.
 - Keep `scripts/bootstrap-local-db.sh` at `009`-`015`, hotfix `016`, then
   `017`-`019` until each new migration exists, is reviewed, and its bootstrap
   inclusion is deliberately approved. P-28 satisfied that source-inclusion
-  gate for unchanged accepted `020`; the script now ends at `020`, while its
-  first clean execution remains separately gated.
+  gate for unchanged accepted `020`; the script now ends at `020`. P-29 then
+  separately approved and passed the first combined clean execution on exact
+  `15b707d`.
 - P-22 amends the still-unaccepted Local-only `020` before fingerprint freeze.
   This supersedes the `3bfc74e` migration fingerprint/evidence for closeout and
   requires new P-20/WP-7/WP-8 reruns. It does not erase the historical evidence
@@ -168,7 +169,9 @@ Do not edit evidence-backed Local migrations `017`-`019`.
   Independent G2 then reproduced the final candidate and P-20 hashes. G3
   technical stale-review recovery and cleanup also passed on `6599c30`; the
   owner closeout was accepted through P-27. P-28 later authorized repository
-  inclusion without authorizing a Local reset.
+  inclusion without authorizing a Local reset; P-29 subsequently authorized and
+  passed the bounded G4E Local execution. WP-7 owner acceptance remains
+  separate.
 
 ## 7. Deliberate deferrals and control visibility
 
@@ -210,6 +213,7 @@ bounded operator corrections described in
 [Doc #31](./31-phase4-wp66-operator-workflow-correction-plan.md). P-26
 authorizes the bounded application/test/documentation correction for C-17.
 These decisions, including P-28 source integration, do not authorize a Local
-database reset, Production access/write, feature
+database reset. P-29 separately authorized and completed exactly one bounded
+G4E Local reset; neither decision authorizes Production access/write, feature
 enablement, publication, new Factor F work, P-18/`021`, or expansion of hotfix
 `016`.

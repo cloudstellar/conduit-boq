@@ -23,8 +23,11 @@ Local evidence runs. Migration `020` passed repository, Local DB/RLS/
 concurrency, P-20 rerun, and browser technical QA on `3bfc74e`; owner closeout
 was later accepted through P-27 after final G1R/G2/G3/P-26 evidence. P-28 then
 approved `020` bootstrap source integration and the regression-only WP-7
-harness without authorizing a Local reset or live execution. No Production
-action, P-18/`021`, new Factor F workflow, or hotfix expansion is authorized.
+harness without authorizing a Local reset or live execution. P-29 subsequently
+authorized one Local-only G4E reset; the integrated bootstrap and live WP-7
+regression evidence passed with Factor F pointer/rows/grants/bindings unchanged.
+No Production action, P-18/`021`, new Factor F workflow, or hotfix expansion is
+authorized.
 
 ## 1. Difficulty assessment
 
@@ -237,8 +240,8 @@ Rehearsal path:
 1. Restore refreshed Production data locally.
 2. Use the canonical bootstrap order `009`-`015`, production hotfix `016`, then
    Phase 4 `017`-`020`; include `021` only after P-18/WP-7.5 is accepted and
-   implemented. The current reviewed source authority ends at `020`; its first
-   combined clean execution remains the separate G4E gate.
+   implemented. The reviewed source authority ends at `020`; its first combined
+   clean execution passed under P-29/G4E on exact `15b707d`.
 3. Record before/after catalog counts.
 4. Record before/after Factor F pointer, active versions, row counts, and
    hashes.

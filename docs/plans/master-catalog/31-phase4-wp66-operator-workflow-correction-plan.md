@@ -25,7 +25,11 @@ exact `78e96ab3ed9993707014c4aba1d285b7592b17a1`; the owner accepted
 G3/WP-6.6 on that checkpoint at 2026-07-14 23:50 +07. G4 bootstrap/WP-7
 sequencing remained pending at that checkpoint. P-28 then approved G4
 repository integration and WP-7 harness source on 2026-07-15; destructive
-clean execution remains pending and separate.
+clean execution remained pending and separate at that point. P-29 subsequently
+authorized one warned G4E reset on exact pushed checkout
+`15b707d443bec701f6b3a86aa7675ca1266604ba`; the integrated `009`-`020`
+bootstrap and live WP-6.6/WP-6.5/P-20/WP-7 evidence passed. WP-7 owner
+acceptance, WP-8, and Production remain separate gates.
 
 **Production touched:** No
 
@@ -331,7 +335,7 @@ execution of that integrated source remains separately gated.
 | G2 | Explicitly owner-approved and passed 2026-07-13 on the same exact checkout `721c2c2c4a234a4fd00e5686383be9af87ee15dd`; second clean rebuild, separate unchanged `020`, WP-6.6/WP-6.5 evidence, P-20 comparator, current advisors, repository gates, and cleanup passed. |
 | G3 | Accepted 2026-07-14 23:50 +07 on exact application checkpoint `78e96ab3ed9993707014c4aba1d285b7592b17a1` after P-25 compound/high-volume presentation, real-route stale-after-review, and P-26 high-impact confirmation evidence passed |
 | G4R | Passed by P-28 on 2026-07-15: after G3, add accepted unchanged `020` to bootstrap source and implement the tracked WP-7 harness without a reset |
-| G4E | Pending: separately warn/authorize one destructive clean bootstrap of the exact G4R commit, then run live WP-6.6/P-20/WP-7 evidence and final invariants |
+| G4E | Owner-approved and passed 2026-07-15 on exact pushed checkout `15b707d443bec701f6b3a86aa7675ca1266604ba`: one destructive Local-only clean bootstrap applied `009`-`020`; WP-6.6, WP-6.5/P-20, WP-7, advisors, repository gates, and final invariants passed. WP-7 owner acceptance is not inferred. |
 
 Production P-12 through P-15 remain separate and unrequested.
 
@@ -812,3 +816,51 @@ This is G4R repository integration, not G4E execution evidence. The exact
 integration commit and static checks must be recorded before requesting one
 warned Local reset. P-18/`021`, P-19, WP-8, feature enablement, publication,
 Factor F/hotfix expansion, and Production remain outside this approval.
+
+## 22. P-29 G4E clean Local execution
+
+After G4R was committed and pushed, the owner explicitly approved one
+destructive G4E reset. The execution used exact checkout
+`15b707d443bec701f6b3a86aa7675ca1266604ba`; migration `020` remained byte
+unchanged with SHA-256
+`e07e0c4161077efba7bc4f6ebf95518d0cc1bc7e4628a43a128dd899bd1aef93`.
+
+Technical result on 2026-07-15:
+
+- `npm run db:local:bootstrap` reset only Local Supabase and applied canonical
+  `009`-`015`, hotfix `016`, then Phase 4 `017`-`020`; bootstrap smoke restored
+  198 BOQs, 1,547 BOQ items, 710 current catalog rows, and 73 Factor F rows;
+- canonical `2568.0.0` remained 710 rows with dataset hash
+  `sha256:2e3571ea7135fbc0bbb84c8cc330af1173e4c1d2345e5eb59958dc76e45558b8`;
+- retained untracked WP-6.6 evidence
+  `tmp/master-catalog/wp66-evidence/20260715-g4e-15b707d.json` has SHA-256
+  `2e57892c5649fe10e9dc44a885d105066261e5226fd5a23d67ec05bfa4a83e1f`;
+- retained untracked WP-6.5/P-20 input
+  `tmp/master-catalog/wp65-evidence/20260715-g4e-15b707d.json` has SHA-256
+  `6d9f9b50381f503fee59a54f993647e4efa4df05f19d4542703efa281a83dd60`;
+  its base version, dataset hash, 710 identity count, and identity-mapping
+  SHA-256 matched the prior independent G2 input. The existing G1R-versus-G2
+  same-commit comparator remains the formal two-clean-run P-20 evidence;
+- retained untracked WP-7 evidence
+  `tmp/master-catalog/wp7-evidence/20260715-g4e-15b707d.json` has SHA-256
+  `aafb8282e3a3485b606b086e6a718bed60689104e1305272553a94ac7f37b220`;
+  all approved suffixes, catalog-authoritative fields, atomic negatives, BOQ
+  bindings/copies, print/export data modes, historical preservation, and
+  Factor F/security invariants passed;
+- DB lint found no schema errors; CLI security advisors found no issue. The
+  already-triaged performance baseline remains 19 RLS init-plan and 5
+  multiple-permissive-policy warnings plus seven unindexed-FK information
+  findings; both `020` authority FKs are covered and WP-8 owns disposition;
+- 31 test files/169 tests, TypeScript, lint with 0 errors/10 existing warnings,
+  frozen authority 710/65/17, production dependency audit with 0
+  vulnerabilities, production build, and `git diff --check` passed; and
+- final Local readback returned pointer `2568.0.0`, zero drafts, all three
+  catalog flags false, zero cross-version BOQ items, BOQ 198/1,547, Factor F
+  `2569.0.0`/36 current rows (73 total), and zero partial legacy Factor F
+  snapshots. Published Local test versions remain immutable, non-default
+  history. Production touched: No.
+
+This passes the bounded G4E technical gate and makes WP-7 ready for owner
+review. It does not infer WP-7 acceptance, authorize P-18/`021`, P-19, WP-8,
+feature enablement, publication, Factor F/hotfix expansion, or any Production
+action.

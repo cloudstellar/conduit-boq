@@ -133,8 +133,10 @@ Stop immediately when any of these occurs:
     application checkpoint `78e96ab3ed9993707014c4aba1d285b7592b17a1`;
     this did not itself authorize G4, migration/bootstrap, or reset. Then verify
     P-28/G4 repository integration separately: bootstrap source includes exact
-    accepted `020`, while the destructive clean execution is still a distinct
-    owner gate.
+    accepted `020`. Finally verify P-29/G4E separately: exact checkout
+    `15b707d443bec701f6b3a86aa7675ca1266604ba` passed the combined Local
+    `009`-`020` bootstrap and live WP-7 technical evidence. This is not WP-8 or
+    Production approval.
 
 **Exit gate:** All documents have owner/reviewer decisions; no unresolved row
 or taxonomy blocker.
