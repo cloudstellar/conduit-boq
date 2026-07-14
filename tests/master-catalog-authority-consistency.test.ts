@@ -131,7 +131,7 @@ describe('Master Catalog authority consistency', () => {
     ])
 
     expect(migrations).toContain(
-      '**G1R/G2-passed Local-only candidate on exact execution checkout `721c2c2c4a234a4fd00e5686383be9af87ee15dd`; SHA-256 `e07e0c4161077efba7bc4f6ebf95518d0cc1bc7e4628a43a128dd899bd1aef93`; P-20 comparison passed; G3/G4 and Production approvals remain required; not in bootstrap or Production**',
+      '**G1R/G2-passed Local-only candidate on exact execution checkout `721c2c2c4a234a4fd00e5686383be9af87ee15dd`; SHA-256 `e07e0c4161077efba7bc4f6ebf95518d0cc1bc7e4628a43a128dd899bd1aef93`; P-20 comparison and no-reset G3 technical route passed; explicit G3 owner accept/hold and G4 remain required; not in bootstrap or Production**',
     )
     expect(migrations).toContain(
       '**Proposed only — P-18 pending; file does not exist; not in bootstrap**',
@@ -192,10 +192,10 @@ describe('Master Catalog authority consistency', () => {
       'WP-6.6 P-24/G1R',
     )
     expect(decisions).toContain(
-      'final G1R/G2 passed on exact execution checkout `721c2c2`',
+      'final G1R/G2 passed on exact `721c2c2`; G3 technical execution passed on `6599c30`; owner accept/hold remains separate',
     )
     expect(decisions).toContain(
-      'approved standalone Local visual evidence passed; independent real-route stale-after-review UAT and G3 owner acceptance remain pending',
+      'bounded implementation/visual evidence passed; independent real-route stale-after-review technical UAT also passed on `6599c30`; explicit G3 owner acceptance remains pending',
     )
 
     const tracker = read(
@@ -212,7 +212,7 @@ describe('Master Catalog authority consistency', () => {
       'P-25 bounded application/tests/docs and approved standalone Local visual evidence passed on 2026-07-14 after independent G2',
     )
     expect(tracker).toContain(
-      'P-25 presentation evidence no longer blocks G3; do not infer G4/bootstrap/WP-7 or Production',
+      'Owner-authorized no-reset G3 real-route walkthrough passed on source `6599c30`; owner accept/hold is still pending.',
     )
     expect(tracker).toContain(
       'Migration 020 SHA-256: e07e0c4161077efba7bc4f6ebf95518d0cc1bc7e4628a43a128dd899bd1aef93',
@@ -227,10 +227,10 @@ describe('Master Catalog authority consistency', () => {
       '98b9f5fb9e0135ea35a716c87e1f4916e7aa1d186ce68ed067ea02d81b0bce42',
     )
     expect(tracker).toContain(
-      'P-25 27/27 report/screenshots under output/master-catalog/g3-owner-review/20260714-p25-final-review/',
+      'Evidence: `output/master-catalog/g3-owner-review/20260714-p25-final-review/qa-report.json`',
     )
     expect(tracker).toContain(
-      'full 30 files/162 tests',
+      'full suite passed 30 files/162 tests',
     )
     expect(tracker).toContain(
       '050c998361f3372bd3bf9fb6645dc4abd1c0bf2b` is the exact P-24 same-scope closure-lineage checkpoint',
@@ -243,8 +243,8 @@ describe('Master Catalog authority consistency', () => {
     expect(tracker).toMatch(
       /pre-amendment operator\/browser preflight passed on\s+`c8f6dca`/,
     )
-    expect(tracker).toMatch(
-      /G3 stale-after-review acceptance, G4, and every Production\s+action remain unauthorized/i,
+    expect(tracker).toContain(
+      'no-reset real-route G3 technical walkthrough passed on source 6599c30; candidate 020 remains outside bootstrap; explicit G3 owner decision and G4 remain pending',
     )
     expect(existsSync(resolve(
       root,
@@ -266,6 +266,12 @@ describe('Master Catalog authority consistency', () => {
     expect(ownerReview).toContain(
       '**G2 execution checkout:** `721c2c2c4a234a4fd00e5686383be9af87ee15dd`',
     )
+    expect(ownerReview).toContain(
+      '**G3 source HEAD:** `6599c306207c2d1e15342c398888b56513f9bb0a`',
+    )
+    expect(ownerReview).toContain(
+      'The technical recommendation is **Accept G3**',
+    )
     expect(existsSync(resolve(
       root,
       'docs/plans/master-catalog/31-phase4-wp66-operator-workflow-correction-plan.md',
@@ -284,6 +290,9 @@ describe('Master Catalog authority consistency', () => {
     )
     expect(correctionPlan).toContain(
       'G2 independent reproducibility result',
+    )
+    expect(correctionPlan).toContain(
+      'This passes the G3 technical walkthrough. It does not infer the owner\'s',
     )
   })
 

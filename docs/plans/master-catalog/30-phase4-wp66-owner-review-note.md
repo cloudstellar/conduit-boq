@@ -1,7 +1,9 @@
 # Master Catalog Phase 4 WP-6.6 Owner Review Note
 
-**Status:** Hold pending G3 intended-admin closeout; P-25 repository/static and
-approved standalone Local visual evidence passed 2026-07-14. Earlier
+**Status:** Ready for owner accept/hold after the G3 real-route technical
+walkthrough passed on 2026-07-14; owner acceptance is not inferred. P-25
+repository/static and approved standalone Local visual evidence also passed.
+Earlier
 source/G1/browser/P-23 checkpoints remain historical. P-24 base and closure
 lineage are preserved at `88d0711`/`050c998`; the separately owner-approved
 G1R and independent G2 clean DB/concurrency/P-20/advisor gates passed on exact
@@ -18,6 +20,7 @@ remains outside bootstrap and Production.
 **Current migration `020` SHA-256:** `e07e0c4161077efba7bc4f6ebf95518d0cc1bc7e4628a43a128dd899bd1aef93`
 **G1R execution checkout:** `721c2c2c4a234a4fd00e5686383be9af87ee15dd`
 **G2 execution checkout:** `721c2c2c4a234a4fd00e5686383be9af87ee15dd`
+**G3 source HEAD:** `6599c306207c2d1e15342c398888b56513f9bb0a`
 **Correction source checkpoint:**
 `ac31feb`
 **Historical implementation/evidence commit:**
@@ -96,17 +99,17 @@ Recorded owner response:
 | Scope | Passed evidence | Remaining later gate |
 |---|---|---|
 | C-01 browse/history | 1,201-row paging fixture; Local 710-row first/middle/last search; exact item and stable identity/code history | Independent operator comprehension at WP-8 |
-| C-02 draft targeting | Final G1R/G2 on `721c2c2` passed concurrent-create single winner, replay/mismatch/role denial, one-draft precedence, audited abandon/replay/replacement, immutable retained history, and zero working drafts after cleanup; G1R also passed browser abandon. | G3 owner closeout required |
+| C-02 draft targeting | Final G1R/G2 on `721c2c2` passed concurrent-create single winner, replay/mismatch/role denial, one-draft precedence, audited abandon/replay/replacement, immutable retained history, and zero working drafts after cleanup. G3 then created one real-route proof draft, audited-abandoned it at lock 3, retained all 710 rows read-only, and restored zero working drafts. | Owner accept/hold remains |
 | C-03/C-04 authority/allocator | 710 mappings, 65 groups, 17 exclusions; unknown/caller-code denial; concurrent unique allocation; never-reuse; sequence-900 boundary | Rerun in WP-8 |
 | C-05 import evidence | Complete 710-row rollout, 709 structured changes plus approved `ITEM-0139`, and stable validation replay passed. P-23 exact-draft route/no-second-selector browser proof passed; QA also caught and fixed cross-version import-history leakage by scoping the read to exact `version_id`. | Binary upload/apply was not repeated in P-23; full intended-admin import UAT remains WP-8 |
 | C-06/C-07 provenance | Authenticated publisher snapshot; physical archive reference; invalid-date and missing-archive denials | Final candidate metadata/P-15 |
 | C-08 readiness | Shared full 710-row quality result, exact count/hash, successful Local publication proof, pointer restored | Final candidate and WP-8 rerun |
 | C-09/C-10 correction | Retire/reactivate, eligible withdraw, inherited-withdraw denial, preserved identity/code/audit, exact browser item action | P-19 if an official version contains inactive rows |
-| C-11/C-12 schema/UX | G1R/G2 passed final `020` constraints/grants, two authority FK indexes, DB lint/current advisor triage, and P-20 comparison; G1R passed Thai account/navigation/item/import/review/restore flow and bounded desktop/mobile layout. | Formal keyboard traversal, measured performance, and independent UAT at WP-8/G3 |
-| C-13 final review | G1R/G2 passed identity-based complete diff/readiness/exact-lock publication and restore invariants; G1R browser showed the exact before/after `ITEM-0355` one-field change and cancelled restore confirmation without moving the pointer. P-25 retained that contract and passed 27/27 approved standalone Local checks for an eight-field compound row and 710 total/709 affected rows at desktop/mobile sizes. | Independent real-route stale-after-review UAT and G3 owner acceptance |
-| C-14 version intent/reservation | G1R/G2 live sequence/race/replay/one-draft/abandon/replacement cases passed; G1R browser planned and opened system-reserved revision `2568.7.0`. | G3 owner acceptance |
-| C-15 create/item/restore flow | G1R/G2 passed the DB/repository contract; G1R browser opened the exact draft workspace, searched first/middle/last rows, edited an exact item, reviewed the whole snapshot, opened exact-draft import, and inspected current-to-target restore confirmation. | Independent UAT/G3 acceptance |
-| C-16 pre-G1R business/UX guard | Final G1R/G2 migration/helper contracts, safe error mapping, durable focus contracts, contextual authority, accessibility labels, and advisors passed on `721c2c2`; bounded browser flow passed at G1R. | Formal G3/WP-8 operator/accessibility acceptance |
+| C-11/C-12 schema/UX | G1R/G2 passed final `020` constraints/grants, two authority FK indexes, DB lint/current advisor triage, and P-20 comparison; G1R passed Thai account/navigation/item/import/review/restore flow and bounded desktop/mobile layout. G3 independently passed the real-route stale-recovery and clean-closeout path. | Explicit G3 owner accept/hold remains; formal keyboard traversal, measured performance, and independent UAT stay in WP-8 |
+| C-13 final review | G1R/G2 passed identity-based complete diff/readiness/exact-lock publication and restore invariants; P-25 passed 27/27 compound/high-volume checks. G3 then bound final review to lock 1, advanced the draft to lock 2 from another real route, rejected the stale publish with the expected Thai recovery message, retained entered publication fields, created no publish change set, and reloaded the latest lock. | Owner accept/hold remains; broader UAT stays WP-8 |
+| C-14 version intent/reservation | G1R/G2 live sequence/race/replay/one-draft/abandon/replacement cases passed; G3 used explicit correction intent and permanently reserved abandoned Local proof version `2568.0.2` as designed. | Owner accept/hold remains |
+| C-15 create/item/restore flow | G1R/G2 passed the DB/repository contract and bounded browser route; G3 independently used the real create, exact workspace, item edit, final review, and audited-abandon routes. | Owner accept/hold remains; full independent UAT stays WP-8 |
+| C-16 pre-G1R business/UX guard | Final G1R/G2 contracts and P-25 presentation passed. G3 independently observed durable Thai stale recovery, retained form values, explicit Local/account context, and clean disabled-gate closeout. | Owner accept/hold remains; formal accessibility stays WP-8 |
 
 ## 3. Retained evidence
 
@@ -223,6 +226,31 @@ Final G2 cleanup retained pointer `2568.0.0`, 710 current rows, zero working
 drafts, all three catalog flags false, 198 BOQs/1,547 BOQ items, Factor F
 `2569.0.0`/36 rows, and no Production access or write.
 
+### 3.1 G3 intended-admin technical walkthrough
+
+The bounded no-reset G3 walkthrough passed on source HEAD
+`6599c306207c2d1e15342c398888b56513f9bb0a` using intended Local admin
+`local.admin@ntplc.co.th` and the real admin routes. The in-app Browser was
+selected first but rejected `localhost` under its URL policy; the previously
+owner-approved Playwright fallback drove the actual Next.js application and
+Local Supabase API.
+
+The admin created correction draft `2568.0.2`, saved `ITEM-0001` at lock 1,
+held that final-review page open, and saved a second edit at lock 2. The stale
+lock-1 publish request was rejected with the expected Thai instruction to load
+the latest data and review again. All entered publication fields remained
+visible, no `publish` change set was created, and the pointer did not move. A
+fresh review loaded lock 2. The draft was then audited-abandoned through the UI
+at lock 3 and retained as read-only history.
+
+Final Local readback: pointer `2568.0.0`/710, zero working drafts, proof change
+sets `clone=1`, `manual=2`, `abandon=1`, `publish=0`, all three catalog flags
+false, BOQ 198/1,547, Factor F `2569.0.0`/36, five required constraints, valid
+one-draft index, two authority FK indexes, and zero nullable required columns.
+Evidence is retained untracked under
+`output/master-catalog/g3-owner-review/20260714-6599c30-stale-after-review/`.
+Production touched: No.
+
 ## 4. Scope not accepted by this review
 
 - Migration `020` is not yet part of `scripts/bootstrap-local-db.sh`.
@@ -236,12 +264,14 @@ drafts, all three catalog flags false, 198 BOQs/1,547 BOQ items, Factor F
 
 ## 5. Recommendation
 
-Keep WP-6.6 on Hold only for G3 intended-admin closeout. G1R/G2 and the P-20
-comparison are accepted as passed technical evidence on exact checkout
-`721c2c2`; P-25 has now proved that the unchanged identity diff is readable for
-an eight-field compound row and the expected 709-change rollout at desktop and
-mobile sizes. G3 should emphasize independent real-route stale-after-review
-recovery and operator comprehension; broader binary import, accessibility, and
-measured performance remain WP-8. Do not run another reset, add migration `020` to
-bootstrap, begin WP-7, or infer G4/Production acceptance until the applicable
-later owner gates are explicitly accepted.
+Approve G3/WP-6.6 operator closeout if the real-route stale recovery, fresh
+review, and audited cleanup shown in steps 7-11 are understandable without SQL
+or developer intervention. The technical recommendation is **Accept G3**: the
+guard failed closed, preserved the operator's entered evidence, left the
+pointer unchanged, and returned Local to the required baseline. The owner must
+still record accept or hold explicitly; this document does not self-approve.
+
+Broader binary import, accessibility, and measured performance remain WP-8.
+Even after G3 acceptance, G4/bootstrap inclusion is a separate gate. Do not run
+another reset, add migration `020` to bootstrap, begin WP-7, or infer
+Production acceptance until the applicable later owner decisions are recorded.

@@ -92,6 +92,17 @@ comparison, repository gates, current advisor triage, and final Local invariant
 readback passed. G3/G4, bootstrap inclusion, WP-7, and Production remain
 separate approvals.
 
+**G3 real-route technical evidence:** 2026-07-14 — the owner authorized a
+bounded Local-only run without resetting Local Supabase. On source HEAD
+`6599c30`, intended admin review held draft lock 1 while a second real-route
+edit advanced lock 2. The stale publish was rejected with the approved Thai
+recovery message and retained publication fields; no publish change set or
+pointer movement occurred. Fresh review loaded lock 2, audited abandon closed
+the proof at lock 3, and final pointer/BOQ/Factor F/schema invariants passed
+with all catalog flags false. This confirms the architecture's reviewed-lock
+contract; it does not infer owner acceptance, G4/bootstrap inclusion, WP-7,
+WP-8, or Production authorization.
+
 **Owner decision recorded:** 2026-07-04 — approved according to the
 recommendation for Phase 4 Core/local implementation. This approval does not
 authorize Production migration, deploy, feature enablement, candidate data

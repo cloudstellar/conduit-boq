@@ -92,6 +92,15 @@ through `019`, separate final `020`, WP-6.6/WP-6.5 evidence, P-20 comparison,
 repository gates, advisor triage, and final cleanup passed. This does not
 authorize G3/G4, bootstrap inclusion, WP-7, or Production.
 
+**G3 technical execution recorded:** 2026-07-14 — the owner authorized a
+bounded no-reset Local run on source `6599c30`. Intended admin final review was
+held at lock 1, a second real-route edit advanced lock 2, and the stale publish
+was rejected with the approved Thai recovery while retaining entered fields.
+No publish change set or pointer movement occurred. Fresh review loaded lock 2;
+audited abandon closed lock 3; final Local invariants and disabled flags passed.
+This technical result does not record the owner's accept/hold decision and does
+not authorize G4, bootstrap inclusion, WP-7, or Production.
+
 ## 1. Decision requested
 
 Approve detailed implementation and local rehearsal of Master Catalog Phase 4.
@@ -425,10 +434,13 @@ feature enablement, final catalog publication, or silent business-data choices.
       cleanup; no Production access/write occurred
 - [x] Separately approved independent G2 passed on the same exact candidate,
       including P-20 comparison and final Local cleanup
+- [x] Owner-authorized no-reset G3 technical walkthrough passed real-route
+      stale-review rejection, fresh-review recovery, audited cleanup, and final
+      Local invariants on source `6599c30`
 - [x] Unsupported Add/Supplement/Retire controls remain hidden at release unless
       their downstream gates pass
-- [ ] G3 intended-admin closeout accepts or holds the revised WP-6.6 workflow
-      before G4/bootstrap/WP-7 sequencing
+- [ ] Owner explicitly accepts or holds G3/WP-6.6 operator closeout before
+      G4/bootstrap/WP-7 sequencing
 
 ### Additional preconditions before WP-7.5 placement implementation
 

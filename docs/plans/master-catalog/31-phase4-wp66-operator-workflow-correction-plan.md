@@ -16,8 +16,9 @@ browser gate passed on exact execution checkout `721c2c2`; the separately
 owner-approved independent G2 clean rebuild and P-20 comparison then passed on
 the same exact candidate. P-25 repository/static and owner-approved standalone
 Local visual/interaction evidence then passed 27/27 at 710 total/709 affected
-rows without DB mutation. G3 stale-after-review closeout and G4 bootstrap/WP-7
-sequencing remain pending.
+rows without DB mutation. The no-reset G3 real-route technical walkthrough then
+passed stale-after-review recovery and clean Local closeout on source `6599c30`;
+explicit owner accept/hold and G4 bootstrap/WP-7 sequencing remain pending.
 
 **Production touched:** No
 
@@ -495,7 +496,8 @@ same-candidate race normalization. Read-only in-app browser smoke passed the
 disabled/account-context state with zero console warnings/errors; the amended
 mutable flow still awaited G1R at that checkpoint. No Local DB was reset or
 mutated. The later separately approved G1R and independent G2 evidence passed;
-owner G3 remains.
+G3 technical execution later passed on `6599c30`, while owner accept/hold
+remains separate.
 
 ## 15. P-24 pre-G1R hardening
 
@@ -629,9 +631,10 @@ Retained untracked evidence:
 - Production touched: No.
 
 G2 was the independent DB/reproducibility gate and did not repeat browser
-acceptance. G3 must now perform the intended-admin closeout, emphasizing
-stale-after-review recovery and comprehension. G4/bootstrap inclusion, WP-7,
-WP-8, and all Production actions remain separate.
+acceptance. The later G3 real-route technical walkthrough performed the
+intended-admin stale-after-review recovery and clean closeout described in
+Section 19; explicit owner acceptance remains separate. G4/bootstrap
+inclusion, WP-7, WP-8, and all Production actions remain separate.
 
 ## 18. P-25 high-volume final-review refinement
 
@@ -679,6 +682,53 @@ Evidence result on 2026-07-14:
 - no Local DB reset/mutation, migration, bootstrap, or Production action
   occurred.
 
-This closes P-25 presentation evidence only. G3 remains on Hold for independent
-real-route stale-after-review recovery and intended-admin acceptance; G4,
-bootstrap inclusion, WP-7, WP-8, and Production remain separate.
+This closes P-25 presentation evidence only. The independent real-route G3
+technical walkthrough is recorded below; intended-admin owner acceptance
+remains separate. G4, bootstrap inclusion, WP-7, WP-8, and Production remain
+separately gated.
+
+## 19. G3 real-route technical walkthrough
+
+The owner authorized the bounded Local-only G3 execution on 2026-07-14 without
+a Local reset. Source HEAD
+`6599c306207c2d1e15342c398888b56513f9bb0a` used the existing Local Supabase
+stack and the real `/admin/master-catalog` routes. The selected in-app Browser
+rejected `localhost` under its URL policy, so the previously owner-approved
+Playwright fallback drove the real Next.js route and Local API rather than the
+standalone P-25 harness.
+
+Technical result:
+
+- read-only preflight confirmed pointer `2568.0.0`/710 rows, zero working
+  drafts, all three catalog flags false, 198 BOQs/1,547 BOQ items, Factor F
+  `2569.0.0`/36 rows, five required constraints, the valid one-draft partial
+  unique index, two authority FK indexes, and zero nullable required columns;
+- only `catalog_admin_enabled` was enabled temporarily; new-identity and
+  retirement capabilities remained false;
+- intended admin `local.admin@ntplc.co.th` created correction draft
+  `2568.0.2`, saved `ITEM-0001` at lock 1, and opened final review bound to
+  that exact lock;
+- a second audited edit advanced the draft to lock 2 while the lock-1 review
+  remained open;
+- submitting the stale publish form returned the durable Thai
+  `DRAFT_LOCK_CONFLICT` recovery message, retained all entered publication
+  fields, created no `publish` change set, and did not move the pointer;
+- a fresh review loaded lock 2 and the latest value;
+- the draft was audited-abandoned through the UI at lock 3 and retained 710
+  read-only rows; final change sets were `clone=1`, `manual=2`, `abandon=1`,
+  `publish=0`; and
+- final readback restored zero working drafts and all three catalog flags to
+  false while preserving pointer `2568.0.0`/710, BOQ 198/1,547, Factor F
+  `2569.0.0`/36, and the schema/index invariants. Production touched: No.
+
+Closing repository verification passed the focused authority-consistency
+contract (1 file/6 tests), full suite (30 files/162 tests), TypeScript, lint
+with 0 errors/10 existing warnings, frozen authority 710/65/17, the
+network-enabled production build, evidence checksums, and `git diff --check`.
+
+Untracked screenshots and the machine-readable report are retained under
+`output/master-catalog/g3-owner-review/20260714-6599c30-stale-after-review/`.
+This passes the G3 technical walkthrough. It does not infer the owner's
+accept/hold decision, G4, migration `020` bootstrap inclusion, WP-7, WP-8, or
+any Production authorization. The next action is explicit owner review of the
+stale-recovery and cleanup evidence.
