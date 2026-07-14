@@ -326,3 +326,9 @@ checkout `15b707d443bec701f6b3a86aa7675ca1266604ba` passed the combined
 `009`-`020` bootstrap and live WP-6.6/WP-6.5/P-20/WP-7 evidence, with final
 pointer/flags/BOQ/Factor F cleanup. This does not rewrite the P-27/P-28
 point-in-time boundaries or infer WP-7 owner acceptance, WP-8, or Production.
+
+**Subsequent P-30 decision (2026-07-15 01:37 +07):** the owner accepted WP-7
+and all five P-18 V1 rules, then authorized bounded WP-7.5 Local-only source
+implementation. This does not rewrite this note's P-27 point-in-time scope and
+does not authorize `021` bootstrap inclusion, Local apply/reset evidence,
+WP-8, P-19, Factor F/hotfix expansion, or Production.

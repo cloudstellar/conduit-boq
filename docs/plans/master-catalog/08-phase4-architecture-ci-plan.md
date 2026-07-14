@@ -135,6 +135,11 @@ architecture or migration `020`. Final pointer/flags/BOQ/Factor F invariants
 were restored. WP-7 owner acceptance, WP-8, P-18/P-19, and Production remain
 separate.
 
+**P-30 WP-7/P-18 decision:** 2026-07-15 01:37 +07 — the owner accepted WP-7
+and all five P-18 V1 rules. Bounded WP-7.5 Local-only source implementation is
+authorized; `021` bootstrap inclusion, Local apply/reset evidence, WP-8, P-19,
+Factor F/hotfix expansion, and Production remain separate.
+
 **Owner decision recorded:** 2026-07-04 — approved according to the
 recommendation for Phase 4 Core/local implementation. This approval does not
 authorize Production migration, deploy, feature enablement, candidate data
@@ -631,12 +636,13 @@ The registry is one small table that prevents an irreversible lineage error.
 This is lower cost than repairing ambiguous item history after a second catalog
 has been published.
 
-### 4.2.1 Proposed P-18 placement authority
+### 4.2.1 Owner-approved P-18 V1 placement authority
 
-This subsection is a reviewed proposal, not a recorded P-18 business decision.
-If the owner/data custodian accepts the five choices in Review Note #28, WP-7.5
-adds a DB-backed placement revision and append-only placement review for drafts
-containing identities absent from their base version.
+P-30 accepted the five choices in Review Note #28 on 2026-07-15 01:37 +07.
+WP-7.5 adds a DB-backed placement revision and append-only placement review for
+drafts containing identities absent from their base version. This is Local-only
+source authority until the separate apply/reset and technical-closeout gates
+pass.
 
 The V1 invariant is intentionally narrow:
 
@@ -654,7 +660,7 @@ The V1 invariant is intentionally narrow:
 - general baseline reorder, code renumbering, and a multi-stage approval engine
   remain out of scope.
 
-The proposed implementation appends migration `021`, after WP-6.6 migration
+The approved V1 implementation appends migration `021`, after WP-6.6 migration
 `020`, and adds a narrowly scoped
 `catalog_placement_reviews` table, extends existing change-set/item actions for
 placement, and adds one idempotent draft-only placement RPC. It introduces no
@@ -1598,7 +1604,7 @@ Proposed after P-18 acceptance:
   draft/base snapshots by stable identity, shows compound old/new changes and
   readiness/governance warnings, and carries the exact reviewed lock.
 
-### Proposed placement UX
+### Owner-approved placement UX
 
 - Manual Add handles one or a few exceptions; Supplement remains the bulk path.
 - Both paths create provisional new identities in the same draft and converge on
@@ -1730,11 +1736,13 @@ reviewed fix-forward, not an assumed destructive reverse operation.
 **Reason:** The whole user workflow is rehearsed while hidden from Production
 users.
 
-### Phase 4B.5 — Proposed P-18 placement extension (WP-7.5)
+### Phase 4B.5 — P-18 placement extension (WP-7.5)
 
-- Start implementation only after the owner/data custodian accepts the P-18 V1
-  decisions in Review Note #28.
+- P-30 accepted the P-18 V1 decisions in Review Note #28 and authorized bounded
+  Local-only source implementation on 2026-07-15 01:37 +07.
 - Append migration `021`; do not rewrite or renumber `017`-`020`.
+- Keep `021` outside bootstrap and do not apply/reset Local until the exact
+  repository/static candidate receives separate approval.
 - Add placement revision/review authority, exact grants/RLS, the idempotent
   placement RPC, Thai batch UI, audit/history integration, and publish-readiness
   enforcement.

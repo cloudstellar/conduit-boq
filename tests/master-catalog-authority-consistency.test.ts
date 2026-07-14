@@ -135,7 +135,7 @@ describe('Master Catalog authority consistency', () => {
       '**Owner-accepted Local-only migration in bootstrap source; SHA-256 `e07e0c4161077efba7bc4f6ebf95518d0cc1bc7e4628a43a128dd899bd1aef93`; G1R/G2 separate-apply evidence passed on exact checkout `721c2c2c4a234a4fd00e5686383be9af87ee15dd`; G3/WP-6.6 accepted on `78e96ab3ed9993707014c4aba1d285b7592b17a1`; owner-approved G4E combined clean bootstrap through `020` passed on exact execution checkout `15b707d443bec701f6b3a86aa7675ca1266604ba`; not Production-approved**',
     )
     expect(migrations).toContain(
-      '**Proposed only — P-18 pending; file does not exist; not in bootstrap**',
+      '**Owner-approved V1 contract via P-30; Local-only source implementation authorized; file does not yet exist; not in bootstrap; no Local apply/reset or Production approval**',
     )
     expect(existsSync(resolve(
       root,
@@ -193,7 +193,7 @@ describe('Master Catalog authority consistency', () => {
       'Accepted 2026-07-11 22:20 +07; WP-6 complete; Production filing remains separate',
     )
     expect(decisions).toContain(
-      'Proposed V1 documented 2026-07-12; owner/data-custodian acceptance pending; current Local guard evidence passed',
+      'Accepted via P-30 on 2026-07-15 01:37 +07; Local-only source implementation authorized; reset/evidence and Production remain separate',
     )
     expect(decisions).toContain('P-19')
     expect(decisions).toContain('Pending; recorded 2026-07-07')
@@ -214,6 +214,7 @@ describe('Master Catalog authority consistency', () => {
     expect(decisions).toContain('| P-27 |')
     expect(decisions).toContain('| P-28 |')
     expect(decisions).toContain('| P-29 |')
+    expect(decisions).toContain('| P-30 |')
     expect(decisions).toContain(
       'Accepted 2026-07-14 23:50 +07; WP-6.6 complete; G4 and all later gates remain separate',
     )
@@ -223,6 +224,9 @@ describe('Master Catalog authority consistency', () => {
     expect(decisions).toContain(
       'Approved and executed 2026-07-15; combined bootstrap and all named technical evidence passed; WP-7 owner accept/hold and later gates remain separate',
     )
+    expect(decisions).toContain(
+      'Approved 2026-07-15 01:37 +07; WP-7 complete and WP-7.5 Local-only source work authorized; no reset or Production action authorized',
+    )
     expect(decisions).toContain('DB-read version in the Server Action before the publish RPC')
 
     const tracker = read(
@@ -231,16 +235,16 @@ describe('Master Catalog authority consistency', () => {
     expect(tracker).toMatch(/\| WP-5 \|[^\n]+\| Complete \|/)
     expect(tracker).toMatch(/\| WP-6\.5 \|[^\n]+\| Complete \|/)
     expect(tracker).toMatch(/\| WP-6\.6 \|[^\n]+\| Complete \|/)
-    expect(tracker).toMatch(/\| WP-7 \|[^\n]+\| Ready for owner review \|/)
-    expect(tracker).toMatch(/\| WP-7\.5 \|[^\n]+\| Not started \|/)
+    expect(tracker).toMatch(/\| WP-7 \|[^\n]+\| Complete \|/)
+    expect(tracker).toMatch(/\| WP-7\.5 \|[^\n]+\| In progress \|/)
     expect(tracker).toMatch(/\| WP-8 \|[^\n]+\| Not started \|/)
     expect(tracker).toContain('independent intended-admin UAT remains WP-8')
     expect(tracker).toContain('| Production write allowed | No |')
     expect(tracker).toContain(
-      'P-29 approved one warned destructive G4E reset of Local only on exact pushed checkout',
+      'P-30 accepted WP-7 and all five P-18 V1 placement rules',
     )
     expect(tracker).toContain(
-      'Owner review of G4E/WP-7 technical evidence; G4R and WP-6.6 are complete',
+      'WP-7.5 P-18 Local-only source implementation; WP-7, G4R, and WP-6.6 are complete',
     )
     expect(tracker).toContain(
       '2c43f6b0e644171b1ecba60c14566e5856a94b63',
@@ -290,7 +294,7 @@ describe('Master Catalog authority consistency', () => {
       /pre-amendment operator\/browser preflight passed on\s+`c8f6dca`/,
     )
     expect(tracker).toContain(
-      'Status: exact G4E execution checkout 15b707d443bec701f6b3a86aa7675ca1266604ba passed the combined 009-020 bootstrap and live WP-6.6/WP-6.5/P-20/WP-7 gates; WP-7 is Ready for owner review',
+      'Status: P-30 accepted WP-7 and all five P-18 V1 rules; migration 021/RPC/read-model/Thai UI/test/docs source work is authorized, but bootstrap inclusion and Local apply/reset evidence are not',
     )
     expect(existsSync(resolve(
       root,

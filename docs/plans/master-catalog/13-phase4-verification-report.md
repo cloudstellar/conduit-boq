@@ -35,6 +35,9 @@ checkout `15b707d443bec701f6b3a86aa7675ca1266604ba`; the combined `009`-`020`
 bootstrap, live WP-6.6/WP-6.5/P-20/WP-7 evidence, advisors, repository gates,
 and final invariants passed. WP-7 is ready for owner review; WP-7.5, WP-8, and
 Production remain separate.
+P-30 then accepted WP-7 and all five P-18 V1 rules at 2026-07-15 01:37 +07,
+authorizing bounded WP-7.5 Local-only source implementation. No `021` Local
+apply/reset evidence, WP-8 execution, or Production action is inferred.
 **Prepared:** 2026-06-22
 **Production project:** `otlssvssvgkohqwuuiir`
 **Candidate version:** System-planned ADR-003 number; `2568.1.0` only when still
@@ -56,12 +59,12 @@ should link here rather than copy volatile evidence.
 
 | Phase | Environment | Executor | Started | Completed | Result | Evidence |
 |---|---|---|---|---|---|---|
-| 4-0 documents/data decisions | Repository | Owner + developer | 2026-07-04 |  | In progress | P-01 through P-11/P-17/P-20 approved as recorded; P-09 publication metadata, P-18/P-19, and Production gates remain separate |
+| 4-0 documents/data decisions | Repository | Owner + developer | 2026-07-04 |  | In progress | P-01 through P-11/P-17/P-18/P-20 approved as recorded; P-09 publication metadata, P-19, and Production gates remain separate |
 | 4A additive schema | Local | Codex + owner/developer | 2026-07-05 | 2026-07-15 | G4E combined Local execution passed | Final `020` passed separate Local apply twice on exact candidate `721c2c2`; P-28 placed unchanged `020` after `019` in bootstrap source; P-29 then passed the combined clean chain on exact `15b707d`. Production remains unapproved. |
 | 4B application/workflows | Local | Codex + owner/developer | 2026-07-05 | 2026-07-14 | G3/WP-6.6 accepted | Version planning, item-first edit, final review, import, abandon, restore-confirmation, real-route stale-after-review recovery, and high-impact confirmation/cancel behavior passed; broader independent UAT remains WP-8. |
 | WP-6.6 admin workflow/authority hardening | Local | Codex + owner/developer | 2026-07-12 | 2026-07-14 | Accepted/Complete | Exact G1R/G2 evidence passed on `721c2c2`; P-25/G3/P-26 passed; the owner accepted exact application checkpoint `78e96ab3ed9993707014c4aba1d285b7592b17a1`. |
-| WP-7 permanent BOQ/hotfix/Factor F regression | Local | Codex + owner/developer | 2026-07-15 | 2026-07-15 | Ready for owner review | P-29/G4E clean bootstrap and tracked live harness passed on exact `15b707d`; owner acceptance is not inferred. |
-| WP-7.5 P-18 placement | Local |  |  |  | Decision pending | P-18 Review Note #28 |
+| WP-7 permanent BOQ/hotfix/Factor F regression | Local | Codex + owner/developer | 2026-07-15 | 2026-07-15 | Accepted/Complete | P-29/G4E clean bootstrap and tracked live harness passed on exact `15b707d`; owner accepted via P-30 at 2026-07-15 01:37 +07. |
+| WP-7.5 P-18 placement | Local source | Codex + owner/developer | 2026-07-15 |  | In progress | P-30 accepted Review Note #28's five-rule V1 contract; repository/static candidate only, with Local apply/reset evidence separately gated. |
 | 4C clean rehearsal | Local | Codex + owner/developer | 2026-07-15 |  | G4E database rehearsal passed; WP-8 pending | Integrated DB/regression gates passed; independent intended-admin UAT, measured performance, accessibility, export rerun, and final advisor disposition remain WP-8. |
 | 4A migration | Production |  |  |  | Not authorized |  |
 | Application deploy, flag off | Production |  |  |  | Not authorized |  |
@@ -105,6 +108,7 @@ should link here rather than copy volatile evidence.
 | WP-6.6 owner closeout / P-27 G3 | Owner | Accepted exact `78e96ab3ed9993707014c4aba1d285b7592b17a1`; WP-6.6 complete | 2026-07-14 23:50 +07 | [WP-6.6 Owner Review Note](./30-phase4-wp66-owner-review-note.md); G4, WP-7, WP-8, and Production remain separate |
 | P-28/G4 repository integration | Owner | Authorized unchanged `020` bootstrap source inclusion and tracked WP-7 harness source; passed on exact `2c43f6b0e644171b1ecba60c14566e5856a94b63`; no reset/live execution inferred | 2026-07-15 | Focused 3 files/24 tests and full 31 files/169 tests passed with TypeScript, syntax, lint 0 errors/10 existing warnings, authority 710/65/17, network-enabled build, fingerprint, and diff checks. G4E reset remained pending at this point and was later decided under P-29; Production touched: No. |
 | P-29/G4E clean Local execution | Owner + Codex | Explicitly authorized and passed technically; WP-7 owner acceptance not inferred | 2026-07-15 | Exact pushed checkout `15b707d443bec701f6b3a86aa7675ca1266604ba`; combined `009`-`020` bootstrap, WP-6.6, WP-6.5/P-20, WP-7, DB lint/advisors, repository gates, and final cleanup passed. Pointer `2568.0.0`, zero drafts, all flags false, BOQ 198/1,547, Factor F `2569.0.0`/36. Production touched: No. |
+| P-30 WP-7 acceptance and P-18/WP-7.5 start | Owner | WP-7 accepted; all five P-18 V1 rules accepted; bounded Local-only source work authorized | 2026-07-15 01:37 +07 | Implement migration `021`, exact RPC/read model, Thai-first placement workspace, tests, and aligned docs. Do not add `021` to bootstrap, reset/apply Local, start WP-8/P-19, alter Factor F/hotfix scope, or touch Production without separate approval. |
 | P-11 exact artifact acceptance | Owner | Accepted exact TH Sarabun New 16 pt replacement PDF/Excel pair; WP-6 complete | 2026-07-11 22:20 +07 | Owner confirmed `รูปแบบ pdf excel ok เลยครับ` for the `777df75` pair after semantic and visual file QA; Production filing and P-12-P-15 remain separate |
 | P-20 identity/hash portability | Owner | Approved deterministic baseline identity from immutable Production-derived `price_list.id`; retain `identity_id` in lineage hash | 2026-07-11 12:11 +07 | WP-6.5C passed on `1ad01b9`; final candidate G1R/G2 inputs on `721c2c2` matched exactly and the comparator passed. WP-8/P-15 reruns remain. |
 | WP-6.5 Local-only start | Owner | Authorized | 2026-07-11 12:11 +07 | No unannounced Local reset, Production access/write, Factor F workflow change, hotfix scope expansion, placement UI, deploy, enablement, or publication |

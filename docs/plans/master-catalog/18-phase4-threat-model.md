@@ -14,10 +14,10 @@ function checks, import/export malicious fixtures, BOQ/Factor F regression,
 residual-risk acceptance, and re-review triggers are mandatory gates before
 Production. This approval does not authorize Production change.
 
-**P-18 threat amendment proposed:** 2026-07-12 — T-33 through T-36 define the
-minimum controls for proposed WP-7.5 and the owner-found comprehension
-gap. P-18 business acceptance and implementation remain pending; no Local reset
-or Production action is authorized.
+**P-18 threat amendment accepted:** 2026-07-15 01:37 +07 — P-30 accepts the
+five-rule V1 contract governed by T-33 through T-36 and authorizes bounded
+WP-7.5 Local-only source implementation. No bootstrap inclusion, Local
+apply/reset, WP-8 execution, or Production action is authorized.
 
 **Capability-audit amendment:** 2026-07-12 — T-37 through T-42 add the WP-6.6
 operator/authority threats found by
@@ -94,7 +94,7 @@ In scope:
 - publish and pointer restore;
 - authoritative final draft-versus-base snapshot review bound to publish lock;
 - item history and change evidence;
-- proposed new-identity placement confirmation after P-18 acceptance;
+- owner-approved new-identity placement confirmation under P-18/WP-7.5;
 - server-generated official Excel and print/PDF output;
 - Supabase Data API, RLS, grants, and function boundaries.
 
@@ -365,6 +365,7 @@ Re-review this model when any of these changes:
 | Role | Name | Decision | Timestamp | Note |
 |---|---|---|---|---|
 | Owner | Owner | Approved for implementation/local rehearsal | 2026-07-04 | Production change remains separate; reviewer verification still required |
+| Owner | Owner | Approved P-18 V1 for bounded WP-7.5 Local-only source implementation | 2026-07-15 01:37 +07 | P-30; no Local apply/reset, WP-8, or Production authorization |
 | Security/RLS reviewer |  | Pending |  |  |
 | Application reviewer |  | Pending |  |  |
 

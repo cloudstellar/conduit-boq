@@ -506,18 +506,19 @@ draft base; it atomically removes the provisional draft price row while
 retaining the allocated identity, code reservation, change set, and old
 snapshot. Neither action edits or deletes prior audit.
 
-### 6.8 Proposed `catalog_placement_reviews` (P-18 / WP-7.5)
+### 6.8 Owner-approved `catalog_placement_reviews` (P-18 / WP-7.5)
 
-This table and the related columns/actions are a proposed contract pending the
-five owner/data-custodian decisions in Review Note #28. Do not implement them or
-weaken the current new-identity publish guard before that decision is recorded.
+P-30 accepted the five owner/data-custodian decisions in Review Note #28 on
+2026-07-15 01:37 +07. Implement this contract only as bounded Local-only source;
+do not weaken the current new-identity publish guard, add `021` to bootstrap,
+or apply/reset Local until the exact candidate passes its separate gate.
 
 Add `price_list_versions.placement_revision integer not null default 0` with a
 nonnegative check. Increment it only through reviewed draft functions whenever a
 new identity is added or category/order/active state can invalidate an accepted
 new-identity placement. Ordinary non-placement edits do not increment it.
 
-Proposed table:
+Approved V1 table:
 
 | Column | Type | Constraint |
 |---|---|---|
@@ -764,7 +765,7 @@ revision and makes the old review stale. The safe error code remains
 `P18_PLACEMENT_REVIEW_REQUIRED` for missing/stale review and uses separate stable
 codes for malformed order or scope violations.
 
-### Proposed placement confirmation (WP-7.5)
+### Owner-approved placement confirmation (WP-7.5)
 
 1. Authorize active admin, feature flag, and accepted P-18 capability.
 2. Claim/fingerprint the request ID under the existing per-request advisory lock.
@@ -940,6 +941,7 @@ frozen-authority foreign keys have valid covering indexes.
 | Role | Name | Decision | Timestamp | Note |
 |---|---|---|---|---|
 | Owner | Owner | Approved for implementation/local rehearsal | 2026-07-04 | Production migration remains separate; technical verification still required |
+| Owner | Owner | Approved P-18 V1 for bounded WP-7.5 Local-only source implementation | 2026-07-15 01:37 +07 | P-30; no bootstrap inclusion, Local apply/reset, WP-8, or Production authorization |
 | Database reviewer |  | Pending |  |  |
 | Security/RLS reviewer |  | Pending |  |  |
 | Application reviewer |  | Pending |  |  |

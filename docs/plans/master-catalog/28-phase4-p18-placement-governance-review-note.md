@@ -1,10 +1,11 @@
 # Phase 4 P-18 Placement Governance Review Note
 
-**Status:** Proposed V1 contract for owner/data-custodian review; the owner
-authorized adding this review and WP-7.5 to the plan on 2026-07-12, but P-18
-business rules and Local implementation are not yet approved
+**Status:** Owner-accepted P-18 V1 contract; P-30 authorized bounded WP-7.5
+Local-only source implementation on 2026-07-15 01:37 +07; technical evidence
+and owner closeout remain pending
 
-**Environment:** Planning only; no Local reset, database mutation, Production
+**Environment:** Repository/source implementation only; no Local reset or DB
+mutation for evidence, bootstrap inclusion of `021`, WP-8 execution, Production
 access/write, feature enablement, or publication is authorized by this note
 
 ## 1. Why this is now a release decision
@@ -196,9 +197,9 @@ DB guard, and hide/disable Add and Supplement at P-14. This reduces placement
 scope, but admins cannot publish new identities. Exposing the current
 half-complete Add/Supplement workflow is not recommended.
 
-## 8. Owner/data-custodian decision required
+## 8. Owner/data-custodian decision recorded
 
-Before WP-7.5 implementation, explicitly accept or amend these points:
+P-30 accepted these five points on 2026-07-15 01:37 +07:
 
 1. V1 placement applies only to identities absent from the draft's base version.
 2. Placement uses category plus before/after an existing same-category anchor.
@@ -209,6 +210,8 @@ Before WP-7.5 implementation, explicitly accept or amend these points:
 5. WP-7.5 becomes a required dependency of WP-8/P-14 for the full Add/Supplement
    release; otherwise those controls remain hidden/disabled.
 
-Approval of these five points authorizes Local-only implementation planning. A
-Local Supabase reset, Production migration, deploy, feature enablement, and each
-publication still require their existing separate approvals.
+Approval of these five points authorizes the bounded Local-only migration,
+application, tests, and documentation candidate. It does not authorize adding
+`021` to the canonical bootstrap, applying it to Local, resetting Local
+Supabase, running WP-8, Production migration, deploy, feature enablement, or
+publication; each still requires its existing separate approval.

@@ -170,8 +170,9 @@ Do not edit evidence-backed Local migrations `017`-`019`.
   technical stale-review recovery and cleanup also passed on `6599c30`; the
   owner closeout was accepted through P-27. P-28 later authorized repository
   inclusion without authorizing a Local reset; P-29 subsequently authorized and
-  passed the bounded G4E Local execution. WP-7 owner acceptance remains
-  separate.
+  passed the bounded G4E Local execution. P-30 accepted WP-7 and authorized the
+  five-rule P-18/WP-7.5 Local-only source candidate; `021` bootstrap inclusion
+  and Local apply/reset remain separate.
 
 ## 7. Deliberate deferrals and control visibility
 
@@ -214,6 +215,8 @@ bounded operator corrections described in
 authorizes the bounded application/test/documentation correction for C-17.
 These decisions, including P-28 source integration, do not authorize a Local
 database reset. P-29 separately authorized and completed exactly one bounded
-G4E Local reset; neither decision authorizes Production access/write, feature
-enablement, publication, new Factor F work, P-18/`021`, or expansion of hotfix
-`016`.
+G4E Local reset. P-30 later accepted WP-7 and the five-rule P-18 V1 contract for
+bounded `021`/application/test/documentation source work only. It does not
+authorize `021` bootstrap inclusion, another Local apply/reset, WP-8, P-19,
+Production access/write, feature enablement, publication, new Factor F work,
+or expansion of hotfix `016`.

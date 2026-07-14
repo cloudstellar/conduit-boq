@@ -202,7 +202,7 @@ Start blocked:
 | P-10 runtime CI assets | CI implementation/deploy | Decision Register |
 | P-11 official export visual sample | Export acceptance | Decision Register |
 | P-12 to P-15 | Production migration/deploy/enable/publish | Decision Register |
-| P-18 add/supplement placement governance | Add/supplement publish readiness | Decision Register |
+| P-18 add/supplement placement governance | Accepted via P-30 for bounded WP-7.5 Local-only source implementation; bootstrap/apply/reset remain separately gated | Decision Register / Review Note #28 |
 | P-19 inactive/retired export policy | Publication/filing of any version with inactive rows | Decision Register |
 | P-20 canonical hash/identity portability | Initial WP-6.5 exit and rerun after WP-6.6/WP-7.5 migration changes, WP-8 clean rehearsal, and migration fingerprint freeze | Decision Register |
 | P-21 Audit #29 WP-6.6 scope/start | WP-6.6 implementation and any migration `020` execution | Decision Register / Completeness Audit |
@@ -215,10 +215,13 @@ Start blocked:
 Rule: unresolved P-02 through P-11 does not block generic additive schema,
 parser, UI shell, tests, or local rehearsal. It blocks final candidate data
 freeze, approved backfill, export acceptance, and publication where applicable.
-Unresolved P-18 blocks publishing any version with add/supplement/new identity
-rows. Unresolved P-19 blocks official field-facing PDF filing for any version
-with inactive/retired rows. Unresolved P-20 blocks clean-rehearsal hash
-acceptance, migration fingerprint freeze, and P-15 hash acceptance.
+P-18 is resolved for V1 design and Local-only source implementation, but its
+existing DB hold continues to block publishing any version with
+add/supplement/new identity rows until WP-7.5 passes and the accepted placement
+revision is current. Unresolved P-19 blocks official field-facing PDF filing
+for any version with inactive/retired rows. P-20 reruns still block
+clean-rehearsal hash acceptance, migration fingerprint freeze, and P-15 hash
+acceptance.
 
 ## 4. Work package map
 
@@ -719,7 +722,7 @@ rollback/role/version negatives, BOQ binding/copy behavior, print/export data
 modes, publish/restore historical preservation, and BOQ/Factor F/security
 before-after invariants passed. Final Local state restored pointer `2568.0.0`,
 zero drafts, all flags false, BOQ 198/1,547, and Factor F `2569.0.0`/36. The
-Tracker owns the evidence hash and current `Ready for owner review` status.
+Tracker owns the evidence hash; P-30 accepted WP-7 on 2026-07-15 01:37 +07.
 
 ## 15. WP-7.5 P-18 new-identity placement governance
 
@@ -731,6 +734,11 @@ Start only after P-18 accepts the five V1 choices in
 passes. Implement only in append-only migration
 `021_master_catalog_phase4_placement_governance.sql` plus its exact RPC/UI/audit
 and tests.
+
+P-30 satisfied both start conditions at 2026-07-15 01:37 +07 and authorized
+repository/source implementation only. Keep `021` outside bootstrap and do not
+apply or reset Local Supabase until a separately reviewed exact candidate and
+explicit reset approval exist.
 
 Exit gate:
 
