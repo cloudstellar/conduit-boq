@@ -157,6 +157,23 @@ describe('Master Catalog P-22 operator workflow', () => {
     expect(itemEditor).toContain('parsed.pathname !== `${fallback}/review`');
   });
 
+  it('keeps compound and high-volume final review scan-friendly', () => {
+    const finalReview = source(
+      'app/admin/master-catalog/_components/MasterCatalogFinalReviewWorkspace.tsx',
+    );
+
+    expect(finalReview).toContain('const PAGE_SIZE_OPTIONS = [50, 100] as const');
+    expect(finalReview).toContain("returnParams.set('reviewPageSize', String(pageSize))");
+    expect(finalReview).toContain('aria-pressed={active}');
+    expect(finalReview).toContain('ยอดแต่ละประเภทจึงอาจซ้ำกัน');
+    expect(finalReview).toContain('ขยายรายละเอียดทั้งหมดในหน้านี้');
+    expect(finalReview).toContain('aria-expanded={expanded}');
+    expect(finalReview).toContain("surface: 'desktop' | 'mobile'");
+    expect(finalReview).toContain('className="divide-y rounded-md border lg:hidden"');
+    expect(finalReview).toContain('className="hidden overflow-x-auto lg:block"');
+    expect(finalReview).toContain('<Label htmlFor="final-review-page" className="sr-only">');
+  });
+
   it('keeps operator labels accessible and compact on narrow screens', () => {
     const itemEditor = source(
       'app/admin/master-catalog/_components/MasterCatalogItemEditor.tsx',

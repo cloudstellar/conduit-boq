@@ -14,8 +14,10 @@ is committed on exact lineage commit `050c998`. Earlier evidence remains valid
 history. The separately owner-approved G1R clean DB/concurrency/P-20/advisor/
 browser gate passed on exact execution checkout `721c2c2`; the separately
 owner-approved independent G2 clean rebuild and P-20 comparison then passed on
-the same exact candidate. G3 closeout and G4 bootstrap/WP-7 sequencing remain
-pending
+the same exact candidate. P-25 repository/static and owner-approved standalone
+Local visual/interaction evidence then passed 27/27 at 710 total/709 affected
+rows without DB mutation. G3 stale-after-review closeout and G4 bootstrap/WP-7
+sequencing remain pending.
 
 **Production touched:** No
 
@@ -241,9 +243,18 @@ The review page must:
 
 - show unique affected count plus add/recode/detail/price/category/status/order
   counts, explicitly allowing overlapping categories;
+- make summary counts directly filterable and state plainly that one identity
+  may contribute to more than one category count;
 - hide unchanged rows by default but make them available;
 - support search/filter and a direct return-to-edit path;
 - present `ค่าปัจจุบัน` and `ค่าฉบับร่าง` labels, not arrow/color alone;
+- keep one-field rows compact with old/new values visible immediately, while
+  compound rows show the changed-field count and names before exposing all
+  old/new values through per-row and expand-all-on-page controls;
+- support 50/100 rows per page, direct page selection, and preserved page-size
+  context after exact-item editing;
+- use a stacked narrow-screen list so review does not depend on horizontal
+  table scrolling;
 - separate database readiness from P-18/P-19 filing/governance warnings;
 - place the exact-version publish form after the diff and blockers;
 - separate pointer restore from the normal draft-publication workflow;
@@ -283,8 +294,9 @@ Before P-22/WP-6.6 closeout:
   same-request replay, two-session create race, valid/invalid abandon, abandon
   replay/race, rollback, and zero partial clone/audit effects;
 - browser tests cover first/middle/last item search, exact edit, preserved return
-  state, final diff counts/values, stale-review recovery, Thai copy, mobile, and
-  keyboard/focus behavior;
+  state, final diff counts/values, an eight-field compound row, the expected
+  709-change high-volume path at 50/100 rows, direct page selection,
+  stale-review recovery, Thai copy, mobile, and keyboard/focus behavior;
 - readiness/publish, BOQ, hotfix `016`, current pointer, and Factor F before/after
   assertions remain unchanged;
 - repository tests, TypeScript, lint, build, authority consistency, DB lint,
@@ -307,7 +319,7 @@ candidate `020` separately until the new owner closeout accepts it.
 | G1X | Passed and committed on exact closure-lineage commit `050c998`: same-scope identical-retry focus and execution-provenance closure. |
 | G1R | Explicitly owner-approved and passed 2026-07-13 on exact clean execution checkout `721c2c2c4a234a4fd00e5686383be9af87ee15dd`; migration `020` SHA-256 `e07e0c4161077efba7bc4f6ebf95518d0cc1bc7e4628a43a128dd899bd1aef93`; final Local cleanup passed. |
 | G2 | Explicitly owner-approved and passed 2026-07-13 on the same exact checkout `721c2c2c4a234a4fd00e5686383be9af87ee15dd`; second clean rebuild, separate unchanged `020`, WP-6.6/WP-6.5 evidence, P-20 comparator, current advisors, repository gates, and cleanup passed. |
-| G3 | Owner completes intended-admin workflow review and accepts or holds the revised WP-6.6 closeout |
+| G3 | After passed P-25 compound/high-volume presentation evidence, owner completes independent real-route stale-after-review and intended-admin workflow review, then accepts or holds the revised WP-6.6 closeout |
 | G4 | Only after G3, add accepted `020` to bootstrap and separately authorize any WP-7 execution |
 
 Production P-12 through P-15 remain separate and unrequested.
@@ -620,3 +632,53 @@ G2 was the independent DB/reproducibility gate and did not repeat browser
 acceptance. G3 must now perform the intended-admin closeout, emphasizing
 stale-after-review recovery and comprehension. G4/bootstrap inclusion, WP-7,
 WP-8, and all Production actions remain separate.
+
+## 18. P-25 high-volume final-review refinement
+
+Owner review on 2026-07-14 identified a comprehension gap in the otherwise
+complete final diff: the retained browser proof showed one changed field, while
+the approved first structured rollout is expected to contain 709 changed rows
+and the unit contract allows one identity to change up to all compared fields.
+The data and publication architecture remain unchanged; this is a bounded
+presentation and G3 evidence correction.
+
+The owner approved Local-only application/tests/docs work that:
+
+- retains one identity per review row and the existing complete `fields[]`
+  old/new contract;
+- shows a one-field comparison immediately and collapses only compound detail
+  behind an explicit changed-field count/name summary;
+- adds per-row and current-page expand/collapse, clickable overlapping summary
+  filters, 50/100 page size, direct page selection, and return-state
+  preservation;
+- replaces narrow-screen horizontal review-table dependence with a stacked
+  list using the same values and exact edit route; and
+- requires fresh desktop/mobile Local evidence for compound and high-volume
+  states before G3 can pass.
+
+P-25 does not amend migration `020`, reset or mutate Local by itself, enter
+bootstrap, add a data-grid or export artifact contract, or authorize P-18,
+P-19, WP-7, WP-8, Factor F, hotfix, or Production work.
+
+Evidence result on 2026-07-14:
+
+- repository/static checks and an owner-approved standalone Local
+  visual/interaction harness passed 27/27 checks using the real final-review
+  component and project design-system CSS; focused contracts passed 2 files/17
+  tests, the full suite passed 30 files/162 tests, and TypeScript, lint (0
+  errors/10 existing warnings), authority 710/65/17, the network-enabled build,
+  and `git diff --check` passed;
+- the fixture contained 710 total/709 affected rows and one row changing all
+  eight compared fields; desktop 1440x1000 and mobile 390x844 passed summary
+  filtering, expansion, 50/100 paging, direct page 5/8, return context, 44 px
+  mobile controls, and horizontal-overflow checks;
+- the Browser plugin failed before page execution with `Cannot redefine
+  property: process`, so the approved Playwright fallback mocked only Next
+  routing contexts; the report and screenshots are retained under
+  `output/master-catalog/g3-owner-review/20260714-p25-final-review/`; and
+- no Local DB reset/mutation, migration, bootstrap, or Production action
+  occurred.
+
+This closes P-25 presentation evidence only. G3 remains on Hold for independent
+real-route stale-after-review recovery and intended-admin acceptance; G4,
+bootstrap inclusion, WP-7, WP-8, and Production remain separate.

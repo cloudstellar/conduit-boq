@@ -251,7 +251,29 @@ They require the separate Factor F process.
 
 Choose **ตรวจฉบับสุดท้าย** from the draft workspace. It must compare the
 complete final database snapshots against the exact base by stable identity,
-not only list import events. Before requesting publication, verify:
+not only list import events.
+
+For a high-volume review, use the page as a controlled review queue:
+
+1. Start from **รายการที่ได้รับผล**, then select each summary count to filter
+   that change type. One item can belong to more than one type, so category
+   totals can overlap and must not be added together as an item total.
+2. Use code/name/category search to investigate a named item. Use 50 rows per
+   page for normal review; use 100 only when the operator can scan the denser
+   page reliably. Select a page directly instead of stepping through every
+   preceding page.
+3. A one-field change shows its old/new value immediately. A compound change
+   first shows the number and names of changed fields; expand that row to inspect
+   every old/new value. Use **ขยายรายละเอียดทั้งหมดในหน้านี้** only when reviewing
+   all compound rows on the current page as one batch.
+4. When opening an item from review, return through the provided review link so
+   search, type, page size, and page context are retained. Recheck the row after
+   saving because the draft lock and totals can change.
+5. On a narrow screen, use the stacked item list; it contains the same change
+   types, old/new values, and exact-item edit route as the desktop table. Do not
+   treat mobile layout as a reduced evidence view.
+
+Before requesting publication, verify:
 
 - base version is still current;
 - row counts and add/update/retire/recode totals are expected;

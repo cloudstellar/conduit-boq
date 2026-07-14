@@ -16,8 +16,10 @@ commit `88d0711` passed the repository/static gate before G1R. The separately
 owner-approved G1R clean DB/concurrency/P-20/advisor/browser gate passed on
 exact execution checkout `721c2c2`, with final Local cleanup. The separately
 owner-approved independent G2 clean rebuild and P-20 comparison then passed on
-the same exact executable candidate. G3, WP-7, proposed WP-7.5, WP-8, and
-Production gates remain.
+the same exact executable candidate. P-25 repository/static and approved
+standalone Local visual evidence then passed for the 709-change final-review
+presentation without DB mutation. G3 stale-after-review acceptance, WP-7,
+proposed WP-7.5, WP-8, and Production gates remain.
 **Prepared:** 2026-06-22
 **Production project:** `otlssvssvgkohqwuuiir`
 **Candidate version:** System-planned ADR-003 number; `2568.1.0` only when still
@@ -42,7 +44,7 @@ should link here rather than copy volatile evidence.
 | 4-0 documents/data decisions | Repository | Owner + developer | 2026-07-04 |  | In progress | P-01 through P-11/P-17/P-20 approved as recorded; P-09 publication metadata, P-18/P-19, and Production gates remain separate |
 | 4A additive schema | Local | Codex + owner/developer | 2026-07-05 | 2026-07-13 | G1R/G2 passed | `017`-`019` canonical bootstrap remains reviewed. Final `020` passed separate Local apply twice on exact candidate `721c2c2` and remains outside bootstrap/Production. |
 | 4B application/workflows | Local | Codex + owner/developer | 2026-07-05 |  | G1R browser path passed | Version planning, item-first edit, final review, import, abandon, and restore-confirmation paths passed bounded browser QA; independent UAT remains G3/WP-8. |
-| WP-6.6 admin workflow/authority hardening | Local | Codex + owner/developer | 2026-07-12 |  | Hold for G3 | Exact G1R/G2 DB/concurrency/P-20/advisor/repository evidence passed on `721c2c2`; the bounded G1R browser path passed; G3 remains a separate owner gate. |
+| WP-6.6 admin workflow/authority hardening | Local | Codex + owner/developer | 2026-07-12 |  | Hold for G3 | Exact G1R/G2 DB/concurrency/P-20/advisor/repository evidence passed on `721c2c2`; the bounded G1R browser path and P-25 709-change presentation evidence passed; stale-after-review acceptance remains a separate G3 owner gate. |
 | WP-7 permanent BOQ/hotfix/Factor F regression | Local |  |  |  | Not started | Regression-only |
 | WP-7.5 P-18 placement | Local |  |  |  | Decision pending | P-18 Review Note #28 |
 | 4C clean rehearsal | Local |  |  |  | Pending |  |
@@ -683,7 +685,7 @@ exact replacement pair above.
 | Import/diff/manual/history | Import required explicit draft selection and stayed disabled before selection; exact item correction/history and append-only register rendered | Mobile import/history not claimed in this proof | Passed desktop technical QA; full intended-admin/responsive UAT remains WP-8 |
 | Complete catalog search/filter + item history | Browser found first `ITEM-0001`, middle `ITEM-0355`, and last `ITEM-0710`; exact inactive-item route showed stable identity/code history | Exact item page remained readable without page overflow at 390x844 | Passed WP-6.6 technical QA; intended-admin comprehension remains WP-8 |
 | One working draft + stale/abandoned history | One mutable draft per base; duplicate/concurrent create denied; audited abandon/replacement; stale/abandoned views read-only | Final G1R/G2 DB race/replay/role/abandon/replacement/immutability passed; G1R browser created one proof draft, edited it, audited-abandoned it, and confirmed retained read-only history | G1R/G2 technical path passed; G3 pending |
-| Final snapshot review + reviewed-lock publish | Complete cumulative draft/base diff, compound/reverted behavior, readiness/warnings, edit return path, and stale-review recovery | G1R/G2 tests/DB passed complete diff and exact-lock publish/restore; G1R browser opened exact-item edit and cumulative comparison/readiness, then cancelled restore | G1R/G2 technical path passed; independent stale-after-review UAT and G3 pending |
+| Final snapshot review + reviewed-lock publish | Complete cumulative draft/base diff, compound/reverted behavior, high-volume scanability, readiness/warnings, edit return path, and stale-review recovery | G1R/G2 tests/DB passed complete diff and exact-lock publish/restore; G1R browser opened exact-item edit and one-field cumulative comparison/readiness, then cancelled restore. P-25 retained the diff contract and passed 27/27 approved standalone Local visual/interaction checks at 710 total/709 affected rows: overlapping clickable summaries, eight-field expansion, 50/100 paging, direct page 5/8, retained return context, and stacked 390x844 mobile layout with 44 px controls and no horizontal overflow. The harness rendered the real component/design-system bundle and mocked only Next routing contexts; report: `output/master-catalog/g3-owner-review/20260714-p25-final-review/qa-report.json`. | G1R/G2 technical path and P-25 presentation evidence passed; independent real-route stale-after-review UAT and G3 pending |
 | Thai-first forms/no rehearsal defaults/support details | Thai navigation/status/action/readiness/error copy rendered; Local synthetic defaults were absent from operator fields | `c8f6dca` adds Thai clone history, live composed version preview, deduplicated category labels, labelled selects, and wrapping long authority text; desktop/mobile had no page-level overflow. Formal keyboard/focus audit remains WP-8. | Passed visual/accessibility-name technical QA; formal accessibility pending WP-8 |
 | Add/retire blocker shown before apply/publish | With capability flags false, Add was absent, retirement controls were hidden/denied, and the inactive item exposed only Reactivate; readiness showed the separate P-19 warning | Exact inactive-item action remained responsive | Passed release-visibility gate; P-18/P-19 decisions remain separate |
 | Loading/error/not-found and retry/back paths | Route states implemented; user-opened Local tab completed response-loss recovery on `9becdf6` | Browser proof retained submitted values, retried untouched payload, then reset after success | Passed WP-6.5 checkpoint; full representative rerun WP-8 |
@@ -705,14 +707,15 @@ request approves them.
 
 | Gate | Expected | Actual | Result |
 |---|---|---|---|
-| `npm test` | Exit 0 | Exact G1R/G2 checkout `721c2c2`: 30 files/161 tests. Historical diagnostic results remain attached to their commits. | Passed |
-| `npx tsc --noEmit --pretty false` | Exit 0 | Exact G1R/G2 checkout passed 2026-07-13 | Passed |
-| `npm run lint` | Exit 0 | Exact G1R/G2 checkout exited 0 with the same 10 existing warnings outside this scope | Passed with existing warnings |
-| `npm run build` | Exit 0 | Exact G1R/G2 production build compiled, typechecked, generated pages, and included exact draft import/item/review/export routes. The unchanged app-wide Next.js middleware-to-proxy deprecation warning remains outside this bounded correction. | Passed with existing warning |
+| `npm test` | Exit 0 | Exact G1R/G2 checkout `721c2c2`: 30 files/161 tests. P-25 working-tree candidate on 2026-07-14: 30 files/162 tests. Historical diagnostic results remain attached to their commits. | Passed |
+| `npx tsc --noEmit --pretty false` | Exit 0 | Exact G1R/G2 checkout passed 2026-07-13; P-25 candidate passed 2026-07-14 after removing the deleted QA route from generated `.next/dev/types` cache. | Passed |
+| `npm run lint` | Exit 0 | P-25 candidate exited 0 with the same 10 existing warnings outside this scope | Passed with existing warnings |
+| `npm run build` | Exit 0 | P-25 network-enabled production build compiled, typechecked, generated pages, and included exact draft import/item/review/export routes. The unchanged app-wide Next.js middleware-to-proxy deprecation warning remains outside this bounded correction. | Passed with existing warning |
 | `npm run catalog:authority:check` | 710 mappings / 65 groups / 17 exclusions and frozen hash agree | Passed with SHA-256 `28675e6244c65d485dda7142634b381db729a139bccdf189ad51563251a2e12a` | Passed |
 | `node --check scripts/smoke-master-catalog-wp66.mjs` | Exit 0 | Final harness syntax and live execution passed on G1R/G2 | Passed |
 | `git diff --check` | Exit 0 | Passed for exact G1R/G2 execution checkout `721c2c2` | Passed |
 | In-app browser G1R | Local/admin version planning, workspace, item edit, final review, import, abandon, restore confirmation, responsive containment, and cleanup pass | Bounded flow passed; no publish/restore pointer change; final disabled screen restored. One existing `/nt_logo.svg` LCP warning; full keyboard traversal and independent UAT not claimed. | Passed G1R / later UAT pending |
+| P-25 standalone visual/interaction harness | Real final-review component at 710 total/709 affected rows; eight-field compound row; desktop 1440x1000 and mobile 390x844; no console/page error or overflow | Browser plugin runtime was unavailable with `Cannot redefine property: process`; the owner-approved Playwright fallback compiled the real component and project CSS, mocked only Next routing contexts, and passed 27/27 checks. No Local DB reset/mutation, migration, bootstrap, or Production action occurred. | Passed P-25 presentation scope; real-route stale-after-review/G3 not inferred |
 | `npm run audit:prod` | No unaccepted Production vulnerability | Exact G1R/G2 checkout passed with 0 vulnerabilities | Passed |
 | Live Local DB integration/concurrency | Migration/RPC/RLS/role/rollback/race/timeout gates pass | Final amended `020` passed WP-66 and WP-65/P-20 twice on exact `721c2c2`; G1R-versus-G2 comparator passed. | G1R/G2 passed |
 | Permanent hotfix `016`/BOQ/Factor F suite | Real RPC behavior and pre/post invariants pass |  | Pending WP-7 |

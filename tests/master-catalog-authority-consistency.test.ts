@@ -194,6 +194,9 @@ describe('Master Catalog authority consistency', () => {
     expect(decisions).toContain(
       'final G1R/G2 passed on exact execution checkout `721c2c2`',
     )
+    expect(decisions).toContain(
+      'approved standalone Local visual evidence passed; independent real-route stale-after-review UAT and G3 owner acceptance remain pending',
+    )
 
     const tracker = read(
       'docs/plans/master-catalog/25-phase4-execution-progress-tracker.md',
@@ -206,7 +209,10 @@ describe('Master Catalog authority consistency', () => {
     expect(tracker).toContain('independent intended-admin UAT remains WP-8')
     expect(tracker).toContain('| Production write allowed | No |')
     expect(tracker).toContain(
-      'Independent G2 was explicitly approved and completed on 2026-07-13',
+      'P-25 bounded application/tests/docs and approved standalone Local visual evidence passed on 2026-07-14 after independent G2',
+    )
+    expect(tracker).toContain(
+      'P-25 presentation evidence no longer blocks G3; do not infer G4/bootstrap/WP-7 or Production',
     )
     expect(tracker).toContain(
       'Migration 020 SHA-256: e07e0c4161077efba7bc4f6ebf95518d0cc1bc7e4628a43a128dd899bd1aef93',
@@ -215,10 +221,16 @@ describe('Master Catalog authority consistency', () => {
       'G1R/G2 exact checkout 721c2c2c4a234a4fd00e5686383be9af87ee15dd',
     )
     expect(tracker).toContain(
-      'G2 WP-6.6 JSON SHA-256 d5da2ceeb5871160ac8cdf8dfe34ffdee220e20c8880e001e42c0bbaaea13f43',
+      'd5da2ceeb5871160ac8cdf8dfe34ffdee220e20c8880e001e42c0bbaaea13f43',
     )
     expect(tracker).toContain(
-      'G2 WP-6.5/P-20 JSON SHA-256 98b9f5fb9e0135ea35a716c87e1f4916e7aa1d186ce68ed067ea02d81b0bce42',
+      '98b9f5fb9e0135ea35a716c87e1f4916e7aa1d186ce68ed067ea02d81b0bce42',
+    )
+    expect(tracker).toContain(
+      'P-25 27/27 report/screenshots under output/master-catalog/g3-owner-review/20260714-p25-final-review/',
+    )
+    expect(tracker).toContain(
+      'full 30 files/162 tests',
     )
     expect(tracker).toContain(
       '050c998361f3372bd3bf9fb6645dc4abd1c0bf2b` is the exact P-24 same-scope closure-lineage checkpoint',
@@ -232,7 +244,7 @@ describe('Master Catalog authority consistency', () => {
       /pre-amendment operator\/browser preflight passed on\s+`c8f6dca`/,
     )
     expect(tracker).toMatch(
-      /G3, G4, and every\s+Production action remain unauthorized/i,
+      /G3 stale-after-review acceptance, G4, and every Production\s+action remain unauthorized/i,
     )
     expect(existsSync(resolve(
       root,

@@ -1,6 +1,7 @@
 # Master Catalog Phase 4 WP-6.6 Owner Review Note
 
-**Status:** Hold pending G3 closeout. Earlier
+**Status:** Hold pending G3 intended-admin closeout; P-25 repository/static and
+approved standalone Local visual evidence passed 2026-07-14. Earlier
 source/G1/browser/P-23 checkpoints remain historical. P-24 base and closure
 lineage are preserved at `88d0711`/`050c998`; the separately owner-approved
 G1R and independent G2 clean DB/concurrency/P-20/advisor gates passed on exact
@@ -102,7 +103,7 @@ Recorded owner response:
 | C-08 readiness | Shared full 710-row quality result, exact count/hash, successful Local publication proof, pointer restored | Final candidate and WP-8 rerun |
 | C-09/C-10 correction | Retire/reactivate, eligible withdraw, inherited-withdraw denial, preserved identity/code/audit, exact browser item action | P-19 if an official version contains inactive rows |
 | C-11/C-12 schema/UX | G1R/G2 passed final `020` constraints/grants, two authority FK indexes, DB lint/current advisor triage, and P-20 comparison; G1R passed Thai account/navigation/item/import/review/restore flow and bounded desktop/mobile layout. | Formal keyboard traversal, measured performance, and independent UAT at WP-8/G3 |
-| C-13 final review | G1R/G2 passed identity-based complete diff/readiness/exact-lock publication and restore invariants; G1R browser showed the exact before/after `ITEM-0355` change and cancelled restore confirmation without moving the pointer. | Independent stale-after-review UAT and G3 owner acceptance |
+| C-13 final review | G1R/G2 passed identity-based complete diff/readiness/exact-lock publication and restore invariants; G1R browser showed the exact before/after `ITEM-0355` one-field change and cancelled restore confirmation without moving the pointer. P-25 retained that contract and passed 27/27 approved standalone Local checks for an eight-field compound row and 710 total/709 affected rows at desktop/mobile sizes. | Independent real-route stale-after-review UAT and G3 owner acceptance |
 | C-14 version intent/reservation | G1R/G2 live sequence/race/replay/one-draft/abandon/replacement cases passed; G1R browser planned and opened system-reserved revision `2568.7.0`. | G3 owner acceptance |
 | C-15 create/item/restore flow | G1R/G2 passed the DB/repository contract; G1R browser opened the exact draft workspace, searched first/middle/last rows, edited an exact item, reviewed the whole snapshot, opened exact-draft import, and inspected current-to-target restore confirmation. | Independent UAT/G3 acceptance |
 | C-16 pre-G1R business/UX guard | Final G1R/G2 migration/helper contracts, safe error mapping, durable focus contracts, contextual authority, accessibility labels, and advisors passed on `721c2c2`; bounded browser flow passed at G1R. | Formal G3/WP-8 operator/accessibility acceptance |
@@ -237,8 +238,10 @@ drafts, all three catalog flags false, 198 BOQs/1,547 BOQ items, Factor F
 
 Keep WP-6.6 on Hold only for G3 intended-admin closeout. G1R/G2 and the P-20
 comparison are accepted as passed technical evidence on exact checkout
-`721c2c2`. G3 should emphasize stale-after-review recovery and operator
-comprehension; broader binary import, accessibility, and measured performance
-remain WP-8. Do not run another reset, add migration `020` to bootstrap, begin
-WP-7, or infer G4/Production acceptance until the applicable later owner gates
-are explicitly accepted.
+`721c2c2`; P-25 has now proved that the unchanged identity diff is readable for
+an eight-field compound row and the expected 709-change rollout at desktop and
+mobile sizes. G3 should emphasize independent real-route stale-after-review
+recovery and operator comprehension; broader binary import, accessibility, and
+measured performance remain WP-8. Do not run another reset, add migration `020` to
+bootstrap, begin WP-7, or infer G4/Production acceptance until the applicable
+later owner gates are explicitly accepted.

@@ -2,8 +2,8 @@
 
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
-import { useMemo, useState } from 'react';
-import { ChevronLeft, ChevronRight, Search } from 'lucide-react';
+import { useDeferredValue, useMemo, useState } from 'react';
+import { ChevronDown, ChevronLeft, ChevronRight, ChevronUp, Search } from 'lucide-react';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -26,8 +26,9 @@ import type {
   CatalogFinalChangeType,
   CatalogFinalSnapshotDiff,
 } from '@/lib/master-catalog/admin/catalogDiff';
+import { cn } from '@/lib/utils';
 
-const PAGE_SIZE = 50;
+const PAGE_SIZE_OPTIONS = [50, 100] as const;
 const FILTERABLE_CHANGE_TYPES: CatalogFinalChangeType[] = [
   'added',
   'recoded',
@@ -36,6 +37,32 @@ const FILTERABLE_CHANGE_TYPES: CatalogFinalChangeType[] = [
   'category',
   'status',
   'order',
+];
+type ReviewChangeFilter = 'all' | CatalogFinalChangeType;
+type ReviewPageSize = (typeof PAGE_SIZE_OPTIONS)[number];
+type SummaryKey =
+  | 'affectedItemCount'
+  | 'addedCount'
+  | 'recodedCount'
+  | 'detailsCount'
+  | 'priceCount'
+  | 'categoryCount'
+  | 'statusCount'
+  | 'orderCount';
+
+const SUMMARY_FILTERS: Array<{
+  changeType: ReviewChangeFilter;
+  label: string;
+  summaryKey: SummaryKey;
+}> = [
+  { changeType: 'all', label: 'รายการที่ได้รับผล', summaryKey: 'affectedItemCount' },
+  { changeType: 'added', label: 'เพิ่มใหม่', summaryKey: 'addedCount' },
+  { changeType: 'recoded', label: 'เปลี่ยนรหัส', summaryKey: 'recodedCount' },
+  { changeType: 'details', label: 'ชื่อหรือหน่วย', summaryKey: 'detailsCount' },
+  { changeType: 'price', label: 'ราคา', summaryKey: 'priceCount' },
+  { changeType: 'category', label: 'หมวดงาน', summaryKey: 'categoryCount' },
+  { changeType: 'status', label: 'สถานะใช้งาน', summaryKey: 'statusCount' },
+  { changeType: 'order', label: 'ลำดับ', summaryKey: 'orderCount' },
 ];
 
 export function MasterCatalogFinalReviewWorkspace({
@@ -52,19 +79,27 @@ export function MasterCatalogFinalReviewWorkspace({
   const searchParams = useSearchParams();
   const initialType = searchParams.get('reviewType');
   const initialPage = Number(searchParams.get('reviewPage'));
+  const initialPageSize = Number(searchParams.get('reviewPageSize'));
   const [query, setQuery] = useState(searchParams.get('reviewQ') ?? '');
-  const [changeType, setChangeType] = useState(
+  const [changeType, setChangeType] = useState<ReviewChangeFilter>(
     initialType && FILTERABLE_CHANGE_TYPES.includes(initialType as CatalogFinalChangeType)
-      ? initialType
+      ? initialType as CatalogFinalChangeType
       : 'all',
   );
   const [showUnchanged, setShowUnchanged] = useState(
     searchParams.get('reviewUnchanged') === '1',
   );
+  const [pageSize, setPageSize] = useState<ReviewPageSize>(
+    isReviewPageSize(initialPageSize) ? initialPageSize : PAGE_SIZE_OPTIONS[0],
+  );
   const [page, setPage] = useState(
     Number.isInteger(initialPage) && initialPage > 0 ? initialPage - 1 : 0,
   );
-  const normalizedQuery = query.trim().toLocaleLowerCase('th-TH');
+  const [expandedIdentityIds, setExpandedIdentityIds] = useState<Set<string>>(
+    () => new Set(),
+  );
+  const deferredQuery = useDeferredValue(query);
+  const normalizedQuery = deferredQuery.trim().toLocaleLowerCase('th-TH');
 
   const filteredRows = useMemo(() => diff.rows.filter((row) => {
     if (!showUnchanged && row.changeTypes.includes('unchanged')) return false;
@@ -78,12 +113,43 @@ export function MasterCatalogFinalReviewWorkspace({
       .some((value) => value?.toLocaleLowerCase('th-TH').includes(normalizedQuery));
   }), [changeType, diff.rows, normalizedQuery, showUnchanged]);
 
-  const pageCount = Math.max(1, Math.ceil(filteredRows.length / PAGE_SIZE));
+  const pageCount = Math.max(1, Math.ceil(filteredRows.length / pageSize));
   const safePage = Math.min(page, pageCount - 1);
   const visibleRows = filteredRows.slice(
-    safePage * PAGE_SIZE,
-    (safePage + 1) * PAGE_SIZE,
+    safePage * pageSize,
+    (safePage + 1) * pageSize,
   );
+  const compoundRows = visibleRows.filter((row) => row.fields.length > 1);
+  const allCompoundRowsExpanded = compoundRows.length > 0
+    && compoundRows.every((row) => expandedIdentityIds.has(row.identityId));
+  const visibleStart = filteredRows.length === 0 ? 0 : (safePage * pageSize) + 1;
+  const visibleEnd = Math.min((safePage + 1) * pageSize, filteredRows.length);
+
+  function selectSummaryFilter(nextType: ReviewChangeFilter) {
+    setChangeType(nextType);
+    setShowUnchanged(false);
+    setPage(0);
+  }
+
+  function toggleExpandedRow(identityId: string) {
+    setExpandedIdentityIds((current) => {
+      const next = new Set(current);
+      if (next.has(identityId)) next.delete(identityId);
+      else next.add(identityId);
+      return next;
+    });
+  }
+
+  function toggleAllCompoundRows() {
+    setExpandedIdentityIds((current) => {
+      const next = new Set(current);
+      for (const row of compoundRows) {
+        if (allCompoundRowsExpanded) next.delete(row.identityId);
+        else next.add(row.identityId);
+      }
+      return next;
+    });
+  }
 
   return (
     <Card className="min-w-0">
@@ -96,15 +162,19 @@ export function MasterCatalogFinalReviewWorkspace({
       </CardHeader>
       <CardContent className="grid gap-5">
         <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
-          <SummaryValue label="รายการที่ได้รับผล" value={diff.summary.affectedItemCount} />
-          <SummaryValue label="เพิ่มใหม่" value={diff.summary.addedCount} />
-          <SummaryValue label="เปลี่ยนรหัส" value={diff.summary.recodedCount} />
-          <SummaryValue label="ชื่อหรือหน่วย" value={diff.summary.detailsCount} />
-          <SummaryValue label="ราคา" value={diff.summary.priceCount} />
-          <SummaryValue label="หมวดงาน" value={diff.summary.categoryCount} />
-          <SummaryValue label="สถานะใช้งาน" value={diff.summary.statusCount} />
-          <SummaryValue label="ลำดับ" value={diff.summary.orderCount} />
+          {SUMMARY_FILTERS.map((summaryFilter) => (
+            <SummaryValue
+              key={summaryFilter.changeType}
+              active={!showUnchanged && changeType === summaryFilter.changeType}
+              label={summaryFilter.label}
+              value={diff.summary[summaryFilter.summaryKey]}
+              onSelect={() => selectSummaryFilter(summaryFilter.changeType)}
+            />
+          ))}
         </div>
+        <p className="text-xs text-muted-foreground">
+          รายการเดียวอาจอยู่ได้มากกว่าหนึ่งประเภท ยอดแต่ละประเภทจึงอาจซ้ำกัน
+        </p>
 
         {diff.summary.authoritySensitiveCount > 0 ? (
           <Alert>
@@ -138,7 +208,9 @@ export function MasterCatalogFinalReviewWorkspace({
             <Select
               value={changeType}
               onValueChange={(value) => {
-                setChangeType(value);
+                const nextType = value as ReviewChangeFilter;
+                setChangeType(nextType);
+                if (nextType !== 'all') setShowUnchanged(false);
                 setPage(0);
               }}
             >
@@ -161,6 +233,7 @@ export function MasterCatalogFinalReviewWorkspace({
               checked={showUnchanged}
               onCheckedChange={(checked) => {
                 setShowUnchanged(checked);
+                if (checked) setChangeType('all');
                 setPage(0);
               }}
             />
@@ -170,7 +243,26 @@ export function MasterCatalogFinalReviewWorkspace({
           </div>
         </div>
 
-        <div className="overflow-x-auto">
+        {compoundRows.length > 0 ? (
+          <div className="flex flex-wrap items-center justify-between gap-2">
+            <p className="text-sm text-muted-foreground">
+              หน้านี้มี {compoundRows.length.toLocaleString('th-TH')} รายการที่เปลี่ยนหลายค่า
+            </p>
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={toggleAllCompoundRows}
+            >
+              {allCompoundRowsExpanded ? <ChevronUp /> : <ChevronDown />}
+              {allCompoundRowsExpanded
+                ? 'ย่อรายละเอียดทั้งหมดในหน้านี้'
+                : 'ขยายรายละเอียดทั้งหมดในหน้านี้'}
+            </Button>
+          </div>
+        ) : null}
+
+        <div className="hidden overflow-x-auto lg:block">
           <Table>
             <TableHeader>
               <TableRow>
@@ -200,16 +292,16 @@ export function MasterCatalogFinalReviewWorkspace({
                       </div>
                     </TableCell>
                     <TableCell>
-                      <div className="flex flex-wrap gap-1">
-                        {row.changeTypes.map((type) => (
-                          <Badge key={type} variant={type === 'unchanged' ? 'outline' : 'secondary'}>
-                            {changeTypeLabel(type)}
-                          </Badge>
-                        ))}
-                      </div>
+                      <ChangeTypeBadges changeTypes={row.changeTypes} />
                     </TableCell>
                     <TableCell>
-                      <FieldDifferences fields={row.fields} />
+                      <ReviewFieldDifferences
+                        identityId={row.identityId}
+                        fields={row.fields}
+                        expanded={expandedIdentityIds.has(row.identityId)}
+                        surface="desktop"
+                        onToggle={() => toggleExpandedRow(row.identityId)}
+                      />
                     </TableCell>
                     <TableCell className="text-right">
                       {row.draftItem ? (
@@ -221,6 +313,7 @@ export function MasterCatalogFinalReviewWorkspace({
                             changeType,
                             showUnchanged,
                             page: safePage,
+                            pageSize,
                           })}>
                             เปิด
                           </Link>
@@ -234,15 +327,88 @@ export function MasterCatalogFinalReviewWorkspace({
           </Table>
         </div>
 
-        <div className="flex flex-wrap items-center justify-between gap-3">
+        <div className="divide-y rounded-md border lg:hidden">
+          {visibleRows.length === 0 ? (
+            <div className="px-4 py-10 text-center text-sm text-muted-foreground">
+              ไม่พบรายการตามเงื่อนไข
+            </div>
+          ) : visibleRows.map((row) => {
+            const item = row.draftItem ?? row.baseItem;
+            return (
+              <article key={row.identityId} className="grid gap-3 p-4">
+                <div className="flex min-w-0 items-start justify-between gap-3">
+                  <div className="min-w-0">
+                    <div className="font-mono text-xs">{item?.itemCode ?? '-'}</div>
+                    <div className="mt-1 break-words font-medium">{item?.itemName ?? '-'}</div>
+                    <div className="mt-1 text-xs text-muted-foreground">
+                      หมวด {item?.categoryCode ?? '-'} · ลำดับ {(item?.displayOrder ?? -1) + 1}
+                    </div>
+                  </div>
+                  {row.draftItem ? (
+                    <Button variant="outline" size="sm" className="min-h-11" asChild>
+                      <Link href={itemHref({
+                        versionId,
+                        identityId: row.identityId,
+                        query,
+                        changeType,
+                        showUnchanged,
+                        page: safePage,
+                        pageSize,
+                      })}>
+                        เปิดแก้ไข
+                      </Link>
+                    </Button>
+                  ) : null}
+                </div>
+                <ChangeTypeBadges changeTypes={row.changeTypes} />
+                <ReviewFieldDifferences
+                  identityId={row.identityId}
+                  fields={row.fields}
+                  expanded={expandedIdentityIds.has(row.identityId)}
+                  surface="mobile"
+                  onToggle={() => toggleExpandedRow(row.identityId)}
+                />
+              </article>
+            );
+          })}
+        </div>
+
+        <div className="grid gap-3 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-center">
           <p className="text-sm text-muted-foreground">
-            พบ {filteredRows.length.toLocaleString('th-TH')} รายการ
+            แสดง {visibleStart.toLocaleString('th-TH')}–{visibleEnd.toLocaleString('th-TH')}{' '}
+            จาก {filteredRows.length.toLocaleString('th-TH')} รายการ
           </p>
-          <div className="flex items-center gap-2">
+          <div className="flex flex-wrap items-center gap-2">
+            <div className="flex items-center gap-2">
+              <Label htmlFor="final-review-page-size" className="whitespace-nowrap text-sm">
+                ต่อหน้า
+              </Label>
+              <Select
+                value={String(pageSize)}
+                onValueChange={(value) => {
+                  setPageSize(Number(value) as ReviewPageSize);
+                  setPage(0);
+                }}
+              >
+                <SelectTrigger id="final-review-page-size" className="w-24">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectGroup>
+                    {PAGE_SIZE_OPTIONS.map((option) => (
+                      <SelectItem key={option} value={String(option)}>
+                        {option.toLocaleString('th-TH')}
+                      </SelectItem>
+                    ))}
+                  </SelectGroup>
+                </SelectContent>
+              </Select>
+            </div>
             <Button
               type="button"
               variant="outline"
               size="icon"
+              className="size-11 sm:size-9"
               title="หน้าก่อน"
               aria-label="หน้าก่อน"
               disabled={safePage === 0}
@@ -250,13 +416,26 @@ export function MasterCatalogFinalReviewWorkspace({
             >
               <ChevronLeft />
             </Button>
-            <span className="min-w-24 text-center text-sm tabular-nums">
-              หน้า {(safePage + 1).toLocaleString('th-TH')} / {pageCount.toLocaleString('th-TH')}
-            </span>
+            <Label htmlFor="final-review-page" className="sr-only">ไปยังหน้า</Label>
+            <Select value={String(safePage)} onValueChange={(value) => setPage(Number(value))}>
+              <SelectTrigger id="final-review-page" className="w-32">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectGroup>
+                  {Array.from({ length: pageCount }, (_, pageIndex) => (
+                    <SelectItem key={pageIndex} value={String(pageIndex)}>
+                      หน้า {(pageIndex + 1).toLocaleString('th-TH')} / {pageCount.toLocaleString('th-TH')}
+                    </SelectItem>
+                  ))}
+                </SelectGroup>
+              </SelectContent>
+            </Select>
             <Button
               type="button"
               variant="outline"
               size="icon"
+              className="size-11 sm:size-9"
               title="หน้าถัดไป"
               aria-label="หน้าถัดไป"
               disabled={safePage >= pageCount - 1}
@@ -271,13 +450,93 @@ export function MasterCatalogFinalReviewWorkspace({
   );
 }
 
-function SummaryValue({ label, value }: { label: string; value: number }) {
+function SummaryValue({
+  active,
+  label,
+  value,
+  onSelect,
+}: {
+  active: boolean;
+  label: string;
+  value: number;
+  onSelect: () => void;
+}) {
   return (
-    <div className="min-w-0 rounded-md border bg-background px-4 py-3">
+    <button
+      type="button"
+      aria-pressed={active}
+      className={cn(
+        'min-w-0 rounded-md border bg-background px-4 py-3 text-left transition-colors',
+        'outline-none hover:bg-accent focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50',
+        active && 'border-primary bg-primary/5 ring-1 ring-primary/20',
+      )}
+      onClick={onSelect}
+    >
       <div className="text-xs font-medium text-muted-foreground">{label}</div>
       <div className="mt-1 text-xl font-semibold tabular-nums">
         {value.toLocaleString('th-TH')}
       </div>
+    </button>
+  );
+}
+
+function ChangeTypeBadges({ changeTypes }: { changeTypes: CatalogFinalChangeType[] }) {
+  return (
+    <div className="flex flex-wrap gap-1">
+      {changeTypes.map((type) => (
+        <Badge key={type} variant={type === 'unchanged' ? 'outline' : 'secondary'}>
+          {changeTypeLabel(type)}
+        </Badge>
+      ))}
+    </div>
+  );
+}
+
+function ReviewFieldDifferences({
+  identityId,
+  fields,
+  expanded,
+  surface,
+  onToggle,
+}: {
+  identityId: string;
+  fields: CatalogFieldDifference[];
+  expanded: boolean;
+  surface: 'desktop' | 'mobile';
+  onToggle: () => void;
+}) {
+  if (fields.length <= 1) return <FieldDifferences fields={fields} />;
+
+  const detailId = `${surface}-review-fields-${identityId}`;
+  return (
+    <div className="grid gap-2">
+      <div className="flex flex-wrap items-start justify-between gap-2">
+        <div className="min-w-0 flex-1">
+          <div className="text-sm font-medium">
+            เปลี่ยน {fields.length.toLocaleString('th-TH')} ค่า
+          </div>
+          <div className="mt-1 break-words text-xs text-muted-foreground">
+            {fields.map((field) => fieldLabel(field.field)).join(' · ')}
+          </div>
+        </div>
+        <Button
+          type="button"
+          variant="outline"
+          size="sm"
+          className={surface === 'mobile' ? 'min-h-11' : undefined}
+          aria-expanded={expanded}
+          aria-controls={detailId}
+          onClick={onToggle}
+        >
+          {expanded ? <ChevronUp /> : <ChevronDown />}
+          {expanded ? 'ย่อรายละเอียด' : 'ดูรายละเอียด'}
+        </Button>
+      </div>
+      {expanded ? (
+        <div id={detailId} className="border-t pt-2">
+          <FieldDifferences fields={fields} />
+        </div>
+      ) : null}
     </div>
   );
 }
@@ -352,20 +611,27 @@ function itemHref({
   changeType,
   showUnchanged,
   page,
+  pageSize,
 }: {
   versionId: string;
   identityId: string;
   query: string;
-  changeType: string;
+  changeType: ReviewChangeFilter;
   showUnchanged: boolean;
   page: number;
+  pageSize: ReviewPageSize;
 }) {
   const returnParams = new URLSearchParams();
   if (query.trim()) returnParams.set('reviewQ', query.trim());
   if (changeType !== 'all') returnParams.set('reviewType', changeType);
   if (showUnchanged) returnParams.set('reviewUnchanged', '1');
+  if (pageSize !== PAGE_SIZE_OPTIONS[0]) returnParams.set('reviewPageSize', String(pageSize));
   if (page > 0) returnParams.set('reviewPage', String(page + 1));
   const returnQuery = returnParams.toString();
   const returnTo = `/admin/master-catalog/versions/${versionId}/review${returnQuery ? `?${returnQuery}` : ''}`;
   return `/admin/master-catalog/versions/${versionId}/items/${identityId}?returnTo=${encodeURIComponent(returnTo)}`;
+}
+
+function isReviewPageSize(value: number): value is ReviewPageSize {
+  return PAGE_SIZE_OPTIONS.some((option) => option === value);
 }
