@@ -103,6 +103,15 @@ with all catalog flags false. This confirms the architecture's reviewed-lock
 contract; it does not infer owner acceptance, G4/bootstrap inclusion, WP-7,
 WP-8, or Production authorization.
 
+**P-26 human-intent amendment:** 2026-07-14 — high-impact actions add an
+application-layer confirmation without moving database authority into the UI.
+Recode and Retire show exact item/target/reason/impact summaries. Publish shows
+current/target versions, reviewed lock, item count, BOQ effect, and requires the
+target version typed by the admin. The Server Action reads the target
+`version_string` from the database and rejects a mismatch before the publish
+RPC; the RPC still owns role, lock, readiness, idempotency, hash, immutability,
+and pointer invariants. This changes no migration and adds no approval role.
+
 **Owner decision recorded:** 2026-07-04 — approved according to the
 recommendation for Phase 4 Core/local implementation. This approval does not
 authorize Production migration, deploy, feature enablement, candidate data
@@ -1114,7 +1123,8 @@ Publish requires:
   source hash, and physical archive reference.
 - A manual-only draft may publish without workbook metadata; its manual change
   sets and approval evidence are the source record.
-- Typed version-string confirmation matches.
+- Typed version-string confirmation matches the target version read from the
+  database by the Server Action immediately before it can call the publish RPC.
 - Expected lock version matches.
 - The admin has reviewed the complete final database snapshot diff against the
   exact base at that same lock version. A later mutation requires a fresh
@@ -1126,6 +1136,12 @@ Publish requires:
 - The initial structured-code draft has no name, unit, or price differences
   from its Production base. Any separate correction belongs in a later draft or
   separately approved version scope.
+
+The typed value is a human-intent guard, not a database integrity substitute.
+The UI may disable the final button early, but server-side comparison is
+mandatory and a mismatch must produce a stable safe error without calling the
+publish RPC. Final database checks remain authoritative even after the text
+matches.
 
 Within one transaction:
 
@@ -1588,6 +1604,9 @@ Proposed after P-18 acceptance:
   requires a current-to-target summary, reason, and explicit confirmation.
 - Retire and recode require an explicit confirmation dialog; ordinary field
   edits do not use disruptive confirmation dialogs.
+- Publish confirmation shows the exact current/target versions, reviewed lock,
+  item count, immutability, and BOQ effect; the final command remains disabled
+  until the exact target version is typed and server-validated.
 
 ### Responsive behavior
 
@@ -1771,7 +1790,7 @@ Do not advance when any gate fails:
   and related owner decisions are complete for the exact candidate scope.
 - **Phase 4A → 4B:** Local schema reset/migration succeeds; backfill counts,
   constraints, RLS/grants, and advisors pass.
-- **WP-6.6 → WP-7:** Every C-01 through C-15 finding in Audit #29 has an
+- **WP-6.6 → WP-7:** Every C-01 through C-17 finding in Audit #29 has an
   implemented authoritative control and evidence, or the affected capability is
   explicitly removed from release visibility. WP-6.5 reliability evidence
   remains valid but does not replace this gate.
@@ -1892,6 +1911,8 @@ Do not advance when any gate fails:
 ### Publish and export
 
 - Publish without evidence, confirmation, or matching lock version fails
+- A mismatched typed target version cannot call the publish RPC; exact match
+  only enables the final command, and cancel creates no publish effect
 - Publish fails when the current pointer no longer matches the draft base
 - Preliminary readiness and final publish consume the same stale-base and full
   canonical-quality result; the UI cannot show a false green state

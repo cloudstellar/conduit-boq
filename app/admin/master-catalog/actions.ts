@@ -23,6 +23,7 @@ import {
   createCatalogMutationError,
   createCatalogRpcTransportError,
   mapCatalogRpcActionResponse,
+  validateCatalogPublishVersionConfirmation,
 } from '@/lib/master-catalog/admin/actionModel';
 import { logMasterCatalogOperation } from '@/lib/master-catalog/observability';
 import {
@@ -434,6 +435,36 @@ export async function publishCatalogVersionAction(
 
   if ('status' in args) {
     return args;
+  }
+
+  const confirmedVersionString = readRequiredActionText(
+    formData,
+    'confirmedVersionString',
+    'เลขเวอร์ชันยืนยัน',
+  );
+  if (typeof confirmedVersionString !== 'string') {
+    return confirmedVersionString;
+  }
+
+  const { data: draftVersion, error: draftVersionError } = await supabase
+    .from('price_list_versions')
+    .select('version_string')
+    .eq('id', args.p_version_id)
+    .maybeSingle();
+
+  if (draftVersionError || !draftVersion?.version_string) {
+    return createCatalogMutationError(
+      'อ่านเลขเวอร์ชันฉบับร่างไม่สำเร็จ กรุณาโหลดข้อมูลล่าสุดแล้วลองอีกครั้ง',
+      'DRAFT_NOT_FOUND',
+    );
+  }
+
+  const confirmationError = validateCatalogPublishVersionConfirmation(
+    confirmedVersionString,
+    String(draftVersion.version_string),
+  );
+  if (confirmationError) {
+    return confirmationError;
   }
 
   const startedAt = Date.now();

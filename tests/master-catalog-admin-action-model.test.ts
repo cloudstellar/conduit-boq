@@ -9,6 +9,7 @@ import {
   mapCatalogRpcActionResponse,
   shouldBeginNewCatalogOperation,
   shouldPreserveCatalogOperationInput,
+  validateCatalogPublishVersionConfirmation,
 } from '../lib/master-catalog/admin/actionModel';
 
 const VERSION_ID = '00000000-0000-4000-8000-000000000001';
@@ -136,6 +137,16 @@ describe('Master Catalog admin action model', () => {
     }), REQUEST_ID)).toMatchObject({
       status: 'error',
       message: 'รหัสเวอร์ชันเป้าหมายไม่ถูกต้อง',
+    });
+  });
+
+  it('requires the typed publish version to match the server-owned version', () => {
+    expect(validateCatalogPublishVersionConfirmation('2568.1.0', '2568.1.0')).toBeNull();
+    expect(validateCatalogPublishVersionConfirmation(' 2568.1.0 ', '2568.1.0')).toBeNull();
+    expect(validateCatalogPublishVersionConfirmation('2568.0.1', '2568.1.0')).toMatchObject({
+      status: 'error',
+      code: 'PUBLICATION_CONFIRMATION_MISMATCH',
+      message: 'เลขเวอร์ชันที่พิมพ์ไม่ตรง กรุณาพิมพ์ 2568.1.0 ให้ตรงทุกตัว',
     });
   });
 

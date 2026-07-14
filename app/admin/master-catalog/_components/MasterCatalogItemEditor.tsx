@@ -2,13 +2,22 @@
 
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { useActionState, useEffect, useState } from 'react';
+import { useActionState, useEffect, useRef, useState, type FormEvent } from 'react';
 import { useFormStatus } from 'react-dom';
 import { ArrowLeft, CheckCircle2, History, Loader2, Save, ShieldAlert } from 'lucide-react';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import {
@@ -30,6 +39,13 @@ import { useStableCatalogOperation } from './useStableCatalogOperation';
 import { MasterCatalogActionErrorAlert } from './MasterCatalogActionErrorAlert';
 
 type ItemAction = 'update' | 'recode' | 'retire' | 'reactivate' | 'withdraw';
+type ConfirmedItemAction = Extract<ItemAction, 'recode' | 'retire'>;
+
+type PendingItemConfirmation = {
+  action: ConfirmedItemAction;
+  reason: string;
+  targetLabel: string;
+};
 
 const initialState: CatalogMutationState = { status: 'idle', message: '' };
 
@@ -63,6 +79,9 @@ export function MasterCatalogItemEditor({
   const [laborCost, setLaborCost] = useState(money(item.laborCost));
   const [categoryId, setCategoryId] = useState(item.categoryId);
   const [codeGroupId, setCodeGroupId] = useState(recodeGroups[0]?.id ?? '');
+  const [pendingConfirmation, setPendingConfirmation] = useState<PendingItemConfirmation | null>(null);
+  const mutationFormRef = useRef<HTMLFormElement>(null);
+  const confirmedActionRef = useRef<ConfirmedItemAction | null>(null);
   const unitCost = sumMoney(materialCost, laborCost);
   const authorityChanged =
     itemName.trim() !== item.itemName
@@ -84,6 +103,35 @@ export function MasterCatalogItemEditor({
     }
     router.refresh();
   }, [action, returnHref, router, state.status]);
+
+  function handleMutationSubmit(event: FormEvent<HTMLFormElement>) {
+    if (action !== 'recode' && action !== 'retire') return;
+
+    if (confirmedActionRef.current === action) {
+      confirmedActionRef.current = null;
+      return;
+    }
+
+    event.preventDefault();
+    const formData = new FormData(event.currentTarget);
+    const reason = String(formData.get('reason') ?? '').trim();
+    const targetGroup = recodeGroups.find((group) => group.id === codeGroupId);
+
+    setPendingConfirmation({
+      action,
+      reason,
+      targetLabel: action === 'recode' && targetGroup
+        ? `${targetGroup.workContextCode}-${targetGroup.itemTypeCode} · ${targetGroup.workContextNameTh} / ${targetGroup.itemTypeNameTh}`
+        : 'ยกเลิกใช้ในฉบับร่าง',
+    });
+  }
+
+  function confirmHighImpactMutation() {
+    if (!pendingConfirmation || !mutationFormRef.current) return;
+    confirmedActionRef.current = pendingConfirmation.action;
+    setPendingConfirmation(null);
+    mutationFormRef.current.requestSubmit();
+  }
 
   return (
     <div className="flex w-full flex-col gap-4">
@@ -128,10 +176,12 @@ export function MasterCatalogItemEditor({
           <CardContent>
             {canMutate ? (
               <form
+                ref={mutationFormRef}
                 action={formAction}
                 className="grid gap-5"
                 onReset={preserveInput}
                 onSubmitCapture={prepareOperation}
+                onSubmit={handleMutationSubmit}
               >
                 <input ref={requestIdRef} type="hidden" name="requestId" />
                 <input type="hidden" name="versionId" value={item.versionId} />
@@ -143,7 +193,14 @@ export function MasterCatalogItemEditor({
 
                 <div className="grid gap-2">
                   <Label htmlFor="item-action">การดำเนินการ</Label>
-                  <Select value={action} onValueChange={(value) => setRequestedAction(value as ItemAction)}>
+                  <Select
+                    value={action}
+                    onValueChange={(value) => {
+                      setRequestedAction(value as ItemAction);
+                      confirmedActionRef.current = null;
+                      setPendingConfirmation(null);
+                    }}
+                  >
                     <SelectTrigger id="item-action"><SelectValue /></SelectTrigger>
                     <SelectContent>
                       <SelectGroup>
@@ -246,6 +303,68 @@ export function MasterCatalogItemEditor({
           </CardContent>
         </Card>
       </div>
+
+      <Dialog
+        open={pendingConfirmation !== null}
+        onOpenChange={(open) => {
+          if (!open) {
+            confirmedActionRef.current = null;
+            setPendingConfirmation(null);
+          }
+        }}
+      >
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle className="pr-8">
+              {pendingConfirmation?.action === 'retire'
+                ? `ยืนยันการยกเลิกใช้ ${item.itemCode}`
+                : `ยืนยันการเปลี่ยนรหัส ${item.itemCode}`}
+            </DialogTitle>
+            <DialogDescription>
+              {pendingConfirmation?.action === 'retire'
+                ? 'รายการจะเปลี่ยนเป็นยกเลิกใช้ในฉบับร่าง แต่ BOQ เดิมและประวัติรายการจะไม่ถูกแก้ไข'
+                : 'ระบบจะจัดสรรรหัสใหม่จากกลุ่มที่เลือก รหัสเดิมจะคงอยู่ในประวัติและไม่ถูกนำกลับมาใช้ซ้ำ'}
+            </DialogDescription>
+          </DialogHeader>
+          <div className="grid gap-3 rounded-md border p-3 text-sm">
+            <div>
+              <div className="text-xs font-medium text-muted-foreground">รายการ</div>
+              <div className="mt-1 break-words font-medium">{item.itemName}</div>
+              <div className="mt-1 font-mono text-xs">{item.itemCode}</div>
+            </div>
+            <div>
+              <div className="text-xs font-medium text-muted-foreground">ผลหลังบันทึก</div>
+              <div className="mt-1 break-words">{pendingConfirmation?.targetLabel ?? '-'}</div>
+            </div>
+            <div>
+              <div className="text-xs font-medium text-muted-foreground">เหตุผล</div>
+              <div className="mt-1 break-words">{pendingConfirmation?.reason ?? '-'}</div>
+            </div>
+          </div>
+          <Alert>
+            <ShieldAlert />
+            <AlertTitle>ประวัติและ BOQ เดิมไม่ถูกเขียนทับ</AlertTitle>
+            <AlertDescription>
+              การเปลี่ยนแปลงนี้บันทึกเฉพาะในฉบับร่างพร้อมหลักฐานก่อนและหลัง จนกว่าจะผ่านการตรวจและเผยแพร่ทั้งเวอร์ชัน
+            </AlertDescription>
+          </Alert>
+          <DialogFooter>
+            <DialogClose asChild>
+              <Button type="button" variant="outline">กลับไปตรวจ</Button>
+            </DialogClose>
+            <Button
+              type="button"
+              variant={pendingConfirmation?.action === 'retire' ? 'destructive' : 'default'}
+              onClick={confirmHighImpactMutation}
+            >
+              <Save />
+              {pendingConfirmation?.action === 'retire'
+                ? 'ยืนยันยกเลิกใช้'
+                : 'ยืนยันเปลี่ยนรหัส'}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       <IdentityTimeline item={item} history={history} />
     </div>

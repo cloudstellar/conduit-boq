@@ -122,6 +122,7 @@ const SAFE_RPC_ACTION_ERROR_CODES = new Set([
   'IMPORT_RETIREMENT_APPROVAL_REQUIRED',
   'POINTER_ALREADY_CURRENT',
   'P18_PLACEMENT_REVIEW_REQUIRED',
+  'PUBLICATION_CONFIRMATION_MISMATCH',
   'PUBLICATION_METADATA_REQUIRED',
   'PUBLICATION_VALIDATION_FAILED',
   'REQUEST_ALREADY_PROCESSED',
@@ -153,6 +154,7 @@ const RPC_ACTION_ERROR_MESSAGES_TH: Record<string, string> = {
   IMPORT_RETIREMENT_APPROVAL_REQUIRED: 'จำนวนรายการที่จะยกเลิกใช้ต้องมีหลักฐานอนุมัติและยืนยันจำนวนให้ตรงกัน',
   POINTER_ALREADY_CURRENT: 'เวอร์ชันนี้เป็นเวอร์ชันใช้งานปัจจุบันอยู่แล้ว',
   P18_PLACEMENT_REVIEW_REQUIRED: 'รายการเพิ่มใหม่ยังไม่ได้รับการยืนยันตำแหน่ง จึงยังเผยแพร่ไม่ได้',
+  PUBLICATION_CONFIRMATION_MISMATCH: 'เลขเวอร์ชันที่พิมพ์ไม่ตรงกับฉบับร่างที่กำลังเผยแพร่',
   PUBLICATION_METADATA_REQUIRED: 'กรุณาระบุข้อมูลเอกสารอนุมัติและที่เก็บไฟล์ให้ครบ',
   PUBLICATION_VALIDATION_FAILED: 'ฉบับร่างยังไม่ผ่านเงื่อนไขเผยแพร่ กรุณาตรวจผลความพร้อม',
   REQUEST_ALREADY_PROCESSED: 'คำขอนี้ถูกดำเนินการแล้ว ระบบจะไม่บันทึกซ้ำ',
@@ -325,6 +327,23 @@ export function buildPublishCatalogVersionArgs(
     }
     throw error;
   }
+}
+
+export function validateCatalogPublishVersionConfirmation(
+  confirmedVersionString: string,
+  actualVersionString: string,
+): CatalogMutationState | null {
+  const confirmed = confirmedVersionString.trim().normalize('NFC');
+  const actual = actualVersionString.trim().normalize('NFC');
+
+  if (confirmed === actual) {
+    return null;
+  }
+
+  return createCatalogMutationError(
+    `เลขเวอร์ชันที่พิมพ์ไม่ตรง กรุณาพิมพ์ ${actual} ให้ตรงทุกตัว`,
+    'PUBLICATION_CONFIRMATION_MISMATCH',
+  );
 }
 
 export function buildAbandonCatalogDraftArgs(

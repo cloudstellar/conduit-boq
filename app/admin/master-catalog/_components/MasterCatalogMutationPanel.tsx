@@ -443,7 +443,9 @@ export function MasterCatalogDraftAbandonPanel({
                 value={draftVersion.lockVersion}
               />
               <DialogHeader>
-                <DialogTitle>ยืนยันการยกเลิกฉบับร่าง {draftVersion.versionString}</DialogTitle>
+                <DialogTitle className="pr-8">
+                  ยืนยันการยกเลิกฉบับร่าง {draftVersion.versionString}
+                </DialogTitle>
                 <DialogDescription>
                   หลังยืนยันจะกลับมาแก้ฉบับนี้ไม่ได้ ระบบจะเก็บ snapshot และประวัติทั้งหมดไว้อ่านย้อนหลัง
                 </DialogDescription>
@@ -488,6 +490,13 @@ export function MasterCatalogPublishRestorePanel({
 }: PublishRestorePanelProps) {
   const [publishState, publishAction] = useActionState(publishCatalogVersionAction, initialState);
   const [restoreState, restoreAction] = useActionState(restoreCatalogPointerAction, initialState);
+  const [publishEffectiveDate, setPublishEffectiveDate] = useState('');
+  const [publishApprovalReference, setPublishApprovalReference] = useState('');
+  const [publishApprovalDocumentDate, setPublishApprovalDocumentDate] = useState('');
+  const [publishArchiveReference, setPublishArchiveReference] = useState('');
+  const [publishReason, setPublishReason] = useState('');
+  const [publishConfirmationOpen, setPublishConfirmationOpen] = useState(false);
+  const [confirmedVersionString, setConfirmedVersionString] = useState('');
   const [selectedRestoreTargetId, setSelectedRestoreTargetId] = useState('');
   const [restoreReason, setRestoreReason] = useState('');
   const router = useRouter();
@@ -513,6 +522,8 @@ export function MasterCatalogPublishRestorePanel({
     restoreTargetId || 'no-restore-target',
   );
   const publishBlocked = !draftReadiness?.canPublish;
+  const publishConfirmationMatches = confirmedVersionString.trim().normalize('NFC')
+    === draftVersion?.versionString.normalize('NFC');
 
   useEffect(() => {
     if (publishState.status === 'success' || restoreState.status === 'success') {
@@ -545,16 +556,7 @@ export function MasterCatalogPublishRestorePanel({
         ? 'grid gap-5 lg:grid-cols-2'
         : 'grid gap-5'}>
         {draftVersion ? (
-          <form
-            action={publishAction}
-            className="grid gap-4"
-            onReset={preservePublishInput}
-            onSubmitCapture={preparePublishOperation}
-          >
-            <input ref={publishRequestIdInputRef} type="hidden" name="requestId" />
-            <ActionStateAlert state={publishState} />
-            <input type="hidden" name="versionId" value={draftVersion.id} />
-            <input type="hidden" name="expectedLockVersion" value={draftVersion.lockVersion} />
+          <div className="grid gap-4">
             <div className="flex flex-wrap items-center gap-2">
               <Badge variant="secondary">{draftVersion.versionString}</Badge>
               <Badge variant="outline">รุ่นแก้ไข {draftVersion.lockVersion}</Badge>
@@ -574,58 +576,161 @@ export function MasterCatalogPublishRestorePanel({
                 </AlertDescription>
               </Alert>
             ) : null}
-            <div className="grid gap-2">
-              <Label htmlFor="publish-effective-date">วันที่มีผล</Label>
-              <Input
-                id="publish-effective-date"
-                name="effectiveDate"
-                type="date"
-                required
-              />
-            </div>
-            <div className="grid gap-2">
-              <Label htmlFor="publish-approval-reference">เลขที่เอกสารอนุมัติ</Label>
-              <Input
-                id="publish-approval-reference"
-                name="approvalReference"
-                required
-              />
-            </div>
-            <div className="grid gap-2">
-              <Label htmlFor="publish-approval-document-date">วันที่เอกสารอนุมัติ</Label>
-              <Input
-                id="publish-approval-document-date"
-                name="approvalDocumentDate"
-                type="date"
-                required
-              />
-            </div>
-            <div className="grid gap-2">
-              <Label htmlFor="publish-archive-reference">ที่เก็บเอกสารและไฟล์ฉบับอนุมัติ</Label>
-              <Input
-                id="publish-archive-reference"
-                name="physicalArchiveReference"
-                required
-              />
-            </div>
-            <div className="grid gap-2">
-              <Label htmlFor="publish-reason">เหตุผลการเผยแพร่</Label>
-              <Input
-                id="publish-reason"
-                name="reason"
-                required
-              />
-            </div>
-            <div className="flex flex-wrap items-center gap-2">
-              <SubmitButton
-                label="เผยแพร่เวอร์ชันนี้"
-                pendingLabel="กำลังเผยแพร่"
-                disabled={publishBlocked}
-              >
+            <form
+              className="grid gap-4"
+              onSubmit={(event) => {
+                event.preventDefault();
+                setConfirmedVersionString('');
+                setPublishConfirmationOpen(true);
+              }}
+            >
+              <div className="grid gap-2">
+                <Label htmlFor="publish-effective-date">วันที่มีผล</Label>
+                <Input
+                  id="publish-effective-date"
+                  type="date"
+                  value={publishEffectiveDate}
+                  onChange={(event) => setPublishEffectiveDate(event.target.value)}
+                  required
+                />
+              </div>
+              <div className="grid gap-2">
+                <Label htmlFor="publish-approval-reference">เลขที่เอกสารอนุมัติ</Label>
+                <Input
+                  id="publish-approval-reference"
+                  value={publishApprovalReference}
+                  onChange={(event) => setPublishApprovalReference(event.target.value)}
+                  required
+                />
+              </div>
+              <div className="grid gap-2">
+                <Label htmlFor="publish-approval-document-date">วันที่เอกสารอนุมัติ</Label>
+                <Input
+                  id="publish-approval-document-date"
+                  type="date"
+                  value={publishApprovalDocumentDate}
+                  onChange={(event) => setPublishApprovalDocumentDate(event.target.value)}
+                  required
+                />
+              </div>
+              <div className="grid gap-2">
+                <Label htmlFor="publish-archive-reference">ที่เก็บเอกสารและไฟล์ฉบับอนุมัติ</Label>
+                <Input
+                  id="publish-archive-reference"
+                  value={publishArchiveReference}
+                  onChange={(event) => setPublishArchiveReference(event.target.value)}
+                  required
+                />
+              </div>
+              <div className="grid gap-2">
+                <Label htmlFor="publish-reason">เหตุผลการเผยแพร่</Label>
+                <Input
+                  id="publish-reason"
+                  value={publishReason}
+                  onChange={(event) => setPublishReason(event.target.value)}
+                  required
+                />
+              </div>
+              <Button type="submit" className="w-fit" disabled={publishBlocked}>
                 <ShieldCheck data-icon="inline-start" />
-              </SubmitButton>
-            </div>
-          </form>
+                ตรวจและยืนยันการเผยแพร่
+              </Button>
+            </form>
+
+            <Dialog
+              open={publishConfirmationOpen}
+              onOpenChange={(open) => {
+                setPublishConfirmationOpen(open);
+                if (!open) setConfirmedVersionString('');
+              }}
+            >
+              <DialogContent>
+                <form
+                  action={publishAction}
+                  className="grid gap-4"
+                  onReset={preservePublishInput}
+                  onSubmitCapture={preparePublishOperation}
+                >
+                  <input ref={publishRequestIdInputRef} type="hidden" name="requestId" />
+                  <input type="hidden" name="versionId" value={draftVersion.id} />
+                  <input type="hidden" name="expectedLockVersion" value={draftVersion.lockVersion} />
+                  <input type="hidden" name="effectiveDate" value={publishEffectiveDate} />
+                  <input type="hidden" name="approvalReference" value={publishApprovalReference} />
+                  <input type="hidden" name="approvalDocumentDate" value={publishApprovalDocumentDate} />
+                  <input type="hidden" name="physicalArchiveReference" value={publishArchiveReference} />
+                  <input type="hidden" name="reason" value={publishReason} />
+                  <DialogHeader>
+                    <DialogTitle className="pr-8">
+                      ยืนยันการเผยแพร่ {draftVersion.versionString}
+                    </DialogTitle>
+                    <DialogDescription>
+                      หลังยืนยัน ฉบับนี้จะแก้ไขไม่ได้และจะเป็นเวอร์ชันใช้งานสำหรับ BOQ ใหม่
+                      ส่วน BOQ เดิมยังคงผูกกับเวอร์ชันที่บันทึกไว้
+                    </DialogDescription>
+                  </DialogHeader>
+                  <ActionStateAlert state={publishState} />
+                  <div className="grid gap-3 rounded-md border p-3 text-sm sm:grid-cols-2">
+                    <div>
+                      <div className="text-xs font-medium text-muted-foreground">เวอร์ชันใช้งานปัจจุบัน</div>
+                      <div className="mt-1 font-mono font-medium">{currentVersionString ?? '-'}</div>
+                    </div>
+                    <div>
+                      <div className="text-xs font-medium text-muted-foreground">เวอร์ชันที่จะเผยแพร่</div>
+                      <div className="mt-1 font-mono font-medium">{draftVersion.versionString}</div>
+                    </div>
+                    <div>
+                      <div className="text-xs font-medium text-muted-foreground">รุ่นแก้ไขที่ตรวจแล้ว</div>
+                      <div className="mt-1 font-medium">{draftVersion.lockVersion}</div>
+                    </div>
+                    <div>
+                      <div className="text-xs font-medium text-muted-foreground">จำนวนรายการ</div>
+                      <div className="mt-1 font-medium">
+                        {draftVersion.itemCount?.toLocaleString('th-TH') ?? '-'} รายการ
+                      </div>
+                    </div>
+                  </div>
+                  <div className="grid gap-2">
+                    <Label htmlFor="publish-confirm-version">
+                      พิมพ์ {draftVersion.versionString} เพื่อยืนยัน
+                    </Label>
+                    <Input
+                      id="publish-confirm-version"
+                      name="confirmedVersionString"
+                      className="font-mono"
+                      value={confirmedVersionString}
+                      onChange={(event) => setConfirmedVersionString(event.target.value)}
+                      aria-describedby="publish-confirm-version-help"
+                      aria-invalid={confirmedVersionString.length > 0 && !publishConfirmationMatches}
+                      autoComplete="off"
+                      autoCapitalize="none"
+                      spellCheck={false}
+                      required
+                    />
+                    <p
+                      id="publish-confirm-version-help"
+                      className={confirmedVersionString.length > 0 && !publishConfirmationMatches
+                        ? 'text-xs text-destructive'
+                        : 'text-xs text-muted-foreground'}
+                    >
+                      เลขเวอร์ชันต้องตรงทุกตัวก่อนระบบจะส่งคำสั่งเผยแพร่
+                    </p>
+                  </div>
+                  <DialogFooter>
+                    <DialogClose asChild>
+                      <Button type="button" variant="outline">กลับไปตรวจ</Button>
+                    </DialogClose>
+                    <SubmitButton
+                      label="ยืนยันและเผยแพร่"
+                      pendingLabel="กำลังเผยแพร่"
+                      disabled={publishBlocked || !publishConfirmationMatches}
+                    >
+                      <ShieldCheck data-icon="inline-start" />
+                    </SubmitButton>
+                  </DialogFooter>
+                </form>
+              </DialogContent>
+            </Dialog>
+          </div>
         ) : null}
 
         {restorableVersions.length > 0 && !currentVersionString ? (
@@ -685,7 +790,7 @@ export function MasterCatalogPublishRestorePanel({
               </DialogTrigger>
               <DialogContent>
                 <DialogHeader>
-                  <DialogTitle>
+                  <DialogTitle className="pr-8">
                     ยืนยันการเปลี่ยนเวอร์ชันใช้งานเป็น {restoreTarget?.versionString ?? '-'}
                   </DialogTitle>
                   <DialogDescription>

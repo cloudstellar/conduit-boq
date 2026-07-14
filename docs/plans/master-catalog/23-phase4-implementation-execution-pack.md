@@ -32,7 +32,7 @@ still does not permit an unannounced Local reset or any Production action.
 **Capability-completeness alignment recorded:** 2026-07-12 — owner requested
 the full audit and plan correction in
 [Audit #29](./29-phase4-owner-dev-completeness-audit.md). WP-6.5 keeps its
-bounded reliability evidence; new WP-6.6 must close C-01 through C-15 before
+bounded reliability evidence; new WP-6.6 must close C-01 through C-17 before
 WP-7. Migration `020` is reserved for WP-6.6 and proposed P-18 placement moves
 to `021`/WP-7.5. This alignment authorizes documentation only, not migration
 implementation, Local reset, or Production action.
@@ -43,6 +43,12 @@ Repository, migration `020` DB/RLS/concurrency, post-change P-20, and browser
 technical QA passed on `3bfc74e`. Current status and owner closeout remain in
 [the Tracker](./25-phase4-execution-progress-tracker.md); WP-7 must not start
 until that closeout is accepted.
+
+**P-26 human-intent alignment recorded:** 2026-07-14 — WP-6.6 Slice L adds
+exact Recode/Retire summaries and DB-read typed-version Publish confirmation.
+This is application/test/documentation hardening only: migration `020`, Local
+bootstrap, WP-7, Factor F, hotfix `016`, and Production remain unchanged and
+separately gated.
 
 **P-22 operator-workflow correction authorized:** 2026-07-12 — intended-admin
 review placed WP-6.6 closeout on Hold and accepted
@@ -577,7 +583,9 @@ Required slices:
 | G Schema/UX/evidence | After zero-null compatibility proof, add required null/order constraints; Thai-first copy, no synthetic Local/WP evidence, support IDs demoted; DB/role/race/browser/accessibility/authority tests pass. |
 | H Working-draft lifecycle | Partial unique draft-per-base invariant; safe concurrent create conflict; audited idempotent abandon with immutable retained rows/history; replacement starts from a fresh clone. |
 | I Final snapshot review | Make the full searchable item workspace primary; compare complete draft/base snapshots by stable identity; show compound old/new changes/readiness; publish only the exact reviewed lock and force rereview after mutation. |
-| J Version planning and recovery UX | Require business intent and owner-designated annual year; fail closed on incomplete registry; show reserved numbers; DB enforces next sequence after idempotent replay; successful create opens the exact draft; detailed metadata follows items; restore confirms current/target and BOQ effect. |
+| J Operator context/import/export semantics | Preserve signed-in admin identity and environment context; keep global navigation informational; bind import to the exact draft; distinguish approved workbook input from review-only Excel/PDF exports; keep import iterative rather than a misleading one-way wizard. |
+| K Version planning and recovery UX | Require business intent and owner-designated annual year; fail closed on incomplete registry; show reserved numbers; DB enforces next sequence after idempotent replay; successful create opens the exact draft; detailed metadata follows items; restore confirms current/target and BOQ effect. |
+| L High-impact human-intent confirmation | Recode/Retire show exact item/target/reason/BOQ-audit summaries. Publish shows current/target versions, reviewed lock, item count, immutability, and BOQ effect; require the exact DB-read target version and reject mismatch before the publish RPC. Prove cancel/no-write and responsive behavior. |
 
 Required behavior:
 
@@ -600,10 +608,13 @@ Required behavior:
 - an admin cannot submit raw version segments without intent, reuse an abandoned
   number, skip the next lane number, or silently receive a number different from
   the one reviewed; a void annual identifier does not force a false effective year.
+- Recode, Retire, and Publish cannot cross their final high-impact boundary from
+  the first form submit; cancellation creates no mutation, and a mismatched
+  typed publish target cannot call the publish RPC.
 
 Exit gate:
 
-- Audit #29 C-01 through C-15 each have an implementation/evidence reference in
+- Audit #29 C-01 through C-17 each have an implementation/evidence reference in
   the Verification Report;
 - migration `020` static verification and explicitly approved G1R/G2 Local
   DB/RLS/grant/rollback/concurrency/P-20 evidence have passed; G1R also passed
@@ -855,7 +866,7 @@ Before asking for code review:
 - [ ] Privileged functions have narrow execute grants and safe `search_path`.
 - [ ] New foreign keys and hot filters are indexed or intentionally documented.
 - [ ] Published data is immutable.
-- [ ] Audit #29 C-01 through C-15 have exact implementation/evidence references
+- [ ] Audit #29 C-01 through C-17 have exact implementation/evidence references
   or the affected capability is excluded from release visibility.
 - [ ] Full catalog/item history, one current-base workspace, and
   stale/abandoned read-only targeting work.
@@ -881,6 +892,8 @@ Before asking for code review:
 - [ ] Draft create requires explicit business intent, complete-registry
   reserved-number planning, DB next-sequence enforcement, annual void-number
   recovery, and exact post-create navigation.
+- [ ] Recode/Retire summaries and DB-read typed-version Publish confirmation
+  pass mismatch/exact/cancel/no-write desktop and mobile evidence.
 - [ ] P-20 hash/identity portability contract is implemented consistently in
   migration, canonicalizer, DB hash, export, and tests.
 - [ ] Draft mutation and import are audited.
@@ -909,7 +922,7 @@ Before asking for code review:
 | P-18 unresolved | Keep draft add/supplement review available, but block publication of versions with new identities until guard evidence and placement governance are accepted |
 | P-19 unresolved | Do not file a field-facing official PDF for versions with inactive/retired rows; publish only if owner explicitly approves the rendering/exclusion policy |
 | P-20 unresolved | Continue non-hash-changing reliability work, but do not accept WP-8 clean-reset hash evidence, freeze the migration fingerprint, or request P-15 |
-| Any Audit #29 C-01 through C-15 gap unresolved | Do not start WP-7 or claim full operator readiness. Implement WP-6.6 or remove the affected control from release visibility according to the audit |
+| Any Audit #29 C-01 through C-17 gap unresolved | Do not start WP-7 or claim full operator readiness. Implement WP-6.6 or remove the affected control from release visibility according to the audit |
 | Reusable path still hardcodes `2568.1.0` | Treat as implementation nonconformance with ADR-003; fix and test another valid annual/revision/patch version before P-14 |
 | Advisor warning from pre-existing system | Add to advisor baseline with owner/remediation metadata |
 | New advisor warning from Phase 4 | Stop and fix or get explicit accepted-risk signoff |

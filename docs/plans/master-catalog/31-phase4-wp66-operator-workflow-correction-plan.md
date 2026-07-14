@@ -18,7 +18,10 @@ the same exact candidate. P-25 repository/static and owner-approved standalone
 Local visual/interaction evidence then passed 27/27 at 710 total/709 affected
 rows without DB mutation. The no-reset G3 real-route technical walkthrough then
 passed stale-after-review recovery and clean Local closeout on source `6599c30`;
-explicit owner accept/hold and G4 bootstrap/WP-7 sequencing remain pending.
+P-26 subsequently closed the separate high-impact human-intent gap for Publish,
+Recode, and Retire on a working-tree candidate based on `2fd438d`, with a
+no-reset Local proof and clean disabled-state readback. Explicit owner
+accept/hold and G4 bootstrap/WP-7 sequencing remain pending.
 
 **Production touched:** No
 
@@ -320,7 +323,7 @@ candidate `020` separately until the new owner closeout accepts it.
 | G1X | Passed and committed on exact closure-lineage commit `050c998`: same-scope identical-retry focus and execution-provenance closure. |
 | G1R | Explicitly owner-approved and passed 2026-07-13 on exact clean execution checkout `721c2c2c4a234a4fd00e5686383be9af87ee15dd`; migration `020` SHA-256 `e07e0c4161077efba7bc4f6ebf95518d0cc1bc7e4628a43a128dd899bd1aef93`; final Local cleanup passed. |
 | G2 | Explicitly owner-approved and passed 2026-07-13 on the same exact checkout `721c2c2c4a234a4fd00e5686383be9af87ee15dd`; second clean rebuild, separate unchanged `020`, WP-6.6/WP-6.5 evidence, P-20 comparator, current advisors, repository gates, and cleanup passed. |
-| G3 | After passed P-25 compound/high-volume presentation evidence, owner completes independent real-route stale-after-review and intended-admin workflow review, then accepts or holds the revised WP-6.6 closeout |
+| G3 | After passed P-25 compound/high-volume presentation, real-route stale-after-review, and P-26 high-impact confirmation evidence, owner accepts or holds the revised WP-6.6 closeout |
 | G4 | Only after G3, add accepted `020` to bootstrap and separately authorize any WP-7 execution |
 
 Production P-12 through P-15 remain separate and unrequested.
@@ -732,3 +735,45 @@ This passes the G3 technical walkthrough. It does not infer the owner's
 accept/hold decision, G4, migration `020` bootstrap inclusion, WP-7, WP-8, or
 any Production authorization. The next action is explicit owner review of the
 stale-recovery and cleanup evidence.
+
+## 20. P-26 high-impact human-intent guard
+
+The owner authorized this bounded Local-only correction on 2026-07-14 after
+the final owner/developer audit identified one remaining mis-click risk. The
+database already failed closed for stale locks, readiness, role, idempotency,
+and immutable publication, but Publish, Recode, and Retire did not all require
+a distinct confirmation of operator intent.
+
+Implemented closure on the working-tree candidate based on
+`2fd438dd3417850faca572b9e5e5561e944df345`:
+
+- Recode and Retire now stop at a Thai confirmation dialog showing the exact
+  item, intended result, reason, and BOQ/audit effect before the Server Action
+  form is resubmitted;
+- ordinary Update, Reactivate, and eligible Withdraw keep their existing
+  direct-save behavior because their risk and recovery profile is different;
+- Publish first presents current and target versions, reviewed lock, item
+  count, immutability, and new-versus-historical BOQ behavior;
+- the final Publish action remains disabled until the admin types the exact
+  target version; and
+- the Server Action independently reads `price_list_versions.version_string`
+  for the submitted draft and returns stable
+  `PUBLICATION_CONFIRMATION_MISMATCH` before the publish RPC when the typed
+  value differs. UI state is therefore not the authority.
+
+No-reset Local browser proof used the real admin routes and proof draft
+`2568.0.3`. Recode and Retire summaries were inspected and cancelled. Publish
+blocked mismatched `2568.0.2`, enabled only exact `2568.0.3`, and was cancelled
+without publication. Desktop and 390x844 layouts passed after adding title
+clearance for the close control. The proof draft was audited-abandoned at lock
+2. Final readback confirmed pointer `2568.0.0`/710 rows, zero working drafts,
+all three catalog flags `false`, BOQ 198/1,547, and Factor F
+`2569.0.0`/36 unchanged. Change sets were `clone=1`, `manual=1`, `abandon=1`,
+`publish=0`. Production touched: No.
+
+Untracked screenshots, checksums, and the machine-readable cleanup report are
+retained under
+`output/master-catalog/g3-owner-review/20260714-p26-human-intent/`.
+This closes Audit #29 C-17 technically. It does not change or apply migration
+`020`, add it to bootstrap, infer G3 owner acceptance, authorize G4/WP-7/WP-8,
+or authorize any Production, Factor F, hotfix, P-18, or P-19 action.

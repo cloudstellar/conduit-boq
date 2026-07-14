@@ -197,6 +197,41 @@ describe('Master Catalog P-22 operator workflow', () => {
     expect(importPanel).toContain('aria-label="หน้าถัดไป"');
   });
 
+  it('confirms publish, recode, and retire before high-impact submission', () => {
+    const panel = source(
+      'app/admin/master-catalog/_components/MasterCatalogMutationPanel.tsx',
+    );
+    const itemEditor = source(
+      'app/admin/master-catalog/_components/MasterCatalogItemEditor.tsx',
+    );
+    const actions = source('app/admin/master-catalog/actions.ts');
+    const publishActionStart = actions.indexOf('export async function publishCatalogVersionAction');
+    const restoreActionStart = actions.indexOf('export async function restoreCatalogPointerAction');
+    const publishAction = actions.slice(publishActionStart, restoreActionStart);
+
+    expect(panel).toContain('ตรวจและยืนยันการเผยแพร่');
+    expect(panel).toContain('ยืนยันการเผยแพร่ {draftVersion.versionString}');
+    expect(panel).toContain('name="confirmedVersionString"');
+    expect(panel).toContain('publishConfirmationMatches');
+    expect(panel).toContain('เลขเวอร์ชันต้องตรงทุกตัวก่อนระบบจะส่งคำสั่งเผยแพร่');
+    expect(panel).toContain('ส่วน BOQ เดิมยังคงผูกกับเวอร์ชันที่บันทึกไว้');
+
+    expect(publishActionStart).toBeGreaterThan(-1);
+    expect(restoreActionStart).toBeGreaterThan(publishActionStart);
+    expect(publishAction).toContain(".select('version_string')");
+    expect(publishAction).toContain('validateCatalogPublishVersionConfirmation(');
+    expect(publishAction.indexOf('validateCatalogPublishVersionConfirmation(')).toBeLessThan(
+      publishAction.indexOf("supabase.rpc('publish_catalog_version'"),
+    );
+
+    expect(itemEditor).toContain('onSubmit={handleMutationSubmit}');
+    expect(itemEditor).toContain("action !== 'recode' && action !== 'retire'");
+    expect(itemEditor).toContain('mutationFormRef.current.requestSubmit()');
+    expect(itemEditor).toContain('ยืนยันการยกเลิกใช้ ${item.itemCode}');
+    expect(itemEditor).toContain('ยืนยันการเปลี่ยนรหัส ${item.itemCode}');
+    expect(itemEditor).toContain('ประวัติและ BOQ เดิมไม่ถูกเขียนทับ');
+  });
+
   it('keeps failures visible, understandable, and free of internal workflow labels', () => {
     const views = source(
       'app/admin/master-catalog/_components/MasterCatalogAdminViews.tsx',

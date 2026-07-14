@@ -101,6 +101,15 @@ audited abandon closed lock 3; final Local invariants and disabled flags passed.
 This technical result does not record the owner's accept/hold decision and does
 not authorize G4, bootstrap inclusion, WP-7, or Production.
 
+**P-26 human-intent amendment recorded:** 2026-07-14 — the owner authorized a
+bounded application/test/documentation correction after final review found
+that DB integrity guards did not by themselves prevent an accidental Recode,
+Retire, or Publish click. Recode/Retire now require exact summary confirmation;
+Publish requires current/target/lock/count/BOQ review plus an exact typed target
+version independently compared with the DB-read version before the RPC. The
+no-reset Local proof passed and cleaned up without publication. Migration
+`020`, bootstrap, WP-7, Factor F, hotfix `016`, and Production are unchanged.
+
 ## 1. Decision requested
 
 Approve detailed implementation and local rehearsal of Master Catalog Phase 4.
@@ -328,7 +337,7 @@ scope.
 | 4-0 | Approve ADR/CR, dictionary, reconciliation, specs, backup/runbook | None |
 | 4A Local | Build additive schema/functions and backfill on Local | None |
 | 4B Local | Build UI/import/manual/history/publish/export behind flag | None |
-| WP-6.6 Local | Close Audit #29 C-01 through C-15 with candidate migration `020`, RPC/UI/tests, final snapshot review, version planning, and owner review | None |
+| WP-6.6 Local | Close Audit #29 C-01 through C-17 with candidate migration `020` where DB changes are required, RPC/UI/tests, final snapshot review, version planning, high-impact confirmation, and owner review | None |
 | WP-7 Local | Preserve BOQ/hotfix `016` and Factor F behavior through permanent regression tests only | None |
 | 4B.5 Local / WP-7.5 | After P-18 acceptance, add DB-backed placement for new identities only | None |
 | 4C Rehearsal | Full local workflow from refreshed Production data | None |
@@ -396,6 +405,7 @@ scope.
 | Mistaken retire/add has no explicit correction path | Medium | Medium | Audited reactivate and base-absent withdraw while retaining identity/code/audit | Admin must discard/rebuild a draft or publish an unintended inactive row |
 | Concurrent or duplicate current-base drafts split release intent, or starting over destroys lineage | Medium | High | Partial unique draft-per-base invariant plus audited idempotent abandon; no draft/audit deletion | Two mutable drafts exist for one base or an abandoned attempt can mutate/publish |
 | Admin reaches publish without seeing cumulative manual/import effects, or publishes after the reviewed state changed | Medium | Critical | Complete identity-based snapshot diff before publish and exact reviewed `lock_version`; mutation forces rereview | Diff is incomplete/unstable or stale reviewed lock can publish |
+| Admin accidentally confirms a high-impact item or publication action | Medium without a separate intent barrier | High | Recode/Retire exact summary dialogs; Publish exact current/target/lock/count/BOQ summary plus DB-read typed target validation before RPC | One-click Recode/Retire/Publish crosses the boundary, mismatch reaches RPC, or cancel creates an effect |
 | UI-only reorder corrupts official order/audit | Medium without DB contract | High | Draft-only placement RPC, placement revision/review, unique contiguous order, base relative-order invariant, one transaction | Direct `display_order` write, duplicate/gapped order, inherited-row move, or missing review succeeds |
 | Documents/evidence disagree | Medium | High | Tracker authority index and automated consistency check | Migration/WP/decision/rollback facts conflict |
 
@@ -418,7 +428,7 @@ feature enablement, final catalog publication, or silent business-data choices.
 - [x] P-21 explicitly authorizes WP-6.6 Local-only implementation scope/start
 - [x] P-22/G0 authorizes the bounded operator-workflow docs and Local-only
       implementation; G1/G2 required separate approvals and are now complete
-- [x] Audit #29 C-01 through C-15 are mapped to exact DB/UI/test owners
+- [x] Audit #29 C-01 through C-17 are mapped to exact DB/UI/test owners
 - [x] WP-6.5 reliability evidence remains preserved and is not relabeled as a
       full operator-completeness certificate
 - [x] Planned DB changes amend still-unaccepted candidate `020`; `017`-`019`
@@ -437,6 +447,10 @@ feature enablement, final catalog publication, or silent business-data choices.
 - [x] Owner-authorized no-reset G3 technical walkthrough passed real-route
       stale-review rejection, fresh-review recovery, audited cleanup, and final
       Local invariants on source `6599c30`
+- [x] Owner-authorized P-26 no-reset proof passed Recode/Retire confirmation,
+      typed-version Publish mismatch/exact behavior, responsive layout,
+      audited cleanup, and final disabled Local invariants on a candidate based
+      on `2fd438d`
 - [x] Unsupported Add/Supplement/Retire controls remain hidden at release unless
       their downstream gates pass
 - [ ] Owner explicitly accepts or holds G3/WP-6.6 operator closeout before
@@ -491,7 +505,7 @@ pretend a publishable candidate has been approved.
 - [ ] Stable request-ID timeout/retry and two-session concurrency tests pass
 - [ ] ADR-003 reusable version path passes beyond `2568.1.0`
 - [ ] Permanent live DB hotfix `016`/BOQ/Factor F regressions pass
-- [ ] WP-6.6 C-01 through C-15 close with authoritative automated/browser/UAT
+- [ ] WP-6.6 C-01 through C-17 close with authoritative automated/browser/UAT
       evidence, or affected controls are removed from release visibility
 - [ ] Tracked export verifier and documentation consistency checks pass
 - [ ] Intended-admin UAT, safe Thai recovery/log correlation, and 710-row

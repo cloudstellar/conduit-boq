@@ -28,8 +28,11 @@ visual/interaction harness passed 27/27 checks at 710 total/709 affected rows
 without DB mutation. A bounded no-reset G3 real-route walkthrough then passed
 the stale-after-review guard, fresh-review recovery, audited abandon, and final
 Local invariant readback on source HEAD `6599c30`. Explicit owner accept/hold
-remains pending; G4, bootstrap inclusion, WP-7, and every Production action
-remain unauthorized.
+remains pending. P-26 then closed the separate high-impact human-intent gap for
+Publish, Recode, and Retire on a working-tree candidate based on `2fd438d`;
+no-reset Local proof passed, proof draft `2568.0.3` was audited-abandoned, and
+the disabled baseline was restored. G4, bootstrap inclusion, WP-7, and every
+Production action remain unauthorized.
 **Purpose:** Owner-facing progress tracker for Master Catalog Phase 4 local
 implementation and rehearsal. This file is the authority for current WP status,
 blockers, next safe step, and the authority/evidence index. Detailed decisions,
@@ -63,13 +66,13 @@ Allowed statuses:
 |---|---|
 | Current branch | `codex/master-catalog-phase4` |
 | Named evidence commits | `6599c306207c2d1e15342c398888b56513f9bb0a` is the source HEAD for the P-25-complete, real-route G3 technical walkthrough; `721c2c2c4a234a4fd00e5686383be9af87ee15dd` is the exact clean G1R/G2 execution checkout and final DB-evidenced candidate; `050c998361f3372bd3bf9fb6645dc4abd1c0bf2b` is the exact P-24 same-scope closure-lineage checkpoint; `88d0711` is its base implementation/repository checkpoint. G1R diagnostics exposed and fixed stale harness assumptions at `f9f0bd7`, `bfccbb3`, `be157d4`, and `2b1ccec`; `721c2c2` added the two required authority foreign-key covering indexes. `31fd689` produced the P-23/P-23.1 source/repository checkpoint; `c8f6dca282cd2729ac2b58e488b3ef516fb29713` produced the pre-G2 operator/UI source checkpoint; `e463270dfb9f23332559f31591cf338b8eeada3c` produced historical P-22 G1 DB/P-20 evidence; `17ec6cc` repaired reusable WP-6.5 fixture cleanup found during G1; `ac31feb` produced the P-22 source/static implementation checkpoint; `3bfc74ea00843033ad3cfd2afac43820b18c0124` produced historical WP-6.6 DB and post-`020` P-20/browser evidence; `59b17d3c3e7ed6180445ac5dc5e0b75db9fe9452` added the verified Local secret/login guard; `1ad01b9268cec64c621266c3eb33b16a4325e627` produced the two clean WP-6.5/P-20 rebuilds; `54233731b121c32723bb8efcc6889f70f3f2dcef` produced live lifecycle-negative evidence; `e782459ce17b2bda90d7f34efd4e15c28565ad07` produced transport response-loss evidence; `9becdf675386b03a3aeff717cebccd6e88f8b664` produced browser same-ID/input-preservation evidence; `777df7598c8aa96a17f3665db5131e5fb5397b96` produced the accepted P-11 pair; `edf3570a` is superseded history |
-| Current work package | WP-6.6 G3 owner accept/hold after P-22/P-23/P-23.1/P-24/P-25 technical closeout |
+| Current work package | WP-6.6 G3 owner accept/hold after P-22/P-23/P-23.1/P-24/P-25/P-26 technical closeout |
 | Current environment | Local only |
 | Production write allowed | No |
 | Feature flag default | Disabled |
-| Latest owner decision | P-25 bounded application/tests/docs and approved standalone Local visual evidence passed on 2026-07-14 after independent G2. This did not approve DB mutation, bootstrap inclusion, G3/G4, Production, P-18/`021`, P-19, WP-7, Factor F work, or hotfix expansion. |
-| Latest technical result | Owner-authorized no-reset G3 real-route walkthrough passed on source `6599c30`; owner accept/hold is still pending. |
-| Next owner review point | Explicitly accept or hold G3 using the real-route stale-recovery evidence under `output/master-catalog/g3-owner-review/20260714-6599c30-stale-after-review/`. Technical recommendation: Accept G3. Do not infer G4/bootstrap/WP-7 or Production. |
+| Latest owner decision | P-26 bounded application/tests/docs and no-reset Local human-intent proof were authorized on 2026-07-14. This did not approve migration/DB changes, bootstrap inclusion, G3/G4, Production, P-18/`021`, P-19, WP-7, Factor F work, or hotfix expansion. |
+| Latest technical result | G3 real-route stale-review walkthrough passed on source `6599c30`; P-26 typed Publish plus Recode/Retire confirmations passed on a candidate based on `2fd438d`; both Local runs cleaned up with no publication. Owner accept/hold is still pending. |
+| Next owner review point | Explicitly accept or hold G3 using the stale-recovery evidence under `output/master-catalog/g3-owner-review/20260714-6599c30-stale-after-review/` and P-26 evidence under `output/master-catalog/g3-owner-review/20260714-p26-human-intent/`. Technical recommendation: Accept G3. Do not infer G4/bootstrap/WP-7 or Production. |
 | Last updated | 2026-07-14 |
 
 ## 2.1 Canonical authority and evidence manifest
@@ -86,7 +89,7 @@ Allowed statuses:
 | Excel/PDF presentation and filing | [Official Export Specification](./20-phase4-official-export-spec.md) | P-11/P-19 decisions update the spec first |
 | Admin workflow/UAT | [Admin Operating Procedure](./15-phase4-admin-operating-procedure.md) | Must match implemented messages and recovery paths before P-14 |
 | End-to-end capability completeness/release visibility | [Owner/Developer Capability Audit #29](./29-phase4-owner-dev-completeness-audit.md) | Every visible capability closes its route-to-evidence matrix or is removed from release scope |
-| P-22/P-23/P-23.1/P-24/P-25 working-draft/final-review/context/version-planning correction | [Operator Workflow Correction Plan #31](./31-phase4-wp66-operator-workflow-correction-plan.md) | Amend still-unaccepted `020` and route/UI/test/operator contracts together; prior evidence remains historical; follow G1R/G2/G3/G4 without inferring reset or Production approval |
+| P-22/P-23/P-23.1/P-24/P-25/P-26 working-draft/final-review/context/version-planning/human-intent correction | [Operator Workflow Correction Plan #31](./31-phase4-wp66-operator-workflow-correction-plan.md) | Amend still-unaccepted `020` only where the DB contract changes; align route/UI/test/operator contracts; prior evidence remains historical; follow G1R/G2/G3/G4 without inferring reset or Production approval |
 
 Current evidence baseline:
 
@@ -211,7 +214,9 @@ Current evidence baseline:
    UI/routes/tests/docs without changing `020`; P-23.1 then amended `020` and
    passed repository/static verification. G1R/G2 later applied the final
    candidate separately and passed; it remains outside bootstrap. The later G3
-   technical route passed; explicit G3 owner acceptance and G4 remain pending;
+   technical route passed. P-26 later changed only application/tests/docs and
+   passed a no-reset Local confirmation/cancel/cleanup proof; explicit G3 owner
+   acceptance and G4 remain pending;
 - Local bootstrap authority order: `009`-`015`, `016`, `017`-`019`;
 - proposed `021` (P-18/WP-7.5) does not exist and is not in bootstrap;
 - Local login/password parsing was verified after commit `59b17d3`; guarded
@@ -233,7 +238,7 @@ Current evidence baseline:
 | WP-5 | Publish, pointer restore, and audit on Local | Ready for owner review | Backend DB/RPC slice passed: migration `019`, Local publish/restore smoke including stale-base pointer fixture, DB hash readback, immutability checks, active-admin publish/restore UI controls, browser create/publish/restore proof, final DB readback, owner-review cleanup, and [Verification Report publication evidence](./13-phase4-verification-report.md#12-publication-tests). Hash-portability review note remains for WP-8/P-15 | Owner accepted continuing to WP-6 local-only implementation |
 | WP-6 | Official Excel/PDF export | Complete | Selected-version export core, paged export data reads, older-version coverage, draft marking, Excel/PDF generators, and tracked verification exist. The exact replacement pair from `777df75` uses TH Sarabun New on all 20,808 populated Excel cells at 16 pt or larger and passed semantic, five-sheet workbook, 19-page PDF, and unchanged Local readback checks. | Owner accepted the exact Local replacement pair at 2026-07-11 22:20 +07; preserve it without regeneration; Production filing remains separate |
 | WP-6.5 | Reliability and publish-boundary hardening | Ready for owner review | Code/static implementation for A-H, two owner-approved clean Local rebuilds/P-20 evidence on `1ad01b9`, live lifecycle negatives on `5423373`, transport response-loss recovery on `e782459`, browser same-ID/input-preservation proof on `9becdf6`, and owner-accepted export evidence on `777df75` passed. See the sub-gate table below. | Accept only as bounded reliability evidence. It is not a full operator-completeness certificate and no longer leads directly to WP-7; WP-6.6 is next. |
-| WP-6.6 | Admin workflow completeness and authority hardening | In progress | P-24 base `88d0711` and closure lineage `050c998` are preserved; owner-approved G1R/G2 passed on exact `721c2c2`; P-25 presentation passed 27/27; real-route G3 technical walkthrough passed stale-lock recovery and clean Local closeout on source `6599c30`. | Ready for explicit G3 owner accept/hold; G4 bootstrap/WP-7 sequencing remains separately gated |
+| WP-6.6 | Admin workflow completeness and authority hardening | In progress | P-24 base `88d0711` and closure lineage `050c998` are preserved; owner-approved G1R/G2 passed on exact `721c2c2`; P-25 presentation passed 27/27; real-route G3 stale-lock recovery passed on source `6599c30`; P-26 high-impact confirmation and clean no-reset Local proof passed on a candidate based on `2fd438d`. | Ready for explicit G3 owner accept/hold; G4 bootstrap/WP-7 sequencing remains separately gated |
 | WP-7 | Permanent BOQ/hotfix `016` and Factor F regression preservation | Not started | Live DB behavior for all approved BOQ suffixes and authoritative catalog fields, rollback/role/version negatives, BOQ save/print/export regressions, and Factor F before/after assertions; suite is reusable in CI/rehearsal | Starts only after WP-6.6 closeout; required before WP-7.5/WP-8 |
 | WP-7.5 | P-18 new-identity placement governance | Not started | Conditional migration `021`, placement revision/review, exact RPC/RLS/audit/order/concurrency/hash/export/browser evidence | P-18 acceptance required; otherwise Add/Supplement hidden and DB guard retained for WP-8 |
 | WP-8 | Clean Local rehearsal, admin UAT, performance baseline, and Verification Report | Not started | Owner-approved Local reset, full supported workflow, DB integration/concurrency, test/lint/build/audit/advisor evidence, tracked export verification, admin UAT without developer/SQL assistance, and measured 710-row performance | Requires WP-6.6/WP-7 plus WP-7.5 or hidden Add/Supplement; required before any P-12 request |
@@ -267,6 +272,7 @@ Current evidence baseline:
 | I Final snapshot review | G1R/G2/P-25 and G3 technical path passed; owner decision pending | Complete identity diff, exact lock, readiness/publish/restore, compound/high-volume presentation, and real-route stale-after-review recovery passed. Broader independent UAT remains WP-8. |
 | J Operator context/import/export semantics | G1R browser path passed | Account/environment context, information navigation, exact-draft import, review-export semantics, and three-state import passed; independent UAT remains WP-8. |
 | K Version planning/create/item/restore flow | G1R/G2 and G3 technical path passed; owner decision pending | Explicit intent, complete registry, next sequence/annual recovery, exact workspace, item-first hierarchy, and current-to-target restore confirmation passed; G3 independently exercised correction intent/create/item/review/abandon on real routes. |
+| L High-impact human-intent confirmation | P-26 technical path passed; owner decision pending | Recode/Retire exact summary dialogs, DB-read typed-version Publish check, mismatch disabled/exact enabled, cancel/no-write behavior, desktop/mobile layout, audited abandon, and disabled-baseline cleanup passed without reset or publication. |
 
 ## 4. Owner pause points
 
@@ -282,7 +288,7 @@ Current evidence baseline:
 | P-19 inactive/retired export policy | Any candidate version contains inactive/retired rows | Approve PDF rendering/exclusion policy before official filing |
 | P-20 hash portability | Initial WP-6.5 and post-`020` WP-6.6 proofs passed; rerun after any WP-7.5 migration change and before WP-8/migration fingerprint/P-15 acceptance | Prove identical identity/hash output across the approved independent rebuild scope |
 | P-21 / WP-6.6 initial scope | Start and historical Local evidence accepted for execution 2026-07-12 | Preserve the evidence as history; it does not close the P-22-amended candidate |
-| P-22/P-23/P-23.1/P-24/P-25 / WP-6.6 operator correction | Exact G1R/G2 candidate `721c2c2`, P-25 visual evidence, and real-route G3 technical walkthrough on `6599c30` passed | Review the untracked G3 evidence under `output/master-catalog/g3-owner-review/20260714-6599c30-stale-after-review/` and explicitly accept or hold G3; decide G4 separately |
+| P-22/P-23/P-23.1/P-24/P-25/P-26 / WP-6.6 operator correction | Exact G1R/G2 candidate `721c2c2`, P-25 visual evidence, real-route G3 walkthrough on `6599c30`, and P-26 human-intent proof passed | Review the untracked G3 evidence under `output/master-catalog/g3-owner-review/20260714-6599c30-stale-after-review/` plus P-26 evidence under `output/master-catalog/g3-owner-review/20260714-p26-human-intent/`; explicitly accept or hold G3 and decide G4 separately |
 | Reusable version path | Before P-14 feature enablement | Local positive and duplicate/nonmonotonic evidence passed 2026-07-11; rerun the generic ADR-003 set at WP-8/P-14 |
 | WP-8 completion | Clean Local rehearsal passes | Review readiness evidence before any P-12 request |
 | P-12 | Production migration window requested | Approve or reject Production migration |
@@ -436,15 +442,15 @@ Current evidence baseline:
 Use this template at the end of each implementation session:
 
 ```text
-Current WP: WP-6.6 G3 owner accept/hold after P-22/P-23/P-23.1/P-24/P-25 technical closeout
-Status: G1R/G2 passed on exact DB-evidenced checkout 721c2c2; P-25 passed 27/27; no-reset real-route G3 technical walkthrough passed on source 6599c30; candidate 020 remains outside bootstrap; explicit G3 owner decision and G4 remain pending
+Current WP: WP-6.6 G3 owner accept/hold after P-22/P-23/P-23.1/P-24/P-25/P-26 technical closeout
+Status: G1R/G2 passed on exact DB-evidenced checkout 721c2c2; P-25 passed 27/27; no-reset real-route G3 walkthrough passed on source 6599c30; P-26 high-impact confirmation/cancel/cleanup proof passed on a candidate based on 2fd438d; candidate 020 remains outside bootstrap; explicit G3 owner decision and G4 remain pending
 Branch: codex/master-catalog-phase4
 Execution provenance: G3 source 6599c306207c2d1e15342c398888b56513f9bb0a; G1R/G2 exact checkout 721c2c2c4a234a4fd00e5686383be9af87ee15dd; P-24 base lineage 88d0711; same-scope closure lineage 050c998
 Migration 020 SHA-256: e07e0c4161077efba7bc4f6ebf95518d0cc1bc7e4628a43a128dd899bd1aef93; bootstrap remains through 019
 Prior named evidence commits: 721c2c2 for exact G1R/G2 and FK-index closure; 2b1ccec/be157d4/bfccbb3/f9f0bd7 for truthful harness corrections; 050c998 for P-24 closure lineage; 88d0711 for P-24 base repository/static; 31fd689 for P-23/P-23.1 source; c8f6dca for historical operator/UI; e463270 for historical P-22 G1 DB/P-20; 777df75 for accepted P-11
-Files changed: G3 status/evidence alignment docs plus the authority-consistency contract test; bootstrap, migration SQL, application source, Production, Factor F, hotfix 016, and untracked files/, tmp/, output/ remain outside commits
-Evidence produced: real-route G3 screenshots/report under output/master-catalog/g3-owner-review/20260714-6599c30-stale-after-review/; final Local readback clean
-Tests/checks run: focused authority consistency 1 file/6 tests; full suite 30 files/162 tests; TypeScript; lint 0 errors/10 existing warnings; authority 710/65/17; network-enabled production build; evidence checksum manifest; git diff --check; G3 Local pointer/BOQ/Factor F/schema invariants passed
+Files changed: P-26 application guard, tests, and authority docs; bootstrap, migration SQL, Production, Factor F, hotfix 016, and untracked files/, tmp/, output/ remain outside commits
+Evidence produced: prior real-route G3 evidence plus P-26 screenshots/report under output/master-catalog/g3-owner-review/20260714-p26-human-intent/; final Local readback clean
+Tests/checks run: focused P-26/authority 3 files/30 tests; full suite 30 files/165 tests; TypeScript; focused/full lint 0 errors and 10 existing warnings; authority 710/65/17; network-enabled production build; production dependency audit 0 vulnerabilities; git diff --check; Local P-26 pointer/draft/flags/BOQ/Factor F cleanup passed
 Blockers: explicit G3 owner accept/hold; then separate G4/bootstrap/WP-7; P-18/P-19 when affected; WP-8 independent UAT, measured performance, formal accessibility, and final advisor disposition
 Owner decisions needed: accept or hold G3; G4 and Production P-12 through P-15 remain separate
 Next safe step: present G3 evidence for owner decision; do not reset Local, add 020 to bootstrap, start WP-7, or touch Production without later approval

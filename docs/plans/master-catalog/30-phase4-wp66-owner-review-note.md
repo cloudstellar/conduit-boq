@@ -1,8 +1,9 @@
 # Master Catalog Phase 4 WP-6.6 Owner Review Note
 
 **Status:** Ready for owner accept/hold after the G3 real-route technical
-walkthrough passed on 2026-07-14; owner acceptance is not inferred. P-25
-repository/static and approved standalone Local visual evidence also passed.
+walkthrough and P-26 high-impact human-intent guard proof passed on 2026-07-14;
+owner acceptance is not inferred. P-25 repository/static and approved
+standalone Local visual evidence also passed.
 Earlier
 source/G1/browser/P-23 checkpoints remain historical. P-24 base and closure
 lineage are preserved at `88d0711`/`050c998`; the separately owner-approved
@@ -21,6 +22,7 @@ remains outside bootstrap and Production.
 **G1R execution checkout:** `721c2c2c4a234a4fd00e5686383be9af87ee15dd`
 **G2 execution checkout:** `721c2c2c4a234a4fd00e5686383be9af87ee15dd`
 **G3 source HEAD:** `6599c306207c2d1e15342c398888b56513f9bb0a`
+**P-26 source base HEAD:** `2fd438dd3417850faca572b9e5e5561e944df345`
 **Correction source checkpoint:**
 `ac31feb`
 **Historical implementation/evidence commit:**
@@ -88,6 +90,16 @@ gates, and final invariant readback passed on the same exact candidate
 independent DB/reproducibility proof. G2 does not infer G3/G4, bootstrap
 inclusion, WP-7, or Production.
 
+On 2026-07-14 the owner approved the bounded P-26 correction after a final
+owner/developer review found that exact-lock/readiness controls protected data
+integrity but did not provide a distinct human-intent barrier for every
+high-impact action. Recode and Retire now show exact summary dialogs. Publish
+shows current/target version, reviewed lock, item count, BOQ effect, and
+requires the target version to be typed and independently compared with the
+DB-read version before the RPC. The no-reset Local proof passed and cleanup
+restored the disabled baseline. This does not change `020` or infer G3/G4,
+WP-7, Factor F/hotfix work, or Production approval.
+
 Recorded owner response:
 
 > Hold WP-6.6 closeout; implement P-22 one-current-base-working-draft,
@@ -110,6 +122,7 @@ Recorded owner response:
 | C-14 version intent/reservation | G1R/G2 live sequence/race/replay/one-draft/abandon/replacement cases passed; G3 used explicit correction intent and permanently reserved abandoned Local proof version `2568.0.2` as designed. | Owner accept/hold remains |
 | C-15 create/item/restore flow | G1R/G2 passed the DB/repository contract and bounded browser route; G3 independently used the real create, exact workspace, item edit, final review, and audited-abandon routes. | Owner accept/hold remains; full independent UAT stays WP-8 |
 | C-16 pre-G1R business/UX guard | Final G1R/G2 contracts and P-25 presentation passed. G3 independently observed durable Thai stale recovery, retained form values, explicit Local/account context, and clean disabled-gate closeout. | Owner accept/hold remains; formal accessibility stays WP-8 |
+| C-17 high-impact human-intent guard | P-26 source/tests and real-route no-reset Local evidence passed. Recode and Retire showed exact item/target/reason/BOQ-audit summaries and were cancelled. Publish blocked mismatched `2568.0.2`, enabled exact DB-owned `2568.0.3`, and was cancelled without publication. Desktop and 390x844 layouts passed after title clearance; proof draft was audited-abandoned and all flags returned false. | Owner accept/hold remains; repeat the final supported workflow during WP-8 UAT |
 
 ## 3. Retained evidence
 
@@ -251,6 +264,13 @@ Evidence is retained untracked under
 `output/master-catalog/g3-owner-review/20260714-6599c30-stale-after-review/`.
 Production touched: No.
 
+P-26 then used real Local routes without a reset. Proof draft `2568.0.3` was
+never published and ended audited-abandoned at lock 2 with
+`clone=1`, `manual=1`, `abandon=1`, `publish=0`. Final pointer, draft count,
+flags, BOQ, and Factor F matched the baseline above. Screenshots, checksums,
+and cleanup report are retained untracked under
+`output/master-catalog/g3-owner-review/20260714-p26-human-intent/`.
+
 ## 4. Scope not accepted by this review
 
 - Migration `020` is not yet part of `scripts/bootstrap-local-db.sh`.
@@ -265,11 +285,13 @@ Production touched: No.
 ## 5. Recommendation
 
 Approve G3/WP-6.6 operator closeout if the real-route stale recovery, fresh
-review, and audited cleanup shown in steps 7-11 are understandable without SQL
-or developer intervention. The technical recommendation is **Accept G3**: the
-guard failed closed, preserved the operator's entered evidence, left the
-pointer unchanged, and returned Local to the required baseline. The owner must
-still record accept or hold explicitly; this document does not self-approve.
+review, P-26 confirmation screens, and audited cleanup are understandable
+without SQL or developer intervention. The technical recommendation is
+**Accept G3**: stale review and typed-version guards failed closed, the
+high-impact dialogs expose the exact result before mutation, no publication
+occurred, and both Local walkthroughs returned the pointer and flags to the
+required baseline. The owner must still record accept or hold explicitly; this
+document does not self-approve.
 
 Broader binary import, accessibility, and measured performance remain WP-8.
 Even after G3 acceptance, G4/bootstrap inclusion is a separate gate. Do not run

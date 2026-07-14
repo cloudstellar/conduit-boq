@@ -197,6 +197,9 @@ describe('Master Catalog authority consistency', () => {
     expect(decisions).toContain(
       'bounded implementation/visual evidence passed; independent real-route stale-after-review technical UAT also passed on `6599c30`; explicit G3 owner acceptance remains pending',
     )
+    expect(decisions).toContain('| L-56 |')
+    expect(decisions).toContain('| P-26 |')
+    expect(decisions).toContain('DB-read version in the Server Action before the publish RPC')
 
     const tracker = read(
       'docs/plans/master-catalog/25-phase4-execution-progress-tracker.md',
@@ -209,10 +212,10 @@ describe('Master Catalog authority consistency', () => {
     expect(tracker).toContain('independent intended-admin UAT remains WP-8')
     expect(tracker).toContain('| Production write allowed | No |')
     expect(tracker).toContain(
-      'P-25 bounded application/tests/docs and approved standalone Local visual evidence passed on 2026-07-14 after independent G2',
+      'P-26 bounded application/tests/docs and no-reset Local human-intent proof were authorized on 2026-07-14',
     )
     expect(tracker).toContain(
-      'Owner-authorized no-reset G3 real-route walkthrough passed on source `6599c30`; owner accept/hold is still pending.',
+      'P-26 typed Publish plus Recode/Retire confirmations passed on a candidate based on `2fd438d`',
     )
     expect(tracker).toContain(
       'Migration 020 SHA-256: e07e0c4161077efba7bc4f6ebf95518d0cc1bc7e4628a43a128dd899bd1aef93',
@@ -244,7 +247,7 @@ describe('Master Catalog authority consistency', () => {
       /pre-amendment operator\/browser preflight passed on\s+`c8f6dca`/,
     )
     expect(tracker).toContain(
-      'no-reset real-route G3 technical walkthrough passed on source 6599c30; candidate 020 remains outside bootstrap; explicit G3 owner decision and G4 remain pending',
+      'P-26 high-impact confirmation/cancel/cleanup proof passed on a candidate based on 2fd438d; candidate 020 remains outside bootstrap; explicit G3 owner decision and G4 remain pending',
     )
     expect(existsSync(resolve(
       root,
@@ -270,7 +273,10 @@ describe('Master Catalog authority consistency', () => {
       '**G3 source HEAD:** `6599c306207c2d1e15342c398888b56513f9bb0a`',
     )
     expect(ownerReview).toContain(
-      'The technical recommendation is **Accept G3**',
+      '**P-26 source base HEAD:** `2fd438dd3417850faca572b9e5e5561e944df345`',
+    )
+    expect(ownerReview).toMatch(
+      /technical recommendation is\s+\*\*Accept G3\*\*/,
     )
     expect(existsSync(resolve(
       root,
@@ -294,6 +300,8 @@ describe('Master Catalog authority consistency', () => {
     expect(correctionPlan).toContain(
       'This passes the G3 technical walkthrough. It does not infer the owner\'s',
     )
+    expect(correctionPlan).toContain('## 20. P-26 high-impact human-intent guard')
+    expect(correctionPlan).toContain('This closes Audit #29 C-17 technically.')
   })
 
   it('keeps reliability commands and route recovery files tracked by contract', () => {
@@ -422,6 +430,42 @@ describe('Master Catalog authority consistency', () => {
     expect(procedure).toContain('historical BOQs do not change')
     expect(correction).toContain('| G1R |')
     expect(correction).toContain('| G2 |')
+  })
+
+  it('keeps P-26 human-intent guards aligned across code and operator authority', () => {
+    const audit = read(
+      'docs/plans/master-catalog/29-phase4-owner-dev-completeness-audit.md',
+    )
+    const executionPack = read(
+      'docs/plans/master-catalog/23-phase4-implementation-execution-pack.md',
+    )
+    const procedure = read(
+      'docs/plans/master-catalog/15-phase4-admin-operating-procedure.md',
+    )
+    const actions = read('app/admin/master-catalog/actions.ts')
+    const actionModel = read('lib/master-catalog/admin/actionModel.ts')
+    const mutationPanel = read(
+      'app/admin/master-catalog/_components/MasterCatalogMutationPanel.tsx',
+    )
+    const itemEditor = read(
+      'app/admin/master-catalog/_components/MasterCatalogItemEditor.tsx',
+    )
+
+    expect(audit).toContain('| C-17 |')
+    expect(audit).toContain('- L: high-impact human-intent confirmation')
+    expect(executionPack).toContain('| L High-impact human-intent confirmation |')
+    expect(procedure).toContain('**ยืนยันและเผยแพร่** disabled')
+    expect(actionModel).toContain('PUBLICATION_CONFIRMATION_MISMATCH')
+    expect(actionModel).toContain('validateCatalogPublishVersionConfirmation')
+    expectInOrder(actions, [
+      ".from('price_list_versions')",
+      'validateCatalogPublishVersionConfirmation(',
+      "supabase.rpc('publish_catalog_version'",
+    ])
+    expect(mutationPanel).toContain('name="confirmedVersionString"')
+    expect(mutationPanel).toContain('พิมพ์ {draftVersion.versionString} เพื่อยืนยัน')
+    expect(itemEditor).toContain("action !== 'recode' && action !== 'retire'")
+    expect(itemEditor).toContain('ประวัติและ BOQ เดิมไม่ถูกเขียนทับ')
   })
 
   it('keeps core authority links resolvable', () => {

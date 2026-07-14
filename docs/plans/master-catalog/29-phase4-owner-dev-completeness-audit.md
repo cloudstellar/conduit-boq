@@ -13,7 +13,10 @@ P-24 repository/static verification passed on exact implementation commit
 `721c2c2`. The separately approved independent G2 clean rebuild and P-20
 comparison then passed on the same exact candidate. G3 owner closeout must
 precede WP-7. The bounded no-reset G3 real-route technical walkthrough passed
-on source `6599c30`; explicit owner accept/hold remains pending.
+on source `6599c30`. P-26 then closed the remaining human-intent gap for
+Publish, Recode, and Retire on a working-tree candidate based on `2fd438d`;
+the no-reset Local proof passed and returned Local to its disabled baseline.
+Explicit owner accept/hold remains pending.
 
 **Environment:** Source/document audit only. No Local database reset, Production
 access/write, feature enablement, publication, new Factor F workflow, or hotfix
@@ -98,6 +101,7 @@ do not remove the need for the operator-completeness work below.
 | C-14 | Draft creation always suggests a revision and exposes raw major/minor/patch inputs, although annual versus revision versus patch depends on business authority. The overview only has a 25-row display list, and an abandoned annual `{year}.0.0` can block a truthful replacement under the old transition shape. | Require explicit business intent and owner-designated annual year; load a complete all-status registry or fail closed; permanently reserve identifiers; derive/show the next lane candidate; enforce sequence in candidate `020`; permit the next patch-0 annual revision in the same target year when lower identifiers are reserved. |
 | C-15 | Successful create leaves the admin on the overview, detailed metadata delays the item workspace, and pointer restore submits without a current-to-target human confirmation. | Open the exact new draft after success; place compact context/actions then items before detailed document metadata; separate restore as recovery and confirm current/target, reason, and new-versus-historical BOQ behavior. |
 | C-16 | Annual year accepts impractical far-future values; stale-sequence error copy can fall through to raw backend text or disappear when registry refresh remounts the form; internal P-labels and technical identifiers compete with the operator task; first-rollout authority and Factor F context can read as permanent workflow content. | Enforce base +1 through +10 in UI/server/DB; allowlist stable stale/range errors with Thai copy; key refresh state independently and focus a shared error alert; collapse support identifiers; remove internal labels; contextualize first-rollout authority and demote separate Factor F details. |
+| C-17 | Exact-lock and database readiness prevent stale or invalid publication, but the visible Publish action previously submitted after one click without a separate human-intent check. Recode and Retire likewise changed code/status immediately after the item form submit. This left a preventable mis-click path even though database integrity remained protected. | Add a summary confirmation for Recode and Retire. Publish must show current/target version, reviewed lock, item count, BOQ effect, and immutability; require the admin to type the exact DB-read target version. Keep the final Server Action comparison server-owned and fail closed before the publish RPC. Prove mismatch disabled, exact match enabled, cancel/no-write behavior, responsive layout, and clean Local cleanup. |
 
 P-18 placement and P-19 retired-row PDF policy are already recorded gates, not
 new discoveries from this audit. WP-7 BOQ/hotfix `016`/Factor F regression and
@@ -108,7 +112,7 @@ WP-8 clean rehearsal/UAT/performance/advisors also remain required.
 | Order | Work package | Exit meaning |
 |---:|---|---|
 | 1 | WP-6.5 reliability and publish-boundary hardening | Preserve passed evidence for idempotency, concurrency, fail-closed guards, portability, and recovery. It is not an operator-completeness certificate. |
-| 2 | WP-6.6 admin workflow completeness and authority hardening | Close C-01 through C-15 with migration/RPC/UI/audit/tests and owner browser review. No Local reset is implied by planning this work. |
+| 2 | WP-6.6 admin workflow completeness and authority hardening | Close C-01 through C-17 with migration/RPC/UI/audit/tests and owner browser review. No Local reset is implied by planning this work. |
 | 3 | WP-7 permanent BOQ/hotfix `016` and Factor F regression preservation | Regression-only; no new Factor F or hotfix workflow. |
 | 4 | P-18 decision and WP-7.5 placement governance | Required for full Add/Supplement release; preserve inherited relative order while auditing every shifted numeric position. |
 | 5 | P-19 decision when Retire is in release scope | Resolve official PDF treatment before filing a candidate with inactive rows. |
@@ -133,6 +137,8 @@ WP-6.6 should be delivered in reviewable slices:
   same draft after import apply.
 - K: explicit version intent/all-status reservation, post-create exact-workspace
   navigation, item-before-metadata hierarchy, and pointer-restore confirmation.
+- L: high-impact human-intent confirmation for Publish, Recode, and Retire,
+  including server-owned exact-version comparison and cancel/no-write proof.
 
 ## 6. Migration and authority order
 
@@ -195,7 +201,9 @@ every in-scope row.
 The owner requested this full audit and plan alignment on 2026-07-12. P-21
 authorized the first Local-only implementation; P-22/P-23/P-23.1 authorize the
 bounded operator corrections described in
-[Doc #31](./31-phase4-wp66-operator-workflow-correction-plan.md). These decisions
+[Doc #31](./31-phase4-wp66-operator-workflow-correction-plan.md). P-26
+authorizes the bounded application/test/documentation correction for C-17.
+These decisions
 do not authorize a Local database reset, Production access/write, feature
 enablement, publication, new Factor F work, P-18/`021`, or expansion of hotfix
 `016`.

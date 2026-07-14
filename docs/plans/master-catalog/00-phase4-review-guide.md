@@ -23,8 +23,12 @@
   exact checkout `721c2c2` แล้ว ต่อมา owner อนุมัติ independent G2 แยก และ
   clean rebuild/P-20 comparison ผ่านบน exact candidate เดียวกัน พร้อมคืน
   Local เป็น pointer `2568.0.0`, ไม่มี working draft และปิด catalog flags
-  ทั้งหมด. หลักฐาน `3bfc74e` เป็นประวัติแต่ถูก supersede สำหรับ closeout
-  รอบใหม่; G3/G4, WP-7 และ Production ยังไม่ได้อนุมัติ**
+  ทั้งหมด. ต่อมา P-25 presentation และ G3 real-route stale-review technical
+  walkthrough ผ่านบน source `6599c30`; P-26 confirmation สำหรับ Publish,
+  Recode และ Retire ผ่านแบบไม่ reset/publish บน candidate ที่อิง `2fd438d`
+  และ cleanup คืน baseline แล้ว. หลักฐาน `3bfc74e` เป็นประวัติแต่ถูก
+  supersede สำหรับ closeout รอบใหม่; ยังต้องมี owner accept/hold G3 ชัดเจน
+  ส่วน G4, WP-7 และ Production ยังไม่ได้อนุมัติ**
 - รอบถัดไปของ Phase 4: **เริ่มจาก baseline หลัง Factor F `012-015` และ
   production hotfix `016`; Phase 4 migrations คือ `017+`**
 - เอกสาร Phase 4 ต้องใช้ live preflight count เสมอ เพราะ BOQ ใหม่อาจเพิ่ม
@@ -126,9 +130,9 @@ checkpoint.
 | P-18 placement governance สำหรับ add/supplement | WP-6.5 guard/readiness ผ่าน Local technical evidence แล้วและยังคง block การ publish identity ใหม่; proposed WP-7.5 แยก placement workflow ออกจาก structured-code guard ตาม [Review Note #28](./28-phase4-p18-placement-governance-review-note.md). ต้องรับรองกติกา P-18 ก่อน implement; ถ้า defer ต้องซ่อน/ปิด Add และ Supplement เมื่อ enable feature |
 | P-19 PDF policy สำหรับรายการยกเลิกใช้ | ถ้า version ใดมี inactive/retired rows ต้องตัดสินใจว่าจะ exclude/mark/appendix ก่อน filed PDF |
 | P-20 canonical hash portability | Owner approved deterministic baseline identity จาก Production-derived `price_list.id`; independent two-rebuild proof ผ่านแล้ว และต้อง rerun หลัง migration change รวมถึง WP-8/P-15 |
-| WP-6.6 capability completeness | G1R และ independent G2 ผ่าน DB/concurrency/P-20/advisor/repository บน exact candidate `721c2c2` แล้ว; P-20 comparison ตรงกัน. ยังต้องผ่าน G3 owner closeout ก่อน WP-7 ส่วน independent UAT/performance/formal accessibility อยู่ WP-8 |
-| P-21/P-22/P-23/P-23.1 WP-6.6 Local-only | `020` SHA-256 `e07e0c4161077efba7bc4f6ebf95518d0cc1bc7e4628a43a128dd899bd1aef93` ผ่าน G1R/G2 แต่ยังอยู่นอก bootstrap; G3 และ G4 ต้องอนุมัติแยก และไม่รวม P-18/`021`, Factor F/hotfix expansion หรือ Production |
-| Version lifecycle ตาม ADR-003 | Admin ต้องเลือก annual/revision/patch; annual year มาจาก owner; ระบบใช้ทะเบียนทุกสถานะและไม่ reuse เลข; DB บังคับเลขถัดไป. Live G1R/G2 ผ่านแล้ว ส่วน G3 และ WP-8/P-14 ยังรอ |
+| WP-6.6 capability completeness | G1R/G2 ผ่าน DB/concurrency/P-20/advisor/repository บน exact candidate `721c2c2`; P-25/G3/P-26 technical paths ผ่านแล้ว. ยังต้อง owner accept/hold G3 ก่อน G4/WP-7 ส่วน independent UAT/performance/formal accessibility อยู่ WP-8 |
+| P-21/P-22/P-23/P-23.1/P-24/P-25/P-26 WP-6.6 Local-only | `020` SHA-256 `e07e0c4161077efba7bc4f6ebf95518d0cc1bc7e4628a43a128dd899bd1aef93` ผ่าน G1R/G2 แต่ยังอยู่นอก bootstrap; G3 technical และ P-26 human-intent proof ผ่านแล้ว แต่ owner accept/hold กับ G4 ต้องอนุมัติแยก และไม่รวม P-18/`021`, Factor F/hotfix expansion หรือ Production |
+| Version lifecycle ตาม ADR-003 | Admin ต้องเลือก annual/revision/patch; annual year มาจาก owner; ระบบใช้ทะเบียนทุกสถานะและไม่ reuse เลข; DB บังคับเลขถัดไป. Live G1R/G2 และ G3 technical ผ่านแล้ว; owner closeout กับ WP-8/P-14 ยังรอ |
 | Live Production preflight หลัง Factor F rollout | ต้อง refresh ก่อนทุก Production gate; ห้ามใช้ BOQ count จาก closeout เป็นค่าตายตัว |
 
 ## ตัวเลข reconciliation ที่ต้องใช้เป็นจุดตรวจ

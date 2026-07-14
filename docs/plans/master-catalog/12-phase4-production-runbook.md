@@ -83,7 +83,7 @@ Stop immediately when any of these occurs:
   would be reused;
 - live DB/RPC/RLS/concurrency, tracked artifact verification, admin UAT, or
   documented recovery evidence required for the next gate is missing;
-- any Audit #29 C-01 through C-15 capability is visible as supported without
+- any Audit #29 C-01 through C-17 capability is visible as supported without
   its authoritative WP-6.6 implementation/evidence;
 - an item/import path creates free-form taxonomy, accepts caller-owned code
   allocation/publisher identity, silently chooses a draft, or presents partial
@@ -91,6 +91,9 @@ Stop immediately when any of these occurs:
 - two mutable drafts can exist for one base, a draft/abandon action loses audit
   history, or publication can proceed without the exact final snapshot/lock
   state the operator reviewed;
+- Recode/Retire can cross the mutation boundary without their exact summary,
+  or Publish can call its RPC without a server-validated exact DB-read target
+  version confirmation;
 - Supabase advisors show a new or untriaged security/performance finding for
   the Phase 4 change set;
 - unexpected active admin activity or simultaneous catalog edit is detected;
@@ -126,7 +129,7 @@ Stop immediately when any of these occurs:
 12. Confirm `/CI/` is excluded from commits and identify approved derivative
    fonts/logo assets.
 13. Complete the Phase 4 verification template baseline section.
-14. Accept Audit #29 as the corrected capability gate and confirm WP-6.6 is
+14. Accept Audit #29 C-01 through C-17 as the corrected capability gate and confirm WP-6.6 is
     scheduled before WP-7; this does not itself authorize migration/reset.
 
 **Exit gate:** All documents have owner/reviewer decisions; no unresolved row
@@ -261,7 +264,7 @@ Before requesting P-12, record:
 - tracked semantic artifact-verifier output;
 - route failure-state, Thai recovery message, intended-admin UAT, and 710-row
   performance evidence;
-- Audit #29 capability matrix showing C-01 through C-15 implemented/evidenced
+- Audit #29 capability matrix showing C-01 through C-17 implemented/evidenced
   or an affected control explicitly excluded from release visibility;
 - authority/document consistency result;
 - security/performance advisor results with no unresolved Phase 4 blocker;

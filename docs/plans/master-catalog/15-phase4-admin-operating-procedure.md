@@ -136,7 +136,7 @@ until the final Publish click to inform the operator.
 1. Search by legacy code, canonical code, or item name.
 2. Confirm the search covers the complete selected version, then open the exact
    item and verify its identity/history/current values.
-3. Choose **Edit in this draft**.
+3. Choose **แก้ไขข้อมูล**.
 4. Change only approved fields.
 5. Enter the reason; name, unit, or money changes also require price authority.
 6. Review highlighted field differences and save.
@@ -147,10 +147,13 @@ review their change, and reapply deliberately. Do not overwrite blindly.
 ## 6. Retire an item
 
 1. Open the item in the draft.
-2. Choose **Retire from this version**.
+2. Choose **ยกเลิกใช้**.
 3. Confirm affected code, identity, and whether a replacement exists.
 4. Enter reason and optional replacement reference.
-5. Review Full-import/retirement warnings and confirm.
+5. Select **บันทึกในฉบับร่าง**, then review the confirmation summary for the
+   exact item, result, reason, and BOQ/audit effect.
+6. Choose **ยืนยันยกเลิกใช้** only when the summary is correct; otherwise choose
+   **กลับไปตรวจ**. Cancelling must create no mutation.
 
 Retirement removes the item from the new version's active set; it does not
 delete identity, code registry, history, prior versions, or historical BOQs.
@@ -161,12 +164,14 @@ before the operator proceeds to publication readiness.
 ## 7. Recode an item
 
 1. Open item history and confirm stable identity.
-2. Choose **Recode in this draft**.
+2. Choose **เปลี่ยนกลุ่มและจัดสรรรหัสใหม่**.
 3. Select the approved group and let the server allocate the next never-issued
    code. Do not reuse a gap or type an arbitrary suffix.
 4. Confirm the legacy code remains registered to the same identity.
-5. Enter reason and review the recode diff.
-6. Save.
+5. Enter the reason and select **บันทึกในฉบับร่าง**.
+6. Review the confirmation summary for the exact item, target group, reason,
+   and BOQ/audit effect. Choose **ยืนยันเปลี่ยนรหัส** only when it is correct;
+   otherwise choose **กลับไปตรวจ**. Cancelling must create no mutation.
 
 Never reuse a retired code or change a published row in place.
 
@@ -322,9 +327,16 @@ Publication is high impact.
 7. If any inactive/retired rows are present, confirm P-19 official PDF policy.
 8. Confirm the version number and current base/pointer.
 9. Obtain explicit owner approval for this exact version.
-10. Type/confirm the version when prompted and publish from this review page
-    once. The screen retains this publish operation ID until a definitive
-    result and submits the exact reviewed lock version.
+10. Select **ตรวจและยืนยันการเผยแพร่**. In the confirmation dialog, recheck the
+    current version, target version, reviewed draft revision, item count,
+    immutability, and BOQ effect.
+11. Type the exact target version when prompted. A mismatch keeps
+    **ยืนยันและเผยแพร่** disabled and the Server Action must reject it before
+    the publish RPC even if client validation is bypassed. Choose
+    **กลับไปตรวจ** to cancel with no publication effect.
+12. Publish from this review page once. The screen retains this publish
+    operation ID until a definitive result and submits the exact reviewed lock
+    version.
 
 If publication succeeds, the version is immutable and the pointer moves
 atomically. Do not attempt to edit it.
@@ -385,6 +397,7 @@ Use only when a published current version must stop being used for new BOQs.
 | Draft lock conflict | Refresh and reconcile the other admin's change |
 | Working draft already exists | Open the existing Current-base workspace; abandon it with a reason only when the attempt truly must be replaced |
 | Draft review changed | The draft was edited after review. Return to final comparison, inspect the new state, and publish only with the refreshed lock |
+| เลขเวอร์ชันที่พิมพ์ไม่ตรง | Return to the confirmation summary and type the displayed target version exactly. Do not retry by changing the URL, request ID, or hidden fields |
 | Draft base stale | Create a new draft from Current and reapply approved changes; do not publish/rebase the stale draft |
 | Current restore version unavailable | Keep Restore closed, reload the version data, and verify both current and target before confirming |
 | Publish evidence required | Complete real approval metadata; do not use placeholder text |
