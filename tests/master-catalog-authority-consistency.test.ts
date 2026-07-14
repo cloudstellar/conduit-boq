@@ -112,6 +112,7 @@ describe('Master Catalog authority consistency', () => {
       '017',
       '018',
       '019',
+      '020',
     ])
 
     expectInOrder(bootstrap, [
@@ -131,7 +132,7 @@ describe('Master Catalog authority consistency', () => {
     ])
 
     expect(migrations).toContain(
-      '**G1R/G2-passed Local-only candidate on exact execution checkout `721c2c2c4a234a4fd00e5686383be9af87ee15dd`; SHA-256 `e07e0c4161077efba7bc4f6ebf95518d0cc1bc7e4628a43a128dd899bd1aef93`; P-20 comparison and no-reset G3 route passed; G3/WP-6.6 owner-accepted on exact application checkpoint `78e96ab3ed9993707014c4aba1d285b7592b17a1`; G4 remains required; not in bootstrap or Production**',
+      '**Owner-accepted Local-only migration in bootstrap source after G4 repository approval on 2026-07-15; SHA-256 `e07e0c4161077efba7bc4f6ebf95518d0cc1bc7e4628a43a128dd899bd1aef93`; G1R/G2 separate-apply evidence passed on exact execution checkout `721c2c2c4a234a4fd00e5686383be9af87ee15dd`; G3/WP-6.6 accepted on exact application checkpoint `78e96ab3ed9993707014c4aba1d285b7592b17a1`; clean bootstrap execution on the new G4 integration commit remains separately gated; not Production-approved**',
     )
     expect(migrations).toContain(
       '**Proposed only — P-18 pending; file does not exist; not in bootstrap**',
@@ -151,6 +152,9 @@ describe('Master Catalog authority consistency', () => {
     expect(packageJson.scripts?.['db:local:smoke-master-catalog-wp66']).toBe(
       'node --env-file=.env.development.local --env-file=supabase/.env.local scripts/smoke-master-catalog-wp66.mjs',
     )
+    expect(packageJson.scripts?.['db:local:smoke-master-catalog-wp7']).toBe(
+      'node --env-file=.env.development.local --env-file=supabase/.env.local scripts/smoke-master-catalog-wp7.mjs',
+    )
     expect(existsSync(resolve(
       root,
       'scripts/smoke-master-catalog-wp66.mjs',
@@ -159,6 +163,14 @@ describe('Master Catalog authority consistency', () => {
     expect(wp66Smoke).toContain('schemaContract.authority_fk_indexes === 2')
     expect(wp66Smoke).toContain("'VERSION_SEQUENCE_STALE'")
     expect(wp66Smoke).toContain('sameCandidateRaceNormalized: true')
+    expect(existsSync(resolve(
+      root,
+      'scripts/smoke-master-catalog-wp7.mjs',
+    ))).toBe(true)
+    const wp7Smoke = read('scripts/smoke-master-catalog-wp7.mjs')
+    expect(wp7Smoke).toContain('approvedSuffixesPassed: true')
+    expect(wp7Smoke).toContain('crossVersionItemRejectedAtomically: true')
+    expect(wp7Smoke).toContain('productionTouched: false')
   })
 
   it('keeps work-package sequencing and owner decisions explicit', () => {
@@ -200,26 +212,31 @@ describe('Master Catalog authority consistency', () => {
     expect(decisions).toContain('| L-56 |')
     expect(decisions).toContain('| P-26 |')
     expect(decisions).toContain('| P-27 |')
+    expect(decisions).toContain('| P-28 |')
     expect(decisions).toContain(
       'Accepted 2026-07-14 23:50 +07; WP-6.6 complete; G4 and all later gates remain separate',
+    )
+    expect(decisions).toContain(
+      'Approved 2026-07-15 for repository/source work only; G4 clean execution and live WP-7 remain pending',
     )
     expect(decisions).toContain('DB-read version in the Server Action before the publish RPC')
 
     const tracker = read(
       'docs/plans/master-catalog/25-phase4-execution-progress-tracker.md',
     )
-    expect(tracker).toMatch(/\| WP-6\.5 \|[^\n]+\| Ready for owner review \|/)
+    expect(tracker).toMatch(/\| WP-5 \|[^\n]+\| Complete \|/)
+    expect(tracker).toMatch(/\| WP-6\.5 \|[^\n]+\| Complete \|/)
     expect(tracker).toMatch(/\| WP-6\.6 \|[^\n]+\| Complete \|/)
-    expect(tracker).toMatch(/\| WP-7 \|[^\n]+\| Not started \|/)
+    expect(tracker).toMatch(/\| WP-7 \|[^\n]+\| In progress \|/)
     expect(tracker).toMatch(/\| WP-7\.5 \|[^\n]+\| Not started \|/)
     expect(tracker).toMatch(/\| WP-8 \|[^\n]+\| Not started \|/)
     expect(tracker).toContain('independent intended-admin UAT remains WP-8')
     expect(tracker).toContain('| Production write allowed | No |')
     expect(tracker).toContain(
-      'P-27 accepted G3/WP-6.6 on exact application checkpoint `78e96ab3ed9993707014c4aba1d285b7592b17a1` at 2026-07-14 23:50 +07',
+      'P-28 approved unchanged `020` bootstrap source inclusion and tracked WP-7 harness source on 2026-07-15',
     )
     expect(tracker).toContain(
-      'G4/bootstrap inclusion approval before WP-7; WP-6.6 is complete',
+      'G4R bootstrap-source integration and WP-7 harness preparation; WP-6.6 is complete',
     )
     expect(tracker).toContain(
       'Migration 020 SHA-256: e07e0c4161077efba7bc4f6ebf95518d0cc1bc7e4628a43a128dd899bd1aef93',
@@ -251,7 +268,7 @@ describe('Master Catalog authority consistency', () => {
       /pre-amendment operator\/browser preflight passed on\s+`c8f6dca`/,
     )
     expect(tracker).toContain(
-      'P-26 guards are committed at owner-accepted exact checkpoint 78e96ab3ed9993707014c4aba1d285b7592b17a1; candidate 020 remains outside bootstrap; G4 remains pending',
+      'P-28 approved repository/source work only; unchanged accepted 020 now follows 019 in bootstrap source; tracked WP-7 harness exists; G4E clean execution/live evidence remains pending',
     )
     expect(existsSync(resolve(
       root,
@@ -285,6 +302,7 @@ describe('Master Catalog authority consistency', () => {
     expect(ownerReview).toContain(
       'The owner **accepted G3** on exact checkpoint',
     )
+    expect(ownerReview).toContain('**Subsequent P-28 decision (2026-07-15):**')
     expect(existsSync(resolve(
       root,
       'docs/plans/master-catalog/31-phase4-wp66-operator-workflow-correction-plan.md',
@@ -312,6 +330,9 @@ describe('Master Catalog authority consistency', () => {
     expect(correctionPlan).toContain(
       '**Subsequent owner decision:** at 2026-07-14 23:50 +07',
     )
+    expect(correctionPlan).toContain('| G4R | Passed by P-28 on 2026-07-15')
+    expect(correctionPlan).toContain('| G4E | Pending:')
+    expect(correctionPlan).toContain('## 21. P-28 G4 repository integration')
   })
 
   it('keeps reliability commands and route recovery files tracked by contract', () => {

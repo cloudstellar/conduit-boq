@@ -119,6 +119,14 @@ target version typed by the admin. The Server Action reads the target
 RPC; the RPC still owns role, lock, readiness, idempotency, hash, immutability,
 and pointer invariants. This changes no migration and adds no approval role.
 
+**P-28/G4 repository integration:** 2026-07-15 — accepted migration `020` is
+now the last migration in the canonical Local bootstrap source, after hotfix
+`016` and Phase 4 `017`-`019`. WP-7 gains a tracked Local-only regression
+harness over the existing BOQ/Factor F boundaries. This changes no domain
+architecture: source integration is complete, while destructive clean
+execution and live evidence remain a separate gate. Production and the
+P-18/P-19 decisions remain untouched.
+
 **Owner decision recorded:** 2026-07-04 — approved according to the
 recommendation for Phase 4 Core/local implementation. This approval does not
 authorize Production migration, deploy, feature enablement, candidate data

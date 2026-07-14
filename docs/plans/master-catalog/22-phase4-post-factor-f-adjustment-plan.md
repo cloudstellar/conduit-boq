@@ -21,8 +21,10 @@ reserved for that hardening, and proposed placement uses WP-7.5/`021`. P-21
 later authorized WP-6.6 Local-only implementation and separate destructive
 Local evidence runs. Migration `020` passed repository, Local DB/RLS/
 concurrency, P-20 rerun, and browser technical QA on `3bfc74e`; owner closeout
-is pending and `020` remains outside bootstrap. No Production action, P-18/
-`021`, new Factor F workflow, or hotfix expansion is authorized.
+was later accepted through P-27 after final G1R/G2/G3/P-26 evidence. P-28 then
+approved `020` bootstrap source integration and the regression-only WP-7
+harness without authorizing a Local reset or live execution. No Production
+action, P-18/`021`, new Factor F workflow, or hotfix expansion is authorized.
 
 ## 1. Difficulty assessment
 
@@ -235,8 +237,8 @@ Rehearsal path:
 1. Restore refreshed Production data locally.
 2. Use the canonical bootstrap order `009`-`015`, production hotfix `016`, then
    Phase 4 `017`-`020`; include `021` only after P-18/WP-7.5 is accepted and
-   implemented. Until new files are reviewed, the current authority path remains
-   `017`-`019`.
+   implemented. The current reviewed source authority ends at `020`; its first
+   combined clean execution remains the separate G4E gate.
 3. Record before/after catalog counts.
 4. Record before/after Factor F pointer, active versions, row counts, and
    hashes.

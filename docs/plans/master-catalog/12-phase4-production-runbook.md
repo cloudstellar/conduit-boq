@@ -131,7 +131,10 @@ Stop immediately when any of these occurs:
 13. Complete the Phase 4 verification template baseline section.
 14. Verify P-27 owner acceptance of Audit #29 C-01 through C-17 on exact
     application checkpoint `78e96ab3ed9993707014c4aba1d285b7592b17a1`;
-    this does not itself authorize G4, migration/bootstrap, or reset.
+    this did not itself authorize G4, migration/bootstrap, or reset. Then verify
+    P-28/G4 repository integration separately: bootstrap source includes exact
+    accepted `020`, while the destructive clean execution is still a distinct
+    owner gate.
 
 **Exit gate:** All documents have owner/reviewer decisions; no unresolved row
 or taxonomy blocker.
@@ -155,12 +158,13 @@ major image at an incompatible existing data directory.
 
 ### 6.2 Rehearse additive migration
 
-1. Start from a clean Local reset/bootstrap that applies the root chain
-   `009`-`015`, production hotfix `016`, and the current Phase 4 scripts
-   `017`-`019`.
-   Add owner-accepted WP-6.6 `020` only after separate G4 approval; add
-   P-18/WP-7.5 `021` only after its separate acceptance. Never assume a planned
-   file is already in the authority path.
+1. After explicit warning and owner approval for the destructive Local reset,
+   start from the canonical bootstrap source that applies root `009`-`015`,
+   production hotfix `016`, and Phase 4 `017`-`020` in that order. G4 repository
+   integration placed accepted `020` in source on 2026-07-15; that source edit
+   is not proof that the new chain has been executed. Add P-18/WP-7.5 `021`
+   only after its separate acceptance. Never assume a planned file is already
+   in the authority path.
 2. If applying SQL manually for a focused rehearsal, apply hotfix `016` before
    any reviewed Phase 4A migration(s).
 3. Verify all new tables, constraints, indexes, grants, RLS policies, functions,
@@ -220,6 +224,12 @@ With feature flag disabled by default:
 16. Test audited pointer restore and verify historical BOQs are unchanged.
 17. Rebuild from a clean Local reset and repeat the critical path only after
     the owner approves the Local Supabase reset.
+18. Run
+    `npm run db:local:smoke-master-catalog-wp7 -- --output tmp/master-catalog/wp7-evidence/<run>.json`
+    and the focused WP-7 print/export contracts. Require all four approved
+    suffixes, invalid/cross-version atomic rollback, anonymous/non-authorized
+    denial, duplicate and selected-Factor-F copy behavior, publish/restore BOQ
+    invariants, and exact Factor F/grant/RLS before/after evidence.
 
 ### 6.4 Repository gates
 

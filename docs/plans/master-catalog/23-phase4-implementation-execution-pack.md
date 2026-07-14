@@ -50,6 +50,13 @@ This is application/test/documentation hardening only: migration `020`, Local
 bootstrap, WP-7, Factor F, hotfix `016`, and Production remain unchanged and
 separately gated.
 
+**P-28/G4 repository integration recorded:** 2026-07-15 — after accepting
+G3/WP-6.6, the owner approved adding exact accepted migration `020` to the
+Local bootstrap source and implementing the tracked WP-7 regression harness.
+This is repository/source authorization only. It does not authorize or imply a
+Local reset, live WP-7 execution, P-18/`021`, P-19, WP-8, Factor F or hotfix
+scope expansion, feature enablement, publication, or Production access/write.
+
 **P-22 operator-workflow correction authorized:** 2026-07-12 — intended-admin
 review placed WP-6.6 closeout on Hold and accepted
 [Correction Plan #31](./31-phase4-wp66-operator-workflow-correction-plan.md).
@@ -636,7 +643,10 @@ Exit gate:
 Exit recorded 2026-07-14 23:50 +07: the owner accepted G3/WP-6.6 on exact
 application checkpoint `78e96ab3ed9993707014c4aba1d285b7592b17a1`.
 This satisfies the WP-6.6 exit gate only; G4 must still be approved before
-adding `020` to bootstrap or starting WP-7.
+adding `020` to bootstrap or starting WP-7. P-28 subsequently approved the G4
+repository/source part: `020` is now in bootstrap source and the WP-7 harness
+is tracked. Destructive clean bootstrap and live WP-7 execution remain a
+separate owner gate.
 
 The G2 advisor baseline is explicit: eight authenticated-callable
 `SECURITY DEFINER` warnings are triaged (seven baseline RPCs and one guarded
@@ -683,6 +693,16 @@ Exit gate:
 - the suite is tracked and wired into the appropriate PR/rehearsal CI gate, not
   retained as one-time Local evidence.
 
+Tracked source command:
+
+`npm run db:local:smoke-master-catalog-wp7 -- --output tmp/master-catalog/wp7-evidence/<run>.json`
+
+The source harness must reject non-loopback Supabase URLs, require a clean
+tracked tree for evidence, exercise the real Local RPCs, and restore/remove its
+BOQ fixtures. Repository/static readiness does not satisfy this WP: the command
+and focused BOQ print/export contracts must still run after a separately
+approved clean bootstrap of the exact integration commit.
+
 ## 15. WP-7.5 P-18 new-identity placement governance
 
 Goal: complete Add/Supplement publication for new identities without enabling
@@ -714,8 +734,8 @@ Run order:
 
 1. Clean local reset from the canonical bootstrap chain, including `009`-`015`,
    production hotfix `016`, Phase 4 `017`-`020`, and `021` only when P-18/WP-7.5
-   is accepted/implemented. Until those files exist, the authority path remains
-   exactly `017`-`019`.
+   is accepted/implemented. The current G4 source authority ends at `020`; its
+   first clean execution still requires the explicit reset gate.
 2. Load approved baseline fixture/snapshot.
 3. Record catalog count/hash and Factor F baseline.
 4. Confirm Phase 4 `017+` migrations apply only after hotfix `016`.

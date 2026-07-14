@@ -6,7 +6,7 @@ migration approval remain separate gates
 
 **Prepared:** 2026-06-22
 
-**Last updated:** 2026-07-13 to record the WP-6.6 capability/authority hardening
+**Last updated:** 2026-07-15 to record the WP-6.6 capability/authority hardening
 from [Audit #29](./29-phase4-owner-dev-completeness-audit.md), the P-22
 [Operator Workflow Correction](./31-phase4-wp66-operator-workflow-correction-plan.md),
 and the proposed P-18/WP-7.5 placement extension. Existing `017`-`019` remain
@@ -25,7 +25,10 @@ authority foreign-key covering indexes. The separately approved independent G2
 then repeated the clean DB/concurrency/P-20 evidence on the same exact
 candidate and the comparator passed. Current advisor-rule warnings are triaged
 below and require final WP-8 disposition rather than being hidden.
-`020` remains outside bootstrap and has not been applied to Production.
+P-28/G4 repository approval subsequently placed unchanged accepted `020` in
+the canonical Local bootstrap source after `019`. The new `009`-`020` source
+chain has not yet been clean-executed on its integration commit, and `020` has
+not been applied to Production.
 P-18 rules and placement migration `021` remain pending owner/data-custodian
 approval.
 

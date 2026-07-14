@@ -23,7 +23,9 @@ Recode, and Retire on a working-tree candidate based on `2fd438d`, with a
 no-reset Local proof and clean disabled-state readback. P-26 was committed at
 exact `78e96ab3ed9993707014c4aba1d285b7592b17a1`; the owner accepted
 G3/WP-6.6 on that checkpoint at 2026-07-14 23:50 +07. G4 bootstrap/WP-7
-sequencing remains pending and separate.
+sequencing remained pending at that checkpoint. P-28 then approved G4
+repository integration and WP-7 harness source on 2026-07-15; destructive
+clean execution remains pending and separate.
 
 **Production touched:** No
 
@@ -310,8 +312,10 @@ Before P-22/WP-6.6 closeout:
 
 The full Local bootstrap destroys and rebuilds the Local Supabase stack. Do not
 run it until implementation/static checks are ready and the owner separately
-approves each required clean rebuild. Bootstrap remains through `019`; apply
-candidate `020` separately until the new owner closeout accepts it.
+approves each required clean rebuild. During G1R/G2 bootstrap remained through
+`019` and candidate `020` was applied separately. After P-27 closeout, P-28
+approved adding unchanged `020` to bootstrap source only; the first clean
+execution of that integrated source remains separately gated.
 
 ## 9. Review gates
 
@@ -326,7 +330,8 @@ candidate `020` separately until the new owner closeout accepts it.
 | G1R | Explicitly owner-approved and passed 2026-07-13 on exact clean execution checkout `721c2c2c4a234a4fd00e5686383be9af87ee15dd`; migration `020` SHA-256 `e07e0c4161077efba7bc4f6ebf95518d0cc1bc7e4628a43a128dd899bd1aef93`; final Local cleanup passed. |
 | G2 | Explicitly owner-approved and passed 2026-07-13 on the same exact checkout `721c2c2c4a234a4fd00e5686383be9af87ee15dd`; second clean rebuild, separate unchanged `020`, WP-6.6/WP-6.5 evidence, P-20 comparator, current advisors, repository gates, and cleanup passed. |
 | G3 | Accepted 2026-07-14 23:50 +07 on exact application checkpoint `78e96ab3ed9993707014c4aba1d285b7592b17a1` after P-25 compound/high-volume presentation, real-route stale-after-review, and P-26 high-impact confirmation evidence passed |
-| G4 | Only after G3, add accepted `020` to bootstrap and separately authorize any WP-7 execution |
+| G4R | Passed by P-28 on 2026-07-15: after G3, add accepted unchanged `020` to bootstrap source and implement the tracked WP-7 harness without a reset |
+| G4E | Pending: separately warn/authorize one destructive clean bootstrap of the exact G4R commit, then run live WP-6.6/P-20/WP-7 evidence and final invariants |
 
 Production P-12 through P-15 remain separate and unrequested.
 
@@ -788,3 +793,22 @@ G3/WP-6.6 on exact application checkpoint
 the point-in-time technical boundary of the P-26 proof; the later decision
 closes WP-6.6 but does not authorize G4, Local reset, bootstrap inclusion,
 WP-7, WP-8, or Production.
+
+## 21. P-28 G4 repository integration
+
+On 2026-07-15 the owner approved the recommended source-first sequence after
+P-27 closeout:
+
+- add unchanged accepted migration `020` after `019` in the canonical Local
+  bootstrap source;
+- align migration/provenance/authority contracts to `009`-`020`;
+- implement a tracked, fail-closed WP-7 Local harness covering hotfix `016`,
+  BOQ catalog/Factor F bindings, rollback/authorization/version boundaries,
+  duplicate and selected-Factor-F copy, print/export data modes, pointer
+  publish/restore, and before/after invariants; and
+- stop before running the destructive bootstrap or live harness.
+
+This is G4R repository integration, not G4E execution evidence. The exact
+integration commit and static checks must be recorded before requesting one
+warned Local reset. P-18/`021`, P-19, WP-8, feature enablement, publication,
+Factor F/hotfix expansion, and Production remain outside this approval.

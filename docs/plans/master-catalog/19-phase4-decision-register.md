@@ -52,6 +52,15 @@ was committed at `78e96ab`. The owner accepted G3/WP-6.6 on that exact
 application checkpoint at 2026-07-14 23:50 +07. G4, bootstrap inclusion,
 WP-7, and Production are not inferred.
 
+**P-28/G4 repository integration recorded:** 2026-07-15 — the owner approved
+the recommended repository-only sequence: add exact accepted migration `020`
+to the canonical Local bootstrap source and implement the tracked WP-7
+regression harness before requesting one warned destructive Local reset. This
+authorizes source/tests/docs only. It does not authorize executing
+`npm run db:local:bootstrap`, live WP-7 DB mutation/evidence, P-18/`021`, P-19,
+WP-8, Factor F or hotfix expansion, feature enablement, publication, or any
+Production access/write.
+
 **G2 advisor disposition recorded:** 2026-07-13 — the current Local Studio
 rules report eight authenticated-callable `SECURITY DEFINER` warnings. Seven
 belong to baseline application RPCs; one is the active-admin/feature-flag-
@@ -249,6 +258,7 @@ this register. In particular:
 | P-25 | Approve bounded high-volume final-review scanability before G3 closeout | Keep the existing identity-based complete snapshot diff and exact reviewed-lock publication contract. Make one-field changes compact and immediately visible; summarize compound rows with explicit expand/collapse and expand-all-on-page controls; make overlapping summary counts explicit and directly filterable; preserve search/filter/page-size/page context through exact-item edit; support 50/100 rows and direct page selection; render a stacked mobile list instead of requiring horizontal table scrolling. Require Local visual/interaction evidence for an eight-field compound row and the expected 709-change rollout scale before G3 acceptance. Do not add a data-grid dependency, DB migration, approval role, new export contract, Local reset, Production action, P-18/P-19/WP-7/Factor F, or hotfix scope. | Owner + developer | Before G3 intended-admin acceptance | Approved 2026-07-14; bounded visual and real-route evidence accepted through P-27 |
 | P-26 | Approve bounded high-impact human-intent guards before G3/WP-6.6 closeout | Preserve database-owned locks, readiness, idempotency, audit, and publish invariants. Add exact summary-and-confirm dialogs for Recode and Retire. Publish requires the admin to type the target version; the Server Action reads the authoritative version string from `price_list_versions`, compares it using the shared stable error contract, and does not call the publish RPC on mismatch. Include responsive/cancel/no-write Local proof. Do not change migration `020`, reset Local, publish a version, add approval roles, or cross P-18/P-19/WP-7/Factor F/hotfix/Production boundaries. | Owner + developer | Before explicit G3/WP-6.6 accept/hold | Approved and committed at exact `78e96ab3ed9993707014c4aba1d285b7592b17a1`; no-reset Local proof passed and P-27 accepted G3/WP-6.6 |
 | P-27 | Accept the exact G3/WP-6.6 operator closeout checkpoint | Accept C-01 through C-17 based on final G1R/G2 DB evidence, P-25/G3 stale-review evidence, P-26 confirmation/cancel/cleanup evidence, and exact application checkpoint `78e96ab3ed9993707014c4aba1d285b7592b17a1`. Preserve WP-8 independent UAT/accessibility/performance and advisor disposition. This decision does not authorize G4, a Local reset, adding `020` to bootstrap, WP-7, P-18/`021`, P-19, WP-8 execution, feature enablement, publication, Factor F/hotfix expansion, or Production. | Owner | WP-6.6 closeout before G4/WP-7 | Accepted 2026-07-14 23:50 +07; WP-6.6 complete; G4 and all later gates remain separate |
+| P-28 | Approve G4 repository integration and WP-7 harness source without destructive execution | Add unchanged owner-accepted `020` after `019` in `scripts/bootstrap-local-db.sh`; align migration/provenance/authority contracts; add a fail-closed Local-only WP-7 harness for hotfix suffixes, catalog authority, rollback/role/version boundaries, BOQ duplicate/selected-Factor-F copy, print/export data modes, publish/restore, and BOQ/Factor F/security before-after invariants. Do not run bootstrap or the live harness until the exact source checkpoint and separate reset approval are recorded. | Owner + developer | Before the first clean `009`-`020` bootstrap and live WP-7 evidence | Approved 2026-07-15 for repository/source work only; G4 clean execution and live WP-7 remain pending |
 
 ### P-11 cover-layout refinement (2026-07-10, revised 2026-07-11)
 
@@ -310,7 +320,7 @@ For P-02 through P-07, record the final answer in:
 4. parser/golden fixtures and database seed/backfill generated from the frozen
    approved data.
 
-For P-08 through P-26, record the evidence in the Change Request, Runbook,
+For P-08 through P-28, record the evidence in the Change Request, Runbook,
 Verification Report, and per-version Release Note as applicable. P-18 through
 P-20 also require the affected architecture/spec/test contract to be updated in
 the same reviewed change.
@@ -371,6 +381,7 @@ Production migration, deploy, feature enablement, or publication.
 | WP-6.6 P-25 final-review presentation | Bounded repository/static and approved standalone Local visual/interaction evidence passed; G3 not inferred | Owner + developer | 2026-07-14 | Real component/design-system bundle passed 27/27 checks at 710 total/709 affected rows on 1440x1000 and 390x844; no DB reset/mutation, migration, bootstrap, Production, P-18/P-19, WP-7, Factor F, or hotfix scope |
 | WP-6.6 G3 technical walkthrough | Real-route stale-after-review, fresh-review recovery, audited abandon, and final Local invariants passed; owner accept/hold not inferred | Owner-authorized execution + developer evidence | 2026-07-14 | Source `6599c30`; review lock 1, mutation lock 2, stale publish denied with retained fields and no publish effect, abandon lock 3, pointer `2568.0.0`/710, zero drafts, all flags false, BOQ and Factor F unchanged; no reset or Production action |
 | WP-6.6 P-26/P-27 G3 closeout | Exact application checkpoint accepted; WP-6.6 complete | Owner | 2026-07-14 23:50 +07 | Exact `78e96ab3ed9993707014c4aba1d285b7592b17a1`; P-26 confirmation/cancel/cleanup evidence accepted. G4, reset/bootstrap/WP-7, WP-8, and Production remain separate. |
+| P-28/G4 repository integration | `020` bootstrap source inclusion and WP-7 harness source authorized; destructive execution held | Owner | 2026-07-15 | Repository/tests/docs only. Exact integration commit and static gates precede a separate warned Local reset approval; no Production, P-18/P-19, Factor F, or hotfix expansion. |
 | Production migration | Not requested |  |  | P-12; request after WP-8 evidence review |
 | Deploy / feature enable | Not requested |  |  | P-13–P-14; request only after preceding Production gate passes |
 | Publish named version | Not requested |  |  | P-15 |

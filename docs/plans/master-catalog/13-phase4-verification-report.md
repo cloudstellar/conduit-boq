@@ -27,7 +27,9 @@ candidate based on `2fd438d`; no publication occurred and Local returned to its
 disabled baseline. P-26 was committed at exact
 `78e96ab3ed9993707014c4aba1d285b7592b17a1`, and the owner accepted
 G3/WP-6.6 on that checkpoint at 2026-07-14 23:50 +07. G4/bootstrap inclusion,
-WP-7, proposed WP-7.5, WP-8, and Production gates remain separate.
+WP-7, proposed WP-7.5, WP-8, and Production gates remained separate at that
+checkpoint. P-28 then approved G4 repository integration and WP-7 harness
+source on 2026-07-15 without authorizing a Local reset or live DB execution.
 **Prepared:** 2026-06-22
 **Production project:** `otlssvssvgkohqwuuiir`
 **Candidate version:** System-planned ADR-003 number; `2568.1.0` only when still
@@ -50,10 +52,10 @@ should link here rather than copy volatile evidence.
 | Phase | Environment | Executor | Started | Completed | Result | Evidence |
 |---|---|---|---|---|---|---|
 | 4-0 documents/data decisions | Repository | Owner + developer | 2026-07-04 |  | In progress | P-01 through P-11/P-17/P-20 approved as recorded; P-09 publication metadata, P-18/P-19, and Production gates remain separate |
-| 4A additive schema | Local | Codex + owner/developer | 2026-07-05 | 2026-07-13 | G1R/G2 passed | `017`-`019` canonical bootstrap remains reviewed. Final `020` passed separate Local apply twice on exact candidate `721c2c2` and remains outside bootstrap/Production. |
+| 4A additive schema | Local | Codex + owner/developer | 2026-07-05 |  | G4R source integrated; G4E pending | Final `020` passed separate Local apply twice on exact candidate `721c2c2`; P-28 now places unchanged `020` after `019` in bootstrap source. Clean integrated execution and Production remain unapproved. |
 | 4B application/workflows | Local | Codex + owner/developer | 2026-07-05 | 2026-07-14 | G3/WP-6.6 accepted | Version planning, item-first edit, final review, import, abandon, restore-confirmation, real-route stale-after-review recovery, and high-impact confirmation/cancel behavior passed; broader independent UAT remains WP-8. |
-| WP-6.6 admin workflow/authority hardening | Local | Codex + owner/developer | 2026-07-12 | 2026-07-14 | Accepted/Complete | Exact G1R/G2 evidence passed on `721c2c2`; P-25/G3/P-26 passed; the owner accepted exact application checkpoint `78e96ab3ed9993707014c4aba1d285b7592b17a1`. G4 remains separate. |
-| WP-7 permanent BOQ/hotfix/Factor F regression | Local |  |  |  | Not started | Regression-only |
+| WP-6.6 admin workflow/authority hardening | Local | Codex + owner/developer | 2026-07-12 | 2026-07-14 | Accepted/Complete | Exact G1R/G2 evidence passed on `721c2c2`; P-25/G3/P-26 passed; the owner accepted exact application checkpoint `78e96ab3ed9993707014c4aba1d285b7592b17a1`. |
+| WP-7 permanent BOQ/hotfix/Factor F regression | Local | Codex + owner/developer | 2026-07-15 |  | Source implemented; live pending | P-28 tracked harness/contracts are repository-only until a separately approved clean `009`-`020` bootstrap and live run. |
 | WP-7.5 P-18 placement | Local |  |  |  | Decision pending | P-18 Review Note #28 |
 | 4C clean rehearsal | Local |  |  |  | Pending |  |
 | 4A migration | Production |  |  |  | Not authorized |  |
@@ -96,6 +98,7 @@ should link here rather than copy volatile evidence.
 | P-25/G3 real-route technical walkthrough | Codex + owner/developer | Passed technically; owner accept/hold not inferred | 2026-07-14 | No-reset Local run on source `6599c30`: review lock 1, second edit lock 2, stale publish denied with Thai recovery and retained fields, fresh review lock 2, audited abandon lock 3, zero publish effects, clean final invariants. Production touched: No. |
 | P-26 high-impact human-intent guard | Owner + Codex | Authorized and passed technically; owner G3 accept/hold not inferred | 2026-07-14 | No-reset Local real-route proof on a candidate based on `2fd438d`: Recode/Retire exact summaries inspected and cancelled; Publish mismatch `2568.0.2` disabled, exact DB-owned `2568.0.3` enabled, then cancelled; 390x844 title/action layout passed; proof draft audited-abandoned at lock 2; pointer `2568.0.0`/710, zero drafts, flags false, BOQ 198/1,547, Factor F `2569.0.0`/36; `publish=0`. Migration `020` and Production untouched. |
 | WP-6.6 owner closeout / P-27 G3 | Owner | Accepted exact `78e96ab3ed9993707014c4aba1d285b7592b17a1`; WP-6.6 complete | 2026-07-14 23:50 +07 | [WP-6.6 Owner Review Note](./30-phase4-wp66-owner-review-note.md); G4, WP-7, WP-8, and Production remain separate |
+| P-28/G4 repository integration | Owner | Authorized unchanged `020` bootstrap source inclusion and tracked WP-7 harness source; no reset/live execution inferred | 2026-07-15 | Repository/tests/docs only. Exact G4R commit and full static gates precede a separate G4E reset decision; Production touched: No. |
 | P-11 exact artifact acceptance | Owner | Accepted exact TH Sarabun New 16 pt replacement PDF/Excel pair; WP-6 complete | 2026-07-11 22:20 +07 | Owner confirmed `รูปแบบ pdf excel ok เลยครับ` for the `777df75` pair after semantic and visual file QA; Production filing and P-12-P-15 remain separate |
 | P-20 identity/hash portability | Owner | Approved deterministic baseline identity from immutable Production-derived `price_list.id`; retain `identity_id` in lineage hash | 2026-07-11 12:11 +07 | WP-6.5C passed on `1ad01b9`; final candidate G1R/G2 inputs on `721c2c2` matched exactly and the comparator passed. WP-8/P-15 reruns remain. |
 | WP-6.5 Local-only start | Owner | Authorized | 2026-07-11 12:11 +07 | No unannounced Local reset, Production access/write, Factor F workflow change, hotfix scope expansion, placement UI, deploy, enablement, or publication |
@@ -406,8 +409,10 @@ authorization, the canonical bootstrap through `019` was
 run on two independent clean Local rebuilds at exact commit
 `3bfc74ea00843033ad3cfd2afac43820b18c0124`; `020` was then applied separately
 for evidence. P-22 now amends candidate `020`, so these results are superseded
-for revised closeout. Migration `020` remains outside bootstrap and has not been
-applied to Production.
+for revised closeout. At that historical checkpoint migration `020` remained
+outside bootstrap. P-28 later integrated the final unchanged accepted file into
+bootstrap source; it has not been applied to Production, and the integrated
+clean execution remains pending.
 
 Retained Local evidence outputs (untracked by policy):
 
@@ -516,7 +521,7 @@ fixed and reviewed.
 | Repository/deployment fingerprint | Exact branch, commit, CI, and deploy artifact recorded |  | Pending |
 | Fresh Production preflight | Live counts, pointer, Factor F, BOQ split, and drift recorded |  | Pending |
 | Backup/restore gate | Fresh backup manifest and clean Local restore test pass |  | Pending |
-| Hotfix `016` / migration order | Remote ledger includes `016`; clean Local bootstrap applies `009`-`015`, hotfix `016`, then reviewed Phase 4 migrations before WP-8 evidence is accepted | G1R/G2 bootstraps applied canonical `009`-`015`, `016`, and `017`-`019`; final candidate `020` was applied separately. It enters bootstrap only after G3/G4. The fresh Production ledger check remains. | G1R/G2 passed; later Production check pending |
+| Hotfix `016` / migration order | Remote ledger includes `016`; clean Local bootstrap applies `009`-`015`, hotfix `016`, then reviewed Phase 4 migrations before WP-8 evidence is accepted | G1R/G2 bootstraps applied canonical `009`-`015`, `016`, and `017`-`019`, then final `020` separately. P-28 now integrates unchanged `020` into bootstrap source; clean G4E execution and the fresh Production ledger check remain pending. | G4R source integrated; G4E/Production checks pending |
 | End-to-end request idempotency | UI/action/DB reuse one operation ID after timeout; changed payload with same ID rejects | DB replay/mismatch and tracked transport proof passed. Browser proof on `9becdf6` retained the original Reason/target through the uncertain state, retried without refilling, matched the full request ID in both responses, returned `duplicateRequest=true`, and created one change set. | Passed WP-6.5; rerun WP-8 |
 | Live DB integration/concurrency | Migrations, RPC/RLS/roles, rollback, two-session publish/restore, and lock timeout pass | WP-6.5 harness passed previously; post-`020` WP-6.6 evidence added constraints/grants/role denial, server-allocation concurrency/never-reuse/900 boundary, correction and publication negatives, exact registers, and pointer/BOQ/Factor F cleanup | Passed WP-6.6 technical gate; rerun WP-8 |
 | P-20 hash portability | Approved clean-reset/cross-environment identity/hash model passes | Final G1R/G2 inputs on `721c2c2` reproduced 710 rows, dataset hash `sha256:2e3571ea7135fbc0bbb84c8cc330af1173e4c1d2345e5eb59958dc76e45558b8`, and identity mapping SHA-256 `5f68993ce5aa5c7735b0d9e6de6d27946b4846fb8a6eb77d1b6b3bd6c4a73de7`; the comparator passed with no failures. | G1R/G2 passed; WP-8/P-15 pending |
@@ -560,7 +565,7 @@ Approved dictionary fingerprint: `_______________________________`
 
 | Check | Expected | Actual/evidence | Result |
 |---|---|---|---|
-| Clean reset + migrations | Success, including `009`-`015`, hotfix `016`, and Phase 4 `017+` in order | G1R and independent G2 clean bootstraps through `019` plus separate final `020` apply passed on `721c2c2`; migration SHA-256 `e07e0c4161077efba7bc4f6ebf95518d0cc1bc7e4628a43a128dd899bd1aef93`. | G1R/G2 passed; add `020` to bootstrap only after G3/G4 |
+| Clean reset + migrations | Success, including `009`-`015`, hotfix `016`, and Phase 4 `017+` in order | G1R and independent G2 clean bootstraps through `019` plus separate final `020` apply passed on `721c2c2`; migration SHA-256 `e07e0c4161077efba7bc4f6ebf95518d0cc1bc7e4628a43a128dd899bd1aef93`. P-28 subsequently integrated unchanged `020` into bootstrap source. | G1R/G2 separate-apply evidence passed; G4R source integrated; first combined G4E execution pending |
 | 710 identities/legacy code registrations | Exact | Both retained runs read 710 baseline rows and proved every baseline `identity_id` equals its immutable Production-derived `price_list.id`; mapping SHA-256 `5f68993ce5aa5c7735b0d9e6de6d27946b4846fb8a6eb77d1b6b3bd6c4a73de7` | Passed P-20 identity scope |
 | Published baseline identity merges | 0 | Deterministic one-row-to-one-identity mapping covered all 710 baseline rows in both clean rebuilds; no identity merge step exists in the P-20 mapping | Passed WP-6.5 |
 | Category backfill | Approved count |  | Pending |
@@ -790,10 +795,10 @@ request approves them.
 | P-26 in-app browser proof | Real Recode/Retire/Publish confirmation and cancellation, mismatched/exact target typing, desktop/390x844 layout, audited cleanup, and final disabled page | Passed on real Local routes; no Recode/Retire/Publish effect, proof draft abandoned, zero drafts/all flags false, pointer/BOQ/Factor F unchanged | Passed and owner-accepted via P-27 |
 | `npm run audit:prod` | No unaccepted Production vulnerability | P-26 candidate equivalent command `npm audit --omit=dev --audit-level=moderate` passed with 0 vulnerabilities | Passed |
 | Live Local DB integration/concurrency | Migration/RPC/RLS/role/rollback/race/timeout gates pass | Final amended `020` passed WP-66 and WP-65/P-20 twice on exact `721c2c2`; G1R-versus-G2 comparator passed. | G1R/G2 passed |
-| Permanent hotfix `016`/BOQ/Factor F suite | Real RPC behavior and pre/post invariants pass |  | Pending WP-7 |
+| Permanent hotfix `016`/BOQ/Factor F suite | Real RPC behavior and pre/post invariants pass | Tracked WP-7 Local harness/source contracts implemented under P-28; live command deliberately not run before G4E approval | Source ready; live WP-7 pending |
 | WP-6.6 capability suite | Audit #29 C-01 through C-17 DB/UI/browser evidence pass | Final G1R/G2 passed on `721c2c2`; P-25 presentation and G3 real-route stale recovery/cleanup passed on `6599c30`; P-26 confirmation/cancel/cleanup proof is committed at exact `78e96ab3ed9993707014c4aba1d285b7592b17a1`. | Accepted/Complete via P-27 |
 | Tracked export artifact verification | Semantic verifier passes from clean checkout | Exact `777df75` replacement pair passed embedded and independent semantic verification; five verifier fixtures also pass; owner accepted the exact pair | Passed/accepted P-11; WP-8 rerun pending |
-| Documentation consistency | Authority links/table shapes, migration order, WP order, decisions, and execution provenance agree | P-27 owner acceptance, exact `78e96ab` checkpoint, C-17/Slice L/P-26, G1R/G2, P-25/G3 source, evidence paths, P-20, and bootstrap/G4 boundaries are recorded separately. Focused authority consistency passed 1 file/7 tests; full suite passed 30 files/165 tests; TypeScript, lint with 0 errors/10 existing warnings, authority 710/65/17, and `git diff --check` passed. | Passed closeout; rerun at WP-8 |
+| Documentation consistency | Authority links/table shapes, migration order, WP order, decisions, and execution provenance agree | P-27 closeout remains historical authority; P-28/G4R now distinguishes source inclusion from destructive G4E execution and live WP-7 evidence. Current G4R checks are recorded in the Tracker after completion. | G4R verification in progress; rerun at WP-8 |
 | Security advisor | No new or untriaged blocker | Current G2 Studio rules reported eight triaged `WARN` findings: seven baseline RPCs and one guarded Master Catalog readiness facade; anon execution is denied for all. | Passed G2 scope; least-privilege/minimization disposition WP-8 |
 | Performance advisor | No rollout blocker | G2 retained 24 pre-existing baseline policy warnings and seven baseline unindexed-FK information findings; both new authority FKs have covering indexes. | Passed G2 scope; disposition WP-8 |
 | CI exact commit | Passed |  | Pending |

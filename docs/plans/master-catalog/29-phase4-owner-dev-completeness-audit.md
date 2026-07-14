@@ -18,7 +18,8 @@ Publish, Recode, and Retire on a working-tree candidate based on `2fd438d`;
 the no-reset Local proof passed and returned Local to its disabled baseline.
 P-26 was committed at exact `78e96ab3ed9993707014c4aba1d285b7592b17a1`,
 and the owner accepted G3/WP-6.6 on that checkpoint at
-2026-07-14 23:50 +07. G4 and later gates remain separate.
+2026-07-14 23:50 +07. P-28 approved G4 repository integration and WP-7 harness
+source on 2026-07-15 without authorizing the destructive clean execution.
 
 **Environment:** Source/document audit only. No Local database reset, Production
 access/write, feature enablement, publication, new Factor F workflow, or hotfix
@@ -152,7 +153,9 @@ Do not edit evidence-backed Local migrations `017`-`019`.
   P-18/WP-7.5 extension.
 - Keep `scripts/bootstrap-local-db.sh` at `009`-`015`, hotfix `016`, then
   `017`-`019` until each new migration exists, is reviewed, and its bootstrap
-  inclusion is deliberately approved.
+  inclusion is deliberately approved. P-28 satisfied that source-inclusion
+  gate for unchanged accepted `020`; the script now ends at `020`, while its
+  first clean execution remains separately gated.
 - P-22 amends the still-unaccepted Local-only `020` before fingerprint freeze.
   This supersedes the `3bfc74e` migration fingerprint/evidence for closeout and
   requires new P-20/WP-7/WP-8 reruns. It does not erase the historical evidence
@@ -164,7 +167,8 @@ Do not edit evidence-backed Local migrations `017`-`019`.
   `e07e0c4161077efba7bc4f6ebf95518d0cc1bc7e4628a43a128dd899bd1aef93`.
   Independent G2 then reproduced the final candidate and P-20 hashes. G3
   technical stale-review recovery and cleanup also passed on `6599c30`; the
-  owner closeout decision remains separate.
+  owner closeout was accepted through P-27. P-28 later authorized repository
+  inclusion without authorizing a Local reset.
 
 ## 7. Deliberate deferrals and control visibility
 
@@ -205,7 +209,7 @@ authorized the first Local-only implementation; P-22/P-23/P-23.1 authorize the
 bounded operator corrections described in
 [Doc #31](./31-phase4-wp66-operator-workflow-correction-plan.md). P-26
 authorizes the bounded application/test/documentation correction for C-17.
-These decisions
-do not authorize a Local database reset, Production access/write, feature
+These decisions, including P-28 source integration, do not authorize a Local
+database reset, Production access/write, feature
 enablement, publication, new Factor F work, P-18/`021`, or expansion of hotfix
 `016`.

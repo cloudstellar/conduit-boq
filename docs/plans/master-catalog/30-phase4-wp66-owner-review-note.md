@@ -10,7 +10,9 @@ source/G1/browser/P-23 checkpoints remain historical. P-24 base and closure
 lineage are preserved at `88d0711`/`050c998`; the separately owner-approved
 G1R and independent G2 clean DB/concurrency/P-20/advisor gates passed on exact
 execution checkout `721c2c2`; bounded browser QA passed at G1R. Migration `020`
-remains outside bootstrap and Production.
+remained outside bootstrap through this P-27 closeout. P-28 later approved its
+unchanged bootstrap source inclusion; clean integrated execution is pending,
+and Production remains unauthorized.
 **Review environment:** Local only
 **Historical P-22 G1 evidence commit:**
 `e463270dfb9f23332559f31591cf338b8eeada3c`
@@ -310,3 +312,10 @@ Broader binary import, accessibility, and measured performance remain WP-8.
 Even after G3 acceptance, G4/bootstrap inclusion is a separate gate. Do not run
 another reset, add migration `020` to bootstrap, begin WP-7, or infer
 Production acceptance until the applicable later owner decisions are recorded.
+
+**Subsequent P-28 decision (2026-07-15):** the owner later approved adding
+unchanged accepted `020` to bootstrap source and implementing the WP-7 harness
+without running either destructive Local bootstrap or live WP-7 evidence. This
+follow-up does not rewrite the P-27 point-in-time scope above. G4 repository
+integration is authorized; clean execution, WP-7 pass/fail, WP-8, and every
+Production gate remain separate.

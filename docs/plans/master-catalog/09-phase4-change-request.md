@@ -117,6 +117,13 @@ for the bounded WP-6.6 operator gate. G4/bootstrap inclusion, WP-7,
 P-18/`021`, P-19, WP-8, feature enablement, publication, Factor F/hotfix
 expansion, and Production remain separately gated.
 
+**P-28/G4 repository integration recorded:** 2026-07-15 — the owner approved
+the recommended source-first sequence. Exact accepted migration `020` now
+follows `019` in the canonical Local bootstrap source, and a tracked WP-7
+regression harness is implemented for later live execution. This approval does
+not authorize the destructive Local reset, live WP-7 evidence, P-18/`021`,
+P-19, WP-8, Factor F/hotfix expansion, or Production.
+
 ## 1. Decision requested
 
 Approve detailed implementation and local rehearsal of Master Catalog Phase 4.
@@ -181,8 +188,10 @@ Production migration ledger includes:
 Supabase MCP verified after the Factor F rollout that root migrations `012`
 through `015` are applied, current Factor F default is `2569.0.0`, and legacy
 BOQs were not backfilled with a guessed Factor F version. Master Catalog Phase
-4 database migrations start at `017+`; current Phase 4 drafts `017`-`019`
-remain Local only.
+4 database migrations start at `017+`; the reviewed Local-only source chain is
+now `017`-`020` under P-28. The first clean bootstrap execution of that combined
+chain remains the separate G4E gate, and none of these migrations is
+Production-approved.
 
 The detailed post-Factor-F difficulty assessment and adjusted implementation
 sequence are recorded in the
