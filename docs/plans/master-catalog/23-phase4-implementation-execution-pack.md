@@ -745,8 +745,10 @@ implements the revision/review schema, exact bounded idempotent RPC, readiness
 and publish invariants, Thai all-pending-items placement workspace, release
 gating, and unit/static contracts. Migration `021` SHA-256 is
 `78359215f7d859d9c167db608e1e96d66712b6b06a9d103fd7b26ce781835a83`.
-This does not satisfy the live DB/concurrency/hash/export/browser exit evidence;
-accept/commit the exact source checkpoint before a separate warned Local gate.
+P-31 accepted exact Source/Static checkpoint
+`4e3574a31a2697f4d727acabc8f55f34a4233bff` for commit/push. This does not
+satisfy the live DB/concurrency/hash/export/browser exit evidence; the warned
+Local gate still requires separate owner approval.
 
 Exit gate:
 

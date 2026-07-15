@@ -2,8 +2,9 @@
 
 **Status:** Owner-accepted P-18 V1 contract; P-30 authorized bounded WP-7.5
 Local-only source implementation on 2026-07-15 01:37 +07; repository/static
-candidate passed on 2026-07-15; Local DB/browser evidence and owner closeout
-remain pending
+candidate passed and P-31 accepted exact Source/Static checkpoint
+`4e3574a31a2697f4d727acabc8f55f34a4233bff` on 2026-07-15 10:24 +07;
+Local DB/browser evidence and owner closeout remain pending
 
 **Environment:** Repository/source implementation only. Exact migration SHA-256:
 `78359215f7d859d9c167db608e1e96d66712b6b06a9d103fd7b26ce781835a83`. No
@@ -220,7 +221,7 @@ to skip gates:
 
 | Remaining band | Expected focused engineering effort |
 |---|---:|
-| WP-7.5 exact commit plus approved Local DB/concurrency/hash/export/browser evidence | 1-2 focused days plus owner/reviewer availability |
+| WP-7.5 approved Local DB/concurrency/hash/export/browser evidence after accepted source checkpoint | 1-2 focused days plus owner/reviewer availability |
 | WP-8 clean rehearsal, performance, intended-admin UAT, and readiness package | 1-2 focused days plus reviewer availability |
 | Earliest remaining path before any Production request | About 2-4 focused days; approval and independent UAT availability may extend calendar time |
 
@@ -229,7 +230,7 @@ DB guard, and hide/disable Add and Supplement at P-14. This reduces placement
 scope, but admins cannot publish new identities. Exposing the current
 half-complete Add/Supplement workflow is not recommended.
 
-## 8. Owner/data-custodian decision recorded
+## 8. Owner/data-custodian decisions recorded
 
 P-30 accepted these five points on 2026-07-15 01:37 +07:
 
@@ -247,3 +248,11 @@ application, tests, and documentation candidate. It does not authorize adding
 `021` to the canonical bootstrap, applying it to Local, resetting Local
 Supabase, running WP-8, Production migration, deploy, feature enablement, or
 publication; each still requires its existing separate approval.
+
+P-31 subsequently accepted exact Source/Static checkpoint
+`4e3574a31a2697f4d727acabc8f55f34a4233bff` for commit/push on 2026-07-15
+10:24 +07. The accepted migration `021` SHA-256 is
+`78359215f7d859d9c167db608e1e96d66712b6b06a9d103fd7b26ce781835a83`.
+This acceptance closes only the source-review gate. It does not authorize
+bootstrap inclusion, Local reset/apply/live evidence, WP-8, P-19, Factor F or
+hotfix expansion, feature enablement, publication, or Production.

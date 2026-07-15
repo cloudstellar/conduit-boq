@@ -28,6 +28,14 @@ resetting or mutating Local Supabase for evidence, WP-8 execution, P-19,
 Production access/write, feature enablement, publication, new Factor F work,
 or expansion of hotfix `016`; those gates remain separate.
 
+**P-31 WP-7.5 Source/Static acceptance recorded:** 2026-07-15 10:24 +07 —
+after reviewing the owner/developer recommendation, the owner accepted exact
+checkpoint `4e3574a31a2697f4d727acabc8f55f34a4233bff` for commit/push. Migration
+`021` remains outside bootstrap and unapplied. This decision does not authorize
+resetting or mutating Local Supabase, live DB/browser evidence, WP-8, P-19,
+Production access/write, feature enablement, publication, new Factor F work,
+or expansion of hotfix `016`; those gates remain separate.
+
 **Capability-completeness alignment recorded:** 2026-07-12 — owner requested a
 full owner/developer audit and plan correction. Audit #29 adds WP-6.6 before
 WP-7 and reserves migration `020` for fix-forward authority/workflow hardening;
@@ -274,6 +282,7 @@ this register. In particular:
 | P-28 | Approve G4 repository integration and WP-7 harness source without destructive execution | Add unchanged owner-accepted `020` after `019` in `scripts/bootstrap-local-db.sh`; align migration/provenance/authority contracts; add a fail-closed Local-only WP-7 harness for hotfix suffixes, catalog authority, rollback/role/version boundaries, BOQ duplicate/selected-Factor-F copy, print/export data modes, publish/restore, and BOQ/Factor F/security before-after invariants. Do not run bootstrap or the live harness until the exact source checkpoint and separate reset approval are recorded. | Owner + developer | Before the first clean `009`-`020` bootstrap and live WP-7 evidence | Approved 2026-07-15 for repository/source work only; G4 clean execution and live WP-7 remained pending at this point and were later decided under P-29 |
 | P-29 | Authorize the destructive G4E clean Local execution and live WP-7 evidence | Reset only Local Supabase from exact pushed checkout `15b707d443bec701f6b3a86aa7675ca1266604ba`; apply canonical `009`-`015`, hotfix `016`, and Phase 4 `017`-`020`; run WP-6.6, WP-6.5/P-20, WP-7, lint/advisors, repository gates, and final invariant cleanup. Do not touch Production, start P-18/`021` or P-19, run WP-8 UAT, add a Factor F workflow, or expand hotfix `016`. | Owner + developer | After G4R source was committed/pushed and before the first combined clean execution | Approved and executed 2026-07-15; combined bootstrap and all named technical evidence passed; WP-7 owner accept/hold and later gates remain separate |
 | P-30 | Accept WP-7 and authorize the five-rule P-18/WP-7.5 Local-only source implementation | Accept P-29/G4E as WP-7 technical closeout; implement placement only for identities absent from the base, using category plus same-category before/after anchor, one audited batch, the existing one-admin publisher model, and preserved inherited relative order. Keep Add/Supplement disabled until `021` and the supported workflow pass. Do not reorder inherited rows arbitrarily or cross P-19, WP-8 reset/evidence, Factor F, hotfix expansion, feature enablement, publication, or Production boundaries. | Owner + developer | Before creating the reviewed `021` candidate and WP-7.5 application/tests | Approved 2026-07-15 01:37 +07; WP-7 complete and WP-7.5 Local-only source work authorized; no reset or Production action authorized |
+| P-31 | Accept the exact WP-7.5 Source/Static checkpoint for commit/push | Accept checkpoint `4e3574a31a2697f4d727acabc8f55f34a4233bff`, migration `021` SHA-256 `78359215f7d859d9c167db608e1e96d66712b6b06a9d103fd7b26ce781835a83`, and the recorded repository/static checks. Keep `021` outside bootstrap and unapplied until a separate warned Local gate is approved. | Owner + developer | After repository/static review and before Local reset/apply/live evidence | Approved 2026-07-15 10:24 +07 for exact tracked checkpoint commit/push only; Local DB/browser evidence, bootstrap inclusion, WP-8, Production, and adjacent domains remain separate |
 
 ### P-11 cover-layout refinement (2026-07-10, revised 2026-07-11)
 
@@ -335,7 +344,7 @@ For P-02 through P-07, record the final answer in:
 4. parser/golden fixtures and database seed/backfill generated from the frozen
    approved data.
 
-For P-08 through P-29, record the evidence in the Change Request, Runbook,
+For P-08 through P-31, record the evidence in the Change Request, Runbook,
 Verification Report, and per-version Release Note as applicable. P-18 through
 P-20 also require the affected architecture/spec/test contract to be updated in
 the same reviewed change.
@@ -399,6 +408,7 @@ Production migration, deploy, feature enablement, or publication.
 | P-28/G4 repository integration | `020` bootstrap source inclusion and WP-7 harness source authorized; destructive execution held | Owner | 2026-07-15 | Repository/tests/docs only. Exact integration commit and static gates precede a separate warned Local reset approval; no Production, P-18/P-19, Factor F, or hotfix expansion. |
 | P-29/G4E clean Local execution | Combined `009`-`020` bootstrap and live WP-6.6/WP-6.5/P-20/WP-7 evidence passed; WP-7 owner acceptance not inferred | Owner-authorized execution + developer evidence | 2026-07-15 | Exact execution checkout `15b707d443bec701f6b3a86aa7675ca1266604ba`; pointer `2568.0.0`, zero drafts, all flags false, BOQ 198/1,547 and Factor F `2569.0.0`/36 preserved; Production touched: No. |
 | P-30 WP-7 acceptance and P-18/WP-7.5 start | WP-7 accepted; five-rule P-18 V1 contract accepted for bounded Local-only source implementation | Owner | 2026-07-15 01:37 +07 | Migration `021`, exact RPC/read model, Thai-first placement workspace, tests, and docs are authorized. Bootstrap inclusion, Local reset/evidence, WP-8, P-19, Factor F/hotfix expansion, feature enablement, publication, and Production remain separate. |
+| P-31 WP-7.5 Source/Static acceptance | Exact checkpoint accepted for commit/push; WP-7.5 remains incomplete pending live evidence | Owner | 2026-07-15 10:24 +07 | Exact `4e3574a31a2697f4d727acabc8f55f34a4233bff`; migration `021` remains outside bootstrap and unapplied. Local reset/apply/live evidence, WP-8, P-19, Factor F/hotfix expansion, feature enablement, publication, and Production remain separate. |
 | Production migration | Not requested |  |  | P-12; request after WP-8 evidence review |
 | Deploy / feature enable | Not requested |  |  | P-13–P-14; request only after preceding Production gate passes |
 | Publish named version | Not requested |  |  | P-15 |

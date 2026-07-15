@@ -135,7 +135,7 @@ describe('Master Catalog authority consistency', () => {
       '**Owner-accepted Local-only migration in bootstrap source; SHA-256 `e07e0c4161077efba7bc4f6ebf95518d0cc1bc7e4628a43a128dd899bd1aef93`; G1R/G2 separate-apply evidence passed on exact checkout `721c2c2c4a234a4fd00e5686383be9af87ee15dd`; G3/WP-6.6 accepted on `78e96ab3ed9993707014c4aba1d285b7592b17a1`; owner-approved G4E combined clean bootstrap through `020` passed on exact execution checkout `15b707d443bec701f6b3a86aa7675ca1266604ba`; not Production-approved**',
     )
     expect(migrations).toContain(
-      '**Local-only repository/static candidate passed 2026-07-15; SHA-256 `78359215f7d859d9c167db608e1e96d66712b6b06a9d103fd7b26ce781835a83`; not in bootstrap or applied to Local; live DB/visual evidence and Production approval remain separate**',
+      '**Owner-accepted Local-only Source/Static checkpoint `4e3574a31a2697f4d727acabc8f55f34a4233bff` on 2026-07-15; SHA-256 `78359215f7d859d9c167db608e1e96d66712b6b06a9d103fd7b26ce781835a83`; not in bootstrap or applied to Local; live DB/visual evidence and Production approval remain separate**',
     )
     expect(existsSync(resolve(
       root,
@@ -215,6 +215,7 @@ describe('Master Catalog authority consistency', () => {
     expect(decisions).toContain('| P-28 |')
     expect(decisions).toContain('| P-29 |')
     expect(decisions).toContain('| P-30 |')
+    expect(decisions).toContain('| P-31 |')
     expect(decisions).toContain(
       'Accepted 2026-07-14 23:50 +07; WP-6.6 complete; G4 and all later gates remain separate',
     )
@@ -227,6 +228,9 @@ describe('Master Catalog authority consistency', () => {
     expect(decisions).toContain(
       'Approved 2026-07-15 01:37 +07; WP-7 complete and WP-7.5 Local-only source work authorized; no reset or Production action authorized',
     )
+    expect(decisions).toContain(
+      'Approved 2026-07-15 10:24 +07 for exact tracked checkpoint commit/push only; Local DB/browser evidence, bootstrap inclusion, WP-8, Production, and adjacent domains remain separate',
+    )
     expect(decisions).toContain('DB-read version in the Server Action before the publish RPC')
 
     const tracker = read(
@@ -236,15 +240,18 @@ describe('Master Catalog authority consistency', () => {
     expect(tracker).toMatch(/\| WP-6\.5 \|[^\n]+\| Complete \|/)
     expect(tracker).toMatch(/\| WP-6\.6 \|[^\n]+\| Complete \|/)
     expect(tracker).toMatch(/\| WP-7 \|[^\n]+\| Complete \|/)
-    expect(tracker).toMatch(/\| WP-7\.5 \|[^\n]+\| Ready for owner review \|/)
+    expect(tracker).toMatch(/\| WP-7\.5 \|[^\n]+\| In progress \|/)
     expect(tracker).toMatch(/\| WP-8 \|[^\n]+\| Not started \|/)
     expect(tracker).toContain('independent intended-admin UAT remains WP-8')
     expect(tracker).toContain('| Production write allowed | No |')
     expect(tracker).toContain(
-      'P-30 accepted WP-7 and all five P-18 V1 placement rules',
+      'P-31 accepted exact WP-7.5 Source/Static checkpoint',
     )
     expect(tracker).toContain(
-      'WP-7.5 P-18 repository/static candidate is ready for owner review; live Local evidence remains pending',
+      'WP-7.5 P-18 Source/Static checkpoint is owner-accepted; live Local evidence remains pending',
+    )
+    expect(tracker).toContain(
+      '4e3574a31a2697f4d727acabc8f55f34a4233bff',
     )
     expect(tracker).toContain(
       '2c43f6b0e644171b1ecba60c14566e5856a94b63',
@@ -297,7 +304,7 @@ describe('Master Catalog authority consistency', () => {
       /pre-amendment operator\/browser preflight passed on\s+`c8f6dca`/,
     )
     expect(tracker).toContain(
-      'Status: P-30 accepted WP-7 and all five P-18 V1 rules; migration 021/RPC/read-model/Thai UI/test/docs source/static passed, but exact commit, bootstrap inclusion, and Local apply/reset/live evidence are not accepted yet',
+      'Status: P-31 accepted exact checkpoint 4e3574a31a2697f4d727acabc8f55f34a4233bff for commit/push; migration 021/RPC/read-model/Thai UI/test/docs source/static passed, but bootstrap inclusion and Local apply/reset/live evidence are not accepted',
     )
     expect(existsSync(resolve(
       root,
