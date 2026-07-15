@@ -135,7 +135,7 @@ describe('Master Catalog authority consistency', () => {
       '**Owner-accepted Local-only migration in bootstrap source; SHA-256 `e07e0c4161077efba7bc4f6ebf95518d0cc1bc7e4628a43a128dd899bd1aef93`; G1R/G2 separate-apply evidence passed on exact checkout `721c2c2c4a234a4fd00e5686383be9af87ee15dd`; G3/WP-6.6 accepted on `78e96ab3ed9993707014c4aba1d285b7592b17a1`; owner-approved G4E combined clean bootstrap through `020` passed on exact execution checkout `15b707d443bec701f6b3a86aa7675ca1266604ba`; not Production-approved**',
     )
     expect(migrations).toContain(
-      '**Owner-accepted Local-only technical candidate via P-33 at 2026-07-15 13:54 +07; SHA-256 `e4de258756bbfbda0508e55d7b76ba2e907f644625b49bc29d4a4d7ac42fa714`; clean-chain DB/RLS/concurrency/hash/export/browser evidence passed on source checkpoint `80b2574`; outside bootstrap; WP-8 UX/release evidence and every Production approval remain pending**',
+      '**Owner-accepted Local-only technical candidate via P-33 at 2026-07-15 13:54 +07; SHA-256 `e4de258756bbfbda0508e55d7b76ba2e907f644625b49bc29d4a4d7ac42fa714`; clean-chain DB/RLS/concurrency/hash/export/browser evidence passed on source checkpoint `80b2574`; P-34 UX source/static passed on `0780925`; outside bootstrap; integrated WP-8 UX/release evidence and every Production approval remain pending**',
     )
     expect(existsSync(resolve(
       root,
@@ -233,10 +233,15 @@ describe('Master Catalog authority consistency', () => {
     expect(decisions).toContain('| P-31 |')
     expect(decisions).toContain('| P-32 |')
     expect(decisions).toContain('| P-33 |')
+    expect(decisions).toContain('| P-34 |')
     expect(decisions).toContain(
       'Accepted 2026-07-15 13:54 +07 for the exact bounded technical checkpoint; WP-7.5 technically complete; no bootstrap, WP-8, feature, publication, or Production authorization inferred',
     )
+    expect(decisions).toContain(
+      'Authorized and source/static-passed 2026-07-15; WP-8 is In progress. No bootstrap edit, Local DB reset/write, feature enablement, publication, Factor F/hotfix expansion, or Production action authorized',
+    )
     expect(decisions).toContain('| L-57 |')
+    expect(decisions).toContain('| L-58 |')
     expect(decisions).toContain('review-by-exception')
     expect(decisions).toContain(
       'Accepted 2026-07-14 23:50 +07; WP-6.6 complete; G4 and all later gates remain separate',
@@ -263,14 +268,17 @@ describe('Master Catalog authority consistency', () => {
     expect(tracker).toMatch(/\| WP-6\.6 \|[^\n]+\| Complete \|/)
     expect(tracker).toMatch(/\| WP-7 \|[^\n]+\| Complete \|/)
     expect(tracker).toMatch(/\| WP-7\.5 \|[^\n]+\| Complete \|/)
-    expect(tracker).toMatch(/\| WP-8 \|[^\n]+\| Not started \|/)
+    expect(tracker).toMatch(/\| WP-8 \|[^\n]+\| In progress \|/)
     expect(tracker).toContain('independent intended-admin UAT remains WP-8')
     expect(tracker).toContain('| Production write allowed | No |')
-    expect(tracker).toContain(
-      'P-33 accepted the exact bounded WP-7.5 technical checkpoint at 2026-07-15 13:54 +07',
+    expect(tracker).toMatch(
+      /P-33 accepted that\s+exact bounded WP-7\.5 technical checkpoint at 2026-07-15 13:54 \+07/,
     )
     expect(tracker).toContain(
-      'WP-7.5 technically complete via P-33; WP-8/bootstrap authorization and placement UX hardening are next',
+      'WP-8 In progress via P-34 source/static checkpoint; destructive Local rehearsal and release evidence remain separately gated',
+    )
+    expect(tracker).toContain(
+      '0780925aca8fa7ebbf8abbaf2b7cf151b39b676a',
     )
     expect(tracker).toContain('### 3.3 WP-8 placement UX hard gates')
     expect(tracker).toContain('Truthful accepted/dirty state')
@@ -353,7 +361,7 @@ describe('Master Catalog authority consistency', () => {
     expect(tracker).toMatch(
       /pre-amendment operator\/browser preflight passed on\s+`c8f6dca`/,
     )
-    expect(tracker).toContain('Status: amended 021 passed P-32 clean-chain DB/RLS/concurrency/hash/export/browser evidence')
+    expect(tracker).toContain('Status: exact placement UX source checkpoint 0780925 passed repository/static gates')
     expect(existsSync(resolve(
       root,
       'docs/plans/master-catalog/30-phase4-wp66-owner-review-note.md',

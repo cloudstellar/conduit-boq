@@ -58,6 +58,19 @@ Truthful local dirty state, review-by-exception, keyboard equivalence, measured
 release gates. Drag and drop remains optional; general inherited-row reorder
 remains a future Change Request.
 
+**P-34 WP-8 placement UX source gate recorded:** 2026-07-15 — the owner
+authorized the recommended source-only hardening after the P-33 docs-first
+review. Exact application checkpoint
+`0780925aca8fa7ebbf8abbaf2b7cf151b39b676a` implements truthful accepted-versus-
+locally-dirty status, versioned recoverable browser choices and guarded
+navigation, direct exception filters/counts, native keyboard-complete
+before/after radios, complete affected-category/immediate-neighbor confirmation,
+and memoized/deferred list derivation. Repository tests, TypeScript, lint, and a
+network-enabled production build passed. This starts WP-8 source/static only;
+it does not add `021` to bootstrap, reset or mutate Local Supabase, accept live
+performance/accessibility/intended-admin UAT, enable Add/Supplement, publish,
+touch Production, reopen Factor F, or expand hotfix `016`.
+
 **Capability-completeness alignment recorded:** 2026-07-12 — owner requested a
 full owner/developer audit and plan correction. Audit #29 adds WP-6.6 before
 WP-7 and reserves migration `020` for fix-forward authority/workflow hardening;
@@ -196,6 +209,7 @@ change only application code or SQL.
 | L-55 | A successful create opens the exact draft workspace; items/actions precede detailed document metadata; pointer restore requires current-to-target confirmation and explains that historical BOQs retain their saved version | Keeps the admin flow aligned with the release workspace and adds a human safety barrier around the separate recovery operation |
 | L-56 | High-impact Master Catalog actions require a separate human-intent confirmation: Recode and Retire show exact item/target/reason/impact, while Publish shows current/target version, reviewed lock, item count, BOQ effect, and requires the exact target version typed by the admin and revalidated against the DB-read version in the Server Action before the publish RPC | Reduces preventable mis-clicks without duplicating database integrity rules or adding a multi-stage approval engine; exact locks, readiness, idempotency, and RPC invariants remain authoritative |
 | L-57 | P-33 technical acceptance does not equal placement UX or release acceptance. WP-8/P-14 require truthful accepted-versus-locally-dirty state, recoverable pending choices, review-by-exception, complete impact summary, keyboard-complete non-drag controls, measured 710-row plus realistic-new-batch performance, and independent intended-admin completion without developer/SQL help | Prevents a safe database mechanism or implementer-driven browser proof from being mislabeled as an operationally safe Add/Supplement workflow; arbitrary inherited-row reorder remains outside V1 |
+| L-58 | P-34 source/static completion does not equal WP-8 completion. `021` stays outside bootstrap and Add/Supplement stays disabled until a separately approved clean Local rehearsal proves the integrated chain, realistic placement interaction scale, accessibility/recovery behavior, and independent intended-admin comprehension | Preserves evidence provenance and prevents passing source tests/build from silently authorizing a destructive reset, feature release, or Production progression |
 
 ## 3. Pending owner/data decisions
 
@@ -309,6 +323,7 @@ this register. In particular:
 | P-31 | Accept the exact WP-7.5 Source/Static checkpoint for commit/push | Accept checkpoint `4e3574a31a2697f4d727acabc8f55f34a4233bff`, migration `021` SHA-256 `78359215f7d859d9c167db608e1e96d66712b6b06a9d103fd7b26ce781835a83`, and the recorded repository/static checks. Keep `021` outside bootstrap and unapplied until a separate warned Local gate is approved. | Owner + developer | After repository/static review and before Local reset/apply/live evidence | Approved 2026-07-15 10:24 +07 for exact tracked checkpoint commit/push only; Local DB/browser evidence, bootstrap inclusion, WP-8, Production, and adjacent domains remain separate |
 | P-32 | Authorize warned WP-7.5 Local apply/live evidence and same-scope fix-forward | Reset only Local, bootstrap through `020`, apply `021` separately, run role/rollback/race/hash/export/browser evidence, restore pointer/flags/drafts, and correct defects found within the accepted placement contract. Keep `021` outside bootstrap; do not start WP-8/P-19 or touch Factor F/hotfix/Production. | Owner + developer | After P-31 and before WP-7.5 technical closeout | Approved and executed 2026-07-15; same-scope fix-forward SHA-256 `e4de258756bbfbda0508e55d7b76ba2e907f644625b49bc29d4a4d7ac42fa714` passed replacement DB/browser/export evidence and clean final invariants |
 | P-33 | Accept or hold the exact WP-7.5 technical checkpoint | Accept the P-32 clean-chain evidence, amended `021` fingerprint, 713-row hash/export parity, real Thai desktop/mobile placement/final-review flow, audited abandon, and final invariant cleanup. Acceptance closes WP-7.5 technical scope only. Truthful dirty state, review-by-exception, keyboard equivalence, measured scale, and independent intended-admin comprehension remain hard WP-8/P-14 gates; bootstrap inclusion, WP-8 execution, P-19, P-14/P-15, and Production remain separate decisions. | Owner | After P-32 evidence and before WP-8/bootstrap progression | Accepted 2026-07-15 13:54 +07 for the exact bounded technical checkpoint; WP-7.5 technically complete; no bootstrap, WP-8, feature, publication, or Production authorization inferred |
+| P-34 | Authorize and accept the bounded WP-8 placement UX source/static checkpoint | Implement truthful accepted-versus-dirty state from local assignment changes, versioned recoverable browser choices and guarded supported navigation, direct suggested/modified/incomplete/invalid filtering and counts, standards-complete keyboard radio behavior, deferred/memoized list work, and final affected-category/immediate-neighbor impact review. Accept exact source checkpoint `0780925aca8fa7ebbf8abbaf2b7cf151b39b676a` only after repository checks pass. Keep `021` outside bootstrap and preserve separate destructive Local rehearsal, measured browser/accessibility evidence, intended-admin UAT, P-14, and Production decisions. | Owner + developer | After P-33 and before any WP-8 reset/bootstrap/live gate | Authorized and source/static-passed 2026-07-15; WP-8 is In progress. No bootstrap edit, Local DB reset/write, feature enablement, publication, Factor F/hotfix expansion, or Production action authorized |
 
 ### P-11 cover-layout refinement (2026-07-10, revised 2026-07-11)
 
@@ -437,6 +452,7 @@ Production migration, deploy, feature enablement, or publication.
 | P-31 WP-7.5 Source/Static acceptance | Exact checkpoint accepted for commit/push; WP-7.5 remains incomplete pending live evidence | Owner | 2026-07-15 10:24 +07 | Exact `4e3574a31a2697f4d727acabc8f55f34a4233bff`; migration `021` remains outside bootstrap and unapplied. Local reset/apply/live evidence, WP-8, P-19, Factor F/hotfix expansion, feature enablement, publication, and Production remain separate. |
 | P-32 WP-7.5 Local live gate | Local reset/separate apply/live evidence authorized; first attempt failed closed, then same-scope replacement evidence passed | Owner-authorized execution + developer evidence | 2026-07-15 | Error `42704` exposed an unqualified constraint under fixed search path; amended `021` then passed clean-chain DB/browser/export evidence and final cleanup. No Production action. |
 | P-33 WP-7.5 exact technical acceptance | Accepted for bounded technical scope; later UX/release gates remain open | Owner | 2026-07-15 13:54 +07 | Exact P-32 package accepted. WP-8 placement UX hard gates, bootstrap inclusion, P-19, feature enablement, publication, and Production remain separate. |
+| P-34 WP-8 placement UX source/static | Exact `0780925aca8fa7ebbf8abbaf2b7cf151b39b676a` accepted as the bounded source/static checkpoint; WP-8 remains In progress | Owner + developer | 2026-07-15 | Truthful dirty state, recoverable choices/navigation, exception filters, native keyboard relation control, complete impact confirmation, and source performance hardening passed repository checks. `021` bootstrap inclusion, Local reset/live evidence, intended-admin UAT, feature enablement, publication, and Production remain separate. |
 | Production migration | Not requested |  |  | P-12; request after WP-8 evidence review |
 | Deploy / feature enable | Not requested |  |  | P-13–P-14; request only after preceding Production gate passes |
 | Publish named version | Not requested |  |  | P-15 |

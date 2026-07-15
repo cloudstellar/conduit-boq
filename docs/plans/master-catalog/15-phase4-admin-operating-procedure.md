@@ -129,8 +129,11 @@ unpublishable until its current placement batch is accepted. The guard returns
 `P18_PLACEMENT_REVIEW_REQUIRED` and keeps the draft available for review.
 WP-7.5 now implements that operator path and its separately approved P-32 Local
 DB/browser evidence passed. P-33 accepted the bounded technical checkpoint on
-2026-07-15 13:54 +07. Add/Supplement remain hidden or disabled until the
-separate WP-8/P-14 UX, performance, and intended-admin release gates pass.
+2026-07-15 13:54 +07. P-34 exact source checkpoint `0780925` then implemented
+truthful dirty state, recoverable choices/navigation guard, exception filters,
+keyboard-complete before/after controls, and complete impact confirmation.
+Add/Supplement remain hidden or disabled until the separate integrated WP-8/
+P-14 performance, accessibility/recovery, and intended-admin release gates pass.
 The draft/import preview must show this publication hold immediately after the
 new identity appears, together with the placement decision needed; do not wait
 until the final Publish click to inform the operator.
@@ -169,8 +172,9 @@ After a batch is accepted, changing any local category, anchor, before/after
 choice, or sibling order must immediately show **ยังไม่ยืนยัน**. Do not leave
 the page believing those local choices were saved. Use the supported return
 path or respond to the leave/reload warning so the pending choices can be
-continued or deliberately discarded. A page-level **ยืนยันแล้ว** message must
-never override a locally dirty workspace state.
+continued safely. The warning states that browser recovery is not a draft save.
+A page-level **ยืนยันแล้ว** message must never override a locally dirty
+workspace state.
 
 Adding/withdrawing a new identity or changing placement-relevant category,
 active state, order, or inherited-anchor topology makes the accepted placement

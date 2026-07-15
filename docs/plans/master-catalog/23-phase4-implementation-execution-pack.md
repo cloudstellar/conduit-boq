@@ -75,6 +75,18 @@ hotfix expansion, or Production. The placement UX criteria in Section 16 are
 hard WP-8/P-14 release gates. Drag and drop is optional and cannot be the only
 control; arbitrary inherited-row reorder remains outside Phase 4.
 
+**P-34 WP-8 placement UX source/static recorded:** 2026-07-15 — the owner
+authorized the bounded source slice and accepted exact application checkpoint
+`0780925aca8fa7ebbf8abbaf2b7cf151b39b676a` after focused/full tests,
+TypeScript, lint, diff, and network-enabled build passed. The implementation
+now covers truthful accepted-versus-dirty state, versioned recoverable pending
+choices and guarded navigation, direct exception filters/counts, native
+keyboard relation controls, complete impact confirmation, and bounded list
+derivation. This starts WP-8 only at source/static. `021` remains outside
+bootstrap and no Local reset/write, measured live scale/accessibility evidence,
+intended-admin UAT, feature release, Factor F/hotfix expansion, or Production
+action is inferred.
+
 **P-22 operator-workflow correction authorized:** 2026-07-12 — intended-admin
 review placed WP-6.6 closeout on Hold and accepted
 [Correction Plan #31](./31-phase4-wp66-operator-workflow-correction-plan.md).
@@ -866,6 +878,13 @@ Placement UX hard gates for the full Add/Supplement release:
 These gates harden the accepted V1 architecture; they do not add arbitrary
 reorder of inherited identities, taxonomy editing, a second approval role, or a
 round-trip spreadsheet editor.
+
+P-34 exact source checkpoint `0780925` implements the source/application side
+of truthful local state, safe continuation, review by exception, impact before
+commit, and keyboard/pointer equivalence. Those gates remain open at release
+level until exercised on the exact integrated Local candidate. Measured scale,
+independent comprehension, `021` bootstrap integration, and clean rehearsal
+have not been executed under P-34.
 
 Exit gate:
 

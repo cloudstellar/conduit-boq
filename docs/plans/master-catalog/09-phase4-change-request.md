@@ -556,8 +556,11 @@ pretend a publishable candidate has been approved.
 - [ ] Intended-admin UAT, safe Thai recovery/log correlation, and 710-row
       performance evidence pass
 - [x] WP-7.5 Local technical placement evidence and P-33 acceptance passed;
-      Full Add/Supplement release still requires WP-8/P-14, otherwise the
-      controls are hidden/disabled while the P-18 DB guard remains active
+      P-34 source/static placement UX passed on exact `0780925`; Full
+      Add/Supplement release still requires integrated WP-8/P-14 clean Local,
+      performance/accessibility/recovery, and intended-admin evidence,
+      otherwise the controls are hidden/disabled while the P-18 DB guard
+      remains active
 - [ ] Owner explicitly approves the Production migration window
 
 When all checks above are green, package the evidence for owner/verifier review

@@ -209,11 +209,13 @@ that can never finish is not.
 ## 8. Effort and confidence
 
 The original corrected full-path estimate was **9-15 focused engineering
-days**. After P-33, the remaining pre-Production engineering scope is mainly
-WP-8 placement UX hardening, clean rehearsal, and readiness evidence,
-approximately **2-4 focused engineering days** plus owner and independent
-intended-admin availability. This is an effort range, not permission to skip
-gates or a guaranteed date.
+days**. P-34 completed the bounded WP-8 placement UX source/static slice on
+exact `0780925`. The remaining pre-Production engineering scope is mainly the
+integrated clean rehearsal, measured browser/accessibility/recovery evidence,
+independent intended-admin UAT, and readiness package, approximately **1-3
+focused engineering days** plus owner and independent intended-admin
+availability. This is an effort range, not permission to skip gates or a
+guaranteed date.
 
 The confidence is higher than the earlier estimate because the work is now
 enumerated by capability and authoritative layer. Residual unknowns must be

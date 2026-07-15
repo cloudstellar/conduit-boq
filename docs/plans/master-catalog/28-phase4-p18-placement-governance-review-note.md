@@ -7,7 +7,9 @@ candidate passed and P-31 accepted exact Source/Static checkpoint
 P-32 approved the warned Local gate, whose first runtime evidence exposed
 fail-closed `42704`; amended Local DB/RLS/concurrency/hash/export/browser
 evidence passed and P-33 accepted the exact bounded technical checkpoint on
-2026-07-15 13:54 +07
+2026-07-15 13:54 +07; P-34 source/static placement UX hardening passed on exact
+checkpoint `0780925aca8fa7ebbf8abbaf2b7cf151b39b676a`, while integrated Local
+rehearsal, performance/accessibility evidence, and intended-admin UAT remain open
 
 **P-33 decision:** Accepted 2026-07-15 13:54 +07 for the exact bounded
 WP-7.5 technical checkpoint. This is not intended-admin UX or release
@@ -15,12 +17,20 @@ acceptance. The placement UX criteria below are mandatory WP-8/P-14 gates;
 `021` bootstrap inclusion, WP-8 execution, and Production remain separately
 unauthorized.
 
+**P-34 decision:** Authorized and source/static-passed 2026-07-15 on exact
+`0780925aca8fa7ebbf8abbaf2b7cf151b39b676a`. This starts only the bounded WP-8
+application UX slice described below. It does not authorize `021` bootstrap
+inclusion, another Local reset/write, live WP-8 acceptance evidence, feature
+enablement, publication, or Production.
+
 **Environment:** Local-only completed P-32 technical evidence. Historical P-31 migration
 SHA-256 `78359215...` failed closed at runtime because the fixed-search-path
 function deferred an unqualified constraint. Current schema-qualified SHA-256:
 `e4de258756bbfbda0508e55d7b76ba2e907f644625b49bc29d4a4d7ac42fa714`.
-Migration `021` remains outside bootstrap. WP-8, Production access/write,
-feature enablement, and publication remain unauthorized.
+Migration `021` remains outside bootstrap. P-34 started the WP-8 source/static
+application slice only; destructive/integrated WP-8 execution still requires a
+separate gate. Production access/write, feature enablement, and publication
+remain unauthorized.
 
 ## 1. Why this is now a release decision
 
@@ -277,6 +287,39 @@ Codex-driven browser evidence does not replace independent UAT. P-33 accepted
 the exact bounded technical checkpoint on 2026-07-15 13:54 +07. It does not
 certify these later release gates or authorize bootstrap inclusion/WP-8.
 
+P-34 source/static result at exact checkpoint
+`0780925aca8fa7ebbf8abbaf2b7cf151b39b676a`:
+
+- any category, anchor, before/after, or same-anchor sibling change is compared
+  with the loaded suggestion/accepted baseline, so even an equivalent final
+  order immediately becomes **ยังไม่ยืนยัน** without a contradictory outer
+  accepted banner;
+- session choices use a schema-versioned key bound to version, lock, and
+  placement revision; same-origin navigation is guarded, reload/close receives
+  the native warning, and the UI states clearly that recovery is browser-local,
+  not a draft save;
+- suggested/accepted, admin-modified, incomplete, invalid, and combined
+  **ต้องตรวจ** states are counted and directly filterable; unaccepted work opens
+  in exception mode while accepted work remains inspectable;
+- before/after uses native radio behavior with arrow-key support and visible
+  focus; category, searchable anchor, paging, and sibling buttons retain their
+  existing accessible non-drag path;
+- confirmation reports all new identities, shifted inherited identities,
+  affected categories, incomplete/invalid counts, and every new identity's
+  final immediate neighbors before one atomic submission;
+- expensive maps/grouping/search projection are memoized, search is deferred,
+  and visible rows remain paged at 50;
+- focused 2 files/20 tests and full 33 files/183 tests passed; TypeScript,
+  focused/full lint with zero errors and 10 existing warnings, `git diff
+  --check`, and a network-enabled production build passed.
+
+This closes only the application/source side of the first five UX gates. The
+Local browser was intentionally left at the disabled baseline, with no feature
+flag or DB mutation. P-34 therefore does **not** close realistic-scale,
+accessibility/recovery browser evidence, independent intended-admin UAT,
+`021` bootstrap inclusion, the destructive clean rehearsal, P-14, or any
+Production gate.
+
 ## 7. Schedule and safe alternatives
 
 These are current remaining effort bands, not calendar promises or permission
@@ -285,8 +328,9 @@ to skip gates:
 | Remaining band | Expected focused engineering effort |
 |---|---:|
 | P-33 owner review of completed WP-7.5 evidence | Completed 2026-07-15 13:54 +07; technical scope accepted |
-| WP-8 placement UX hardening, clean rehearsal, performance, intended-admin UAT, and readiness package | About 2-4 focused engineering days plus reviewer availability |
-| Earliest remaining path before any Production request | About 2-4 focused engineering days after the separate WP-8/bootstrap authorization; independent UAT and remediation may extend calendar time |
+| P-34 WP-8 placement UX source/static hardening | Completed on exact `0780925`; live acceptance not inferred |
+| Remaining WP-8 clean rehearsal, measured browser/accessibility evidence, intended-admin UAT, and readiness package | About 1-3 focused engineering days plus reviewer availability |
+| Earliest remaining path before any Production request | About 1-3 focused engineering days after the separate `021` bootstrap/reset authorization; independent UAT and remediation may extend calendar time |
 
 Limited safe alternative: finish the shared WP-6.6 gates, defer WP-7.5, keep the
 DB guard, and hide/disable Add and Supplement at P-14. This reduces placement

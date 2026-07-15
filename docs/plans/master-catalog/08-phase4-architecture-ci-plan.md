@@ -3,8 +3,9 @@
 **Status:** Revision 8 remains the owner-approved Phase 4 Core direction;
 WP-6.6 and WP-7 are complete, and the P-18/WP-7.5 extension passed P-32 Local
 technical evidence and P-33 bounded technical acceptance. WP-8 placement
-UX/release evidence, bootstrap inclusion of `021`, and all Production gates
-remain separate
+UX source/static hardening passed P-34 on exact `0780925`; integrated Local
+rehearsal, measured accessibility/performance, intended-admin UAT, bootstrap
+inclusion of `021`, and all Production gates remain separate
 
 **Date:** 2026-06-22
 
@@ -22,6 +23,16 @@ checkpoint the exact P-18 contract remained pending in
 [Review Note #28](./28-phase4-p18-placement-governance-review-note.md). P-30
 later accepted it, and P-32 later authorized and completed the bounded Local
 technical evidence; neither decision authorizes Production.
+
+**P-34 WP-8 source/static amendment:** 2026-07-15 — exact checkpoint
+`0780925aca8fa7ebbf8abbaf2b7cf151b39b676a` implements the already-approved UX
+contract without changing the V1 architecture: local assignment dirtiness is
+separate from server acceptance, pending choices are recoverable and
+revision-bound, exception states are explicit/filterable, native radios provide
+keyboard semantics, one final summary exposes complete batch impact, and
+derived list work is bounded/memoized. This is application/source evidence,
+not permission to add `021` to bootstrap, reset Local, enable features, or
+advance any Production gate.
 
 **Capability-completeness amendment:** 2026-07-12 —
 [Audit #29](./29-phase4-owner-dev-completeness-audit.md) corrects the earlier

@@ -37,7 +37,7 @@
 | `018_master_catalog_phase4_draft_mutation.sql` | Draft create/manual/import RPCs with actor+payload request fingerprints, per-request/per-code locks, bounded runtime timeouts, full-payload preflight, audited mutation subtransaction rollback, and reusable ADR-003 transitions | **Draft — Local only, not applied to Production** |
 | `019_master_catalog_phase4_publish_pointer.sql` | Publish/restore, shared admin publish-readiness RPC, P-18 and structured-rollout boundary guards, P-19 inactive-row filing warning, catalog-only DB count/hash, runtime timeouts, and published immutability | **Draft — Local only, not applied to Production** |
 | `020_master_catalog_phase4_admin_workflow_hardening.sql` | WP-6.6 frozen first-rollout authority, resolve-only dictionaries/server allocator, exact read registers, readiness/provenance parity, correction path, schema hardening, P-22 working-draft lifecycle, P-23.1 reserved version sequence, P-24 annual-year range guard, and covering indexes for both frozen-authority foreign keys | **Owner-accepted Local-only migration in bootstrap source; SHA-256 `e07e0c4161077efba7bc4f6ebf95518d0cc1bc7e4628a43a128dd899bd1aef93`; G1R/G2 separate-apply evidence passed on exact checkout `721c2c2c4a234a4fd00e5686383be9af87ee15dd`; G3/WP-6.6 accepted on `78e96ab3ed9993707014c4aba1d285b7592b17a1`; owner-approved G4E combined clean bootstrap through `020` passed on exact execution checkout `15b707d443bec701f6b3a86aa7675ca1266604ba`; not Production-approved** |
-| `021_master_catalog_phase4_placement_governance.sql` | P-18/WP-7.5 new-identity placement revision/review and atomic order contract | **Owner-accepted Local-only technical candidate via P-33 at 2026-07-15 13:54 +07; SHA-256 `e4de258756bbfbda0508e55d7b76ba2e907f644625b49bc29d4a4d7ac42fa714`; clean-chain DB/RLS/concurrency/hash/export/browser evidence passed on source checkpoint `80b2574`; outside bootstrap; WP-8 UX/release evidence and every Production approval remain pending** |
+| `021_master_catalog_phase4_placement_governance.sql` | P-18/WP-7.5 new-identity placement revision/review and atomic order contract | **Owner-accepted Local-only technical candidate via P-33 at 2026-07-15 13:54 +07; SHA-256 `e4de258756bbfbda0508e55d7b76ba2e907f644625b49bc29d4a4d7ac42fa714`; clean-chain DB/RLS/concurrency/hash/export/browser evidence passed on source checkpoint `80b2574`; P-34 UX source/static passed on `0780925`; outside bootstrap; integrated WP-8 UX/release evidence and every Production approval remain pending** |
 | `017+_master_catalog_phase4_*.sql` | Umbrella reference for the Local-only Phase 4 range; files currently exist as `017`-`021`, while the current G4 bootstrap authority still applies only `017`-`020` after hotfix `016` | **Local-only range — owner-approved G4E combined clean execution through `020` passed; `021` passed separately applied P-32 Local evidence and P-33 technical acceptance but remains outside bootstrap; WP-8/bootstrap inclusion and every Production approval remain separate** |
 
 ### Local Schema Baseline (`supabase/local/`)
@@ -154,6 +154,11 @@ and audited-abandon paths. P-33 accepted that bounded technical checkpoint at
 exception, keyboard equivalence, measured scale, and independent intended-admin
 comprehension as WP-8/P-14 gates. Migration `021` stays outside bootstrap
 pending the separate WP-8/bootstrap decision.
+P-34 subsequently passed the bounded placement UX source/static checkpoint on
+exact application commit `0780925aca8fa7ebbf8abbaf2b7cf151b39b676a` without
+editing this migration or bootstrap and without resetting or mutating Local
+Supabase. This source result does not authorize `021` bootstrap inclusion, the
+destructive WP-8 clean rehearsal, feature enablement, or Production.
 Applied hotfix `016` must not be edited.
 This is not a new Production hotfix and must not be applied to Production
 without the normal Phase 4 P-12+ approvals.
