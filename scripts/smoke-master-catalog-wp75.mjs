@@ -273,7 +273,16 @@ try {
     .map((result, index) => ({ result, index }))
     .filter(({ result }) => !result.error && result.data?.ok === true)
     .map(({ index }) => index)
-  assert(winnerIndexes.length === 1, 'Placement race did not produce exactly one winner')
+  assert(
+    winnerIndexes.length === 1,
+    `Placement race did not produce exactly one winner: ${JSON.stringify(
+      raceResults.map((result) => ({
+        transportCode: result.error?.code ?? null,
+        transportMessage: result.error?.message ?? null,
+        envelope: result.data ?? null,
+      })),
+    )}`,
+  )
   const winnerIndex = winnerIndexes[0]
   const loserIndex = winnerIndex === 0 ? 1 : 0
   const firstPlacement = actionOk(raceResults[winnerIndex], 'placement race winner')
