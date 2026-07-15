@@ -135,7 +135,7 @@ describe('Master Catalog authority consistency', () => {
       '**Owner-accepted Local-only migration in bootstrap source; SHA-256 `e07e0c4161077efba7bc4f6ebf95518d0cc1bc7e4628a43a128dd899bd1aef93`; G1R/G2 separate-apply evidence passed on exact checkout `721c2c2c4a234a4fd00e5686383be9af87ee15dd`; G3/WP-6.6 accepted on `78e96ab3ed9993707014c4aba1d285b7592b17a1`; owner-approved G4E combined clean bootstrap through `020` passed on exact execution checkout `15b707d443bec701f6b3a86aa7675ca1266604ba`; not Production-approved**',
     )
     expect(migrations).toContain(
-      '**Local-only amended candidate proven under P-32; SHA-256 `e4de258756bbfbda0508e55d7b76ba2e907f644625b49bc29d4a4d7ac42fa714`; clean-chain DB/RLS/concurrency/hash/export/browser evidence passed on source checkpoint `80b2574`; outside bootstrap; exact P-33 owner acceptance, WP-8, and every Production approval remain pending**',
+      '**Owner-accepted Local-only technical candidate via P-33 at 2026-07-15 13:54 +07; SHA-256 `e4de258756bbfbda0508e55d7b76ba2e907f644625b49bc29d4a4d7ac42fa714`; clean-chain DB/RLS/concurrency/hash/export/browser evidence passed on source checkpoint `80b2574`; outside bootstrap; WP-8 UX/release evidence and every Production approval remain pending**',
     )
     expect(existsSync(resolve(
       root,
@@ -188,6 +188,18 @@ describe('Master Catalog authority consistency', () => {
       '## 15. WP-7.5 P-18 new-identity placement governance',
       '## 16. WP-8 clean local rehearsal',
     ])
+    for (const contract of [
+      'Placement UX hard gates for the full Add/Supplement release',
+      '**Truthful local state:**',
+      '**Safe continuation:**',
+      '**Review by exception:**',
+      '**Impact before commit:**',
+      '**Keyboard and pointer equivalence:**',
+      '**Measured scale:**',
+      '**Independent comprehension:**',
+    ]) {
+      expect(executionPack).toContain(contract)
+    }
 
     const decisions = read(
       'docs/plans/master-catalog/19-phase4-decision-register.md',
@@ -196,7 +208,7 @@ describe('Master Catalog authority consistency', () => {
       'Accepted 2026-07-11 22:20 +07; WP-6 complete; Production filing remains separate',
     )
     expect(decisions).toContain(
-      'Accepted via P-30; P-32 Local technical evidence passed; P-33 exact acceptance and Production remain separate',
+      'Accepted via P-30; P-32 Local technical evidence and P-33 bounded technical acceptance passed; WP-8/P-14 UX/release evidence and Production remain separate',
     )
     expect(decisions).toContain('P-19')
     expect(decisions).toContain('Pending; recorded 2026-07-07')
@@ -222,8 +234,10 @@ describe('Master Catalog authority consistency', () => {
     expect(decisions).toContain('| P-32 |')
     expect(decisions).toContain('| P-33 |')
     expect(decisions).toContain(
-      'Pending owner review; technical recommendation: Accept',
+      'Accepted 2026-07-15 13:54 +07 for the exact bounded technical checkpoint; WP-7.5 technically complete; no bootstrap, WP-8, feature, publication, or Production authorization inferred',
     )
+    expect(decisions).toContain('| L-57 |')
+    expect(decisions).toContain('review-by-exception')
     expect(decisions).toContain(
       'Accepted 2026-07-14 23:50 +07; WP-6.6 complete; G4 and all later gates remain separate',
     )
@@ -248,14 +262,34 @@ describe('Master Catalog authority consistency', () => {
     expect(tracker).toMatch(/\| WP-6\.5 \|[^\n]+\| Complete \|/)
     expect(tracker).toMatch(/\| WP-6\.6 \|[^\n]+\| Complete \|/)
     expect(tracker).toMatch(/\| WP-7 \|[^\n]+\| Complete \|/)
-    expect(tracker).toMatch(/\| WP-7\.5 \|[^\n]+\| Ready for owner review \|/)
+    expect(tracker).toMatch(/\| WP-7\.5 \|[^\n]+\| Complete \|/)
     expect(tracker).toMatch(/\| WP-8 \|[^\n]+\| Not started \|/)
     expect(tracker).toContain('independent intended-admin UAT remains WP-8')
     expect(tracker).toContain('| Production write allowed | No |')
-    expect(tracker).toContain('P-32 authorized the warned Local reset')
     expect(tracker).toContain(
-      'WP-7.5 P-18 technical evidence complete; ready for P-33 owner review',
+      'P-33 accepted the exact bounded WP-7.5 technical checkpoint at 2026-07-15 13:54 +07',
     )
+    expect(tracker).toContain(
+      'WP-7.5 technically complete via P-33; WP-8/bootstrap authorization and placement UX hardening are next',
+    )
+    expect(tracker).toContain('### 3.3 WP-8 placement UX hard gates')
+    expect(tracker).toContain('Truthful accepted/dirty state')
+    expect(tracker).toContain('Review by exception')
+    expect(tracker).toContain('Keyboard/pointer equivalence')
+    expect(tracker).toContain('Measured realistic scale')
+
+    const operatorProcedure = read(
+      'docs/plans/master-catalog/15-phase4-admin-operating-procedure.md',
+    )
+    expect(operatorProcedure).toContain('Start with **ต้องตรวจ**')
+    expect(operatorProcedure).toContain('must immediately show **ยังไม่ยืนยัน**')
+    expect(operatorProcedure).toContain('keyboard-incomplete required control blocks P-14')
+
+    const threatModel = read(
+      'docs/plans/master-catalog/18-phase4-threat-model.md',
+    )
+    expect(threatModel).toContain('| T-49 |')
+    expect(threatModel).toContain('| T-50 |')
     expect(tracker).toContain(
       '80b2574bbaccc5bb14093aa204a46fcc50ba1d5c',
     )

@@ -1,9 +1,10 @@
 # Master Catalog Phase 4: Lean Architecture, CI and Official Export Plan
 
 **Status:** Revision 8 remains the owner-approved Phase 4 Core direction;
-WP-6.6 and WP-7 are complete, and the P-18/WP-7.5 extension has passed its
-P-32 Local technical evidence. Exact P-33 owner acceptance, WP-8, bootstrap
-inclusion of `021`, and all Production gates remain separate
+WP-6.6 and WP-7 are complete, and the P-18/WP-7.5 extension passed P-32 Local
+technical evidence and P-33 bounded technical acceptance. WP-8 placement
+UX/release evidence, bootstrap inclusion of `021`, and all Production gates
+remain separate
 
 **Date:** 2026-06-22
 
@@ -149,7 +150,7 @@ deferred constraint produces current fix candidate SHA-256
 `e4de258756bbfbda0508e55d7b76ba2e907f644625b49bc29d4a4d7ac42fa714`.
 The architecture is unchanged: inherited order remains stable, new identities
 are confirmed as one batch, DB authority remains final, and Add/Supplement stay
-disabled until exact technical acceptance and the later release gates pass.
+disabled until the later WP-8/P-14 UX/release gates pass.
 
 **WP-7.5 P-32 Local evidence:** 2026-07-15 — a fresh canonical reset through
 `020`, separate amended `021` apply, and tracked role/rollback/race/order/hash
@@ -157,12 +158,14 @@ harness passed on source checkpoint `80b2574`. Evidence JSON SHA-256 is
 `875488a965c9c24fbe82a373d2bb18e585f7b6df4fb9267041f909eae1c05602`.
 The 713-row candidate hash matched database, Excel, PDF, and the tracked
 verifier. The Thai desktop/mobile operator path passed on UI checkpoint
-`99fa56c`, including two-item same-anchor ordering, accepted-state clarity,
-700 affected rows in final review, and audited abandon. Cleanup restored
-`2568.0.0`/710, zero working drafts, all three flags `false`, BOQ 198/1,547,
-and Factor F `2569.0.0`/36. This satisfies the technical exit evidence but does
-not infer P-33 acceptance, add `021` to bootstrap, start WP-8, or authorize
-Production.
+`99fa56c`, including two-item same-anchor ordering, clear server-accepted state
+without a redundant confirm action, 700 affected rows in final review, and
+audited abandon. The later locally dirty-state contract remains a WP-8 gate.
+Cleanup restored `2568.0.0`/710, zero working drafts, all three flags `false`,
+BOQ 198/1,547,
+and Factor F `2569.0.0`/36. P-33 accepted this technical exit evidence; that
+decision does not add `021` to bootstrap, start WP-8, certify intended-admin
+UX, or authorize Production.
 
 **Owner decision recorded:** 2026-07-04 — approved according to the
 recommendation for Phase 4 Core/local implementation. This approval does not
@@ -618,16 +621,16 @@ workbook row order. `display_order` is included in the canonical dataset hash
 and official presentation contract.
 
 This append-at-end rule is draft allocation only. P-18 V1 was accepted through
-P-30, and amended WP-7.5 placement evidence passed the P-32 Local gate. A
-version with new add/supplement identities must still not publish until exact
-P-33 acceptance and the later WP-8/P-14 release gates. WP-6.5 implements a
+P-30, and amended WP-7.5 placement evidence passed the P-32 Local gate and P-33
+technical acceptance. A version with new add/supplement identities must still
+not publish until the later WP-8/P-14 UX/release gates. WP-6.5 implements a
 publish guard that rejects draft rows whose
 `identity_id` is absent from the base version with
 `P18_PLACEMENT_REVIEW_REQUIRED`; Local guard/atomicity evidence has passed. The
 WP-7.5 extension is defined in
 [Review Note #28](./28-phase4-p18-placement-governance-review-note.md). Keep the
 guard and do not expose Add/Supplement as a Production-capable workflow while
-P-33/WP-8/P-14 remain open.
+WP-8/P-14 remain open.
 
 Backfill the current 710 rows one-to-one. A recoded item receives a new registry
 row pointing to the same identity. A code can never move to another identity.
@@ -1778,9 +1781,11 @@ users.
 - Run Local DB role, rollback, concurrency, order, hash/export, and browser tests
   before WP-8.
 
-P-32 technical evidence passed all of the checks above. The remaining WP-7.5
-gate is exact owner accept/hold under P-33; WP-8 must still repeat the supported
-release workflow from its own approved clean scope.
+P-32 technical evidence passed all of the checks above, and P-33 accepted the
+exact bounded WP-7.5 technical checkpoint. WP-8 must still harden and repeat
+the supported release workflow from its own approved clean scope, including
+truthful local dirty state, review-by-exception, keyboard equivalence, measured
+scale, and independent intended-admin completion.
 
 **Reason:** This completes the already exposed Add/Supplement business outcome
 without turning a UI-only reorder into hidden technical debt. If P-18 is

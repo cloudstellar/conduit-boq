@@ -337,5 +337,6 @@ WP-8, P-19, Factor F/hotfix expansion, or Production.
 Local reset, separate amended `021` apply, and same-scope live gate. Replacement
 DB/RLS/concurrency/hash/export/browser evidence passed after the fail-closed
 `42704` fix-forward, and final Local invariants were restored. This remains
-outside the P-27 point-in-time scope; P-33 owner acceptance, `021` bootstrap
-inclusion, WP-8, and Production are still separate.
+outside the P-27 point-in-time scope. P-33 subsequently accepted the bounded
+WP-7.5 technical checkpoint; `021` bootstrap inclusion, WP-8 UX/release
+evidence, and Production are still separate.

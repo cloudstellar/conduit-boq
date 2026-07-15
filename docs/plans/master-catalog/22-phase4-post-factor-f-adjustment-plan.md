@@ -240,9 +240,10 @@ Rehearsal path:
 1. Restore refreshed Production data locally.
 2. Use the canonical bootstrap order `009`-`015`, production hotfix `016`, then
    Phase 4 `017`-`020`. P-18 is accepted and amended `021` passed a separate
-   P-32 Local apply/live gate, but include it in bootstrap only after P-33 and
-   an explicit inclusion decision. The reviewed bootstrap authority still ends
-   at `020`; its first combined clean execution passed under P-29/G4E on exact
+   P-32 Local apply/live gate plus P-33 bounded technical acceptance, but
+   include it in bootstrap only after an explicit inclusion/WP-8 decision. The
+   reviewed bootstrap authority still ends at `020`; its first combined clean
+   execution passed under P-29/G4E on exact
    `15b707d`.
 3. Record before/after catalog counts.
 4. Record before/after Factor F pointer, active versions, row counts, and

@@ -21,8 +21,9 @@ and the owner accepted G3/WP-6.6 on that checkpoint at
 2026-07-14 23:50 +07. P-28 approved G4 repository integration and WP-7 harness
 source on 2026-07-15; P-29/G4E then passed the clean `009`-`020` execution and
 P-30 accepted WP-7/P-18. P-32 subsequently passed the amended WP-7.5
-DB/RLS/concurrency/hash/export/browser technical evidence. Exact P-33 owner
-acceptance and WP-8 remain.
+DB/RLS/concurrency/hash/export/browser technical evidence, and P-33 accepted
+that exact bounded technical checkpoint at 2026-07-15 13:54 +07. WP-8
+placement UX/release evidence remains.
 
 **Environment:** Source/document audit only. No Local database reset, Production
 access/write, feature enablement, publication, new Factor F workflow, or hotfix
@@ -175,8 +176,8 @@ Do not edit evidence-backed Local migrations `017`-`019`.
   inclusion without authorizing a Local reset; P-29 subsequently authorized and
   passed the bounded G4E Local execution. P-30 accepted WP-7 and authorized the
   five-rule P-18/WP-7.5 Local-only source candidate. P-32 separately completed
-  Local apply/reset/live evidence; `021` bootstrap inclusion and P-33 remain
-  separate.
+  Local apply/reset/live evidence, and P-33 accepted the bounded technical
+  checkpoint. `021` bootstrap inclusion and WP-8 remain separate.
 
 ## 7. Deliberate deferrals and control visibility
 
@@ -191,6 +192,14 @@ does not imply they are supported:
 - server pagination/virtualization before the measured threshold;
 - BOQ Rebase, K-formula governance, new Factor F workflow, or hotfix expansion.
 
+The narrow new-identity placement path is not a deferral. Before Add/Supplement
+can be visible at P-14, WP-8 must close the accepted-versus-locally-dirty state,
+recoverable pending choices, review-by-exception, complete impact summary,
+keyboard-complete non-drag controls, measured 710-row plus realistic-new-batch
+performance, and independent intended-admin comprehension gates defined in the
+[Execution Pack](./23-phase4-implementation-execution-pack.md). Implementer-
+driven technical browser evidence alone cannot close these gates.
+
 If the owner chooses a limited first release, hide Add, Supplement, and Retire
 until their gates close. Update/recode may be released only after the shared
 WP-6.6 browse, draft, authority, publication metadata, readiness, and UAT gates
@@ -200,10 +209,11 @@ that can never finish is not.
 ## 8. Effort and confidence
 
 The original corrected full-path estimate was **9-15 focused engineering
-days**. After P-32, the remaining pre-Production engineering scope is mainly
-P-33 review and WP-8, approximately **1-2 focused engineering days** plus owner
-and independent intended-admin availability. This is an effort range, not
-permission to skip gates or a guaranteed date.
+days**. After P-33, the remaining pre-Production engineering scope is mainly
+WP-8 placement UX hardening, clean rehearsal, and readiness evidence,
+approximately **2-4 focused engineering days** plus owner and independent
+intended-admin availability. This is an effort range, not permission to skip
+gates or a guaranteed date.
 
 The confidence is higher than the earlier estimate because the work is now
 enumerated by capability and authoritative layer. Residual unknowns must be

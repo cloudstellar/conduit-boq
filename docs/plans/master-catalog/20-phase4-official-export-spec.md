@@ -39,8 +39,9 @@ numeric positions of inherited rows may shift when new identities are inserted,
 while their relative order remains unchanged. The final accepted order is part
 of the existing canonical dataset hash and must match Excel/PDF sequence. P-32
 proved 713-row database/Excel/PDF/verifier parity for the amended Local `021`
-candidate. This proof does not replace P-33 owner acceptance, WP-8 final
-candidate export evidence, filing approval, or any Production gate.
+candidate, and P-33 accepted that bounded technical checkpoint. This proof does
+not replace WP-8 final candidate UX/export evidence, filing approval, or any
+Production gate.
 
 ## 1. Purpose and authority
 

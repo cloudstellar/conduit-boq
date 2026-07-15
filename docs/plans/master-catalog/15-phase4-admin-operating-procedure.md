@@ -128,8 +128,9 @@ Under P-18, any draft containing a newly added/supplement identity remains
 unpublishable until its current placement batch is accepted. The guard returns
 `P18_PLACEMENT_REVIEW_REQUIRED` and keeps the draft available for review.
 WP-7.5 now implements that operator path and its separately approved P-32 Local
-DB/browser evidence passed. Add/Supplement remain hidden or disabled until the
-owner accepts P-33 and the later WP-8/P-14 release gates enable them.
+DB/browser evidence passed. P-33 accepted the bounded technical checkpoint on
+2026-07-15 13:54 +07. Add/Supplement remain hidden or disabled until the
+separate WP-8/P-14 UX, performance, and intended-admin release gates pass.
 The draft/import preview must show this publication hold immediately after the
 new identity appears, together with the placement decision needed; do not wait
 until the final Publish click to inform the operator.
@@ -144,21 +145,32 @@ by one.
 2. Confirm that the page count equals every pending new identity. Search and
    paging only change the visible subset; the final confirmation always covers
    the complete pending batch.
-3. For each new identity, choose a category that contains an inherited item,
-   then choose one inherited item in that same category as the anchor.
-4. Choose **ก่อนรายการนี้** or **หลังรายการนี้**. Do not use another new item as
+3. Start with **ต้องตรวจ** rather than rereading every suggestion. Confirm which
+   rows are system-suggested, which were changed by an admin, and which remain
+   incomplete or invalid.
+4. For each row that needs attention, choose a category that contains an
+   inherited item, then choose one inherited item in that same category as the
+   anchor.
+5. Choose **ก่อนรายการนี้** or **หลังรายการนี้**. Do not use another new item as
    an anchor.
-5. When several new items share one anchor and relation, use the up/down buttons
+6. When several new items share one anchor and relation, use the up/down buttons
    to set their order within that exact group. This cannot reorder inherited
    identities.
-6. Review each final sequence number, immediate previous/next item, and the
-   count of inherited rows that will shift numerically.
-7. Choose **ตรวจและยืนยันทั้งชุด**, enter the real placement rationale, and
+7. Review each final sequence number, immediate previous/next item, affected
+   categories, and the count of inherited rows that will shift numerically.
+8. Choose **ตรวจและยืนยันทั้งชุด**, enter the real placement rationale, and
    confirm once. The operation records the new rows and every shifted row in
    one append-only change set/review.
-8. If the draft changed after the page loaded, reload and review the current
+9. If the draft changed after the page loaded, reload and review the current
    batch. Do not retry with a new hidden request ID or repair `display_order`
    directly.
+
+After a batch is accepted, changing any local category, anchor, before/after
+choice, or sibling order must immediately show **ยังไม่ยืนยัน**. Do not leave
+the page believing those local choices were saved. Use the supported return
+path or respond to the leave/reload warning so the pending choices can be
+continued or deliberately discarded. A page-level **ยืนยันแล้ว** message must
+never override a locally dirty workspace state.
 
 Adding/withdrawing a new identity or changing placement-relevant category,
 active state, order, or inherited-anchor topology makes the accepted placement
@@ -492,9 +504,13 @@ recognizing the message and completing the recovery through the UI.
    item's field-level history;
 3. preview an approved workbook and explain Full versus Supplement impact,
    complete row diff/omissions, and price authority;
-4. add or import several approved new identities, place them as one batch
-   without confirming inherited rows individually, explain the shifted-row
-   count, and recover from one stale-placement response;
+4. add or import several approved new identities; distinguish system-suggested,
+   admin-modified, incomplete/invalid, unconfirmed, and accepted placement
+   states; filter to rows requiring attention; place them as one batch without
+   confirming inherited rows individually; explain affected categories and the
+   shifted-row count; change one accepted local assignment and recognize that
+   it is **ยังไม่ยืนยัน**; exercise the leave/reload recovery; and recover from
+   one stale-placement response;
 5. recognize and recover from at least three other representative safe
    failures, including stale lock/base, retirement hold, or invalid authority;
 6. perform one eligible reactivate or never-published withdraw correction and
@@ -514,3 +530,12 @@ recognizing the message and completing the recovery through the UI.
 Record task completion, misunderstood wording, recovery outcome, elapsed time,
 browser/device, and reviewer. A failed or developer-dependent critical task
 blocks P-14 until the UX/procedure is corrected and rerun.
+
+For placement, also record the agreed realistic new-item batch size and
+interaction evidence against 710 inherited rows: initial render, search, anchor
+selection, preview recalculation, paging, sibling movement, and confirmation.
+Material stutter, focus loss, layout shift, contradictory accepted/dirty state,
+or a keyboard-incomplete required control blocks P-14 unless corrected and
+rerun or explicitly accepted with an owner, rationale, remediation owner, and
+due date. Drag and drop is not required and may never replace the visible
+category/anchor/before-after/up-down path.

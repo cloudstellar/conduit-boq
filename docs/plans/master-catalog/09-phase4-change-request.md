@@ -38,8 +38,9 @@ the bounded schema-qualified amendment is SHA-256
 `e4de258756bbfbda0508e55d7b76ba2e907f644625b49bc29d4a4d7ac42fa714`.
 A fresh clean chain through `020`, separate amended `021` apply, tracked
 DB/RLS/concurrency/hash/export harness, Thai desktop/mobile browser flow, and
-final cleanup then passed. Exact P-33 owner acceptance, bootstrap inclusion,
-WP-8, and every Production gate remain separate.
+final cleanup then passed. P-33 accepted the exact bounded WP-7.5 technical
+checkpoint at 2026-07-15 13:54 +07. Bootstrap inclusion, WP-8 UX/release
+evidence, and every Production gate remain separate.
 
 **Capability-completeness amendment recorded:** 2026-07-12 —
 [Audit #29](./29-phase4-owner-dev-completeness-audit.md) found that the current
@@ -510,8 +511,9 @@ JSON is `tmp/master-catalog/wp75-evidence/20260715-clean-chain-80b2574.json`
 with SHA-256
 `875488a965c9c24fbe82a373d2bb18e585f7b6df4fb9267041f909eae1c05602`.
 The existing P-18 DB guard remains authoritative, and Add/Supplement stay
-release-disabled until P-33 exact acceptance plus the applicable WP-8/P-14
-gates; technical completion does not itself enable the feature.
+release-disabled until the applicable WP-8/P-14 dirty-state, review-by-
+exception, keyboard, performance, and intended-admin gates pass; P-33 technical
+acceptance does not itself enable the feature.
 
 ### Additional preconditions before final data backfill/candidate freeze
 
@@ -553,8 +555,8 @@ pretend a publishable candidate has been approved.
 - [ ] Tracked export verifier and documentation consistency checks pass
 - [ ] Intended-admin UAT, safe Thai recovery/log correlation, and 710-row
       performance evidence pass
-- [x] WP-7.5 Local technical placement evidence passed; Full Add/Supplement
-      release still requires P-33/WP-8/P-14, otherwise the
+- [x] WP-7.5 Local technical placement evidence and P-33 acceptance passed;
+      Full Add/Supplement release still requires WP-8/P-14, otherwise the
       controls are hidden/disabled while the P-18 DB guard remains active
 - [ ] Owner explicitly approves the Production migration window
 

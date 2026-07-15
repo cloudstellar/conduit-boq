@@ -6,7 +6,14 @@ candidate passed and P-31 accepted exact Source/Static checkpoint
 `4e3574a31a2697f4d727acabc8f55f34a4233bff` on 2026-07-15 10:24 +07;
 P-32 approved the warned Local gate, whose first runtime evidence exposed
 fail-closed `42704`; amended Local DB/RLS/concurrency/hash/export/browser
-evidence now passes and exact P-33 owner acceptance remains pending
+evidence passed and P-33 accepted the exact bounded technical checkpoint on
+2026-07-15 13:54 +07
+
+**P-33 decision:** Accepted 2026-07-15 13:54 +07 for the exact bounded
+WP-7.5 technical checkpoint. This is not intended-admin UX or release
+acceptance. The placement UX criteria below are mandatory WP-8/P-14 gates;
+`021` bootstrap inclusion, WP-8 execution, and Production remain separately
+unauthorized.
 
 **Environment:** Local-only completed P-32 technical evidence. Historical P-31 migration
 SHA-256 `78359215...` failed closed at runtime because the fixed-search-path
@@ -104,8 +111,9 @@ WP-7.5 appends the reviewed Local-only source candidate
 the prerequisite admin/authority hardening found by
 [Completeness Audit #29](./29-phase4-owner-dev-completeness-audit.md). Do not
 renumber or rewrite evidence-backed Local migrations `017`-`020`. Migration
-`020` is already in the canonical Local bootstrap after P-28/P-29. Do not add
-`021` to bootstrap until P-33 and the separate inclusion/WP-8 gate.
+`020` is already in the canonical Local bootstrap after P-28/P-29. P-33 has
+passed, but do not add `021` to bootstrap until the separate inclusion/WP-8
+gate.
 
 The implementation should use DB-backed authority rather than inferring approval
 from UI state, current integers, or free-form audit JSON:
@@ -167,8 +175,24 @@ adds the placement task without mixing it into the general item editor:
   preview/confirm, rather than forcing a new catalog version per item;
 - manual add remains suitable for one or a few exceptions; Supplement import
   remains the bulk intake path; both converge on the same placement review;
-- the UI cannot imply publication readiness while placement review is stale or
-  missing.
+- the UI cannot imply publication readiness while placement review is stale,
+  missing, or locally changed but not yet confirmed;
+- system-suggested, admin-modified, incomplete, and invalid assignments are
+  distinguishable and filterable so an admin reviews exceptions instead of
+  mechanically acknowledging inherited rows;
+- paging and supported navigation preserve pending choices, while leaving or
+  reloading with unconfirmed changes gives a clear warning or recoverable
+  continuation and never claims the choices were saved;
+- the final batch summary shows new-row count, shifted inherited-row count,
+  affected categories, incomplete/conflicting assignments, and the immediate
+  final neighbors of changed new rows;
+- category, anchor search, before/after, paging, sibling order, and confirmation
+  are keyboard-complete with visible focus. Any custom radio-style control must
+  implement expected arrow-key behavior or use an existing standards-complete
+  component;
+- drag and drop is optional desktop enhancement only. It must preserve the
+  visible non-drag path and cannot expand V1 into arbitrary inherited-row
+  reorder.
 
 ## 6. Required verification
 
@@ -212,9 +236,20 @@ WP-8:
 - the exact accepted P-11 baseline pair remains preserved as historical visual
   evidence; a later candidate pair is generated only from that exact final
   candidate and does not overwrite the accepted baseline pair;
-- intended-admin WP-8 UAT must still add several rows, place them as one batch, explain
-  draft versus publish, recover from one stale-placement error, and finish
-  without developer or SQL assistance.
+- intended-admin WP-8 UAT must still add several rows, distinguish suggested,
+  locally changed/unconfirmed, and accepted placement states, filter to rows
+  needing attention, place them as one batch, explain draft versus publish and
+  the shifted-row count, recover from one stale-placement error, and finish
+  without developer or SQL assistance;
+- WP-8 must record 710-row plus realistic-new-batch interaction evidence for
+  initial render, search, anchor selection, preview recalculation, paging,
+  sibling movement, and confirmation. Material stutter, focus loss, layout
+  shift, or unexplained regression blocks P-14 unless fixed or explicitly
+  accepted with owner/remediation metadata;
+- an accepted server-side placement followed by a local assignment change must
+  display **ยังไม่ยืนยัน** consistently at page and workspace level and must
+  warn or preserve recovery before navigation. This accepted-state/dirty-state
+  contract is a release safety requirement, not visual polish.
 
 P-32 exact technical evidence:
 
@@ -231,14 +266,16 @@ P-32 exact technical evidence:
   count/order/hash on artifact source `7d60ab60`;
 - Thai real-route UI on `99fa56c3d3c68e1886fbd308d8536e598eaee02f`
   proved two new items, same-anchor sibling
-  ordering, accepted-state clarity, 700 affected final-review rows, desktop and
-  390x844 mobile no-overflow, and audited abandon;
+  ordering, the server-accepted state without a redundant confirm action, 700
+  affected final-review rows, desktop and 390x844 mobile no-overflow, and
+  audited abandon; it did not close the later locally dirty-state gate;
 - final pointer `2568.0.0`/710, zero working drafts, all three flags `false`,
   BOQ 198/1,547, Factor F `2569.0.0`/36, Production touched: No.
 
-The final bullet in the earlier list remains a WP-8 independent intended-admin
-UAT requirement; Codex-driven browser evidence does not replace it. P-33 exact
-owner accept/hold is the only remaining WP-7.5 closeout decision.
+The final UX, scale, and intended-admin bullets remain WP-8/P-14 requirements;
+Codex-driven browser evidence does not replace independent UAT. P-33 accepted
+the exact bounded technical checkpoint on 2026-07-15 13:54 +07. It does not
+certify these later release gates or authorize bootstrap inclusion/WP-8.
 
 ## 7. Schedule and safe alternatives
 
@@ -247,9 +284,9 @@ to skip gates:
 
 | Remaining band | Expected focused engineering effort |
 |---|---:|
-| P-33 owner review of completed WP-7.5 evidence | Focused review; no new engineering unless held |
-| WP-8 clean rehearsal, performance, intended-admin UAT, and readiness package | 1-2 focused days plus reviewer availability |
-| Earliest remaining path before any Production request | About 1-2 focused days after P-33; approval and independent UAT availability may extend calendar time |
+| P-33 owner review of completed WP-7.5 evidence | Completed 2026-07-15 13:54 +07; technical scope accepted |
+| WP-8 placement UX hardening, clean rehearsal, performance, intended-admin UAT, and readiness package | About 2-4 focused engineering days plus reviewer availability |
+| Earliest remaining path before any Production request | About 2-4 focused engineering days after the separate WP-8/bootstrap authorization; independent UAT and remediation may extend calendar time |
 
 Limited safe alternative: finish the shared WP-6.6 gates, defer WP-7.5, keep the
 DB guard, and hide/disable Add and Supplement at P-14. This reduces placement
@@ -290,5 +327,8 @@ fixtures and restored pointer/flags. The schema-qualified same-scope amendment
 has SHA-256
 `e4de258756bbfbda0508e55d7b76ba2e907f644625b49bc29d4a4d7ac42fa714`;
 replacement source/live evidence then passed as recorded in Section 6. P-33
-exact owner acceptance, bootstrap inclusion, WP-8, and Production remain
-separate.
+accepted that exact bounded technical checkpoint on 2026-07-15 13:54 +07. The
+decision also records that truthful dirty state, review-by-exception, keyboard
+equivalence, measured scale, and independent intended-admin comprehension are
+hard WP-8/P-14 gates. Bootstrap inclusion, WP-8 execution, P-19, feature
+enablement, publication, and Production remain separate.

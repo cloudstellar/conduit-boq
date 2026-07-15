@@ -40,7 +40,8 @@ A fresh clean Local chain through `020`, separate amended `021` apply, and the
 P-32 DB/RLS/concurrency/order/hash/export/browser evidence then passed on source
 checkpoint `80b2574` plus UI checkpoint `99fa56c`. Cleanup restored the Local
 authority baseline. `021` remains outside bootstrap and has not been applied to
-Production; exact P-33 owner acceptance remains separate.
+Production; P-33 accepted the bounded Local technical checkpoint while WP-8
+UX/release evidence and bootstrap inclusion remain separate.
 
 **Owner decision recorded:** 2026-07-04 — approved according to the
 recommendation as the technical backbone for Phase 4A and every Phase 4 write
@@ -340,8 +341,9 @@ current placement revision and recheck complete order/base-relative invariants.
 Otherwise it returns the stable safe code
 `P18_PLACEMENT_REVIEW_REQUIRED`. The separately gated WP-7.5 workflow is
 defined in [Review Note #28](./28-phase4-p18-placement-governance-review-note.md).
-Its amended source and P-32 Local live evidence pass, while the existing release
-hold and hidden Add/Supplement controls remain until P-33/WP-8/P-14.
+Its amended source, P-32 Local live evidence, and P-33 technical acceptance
+pass, while the existing release hold and hidden Add/Supplement controls remain
+until WP-8/P-14.
 
 Phase 4 should set `material_cost`, `labor_cost`, `unit_cost`, `is_active`,
 `created_at`, and `updated_at` to `NOT NULL` only after the preflight confirms
@@ -864,9 +866,9 @@ P-28/G4 recorded that closeout and placed unchanged `020` in
 P-18 is accepted and the placement extension is implemented only in append-only
 migration `021_master_catalog_phase4_placement_governance.sql`. Do not edit or
 renumber `017`-`020`. P-32 passed separate Local apply/order/RLS/concurrency/
-hash/export/browser evidence. Add `021` to bootstrap only after exact P-33 and
-the reviewed inclusion decision, then rerun P-20, WP-7, and the full WP-8 clean
-rehearsal.
+hash/export/browser evidence, and P-33 accepted that bounded technical scope.
+Add `021` to bootstrap only after the reviewed inclusion/WP-8 decision, then
+rerun P-20, WP-7, and the full WP-8 clean rehearsal.
 
 Do not edit an applied migration file. Forward-fix with a new reviewed
 migration.

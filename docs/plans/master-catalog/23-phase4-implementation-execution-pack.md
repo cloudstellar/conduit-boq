@@ -65,6 +65,16 @@ WP-6.5/P-20, WP-7, advisor, repository, and final-invariant gates. This makes
 WP-7 ready for owner review; it does not approve P-18/`021`, P-19, WP-8,
 Factor F/hotfix expansion, feature enablement, publication, or Production.
 
+**P-33 WP-7.5 technical acceptance and WP-8 UX-gate alignment recorded:**
+2026-07-15 13:54 +07 — after P-32 replacement evidence passed, the owner
+accepted the exact WP-7.5 technical checkpoint. This acceptance confirms the
+bounded database/RPC/order/hash/export/browser mechanism only. It does not
+certify intended-admin usability or authorize `021` bootstrap inclusion, a
+Local reset, WP-8 execution, P-19, feature enablement, publication, Factor F or
+hotfix expansion, or Production. The placement UX criteria in Section 16 are
+hard WP-8/P-14 release gates. Drag and drop is optional and cannot be the only
+control; arbitrary inherited-row reorder remains outside Phase 4.
+
 **P-22 operator-workflow correction authorized:** 2026-07-12 — intended-admin
 review placed WP-6.6 closeout on Hold and accepted
 [Correction Plan #31](./31-phase4-wp66-operator-workflow-correction-plan.md).
@@ -202,7 +212,7 @@ Start blocked:
 | P-10 runtime CI assets | CI implementation/deploy | Decision Register |
 | P-11 official export visual sample | Export acceptance | Decision Register |
 | P-12 to P-15 | Production migration/deploy/enable/publish | Decision Register |
-| P-18 add/supplement placement governance | Accepted via P-30; amended WP-7.5 passed the separately authorized P-32 Local apply/reset/live gate; exact P-33 acceptance and the later bootstrap/WP-8 decision remain separately gated | Decision Register / Review Note #28 |
+| P-18 add/supplement placement governance | Accepted via P-30; amended WP-7.5 passed the separately authorized P-32 Local apply/reset/live gate and P-33 bounded technical acceptance; the later bootstrap/WP-8 UX/release decision remains separately gated | Decision Register / Review Note #28 |
 | P-19 inactive/retired export policy | Publication/filing of any version with inactive rows | Decision Register |
 | P-20 canonical hash/identity portability | Initial WP-6.5 exit and rerun after WP-6.6/WP-7.5 migration changes, WP-8 clean rehearsal, and migration fingerprint freeze | Decision Register |
 | P-21 Audit #29 WP-6.6 scope/start | WP-6.6 implementation and any migration `020` execution | Decision Register / Completeness Audit |
@@ -216,10 +226,10 @@ Rule: unresolved P-02 through P-11 does not block generic additive schema,
 parser, UI shell, tests, or local rehearsal. It blocks final candidate data
 freeze, approved backfill, export acceptance, and publication where applicable.
 P-18 is resolved for V1 design, and amended WP-7.5 passed its P-32 Local
-technical gate. The existing DB hold continues to block publishing any version
-with add/supplement/new identity rows until P-33 and the later WP-8/P-14 release
-gates pass and the accepted placement revision is current. Unresolved P-19
-blocks official field-facing PDF filing
+technical gate and P-33 acceptance. The existing DB hold continues to block
+publishing any version with add/supplement/new identity rows until the later
+WP-8/P-14 UX/release gates pass and the accepted placement revision is current.
+Unresolved P-19 blocks official field-facing PDF filing
 for any version with inactive/retired rows. P-20 reruns still block
 clean-rehearsal hash acceptance, migration fingerprint freeze, and P-15 hash
 acceptance.
@@ -758,7 +768,8 @@ schema-qualified amendment is SHA-256
 replacement clean-chain DB/RLS/concurrency/order/hash/export/browser evidence
 then passed on source `80b2574` plus UI checkpoint `99fa56c`. Final Local
 cleanup restored pointer/flags/drafts/BOQ/Factor F. `021` stays outside
-bootstrap, and P-33 owner acceptance remains required.
+bootstrap. P-33 later accepted the bounded technical checkpoint; WP-8 UX/
+release evidence remains required.
 
 Exit gate:
 
@@ -772,8 +783,10 @@ Exit gate:
 - if this WP is deferred, Add/Supplement remain hidden and the P-18 DB guard is
   retained/tested for WP-8/P-14.
 
-Technical exit evidence above is green. Mark WP-7.5 complete only after P-33
-owner accept/hold is recorded; do not infer WP-8 or bootstrap authorization.
+Technical exit evidence above is green. P-33 accepted this exact bounded
+technical checkpoint on 2026-07-15 13:54 +07, so WP-7.5 is complete for its
+technical scope. This does not infer WP-8, `021` bootstrap inclusion, intended-
+admin UX acceptance, feature enablement, or Production authorization.
 
 ## 16. WP-8 clean local rehearsal
 
@@ -782,9 +795,10 @@ Goal: prove the full plan works from a clean state.
 Run order:
 
 1. Clean local reset from the canonical bootstrap chain, including `009`-`015`,
-   production hotfix `016`, and Phase 4 `017`-`020`. Add `021` only after P-33
-   and a separate bootstrap/WP-8 decision; P-32 separate-apply evidence is not
-   source inclusion. The current bootstrap authority ends at `020`.
+   production hotfix `016`, and Phase 4 `017`-`020`. Add `021` only after the
+   separate bootstrap/WP-8 decision; P-33 technical acceptance and P-32
+   separate-apply evidence are not source inclusion. The current bootstrap
+   authority ends at `020`.
 2. Load approved baseline fixture/snapshot.
 3. Record catalog count/hash and Factor F baseline.
 4. Confirm Phase 4 `017+` migrations apply only after hotfix `016`.
@@ -813,11 +827,53 @@ Run order:
 20. Run documentation/authority consistency verification.
 21. Fill Verification Report with evidence references.
 
+Placement UX hard gates for the full Add/Supplement release:
+
+- **Truthful local state:** after an accepted server-side placement, changing a
+  category, anchor, before/after relation, or same-anchor sibling order must
+  immediately replace any accepted-state claim with a clear **ยังไม่ยืนยัน**
+  state. Page-level and workspace-level messages must not contradict each other.
+- **Safe continuation:** pending placement choices must survive paging and the
+  supported return path. Leaving or reloading with unconfirmed changes must
+  warn the admin or provide an equally clear recoverable continuation; the UI
+  must never imply those local choices were saved to the draft.
+- **Review by exception:** system suggestions remain visible as suggestions,
+  admin-modified rows are distinguishable, incomplete/invalid rows are counted,
+  and the admin can filter directly to rows that still require attention. The
+  workflow must not require confirming 710 inherited rows one by one.
+- **Impact before commit:** the final confirmation shows total new identities,
+  inherited rows whose numeric position will shift, affected categories,
+  incomplete/conflicting assignments, and the immediate final neighbors for
+  changed new rows. One confirmation still applies the complete pending batch.
+- **Keyboard and pointer equivalence:** category, searchable anchor,
+  before/after choice, paging, sibling up/down, and confirmation are operable
+  and visibly focused by keyboard. A custom radio-style control implements the
+  expected arrow-key behavior or uses a standards-complete existing component.
+  Drag may be added only as an optional desktop enhancement with the existing
+  non-drag path preserved.
+- **Measured scale:** record browser/device, agreed realistic new-item batch
+  size, and timings or interaction observations for 710 inherited rows across
+  initial render, search, anchor selection, preview recalculation, paging,
+  sibling movement, and confirmation. Material stutter, focus loss, layout
+  shift, or an unexplained regression blocks release until fixed or explicitly
+  accepted with owner/remediation metadata.
+- **Independent comprehension:** an intended admin/data custodian completes the
+  placement task without developer or SQL help, explains suggested versus
+  unconfirmed versus accepted state, explains the shifted-row count, recovers
+  from one stale-placement response, and returns to final review without an
+  irreversible mistake.
+
+These gates harden the accepted V1 architecture; they do not add arbitrary
+reorder of inherited identities, taxonomy editing, a second approval role, or a
+round-trip spreadsheet editor.
+
 Exit gate:
 
 - all gates pass;
 - P-20 hash portability evidence passes across the approved clean-reset scope;
 - admin UAT has no irreversible mistake or developer-only recovery path;
+- every placement UX hard gate above has current automated/browser/UAT evidence
+  or the Add/Supplement controls remain hidden/disabled at P-14;
 - performance measurements are within the reviewed budget or carry an explicit
   accepted-risk owner/remediation record;
 - accepted warnings have owner, technical rationale, remediation owner, and due
@@ -996,7 +1052,7 @@ Before asking for code review:
 | P-08/P-09 missing | P-08 is currently approved in the Decision Register; if superseded or missing, continue local draft mechanics but do not validate publication-completeness. If P-09 is missing, continue local draft/publish mechanics but do not publish Production |
 | P-10 missing or superseded | Current Decision Register records P-10 approved limited runtime CI assets; if superseded or missing, use placeholder-safe local styling only and do not deploy CI assets |
 | P-11 missing | Build export mechanics; do not accept official export visual |
-| P-33 or WP-8/P-14 placement release acceptance missing | Keep draft add/supplement review capability-gated, and block publication of versions with new identities until the exact placement checkpoint and release evidence are accepted |
+| WP-8/P-14 placement release acceptance missing | Keep draft add/supplement review capability-gated, and block publication of versions with new identities until the placement UX, performance, intended-admin, and release evidence are accepted |
 | P-19 unresolved | Do not file a field-facing official PDF for versions with inactive/retired rows; publish only if owner explicitly approves the rendering/exclusion policy |
 | P-20 unresolved | Continue non-hash-changing reliability work, but do not accept WP-8 clean-reset hash evidence, freeze the migration fingerprint, or request P-15 |
 | Any Audit #29 C-01 through C-17 gap unresolved | Do not start WP-7 or claim full operator readiness. Implement WP-6.6 or remove the affected control from release visibility according to the audit |
