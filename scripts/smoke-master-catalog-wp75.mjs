@@ -423,6 +423,12 @@ try {
     (query) => query.eq('status', 'draft'),
   )
   assert(workingDraftCount === 0, `WP-7.5 left ${workingDraftCount} working drafts`)
+  await setSetting('catalog_new_identity_enabled', originalNewIdentityFlag)
+  await setSetting('catalog_retirement_enabled', originalRetirementFlag)
+  await setSetting('catalog_admin_enabled', originalAdminFlag)
+  assert(await readSetting('catalog_new_identity_enabled') === false, 'New-identity flag was not restored')
+  assert(await readSetting('catalog_retirement_enabled') === false, 'Retirement flag was not restored')
+  assert(await readSetting('catalog_admin_enabled') === false, 'Admin flag was not restored')
 
   const evidence = {
     schemaVersion: 1,
@@ -483,7 +489,7 @@ try {
     workingDraftsRemaining: workingDraftCount,
     boqUnchanged: true,
     factorFUnchanged: true,
-    featureFlagsRestoredByFinally: true,
+    featureFlagsRestored: true,
     productionTouched: false,
   }
 

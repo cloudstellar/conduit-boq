@@ -83,5 +83,7 @@ describe('Master Catalog WP-7.5 live evidence contracts', () => {
     expect(smoke).toContain('WP-7.5 changed BOQ bindings')
     expect(smoke).toContain('WP-7.5 changed Factor F state')
     expect(smoke).toContain('workingDraftCount === 0')
+    expect(smoke).toContain("featureFlagsRestored: true")
+    expect(smoke).toContain("Admin flag was not restored")
   })
 })
