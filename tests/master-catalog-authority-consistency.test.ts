@@ -135,7 +135,7 @@ describe('Master Catalog authority consistency', () => {
       '**Owner-accepted Local-only migration in bootstrap source; SHA-256 `e07e0c4161077efba7bc4f6ebf95518d0cc1bc7e4628a43a128dd899bd1aef93`; G1R/G2 separate-apply evidence passed on exact checkout `721c2c2c4a234a4fd00e5686383be9af87ee15dd`; G3/WP-6.6 accepted on `78e96ab3ed9993707014c4aba1d285b7592b17a1`; owner-approved G4E combined clean bootstrap through `020` passed on exact execution checkout `15b707d443bec701f6b3a86aa7675ca1266604ba`; not Production-approved**',
     )
     expect(migrations).toContain(
-      '**Owner-accepted Local-only Source/Static checkpoint `4e3574a31a2697f4d727acabc8f55f34a4233bff` on 2026-07-15; SHA-256 `78359215f7d859d9c167db608e1e96d66712b6b06a9d103fd7b26ce781835a83`; not in bootstrap or applied to Local; live DB/visual evidence and Production approval remain separate**',
+      '**Local-only runtime fix candidate; P-31 Source/Static checkpoint `4e3574a` / SHA-256 `78359215...` is historical after approved live execution exposed unqualified-constraint error `42704`; current SHA-256 `e4de258756bbfbda0508e55d7b76ba2e907f644625b49bc29d4a4d7ac42fa714`; outside bootstrap; amended live evidence and Production approval remain pending**',
     )
     expect(existsSync(resolve(
       root,
@@ -154,6 +154,9 @@ describe('Master Catalog authority consistency', () => {
     )
     expect(packageJson.scripts?.['db:local:smoke-master-catalog-wp7']).toBe(
       'node --env-file=.env.development.local --env-file=supabase/.env.local scripts/smoke-master-catalog-wp7.mjs',
+    )
+    expect(packageJson.scripts?.['db:local:smoke-master-catalog-wp75']).toBe(
+      'node --env-file=.env.development.local --env-file=supabase/.env.local scripts/smoke-master-catalog-wp75.mjs',
     )
     expect(existsSync(resolve(
       root,
@@ -216,6 +219,7 @@ describe('Master Catalog authority consistency', () => {
     expect(decisions).toContain('| P-29 |')
     expect(decisions).toContain('| P-30 |')
     expect(decisions).toContain('| P-31 |')
+    expect(decisions).toContain('| P-32 |')
     expect(decisions).toContain(
       'Accepted 2026-07-14 23:50 +07; WP-6.6 complete; G4 and all later gates remain separate',
     )
@@ -244,11 +248,9 @@ describe('Master Catalog authority consistency', () => {
     expect(tracker).toMatch(/\| WP-8 \|[^\n]+\| Not started \|/)
     expect(tracker).toContain('independent intended-admin UAT remains WP-8')
     expect(tracker).toContain('| Production write allowed | No |')
+    expect(tracker).toContain('P-32 authorized the warned Local reset')
     expect(tracker).toContain(
-      'P-31 accepted exact WP-7.5 Source/Static checkpoint',
-    )
-    expect(tracker).toContain(
-      'WP-7.5 P-18 Source/Static checkpoint is owner-accepted; live Local evidence remains pending',
+      'WP-7.5 P-18 runtime fix candidate; replacement Local evidence pending',
     )
     expect(tracker).toContain(
       '4e3574a31a2697f4d727acabc8f55f34a4233bff',
@@ -278,6 +280,9 @@ describe('Master Catalog authority consistency', () => {
       '78359215f7d859d9c167db608e1e96d66712b6b06a9d103fd7b26ce781835a83',
     )
     expect(tracker).toContain(
+      'e4de258756bbfbda0508e55d7b76ba2e907f644625b49bc29d4a4d7ac42fa714',
+    )
+    expect(tracker).toContain(
       'G1R/G2 exact checkout 721c2c2c4a234a4fd00e5686383be9af87ee15dd',
     )
     expect(tracker).toContain(
@@ -303,9 +308,7 @@ describe('Master Catalog authority consistency', () => {
     expect(tracker).toMatch(
       /pre-amendment operator\/browser preflight passed on\s+`c8f6dca`/,
     )
-    expect(tracker).toContain(
-      'Status: P-31 accepted exact checkpoint 4e3574a31a2697f4d727acabc8f55f34a4233bff for commit/push; migration 021/RPC/read-model/Thai UI/test/docs source/static passed, but bootstrap inclusion and Local apply/reset/live evidence are not accepted',
-    )
+    expect(tracker).toContain('Status: P-31 accepted exact checkpoint 4e3574a31a2697f4d727acabc8f55f34a4233bff for commit/push')
     expect(existsSync(resolve(
       root,
       'docs/plans/master-catalog/30-phase4-wp66-owner-review-note.md',

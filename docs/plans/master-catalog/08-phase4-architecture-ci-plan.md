@@ -142,8 +142,10 @@ Factor F/hotfix expansion, and Production remain separate.
 
 **WP-7.5 source checkpoint:** 2026-07-15 — migration `021` and the exact
 placement RPC/readiness/publish/read-model/Thai-workspace contracts passed
-repository/static review at SHA-256
-`78359215f7d859d9c167db608e1e96d66712b6b06a9d103fd7b26ce781835a83`.
+repository/static review at historical SHA-256 `78359215...`. P-32 live
+execution then exposed fail-closed runtime error `42704`; schema-qualifying the
+deferred constraint produces current fix candidate SHA-256
+`e4de258756bbfbda0508e55d7b76ba2e907f644625b49bc29d4a4d7ac42fa714`.
 The architecture is unchanged: inherited order remains stable, new identities
 are confirmed as one batch, DB authority remains final, and Add/Supplement stay
 disabled until separately approved Local live evidence passes.

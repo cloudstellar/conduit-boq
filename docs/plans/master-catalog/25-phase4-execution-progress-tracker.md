@@ -45,12 +45,15 @@ checkout `15b707d443bec701f6b3a86aa7675ca1266604ba`; combined bootstrap through
 final invariants passed. P-30 then accepted WP-7 and all five P-18 V1 rules on
 2026-07-15 01:37 +07, authorizing bounded WP-7.5 Local-only source work.
 The migration `021`/RPC/read-model/Thai-workspace repository/static candidate
-then passed on 2026-07-15 at SHA-256
-`78359215f7d859d9c167db608e1e96d66712b6b06a9d103fd7b26ce781835a83`.
-P-31 then accepted the exact Source/Static checkpoint
-`4e3574a31a2697f4d727acabc8f55f34a4233bff` at 2026-07-15 10:24 +07.
-Bootstrap inclusion, Local DB/browser evidence, P-19, WP-8, Factor F/hotfix
-expansion, and Production remain separate.
+passed at historical SHA-256 `78359215...`, and P-31 accepted exact checkpoint
+`4e3574a` at 2026-07-15 10:24 +07. P-32 then approved the warned Local reset,
+separate apply, and live gate. The harness failed closed at runtime with `42704`
+because the fixed-search-path function deferred an unqualified constraint;
+cleanup restored pointer `2568.0.0`, zero drafts, and all disabled flags. The
+current schema-qualified fix candidate has SHA-256
+`e4de258756bbfbda0508e55d7b76ba2e907f644625b49bc29d4a4d7ac42fa714`.
+Replacement live evidence is pending. Bootstrap inclusion, P-19, WP-8,
+Factor F/hotfix expansion, and Production remain separate.
 **Purpose:** Owner-facing progress tracker for Master Catalog Phase 4 local
 implementation and rehearsal. This file is the authority for current WP status,
 blockers, next safe step, and the authority/evidence index. Detailed decisions,
@@ -84,14 +87,14 @@ Allowed statuses:
 |---|---|
 | Current branch | `codex/master-catalog-phase4` |
 | Owner-accepted G3/WP-6.6 checkpoint | `78e96ab3ed9993707014c4aba1d285b7592b17a1` at 2026-07-14 23:50 +07 |
-| Named evidence commits | `4e3574a31a2697f4d727acabc8f55f34a4233bff` is the owner-accepted WP-7.5 Source/Static checkpoint; `15b707d443bec701f6b3a86aa7675ca1266604ba` is the exact pushed G4E combined clean-execution checkout; `2c43f6b0e644171b1ecba60c14566e5856a94b63` is the exact G4R bootstrap/WP-7 source checkpoint; `6599c306207c2d1e15342c398888b56513f9bb0a` is the source HEAD for the P-25-complete, real-route G3 technical walkthrough; `721c2c2c4a234a4fd00e5686383be9af87ee15dd` is the exact clean G1R/G2 execution checkout and final DB-evidenced candidate; `050c998361f3372bd3bf9fb6645dc4abd1c0bf2b` is the exact P-24 same-scope closure-lineage checkpoint; `88d0711` is its base implementation/repository checkpoint. G1R diagnostics exposed and fixed stale harness assumptions at `f9f0bd7`, `bfccbb3`, `be157d4`, and `2b1ccec`; `721c2c2` added the two required authority foreign-key covering indexes. `31fd689` produced the P-23/P-23.1 source/repository checkpoint; `c8f6dca282cd2729ac2b58e488b3ef516fb29713` produced the pre-G2 operator/UI source checkpoint; `e463270dfb9f23332559f31591cf338b8eeada3c` produced historical P-22 G1 DB/P-20 evidence; `17ec6cc` repaired reusable WP-6.5 fixture cleanup found during G1; `ac31feb` produced the P-22 source/static implementation checkpoint; `3bfc74ea00843033ad3cfd2afac43820b18c0124` produced historical WP-6.6 DB and post-`020` P-20/browser evidence; `59b17d3c3e7ed6180445ac5dc5e0b75db9fe9452` added the verified Local secret/login guard; `1ad01b9268cec64c621266c3eb33b16a4325e627` produced the two clean WP-6.5/P-20 rebuilds; `54233731b121c32723bb8efcc6889f70f3f2dcef` produced live lifecycle-negative evidence; `e782459ce17b2bda90d7f34efd4e15c28565ad07` produced transport response-loss evidence; `9becdf675386b03a3aeff717cebccd6e88f8b664` produced browser same-ID/input-preservation evidence; `777df7598c8aa96a17f3665db5131e5fb5397b96` produced the accepted P-11 pair; `edf3570a` is superseded history |
-| Current work package | WP-7.5 P-18 Source/Static checkpoint is owner-accepted; live Local evidence remains pending |
-| Current environment | Local integrated `009`-`020` rehearsal passed; pointer and disabled baseline restored |
+| Named evidence commits | `4e3574a31a2697f4d727acabc8f55f34a4233bff` is the historical owner-accepted WP-7.5 Source/Static checkpoint superseded for execution by the `42704` finding; `52710b1` is the diagnostic harness checkpoint; `15b707d443bec701f6b3a86aa7675ca1266604ba` is the exact pushed G4E combined clean-execution checkout; `2c43f6b0e644171b1ecba60c14566e5856a94b63` is the exact G4R bootstrap/WP-7 source checkpoint; `6599c306207c2d1e15342c398888b56513f9bb0a` is the source HEAD for the P-25-complete, real-route G3 technical walkthrough; `721c2c2c4a234a4fd00e5686383be9af87ee15dd` is the exact clean G1R/G2 execution checkout and final DB-evidenced candidate; `050c998361f3372bd3bf9fb6645dc4abd1c0bf2b` is the exact P-24 same-scope closure-lineage checkpoint; `88d0711` is its base implementation/repository checkpoint. Earlier named evidence remains preserved in the detailed log. |
+| Current work package | WP-7.5 P-18 runtime fix candidate; replacement Local evidence pending |
+| Current environment | Local bootstrap through `020` plus separately applied historical `021`; failed fixtures cleaned, pointer `2568.0.0`, zero drafts, all catalog flags false |
 | Production write allowed | No |
 | Feature flag default | Disabled |
-| Latest owner decision | P-31 accepted exact WP-7.5 Source/Static checkpoint `4e3574a31a2697f4d727acabc8f55f34a4233bff` at 2026-07-15 10:24 +07 and authorized commit/push of that tracked checkpoint. It does not authorize bootstrap inclusion, Local reset/apply/live evidence, P-19, WP-8, Factor F/hotfix expansion, feature enablement, publication, or Production. |
-| Latest technical result | WP-7.5 repository/static candidate passed: migration `021` SHA-256 `78359215f7d859d9c167db608e1e96d66712b6b06a9d103fd7b26ce781835a83`; focused 4 files/37 tests and full 32 files/175 tests; TypeScript; lint 0 errors/10 existing warnings; authority 710/65/17; dependency audit 0 vulnerabilities; network-enabled production build including `/placement`; and `git diff --check`. Migration `020` remained unchanged; no Local DB command, bootstrap change, feature enablement, or Production action occurred. |
-| Next owner review point | Separately approve or hold one warned Local reset/application/live-evidence run against exact checkpoint `4e3574a`; do not infer bootstrap inclusion, WP-8, or Production approval. |
+| Latest owner decision | P-32 authorized the warned Local reset/bootstrap-through-`020`, separate `021` apply, live evidence, and same-scope fix-forward. It does not authorize bootstrap inclusion of `021`, P-19, WP-8, Factor F/hotfix expansion, feature enablement, or Production. |
+| Latest technical result | Live harness checkpoints `cc4cd92`/`52710b1` exposed PostgreSQL `42704` in both concurrent calls; schema qualification was proven locally and implemented as current migration SHA-256 `e4de258756bbfbda0508e55d7b76ba2e907f644625b49bc29d4a4d7ac42fa714`. Both failed runs cleaned pointer/drafts/flags/test trigger. Replacement live evidence is pending. |
+| Next owner review point | Complete source/static and replacement Local live evidence for exact amended `021`, then request exact technical accept/hold; do not infer bootstrap inclusion, WP-8, or Production approval. |
 | Last updated | 2026-07-15 |
 
 ## 2.1 Canonical authority and evidence manifest
@@ -275,11 +278,11 @@ Current evidence baseline:
    completed clean G4E execution on exact `15b707d`; P-30 accepted WP-7 and
    authorized bounded P-18/WP-7.5 Local-only source implementation;
 - Local bootstrap source authority order: `009`-`015`, `016`, `017`-`020`;
-- owner-approved candidate `021` (P-18/WP-7.5) passed repository/static review
-  at SHA-256
-  `78359215f7d859d9c167db608e1e96d66712b6b06a9d103fd7b26ce781835a83` and
-  remains outside bootstrap; P-30 authorizes source implementation, not Local
-  apply/reset;
+- historical candidate `021` passed repository/static review at SHA-256
+  `78359215...`; P-32 live execution exposed fail-closed `42704`. Current
+  schema-qualified fix candidate SHA-256 is
+  `e4de258756bbfbda0508e55d7b76ba2e907f644625b49bc29d4a4d7ac42fa714` and
+  remains outside bootstrap pending replacement live evidence;
 - Local login/password parsing was verified after commit `59b17d3`; guarded
   secrets containing a literal `#` must be quoted and ambiguous values now fail
   closed. `supabase/.env.local` remains ignored;
@@ -301,7 +304,7 @@ Current evidence baseline:
 | WP-6.5 | Reliability and publish-boundary hardening | Complete | Code/static implementation for A-H, two owner-approved clean Local rebuilds/P-20 evidence on `1ad01b9`, live lifecycle negatives on `5423373`, transport response-loss recovery on `e782459`, browser same-ID/input-preservation proof on `9becdf6`, and owner-accepted export evidence on `777df75` passed. See the sub-gate table below. | Complete for its bounded reliability scope; it is not an operator-completeness or release-readiness certificate, and WP-8 reruns remain. |
 | WP-6.6 | Admin workflow completeness and authority hardening | Complete | P-24 base `88d0711` and closure lineage `050c998` are preserved; owner-approved G1R/G2 passed on exact `721c2c2`; P-25 presentation passed 27/27; real-route G3 stale-lock recovery passed on source `6599c30`; P-26 high-impact confirmation and clean no-reset Local proof were committed at exact `78e96ab3ed9993707014c4aba1d285b7592b17a1`. | Owner accepted G3/WP-6.6 via P-27 at 2026-07-14 23:50 +07; G4 bootstrap/WP-7 sequencing remains separately gated |
 | WP-7 | Permanent BOQ/hotfix `016` and Factor F regression preservation | Complete | P-29/G4E clean integrated execution passed the tracked live harness for all suffixes, catalog authority, rollback/role/version negatives, BOQ binding/copies, print/export data modes, publish/restore, and BOQ/Factor F/security before-after checks on exact `15b707d`. | Owner accepted via P-30 at 2026-07-15 01:37 +07; rerun remains part of WP-8 after `021` |
-| WP-7.5 | P-18 new-identity placement governance | In progress | Owner accepted exact Source/Static checkpoint `4e3574a`; migration `021`, placement revision/review, exact RPC/RLS/audit/order contract, Thai UI, and unit/static gates passed. Local SQL execution, role/concurrency/hash/export/browser evidence remain pending. | P-31 authorizes the tracked checkpoint only; bootstrap inclusion and warned Local reset/apply/live evidence remain separate approvals |
+| WP-7.5 | P-18 new-identity placement governance | In progress | Historical Source/Static checkpoint `4e3574a` passed but live execution exposed fail-closed `42704`. Current schema-qualified migration SHA-256 is `e4de258756bbfbda0508e55d7b76ba2e907f644625b49bc29d4a4d7ac42fa714`; role/concurrency/hash/export/browser replacement evidence remains pending. | P-32 authorizes same-scope Local fix-forward/live evidence only; bootstrap inclusion, WP-8, and Production remain separate |
 | WP-8 | Clean Local rehearsal, admin UAT, performance baseline, and Verification Report | Not started | Owner-approved Local reset, full supported workflow, DB integration/concurrency, test/lint/build/audit/advisor evidence, tracked export verification, admin UAT without developer/SQL assistance, and measured 710-row performance | Requires WP-6.6/WP-7 plus WP-7.5 or hidden Add/Supplement; required before any P-12 request |
 | WP-9 | Production migration/deploy/enable/publish | Not authorized | P-12 through P-15 sequential approvals | Separate Production readiness review required |
 
@@ -362,6 +365,7 @@ Current evidence baseline:
 
 | Date/time | WP | Evidence | Result | Notes |
 |---|---|---|---|---|
+| 2026-07-15 | P-32/WP-7.5 Local live diagnostic | Owner-approved Local reset/bootstrap through `020`, separate historical `021` apply, new tracked WP-7.5 harness, temp-aware lint, and two runtime attempts | Failed closed; same-scope fix-forward in progress | Standard DB lint reported the documented temp-table static-analysis limitation; a transaction-scoped temp-aware `plpgsql_check` returned no findings. Runtime reached placement but both sessions returned PostgreSQL `42704` because `SET CONSTRAINTS` used an unqualified name under fixed `search_path = ''`. Schema-qualified syntax passed Local SQL. Both runs restored pointer `2568.0.0`, zero drafts, all flags false, and removed the injected test trigger/function. Current `021` SHA-256 is `e4de258756bbfbda0508e55d7b76ba2e907f644625b49bc29d4a4d7ac42fa714`; replacement evidence pending. Production touched: No. |
 | 2026-07-15 10:24 +07 | P-31 WP-7.5 Source/Static acceptance | Owner reviewed the owner/developer recommendation and authorized the accepted checkpoint sequence | Exact Source/Static checkpoint `4e3574a31a2697f4d727acabc8f55f34a4233bff` accepted for commit/push; live gate not inferred | Migration `021` remains SHA-256 `78359215f7d859d9c167db608e1e96d66712b6b06a9d103fd7b26ce781835a83`, outside bootstrap and unapplied. Local reset/apply/live evidence, P-19, WP-8, Factor F/hotfix expansion, feature enablement, publication, and Production remain separate. Untracked `files/`, `tmp/`, and `output/` were excluded. |
 | 2026-07-15 07:33 +07 | WP-7.5 P-18 repository/static | Implemented and reviewed migration `021`, exact placement/readiness/publish contracts, Thai all-pending-items workspace, import/Add release gating, and aligned tests/docs without applying SQL | Passed working-tree source/static candidate; owner accept/commit and live gate not inferred | Migration `021` SHA-256 `78359215f7d859d9c167db608e1e96d66712b6b06a9d103fd7b26ce781835a83`; focused 4 files/37 tests and full 32 files/175 tests, TypeScript, lint 0 errors/10 existing warnings, authority 710/65/17, dependency audit 0 vulnerabilities, network-enabled production build, and diff checks passed. Migration `020` stayed SHA-256 `e07e0c4161077efba7bc4f6ebf95518d0cc1bc7e4628a43a128dd899bd1aef93`. `021` remains outside bootstrap; no Local DB command, feature flag change, browser/live visual acceptance, Production, P-19, Factor F workflow, or hotfix expansion occurred. |
 | 2026-07-15 01:37 +07 | P-30 WP-7 acceptance and P-18/WP-7.5 start | Owner reviewed the G4E result and full-versus-limited release recommendation, then instructed implementation to follow the accepted architecture and relevant best practices | WP-7 accepted; all five P-18 V1 rules accepted; WP-7.5 Local-only source work authorized | Scope is migration `021`, exact RPC/read model, Thai-first placement workspace, tests, and aligned authority docs. Add/Supplement remain disabled. Bootstrap inclusion, Local reset/evidence, WP-8, P-19, Factor F/hotfix expansion, feature enablement, publication, and Production remain separate. |
@@ -510,12 +514,12 @@ Current evidence baseline:
 Use this template at the end of each implementation session:
 
 ```text
-Current WP: WP-7.5 P-18 Source/Static checkpoint accepted; live Local evidence gate pending; WP-7, G4R, and WP-6.6 are complete
-Status: P-31 accepted exact checkpoint 4e3574a31a2697f4d727acabc8f55f34a4233bff for commit/push; migration 021/RPC/read-model/Thai UI/test/docs source/static passed, but bootstrap inclusion and Local apply/reset/live evidence are not accepted
+Current WP: WP-7.5 P-18 runtime fix candidate; replacement Local evidence pending; WP-7, G4R, and WP-6.6 are complete
+Status: P-31 accepted exact checkpoint 4e3574a31a2697f4d727acabc8f55f34a4233bff for commit/push; P-32 live execution exposed fail-closed 42704; schema-qualified fix-forward is in progress and bootstrap inclusion remains unapproved
 Branch: codex/master-catalog-phase4
 Execution provenance: WP-7.5 Source/Static checkpoint 4e3574a31a2697f4d727acabc8f55f34a4233bff; G4E exact checkout 15b707d443bec701f6b3a86aa7675ca1266604ba; G4R source checkpoint 2c43f6b0e644171b1ecba60c14566e5856a94b63; owner-accepted application checkpoint 78e96ab3ed9993707014c4aba1d285b7592b17a1; G3 source 6599c306207c2d1e15342c398888b56513f9bb0a; G1R/G2 exact checkout 721c2c2c4a234a4fd00e5686383be9af87ee15dd; P-24 base lineage 88d0711; same-scope closure lineage 050c998
 Migration 020 SHA-256: e07e0c4161077efba7bc4f6ebf95518d0cc1bc7e4628a43a128dd899bd1aef93; bootstrap source ends at 020; combined clean execution passed
-Migration 021 SHA-256: 78359215f7d859d9c167db608e1e96d66712b6b06a9d103fd7b26ce781835a83; repository/static passed; outside bootstrap and unapplied
+Migration 021 SHA-256: e4de258756bbfbda0508e55d7b76ba2e907f644625b49bc29d4a4d7ac42fa714; runtime fix candidate; outside bootstrap; replacement live evidence pending
 Prior named evidence commits: 721c2c2 for exact G1R/G2 and FK-index closure; 2b1ccec/be157d4/bfccbb3/f9f0bd7 for truthful harness corrections; 050c998 for P-24 closure lineage; 88d0711 for P-24 base repository/static; 31fd689 for P-23/P-23.1 source; c8f6dca for historical operator/UI; e463270 for historical P-22 G1 DB/P-20; 777df75 for accepted P-11
 Files changed: migration 021; placement model/read/action/UI/route/release gates; P-18 contracts/SOP/tracker/verification docs; focused/static tests. Production, Factor F, hotfix 016, bootstrap, and untracked files/, tmp/, output/ unchanged
 Evidence produced: repository/static only; no new Local DB or browser artifact. Migration hashes and check results are recorded above

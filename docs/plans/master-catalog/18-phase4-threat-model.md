@@ -20,8 +20,10 @@ WP-7.5 Local-only source implementation. No bootstrap inclusion, Local
 apply/reset, WP-8 execution, or Production action is authorized.
 
 **P-18 source-control checkpoint:** 2026-07-15 — T-33 through T-35 controls
-are implemented in the repository/static candidate at migration `021`
-SHA-256 `78359215f7d859d9c167db608e1e96d66712b6b06a9d103fd7b26ce781835a83`.
+were implemented in historical repository/static candidate SHA-256
+`78359215...`. Approved live execution exposed fail-closed error `42704`; the
+schema-qualified migration `021` fix candidate is SHA-256
+`e4de258756bbfbda0508e55d7b76ba2e907f644625b49bc29d4a4d7ac42fa714`.
 Residual risk remains Medium until approved Local role/direct-write,
 concurrency/rollback, hash/export, and browser evidence passes.
 

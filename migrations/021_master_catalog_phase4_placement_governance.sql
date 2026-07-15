@@ -1164,7 +1164,7 @@ SET LOCAL statement_timeout = '60s';
       RETURNING id INTO v_change_set_id;
 
       PERFORM set_config('catalog.placement_write', 'on', true);
-      SET CONSTRAINTS uq_price_list_version_display_order DEFERRED;
+      SET CONSTRAINTS public.uq_price_list_version_display_order DEFERRED;
 
       UPDATE public.price_list candidate
       SET

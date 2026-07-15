@@ -4,13 +4,15 @@
 Local-only source implementation on 2026-07-15 01:37 +07; repository/static
 candidate passed and P-31 accepted exact Source/Static checkpoint
 `4e3574a31a2697f4d727acabc8f55f34a4233bff` on 2026-07-15 10:24 +07;
-Local DB/browser evidence and owner closeout remain pending
+P-32 approved the warned Local gate, whose first runtime evidence exposed
+fail-closed `42704`; amended Local DB/browser evidence and closeout remain pending
 
-**Environment:** Repository/source implementation only. Exact migration SHA-256:
-`78359215f7d859d9c167db608e1e96d66712b6b06a9d103fd7b26ce781835a83`. No
-Local reset or DB mutation for evidence, bootstrap inclusion of `021`, WP-8
-execution, Production access/write, feature enablement, or publication is
-authorized by this note.
+**Environment:** Local-only fix-forward evidence. Historical P-31 migration
+SHA-256 `78359215...` failed closed at runtime because the fixed-search-path
+function deferred an unqualified constraint. Current schema-qualified SHA-256:
+`e4de258756bbfbda0508e55d7b76ba2e907f644625b49bc29d4a4d7ac42fa714`.
+Migration `021` remains outside bootstrap. WP-8, Production access/write,
+feature enablement, and publication remain unauthorized.
 
 ## 1. Why this is now a release decision
 
@@ -256,3 +258,10 @@ P-31 subsequently accepted exact Source/Static checkpoint
 This acceptance closes only the source-review gate. It does not authorize
 bootstrap inclusion, Local reset/apply/live evidence, WP-8, P-19, Factor F or
 hotfix expansion, feature enablement, publication, or Production.
+
+P-32 later authorized the warned Local reset, separate apply, and live evidence.
+That execution made the P-31 hash historical by exposing fail-closed PostgreSQL
+`42704` in the placement RPC. Both diagnostic runs cleaned all fixtures and
+restored pointer/flags. The schema-qualified same-scope fix has SHA-256
+`e4de258756bbfbda0508e55d7b76ba2e907f644625b49bc29d4a4d7ac42fa714` and
+requires replacement source/static and live evidence before closeout.

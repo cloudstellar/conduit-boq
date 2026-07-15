@@ -42,6 +42,7 @@ describe('Master Catalog WP-7.5 live evidence contracts', () => {
 
   it('covers invalid placement, rollback, concurrency, replay, and stale review recovery', () => {
     const smoke = read('scripts/smoke-master-catalog-wp75.mjs')
+    const migration = read('migrations/021_master_catalog_phase4_placement_governance.sql')
 
     for (const code of [
       'PLACEMENT_SCOPE_INVALID',
@@ -61,6 +62,12 @@ describe('Master Catalog WP-7.5 live evidence contracts', () => {
     expect(smoke).toContain('replay.duplicateRequest')
     expect(smoke).toContain('Prior placement stayed current after a new add')
     expect(smoke).toContain('Normal edit invalidated placement')
+    expect(migration).toContain(
+      'SET CONSTRAINTS public.uq_price_list_version_display_order DEFERRED;',
+    )
+    expect(migration).not.toContain(
+      'SET CONSTRAINTS uq_price_list_version_display_order DEFERRED;',
+    )
   })
 
   it('proves ordered audit, publication hash, pointer restoration, and domain isolation', () => {

@@ -32,9 +32,11 @@ Production action.
 **P-30 P-18 decision and source checkpoint:** 2026-07-15 — the owner accepted
 all five V1 rules and authorized bounded Local-only source implementation.
 Migration `021` plus the RPC/read-model/Thai workspace/tests/docs candidate then
-passed repository/static review at SHA-256
-`78359215f7d859d9c167db608e1e96d66712b6b06a9d103fd7b26ce781835a83`.
-Exact commit, bootstrap inclusion, Local apply/reset/live evidence, WP-8, and
+passed repository/static review at historical SHA-256 `78359215...`. Approved
+Local live execution exposed fail-closed constraint-resolution error `42704`;
+the bounded current fix candidate is SHA-256
+`e4de258756bbfbda0508e55d7b76ba2e907f644625b49bc29d4a4d7ac42fa714`.
+Replacement live evidence, exact acceptance, bootstrap inclusion, WP-8, and
 every Production gate remain separate.
 
 **Capability-completeness amendment recorded:** 2026-07-12 —

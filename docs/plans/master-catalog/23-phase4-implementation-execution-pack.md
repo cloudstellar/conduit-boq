@@ -743,12 +743,18 @@ explicit reset approval exist.
 Repository/static checkpoint passed on 2026-07-15. The working-tree candidate
 implements the revision/review schema, exact bounded idempotent RPC, readiness
 and publish invariants, Thai all-pending-items placement workspace, release
-gating, and unit/static contracts. Migration `021` SHA-256 is
-`78359215f7d859d9c167db608e1e96d66712b6b06a9d103fd7b26ce781835a83`.
-P-31 accepted exact Source/Static checkpoint
+gating, and unit/static contracts. P-31 accepted historical Source/Static
+SHA-256 `78359215...` at exact checkpoint
 `4e3574a31a2697f4d727acabc8f55f34a4233bff` for commit/push. This does not
 satisfy the live DB/concurrency/hash/export/browser exit evidence; the warned
 Local gate still requires separate owner approval.
+
+P-32 subsequently authorized that warned Local-only gate. Runtime evidence
+failed closed with PostgreSQL `42704` because the fixed-search-path placement
+function deferred an unqualified constraint. The bounded schema-qualified fix
+candidate is SHA-256
+`e4de258756bbfbda0508e55d7b76ba2e907f644625b49bc29d4a4d7ac42fa714`;
+replacement live evidence remains required and `021` stays outside bootstrap.
 
 Exit gate:
 

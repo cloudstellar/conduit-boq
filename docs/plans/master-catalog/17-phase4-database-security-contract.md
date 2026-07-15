@@ -32,9 +32,11 @@ checkout `15b707d443bec701f6b3a86aa7675ca1266604ba`; schema lint, security
 advisors, WP-6.6/WP-6.5/P-20/WP-7 evidence, and final Local invariants passed.
 Migration `020` has not been applied to Production. P-30 accepted the P-18 V1
 rules and authorized a bounded Local-only `021` source candidate. Repository/
-static review of that candidate passed on 2026-07-15 at SHA-256
-`78359215f7d859d9c167db608e1e96d66712b6b06a9d103fd7b26ce781835a83`; it is
-not in bootstrap and has not been applied to Local or Production.
+static review passed at historical SHA-256 `78359215...`; approved Local live
+execution then exposed fail-closed error `42704` because the fixed-search-path
+function used an unqualified constraint name. The schema-qualified fix candidate
+is SHA-256 `e4de258756bbfbda0508e55d7b76ba2e907f644625b49bc29d4a4d7ac42fa714`.
+It remains outside bootstrap and has not been applied to Production.
 
 **Owner decision recorded:** 2026-07-04 — approved according to the
 recommendation as the technical backbone for Phase 4A and every Phase 4 write

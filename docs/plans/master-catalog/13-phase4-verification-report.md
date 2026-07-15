@@ -37,10 +37,12 @@ and final invariants passed. WP-7 is ready for owner review; WP-7.5, WP-8, and
 Production remain separate.
 P-30 then accepted WP-7 and all five P-18 V1 rules at 2026-07-15 01:37 +07,
 authorizing bounded WP-7.5 Local-only source implementation. The repository/
-static candidate then passed at migration `021` SHA-256
-`78359215f7d859d9c167db608e1e96d66712b6b06a9d103fd7b26ce781835a83`.
-No `021` Local apply/reset, SQL/concurrency/browser evidence, WP-8 execution, or
-Production action is inferred.
+static candidate passed at historical migration `021` SHA-256 `78359215...`.
+P-32 then authorized Local reset/apply/live evidence; runtime calls failed
+closed with `42704` and cleanup restored all invariants. The schema-qualified
+fix candidate is SHA-256
+`e4de258756bbfbda0508e55d7b76ba2e907f644625b49bc29d4a4d7ac42fa714`.
+Replacement live evidence, WP-8, and Production remain pending.
 **Prepared:** 2026-06-22
 **Production project:** `otlssvssvgkohqwuuiir`
 **Candidate version:** System-planned ADR-003 number; `2568.1.0` only when still
@@ -67,7 +69,7 @@ should link here rather than copy volatile evidence.
 | 4B application/workflows | Local | Codex + owner/developer | 2026-07-05 | 2026-07-14 | G3/WP-6.6 accepted | Version planning, item-first edit, final review, import, abandon, restore-confirmation, real-route stale-after-review recovery, and high-impact confirmation/cancel behavior passed; broader independent UAT remains WP-8. |
 | WP-6.6 admin workflow/authority hardening | Local | Codex + owner/developer | 2026-07-12 | 2026-07-14 | Accepted/Complete | Exact G1R/G2 evidence passed on `721c2c2`; P-25/G3/P-26 passed; the owner accepted exact application checkpoint `78e96ab3ed9993707014c4aba1d285b7592b17a1`. |
 | WP-7 permanent BOQ/hotfix/Factor F regression | Local | Codex + owner/developer | 2026-07-15 | 2026-07-15 | Accepted/Complete | P-29/G4E clean bootstrap and tracked live harness passed on exact `15b707d`; owner accepted via P-30 at 2026-07-15 01:37 +07. |
-| WP-7.5 P-18 placement | Local source | Codex + owner/developer | 2026-07-15 | 2026-07-15 | Ready for owner review | P-30 accepted Review Note #28's five-rule V1 contract; repository/static candidate passed at migration `021` SHA-256 `78359215f7d859d9c167db608e1e96d66712b6b06a9d103fd7b26ce781835a83`; Local apply/reset/live evidence remain separately gated. |
+| WP-7.5 P-18 placement | Local | Codex + owner/developer | 2026-07-15 |  | In progress | P-31 static checkpoint became historical when P-32 live execution exposed fail-closed `42704`; current schema-qualified `021` SHA-256 is `e4de258756bbfbda0508e55d7b76ba2e907f644625b49bc29d4a4d7ac42fa714`; replacement live evidence remains pending. |
 | 4C clean rehearsal | Local | Codex + owner/developer | 2026-07-15 |  | G4E database rehearsal passed; WP-8 pending | Integrated DB/regression gates passed; independent intended-admin UAT, measured performance, accessibility, export rerun, and final advisor disposition remain WP-8. |
 | 4A migration | Production |  |  |  | Not authorized |  |
 | Application deploy, flag off | Production |  |  |  | Not authorized |  |
@@ -808,7 +810,7 @@ request approves them.
 | P-25 standalone visual/interaction harness | Real final-review component at 710 total/709 affected rows; eight-field compound row; desktop 1440x1000 and mobile 390x844; no console/page error or overflow | Browser plugin runtime was unavailable with `Cannot redefine property: process`; the owner-approved Playwright fallback compiled the real component and project CSS, mocked only Next routing contexts, and passed 27/27 checks. No Local DB reset/mutation, migration, bootstrap, or Production action occurred. | Passed P-25 presentation scope; real-route stale-after-review/G3 not inferred |
 | P-26 in-app browser proof | Real Recode/Retire/Publish confirmation and cancellation, mismatched/exact target typing, desktop/390x844 layout, audited cleanup, and final disabled page | Passed on real Local routes; no Recode/Retire/Publish effect, proof draft abandoned, zero drafts/all flags false, pointer/BOQ/Factor F unchanged | Passed and owner-accepted via P-27 |
 | `npm run audit:prod` | No unaccepted Production vulnerability | G4E `npm audit --omit=dev --audit-level=moderate` passed with 0 vulnerabilities | Passed |
-| WP-7.5 repository/static candidate | Exact migration/RPC/readiness/publish/UI/release-gating contracts compile and preserve adjacent authority | Migration `021` SHA-256 `78359215f7d859d9c167db608e1e96d66712b6b06a9d103fd7b26ce781835a83`; focused 4 files/37 tests and full 32 files/175 tests, TypeScript, lint 0 errors/10 existing warnings, authority 710/65/17, dependency audit 0 vulnerabilities, network-enabled production build including `/placement`, and `git diff --check` passed. Migration `020` remained unchanged. | Passed source/static; no Local SQL/browser evidence inferred |
+| WP-7.5 repository/static candidate | Exact migration/RPC/readiness/publish/UI/release-gating contracts compile and preserve adjacent authority | Historical SHA-256 `78359215...` passed static checks; P-32 runtime exposed `42704`. Current schema-qualified SHA-256 is `e4de258756bbfbda0508e55d7b76ba2e907f644625b49bc29d4a4d7ac42fa714`; replacement source/live gates pending. Migration `020` remains unchanged. | In progress; old static checkpoint is historical |
 | Live Local DB integration/concurrency | Migration/RPC/RLS/role/rollback/race/timeout gates pass | Final amended `020` passed G1R/G2 on exact `721c2c2`; G4E then passed WP-66 and WP-65/P-20 from the combined bootstrap on exact `15b707d`. | Passed integrated G4E |
 | Permanent hotfix `016`/BOQ/Factor F suite | Real RPC behavior and pre/post invariants pass | G4E retained WP-7 JSON passed all suffix/catalog authority/atomic negative/binding/copy/print-export/publish-restore/security cases; final BOQ and Factor F invariants were restored | Passed technically; owner review pending |
 | WP-6.6 capability suite | Audit #29 C-01 through C-17 DB/UI/browser evidence pass | Final G1R/G2 passed on `721c2c2`; P-25 presentation and G3 real-route stale recovery/cleanup passed on `6599c30`; P-26 confirmation/cancel/cleanup proof is committed at exact `78e96ab3ed9993707014c4aba1d285b7592b17a1`. | Accepted/Complete via P-27 |
