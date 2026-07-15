@@ -201,17 +201,47 @@ describe('Master Catalog P-22 operator workflow', () => {
     const placementWorkspace = source(
       'app/admin/master-catalog/_components/MasterCatalogPlacementWorkspace.tsx',
     );
+    const adminViews = source(
+      'app/admin/master-catalog/_components/MasterCatalogAdminViews.tsx',
+    );
     const versionWorkspace = source(
       'app/admin/master-catalog/_components/MasterCatalogVersionWorkspace.tsx',
     );
+    const placementViewStart = adminViews.indexOf('export function MasterCatalogPlacementView');
+    const placementViewEnd = adminViews.indexOf('export function MasterCatalogVersionReviewView');
+    const placementView = adminViews.slice(placementViewStart, placementViewEnd);
 
     expect(placementWorkspace).toContain('hasCatalogPlacementDraftChanges');
     expect(placementWorkspace).toContain('placementReviewAlreadyCurrent');
+    expect(placementWorkspace).toContain('hasLocalAssignmentChanges');
     expect(placementWorkspace).toContain('ชุดปัจจุบันยืนยันแล้ว');
+    expect(placementWorkspace).toContain('มีการแก้ไขตำแหน่งที่ยังไม่ยืนยัน');
     expect(placementWorkspace).toContain('รายการเดิมที่จะเลื่อน');
     expect(placementWorkspace).toContain('ยืนยันชุดปัจจุบันแล้ว');
+    expect(placementView).not.toContain('ตำแหน่งชุดปัจจุบันได้รับการยืนยันแล้ว');
     expect(versionWorkspace).toContain('รายการที่เพิ่มใหม่ต้องจัดตำแหน่งก่อนเผยแพร่');
     expect(versionWorkspace).not.toContain('รายการใหม่ยังไม่ได้รับการยืนยันตำแหน่ง');
+  });
+
+  it('keeps placement review recoverable, exception-led, and keyboard complete', () => {
+    const placementWorkspace = source(
+      'app/admin/master-catalog/_components/MasterCatalogPlacementWorkspace.tsx',
+    );
+
+    expect(placementWorkspace).toContain('const STORAGE_SCHEMA_VERSION = 1');
+    expect(placementWorkspace).toContain("window.addEventListener('beforeunload'");
+    expect(placementWorkspace).toContain("document.addEventListener('click', guardSameOriginNavigation, true)");
+    expect(placementWorkspace).toContain('กู้คืนตัวเลือกที่ยังไม่ยืนยันแล้ว');
+    expect(placementWorkspace).toContain('ต้องตรวจ');
+    expect(placementWorkspace).toContain('ผู้ดูแลแก้ไข');
+    expect(placementWorkspace).toContain('ข้อมูลยังไม่ครบ');
+    expect(placementWorkspace).toContain('ตำแหน่งไม่ถูกต้อง');
+    expect(placementWorkspace).toContain('<fieldset className="grid grid-cols-2 rounded-md border p-1"');
+    expect(placementWorkspace).toContain('peer-focus-visible:ring-2');
+    expect(placementWorkspace).toContain('affectedCategoryLabels');
+    expect(placementWorkspace).toContain('ตำแหน่งสุดท้ายของรายการใหม่');
+    expect(placementWorkspace).toContain('ก่อนหน้า: {formatPlacementNeighbor(previous');
+    expect(placementWorkspace).toContain('ถัดไป: {formatPlacementNeighbor(next');
   });
 
   it('confirms publish, recode, and retire before high-impact submission', () => {

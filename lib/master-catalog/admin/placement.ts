@@ -15,6 +15,8 @@ export interface CatalogPlacementPreview {
   affectedIdentityIds: string[];
 }
 
+export type CatalogPlacementAssignmentValidity = 'complete' | 'incomplete' | 'invalid';
+
 export class CatalogPlacementValidationError extends Error {
   constructor(
     readonly code:
@@ -183,6 +185,28 @@ export function hasCatalogPlacementDraftChanges(
       || current.displayOrder !== item.displayOrder
       || current.categoryId !== item.categoryId;
   });
+}
+
+export function catalogPlacementAssignmentsEqual(
+  left: CatalogPlacementAssignment | undefined,
+  right: CatalogPlacementAssignment | undefined,
+): boolean {
+  if (!left || !right) return false;
+  return left.identityId === right.identityId
+    && left.categoryId === right.categoryId
+    && left.anchorIdentityId === right.anchorIdentityId
+    && left.relation === right.relation
+    && left.batchOrder === right.batchOrder;
+}
+
+export function getCatalogPlacementAssignmentValidity(
+  assignment: CatalogPlacementAssignment,
+  validAnchorIdentityIds: ReadonlySet<string>,
+): CatalogPlacementAssignmentValidity {
+  if (!assignment.anchorIdentityId) return 'incomplete';
+  return validAnchorIdentityIds.has(assignment.anchorIdentityId)
+    ? 'complete'
+    : 'invalid';
 }
 
 export function resequenceCatalogPlacementAssignments(

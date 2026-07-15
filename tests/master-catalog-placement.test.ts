@@ -2,6 +2,8 @@ import { describe, expect, it } from 'vitest';
 import type { CatalogWorkspaceItem } from '../lib/master-catalog/admin/catalogWorkspace';
 import {
   buildCatalogPlacementPreview,
+  catalogPlacementAssignmentsEqual,
+  getCatalogPlacementAssignmentValidity,
   hasCatalogPlacementDraftChanges,
   moveCatalogPlacementAssignmentWithinAnchor,
   resequenceCatalogPlacementAssignments,
@@ -130,6 +132,27 @@ describe('Master Catalog placement model', () => {
       [Y.identityId, 0],
       [X.identityId, 1],
     ]);
+  });
+
+  it('classifies incomplete and invalid choices separately from admin changes', () => {
+    const suggestion = suggestCatalogPlacements([X], [A, B, C])[0];
+    const validAnchors = new Set([A.identityId, B.identityId]);
+
+    expect(catalogPlacementAssignmentsEqual(suggestion, { ...suggestion })).toBe(true);
+    expect(catalogPlacementAssignmentsEqual(
+      suggestion,
+      { ...suggestion, relation: 'before' },
+    )).toBe(false);
+    expect(catalogPlacementAssignmentsEqual(suggestion, undefined)).toBe(false);
+    expect(getCatalogPlacementAssignmentValidity(suggestion, validAnchors)).toBe('complete');
+    expect(getCatalogPlacementAssignmentValidity(
+      { ...suggestion, anchorIdentityId: '' },
+      validAnchors,
+    )).toBe('incomplete');
+    expect(getCatalogPlacementAssignmentValidity(
+      { ...suggestion, anchorIdentityId: C.identityId },
+      validAnchors,
+    )).toBe('invalid');
   });
 
   it('distinguishes a pending placement from the already accepted draft order', () => {

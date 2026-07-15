@@ -489,16 +489,7 @@ export function MasterCatalogPlacementView({
         </div>
       </section>
 
-      {readiness?.placementReviewRequired && readiness.placementReviewCurrent ? (
-        <Alert>
-          <CheckCircle2 />
-          <AlertTitle>ตำแหน่งชุดปัจจุบันได้รับการยืนยันแล้ว</AlertTitle>
-          <AlertDescription>
-            สถานะการยืนยันตรงกับฉบับร่างปัจจุบัน หากปรับตำแหน่งแล้ว การยืนยันใหม่จะบันทึก
-            ประวัติชุดใหม่โดยไม่แก้ไขประวัติเดิม
-          </AlertDescription>
-        </Alert>
-      ) : readiness?.placementReviewRequired ? (
+      {readiness?.placementReviewRequired && !readiness.placementReviewCurrent ? (
         <Alert>
           <MapPin />
           <AlertTitle>ยังต้องยืนยันตำแหน่งก่อนเผยแพร่</AlertTitle>

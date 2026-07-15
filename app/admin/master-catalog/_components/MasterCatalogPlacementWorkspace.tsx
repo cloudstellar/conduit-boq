@@ -1,6 +1,6 @@
 'use client';
 
-import { useActionState, useEffect, useMemo, useState } from 'react';
+import { useActionState, useDeferredValue, useEffect, useMemo, useState } from 'react';
 import { useFormStatus } from 'react-dom';
 import { useRouter } from 'next/navigation';
 import {
@@ -11,6 +11,7 @@ import {
   ChevronLeft,
   ChevronRight,
   ChevronsUpDown,
+  CircleAlert,
   Loader2,
   MapPin,
   Search,
@@ -54,10 +55,13 @@ import type {
 import type { CatalogPlacementWorkspace } from '@/lib/master-catalog/admin/readModel';
 import {
   buildCatalogPlacementPreview,
+  catalogPlacementAssignmentsEqual,
+  getCatalogPlacementAssignmentValidity,
   hasCatalogPlacementDraftChanges,
   moveCatalogPlacementAssignmentWithinAnchor,
   suggestCatalogPlacements,
   type CatalogPlacementAssignment,
+  type CatalogPlacementAssignmentValidity,
   type CatalogPlacementRelation,
 } from '@/lib/master-catalog/admin/placement';
 import { formatCatalogDictionaryLabel } from '@/lib/master-catalog/admin/presentation';
@@ -67,6 +71,20 @@ import { useStableCatalogOperation } from './useStableCatalogOperation';
 
 const initialState: CatalogMutationState = { status: 'idle', message: '' };
 const PAGE_SIZE = 50;
+const STORAGE_SCHEMA_VERSION = 1;
+
+type PlacementReviewFilter =
+  | 'attention'
+  | 'all'
+  | 'modified'
+  | 'suggested'
+  | 'incomplete'
+  | 'invalid';
+
+interface PlacementAssignmentReview {
+  modified: boolean;
+  validity: CatalogPlacementAssignmentValidity;
+}
 
 export function MasterCatalogPlacementWorkspaceView({
   workspace,
@@ -75,13 +93,21 @@ export function MasterCatalogPlacementWorkspaceView({
 }) {
   const router = useRouter();
   const [state, formAction] = useActionState(placeCatalogItemsAction, initialState);
-  const [assignments, setAssignments] = useState(() => suggestCatalogPlacements(
+  const suggestedAssignments = useMemo(() => suggestCatalogPlacements(
     workspace.newItems,
     workspace.inheritedItems,
-  ));
+  ), [workspace.inheritedItems, workspace.newItems]);
+  const [assignments, setAssignments] = useState(() => suggestedAssignments);
   const [query, setQuery] = useState('');
+  const deferredQuery = useDeferredValue(query);
+  const [reviewFilter, setReviewFilter] = useState<PlacementReviewFilter>(() => (
+    workspace.readiness?.placementReviewCurrent ? 'all' : 'attention'
+  ));
   const [page, setPage] = useState(0);
   const [confirmOpen, setConfirmOpen] = useState(false);
+  const [leaveConfirmOpen, setLeaveConfirmOpen] = useState(false);
+  const [pendingNavigationHref, setPendingNavigationHref] = useState<string | null>(null);
+  const [restoredFromStorage, setRestoredFromStorage] = useState(false);
   const [storageReady, setStorageReady] = useState(false);
   const storageKey = `master-catalog-placement:${workspace.version.id}:${workspace.version.lockVersion}:${workspace.placementRevision}`;
   const [requestIdRef, prepareOperation, preserveInput] = useStableCatalogOperation(
@@ -109,6 +135,51 @@ export function MasterCatalogPlacementWorkspaceView({
     () => new Set(workspace.inheritedItems.map((item) => item.identityId)),
     [workspace.inheritedItems],
   );
+  const inheritedIdentityIdsByCategory = useMemo(() => {
+    const grouped = new Map<string, Set<string>>();
+    for (const item of workspace.inheritedItems) {
+      const identityIds = grouped.get(item.categoryId) ?? new Set<string>();
+      identityIds.add(item.identityId);
+      grouped.set(item.categoryId, identityIds);
+    }
+    return grouped;
+  }, [workspace.inheritedItems]);
+  const assignmentByIdentity = useMemo(
+    () => new Map(assignments.map((entry) => [entry.identityId, entry])),
+    [assignments],
+  );
+  const suggestedAssignmentByIdentity = useMemo(
+    () => new Map(suggestedAssignments.map((entry) => [entry.identityId, entry])),
+    [suggestedAssignments],
+  );
+  const assignmentReviewByIdentity = useMemo(() => new Map(assignments.map((entry) => {
+    const validAnchorIdentityIds = inheritedIdentityIdsByCategory.get(entry.categoryId)
+      ?? new Set<string>();
+    return [entry.identityId, {
+      modified: !catalogPlacementAssignmentsEqual(
+        entry,
+        suggestedAssignmentByIdentity.get(entry.identityId),
+      ),
+      validity: getCatalogPlacementAssignmentValidity(entry, validAnchorIdentityIds),
+    } satisfies PlacementAssignmentReview] as const;
+  })), [assignments, inheritedIdentityIdsByCategory, suggestedAssignmentByIdentity]);
+  const reviewCounts = useMemo(() => {
+    const counts = {
+      attention: 0,
+      modified: 0,
+      suggested: 0,
+      incomplete: 0,
+      invalid: 0,
+    };
+    for (const review of assignmentReviewByIdentity.values()) {
+      if (review.modified || review.validity !== 'complete') counts.attention += 1;
+      if (review.modified) counts.modified += 1;
+      if (!review.modified && review.validity === 'complete') counts.suggested += 1;
+      if (review.validity === 'incomplete') counts.incomplete += 1;
+      if (review.validity === 'invalid') counts.invalid += 1;
+    }
+    return counts;
+  }, [assignmentReviewByIdentity]);
   const previewResult = useMemo(() => {
     try {
       return {
@@ -126,48 +197,118 @@ export function MasterCatalogPlacementWorkspaceView({
       };
     }
   }, [assignments, draftItems, workspace.baseItems]);
+  const previewItems = useMemo(
+    () => previewResult.preview?.orderedItems ?? [],
+    [previewResult.preview],
+  );
+  const previewByIdentity = useMemo(
+    () => new Map(previewItems.map((item) => [item.identityId, item])),
+    [previewItems],
+  );
+  const previewIndexByIdentity = useMemo(
+    () => new Map(previewItems.map((item, index) => [item.identityId, index])),
+    [previewItems],
+  );
+  const assignmentsByAnchorRelation = useMemo(() => {
+    const grouped = new Map<string, CatalogPlacementAssignment[]>();
+    for (const assignment of assignments) {
+      const key = `${assignment.anchorIdentityId}:${assignment.relation}`;
+      const group = grouped.get(key) ?? [];
+      group.push(assignment);
+      grouped.set(key, group);
+    }
+    for (const group of grouped.values()) {
+      group.sort((left, right) => left.batchOrder - right.batchOrder);
+    }
+    return grouped;
+  }, [assignments]);
 
-  const normalizedQuery = query.trim().toLocaleLowerCase('th-TH');
-  const filteredNewItems = workspace.newItems.filter((item) => (
-    !normalizedQuery
-    || item.itemCode.toLocaleLowerCase('th-TH').includes(normalizedQuery)
-    || item.itemName.toLocaleLowerCase('th-TH').includes(normalizedQuery)
-  ));
+  const normalizedQuery = deferredQuery.trim().toLocaleLowerCase('th-TH');
+  const filteredNewItems = useMemo(() => workspace.newItems.filter((item) => {
+    const matchesQuery = !normalizedQuery
+      || item.itemCode.toLocaleLowerCase('th-TH').includes(normalizedQuery)
+      || item.itemName.toLocaleLowerCase('th-TH').includes(normalizedQuery);
+    const review = assignmentReviewByIdentity.get(item.identityId);
+    return matchesQuery && review !== undefined && matchesPlacementReviewFilter(
+      review,
+      reviewFilter,
+    );
+  }), [assignmentReviewByIdentity, normalizedQuery, reviewFilter, workspace.newItems]);
   const pageCount = Math.max(1, Math.ceil(filteredNewItems.length / PAGE_SIZE));
   const safePage = Math.min(page, pageCount - 1);
   const visibleNewItems = filteredNewItems.slice(
     safePage * PAGE_SIZE,
     (safePage + 1) * PAGE_SIZE,
   );
-  const assignmentByIdentity = new Map(assignments.map((entry) => [entry.identityId, entry]));
-  const previewItems = previewResult.preview?.orderedItems ?? [];
-  const previewByIdentity = new Map(previewItems.map((item) => [item.identityId, item]));
-  const previewIndexByIdentity = new Map(
-    previewItems.map((item, index) => [item.identityId, index]),
-  );
-  const completedCount = assignments.filter((entry) => (
-    entry.anchorIdentityId
-    && inheritedItemsByCategory.get(entry.categoryId)?.some((anchor) => (
-      anchor.identityId === entry.anchorIdentityId
-    ))
-  )).length;
+  const completedCount = workspace.newItems.length
+    - reviewCounts.incomplete
+    - reviewCounts.invalid;
   const shiftedInheritedCount = previewResult.preview?.affectedIdentityIds.filter((identityId) => (
     inheritedIdentityIds.has(identityId)
   )).length ?? 0;
   const placementWouldChangeDraft = previewResult.preview
     ? hasCatalogPlacementDraftChanges(draftItems, previewResult.preview.orderedItems)
     : false;
-  const placementReviewAlreadyCurrent = workspace.readiness?.placementReviewCurrent === true
-    && !placementWouldChangeDraft;
+  const hasLocalAssignmentChanges = reviewCounts.modified > 0;
+  const placementReviewAlreadyCurrent = state.status === 'success'
+    || (
+      workspace.readiness?.placementReviewCurrent === true
+      && !hasLocalAssignmentChanges
+      && !placementWouldChangeDraft
+    );
+  const hasPendingLocalChanges = state.status !== 'success'
+    && (
+      hasLocalAssignmentChanges
+      || (workspace.readiness?.placementReviewCurrent === true && placementWouldChangeDraft)
+    );
   const canConfirm = workspace.editable
     && workspace.newItems.length > 0
     && completedCount === workspace.newItems.length
     && previewResult.preview !== null
     && !placementReviewAlreadyCurrent;
+  const draftItemByIdentity = useMemo(
+    () => new Map(draftItems.map((item) => [item.identityId, item])),
+    [draftItems],
+  );
+  const categoryById = useMemo(
+    () => new Map(workspace.categories.map((category) => [category.id, category])),
+    [workspace.categories],
+  );
+  const affectedCategoryLabels = useMemo(() => {
+    const categoryIds = new Set<string>();
+    for (const identityId of previewResult.preview?.affectedIdentityIds ?? []) {
+      const previous = draftItemByIdentity.get(identityId);
+      const next = previewByIdentity.get(identityId);
+      if (previous) categoryIds.add(previous.categoryId);
+      if (next) categoryIds.add(next.categoryId);
+    }
+    return [...categoryIds]
+      .map((categoryId) => categoryById.get(categoryId))
+      .filter((category): category is NonNullable<typeof category> => Boolean(category))
+      .map((category) => formatCatalogDictionaryLabel(category.code, category.name))
+      .sort((left, right) => left.localeCompare(right, 'th-TH'));
+  }, [categoryById, draftItemByIdentity, previewByIdentity, previewResult.preview]);
+  const placementImpactRows = useMemo(() => workspace.newItems
+    .map((item) => {
+      const previewIndex = previewIndexByIdentity.get(item.identityId) ?? -1;
+      return {
+        item,
+        previewIndex,
+        previous: previewIndex > 0 ? previewItems[previewIndex - 1] : null,
+        next: previewIndex >= 0 ? previewItems[previewIndex + 1] ?? null : null,
+      };
+    })
+    .filter((entry) => entry.previewIndex >= 0)
+    .sort((left, right) => left.previewIndex - right.previewIndex), [
+    previewIndexByIdentity,
+    previewItems,
+    workspace.newItems,
+  ]);
 
   useEffect(() => {
     if (state.status === 'success') {
       window.sessionStorage.removeItem(storageKey);
+      setRestoredFromStorage(false);
       setConfirmOpen(false);
       router.refresh();
     }
@@ -178,22 +319,105 @@ export function MasterCatalogPlacementWorkspaceView({
     if (stored) {
       try {
         const parsed = JSON.parse(stored) as unknown;
-        if (isStoredPlacementAssignments(parsed, workspace.newItems.length)) {
-          buildCatalogPlacementPreview(workspace.baseItems, draftItems, parsed);
-          setAssignments(parsed);
+        const storedAssignments = parseStoredPlacementAssignments(
+          parsed,
+          workspace.newItems.length,
+        );
+        if (storedAssignments) {
+          buildCatalogPlacementPreview(workspace.baseItems, draftItems, storedAssignments);
+          setAssignments(storedAssignments);
+          setRestoredFromStorage(storedAssignments.some((entry) => (
+            !catalogPlacementAssignmentsEqual(
+              entry,
+              suggestedAssignmentByIdentity.get(entry.identityId),
+            )
+          )));
+        } else {
+          window.sessionStorage.removeItem(storageKey);
         }
       } catch {
         window.sessionStorage.removeItem(storageKey);
       }
     }
     setStorageReady(true);
-  }, [draftItems, storageKey, workspace.baseItems, workspace.newItems.length]);
+  }, [
+    draftItems,
+    storageKey,
+    suggestedAssignmentByIdentity,
+    workspace.baseItems,
+    workspace.newItems.length,
+  ]);
 
   useEffect(() => {
     if (storageReady) {
-      window.sessionStorage.setItem(storageKey, JSON.stringify(assignments));
+      window.sessionStorage.setItem(storageKey, JSON.stringify({
+        schemaVersion: STORAGE_SCHEMA_VERSION,
+        assignments,
+      }));
     }
   }, [assignments, storageKey, storageReady]);
+
+  useEffect(() => {
+    if (!hasPendingLocalChanges) return undefined;
+
+    const warnBeforeUnload = (event: BeforeUnloadEvent) => {
+      event.preventDefault();
+      event.returnValue = '';
+    };
+
+    window.addEventListener('beforeunload', warnBeforeUnload);
+    return () => window.removeEventListener('beforeunload', warnBeforeUnload);
+  }, [hasPendingLocalChanges]);
+
+  useEffect(() => {
+    if (!hasPendingLocalChanges) return undefined;
+
+    const guardSameOriginNavigation = (event: MouseEvent) => {
+      if (
+        event.defaultPrevented
+        || event.button !== 0
+        || event.metaKey
+        || event.ctrlKey
+        || event.shiftKey
+        || event.altKey
+        || !(event.target instanceof Element)
+      ) {
+        return;
+      }
+
+      const anchor = event.target.closest('a[href]');
+      if (
+        !(anchor instanceof HTMLAnchorElement)
+        || anchor.hasAttribute('download')
+        || (anchor.target && anchor.target !== '_self')
+      ) {
+        return;
+      }
+
+      const destination = new URL(anchor.href, window.location.href);
+      const current = new URL(window.location.href);
+      if (
+        destination.origin !== current.origin
+        || (
+          destination.pathname === current.pathname
+          && destination.search === current.search
+          && destination.hash === current.hash
+        )
+      ) {
+        return;
+      }
+
+      event.preventDefault();
+      event.stopPropagation();
+      setPendingNavigationHref(
+        `${destination.pathname}${destination.search}${destination.hash}`,
+      );
+      setLeaveConfirmOpen(true);
+    };
+
+    document.addEventListener('click', guardSameOriginNavigation, true);
+    return () => document.removeEventListener('click', guardSameOriginNavigation, true);
+  }, [hasPendingLocalChanges]);
 
   if (workspace.newItems.length === 0) {
     return (
@@ -216,6 +440,37 @@ export function MasterCatalogPlacementWorkspaceView({
           <AlertDescription>
             ยืนยัน {state.newIdentityCount?.toLocaleString('th-TH') ?? workspace.newItems.length.toLocaleString('th-TH')} รายการใหม่
             และบันทึกผลกระทบ {state.affectedRows?.toLocaleString('th-TH') ?? '-'} รายการแล้ว
+          </AlertDescription>
+        </Alert>
+      ) : null}
+
+      {workspace.readiness?.placementReviewCurrent ? (
+        placementReviewAlreadyCurrent ? (
+          <Alert>
+            <CheckCircle2 />
+            <AlertTitle>ตำแหน่งชุดปัจจุบันได้รับการยืนยันแล้ว</AlertTitle>
+            <AlertDescription>
+              สถานะการยืนยันตรงกับฉบับร่างปัจจุบัน หากแก้ตัวเลือกใด
+              หน้านี้จะเปลี่ยนเป็นยังไม่ยืนยันก่อนบันทึกชุดใหม่
+            </AlertDescription>
+          </Alert>
+        ) : (
+          <Alert>
+            <CircleAlert />
+            <AlertTitle>มีการแก้ไขตำแหน่งที่ยังไม่ยืนยัน</AlertTitle>
+            <AlertDescription>
+              ฉบับร่างในฐานข้อมูลยังคงเป็นชุดที่ยืนยันล่าสุด ตัวเลือกบนหน้านี้เก็บไว้ชั่วคราว
+              ในเบราว์เซอร์นี้และจะบันทึกจริงเมื่อยืนยันทั้งชุดเท่านั้น
+            </AlertDescription>
+          </Alert>
+        )
+      ) : restoredFromStorage ? (
+        <Alert>
+          <CircleAlert />
+          <AlertTitle>กู้คืนตัวเลือกที่ยังไม่ยืนยันแล้ว</AlertTitle>
+          <AlertDescription>
+            ระบบนำตัวเลือกชั่วคราวของฉบับร่างและรุ่นแก้ไขนี้กลับมาให้ตรวจต่อ
+            ข้อมูลนี้ยังไม่ได้บันทึกลงฉบับร่าง
           </AlertDescription>
         </Alert>
       ) : null}
@@ -259,11 +514,23 @@ export function MasterCatalogPlacementWorkspaceView({
               </Badge>
             ) : (
               <Badge variant="outline">
-                รายการเดิมที่จะเลื่อน {shiftedInheritedCount.toLocaleString('th-TH')}
+                <CircleAlert data-icon="inline-start" />
+                ยังไม่ยืนยัน
               </Badge>
             )}
+            {!placementReviewAlreadyCurrent ? (
+              <Badge variant="outline">
+                รายการเดิมที่จะเลื่อน {shiftedInheritedCount.toLocaleString('th-TH')}
+              </Badge>
+            ) : null}
           </div>
         </div>
+        {!placementReviewAlreadyCurrent ? (
+          <p className="text-xs text-muted-foreground">
+            ตัวเลือกจะอยู่ชั่วคราวเฉพาะเบราว์เซอร์ ฉบับร่าง และรุ่นแก้ไขนี้
+            จนกว่าจะยืนยันทั้งชุด
+          </p>
+        ) : null}
       </section>
 
       <Card className="min-w-0">
@@ -279,31 +546,87 @@ export function MasterCatalogPlacementWorkspaceView({
           </CardDescription>
         </CardHeader>
         <CardContent className="grid gap-4">
-          <div className="relative">
-            <Search className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
-            <Input
-              aria-label="ค้นหารายการใหม่"
-              className="pl-9"
-              value={query}
-              onChange={(event) => {
-                setQuery(event.target.value);
-                setPage(0);
-              }}
-              placeholder="ค้นหารหัสหรือชื่อรายการใหม่"
-            />
+          <div className="flex flex-wrap gap-2" aria-label="จำนวนรายการตามสถานะการตรวจ">
+            <Badge variant="outline">
+              ต้องตรวจ {reviewCounts.attention.toLocaleString('th-TH')}
+            </Badge>
+            <Badge variant="secondary">
+              {workspace.readiness?.placementReviewCurrent ? 'ยืนยันไว้แล้ว' : 'ระบบเสนอ'}{' '}
+              {reviewCounts.suggested.toLocaleString('th-TH')}
+            </Badge>
+            <Badge variant="outline">
+              ผู้ดูแลแก้ไข {reviewCounts.modified.toLocaleString('th-TH')}
+            </Badge>
+            <Badge variant={reviewCounts.incomplete > 0 ? 'destructive' : 'outline'}>
+              ยังไม่ครบ {reviewCounts.incomplete.toLocaleString('th-TH')}
+            </Badge>
+            <Badge variant={reviewCounts.invalid > 0 ? 'destructive' : 'outline'}>
+              ไม่ถูกต้อง {reviewCounts.invalid.toLocaleString('th-TH')}
+            </Badge>
+          </div>
+
+          <div className="grid gap-3 sm:grid-cols-[minmax(0,1fr)_240px]">
+            <div className="relative">
+              <Search className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
+              <Input
+                aria-label="ค้นหารายการใหม่"
+                className="pl-9"
+                value={query}
+                onChange={(event) => {
+                  setQuery(event.target.value);
+                  setPage(0);
+                }}
+                placeholder="ค้นหารหัสหรือชื่อรายการใหม่"
+              />
+            </div>
+            <div>
+              <Label htmlFor="placement-review-filter" className="sr-only">
+                แสดงรายการตามสถานะ
+              </Label>
+              <Select
+                value={reviewFilter}
+                onValueChange={(value) => {
+                  setReviewFilter(value as PlacementReviewFilter);
+                  setPage(0);
+                }}
+              >
+                <SelectTrigger id="placement-review-filter" className="w-full">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="attention">
+                    ต้องตรวจ ({reviewCounts.attention.toLocaleString('th-TH')})
+                  </SelectItem>
+                  <SelectItem value="modified">
+                    ผู้ดูแลแก้ไข ({reviewCounts.modified.toLocaleString('th-TH')})
+                  </SelectItem>
+                  <SelectItem value="suggested">
+                    {workspace.readiness?.placementReviewCurrent ? 'ยืนยันไว้แล้ว' : 'ระบบเสนอ'}
+                    {' '}({reviewCounts.suggested.toLocaleString('th-TH')})
+                  </SelectItem>
+                  <SelectItem value="incomplete">
+                    ยังไม่ครบ ({reviewCounts.incomplete.toLocaleString('th-TH')})
+                  </SelectItem>
+                  <SelectItem value="invalid">
+                    ไม่ถูกต้อง ({reviewCounts.invalid.toLocaleString('th-TH')})
+                  </SelectItem>
+                  <SelectItem value="all">
+                    ทั้งหมด ({workspace.newItems.length.toLocaleString('th-TH')})
+                  </SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
           </div>
 
           <div className="divide-y rounded-md border">
             {visibleNewItems.map((item) => {
               const assignment = assignmentByIdentity.get(item.identityId);
-              if (!assignment) return null;
+              const review = assignmentReviewByIdentity.get(item.identityId);
+              if (!assignment || !review) return null;
               const anchors = inheritedItemsByCategory.get(assignment.categoryId) ?? [];
-              const siblings = assignments
-                .filter((entry) => (
-                  entry.anchorIdentityId === assignment.anchorIdentityId
-                  && entry.relation === assignment.relation
-                ))
-                .sort((left, right) => left.batchOrder - right.batchOrder);
+              const siblings = assignmentsByAnchorRelation.get(
+                `${assignment.anchorIdentityId}:${assignment.relation}`,
+              ) ?? [];
               const siblingIndex = siblings.findIndex((entry) => (
                 entry.identityId === item.identityId
               ));
@@ -325,6 +648,21 @@ export function MasterCatalogPlacementWorkspaceView({
                       <div className="flex flex-wrap items-center gap-2">
                         <span className="font-mono text-xs">{item.itemCode}</span>
                         <Badge variant="outline">รายการใหม่</Badge>
+                        {review.modified ? (
+                          <Badge variant="secondary">ผู้ดูแลแก้ไข · ยังไม่ยืนยัน</Badge>
+                        ) : review.validity === 'complete' ? (
+                          <Badge variant="outline">
+                            {workspace.readiness?.placementReviewCurrent
+                              ? 'ยืนยันไว้แล้ว'
+                              : 'ระบบเสนอ'}
+                          </Badge>
+                        ) : null}
+                        {review.validity === 'incomplete' ? (
+                          <Badge variant="destructive">ข้อมูลยังไม่ครบ</Badge>
+                        ) : null}
+                        {review.validity === 'invalid' ? (
+                          <Badge variant="destructive">ตำแหน่งไม่ถูกต้อง</Badge>
+                        ) : null}
                         {previewItem ? (
                           <Badge variant="secondary">
                             ลำดับ {(previewItem.displayOrder + 1).toLocaleString('th-TH')}
@@ -441,7 +779,7 @@ export function MasterCatalogPlacementWorkspaceView({
 
           {visibleNewItems.length === 0 ? (
             <p className="py-8 text-center text-sm text-muted-foreground">
-              ไม่พบรายการใหม่ตามคำค้น
+              ไม่พบรายการใหม่ตามคำค้นและสถานะที่เลือก เลือกสถานะอื่นเพื่อดูรายการที่เหลือ
             </p>
           ) : null}
 
@@ -504,7 +842,7 @@ export function MasterCatalogPlacementWorkspaceView({
       </Card>
 
       <Dialog open={confirmOpen} onOpenChange={setConfirmOpen}>
-        <DialogContent>
+        <DialogContent className="max-h-[calc(100dvh-2rem)] overflow-y-auto sm:max-w-2xl">
           <form
             action={formAction}
             className="grid gap-4"
@@ -531,7 +869,38 @@ export function MasterCatalogPlacementWorkspaceView({
             <div className="grid gap-2 rounded-md border p-3 text-sm">
               <p>รายการใหม่ {workspace.newItems.length.toLocaleString('th-TH')} รายการ</p>
               <p>รายการเดิมที่คาดว่าจะเลื่อน {shiftedInheritedCount.toLocaleString('th-TH')} รายการ</p>
+              <p>
+                หมวดงานที่ได้รับผลกระทบ {affectedCategoryLabels.length.toLocaleString('th-TH')} หมวด
+              </p>
+              <p className="text-muted-foreground">
+                {affectedCategoryLabels.join(', ') || 'ไม่มีหมวดงานที่เปลี่ยนแปลง'}
+              </p>
+              <p>
+                ข้อมูลยังไม่ครบ {reviewCounts.incomplete.toLocaleString('th-TH')} รายการ
+                {' · '}ตำแหน่งไม่ถูกต้อง {reviewCounts.invalid.toLocaleString('th-TH')} รายการ
+              </p>
               <p>เวอร์ชัน {workspace.version.versionString}</p>
+            </div>
+            <div className="grid gap-2">
+              <p className="text-sm font-medium">
+                ตำแหน่งสุดท้ายของรายการใหม่ {placementImpactRows.length.toLocaleString('th-TH')} รายการ
+              </p>
+              <ul className="max-h-60 divide-y overflow-y-auto rounded-md border" aria-label="รายการข้างเคียงสุดท้าย">
+                {placementImpactRows.map(({ item, previous, next }) => (
+                  <li key={item.identityId} className="grid gap-1 p-3 text-sm">
+                    <p className="font-medium">
+                      <span className="font-mono text-xs">{item.itemCode}</span>
+                      {' '}{item.itemName}
+                    </p>
+                    <p className="text-xs text-muted-foreground">
+                      ก่อนหน้า: {formatPlacementNeighbor(previous, 'เริ่มต้นบัญชี')}
+                    </p>
+                    <p className="text-xs text-muted-foreground">
+                      ถัดไป: {formatPlacementNeighbor(next, 'สิ้นสุดบัญชี')}
+                    </p>
+                  </li>
+                ))}
+              </ul>
             </div>
             <div className="grid gap-2">
               <Label htmlFor="placement-reason">เหตุผลการยืนยันตำแหน่ง</Label>
@@ -550,6 +919,39 @@ export function MasterCatalogPlacementWorkspaceView({
               <PlacementSubmitButton />
             </DialogFooter>
           </form>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog
+        open={leaveConfirmOpen}
+        onOpenChange={(open) => {
+          setLeaveConfirmOpen(open);
+          if (!open) setPendingNavigationHref(null);
+        }}
+      >
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle className="pr-8">ออกจากหน้าที่มีตัวเลือกยังไม่ยืนยันหรือไม่</DialogTitle>
+            <DialogDescription>
+              ตัวเลือกที่แก้ไขยังไม่ได้บันทึกลงฉบับร่าง ระบบจะเก็บไว้ชั่วคราวในเบราว์เซอร์นี้
+              สำหรับฉบับร่างและรุ่นแก้ไขเดิม เพื่อให้กลับมาตรวจต่อได้
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <DialogClose asChild>
+              <Button type="button" variant="outline">อยู่หน้านี้</Button>
+            </DialogClose>
+            <Button
+              type="button"
+              onClick={() => {
+                const destination = pendingNavigationHref;
+                setLeaveConfirmOpen(false);
+                if (destination) router.push(destination);
+              }}
+            >
+              ออกและเก็บไว้ชั่วคราว
+            </Button>
+          </DialogFooter>
         </DialogContent>
       </Dialog>
     </div>
@@ -654,7 +1056,7 @@ function AnchorCombobox({
 
 function RelationControl({
   value,
-  label,
+  label: itemLabel,
   disabled,
   onValueChange,
 }: {
@@ -664,29 +1066,35 @@ function RelationControl({
   onValueChange: (value: CatalogPlacementRelation) => void;
 }) {
   return (
-    <div
-      className="grid grid-cols-2 rounded-md border p-1"
-      role="radiogroup"
-      aria-label={`ตำแหน่งของ ${label} เทียบกับรายการอ้างอิง`}
-    >
+    <fieldset className="grid grid-cols-2 rounded-md border p-1" disabled={disabled}>
+      <legend className="sr-only">
+        ตำแหน่งของ {itemLabel} เทียบกับรายการอ้างอิง
+      </legend>
       {([
         ['before', 'ก่อนรายการนี้'],
         ['after', 'หลังรายการนี้'],
-      ] as const).map(([option, label]) => (
-        <Button
+      ] as const).map(([option, optionLabel]) => (
+        <label
           key={option}
-          type="button"
-          size="sm"
-          variant={value === option ? 'secondary' : 'ghost'}
-          role="radio"
-          aria-checked={value === option}
-          disabled={disabled}
-          onClick={() => onValueChange(option)}
+          className={cn(
+            'cursor-pointer',
+            disabled && 'cursor-not-allowed opacity-50',
+          )}
         >
-          {label}
-        </Button>
+          <input
+            className="peer sr-only"
+            type="radio"
+            name={`placement-relation-${itemLabel}`}
+            value={option}
+            checked={value === option}
+            onChange={() => onValueChange(option)}
+          />
+          <span className="flex h-8 items-center justify-center rounded-sm px-2 text-sm font-medium transition-colors peer-checked:bg-secondary peer-checked:text-secondary-foreground peer-focus-visible:outline-none peer-focus-visible:ring-2 peer-focus-visible:ring-ring peer-focus-visible:ring-offset-2">
+            {optionLabel}
+          </span>
+        </label>
       ))}
-    </div>
+    </fieldset>
   );
 }
 
@@ -702,6 +1110,51 @@ function PlacementSubmitButton() {
 
 function compareDisplayOrder(left: CatalogWorkspaceItem, right: CatalogWorkspaceItem) {
   return left.displayOrder - right.displayOrder || left.itemCode.localeCompare(right.itemCode);
+}
+
+function matchesPlacementReviewFilter(
+  review: PlacementAssignmentReview,
+  filter: PlacementReviewFilter,
+) {
+  switch (filter) {
+    case 'attention':
+      return review.modified || review.validity !== 'complete';
+    case 'modified':
+      return review.modified;
+    case 'suggested':
+      return !review.modified && review.validity === 'complete';
+    case 'incomplete':
+      return review.validity === 'incomplete';
+    case 'invalid':
+      return review.validity === 'invalid';
+    case 'all':
+      return true;
+  }
+}
+
+function formatPlacementNeighbor(
+  item: CatalogWorkspaceItem | null | undefined,
+  fallback: string,
+) {
+  return item ? `${item.itemCode} ${item.itemName}` : fallback;
+}
+
+function parseStoredPlacementAssignments(
+  value: unknown,
+  expectedLength: number,
+): CatalogPlacementAssignment[] | null {
+  if (isStoredPlacementAssignments(value, expectedLength)) return value;
+  if (
+    value
+    && typeof value === 'object'
+    && 'schemaVersion' in value
+    && value.schemaVersion === STORAGE_SCHEMA_VERSION
+    && 'assignments' in value
+    && isStoredPlacementAssignments(value.assignments, expectedLength)
+  ) {
+    return value.assignments;
+  }
+  return null;
 }
 
 function isStoredPlacementAssignments(
