@@ -423,6 +423,12 @@ describe('Master Catalog authority consistency', () => {
 
     const responseLossProxy = read('scripts/proxy-master-catalog-wp65-response-loss.mjs')
     expect(responseLossProxy).toContain("state.status = 'awaiting_same_id_retry'")
+
+    const artifactGenerator = read('scripts/generate-master-catalog-artifact-proof.mjs')
+    expect(artifactGenerator).toContain('MASTER_CATALOG_PROOF_VERSION_ID')
+    expect(artifactGenerator).toContain("'explicit-version-id'")
+    expect(artifactGenerator).toContain("'current-default-pointer'")
+    expect(artifactGenerator).toContain('Explicit Local version is not active')
     expect(responseLossProxy).toContain('state.sameRequestId')
     expect(responseLossProxy).toContain('state.responseRequestIdMatches')
     expect(responseLossProxy).toContain('state.duplicateRequest')

@@ -25,6 +25,10 @@ const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
 const localEnv = readLocalEnvFile()
 const password = localEnv.LOCAL_TEST_PASSWORD ?? process.env.LOCAL_TEST_PASSWORD
 const email = process.env.MASTER_CATALOG_PROOF_EMAIL ?? 'local.admin@ntplc.co.th'
+const requestedVersionId = readOptionalUuid(
+  'MASTER_CATALOG_PROOF_VERSION_ID',
+  process.env.MASTER_CATALOG_PROOF_VERSION_ID,
+)
 const outputRoot = resolve(
   process.env.MASTER_CATALOG_PROOF_OUTPUT_ROOT
     ?? 'output/master-catalog/review-artifacts',
@@ -104,6 +108,9 @@ try {
     source: {
       appOrigin,
       routeKind: 'authenticated selected-version server export',
+      versionSelection: requestedVersionId
+        ? 'explicit-version-id'
+        : 'current-default-pointer',
       actorRole: 'admin',
       excelRequestId: excel.requestId,
     },
@@ -187,21 +194,29 @@ async function createLocalAdminSession() {
     throw new Error(`Unexpected Local profile role/status: ${profile.role}/${profile.status}`)
   }
 
-  const { data: pointer, error: pointerError } = await supabase
-    .from('price_list_default_version')
-    .select('version_id')
-    .eq('id', true)
-    .single()
-  if (pointerError) throw pointerError
+  let versionId = requestedVersionId
+  if (!versionId) {
+    const { data: pointer, error: pointerError } = await supabase
+      .from('price_list_default_version')
+      .select('version_id')
+      .eq('id', true)
+      .single()
+    if (pointerError) throw pointerError
+    versionId = pointer.version_id
+  }
 
   const { data: version, error: versionError } = await supabase
     .from('price_list_versions')
     .select('id,version_string,status,is_default,item_count,dataset_hash,effective_date')
-    .eq('id', pointer.version_id)
+    .eq('id', versionId)
     .single()
   if (versionError) throw versionError
-  if (version.status !== 'active' || !version.is_default) {
-    throw new Error(`Selected Local version is not active/default: ${version.status}/${version.is_default}`)
+  if (version.status !== 'active' || (!requestedVersionId && !version.is_default)) {
+    throw new Error(
+      requestedVersionId
+        ? `Explicit Local version is not active: ${version.status}`
+        : `Selected Local version is not active/default: ${version.status}/${version.is_default}`,
+    )
   }
   if (
     !Number.isInteger(Number(version.item_count))
@@ -512,6 +527,15 @@ function readLoopbackOrigin(name, value) {
   }
 
   return url.origin
+}
+
+function readOptionalUuid(name, value) {
+  if (typeof value === 'undefined' || value.trim() === '') return null
+  const normalized = value.trim()
+  if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(normalized)) {
+    throw new Error(`${name} must be a UUID`)
+  }
+  return normalized
 }
 
 function assertTrackedTreeClean() {
