@@ -26,8 +26,9 @@ enablement, publication, or Production.
 
 **P-35 decision:** Authorized 2026-07-15 on exact gate checkpoint
 `43b75e3f0b0643d6f4e741fcc81ea8b0a6311a13` for repository/source integration,
-static verification, commit, and push only. P-36 destructive execution and P-37
-WP-8 acceptance remain separately gated.
+static verification, commit, and push only. Exact source checkpoint
+`01eba0d49f2e4b6e65f0d9dd287fd461ba9ea19a` passed. P-36 destructive execution
+and P-37 WP-8 acceptance remain separately gated.
 
 **Environment:** Local-only completed P-32 technical evidence. Historical P-31 migration
 SHA-256 `78359215...` failed closed at runtime because the fixed-search-path
@@ -335,7 +336,7 @@ to skip gates:
 |---|---:|
 | P-33 owner review of completed WP-7.5 evidence | Completed 2026-07-15 13:54 +07; technical scope accepted |
 | P-34 WP-8 placement UX source/static hardening | Completed on exact `0780925`; live acceptance not inferred |
-| P-35 `021` bootstrap source integration | Authorized and implemented as non-destructive repository/source work; P-36 execution remains separate |
+| P-35 `021` bootstrap source integration | Completed on exact source checkpoint `01eba0d49f2e4b6e65f0d9dd287fd461ba9ea19a`; P-36 execution remains separate |
 | Remaining WP-8 clean rehearsal, measured browser/accessibility evidence, intended-admin UAT, and readiness package | About 1-3 focused engineering days plus reviewer availability |
 | Earliest remaining path before any Production request | About 1-3 focused engineering days after separate P-36 reset authorization; independent UAT and remediation may extend calendar time |
 
@@ -386,5 +387,7 @@ hard WP-8/P-14 gates. Bootstrap inclusion, WP-8 execution, P-19, feature
 enablement, publication, and Production remained separate at P-33. P-34 then
 passed the bounded application/source UX slice, and P-35 authorized the
 non-destructive bootstrap source integration on gate commit
-`43b75e3f0b0643d6f4e741fcc81ea8b0a6311a13`. P-36 execution, P-37 acceptance,
-P-19, feature enablement, publication, and Production remain separate.
+`43b75e3f0b0643d6f4e741fcc81ea8b0a6311a13`; exact source checkpoint
+`01eba0d49f2e4b6e65f0d9dd287fd461ba9ea19a` passed. P-36 execution, P-37
+acceptance, P-19, feature enablement, publication, and Production remain
+separate.

@@ -136,7 +136,7 @@ describe('Master Catalog authority consistency', () => {
       '**Owner-accepted Local-only migration in bootstrap source; SHA-256 `e07e0c4161077efba7bc4f6ebf95518d0cc1bc7e4628a43a128dd899bd1aef93`; G1R/G2 separate-apply evidence passed on exact checkout `721c2c2c4a234a4fd00e5686383be9af87ee15dd`; G3/WP-6.6 accepted on `78e96ab3ed9993707014c4aba1d285b7592b17a1`; owner-approved G4E combined clean bootstrap through `020` passed on exact execution checkout `15b707d443bec701f6b3a86aa7675ca1266604ba`; not Production-approved**',
     )
     expect(migrations).toContain(
-      '**Owner-accepted Local-only migration in bootstrap source under P-35; SHA-256 `e4de258756bbfbda0508e55d7b76ba2e907f644625b49bc29d4a4d7ac42fa714`; P-32 separate-apply DB/RLS/concurrency/hash/export/browser evidence passed on source `80b2574`; P-33 technical acceptance and P-34 UX source/static passed; integrated clean bootstrap/live WP-8 evidence remains pending P-36; not Production-approved**',
+      '**Owner-accepted Local-only migration in bootstrap source under P-35 on exact source checkpoint `01eba0d49f2e4b6e65f0d9dd287fd461ba9ea19a`; SHA-256 `e4de258756bbfbda0508e55d7b76ba2e907f644625b49bc29d4a4d7ac42fa714`; P-32 separate-apply DB/RLS/concurrency/hash/export/browser evidence passed on source `80b2574`; P-33 technical acceptance and P-34 UX source/static passed; integrated clean bootstrap/live WP-8 evidence remains pending P-36; not Production-approved**',
     )
     expect(existsSync(resolve(
       root,
@@ -236,6 +236,9 @@ describe('Master Catalog authority consistency', () => {
     expect(decisions).toContain('| P-33 |')
     expect(decisions).toContain('| P-34 |')
     expect(decisions).toContain('| P-35 |')
+    expect(decisions).toContain(
+      '01eba0d49f2e4b6e65f0d9dd287fd461ba9ea19a',
+    )
     expect(decisions).toContain('| P-36 |')
     expect(decisions).toContain('| P-37 |')
     expect(decisions).toContain(
@@ -245,7 +248,7 @@ describe('Master Catalog authority consistency', () => {
       'Authorized and source/static-passed 2026-07-15; WP-8 is In progress. No bootstrap edit, Local DB reset/write, feature enablement, publication, Factor F/hotfix expansion, or Production action authorized',
     )
     expect(decisions).toContain(
-      'Approved 2026-07-15 for repository/source work only; exact integration checkpoint and static evidence must be recorded before P-36 is requested',
+      'Approved and source/static-passed 2026-07-15 on exact checkpoint `01eba0d49f2e4b6e65f0d9dd287fd461ba9ea19a`; P-36 remains separately gated',
     )
     expect(decisions).toContain('| L-57 |')
     expect(decisions).toContain('| L-58 |')
@@ -282,7 +285,7 @@ describe('Master Catalog authority consistency', () => {
       /P-33 accepted that\s+exact bounded WP-7\.5 technical checkpoint at 2026-07-15 13:54 \+07/,
     )
     expect(tracker).toContain(
-      'WP-8 In progress via P-35 bootstrap source-integration candidate; exact commit/push and destructive P-36 Local rehearsal remain separately gated',
+      'WP-8 In progress; P-35 source checkpoint `01eba0d49f2e4b6e65f0d9dd287fd461ba9ea19a` passed and destructive P-36 Local rehearsal remains separately gated',
     )
     expect(tracker).toContain(
       '0780925aca8fa7ebbf8abbaf2b7cf151b39b676a',
@@ -368,7 +371,7 @@ describe('Master Catalog authority consistency', () => {
     expect(tracker).toMatch(
       /pre-amendment operator\/browser preflight passed on\s+`c8f6dca`/,
     )
-    expect(tracker).toContain('Status: P-35 integrates unchanged amended 021 into bootstrap source')
+    expect(tracker).toContain('Status: P-35 source integration is complete')
     expect(existsSync(resolve(
       root,
       'docs/plans/master-catalog/30-phase4-wp66-owner-review-note.md',
