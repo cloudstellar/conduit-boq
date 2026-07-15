@@ -140,6 +140,14 @@ and all five P-18 V1 rules. Bounded WP-7.5 Local-only source implementation is
 authorized; `021` bootstrap inclusion, Local apply/reset evidence, WP-8, P-19,
 Factor F/hotfix expansion, and Production remain separate.
 
+**WP-7.5 source checkpoint:** 2026-07-15 — migration `021` and the exact
+placement RPC/readiness/publish/read-model/Thai-workspace contracts passed
+repository/static review at SHA-256
+`78359215f7d859d9c167db608e1e96d66712b6b06a9d103fd7b26ce781835a83`.
+The architecture is unchanged: inherited order remains stable, new identities
+are confirmed as one batch, DB authority remains final, and Add/Supplement stay
+disabled until separately approved Local live evidence passes.
+
 **Owner decision recorded:** 2026-07-04 — approved according to the
 recommendation for Phase 4 Core/local implementation. This approval does not
 authorize Production migration, deploy, feature enablement, candidate data
@@ -310,7 +318,7 @@ decisions.
 | Dataset hash and item count | Keep | Makes Excel/PDF exports verifiable against the published version |
 | Feature flag, local rehearsal, logical backup | Keep | Reduces Production rollout risk without another paid project |
 | NT CI foundation for catalog UI/exports | Keep | Required product identity and document consistency |
-| New-identity placement before publication | Proposed WP-7.5, pending P-18 | Completes Add/Supplement without allowing arbitrary reorder of the inherited baseline |
+| New-identity placement before publication | Keep; P-18 V1 accepted and WP-7.5 source/static passed, with Local live evidence still gated | Completes Add/Supplement without allowing arbitrary reorder of the inherited baseline |
 
 ### Simplify in Phase 4 Core
 

@@ -740,6 +740,14 @@ repository/source implementation only. Keep `021` outside bootstrap and do not
 apply or reset Local Supabase until a separately reviewed exact candidate and
 explicit reset approval exist.
 
+Repository/static checkpoint passed on 2026-07-15. The working-tree candidate
+implements the revision/review schema, exact bounded idempotent RPC, readiness
+and publish invariants, Thai all-pending-items placement workspace, release
+gating, and unit/static contracts. Migration `021` SHA-256 is
+`78359215f7d859d9c167db608e1e96d66712b6b06a9d103fd7b26ce781835a83`.
+This does not satisfy the live DB/concurrency/hash/export/browser exit evidence;
+accept/commit the exact source checkpoint before a separate warned Local gate.
+
 Exit gate:
 
 - one/many new identities remain blocked before accepted placement;
@@ -824,9 +832,10 @@ current evidence for:
 - BOQ regression preservation, including price-list version links;
 - Factor F before/after assertions proving no pointer, row, hash, grant, RLS,
   or BOQ binding change;
-- WP-6.5 guard evidence showing add/supplement/new-identity publish is rejected
-  until placement governance is approved and structured-code legacy exceptions
-  are limited to the recorded `ITEM-0139` case;
+- WP-6.5/WP-7.5 guard evidence showing add/supplement/new-identity publish is
+  rejected until the current placement batch has a matching accepted review,
+  and structured-code legacy exceptions are limited to the recorded
+  `ITEM-0139` case;
 - P-19 inactive/retired row official export policy, if the candidate contains
   any inactive/retired rows;
 - structured-code completeness evidence for the exact candidate, including the
@@ -934,8 +943,8 @@ Before asking for code review:
 - [ ] Publisher snapshot is authenticated, version archive reference is stored,
   and readiness/publish share full base/quality authority.
 - [ ] Reactivate/base-absent-withdraw and required null/order constraints pass.
-- [ ] WP-6.5 guard rejects add/supplement/new-identity publication until
-  placement governance is approved.
+- [ ] WP-6.5/WP-7.5 guard rejects add/supplement/new-identity publication until
+  the current placement batch has a matching accepted review.
 - [ ] WP-6.5 guard enforces the structured-code legacy exception set before
   publication.
 - [ ] Client/form retains the same operation ID through an uncertain response

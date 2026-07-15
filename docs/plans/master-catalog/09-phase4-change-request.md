@@ -29,6 +29,14 @@ Add/Supplement operator path. Exact P-18 business rules remain pending in
 planning approval does not authorize migration `021`, a Local reset, or any
 Production action.
 
+**P-30 P-18 decision and source checkpoint:** 2026-07-15 — the owner accepted
+all five V1 rules and authorized bounded Local-only source implementation.
+Migration `021` plus the RPC/read-model/Thai workspace/tests/docs candidate then
+passed repository/static review at SHA-256
+`78359215f7d859d9c167db608e1e96d66712b6b06a9d103fd7b26ce781835a83`.
+Exact commit, bootstrap inclusion, Local apply/reset/live evidence, WP-8, and
+every Production gate remain separate.
+
 **Capability-completeness amendment recorded:** 2026-07-12 —
 [Audit #29](./29-phase4-owner-dev-completeness-audit.md) found that the current
 fail-closed implementation is not yet a complete intended-admin workflow.
@@ -483,17 +491,18 @@ feature enablement, final catalog publication, or silent business-data choices.
 
 ### Additional preconditions before WP-7.5 placement implementation
 
-- [ ] Owner/data custodian accepts or amends all five P-18 V1 choices in
+- [x] Owner/data custodian accepts or amends all five P-18 V1 choices in
       [Review Note #28](./28-phase4-p18-placement-governance-review-note.md)
-- [ ] DB/security, threat, parser/hash, export, runbook, verification, admin
+- [x] DB/security, threat, parser/hash, export, runbook, verification, admin
       procedure, execution pack, tracker, and consistency-test contracts agree
-- [ ] Scope remains new identities only; inherited baseline reorder and
+- [x] Scope remains new identities only; inherited baseline reorder and
       item-code renumbering remain excluded
-- [ ] Proposed migration is append-only `021`; `017`-`020` remain unchanged
+- [x] Migration is append-only `021`; `017`-`020` remain unchanged
 - [ ] A separate owner decision is obtained before any Local bootstrap/reset
 
-Until these checks pass, the existing P-18 DB guard remains authoritative and
-Add/Supplement is not a complete publishable workflow.
+The source checks now pass, but the final reset/live-evidence check does not.
+The existing P-18 DB guard remains authoritative and Add/Supplement is not a
+complete publishable workflow until that separate gate passes.
 
 ### Additional preconditions before final data backfill/candidate freeze
 

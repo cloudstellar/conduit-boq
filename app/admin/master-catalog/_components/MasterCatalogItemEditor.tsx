@@ -583,7 +583,7 @@ function FieldDiff({
 }
 
 function historyActionLabel(action: string): string {
-  return ({ add: 'เพิ่ม', update: 'แก้ไข', recode: 'เปลี่ยนรหัส', retire: 'ยกเลิกใช้', reactivate: 'เปิดใช้อีกครั้ง', withdraw: 'ถอนจากฉบับร่าง' } as Record<string, string>)[action] ?? action;
+  return ({ add: 'เพิ่ม', update: 'แก้ไข', recode: 'เปลี่ยนรหัส', retire: 'ยกเลิกใช้', reactivate: 'เปิดใช้อีกครั้ง', withdraw: 'ถอนจากฉบับร่าง', place: 'ยืนยันตำแหน่ง' } as Record<string, string>)[action] ?? action;
 }
 
 function displayValue(value: unknown): string {

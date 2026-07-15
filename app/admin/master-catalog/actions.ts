@@ -18,6 +18,7 @@ import {
   type CatalogRpcActionResponse,
   buildAbandonCatalogDraftArgs,
   buildPublishCatalogVersionArgs,
+  buildPlaceCatalogItemsArgs,
   buildRestoreCatalogPointerArgs,
   buildManualCatalogChangeArgs,
   createCatalogMutationError,
@@ -240,6 +241,54 @@ export async function applyCatalogManualChangeAction(
   );
   logMasterCatalogOperation({
     operation: 'applyCatalogManualChange',
+    outcome: result.status === 'success' ? 'success' : 'rejected',
+    startedAt,
+    requestId: result.requestId ?? requestId,
+    versionId: result.versionId ?? args.p_version_id,
+    code: result.code,
+  });
+
+  if (result.status === 'success') {
+    revalidateMasterCatalogPaths(result.versionId ?? args.p_version_id);
+  }
+
+  return result;
+}
+
+export async function placeCatalogItemsAction(
+  _previousState: CatalogMutationState,
+  formData: FormData,
+): Promise<CatalogMutationState> {
+  const requestId = readOperationRequestId(formData);
+  if (typeof requestId !== 'string') return requestId;
+
+  const supabase = await createClient();
+  const gate = await loadCatalogAdminGate(supabase);
+  if (gate.state !== 'enabled') {
+    return createCatalogMutationError(
+      'ระบบบัญชีราคาสำหรับผู้ดูแลยังไม่เปิดใช้งาน',
+      'FORBIDDEN',
+    );
+  }
+
+  const args = buildPlaceCatalogItemsArgs(formData, requestId);
+  if ('status' in args) return args;
+
+  const startedAt = Date.now();
+  const { data, error } = await supabase.rpc('place_catalog_items', args);
+  if (error) {
+    return mapRpcTransportError('placeCatalogItems', error, requestId, {
+      startedAt,
+      versionId: args.p_version_id,
+    });
+  }
+
+  const result = mapCatalogRpcActionResponse(
+    data as CatalogRpcActionResponse,
+    'ยืนยันตำแหน่งรายการใหม่ทั้งชุดแล้ว',
+  );
+  logMasterCatalogOperation({
+    operation: 'placeCatalogItems',
     outcome: result.status === 'success' ? 'success' : 'rejected',
     startedAt,
     requestId: result.requestId ?? requestId,
@@ -663,6 +712,7 @@ function revalidateMasterCatalogPaths(versionId: string | undefined) {
   if (versionId) {
     revalidatePath(`/admin/master-catalog/versions/${versionId}`);
     revalidatePath(`/admin/master-catalog/versions/${versionId}/review`);
+    revalidatePath(`/admin/master-catalog/versions/${versionId}/placement`);
   }
 }
 

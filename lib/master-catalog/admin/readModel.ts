@@ -26,7 +26,14 @@ export { isCatalogAdminEnabled } from './flags';
 export type CatalogAdminSection = 'overview' | 'versions' | 'history';
 export type CatalogVersionStatus = 'draft' | 'active' | 'archived' | 'abandoned';
 export type CatalogImportStatus = 'validated' | 'applied' | 'rejected';
-export type CatalogChangeType = 'clone' | 'import' | 'manual' | 'abandon' | 'publish' | 'restore';
+export type CatalogChangeType =
+  | 'clone'
+  | 'import'
+  | 'manual'
+  | 'abandon'
+  | 'publish'
+  | 'restore'
+  | 'placement';
 
 export interface CatalogAdminProfile {
   id: string;
@@ -110,6 +117,16 @@ export interface CatalogPublishReadiness {
   unapprovedLegacyActiveCount: number;
   inactiveRowCount: number;
   retiredPdfPolicyRequired: boolean;
+  placementGovernanceAvailable: boolean;
+  placementRevision: number;
+  acceptedPlacementRevision: number | null;
+  placementReviewId: string | null;
+  placementChangeSetId: string | null;
+  placementReviewRequired: boolean;
+  placementReviewCurrent: boolean;
+  orderContiguous: boolean;
+  inheritedOrderPreserved: boolean;
+  expectedOrderMatches: boolean;
   qualityPassed: boolean;
   dataset: {
     itemCount: number;
@@ -119,6 +136,27 @@ export interface CatalogPublishReadiness {
     quality: Record<string, number>;
   } | null;
   canPublish: boolean;
+}
+
+export interface CatalogPlacementWorkspace {
+  version: {
+    id: string;
+    versionString: string;
+    status: CatalogVersionStatus;
+    basedOnVersionId: string | null;
+    lockVersion: number;
+  };
+  currentVersionId: string | null;
+  placementRevision: number;
+  readiness: CatalogPublishReadiness | null;
+  baseItems: CatalogWorkspaceItem[];
+  newItems: CatalogWorkspaceItem[];
+  inheritedItems: CatalogWorkspaceItem[];
+  categories: CatalogCategoryOption[];
+  capabilities: CatalogCapabilityFlags;
+  complete: boolean;
+  editable: boolean;
+  warnings: string[];
 }
 
 export interface CatalogAdminOverview {
@@ -499,7 +537,7 @@ export async function loadCatalogAdminOverview(
   };
 }
 
-async function loadCatalogPublishReadiness(
+export async function loadCatalogPublishReadiness(
   supabase: SupabaseClient,
   versionId: string,
   warnings: string[],
@@ -538,9 +576,95 @@ async function loadCatalogPublishReadiness(
     unapprovedLegacyActiveCount: toNullableNumber(row.unapprovedLegacyActiveCount) ?? 0,
     inactiveRowCount: toNullableNumber(row.inactiveRowCount) ?? 0,
     retiredPdfPolicyRequired: row.retiredPdfPolicyRequired === true,
+    placementGovernanceAvailable: row.placementGovernanceAvailable === true,
+    placementRevision: toNullableNumber(row.placementRevision) ?? 0,
+    acceptedPlacementRevision: toNullableNumber(row.acceptedPlacementRevision),
+    placementReviewId: toNullableString(row.placementReviewId),
+    placementChangeSetId: toNullableString(row.placementChangeSetId),
+    placementReviewRequired: row.placementReviewRequired === true,
+    placementReviewCurrent: row.placementReviewCurrent === true,
+    orderContiguous: row.orderContiguous === true,
+    inheritedOrderPreserved: row.inheritedOrderPreserved === true,
+    expectedOrderMatches: row.expectedOrderMatches === true,
     qualityPassed: row.qualityPassed === true,
     dataset: mapPublishDataset(row.dataset),
     canPublish: row.canPublish === true,
+  };
+}
+
+export async function loadCatalogPlacementWorkspace(
+  supabase: SupabaseClient,
+  versionId: string,
+): Promise<CatalogPlacementWorkspace | null> {
+  const warnings: string[] = [];
+  const { data: versionData, error: versionError } = await supabase
+    .from('price_list_versions')
+    .select('id,version_string,status,based_on_version_id,lock_version')
+    .eq('id', versionId)
+    .maybeSingle();
+
+  pushError(warnings, versionError, 'โหลดฉบับร่างสำหรับจัดตำแหน่งไม่สำเร็จ');
+  const versionRow = rowFromResult(versionData);
+  if (!versionRow) return null;
+
+  const basedOnVersionId = toNullableString(versionRow.based_on_version_id);
+  const [workspace, baseSnapshot, pointerResult, readiness, capabilityResult] =
+    await Promise.all([
+      loadCatalogVersionWorkspace(supabase, versionId),
+      basedOnVersionId
+        ? loadCatalogVersionItemsSnapshot(supabase, basedOnVersionId)
+        : Promise.resolve({
+            items: [],
+            totalItems: 0,
+            complete: false,
+            warnings: ['ฉบับนี้ไม่มีเวอร์ชันฐานสำหรับยืนยันตำแหน่ง'],
+          }),
+      supabase
+        .from('price_list_default_version')
+        .select('version_id')
+        .eq('id', true)
+        .maybeSingle(),
+      loadCatalogPublishReadiness(supabase, versionId, warnings),
+      loadCatalogCapabilityFlags(supabase),
+    ]);
+
+  warnings.push(...workspace.warnings, ...baseSnapshot.warnings);
+  pushError(warnings, pointerResult.error, 'โหลดเวอร์ชันบัญชีราคาที่ใช้งานปัจจุบันไม่สำเร็จ');
+  if (capabilityResult.warning) warnings.push(capabilityResult.warning);
+
+  const baseIdentityIds = new Set(baseSnapshot.items.map((item) => item.identityId));
+  const newItems = workspace.items.filter((item) => !baseIdentityIds.has(item.identityId));
+  const inheritedItems = workspace.items.filter((item) => baseIdentityIds.has(item.identityId));
+  const currentVersionId = toNullableString(pointerResult.data?.version_id);
+  const status = (versionRow.status ?? 'draft') as CatalogVersionStatus;
+  const complete = workspace.items.length === workspace.totalItems && baseSnapshot.complete;
+  const placementGovernanceAvailable = readiness?.placementGovernanceAvailable === true;
+
+  return {
+    version: {
+      id: String(versionRow.id),
+      versionString: String(versionRow.version_string ?? ''),
+      status,
+      basedOnVersionId,
+      lockVersion: toNullableNumber(versionRow.lock_version) ?? 0,
+    },
+    currentVersionId,
+    placementRevision: readiness?.placementRevision ?? 0,
+    readiness,
+    baseItems: baseSnapshot.items,
+    newItems,
+    inheritedItems,
+    categories: workspace.categories,
+    capabilities: capabilityResult.flags,
+    complete,
+    editable:
+      status === 'draft'
+      && basedOnVersionId !== null
+      && basedOnVersionId === currentVersionId
+      && complete
+      && placementGovernanceAvailable
+      && capabilityResult.flags.newIdentityEnabled,
+    warnings,
   };
 }
 

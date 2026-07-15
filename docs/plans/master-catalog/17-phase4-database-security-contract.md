@@ -9,7 +9,7 @@ migration approval remain separate gates
 **Last updated:** 2026-07-15 to record the WP-6.6 capability/authority hardening
 from [Audit #29](./29-phase4-owner-dev-completeness-audit.md), the P-22
 [Operator Workflow Correction](./31-phase4-wp66-operator-workflow-correction-plan.md),
-and the proposed P-18/WP-7.5 placement extension. Existing `017`-`019` remain
+and the accepted P-18/WP-7.5 placement extension. Existing `017`-`019` remain
 the reviewed Local/bootstrap contract. Candidate `020` was amended under P-22
 and passed historical G1 DB/concurrency/lint/security evidence on `e463270`.
 P-23 first changed operator context/navigation only. Owner-approved P-23.1 then
@@ -30,9 +30,11 @@ the canonical Local bootstrap source after `019`. The new `009`-`020` source
 chain was then clean-executed under separately owner-approved P-29/G4E on exact
 checkout `15b707d443bec701f6b3a86aa7675ca1266604ba`; schema lint, security
 advisors, WP-6.6/WP-6.5/P-20/WP-7 evidence, and final Local invariants passed.
-Migration `020` has not been applied to Production.
-P-18 rules and placement migration `021` remain pending owner/data-custodian
-approval.
+Migration `020` has not been applied to Production. P-30 accepted the P-18 V1
+rules and authorized a bounded Local-only `021` source candidate. Repository/
+static review of that candidate passed on 2026-07-15 at SHA-256
+`78359215f7d859d9c167db608e1e96d66712b6b06a9d103fd7b26ce781835a83`; it is
+not in bootstrap and has not been applied to Local or Production.
 
 **Owner decision recorded:** 2026-07-04 — approved according to the
 recommendation as the technical backbone for Phase 4A and every Phase 4 write
@@ -133,9 +135,10 @@ erDiagram
     CATALOG_CHANGE_SETS ||--o| CATALOG_PLACEMENT_REVIEWS : records
 ```
 
-The diagram is semantic. `CATALOG_PLACEMENT_REVIEWS` is proposed for WP-7.5 and
-does not exist until P-18 is accepted and migration `021` is implemented. Exact
-foreign keys and deletion behavior are defined below.
+The diagram is semantic. `CATALOG_PLACEMENT_REVIEWS` now exists in the unapplied
+Local-only `021` source candidate. It does not exist in the current Local or
+Production schema until the separately approved migration gate is executed.
+Exact foreign keys and deletion behavior are defined below.
 
 ## 4. Design principles
 
@@ -324,14 +327,15 @@ order, and do not add a Phase 4 Core reorder UI.
 
 This rule is deliberately mechanical: it reproduces the legacy business code
 sequence without treating an unstable source row position as authority.
-It is a draft allocation fallback, not publication approval. Until P-18
-placement governance is approved, `publish_catalog_version` must reject any
-draft whose `price_list.identity_id` does not exist in the draft's
-`based_on_version_id` rows, returning the stable safe code
-`P18_PLACEMENT_REVIEW_REQUIRED`. The proposed separately gated WP-7.5 workflow
-is defined in
-[Review Note #28](./28-phase4-p18-placement-governance-review-note.md); until
-accepted and implemented, the current guard remains unchanged.
+It is a draft allocation fallback, not publication approval. For a draft whose
+`price_list.identity_id` does not exist in its `based_on_version_id` rows,
+`publish_catalog_version` must require a matching accepted review for the
+current placement revision and recheck complete order/base-relative invariants.
+Otherwise it returns the stable safe code
+`P18_PLACEMENT_REVIEW_REQUIRED`. The separately gated WP-7.5 workflow is
+defined in [Review Note #28](./28-phase4-p18-placement-governance-review-note.md).
+Its source/static candidate is implemented, while the existing release hold and
+hidden Add/Supplement controls remain until Local live evidence passes.
 
 Phase 4 should set `material_cost`, `labor_cost`, `unit_cost`, `is_active`,
 `created_at`, and `updated_at` to `NOT NULL` only after the preflight confirms
@@ -527,13 +531,19 @@ Approved V1 table:
 | `placement_revision` | `integer` | Nonnegative; unique with version |
 | `change_set_id` | `uuid` | Unique FK to a `placement` change set, `ON DELETE RESTRICT` |
 | `new_identity_count` | `integer` | Positive and equal to the reviewed current new-identity set |
+| `placement_payload` | `jsonb` | Normalized bounded array containing each new identity, category, inherited anchor, relation, and explicit batch order |
+| `affected_row_count` | `integer` | Positive count of new identities and shifted/category-changed rows audited by the change set |
+| `affected_start_order` | `integer` | First zero-based order included in the audited affected range |
+| `affected_end_order` | `integer` | Last zero-based order included in the audited affected range; not before the start |
 | `request_id` | `uuid` | Unique idempotency key/fingerprint authority |
 | `actor_id` | `uuid` | FK auth user, `ON DELETE RESTRICT` |
 | `actor_display_name` | `text` | Immutable bounded snapshot |
 | `reason` | `text` | Trimmed nonblank, bounded |
 | `created_at` | `timestamptz` | `not null default now()` |
 
-The table is append-only. Pending placement is represented by a draft whose
+The table is append-only. The normalized payload is retained so readiness and
+publication can reconstruct the accepted sequence instead of trusting only a
+counter or opaque request hash. Pending placement is represented by a draft whose
 current `placement_revision` has no matching accepted review; do not add a
 mutable client-controlled approval flag. Extend `catalog_change_sets.change_type`
 with `placement` and `catalog_change_items.action` with `place` for explicitly
@@ -771,9 +781,12 @@ codes for malformed order or scope violations.
 2. Claim/fingerprint the request ID under the existing per-request advisory lock.
 3. Lock the draft version and compare expected `lock_version`.
 4. Load base/candidate identities and validate complete unique pending-new-item
-   input, categories, same-category anchors, and before/after relations.
+   input, categories, same-category anchors inherited from the draft base,
+   before/after relations, and a unique contiguous zero-based batch order.
 5. Construct the resulting total order while preserving inherited relative
-   order. Assign contiguous zero-based values; shifted inherited numeric values
+   order. For new identities sharing one anchor/relation, use the submitted
+   batch order; it orders only those new identities and cannot reorder inherited
+   rows. Assign contiguous zero-based values; shifted inherited numeric values
    are expected.
 6. Update all changed draft rows under the deferrable unique-order constraint,
    append complete `place` old/new snapshots for every shifted row, append the

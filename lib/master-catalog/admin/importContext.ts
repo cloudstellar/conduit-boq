@@ -155,7 +155,13 @@ export async function loadCatalogImportContext(
     };
   }
 
-  const [mappingResult, exclusionResult, workspace, baseVersionResult] = await Promise.all([
+  const [
+    mappingResult,
+    exclusionResult,
+    workspace,
+    baseVersionResult,
+    publishReadinessResult,
+  ] = await Promise.all([
     supabase
       .from('catalog_first_rollout_mappings')
       .select('identity_id,legacy_item_code,source_item_code,target_item_code,identity_outcome,work_context_code,item_type_code')
@@ -172,12 +178,30 @@ export async function loadCatalogImportContext(
           .eq('id', draft.basedOnVersionId)
           .maybeSingle()
       : Promise.resolve({ data: null, error: null }),
+    supabase.rpc('get_catalog_publish_readiness', { p_version_id: draft.id }),
   ]);
 
   warnings.push(...workspace.warnings);
   if (mappingResult.error) warnings.push('โหลดชุดจับคู่ที่รับรองสำหรับรอบเผยแพร่แรกไม่สำเร็จ');
   if (exclusionResult.error) warnings.push('โหลดรายการจากไฟล์ต้นทางที่เลื่อนไปรอบถัดไปไม่สำเร็จ');
   if (baseVersionResult.error) warnings.push('โหลดเลขฉบับฐานสำหรับการนำเข้าไม่สำเร็จ');
+  if (publishReadinessResult.error) warnings.push('ตรวจความพร้อมของ workflow รายการใหม่ไม่สำเร็จ');
+
+  const readiness = publishReadinessResult.data;
+  const placementGovernanceAvailable = Boolean(
+    readiness
+    && typeof readiness === 'object'
+    && !Array.isArray(readiness)
+    && (readiness as Record<string, unknown>).placementGovernanceAvailable === true,
+  );
+  const capabilities = {
+    ...capabilityResult.flags,
+    newIdentityEnabled:
+      capabilityResult.flags.newIdentityEnabled && placementGovernanceAvailable,
+  };
+  if (capabilityResult.flags.newIdentityEnabled && !placementGovernanceAvailable) {
+    warnings.push('ปิดการนำเข้าเฉพาะรายการเพิ่มเติมไว้จนกว่าระบบยืนยันตำแหน่งจะพร้อม');
+  }
 
   const mappings = rows(mappingResult.data) as MappingRow[];
   const exclusions = rows(exclusionResult.data)
@@ -297,7 +321,7 @@ export async function loadCatalogImportContext(
     },
     evidenceCounts,
     authorityReady,
-    capabilities: capabilityResult.flags,
+    capabilities,
     warnings,
   };
 }

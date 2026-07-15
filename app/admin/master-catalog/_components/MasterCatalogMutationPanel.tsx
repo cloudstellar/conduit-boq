@@ -12,6 +12,7 @@ import {
   FilePlus2,
   ListPlus,
   Loader2,
+  MapPin,
   Plus,
   RotateCcw,
   ShieldAlert,
@@ -564,7 +565,10 @@ export function MasterCatalogPublishRestorePanel({
                 <Badge variant="outline">{draftVersion.itemCount.toLocaleString('th-TH')} รายการ</Badge>
               ) : null}
             </div>
-            <PublishReadinessAlert readiness={draftReadiness} />
+            <PublishReadinessAlert
+              readiness={draftReadiness}
+              versionId={draftVersion.id}
+            />
             {draftReadiness?.retiredPdfPolicyRequired ? (
               <Alert>
                 <ShieldCheck />
@@ -845,8 +849,10 @@ export function MasterCatalogPublishRestorePanel({
 
 function PublishReadinessAlert({
   readiness,
+  versionId,
 }: {
   readiness: CatalogPublishReadiness | null;
+  versionId: string;
 }) {
   if (!readiness) {
     return (
@@ -866,7 +872,9 @@ function PublishReadinessAlert({
         <CheckCircle2 />
         <AlertTitle>ข้อมูลทั้งเวอร์ชันผ่านเงื่อนไขเผยแพร่</AlertTitle>
         <AlertDescription>
-          ฐานยังเป็นเวอร์ชันใช้งานปัจจุบัน คุณภาพข้อมูลรหัสมาตรฐานผ่าน และไม่พบรายการเพิ่มใหม่หรือรหัสเดิมที่ติดเงื่อนไข
+          ฐานยังเป็นเวอร์ชันใช้งานปัจจุบัน คุณภาพข้อมูลผ่าน
+          {readiness.newIdentityCount > 0 ? ' ตำแหน่งรายการใหม่ตรงกับฉบับร่างปัจจุบัน' : ''}
+          {' '}และไม่พบรหัสเดิมที่ติดเงื่อนไข
         </AlertDescription>
       </Alert>
     );
@@ -887,11 +895,29 @@ function PublishReadinessAlert({
           {!readiness.qualityPassed ? (
             <p>การตรวจจำนวนตัวตนรายการ หมวด รหัส ราคา หรือลำดับของข้อมูลทั้งเวอร์ชันยังไม่ผ่าน</p>
           ) : null}
-          {readiness.newIdentityCount > 0 ? (
-            <p>
-              มีรายการเพิ่มใหม่ {readiness.newIdentityCount.toLocaleString('th-TH')} รายการ
-              ที่ต้องพิจารณาและยืนยันตำแหน่งในบัญชีก่อนเผยแพร่
-            </p>
+          {readiness.newIdentityCount > 0 && !readiness.placementReviewCurrent ? (
+            <div className="grid justify-items-start gap-2">
+              <p>
+                มีรายการเพิ่มใหม่ {readiness.newIdentityCount.toLocaleString('th-TH')} รายการ
+                ที่ต้องพิจารณาและยืนยันตำแหน่งในบัญชีก่อนเผยแพร่
+              </p>
+              {readiness.placementGovernanceAvailable ? (
+                <Button variant="outline" size="sm" asChild>
+                  <Link href={`/admin/master-catalog/versions/${versionId}/placement`}>
+                    <MapPin data-icon="inline-start" />
+                    เปิดหน้าจัดตำแหน่งรายการใหม่
+                  </Link>
+                </Button>
+              ) : null}
+            </div>
+          ) : null}
+          {!readiness.orderContiguous || !readiness.inheritedOrderPreserved ? (
+            <p>ลำดับทั้งฉบับไม่ต่อเนื่อง หรือลำดับสัมพัทธ์ของรายการเดิมเปลี่ยนไป</p>
+          ) : null}
+          {readiness.newIdentityCount > 0
+            && readiness.placementReviewCurrent
+            && !readiness.expectedOrderMatches ? (
+            <p>ลำดับปัจจุบันไม่ตรงกับชุดตำแหน่งที่ยืนยันไว้</p>
           ) : null}
           {readiness.unapprovedLegacyActiveCount > 0 ? (
             <p>

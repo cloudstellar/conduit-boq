@@ -11,6 +11,7 @@ import {
   FileSpreadsheet,
   History,
   LockKeyhole,
+  MapPin,
   PackageOpen,
   Printer,
   ShieldAlert,
@@ -46,6 +47,7 @@ import {
   CatalogAdminSection,
   CatalogChangeSetSummary,
   CatalogImportSummary,
+  CatalogPlacementWorkspace,
   CatalogRegisterPage,
   CatalogVersionDetail,
   CatalogVersionReview,
@@ -74,6 +76,7 @@ import type {
 } from '@/lib/master-catalog/admin/catalogWorkspace';
 import { MasterCatalogItemEditor } from './MasterCatalogItemEditor';
 import { MasterCatalogHeaderUtilities } from './MasterCatalogHeaderUtilities';
+import { MasterCatalogPlacementWorkspaceView } from './MasterCatalogPlacementWorkspace';
 
 const sectionLinks: Array<{
   section: CatalogAdminSection;
@@ -309,8 +312,22 @@ export function MasterCatalogVersionDetailView({
           </div>
           {version.status !== 'abandoned' ? (
             <div className="flex flex-wrap gap-2">
-              {isEditableDraft ? (
+              {isEditableDraft
+                && detail.publishReadiness?.placementGovernanceAvailable
+                && (detail.publishReadiness.newIdentityCount > 0) ? (
                 <Button size="sm" asChild>
+                  <Link href={`/admin/master-catalog/versions/${version.id}/placement`}>
+                    <MapPin data-icon="inline-start" />
+                    จัดตำแหน่งรายการใหม่
+                  </Link>
+                </Button>
+              ) : null}
+              {isEditableDraft ? (
+                <Button
+                  size="sm"
+                  variant={detail.publishReadiness?.newIdentityCount ? 'outline' : 'default'}
+                  asChild
+                >
                   <Link href={`/admin/master-catalog/versions/${version.id}/review`}>
                     <ClipboardCheck data-icon="inline-start" />
                     ตรวจฉบับสุดท้าย
@@ -374,7 +391,10 @@ export function MasterCatalogVersionDetailView({
           && !detail.isStaleDraft
           && detail.items.length === (detail.counts.rows ?? detail.items.length)
         }
-        allowAdd={detail.capabilities.newIdentityEnabled}
+        allowAdd={
+          detail.capabilities.newIdentityEnabled
+          && detail.publishReadiness?.placementGovernanceAvailable === true
+        }
       />
 
       <section className="grid gap-4 border-t pt-6" aria-labelledby="version-document-heading">
@@ -427,6 +447,71 @@ export function MasterCatalogVersionDetailView({
           }}
         />
       ) : null}
+    </MasterCatalogFrame>
+  );
+}
+
+export function MasterCatalogPlacementView({
+  gate,
+  workspace,
+}: {
+  gate: CatalogAdminGate;
+  workspace: CatalogPlacementWorkspace;
+}) {
+  const readiness = workspace.readiness;
+
+  return (
+    <MasterCatalogFrame activeSection="versions" gate={gate}>
+      <Warnings warnings={workspace.warnings} />
+      <section className="grid gap-4 border-b pb-5">
+        <Button variant="ghost" size="sm" className="w-fit" asChild>
+          <Link href={`/admin/master-catalog/versions/${workspace.version.id}`}>
+            <ArrowLeft data-icon="inline-start" />
+            กลับพื้นที่ทำงานของฉบับร่าง
+          </Link>
+        </Button>
+        <div className="flex flex-col justify-between gap-4 lg:flex-row lg:items-start">
+          <div className="min-w-0">
+            <div className="flex flex-wrap items-center gap-2">
+              <MapPin className="size-5" />
+              <h2 className="text-xl font-semibold">ยืนยันตำแหน่งรายการใหม่</h2>
+              <Badge variant="outline">เวอร์ชัน {workspace.version.versionString}</Badge>
+            </div>
+            <p className="mt-1 text-sm text-muted-foreground">
+              กำหนดตำแหน่งของรายการใหม่เทียบกับรายการเดิม แล้วบันทึกทั้งชุดเพียงครั้งเดียว
+            </p>
+          </div>
+          <div className="flex flex-wrap gap-2">
+            <Badge variant="secondary">
+              รายการใหม่ {workspace.newItems.length.toLocaleString('th-TH')}
+            </Badge>
+          </div>
+        </div>
+      </section>
+
+      {readiness?.placementReviewRequired && readiness.placementReviewCurrent ? (
+        <Alert>
+          <CheckCircle2 />
+          <AlertTitle>ตำแหน่งชุดปัจจุบันได้รับการยืนยันแล้ว</AlertTitle>
+          <AlertDescription>
+            สถานะการยืนยันตรงกับฉบับร่างปัจจุบัน การยืนยันใหม่จะบันทึกประวัติชุดใหม่
+            โดยไม่แก้ไขประวัติเดิม
+          </AlertDescription>
+        </Alert>
+      ) : readiness?.placementReviewRequired ? (
+        <Alert>
+          <MapPin />
+          <AlertTitle>ยังต้องยืนยันตำแหน่งก่อนเผยแพร่</AlertTitle>
+          <AlertDescription>
+            รายการใหม่ทั้งหมดอยู่ในฉบับร่างอย่างปลอดภัย และจะยังไม่เปลี่ยนเวอร์ชันใช้งานจนกว่างานนี้ผ่าน
+          </AlertDescription>
+        </Alert>
+      ) : null}
+
+      <MasterCatalogPlacementWorkspaceView
+        key={`${workspace.version.id}:${workspace.version.lockVersion}:${workspace.placementRevision}`}
+        workspace={workspace}
+      />
     </MasterCatalogFrame>
   );
 }
@@ -1012,6 +1097,7 @@ function changeTypeLabel(changeType: string): string {
     abandon: 'ยกเลิกฉบับร่าง',
     publish: 'เผยแพร่',
     restore: 'คืนเวอร์ชันใช้งาน',
+    placement: 'ยืนยันตำแหน่งรายการใหม่',
   } as Record<string, string>)[changeType] ?? changeType;
 }
 

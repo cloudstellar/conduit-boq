@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import {
   buildAbandonCatalogDraftArgs,
   buildPublishCatalogVersionArgs,
+  buildPlaceCatalogItemsArgs,
   buildRestoreCatalogPointerArgs,
   buildManualCatalogChangeArgs,
   createCatalogRpcTransportError,
@@ -17,6 +18,7 @@ const REQUEST_ID = '00000000-0000-4000-8000-000000000101';
 const IDENTITY_ID = '00000000-0000-4000-8000-000000000201';
 const CATEGORY_ID = '00000000-0000-4000-8000-000000000301';
 const GROUP_ID = '00000000-0000-4000-8000-000000000401';
+const ANCHOR_ID = '00000000-0000-4000-8000-000000000202';
 
 function form(entries: Record<string, string>): FormData {
   const formData = new FormData();
@@ -114,6 +116,57 @@ describe('Master Catalog admin action model', () => {
     }), REQUEST_ID)).toMatchObject({
       status: 'error',
       code: 'VALIDATION_FAILED',
+    });
+  });
+
+  it('builds and validates one normalized placement batch', () => {
+    const placements = [
+      {
+        identityId: IDENTITY_ID,
+        categoryId: CATEGORY_ID,
+        anchorIdentityId: ANCHOR_ID,
+        relation: 'after',
+        batchOrder: 1,
+      },
+      {
+        identityId: ANCHOR_ID,
+        categoryId: CATEGORY_ID,
+        anchorIdentityId: IDENTITY_ID,
+        relation: 'before',
+        batchOrder: 0,
+      },
+    ];
+    const args = buildPlaceCatalogItemsArgs(form({
+      versionId: VERSION_ID,
+      expectedLockVersion: '4',
+      expectedPlacementRevision: '2',
+      placementsJson: JSON.stringify(placements),
+      reason: 'ยืนยันตำแหน่งตามหมวดงาน',
+    }), REQUEST_ID);
+
+    expect(args).toMatchObject({
+      p_version_id: VERSION_ID,
+      p_expected_lock_version: 4,
+      p_expected_placement_revision: 2,
+      p_reason: 'ยืนยันตำแหน่งตามหมวดงาน',
+      p_placements: [
+        { identityId: ANCHOR_ID, batchOrder: 0 },
+        { identityId: IDENTITY_ID, batchOrder: 1 },
+      ],
+    });
+
+    expect(buildPlaceCatalogItemsArgs(form({
+      versionId: VERSION_ID,
+      expectedLockVersion: '4',
+      expectedPlacementRevision: '2',
+      placementsJson: JSON.stringify([
+        placements[0],
+        { ...placements[1], batchOrder: 1 },
+      ]),
+      reason: 'ยืนยันตำแหน่งตามหมวดงาน',
+    }), REQUEST_ID)).toMatchObject({
+      status: 'error',
+      code: 'PLACEMENT_ORDER_INVALID',
     });
   });
 

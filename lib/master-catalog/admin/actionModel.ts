@@ -16,6 +16,10 @@ export interface CatalogMutationState {
   normalizedPayloadHash?: string;
   changedItems?: number;
   retiredByFullImportOmission?: number;
+  placementRevision?: number;
+  placementReviewId?: string;
+  newIdentityCount?: number;
+  affectedRows?: number;
   duplicateRequest?: boolean;
   requestId?: string;
   retryable?: boolean;
@@ -44,6 +48,10 @@ export interface CatalogRpcActionResponse {
     normalizedPayloadHash?: string;
     changedItems?: number;
     retiredByFullImportOmission?: number;
+    placementRevision?: number;
+    placementReviewId?: string;
+    newIdentityCount?: number;
+    affectedRows?: number;
     duplicateRequest?: boolean;
   };
   error?: {
@@ -92,6 +100,23 @@ export interface CatalogRestorePointerArgs {
   p_request_id: string;
 }
 
+export interface CatalogPlacementEntry {
+  identityId: string;
+  categoryId: string;
+  anchorIdentityId: string;
+  relation: 'before' | 'after';
+  batchOrder: number;
+}
+
+export interface CatalogPlaceItemsArgs {
+  p_version_id: string;
+  p_expected_lock_version: number;
+  p_expected_placement_revision: number;
+  p_placements: CatalogPlacementEntry[];
+  p_reason: string;
+  p_request_id: string;
+}
+
 const UUID_PATTERN =
   /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 const DATE_PATTERN = /^\d{4}-\d{2}-\d{2}$/;
@@ -122,6 +147,11 @@ const SAFE_RPC_ACTION_ERROR_CODES = new Set([
   'IMPORT_RETIREMENT_APPROVAL_REQUIRED',
   'POINTER_ALREADY_CURRENT',
   'P18_PLACEMENT_REVIEW_REQUIRED',
+  'PLACEMENT_ANCHOR_INVALID',
+  'PLACEMENT_NOT_REQUIRED',
+  'PLACEMENT_ORDER_INVALID',
+  'PLACEMENT_REVISION_CONFLICT',
+  'PLACEMENT_SCOPE_INVALID',
   'PUBLICATION_CONFIRMATION_MISMATCH',
   'PUBLICATION_METADATA_REQUIRED',
   'PUBLICATION_VALIDATION_FAILED',
@@ -154,6 +184,11 @@ const RPC_ACTION_ERROR_MESSAGES_TH: Record<string, string> = {
   IMPORT_RETIREMENT_APPROVAL_REQUIRED: 'จำนวนรายการที่จะยกเลิกใช้ต้องมีหลักฐานอนุมัติและยืนยันจำนวนให้ตรงกัน',
   POINTER_ALREADY_CURRENT: 'เวอร์ชันนี้เป็นเวอร์ชันใช้งานปัจจุบันอยู่แล้ว',
   P18_PLACEMENT_REVIEW_REQUIRED: 'รายการเพิ่มใหม่ยังไม่ได้รับการยืนยันตำแหน่ง จึงยังเผยแพร่ไม่ได้',
+  PLACEMENT_ANCHOR_INVALID: 'รายการอ้างอิงต้องเป็นรายการเดิมในหมวดงานที่เลือก',
+  PLACEMENT_NOT_REQUIRED: 'ฉบับร่างนี้ไม่มีรายการใหม่ที่ต้องยืนยันตำแหน่ง',
+  PLACEMENT_ORDER_INVALID: 'ลำดับรายการไม่ผ่านเงื่อนไข กรุณาโหลดข้อมูลล่าสุดแล้วตรวจตำแหน่งอีกครั้ง',
+  PLACEMENT_REVISION_CONFLICT: 'รายการหรือตำแหน่งถูกเปลี่ยนหลังเปิดหน้านี้ กรุณาโหลดข้อมูลล่าสุดแล้วตรวจอีกครั้ง',
+  PLACEMENT_SCOPE_INVALID: 'ชุดยืนยันตำแหน่งต้องครบทุกรายการใหม่และไม่ซ้ำกัน',
   PUBLICATION_CONFIRMATION_MISMATCH: 'เลขเวอร์ชันที่พิมพ์ไม่ตรงกับฉบับร่างที่กำลังเผยแพร่',
   PUBLICATION_METADATA_REQUIRED: 'กรุณาระบุข้อมูลเอกสารอนุมัติและที่เก็บไฟล์ให้ครบ',
   PUBLICATION_VALIDATION_FAILED: 'ฉบับร่างยังไม่ผ่านเงื่อนไขเผยแพร่ กรุณาตรวจผลความพร้อม',
@@ -174,6 +209,7 @@ const RPC_TRANSPORT_ERROR_MESSAGES = {
   applyCatalogManualChange: 'บันทึกการเปลี่ยนแปลงในฉบับร่างไม่สำเร็จจากระบบฐานข้อมูล',
   createCatalogDraft: 'สร้างฉบับร่างไม่สำเร็จจากระบบฐานข้อมูล',
   previewCatalogImport: 'บันทึกผลตรวจการนำเข้าไม่สำเร็จจากระบบฐานข้อมูล',
+  placeCatalogItems: 'ยืนยันตำแหน่งรายการใหม่ไม่สำเร็จจากระบบฐานข้อมูล',
   publishCatalogVersion: 'เผยแพร่เวอร์ชันบัญชีราคาไม่สำเร็จจากระบบฐานข้อมูล',
   restoreCatalogPointer: 'คืนเวอร์ชันใช้งานไม่สำเร็จจากระบบฐานข้อมูล',
 } as const;
@@ -270,10 +306,108 @@ export function mapCatalogRpcActionResponse(
     normalizedPayloadHash: response.data?.normalizedPayloadHash,
     changedItems: response.data?.changedItems,
     retiredByFullImportOmission: response.data?.retiredByFullImportOmission,
+    placementRevision: response.data?.placementRevision,
+    placementReviewId: response.data?.placementReviewId,
+    newIdentityCount: response.data?.newIdentityCount,
+    affectedRows: response.data?.affectedRows,
     duplicateRequest: response.data?.duplicateRequest,
     requestId: response.requestId,
     outcomeUncertain: false,
   };
+}
+
+export function buildPlaceCatalogItemsArgs(
+  formData: FormData,
+  requestId: string,
+): CatalogPlaceItemsArgs | CatalogMutationState {
+  try {
+    const versionId = readRequiredText(formData, 'versionId', 'รหัสฉบับร่าง');
+    if (!UUID_PATTERN.test(versionId) || !UUID_PATTERN.test(requestId)) {
+      return createCatalogMutationError('รหัสฉบับร่างหรือรหัสคำขอไม่ถูกต้อง');
+    }
+
+    const expectedLockVersion = readInteger(formData, 'expectedLockVersion', 'รุ่นแก้ไข');
+    if (expectedLockVersion instanceof Error) {
+      return createCatalogMutationError(expectedLockVersion.message);
+    }
+    const expectedPlacementRevision = readInteger(
+      formData,
+      'expectedPlacementRevision',
+      'รุ่นการจัดตำแหน่ง',
+    );
+    if (expectedPlacementRevision instanceof Error) {
+      return createCatalogMutationError(expectedPlacementRevision.message);
+    }
+
+    const placementsJson = readRequiredText(
+      formData,
+      'placementsJson',
+      'ชุดยืนยันตำแหน่ง',
+    );
+    if (new TextEncoder().encode(placementsJson).byteLength > 262144) {
+      return createCatalogMutationError(
+        'ชุดยืนยันตำแหน่งมีขนาดเกินขอบเขตที่รองรับ',
+        'PLACEMENT_SCOPE_INVALID',
+      );
+    }
+    let parsed: unknown;
+    try {
+      parsed = JSON.parse(placementsJson);
+    } catch {
+      return createCatalogMutationError('ชุดยืนยันตำแหน่งต้องเป็น JSON ที่ถูกต้อง');
+    }
+
+    if (!Array.isArray(parsed) || parsed.length < 1 || parsed.length > 1000) {
+      return createCatalogMutationError(
+        'ชุดยืนยันตำแหน่งต้องมีตั้งแต่ 1 ถึง 1,000 รายการ',
+        'PLACEMENT_SCOPE_INVALID',
+      );
+    }
+
+    const placements: CatalogPlacementEntry[] = [];
+    for (const value of parsed) {
+      if (!isExactPlacementEntry(value)) {
+        return createCatalogMutationError(
+          'ข้อมูลตำแหน่งมีรหัส หมวด รายการอ้างอิง ความสัมพันธ์ หรือลำดับไม่ถูกต้อง',
+          'PLACEMENT_SCOPE_INVALID',
+        );
+      }
+      placements.push(value);
+    }
+
+    const identityIds = new Set(placements.map((entry) => entry.identityId));
+    const batchOrders = placements.map((entry) => entry.batchOrder);
+    if (
+      identityIds.size !== placements.length
+      || new Set(batchOrders).size !== placements.length
+      || Math.min(...batchOrders) !== 0
+      || Math.max(...batchOrders) !== placements.length - 1
+    ) {
+      return createCatalogMutationError(
+        'รายการใหม่และลำดับภายในชุดต้องไม่ซ้ำและต่อเนื่องตั้งแต่ศูนย์',
+        'PLACEMENT_ORDER_INVALID',
+      );
+    }
+
+    const reason = readRequiredText(formData, 'reason', 'เหตุผลการยืนยันตำแหน่ง');
+    if (reason.length > 500) {
+      return createCatalogMutationError('เหตุผลการยืนยันตำแหน่งยาวเกิน 500 ตัวอักษร');
+    }
+
+    return {
+      p_version_id: versionId,
+      p_expected_lock_version: expectedLockVersion,
+      p_expected_placement_revision: expectedPlacementRevision,
+      p_placements: placements.sort((left, right) => left.batchOrder - right.batchOrder),
+      p_reason: reason,
+      p_request_id: requestId,
+    };
+  } catch (error) {
+    if (error instanceof RequiredFieldError) {
+      return createCatalogMutationError(error.message);
+    }
+    throw error;
+  }
 }
 
 export function buildPublishCatalogVersionArgs(
@@ -419,6 +553,32 @@ function readSafeRpcActionErrorMessage(
   }
 
   return 'ระบบบัญชีราคาปฏิเสธรายการนี้';
+}
+
+function isExactPlacementEntry(value: unknown): value is CatalogPlacementEntry {
+  if (!value || typeof value !== 'object' || Array.isArray(value)) return false;
+  const entry = value as Record<string, unknown>;
+  const keys = Object.keys(entry);
+  const approvedKeys = new Set([
+    'identityId',
+    'categoryId',
+    'anchorIdentityId',
+    'relation',
+    'batchOrder',
+  ]);
+
+  return keys.length === approvedKeys.size
+    && keys.every((key) => approvedKeys.has(key))
+    && typeof entry.identityId === 'string'
+    && UUID_PATTERN.test(entry.identityId)
+    && typeof entry.categoryId === 'string'
+    && UUID_PATTERN.test(entry.categoryId)
+    && typeof entry.anchorIdentityId === 'string'
+    && UUID_PATTERN.test(entry.anchorIdentityId)
+    && entry.identityId !== entry.anchorIdentityId
+    && (entry.relation === 'before' || entry.relation === 'after')
+    && Number.isSafeInteger(entry.batchOrder)
+    && Number(entry.batchOrder) >= 0;
 }
 
 export function buildManualCatalogChangeArgs(

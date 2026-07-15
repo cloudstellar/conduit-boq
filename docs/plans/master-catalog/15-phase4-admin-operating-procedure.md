@@ -124,14 +124,46 @@ Use when one approved item must be added without replacing a workbook.
 7. Review the before/after preview and save.
 
 The item is not usable by ordinary users until the draft is published/current.
-Under P-18, any draft containing a newly added/supplement identity must remain
-unpublishable until placement governance is approved. The WP-6.5 guard should
-return `P18_PLACEMENT_REVIEW_REQUIRED` and keep the draft available for review.
-The Local WP-6.5 guard safely exposes this count, but WP-6.6 and WP-7.5 must
-complete the operator path before it is release-ready.
+Under P-18, any draft containing a newly added/supplement identity remains
+unpublishable until its current placement batch is accepted. The guard returns
+`P18_PLACEMENT_REVIEW_REQUIRED` and keeps the draft available for review.
+WP-7.5 source now implements that operator path, but Add/Supplement remain
+hidden or disabled until migration `021` passes its separately approved Local
+DB/browser evidence and the release gate enables them.
 The draft/import preview must show this publication hold immediately after the
 new identity appears, together with the placement decision needed; do not wait
 until the final Publish click to inform the operator.
+
+### 4.1 Confirm placement for new items
+
+Use this task after one or more manual/Supplement additions exist in the same
+draft. Do not create another version and do not confirm 710 inherited rows one
+by one.
+
+1. Open the exact current-base draft and choose **จัดตำแหน่งรายการใหม่**.
+2. Confirm that the page count equals every pending new identity. Search and
+   paging only change the visible subset; the final confirmation always covers
+   the complete pending batch.
+3. For each new identity, choose a category that contains an inherited item,
+   then choose one inherited item in that same category as the anchor.
+4. Choose **ก่อนรายการนี้** or **หลังรายการนี้**. Do not use another new item as
+   an anchor.
+5. When several new items share one anchor and relation, use the up/down buttons
+   to set their order within that exact group. This cannot reorder inherited
+   identities.
+6. Review each final sequence number, immediate previous/next item, and the
+   count of inherited rows that will shift numerically.
+7. Choose **ตรวจและยืนยันทั้งชุด**, enter the real placement rationale, and
+   confirm once. The operation records the new rows and every shifted row in
+   one append-only change set/review.
+8. If the draft changed after the page loaded, reload and review the current
+   batch. Do not retry with a new hidden request ID or repair `display_order`
+   directly.
+
+Adding/withdrawing a new identity or changing placement-relevant category,
+active state, order, or inherited-anchor topology makes the accepted placement
+stale. Name, unit, and price edits alone still require normal authority/review
+but do not create an unrelated placement task.
 
 ## 5. Manual edit
 
@@ -405,7 +437,8 @@ Use only when a published current version must stop being used for new BOQs.
 | Publish evidence required | Complete real approval metadata; do not use placeholder text |
 | Draft is stale/read-only | Select/create a current-base draft and deliberately reapply approved changes; do not rebase or force the stale draft |
 | Export hash mismatch | Do not distribute; report with request/version/hash details |
-| Placement review required | Keep the draft; do not publish. Obtain approved item placement under P-18 and rerun readiness checks |
+| Placement review required | Keep the draft; open **จัดตำแหน่งรายการใหม่**, review every pending new item as one batch, confirm with a real reason, then reload publication readiness |
+| Placement changed after page load | Reload the exact draft and placement page, inspect the current batch, and confirm again; never force hidden revision/order values |
 | Retired-row PDF policy required | Keep the draft; do not file the field-facing PDF until P-19 is approved |
 | Result uncertain / timed out | Do not repeatedly create new submissions. Confirm the submitted values remain visible, copy the request ID, refresh audit/state, and retry only through the same operation when instructed; report any cleared field before retrying |
 | Factor F change requested | Out of scope for this procedure; do not edit Master Catalog data, Factor F data, or legacy BOQs |
@@ -459,20 +492,23 @@ recognizing the message and completing the recovery through the UI.
    item's field-level history;
 3. preview an approved workbook and explain Full versus Supplement impact,
    complete row diff/omissions, and price authority;
-4. recognize and recover from at least three representative safe failures,
-   including stale lock/base, placement/retirement hold, or invalid authority;
-5. perform one eligible reactivate or never-published withdraw correction and
+4. add or import several approved new identities, place them as one batch
+   without confirming inherited rows individually, explain the shifted-row
+   count, and recover from one stale-placement response;
+5. recognize and recover from at least three other representative safe
+   failures, including stale lock/base, retirement hold, or invalid authority;
+6. perform one eligible reactivate or never-published withdraw correction and
    explain what identity/code/audit evidence remains;
-6. review the authoritative final snapshot diff, compound/reverted behavior,
+7. review the authoritative final snapshot diff, compound/reverted behavior,
    item history, authenticated publisher/archive evidence, and publication
    readiness without SQL;
-7. locate version/status/count/hash in Excel/PDF and distinguish dataset hash
+8. locate version/status/count/hash in Excel/PDF and distinguish dataset hash
    from binary file hash;
-8. handle an uncertain-response example using the same request ID, verify that
+9. handle an uncertain-response example using the same request ID, verify that
    submitted fields remain unchanged before retry, and confirm they reset only
    after success;
-9. restore to a safe screen without an irreversible mistake or developer help.
-10. edit after opening final review, observe the stale-review conflict, and
+10. restore to a safe screen without an irreversible mistake or developer help.
+11. edit after opening final review, observe the stale-review conflict, and
     complete a fresh review before any successful publication rehearsal.
 
 Record task completion, misunderstood wording, recovery outcome, elapsed time,

@@ -1,12 +1,15 @@
 # Phase 4 P-18 Placement Governance Review Note
 
 **Status:** Owner-accepted P-18 V1 contract; P-30 authorized bounded WP-7.5
-Local-only source implementation on 2026-07-15 01:37 +07; technical evidence
-and owner closeout remain pending
+Local-only source implementation on 2026-07-15 01:37 +07; repository/static
+candidate passed on 2026-07-15; Local DB/browser evidence and owner closeout
+remain pending
 
-**Environment:** Repository/source implementation only; no Local reset or DB
-mutation for evidence, bootstrap inclusion of `021`, WP-8 execution, Production
-access/write, feature enablement, or publication is authorized by this note
+**Environment:** Repository/source implementation only. Exact migration SHA-256:
+`78359215f7d859d9c167db608e1e96d66712b6b06a9d103fd7b26ce781835a83`. No
+Local reset or DB mutation for evidence, bootstrap inclusion of `021`, WP-8
+execution, Production access/write, feature enablement, or publication is
+authorized by this note.
 
 ## 1. Why this is now a release decision
 
@@ -54,6 +57,12 @@ In scope:
 - one batch review for every currently pending new identity in a draft;
 - category selection plus a searchable same-category anchor and
   **ก่อนรายการนี้ / หลังรายการนี้** relation;
+- anchors must be identities inherited from the draft base, not another new
+  identity, so the placement graph cannot become circular or depend on an
+  unreviewed provisional row;
+- an explicit contiguous batch order applies only among new identities assigned
+  to the same anchor/relation; it never permits inherited identities to be
+  reordered;
 - a deterministic preview showing the affected neighborhood and final sequence;
 - active-admin/data-custodian confirmation in the existing one-publisher model;
 - draft-only, function-only, idempotent, lock-versioned, fully audited mutation;
@@ -86,13 +95,14 @@ reorder would also allow `A, C, B`, which is outside this V1 scope.
 
 ## 4. Proposed database contract
 
-WP-7.5 should append a new reviewed root migration, proposed as
+WP-7.5 appends the reviewed Local-only source candidate
 `021_master_catalog_phase4_placement_governance.sql`. WP-6.6 reserves `020` for
 the prerequisite admin/authority hardening found by
 [Completeness Audit #29](./29-phase4-owner-dev-completeness-audit.md). Do not
 renumber or rewrite evidence-backed Local migrations `017`-`019`, and do not add
 `020` or `021` to the Local
-bootstrap until the file and implementation have been reviewed.
+bootstrap until the file and implementation have passed their separate live
+evidence/owner gate.
 
 The implementation should use DB-backed authority rather than inferring approval
 from UI state, current integers, or free-form audit JSON:
@@ -102,14 +112,15 @@ from UI state, current integers, or free-form audit JSON:
   change in a draft containing new identities;
 - add append-only `catalog_placement_reviews`, unique by
   `(version_id, placement_revision)`, with the accepted revision, change set,
-  new-identity count, actor snapshot, reason, request ID, and timestamp;
+  normalized placement payload, new-identity count, affected range/count, actor
+  snapshot, reason, request ID, and timestamp;
 - extend `catalog_change_sets.change_type` with `placement` and
   `catalog_change_items.action` with `place`; append complete old/new snapshots
   for every row whose `display_order` changes so deterministic shifts are not
   hidden from audit;
 - enforce deferrable uniqueness of `(version_id, display_order)` and validate a
   contiguous zero-based range before placement confirmation and publication;
-- expose one exact public wrapper, proposed as `place_catalog_items`, backed by
+- expose one exact public wrapper, `place_catalog_items`, backed by
   an unexposed private privileged function with active-admin and feature-flag
   checks, exact grants, fixed `search_path`, request fingerprinting, expected
   lock version, and bounded timeouts;
@@ -120,6 +131,8 @@ from UI state, current integers, or free-form audit JSON:
 - reject missing/duplicate new identities, cross-category anchors, self-anchors,
   anchors outside the draft/base contract, gaps, duplicate positions, and any
   attempt to reorder an inherited identity;
+- treat the submitted batch order as an explicit integer contract rather than
+  incidental JSON array order, and require unique contiguous values from zero;
 - keep direct table writes revoked and RLS enabled on every new public table.
 
 P-18 must evolve the publish rule from “any new identity is blocked” to “a draft
@@ -156,6 +169,26 @@ adds the placement task without mixing it into the general item editor:
 
 ## 6. Required verification
 
+Repository/static checkpoint passed on 2026-07-15:
+
+- candidate `021` implements the revisioned append-only review, exact bounded
+  RPC, fixed-search-path/RLS/grant contract, deterministic complete order,
+  shifted-row audit, readiness parity, publish guard, and disabled-default
+  postconditions;
+- the Next.js read/action path and Thai placement workspace cover all pending
+  new identities in one batch, searchable inherited anchors, before/after
+  placement, same-anchor sibling ordering, a final preview, one confirmation,
+  stale-state recovery, and hidden/disabled Add/Supplement fallback;
+- TypeScript, focused and full unit/static tests, lint, authority check,
+  dependency audit, network-enabled production build, and diff checks passed;
+- migration `020` remained byte-for-byte unchanged at SHA-256
+  `e07e0c4161077efba7bc4f6ebf95518d0cc1bc7e4628a43a128dd899bd1aef93`;
+- no Local DB command, bootstrap edit, feature enablement, Production action,
+  P-19, Factor F workflow, or hotfix expansion occurred.
+
+This is source evidence, not SQL execution or visual acceptance. The remaining
+live checks below require the separately approved Local migration/rehearsal gate.
+
 WP-7.5 is not complete until tracked tests prove:
 
 - one and multiple manual/Supplement additions remain blocked before placement;
@@ -182,15 +215,14 @@ WP-7.5 is not complete until tracked tests prove:
 
 ## 7. Schedule and safe alternatives
 
-These are effort bands, not calendar promises or permission to skip gates:
+These are current remaining effort bands, not calendar promises or permission
+to skip gates:
 
 | Remaining band | Expected focused engineering effort |
 |---|---:|
-| WP-6.6 admin workflow completeness and authority hardening | 3-5 days |
-| WP-7 permanent BOQ/hotfix `016`/Factor F regression suite | 1-2 days |
-| P-18 decision closure plus WP-7.5 migration/RPC/UI/tests | 3-5 days |
-| WP-8 clean rehearsal, performance, intended-admin UAT, and readiness package | 1-2 days plus reviewer availability |
-| Recommended full path before Production requests | About 9-15 focused engineering days, usually 2-3 calendar weeks because decisions, reset approvals, review, and human UAT are real gates |
+| WP-7.5 exact commit plus approved Local DB/concurrency/hash/export/browser evidence | 1-2 focused days plus owner/reviewer availability |
+| WP-8 clean rehearsal, performance, intended-admin UAT, and readiness package | 1-2 focused days plus reviewer availability |
+| Earliest remaining path before any Production request | About 2-4 focused days; approval and independent UAT availability may extend calendar time |
 
 Limited safe alternative: finish the shared WP-6.6 gates, defer WP-7.5, keep the
 DB guard, and hide/disable Add and Supplement at P-14. This reduces placement
