@@ -328,8 +328,10 @@ function CatalogAddItemForm({
       </CardHeader>
       <CardContent>
         <Alert className="mb-4">
-          <AlertTitle>รายการใหม่ยังไม่ได้รับการยืนยันตำแหน่ง</AlertTitle>
-          <AlertDescription>บันทึกเพื่อเตรียมและตรวจข้อมูลได้ แต่ต้องยืนยันตำแหน่งของรายการใหม่ให้ครบก่อนเผยแพร่</AlertDescription>
+          <AlertTitle>รายการที่เพิ่มใหม่ต้องจัดตำแหน่งก่อนเผยแพร่</AlertTitle>
+          <AlertDescription>
+            บันทึกรายการได้ทันที แต่หลังเพิ่มแล้วต้องเปิดงานจัดตำแหน่งและยืนยันรายการใหม่ทั้งหมดอีกครั้ง
+          </AlertDescription>
         </Alert>
         <form
           action={formAction}

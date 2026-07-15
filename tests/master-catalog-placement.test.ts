@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import type { CatalogWorkspaceItem } from '../lib/master-catalog/admin/catalogWorkspace';
 import {
   buildCatalogPlacementPreview,
+  hasCatalogPlacementDraftChanges,
   moveCatalogPlacementAssignmentWithinAnchor,
   resequenceCatalogPlacementAssignments,
   suggestCatalogPlacements,
@@ -129,6 +130,47 @@ describe('Master Catalog placement model', () => {
       [Y.identityId, 0],
       [X.identityId, 1],
     ]);
+  });
+
+  it('distinguishes a pending placement from the already accepted draft order', () => {
+    const pendingDraft = [A, B, C, X, Y];
+    const preview = buildCatalogPlacementPreview(
+      [A, B, C],
+      pendingDraft,
+      [
+        {
+          identityId: X.identityId,
+          categoryId: CATEGORY_A,
+          anchorIdentityId: B.identityId,
+          relation: 'before',
+          batchOrder: 0,
+        },
+        {
+          identityId: Y.identityId,
+          categoryId: CATEGORY_A,
+          anchorIdentityId: B.identityId,
+          relation: 'before',
+          batchOrder: 1,
+        },
+      ],
+    );
+
+    expect(hasCatalogPlacementDraftChanges(
+      pendingDraft,
+      preview.orderedItems,
+    )).toBe(true);
+    expect(hasCatalogPlacementDraftChanges(
+      preview.orderedItems,
+      preview.orderedItems,
+    )).toBe(false);
+    expect(hasCatalogPlacementDraftChanges(
+      preview.orderedItems,
+      preview.orderedItems.map((entry) => (
+        entry.identityId === X.identityId
+          ? { ...entry, categoryId: CATEGORY_B }
+          : entry
+      )),
+    )).toBe(true);
   });
 
   it('moves only within the same anchor and relation group', () => {

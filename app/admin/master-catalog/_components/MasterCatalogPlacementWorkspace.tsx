@@ -54,6 +54,7 @@ import type {
 import type { CatalogPlacementWorkspace } from '@/lib/master-catalog/admin/readModel';
 import {
   buildCatalogPlacementPreview,
+  hasCatalogPlacementDraftChanges,
   moveCatalogPlacementAssignmentWithinAnchor,
   suggestCatalogPlacements,
   type CatalogPlacementAssignment,
@@ -153,10 +154,16 @@ export function MasterCatalogPlacementWorkspaceView({
   const shiftedInheritedCount = previewResult.preview?.affectedIdentityIds.filter((identityId) => (
     inheritedIdentityIds.has(identityId)
   )).length ?? 0;
+  const placementWouldChangeDraft = previewResult.preview
+    ? hasCatalogPlacementDraftChanges(draftItems, previewResult.preview.orderedItems)
+    : false;
+  const placementReviewAlreadyCurrent = workspace.readiness?.placementReviewCurrent === true
+    && !placementWouldChangeDraft;
   const canConfirm = workspace.editable
     && workspace.newItems.length > 0
     && completedCount === workspace.newItems.length
-    && previewResult.preview !== null;
+    && previewResult.preview !== null
+    && !placementReviewAlreadyCurrent;
 
   useEffect(() => {
     if (state.status === 'success') {
@@ -245,9 +252,16 @@ export function MasterCatalogPlacementWorkspaceView({
             <Badge variant={completedCount === workspace.newItems.length ? 'secondary' : 'outline'}>
               กำหนดแล้ว {completedCount.toLocaleString('th-TH')} / {workspace.newItems.length.toLocaleString('th-TH')}
             </Badge>
-            <Badge variant="outline">
-              รายการเดิมเลื่อน {shiftedInheritedCount.toLocaleString('th-TH')}
-            </Badge>
+            {placementReviewAlreadyCurrent ? (
+              <Badge variant="secondary">
+                <CheckCircle2 data-icon="inline-start" />
+                ชุดปัจจุบันยืนยันแล้ว
+              </Badge>
+            ) : (
+              <Badge variant="outline">
+                รายการเดิมที่จะเลื่อน {shiftedInheritedCount.toLocaleString('th-TH')}
+              </Badge>
+            )}
           </div>
         </div>
       </section>
@@ -255,7 +269,10 @@ export function MasterCatalogPlacementWorkspaceView({
       <Card className="min-w-0">
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
-            <MapPin />รายการใหม่ที่ต้องยืนยัน
+            <MapPin />
+            {placementReviewAlreadyCurrent
+              ? 'ตำแหน่งรายการใหม่ที่ยืนยันแล้ว'
+              : 'รายการใหม่ที่ต้องยืนยัน'}
           </CardTitle>
           <CardDescription>
             เลือกหมวดและรายการเดิมที่อยู่ติดกัน ระบบจะแสดงลำดับจริงก่อนบันทึกทั้งชุด
@@ -472,12 +489,15 @@ export function MasterCatalogPlacementWorkspaceView({
 
           <div className="flex flex-col justify-between gap-3 border-t pt-4 sm:flex-row sm:items-center">
             <p className="text-sm text-muted-foreground">
-              การยืนยันหนึ่งครั้งจะบันทึกรายการใหม่ {workspace.newItems.length.toLocaleString('th-TH')} รายการ
-              และเก็บประวัติรายการที่ถูกเลื่อน {shiftedInheritedCount.toLocaleString('th-TH')} รายการ
+              {placementReviewAlreadyCurrent
+                ? 'ตำแหน่งในฉบับร่างตรงกับชุดที่ยืนยันแล้ว หากปรับหมวด รายการอ้างอิง หรือลำดับ ระบบจะแสดงผลกระทบก่อนยืนยันใหม่'
+                : `การยืนยันหนึ่งครั้งจะบันทึกรายการใหม่ ${workspace.newItems.length.toLocaleString('th-TH')} รายการ และเก็บประวัติรายการเดิมที่จะเลื่อน ${shiftedInheritedCount.toLocaleString('th-TH')} รายการ`}
             </p>
             <Button type="button" disabled={!canConfirm} onClick={() => setConfirmOpen(true)}>
-              <Check data-icon="inline-start" />
-              ตรวจและยืนยันทั้งชุด
+              {placementReviewAlreadyCurrent
+                ? <CheckCircle2 data-icon="inline-start" />
+                : <Check data-icon="inline-start" />}
+              {placementReviewAlreadyCurrent ? 'ยืนยันชุดปัจจุบันแล้ว' : 'ตรวจและยืนยันทั้งชุด'}
             </Button>
           </div>
         </CardContent>

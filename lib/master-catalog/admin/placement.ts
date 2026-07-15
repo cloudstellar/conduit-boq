@@ -167,6 +167,24 @@ export function buildCatalogPlacementPreview(
   }
 }
 
+export function hasCatalogPlacementDraftChanges(
+  currentItems: CatalogWorkspaceItem[],
+  previewItems: CatalogWorkspaceItem[],
+): boolean {
+  if (currentItems.length !== previewItems.length) return true;
+
+  const currentByIdentity = new Map(
+    currentItems.map((item) => [item.identityId, item]),
+  );
+
+  return previewItems.some((item) => {
+    const current = currentByIdentity.get(item.identityId);
+    return !current
+      || current.displayOrder !== item.displayOrder
+      || current.categoryId !== item.categoryId;
+  });
+}
+
 export function resequenceCatalogPlacementAssignments(
   assignments: CatalogPlacementAssignment[],
   orderedIdentityIds: string[],

@@ -197,6 +197,23 @@ describe('Master Catalog P-22 operator workflow', () => {
     expect(importPanel).toContain('aria-label="หน้าถัดไป"');
   });
 
+  it('keeps accepted placement status distinct from a new pending change', () => {
+    const placementWorkspace = source(
+      'app/admin/master-catalog/_components/MasterCatalogPlacementWorkspace.tsx',
+    );
+    const versionWorkspace = source(
+      'app/admin/master-catalog/_components/MasterCatalogVersionWorkspace.tsx',
+    );
+
+    expect(placementWorkspace).toContain('hasCatalogPlacementDraftChanges');
+    expect(placementWorkspace).toContain('placementReviewAlreadyCurrent');
+    expect(placementWorkspace).toContain('ชุดปัจจุบันยืนยันแล้ว');
+    expect(placementWorkspace).toContain('รายการเดิมที่จะเลื่อน');
+    expect(placementWorkspace).toContain('ยืนยันชุดปัจจุบันแล้ว');
+    expect(versionWorkspace).toContain('รายการที่เพิ่มใหม่ต้องจัดตำแหน่งก่อนเผยแพร่');
+    expect(versionWorkspace).not.toContain('รายการใหม่ยังไม่ได้รับการยืนยันตำแหน่ง');
+  });
+
   it('confirms publish, recode, and retire before high-impact submission', () => {
     const panel = source(
       'app/admin/master-catalog/_components/MasterCatalogMutationPanel.tsx',
