@@ -202,7 +202,7 @@ Start blocked:
 | P-10 runtime CI assets | CI implementation/deploy | Decision Register |
 | P-11 official export visual sample | Export acceptance | Decision Register |
 | P-12 to P-15 | Production migration/deploy/enable/publish | Decision Register |
-| P-18 add/supplement placement governance | Accepted via P-30 for bounded WP-7.5 Local-only source implementation; bootstrap/apply/reset remain separately gated | Decision Register / Review Note #28 |
+| P-18 add/supplement placement governance | Accepted via P-30; amended WP-7.5 passed the separately authorized P-32 Local apply/reset/live gate; exact P-33 acceptance and the later bootstrap/WP-8 decision remain separately gated | Decision Register / Review Note #28 |
 | P-19 inactive/retired export policy | Publication/filing of any version with inactive rows | Decision Register |
 | P-20 canonical hash/identity portability | Initial WP-6.5 exit and rerun after WP-6.6/WP-7.5 migration changes, WP-8 clean rehearsal, and migration fingerprint freeze | Decision Register |
 | P-21 Audit #29 WP-6.6 scope/start | WP-6.6 implementation and any migration `020` execution | Decision Register / Completeness Audit |
@@ -215,10 +215,11 @@ Start blocked:
 Rule: unresolved P-02 through P-11 does not block generic additive schema,
 parser, UI shell, tests, or local rehearsal. It blocks final candidate data
 freeze, approved backfill, export acceptance, and publication where applicable.
-P-18 is resolved for V1 design and Local-only source implementation, but its
-existing DB hold continues to block publishing any version with
-add/supplement/new identity rows until WP-7.5 passes and the accepted placement
-revision is current. Unresolved P-19 blocks official field-facing PDF filing
+P-18 is resolved for V1 design, and amended WP-7.5 passed its P-32 Local
+technical gate. The existing DB hold continues to block publishing any version
+with add/supplement/new identity rows until P-33 and the later WP-8/P-14 release
+gates pass and the accepted placement revision is current. Unresolved P-19
+blocks official field-facing PDF filing
 for any version with inactive/retired rows. P-20 reruns still block
 clean-rehearsal hash acceptance, migration fingerprint freeze, and P-15 hash
 acceptance.
@@ -736,9 +737,9 @@ passes. Implement only in append-only migration
 and tests.
 
 P-30 satisfied both start conditions at 2026-07-15 01:37 +07 and authorized
-repository/source implementation only. Keep `021` outside bootstrap and do not
-apply or reset Local Supabase until a separately reviewed exact candidate and
-explicit reset approval exist.
+repository/source implementation. P-32 later supplied the explicit reset/apply
+approval and completed the separate Local evidence. Keep `021` outside
+bootstrap until a later explicit inclusion decision.
 
 Repository/static checkpoint passed on 2026-07-15. The working-tree candidate
 implements the revision/review schema, exact bounded idempotent RPC, readiness
@@ -749,12 +750,15 @@ SHA-256 `78359215...` at exact checkpoint
 satisfy the live DB/concurrency/hash/export/browser exit evidence; the warned
 Local gate still requires separate owner approval.
 
-P-32 subsequently authorized that warned Local-only gate. Runtime evidence
-failed closed with PostgreSQL `42704` because the fixed-search-path placement
-function deferred an unqualified constraint. The bounded schema-qualified fix
-candidate is SHA-256
+P-32 subsequently authorized that warned Local-only gate. The first runtime
+evidence failed closed with PostgreSQL `42704` because the fixed-search-path
+placement function deferred an unqualified constraint. The bounded
+schema-qualified amendment is SHA-256
 `e4de258756bbfbda0508e55d7b76ba2e907f644625b49bc29d4a4d7ac42fa714`;
-replacement live evidence remains required and `021` stays outside bootstrap.
+replacement clean-chain DB/RLS/concurrency/order/hash/export/browser evidence
+then passed on source `80b2574` plus UI checkpoint `99fa56c`. Final Local
+cleanup restored pointer/flags/drafts/BOQ/Factor F. `021` stays outside
+bootstrap, and P-33 owner acceptance remains required.
 
 Exit gate:
 
@@ -768,6 +772,9 @@ Exit gate:
 - if this WP is deferred, Add/Supplement remain hidden and the P-18 DB guard is
   retained/tested for WP-8/P-14.
 
+Technical exit evidence above is green. Mark WP-7.5 complete only after P-33
+owner accept/hold is recorded; do not infer WP-8 or bootstrap authorization.
+
 ## 16. WP-8 clean local rehearsal
 
 Goal: prove the full plan works from a clean state.
@@ -775,9 +782,9 @@ Goal: prove the full plan works from a clean state.
 Run order:
 
 1. Clean local reset from the canonical bootstrap chain, including `009`-`015`,
-   production hotfix `016`, Phase 4 `017`-`020`, and `021` only when P-18/WP-7.5
-   is accepted/implemented. The current G4 source authority ends at `020`; its
-   first clean execution still requires the explicit reset gate.
+   production hotfix `016`, and Phase 4 `017`-`020`. Add `021` only after P-33
+   and a separate bootstrap/WP-8 decision; P-32 separate-apply evidence is not
+   source inclusion. The current bootstrap authority ends at `020`.
 2. Load approved baseline fixture/snapshot.
 3. Record catalog count/hash and Factor F baseline.
 4. Confirm Phase 4 `017+` migrations apply only after hotfix `016`.
@@ -989,7 +996,7 @@ Before asking for code review:
 | P-08/P-09 missing | P-08 is currently approved in the Decision Register; if superseded or missing, continue local draft mechanics but do not validate publication-completeness. If P-09 is missing, continue local draft/publish mechanics but do not publish Production |
 | P-10 missing or superseded | Current Decision Register records P-10 approved limited runtime CI assets; if superseded or missing, use placeholder-safe local styling only and do not deploy CI assets |
 | P-11 missing | Build export mechanics; do not accept official export visual |
-| P-18 unresolved | Keep draft add/supplement review available, but block publication of versions with new identities until guard evidence and placement governance are accepted |
+| P-33 or WP-8/P-14 placement release acceptance missing | Keep draft add/supplement review capability-gated, and block publication of versions with new identities until the exact placement checkpoint and release evidence are accepted |
 | P-19 unresolved | Do not file a field-facing official PDF for versions with inactive/retired rows; publish only if owner explicitly approves the rendering/exclusion policy |
 | P-20 unresolved | Continue non-hash-changing reliability work, but do not accept WP-8 clean-reset hash evidence, freeze the migration fingerprint, or request P-15 |
 | Any Audit #29 C-01 through C-17 gap unresolved | Do not start WP-7 or claim full operator readiness. Implement WP-6.6 or remove the affected control from release visibility according to the audit |

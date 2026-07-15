@@ -37,8 +37,8 @@
 | `018_master_catalog_phase4_draft_mutation.sql` | Draft create/manual/import RPCs with actor+payload request fingerprints, per-request/per-code locks, bounded runtime timeouts, full-payload preflight, audited mutation subtransaction rollback, and reusable ADR-003 transitions | **Draft — Local only, not applied to Production** |
 | `019_master_catalog_phase4_publish_pointer.sql` | Publish/restore, shared admin publish-readiness RPC, P-18 and structured-rollout boundary guards, P-19 inactive-row filing warning, catalog-only DB count/hash, runtime timeouts, and published immutability | **Draft — Local only, not applied to Production** |
 | `020_master_catalog_phase4_admin_workflow_hardening.sql` | WP-6.6 frozen first-rollout authority, resolve-only dictionaries/server allocator, exact read registers, readiness/provenance parity, correction path, schema hardening, P-22 working-draft lifecycle, P-23.1 reserved version sequence, P-24 annual-year range guard, and covering indexes for both frozen-authority foreign keys | **Owner-accepted Local-only migration in bootstrap source; SHA-256 `e07e0c4161077efba7bc4f6ebf95518d0cc1bc7e4628a43a128dd899bd1aef93`; G1R/G2 separate-apply evidence passed on exact checkout `721c2c2c4a234a4fd00e5686383be9af87ee15dd`; G3/WP-6.6 accepted on `78e96ab3ed9993707014c4aba1d285b7592b17a1`; owner-approved G4E combined clean bootstrap through `020` passed on exact execution checkout `15b707d443bec701f6b3a86aa7675ca1266604ba`; not Production-approved** |
-| `021_master_catalog_phase4_placement_governance.sql` | P-18/WP-7.5 new-identity placement revision/review and atomic order contract | **Local-only runtime fix candidate; P-31 Source/Static checkpoint `4e3574a` / SHA-256 `78359215...` is historical after approved live execution exposed unqualified-constraint error `42704`; current SHA-256 `e4de258756bbfbda0508e55d7b76ba2e907f644625b49bc29d4a4d7ac42fa714`; outside bootstrap; amended live evidence and Production approval remain pending** |
-| `017+_master_catalog_phase4_*.sql` | Umbrella reference for the Local-only Phase 4 range; files currently exist as `017`-`021`, while the current G4 bootstrap authority still applies only `017`-`020` after hotfix `016` | **Local-only range — owner-approved G4E combined clean execution through `020` passed; `021` live evidence and every Production approval remain separate** |
+| `021_master_catalog_phase4_placement_governance.sql` | P-18/WP-7.5 new-identity placement revision/review and atomic order contract | **Local-only amended candidate proven under P-32; SHA-256 `e4de258756bbfbda0508e55d7b76ba2e907f644625b49bc29d4a4d7ac42fa714`; clean-chain DB/RLS/concurrency/hash/export/browser evidence passed on source checkpoint `80b2574`; outside bootstrap; exact P-33 owner acceptance, WP-8, and every Production approval remain pending** |
+| `017+_master_catalog_phase4_*.sql` | Umbrella reference for the Local-only Phase 4 range; files currently exist as `017`-`021`, while the current G4 bootstrap authority still applies only `017`-`020` after hotfix `016` | **Local-only range — owner-approved G4E combined clean execution through `020` passed; `021` passed separately applied P-32 Local evidence and remains outside bootstrap; P-33/WP-8 and every Production approval remain separate** |
 
 ### Local Schema Baseline (`supabase/local/`)
 
@@ -134,13 +134,23 @@ and Production was not touched. P-30 accepted WP-7 and the five-rule P-18 V1
 contract on 2026-07-15 01:37 +07. WP-8 and every Production gate remain
 separate. Placement source work now uses reserved migration `021`. P-31
 accepted the repository/static checkpoint `4e3574a` at SHA-256 `78359215...`;
-P-32 then authorized the warned Local-only reset/apply/live gate. Runtime calls
-failed closed with PostgreSQL `42704` because a fixed-empty-search-path function
-deferred `uq_price_list_version_display_order` without the `public` schema.
-Cleanup restored the pointer, zero drafts, and all disabled flags. The bounded
-one-line fix produces current SHA-256
-`e4de258756bbfbda0508e55d7b76ba2e907f644625b49bc29d4a4d7ac42fa714` and
-requires replacement live evidence. Migration `021` stays outside bootstrap.
+P-32 then authorized the warned Local-only reset/apply/live gate. The first
+runtime calls failed closed with PostgreSQL `42704` because a
+fixed-empty-search-path function deferred
+`uq_price_list_version_display_order` without schema qualification.
+The bounded fix produced SHA-256
+`e4de258756bbfbda0508e55d7b76ba2e907f644625b49bc29d4a4d7ac42fa714`.
+A fresh canonical reset through `020`, separate amended `021` apply, and the
+tracked WP-7.5 harness then passed on source checkpoint `80b2574`. Retained
+evidence `tmp/master-catalog/wp75-evidence/20260715-clean-chain-80b2574.json`
+has SHA-256
+`875488a965c9c24fbe82a373d2bb18e585f7b6df4fb9267041f909eae1c05602`.
+Role/direct-write denial, rollback/replay/stale-lock/race/order invariants,
+713-row canonical hash/export parity, and pointer/draft/flag/BOQ/Factor F
+cleanup passed. Browser evidence on exact UI checkpoint `99fa56c` proved the
+Thai add, batch placement, accepted-state, final-review, desktop/mobile, and
+audited-abandon paths. Migration `021` stays outside bootstrap pending exact
+P-33 owner acceptance and the later WP-8/bootstrap decision.
 Applied hotfix `016` must not be edited.
 This is not a new Production hotfix and must not be applied to Production
 without the normal Phase 4 P-12+ approvals.

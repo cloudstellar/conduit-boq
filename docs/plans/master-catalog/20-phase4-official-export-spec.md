@@ -34,12 +34,13 @@ implementation. Final P-11 acceptance still requires real database-generated
 Excel/PDF artifacts. That exact replacement pair was later accepted on
 2026-07-11 as recorded in the Decision Register and Tracker.
 
-**P-18 ordering amendment proposed:** 2026-07-12 — if WP-7.5 is accepted,
+**P-18 ordering amendment accepted and technically proved:** 2026-07-15 —
 numeric positions of inherited rows may shift when new identities are inserted,
 while their relative order remains unchanged. The final accepted order is part
-of the existing canonical dataset hash and must match Excel/PDF sequence. This
-does not authorize P-18 implementation or replace final candidate export
-evidence.
+of the existing canonical dataset hash and must match Excel/PDF sequence. P-32
+proved 713-row database/Excel/PDF/verifier parity for the amended Local `021`
+candidate. This proof does not replace P-33 owner acceptance, WP-8 final
+candidate export evidence, filing approval, or any Production gate.
 
 ## 1. Purpose and authority
 

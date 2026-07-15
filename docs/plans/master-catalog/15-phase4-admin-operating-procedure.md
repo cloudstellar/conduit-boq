@@ -127,9 +127,9 @@ The item is not usable by ordinary users until the draft is published/current.
 Under P-18, any draft containing a newly added/supplement identity remains
 unpublishable until its current placement batch is accepted. The guard returns
 `P18_PLACEMENT_REVIEW_REQUIRED` and keeps the draft available for review.
-WP-7.5 source now implements that operator path, but Add/Supplement remain
-hidden or disabled until migration `021` passes its separately approved Local
-DB/browser evidence and the release gate enables them.
+WP-7.5 now implements that operator path and its separately approved P-32 Local
+DB/browser evidence passed. Add/Supplement remain hidden or disabled until the
+owner accepts P-33 and the later WP-8/P-14 release gates enable them.
 The draft/import preview must show this publication hold immediately after the
 new identity appears, together with the placement decision needed; do not wait
 until the final Publish click to inform the operator.

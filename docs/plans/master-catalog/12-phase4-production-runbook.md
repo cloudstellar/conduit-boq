@@ -163,10 +163,11 @@ major image at an incompatible existing data directory.
 1. After explicit warning and owner approval for the destructive Local reset,
    start from the canonical bootstrap source that applies root `009`-`015`,
    production hotfix `016`, and Phase 4 `017`-`020` in that order. G4 repository
-   integration placed accepted `020` in source on 2026-07-15; that source edit
-   is not proof that the new chain has been executed. Add P-18/WP-7.5 `021`
-   only after its separate acceptance. Never assume a planned file is already
-   in the authority path.
+   integration placed accepted `020` in source on 2026-07-15, and P-29/G4E
+   subsequently passed the combined clean execution. P-32 separately applied
+   and proved amended P-18/WP-7.5 `021`; it remains outside bootstrap until a
+   later explicit inclusion decision. Never assume a separately proven file is
+   already in the authority path.
 2. If applying SQL manually for a focused rehearsal, apply hotfix `016` before
    any reviewed Phase 4A migration(s).
 3. Verify all new tables, constraints, indexes, grants, RLS policies, functions,
@@ -220,9 +221,9 @@ With feature flag disabled by default:
 14. Prove all ADR-003 lanes, incomplete/stale sequence rejection, permanent
     abandoned-number reservation, same-year annual recovery after a void lower
     number, create race, and same-request replay.
-15. Publish only an identity-unchanged approved path in Local until P-18 is
-    accepted. After WP-7.5, separately prove a placed new-identity path; generate
-    Excel/PDF, and compare count/hash.
+15. P-18 is accepted and the P-32 placed-new-identity technical path has passed.
+    Repeat that path in the separately approved WP-8 scope, generate Excel/PDF,
+    and compare count/hash before any release-readiness claim.
 16. Test audited pointer restore and verify historical BOQs are unchanged.
 17. Rebuild from a clean Local reset and repeat the critical path only after
     the owner approves the Local Supabase reset.

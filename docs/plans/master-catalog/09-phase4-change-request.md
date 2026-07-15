@@ -29,15 +29,17 @@ Add/Supplement operator path. Exact P-18 business rules remain pending in
 planning approval does not authorize migration `021`, a Local reset, or any
 Production action.
 
-**P-30 P-18 decision and source checkpoint:** 2026-07-15 — the owner accepted
+**P-30/P-32 P-18 decision and Local evidence:** 2026-07-15 — the owner accepted
 all five V1 rules and authorized bounded Local-only source implementation.
 Migration `021` plus the RPC/read-model/Thai workspace/tests/docs candidate then
 passed repository/static review at historical SHA-256 `78359215...`. Approved
 Local live execution exposed fail-closed constraint-resolution error `42704`;
-the bounded current fix candidate is SHA-256
+the bounded schema-qualified amendment is SHA-256
 `e4de258756bbfbda0508e55d7b76ba2e907f644625b49bc29d4a4d7ac42fa714`.
-Replacement live evidence, exact acceptance, bootstrap inclusion, WP-8, and
-every Production gate remain separate.
+A fresh clean chain through `020`, separate amended `021` apply, tracked
+DB/RLS/concurrency/hash/export harness, Thai desktop/mobile browser flow, and
+final cleanup then passed. Exact P-33 owner acceptance, bootstrap inclusion,
+WP-8, and every Production gate remain separate.
 
 **Capability-completeness amendment recorded:** 2026-07-12 —
 [Audit #29](./29-phase4-owner-dev-completeness-audit.md) found that the current
@@ -500,11 +502,16 @@ feature enablement, final catalog publication, or silent business-data choices.
 - [x] Scope remains new identities only; inherited baseline reorder and
       item-code renumbering remain excluded
 - [x] Migration is append-only `021`; `017`-`020` remain unchanged
-- [ ] A separate owner decision is obtained before any Local bootstrap/reset
+- [x] P-32 separately authorized the warned Local bootstrap/reset, separate
+      `021` apply, same-scope fix-forward, and live evidence
 
-The source checks now pass, but the final reset/live-evidence check does not.
-The existing P-18 DB guard remains authoritative and Add/Supplement is not a
-complete publishable workflow until that separate gate passes.
+The amended source and P-32 technical evidence now pass. The retained evidence
+JSON is `tmp/master-catalog/wp75-evidence/20260715-clean-chain-80b2574.json`
+with SHA-256
+`875488a965c9c24fbe82a373d2bb18e585f7b6df4fb9267041f909eae1c05602`.
+The existing P-18 DB guard remains authoritative, and Add/Supplement stay
+release-disabled until P-33 exact acceptance plus the applicable WP-8/P-14
+gates; technical completion does not itself enable the feature.
 
 ### Additional preconditions before final data backfill/candidate freeze
 
@@ -546,7 +553,8 @@ pretend a publishable candidate has been approved.
 - [ ] Tracked export verifier and documentation consistency checks pass
 - [ ] Intended-admin UAT, safe Thai recovery/log correlation, and 710-row
       performance evidence pass
-- [ ] Full Add/Supplement release either passes WP-7.5 placement evidence or the
+- [x] WP-7.5 Local technical placement evidence passed; Full Add/Supplement
+      release still requires P-33/WP-8/P-14, otherwise the
       controls are hidden/disabled while the P-18 DB guard remains active
 - [ ] Owner explicitly approves the Production migration window
 

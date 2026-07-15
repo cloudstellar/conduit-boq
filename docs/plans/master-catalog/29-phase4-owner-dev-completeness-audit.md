@@ -19,7 +19,10 @@ the no-reset Local proof passed and returned Local to its disabled baseline.
 P-26 was committed at exact `78e96ab3ed9993707014c4aba1d285b7592b17a1`,
 and the owner accepted G3/WP-6.6 on that checkpoint at
 2026-07-14 23:50 +07. P-28 approved G4 repository integration and WP-7 harness
-source on 2026-07-15 without authorizing the destructive clean execution.
+source on 2026-07-15; P-29/G4E then passed the clean `009`-`020` execution and
+P-30 accepted WP-7/P-18. P-32 subsequently passed the amended WP-7.5
+DB/RLS/concurrency/hash/export/browser technical evidence. Exact P-33 owner
+acceptance and WP-8 remain.
 
 **Environment:** Source/document audit only. No Local database reset, Production
 access/write, feature enablement, publication, new Factor F workflow, or hotfix
@@ -171,8 +174,9 @@ Do not edit evidence-backed Local migrations `017`-`019`.
   owner closeout was accepted through P-27. P-28 later authorized repository
   inclusion without authorizing a Local reset; P-29 subsequently authorized and
   passed the bounded G4E Local execution. P-30 accepted WP-7 and authorized the
-  five-rule P-18/WP-7.5 Local-only source candidate; `021` bootstrap inclusion
-  and Local apply/reset remain separate.
+  five-rule P-18/WP-7.5 Local-only source candidate. P-32 separately completed
+  Local apply/reset/live evidence; `021` bootstrap inclusion and P-33 remain
+  separate.
 
 ## 7. Deliberate deferrals and control visibility
 
@@ -195,10 +199,11 @@ that can never finish is not.
 
 ## 8. Effort and confidence
 
-The corrected full path is approximately **9-15 focused engineering days**,
-usually **2-3 calendar weeks** once owner decisions, review, reset approval, and
-intended-admin UAT are included. This is an effort range, not permission to skip
-gates or a guaranteed date.
+The original corrected full-path estimate was **9-15 focused engineering
+days**. After P-32, the remaining pre-Production engineering scope is mainly
+P-33 review and WP-8, approximately **1-2 focused engineering days** plus owner
+and independent intended-admin availability. This is an effort range, not
+permission to skip gates or a guaranteed date.
 
 The confidence is higher than the earlier estimate because the work is now
 enumerated by capability and authoritative layer. Residual unknowns must be

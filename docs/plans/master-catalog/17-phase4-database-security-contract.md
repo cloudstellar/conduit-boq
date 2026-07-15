@@ -34,9 +34,13 @@ Migration `020` has not been applied to Production. P-30 accepted the P-18 V1
 rules and authorized a bounded Local-only `021` source candidate. Repository/
 static review passed at historical SHA-256 `78359215...`; approved Local live
 execution then exposed fail-closed error `42704` because the fixed-search-path
-function used an unqualified constraint name. The schema-qualified fix candidate
+function used an unqualified constraint name. The schema-qualified amendment
 is SHA-256 `e4de258756bbfbda0508e55d7b76ba2e907f644625b49bc29d4a4d7ac42fa714`.
-It remains outside bootstrap and has not been applied to Production.
+A fresh clean Local chain through `020`, separate amended `021` apply, and the
+P-32 DB/RLS/concurrency/order/hash/export/browser evidence then passed on source
+checkpoint `80b2574` plus UI checkpoint `99fa56c`. Cleanup restored the Local
+authority baseline. `021` remains outside bootstrap and has not been applied to
+Production; exact P-33 owner acceptance remains separate.
 
 **Owner decision recorded:** 2026-07-04 — approved according to the
 recommendation as the technical backbone for Phase 4A and every Phase 4 write
@@ -137,10 +141,10 @@ erDiagram
     CATALOG_CHANGE_SETS ||--o| CATALOG_PLACEMENT_REVIEWS : records
 ```
 
-The diagram is semantic. `CATALOG_PLACEMENT_REVIEWS` now exists in the unapplied
-Local-only `021` source candidate. It does not exist in the current Local or
-Production schema until the separately approved migration gate is executed.
-Exact foreign keys and deletion behavior are defined below.
+The diagram is semantic. `CATALOG_PLACEMENT_REVIEWS` exists in the current
+P-32 Local state because `021` was applied separately after bootstrap and
+proved. It is not part of the canonical bootstrap and does not exist in
+Production. Exact foreign keys and deletion behavior are defined below.
 
 ## 4. Design principles
 
@@ -336,8 +340,8 @@ current placement revision and recheck complete order/base-relative invariants.
 Otherwise it returns the stable safe code
 `P18_PLACEMENT_REVIEW_REQUIRED`. The separately gated WP-7.5 workflow is
 defined in [Review Note #28](./28-phase4-p18-placement-governance-review-note.md).
-Its source/static candidate is implemented, while the existing release hold and
-hidden Add/Supplement controls remain until Local live evidence passes.
+Its amended source and P-32 Local live evidence pass, while the existing release
+hold and hidden Add/Supplement controls remain until P-33/WP-8/P-14.
 
 Phase 4 should set `material_cost`, `labor_cost`, `unit_cost`, `is_active`,
 `created_at`, and `updated_at` to `NOT NULL` only after the preflight confirms
@@ -598,7 +602,7 @@ automatic Data API exposure is never assumed.
 | Draft catalog data | No | No | Select permitted | None |
 | Identities/code registry | No | Select only as needed for published views | Select all | None |
 | Imports/change sets/change items | No | No | Select | None |
-| Proposed placement reviews | No | No | Select after P-18/WP-7.5 | None |
+| Placement reviews (`021`) | No | No | Select through approved P-18/WP-7.5 path | None |
 | Public wrapper functions | No execute | No high-impact execute unless wrapper self-check rejects | Exact execute | Function-controlled |
 | Private schema/functions | No access | No Data API exposure | Invoked only through exact wrapper path | Function-controlled |
 
@@ -768,7 +772,8 @@ secret values, raw workbook cells, or internal policy details.
    transaction.
 12. Append publish change set and commit.
 
-After P-18 is accepted and WP-7.5 passes, replace step 6 with the reviewed rule:
+Amended `021` replaces step 6 in the separately proved P-32 Local state with
+the reviewed rule:
 when new identities exist, require the current nonnegative placement revision to
 have a matching append-only review; validate exact new-identity coverage,
 unique/contiguous order, same-category anchors, and unchanged inherited relative
@@ -853,14 +858,15 @@ it must not rewrite `017`-`019`, hotfix `016`, BOQ behavior, or Factor F state.
 Its prior `3bfc74e` and `e463270` Local evidence is historical and superseded for
 the P-23.1 candidate. Final G1R/G2 passed on exact `721c2c2` with migration SHA-256
 `e07e0c4161077efba7bc4f6ebf95518d0cc1bc7e4628a43a128dd899bd1aef93`.
-Keep `020` outside `scripts/bootstrap-local-db.sh` until G3/G4 owner closeout
-is recorded.
+P-28/G4 recorded that closeout and placed unchanged `020` in
+`scripts/bootstrap-local-db.sh`; P-29/G4E passed the combined clean chain.
 
-If P-18 is accepted, implement the placement extension only in append-only
+P-18 is accepted and the placement extension is implemented only in append-only
 migration `021_master_catalog_phase4_placement_governance.sql`. Do not edit or
-renumber `017`-`020`. Add `021` to bootstrap only in the same reviewed
-implementation change, then rerun P-20, WP-7, order, RLS, concurrency, export,
-and WP-8 clean-rebuild evidence.
+renumber `017`-`020`. P-32 passed separate Local apply/order/RLS/concurrency/
+hash/export/browser evidence. Add `021` to bootstrap only after exact P-33 and
+the reviewed inclusion decision, then rerun P-20, WP-7, and the full WP-8 clean
+rehearsal.
 
 Do not edit an applied migration file. Forward-fix with a new reviewed
 migration.

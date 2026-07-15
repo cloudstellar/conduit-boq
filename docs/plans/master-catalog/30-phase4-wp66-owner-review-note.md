@@ -332,3 +332,10 @@ and all five P-18 V1 rules, then authorized bounded WP-7.5 Local-only source
 implementation. This does not rewrite this note's P-27 point-in-time scope and
 does not authorize `021` bootstrap inclusion, Local apply/reset evidence,
 WP-8, P-19, Factor F/hotfix expansion, or Production.
+
+**Subsequent P-32 result (2026-07-15):** the owner later authorized the warned
+Local reset, separate amended `021` apply, and same-scope live gate. Replacement
+DB/RLS/concurrency/hash/export/browser evidence passed after the fail-closed
+`42704` fix-forward, and final Local invariants were restored. This remains
+outside the P-27 point-in-time scope; P-33 owner acceptance, `021` bootstrap
+inclusion, WP-8, and Production are still separate.

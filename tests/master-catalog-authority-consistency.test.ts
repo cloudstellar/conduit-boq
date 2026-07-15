@@ -135,7 +135,7 @@ describe('Master Catalog authority consistency', () => {
       '**Owner-accepted Local-only migration in bootstrap source; SHA-256 `e07e0c4161077efba7bc4f6ebf95518d0cc1bc7e4628a43a128dd899bd1aef93`; G1R/G2 separate-apply evidence passed on exact checkout `721c2c2c4a234a4fd00e5686383be9af87ee15dd`; G3/WP-6.6 accepted on `78e96ab3ed9993707014c4aba1d285b7592b17a1`; owner-approved G4E combined clean bootstrap through `020` passed on exact execution checkout `15b707d443bec701f6b3a86aa7675ca1266604ba`; not Production-approved**',
     )
     expect(migrations).toContain(
-      '**Local-only runtime fix candidate; P-31 Source/Static checkpoint `4e3574a` / SHA-256 `78359215...` is historical after approved live execution exposed unqualified-constraint error `42704`; current SHA-256 `e4de258756bbfbda0508e55d7b76ba2e907f644625b49bc29d4a4d7ac42fa714`; outside bootstrap; amended live evidence and Production approval remain pending**',
+      '**Local-only amended candidate proven under P-32; SHA-256 `e4de258756bbfbda0508e55d7b76ba2e907f644625b49bc29d4a4d7ac42fa714`; clean-chain DB/RLS/concurrency/hash/export/browser evidence passed on source checkpoint `80b2574`; outside bootstrap; exact P-33 owner acceptance, WP-8, and every Production approval remain pending**',
     )
     expect(existsSync(resolve(
       root,
@@ -196,7 +196,7 @@ describe('Master Catalog authority consistency', () => {
       'Accepted 2026-07-11 22:20 +07; WP-6 complete; Production filing remains separate',
     )
     expect(decisions).toContain(
-      'Accepted via P-30 on 2026-07-15 01:37 +07; Local-only source implementation authorized; reset/evidence and Production remain separate',
+      'Accepted via P-30; P-32 Local technical evidence passed; P-33 exact acceptance and Production remain separate',
     )
     expect(decisions).toContain('P-19')
     expect(decisions).toContain('Pending; recorded 2026-07-07')
@@ -220,6 +220,10 @@ describe('Master Catalog authority consistency', () => {
     expect(decisions).toContain('| P-30 |')
     expect(decisions).toContain('| P-31 |')
     expect(decisions).toContain('| P-32 |')
+    expect(decisions).toContain('| P-33 |')
+    expect(decisions).toContain(
+      'Pending owner review; technical recommendation: Accept',
+    )
     expect(decisions).toContain(
       'Accepted 2026-07-14 23:50 +07; WP-6.6 complete; G4 and all later gates remain separate',
     )
@@ -244,13 +248,22 @@ describe('Master Catalog authority consistency', () => {
     expect(tracker).toMatch(/\| WP-6\.5 \|[^\n]+\| Complete \|/)
     expect(tracker).toMatch(/\| WP-6\.6 \|[^\n]+\| Complete \|/)
     expect(tracker).toMatch(/\| WP-7 \|[^\n]+\| Complete \|/)
-    expect(tracker).toMatch(/\| WP-7\.5 \|[^\n]+\| In progress \|/)
+    expect(tracker).toMatch(/\| WP-7\.5 \|[^\n]+\| Ready for owner review \|/)
     expect(tracker).toMatch(/\| WP-8 \|[^\n]+\| Not started \|/)
     expect(tracker).toContain('independent intended-admin UAT remains WP-8')
     expect(tracker).toContain('| Production write allowed | No |')
     expect(tracker).toContain('P-32 authorized the warned Local reset')
     expect(tracker).toContain(
-      'WP-7.5 P-18 runtime fix candidate; replacement Local evidence pending',
+      'WP-7.5 P-18 technical evidence complete; ready for P-33 owner review',
+    )
+    expect(tracker).toContain(
+      '80b2574bbaccc5bb14093aa204a46fcc50ba1d5c',
+    )
+    expect(tracker).toContain(
+      '875488a965c9c24fbe82a373d2bb18e585f7b6df4fb9267041f909eae1c05602',
+    )
+    expect(tracker).toContain(
+      '99fa56c3d3c68e1886fbd308d8536e598eaee02f',
     )
     expect(tracker).toContain(
       '4e3574a31a2697f4d727acabc8f55f34a4233bff',
@@ -283,7 +296,7 @@ describe('Master Catalog authority consistency', () => {
       'e4de258756bbfbda0508e55d7b76ba2e907f644625b49bc29d4a4d7ac42fa714',
     )
     expect(tracker).toContain(
-      'G1R/G2 exact checkout 721c2c2c4a234a4fd00e5686383be9af87ee15dd',
+      '721c2c2c4a234a4fd00e5686383be9af87ee15dd',
     )
     expect(tracker).toContain(
       'd5da2ceeb5871160ac8cdf8dfe34ffdee220e20c8880e001e42c0bbaaea13f43',
@@ -297,9 +310,7 @@ describe('Master Catalog authority consistency', () => {
     expect(tracker).toContain(
       'full suite passed 30 files/162 tests',
     )
-    expect(tracker).toContain(
-      '050c998361f3372bd3bf9fb6645dc4abd1c0bf2b` is the exact P-24 same-scope closure-lineage checkpoint',
-    )
+    expect(tracker).toContain('closure-lineage commit `050c998`')
     expect(tracker).not.toContain('Blockers: exact candidate commit;')
     expect(tracker).not.toContain('Blockers: clean correction commit')
     expect(tracker).not.toContain('Commit the closure before requesting G1R')
@@ -308,7 +319,7 @@ describe('Master Catalog authority consistency', () => {
     expect(tracker).toMatch(
       /pre-amendment operator\/browser preflight passed on\s+`c8f6dca`/,
     )
-    expect(tracker).toContain('Status: P-31 accepted exact checkpoint 4e3574a31a2697f4d727acabc8f55f34a4233bff for commit/push')
+    expect(tracker).toContain('Status: amended 021 passed P-32 clean-chain DB/RLS/concurrency/hash/export/browser evidence')
     expect(existsSync(resolve(
       root,
       'docs/plans/master-catalog/30-phase4-wp66-owner-review-note.md',
@@ -547,6 +558,13 @@ describe('Master Catalog authority consistency', () => {
   })
 
   it('keeps core authority links resolvable', () => {
+    const threatModel = read(
+      'docs/plans/master-catalog/18-phase4-threat-model.md',
+    )
+    const threatIds = [...threatModel.matchAll(/^\| (T-\d+) \|/gm)]
+      .map((match) => match[1])
+    expect(new Set(threatIds).size).toBe(threatIds.length)
+
     for (const path of [
       'docs/01_overview/IMPLEMENTATION_PLAN.md',
       'docs/01_overview/ROADMAP.md',

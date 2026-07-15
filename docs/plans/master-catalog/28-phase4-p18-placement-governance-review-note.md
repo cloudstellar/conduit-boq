@@ -5,9 +5,10 @@ Local-only source implementation on 2026-07-15 01:37 +07; repository/static
 candidate passed and P-31 accepted exact Source/Static checkpoint
 `4e3574a31a2697f4d727acabc8f55f34a4233bff` on 2026-07-15 10:24 +07;
 P-32 approved the warned Local gate, whose first runtime evidence exposed
-fail-closed `42704`; amended Local DB/browser evidence and closeout remain pending
+fail-closed `42704`; amended Local DB/RLS/concurrency/hash/export/browser
+evidence now passes and exact P-33 owner acceptance remains pending
 
-**Environment:** Local-only fix-forward evidence. Historical P-31 migration
+**Environment:** Local-only completed P-32 technical evidence. Historical P-31 migration
 SHA-256 `78359215...` failed closed at runtime because the fixed-search-path
 function deferred an unqualified constraint. Current schema-qualified SHA-256:
 `e4de258756bbfbda0508e55d7b76ba2e907f644625b49bc29d4a4d7ac42fa714`.
@@ -102,10 +103,9 @@ WP-7.5 appends the reviewed Local-only source candidate
 `021_master_catalog_phase4_placement_governance.sql`. WP-6.6 reserves `020` for
 the prerequisite admin/authority hardening found by
 [Completeness Audit #29](./29-phase4-owner-dev-completeness-audit.md). Do not
-renumber or rewrite evidence-backed Local migrations `017`-`019`, and do not add
-`020` or `021` to the Local
-bootstrap until the file and implementation have passed their separate live
-evidence/owner gate.
+renumber or rewrite evidence-backed Local migrations `017`-`020`. Migration
+`020` is already in the canonical Local bootstrap after P-28/P-29. Do not add
+`021` to bootstrap until P-33 and the separate inclusion/WP-8 gate.
 
 The implementation should use DB-backed authority rather than inferring approval
 from UI state, current integers, or free-form audit JSON:
@@ -189,10 +189,10 @@ Repository/static checkpoint passed on 2026-07-15:
 - no Local DB command, bootstrap edit, feature enablement, Production action,
   P-19, Factor F workflow, or hotfix expansion occurred.
 
-This is source evidence, not SQL execution or visual acceptance. The remaining
-live checks below require the separately approved Local migration/rehearsal gate.
-
-WP-7.5 is not complete until tracked tests prove:
+The historical checkpoint above was source evidence only. P-32 later approved
+and completed the Local SQL/visual evidence. The tracked checks proved the
+technical bullets below; the final intended-admin bullet remains assigned to
+WP-8:
 
 - one and multiple manual/Supplement additions remain blocked before placement;
 - a valid batch placement preserves base relative order, creates one accepted
@@ -212,9 +212,33 @@ WP-7.5 is not complete until tracked tests prove:
 - the exact accepted P-11 baseline pair remains preserved as historical visual
   evidence; a later candidate pair is generated only from that exact final
   candidate and does not overwrite the accepted baseline pair;
-- intended-admin WP-8 UAT can add several rows, place them as one batch, explain
+- intended-admin WP-8 UAT must still add several rows, place them as one batch, explain
   draft versus publish, recover from one stale-placement error, and finish
   without developer or SQL assistance.
+
+P-32 exact technical evidence:
+
+- fresh canonical reset through `020`, then separate amended `021` apply;
+- DB/harness source checkpoint
+  `80b2574bbaccc5bb14093aa204a46fcc50ba1d5c`;
+- evidence JSON
+  `tmp/master-catalog/wp75-evidence/20260715-clean-chain-80b2574.json`, SHA-256
+  `875488a965c9c24fbe82a373d2bb18e585f7b6df4fb9267041f909eae1c05602`;
+- candidate `d887b28e-0486-408f-955b-9c5206dd4166`, version `2568.1.0`, 713
+  rows, hash
+  `sha256:c6baec46d90642dd27f2968328d9a3aacd9d70830f109ad2f80c6d935df552a6`;
+- five-sheet Excel, 19-page PDF, and tracked semantic verifier matched exact
+  count/order/hash on artifact source `7d60ab60`;
+- Thai real-route UI on `99fa56c3d3c68e1886fbd308d8536e598eaee02f`
+  proved two new items, same-anchor sibling
+  ordering, accepted-state clarity, 700 affected final-review rows, desktop and
+  390x844 mobile no-overflow, and audited abandon;
+- final pointer `2568.0.0`/710, zero working drafts, all three flags `false`,
+  BOQ 198/1,547, Factor F `2569.0.0`/36, Production touched: No.
+
+The final bullet in the earlier list remains a WP-8 independent intended-admin
+UAT requirement; Codex-driven browser evidence does not replace it. P-33 exact
+owner accept/hold is the only remaining WP-7.5 closeout decision.
 
 ## 7. Schedule and safe alternatives
 
@@ -223,9 +247,9 @@ to skip gates:
 
 | Remaining band | Expected focused engineering effort |
 |---|---:|
-| WP-7.5 approved Local DB/concurrency/hash/export/browser evidence after accepted source checkpoint | 1-2 focused days plus owner/reviewer availability |
+| P-33 owner review of completed WP-7.5 evidence | Focused review; no new engineering unless held |
 | WP-8 clean rehearsal, performance, intended-admin UAT, and readiness package | 1-2 focused days plus reviewer availability |
-| Earliest remaining path before any Production request | About 2-4 focused days; approval and independent UAT availability may extend calendar time |
+| Earliest remaining path before any Production request | About 1-2 focused days after P-33; approval and independent UAT availability may extend calendar time |
 
 Limited safe alternative: finish the shared WP-6.6 gates, defer WP-7.5, keep the
 DB guard, and hide/disable Add and Supplement at P-14. This reduces placement
@@ -260,8 +284,11 @@ bootstrap inclusion, Local reset/apply/live evidence, WP-8, P-19, Factor F or
 hotfix expansion, feature enablement, publication, or Production.
 
 P-32 later authorized the warned Local reset, separate apply, and live evidence.
-That execution made the P-31 hash historical by exposing fail-closed PostgreSQL
-`42704` in the placement RPC. Both diagnostic runs cleaned all fixtures and
-restored pointer/flags. The schema-qualified same-scope fix has SHA-256
-`e4de258756bbfbda0508e55d7b76ba2e907f644625b49bc29d4a4d7ac42fa714` and
-requires replacement source/static and live evidence before closeout.
+The first execution made the P-31 hash historical by exposing fail-closed
+PostgreSQL `42704` in the placement RPC. Both diagnostic runs cleaned all
+fixtures and restored pointer/flags. The schema-qualified same-scope amendment
+has SHA-256
+`e4de258756bbfbda0508e55d7b76ba2e907f644625b49bc29d4a4d7ac42fa714`;
+replacement source/live evidence then passed as recorded in Section 6. P-33
+exact owner acceptance, bootstrap inclusion, WP-8, and Production remain
+separate.
