@@ -83,9 +83,14 @@ Recorded owner decision:
 | Accept the current Excel/PDF visual/content direction | Accepted with Excel refinement | Exact replacement implements TH Sarabun New with 16 pt body baseline; PDF retains NT fonts |
 | Mark WP-6 complete now | Accepted | Owner accepted the exact replacement pair at 2026-07-11 22:20 +07; Production filing remains separate |
 | Start WP-6.5 reliability and publish-boundary hardening | Authorized for Local only; authorization was granted before final WP-6 acceptance and remains in force | Follow Execution Pack sub-gates; no unannounced reset, Production write, placement UI, Factor F change, or hotfix scope expansion |
-| Implement P-20 deterministic identity | Approved: baseline identity equals immutable Production-derived `price_list.id`; keep `identity_id` in the lineage hash | Passed across two independent clean rebuilds; rerun at WP-8/P-15 or after migration changes |
+| Implement P-20 deterministic identity | Approved: baseline identity equals immutable Production-derived `price_list.id`; keep `identity_id` in the lineage hash | Passed across independent rebuilds and repeated under P-36 integrated `021`; P-15 remains separate |
 | Start WP-7 BOQ and Factor F regression preservation | Only after all applicable WP-6.5 evidence, including P-20, is green | Regression-only; no new Factor F workflow |
 | Keep P-18 open and hold add/supplement publication | Required | No add/supplement publish path until guard evidence and placement governance are approved |
+
+Subsequent P-30 accepted P-18 V1 and P-36 passed its integrated technical
+rehearsal. Add/Supplement still remains hidden because P-37 independent
+intended-admin interaction/recovery acceptance is open. These later decisions
+supersede only the pending status above, not the historical WP-6 decision.
 
 ## 2. Authority Basis Checked
 

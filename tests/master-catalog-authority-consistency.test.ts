@@ -136,7 +136,7 @@ describe('Master Catalog authority consistency', () => {
       '**Owner-accepted Local-only migration in bootstrap source; SHA-256 `e07e0c4161077efba7bc4f6ebf95518d0cc1bc7e4628a43a128dd899bd1aef93`; G1R/G2 separate-apply evidence passed on exact checkout `721c2c2c4a234a4fd00e5686383be9af87ee15dd`; G3/WP-6.6 accepted on `78e96ab3ed9993707014c4aba1d285b7592b17a1`; owner-approved G4E combined clean bootstrap through `020` passed on exact execution checkout `15b707d443bec701f6b3a86aa7675ca1266604ba`; not Production-approved**',
     )
     expect(migrations).toContain(
-      '**Owner-accepted Local-only migration in bootstrap source under P-35 on exact source checkpoint `01eba0d49f2e4b6e65f0d9dd287fd461ba9ea19a`; SHA-256 `e4de258756bbfbda0508e55d7b76ba2e907f644625b49bc29d4a4d7ac42fa714`; P-32 separate-apply DB/RLS/concurrency/hash/export/browser evidence passed on source `80b2574`; P-33 technical acceptance and P-34 UX source/static passed; integrated clean bootstrap/live WP-8 evidence remains pending P-36; not Production-approved**',
+      '**Owner-accepted Local-only migration in bootstrap source under P-35 on exact source checkpoint `01eba0d49f2e4b6e65f0d9dd287fd461ba9ea19a`; SHA-256 `e4de258756bbfbda0508e55d7b76ba2e907f644625b49bc29d4a4d7ac42fa714`; P-32 separate-apply evidence/P-33 technical acceptance/P-34 UX source-static passed; P-36 integrated clean bootstrap and live technical evidence passed on exact execution checkout `910cc3cc74660beecf18655d39cd0b0c085d1fc6`; P-37 independent intended-admin release acceptance remains pending with HOLD recommended; not Production-approved**',
     )
     expect(existsSync(resolve(
       root,
@@ -209,12 +209,12 @@ describe('Master Catalog authority consistency', () => {
       'Accepted 2026-07-11 22:20 +07; WP-6 complete; Production filing remains separate',
     )
     expect(decisions).toContain(
-      'Accepted via P-30; P-32 Local technical evidence and P-33 bounded technical acceptance passed; WP-8/P-14 UX/release evidence and Production remain separate',
+      'Accepted via P-30; P-32/P-33 technical scope and P-36 integrated technical rehearsal passed; independent intended-admin WP-8/P-14 release evidence and Production remain separate',
     )
     expect(decisions).toContain('P-19')
     expect(decisions).toContain('Pending; recorded 2026-07-07')
     expect(decisions).toContain(
-      'Approved contract; final G1R/G2 comparison passed; WP-8/P-15 reruns pending',
+      'Approved contract; final G1R/G2 comparison and P-36 integrated rerun passed; P-15 acceptance pending',
     )
     expect(decisions).toContain(
       'WP-6.6 P-24/G1R',
@@ -248,13 +248,14 @@ describe('Master Catalog authority consistency', () => {
       'Authorized and source/static-passed 2026-07-15; WP-8 is In progress. No bootstrap edit, Local DB reset/write, feature enablement, publication, Factor F/hotfix expansion, or Production action authorized',
     )
     expect(decisions).toContain(
-      'Approved and source/static-passed 2026-07-15 on exact checkpoint `01eba0d49f2e4b6e65f0d9dd287fd461ba9ea19a`; P-36 remains separately gated',
+      'Approved and source/static-passed 2026-07-15 on exact checkpoint `01eba0d49f2e4b6e65f0d9dd287fd461ba9ea19a`; P-36 remained separately gated and later passed',
     )
     expect(decisions).toContain(
-      'Approved 2026-07-15 21:00 +07 immediately after the destructive-reset warning; exact gate commit/push and execution evidence pending; Local only',
+      'Approved and technically passed 2026-07-15 on exact gate/execution checkout `910cc3cc74660beecf18655d39cd0b0c085d1fc6`; Local only; interaction/UAT acceptance remains P-37',
     )
     expect(decisions).toContain('| L-57 |')
     expect(decisions).toContain('| L-58 |')
+    expect(decisions).toContain('| L-60 |')
     expect(decisions).toContain('review-by-exception')
     expect(decisions).toContain(
       'Accepted 2026-07-14 23:50 +07; WP-6.6 complete; G4 and all later gates remain separate',
@@ -288,7 +289,7 @@ describe('Master Catalog authority consistency', () => {
       /P-33 accepted that\s+exact bounded WP-7\.5 technical checkpoint at 2026-07-15 13:54 \+07/,
     )
     expect(tracker).toContain(
-      'WP-8 In progress; P-36 destructive Local rehearsal explicitly approved after reset warning; exact gate commit/push and execution pending',
+      'WP-8 In progress; P-36 integrated technical rehearsal passed; P-37 HOLD recommended pending independent intended-admin live interaction/keyboard/recovery UAT',
     )
     expect(tracker).toContain(
       '0780925aca8fa7ebbf8abbaf2b7cf151b39b676a',
@@ -328,6 +329,24 @@ describe('Master Catalog authority consistency', () => {
     )
     expect(tracker).toContain(
       '15b707d443bec701f6b3a86aa7675ca1266604ba',
+    )
+    expect(tracker).toContain(
+      '910cc3cc74660beecf18655d39cd0b0c085d1fc6',
+    )
+    expect(tracker).toContain(
+      'cfe8e86107e032111eccdbf0dfad981a3a6e830d9ed83670caf2971b42f276e4',
+    )
+    expect(tracker).toContain(
+      '65ca478b90dc4c0c598698c46bad93bb513ab0c503c058f58c540ce5b56ba0d8',
+    )
+    expect(tracker).toContain(
+      '2a521c1025ce9cb9e044ec1b6aa507d5424d7f7a5fc42ce5065a93724fcd9a37',
+    )
+    expect(tracker).toContain(
+      'eb8e4266929f6e09d736a9246035b82bc5f775923f4fd5cfe0eb0c381e514f45',
+    )
+    expect(tracker).toContain(
+      'e6c1a00c51f14791de9dc37e4a5bffc8b953a37b90ec7011320b38eda9a5a944',
     )
     expect(tracker).toContain(
       '2e57892c5649fe10e9dc44a885d105066261e5226fd5a23d67ec05bfa4a83e1f',
@@ -374,7 +393,21 @@ describe('Master Catalog authority consistency', () => {
     expect(tracker).toMatch(
       /pre-amendment operator\/browser preflight passed on\s+`c8f6dca`/,
     )
-    expect(tracker).toContain('Status: P-35 source integration is complete')
+    expect(tracker).toContain(
+      'Status: P-35 source integration and P-36 technical execution are complete',
+    )
+    expect(existsSync(resolve(
+      root,
+      'docs/plans/master-catalog/32-phase4-wp8-p36-owner-review-note.md',
+    ))).toBe(true)
+    const p36OwnerReview = read(
+      'docs/plans/master-catalog/32-phase4-wp8-p36-owner-review-note.md',
+    )
+    expect(p36OwnerReview).toContain('**P-37 HOLD is')
+    expect(p36OwnerReview).toContain('Production touched: **No**')
+    expect(p36OwnerReview).toContain(
+      '`v_row_count` is assigned but never read',
+    )
     expect(existsSync(resolve(
       root,
       'docs/plans/master-catalog/30-phase4-wp66-owner-review-note.md',
@@ -644,6 +677,7 @@ describe('Master Catalog authority consistency', () => {
       'docs/plans/master-catalog/29-phase4-owner-dev-completeness-audit.md',
       'docs/plans/master-catalog/30-phase4-wp66-owner-review-note.md',
       'docs/plans/master-catalog/31-phase4-wp66-operator-workflow-correction-plan.md',
+      'docs/plans/master-catalog/32-phase4-wp8-p36-owner-review-note.md',
     ]) {
       expectRelativeMarkdownLinksToExist(path)
       expectMarkdownTablesToBeWellShaped(path)

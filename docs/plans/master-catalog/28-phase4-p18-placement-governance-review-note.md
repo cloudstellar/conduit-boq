@@ -9,8 +9,10 @@ fail-closed `42704`; amended Local DB/RLS/concurrency/hash/export/browser
 evidence passed and P-33 accepted the exact bounded technical checkpoint on
 2026-07-15 13:54 +07; P-34 source/static placement UX hardening passed on exact
 checkpoint `0780925aca8fa7ebbf8abbaf2b7cf151b39b676a`; P-35 then authorized
-unchanged `021` bootstrap source integration, while integrated Local rehearsal,
-performance/accessibility evidence, and intended-admin UAT remain open
+unchanged `021` bootstrap source integration; P-36 integrated Local technical
+rehearsal and 710+18 route-render evidence passed on exact `910cc3c`, while
+independent live interaction/keyboard/recovery and intended-admin UAT remain
+open; P-37 HOLD is recommended
 
 **P-33 decision:** Accepted 2026-07-15 13:54 +07 for the exact bounded
 WP-7.5 technical checkpoint. This is not intended-admin UX or release
@@ -36,14 +38,23 @@ reset/live evidence run and cleanup are authorized from the exact pushed P-35
 lineage. P-37 acceptance, feature enablement, publication, P-19, Factor F/hotfix
 expansion, and Production remain separate.
 
+**P-36 result:** Passed 2026-07-15 on exact gate/execution checkout
+`910cc3cc74660beecf18655d39cd0b0c085d1fc6`. Integrated database, race/order,
+hash/export, BOQ/hotfix/Factor F, advisor, repository, realistic-scale route-
+render, and cleanup evidence passed. Browser automation could not dispatch
+React/Radix client state changes, so independent live interaction, keyboard,
+safe-recovery, and intended-admin UAT are not accepted. See
+[P-36 Owner Review Note](./32-phase4-wp8-p36-owner-review-note.md).
+
 **Environment:** Local-only completed P-32 technical evidence. Historical P-31 migration
 SHA-256 `78359215...` failed closed at runtime because the fixed-search-path
 function deferred an unqualified constraint. Current schema-qualified SHA-256:
 `e4de258756bbfbda0508e55d7b76ba2e907f644625b49bc29d4a4d7ac42fa714`.
 P-35 now places migration `021` in bootstrap source after `020`. P-34 started
-the WP-8 application slice only; destructive/integrated WP-8 execution still
-requires P-36. Production access/write, feature enablement, and publication
-remain unauthorized.
+the WP-8 application slice, and P-36 later passed destructive/integrated
+technical execution. Independent intended-admin interaction/recovery remains
+P-37/P-14. Production access/write, feature enablement, and publication remain
+unauthorized.
 
 ## 1. Why this is now a release decision
 
@@ -135,8 +146,9 @@ the prerequisite admin/authority hardening found by
 [Completeness Audit #29](./29-phase4-owner-dev-completeness-audit.md). Do not
 renumber or rewrite evidence-backed Local migrations `017`-`020`. Migration
 `020` is already in the canonical Local bootstrap after P-28/P-29. P-33 has
-passed, and P-35 now adds unchanged amended `021` to bootstrap source. Do not
-execute the integrated chain until the separately warned P-36 gate.
+passed, and P-35 added unchanged amended `021` to bootstrap source. The
+separately warned P-36 gate later executed the integrated chain successfully;
+any future destructive rerun still requires fresh approval.
 
 The implementation should use DB-backed authority rather than inferring approval
 from UI state, current integers, or free-form audit JSON:
@@ -342,9 +354,10 @@ to skip gates:
 |---|---:|
 | P-33 owner review of completed WP-7.5 evidence | Completed 2026-07-15 13:54 +07; technical scope accepted |
 | P-34 WP-8 placement UX source/static hardening | Completed on exact `0780925`; live acceptance not inferred |
-| P-35 `021` bootstrap source integration | Completed on exact source checkpoint `01eba0d49f2e4b6e65f0d9dd287fd461ba9ea19a`; P-36 execution remains separate |
-| Remaining WP-8 clean rehearsal, measured browser/accessibility evidence, intended-admin UAT, and readiness package | About 1-3 focused engineering days plus reviewer availability |
-| Earliest remaining path before any Production request | About 1-3 focused engineering days after separate P-36 reset authorization; independent UAT and remediation may extend calendar time |
+| P-35 `021` bootstrap source integration | Completed on exact source checkpoint `01eba0d49f2e4b6e65f0d9dd287fd461ba9ea19a` |
+| P-36 integrated technical rehearsal and realistic route rendering | Completed on exact `910cc3c`; independent interaction/UAT not inferred |
+| Remaining independent intended-admin interaction/recovery UAT and readiness closeout | About 0.5-1 focused engineering day plus reviewer availability; remediation may extend calendar time |
+| Earliest remaining path before any Production request | After independent UAT passes, authority closeout is reviewed, and P-37 is accepted; P-12 remains a separate decision |
 
 Limited safe alternative: preserve the completed WP-6.6/WP-7/WP-7.5 technical
 work, defer full WP-8/P-14 placement release acceptance, keep the DB guard, and
@@ -394,6 +407,7 @@ enablement, publication, and Production remained separate at P-33. P-34 then
 passed the bounded application/source UX slice, and P-35 authorized the
 non-destructive bootstrap source integration on gate commit
 `43b75e3f0b0643d6f4e741fcc81ea8b0a6311a13`; exact source checkpoint
-`01eba0d49f2e4b6e65f0d9dd287fd461ba9ea19a` passed. P-36 execution, P-37
+`01eba0d49f2e4b6e65f0d9dd287fd461ba9ea19a` passed. P-36 integrated technical
+execution later passed on exact `910cc3c`. P-37 independent intended-admin
 acceptance, P-19, feature enablement, publication, and Production remain
 separate.

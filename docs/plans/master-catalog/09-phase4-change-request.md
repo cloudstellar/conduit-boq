@@ -145,6 +145,18 @@ pointer, flags, BOQ, and Factor F invariants were restored. This makes WP-7
 ready for owner review and does not authorize P-18/`021`, P-19, WP-8, Factor F
 or hotfix expansion, or Production.
 
+**P-36/WP-8 integrated Local technical execution recorded:** 2026-07-15 —
+after the owner received the destructive Local reset warning, exact checkout
+`910cc3cc74660beecf18655d39cd0b0c085d1fc6` clean-applied `009`-`015`, hotfix
+`016`, and Phase 4 `017`-`021`. Integrated WP-6.6/WP-6.5/P-20/WP-7/WP-7.5,
+export, advisor, repository, realistic-scale route-render, and cleanup evidence
+passed. The Browser automation runtime did not dispatch React/Radix client
+state changes, so independent intended-admin interaction, keyboard, stale/
+leave-reload recovery, and error-comprehension UAT remain open. P-37 HOLD is
+recommended; Add/Supplement remains hidden. See
+[P-36 Owner Review Note](./32-phase4-wp8-p36-owner-review-note.md). This does
+not authorize P-12 or any other Production gate.
+
 ## 1. Decision requested
 
 Approve detailed implementation and local rehearsal of Master Catalog Phase 4.
@@ -212,8 +224,9 @@ BOQs were not backfilled with a guessed Factor F version. Master Catalog Phase
 4 database migrations start at `017+`; the reviewed Local-only source chain is
 now `017`-`021` under P-35. P-29/G4E passed the first clean bootstrap execution
 through `020` on exact `15b707d`, and P-32 passed amended `021` separately. The
-first integrated clean execution through `021` remains pending P-36; none of
-these migrations is Production-approved.
+first integrated clean execution through `021` passed under P-36 on exact
+`910cc3cc74660beecf18655d39cd0b0c085d1fc6`; none of these migrations is
+Production-approved, and P-37 release acceptance remains separate.
 
 The detailed post-Factor-F difficulty assessment and adjusted implementation
 sequence are recorded in the
@@ -565,7 +578,10 @@ pretend a publishable candidate has been approved.
       otherwise the controls are hidden/disabled while the P-18 DB guard
       remains active
 - [x] P-35 source integration places exact amended `021` after `020`; P-36
-      integrated Local execution and P-37 WP-8 acceptance remain pending
+      integrated Local technical execution passed on exact `910cc3c`
+- [ ] P-37 WP-8 acceptance remains on recommended HOLD until independent
+      intended-admin interaction, keyboard, recovery, and error-comprehension
+      UAT passes; Add/Supplement stays hidden
 - [ ] Owner explicitly approves the Production migration window
 
 When all checks above are green, package the evidence for owner/verifier review

@@ -103,6 +103,16 @@ pushed P-35 lineage. Fail closed on any scope-changing defect. P-37 acceptance,
 feature enablement, publication, P-19, Factor F/hotfix expansion, and Production
 remain separate.
 
+**P-36 integrated technical result recorded:** 2026-07-15 — exact gate and
+execution checkout `910cc3cc74660beecf18655d39cd0b0c085d1fc6` passed the
+clean chain through `021`, integrated DB/RLS/concurrency/P-20/WP-7/WP-7.5,
+export/advisors/repository gates, realistic 710+18 route rendering, and
+disabled-baseline cleanup. Browser automation did not dispatch React/Radix
+client state changes, so the live interaction, keyboard/recovery/error-
+comprehension, and independent intended-admin portions of Section 16 remain
+open. P-37 HOLD is recommended and Add/Supplement remains hidden. See
+[P-36 Owner Review Note](./32-phase4-wp8-p36-owner-review-note.md).
+
 **P-22 operator-workflow correction authorized:** 2026-07-12 — intended-admin
 review placed WP-6.6 closeout on Hold and accepted
 [Correction Plan #31](./31-phase4-wp66-operator-workflow-correction-plan.md).
@@ -826,6 +836,7 @@ Run order:
    P-35 bootstrap source, including `009`-`015`, production hotfix `016`, and
    Phase 4 `017`-`021`. P-32 separate-apply evidence and P-35 source inclusion
    remain distinct provenance; neither alone is integrated execution evidence.
+   P-36 later completed this exact step on `910cc3c`.
 2. Load approved baseline fixture/snapshot.
 3. Record catalog count/hash and Factor F baseline.
 4. Confirm Phase 4 `017+` migrations apply only after hotfix `016`.
@@ -897,9 +908,11 @@ round-trip spreadsheet editor.
 P-34 exact source checkpoint `0780925` implements the source/application side
 of truthful local state, safe continuation, review by exception, impact before
 commit, and keyboard/pointer equivalence. Those gates remain open at release
-level until exercised on the exact integrated Local candidate. Measured scale,
-independent comprehension and clean rehearsal have not been executed. P-35
-integrates `021` into source only; P-36 remains required for live evidence.
+level until exercised on the exact integrated Local candidate. P-36 passed the
+clean integrated database/export/advisor path and 710+18 desktop/mobile route-
+render measurements. The Browser runtime did not dispatch client state changes,
+so live filter/paging/relation/sibling/confirmation timing, full keyboard/
+recovery behavior, and independent intended-admin comprehension remain open.
 
 Exit gate:
 

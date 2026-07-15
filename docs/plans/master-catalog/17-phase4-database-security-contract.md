@@ -24,7 +24,9 @@ RLS/grants, concurrency, P-20 input, lint/security advisors, and two required
 authority foreign-key covering indexes. The separately approved independent G2
 then repeated the clean DB/concurrency/P-20 evidence on the same exact
 candidate and the comparator passed. Current advisor-rule warnings are triaged
-below and require final WP-8 disposition rather than being hidden.
+below. P-36 reproduced them without a security issue or rollout blocker; their
+least-privilege/performance minimization remains due before P-12 rather than
+being hidden.
 P-28/G4 repository approval subsequently placed unchanged accepted `020` in
 the canonical Local bootstrap source after `019`. The new `009`-`020` source
 chain was then clean-executed under separately owner-approved P-29/G4E on exact
@@ -40,9 +42,12 @@ A fresh clean Local chain through `020`, separate amended `021` apply, and the
 P-32 DB/RLS/concurrency/order/hash/export/browser evidence then passed on source
 checkpoint `80b2574` plus UI checkpoint `99fa56c`. Cleanup restored the Local
 authority baseline. P-35 now places unchanged amended `021` after `020` in the
-canonical Local bootstrap source; it has not been clean-executed through that
-integrated path or applied to Production. P-36 live WP-8 execution and P-37
-acceptance remain separate.
+canonical Local bootstrap source. P-36 later clean-executed that integrated
+path on exact checkout `910cc3cc74660beecf18655d39cd0b0c085d1fc6` and passed
+the DB/RLS/concurrency/P-20/WP-7/WP-7.5/advisor/final-invariant technical gates.
+It has not been applied to Production. P-37 independent intended-admin
+interaction/recovery acceptance remains separate; see
+[P-36 Owner Review Note](./32-phase4-wp8-p36-owner-review-note.md).
 
 **Owner decision recorded:** 2026-07-04 — approved according to the
 recommendation as the technical backbone for Phase 4A and every Phase 4 write
@@ -144,10 +149,9 @@ erDiagram
 ```
 
 The diagram is semantic. `CATALOG_PLACEMENT_REVIEWS` exists in the current
-P-32 Local state because `021` was applied separately and proved. P-35 now
-includes unchanged `021` in the canonical bootstrap source, but P-36 integrated
-execution remains pending. The object does not exist in Production. Exact
-foreign keys and deletion behavior are defined below.
+Local schema because amended `021` passed P-32 separately and P-36 later passed
+the integrated bootstrap through `021`. The object does not exist in
+Production. Exact foreign keys and deletion behavior are defined below.
 
 ## 4. Design principles
 
@@ -525,8 +529,9 @@ snapshot. Neither action edits or deletes prior audit.
 P-30 accepted the five owner/data-custodian decisions in Review Note #28 on
 2026-07-15 01:37 +07. P-32/P-33 proved and accepted the bounded technical
 candidate, and P-35 authorizes its bootstrap source integration. Do not weaken
-the current new-identity publish guard or reset/write Local until P-36 is
-separately warned and approved.
+the current new-identity publish guard. P-36 was separately warned, approved,
+and passed; any future Local reset/write requires its own current scope and
+approval rather than reusing P-36.
 
 Add `price_list_versions.placement_revision integer not null default 0` with a
 nonnegative check. Increment it only through reviewed draft functions whenever a
@@ -871,7 +876,9 @@ migration `021_master_catalog_phase4_placement_governance.sql`. Do not edit or
 renumber `017`-`020`. P-32 passed separate Local apply/order/RLS/concurrency/
 hash/export/browser evidence, and P-33 accepted that bounded technical scope.
 P-35 adds unchanged `021` to bootstrap source. After the separately warned and
-approved P-36 decision, rerun P-20, WP-7, and the full WP-8 clean rehearsal.
+approved P-36 decision, P-20, WP-7, WP-7.5, advisors, and the integrated
+technical rehearsal passed on exact `910cc3c`. Independent live client
+interaction/recovery and intended-admin UAT remain before P-37 acceptance.
 
 Do not edit an applied migration file. Forward-fix with a new reviewed
 migration.
@@ -931,11 +938,12 @@ authenticated-callable `SECURITY DEFINER` warnings. All eight deny anonymous
 execution. Seven are pre-existing application RPCs; the one Master Catalog RPC
 is `get_catalog_publish_readiness`, whose public facade requires the feature
 flag and active-admin private context. This is not a new untriaged G2 blocker,
-but WP-8 must review whether every authenticated grant remains necessary and
-record a least-privilege/minimization disposition, especially for baseline
-`get_user_role` and `is_admin`. The 24 performance warnings and seven
-unindexed-FK information findings are pre-existing baseline items; both new
-frozen-authority foreign keys have valid covering indexes.
+and P-36 reproduced the current rules without a security issue. Whether every
+authenticated grant remains necessary, especially for baseline `get_user_role`
+and `is_admin`, remains a least-privilege minimization task before P-12. The 24
+Studio performance warnings and seven unindexed-FK information findings are
+pre-existing baseline items; both new frozen-authority foreign keys have valid
+covering indexes.
 
 ## 14. Retention and deletion
 

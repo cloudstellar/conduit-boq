@@ -241,10 +241,13 @@ Rehearsal path:
 2. Use the canonical bootstrap order `009`-`015`, production hotfix `016`, then
    Phase 4 `017`-`021`. P-18 is accepted and amended `021` passed a separate
    P-32 Local apply/live gate plus P-33 bounded technical acceptance. P-35 now
-   includes unchanged `021` in source, while its first integrated clean
-   execution remains pending the separately warned P-36 decision. The prior
-   combined clean execution through `020` passed under P-29/G4E on exact
-   `15b707d`.
+   includes unchanged `021` in source. After a separate destructive-reset
+   warning/approval, P-36 passed the first integrated clean execution through
+   `021` on exact `910cc3c`, including WP-7 BOQ/hotfix/Factor F preservation and
+   final cleanup. Independent intended-admin interaction/recovery UAT remains
+   P-37/P-14; this result does not reopen Factor F or hotfix scope. The prior
+   combined clean execution through `020` remains historical P-29/G4E evidence
+   on exact `15b707d`.
 3. Record before/after catalog counts.
 4. Record before/after Factor F pointer, active versions, row counts, and
    hashes.

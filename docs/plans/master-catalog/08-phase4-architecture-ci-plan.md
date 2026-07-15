@@ -3,10 +3,11 @@
 **Status:** Revision 8 remains the owner-approved Phase 4 Core direction;
 WP-6.6 and WP-7 are complete, and the P-18/WP-7.5 extension passed P-32 Local
 technical evidence and P-33 bounded technical acceptance. WP-8 placement
-UX source/static hardening passed P-34 on exact `0780925`; integrated Local
-rehearsal, measured accessibility/performance, intended-admin UAT, and all
-Production gates remain separate. P-35 has authorized `021` bootstrap source
-integration without authorizing the destructive P-36 execution
+UX source/static hardening passed P-34 on exact `0780925`; P-35 integrated
+unchanged `021` into bootstrap source; and P-36 integrated Local technical
+rehearsal passed on exact execution checkout `910cc3c`. Independent intended-
+admin interaction/recovery UAT and all Production gates remain separate, so
+P-37 HOLD is recommended and Add/Supplement stays hidden
 
 **Date:** 2026-06-22
 
@@ -42,6 +43,17 @@ provenance/contracts, running repository checks, and committing/pushing the
 result. This does not change the architecture or migration SQL and does not
 authorize a Local reset/write, P-36 live evidence, P-37 acceptance, feature
 enablement, publication, Factor F/hotfix expansion, or Production.
+
+**P-36 integrated Local technical result:** 2026-07-15 — after the explicit
+destructive-reset warning and owner approval, exact checkout
+`910cc3cc74660beecf18655d39cd0b0c085d1fc6` clean-applied `009`-`015`, hotfix
+`016`, and Phase 4 `017`-`021`. Integrated DB/RLS/concurrency/P-20/WP-7/WP-7.5,
+export, advisor, repository, realistic-scale route-render, and cleanup evidence
+passed. Browser automation could not dispatch React/Radix state changes, so
+live client interaction, keyboard/recovery behavior, and independent intended-
+admin comprehension remain release gates. This validates the architecture's
+technical path without authorizing P-37 acceptance or Production. See
+[P-36 Owner Review Note](./32-phase4-wp8-p36-owner-review-note.md).
 
 **Capability-completeness amendment:** 2026-07-12 —
 [Audit #29](./29-phase4-owner-dev-completeness-audit.md) corrects the earlier
@@ -1791,8 +1803,8 @@ users.
   Local-only source implementation on 2026-07-15 01:37 +07.
 - Append migration `021`; do not rewrite or renumber `017`-`020`.
 - P-35 places unchanged `021` in bootstrap source after `020`. P-32's historical
-  separate-apply evidence remains valid for its bounded scope, while integrated
-  clean execution still requires the separately warned P-36 decision.
+  separate-apply evidence remains valid for its bounded scope. The separately
+  warned P-36 integrated clean execution later passed on exact `910cc3c`.
 - Add placement revision/review authority, exact grants/RLS, the idempotent
   placement RPC, Thai batch UI, audit/history integration, and publish-readiness
   enforcement.
@@ -1803,9 +1815,11 @@ users.
 
 P-32 technical evidence passed all of the checks above, and P-33 accepted the
 exact bounded WP-7.5 technical checkpoint. WP-8 must still harden and repeat
-the supported release workflow from its own approved clean scope, including
-truthful local dirty state, review-by-exception, keyboard equivalence, measured
-scale, and independent intended-admin completion.
+the supported release workflow from its own approved clean scope. P-36 passed
+the integrated database, hash/export, route-render, realistic-scale, and cleanup
+evidence. Independent live client interaction, keyboard/error recovery, and
+intended-admin completion remain required before the release workflow is
+accepted.
 
 **Reason:** This completes the already exposed Add/Supplement business outcome
 without turning a UI-only reorder into hidden technical debt. If P-18 is

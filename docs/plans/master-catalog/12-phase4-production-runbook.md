@@ -137,8 +137,11 @@ Stop immediately when any of these occurs:
     `15b707d443bec701f6b3a86aa7675ca1266604ba` passed the combined Local
     `009`-`020` bootstrap and live WP-7 technical evidence. This is not WP-8 or
     Production approval. Finally verify P-35 separately: unchanged amended
-    `021` is now in bootstrap source after `020`, but no integrated reset/live
-    evidence exists until the owner explicitly approves P-36.
+    `021` is now in bootstrap source after `020`. P-36 was separately approved
+    after the reset warning and the integrated Local technical rehearsal passed
+    on exact checkout `910cc3c`. Independent intended-admin interaction/
+    recovery UAT remains a P-37/P-14 gate; see
+    [P-36 Owner Review Note](./32-phase4-wp8-p36-owner-review-note.md).
 
 **Exit gate:** All documents have owner/reviewer decisions; no unresolved row
 or taxonomy blocker.
@@ -168,9 +171,10 @@ major image at an incompatible existing data directory.
    integration placed accepted `020` in source on 2026-07-15, and P-29/G4E
    subsequently passed the combined clean execution. P-32 separately applied
    and proved amended P-18/WP-7.5 `021`; P-35 later placed that unchanged file
-   in source. This source inclusion is not integrated execution evidence. Do not
-   run the destructive command until P-36 is explicitly approved after the
-   reset warning.
+   in source. P-36 later supplied separate integrated execution evidence on
+   exact `910cc3c` after explicit owner warning/approval. Any future destructive
+   rerun still requires a fresh warning and approval; P-36 is not reusable
+   blanket reset permission.
 2. If applying SQL manually for a focused rehearsal, apply hotfix `016` before
    any reviewed Phase 4A migration(s).
 3. Verify all new tables, constraints, indexes, grants, RLS policies, functions,

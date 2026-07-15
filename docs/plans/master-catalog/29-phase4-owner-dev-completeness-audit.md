@@ -24,12 +24,17 @@ P-30 accepted WP-7/P-18. P-32 subsequently passed the amended WP-7.5
 DB/RLS/concurrency/hash/export/browser technical evidence, and P-33 accepted
 that exact bounded technical checkpoint at 2026-07-15 13:54 +07. P-34 then
 passed the bounded WP-8 placement UX source/static slice and P-35 authorized
-unchanged `021` bootstrap source integration. P-36 integrated rehearsal and the
-remaining WP-8 release evidence remain.
+unchanged `021` bootstrap source integration. P-36 then passed the integrated
+Local technical rehearsal on exact `910cc3c`, including realistic 710+18 route
+rendering and clean final invariants. Browser automation could not dispatch
+React/Radix client state changes, so independent intended-admin live
+interaction/keyboard/recovery UAT remains; P-37 HOLD is recommended.
 
 **Environment:** Source/document audit only. No Local database reset, Production
 access/write, feature enablement, publication, new Factor F workflow, or hotfix
-scope expansion was performed or authorized by this audit.
+scope expansion was performed or authorized by this audit. The later P-36
+Local reset/result is a separate owner-approved execution recorded in
+[Review Note #32](./32-phase4-wp8-p36-owner-review-note.md).
 
 ## 1. Correction to the earlier completeness statement
 
@@ -211,13 +216,13 @@ that can never finish is not.
 ## 8. Effort and confidence
 
 The original corrected full-path estimate was **9-15 focused engineering
-days**. P-34 completed the bounded WP-8 placement UX source/static slice on
-exact `0780925`. The remaining pre-Production engineering scope is mainly the
-integrated clean rehearsal, measured browser/accessibility/recovery evidence,
-independent intended-admin UAT, and readiness package, approximately **1-3
-focused engineering days** plus owner and independent intended-admin
-availability. This is an effort range, not permission to skip gates or a
-guaranteed date.
+days**. P-34 completed the bounded WP-8 placement UX source/static slice and
+P-36 completed the integrated technical rehearsal plus realistic route-render
+measurements. The remaining pre-P-37 scope is one independent intended-admin
+live interaction/keyboard/recovery session and authority closeout,
+approximately **0.5-1 focused engineering day** plus reviewer availability.
+Any defect found by that session extends the range. This is an effort estimate,
+not permission to skip gates or a guaranteed date.
 
 The confidence is higher than the earlier estimate because the work is now
 enumerated by capability and authoritative layer. Residual unknowns must be
@@ -235,7 +240,8 @@ authorizes the bounded application/test/documentation correction for C-17.
 These decisions, including P-28 source integration, do not authorize a Local
 database reset. P-29 separately authorized and completed exactly one bounded
 G4E Local reset. P-30 later accepted WP-7 and the five-rule P-18 V1 contract for
-bounded `021`/application/test/documentation source work only. It does not
-authorize `021` bootstrap inclusion, another Local apply/reset, WP-8, P-19,
-Production access/write, feature enablement, publication, new Factor F work,
-or expansion of hotfix `016`.
+bounded `021`/application/test/documentation source work only. P-35 and P-36
+later separately authorized source integration and one integrated Local reset,
+respectively; P-36 passed on exact `910cc3c`. None of these decisions authorizes
+another Local reset, P-37 acceptance, P-19, Production access/write, feature
+enablement, publication, new Factor F work, or expansion of hotfix `016`.
