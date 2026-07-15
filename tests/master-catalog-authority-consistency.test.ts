@@ -250,6 +250,9 @@ describe('Master Catalog authority consistency', () => {
     expect(decisions).toContain(
       'Approved and source/static-passed 2026-07-15 on exact checkpoint `01eba0d49f2e4b6e65f0d9dd287fd461ba9ea19a`; P-36 remains separately gated',
     )
+    expect(decisions).toContain(
+      'Approved 2026-07-15 21:00 +07 immediately after the destructive-reset warning; exact gate commit/push and execution evidence pending; Local only',
+    )
     expect(decisions).toContain('| L-57 |')
     expect(decisions).toContain('| L-58 |')
     expect(decisions).toContain('review-by-exception')
@@ -285,7 +288,7 @@ describe('Master Catalog authority consistency', () => {
       /P-33 accepted that\s+exact bounded WP-7\.5 technical checkpoint at 2026-07-15 13:54 \+07/,
     )
     expect(tracker).toContain(
-      'WP-8 In progress; P-35 source checkpoint `01eba0d49f2e4b6e65f0d9dd287fd461ba9ea19a` passed and destructive P-36 Local rehearsal remains separately gated',
+      'WP-8 In progress; P-36 destructive Local rehearsal explicitly approved after reset warning; exact gate commit/push and execution pending',
     )
     expect(tracker).toContain(
       '0780925aca8fa7ebbf8abbaf2b7cf151b39b676a',

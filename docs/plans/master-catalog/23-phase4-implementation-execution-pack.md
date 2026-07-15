@@ -95,6 +95,14 @@ checkpoint. This does not authorize `npm run db:local:bootstrap`, any Local
 reset/write, P-36 live evidence, P-37 acceptance, feature enablement,
 publication, P-19, Factor F/hotfix expansion, or Production.
 
+**P-36 WP-8 destructive Local execution recorded:** 2026-07-15 21:00 +07 —
+after the explicit warning that `npm run db:local:bootstrap` resets all Local
+Supabase, the owner instructed the team to continue. This authorizes the one
+integrated Local-only run and named WP-8 evidence in Section 16 from the exact
+pushed P-35 lineage. Fail closed on any scope-changing defect. P-37 acceptance,
+feature enablement, publication, P-19, Factor F/hotfix expansion, and Production
+remain separate.
+
 **P-22 operator-workflow correction authorized:** 2026-07-12 — intended-admin
 review placed WP-6.6 closeout on Hold and accepted
 [Correction Plan #31](./31-phase4-wp66-operator-workflow-correction-plan.md).

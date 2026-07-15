@@ -30,6 +30,12 @@ static verification, commit, and push only. Exact source checkpoint
 `01eba0d49f2e4b6e65f0d9dd287fd461ba9ea19a` passed. P-36 destructive execution
 and P-37 WP-8 acceptance remain separately gated.
 
+**P-36 decision:** Authorized 2026-07-15 21:00 +07 immediately after the owner
+was warned that bootstrap resets all Local Supabase. One integrated Local-only
+reset/live evidence run and cleanup are authorized from the exact pushed P-35
+lineage. P-37 acceptance, feature enablement, publication, P-19, Factor F/hotfix
+expansion, and Production remain separate.
+
 **Environment:** Local-only completed P-32 technical evidence. Historical P-31 migration
 SHA-256 `78359215...` failed closed at runtime because the fixed-search-path
 function deferred an unqualified constraint. Current schema-qualified SHA-256:
