@@ -332,10 +332,11 @@ to skip gates:
 | Remaining WP-8 clean rehearsal, measured browser/accessibility evidence, intended-admin UAT, and readiness package | About 1-3 focused engineering days plus reviewer availability |
 | Earliest remaining path before any Production request | About 1-3 focused engineering days after the separate `021` bootstrap/reset authorization; independent UAT and remediation may extend calendar time |
 
-Limited safe alternative: finish the shared WP-6.6 gates, defer WP-7.5, keep the
-DB guard, and hide/disable Add and Supplement at P-14. This reduces placement
-scope, but admins cannot publish new identities. Exposing the current
-half-complete Add/Supplement workflow is not recommended.
+Limited safe alternative: preserve the completed WP-6.6/WP-7/WP-7.5 technical
+work, defer full WP-8/P-14 placement release acceptance, keep the DB guard, and
+hide/disable Add and Supplement at P-14. This reduces release scope, but admins
+cannot publish new identities. Exposing Add/Supplement without the remaining
+WP-8 evidence is not recommended.
 
 ## 8. Owner/data-custodian decisions recorded
 

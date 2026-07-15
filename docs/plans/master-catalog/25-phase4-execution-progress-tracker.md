@@ -106,9 +106,9 @@ Allowed statuses:
 | Current environment | Local bootstrap through `020` plus separately applied amended `021`; proof draft audited-abandoned, pointer `2568.0.0`/710, zero working drafts, all catalog flags false |
 | Production write allowed | No |
 | Feature flag default | Disabled |
-| Latest owner decision | P-34 authorized and accepted exact `0780925aca8fa7ebbf8abbaf2b7cf151b39b676a` as the WP-8 placement UX source/static checkpoint. It does not authorize bootstrap inclusion of `021`, another Local reset/write, live WP-8 performance/accessibility/UAT evidence, P-19, Factor F/hotfix expansion, feature enablement, publication, or Production. |
+| Latest owner decision | P-35 authorizes exact amended `021` bootstrap repository/source integration, authority alignment, static verification, commit, and push. It does not authorize `npm run db:local:bootstrap`, a Local reset/write, live WP-8 evidence, P-19, Factor F/hotfix expansion, feature enablement, publication, or Production. P-36 and P-37 remain separate. |
 | Latest technical result | P-34 source/static passed: focused 2 files/20 tests, full 33 files/183 tests, TypeScript, focused/full lint with 0 errors and 10 existing warnings, `git diff --check`, and network-enabled production build. Local browser login confirmed the disabled baseline and one existing NT logo LCP warning; no feature flag or DB state was changed, so this is not live WP-8 acceptance evidence. |
-| Next owner review point | Review exact P-34 source checkpoint, then separately decide whether to add `021` to bootstrap and authorize one destructive WP-8 Local reset/live evidence run. Warn that bootstrap resets all Local Supabase before any command. Do not infer feature enablement, publication, or Production approval. |
+| Next owner review point | Review the exact committed/pushed P-35 bootstrap source-integration checkpoint and static evidence, then separately decide P-36. Immediately before P-36, warn that bootstrap resets all Local Supabase. Do not infer live evidence, P-37 acceptance, feature enablement, publication, or Production approval. |
 | Last updated | 2026-07-15 |
 
 ## 2.1 Canonical authority and evidence manifest
@@ -566,8 +566,8 @@ Prior named evidence commits: 721c2c2 for exact G1R/G2 and FK-index closure; 2b1
 Files changed: committed WP-8 placement workspace/model/tests at 0780925 plus P-34 authority/status alignment. Migrations, bootstrap, Production, Factor F, hotfix 016, and untracked files/, tmp/, output/ unchanged
 Evidence produced: source/static only: truthful dirty state, versioned recovery/navigation guard, exception filters/counts, native keyboard relation control, complete impact confirmation; prior P-32 clean-chain evidence remains authoritative for WP-7.5
 Tests/checks run: focused 2 files/20 tests; full 33 files/183 tests; TypeScript; focused/full lint 0 errors/10 existing warnings; network-enabled production build; git diff --check; Local browser disabled-baseline login only
-Blockers: exact 021 bootstrap/reset authorization; integrated realistic-scale/accessibility/recovery browser evidence; independent intended-admin UAT; P-19 when affected; final advisor disposition
-Owner decisions needed: review P-34 checkpoint, then separately decide exact 021 bootstrap inclusion and one destructive WP-8 Local reset/live run. Production P-12 through P-15 remain separate
-Next safe step: keep Add/Supplement disabled and 021 outside bootstrap until the warned reset gate is approved; do not reset Local, start live WP-8 evidence, or touch Production by inference
+Blockers: exact P-35 integration checkpoint; separate P-36 reset/live authorization; integrated realistic-scale/accessibility/recovery browser evidence; independent intended-admin UAT; P-19 when affected; final advisor disposition
+Owner decisions needed: P-35 repository/source integration is authorized; after its exact checkpoint is pushed, separately decide one destructive P-36 WP-8 Local reset/live run. P-37 and Production P-12 through P-15 remain separate
+Next safe step: complete and push P-35 source integration while keeping Add/Supplement disabled; do not reset Local, start live WP-8 evidence, or touch Production by inference
 Production touched: No
 ```
