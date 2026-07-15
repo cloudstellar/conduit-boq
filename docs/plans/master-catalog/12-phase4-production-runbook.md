@@ -136,7 +136,9 @@ Stop immediately when any of these occurs:
     accepted `020`. Finally verify P-29/G4E separately: exact checkout
     `15b707d443bec701f6b3a86aa7675ca1266604ba` passed the combined Local
     `009`-`020` bootstrap and live WP-7 technical evidence. This is not WP-8 or
-    Production approval.
+    Production approval. Finally verify P-35 separately: unchanged amended
+    `021` is now in bootstrap source after `020`, but no integrated reset/live
+    evidence exists until the owner explicitly approves P-36.
 
 **Exit gate:** All documents have owner/reviewer decisions; no unresolved row
 or taxonomy blocker.
@@ -162,12 +164,13 @@ major image at an incompatible existing data directory.
 
 1. After explicit warning and owner approval for the destructive Local reset,
    start from the canonical bootstrap source that applies root `009`-`015`,
-   production hotfix `016`, and Phase 4 `017`-`020` in that order. G4 repository
+   production hotfix `016`, and Phase 4 `017`-`021` in that order. G4 repository
    integration placed accepted `020` in source on 2026-07-15, and P-29/G4E
    subsequently passed the combined clean execution. P-32 separately applied
-   and proved amended P-18/WP-7.5 `021`; it remains outside bootstrap until a
-   later explicit inclusion decision. Never assume a separately proven file is
-   already in the authority path.
+   and proved amended P-18/WP-7.5 `021`; P-35 later placed that unchanged file
+   in source. This source inclusion is not integrated execution evidence. Do not
+   run the destructive command until P-36 is explicitly approved after the
+   reset warning.
 2. If applying SQL manually for a focused rehearsal, apply hotfix `016` before
    any reviewed Phase 4A migration(s).
 3. Verify all new tables, constraints, indexes, grants, RLS policies, functions,

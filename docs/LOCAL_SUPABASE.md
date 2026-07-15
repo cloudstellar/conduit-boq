@@ -23,18 +23,18 @@ from the captured production snapshot. This is destructive for the Local
 Supabase database: it resets the local stack, restores business data and
 scrubbed auth metadata, applies the canonical root chain `009` through `015`,
 production hotfix `016`, and the current Phase 4 local scripts `017` through
-`019`, seeds local-only role accounts, then runs auth and Master Catalog
+`021`, seeds local-only role accounts, then runs auth and Master Catalog
 workflow smoke tests. Get owner approval before using this command as evidence
 when preserving existing Local state matters.
 
 WP-6.6 migration `020_master_catalog_phase4_admin_workflow_hardening.sql` passed
-the separately owner-approved G1R and independent G2 clean Local
-DB/concurrency evidence runs on exact execution checkout
-`721c2c2c4a234a4fd00e5686383be9af87ee15dd`, with SHA-256
-`e07e0c4161077efba7bc4f6ebf95518d0cc1bc7e4628a43a128dd899bd1aef93`.
-The P-20 G1R-versus-G2 comparison passed. It remains outside this canonical
-bootstrap until the WP-6.6 G3/G4 closeout is accepted. Do not append `020` to
-the bootstrap command ad hoc.
+G1R/G2 and the combined G4E clean bootstrap. WP-7.5 migration
+`021_master_catalog_phase4_placement_governance.sql`, SHA-256
+`e4de258756bbfbda0508e55d7b76ba2e907f644625b49bc29d4a4d7ac42fa714`,
+passed the P-32 separate-apply technical evidence and P-33/P-34 bounded gates.
+P-35 now places that unchanged file in the canonical bootstrap source. Source
+inclusion is not execution evidence: do not run the command below until the
+owner receives the destructive-reset warning and explicitly approves P-36.
 
 ```bash
 npm run db:local:bootstrap
@@ -75,7 +75,9 @@ migration. The bootstrap script applies the explicit root sequence `009` through
 `015`, then production hotfix `016_hotfix_preserve_boq_item_suffix.sql`, then
 the current Phase 4 scripts `017_master_catalog_phase4_foundation.sql`,
 `018_master_catalog_phase4_draft_mutation.sql`, and
-`019_master_catalog_phase4_publish_pointer.sql`.
+`019_master_catalog_phase4_publish_pointer.sql`,
+`020_master_catalog_phase4_admin_workflow_hardening.sql`, and
+`021_master_catalog_phase4_placement_governance.sql`.
 Consequently, `supabase db diff --local` will show the rehearsed schema as drift
 from an empty CLI migration ledger. Do not generate a new migration from that
 expected diff.

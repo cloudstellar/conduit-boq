@@ -22,8 +22,10 @@ and the owner accepted G3/WP-6.6 on that checkpoint at
 source on 2026-07-15; P-29/G4E then passed the clean `009`-`020` execution and
 P-30 accepted WP-7/P-18. P-32 subsequently passed the amended WP-7.5
 DB/RLS/concurrency/hash/export/browser technical evidence, and P-33 accepted
-that exact bounded technical checkpoint at 2026-07-15 13:54 +07. WP-8
-placement UX/release evidence remains.
+that exact bounded technical checkpoint at 2026-07-15 13:54 +07. P-34 then
+passed the bounded WP-8 placement UX source/static slice and P-35 authorized
+unchanged `021` bootstrap source integration. P-36 integrated rehearsal and the
+remaining WP-8 release evidence remain.
 
 **Environment:** Source/document audit only. No Local database reset, Production
 access/write, feature enablement, publication, new Factor F workflow, or hotfix

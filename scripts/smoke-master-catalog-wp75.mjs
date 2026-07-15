@@ -431,7 +431,7 @@ try {
   assert(await readSetting('catalog_admin_enabled') === false, 'Admin flag was not restored')
 
   const evidence = {
-    schemaVersion: 1,
+    schemaVersion: 2,
     status: 'passed',
     generatedAt: new Date().toISOString(),
     gitCommit: currentCommit(),
@@ -439,8 +439,8 @@ try {
     migration: {
       file: 'migrations/021_master_catalog_phase4_placement_governance.sql',
       sha256: fileSha256('migrations/021_master_catalog_phase4_placement_governance.sql'),
-      appliedSeparatelyAfterBootstrap020: true,
-      includedInBootstrap: false,
+      includedInBootstrapSource: true,
+      bootstrapExecutionProvenance: 'external-p36-gate',
     },
     schemaContract: {
       ...schemaContract,

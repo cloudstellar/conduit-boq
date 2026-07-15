@@ -4,8 +4,9 @@
 WP-6.6 and WP-7 are complete, and the P-18/WP-7.5 extension passed P-32 Local
 technical evidence and P-33 bounded technical acceptance. WP-8 placement
 UX source/static hardening passed P-34 on exact `0780925`; integrated Local
-rehearsal, measured accessibility/performance, intended-admin UAT, bootstrap
-inclusion of `021`, and all Production gates remain separate
+rehearsal, measured accessibility/performance, intended-admin UAT, and all
+Production gates remain separate. P-35 has authorized `021` bootstrap source
+integration without authorizing the destructive P-36 execution
 
 **Date:** 2026-06-22
 
@@ -33,6 +34,14 @@ keyboard semantics, one final summary exposes complete batch impact, and
 derived list work is bounded/memoized. This is application/source evidence,
 not permission to add `021` to bootstrap, reset Local, enable features, or
 advance any Production gate.
+
+**P-35 bootstrap source-integration amendment:** 2026-07-15 — exact gate
+checkpoint `43b75e3f0b0643d6f4e741fcc81ea8b0a6311a13` authorizes adding the unchanged
+amended `021` after `020` in the canonical Local bootstrap source, aligning
+provenance/contracts, running repository checks, and committing/pushing the
+result. This does not change the architecture or migration SQL and does not
+authorize a Local reset/write, P-36 live evidence, P-37 acceptance, feature
+enablement, publication, Factor F/hotfix expansion, or Production.
 
 **Capability-completeness amendment:** 2026-07-12 —
 [Audit #29](./29-phase4-owner-dev-completeness-audit.md) corrects the earlier
@@ -1781,9 +1790,9 @@ users.
 - P-30 accepted the P-18 V1 decisions in Review Note #28 and authorized bounded
   Local-only source implementation on 2026-07-15 01:37 +07.
 - Append migration `021`; do not rewrite or renumber `017`-`020`.
-- Keep `021` outside bootstrap. P-32 separately authorized and completed the
-  clean Local apply/live evidence; bootstrap inclusion still needs a later
-  explicit decision.
+- P-35 places unchanged `021` in bootstrap source after `020`. P-32's historical
+  separate-apply evidence remains valid for its bounded scope, while integrated
+  clean execution still requires the separately warned P-36 decision.
 - Add placement revision/review authority, exact grants/RLS, the idempotent
   placement RPC, Thai batch UI, audit/history integration, and publish-readiness
   enforcement.

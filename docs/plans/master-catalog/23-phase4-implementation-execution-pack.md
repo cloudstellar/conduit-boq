@@ -87,6 +87,14 @@ bootstrap and no Local reset/write, measured live scale/accessibility evidence,
 intended-admin UAT, feature release, Factor F/hotfix expansion, or Production
 action is inferred.
 
+**P-35 WP-8 bootstrap source integration recorded:** 2026-07-15 — exact gate
+checkpoint `43b75e3f0b0643d6f4e741fcc81ea8b0a6311a13` authorizes adding unchanged
+amended `021` after `020`, aligning current authority/provenance and executable
+contracts, running repository checks, and committing/pushing the exact source
+checkpoint. This does not authorize `npm run db:local:bootstrap`, any Local
+reset/write, P-36 live evidence, P-37 acceptance, feature enablement,
+publication, P-19, Factor F/hotfix expansion, or Production.
+
 **P-22 operator-workflow correction authorized:** 2026-07-12 — intended-admin
 review placed WP-6.6 closeout on Hold and accepted
 [Correction Plan #31](./31-phase4-wp66-operator-workflow-correction-plan.md).
@@ -806,11 +814,10 @@ Goal: prove the full plan works from a clean state.
 
 Run order:
 
-1. Clean local reset from the canonical bootstrap chain, including `009`-`015`,
-   production hotfix `016`, and Phase 4 `017`-`020`. Add `021` only after the
-   separate bootstrap/WP-8 decision; P-33 technical acceptance and P-32
-   separate-apply evidence are not source inclusion. The current bootstrap
-   authority ends at `020`.
+1. After the explicit P-36 warning/approval, clean local reset from the canonical
+   P-35 bootstrap source, including `009`-`015`, production hotfix `016`, and
+   Phase 4 `017`-`021`. P-32 separate-apply evidence and P-35 source inclusion
+   remain distinct provenance; neither alone is integrated execution evidence.
 2. Load approved baseline fixture/snapshot.
 3. Record catalog count/hash and Factor F baseline.
 4. Confirm Phase 4 `017+` migrations apply only after hotfix `016`.
@@ -883,8 +890,8 @@ P-34 exact source checkpoint `0780925` implements the source/application side
 of truthful local state, safe continuation, review by exception, impact before
 commit, and keyboard/pointer equivalence. Those gates remain open at release
 level until exercised on the exact integrated Local candidate. Measured scale,
-independent comprehension, `021` bootstrap integration, and clean rehearsal
-have not been executed under P-34.
+independent comprehension and clean rehearsal have not been executed. P-35
+integrates `021` into source only; P-36 remains required for live evidence.
 
 Exit gate:
 

@@ -45,12 +45,12 @@ schema-qualified amendment is SHA-256
 A replacement clean chain, DB/RLS/concurrency/hash/export harness, Thai
 desktop/mobile browser workflow, artifact verification, and audited cleanup
 passed. P-33 accepted the exact bounded WP-7.5 technical checkpoint on
-2026-07-15 13:54 +07. Bootstrap inclusion, WP-8 UX/release evidence, and
-Production remain pending. P-34 then authorized and passed the bounded WP-8
+2026-07-15 13:54 +07. P-34 then authorized and passed the bounded WP-8
 placement UX source/static checkpoint on exact
-`0780925aca8fa7ebbf8abbaf2b7cf151b39b676a`. WP-8 is In progress; `021`
-bootstrap inclusion, a new Local reset/write, integrated browser/scale/
-accessibility evidence, intended-admin UAT, and Production remain pending.
+`0780925aca8fa7ebbf8abbaf2b7cf151b39b676a`. P-35 now authorizes unchanged
+`021` bootstrap repository/source integration. WP-8 is In progress; P-36 Local
+reset/write, integrated browser/scale/accessibility evidence, intended-admin
+UAT, P-37 acceptance, and Production remain pending.
 **Prepared:** 2026-06-22
 **Production project:** `otlssvssvgkohqwuuiir`
 **Candidate version:** System-planned ADR-003 number; `2568.1.0` only when still
@@ -78,7 +78,7 @@ should link here rather than copy volatile evidence.
 | WP-6.6 admin workflow/authority hardening | Local | Codex + owner/developer | 2026-07-12 | 2026-07-14 | Accepted/Complete | Exact G1R/G2 evidence passed on `721c2c2`; P-25/G3/P-26 passed; the owner accepted exact application checkpoint `78e96ab3ed9993707014c4aba1d285b7592b17a1`. |
 | WP-7 permanent BOQ/hotfix/Factor F regression | Local | Codex + owner/developer | 2026-07-15 | 2026-07-15 | Accepted/Complete | P-29/G4E clean bootstrap and tracked live harness passed on exact `15b707d`; owner accepted via P-30 at 2026-07-15 01:37 +07. |
 | WP-7.5 P-18 placement | Local | Codex + owner/developer | 2026-07-15 | 2026-07-15 | Accepted/Complete for bounded technical scope | P-32 replacement evidence passed with amended `021` SHA-256 `e4de258756bbfbda0508e55d7b76ba2e907f644625b49bc29d4a4d7ac42fa714`; DB source `80b2574`, evidence JSON SHA-256 `875488a965c9c24fbe82a373d2bb18e585f7b6df4fb9267041f909eae1c05602`, artifact source `7d60ab60`, and UI checkpoint `99fa56c`. P-33 accepted this exact technical checkpoint at 2026-07-15 13:54 +07. |
-| 4C clean rehearsal | Local | Codex + owner/developer | 2026-07-15 |  | WP-8 In progress; source/static passed, clean rehearsal pending | P-34 exact `0780925` passed the application/source side of truthful dirty state, recoverable pending choices/navigation, review-by-exception, complete impact summary, keyboard equivalence, and list-work hardening. `021` bootstrap/reset, integrated DB/regression/export/advisor reruns, 710-row plus realistic-new-batch browser/accessibility evidence, and independent intended-admin UAT remain WP-8/P-14. |
+| 4C clean rehearsal | Local | Codex + owner/developer | 2026-07-15 |  | WP-8 In progress; source/static and P-35 bootstrap source integration passed, clean rehearsal pending | P-34 exact `0780925` passed the application/source side of truthful dirty state, recoverable pending choices/navigation, review-by-exception, complete impact summary, keyboard equivalence, and list-work hardening. P-35 integrates unchanged `021` after `020` in bootstrap source. P-36 integrated DB/regression/export/advisor reruns, 710-row plus realistic-new-batch browser/accessibility evidence, and independent intended-admin UAT remain WP-8/P-14. |
 | 4A migration | Production |  |  |  | Not authorized |  |
 | Application deploy, flag off | Production |  |  |  | Not authorized |  |
 | Feature enablement | Production |  |  |  | Not authorized |  |
@@ -125,6 +125,9 @@ should link here rather than copy volatile evidence.
 | P-32 WP-7.5 Local technical evidence | Owner + Codex | Explicitly authorized and passed after same-scope fix-forward; P-33 acceptance not inferred | 2026-07-15 | Fresh bootstrap through `020`, separate amended `021`, role/direct-write denial, rollback/replay/stale/race/order/hash/export evidence, Thai desktop/mobile workflow, final-review scale, and audited abandon passed. Retained JSON SHA-256 `875488a965c9c24fbe82a373d2bb18e585f7b6df4fb9267041f909eae1c05602`; final Local pointer `2568.0.0`/710, zero drafts, all flags false, BOQ 198/1,547, Factor F `2569.0.0`/36. Production touched: No. |
 | P-33 WP-7.5 exact technical accept/hold | Owner | Accepted for bounded technical scope; later UX/release gates remain open | 2026-07-15 13:54 +07 | Exact P-32 evidence package accepted. WP-8 placement UX hardening/UAT/performance, `021` bootstrap inclusion, P-19, feature enablement, publication, and Production remain separate. |
 | P-34 WP-8 placement UX source/static | Owner + Codex | Authorized and passed for exact bounded source/static checkpoint; live/release acceptance not inferred | 2026-07-15 14:58 +07 | Exact `0780925aca8fa7ebbf8abbaf2b7cf151b39b676a`; focused 2 files/20 tests, full 33 files/183 tests, TypeScript, focused/full lint 0 errors/10 existing warnings, `git diff --check`, and network-enabled production build passed. Local browser confirmed only the disabled baseline; no feature flag or DB state changed. |
+| P-35 WP-8 bootstrap source integration | Owner + Codex | Authorized; working-tree repository/static candidate passed; exact source commit/push pending | 2026-07-15 15:37 +07 | Gate commit `43b75e3f0b0643d6f4e741fcc81ea8b0a6311a13`; unchanged amended `021` SHA-256 `e4de258756bbfbda0508e55d7b76ba2e907f644625b49bc29d4a4d7ac42fa714` is after `020`. Shell/Node syntax, focused 3 files/25 tests, full 33 files/183 tests, TypeScript, lint 0 errors/10 existing warnings, authority 710/65/17, dependency audit 0 vulnerabilities, diff check, and network-enabled build passed. No Local DB command or Production action. |
+| P-36 WP-8 destructive Local execution | Owner + Codex | Not requested |  | Requires a fresh explicit warning that bootstrap resets all Local Supabase and approval against the exact pushed P-35 checkpoint. |
+| P-37 WP-8 accept/hold | Owner | Not requested |  | Requires complete P-36 live evidence, realistic-scale/accessibility/recovery proof, independent intended-admin UAT, advisor disposition, and clean final invariants. |
 | P-11 exact artifact acceptance | Owner | Accepted exact TH Sarabun New 16 pt replacement PDF/Excel pair; WP-6 complete | 2026-07-11 22:20 +07 | Owner confirmed `รูปแบบ pdf excel ok เลยครับ` for the `777df75` pair after semantic and visual file QA; Production filing and P-12-P-15 remain separate |
 | P-20 identity/hash portability | Owner | Approved deterministic baseline identity from immutable Production-derived `price_list.id`; retain `identity_id` in lineage hash | 2026-07-11 12:11 +07 | WP-6.5C passed on `1ad01b9`; final candidate G1R/G2 inputs on `721c2c2` matched exactly and the comparator passed. WP-8/P-15 reruns remain. |
 | WP-6.5 Local-only start | Owner | Authorized | 2026-07-11 12:11 +07 | No unannounced Local reset, Production access/write, Factor F workflow change, hotfix scope expansion, placement UI, deploy, enablement, or publication |

@@ -68,6 +68,7 @@ describe('Master Catalog migration contracts', () => {
     expect(bootstrap).toContain('migrations/018_master_catalog_phase4_draft_mutation.sql')
     expect(bootstrap).toContain('migrations/019_master_catalog_phase4_publish_pointer.sql')
     expect(bootstrap).toContain('migrations/020_master_catalog_phase4_admin_workflow_hardening.sql')
+    expect(bootstrap).toContain('migrations/021_master_catalog_phase4_placement_governance.sql')
     expect(bootstrap).toContain('supabase/local/production-baseline.sql')
     expect(bootstrap).toContain('PUBLIC_DATA_SNAPSHOT=')
     expect(bootstrap).toContain('docker cp "$PUBLIC_DATA_SNAPSHOT"')
@@ -79,6 +80,7 @@ describe('Master Catalog migration contracts', () => {
     expect(bootstrap).toContain('psql -v ON_ERROR_STOP=1 -U postgres -d postgres -f /tmp/018.sql')
     expect(bootstrap).toContain('psql -v ON_ERROR_STOP=1 -U postgres -d postgres -f /tmp/019.sql')
     expect(bootstrap).toContain('psql -v ON_ERROR_STOP=1 -U postgres -d postgres -f /tmp/020.sql')
+    expect(bootstrap).toContain('psql -v ON_ERROR_STOP=1 -U postgres -d postgres -f /tmp/021.sql')
     expect(bootstrap).toContain("'factor_f_default_version'")
     expect(bootstrap).toContain("'factor_f_2569_row_count'")
     expect(bootstrap).toContain("'factor_f_partial_legacy_snapshots_remaining'")
@@ -447,7 +449,7 @@ describe('Master Catalog migration contracts', () => {
     expect(sql).not.toContain('SET factor_reference_version_id')
   })
 
-  it('implements bounded WP-7.5 placement governance without enabling or applying it', () => {
+  it('integrates bounded WP-7.5 placement governance without enabling it', () => {
     const sql = readMigration('021_master_catalog_phase4_placement_governance.sql')
 
     expect(sql).toContain('Migration 021: Master Catalog Phase 4 Placement Governance')
@@ -483,8 +485,8 @@ describe('Master Catalog migration contracts', () => {
     expect(sql).not.toContain('SET factor_reference_version_id')
 
     const bootstrap = readFileSync(resolve(process.cwd(), 'scripts/bootstrap-local-db.sh'), 'utf8')
-    expect(bootstrap).not.toContain('021_master_catalog_phase4_placement_governance.sql')
-    expect(bootstrap).not.toContain('/tmp/021.sql')
+    expect(bootstrap).toContain('021_master_catalog_phase4_placement_governance.sql')
+    expect(bootstrap).toContain('/tmp/021.sql')
   })
 
   it('keeps the Production snapshot outside the Supabase remote migration ledger', () => {

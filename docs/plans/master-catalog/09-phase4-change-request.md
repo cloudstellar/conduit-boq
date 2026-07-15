@@ -210,9 +210,10 @@ Supabase MCP verified after the Factor F rollout that root migrations `012`
 through `015` are applied, current Factor F default is `2569.0.0`, and legacy
 BOQs were not backfilled with a guessed Factor F version. Master Catalog Phase
 4 database migrations start at `017+`; the reviewed Local-only source chain is
-now `017`-`020` under P-28. P-29/G4E passed the first clean bootstrap execution
-of that combined chain on exact `15b707d`; none of these migrations is
-Production-approved.
+now `017`-`021` under P-35. P-29/G4E passed the first clean bootstrap execution
+through `020` on exact `15b707d`, and P-32 passed amended `021` separately. The
+first integrated clean execution through `021` remains pending P-36; none of
+these migrations is Production-approved.
 
 The detailed post-Factor-F difficulty assessment and adjusted implementation
 sequence are recorded in the
@@ -505,6 +506,8 @@ feature enablement, final catalog publication, or silent business-data choices.
 - [x] Migration is append-only `021`; `017`-`020` remain unchanged
 - [x] P-32 separately authorized the warned Local bootstrap/reset, separate
       `021` apply, same-scope fix-forward, and live evidence
+- [x] P-35 authorized and integrated unchanged amended `021` into the canonical
+      bootstrap source without running the destructive command
 
 The amended source and P-32 technical evidence now pass. The retained evidence
 JSON is `tmp/master-catalog/wp75-evidence/20260715-clean-chain-80b2574.json`
@@ -561,6 +564,8 @@ pretend a publishable candidate has been approved.
       performance/accessibility/recovery, and intended-admin evidence,
       otherwise the controls are hidden/disabled while the P-18 DB guard
       remains active
+- [x] P-35 source integration places exact amended `021` after `020`; P-36
+      integrated Local execution and P-37 WP-8 acceptance remain pending
 - [ ] Owner explicitly approves the Production migration window
 
 When all checks above are green, package the evidence for owner/verifier review

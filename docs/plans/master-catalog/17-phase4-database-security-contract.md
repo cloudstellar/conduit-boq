@@ -9,8 +9,8 @@ migration approval remain separate gates
 **Last updated:** 2026-07-15 to record the WP-6.6 capability/authority hardening
 from [Audit #29](./29-phase4-owner-dev-completeness-audit.md), the P-22
 [Operator Workflow Correction](./31-phase4-wp66-operator-workflow-correction-plan.md),
-and the accepted P-18/WP-7.5 placement extension. Existing `017`-`019` remain
-the reviewed Local/bootstrap contract. Candidate `020` was amended under P-22
+and the accepted P-18/WP-7.5 placement extension. Existing migrations remain
+append-only. Candidate `020` was amended under P-22
 and passed historical G1 DB/concurrency/lint/security evidence on `e463270`.
 P-23 first changed operator context/navigation only. Owner-approved P-23.1 then
 amended candidate `020` to enforce explicit ADR-003 intent-compatible next-number
@@ -39,9 +39,10 @@ is SHA-256 `e4de258756bbfbda0508e55d7b76ba2e907f644625b49bc29d4a4d7ac42fa714`.
 A fresh clean Local chain through `020`, separate amended `021` apply, and the
 P-32 DB/RLS/concurrency/order/hash/export/browser evidence then passed on source
 checkpoint `80b2574` plus UI checkpoint `99fa56c`. Cleanup restored the Local
-authority baseline. `021` remains outside bootstrap and has not been applied to
-Production; P-33 accepted the bounded Local technical checkpoint while WP-8
-UX/release evidence and bootstrap inclusion remain separate.
+authority baseline. P-35 now places unchanged amended `021` after `020` in the
+canonical Local bootstrap source; it has not been clean-executed through that
+integrated path or applied to Production. P-36 live WP-8 execution and P-37
+acceptance remain separate.
 
 **Owner decision recorded:** 2026-07-04 — approved according to the
 recommendation as the technical backbone for Phase 4A and every Phase 4 write
@@ -143,9 +144,10 @@ erDiagram
 ```
 
 The diagram is semantic. `CATALOG_PLACEMENT_REVIEWS` exists in the current
-P-32 Local state because `021` was applied separately after bootstrap and
-proved. It is not part of the canonical bootstrap and does not exist in
-Production. Exact foreign keys and deletion behavior are defined below.
+P-32 Local state because `021` was applied separately and proved. P-35 now
+includes unchanged `021` in the canonical bootstrap source, but P-36 integrated
+execution remains pending. The object does not exist in Production. Exact
+foreign keys and deletion behavior are defined below.
 
 ## 4. Design principles
 
@@ -521,9 +523,10 @@ snapshot. Neither action edits or deletes prior audit.
 ### 6.8 Owner-approved `catalog_placement_reviews` (P-18 / WP-7.5)
 
 P-30 accepted the five owner/data-custodian decisions in Review Note #28 on
-2026-07-15 01:37 +07. Implement this contract only as bounded Local-only source;
-do not weaken the current new-identity publish guard, add `021` to bootstrap,
-or apply/reset Local until the exact candidate passes its separate gate.
+2026-07-15 01:37 +07. P-32/P-33 proved and accepted the bounded technical
+candidate, and P-35 authorizes its bootstrap source integration. Do not weaken
+the current new-identity publish guard or reset/write Local until P-36 is
+separately warned and approved.
 
 Add `price_list_versions.placement_revision integer not null default 0` with a
 nonnegative check. Increment it only through reviewed draft functions whenever a
@@ -867,8 +870,8 @@ P-18 is accepted and the placement extension is implemented only in append-only
 migration `021_master_catalog_phase4_placement_governance.sql`. Do not edit or
 renumber `017`-`020`. P-32 passed separate Local apply/order/RLS/concurrency/
 hash/export/browser evidence, and P-33 accepted that bounded technical scope.
-Add `021` to bootstrap only after the reviewed inclusion/WP-8 decision, then
-rerun P-20, WP-7, and the full WP-8 clean rehearsal.
+P-35 adds unchanged `021` to bootstrap source. After the separately warned and
+approved P-36 decision, rerun P-20, WP-7, and the full WP-8 clean rehearsal.
 
 Do not edit an applied migration file. Forward-fix with a new reviewed
 migration.
