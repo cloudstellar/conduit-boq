@@ -77,6 +77,16 @@ authorized evidence reconciliation and one bounded no-reset continuation.
 now preserves the reusable evidence boundary and defines the pending Cards
 A-G, E-01/E-02/E-03, named performance budget, stop rules, and cleanup. No
 Local DB command or Production action was run during that reconciliation.
+[Preflight Note #36](./36-phase4-wp8-p38-no-reset-owner-uat-preflight.md)
+subsequently corrected E-01 to an unmapped Local candidate, verified the
+hash-bound E-01/E-02 binaries through the application ExcelJS dependency, and
+added fail-closed no-reset prepare/status/cleanup tooling. Read-only Local
+status matched the disabled baseline; mutating prepare and scored UAT remain
+pending. Focused P-38 checks passed 3 files/17 tests; the full suite passed 33
+files/185 tests; script syntax, TypeScript, lint with 0 errors/10 existing
+warnings, authority 710/65/17, exact pinned-input/provenance/cleanup contracts,
+and diff check passed. No build was rerun because application, dependency, and
+migration source are unchanged.
 **Prepared:** 2026-06-22
 **Production project:** `otlssvssvgkohqwuuiir`
 **Candidate version:** System-planned ADR-003 number; `2568.1.0` only when still
@@ -154,7 +164,7 @@ should link here rather than copy volatile evidence.
 | P-35 WP-8 bootstrap source integration | Owner + Codex | Passed on exact source checkpoint `01eba0d49f2e4b6e65f0d9dd287fd461ba9ea19a`; P-36 remained separately gated and later passed | 2026-07-15 15:42 +07 | Gate commit `43b75e3f0b0643d6f4e741fcc81ea8b0a6311a13`; unchanged amended `021` SHA-256 `e4de258756bbfbda0508e55d7b76ba2e907f644625b49bc29d4a4d7ac42fa714` is after `020`. Shell/Node syntax, focused 3 files/25 tests, full 33 files/183 tests, TypeScript, lint 0 errors/10 existing warnings, authority 710/65/17, dependency audit 0 vulnerabilities, diff check, and network-enabled build passed. No Local DB command or Production action. |
 | P-36 WP-8 destructive Local execution | Owner + Codex | Approved after explicit destructive-reset warning and passed for integrated technical scope | 2026-07-15 | Exact gate/execution checkout `910cc3cc74660beecf18655d39cd0b0c085d1fc6`; integrated bootstrap through `021`, named DB/regression/export/advisor/repository gates, realistic-scale route rendering, and disabled-baseline cleanup passed. Production touched: No. |
 | P-37 WP-8 accept/hold | Owner | HOLD for unresolved closure evidence; named technical, recovery, keyboard, focus, and presentation checks passed | 2026-07-17/18 | The insertion-gap correction preserves the DB contract. Complete owner keyboard/focus/presentation UAT passed without a placement submission on no-reset `2568.15.0`; final pushed checkpoint `f36d896d672609653de6634e307dcc44bce6d519` passed full verification and cleanup. Final owner UI submission, broader independent core-admin UAT, three safe-error recoveries, and named performance rows remain open. Add/Supplement stays hidden. See [P-37 UAT/UX Note](./33-phase4-wp8-p37-uat-ux-correction-note.md) and [Closure Matrix #34](./34-phase4-wp8-p37-closure-matrix.md). |
-| P-38 P-37 evidence reconciliation and bounded Owner UAT continuation | Owner + Codex | Approved for documentation alignment and no-reset Local preparation/execution only; P-37 not inferred | 2026-07-18 | [Owner UAT Script #35](./35-phase4-wp8-p37-evidence-reconciliation-and-owner-uat-script.md) maps retained evidence, names current-route Cards A-G, safe errors E-01/E-02/E-03, performance budget, and exact cleanup. Scored UAT remains pending; no reset, successful publication, P-19, Factor F/hotfix, or Production action authorized. |
+| P-38 P-37 evidence reconciliation and bounded Owner UAT continuation | Owner + Codex | Approved for documentation alignment and no-reset Local preparation/execution only; P-37 not inferred | 2026-07-18 | [Owner UAT Script #35](./35-phase4-wp8-p37-evidence-reconciliation-and-owner-uat-script.md) maps retained evidence and owns Cards A-G. [Preflight Note #36](./36-phase4-wp8-p38-no-reset-owner-uat-preflight.md) records corrected E-01/E-02 recipes, exact input hashes, tracked fail-closed commands, and a passing read-only disabled baseline. Mutating prepare/scored UAT remain pending; no reset, successful publication, P-19, Factor F/hotfix, or Production action authorized. |
 | P-11 exact artifact acceptance | Owner | Accepted exact TH Sarabun New 16 pt replacement PDF/Excel pair; WP-6 complete | 2026-07-11 22:20 +07 | Owner confirmed `รูปแบบ pdf excel ok เลยครับ` for the `777df75` pair after semantic and visual file QA; Production filing and P-12-P-15 remain separate |
 | P-20 identity/hash portability | Owner | Approved deterministic baseline identity from immutable Production-derived `price_list.id`; retain `identity_id` in lineage hash | 2026-07-11 12:11 +07 | WP-6.5C and final G1R/G2 comparison passed; P-36 repeated the same 710-row dataset/mapping after integrated `021`. Final P-15 acceptance remains separate. |
 | WP-6.5 Local-only start | Owner | Authorized | 2026-07-11 12:11 +07 | No unannounced Local reset, Production access/write, Factor F workflow change, hotfix scope expansion, placement UI, deploy, enablement, or publication |

@@ -150,6 +150,78 @@ describe('Master Catalog browser XLSX workbook adapter', () => {
     expect(normalized).not.toHaveProperty('factor_f_version')
   })
 
+  it('replaces mapped workbook authority fields and treats an unmapped valid code as a candidate add', async () => {
+    const arrayBuffer = await createWorkbookBuffer({
+      rows: [
+        validWorkbookRow({
+          description_th: 'ข้อความที่ไฟล์พยายามเปลี่ยน',
+          material_cost: '999.00',
+          labor_cost: '1.00',
+          total_cost: '1000.00',
+        }),
+        validWorkbookRow({
+          item_code: 'AAA-BBB-998',
+          source_row: '3',
+          description_th: 'รายการทดสอบ Local เท่านั้น',
+        }),
+      ],
+    })
+    const parsed = await parseCatalogWorkbookInfoFromXlsx({
+      filename: 'p38-parser-trust-boundary.xlsx',
+      sizeBytes: arrayBuffer.byteLength,
+      arrayBuffer,
+    })
+    const context: ParseContext = {
+      authoritativeRowBySourceCode: {
+        'AAA-BBB-001': {
+          sourceRow: 1,
+          sourceReference: 'production:ITEM-0001',
+          sourceItemCode: 'AAA-BBB-001',
+          legacyItemCode: 'ITEM-0001',
+          canonicalCode: 'AAA-BBB-001',
+          targetIdentityId: '00000000-0000-4000-8000-000000000001',
+          workContextCode: 'AAA',
+          workContextNameTh: 'กลุ่มงานที่รับรอง',
+          itemTypeCode: 'BBB',
+          itemTypeNameTh: 'ชนิดที่รับรอง',
+          itemName: 'ชื่อจาก Production authority',
+          unit: 'ม.',
+          materialCost: '100.00',
+          laborCost: '25.00',
+          unitCost: '125.00',
+          categoryCode: '1.1',
+          categoryId: '00000000-0000-4000-8000-000000000002',
+          codeGroupId: '00000000-0000-4000-8000-000000000003',
+          identityOutcome: 'recode',
+          priceAuthorityReference: null,
+        },
+      },
+      categoryCodeByGroup: { 'AAA-BBB': '1.1' },
+      categoryIdByCode: { '1.1': '00000000-0000-4000-8000-000000000002' },
+      codeGroupIdByGroup: { 'AAA-BBB': '00000000-0000-4000-8000-000000000003' },
+    }
+    const [mappedRow, candidateRow] = parsed.workbookInfo.sheets[0].dataRows
+      .map((row) => NT_ITEM_MASTER_2568_PROFILE.normalizeRow(row, context))
+
+    expect(mappedRow).toMatchObject({
+      sourceRow: 2,
+      sourceReference: '01_Item_Master_Final:2',
+      itemName: 'ชื่อจาก Production authority',
+      materialCost: '100.00',
+      laborCost: '25.00',
+      unitCost: '125.00',
+      identityOutcome: 'recode',
+    })
+    expect(candidateRow).toMatchObject({
+      sourceRow: 3,
+      canonicalCode: 'AAA-BBB-998',
+      itemName: 'รายการทดสอบ Local เท่านั้น',
+      identityOutcome: 'candidate_add',
+      categoryId: '00000000-0000-4000-8000-000000000002',
+      codeGroupId: '00000000-0000-4000-8000-000000000003',
+    })
+  })
+
   it('passes exact profile detection failures through WorkbookInfo for wrong sheet/header and row overrun', async () => {
     const wrongSheetBuffer = await createWorkbookBuffer({ sheetName: 'Wrong Sheet' })
     const wrongSheet = await parseCatalogWorkbookInfoFromXlsx({

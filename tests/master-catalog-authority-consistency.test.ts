@@ -162,6 +162,18 @@ describe('Master Catalog authority consistency', () => {
     expect(packageJson.scripts?.['db:local:smoke-master-catalog-wp75']).toBe(
       'node --env-file=.env.development.local --env-file=supabase/.env.local scripts/smoke-master-catalog-wp75.mjs',
     )
+    expect(packageJson.scripts?.['db:local:p38:verify-inputs']).toBe(
+      'node scripts/manage-master-catalog-p38-owner-uat.mjs verify-inputs',
+    )
+    expect(packageJson.scripts?.['db:local:p38:prepare']).toBe(
+      'node --env-file=.env.development.local --env-file=supabase/.env.local scripts/manage-master-catalog-p38-owner-uat.mjs prepare',
+    )
+    expect(packageJson.scripts?.['db:local:p38:status']).toBe(
+      'node --env-file=.env.development.local --env-file=supabase/.env.local scripts/manage-master-catalog-p38-owner-uat.mjs status',
+    )
+    expect(packageJson.scripts?.['db:local:p38:cleanup']).toBe(
+      'node --env-file=.env.development.local --env-file=supabase/.env.local scripts/manage-master-catalog-p38-owner-uat.mjs cleanup',
+    )
     expect(existsSync(resolve(
       root,
       'scripts/smoke-master-catalog-wp66.mjs',
@@ -178,6 +190,34 @@ describe('Master Catalog authority consistency', () => {
     expect(wp7Smoke).toContain('approvedSuffixesPassed: true')
     expect(wp7Smoke).toContain('crossVersionItemRejectedAtomically: true')
     expect(wp7Smoke).toContain('productionTouched: false')
+    expect(existsSync(resolve(
+      root,
+      'scripts/manage-master-catalog-p38-owner-uat.mjs',
+    ))).toBe(true)
+    const p38Harness = read('scripts/manage-master-catalog-p38-owner-uat.mjs')
+    expect(p38Harness).toContain("const MARKER = 'LOCAL-UAT-ONLY-NOT-AUTHORITY'")
+    expect(p38Harness).toContain('assertTrackedTreeClean()')
+    expect(p38Harness).toContain('assertHeadPushed()')
+    expect(p38Harness).toContain('P-38 prepare requires branch codex/master-catalog-phase4')
+    expect(p38Harness).toContain('P-38 requires HEAD to match the pushed upstream checkpoint')
+    expect(p38Harness).toContain('metadata.sourceHead === gitHead()')
+    expect(p38Harness).toContain(
+      '1296f1056f6c1cd768b23c5ac3e6c00462dce018c3bb7710f62c067ee0e63b92',
+    )
+    expect(p38Harness).toContain(
+      'sha256:2e3571ea7135fbc0bbb84c8cc330af1173e4c1d2345e5eb59958dc76e45558b8',
+    )
+    expect(p38Harness).toContain("catalog_retirement_enabled: false")
+    expect(p38Harness).toContain("createdVersions.length === 2")
+    expect(p38Harness).toContain("version.status === 'abandoned'")
+    expect(p38Harness).toContain(
+      'cleanup restored Local flags before refusing evidence closure',
+    )
+    expect(p38Harness).toContain('must be a loopback URL for Local-only P-38 work')
+    expect(p38Harness).not.toContain(".rpc(")
+    expect(p38Harness).not.toContain('create_catalog_draft')
+    expect(p38Harness).not.toContain('abandon_catalog_draft')
+    expect(p38Harness).not.toContain('db:local:bootstrap')
   })
 
   it('keeps work-package sequencing and owner decisions explicit', () => {
@@ -267,7 +307,7 @@ describe('Master Catalog authority consistency', () => {
       'Approved and technically passed 2026-07-15 on exact gate/execution checkout `910cc3cc74660beecf18655d39cd0b0c085d1fc6`; Local only; interaction/UAT acceptance remains P-37',
     )
     expect(decisions).toContain(
-      'Approved 2026-07-18 for the bounded no-reset Local continuation only; evidence reconciliation completed, scored Owner UAT and cleanup still pending',
+      'Approved 2026-07-18 for the bounded no-reset Local continuation only; evidence reconciliation plus fail-closed tooling/input verification/read-only baseline completed; mutating prepare, scored Owner UAT, and cleanup still pending',
     )
     expect(decisions).toContain('| L-57 |')
     expect(decisions).toContain('| L-58 |')
@@ -522,6 +562,9 @@ describe('Master Catalog authority consistency', () => {
       expect(p37OwnerUat).toContain(contract)
     }
     expect(p37OwnerUat).toContain('This UAT requires no clean reset')
+    expect(p37OwnerUat).toContain('npm run db:local:p38:verify-inputs')
+    expect(p37OwnerUat).toContain('CIC-PVC-998')
+    expect(p37OwnerUat).toContain('changing only a known mapped')
     expect(p37OwnerUat).toMatch(/Production `2568\.0\.0`\s+remains authority/)
     expect(p37OwnerUat).toContain('Do not perform a successful publication')
     expect(p37OwnerUat).toMatch(/Do not run\s+`npm run db:local:bootstrap`/)
@@ -531,7 +574,30 @@ describe('Master Catalog authority consistency', () => {
     )
     expect(verificationReport).toContain('P-38 P-37 evidence reconciliation')
     expect(threatModel).toContain('| T-52 |')
+    expect(threatModel).toContain('| T-53 |')
     expect(threatModel).toContain('Owner UAT Script #35')
+    expect(existsSync(resolve(
+      root,
+      'docs/plans/master-catalog/36-phase4-wp8-p38-no-reset-owner-uat-preflight.md',
+    ))).toBe(true)
+    const p38Preflight = read(
+      'docs/plans/master-catalog/36-phase4-wp8-p38-no-reset-owner-uat-preflight.md',
+    )
+    for (const contract of [
+      'P-37 remains **HOLD**',
+      'IMPORT_PRICE_AUTHORITY_REQUIRED',
+      'IMPORT_RETIREMENT_APPROVAL_REQUIRED',
+      '`CIC-PVC-998`',
+      'npm run db:local:p38:verify-inputs',
+      'npm run db:local:p38:cleanup',
+      'No Local reset',
+      'Production touched',
+    ]) {
+      expect(p38Preflight).toContain(contract)
+    }
+    expect(p38Preflight).toMatch(
+      /It never\s+creates, edits, publishes, or abandons a draft/,
+    )
     expect(existsSync(resolve(
       root,
       'docs/plans/master-catalog/30-phase4-wp66-owner-review-note.md',
@@ -805,6 +871,7 @@ describe('Master Catalog authority consistency', () => {
       'docs/plans/master-catalog/33-phase4-wp8-p37-uat-ux-correction-note.md',
       'docs/plans/master-catalog/34-phase4-wp8-p37-closure-matrix.md',
       'docs/plans/master-catalog/35-phase4-wp8-p37-evidence-reconciliation-and-owner-uat-script.md',
+      'docs/plans/master-catalog/36-phase4-wp8-p38-no-reset-owner-uat-preflight.md',
     ]) {
       expectRelativeMarkdownLinksToExist(path)
       expectMarkdownTablesToBeWellShaped(path)

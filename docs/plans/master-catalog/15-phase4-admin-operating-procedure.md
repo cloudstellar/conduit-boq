@@ -530,6 +530,14 @@ hold, and E-03 stale final review as the three non-destructive errors. Stale
 placement and uncertain response are recorded separately and are not
 double-counted.
 
+The developer must first follow
+[Preflight Note #36](./36-phase4-wp8-p38-no-reset-owner-uat-preflight.md): run
+`db:local:p38:verify-inputs` and read-only `status`, then run `prepare` only on
+the exact clean pushed checkpoint. E-01 uses one valid but unmapped Local
+candidate because mapped workbook names/units/prices are replaced by
+Production authority during parsing. The harness never creates or abandons an
+Owner draft and keeps retirement disabled.
+
 Developer DB/transport fault-injection evidence may prepare and verify the
 uncertain-response example, but it does not substitute for the intended admin
 recognizing the message and completing the recovery through the UI.

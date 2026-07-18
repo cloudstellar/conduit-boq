@@ -192,6 +192,11 @@ the remaining gates are in
 P-38 completed evidence reconciliation and authorized only the bounded no-reset
 Local continuation in
 [Owner UAT Script #35](../plans/master-catalog/35-phase4-wp8-p37-evidence-reconciliation-and-owner-uat-script.md).
+[Preflight Note #36](../plans/master-catalog/36-phase4-wp8-p38-no-reset-owner-uat-preflight.md)
+records parser-aware E-01/E-02 inputs, a tracked fail-closed harness, and the
+passing read-only disabled Local baseline; mutating prepare and Owner Cards are
+still pending. The harness adds no migration and does not alter migration
+history.
 No migration or DB/RPC contract changed.
 Applied hotfix `016` must not be edited.
 This is not a new Production hotfix and must not be applied to Production

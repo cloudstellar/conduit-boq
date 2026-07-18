@@ -1,9 +1,12 @@
 # Phase 4 WP-8 P-37 Evidence Reconciliation and Owner UAT Script
 
-**Status:** Evidence reconciliation complete; P-37 remains **HOLD**. This note
-defines the smallest current-route Owner UAT that can close Closure Matrix #34
-C-07 through C-11 without repeating evidence that already proves the same
-actor-independent contract.
+**Status:** Evidence reconciliation and the fail-closed developer preflight
+design are complete; P-37 remains **HOLD**. The read-only Local baseline and
+untracked input manifest passed, while the mutating prepare step and all Owner
+Cards remain pending. See [Preflight Note #36](./36-phase4-wp8-p38-no-reset-owner-uat-preflight.md).
+This note defines the smallest current-route Owner UAT that can close Closure
+Matrix #34 C-07 through C-11 without repeating evidence that already proves
+the same actor-independent contract.
 
 **Environment:** Local only, no reset. Production access/write, successful
 publication or pointer movement, feature enablement outside the temporary Local
@@ -59,15 +62,19 @@ because this note cites them.
 Run this section before handing the browser to the Owner.
 
 1. Confirm branch `codex/master-catalog-phase4`, exact pushed HEAD, and a clean
-   tracked tree. Ignore and do not stage `files/`, `tmp/`, or `output/`.
+   tracked tree. Ignore and do not stage `files/`, `tmp/`, or `output/`. Run
+   `npm run db:local:p38:verify-inputs` and
+   `npm run db:local:p38:status`; both must pass before `prepare`.
 2. Read the Local baseline without mutation: pointer `2568.0.0`, 710 rows, zero
    working drafts, all catalog flags `false`, BOQ/BOQ-item counts unchanged,
    and Factor F default `2569.0.0` with 36 rows.
 3. Confirm Local Supabase and the Local app are healthy. Do not run
    `npm run db:local:bootstrap`; this UAT must not reset Local Supabase.
-4. Enable only the temporary Local admin and new-identity capabilities needed
-   by the script. Keep the retirement capability disabled; retirement is
-   previewed as a safe hold and is never applied.
+4. Run `npm run db:local:p38:prepare`. The tracked harness must enable only the
+   temporary Local admin and new-identity capabilities needed by the script.
+   Keep the retirement capability disabled; retirement is previewed as a safe
+   hold and is never applied. The harness must not create or abandon either
+   Owner draft.
 5. Record the exact signed-in active-admin email, browser/version, device,
    viewport, Local URL, source HEAD, and start time.
 6. Prepare untracked, hash-recorded test inputs:
@@ -76,12 +83,17 @@ Run this section before handing the browser to the Owner.
      frozen reconciliation context must resolve to the 710-row authority
      payload, while Production `2568.0.0` remains authority for names, units,
      and prices;
-   - E-01, a Local-only derivative with one deliberate authority-field change;
+   - E-01, a Local-only derivative that replaces one frozen-mapped source code
+     with one valid but unmapped candidate code; changing only a known mapped
+     name/unit/price is not a valid test because the parser replaces those
+     fields with Production authority;
    - E-02, a Local-only derivative with at least the exact retirement-threshold
      number of mapped identities omitted;
    - one official review-export workbook for the optional wrong-profile check.
 7. Mark every derivative `LOCAL-UAT-ONLY-NOT-AUTHORITY`; never apply E-01 or
    E-02. Record file SHA-256 values and the expected diagnostic before use.
+   The exact recipes/hashes and compatibility verification are controlled by
+   [Preflight Note #36](./36-phase4-wp8-p38-no-reset-owner-uat-preflight.md).
 8. Supply three exact existing search examples representing the first, middle,
    and last portions of the 710-row catalog. Do not tell the Owner where the UI
    controls are or what result to select.
@@ -141,12 +153,17 @@ retired or deleted.
    be visible as draft-only Full-import retire/omission candidates. Do not
    apply the import.
 3. E-01: select the invalid-authority derivative with no authority reference.
-   Record the Thai rejection and zero-write state. Add the clearly Local-only
-   authority reference, rerun validation, and stop before Apply.
+   It replaces mapped `CIC-PVC-001` with unmapped Local candidate
+   `CIC-PVC-998`; it does not merely change a trusted mapped price. Record the
+   Thai `IMPORT_PRICE_AUTHORITY_REQUIRED` rejection and zero-write state. Add
+   the clearly Local-only authority reference, rerun server review, confirm
+   that retirement remains disabled and Apply is unavailable, then stop.
 4. E-02: select the retirement-hold derivative with no retirement approval or
-   confirmed count. Record the Thai rejection and zero-write state. Enter the
-   exact derived count plus Local-only approval reference, rerun validation,
-   and confirm Apply remains unused/disabled for this UAT.
+   confirmed count. It omits 15 frozen-mapped rows; after Card B the expected
+   server count is 17 because the two remaining Local-only identities are also
+   absent. Record the Thai rejection and zero-write state. Enter the exact
+   count displayed by the server plus Local-only approval reference, rerun
+   validation, and confirm Apply remains unavailable for this UAT.
 5. Return to the draft workspace without applying any import.
 
 Pass: the Owner can explain source authority, Full/Supplement, omissions,
@@ -258,7 +275,8 @@ the affected card on a fresh bounded fixture.
 
 After Card G:
 
-1. Disable/restore all temporary Local feature flags.
+1. Run `npm run db:local:p38:cleanup`. It must restore all temporary Local
+   feature flags and must fail closed rather than abandon an Owner draft.
 2. Read back pointer `2568.0.0`/710, zero working drafts, all catalog flags
    `false`, unchanged BOQ/BOQ-item invariants, and Factor F `2569.0.0`/36.
 3. Confirm every rejected error produced zero unintended effect, the placement

@@ -17,6 +17,9 @@
   UAT, three safe-error recoveries และ named import-preview/publish-readiness
   interaction baselines ยังต้องปิดตาม
   [Owner UAT Script #35](./35-phase4-wp8-p37-evidence-reconciliation-and-owner-uat-script.md).
+  [Preflight Note #36](./36-phase4-wp8-p38-no-reset-owner-uat-preflight.md)
+  บันทึก corrected safe-error inputs, tracked no-reset harness และ read-only
+  baseline ที่ผ่านแล้ว; mutating prepare/Owner Cards ยังไม่รัน.
   P-38 อนุมัติเฉพาะ bounded no-reset Local continuation; Add/Supplement ยังซ่อน
   และ Production P-12 ถึง P-15 ยังไม่ได้อนุมัติ. ใช้ Tracker เป็น authority
   ของ volatile status และใช้ Verification Report เป็น authority ของหลักฐานละเอียด**
@@ -40,16 +43,17 @@
 11. [P-18 Placement Governance Review Note](./28-phase4-p18-placement-governance-review-note.md) — ตรวจข้อเสนอ narrow-scope สำหรับรายการใหม่ก่อนอนุมัติ WP-7.5
 12. [WP-8 P-37 Closure Matrix](./34-phase4-wp8-p37-closure-matrix.md) — เทียบ exit gate กับหลักฐานและระบุ UAT ที่ยังขาดโดยไม่ตีความเกินหลักฐาน
 13. [WP-8 P-37 Evidence Reconciliation and Owner UAT Script](./35-phase4-wp8-p37-evidence-reconciliation-and-owner-uat-script.md) — ใช้เป็นสคริปต์เดียวสำหรับ Owner Cards A-G, safe errors, performance และ cleanup
-14. [Reconciliation Report](./11-phase4-reconciliation-report.md) — ตรวจว่าข้อมูล 710/708 ถูกจัดการอย่างไร
-15. [Code Dictionary](./10-phase4-structured-code-dictionary.md) — ตรวจความหมาย AAA/TTT และจุดผิด 16 Crossing
-16. [Database/Security Contract](./17-phase4-database-security-contract.md) — ตรวจ schema, RLS/grants, function และ migration order
-17. [Lean Threat Model](./18-phase4-threat-model.md) — ตรวจความเสี่ยง/control/หลักฐานทดสอบ
-18. [Parser/Hash Specification](./14-phase4-parser-and-canonical-hash-spec.md) — สัญญาเชิงเทคนิคที่ทำให้ import/export ทำซ้ำได้
-19. [Official Export Specification](./20-phase4-official-export-spec.md) — อนุมัติรูปแบบ Excel/PDF, stamp และ hash
-20. [Production Runbook](./12-phase4-production-runbook.md) — ขั้นตอนจริง จุดหยุด และ rollback
-21. [Verification Report](./13-phase4-verification-report.md) — หลักฐานที่ต้องกรอกเมื่อ implement/rollout
-22. [Admin Operating Procedure](./15-phase4-admin-operating-procedure.md) — วิธีใช้งานของผู้ดูแลระบบ
-23. [Release Note Template](./16-phase4-release-note-template.md) — เอกสารต่อหนึ่งเวอร์ชันที่ publish
+14. [WP-8 P-38 No-reset Owner UAT Preflight](./36-phase4-wp8-p38-no-reset-owner-uat-preflight.md) — corrected E-01/E-02, input hashes, tracked fail-closed commands และ read-only Local baseline
+15. [Reconciliation Report](./11-phase4-reconciliation-report.md) — ตรวจว่าข้อมูล 710/708 ถูกจัดการอย่างไร
+16. [Code Dictionary](./10-phase4-structured-code-dictionary.md) — ตรวจความหมาย AAA/TTT และจุดผิด 16 Crossing
+17. [Database/Security Contract](./17-phase4-database-security-contract.md) — ตรวจ schema, RLS/grants, function และ migration order
+18. [Lean Threat Model](./18-phase4-threat-model.md) — ตรวจความเสี่ยง/control/หลักฐานทดสอบ
+19. [Parser/Hash Specification](./14-phase4-parser-and-canonical-hash-spec.md) — สัญญาเชิงเทคนิคที่ทำให้ import/export ทำซ้ำได้
+20. [Official Export Specification](./20-phase4-official-export-spec.md) — อนุมัติรูปแบบ Excel/PDF, stamp และ hash
+21. [Production Runbook](./12-phase4-production-runbook.md) — ขั้นตอนจริง จุดหยุด และ rollback
+22. [Verification Report](./13-phase4-verification-report.md) — หลักฐานที่ต้องกรอกเมื่อ implement/rollout
+23. [Admin Operating Procedure](./15-phase4-admin-operating-procedure.md) — วิธีใช้งานของผู้ดูแลระบบ
+24. [Release Note Template](./16-phase4-release-note-template.md) — เอกสารต่อหนึ่งเวอร์ชันที่ publish
 
 ระหว่าง implementation ให้ใช้
 [Execution Progress Tracker](./25-phase4-execution-progress-tracker.md)
@@ -73,6 +77,7 @@
 | Admin workflow and UAT | [Admin Operating Procedure](./15-phase4-admin-operating-procedure.md) |
 | WP-8/P-37 gate closure and remaining UAT | [P-37 Closure Matrix #34](./34-phase4-wp8-p37-closure-matrix.md) |
 | WP-8/P-37 evidence reuse, Owner tasks, safe errors, performance budget และ cleanup | [Owner UAT Script #35](./35-phase4-wp8-p37-evidence-reconciliation-and-owner-uat-script.md) |
+| WP-8/P-38 reproducible inputs, no-reset preflight/cleanup และ exact Local baseline | [Preflight Note #36](./36-phase4-wp8-p38-no-reset-owner-uat-preflight.md) |
 | End-to-end capability completeness and release visibility | [Completeness Audit #29](./29-phase4-owner-dev-completeness-audit.md) |
 | One-working-draft, abandon และ final snapshot review | [P-22 Correction Plan #31](./31-phase4-wp66-operator-workflow-correction-plan.md) |
 | Version intent, reserved sequence และ item-first/create/restore correction | ADR-003 และ [P-22/P-23.1 Correction Plan #31](./31-phase4-wp66-operator-workflow-correction-plan.md) |

@@ -137,6 +137,11 @@ is the current Section 16 closure script: Cards A-G, three separately named
 safe errors, same-session stale placement, uncertain response, 710-row import/
 readiness measurements, and exact cleanup. P-38 authorizes no reset, successful
 publication, P-37 acceptance, P-19, Factor F/hotfix, or Production action.
+[Preflight Note #36](./36-phase4-wp8-p38-no-reset-owner-uat-preflight.md)
+records the corrected unmapped-candidate E-01, 15-omission E-02, exact binary
+hashes, tracked fail-closed Local commands, and passing read-only disabled
+baseline. Commit/push that checkpoint before running mutating `prepare`; the
+Owner must still create/abandon both drafts and complete Cards A-G.
 
 **P-22 operator-workflow correction authorized:** 2026-07-12 — intended-admin
 review placed WP-6.6 closeout on Hold and accepted
