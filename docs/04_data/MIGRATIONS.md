@@ -189,6 +189,9 @@ open under Closure Matrix #34 before any P-37 decision. The evidence is recorded
 [P-37 UAT and UX Correction Note](../plans/master-catalog/33-phase4-wp8-p37-uat-ux-correction-note.md);
 the remaining gates are in
 [P-37 Closure Matrix](../plans/master-catalog/34-phase4-wp8-p37-closure-matrix.md).
+P-38 completed evidence reconciliation and authorized only the bounded no-reset
+Local continuation in
+[Owner UAT Script #35](../plans/master-catalog/35-phase4-wp8-p37-evidence-reconciliation-and-owner-uat-script.md).
 No migration or DB/RPC contract changed.
 Applied hotfix `016` must not be edited.
 This is not a new Production hotfix and must not be applied to Production

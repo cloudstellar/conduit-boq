@@ -128,6 +128,16 @@ safe-error recoveries, and named import-preview/publish-readiness interaction
 evidence. P-37 remains HOLD. See [Review Note #33](./33-phase4-wp8-p37-uat-ux-correction-note.md)
 and [Closure Matrix #34](./34-phase4-wp8-p37-closure-matrix.md).
 
+**P-38 evidence reconciliation and no-reset continuation recorded:**
+2026-07-18 — the owner instructed the team to continue with the recommended
+evidence-first path. Reconciliation retained actor-independent P-36/P-37/G1R/
+G3/P-26/WP-4 evidence without converting it into intended-admin evidence.
+[Owner UAT Script #35](./35-phase4-wp8-p37-evidence-reconciliation-and-owner-uat-script.md)
+is the current Section 16 closure script: Cards A-G, three separately named
+safe errors, same-session stale placement, uncertain response, 710-row import/
+readiness measurements, and exact cleanup. P-38 authorizes no reset, successful
+publication, P-37 acceptance, P-19, Factor F/hotfix, or Production action.
+
 **P-22 operator-workflow correction authorized:** 2026-07-12 — intended-admin
 review placed WP-6.6 closeout on Hold and accepted
 [Correction Plan #31](./31-phase4-wp66-operator-workflow-correction-plan.md).

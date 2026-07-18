@@ -281,8 +281,9 @@ core-admin UAT, three safe validation-error recoveries, and named import-
 preview/publish-readiness interaction baselines also remain unclosed.
 
 [Closure Matrix #34](./34-phase4-wp8-p37-closure-matrix.md) is authoritative
-for the remaining path. First reconcile reusable evidence, then run only the
-missing rows in one bounded no-reset Local owner session. Do not run
+for gate status. P-38 completed the evidence reconciliation; use
+[Owner UAT Script #35](./35-phase4-wp8-p37-evidence-reconciliation-and-owner-uat-script.md)
+for the remaining Cards A-G in one bounded no-reset Local owner session. Do not run
 `npm run db:local:bootstrap`; if a reset becomes necessary, stop for a new
 explicit destructive-reset approval.
 

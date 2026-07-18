@@ -244,6 +244,7 @@ describe('Master Catalog authority consistency', () => {
     )
     expect(decisions).toContain('| P-36 |')
     expect(decisions).toContain('| P-37 |')
+    expect(decisions).toContain('| P-38 |')
     expect(decisions).toContain(
       'P-37 first intended-admin UAT result recorded',
     )
@@ -264,6 +265,9 @@ describe('Master Catalog authority consistency', () => {
     )
     expect(decisions).toContain(
       'Approved and technically passed 2026-07-15 on exact gate/execution checkout `910cc3cc74660beecf18655d39cd0b0c085d1fc6`; Local only; interaction/UAT acceptance remains P-37',
+    )
+    expect(decisions).toContain(
+      'Approved 2026-07-18 for the bounded no-reset Local continuation only; evidence reconciliation completed, scored Owner UAT and cleanup still pending',
     )
     expect(decisions).toContain('| L-57 |')
     expect(decisions).toContain('| L-58 |')
@@ -487,7 +491,7 @@ describe('Master Catalog authority consistency', () => {
       '| C-11 | 710-row performance baseline |',
       '| C-12 | Documentation consistency |',
       '| Passed | Keep the consistency assertions green',
-      '**ยืนยันและบันทึกตำแหน่ง** exactly once through the UI',
+      'one rejected stale attempt with zero effect, then exactly one accepted UI batch/change set',
       'does not require `npm run db:local:bootstrap`',
     ]) {
       expect(p37Closure).toContain(contract)
@@ -498,7 +502,36 @@ describe('Master Catalog authority consistency', () => {
     expect(executionPack).toContain(
       'an intended admin/data custodian completes the',
     )
+    expect(existsSync(resolve(
+      root,
+      'docs/plans/master-catalog/35-phase4-wp8-p37-evidence-reconciliation-and-owner-uat-script.md',
+    ))).toBe(true)
+    const p37OwnerUat = read(
+      'docs/plans/master-catalog/35-phase4-wp8-p37-evidence-reconciliation-and-owner-uat-script.md',
+    )
+    for (const contract of [
+      'P-37 remains **HOLD**',
+      'without live developer or SQL guidance',
+      'E-01 invalid authority',
+      'E-02 retirement hold',
+      'E-03 stale final review',
+      'one rejected stale attempt with zero effect, then exactly one accepted UI batch/change set',
+      '**ปรับในหน้านี้ · ยังไม่บันทึก**',
+      'Full 710-row client preparation plus server diff',
+    ]) {
+      expect(p37OwnerUat).toContain(contract)
+    }
+    expect(p37OwnerUat).toContain('This UAT requires no clean reset')
+    expect(p37OwnerUat).toMatch(/Production `2568\.0\.0`\s+remains authority/)
+    expect(p37OwnerUat).toContain('Do not perform a successful publication')
+    expect(p37OwnerUat).toMatch(/Do not run\s+`npm run db:local:bootstrap`/)
+    expect(p37OwnerUat).not.toContain('technical evidence is accepted as Owner evidence')
+    expect(tracker).toContain(
+      'P-38 evidence reconciliation and Owner UAT Script #35 complete',
+    )
+    expect(verificationReport).toContain('P-38 P-37 evidence reconciliation')
     expect(threatModel).toContain('| T-52 |')
+    expect(threatModel).toContain('Owner UAT Script #35')
     expect(existsSync(resolve(
       root,
       'docs/plans/master-catalog/30-phase4-wp66-owner-review-note.md',
@@ -771,6 +804,7 @@ describe('Master Catalog authority consistency', () => {
       'docs/plans/master-catalog/32-phase4-wp8-p36-owner-review-note.md',
       'docs/plans/master-catalog/33-phase4-wp8-p37-uat-ux-correction-note.md',
       'docs/plans/master-catalog/34-phase4-wp8-p37-closure-matrix.md',
+      'docs/plans/master-catalog/35-phase4-wp8-p37-evidence-reconciliation-and-owner-uat-script.md',
     ]) {
       expectRelativeMarkdownLinksToExist(path)
       expectMarkdownTablesToBeWellShaped(path)

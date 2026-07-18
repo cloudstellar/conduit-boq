@@ -20,7 +20,11 @@ HOLD for that final independent submission plus the broader core-admin,
 safe-error, and performance rows in
 [Closure Matrix #34](./34-phase4-wp8-p37-closure-matrix.md). P-19 when triggered
 and all Production gates remain pending. The Local UI must not be treated as
-Production-ready until those gates pass.
+Production-ready until those gates pass. P-38 completed evidence reconciliation
+and authorizes one bounded no-reset continuation. The current scored sequence,
+named safe errors, measurement budget, and cleanup are in
+[Owner UAT Script #35](./35-phase4-wp8-p37-evidence-reconciliation-and-owner-uat-script.md);
+this section remains the general operating contract.
 **Audience:** Active Master Catalog administrators
 **Rule:** A draft is not official; published versions are immutable
 
@@ -517,6 +521,14 @@ Use only when a published current version must stop being used for new BOQs.
 
 An intended active admin/data custodian, not the implementer, must complete this
 script on the approved Local/preview environment:
+
+For the current P-37 closure run, execute Cards A-G in
+[Owner UAT Script #35](./35-phase4-wp8-p37-evidence-reconciliation-and-owner-uat-script.md)
+instead of improvising from this general checklist. Note #35 reuses only
+actor-independent evidence and requires E-01 invalid authority, E-02 retirement
+hold, and E-03 stale final review as the three non-destructive errors. Stale
+placement and uncertain response are recorded separately and are not
+double-counted.
 
 Developer DB/transport fault-injection evidence may prepare and verify the
 uncertain-response example, but it does not substitute for the intended admin

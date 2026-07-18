@@ -15,9 +15,11 @@ Add/Supplement, or infer Production readiness until every open row below is
 closed or carries an explicit owner risk acceptance with rationale, owner, and
 due date.
 
-**Environment:** Documentation/evidence reconciliation only. No Local reset,
-Local database mutation, feature enablement, publication, Production access,
-Factor F work, hotfix expansion, or P-19 decision is authorized by this note.
+**Current continuation:** Evidence reconciliation is complete in
+[Owner UAT Script #35](./35-phase4-wp8-p37-evidence-reconciliation-and-owner-uat-script.md).
+P-38 authorizes its bounded no-reset Local preparation and scored Owner UAT.
+It does not authorize Local reset, successful publication, Production access,
+Factor F work, hotfix expansion, or P-19.
 
 ## 1. Why this matrix exists
 
@@ -50,52 +52,31 @@ Local cleanup.
 | C-04 | Security/performance advisor blocker review | P-36 returned no security blocker; baseline performance findings and the unused `v_row_count` are assigned to P-12 with owners and rationale | Passed for P-37 | Reassess/minimize before P-12; this is not a Production waiver |
 | C-05 | Repository/source quality | Exact source `f36d896d672609653de6634e307dcc44bce6d519` passed 33 files/184 tests, TypeScript, lint with 0 errors/10 existing warnings, authority 710/65/17, production build, and diff check | Passed | Rerun after any source change |
 | C-06 | Placement comprehension, review by exception, keyboard, focus, and final presentation | Owner passed all named overview/gap/sibling/leave-reload/keyboard/focus/previous-new-next checks on no-reset `2568.15.0` | Passed for the exercised path | Do not repeat these controls unless the UI changes |
-| C-07 | One complete independent placement task | Technical automation/RPC submitted and read back one accepted batch; the owner UI session reached final review but never activated **ยืนยันและบันทึกตำแหน่ง** | Open | In one bounded owner session, submit once through the UI, observe the accepted state, then prove a later local edit returns to **ยังไม่บันทึก** without duplicate effects |
-| C-08 | Stale-placement recovery inside the independent owner task | Technical continuation proved stale rejection; owner separately proved leave/reload recovery and final review | Partial | Include one safe stale response and recovery in the same independent UAT session without developer/SQL intervention |
-| C-09 | Independent core-admin UAT | G1R/G3/P-26 and P-36 prove version planning, item edit, import context, final review, publish guards, export, abandon, and recovery technically; current authority still labels broader independent UAT incomplete | Open | Reconcile existing evidence, then have the intended admin complete only the missing create/import/manual/history/final-review/publish-readiness/review-export steps from an approved script without live developer help |
-| C-10 | At least three safe validation-error recoveries | Several technical error paths exist, but no current WP-8 record identifies three errors completed by the intended admin in the independent session | Open | Record three named non-destructive errors, the Thai message shown, operator recovery, and proof of no unintended write |
-| C-11 | 710-row performance baseline | P-36 measured 710+18 placement/final-review routes at 607-1,136 ms, deep paging at 746 ms, and verified export; P-37 exercised search/preview/sibling/focus without material stutter | Partial | Name or measure the remaining 710-row import-preview, publish-readiness, and admin interaction observations required by the Execution Pack; accept any exception explicitly |
-| C-12 | Documentation consistency | Tracker, Verification Report, Decision Register, migration ledger, review notes, and Note #34 now distinguish retained evidence from C-07 through C-11; executable authority checks passed 1 file/7 tests and the full suite passed 33 files/184 tests | Passed | Keep the consistency assertions green after every current-status or gate change |
+| C-07 | One complete independent placement task | Technical automation/RPC submitted and read back one accepted batch; the owner UI session reached final review but never activated **ยืนยันและบันทึกตำแหน่ง** | Open | In Card D of Note #35, record one rejected stale attempt with zero effect, then exactly one accepted UI batch/change set; observe accepted state and prove a later local edit returns to **ยังไม่บันทึก** |
+| C-08 | Stale-placement recovery inside the independent owner task | Technical continuation proved stale rejection; owner separately proved leave/reload recovery and final review | Partial | Complete Note #35 Card D using two UI tabs in the same independent task without developer/SQL intervention |
+| C-09 | Independent core-admin UAT | G1R/G3/P-26 and P-36 prove version planning, item edit, import context, final review, publish guards, export, abandon, and recovery technically; WP-4 proves a historical one-row file-picker preview | Open | Evidence reconciliation is complete. The intended admin must complete Note #35 Cards A-G on current routes without live developer help |
+| C-10 | At least three safe validation-error recoveries | Several technical error paths exist, but no current WP-8 record identifies three errors completed by the intended admin in the independent session | Open | Record Note #35 E-01 invalid authority, E-02 retirement hold, and E-03 stale final review; stale placement and uncertain response remain separate evidence |
+| C-11 | 710-row performance baseline | P-36 measured 710+18 placement/final-review routes at 607-1,136 ms, deep paging at 746 ms, and verified export; P-37 exercised search/preview/sibling/focus without material stutter | Partial | Reuse those named results and complete Note #35's Full 710-row import-preview plus publish-readiness/current-interaction measurements against the written budget |
+| C-12 | Documentation consistency | Tracker, Verification Report, Decision Register, migration ledger, threat model, review notes, Closure Matrix #34, and Owner UAT Script #35 distinguish retained evidence, developer preflight, Owner interaction, and C-07 through C-11; executable authority checks passed 1 file/7 tests and the full suite passed 33 files/184 tests | Passed | Keep the consistency assertions green after every current-status or gate change |
 | C-13 | Disabled clean Local baseline | Pointer `2568.0.0`/710, zero working drafts, all three catalog flags false, BOQ 198/1,547, Factor F `2569.0.0`/36; Production untouched | Passed | Repeat exact readback after the final bounded UAT fixture is audited-abandoned |
 
 ## 3. Minimal closure sequence
 
-### A. Evidence reconciliation - no database action
+### A. Evidence reconciliation - complete, no database action
 
-1. Map every prior G1R/G2/G3/P-26/P-36/P-37 artifact to C-07 through C-11.
-2. Reuse evidence only when it names the same route, actor type, expected
-   behavior, and recovery outcome required by the gate.
-3. Do not relabel implementer-driven RPC or route rendering as independent
-   operator interaction.
-4. Produce the short owner UAT script only for rows that remain open.
+The manifest and gate map in Note #35 retain actor-independent evidence and do
+not relabel implementer-driven RPC or route rendering as independent operator
+interaction. No C-07 through C-11 gate was closed by reconciliation alone.
 
 ### B. One bounded no-reset Local owner UAT
 
-The developer may prepare the Local fixture, approved input workbook, and
-written Thai script before the session. During the scored session the intended
-admin must not need live developer or SQL assistance.
-
-1. Confirm signed-in admin identity, Local environment, Current version, and
-   the exact working draft.
-2. Complete the missing version/create/import/manual/history/final-review/
-   publish-readiness/review-export steps identified by reconciliation.
-3. Recover from three preselected safe validation errors. Record the visible
-   Thai message, the admin's next action, and proof that no unintended write
-   occurred.
-4. On the 710+realistic-new-row placement workspace, inspect system suggestions,
-   filter exceptions, adjust one gap and sibling order, leave/reload, and
-   recover one stale-placement response.
-5. Review the complete impact, enter a real UAT reason, and activate
-   **ยืนยันและบันทึกตำแหน่ง** exactly once through the UI.
-6. Verify the accepted state and exact batch result. Make one browser-local
-   adjustment afterward and verify the accepted claim is replaced by
-   **ปรับในหน้านี้ · ยังไม่บันทึก**.
-7. Record the remaining import-preview, publish-readiness, export, and admin
-   interaction observations against the 710-row baseline.
-8. Audited-abandon the fixture and repeat the exact disabled-baseline readback.
+Use Note #35 as the sole scored script. It separates developer preflight from
+Owner Cards A-G, names the three non-destructive errors, clarifies that a stale
+placement attempt must have zero effect before exactly one accepted batch, and
+defines the measurement/cleanup record.
 
 This sequence does not require `npm run db:local:bootstrap` and must not reset
-Local Supabase. If evidence reconciliation shows that a clean reset is actually
+Local Supabase. If Note #35 preflight shows that a clean reset is actually
 required, stop and obtain a new explicit destructive-reset approval first.
 
 ### C. Repository and owner decision
