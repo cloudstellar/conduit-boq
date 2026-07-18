@@ -6,6 +6,7 @@ SNAPSHOT_DIR="$ROOT_DIR/supabase/.snapshots"
 LOCAL_ENV="$ROOT_DIR/supabase/.env.local"
 DB_CONTAINER="supabase_db_conduit-boq-local"
 PUBLIC_DATA_SNAPSHOT="${PUBLIC_DATA_SNAPSHOT:-$SNAPSHOT_DIR/public-data.sql}"
+LOCAL_API_URL="http://127.0.0.1:55321"
 
 cd "$ROOT_DIR"
 
@@ -28,6 +29,30 @@ set -a
 # shellcheck disable=SC1090
 source "$LOCAL_ENV"
 set +a
+
+: "${LOCAL_SUPABASE_SECRET_KEY:?Missing LOCAL_SUPABASE_SECRET_KEY in $LOCAL_ENV}"
+
+wait_for_local_rest_schema() {
+  local attempt
+
+  for attempt in {1..30}; do
+    if curl --fail --silent --output /dev/null \
+      --connect-timeout 2 \
+      --max-time 5 \
+      --header "apikey: $LOCAL_SUPABASE_SECRET_KEY" \
+      "$LOCAL_API_URL/rest/v1/organizations?select=id&limit=1"; then
+      echo "Local PostgREST schema cache is ready."
+      return 0
+    fi
+
+    if (( attempt < 30 )); then
+      sleep 1
+    fi
+  done
+
+  echo "Local PostgREST schema cache did not become ready after 30 attempts." >&2
+  return 1
+}
 
 npm run db:local:start
 npx supabase db reset --local --no-seed
@@ -85,6 +110,7 @@ docker exec "$DB_CONTAINER" psql -v ON_ERROR_STOP=1 -U postgres -d postgres -f /
 docker exec "$DB_CONTAINER" psql -v ON_ERROR_STOP=1 -U postgres -d postgres -f /tmp/023.sql
 docker exec "$DB_CONTAINER" psql -v ON_ERROR_STOP=1 -U postgres -d postgres -f /tmp/024.sql
 
+wait_for_local_rest_schema
 npm run db:local:seed-users
 npm run db:local:smoke-auth
 npm run db:local:smoke-master-catalog
