@@ -232,6 +232,8 @@ describe('Master Catalog P-22 operator workflow', () => {
     expect(placementWorkspace).toContain("window.addEventListener('beforeunload'");
     expect(placementWorkspace).toContain("document.addEventListener('click', guardSameOriginNavigation, true)");
     expect(placementWorkspace).toContain('กู้คืนตัวเลือกที่ยังไม่ยืนยันแล้ว');
+    expect(placementWorkspace).toContain('restoredFromStorage && hasPendingLocalChanges');
+    expect(placementWorkspace).toContain('setRestoredFromStorage(false)');
     expect(placementWorkspace).toContain('ต้องแก้');
     expect(placementWorkspace).toContain('ปรับในหน้านี้');
     expect(placementWorkspace).toContain('ข้อมูลยังไม่ครบ');

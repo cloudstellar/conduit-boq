@@ -521,7 +521,7 @@ export function MasterCatalogPlacementWorkspaceView({
             </AlertDescription>
           </Alert>
         )
-      ) : restoredFromStorage ? (
+      ) : restoredFromStorage && hasPendingLocalChanges ? (
         <Alert>
           <CircleAlert />
           <AlertTitle>กู้คืนตัวเลือกที่ยังไม่ยืนยันแล้ว</AlertTitle>
@@ -634,6 +634,7 @@ export function MasterCatalogPlacementWorkspaceView({
                 size="sm"
                 onClick={() => {
                   setAssignments(suggestedAssignments);
+                  setRestoredFromStorage(false);
                   setReviewFilter('all');
                   setPage(0);
                 }}
