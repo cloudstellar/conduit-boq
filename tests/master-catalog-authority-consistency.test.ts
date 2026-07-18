@@ -402,10 +402,10 @@ describe('Master Catalog authority consistency', () => {
       /P-33 accepted that\s+exact bounded WP-7\.5 technical checkpoint at 2026-07-15 13:54 \+07/,
     )
     expect(tracker).toContain(
-      '| Current work package | WP-8/P-37 HOLD; P-39R P39R-L passed on incremental `022`-`024`; P39R-C awaits a fresh destructive-reset warning/owner decision and P39R-U remains pending |',
+      '| Current work package | WP-8/P-37 HOLD; P-39R P39R-S/P39R-L/P39R-C passed through clean `009`-`024`; P39R-U remains pending before P-38 resumes |',
     )
     expect(tracker).toContain(
-      '| Current environment | Disabled Local baseline after `024`: pointer `2568.0.0`/710',
+      '| Current environment | Disabled clean Local baseline after `024`: pointer `2568.0.0`/710',
     )
     expect(tracker).toContain(
       '0780925aca8fa7ebbf8abbaf2b7cf151b39b676a',
@@ -583,7 +583,7 @@ describe('Master Catalog authority consistency', () => {
       '| C-10 | At least three safe validation-error recoveries |',
       '| C-11 | 710-row performance baseline |',
       '| C-12 | Documentation consistency |',
-      '| Passed through P39R-L; monitor | Authority consistency and full repository checks passed; rerun after any P39R-C/P39R-U evidence update |',
+      '| Passed through P39R-C; monitor | Authority consistency and full repository checks passed; rerun after P39R-U evidence update |',
       'one rejected stale attempt with zero effect, then exactly one accepted UI batch/change set',
       'does not require `npm run db:local:bootstrap`',
     ]) {
@@ -888,6 +888,10 @@ describe('Master Catalog authority consistency', () => {
     expect(p39).toContain('P39R-L')
     expect(p39).toContain('P39R-C')
     expect(p39).toContain('P39R-U')
+    expect(p39).toContain('### 6.4 P39R-C clean-chain closure')
+    expect(p39).toContain(
+      '10531610eac53a97c6ef8f9d06418766b58bee36',
+    )
     expect(p39).toContain('prior published/active version')
     expect(p39).not.toContain('Restoring an archived version')
     expect(procedure).toContain('สร้างและเปิดพื้นที่ทำงาน')

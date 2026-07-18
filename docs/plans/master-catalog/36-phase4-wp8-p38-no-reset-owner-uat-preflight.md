@@ -4,9 +4,10 @@
 and used for the first P-38 session. Card A created Local attempts `2568.16.0`
 and `2568.17.0`; the owner then stopped the UAT after identifying the official
 number-gap problem. Both attempts were audited-abandoned and cleanup restored
-the exact disabled baseline without reset. P-39 is now in progress; Cards A-G
-must not resume until [Correction Plan #37](./37-phase4-p39-draft-identity-release-number-correction-plan.md)
-passes its Local gates. P-37 remains **HOLD**.
+the exact disabled baseline without reset. P39R-S, incremental P39R-L, and the
+separately approved clean P39R-C gate now pass; Cards A-G must not resume until
+P39R-U in [Correction Plan #37](./37-phase4-p39-draft-identity-release-number-correction-plan.md)
+passes. P-37 remains **HOLD**.
 
 **Boundary:** Local only, no reset. This note does not authorize successful
 publication, pointer movement, P-37 acceptance, P-19, Factor F work, hotfix
@@ -134,8 +135,9 @@ then exposed the `021` row-trigger clone timeout. Final forward `024` corrected
 that execution shape; exact pushed
 `b6d58ce6cfedafa5812821edb49b897c2856f049` passed incremental apply, complete
 WP-6.6/WP-7.5 live reruns, canonical readback, and final invariants without
-reset. P39R-L is passed. Receive a fresh destructive-reset approval for
-P39R-C. Only after P39R-U proves the corrected
-Card A behavior may the Owner resume Cards B-G. Do not request P-37 before that
+reset. P39R-L is passed. After a fresh warning/approval, P39R-C also passed the
+clean `009`-`024` bootstrap, DB/RLS/concurrency/export/advisor/invariant suite,
+and disabled-baseline cleanup on exact pushed `10531610`. Only after P39R-U
+proves the corrected Card A behavior may the Owner resume Cards B-G. Do not request P-37 before that
 evidence, cleanup, authority update, exact verification, commit, and push are
 complete.

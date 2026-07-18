@@ -8,8 +8,10 @@ harness then exposed migration `021` row-trigger amplification while cloning
 710 rows. Owner-approved forward `024` was committed, pushed, and incrementally
 applied on exact `b6d58ce6cfedafa5812821edb49b897c2856f049`; WP-6.6,
 WP-7.5, canonical, cleanup, and adjacent business hashes passed. P39R-L is
-passed, while P39R-C/P39R-U and Production approval remain pending. The earlier
-P39-S result is historical. Production remains untouched.
+passed. Separately approved P39R-C then passed the clean `009`-`024` chain on
+exact pushed `10531610eac53a97c6ef8f9d06418766b58bee36`. P39R-U and every
+Production approval remain pending. The earlier P39-S result is historical.
+Production remains untouched.
 
 **Supersedes for future execution:** P-23.1's rule that every created draft
 permanently consumes its proposed catalog version. P-23.1 evidence remains
@@ -313,9 +315,60 @@ flags are false. Exact pre/post table hashes remain:
 - Factor F versions 2: `b2e4815ea7b20e7c2a00b040acd4bed6`; and
 - Factor F rows 73: `a83893a1ade59874eeee93040db18534`.
 
-P39R-L passed on 2026-07-19. P39R-C still requires a fresh destructive-reset
-warning and separate owner approval; P39R-U remains after P39R-C. No reset or
-Production action occurred in P39R-L.
+P39R-L passed on 2026-07-19 without reset or Production action. P39R-C was then
+separately warned, approved, and passed; P39R-U remains next.
+
+### 6.4 P39R-C clean-chain closure
+
+The Owner was explicitly warned that `npm run db:local:bootstrap` resets all
+Local Supabase data and separately approved P39R-C. Production was never
+targeted. Exact pushed source
+`10531610eac53a97c6ef8f9d06418766b58bee36` then passed the complete clean
+bootstrap order `009`-`015`, hotfix `016`, and Phase 4 `017`-`024`.
+
+Two same-gate tooling defects failed closed and were corrected without adding
+or changing a migration:
+
+- the first bootstrap reached PostgREST before its schema cache was ready and
+  returned `PGRST002`; pushed `b79992f` added a bounded loopback-only readiness
+  probe before Local user seeding; and
+- the first post-bootstrap WP-6.5 run assumed an abandoned target remained
+  consumed; pushed `1053161` corrected the harness to reuse the released target,
+  matching the P-39R production contract.
+
+On the final exact source, WP-6.5, WP-6.6, WP-7, and WP-7.5 passed with retained
+evidence SHA-256 values `ad0a76bee9f32368a5f65a0a1eedf839e968dca8165c351fa588a725e7581894`,
+`7fb1dd571ec8fa8308285ee389f312438a3acde76b0fc08bc958f27115a5b474`,
+`1e2f17cfdb073a54e8e8d443c0c1e1a30edce09d4bb3e957d986eba3ed90fa94`,
+and `eb35fa03ad1d0f02c3d67101b4c84b436427da0dd83a6cd652c17684573b1507`.
+The canonical readback remained 710 rows, 471,777 bytes, and
+`sha256:2e3571ea7135fbc0bbb84c8cc330af1173e4c1d2345e5eb59958dc76e45558b8`,
+with trigger inventory 3 statement/0 row.
+
+The selected active-version export generated a verified five-sheet Excel and
+19-page PDF. Manifest SHA-256 is
+`2b455b748fa963ee39b279326ca0065621c0a9532bf0591be4e063e498cb856f`;
+Excel/PDF binary SHA-256 values are
+`55c43400576d119b032ffc78082ca4e62f3848a2eaec41ab8229359e213c9c0f`
+and `1519bbcbad973d5a7ddb69f44f72d167850d625bfd6513becf30470dd86dd428`.
+The generated files remain untracked under `output/` and are not release
+authority.
+
+The security advisor returned no issues. The performance advisor returned no
+errors and only the triaged baseline warning/information classes. Standard DB
+lint repeated its documented inability to resolve the function-created
+`pg_temp.catalog_placement_input` plus the unused `v_row_count` warning;
+transaction-scoped temp-aware `plpgsql_check` returned zero findings and the
+full placement runtime/rollback/race suite passed. Refactoring accepted
+migration `021` solely to silence that generic static limitation is deferred
+to bounded P-12 tooling/debt review.
+
+Final cleanup restored pointer `2568.0.0`/710, zero working drafts, all three
+flags false, BOQ 198/items 1,547 with zero unversioned/cross-version rows, and
+Factor F `2569.0.0`/36. Full repository checks passed 33 files/191 tests,
+TypeScript, lint with 0 errors/10 existing warnings, authority 710/65/17,
+script syntax, production build, and diff check. P39R-C is passed; P39R-U is
+the next bounded owner gate. Production touched: **No**.
 
 ## 7. Deployment and rollback compatibility
 

@@ -153,12 +153,13 @@ Stop immediately when any of these occurs:
 15. Verify P-39R separately: the P-38 Card A session was safely cleaned and
     P-23.1 permanent reservation is historical. Corrected `022`, forward
     code-RLS correction `023`, and set-based placement invalidation correction
-    `024` passed P39R-S and separately approved incremental P39R-L on exact
-    pushed `b6d58ce6cfedafa5812821edb49b897c2856f049`. Do not request P-37/P-12
-    until separately approved destructive P39R-C and owner P39R-U pass. Confirm
-    one open draft globally, stale-draft abandonment, restore effect/pointer audit,
-    role/state RLS, complete publication metadata, and replay identity. No prior
-    reset approval applies.
+    `024` passed P39R-S, incremental P39R-L on exact pushed `b6d58ce6`, and the
+    separately approved destructive P39R-C clean chain on exact pushed
+    `10531610eac53a97c6ef8f9d06418766b58bee36`. Do not request P-37/P-12
+    until owner P39R-U passes. Confirm one open draft globally, stale-draft
+    abandonment, restore effect/pointer audit, role/state RLS, complete
+    publication metadata, and replay identity. The completed P39R-C approval
+    does not authorize a later reset or any Production action.
 
 **Exit gate:** All documents have owner/reviewer decisions; no unresolved row
 or taxonomy blocker.
@@ -189,11 +190,11 @@ major image at an incompatible existing data directory.
    subsequently passed the combined clean execution. P-32 separately applied
    and proved amended P-18/WP-7.5 `021`; P-35 later placed that unchanged file
    in source. P-36 later supplied separate integrated execution evidence on
-   exact `910cc3c` after explicit owner warning/approval. Any future destructive
-   rerun still requires a fresh warning and approval; P-36 is not reusable
-   blanket reset permission. Migrations `022`-`024` are P-39R forward
-   corrections; source inclusion is not clean-execution evidence, and P39R-C
-   requires a fresh destructive-reset warning and approval.
+   exact `910cc3c` after explicit owner warning/approval. P39R-C later repeated
+   the complete `009`-`024` chain on exact `10531610` after its own warning and
+   approval. Its bootstrap, DB/RLS/concurrency/export/advisor/invariant evidence
+   passed. Any future destructive rerun still requires a fresh warning and
+   approval; neither P-36 nor P39R-C is reusable blanket reset permission.
 2. If applying SQL manually for a focused rehearsal, apply hotfix `016` before
    any reviewed Phase 4A migration(s).
 3. Verify all new tables, constraints, indexes, grants, RLS policies, functions,

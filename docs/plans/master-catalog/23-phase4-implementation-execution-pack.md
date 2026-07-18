@@ -15,8 +15,10 @@ row-trigger amplification on a 710-row clone. Final bounded forward `024`
 replaces only placement invalidation execution with transition-table statement
 triggers and transaction-local caches. Exact pushed
 `b6d58ce6cfedafa5812821edb49b897c2856f049` passed incremental apply, full
-WP-6.6/WP-7.5, and final invariants, closing P39R-L. P-22/P-23.1 evidence
-remains historical. P-38/WP-8 must not resume before P39R-C/P39R-U pass.
+WP-6.6/WP-7.5, and final invariants, closing P39R-L. Separately approved
+P39R-C then passed the clean `009`-`024` technical chain on exact pushed
+`10531610`. P-22/P-23.1 evidence remains historical. P-38/WP-8 must not resume
+before P39R-U passes.
 Production remains unauthorized.
 
 **Status:** Owner-approved for WP-0 through WP-8 implementation/local

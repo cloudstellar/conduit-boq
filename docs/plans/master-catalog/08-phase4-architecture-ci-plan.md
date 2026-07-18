@@ -43,8 +43,10 @@ execution shape with statement-level transition tables and transaction-local
 version caches, without duplicating the mutation RPC or adding persistent
 derived state. Exact pushed `b6d58ce6cfedafa5812821edb49b897c2856f049`
 applied `024` incrementally and passed full WP-6.6/WP-7.5 plus final
-invariants, so P39R-L is passed. P39R-C/P39R-U and every Production approval
-remain separate gates.
+invariants, so P39R-L is passed. Separately approved P39R-C then repeated the
+clean `009`-`024` DB/RLS/concurrency/export/advisor/invariant chain on exact
+pushed `10531610eac53a97c6ef8f9d06418766b58bee36`. P39R-U and every Production
+approval remain separate gates.
 
 **Reliability amendment:** 2026-07-11 — WP-6.5 now closes end-to-end
 idempotency, publish-block UX, P-20 hash portability, ADR-003 reusable
