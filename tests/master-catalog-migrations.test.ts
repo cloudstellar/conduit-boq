@@ -91,8 +91,10 @@ describe('Master Catalog migration contracts', () => {
     expect(bootstrap).toContain("'factor_f_2569_row_count'")
     expect(bootstrap).toContain("'factor_f_partial_legacy_snapshots_remaining'")
     expect(bootstrap).toContain('npm run db:local:smoke-master-catalog')
-    expect(canonicalHash).toContain('Phase 4 017-022')
-    expect(canonicalHash).not.toContain('Phase 4 017-021')
+    expect(canonicalHash).toContain("const phase4Range = migration022Detected ? '017-022' : '017-021'")
+    expect(canonicalHash).toContain('p39r_identity_columns')
+    expect(canonicalHash).toContain('p39r_identity_trigger_function')
+    expect(canonicalHash).toContain('migration 022 schema markers are partial or inconsistent')
   })
 
   it('publishes Factor F 2569 without backfilling existing BOQs', () => {

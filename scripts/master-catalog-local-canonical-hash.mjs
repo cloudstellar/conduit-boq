@@ -45,6 +45,24 @@ rows AS (
    AND cg.id = pl.code_group_id
 )
 SELECT json_build_object(
+  'schema', json_build_object(
+    'p39r_identity_columns', (
+      SELECT count(*)
+      FROM information_schema.columns
+      WHERE table_schema = 'public'
+        AND table_name = 'price_list_versions'
+        AND column_name IN (
+          'target_major',
+          'target_minor',
+          'target_patch',
+          'draft_attempt',
+          'target_version_string',
+          'draft_reference'
+        )
+    ),
+    'p39r_identity_trigger_function',
+      to_regprocedure('private.prepare_catalog_version_identity()') IS NOT NULL
+  ),
   'version', (
     SELECT json_build_object(
       'id', id::text,
@@ -139,8 +157,17 @@ function queryLocalCatalogSnapshot() {
 }
 
 function assertQuality(snapshot) {
-  const { version, quality, rows } = snapshot
+  const { schema, version, quality, rows } = snapshot
   const failures = []
+
+  const isPreP39r = schema?.p39r_identity_columns === 0
+    && schema?.p39r_identity_trigger_function === false
+  const isPostP39r = schema?.p39r_identity_columns === 6
+    && schema?.p39r_identity_trigger_function === true
+
+  if (!isPreP39r && !isPostP39r) {
+    failures.push('migration 022 schema markers are partial or inconsistent')
+  }
 
   if (version?.version_string !== '2568.0.0') {
     failures.push(`default version is ${version?.version_string ?? 'missing'}, expected 2568.0.0`)
@@ -196,11 +223,21 @@ async function buildEvidence() {
     throw new Error('Catalog canonical hash is not stable across repeat Local DB reads')
   }
 
+  if (JSON.stringify(first.schema) !== JSON.stringify(second.schema)) {
+    throw new Error('Catalog schema markers changed across repeat Local DB reads')
+  }
+
+  const migration022Detected = first.schema.p39r_identity_columns === 6
+    && first.schema.p39r_identity_trigger_function === true
+  const phase4Range = migration022Detected ? '017-022' : '017-021'
+
   return {
     source:
-      'Local Supabase restored from production-derived public snapshot plus root migrations 009-015, hotfix 016, and Phase 4 017-022',
+      `Local Supabase schema includes root migrations 009-015, hotfix 016, and detected Phase 4 ${phase4Range}`,
     productionAuthorityVersion: '2568.0.0',
     localDbContainer: DB_CONTAINER,
+    migration022Detected,
+    schema: first.schema,
     version: first.version,
     quality: first.quality,
     canonicalHash: firstHash,
