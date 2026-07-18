@@ -2,11 +2,12 @@
 
 **Status:** P-37 remains **HOLD**. The first no-reset intended-admin Local UAT
 session on 2026-07-17 failed the comprehension gate before any placement batch
-was confirmed. A bounded UI correction is implemented in the working tree. A
+was confirmed. A bounded UI correction is implemented and pushed. A
 2026-07-18 Local-only continuation then passed controlled stale-lock rejection,
 one accepted placement, same-request idempotent replay, accepted-state route
-readback, and audited cleanup. Owner re-UAT for complete keyboard traversal and
-leave/reload recovery plus exact commit/push provenance remain open; those
+readback, and audited cleanup. Corrected source checkpoint
+`e6d79d77bd8fb8d6a0211d7d7b440d2136cb6512` is pushed. Owner re-UAT for
+complete keyboard traversal and leave/reload recovery remains open; those
 operator gates are not inferred from RPC or screenshot evidence.
 
 **Environment:** Local only. Production touched: **No**.
@@ -182,10 +183,11 @@ not inferred:
    evidence;
 7. verify the accepted state/final review; audited fixture cleanup and disabled
    baseline restoration are already complete;
-8. record exact commit/push provenance. Focused/full tests, TypeScript, lint,
-   production build, authority consistency, and diff checks passed on the
-   post-evidence working-tree candidate on 2026-07-18.
+8. record exact commit/push provenance: corrected source checkpoint
+   `e6d79d77bd8fb8d6a0211d7d7b440d2136cb6512` is pushed. Focused/full tests,
+   TypeScript, lint, production build, authority consistency, and diff checks
+   passed on the same source candidate on 2026-07-18.
 
-Until owner keyboard/leave-reload re-UAT and exact commit/push provenance pass,
+Until owner keyboard/leave-reload re-UAT and explicit acceptance pass,
 WP-8 remains **In progress**, P-37 remains **HOLD**, Add/Supplement remains
 hidden for release, and P-12 through P-15 remain unauthorized.

@@ -119,9 +119,9 @@ working tree now presents one insertion-gap choice and truthful local state
 while preserving the exact P-18 category/anchor/relation payload. Desktop/mobile
 interaction QA passed. The later Local continuation passed stale rejection,
 one acceptance, exact-request replay, accepted-state route readback, cleanup,
-and post-evidence repository checks. Owner keyboard/leave-reload re-UAT, exact
-commit/push provenance, and
-explicit acceptance remain open. P-37 remains HOLD. See
+and post-evidence repository checks. Corrected source checkpoint
+`e6d79d77bd8fb8d6a0211d7d7b440d2136cb6512` is pushed. Owner
+keyboard/leave-reload re-UAT and explicit acceptance remain open. P-37 remains HOLD. See
 [Review Note #33](./33-phase4-wp8-p37-uat-ux-correction-note.md).
 
 **P-22 operator-workflow correction authorized:** 2026-07-12 — intended-admin

@@ -139,7 +139,7 @@ describe('Master Catalog authority consistency', () => {
       'P-32 separate-apply evidence/P-33 technical acceptance/P-34 historical UX source-static/P-36 integrated technical evidence passed; first P-37 intended-admin UAT failed comprehension, while the corrected-flow technical stale/accept/replay/cleanup continuation and post-evidence repository checks later passed',
     )
     expect(migrations).toContain(
-      'P-37 is HOLD for independent keyboard/leave-reload re-UAT and exact commit/push provenance; DB contract unchanged; not Production-approved',
+      'corrected source checkpoint `e6d79d77bd8fb8d6a0211d7d7b440d2136cb6512` is pushed; P-37 is HOLD for independent keyboard/leave-reload re-UAT and explicit owner acceptance; DB contract unchanged; not Production-approved',
     )
     expect(existsSync(resolve(
       root,
@@ -301,7 +301,10 @@ describe('Master Catalog authority consistency', () => {
       /P-33 accepted that\s+exact bounded WP-7\.5 technical checkpoint at 2026-07-15 13:54 \+07/,
     )
     expect(tracker).toContain(
-      'WP-8 In progress; P-36 integrated technical rehearsal passed; first P-37 intended-admin session failed comprehension; corrected placement flow awaits re-UAT and remaining keyboard/recovery evidence',
+      'WP-8 In progress; P-36 integrated technical rehearsal passed; first P-37 intended-admin session failed comprehension; corrected placement source is pushed and awaits keyboard/leave-reload re-UAT plus explicit acceptance',
+    )
+    expect(tracker).toContain(
+      '| Current environment | Clean disabled Local baseline: pointer `2568.0.0`/710; zero working drafts;',
     )
     expect(tracker).toContain(
       '0780925aca8fa7ebbf8abbaf2b7cf151b39b676a',

@@ -33,9 +33,9 @@ interaction/keyboard/recovery UAT remained. The first no-reset P-37 session on
 UI exposed reference-item/before-after mechanics. A bounded insertion-gap
 presentation correction is implemented. Its later Local technical continuation
 passed stale rejection, one acceptance, exact replay, accepted-state readback,
-cleanup, and post-evidence repository checks. Owner keyboard/leave-reload
-re-UAT, exact commit/push provenance,
-and explicit acceptance remain; P-37 is HOLD. See
+cleanup, and post-evidence repository checks. Corrected source checkpoint
+`e6d79d77bd8fb8d6a0211d7d7b440d2136cb6512` is pushed. Owner
+keyboard/leave-reload re-UAT and explicit acceptance remain; P-37 is HOLD. See
 [Note #33](./33-phase4-wp8-p37-uat-ux-correction-note.md).
 
 **Environment:** Source/document audit only. No Local database reset, Production
@@ -230,9 +230,9 @@ days**. P-34 completed its historical source/static slice and P-36 completed
 the integrated technical rehearsal plus realistic route-render measurements.
 The first P-37 session found a presentation defect; the bounded correction is
 now implemented, and technical stale/confirmation/replay/cleanup evidence plus
-post-evidence repository checks have passed. Owner keyboard/leave-reload re-UAT,
-exact commit/push provenance,
-and the explicit decision remain approximately **0.5 focused engineering day**
+post-evidence repository checks have passed. Corrected source checkpoint
+`e6d79d77bd8fb8d6a0211d7d7b440d2136cb6512` is pushed. Owner
+keyboard/leave-reload re-UAT and the explicit decision remain approximately **0.5 focused engineering day**
 plus reviewer availability if no further defect is found. This is an effort
 estimate, not permission to skip gates or a guaranteed date.
 

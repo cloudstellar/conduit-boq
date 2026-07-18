@@ -165,9 +165,9 @@ correction now shows the final neighboring rows and lets the admin choose one
 insertion gap; it maps back to the unchanged P-18 anchor/relation contract.
 The later Local technical continuation passed stale rejection, one acceptance,
 exact replay, accepted-state readback, audited cleanup, and post-evidence
-repository checks. P-37 remains HOLD pending independent keyboard/leave-reload
-re-UAT, exact commit/push provenance,
-and explicit owner acceptance. See
+repository checks, and corrected source checkpoint
+`e6d79d77bd8fb8d6a0211d7d7b440d2136cb6512` is pushed. P-37 remains HOLD
+pending independent keyboard/leave-reload re-UAT and explicit owner acceptance. See
 [P-37 UAT and UX Correction Note](./33-phase4-wp8-p37-uat-ux-correction-note.md).
 No Production action is authorized.
 
@@ -598,8 +598,9 @@ pretend a publishable candidate has been approved.
       integrated Local technical execution passed on exact `910cc3c`
 - [ ] P-37 WP-8 acceptance is on HOLD after the first intended-admin
       comprehension failure. Owner re-UAT of the corrected insertion-gap flow,
-      keyboard and leave/reload recovery, exact commit/push provenance, and
-      explicit acceptance must pass; technical stale-response, one confirmation,
+      keyboard and leave/reload recovery, and explicit acceptance must pass;
+      corrected source checkpoint `e6d79d77bd8fb8d6a0211d7d7b440d2136cb6512`
+      is pushed; technical stale-response, one confirmation,
       exact replay, accepted-state readback, and cleanup passed 2026-07-18;
       Add/Supplement stays hidden
 - [ ] Owner explicitly approves the Production migration window

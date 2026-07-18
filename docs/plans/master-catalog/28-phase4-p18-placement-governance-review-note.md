@@ -14,8 +14,9 @@ rehearsal and 710+18 route-render evidence passed on exact `910cc3c`, while
 the first intended-admin session later failed comprehension before confirmation.
 The current UI-only insertion-gap correction preserves this V1 contract and
 later passed technical stale rejection, one acceptance, exact replay, accepted-
-state readback, and cleanup. Independent keyboard/leave-reload re-UAT and exact
-candidate provenance remain; P-37 remains HOLD. See
+state readback, and cleanup. Corrected source checkpoint
+`e6d79d77bd8fb8d6a0211d7d7b440d2136cb6512` is pushed. Independent
+keyboard/leave-reload re-UAT and explicit owner acceptance remain; P-37 remains HOLD. See
 [Review Note #33](./33-phase4-wp8-p37-uat-ux-correction-note.md).
 
 **P-33 decision:** Accepted 2026-07-15 13:54 +07 for the exact bounded
@@ -371,7 +372,7 @@ to skip gates:
 | P-34 WP-8 placement UX source/static hardening | Completed on exact `0780925`; live acceptance not inferred |
 | P-35 `021` bootstrap source integration | Completed on exact source checkpoint `01eba0d49f2e4b6e65f0d9dd287fd461ba9ea19a` |
 | P-36 integrated technical rehearsal and realistic route rendering | Completed on exact `910cc3c`; independent interaction/UAT not inferred |
-| Remaining independent keyboard/leave-reload UAT, exact commit/push provenance, and readiness closeout | About 0.5 focused engineering day plus reviewer availability; remediation may extend calendar time |
+| Remaining independent keyboard/leave-reload UAT and readiness closeout | About 0.5 focused engineering day plus reviewer availability; remediation may extend calendar time |
 | Earliest remaining path before any Production request | After independent UAT passes, authority closeout is reviewed, and P-37 is accepted; P-12 remains a separate decision |
 
 Limited safe alternative: preserve the completed WP-6.6/WP-7/WP-7.5 technical

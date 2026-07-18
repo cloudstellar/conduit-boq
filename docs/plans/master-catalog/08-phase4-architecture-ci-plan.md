@@ -9,9 +9,9 @@ rehearsal passed on exact execution checkout `910cc3c`. The first P-37 intended-
 admin session failed comprehension before confirmation; the current UI-only
 insertion-gap correction preserves the P-18 DB contract. Its later Local
 technical continuation passed stale rejection, one acceptance, exact replay,
-accepted-state readback, cleanup, and post-evidence repository checks;
-independent keyboard/leave-reload re-UAT and exact commit/push provenance remain.
-P-37 remains HOLD, all Production gates
+accepted-state readback, cleanup, and post-evidence repository checks; corrected
+source checkpoint `e6d79d77bd8fb8d6a0211d7d7b440d2136cb6512` is pushed. Independent
+keyboard/leave-reload re-UAT and explicit owner acceptance remain. P-37 remains HOLD, all Production gates
 remain separate, and Add/Supplement stays hidden. See
 [Review Note #33](./33-phase4-wp8-p37-uat-ux-correction-note.md).
 
