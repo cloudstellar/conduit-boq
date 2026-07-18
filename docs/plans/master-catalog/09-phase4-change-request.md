@@ -21,9 +21,11 @@ publication completeness, and least-privilege role/state reads; see
 [Correction Plan #37](./37-phase4-p39-draft-identity-release-number-correction-plan.md).
 P-23.1 remains historical. Incremental `022` invariants passed; live review
 requires forward policy-only `023` so staff code visibility follows the exact
-identity/code pair used in an issued snapshot. Complete P39R-L, destructive
-bootstrap, Production, Factor F/hotfix expansion, and P-19 remain separately
-gated.
+identity/code pair used in an issued snapshot. Corrected `023` then applied
+without reset; the continued harness safely exposed row-trigger amplification
+during a 710-row draft clone. Forward `024` is the bounded set-based trigger
+correction. Complete P39R-L, destructive bootstrap, Production, Factor F/hotfix
+expansion, and P-19 remain separately gated.
 
 **Owner decision recorded:** 2026-07-04 — approved according to the
 recommendation for implementation/local rehearsal only. The gate structure,
@@ -464,6 +466,9 @@ scope.
 - A client/form-owned `request_id` makes create/abandon/manual/apply/publish/restore
   retries idempotent only when the same ID is reused after an uncertain result.
 - Migration lock and statement timeouts are bounded.
+- Multi-row catalog writes use statement-level transition-table invalidation;
+  transaction-local markers prevent repeated whole-draft scans while
+  preserving one placement-revision increment per version/transaction.
 - Two-session Local DB tests prove advisory-lock ordering and timeout behavior.
 
 ## 10. Risk assessment
@@ -482,6 +487,7 @@ scope.
 | Oversized payload fails unpredictably | Low | Medium | 750 KB application cap, tested error | Payload exceeds cap |
 | Factor F change hidden inside catalog work | Medium | High | Completed Factor F closeout is treated as a protected baseline; Phase 4 has no Factor F write path | Any Factor F row/value/pointer change in this CR |
 | Retry after timeout creates a second business effect | Medium | High | Client-owned stable operation ID plus timeout-after-commit test | Same intended retry reaches DB with a new ID or creates a second change set |
+| Row-level invalidation amplifies a bulk clone/import into repeated whole-draft scans | Medium | High | Set-based transition-table triggers plus transaction-local positive/negative version markers | 710-row clone/import hits statement timeout or placement revision semantics drift |
 | Clean rebuild hash cannot be reconciled | Medium until independent P-20 proof | High | Approved deterministic Production-derived `price_list.id` baseline mapping plus tracked two-run comparator | Independent clean approved environments disagree or evidence does not match the reviewed commit |
 | Future version needs a code hotfix | High with hardcoding | High | Generic ADR-003 version validation and multi-version fixtures | Reusable path requires a `2568.1.0` code change |
 | Hotfix behavior regresses despite static tests | Medium | High | Permanent live DB/RPC suffix/authority/rollback suite | Any approved suffix or authoritative catalog field behaves incorrectly |

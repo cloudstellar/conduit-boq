@@ -2,12 +2,13 @@
 
 **Status:** Owner-approved for the P-39R Local-only architecture correction,
 source, migration, documentation, and verification work on 2026-07-18. P39R-S
-passed and exact source commits through `7997387` are pushed. Incremental `022`
-apply and business-invariant readback passed, but the live harness exposed a
-published-code RLS scope gap and a clean-baseline count assumption. Forward
-`023` and the accumulated-history harness correction are source/static only;
-P39R-L remains in progress, while P39R-C/P39R-U and Production approval remain
-pending. The earlier P39-S result is historical. Production remains untouched.
+passed and exact source commits through `6f01457` are pushed. Incremental `022`
+and corrected `023` apply/readback passed without reset. The resumed live
+harness then exposed migration `021` row-trigger amplification while cloning
+710 rows. Owner-approved forward `024` is the one bounded remaining database
+correction; its exact commit/apply/live proof is pending. P39R-L remains in
+progress, while P39R-C/P39R-U and Production approval remain pending. The
+earlier P39-S result is historical. Production remains untouched.
 
 **Supersedes for future execution:** P-23.1's rule that every created draft
 permanently consumes its proposed catalog version. P-23.1 evidence remains
@@ -124,6 +125,23 @@ read a registry code only when the exact identity/code pair occurs in an
 It performs no catalog-row, BOQ, or Factor F data writes. This fix-forward path
 preserves Local migration provenance instead of rewriting applied `022`.
 
+Forward migration `024_master_catalog_phase4_set_based_placement_invalidation.sql`
+preserves applied `021`-`023` business semantics and replaces only the
+placement-invalidation trigger execution shape:
+
+- three `AFTER ... FOR EACH STATEMENT` triggers use PostgreSQL transition
+  tables for `INSERT`, `UPDATE`, and `DELETE`;
+- direct new-identity detection remains set-based against the exact base
+  version;
+- transaction-local markers cache both already-invalidated versions and
+  versions proven to have no new identity, so clone/import work does not repeat
+  whole-draft scans for every row;
+- `catalog.placement_write = 'on'` remains the placement RPC bypass because
+  that RPC owns its revision increment atomically;
+- no permanent cache column/table or duplicate mutation implementation is
+  introduced; and
+- all three catalog feature flags must remain false before and after apply.
+
 ## 4. Application and export contract
 
 The UI must not call a target an issued version before publication.
@@ -153,8 +171,9 @@ labels never become database authority.
 - Production `2568.0.0` remains authority for names, units, and prices.
 - No Production migration, flag, pointer, catalog row, BOQ, Factor F, or hotfix
   operation is authorized.
-- Migrations `022` and `023` must not update BOQ or Factor F tables; `023` must
-  not update catalog business rows.
+- Migrations `022`-`024` must not update BOQ or Factor F tables; `023` must not
+  update catalog business rows, and `024` must not replace business RPCs or
+  execute catalog-row rewrites during migration apply.
 - The one-open-draft-global rule, current-base mutation requirement, audited
   abandon, placement, readiness, exact-lock publish, idempotency, RLS, and
   immutable-history rules remain.
@@ -167,14 +186,16 @@ labels never become database authority.
 1. **P39R-S source/static:** migration contract, version planner, read models,
    UI language, export metadata/filenames, authority consistency, TypeScript,
    lint, build, and full tests pass.
-2. **P39R-L incremental Local:** separately approve and apply `022`, then the
-   forward-only `023` discovered by the live gate, to the disabled Local baseline
-   without reset; prove existing abandoned rows are backfilled/released, staff
-   code visibility requires an issued identity/code pair, current
-   pointer/BOQ/Factor F remain unchanged, and all flags return to false.
+2. **P39R-L incremental Local:** separately approve and apply `022`, `023`, and
+   the final bounded `024` discovered by the live gate, to the disabled Local
+   baseline without reset; prove existing abandoned rows are backfilled and
+   released, staff code visibility requires an issued identity/code pair,
+   clone/import placement invalidation is set-based and retains revision
+   semantics, current pointer/BOQ/Factor F remain unchanged, and all flags
+   return to false.
 3. **P39R-C clean chain:** after an explicit destructive-reset warning and
    separate Owner approval, bootstrap `009`-`015`, hotfix `016`, and Phase 4
-   `017`-`023`; rerun DB/RLS/concurrency/export/advisor/invariant evidence.
+   `017`-`024`; rerun DB/RLS/concurrency/export/advisor/invariant evidence.
 4. **P39R-U owner rerun:** prepare a new bounded no-reset UAT fixture. The Owner
    creates a draft, notes its draft reference and target, abandons it, creates a
    replacement, and confirms that the replacement receives a new draft
@@ -254,12 +275,31 @@ back completely and canonical pre-`023` state remained exact. Corrected
 migration `023` SHA-256
 `cbe01f63c6dd822edb29e1f7a31bfd27d5cb063e4d7d7e3878567875434d0a88`
 matches the inspected parse form without weakening the policy predicate.
-P39R-L is not passed until corrected `023`, transient RLS denial, the full live
-harness, and final invariants pass on one exact committed source.
+Corrected `023` then applied transactionally from exact pushed `6f01457` and
+canonical evidence detected `017`-`023` with pointer `2568.0.0`/710 and hash
+`sha256:2e3571ea7135fbc0bbb84c8cc330af1173e4c1d2345e5eb59958dc76e45558b8`.
+
+The full WP-6.6 rerun passed the corrected RLS boundary, published-history
+counts, and transient draft-only code denial, then safely stopped during the
+post-publish restore-impact draft clone with PostgreSQL statement timeout.
+PostgreSQL logs traced the timeout to
+`private.touch_catalog_placement_revision()` from migration `021`: its
+row-level trigger repeated candidate/base anti-joins for every row in the
+710-row `INSERT ... SELECT`. The failing RPC transaction rolled back. Cleanup
+confirmed zero drafts, all three flags false, the same pointer/catalog hash,
+BOQ 198/items 1,547 with zero unversioned BOQs, and Factor F `2569.0.0`/36.
+
+Migration `024` SHA-256
+`d3aa11282fa4b2d4bac058bde3851287c551556ba5eac307277f086ba3d86b25`
+is the owner-approved bounded fix-forward candidate. It uses statement-level
+transition tables plus transaction-local positive/negative version markers;
+it does not copy the large apply RPC or add denormalized persistent state.
+P39R-L is not passed until exact committed `024` applies, WP-6.6 and WP-7.5
+live suites pass, and final invariants pass on one exact pushed source.
 
 ## 7. Deployment and rollback compatibility
 
-All Master Catalog feature flags must be `false` while migrations `022`/`023`
+All Master Catalog feature flags must be `false` while migrations `022`-`024`
 and their matching application are deployed. Compatibility is intentionally
 bounded:
 
@@ -267,15 +307,17 @@ bounded:
 |---|---|---|
 | Pre-P-39R | Pre-`022` | Existing behavior only |
 | Pre-P-39R | Post-`022`, pre-`023` | Normal non-catalog paths while all catalog admin flags are off; do not use Master Catalog admin mutations |
-| Pre-P-39R | Post-`023` | Normal non-catalog paths while all catalog admin flags are off; do not use Master Catalog admin mutations |
+| Pre-P-39R | Post-`023`, pre-`024` | Normal non-catalog paths while all catalog admin flags are off; do not use Master Catalog admin mutations |
+| Pre-P-39R | Post-`024` | Normal non-catalog paths while all catalog admin flags are off; do not use Master Catalog admin mutations |
 | P-39R | Pre-`022` | Normal non-catalog paths while all catalog admin flags are off; do not use Master Catalog admin routes |
 | P-39R | Post-`022`, pre-`023` | Keep catalog flags off; P39R-L fix-forward is incomplete |
-| P-39R | Post-`023` | Supported P-39R combination after verification and explicit flag approval |
+| P-39R | Post-`023`, pre-`024` | Keep catalog flags off; placement clone/import performance correction is incomplete |
+| P-39R | Post-`024` | Supported P-39R combination after verification and explicit flag approval |
 
 After `022` is applied, an application-only rollback is not an approved way to
 resume catalog administration. Keep all catalog admin flags off and fix forward
-through `023` and the matching P-39R application. Both migrations are
-transactional; an apply failure rolls back that migration's transaction. Any
+through `024` and the matching P-39R application. All three forward migrations
+are transactional; an apply failure rolls back that migration's transaction. Any
 rollback after a successful Production apply requires a separately reviewed
 data-safe plan.
 

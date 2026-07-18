@@ -40,7 +40,8 @@ and Production remains unauthorized.
 WP-6.6 closeout. Its P-23.1 permanent abandoned-number reservation is
 superseded for future execution by
 [Correction Plan #37](./37-phase4-p39-draft-identity-release-number-correction-plan.md).
-P-39R uses forward lifecycle migration `022` plus policy-only fix-forward `023`;
+P-39R uses forward lifecycle migration `022`, policy-only fix-forward `023`,
+and bounded set-based placement invalidation fix-forward `024`;
 accepted `020` evidence is not rewritten and
 does not by itself prove the new global-draft, claim/issue/release,
 restore-effect, RLS, or publication lifecycle.

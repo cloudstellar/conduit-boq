@@ -56,7 +56,7 @@ Local cleanup.
 
 | ID | WP-8/P-37 gate | Current evidence | Status | Required closure |
 |---|---|---|---|---|
-| C-01 | Clean integrated Local chain through the current Phase 4 migration | P-36 exact checkout `910cc3cc74660beecf18655d39cd0b0c085d1fc6` passed through `021`; P-39R adds lifecycle `022` and published-code RLS correction `023` | Reopened for P39R-C | After complete P39R-S/P39R-L, run one separately approved clean bootstrap through `023` and retain the prior `021` evidence as historical |
+| C-01 | Clean integrated Local chain through the current Phase 4 migration | P-36 exact checkout `910cc3cc74660beecf18655d39cd0b0c085d1fc6` passed through `021`; P-39R adds lifecycle `022`, published-code RLS correction `023`, and set-based placement invalidation `024` | Reopened for P39R-C | After complete P39R-S/P39R-L, run one separately approved clean bootstrap through `024` and retain the prior `021` evidence as historical |
 | C-02 | DB/RLS/role/rollback/race/idempotency/P-20/BOQ/Factor F invariants | P-36 harnesses passed; later P-37 technical continuation proved stale rejection, one acceptance, exact replay, accepted readback, and cleanup | Passed technically | Retain; the owner UI path remains separate under C-07 |
 | C-03 | Tracked official export verification | P-11 exact pair was owner-accepted; P-36 regenerated and independently verified the active 710-row Excel/PDF evidence | Passed | Production filing remains P-15, not P-37 |
 | C-04 | Security/performance advisor blocker review | P-36 returned no security blocker; baseline performance findings and the unused `v_row_count` are assigned to P-12 with owners and rationale | Passed for P-37 | Reassess/minimize before P-12; this is not a Production waiver |

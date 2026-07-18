@@ -10,8 +10,12 @@ restore effect/pointer audit, lifecycle/publication completeness, and narrowed
 role/state RLS. Incremental `022` invariants passed and live review produced
 forward policy-only `023`, which requires an exact issued identity/code pair for
 staff code-registry reads and correct accumulated-history harness expectations.
-P-22/P-23.1 evidence remains historical. P-38/WP-8 must not resume before the
-complete P39R-L/P39R-C/P39R-U gates. Production remains unauthorized.
+Corrected `023` applied without reset; the continued live gate exposed `021`
+row-trigger amplification on a 710-row clone. Final bounded forward `024`
+replaces only placement invalidation execution with transition-table statement
+triggers and transaction-local caches. P-22/P-23.1 evidence remains historical.
+P-38/WP-8 must not resume before the complete P39R-L/P39R-C/P39R-U gates.
+Production remains unauthorized.
 
 **Status:** Owner-approved for WP-0 through WP-8 implementation/local
 rehearsal; WP-9 Production execution requires separate P-12 through P-15
@@ -648,6 +652,11 @@ PL/pgSQL subtransaction so the whole change set, item rows, identities, and code
 registrations roll back before a safe action error is returned. Private runtime
 functions carry bounded lock/statement timeouts; migration-time timeouts alone
 are not runtime evidence.
+Placement invalidation must remain set-based for bulk clone/import operations.
+Use transition relations and transaction-local version markers; do not copy the
+large mutation RPC or add a persistent derived-state cache merely to bypass a
+row-trigger performance defect. WP-6.6 and WP-7.5 live suites must jointly
+prove clone performance and unchanged placement-revision semantics.
 
 Exit gate:
 
@@ -1066,7 +1075,7 @@ implementation finds a cleaner existing home.
 
 | Area | Likely targets |
 |---|---|
-| Supabase migration | Existing `migrations/017_*`-`019_*`; planned WP-6.6 `020_*`; conditional P-18/WP-7.5 `021_*` |
+| Supabase migration | Reviewed Phase 4 `migrations/017_*`-`021_*`; P-39R fix-forward `022_*`-`024_*` |
 | DB helpers/types | `lib/catalog/*`, `lib/supabase.ts`, generated/hand-maintained types |
 | Parser/canonicalizer | `lib/catalog/parser/*`, `lib/catalog/hash/*` |
 | Admin pages | `app/admin/master-catalog/**` |

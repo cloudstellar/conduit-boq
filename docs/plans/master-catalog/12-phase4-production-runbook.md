@@ -152,7 +152,8 @@ Stop immediately when any of these occurs:
     [P-37 UAT/UX Note](./33-phase4-wp8-p37-uat-ux-correction-note.md).
 15. Verify P-39R separately: the P-38 Card A session was safely cleaned and
     P-23.1 permanent reservation is historical. Do not request P-37/P-12 until
-    corrected `022` plus forward code-RLS correction `023` have passed P39R-S,
+    corrected `022`, forward code-RLS correction `023`, and set-based placement
+    invalidation correction `024` have passed P39R-S,
     separately approved incremental P39R-L,
     separately approved destructive P39R-C, and owner P39R-U. Confirm one open
     draft globally, stale-draft abandonment, restore effect/pointer audit,
@@ -183,14 +184,14 @@ major image at an incompatible existing data directory.
 
 1. After explicit warning and owner approval for the destructive Local reset,
    start from the canonical bootstrap source that applies root `009`-`015`,
-   production hotfix `016`, and Phase 4 `017`-`023` in that order. G4 repository
+   production hotfix `016`, and Phase 4 `017`-`024` in that order. G4 repository
    integration placed accepted `020` in source on 2026-07-15, and P-29/G4E
    subsequently passed the combined clean execution. P-32 separately applied
    and proved amended P-18/WP-7.5 `021`; P-35 later placed that unchanged file
    in source. P-36 later supplied separate integrated execution evidence on
    exact `910cc3c` after explicit owner warning/approval. Any future destructive
    rerun still requires a fresh warning and approval; P-36 is not reusable
-   blanket reset permission. Migrations `022` and `023` are P-39R forward
+   blanket reset permission. Migrations `022`-`024` are P-39R forward
    corrections; source inclusion is not clean-execution evidence, and P39R-C
    requires a fresh destructive-reset warning and approval.
 2. If applying SQL manually for a focused rehearsal, apply hotfix `016` before

@@ -58,7 +58,12 @@ try {
   assert(schemaContract.review_rls === true, 'Placement-review RLS is disabled')
   assert(schemaContract.review_policy_count === 1, 'Placement-review policy is incomplete')
   assert(schemaContract.display_order_deferrable === true, 'Display-order uniqueness is not deferrable')
-  assert(schemaContract.placement_trigger_count === 2, 'Placement triggers are incomplete')
+  assert(schemaContract.placement_statement_trigger_count === 3,
+    'Set-based placement invalidation triggers are incomplete')
+  assert(schemaContract.placement_row_trigger_count === 0,
+    'Legacy row-level placement invalidation trigger remains')
+  assert(schemaContract.review_trigger_count === 1,
+    'Placement-review immutability trigger is incomplete')
   assert(schemaContract.auth_public_execute === true, 'Authenticated placement execute is missing')
   assert(schemaContract.anon_public_execute === false, 'Anonymous placement execute is too broad')
   assert(schemaContract.anon_private_execute === false, 'Anonymous private placement execute is too broad')
@@ -1034,12 +1039,35 @@ function readSchemaContract() {
           AND conname = 'uq_price_list_version_display_order'
           AND convalidated AND condeferrable
       ),
-      'placement_trigger_count', (
-        SELECT count(*) FROM pg_trigger
-        WHERE NOT tgisinternal AND tgname IN (
-          'trigger_touch_catalog_placement_revision',
-          'trigger_prevent_catalog_placement_review_mutation'
-        )
+      'placement_statement_trigger_count', (
+        SELECT count(*) FROM pg_trigger trigger_row
+        WHERE trigger_row.tgrelid = 'public.price_list'::regclass
+          AND trigger_row.tgname IN (
+            'trigger_touch_catalog_placement_revision_insert',
+            'trigger_touch_catalog_placement_revision_update',
+            'trigger_touch_catalog_placement_revision_delete'
+          )
+          AND trigger_row.tgfoid =
+            'private.touch_catalog_placement_revision()'::regprocedure
+          AND (trigger_row.tgtype & 1) = 0
+          AND trigger_row.tgenabled = 'O'
+          AND NOT trigger_row.tgisinternal
+      ),
+      'placement_row_trigger_count', (
+        SELECT count(*) FROM pg_trigger trigger_row
+        WHERE trigger_row.tgrelid = 'public.price_list'::regclass
+          AND trigger_row.tgfoid =
+            'private.touch_catalog_placement_revision()'::regprocedure
+          AND (trigger_row.tgtype & 1) = 1
+          AND trigger_row.tgenabled = 'O'
+          AND NOT trigger_row.tgisinternal
+      ),
+      'review_trigger_count', (
+        SELECT count(*) FROM pg_trigger trigger_row
+        WHERE trigger_row.tgrelid = 'public.catalog_placement_reviews'::regclass
+          AND trigger_row.tgname = 'trigger_prevent_catalog_placement_review_mutation'
+          AND trigger_row.tgenabled = 'O'
+          AND NOT trigger_row.tgisinternal
       ),
       'auth_public_execute', has_function_privilege(
         'authenticated',

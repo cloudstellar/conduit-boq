@@ -73,6 +73,10 @@ try {
   assert(schemaContract.catalog_state_policies === 7, 'Catalog state-scoped read policies are incomplete')
   assert(schemaContract.published_code_policy_exact === true,
     'Published code registry policy is not scoped by identity and code')
+  assert(schemaContract.placement_statement_triggers === 3,
+    'Set-based placement invalidation triggers are incomplete')
+  assert(schemaContract.placement_row_triggers === 0,
+    'Legacy row-level placement invalidation trigger remains')
   assert(schemaContract.published_identity_count >= 710,
     'Published identity history is smaller than the authority baseline')
   assert(schemaContract.published_code_count >= schemaContract.published_identity_count,
@@ -1463,6 +1467,31 @@ function readSchemaContract() {
           AND qual ILIKE '%catalog_row.identity_id = catalog_item_codes.identity_id%'
           AND qual ILIKE '%catalog_row.item_code%::text = catalog_item_codes.item_code%'
           AND qual ILIKE '%version.status%active%archived%'
+      ),
+      'placement_statement_triggers', (
+        SELECT count(*)
+        FROM pg_trigger trigger_row
+        WHERE trigger_row.tgrelid = 'public.price_list'::regclass
+          AND trigger_row.tgname IN (
+            'trigger_touch_catalog_placement_revision_insert',
+            'trigger_touch_catalog_placement_revision_update',
+            'trigger_touch_catalog_placement_revision_delete'
+          )
+          AND trigger_row.tgfoid =
+            'private.touch_catalog_placement_revision()'::regprocedure
+          AND (trigger_row.tgtype & 1) = 0
+          AND trigger_row.tgenabled = 'O'
+          AND NOT trigger_row.tgisinternal
+      ),
+      'placement_row_triggers', (
+        SELECT count(*)
+        FROM pg_trigger trigger_row
+        WHERE trigger_row.tgrelid = 'public.price_list'::regclass
+          AND trigger_row.tgfoid =
+            'private.touch_catalog_placement_revision()'::regprocedure
+          AND (trigger_row.tgtype & 1) = 1
+          AND trigger_row.tgenabled = 'O'
+          AND NOT trigger_row.tgisinternal
       ),
       'published_identity_count', (
         SELECT count(DISTINCT catalog_row.identity_id)

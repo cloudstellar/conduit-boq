@@ -71,6 +71,31 @@ SELECT json_build_object(
         AND policy.qual ILIKE '%catalog_row.identity_id = catalog_item_codes.identity_id%'
         AND policy.qual ILIKE '%catalog_row.item_code%::text = catalog_item_codes.item_code%'
         AND policy.qual ILIKE '%version.status%active%archived%'
+    ),
+    'p39r_placement_statement_triggers', (
+      SELECT count(*)
+      FROM pg_catalog.pg_trigger trigger_row
+      WHERE trigger_row.tgrelid = 'public.price_list'::regclass
+        AND trigger_row.tgname IN (
+          'trigger_touch_catalog_placement_revision_insert',
+          'trigger_touch_catalog_placement_revision_update',
+          'trigger_touch_catalog_placement_revision_delete'
+        )
+        AND trigger_row.tgfoid =
+          'private.touch_catalog_placement_revision()'::regprocedure
+        AND (trigger_row.tgtype & 1) = 0
+        AND trigger_row.tgenabled = 'O'
+        AND NOT trigger_row.tgisinternal
+    ),
+    'p39r_placement_row_triggers', (
+      SELECT count(*)
+      FROM pg_catalog.pg_trigger trigger_row
+      WHERE trigger_row.tgrelid = 'public.price_list'::regclass
+        AND trigger_row.tgfoid =
+          'private.touch_catalog_placement_revision()'::regprocedure
+        AND (trigger_row.tgtype & 1) = 1
+        AND trigger_row.tgenabled = 'O'
+        AND NOT trigger_row.tgisinternal
     )
   ),
   'version', (
@@ -175,9 +200,21 @@ function assertQuality(snapshot) {
   const isPostP39r = schema?.p39r_identity_columns === 6
     && schema?.p39r_identity_trigger_function === true
   const hasPublishedCodeScope = schema?.p39r_published_code_policy_scoped === true
+  const hasLegacyPlacementTrigger = schema?.p39r_placement_statement_triggers === 0
+    && schema?.p39r_placement_row_triggers === 1
+  const hasSetBasedPlacementTriggers = schema?.p39r_placement_statement_triggers === 3
+    && schema?.p39r_placement_row_triggers === 0
 
   if ((!isPreP39r && !isPostP39r) || (isPreP39r && hasPublishedCodeScope)) {
     failures.push('migration 022 schema markers are partial or inconsistent')
+  }
+
+  if (!hasLegacyPlacementTrigger && !hasSetBasedPlacementTriggers) {
+    failures.push('migration 024 placement-trigger markers are partial or inconsistent')
+  }
+
+  if (hasSetBasedPlacementTriggers && (!isPostP39r || !hasPublishedCodeScope)) {
+    failures.push('migration 024 placement triggers exist without migrations 022/023')
   }
 
   if (version?.version_string !== '2568.0.0') {
@@ -242,7 +279,12 @@ async function buildEvidence() {
     && first.schema.p39r_identity_trigger_function === true
   const migration023Detected = migration022Detected
     && first.schema.p39r_published_code_policy_scoped === true
-  const phase4Range = migration023Detected
+  const migration024Detected = migration023Detected
+    && first.schema.p39r_placement_statement_triggers === 3
+    && first.schema.p39r_placement_row_triggers === 0
+  const phase4Range = migration024Detected
+    ? '017-024'
+    : migration023Detected
     ? '017-023'
     : migration022Detected ? '017-022' : '017-021'
 
@@ -253,6 +295,7 @@ async function buildEvidence() {
     localDbContainer: DB_CONTAINER,
     migration022Detected,
     migration023Detected,
+    migration024Detected,
     schema: first.schema,
     version: first.version,
     quality: first.quality,
