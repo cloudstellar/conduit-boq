@@ -167,11 +167,11 @@ insertion gap; it maps back to the unchanged P-18 anchor/relation contract.
 The later Local technical continuation passed stale rejection, one acceptance,
 exact replay, accepted-state readback, audited cleanup, and post-evidence
 repository checks, and corrected source checkpoint
-`e6d79d77bd8fb8d6a0211d7d7b440d2136cb6512` is pushed. Final fresh no-reset
-UAT passed leave/return/reload recovery and gap-list `ArrowDown`/`Enter`, and
-pushed checkpoint `96c2ac6892e8ffe9d020c2dff641a847157cd4b2` corrected the stale
-recovery alert. P-37 remains HOLD pending complete native-button keyboard
-traversal and explicit owner acceptance. See
+`e6d79d77bd8fb8d6a0211d7d7b440d2136cb6512` is pushed. Later no-reset UAT
+passed leave/return/reload recovery plus complete owner keyboard/focus/
+presentation review. Final pushed checkpoint
+`f36d896d672609653de6634e307dcc44bce6d519` passed repository verification.
+P-37 remains HOLD only for the explicit owner accept/hold decision. See
 [P-37 UAT and UX Correction Note](./33-phase4-wp8-p37-uat-ux-correction-note.md).
 No Production action is authorized.
 
@@ -600,12 +600,11 @@ pretend a publishable candidate has been approved.
       remains active
 - [x] P-35 source integration places exact amended `021` after `020`; P-36
       integrated Local technical execution passed on exact `910cc3c`
-- [ ] P-37 WP-8 acceptance is on HOLD after the first intended-admin
-      comprehension failure. Corrected insertion-gap leave/return/reload
-      recovery and gap-list `ArrowDown`/`Enter` now pass; complete native-button
-      keyboard traversal and explicit acceptance must still pass. Corrected
-      source checkpoints `e6d79d77bd8fb8d6a0211d7d7b440d2136cb6512` and
-      `96c2ac6892e8ffe9d020c2dff641a847157cd4b2` are pushed; technical
+- [ ] P-37 WP-8 acceptance remains on HOLD after the first intended-admin
+      comprehension failure. Corrected insertion-gap recovery plus complete
+      owner keyboard/focus/presentation UAT now pass; only explicit owner
+      acceptance remains. Final corrective source checkpoint
+      `f36d896d672609653de6634e307dcc44bce6d519` is pushed; technical
       stale-response, one confirmation, exact replay, accepted-state readback,
       and cleanup passed 2026-07-18;
       Add/Supplement stays hidden

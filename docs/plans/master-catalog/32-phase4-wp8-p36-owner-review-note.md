@@ -30,6 +30,12 @@ alert found by that session. Complete native-button keyboard traversal and
 explicit P-37 acceptance remain; Note #33 supersedes the earlier open
 leave/reload statement.
 
+**2026-07-18 owner-keyboard supplement:** fresh no-reset `2568.15.0` completed
+the remaining owner `Tab`/`Shift+Tab`, `Enter`/`Space`, sibling-order, dialog
+focus-return, and final-presentation gates. Final pushed corrective checkpoint
+`f36d896d672609653de6634e307dcc44bce6d519` passed verification and cleanup.
+Only the explicit P-37 accept/hold decision remains; Note #33 is authoritative.
+
 ## 1. Scope and provenance
 
 - branch: `codex/master-catalog-phase4`;

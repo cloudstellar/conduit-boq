@@ -114,9 +114,9 @@ and could not determine the task from the direct reference-item and
 before/after controls. The session stopped before final confirmation and made
 no placement RPC effect. The bounded working-tree correction replaces that
 presentation with final-neighbor previews and one insertion-gap editor while
-preserving the category/anchor/relation DB payload. P-37 is HOLD, not accepted,
-until owner re-UAT and the remaining complete native-button keyboard traversal,
-exact candidate-provenance, and explicit decision gates pass. See
+preserving the category/anchor/relation DB payload. At that historical
+checkpoint P-37 was HOLD for owner re-UAT, complete native-button traversal,
+exact candidate provenance, and an explicit decision. See
 [P-37 UAT and UX Correction Note](./33-phase4-wp8-p37-uat-ux-correction-note.md).
 Production remains unauthorized.
 
@@ -136,8 +136,19 @@ until the current Note #33 exit gates and an explicit owner accept/hold decision
 `2568.14.0` passed leave/return/reload recovery, gap-list `ArrowDown`/`Enter`,
 final review, reset, and cleanup without a placement submission. Pushed source
 checkpoint `96c2ac6892e8ffe9d020c2dff641a847157cd4b2` corrected and
-re-verified the stale recovery alert found by reset-all. Complete native-button
-keyboard traversal and explicit owner acceptance remain. Production remains unauthorized.
+re-verified the stale recovery alert found by reset-all. At that checkpoint,
+native-button traversal and explicit owner acceptance still remained.
+Production remained unauthorized.
+
+**P-37 owner keyboard/final-presentation UAT recorded:** 2026-07-18 — fresh
+no-reset Local `2568.15.0` completed visible `Tab`/`Shift+Tab`, native-button
+`Enter`/`Space`, insertion-gap, same-gap sibling-order, and editor/final-review
+focus-return gates without submitting the placement batch. Final review reuses
+the previous/new/next preview and labels the DB-derived final position
+separately from the authority-owned item name. Pushed checkpoint
+`f36d896d672609653de6634e307dcc44bce6d519` passed full verification; audited
+cleanup restored the exact disabled baseline. P-37 remains HOLD only for the
+explicit owner accept/hold decision. Production remains unauthorized.
 
 **Capability-completeness alignment recorded:** 2026-07-12 — owner requested a
 full owner/developer audit and plan correction. Audit #29 adds WP-6.6 before
@@ -283,6 +294,7 @@ change only application code or SQL.
 | L-60 | Browser route-render/semantic evidence is not interaction acceptance when the automation runtime cannot dispatch the application's client state changes. Preserve the technical measurements, name the tooling boundary, and require independent intended-admin keyboard/pointer/recovery UAT before P-37 | Prevents a green route screenshot or RPC-created accepted state from being mislabeled as proof that the operator can safely complete the live workflow |
 | L-61 | P-37 technical stale-lock rejection, one-batch acceptance, exact-request replay, accepted-state readback, and audited cleanup may close their named engineering gates without closing intended-admin keyboard or leave/reload recovery UAT | Preserves useful Local safety evidence while preventing an automation limitation or RPC-driven accepted state from silently becoming owner usability acceptance |
 | L-62 | A fresh no-reset browser session may close the named leave/return/reload recovery gate independently, but partial gap-list keyboard evidence cannot close complete keyboard traversal. Recovery copy is visible only while browser-local work is still pending; reset-all must clear both the work and the recovered-state claim | Keeps gate accounting evidence-based, prevents a tooling limitation from becoming inferred accessibility acceptance, and prevents truthful-state drift after an admin discards recovered choices |
+| L-63 | A controlled dialog opened without a colocated trigger must retain the exact invoking element transiently and restore focus on close. Final placement review must reuse the same previous/new/next preview as the editor and label DB-derived final position separately from the authority-owned item name | Preserves keyboard context across editor, final-review, and guarded-leave dialogs; keeps one presentation source and avoids future layout/wording changes drifting from placement logic |
 
 ## 3. Pending owner/data decisions
 
@@ -399,7 +411,7 @@ this register. In particular:
 | P-34 | Authorize and accept the bounded WP-8 placement UX source/static checkpoint | Implement truthful accepted-versus-dirty state from local assignment changes, versioned recoverable browser choices and guarded supported navigation, direct suggested/modified/incomplete/invalid filtering and counts, standards-complete keyboard radio behavior, deferred/memoized list work, and final affected-category/immediate-neighbor impact review. Accept exact source checkpoint `0780925aca8fa7ebbf8abbaf2b7cf151b39b676a` only after repository checks pass. Keep `021` outside bootstrap and preserve separate destructive Local rehearsal, measured browser/accessibility evidence, intended-admin UAT, P-14, and Production decisions. | Owner + developer | After P-33 and before any WP-8 reset/bootstrap/live gate | Authorized and source/static-passed 2026-07-15; historical source checkpoint only. The first P-37 intended-admin UAT later rejected its direct anchor/relation presentation; the bounded insertion-gap correction in [Review Note #33](./33-phase4-wp8-p37-uat-ux-correction-note.md) preserves the accepted DB contract and awaits re-UAT. |
 | P-35 | Authorize exact `021` bootstrap repository integration without destructive execution | Add unchanged amended `021` SHA-256 `e4de258756bbfbda0508e55d7b76ba2e907f644625b49bc29d4a4d7ac42fa714` after `020` in the canonical Local bootstrap source; align current authority/operator documents, provenance metadata, and executable consistency tests; run repository/static verification; commit and push the exact source checkpoint. Do not run bootstrap, reset or write Local, change feature flags, run live WP-8 evidence, decide P-19, change Factor F/hotfix scope, publish, or touch Production. | Owner + developer | After P-34 and before P-36 | Approved and source/static-passed 2026-07-15 on exact checkpoint `01eba0d49f2e4b6e65f0d9dd287fd461ba9ea19a`; P-36 remained separately gated and later passed |
 | P-36 | Authorize one destructive integrated WP-8 Local reset and live evidence run | From the exact pushed P-35 checkout, warn that `npm run db:local:bootstrap` resets all Local Supabase, then apply `009`-`015`, hotfix `016`, and Phase 4 `017`-`021`; run integrated DB/RLS/concurrency/P-20/WP-7/WP-7.5/export/advisor/browser/accessibility/performance/recovery evidence and restore the disabled clean baseline. | Owner + developer | After P-35 source checkpoint is pushed | Approved and technically passed 2026-07-15 on exact gate/execution checkout `910cc3cc74660beecf18655d39cd0b0c085d1fc6`; Local only; interaction/UAT acceptance remains P-37 |
-| P-37 | Accept or hold WP-8 and the Production-readiness package | Review exact P-36 execution provenance, clean final invariants, realistic-scale evidence, intended-admin UAT without developer/SQL assistance, advisor disposition, tracked export verification, and authority consistency. Acceptance permits only a later P-12 request; it does not authorize Production migration, deploy, enablement, or publication. | Owner | After every WP-8 exit gate passes | **HOLD retained 2026-07-17/18:** the first no-reset intended-admin session failed comprehension before any placement confirmation. The insertion-gap correction later passed technical stale/accept/replay/accepted-state/cleanup evidence. A final fresh no-reset session passed leave/return/reload recovery, gap-list `ArrowDown`/`Enter`, final review, reset, and cleanup; pushed checkpoint `96c2ac6892e8ffe9d020c2dff641a847157cd4b2` corrected its stale recovery-banner finding. Complete native-button keyboard traversal and explicit acceptance remain. See [Review Note #33](./33-phase4-wp8-p37-uat-ux-correction-note.md). |
+| P-37 | Accept or hold WP-8 and the Production-readiness package | Review exact P-36 execution provenance, clean final invariants, realistic-scale evidence, intended-admin UAT without developer/SQL assistance, advisor disposition, tracked export verification, and authority consistency. Acceptance permits only a later P-12 request; it does not authorize Production migration, deploy, enablement, or publication. | Owner | After every WP-8 exit gate passes | **HOLD retained only for explicit owner decision:** all named technical, recovery, realistic-scale, keyboard, focus-return, and final-presentation gates passed by 2026-07-18. Final pushed candidate `f36d896d672609653de6634e307dcc44bce6d519`; no placement submission; exact disabled-baseline cleanup passed. See [Review Note #33](./33-phase4-wp8-p37-uat-ux-correction-note.md). |
 
 ### P-11 cover-layout refinement (2026-07-10, revised 2026-07-11)
 
@@ -531,7 +543,7 @@ Production migration, deploy, feature enablement, or publication.
 | P-34 WP-8 placement UX source/static | Exact `0780925aca8fa7ebbf8abbaf2b7cf151b39b676a` accepted as a historical bounded source/static checkpoint; WP-8 remains In progress | Owner + developer | 2026-07-15 | Technical provenance remains valid. Its direct relation-control presentation was rejected by first P-37 UAT and is superseded by the Note #33 insertion-gap correction; DB contract unchanged. |
 | P-35 WP-8 bootstrap source integration | Exact source checkpoint `01eba0d49f2e4b6e65f0d9dd287fd461ba9ea19a` passed; destructive execution was held at this checkpoint | Owner + developer | 2026-07-15 | Unchanged amended `021` is after `020`; authority and executable contracts are aligned. P-36 remained separate and later passed; P-37/Production remain separate. |
 | P-36 WP-8 destructive Local execution | Approved after explicit reset warning and passed for integrated technical scope | Owner + developer | 2026-07-15 | Exact gate/execution `910cc3cc74660beecf18655d39cd0b0c085d1fc6`; integrated DB/regression/hash/export/advisor/route-render/cleanup evidence passed. Production touched: No. |
-| P-37 WP-8 owner acceptance | HOLD after first intended-admin comprehension failure; technical continuation and final leave/reload recovery passed, acceptance not recorded | Owner | 2026-07-17/18 | Corrected insertion-gap flow passed technical stale recovery, one-batch confirmation, exact replay, accepted-state readback, audited cleanup, and post-evidence repository checks. Final fresh no-reset UAT passed leave/return/reload recovery, gap-list `ArrowDown`/`Enter`, final review, reset, and cleanup; source checkpoint `96c2ac6892e8ffe9d020c2dff641a847157cd4b2` fixed and re-verified the stale recovery alert. Complete native-button keyboard traversal and explicit acceptance remain. Add/Supplement remains hidden; see Note #33. |
+| P-37 WP-8 owner acceptance | HOLD only for explicit owner accept/hold; technical, recovery, keyboard, focus, and presentation gates passed | Owner | 2026-07-17/18 | Fresh no-reset owner UAT completed the remaining keyboard-only path and accepted the final presentation without submitting placements. Exact pushed checkpoint `f36d896d672609653de6634e307dcc44bce6d519`; baseline cleanup exact. Add/Supplement remains hidden until the decision; see Note #33. |
 | Production migration | Not requested |  |  | P-12; request after WP-8 evidence review |
 | Deploy / feature enable | Not requested |  |  | P-13–P-14; request only after preceding Production gate passes |
 | Publish named version | Not requested |  |  | P-15 |

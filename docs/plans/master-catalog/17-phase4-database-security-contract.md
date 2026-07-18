@@ -45,9 +45,11 @@ authority baseline. P-35 now places unchanged amended `021` after `020` in the
 canonical Local bootstrap source. P-36 later clean-executed that integrated
 path on exact checkout `910cc3cc74660beecf18655d39cd0b0c085d1fc6` and passed
 the DB/RLS/concurrency/P-20/WP-7/WP-7.5/advisor/final-invariant technical gates.
-It has not been applied to Production. P-37 independent intended-admin
-interaction/recovery acceptance remains separate; see
-[P-36 Owner Review Note](./32-phase4-wp8-p36-owner-review-note.md).
+It has not been applied to Production. Corrected P-37 intended-admin
+interaction/recovery and owner keyboard/focus/presentation UAT passed on
+pushed checkpoint `f36d896d672609653de6634e307dcc44bce6d519`; only the explicit
+owner P-37 accept/hold decision remains separate. See
+[P-37 UAT/UX Note](./33-phase4-wp8-p37-uat-ux-correction-note.md).
 
 **Owner decision recorded:** 2026-07-04 — approved according to the
 recommendation as the technical backbone for Phase 4A and every Phase 4 write
@@ -877,8 +879,9 @@ renumber `017`-`020`. P-32 passed separate Local apply/order/RLS/concurrency/
 hash/export/browser evidence, and P-33 accepted that bounded technical scope.
 P-35 adds unchanged `021` to bootstrap source. After the separately warned and
 approved P-36 decision, P-20, WP-7, WP-7.5, advisors, and the integrated
-technical rehearsal passed on exact `910cc3c`. Independent live client
-interaction/recovery and intended-admin UAT remain before P-37 acceptance.
+technical rehearsal passed on exact `910cc3c`. Corrected live client recovery
+and complete owner keyboard/focus/presentation UAT later passed on exact
+`f36d896d672609653de6634e307dcc44bce6d519`; explicit P-37 acceptance remains.
 
 Do not edit an applied migration file. Forward-fix with a new reviewed
 migration.

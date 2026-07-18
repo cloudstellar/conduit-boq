@@ -136,10 +136,10 @@ describe('Master Catalog authority consistency', () => {
       '**Owner-accepted Local-only migration in bootstrap source; SHA-256 `e07e0c4161077efba7bc4f6ebf95518d0cc1bc7e4628a43a128dd899bd1aef93`; G1R/G2 separate-apply evidence passed on exact checkout `721c2c2c4a234a4fd00e5686383be9af87ee15dd`; G3/WP-6.6 accepted on `78e96ab3ed9993707014c4aba1d285b7592b17a1`; owner-approved G4E combined clean bootstrap through `020` passed on exact execution checkout `15b707d443bec701f6b3a86aa7675ca1266604ba`; not Production-approved**',
     )
     expect(migrations).toContain(
-      'P-32 separate-apply evidence/P-33 technical acceptance/P-34 historical UX source-static/P-36 integrated technical evidence passed; first P-37 intended-admin UAT failed comprehension, while the corrected-flow technical stale/accept/replay/cleanup continuation and final no-reset leave/reload recovery plus gap-list keyboard interaction later passed',
+      'P-32 separate-apply evidence/P-33 technical acceptance/P-34 historical UX source-static/P-36 integrated technical evidence passed; first P-37 intended-admin UAT failed comprehension, while corrected technical/recovery evidence and the final owner keyboard/focus/presentation UAT later passed',
     )
     expect(migrations).toContain(
-      'corrected-flow checkpoint `e6d79d77bd8fb8d6a0211d7d7b440d2136cb6512` and recovery-state checkpoint `96c2ac6892e8ffe9d020c2dff641a847157cd4b2` are pushed; P-37 is HOLD for complete native-button keyboard traversal and explicit owner acceptance; DB contract unchanged; not Production-approved',
+      'P-37 is HOLD only for the explicit owner accept/hold decision; DB contract unchanged; not Production-approved',
     )
     expect(existsSync(resolve(
       root,
@@ -268,6 +268,7 @@ describe('Master Catalog authority consistency', () => {
     expect(decisions).toContain('| L-57 |')
     expect(decisions).toContain('| L-58 |')
     expect(decisions).toContain('| L-60 |')
+    expect(decisions).toContain('| L-63 |')
     expect(decisions).toContain('review-by-exception')
     expect(decisions).toContain(
       'Accepted 2026-07-14 23:50 +07; WP-6.6 complete; G4 and all later gates remain separate',
@@ -301,7 +302,7 @@ describe('Master Catalog authority consistency', () => {
       /P-33 accepted that\s+exact bounded WP-7\.5 technical checkpoint at 2026-07-15 13:54 \+07/,
     )
     expect(tracker).toContain(
-      'WP-8 In progress; P-36 integrated technical rehearsal passed; P-37 leave/reload recovery and gap-search keyboard interaction passed on the corrected flow; complete native-button keyboard traversal plus explicit owner acceptance remain',
+      'WP-8 In progress; P-36 and every named P-37 technical/recovery/owner keyboard/focus/presentation gate passed; only explicit owner P-37 accept/hold remains',
     )
     expect(tracker).toContain(
       '| Current environment | Clean disabled Local baseline: pointer `2568.0.0`/710; zero working drafts;',
@@ -431,7 +432,9 @@ describe('Master Catalog authority consistency', () => {
     const p37Correction = read(
       'docs/plans/master-catalog/33-phase4-wp8-p37-uat-ux-correction-note.md',
     )
-    expect(p37Correction).toContain('P-37 remains **HOLD**')
+    expect(p37Correction).toContain(
+      'P-37 remains **HOLD only for the explicit owner accept/hold',
+    )
     expect(p37Correction).toContain('This is a genuine UAT failure, not operator error')
     expect(p37Correction).toContain('insertion gap')
     expect(p37Correction).toContain('keeps the DB/RPC/readiness/audit/concurrency contract')
@@ -441,6 +444,10 @@ describe('Master Catalog authority consistency', () => {
     expect(p37Correction).toContain(
       '96c2ac6892e8ffe9d020c2dff641a847157cd4b2',
     )
+    expect(p37Correction).toContain(
+      'f36d896d672609653de6634e307dcc44bce6d519',
+    )
+    expect(p37Correction).toContain('Owner keyboard and final-presentation re-UAT')
     expect(existsSync(resolve(
       root,
       'docs/plans/master-catalog/30-phase4-wp66-owner-review-note.md',

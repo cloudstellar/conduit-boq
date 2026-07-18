@@ -139,9 +139,11 @@ Stop immediately when any of these occurs:
     Production approval. Finally verify P-35 separately: unchanged amended
     `021` is now in bootstrap source after `020`. P-36 was separately approved
     after the reset warning and the integrated Local technical rehearsal passed
-    on exact checkout `910cc3c`. Independent intended-admin interaction/
-    recovery UAT remains a P-37/P-14 gate; see
-    [P-36 Owner Review Note](./32-phase4-wp8-p36-owner-review-note.md).
+    on exact checkout `910cc3c`. Corrected intended-admin interaction/recovery
+    and complete owner keyboard/focus/presentation UAT later passed on pushed
+    checkpoint `f36d896d672609653de6634e307dcc44bce6d519`; the explicit P-37
+    accept/hold decision remains a P-37/P-14 gate. See
+    [P-37 UAT/UX Note](./33-phase4-wp8-p37-uat-ux-correction-note.md).
 
 **Exit gate:** All documents have owner/reviewer decisions; no unresolved row
 or taxonomy blocker.

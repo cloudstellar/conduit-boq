@@ -1,17 +1,20 @@
 # Phase 4 WP-8 P-37 Intended-Admin UAT and Placement UX Correction Note
 
-**Status:** P-37 remains **HOLD**. The first no-reset intended-admin Local UAT
-session on 2026-07-17 failed the comprehension gate before any placement batch
-was confirmed. The bounded insertion-gap correction and its technical
-stale/accept/replay/accepted-state/cleanup continuation passed. A final fresh
-no-reset Local session on 2026-07-18 then passed browser-local leave, return,
-reload, and recovery; insertion-gap search plus `ArrowDown`/`Enter`; final batch
-review; and cleanup. That session found and corrected one stale recovery-banner
-state. Exact corrective source checkpoint
-`96c2ac6892e8ffe9d020c2dff641a847157cd4b2` is pushed. Complete independent
-`Tab`/`Shift+Tab` traversal and native-button `Enter`/`Space` activation remain
-open because the in-app browser driver did not dispatch those keys. Explicit
-owner acceptance also remains open.
+**Status:** P-37 remains **HOLD only for the explicit owner accept/hold
+decision**. The first no-reset intended-admin Local UAT on 2026-07-17 failed the
+comprehension gate before any placement batch was confirmed. The bounded
+insertion-gap correction and its technical stale/accept/replay/accepted-state/
+cleanup continuation passed. A fresh no-reset Local session then passed
+browser-local leave/return/reload recovery, gap search, final review, and
+cleanup. On 2026-07-18 the owner completed the remaining manual keyboard-only
+path on fresh fixture `2568.15.0`: visible `Tab`/`Shift+Tab` traversal,
+native-button `Enter`/`Space`, insertion-gap selection, same-gap sibling moves,
+and editor/final-review focus return all passed. The owner also accepted the
+final previous/new/next presentation with an explicit post-save sequence
+number. Exact corrective source checkpoint
+`f36d896d672609653de6634e307dcc44bce6d519` is pushed. No placement batch was
+submitted. This usability approval is evidence for P-37 but is not silently
+treated as the still-pending explicit P-37 decision.
 
 **Environment:** Local only. Production touched: **No**.
 
@@ -196,8 +199,54 @@ External screenshots are review evidence only and must not be staged:
   `/Users/cloud/.codex/visualizations/2026/07/06/019f36c9-8c72-7f30-9bd3-6161114f7c1b/p37-final-uat/06-recovered-after-reload.png`,
   `/Users/cloud/.codex/visualizations/2026/07/06/019f36c9-8c72-7f30-9bd3-6161114f7c1b/p37-final-uat/07-final-batch-review.png`, and
   `/Users/cloud/.codex/visualizations/2026/07/06/019f36c9-8c72-7f30-9bd3-6161114f7c1b/p37-final-uat/08-reset-clears-recovery-banner.png`.
+- owner keyboard-only evidence retained outside Git:
+  `/Users/cloud/.codex/visualizations/2026/07/06/019f36c9-8c72-7f30-9bd3-6161114f7c1b/p37-owner-keyboard-uat/01-placement-editor-open.png`,
+  `/Users/cloud/.codex/visualizations/2026/07/06/019f36c9-8c72-7f30-9bd3-6161114f7c1b/p37-owner-keyboard-uat/02-gap-selected.png`,
+  `/Users/cloud/.codex/visualizations/2026/07/06/019f36c9-8c72-7f30-9bd3-6161114f7c1b/p37-owner-keyboard-uat/03-local-change-overview.png`,
+  `/Users/cloud/.codex/visualizations/2026/07/06/019f36c9-8c72-7f30-9bd3-6161114f7c1b/p37-owner-keyboard-uat/04-final-review-focus.png`, and
+  `/Users/cloud/.codex/visualizations/2026/07/06/019f36c9-8c72-7f30-9bd3-6161114f7c1b/p37-owner-keyboard-uat/05-final-review-sequence.png`.
 
-## 4. Current Local state
+## 4. Owner keyboard and final-presentation re-UAT
+
+The owner used the real Local application on `http://localhost:3000` without a
+database reset or developer-driven browser automation. Fresh draft `2568.15.0`
+contained 710 inherited rows plus 18 temporary new rows. The continuous pass
+proved:
+
+- `Tab` reached the first **เปลี่ยนตำแหน่ง** button and `Enter` opened the
+  editor; visible focus landed on the category select;
+- category open/close, insertion-gap search, `ArrowDown`/`Enter` selection, and
+  `Tab`/`Shift+Tab` traversal through cancel/apply worked without a pointer;
+- `Space` applied one browser-local change, producing the truthful 17 system /
+  1 locally adjusted state without a database placement submission;
+- the first editor close exposed missing opener-focus restoration. The bounded
+  correction stores the invoking native button, restores it with
+  `preventScroll`, and passed re-UAT when immediate `Enter` reopened the same
+  editor;
+- the native same-gap disclosure opened with `Enter`; disabled controls were
+  skipped; `Space` moved one sibling down and then back up;
+- final review opened from the keyboard with visible focus on the required
+  reason field. `Tab`/`Shift+Tab` traversed both footer buttons, `Space` on
+  **กลับไปตรวจ** closed the dialog, and immediate `Enter` reopened it from the
+  invoking button;
+- final review now reuses the same responsive previous/new/next component as
+  the editor and displays the DB-preview-derived **ลำดับหลังบันทึก** separately
+  from the authority-owned item name. The owner judged this presentation usable;
+- the same explicit focus-return pattern also protects the guarded same-origin
+  leave dialog, preventing a keyboard user who chooses **อยู่หน้านี้** from
+  losing the invoking link;
+- the dangerous **ยืนยันและบันทึกตำแหน่ง** action was never activated.
+
+Checkpoint `f36d896d672609653de6634e307dcc44bce6d519` contains only the
+placement workspace and focused regression contract. The database, migration
+`021`, RPC payload, authority data, hotfix `016`, Factor F, and Production were
+unchanged. Verification passed: focused operator test 1 file / 14 tests; full
+suite 33 files / 184 tests; TypeScript; ESLint with zero errors and the same 10
+existing warnings; authority 710 mappings / 65 groups / 17 exclusions,
+SHA-256 `28675e6244c65d485dda7142634b381db729a139bccdf189ad51563251a2e12a`;
+network-enabled production build; and `git diff --check`.
+
+## 5. Current Local state
 
 The temporary UAT fixture was audited-abandoned after evidence capture:
 
@@ -205,36 +254,29 @@ The temporary UAT fixture was audited-abandoned after evidence capture:
 - zero working drafts; technical test version `2568.13.0` remains `abandoned`
   with 728 retained audit rows at lock `4` / placement revision `2`, and the
   final no-reset UAT version `2568.14.0` is `abandoned` with 728 retained rows
-  at lock `2` / placement revision `1`;
+  at lock `2` / placement revision `1`; owner keyboard UAT version `2568.15.0`
+  is also `abandoned` with 728 retained rows at lock `2` / placement revision
+  `1`;
 - `catalog_admin_enabled = false`, `catalog_new_identity_enabled = false`, and
   `catalog_retirement_enabled = false`;
 - 198 BOQs, 1,547 BOQ items, zero unversioned BOQs;
 - Factor F current `2569.0.0`, 36 rows;
 - Production touched: **No**.
 
-## 5. Remaining P-37 exit path
+## 6. Remaining P-37 exit path
 
-Codex has already exercised and recorded the corrected flow, realistic 710+18
-scale, leave/return/reload recovery, final review, stale rejection, one-batch
-confirmation mechanics, exact replay, accepted-state readback, reset, and
-cleanup. The owner does not need to repeat those gates or submit another
-placement batch.
+All named technical, recovery, realistic-scale, keyboard, focus-return, and
+owner-presentation gates are now complete. The temporary fixture is cleaned and
+the disabled canonical baseline is exact. The owner does not need another Local
+fixture, reset, or placement submission.
 
-P-37 may be reconsidered after one fresh no-reset, keyboard-only pass without
-developer or SQL guidance:
+The only remaining P-37 action is an explicit owner **accept** or **hold**
+decision against pushed corrective source checkpoint
+`f36d896d672609653de6634e307dcc44bce6d519`. Acceptance would close this WP-8
+release-readiness gate and permit only a later P-12 Production-readiness
+request. It would not authorize Production migration, deployment, feature
+enablement, publication, P-19, Factor F work, or hotfix expansion.
 
-1. Codex prepares a temporary Local-only 710+18 fixture; no Local reset is
-   required and no Production environment is involved;
-2. the owner uses `Tab`/`Shift+Tab` with visible focus and `Enter`/`Space` on
-   native buttons to open/close the row editor, operate category and insertion-
-   gap controls, move same-gap siblings, open/close final review, and verify
-   focus returns to the invoking control; gap search, `ArrowDown`, and `Enter`
-   selection are already passed and need only a brief confirmation in this
-   continuous keyboard path;
-3. stop before the final placement submission, then record an explicit owner
-   P-37 accept/hold decision against corrective source checkpoint
-   `96c2ac6892e8ffe9d020c2dff641a847157cd4b2`.
-
-Until complete owner keyboard re-UAT and explicit acceptance pass,
-WP-8 remains **In progress**, P-37 remains **HOLD**, Add/Supplement remains
-hidden for release, and P-12 through P-15 remain unauthorized.
+Until that explicit decision is recorded, WP-8 remains **In progress**, P-37
+remains **HOLD**, Add/Supplement remains hidden for release, and P-12 through
+P-15 remain unauthorized.

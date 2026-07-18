@@ -12,9 +12,10 @@ exact candidate `721c2c2`. The owner accepted G3/WP-6.6 on exact application
 checkpoint `78e96ab3ed9993707014c4aba1d285b7592b17a1` at
 2026-07-14 23:50 +07. Prior `3bfc74e` evidence is historical. G4,
 P-18 technical placement, and P-36 integrated rehearsal later passed. The
-corrected P-37 flow also passed Local stale/accept/replay/cleanup mechanics and
-final no-reset leave/return/reload recovery. Complete native-button keyboard
-traversal, explicit P-37 acceptance, P-19 when triggered, and the Production
+corrected P-37 flow also passed Local stale/accept/replay/cleanup mechanics,
+final no-reset leave/return/reload recovery, and owner keyboard/focus/
+presentation UAT on pushed checkpoint `f36d896d672609653de6634e307dcc44bce6d519`.
+Explicit P-37 acceptance, P-19 when triggered, and the Production
 gates remain pending. The Local UI must not be treated as
 Production-ready until those gates pass.
 **Audience:** Active Master Catalog administrators

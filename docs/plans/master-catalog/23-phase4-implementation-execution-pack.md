@@ -119,12 +119,10 @@ working tree now presents one insertion-gap choice and truthful local state
 while preserving the exact P-18 category/anchor/relation payload. Desktop/mobile
 interaction QA passed. The later Local continuation passed stale rejection,
 one acceptance, exact-request replay, accepted-state route readback, cleanup,
-and post-evidence repository checks. Corrected source checkpoint
-`e6d79d77bd8fb8d6a0211d7d7b440d2136cb6512` is pushed. Final fresh no-reset
-UAT passed leave/return/reload recovery and gap-list `ArrowDown`/`Enter`, and
-checkpoint `96c2ac6892e8ffe9d020c2dff641a847157cd4b2` fixed the stale
-recovery alert. Complete native-button keyboard traversal and explicit
-acceptance remain open. P-37 remains HOLD. See
+and post-evidence repository checks. Later no-reset UAT passed leave/return/
+reload recovery and complete owner keyboard/focus/presentation review. Final
+pushed checkpoint `f36d896d672609653de6634e307dcc44bce6d519` passed repository
+verification. Only explicit owner acceptance remains open. P-37 remains HOLD. See
 [Review Note #33](./33-phase4-wp8-p37-uat-ux-correction-note.md).
 
 **P-22 operator-workflow correction authorized:** 2026-07-12 — intended-admin
