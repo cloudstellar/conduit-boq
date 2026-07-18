@@ -127,7 +127,7 @@ BEGIN;
         AND policy.qual ILIKE '%profile.status = ''active''%'
         AND policy.qual ILIKE '%profile.role = ''admin''%'
         AND policy.qual ILIKE '%catalog_row.identity_id = catalog_item_codes.identity_id%'
-        AND policy.qual ILIKE '%catalog_row.item_code = catalog_item_codes.item_code%'
+        AND policy.qual ILIKE '%catalog_row.item_code%::text = catalog_item_codes.item_code%'
         AND policy.qual ILIKE '%version.status%active%archived%'
     ) THEN
       RAISE EXCEPTION

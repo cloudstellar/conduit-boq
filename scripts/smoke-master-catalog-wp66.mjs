@@ -1461,7 +1461,7 @@ function readSchemaContract() {
           AND cmd = 'SELECT'
           AND roles = ARRAY['authenticated'::name]
           AND qual ILIKE '%catalog_row.identity_id = catalog_item_codes.identity_id%'
-          AND qual ILIKE '%catalog_row.item_code = catalog_item_codes.item_code%'
+          AND qual ILIKE '%catalog_row.item_code%::text = catalog_item_codes.item_code%'
           AND qual ILIKE '%version.status%active%archived%'
       ),
       'published_identity_count', (

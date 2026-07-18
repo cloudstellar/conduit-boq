@@ -69,7 +69,7 @@ SELECT json_build_object(
         AND policy.tablename = 'catalog_item_codes'
         AND policy.policyname = 'catalog_item_codes_select'
         AND policy.qual ILIKE '%catalog_row.identity_id = catalog_item_codes.identity_id%'
-        AND policy.qual ILIKE '%catalog_row.item_code = catalog_item_codes.item_code%'
+        AND policy.qual ILIKE '%catalog_row.item_code%::text = catalog_item_codes.item_code%'
         AND policy.qual ILIKE '%version.status%active%archived%'
     )
   ),

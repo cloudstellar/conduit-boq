@@ -247,10 +247,15 @@ published history exposes 713 identities rather than the clean-baseline 710.
 Review confirmed that published-history identity union is intended, while the
 code policy also needed the exact code-pair predicate to prevent a future
 draft-only alias of an issued identity from leaking to staff. Cleanup restored
-all flags, pointer, zero drafts, and BOQ counts. Migration `023` SHA-256
-`fd0a75d961dac7cf61b98330430e9a10beb6910f735c7fcd1eb439d48b18b52c`
-owns the policy-only fix; P39R-L is not passed until `023`, transient RLS denial,
-the full live harness, and final invariants pass on one exact committed source.
+all flags, pointer, zero drafts, and BOQ counts. The first `023` apply from exact
+pushed `072294d` created the intended policy but its textual postcondition did
+not account for PostgreSQL's implicit `item_code` cast. The transaction rolled
+back completely and canonical pre-`023` state remained exact. Corrected
+migration `023` SHA-256
+`cbe01f63c6dd822edb29e1f7a31bfd27d5cb063e4d7d7e3878567875434d0a88`
+matches the inspected parse form without weakening the policy predicate.
+P39R-L is not passed until corrected `023`, transient RLS denial, the full live
+harness, and final invariants pass on one exact committed source.
 
 ## 7. Deployment and rollback compatibility
 
