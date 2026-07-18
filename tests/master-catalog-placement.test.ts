@@ -3,7 +3,9 @@ import type { CatalogWorkspaceItem } from '../lib/master-catalog/admin/catalogWo
 import {
   buildCatalogPlacementPreview,
   catalogPlacementAssignmentsEqual,
+  getCatalogPlacementAssignmentForGap,
   getCatalogPlacementAssignmentValidity,
+  getCatalogPlacementGapIndex,
   hasCatalogPlacementDraftChanges,
   moveCatalogPlacementAssignmentWithinAnchor,
   resequenceCatalogPlacementAssignments,
@@ -132,6 +134,44 @@ describe('Master Catalog placement model', () => {
       [Y.identityId, 0],
       [X.identityId, 1],
     ]);
+  });
+
+  it('maps user-facing insertion gaps to the canonical anchor relation', () => {
+    const anchors = [A, B];
+    const firstGap = getCatalogPlacementAssignmentForGap(anchors, 0);
+    const middleGap = getCatalogPlacementAssignmentForGap(anchors, 1);
+    const lastGap = getCatalogPlacementAssignmentForGap(anchors, 2);
+
+    expect(firstGap).toEqual({
+      anchorIdentityId: A.identityId,
+      relation: 'before',
+    });
+    expect(middleGap).toEqual({
+      anchorIdentityId: A.identityId,
+      relation: 'after',
+    });
+    expect(lastGap).toEqual({
+      anchorIdentityId: B.identityId,
+      relation: 'after',
+    });
+    expect(getCatalogPlacementAssignmentForGap(anchors, -1)).toEqual(firstGap);
+    expect(getCatalogPlacementAssignmentForGap(anchors, 99)).toEqual(lastGap);
+    expect(getCatalogPlacementAssignmentForGap([], 0)).toBeNull();
+
+    expect(getCatalogPlacementGapIndex(anchors, {
+      identityId: X.identityId,
+      categoryId: CATEGORY_A,
+      anchorIdentityId: A.identityId,
+      relation: 'after',
+      batchOrder: 0,
+    })).toBe(1);
+    expect(getCatalogPlacementGapIndex(anchors, {
+      identityId: X.identityId,
+      categoryId: CATEGORY_A,
+      anchorIdentityId: B.identityId,
+      relation: 'before',
+      batchOrder: 0,
+    })).toBe(1);
   });
 
   it('classifies incomplete and invalid choices separately from admin changes', () => {

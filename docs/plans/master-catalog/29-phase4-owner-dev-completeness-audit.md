@@ -28,13 +28,23 @@ unchanged `021` bootstrap source integration. P-36 then passed the integrated
 Local technical rehearsal on exact `910cc3c`, including realistic 710+18 route
 rendering and clean final invariants. Browser automation could not dispatch
 React/Radix client state changes, so independent intended-admin live
-interaction/keyboard/recovery UAT remains; P-37 HOLD is recommended.
+interaction/keyboard/recovery UAT remained. The first no-reset P-37 session on
+2026-07-17 then failed the comprehension gate before confirmation because the
+UI exposed reference-item/before-after mechanics. A bounded insertion-gap
+presentation correction is implemented. Its later Local technical continuation
+passed stale rejection, one acceptance, exact replay, accepted-state readback,
+cleanup, and post-evidence repository checks. Owner keyboard/leave-reload
+re-UAT, exact commit/push provenance,
+and explicit acceptance remain; P-37 is HOLD. See
+[Note #33](./33-phase4-wp8-p37-uat-ux-correction-note.md).
 
 **Environment:** Source/document audit only. No Local database reset, Production
 access/write, feature enablement, publication, new Factor F workflow, or hotfix
 scope expansion was performed or authorized by this audit. The later P-36
 Local reset/result is a separate owner-approved execution recorded in
-[Review Note #32](./32-phase4-wp8-p36-owner-review-note.md).
+[Review Note #32](./32-phase4-wp8-p36-owner-review-note.md). The later P-37
+no-reset intended-admin session and bounded correction are recorded separately
+in [Review Note #33](./33-phase4-wp8-p37-uat-ux-correction-note.md).
 
 ## 1. Correction to the earlier completeness statement
 
@@ -216,13 +226,15 @@ that can never finish is not.
 ## 8. Effort and confidence
 
 The original corrected full-path estimate was **9-15 focused engineering
-days**. P-34 completed the bounded WP-8 placement UX source/static slice and
-P-36 completed the integrated technical rehearsal plus realistic route-render
-measurements. The remaining pre-P-37 scope is one independent intended-admin
-live interaction/keyboard/recovery session and authority closeout,
-approximately **0.5-1 focused engineering day** plus reviewer availability.
-Any defect found by that session extends the range. This is an effort estimate,
-not permission to skip gates or a guaranteed date.
+days**. P-34 completed its historical source/static slice and P-36 completed
+the integrated technical rehearsal plus realistic route-render measurements.
+The first P-37 session found a presentation defect; the bounded correction is
+now implemented, and technical stale/confirmation/replay/cleanup evidence plus
+post-evidence repository checks have passed. Owner keyboard/leave-reload re-UAT,
+exact commit/push provenance,
+and the explicit decision remain approximately **0.5 focused engineering day**
+plus reviewer availability if no further defect is found. This is an effort
+estimate, not permission to skip gates or a guaranteed date.
 
 The confidence is higher than the earlier estimate because the work is now
 enumerated by capability and authoritative layer. Residual unknowns must be

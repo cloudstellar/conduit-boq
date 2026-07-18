@@ -136,7 +136,10 @@ describe('Master Catalog authority consistency', () => {
       '**Owner-accepted Local-only migration in bootstrap source; SHA-256 `e07e0c4161077efba7bc4f6ebf95518d0cc1bc7e4628a43a128dd899bd1aef93`; G1R/G2 separate-apply evidence passed on exact checkout `721c2c2c4a234a4fd00e5686383be9af87ee15dd`; G3/WP-6.6 accepted on `78e96ab3ed9993707014c4aba1d285b7592b17a1`; owner-approved G4E combined clean bootstrap through `020` passed on exact execution checkout `15b707d443bec701f6b3a86aa7675ca1266604ba`; not Production-approved**',
     )
     expect(migrations).toContain(
-      '**Owner-accepted Local-only migration in bootstrap source under P-35 on exact source checkpoint `01eba0d49f2e4b6e65f0d9dd287fd461ba9ea19a`; SHA-256 `e4de258756bbfbda0508e55d7b76ba2e907f644625b49bc29d4a4d7ac42fa714`; P-32 separate-apply evidence/P-33 technical acceptance/P-34 UX source-static passed; P-36 integrated clean bootstrap and live technical evidence passed on exact execution checkout `910cc3cc74660beecf18655d39cd0b0c085d1fc6`; P-37 independent intended-admin release acceptance remains pending with HOLD recommended; not Production-approved**',
+      'P-32 separate-apply evidence/P-33 technical acceptance/P-34 historical UX source-static/P-36 integrated technical evidence passed; first P-37 intended-admin UAT failed comprehension, while the corrected-flow technical stale/accept/replay/cleanup continuation and post-evidence repository checks later passed',
+    )
+    expect(migrations).toContain(
+      'P-37 is HOLD for independent keyboard/leave-reload re-UAT and exact commit/push provenance; DB contract unchanged; not Production-approved',
     )
     expect(existsSync(resolve(
       root,
@@ -242,10 +245,19 @@ describe('Master Catalog authority consistency', () => {
     expect(decisions).toContain('| P-36 |')
     expect(decisions).toContain('| P-37 |')
     expect(decisions).toContain(
+      'P-37 first intended-admin UAT result recorded',
+    )
+    expect(decisions).toContain(
+      'The bounded working-tree correction replaces that',
+    )
+    expect(decisions).toContain(
+      'preserving the category/anchor/relation DB payload',
+    )
+    expect(decisions).toContain(
       'Accepted 2026-07-15 13:54 +07 for the exact bounded technical checkpoint; WP-7.5 technically complete; no bootstrap, WP-8, feature, publication, or Production authorization inferred',
     )
     expect(decisions).toContain(
-      'Authorized and source/static-passed 2026-07-15; WP-8 is In progress. No bootstrap edit, Local DB reset/write, feature enablement, publication, Factor F/hotfix expansion, or Production action authorized',
+      'Authorized and source/static-passed 2026-07-15; historical source checkpoint only',
     )
     expect(decisions).toContain(
       'Approved and source/static-passed 2026-07-15 on exact checkpoint `01eba0d49f2e4b6e65f0d9dd287fd461ba9ea19a`; P-36 remained separately gated and later passed',
@@ -289,7 +301,7 @@ describe('Master Catalog authority consistency', () => {
       /P-33 accepted that\s+exact bounded WP-7\.5 technical checkpoint at 2026-07-15 13:54 \+07/,
     )
     expect(tracker).toContain(
-      'WP-8 In progress; P-36 integrated technical rehearsal passed; P-37 HOLD recommended pending independent intended-admin live interaction/keyboard/recovery UAT',
+      'WP-8 In progress; P-36 integrated technical rehearsal passed; first P-37 intended-admin session failed comprehension; corrected placement flow awaits re-UAT and remaining keyboard/recovery evidence',
     )
     expect(tracker).toContain(
       '0780925aca8fa7ebbf8abbaf2b7cf151b39b676a',
@@ -303,8 +315,9 @@ describe('Master Catalog authority consistency', () => {
     const operatorProcedure = read(
       'docs/plans/master-catalog/15-phase4-admin-operating-procedure.md',
     )
-    expect(operatorProcedure).toContain('Start with **ต้องตรวจ**')
-    expect(operatorProcedure).toContain('must immediately show **ยังไม่ยืนยัน**')
+    expect(operatorProcedure).toContain('The page opens on **ทั้งหมด**')
+    expect(operatorProcedure).toContain('select one insertion gap')
+    expect(operatorProcedure).toContain('must immediately show **ปรับในหน้านี้ · ยังไม่บันทึก**')
     expect(operatorProcedure).toContain('keyboard-incomplete required control blocks P-14')
 
     const threatModel = read(
@@ -394,7 +407,7 @@ describe('Master Catalog authority consistency', () => {
       /pre-amendment operator\/browser preflight passed on\s+`c8f6dca`/,
     )
     expect(tracker).toContain(
-      'Status: P-35 source integration and P-36 technical execution are complete',
+      'Status: P-37 HOLD retained; Add/Supplement remains hidden; no Production action authorized',
     )
     expect(existsSync(resolve(
       root,
@@ -408,6 +421,19 @@ describe('Master Catalog authority consistency', () => {
     expect(p36OwnerReview).toContain(
       '`v_row_count` is assigned but never read',
     )
+    expect(existsSync(resolve(
+      root,
+      'docs/plans/master-catalog/33-phase4-wp8-p37-uat-ux-correction-note.md',
+    ))).toBe(true)
+    const p37Correction = read(
+      'docs/plans/master-catalog/33-phase4-wp8-p37-uat-ux-correction-note.md',
+    )
+    expect(p37Correction).toContain('P-37 remains **HOLD**')
+    expect(p37Correction).toContain('This is a genuine UAT failure, not operator error')
+    expect(p37Correction).toContain('insertion gap')
+    expect(p37Correction).toContain('keeps the DB/RPC/readiness/audit/concurrency contract')
+    expect(p37Correction).toContain('unchanged and replaces only the operator translation')
+    expect(p37Correction).toContain('Production touched: **No**')
     expect(existsSync(resolve(
       root,
       'docs/plans/master-catalog/30-phase4-wp66-owner-review-note.md',

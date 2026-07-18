@@ -214,10 +214,10 @@ describe('Master Catalog P-22 operator workflow', () => {
     expect(placementWorkspace).toContain('hasCatalogPlacementDraftChanges');
     expect(placementWorkspace).toContain('placementReviewAlreadyCurrent');
     expect(placementWorkspace).toContain('hasLocalAssignmentChanges');
-    expect(placementWorkspace).toContain('ชุดปัจจุบันยืนยันแล้ว');
+    expect(placementWorkspace).toContain('ตำแหน่งรายการใหม่ได้รับการยืนยันแล้ว');
     expect(placementWorkspace).toContain('มีการแก้ไขตำแหน่งที่ยังไม่ยืนยัน');
-    expect(placementWorkspace).toContain('รายการเดิมที่จะเลื่อน');
-    expect(placementWorkspace).toContain('ยืนยันชุดปัจจุบันแล้ว');
+    expect(placementWorkspace).toContain('เลขลำดับรายการเดิมจะเลื่อน');
+    expect(placementWorkspace).toContain('บันทึกตำแหน่งชุดนี้แล้ว');
     expect(placementView).not.toContain('ตำแหน่งชุดปัจจุบันได้รับการยืนยันแล้ว');
     expect(versionWorkspace).toContain('รายการที่เพิ่มใหม่ต้องจัดตำแหน่งก่อนเผยแพร่');
     expect(versionWorkspace).not.toContain('รายการใหม่ยังไม่ได้รับการยืนยันตำแหน่ง');
@@ -228,17 +228,23 @@ describe('Master Catalog P-22 operator workflow', () => {
       'app/admin/master-catalog/_components/MasterCatalogPlacementWorkspace.tsx',
     );
 
-    expect(placementWorkspace).toContain('const STORAGE_SCHEMA_VERSION = 1');
+    expect(placementWorkspace).toContain('const STORAGE_SCHEMA_VERSION = 2');
     expect(placementWorkspace).toContain("window.addEventListener('beforeunload'");
     expect(placementWorkspace).toContain("document.addEventListener('click', guardSameOriginNavigation, true)");
     expect(placementWorkspace).toContain('กู้คืนตัวเลือกที่ยังไม่ยืนยันแล้ว');
-    expect(placementWorkspace).toContain('ต้องตรวจ');
-    expect(placementWorkspace).toContain('ผู้ดูแลแก้ไข');
+    expect(placementWorkspace).toContain('ต้องแก้');
+    expect(placementWorkspace).toContain('ปรับในหน้านี้');
     expect(placementWorkspace).toContain('ข้อมูลยังไม่ครบ');
     expect(placementWorkspace).toContain('ตำแหน่งไม่ถูกต้อง');
-    expect(placementWorkspace).toContain('<fieldset className="grid grid-cols-2 rounded-md border p-1"');
-    expect(placementWorkspace).toContain('peer-focus-visible:ring-2');
-    expect(placementWorkspace).toContain('affectedCategoryLabels');
+    expect(placementWorkspace).toContain('function PlacementGapCombobox');
+    expect(placementWorkspace).toContain('role="combobox"');
+    expect(placementWorkspace).toContain('ช่วงที่จะวางรายการนี้');
+    expect(placementWorkspace).toContain('ใช้ตำแหน่งนี้');
+    expect(placementWorkspace).toContain('ตรวจสรุปก่อนบันทึกทั้งชุด');
+    expect(placementWorkspace).toContain('<details className="group min-w-0">');
+    expect(placementWorkspace).toContain('เปลี่ยนลำดับในช่วงนี้');
+    expect(placementWorkspace).toContain('function PlacementPositionPreview');
+    expect(placementWorkspace).toContain('placementCategoryLabels');
     expect(placementWorkspace).toContain('ตำแหน่งสุดท้ายของรายการใหม่');
     expect(placementWorkspace).toContain('ก่อนหน้า: {formatPlacementNeighbor(previous');
     expect(placementWorkspace).toContain('ถัดไป: {formatPlacementNeighbor(next');

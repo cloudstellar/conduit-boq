@@ -478,7 +478,7 @@ export function MasterCatalogPlacementView({
               <Badge variant="outline">เวอร์ชัน {workspace.version.versionString}</Badge>
             </div>
             <p className="mt-1 text-sm text-muted-foreground">
-              กำหนดตำแหน่งของรายการใหม่เทียบกับรายการเดิม แล้วบันทึกทั้งชุดเพียงครั้งเดียว
+              ตรวจตำแหน่งที่ระบบจัดให้ แก้เฉพาะรายการที่ต้องการ แล้วบันทึกทั้งชุดเพียงครั้งเดียว
             </p>
           </div>
           <div className="flex flex-wrap gap-2">

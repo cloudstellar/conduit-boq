@@ -209,6 +209,42 @@ export function getCatalogPlacementAssignmentValidity(
     : 'invalid';
 }
 
+export function clampCatalogPlacementGapIndex(
+  gapIndex: number,
+  anchorCount: number,
+) {
+  return Math.max(0, Math.min(gapIndex, anchorCount));
+}
+
+export function getCatalogPlacementGapIndex(
+  anchors: CatalogWorkspaceItem[],
+  assignment: CatalogPlacementAssignment,
+) {
+  const anchorIndex = anchors.findIndex((anchor) => (
+    anchor.identityId === assignment.anchorIdentityId
+  ));
+  if (anchorIndex < 0) return anchors.length;
+  return assignment.relation === 'before' ? anchorIndex : anchorIndex + 1;
+}
+
+export function getCatalogPlacementAssignmentForGap(
+  anchors: CatalogWorkspaceItem[],
+  gapIndex: number,
+): Pick<CatalogPlacementAssignment, 'anchorIdentityId' | 'relation'> | null {
+  if (anchors.length === 0) return null;
+  const safeGapIndex = clampCatalogPlacementGapIndex(gapIndex, anchors.length);
+  if (safeGapIndex === 0) {
+    return {
+      anchorIdentityId: anchors[0].identityId,
+      relation: 'before',
+    };
+  }
+  return {
+    anchorIdentityId: anchors[safeGapIndex - 1].identityId,
+    relation: 'after',
+  };
+}
+
 export function resequenceCatalogPlacementAssignments(
   assignments: CatalogPlacementAssignment[],
   orderedIdentityIds: string[],

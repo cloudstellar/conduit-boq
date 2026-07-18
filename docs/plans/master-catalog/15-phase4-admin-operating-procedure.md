@@ -11,9 +11,11 @@ separately approved independent G2 rebuild/P-20 comparison later passed on
 exact candidate `721c2c2`. The owner accepted G3/WP-6.6 on exact application
 checkpoint `78e96ab3ed9993707014c4aba1d285b7592b17a1` at
 2026-07-14 23:50 +07. Prior `3bfc74e` evidence is historical. G4,
-P-18/P-19 where applicable, and
-independent intended-admin WP-8 UAT remain pending. The Local UI must not be
-treated as Production-ready until those gates pass.
+P-18 technical placement, and P-36 integrated rehearsal later passed. The
+corrected P-37 flow also passed Local stale/accept/replay/cleanup mechanics, but
+independent keyboard/leave-reload intended-admin WP-8 UAT, P-19 when triggered,
+and the Production gates remain pending. The Local UI must not be treated as
+Production-ready until those gates pass.
 **Audience:** Active Master Catalog administrators
 **Rule:** A draft is not official; published versions are immutable
 
@@ -131,7 +133,11 @@ WP-7.5 now implements that operator path and its separately approved P-32 Local
 DB/browser evidence passed. P-33 accepted the bounded technical checkpoint on
 2026-07-15 13:54 +07. P-34 exact source checkpoint `0780925` then implemented
 truthful dirty state, recoverable choices/navigation guard, exception filters,
-keyboard-complete before/after controls, and complete impact confirmation.
+keyboard-complete before/after controls, and complete impact confirmation. The
+first P-37 intended-admin session later rejected that direct control model; the
+current UI presents one insertion-gap choice while mapping it to the unchanged
+same-category anchor/relation contract. See
+[Review Note #33](./33-phase4-wp8-p37-uat-ux-correction-note.md).
 Add/Supplement remain hidden or disabled until the separate integrated WP-8/
 P-14 performance, accessibility/recovery, and intended-admin release gates pass.
 The draft/import preview must show this publication hold immediately after the
@@ -148,33 +154,37 @@ by one.
 2. Confirm that the page count equals every pending new identity. Search and
    paging only change the visible subset; the final confirmation always covers
    the complete pending batch.
-3. Start with **ต้องตรวจ** rather than rereading every suggestion. Confirm which
-   rows are system-suggested, which were changed by an admin, and which remain
-   incomplete or invalid.
-4. For each row that needs attention, choose a category that contains an
-   inherited item, then choose one inherited item in that same category as the
-   anchor.
-5. Choose **ก่อนรายการนี้** or **หลังรายการนี้**. Do not use another new item as
-   an anchor.
-6. When several new items share one anchor and relation, use the up/down buttons
-   to set their order within that exact group. This cannot reorder inherited
-   identities.
-7. Review each final sequence number, immediate previous/next item, affected
-   categories, and the count of inherited rows that will shift numerically.
-8. Choose **ตรวจและยืนยันทั้งชุด**, enter the real placement rationale, and
-   confirm once. The operation records the new rows and every shifted row in
-   one append-only change set/review.
+3. The page opens on **ทั้งหมด** and shows **ระบบจัดให้** for complete
+   suggestions. The admin does not have to click or approve every suggested row.
+   Use **ปรับในหน้านี้** or **ต้องแก้** only to narrow the review when needed.
+4. Read the actual final **ก่อนหน้า / รายการใหม่นี้ / ถัดไป** preview. If it is
+   correct, leave that row unchanged.
+5. For a wrong row, choose **เปลี่ยนตำแหน่ง**, select a category that contains
+   inherited items, then select one insertion gap: **ต้นหมวด**, **ระหว่าง ...
+   และ ...**, or **ท้ายหมวด**. The UI maps the gap to the accepted inherited
+   anchor/relation payload; another new item is never used as an anchor.
+6. When several new items share one insertion gap, use the up/down buttons to
+   set their order within that group. The buttons are initially folded under
+   **เปลี่ยนลำดับในช่วงนี้** so a complete system suggestion does not look like
+   unfinished work. This cannot reorder inherited identities.
+7. Review each final sequence number and immediate previous/next item. The final
+   summary separately shows receiving categories and the count of inherited
+   sequence numbers that will shift.
+8. Choose the visible **ตรวจสรุปก่อนบันทึกทั้งชุด** action above the list, or
+   the equivalent count-labelled action below the list, enter the real
+   placement rationale, and confirm once. The operation records the new rows
+   and every shifted row in one append-only change set/review.
 9. If the draft changed after the page loaded, reload and review the current
    batch. Do not retry with a new hidden request ID or repair `display_order`
    directly.
 
-After a batch is accepted, changing any local category, anchor, before/after
-choice, or sibling order must immediately show **ยังไม่ยืนยัน**. Do not leave
-the page believing those local choices were saved. Use the supported return
-path or respond to the leave/reload warning so the pending choices can be
-continued safely. The warning states that browser recovery is not a draft save.
-A page-level **ยืนยันแล้ว** message must never override a locally dirty
-workspace state.
+After a batch is accepted, changing any local category, insertion gap, or
+sibling order must immediately show **ปรับในหน้านี้ · ยังไม่บันทึก** and replace
+the accepted-state claim. Do not leave the page believing those local choices
+were saved. Use the supported return path or respond to the leave/reload warning
+so the pending choices can be continued safely. The warning states that browser
+recovery is not a draft save. A page-level accepted message must never override
+a locally dirty workspace state.
 
 Adding/withdrawing a new identity or changing placement-relevant category,
 active state, order, or inherited-anchor topology makes the accepted placement
@@ -536,10 +546,11 @@ browser/device, and reviewer. A failed or developer-dependent critical task
 blocks P-14 until the UX/procedure is corrected and rerun.
 
 For placement, also record the agreed realistic new-item batch size and
-interaction evidence against 710 inherited rows: initial render, search, anchor
-selection, preview recalculation, paging, sibling movement, and confirmation.
+interaction evidence against 710 inherited rows: initial render, search,
+insertion-gap selection, preview recalculation, paging, sibling movement, and
+confirmation.
 Material stutter, focus loss, layout shift, contradictory accepted/dirty state,
 or a keyboard-incomplete required control blocks P-14 unless corrected and
 rerun or explicitly accepted with an owner, rationale, remediation owner, and
 due date. Drag and drop is not required and may never replace the visible
-category/anchor/before-after/up-down path.
+category/insertion-gap/up-down path.

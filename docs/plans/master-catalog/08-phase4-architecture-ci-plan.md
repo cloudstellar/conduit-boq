@@ -5,9 +5,15 @@ WP-6.6 and WP-7 are complete, and the P-18/WP-7.5 extension passed P-32 Local
 technical evidence and P-33 bounded technical acceptance. WP-8 placement
 UX source/static hardening passed P-34 on exact `0780925`; P-35 integrated
 unchanged `021` into bootstrap source; and P-36 integrated Local technical
-rehearsal passed on exact execution checkout `910cc3c`. Independent intended-
-admin interaction/recovery UAT and all Production gates remain separate, so
-P-37 HOLD is recommended and Add/Supplement stays hidden
+rehearsal passed on exact execution checkout `910cc3c`. The first P-37 intended-
+admin session failed comprehension before confirmation; the current UI-only
+insertion-gap correction preserves the P-18 DB contract. Its later Local
+technical continuation passed stale rejection, one acceptance, exact replay,
+accepted-state readback, cleanup, and post-evidence repository checks;
+independent keyboard/leave-reload re-UAT and exact commit/push provenance remain.
+P-37 remains HOLD, all Production gates
+remain separate, and Add/Supplement stays hidden. See
+[Review Note #33](./33-phase4-wp8-p37-uat-ux-correction-note.md).
 
 **Date:** 2026-06-22
 
@@ -1577,7 +1583,9 @@ Proposed after P-18 acceptance:
 `/admin/master-catalog/versions/[versionId]/placement`
 
 - Pending new identities only
-- Category and searchable same-category before/after anchor controls
+- Category and searchable insertion-gap controls expressed as start, between,
+  or end of category; the client maps the chosen gap to the same-category
+  inherited anchor/relation DB contract
 - Batch neighborhood/order preview and one audited confirmation
 - No arbitrary inherited-row reorder and no drag-only interaction
 
@@ -1674,8 +1682,8 @@ Proposed after P-18 acceptance:
   confirms one batch. The draft/version ID does not change per item.
 - A later add or placement-relevant change clearly returns the draft to
   **รอจัดตำแหน่ง** and blocks publication again.
-- Keyboard users can complete category, anchor, before/after, preview, and
-  confirmation without drag and drop.
+- Keyboard users can complete category, insertion-gap selection, preview,
+  sibling order, and confirmation without drag and drop.
 
 ### History UX
 

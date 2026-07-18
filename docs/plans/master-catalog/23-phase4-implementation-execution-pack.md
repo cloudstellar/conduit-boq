@@ -113,6 +113,17 @@ comprehension, and independent intended-admin portions of Section 16 remain
 open. P-37 HOLD is recommended and Add/Supplement remains hidden. See
 [P-36 Owner Review Note](./32-phase4-wp8-p36-owner-review-note.md).
 
+**P-37 intended-admin UAT correction recorded:** 2026-07-17 — the first
+no-reset session failed comprehension before any placement confirmation. The
+working tree now presents one insertion-gap choice and truthful local state
+while preserving the exact P-18 category/anchor/relation payload. Desktop/mobile
+interaction QA passed. The later Local continuation passed stale rejection,
+one acceptance, exact-request replay, accepted-state route readback, cleanup,
+and post-evidence repository checks. Owner keyboard/leave-reload re-UAT, exact
+commit/push provenance, and
+explicit acceptance remain open. P-37 remains HOLD. See
+[Review Note #33](./33-phase4-wp8-p37-uat-ux-correction-note.md).
+
 **P-22 operator-workflow correction authorized:** 2026-07-12 — intended-admin
 review placed WP-6.6 closeout on Hold and accepted
 [Correction Plan #31](./31-phase4-wp66-operator-workflow-correction-plan.md).
@@ -868,30 +879,30 @@ Run order:
 Placement UX hard gates for the full Add/Supplement release:
 
 - **Truthful local state:** after an accepted server-side placement, changing a
-  category, anchor, before/after relation, or same-anchor sibling order must
-  immediately replace any accepted-state claim with a clear **ยังไม่ยืนยัน**
-  state. Page-level and workspace-level messages must not contradict each other.
+  category, insertion gap, or same-gap sibling order must immediately replace
+  any accepted-state claim with clear **ปรับในหน้านี้ · ยังไม่บันทึก** state.
+  Page-level and workspace-level messages must not contradict each other.
 - **Safe continuation:** pending placement choices must survive paging and the
   supported return path. Leaving or reloading with unconfirmed changes must
   warn the admin or provide an equally clear recoverable continuation; the UI
   must never imply those local choices were saved to the draft.
-- **Review by exception:** system suggestions remain visible as suggestions,
-  admin-modified rows are distinguishable, incomplete/invalid rows are counted,
-  and the admin can filter directly to rows that still require attention. The
-  workflow must not require confirming 710 inherited rows one by one.
+- **Review by exception:** the page opens on the complete new-item batch;
+  system-arranged rows remain visible, locally adjusted rows are distinguishable,
+  incomplete/invalid rows are counted, and the admin can filter directly to
+  rows that require correction. The workflow must not require per-row approval
+  or confirming 710 inherited rows one by one.
 - **Impact before commit:** the final confirmation shows total new identities,
-  inherited rows whose numeric position will shift, affected categories,
-  incomplete/conflicting assignments, and the immediate final neighbors for
-  changed new rows. One confirmation still applies the complete pending batch.
-- **Keyboard and pointer equivalence:** category, searchable anchor,
-  before/after choice, paging, sibling up/down, and confirmation are operable
-  and visibly focused by keyboard. A custom radio-style control implements the
-  expected arrow-key behavior or uses a standards-complete existing component.
+  inherited rows whose numeric position will shift, categories receiving new
+  rows, incomplete/conflicting assignments, and the immediate final neighbors
+  for every new row. One confirmation still applies the complete pending batch.
+- **Keyboard and pointer equivalence:** category, searchable insertion-gap
+  combobox, paging, sibling up/down, and confirmation are operable and visibly
+  focused by keyboard using the existing standards-complete components.
   Drag may be added only as an optional desktop enhancement with the existing
   non-drag path preserved.
 - **Measured scale:** record browser/device, agreed realistic new-item batch
   size, and timings or interaction observations for 710 inherited rows across
-  initial render, search, anchor selection, preview recalculation, paging,
+  initial render, search, insertion-gap selection, preview recalculation, paging,
   sibling movement, and confirmation. Material stutter, focus loss, layout
   shift, or an unexplained regression blocks release until fixed or explicitly
   accepted with owner/remediation metadata.

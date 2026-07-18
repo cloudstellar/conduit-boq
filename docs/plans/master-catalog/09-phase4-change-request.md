@@ -157,6 +157,20 @@ recommended; Add/Supplement remains hidden. See
 [P-36 Owner Review Note](./32-phase4-wp8-p36-owner-review-note.md). This does
 not authorize P-12 or any other Production gate.
 
+**P-37 first intended-admin UAT recorded:** 2026-07-17 — the no-reset Local
+session stopped before confirmation because the direct category + reference
+item + before/after presentation did not communicate the operator task. This
+is a comprehension-gate failure, not operator error. A bounded presentation
+correction now shows the final neighboring rows and lets the admin choose one
+insertion gap; it maps back to the unchanged P-18 anchor/relation contract.
+The later Local technical continuation passed stale rejection, one acceptance,
+exact replay, accepted-state readback, audited cleanup, and post-evidence
+repository checks. P-37 remains HOLD pending independent keyboard/leave-reload
+re-UAT, exact commit/push provenance,
+and explicit owner acceptance. See
+[P-37 UAT and UX Correction Note](./33-phase4-wp8-p37-uat-ux-correction-note.md).
+No Production action is authorized.
+
 ## 1. Decision requested
 
 Approve detailed implementation and local rehearsal of Master Catalog Phase 4.
@@ -316,8 +330,9 @@ After completion, an active admin can:
 - Thai-first production-capable forms with no rehearsal placeholders, clear
   draft-save versus whole-version publish hierarchy, and support IDs demoted
   from primary content
-- Proposed after P-18 acceptance: keyboard-complete batch placement for new
-  identities using category plus same-category before/after anchor
+- After P-18 acceptance: keyboard-complete batch placement for new identities
+  through a user-facing insertion gap, deterministically mapped to the
+  accepted category plus same-category inherited anchor/relation contract
 
 ### Evidence and operations
 
@@ -572,16 +587,21 @@ pretend a publishable candidate has been approved.
 - [ ] Intended-admin UAT, safe Thai recovery/log correlation, and 710-row
       performance evidence pass
 - [x] WP-7.5 Local technical placement evidence and P-33 acceptance passed;
-      P-34 source/static placement UX passed on exact `0780925`; Full
+      P-34 source/static placement UX passed on exact `0780925`, but its direct
+      anchor/relation presentation is historical after the first P-37 UAT;
+      the bounded insertion-gap correction is recorded in Note #33. Full
       Add/Supplement release still requires integrated WP-8/P-14 clean Local,
       performance/accessibility/recovery, and intended-admin evidence,
       otherwise the controls are hidden/disabled while the P-18 DB guard
       remains active
 - [x] P-35 source integration places exact amended `021` after `020`; P-36
       integrated Local technical execution passed on exact `910cc3c`
-- [ ] P-37 WP-8 acceptance remains on recommended HOLD until independent
-      intended-admin interaction, keyboard, recovery, and error-comprehension
-      UAT passes; Add/Supplement stays hidden
+- [ ] P-37 WP-8 acceptance is on HOLD after the first intended-admin
+      comprehension failure. Owner re-UAT of the corrected insertion-gap flow,
+      keyboard and leave/reload recovery, exact commit/push provenance, and
+      explicit acceptance must pass; technical stale-response, one confirmation,
+      exact replay, accepted-state readback, and cleanup passed 2026-07-18;
+      Add/Supplement stays hidden
 - [ ] Owner explicitly approves the Production migration window
 
 When all checks above are green, package the evidence for owner/verifier review

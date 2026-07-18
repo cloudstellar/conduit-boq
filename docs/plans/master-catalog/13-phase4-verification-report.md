@@ -54,8 +54,19 @@ integrated Local technical rehearsal on exact checkout
 P-20, WP-7/WP-7.5, export, advisor, repository, realistic-scale route-render,
 and clean final-invariant evidence. The Browser runtime could not dispatch
 React/Radix client state changes, so independent intended-admin interaction,
-keyboard/recovery/error-comprehension UAT remains open. WP-8 is In progress;
-P-37 HOLD is recommended and Production remains unauthorized.
+keyboard/recovery/error-comprehension UAT remained open. The first no-reset
+intended-admin session on 2026-07-17 then failed comprehension before any
+placement confirmation. The working tree now presents the unchanged placement
+contract as one insertion-gap choice with truthful local state and bounded
+impact review; real-route desktop/mobile interaction QA passed. A 2026-07-18
+Local continuation then passed retryable stale-lock rejection, one accepted
+18-row placement, exact-request idempotent replay, accepted-state route
+readback, audited disabled-baseline cleanup, and post-evidence repository
+checks. Independent keyboard and leave/reload recovery re-UAT, exact
+commit/push provenance, and the P-37 owner
+decision remain open. WP-8 is In progress; P-37 remains HOLD and Production
+remains unauthorized. See
+[Review Note #33](./33-phase4-wp8-p37-uat-ux-correction-note.md).
 **Prepared:** 2026-06-22
 **Production project:** `otlssvssvgkohqwuuiir`
 **Candidate version:** System-planned ADR-003 number; `2568.1.0` only when still
@@ -83,7 +94,7 @@ should link here rather than copy volatile evidence.
 | WP-6.6 admin workflow/authority hardening | Local | Codex + owner/developer | 2026-07-12 | 2026-07-14 | Accepted/Complete | Exact G1R/G2 evidence passed on `721c2c2`; P-25/G3/P-26 passed; the owner accepted exact application checkpoint `78e96ab3ed9993707014c4aba1d285b7592b17a1`. |
 | WP-7 permanent BOQ/hotfix/Factor F regression | Local | Codex + owner/developer | 2026-07-15 | 2026-07-15 | Accepted/Complete | P-29/G4E clean bootstrap and tracked live harness passed on exact `15b707d`; owner accepted via P-30 at 2026-07-15 01:37 +07. |
 | WP-7.5 P-18 placement | Local | Codex + owner/developer | 2026-07-15 | 2026-07-15 | Accepted/Complete for bounded technical scope | P-32 replacement evidence passed with amended `021` SHA-256 `e4de258756bbfbda0508e55d7b76ba2e907f644625b49bc29d4a4d7ac42fa714`; DB source `80b2574`, evidence JSON SHA-256 `875488a965c9c24fbe82a373d2bb18e585f7b6df4fb9267041f909eae1c05602`, artifact source `7d60ab60`, and UI checkpoint `99fa56c`. P-33 accepted this exact technical checkpoint at 2026-07-15 13:54 +07. |
-| 4C clean rehearsal | Local | Codex + owner/developer | 2026-07-15 |  | P-36 integrated technical rehearsal passed; WP-8 remains In progress and P-37 HOLD is recommended | Exact checkout `910cc3c` passed the integrated chain through `021`, DB/RLS/concurrency/P-20/WP-7/WP-7.5, export/advisors/repository gates, 710 inherited plus 18-new-item route-render measurements, and disabled-baseline cleanup. Independent live client interaction, keyboard/recovery/error-comprehension, and intended-admin UAT remain WP-8/P-14 hard gates. |
+| 4C clean rehearsal | Local | Codex + owner/developer | 2026-07-15 |  | P-36 integrated technical rehearsal and P-37 technical continuation passed; WP-8 remains In progress and P-37 remains HOLD | Exact checkout `910cc3c` passed the integrated chain through `021`, DB/RLS/concurrency/P-20/WP-7/WP-7.5, export/advisors/repository gates, 710 inherited plus 18-new-item route-render measurements, and disabled-baseline cleanup. The first 2026-07-17 intended-admin session failed comprehension; the bounded UI correction passed working-tree desktop/mobile interaction QA. The 2026-07-18 no-reset continuation passed stale rejection, one accepted placement, exact replay, accepted-state route readback, cleanup, and post-evidence repository checks. Keyboard/leave-reload re-UAT and exact commit/push provenance remain. |
 | 4A migration | Production |  |  |  | Not authorized |  |
 | Application deploy, flag off | Production |  |  |  | Not authorized |  |
 | Feature enablement | Production |  |  |  | Not authorized |  |
@@ -132,7 +143,7 @@ should link here rather than copy volatile evidence.
 | P-34 WP-8 placement UX source/static | Owner + Codex | Authorized and passed for exact bounded source/static checkpoint; live/release acceptance not inferred | 2026-07-15 14:58 +07 | Exact `0780925aca8fa7ebbf8abbaf2b7cf151b39b676a`; focused 2 files/20 tests, full 33 files/183 tests, TypeScript, focused/full lint 0 errors/10 existing warnings, `git diff --check`, and network-enabled production build passed. Local browser confirmed only the disabled baseline; no feature flag or DB state changed. |
 | P-35 WP-8 bootstrap source integration | Owner + Codex | Passed on exact source checkpoint `01eba0d49f2e4b6e65f0d9dd287fd461ba9ea19a`; P-36 remained separately gated and later passed | 2026-07-15 15:42 +07 | Gate commit `43b75e3f0b0643d6f4e741fcc81ea8b0a6311a13`; unchanged amended `021` SHA-256 `e4de258756bbfbda0508e55d7b76ba2e907f644625b49bc29d4a4d7ac42fa714` is after `020`. Shell/Node syntax, focused 3 files/25 tests, full 33 files/183 tests, TypeScript, lint 0 errors/10 existing warnings, authority 710/65/17, dependency audit 0 vulnerabilities, diff check, and network-enabled build passed. No Local DB command or Production action. |
 | P-36 WP-8 destructive Local execution | Owner + Codex | Approved after explicit destructive-reset warning and passed for integrated technical scope | 2026-07-15 | Exact gate/execution checkout `910cc3cc74660beecf18655d39cd0b0c085d1fc6`; integrated bootstrap through `021`, named DB/regression/export/advisor/repository gates, realistic-scale route rendering, and disabled-baseline cleanup passed. Production touched: No. |
-| P-37 WP-8 accept/hold | Owner | Not requested; HOLD recommended |  | P-36 technical evidence is complete. Independent intended-admin live client interaction, keyboard, safe leave/reload, stale-recovery, and error-comprehension UAT remains required; Add/Supplement stays hidden. See [P-36 Owner Review Note](./32-phase4-wp8-p36-owner-review-note.md). |
+| P-37 WP-8 accept/hold | Owner | HOLD retained after failed comprehension gate; later technical continuation does not infer acceptance | 2026-07-17/18 | The first session confirmed no placement. The insertion-gap correction preserves the DB contract. The later Local continuation passed stale rejection, one confirmation, same-ID replay, accepted-state readback, cleanup, and post-evidence repository checks; independent keyboard/leave-reload re-UAT, exact commit/push provenance, and the explicit owner decision remain. Add/Supplement stays hidden. See [P-37 UAT/UX Note](./33-phase4-wp8-p37-uat-ux-correction-note.md). |
 | P-11 exact artifact acceptance | Owner | Accepted exact TH Sarabun New 16 pt replacement PDF/Excel pair; WP-6 complete | 2026-07-11 22:20 +07 | Owner confirmed `รูปแบบ pdf excel ok เลยครับ` for the `777df75` pair after semantic and visual file QA; Production filing and P-12-P-15 remain separate |
 | P-20 identity/hash portability | Owner | Approved deterministic baseline identity from immutable Production-derived `price_list.id`; retain `identity_id` in lineage hash | 2026-07-11 12:11 +07 | WP-6.5C and final G1R/G2 comparison passed; P-36 repeated the same 710-row dataset/mapping after integrated `021`. Final P-15 acceptance remains separate. |
 | WP-6.5 Local-only start | Owner | Authorized | 2026-07-11 12:11 +07 | No unannounced Local reset, Production access/write, Factor F workflow change, hotfix scope expansion, placement UI, deploy, enablement, or publication |
@@ -265,6 +276,16 @@ dialog interaction, keyboard traversal, leave/reload recovery, stale-error
 comprehension, and independent intended-admin completion are not accepted by
 this evidence. This is the sole current P-37 release blocker for the full
 Add/Supplement workflow; the controls remain hidden.
+
+The 2026-07-18 P-37 continuation repeated the safety-critical boundary on the
+corrected no-reset fixture: stale expected lock `1` was rejected after a
+controlled update moved the draft to lock `2`; current placement accepted 18
+rows/716 affected rows at lock/revision `3/2`; exact replay returned
+`duplicateRequest = true` without changing either version counter or audit IDs;
+and the route displayed the accepted state before audited abandon restored
+pointer `2568.0.0`/710, zero drafts, all flags `false`, BOQ 198/1,547, and
+Factor F `2569.0.0`/36. This closes the technical stale/confirmation/replay/
+cleanup bullets only, not the operator keyboard/leave-reload bullets.
 
 Security advisor returned zero issues. Performance advisor reproduced the
 triaged baseline of 19 auth RLS init-plan, 5 multiple-permissive-policy, and 7
@@ -407,6 +428,27 @@ repository policy. Migration `020` was neither changed nor applied and the
 Local stack was not reset. Technical result: **Passed**. Owner G3 accept/hold:
 **Accepted via P-27 at 2026-07-14 23:50 +07 on exact
 `78e96ab3ed9993707014c4aba1d285b7592b17a1`**.
+
+### 3.4 P-37 first intended-admin UAT and bounded correction
+
+The first no-reset intended-admin session on 2026-07-17 opened the real Local
+710+18 placement route and failed the comprehension gate before confirmation.
+The direct `รายการอ้างอิง` plus before/after controls exposed the persistence
+model, and the local-change label could be mistaken for a saved state. No final
+reason was entered, no placement RPC was called, and Production was untouched.
+
+The bounded working-tree correction preserves the P-18 category,
+same-category inherited anchor, relation, batch-order, RPC, readiness, audit,
+and concurrency contracts. It presents actual previous/new/next neighbors,
+uses one insertion-gap editor mapped back to the accepted payload, labels local
+changes as not saved, and keeps final confirmation as one batch. Real-route
+pointer interaction and desktop/mobile containment passed on the retained
+fixture. The later Local continuation passed technical stale rejection,
+accepted-state, exact replay, cleanup, and post-evidence repository checks.
+P-37 remains **HOLD** pending owner re-UAT for complete keyboard and
+leave/reload recovery, exact commit/push provenance, and explicit acceptance.
+Full evidence and screenshot paths are in
+[Review Note #33](./33-phase4-wp8-p37-uat-ux-correction-note.md).
 
 ## 4. Known preparation baseline
 
@@ -930,16 +972,16 @@ exact replacement pair above.
 | Complete catalog search/filter + item history | Browser found first `ITEM-0001`, middle `ITEM-0355`, and last `ITEM-0710`; exact inactive-item route showed stable identity/code history | Exact item page remained readable without page overflow at 390x844 | Passed WP-6.6 technical QA; intended-admin comprehension remains WP-8 |
 | One working draft + stale/abandoned history | One mutable draft per base; duplicate/concurrent create denied; audited abandon/replacement; stale/abandoned views read-only | Prior G1R/G2/G3 path and P-36 integrated lifecycle/cleanup passed; realistic fixture was audited-abandoned and zero working drafts remained | Passed P-36 technical rerun; independent comprehension remains UAT |
 | Final snapshot review + reviewed-lock publish | Complete cumulative draft/base diff, compound/reverted behavior, high-volume scanability, readiness/warnings, edit return path, and stale-review recovery | Prior exact-lock/stale recovery passed; P-36 rendered 716 affected rows, 50/100 paging, and deep page 7 without overflow/error. Client-state interaction could not be automated. | Technical render/scale passed; independent interaction/recovery UAT remains |
-| New-identity placement workspace | Source implements one complete pending batch, search/paging, same-category inherited anchors, before/after choice, same-anchor sibling order, final neighbors/shift count, one reasoned confirmation, and stale-state recovery | P-36 real routes rendered the 710+18 realistic fixture, accepted state, 716-row final impact, deep page 7, and desktop/mobile layouts without overflow/error. Browser automation could not dispatch React/Radix state changes, so accepted placement used the same public Local RPC before route inspection. | Integrated technical/render/scale scope passed; live client interaction, keyboard/recovery, and independent UAT remain the P-37/P-14 hold |
+| New-identity placement workspace | Source implements one complete pending batch, search/paging, a category plus insertion-gap UI mapped to same-category inherited anchor/relation, same-gap sibling order, final neighbors/shift count, one reasoned confirmation, and stale-state recovery | P-36 rendered the 710+18 technical fixture. The first P-37 intended-admin session rejected the direct anchor/before-after presentation. The corrected real route opened all 18 suggestions, changed exactly one gap without a filter jump or DB write, reset to 18 suggestions, kept the primary final-review action above the long list, hid optional move buttons until disclosure, and rendered desktop/mobile editor/final-review states without horizontal overflow. The 2026-07-18 continuation then passed retryable stale rejection, one 18-row confirmation, exact replay, accepted desktop/mobile route state, and audited cleanup. | Integrated technical scope, corrected presentation, and safety-critical Local continuation passed; owner keyboard/leave-reload re-UAT plus exact commit/push provenance remain the P-37/P-14 hold |
 | Thai-first forms/no rehearsal defaults/support details | Thai navigation/status/action/readiness/error copy rendered; Local synthetic defaults were absent from operator fields | `c8f6dca` adds Thai clone history, live composed version preview, deduplicated category labels, labelled selects, and wrapping long authority text; desktop/mobile had no page-level overflow. Formal keyboard/focus audit remains WP-8. | Passed visual/accessibility-name technical QA; formal accessibility pending WP-8 |
 | Add/retire blocker shown before apply/publish | With capability flags false, Add was absent, retirement controls were hidden/denied, and the inactive item exposed only Reactivate; readiness showed the separate P-19 warning | Exact inactive-item action remained responsive. P-18 is now decided and its `021` source keeps Add/Supplement hidden until live placement evidence passes. | Passed release-visibility gate; P-19 remains separate |
 | Loading/error/not-found and retry/back paths | Route states implemented; user-opened Local tab completed response-loss recovery on `9becdf6` | Prior proof retained submitted values and retried untouched payload; P-36 route rendering had no error overlay, but its Browser runtime could not drive client state | Technical recovery contracts passed; independent operator recovery comprehension remains UAT |
 | Thai user message + safe code/request ID | Browser showed the red Thai uncertain message and short request ID `18c669c5`; proxy/server logs matched the full ID | Same-ID retry returned one success/change set with no duplicate effect | Passed WP-6.5 checkpoint; intended-admin comprehension remains WP-8 |
-| Keyboard/focus/errors/contrast | Placement category, anchor search, before/after, paging, sibling order, and confirmation require visible focus and complete keyboard behavior; custom radio semantics require arrow-key support or a standards-complete component | P-34 source/static uses native radios and visible focus; P-36 semantic readback found labeled controls and 36 native radio inputs, but the Browser runtime did not dispatch interactive state changes, so full live traversal was not accepted | Source/semantics passed; independent live keyboard/pointer UAT remains the P-37/P-14 hard gate |
+| Keyboard/focus/errors/contrast | Placement category, insertion-gap combobox, paging, sibling order, and confirmation require visible focus and complete keyboard behavior using standards-complete controls | Corrected source uses existing Radix/shadcn Select, Popover/Command combobox, Dialog, and native buttons. Pointer interaction and mobile fit passed; complete keyboard traversal is not yet accepted. | Source/pointer semantics passed; independent live keyboard UAT remains the P-37/P-14 hard gate |
 | Font/logo/color/spacing | Local export artifact proof | PDF uses `next/font/local` NT Regular/Bold derivatives and the full NT company lockup; approved Excel exception uses TH Sarabun New with a 16 pt body baseline while preserving dataset-hash semantics | P-11 PDF/Excel visual proof accepted; app-wide/primary-logo provenance reconciliation remains under P-10 |
 | Browser console/server errors | P-36 desktop/mobile realistic-scale routes had empty warning/error logs and no Next error overlay | No page-level horizontal overflow, clipped content, or material layout shift was observed across the 710+18 placement/final-review states | Passed P-36 technical route-render QA; interaction UAT remains separate |
-| Intended-admin UAT without developer/SQL help | Intended admin must distinguish suggested, admin-modified, incomplete/invalid, locally unconfirmed, and accepted states; filter to rows needing attention; explain shifted rows; recover stale placement and leave/reload state; reach final review without irreversible error | Implementer-driven browser proof does not satisfy this row | Pending WP-8/P-14 hard gate |
-| 710-row interaction/import/export performance | Measure 710 inherited rows plus an agreed realistic new-item batch for render, search, anchor selection, preview recalculation, paging, sibling movement, confirmation, import, and export on a named browser/device | P-36 measured server navigation/render for 710 inherited + 18 new rows at 607-1,136 ms, deep 100-row paging at 746 ms, and independently verified baseline export. Client-state search/anchor/relation/sibling/confirmation interactions could not be driven by the Browser runtime. | Route-render/export scale passed; live interaction timing and operator perception remain P-37/P-14 |
+| Intended-admin UAT without developer/SQL help | Intended admin must distinguish system-arranged, locally adjusted, incomplete/invalid, unconfirmed, and accepted states; filter when needed; explain shifted sequence numbers; recover stale placement and leave/reload state; reach final review without irreversible error | First 2026-07-17 session failed at comprehension before confirmation. The correction passed technical stale/confirmation/replay/cleanup evidence, but automated events could not prove keyboard or leave/reload operator behavior. | P-37 HOLD; independent keyboard/leave-reload re-UAT remains the WP-8/P-14 hard gate |
+| 710-row interaction/import/export performance | Measure 710 inherited rows plus an agreed realistic new-item batch for render, search, insertion-gap selection, preview recalculation, paging, sibling movement, confirmation, import, and export on a named browser/device | P-36 measured server navigation/render for 710 inherited + 18 new rows at 607-1,136 ms, deep 100-row paging at 746 ms, and independently verified baseline export. The P-37 correction then proved one gap change/reset and responsive fit on the same 710+18 Local fixture; complete interaction timing and remaining tasks are not yet recorded. | Route-render/export scale passed; complete live interaction timing and operator perception remain P-37/P-14 |
 
 Structured log review must show operation, outcome, duration, version and
 request ID for representative failure/success cases without raw workbook rows,
@@ -952,13 +994,13 @@ request approves them.
 
 | Gate | Expected | Actual | Result |
 |---|---|---|---|
-| `npm test` | Exit 0 | P-36 exact checkout `910cc3c`: 33 files/183 tests passed. Historical diagnostic results remain attached to their commits. | Passed |
-| `npx tsc --noEmit --pretty false` | Exit 0 | P-36 exact checkout `910cc3c` passed after live DB evidence. | Passed |
-| `npm run lint` | Exit 0 | P-36 exited 0 with the same 10 existing application warnings outside this scope | Passed with existing warnings |
-| `npm run build` | Exit 0 | P-36 production build compiled, typechecked, and included the exact placement/final-review/export routes. The unchanged Next.js middleware-to-proxy deprecation warning remains outside this bounded gate. | Passed with existing warning |
-| `npm run catalog:authority:check` | 710 mappings / 65 groups / 17 exclusions and frozen hash agree | Passed with SHA-256 `28675e6244c65d485dda7142634b381db729a139bccdf189ad51563251a2e12a` | Passed |
+| `npm test` | Exit 0 | P-36 exact checkout `910cc3c`: 33 files/183 tests passed. P-37 correction working tree: 33 files/184 tests passed, including insertion-gap boundary mapping. | Passed working tree; exact commit pending |
+| `npx tsc --noEmit --pretty false` | Exit 0 | P-36 exact checkout passed; P-37 correction working tree passed. | Passed working tree; exact commit pending |
+| `npm run lint` | Exit 0 | P-37 correction working tree exited 0 with the same 10 existing application warnings outside this scope. | Passed with existing warnings |
+| `npm run build` | Exit 0 | P-37 correction network-enabled build compiled, typechecked, generated all routes including placement, and retained only the existing middleware-to-proxy deprecation warning. | Passed with existing warning |
+| `npm run catalog:authority:check` | 710 mappings / 65 groups / 17 exclusions and frozen hash agree | P-37 correction passed with SHA-256 `28675e6244c65d485dda7142634b381db729a139bccdf189ad51563251a2e12a`. | Passed |
 | `node --check scripts/smoke-master-catalog-wp66.mjs` | Exit 0 | Harness syntax passed; live execution passed again during G4E | Passed |
-| `git diff --check` | Exit 0 | Passed on the exact P-36 technical checkout before closeout documentation | Passed |
+| `git diff --check` | Exit 0 | Passed on the P-37 correction working tree after code/test/document alignment. | Passed working tree; exact commit pending |
 | In-app browser G1R | Local/admin version planning, workspace, item edit, final review, import, abandon, restore confirmation, responsive containment, and cleanup pass | Bounded flow passed; no publish/restore pointer change; final disabled screen restored. One existing `/nt_logo.svg` LCP warning; full keyboard traversal and independent UAT not claimed. | Passed G1R / later UAT pending |
 | P-25 standalone visual/interaction harness | Real final-review component at 710 total/709 affected rows; eight-field compound row; desktop 1440x1000 and mobile 390x844; no console/page error or overflow | Browser plugin runtime was unavailable with `Cannot redefine property: process`; the owner-approved Playwright fallback compiled the real component and project CSS, mocked only Next routing contexts, and passed 27/27 checks. No Local DB reset/mutation, migration, bootstrap, or Production action occurred. | Passed P-25 presentation scope; real-route stale-after-review/G3 not inferred |
 | P-26 in-app browser proof | Real Recode/Retire/Publish confirmation and cancellation, mismatched/exact target typing, desktop/390x844 layout, audited cleanup, and final disabled page | Passed on real Local routes; no Recode/Retire/Publish effect, proof draft abandoned, zero drafts/all flags false, pointer/BOQ/Factor F unchanged | Passed and owner-accepted via P-27 |
@@ -968,7 +1010,7 @@ request approves them.
 | Permanent hotfix `016`/BOQ/Factor F suite | Real RPC behavior and pre/post invariants pass | P-36 retained WP-7 JSON passed all suffix/catalog authority/atomic negative/binding/copy/print-export/publish-restore/security cases; final BOQ and Factor F invariants were restored | Passed integrated P-36 technical scope |
 | WP-6.6 capability suite | Audit #29 C-01 through C-17 DB/UI/browser evidence pass | Final G1R/G2 passed on `721c2c2`; P-25 presentation and G3 real-route stale recovery/cleanup passed on `6599c30`; P-26 confirmation/cancel/cleanup proof is committed at exact `78e96ab3ed9993707014c4aba1d285b7592b17a1`. | Accepted/Complete via P-27 |
 | Tracked export artifact verification | Semantic verifier passes from clean checkout | P-36 regenerated active `2568.0.0` proof on exact `910cc3c`; five-sheet Excel/19-page PDF/hash/order and independent verifier passed. It does not replace the exact owner-accepted P-11 pair. | Passed P-36 rerun and preserved P-11 acceptance |
-| Documentation consistency | Authority links/table shapes, migration order, WP order, decisions, and execution provenance agree | P-36 closeout aligns this report, Tracker, Decision Register, migration ledger, and Owner Review Note #32. Focused 1 file/7 tests and full 33 files/183 tests passed; TypeScript, lint 0 errors/10 existing warnings, authority 710/65/17, dependency audit 0 vulnerabilities, network-enabled production build, and diff check passed. | Passed closeout working tree; commit/push follows |
+| Documentation consistency | Authority links/table shapes, migration order, WP order, decisions, and execution provenance agree | P-37 correction aligns this report, Tracker, Change Request, Architecture/Execution/Operator/Audit/Placement notes, Decision Register, migration ledger, and Review Note #33. Focused 3 files/28 tests and full 33 files/184 tests, TypeScript, lint 0 errors/10 existing warnings, authority 710/65/17, network-enabled build, and diff check passed. Dependencies were unchanged; P-36 audit remains current. | Passed working tree; exact commit/push pending |
 | Security advisor | No new or untriaged blocker | P-36 CLI security advisor returned no issue. The prior Studio authenticated-callable function warnings remain triaged for P-12 least-privilege review; all are anon-denied. | Passed P-36 technical scope; P-12 minimization review remains |
 | Performance advisor | No rollout blocker | P-36 CLI advisor reproduced 19 RLS init-plan and 5 multiple-permissive-policy warnings plus seven unindexed-FK information findings; both `020` authority FKs have covering indexes. | Passed P-36 technical scope; baseline disposition remains due at P-12 |
 | CI exact commit | Passed |  | Pending |
@@ -998,8 +1040,14 @@ state without rewriting that G4E history: exact checkout `910cc3c` passed the
 clean chain through `021` and restored pointer `2568.0.0`/710, zero working
 drafts, all three flags `false`, BOQ 198/1,547 with zero unversioned BOQs, and
 Factor F `2569.0.0`/36. The canonical hash repeated exactly and Production was
-not touched. P-37 remains on recommended HOLD only for the independent live
-client interaction/recovery/intended-admin UAT described above.
+not touched. A later no-reset P-37 UAT session intentionally opened temporary
+draft `2568.13.0`/728 and enabled only the Local admin/new-identity flags. Its
+first comprehension gate failed before confirmation. The corrected UI later
+passed technical stale/confirmation/replay/accepted-state evidence; the draft
+was audited-abandoned and Local returned to the exact disabled baseline. P-37
+therefore remains HOLD for independent keyboard/leave-reload re-UAT, exact
+candidate provenance, and the explicit owner decision in
+[Review Note #33](./33-phase4-wp8-p37-uat-ux-correction-note.md).
 
 ## 16. Final state
 

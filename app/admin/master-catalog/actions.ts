@@ -285,7 +285,7 @@ export async function placeCatalogItemsAction(
 
   const result = mapCatalogRpcActionResponse(
     data as CatalogRpcActionResponse,
-    'ยืนยันตำแหน่งรายการใหม่ทั้งชุดแล้ว',
+    'บันทึกตำแหน่งรายการใหม่ทั้งชุดแล้ว',
   );
   logMasterCatalogOperation({
     operation: 'placeCatalogItems',

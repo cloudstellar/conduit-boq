@@ -11,8 +11,12 @@ evidence passed and P-33 accepted the exact bounded technical checkpoint on
 checkpoint `0780925aca8fa7ebbf8abbaf2b7cf151b39b676a`; P-35 then authorized
 unchanged `021` bootstrap source integration; P-36 integrated Local technical
 rehearsal and 710+18 route-render evidence passed on exact `910cc3c`, while
-independent live interaction/keyboard/recovery and intended-admin UAT remain
-open; P-37 HOLD is recommended
+the first intended-admin session later failed comprehension before confirmation.
+The current UI-only insertion-gap correction preserves this V1 contract and
+later passed technical stale rejection, one acceptance, exact replay, accepted-
+state readback, and cleanup. Independent keyboard/leave-reload re-UAT and exact
+candidate provenance remain; P-37 remains HOLD. See
+[Review Note #33](./33-phase4-wp8-p37-uat-ux-correction-note.md).
 
 **P-33 decision:** Accepted 2026-07-15 13:54 +07 for the exact bounded
 WP-7.5 technical checkpoint. This is not intended-admin UX or release
@@ -100,8 +104,10 @@ In scope:
 
 - newly added identities only, whether created manually or by Supplement import;
 - one batch review for every currently pending new identity in a draft;
-- category selection plus a searchable same-category anchor and
-  **ก่อนรายการนี้ / หลังรายการนี้** relation;
+- the canonical payload remains category plus a same-category inherited anchor
+  and before/after relation; the operator UI expresses the same decision as one
+  searchable insertion gap: **ต้นหมวด**, **ระหว่าง ... และ ...**, or
+  **ท้ายหมวด**;
 - anchors must be identities inherited from the draft base, not another new
   identity, so the placement graph cannot become circular or depend on an
   unreviewed provisional row;
@@ -212,19 +218,18 @@ adds the placement task without mixing it into the general item editor:
   remains the bulk intake path; both converge on the same placement review;
 - the UI cannot imply publication readiness while placement review is stale,
   missing, or locally changed but not yet confirmed;
-- system-suggested, admin-modified, incomplete, and invalid assignments are
+- system-arranged, locally adjusted, incomplete, and invalid assignments are
   distinguishable and filterable so an admin reviews exceptions instead of
-  mechanically acknowledging inherited rows;
+  mechanically acknowledging each suggested or inherited row;
 - paging and supported navigation preserve pending choices, while leaving or
   reloading with unconfirmed changes gives a clear warning or recoverable
   continuation and never claims the choices were saved;
 - the final batch summary shows new-row count, shifted inherited-row count,
-  affected categories, incomplete/conflicting assignments, and the immediate
-  final neighbors of changed new rows;
-- category, anchor search, before/after, paging, sibling order, and confirmation
-  are keyboard-complete with visible focus. Any custom radio-style control must
-  implement expected arrow-key behavior or use an existing standards-complete
-  component;
+  categories receiving new rows, incomplete/conflicting assignments, and the
+  immediate final neighbors of every new row;
+- category, insertion-gap search, paging, sibling order, and confirmation are
+  keyboard-complete with visible focus using standards-complete existing
+  components;
 - drag and drop is optional desktop enhancement only. It must preserve the
   visible non-drag path and cannot expand V1 into arbitrary inherited-row
   reorder.
@@ -238,9 +243,11 @@ Repository/static checkpoint passed on 2026-07-15:
   shifted-row audit, readiness parity, publish guard, and disabled-default
   postconditions;
 - the Next.js read/action path and Thai placement workspace cover all pending
-  new identities in one batch, searchable inherited anchors, before/after
-  placement, same-anchor sibling ordering, a final preview, one confirmation,
-  stale-state recovery, and hidden/disabled Add/Supplement fallback;
+  new identities in one batch. The historical checkpoint exposed searchable
+  inherited anchors/before-after placement directly; the 2026-07-17 bounded
+  correction translates that same payload to searchable insertion gaps,
+  same-gap sibling ordering, final preview, one confirmation, stale-state
+  recovery, and hidden/disabled Add/Supplement fallback;
 - TypeScript, focused and full unit/static tests, lint, authority check,
   dependency audit, network-enabled production build, and diff checks passed;
 - migration `020` remained byte-for-byte unchanged at SHA-256
@@ -345,6 +352,14 @@ accessibility/recovery browser evidence, independent intended-admin UAT,
 the destructive clean rehearsal, P-14, or any
 Production gate.
 
+The 2026-07-17 intended-admin UAT supersedes only that checkpoint's operator
+presentation, not its DB contract or historical evidence. The corrected flow
+opens on all suggestions, stages one insertion-gap decision in a focused dialog,
+uses **ปรับในหน้านี้ · ยังไม่บันทึก**, shows actual final neighbors, and limits
+the category summary to categories receiving new rows. Its later Local
+technical continuation passed stale/confirmation/replay/cleanup. Review Note
+#33 owns that evidence and the remaining keyboard/leave-reload re-UAT gates.
+
 ## 7. Schedule and safe alternatives
 
 These are current remaining effort bands, not calendar promises or permission
@@ -356,7 +371,7 @@ to skip gates:
 | P-34 WP-8 placement UX source/static hardening | Completed on exact `0780925`; live acceptance not inferred |
 | P-35 `021` bootstrap source integration | Completed on exact source checkpoint `01eba0d49f2e4b6e65f0d9dd287fd461ba9ea19a` |
 | P-36 integrated technical rehearsal and realistic route rendering | Completed on exact `910cc3c`; independent interaction/UAT not inferred |
-| Remaining independent intended-admin interaction/recovery UAT and readiness closeout | About 0.5-1 focused engineering day plus reviewer availability; remediation may extend calendar time |
+| Remaining independent keyboard/leave-reload UAT, exact commit/push provenance, and readiness closeout | About 0.5 focused engineering day plus reviewer availability; remediation may extend calendar time |
 | Earliest remaining path before any Production request | After independent UAT passes, authority closeout is reviewed, and P-37 is accepted; P-12 remains a separate decision |
 
 Limited safe alternative: preserve the completed WP-6.6/WP-7/WP-7.5 technical

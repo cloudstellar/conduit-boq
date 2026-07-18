@@ -14,6 +14,8 @@ import {
   CircleAlert,
   Loader2,
   MapPin,
+  PencilLine,
+  RotateCcw,
   Search,
 } from 'lucide-react';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
@@ -56,13 +58,15 @@ import type { CatalogPlacementWorkspace } from '@/lib/master-catalog/admin/readM
 import {
   buildCatalogPlacementPreview,
   catalogPlacementAssignmentsEqual,
+  clampCatalogPlacementGapIndex,
+  getCatalogPlacementAssignmentForGap,
   getCatalogPlacementAssignmentValidity,
+  getCatalogPlacementGapIndex,
   hasCatalogPlacementDraftChanges,
   moveCatalogPlacementAssignmentWithinAnchor,
   suggestCatalogPlacements,
   type CatalogPlacementAssignment,
   type CatalogPlacementAssignmentValidity,
-  type CatalogPlacementRelation,
 } from '@/lib/master-catalog/admin/placement';
 import { formatCatalogDictionaryLabel } from '@/lib/master-catalog/admin/presentation';
 import { placeCatalogItemsAction } from '../actions';
@@ -71,7 +75,7 @@ import { useStableCatalogOperation } from './useStableCatalogOperation';
 
 const initialState: CatalogMutationState = { status: 'idle', message: '' };
 const PAGE_SIZE = 50;
-const STORAGE_SCHEMA_VERSION = 1;
+const STORAGE_SCHEMA_VERSION = 2;
 
 type PlacementReviewFilter =
   | 'attention'
@@ -84,6 +88,12 @@ type PlacementReviewFilter =
 interface PlacementAssignmentReview {
   modified: boolean;
   validity: CatalogPlacementAssignmentValidity;
+}
+
+interface PlacementEditorState {
+  identityId: string;
+  categoryId: string;
+  gapIndex: number;
 }
 
 export function MasterCatalogPlacementWorkspaceView({
@@ -100,11 +110,10 @@ export function MasterCatalogPlacementWorkspaceView({
   const [assignments, setAssignments] = useState(() => suggestedAssignments);
   const [query, setQuery] = useState('');
   const deferredQuery = useDeferredValue(query);
-  const [reviewFilter, setReviewFilter] = useState<PlacementReviewFilter>(() => (
-    workspace.readiness?.placementReviewCurrent ? 'all' : 'attention'
-  ));
+  const [reviewFilter, setReviewFilter] = useState<PlacementReviewFilter>('all');
   const [page, setPage] = useState(0);
   const [confirmOpen, setConfirmOpen] = useState(false);
+  const [placementEditor, setPlacementEditor] = useState<PlacementEditorState | null>(null);
   const [leaveConfirmOpen, setLeaveConfirmOpen] = useState(false);
   const [pendingNavigationHref, setPendingNavigationHref] = useState<string | null>(null);
   const [restoredFromStorage, setRestoredFromStorage] = useState(false);
@@ -172,7 +181,7 @@ export function MasterCatalogPlacementWorkspaceView({
       invalid: 0,
     };
     for (const review of assignmentReviewByIdentity.values()) {
-      if (review.modified || review.validity !== 'complete') counts.attention += 1;
+      if (review.validity !== 'complete') counts.attention += 1;
       if (review.modified) counts.modified += 1;
       if (!review.modified && review.validity === 'complete') counts.suggested += 1;
       if (review.validity === 'incomplete') counts.incomplete += 1;
@@ -266,28 +275,22 @@ export function MasterCatalogPlacementWorkspaceView({
     && completedCount === workspace.newItems.length
     && previewResult.preview !== null
     && !placementReviewAlreadyCurrent;
-  const draftItemByIdentity = useMemo(
-    () => new Map(draftItems.map((item) => [item.identityId, item])),
-    [draftItems],
-  );
   const categoryById = useMemo(
     () => new Map(workspace.categories.map((category) => [category.id, category])),
     [workspace.categories],
   );
-  const affectedCategoryLabels = useMemo(() => {
+  const placementCategoryLabels = useMemo(() => {
     const categoryIds = new Set<string>();
-    for (const identityId of previewResult.preview?.affectedIdentityIds ?? []) {
-      const previous = draftItemByIdentity.get(identityId);
-      const next = previewByIdentity.get(identityId);
-      if (previous) categoryIds.add(previous.categoryId);
-      if (next) categoryIds.add(next.categoryId);
+    for (const item of workspace.newItems) {
+      const placedItem = previewByIdentity.get(item.identityId);
+      if (placedItem) categoryIds.add(placedItem.categoryId);
     }
     return [...categoryIds]
       .map((categoryId) => categoryById.get(categoryId))
       .filter((category): category is NonNullable<typeof category> => Boolean(category))
       .map((category) => formatCatalogDictionaryLabel(category.code, category.name))
       .sort((left, right) => left.localeCompare(right, 'th-TH'));
-  }, [categoryById, draftItemByIdentity, previewByIdentity, previewResult.preview]);
+  }, [categoryById, previewByIdentity, workspace.newItems]);
   const placementImpactRows = useMemo(() => workspace.newItems
     .map((item) => {
       const previewIndex = previewIndexByIdentity.get(item.identityId) ?? -1;
@@ -304,6 +307,60 @@ export function MasterCatalogPlacementWorkspaceView({
     previewItems,
     workspace.newItems,
   ]);
+  const placementEditorItem = placementEditor
+    ? workspace.newItems.find((item) => item.identityId === placementEditor.identityId) ?? null
+    : null;
+  const placementEditorAnchors = useMemo(() => (
+    placementEditor
+      ? inheritedItemsByCategory.get(placementEditor.categoryId) ?? []
+      : []
+  ), [inheritedItemsByCategory, placementEditor]);
+  const placementEditorGapIndex = placementEditor
+    ? clampCatalogPlacementGapIndex(placementEditor.gapIndex, placementEditorAnchors.length)
+    : 0;
+  const placementEditorPreviewNeighbors = useMemo(() => {
+    if (!placementEditor) return null;
+    const nextPlacement = getCatalogPlacementAssignmentForGap(
+      placementEditorAnchors,
+      placementEditorGapIndex,
+    );
+    if (!nextPlacement) return null;
+    const candidateAssignments = assignments.map((entry) => (
+      entry.identityId === placementEditor.identityId
+        ? {
+            ...entry,
+            categoryId: placementEditor.categoryId,
+            ...nextPlacement,
+          }
+        : entry
+    ));
+    try {
+      const candidateItems = buildCatalogPlacementPreview(
+        workspace.baseItems,
+        draftItems,
+        candidateAssignments,
+      ).orderedItems;
+      const itemIndex = candidateItems.findIndex((item) => (
+        item.identityId === placementEditor.identityId
+      ));
+      if (itemIndex < 0) return null;
+      return {
+        previous: itemIndex > 0 ? candidateItems[itemIndex - 1] : null,
+        next: candidateItems[itemIndex + 1] ?? null,
+      };
+    } catch {
+      return null;
+    }
+  }, [
+    assignments,
+    draftItems,
+    placementEditor,
+    placementEditorAnchors,
+    placementEditorGapIndex,
+    workspace.baseItems,
+  ]);
+  const placementEditorPrevious = placementEditorPreviewNeighbors?.previous ?? null;
+  const placementEditorNext = placementEditorPreviewNeighbors?.next ?? null;
 
   useEffect(() => {
     if (state.status === 'success') {
@@ -497,38 +554,51 @@ export function MasterCatalogPlacementWorkspaceView({
         <div className="flex flex-col justify-between gap-3 lg:flex-row lg:items-center">
           <div>
             <h2 id="placement-status-heading" className="text-base font-semibold">
-              สถานะชุดจัดตำแหน่ง
+              {placementReviewAlreadyCurrent
+                ? 'ตำแหน่งรายการใหม่ได้รับการยืนยันแล้ว'
+                : `ระบบจัดตำแหน่งเบื้องต้นให้แล้ว ${workspace.newItems.length.toLocaleString('th-TH')} รายการ`}
             </h2>
             <p className="text-sm text-muted-foreground">
-              ยืนยันเฉพาะรายการใหม่ โดยรักษาลำดับสัมพัทธ์ของรายการเดิมทั้งหมด
+              {placementReviewAlreadyCurrent
+                ? 'ตำแหน่งปัจจุบันตรงกับฉบับร่าง หากต้องการเปลี่ยนให้แก้เฉพาะรายการนั้นแล้วจึงยืนยันใหม่'
+                : 'ตรวจรายการข้างเคียงด้านล่าง หากถูกต้องไม่ต้องแก้ทีละรายการ และยืนยันพร้อมกันได้ทั้งชุด'}
             </p>
           </div>
-          <div className="flex flex-wrap gap-2">
-            <Badge variant={completedCount === workspace.newItems.length ? 'secondary' : 'outline'}>
-              กำหนดแล้ว {completedCount.toLocaleString('th-TH')} / {workspace.newItems.length.toLocaleString('th-TH')}
-            </Badge>
-            {placementReviewAlreadyCurrent ? (
-              <Badge variant="secondary">
-                <CheckCircle2 data-icon="inline-start" />
-                ชุดปัจจุบันยืนยันแล้ว
+          <div className="flex flex-col items-start gap-2 lg:items-end">
+            <div className="flex flex-wrap gap-2 lg:justify-end">
+              <Badge variant={completedCount === workspace.newItems.length ? 'secondary' : 'outline'}>
+                พร้อมยืนยัน {completedCount.toLocaleString('th-TH')} / {workspace.newItems.length.toLocaleString('th-TH')}
               </Badge>
-            ) : (
-              <Badge variant="outline">
-                <CircleAlert data-icon="inline-start" />
-                ยังไม่ยืนยัน
-              </Badge>
-            )}
+              {placementReviewAlreadyCurrent ? (
+                <Badge variant="secondary">
+                  <CheckCircle2 data-icon="inline-start" />
+                  บันทึกแล้ว
+                </Badge>
+              ) : (
+                <Badge variant="outline">
+                  <CircleAlert data-icon="inline-start" />
+                  ยังไม่บันทึก
+                </Badge>
+              )}
+              {!placementReviewAlreadyCurrent ? (
+                <Badge variant="outline">
+                  เลขลำดับรายการเดิมจะเลื่อน {shiftedInheritedCount.toLocaleString('th-TH')}
+                </Badge>
+              ) : null}
+            </div>
             {!placementReviewAlreadyCurrent ? (
-              <Badge variant="outline">
-                รายการเดิมที่จะเลื่อน {shiftedInheritedCount.toLocaleString('th-TH')}
-              </Badge>
+              <Button type="button" disabled={!canConfirm} onClick={() => setConfirmOpen(true)}>
+                <Check data-icon="inline-start" />
+                {canConfirm
+                  ? 'ตรวจสรุปก่อนบันทึกทั้งชุด'
+                  : 'แก้รายการที่มีปัญหาก่อน'}
+              </Button>
             ) : null}
           </div>
         </div>
         {!placementReviewAlreadyCurrent ? (
           <p className="text-xs text-muted-foreground">
-            ตัวเลือกจะอยู่ชั่วคราวเฉพาะเบราว์เซอร์ ฉบับร่าง และรุ่นแก้ไขนี้
-            จนกว่าจะยืนยันทั้งชุด
+            การเลื่อนหมายถึงเลขลำดับเปลี่ยนตามการแทรกรายการใหม่ เนื้อหา หน่วย และราคาเดิมไม่เปลี่ยน
           </p>
         ) : null}
       </section>
@@ -537,32 +607,41 @@ export function MasterCatalogPlacementWorkspaceView({
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <MapPin />
-            {placementReviewAlreadyCurrent
-              ? 'ตำแหน่งรายการใหม่ที่ยืนยันแล้ว'
-              : 'รายการใหม่ที่ต้องยืนยัน'}
+            ตรวจตำแหน่งรายการใหม่
           </CardTitle>
           <CardDescription>
-            เลือกหมวดและรายการเดิมที่อยู่ติดกัน ระบบจะแสดงลำดับจริงก่อนบันทึกทั้งชุด
+            แต่ละรายการแสดงสิ่งที่จะอยู่ก่อนหน้าและถัดไป เปลี่ยนเฉพาะตำแหน่งที่ไม่ถูกต้อง
           </CardDescription>
         </CardHeader>
         <CardContent className="grid gap-4">
-          <div className="flex flex-wrap gap-2" aria-label="จำนวนรายการตามสถานะการตรวจ">
-            <Badge variant="outline">
-              ต้องตรวจ {reviewCounts.attention.toLocaleString('th-TH')}
-            </Badge>
+          <div className="flex flex-wrap items-center gap-2" aria-label="จำนวนรายการตามสถานะการตรวจ">
             <Badge variant="secondary">
-              {workspace.readiness?.placementReviewCurrent ? 'ยืนยันไว้แล้ว' : 'ระบบเสนอ'}{' '}
+              {workspace.readiness?.placementReviewCurrent ? 'บันทึกแล้ว' : 'ระบบจัดให้'}{' '}
               {reviewCounts.suggested.toLocaleString('th-TH')}
             </Badge>
             <Badge variant="outline">
-              ผู้ดูแลแก้ไข {reviewCounts.modified.toLocaleString('th-TH')}
+              ปรับในหน้านี้ {reviewCounts.modified.toLocaleString('th-TH')}
             </Badge>
-            <Badge variant={reviewCounts.incomplete > 0 ? 'destructive' : 'outline'}>
-              ยังไม่ครบ {reviewCounts.incomplete.toLocaleString('th-TH')}
-            </Badge>
-            <Badge variant={reviewCounts.invalid > 0 ? 'destructive' : 'outline'}>
-              ไม่ถูกต้อง {reviewCounts.invalid.toLocaleString('th-TH')}
-            </Badge>
+            {reviewCounts.attention > 0 ? (
+              <Badge variant="destructive">
+                ต้องแก้ {reviewCounts.attention.toLocaleString('th-TH')}
+              </Badge>
+            ) : null}
+            {reviewCounts.modified > 0 ? (
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                onClick={() => {
+                  setAssignments(suggestedAssignments);
+                  setReviewFilter('all');
+                  setPage(0);
+                }}
+              >
+                <RotateCcw data-icon="inline-start" />
+                ยกเลิกการปรับทั้งหมด
+              </Button>
+            ) : null}
           </div>
 
           <div className="grid gap-3 sm:grid-cols-[minmax(0,1fr)_240px]">
@@ -595,20 +674,14 @@ export function MasterCatalogPlacementWorkspaceView({
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="attention">
-                    ต้องตรวจ ({reviewCounts.attention.toLocaleString('th-TH')})
+                    ต้องแก้ ({reviewCounts.attention.toLocaleString('th-TH')})
                   </SelectItem>
                   <SelectItem value="modified">
-                    ผู้ดูแลแก้ไข ({reviewCounts.modified.toLocaleString('th-TH')})
+                    ปรับในหน้านี้ ({reviewCounts.modified.toLocaleString('th-TH')})
                   </SelectItem>
                   <SelectItem value="suggested">
-                    {workspace.readiness?.placementReviewCurrent ? 'ยืนยันไว้แล้ว' : 'ระบบเสนอ'}
+                    {workspace.readiness?.placementReviewCurrent ? 'บันทึกแล้ว' : 'ระบบจัดให้'}
                     {' '}({reviewCounts.suggested.toLocaleString('th-TH')})
-                  </SelectItem>
-                  <SelectItem value="incomplete">
-                    ยังไม่ครบ ({reviewCounts.incomplete.toLocaleString('th-TH')})
-                  </SelectItem>
-                  <SelectItem value="invalid">
-                    ไม่ถูกต้อง ({reviewCounts.invalid.toLocaleString('th-TH')})
                   </SelectItem>
                   <SelectItem value="all">
                     ทั้งหมด ({workspace.newItems.length.toLocaleString('th-TH')})
@@ -623,7 +696,6 @@ export function MasterCatalogPlacementWorkspaceView({
               const assignment = assignmentByIdentity.get(item.identityId);
               const review = assignmentReviewByIdentity.get(item.identityId);
               if (!assignment || !review) return null;
-              const anchors = inheritedItemsByCategory.get(assignment.categoryId) ?? [];
               const siblings = assignmentsByAnchorRelation.get(
                 `${assignment.anchorIdentityId}:${assignment.relation}`,
               ) ?? [];
@@ -649,12 +721,12 @@ export function MasterCatalogPlacementWorkspaceView({
                         <span className="font-mono text-xs">{item.itemCode}</span>
                         <Badge variant="outline">รายการใหม่</Badge>
                         {review.modified ? (
-                          <Badge variant="secondary">ผู้ดูแลแก้ไข · ยังไม่ยืนยัน</Badge>
+                          <Badge variant="secondary">ปรับในหน้านี้ · ยังไม่บันทึก</Badge>
                         ) : review.validity === 'complete' ? (
                           <Badge variant="outline">
                             {workspace.readiness?.placementReviewCurrent
-                              ? 'ยืนยันไว้แล้ว'
-                              : 'ระบบเสนอ'}
+                              ? 'บันทึกแล้ว'
+                              : 'ระบบจัดให้'}
                           </Badge>
                         ) : null}
                         {review.validity === 'incomplete' ? (
@@ -670,7 +742,7 @@ export function MasterCatalogPlacementWorkspaceView({
                         ) : null}
                         {siblings.length > 1 ? (
                           <Badge variant="outline">
-                            ลำดับในจุดนี้ {(siblingIndex + 1).toLocaleString('th-TH')} / {siblings.length.toLocaleString('th-TH')}
+                            ลำดับในช่วงเดียวกัน {(siblingIndex + 1).toLocaleString('th-TH')} / {siblings.length.toLocaleString('th-TH')}
                           </Badge>
                         ) : null}
                       </div>
@@ -679,99 +751,61 @@ export function MasterCatalogPlacementWorkspaceView({
                         หน่วย {item.unit} · ราคา {item.unitCost.toLocaleString('th-TH', { minimumFractionDigits: 2 })}
                       </p>
                     </div>
-                    <div className="flex shrink-0 items-center gap-1">
-                      <Button
-                        type="button"
-                        size="icon"
-                        variant="ghost"
-                        title="เลื่อนขึ้นภายในจุดอ้างอิงเดียวกัน"
-                        aria-label={`เลื่อน ${item.itemCode} ขึ้น`}
-                        disabled={!workspace.editable || siblings.length < 2 || siblingIndex <= 0}
-                        onClick={() => moveAssignment(item.identityId, -1)}
-                      >
-                        <ArrowUp />
-                      </Button>
-                      <Button
-                        type="button"
-                        size="icon"
-                        variant="ghost"
-                        title="เลื่อนลงภายในจุดอ้างอิงเดียวกัน"
-                        aria-label={`เลื่อน ${item.itemCode} ลง`}
-                        disabled={
-                          !workspace.editable
-                          || siblings.length < 2
-                          || siblingIndex >= siblings.length - 1
-                        }
-                        onClick={() => moveAssignment(item.identityId, 1)}
-                      >
-                        <ArrowDown />
-                      </Button>
-                    </div>
-                  </div>
-
-                  <div className="grid gap-3 lg:grid-cols-[minmax(180px,0.7fr)_minmax(240px,1.3fr)_220px]">
-                    <div className="grid gap-2">
-                      <Label>หมวดงาน</Label>
-                      <Select
-                        value={assignment.categoryId}
-                        onValueChange={(categoryId) => changeCategory(item.identityId, categoryId)}
-                        disabled={!workspace.editable}
-                      >
-                        <SelectTrigger
-                          className="w-full"
-                          aria-label={`หมวดงานของ ${item.itemCode}`}
-                        >
-                          <SelectValue placeholder="เลือกหมวดงาน" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {workspace.categories.map((category) => (
-                            <SelectItem
-                              key={category.id}
-                              value={category.id}
-                              disabled={!inheritedItemsByCategory.has(category.id)}
-                            >
-                              {formatCatalogDictionaryLabel(category.code, category.name)}
-                              {!inheritedItemsByCategory.has(category.id) ? ' (ไม่มีรายการเดิมให้อ้างอิง)' : ''}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    </div>
-
-                    <div className="grid gap-2">
-                      <Label>รายการเดิมที่ใช้อ้างอิง</Label>
-                      <AnchorCombobox
-                        anchors={anchors}
-                        value={assignment.anchorIdentityId}
-                        label={item.itemCode}
-                        disabled={!workspace.editable}
-                        onValueChange={(anchorIdentityId) => updateAssignment(item.identityId, {
-                          anchorIdentityId,
-                        })}
-                      />
-                    </div>
-
-                    <div className="grid gap-2">
-                      <Label>ตำแหน่งเทียบกับรายการอ้างอิง</Label>
-                      <RelationControl
-                        value={assignment.relation}
-                        label={item.itemCode}
-                        disabled={!workspace.editable}
-                        onValueChange={(relation) => updateAssignment(item.identityId, { relation })}
-                      />
-                    </div>
                   </div>
 
                   {previewItem ? (
-                    <div className="grid gap-1 rounded-md bg-muted/45 px-3 py-2 text-sm sm:grid-cols-2">
-                      <p className="truncate">
-                        ก่อนหน้า: {previous ? `${previous.itemCode} ${previous.itemName}` : 'เริ่มต้นบัญชี'}
-                      </p>
-                      <p className="truncate">
-                        ถัดไป: {next ? `${next.itemCode} ${next.itemName}` : 'สิ้นสุดบัญชี'}
-                      </p>
-                    </div>
+                    <PlacementPositionPreview item={item} previous={previous} next={next} />
                   ) : null}
+
+                  <div className="flex flex-col justify-between gap-3 sm:flex-row sm:items-center">
+                    {siblings.length > 1 ? (
+                      <details className="group min-w-0">
+                        <summary className="w-fit cursor-pointer rounded-sm text-sm font-medium text-muted-foreground outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2">
+                          เปลี่ยนลำดับในช่วงนี้
+                        </summary>
+                        <div className="mt-2 flex flex-wrap items-center gap-2">
+                          <span className="text-sm text-muted-foreground">
+                            รายการนี้อยู่ลำดับ {(siblingIndex + 1).toLocaleString('th-TH')}
+                            {' '}จาก {siblings.length.toLocaleString('th-TH')}
+                          </span>
+                          <Button
+                            type="button"
+                            size="icon"
+                            variant="outline"
+                            title="เลื่อนรายการนี้ขึ้นหนึ่งตำแหน่ง"
+                            aria-label={`เลื่อน ${item.itemCode} ขึ้นหนึ่งตำแหน่ง`}
+                            disabled={!workspace.editable || siblingIndex <= 0}
+                            onClick={() => moveAssignment(item.identityId, -1)}
+                          >
+                            <ArrowUp />
+                          </Button>
+                          <Button
+                            type="button"
+                            size="icon"
+                            variant="outline"
+                            title="เลื่อนรายการนี้ลงหนึ่งตำแหน่ง"
+                            aria-label={`เลื่อน ${item.itemCode} ลงหนึ่งตำแหน่ง`}
+                            disabled={
+                              !workspace.editable
+                              || siblingIndex >= siblings.length - 1
+                            }
+                            onClick={() => moveAssignment(item.identityId, 1)}
+                          >
+                            <ArrowDown />
+                          </Button>
+                        </div>
+                      </details>
+                    ) : <span />}
+                    <Button
+                      type="button"
+                      variant="outline"
+                      disabled={!workspace.editable}
+                      onClick={() => openPlacementEditor(item.identityId)}
+                    >
+                      <PencilLine data-icon="inline-start" />
+                      เปลี่ยนตำแหน่ง
+                    </Button>
+                  </div>
                 </article>
               );
             })}
@@ -828,21 +862,120 @@ export function MasterCatalogPlacementWorkspaceView({
           <div className="flex flex-col justify-between gap-3 border-t pt-4 sm:flex-row sm:items-center">
             <p className="text-sm text-muted-foreground">
               {placementReviewAlreadyCurrent
-                ? 'ตำแหน่งในฉบับร่างตรงกับชุดที่ยืนยันแล้ว หากปรับหมวด รายการอ้างอิง หรือลำดับ ระบบจะแสดงผลกระทบก่อนยืนยันใหม่'
-                : `การยืนยันหนึ่งครั้งจะบันทึกรายการใหม่ ${workspace.newItems.length.toLocaleString('th-TH')} รายการ และเก็บประวัติรายการเดิมที่จะเลื่อน ${shiftedInheritedCount.toLocaleString('th-TH')} รายการ`}
+                ? 'ตำแหน่งในฉบับร่างตรงกับชุดที่บันทึกไว้แล้ว'
+                : `ไม่ต้องยืนยันทีละรายการ ระบบจะบันทึกตำแหน่งใหม่ ${workspace.newItems.length.toLocaleString('th-TH')} รายการพร้อมกันหนึ่งครั้ง`}
             </p>
             <Button type="button" disabled={!canConfirm} onClick={() => setConfirmOpen(true)}>
               {placementReviewAlreadyCurrent
                 ? <CheckCircle2 data-icon="inline-start" />
                 : <Check data-icon="inline-start" />}
-              {placementReviewAlreadyCurrent ? 'ยืนยันชุดปัจจุบันแล้ว' : 'ตรวจและยืนยันทั้งชุด'}
+              {placementReviewAlreadyCurrent
+                ? 'บันทึกตำแหน่งชุดนี้แล้ว'
+                : `ตรวจสรุปก่อนบันทึก ${workspace.newItems.length.toLocaleString('th-TH')} รายการ`}
             </Button>
           </div>
         </CardContent>
       </Card>
 
+      <Dialog
+        open={placementEditor !== null}
+        onOpenChange={(open) => {
+          if (!open) setPlacementEditor(null);
+        }}
+      >
+        <DialogContent className="max-h-[calc(100dvh-2rem)] min-w-0 overflow-x-hidden overflow-y-auto sm:max-w-2xl">
+          {placementEditor && placementEditorItem ? (
+            <div className="grid min-w-0 gap-5">
+              <DialogHeader>
+                <DialogTitle className="pr-8">
+                  เปลี่ยนตำแหน่ง {placementEditorItem.itemCode}
+                </DialogTitle>
+                <DialogDescription>
+                  เลือกหมวดและช่วงที่รายการนี้ควรอยู่ ค่านี้จะยังไม่บันทึกจนกว่าจะยืนยันทั้งชุด
+                </DialogDescription>
+              </DialogHeader>
+
+              <div className="grid gap-1 border-y py-3">
+                <p className="font-medium">{placementEditorItem.itemName}</p>
+                <p className="text-sm text-muted-foreground">
+                  หน่วย {placementEditorItem.unit} · ราคา {placementEditorItem.unitCost.toLocaleString('th-TH', { minimumFractionDigits: 2 })}
+                </p>
+              </div>
+
+              <div className="grid min-w-0 gap-4">
+                <div className="grid min-w-0 gap-2">
+                  <Label htmlFor="placement-editor-category">หมวดงาน</Label>
+                  <Select
+                    value={placementEditor.categoryId}
+                    onValueChange={(categoryId) => {
+                      const anchors = inheritedItemsByCategory.get(categoryId) ?? [];
+                      setPlacementEditor((current) => current ? {
+                        ...current,
+                        categoryId,
+                        gapIndex: anchors.length,
+                      } : null);
+                    }}
+                  >
+                    <SelectTrigger id="placement-editor-category" className="w-full min-w-0">
+                      <SelectValue placeholder="เลือกหมวดงาน" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {workspace.categories.map((category) => (
+                        <SelectItem
+                          key={category.id}
+                          value={category.id}
+                          disabled={!inheritedItemsByCategory.has(category.id)}
+                        >
+                          {formatCatalogDictionaryLabel(category.code, category.name)}
+                          {!inheritedItemsByCategory.has(category.id) ? ' (ไม่มีรายการเดิม)' : ''}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div className="grid min-w-0 gap-2">
+                  <Label>ช่วงที่จะวางรายการนี้</Label>
+                  <PlacementGapCombobox
+                    anchors={placementEditorAnchors}
+                    gapIndex={placementEditorGapIndex}
+                    itemCode={placementEditorItem.itemCode}
+                    onValueChange={(gapIndex) => setPlacementEditor((current) => (
+                      current ? { ...current, gapIndex } : null
+                    ))}
+                  />
+                </div>
+              </div>
+
+              <div className="grid min-w-0 gap-2">
+                <p className="text-sm font-medium">ตัวอย่างตำแหน่งที่เลือก</p>
+                <PlacementPositionPreview
+                  item={placementEditorItem}
+                  previous={placementEditorPrevious}
+                  next={placementEditorNext}
+                />
+              </div>
+
+              <DialogFooter>
+                <DialogClose asChild>
+                  <Button type="button" variant="outline">ยกเลิก</Button>
+                </DialogClose>
+                <Button
+                  type="button"
+                  disabled={placementEditorAnchors.length === 0}
+                  onClick={applyPlacementEditor}
+                >
+                  <Check data-icon="inline-start" />
+                  ใช้ตำแหน่งนี้
+                </Button>
+              </DialogFooter>
+            </div>
+          ) : null}
+        </DialogContent>
+      </Dialog>
+
       <Dialog open={confirmOpen} onOpenChange={setConfirmOpen}>
-        <DialogContent className="max-h-[calc(100dvh-2rem)] overflow-y-auto sm:max-w-2xl">
+        <DialogContent className="max-h-[calc(100dvh-2rem)] min-w-0 overflow-x-hidden overflow-y-auto sm:max-w-2xl">
           <form
             action={formAction}
             className="grid gap-4"
@@ -859,21 +992,25 @@ export function MasterCatalogPlacementWorkspaceView({
               value={JSON.stringify([...assignments].sort((left, right) => left.batchOrder - right.batchOrder))}
             />
             <DialogHeader>
-              <DialogTitle className="pr-8">ยืนยันตำแหน่งรายการใหม่ทั้งชุด</DialogTitle>
+              <DialogTitle className="pr-8">ตรวจสรุปก่อนบันทึกตำแหน่ง</DialogTitle>
               <DialogDescription>
-                ระบบจะจัดลำดับและบันทึกทั้งชุดในครั้งเดียว รักษาลำดับรายการเดิม
-                และเก็บประวัติทุกแถวที่ถูกเลื่อน
+                การกดยืนยันจะบันทึกตำแหน่งรายการใหม่ทั้งหมดหนึ่งครั้ง
+                โดยไม่เปลี่ยนลำดับสัมพัทธ์ เนื้อหา หน่วย หรือราคาของรายการเดิม
               </DialogDescription>
             </DialogHeader>
             <MasterCatalogActionErrorAlert state={state} />
             <div className="grid gap-2 rounded-md border p-3 text-sm">
               <p>รายการใหม่ {workspace.newItems.length.toLocaleString('th-TH')} รายการ</p>
-              <p>รายการเดิมที่คาดว่าจะเลื่อน {shiftedInheritedCount.toLocaleString('th-TH')} รายการ</p>
               <p>
-                หมวดงานที่ได้รับผลกระทบ {affectedCategoryLabels.length.toLocaleString('th-TH')} หมวด
+                ระบบจัดให้ {reviewCounts.suggested.toLocaleString('th-TH')} รายการ
+                {' · '}ปรับในหน้านี้ {reviewCounts.modified.toLocaleString('th-TH')} รายการ
+              </p>
+              <p>เลขลำดับรายการเดิมที่จะเลื่อน {shiftedInheritedCount.toLocaleString('th-TH')} รายการ</p>
+              <p>
+                หมวดที่วางรายการใหม่ {placementCategoryLabels.length.toLocaleString('th-TH')} หมวด
               </p>
               <p className="text-muted-foreground">
-                {affectedCategoryLabels.join(', ') || 'ไม่มีหมวดงานที่เปลี่ยนแปลง'}
+                {placementCategoryLabels.join(', ') || 'ยังไม่ได้กำหนดหมวดงาน'}
               </p>
               <p>
                 ข้อมูลยังไม่ครบ {reviewCounts.incomplete.toLocaleString('th-TH')} รายการ
@@ -957,27 +1094,42 @@ export function MasterCatalogPlacementWorkspaceView({
     </div>
   );
 
-  function updateAssignment(
-    identityId: string,
-    patch: Partial<Pick<CatalogPlacementAssignment, 'anchorIdentityId' | 'relation'>>,
-  ) {
-    setAssignments((current) => current.map((entry) => (
-      entry.identityId === identityId ? { ...entry, ...patch } : entry
-    )));
+  function openPlacementEditor(identityId: string) {
+    const assignment = assignmentByIdentity.get(identityId);
+    if (!assignment) return;
+    const anchors = inheritedItemsByCategory.get(assignment.categoryId) ?? [];
+    setPlacementEditor({
+      identityId,
+      categoryId: assignment.categoryId,
+      gapIndex: getCatalogPlacementGapIndex(anchors, assignment),
+    });
   }
 
-  function changeCategory(identityId: string, categoryId: string) {
-    const anchors = inheritedItemsByCategory.get(categoryId) ?? [];
-    setAssignments((current) => current.map((entry) => (
-      entry.identityId === identityId
-        ? {
-            ...entry,
-            categoryId,
-            anchorIdentityId: anchors.at(-1)?.identityId ?? '',
-            relation: 'after',
-          }
-        : entry
-    )));
+  function applyPlacementEditor() {
+    if (!placementEditor) return;
+    const currentAssignment = assignmentByIdentity.get(placementEditor.identityId);
+    const anchors = inheritedItemsByCategory.get(placementEditor.categoryId) ?? [];
+    const nextPlacement = getCatalogPlacementAssignmentForGap(
+      anchors,
+      placementEditorGapIndex,
+    );
+    if (!currentAssignment || !nextPlacement) return;
+
+    const currentAnchors = inheritedItemsByCategory.get(currentAssignment.categoryId) ?? [];
+    const unchanged = currentAssignment.categoryId === placementEditor.categoryId
+      && getCatalogPlacementGapIndex(currentAnchors, currentAssignment) === placementEditorGapIndex;
+    if (!unchanged) {
+      setAssignments((current) => current.map((entry) => (
+        entry.identityId === placementEditor.identityId
+          ? {
+              ...entry,
+              categoryId: placementEditor.categoryId,
+              ...nextPlacement,
+            }
+          : entry
+      )));
+    }
+    setPlacementEditor(null);
   }
 
   function moveAssignment(identityId: string, delta: -1 | 1) {
@@ -989,21 +1141,19 @@ export function MasterCatalogPlacementWorkspaceView({
   }
 }
 
-function AnchorCombobox({
+function PlacementGapCombobox({
   anchors,
-  value,
-  label,
-  disabled,
+  gapIndex,
+  itemCode,
   onValueChange,
 }: {
   anchors: CatalogWorkspaceItem[];
-  value: string;
-  label: string;
-  disabled: boolean;
-  onValueChange: (value: string) => void;
+  gapIndex: number;
+  itemCode: string;
+  onValueChange: (gapIndex: number) => void;
 }) {
   const [open, setOpen] = useState(false);
-  const selected = anchors.find((anchor) => anchor.identityId === value);
+  const gapOptions = Array.from({ length: anchors.length + 1 }, (_, index) => index);
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
@@ -1013,37 +1163,41 @@ function AnchorCombobox({
           variant="outline"
           role="combobox"
           aria-expanded={open}
-          aria-label={`รายการเดิมที่ใช้อ้างอิงสำหรับ ${label}`}
-          disabled={disabled || anchors.length === 0}
-          className="w-full justify-between font-normal"
+          aria-label={`ช่วงที่จะวาง ${itemCode}`}
+          disabled={anchors.length === 0}
+          className="w-full min-w-0 justify-between overflow-hidden font-normal"
         >
-          <span className="truncate">
-            {selected
-              ? `${selected.itemCode} ${selected.itemName}${selected.isActive ? '' : ' (ยกเลิกใช้)'}`
-              : 'เลือกรายการเดิม'}
+          <span className="truncate text-left">
+            {anchors.length > 0
+              ? formatPlacementGapLabel(anchors, gapIndex)
+              : 'ไม่มีรายการเดิมในหมวดนี้'}
           </span>
           <ChevronsUpDown className="opacity-50" />
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-[min(520px,calc(100vw-2rem))] p-0" align="start">
+      <PopoverContent className="w-[min(640px,calc(100vw-2rem))] p-0" align="start">
         <Command>
-          <CommandInput placeholder="ค้นหารหัสหรือชื่อรายการเดิม" />
+          <CommandInput placeholder="ค้นหารหัสหรือชื่อรายการก่อนหน้า/ถัดไป" />
           <CommandList>
-            <CommandEmpty>ไม่พบรายการเดิมในหมวดนี้</CommandEmpty>
+            <CommandEmpty>ไม่พบช่วงที่ตรงกับคำค้น</CommandEmpty>
             <CommandGroup>
-              {anchors.map((anchor) => (
+              {gapOptions.map((optionGapIndex) => (
                 <CommandItem
-                  key={anchor.identityId}
-                  value={`${anchor.itemCode} ${anchor.itemName} ${anchor.isActive ? 'ใช้งาน' : 'ยกเลิกใช้'}`}
+                  key={optionGapIndex}
+                  value={`${optionGapIndex} ${formatPlacementGapLabel(anchors, optionGapIndex)}`}
+                  className="items-start py-2"
                   onSelect={() => {
-                    onValueChange(anchor.identityId);
+                    onValueChange(optionGapIndex);
                     setOpen(false);
                   }}
                 >
-                  <Check className={cn('size-4', value === anchor.identityId ? 'opacity-100' : 'opacity-0')} />
-                  <span className="font-mono text-xs">{anchor.itemCode}</span>
-                  <span className="truncate">{anchor.itemName}</span>
-                  {!anchor.isActive ? <Badge variant="outline">ยกเลิกใช้</Badge> : null}
+                  <Check className={cn(
+                    'mt-0.5 size-4',
+                    gapIndex === optionGapIndex ? 'opacity-100' : 'opacity-0',
+                  )} />
+                  <span className="min-w-0 break-words">
+                    {formatPlacementGapLabel(anchors, optionGapIndex)}
+                  </span>
                 </CommandItem>
               ))}
             </CommandGroup>
@@ -1054,47 +1208,50 @@ function AnchorCombobox({
   );
 }
 
-function RelationControl({
-  value,
-  label: itemLabel,
-  disabled,
-  onValueChange,
+function PlacementPositionPreview({
+  item,
+  previous,
+  next,
 }: {
-  value: CatalogPlacementRelation;
-  label: string;
-  disabled: boolean;
-  onValueChange: (value: CatalogPlacementRelation) => void;
+  item: CatalogWorkspaceItem;
+  previous: CatalogWorkspaceItem | null;
+  next: CatalogWorkspaceItem | null;
 }) {
   return (
-    <fieldset className="grid grid-cols-2 rounded-md border p-1" disabled={disabled}>
-      <legend className="sr-only">
-        ตำแหน่งของ {itemLabel} เทียบกับรายการอ้างอิง
-      </legend>
-      {([
-        ['before', 'ก่อนรายการนี้'],
-        ['after', 'หลังรายการนี้'],
-      ] as const).map(([option, optionLabel]) => (
-        <label
-          key={option}
-          className={cn(
-            'cursor-pointer',
-            disabled && 'cursor-not-allowed opacity-50',
-          )}
-        >
-          <input
-            className="peer sr-only"
-            type="radio"
-            name={`placement-relation-${itemLabel}`}
-            value={option}
-            checked={value === option}
-            onChange={() => onValueChange(option)}
-          />
-          <span className="flex h-8 items-center justify-center rounded-sm px-2 text-sm font-medium transition-colors peer-checked:bg-secondary peer-checked:text-secondary-foreground peer-focus-visible:outline-none peer-focus-visible:ring-2 peer-focus-visible:ring-ring peer-focus-visible:ring-offset-2">
-            {optionLabel}
-          </span>
-        </label>
-      ))}
-    </fieldset>
+    <div className="grid min-w-0 gap-2 rounded-md bg-muted/45 p-3 sm:grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)_auto_minmax(0,1fr)] sm:items-center">
+      <PlacementPreviewItem
+        label="ก่อนหน้า"
+        value={formatPlacementNeighbor(previous, 'เริ่มต้นหมวด')}
+      />
+      <ChevronRight className="hidden size-4 text-muted-foreground sm:block" aria-hidden="true" />
+      <PlacementPreviewItem
+        current
+        label="รายการใหม่นี้"
+        value={`${item.itemCode} ${item.itemName}`}
+      />
+      <ChevronRight className="hidden size-4 text-muted-foreground sm:block" aria-hidden="true" />
+      <PlacementPreviewItem
+        label="ถัดไป"
+        value={formatPlacementNeighbor(next, 'สิ้นสุดหมวด')}
+      />
+    </div>
+  );
+}
+
+function PlacementPreviewItem({
+  label,
+  value,
+  current = false,
+}: {
+  label: string;
+  value: string;
+  current?: boolean;
+}) {
+  return (
+    <div className={cn('min-w-0', current && 'font-medium text-foreground')}>
+      <p className="text-xs text-muted-foreground">{label}</p>
+      <p className="break-words text-sm">{value}</p>
+    </div>
   );
 }
 
@@ -1103,7 +1260,7 @@ function PlacementSubmitButton() {
   return (
     <Button type="submit" disabled={pending}>
       {pending ? <Loader2 className="animate-spin" data-icon="inline-start" /> : <Check data-icon="inline-start" />}
-      {pending ? 'กำลังยืนยัน' : 'ยืนยันและบันทึกทั้งชุด'}
+      {pending ? 'กำลังบันทึก' : 'ยืนยันและบันทึกตำแหน่ง'}
     </Button>
   );
 }
@@ -1112,13 +1269,29 @@ function compareDisplayOrder(left: CatalogWorkspaceItem, right: CatalogWorkspace
   return left.displayOrder - right.displayOrder || left.itemCode.localeCompare(right.itemCode);
 }
 
+function formatPlacementGapLabel(
+  anchors: CatalogWorkspaceItem[],
+  gapIndex: number,
+) {
+  const safeGapIndex = clampCatalogPlacementGapIndex(gapIndex, anchors.length);
+  const previous = safeGapIndex > 0 ? anchors[safeGapIndex - 1] : null;
+  const next = safeGapIndex < anchors.length ? anchors[safeGapIndex] : null;
+  if (!previous && next) {
+    return `ต้นหมวด · ก่อน ${formatPlacementNeighbor(next, '')}`;
+  }
+  if (previous && !next) {
+    return `ท้ายหมวด · หลัง ${formatPlacementNeighbor(previous, '')}`;
+  }
+  return `ระหว่าง ${formatPlacementNeighbor(previous, '')} และ ${formatPlacementNeighbor(next, '')}`;
+}
+
 function matchesPlacementReviewFilter(
   review: PlacementAssignmentReview,
   filter: PlacementReviewFilter,
 ) {
   switch (filter) {
     case 'attention':
-      return review.modified || review.validity !== 'complete';
+      return review.validity !== 'complete';
     case 'modified':
       return review.modified;
     case 'suggested':
@@ -1143,7 +1316,6 @@ function parseStoredPlacementAssignments(
   value: unknown,
   expectedLength: number,
 ): CatalogPlacementAssignment[] | null {
-  if (isStoredPlacementAssignments(value, expectedLength)) return value;
   if (
     value
     && typeof value === 'object'

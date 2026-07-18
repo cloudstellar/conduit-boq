@@ -9,6 +9,19 @@ feature enablement, publication, P-19, Factor F work, or hotfix `016` expansion.
 
 **Recorded:** 2026-07-15
 
+**2026-07-17 supplement:** the first intended-admin UAT failed comprehension
+before confirmation. The resulting UI-only insertion-gap correction and current
+P-37 HOLD are recorded in
+[Review Note #33](./33-phase4-wp8-p37-uat-ux-correction-note.md). This P-36 note
+remains the authority for the earlier integrated technical rehearsal and clean
+baseline; it does not claim acceptance of the superseded anchor/relation UI.
+
+**2026-07-18 supplement:** the corrected fixture later passed controlled stale
+rejection, one accepted placement, exact replay, accepted-state readback, and
+audited cleanup back to the disabled baseline. That evidence does not replace
+independent keyboard/leave-reload UAT or record P-37 acceptance; Note #33 remains
+the authority for the current hold.
+
 ## 1. Scope and provenance
 
 - branch: `codex/master-catalog-phase4`;
@@ -100,12 +113,13 @@ the run must **not** be labeled as any of the following:
 
 Before P-37 can be accepted for the full Add/Supplement release, a non-
 implementer admin must complete one bounded Local session without developer or
-SQL assistance: inspect suggestions, filter exceptions, change category/anchor/
-relation and sibling order, observe **ยังไม่ยืนยัน**, recover a supported
-leave/reload and one stale-placement response, use the required controls by
-keyboard, confirm the batch once, explain the shifted-row impact, and reach
-final review without an irreversible mistake. Add/Supplement remains hidden
-until that evidence passes.
+SQL assistance: inspect suggestions, filter exceptions, change category and one
+insertion gap (which maps to the accepted same-category anchor/relation
+contract), change sibling order, distinguish browser-local **ยังไม่บันทึก**
+from accepted state, recover a supported leave/reload and one stale-placement
+response, use the required controls by keyboard, confirm the batch once,
+explain the shifted-row impact, and reach final review without an irreversible
+mistake. Add/Supplement remains hidden until that evidence passes.
 
 ## 5. Advisor and debt disposition
 
