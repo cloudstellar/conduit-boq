@@ -151,12 +151,12 @@ Stop immediately when any of these occurs:
     the explicit P-37 accept/hold decision or any P-12/P-14 gate. See also
     [P-37 UAT/UX Note](./33-phase4-wp8-p37-uat-ux-correction-note.md).
 15. Verify P-39R separately: the P-38 Card A session was safely cleaned and
-    P-23.1 permanent reservation is historical. Do not request P-37/P-12 until
-    corrected `022`, forward code-RLS correction `023`, and set-based placement
-    invalidation correction `024` have passed P39R-S,
-    separately approved incremental P39R-L,
-    separately approved destructive P39R-C, and owner P39R-U. Confirm one open
-    draft globally, stale-draft abandonment, restore effect/pointer audit,
+    P-23.1 permanent reservation is historical. Corrected `022`, forward
+    code-RLS correction `023`, and set-based placement invalidation correction
+    `024` passed P39R-S and separately approved incremental P39R-L on exact
+    pushed `b6d58ce6cfedafa5812821edb49b897c2856f049`. Do not request P-37/P-12
+    until separately approved destructive P39R-C and owner P39R-U pass. Confirm
+    one open draft globally, stale-draft abandonment, restore effect/pointer audit,
     role/state RLS, complete publication metadata, and replay identity. No prior
     reset approval applies.
 

@@ -5,10 +5,11 @@ source, migration, documentation, and verification work on 2026-07-18. P39R-S
 passed and exact source commits through `6f01457` are pushed. Incremental `022`
 and corrected `023` apply/readback passed without reset. The resumed live
 harness then exposed migration `021` row-trigger amplification while cloning
-710 rows. Owner-approved forward `024` is the one bounded remaining database
-correction; its exact commit/apply/live proof is pending. P39R-L remains in
-progress, while P39R-C/P39R-U and Production approval remain pending. The
-earlier P39-S result is historical. Production remains untouched.
+710 rows. Owner-approved forward `024` was committed, pushed, and incrementally
+applied on exact `b6d58ce6cfedafa5812821edb49b897c2856f049`; WP-6.6,
+WP-7.5, canonical, cleanup, and adjacent business hashes passed. P39R-L is
+passed, while P39R-C/P39R-U and Production approval remain pending. The earlier
+P39-S result is historical. Production remains untouched.
 
 **Supersedes for future execution:** P-23.1's rule that every created draft
 permanently consumes its proposed catalog version. P-23.1 evidence remains
@@ -291,11 +292,30 @@ BOQ 198/items 1,547 with zero unversioned BOQs, and Factor F `2569.0.0`/36.
 
 Migration `024` SHA-256
 `d3aa11282fa4b2d4bac058bde3851287c551556ba5eac307277f086ba3d86b25`
-is the owner-approved bounded fix-forward candidate. It uses statement-level
+is the owner-approved bounded fix-forward. It uses statement-level
 transition tables plus transaction-local positive/negative version markers;
 it does not copy the large apply RPC or add denormalized persistent state.
-P39R-L is not passed until exact committed `024` applies, WP-6.6 and WP-7.5
-live suites pass, and final invariants pass on one exact pushed source.
+Exact pushed source `b6d58ce6cfedafa5812821edb49b897c2856f049` applied
+transactionally without reset. Full WP-6.6 passed the previously failing clone,
+accumulated-history/RLS, import, lifecycle, publish/restore, rollback/race, and
+cleanup contracts in 2.46 seconds total. Full WP-7.5 passed all placement role,
+stale-lock/revision, invalid-order/anchor, rollback, race, replay, revision,
+normal-edit, inherited-order, and cleanup contracts in 2.29 seconds total.
+
+Final canonical evidence detected `017`-`024`, three statement triggers, zero
+legacy row triggers, pointer `2568.0.0`/710, canonical hash
+`sha256:2e3571ea7135fbc0bbb84c8cc330af1173e4c1d2345e5eb59958dc76e45558b8`,
+and 471,777 canonical JSON bytes. Working drafts are zero and all three feature
+flags are false. Exact pre/post table hashes remain:
+
+- BOQ 198: `b82c0488a092469702c978379f197d0c`;
+- BOQ items 1,547: `5cc1e7f845b1432e39aea850502e1af3`;
+- Factor F versions 2: `b2e4815ea7b20e7c2a00b040acd4bed6`; and
+- Factor F rows 73: `a83893a1ade59874eeee93040db18534`.
+
+P39R-L passed on 2026-07-19. P39R-C still requires a fresh destructive-reset
+warning and separate owner approval; P39R-U remains after P39R-C. No reset or
+Production action occurred in P39R-L.
 
 ## 7. Deployment and rollback compatibility
 

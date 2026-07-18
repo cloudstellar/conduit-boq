@@ -402,10 +402,10 @@ describe('Master Catalog authority consistency', () => {
       /P-33 accepted that\s+exact bounded WP-7\.5 technical checkpoint at 2026-07-15 13:54 \+07/,
     )
     expect(tracker).toContain(
-      '| Current work package | WP-8/P-37 HOLD; P-39R P39R-L in progress after successful incremental `022`/`023`; final bounded `024` source candidate awaits exact commit/apply/live rerun; P39R-C/P39R-U remain pending |',
+      '| Current work package | WP-8/P-37 HOLD; P-39R P39R-L passed on incremental `022`-`024`; P39R-C awaits a fresh destructive-reset warning/owner decision and P39R-U remains pending |',
     )
     expect(tracker).toContain(
-      '| Current environment | Disabled Local baseline after `023`, before `024`: pointer `2568.0.0`/710',
+      '| Current environment | Disabled Local baseline after `024`: pointer `2568.0.0`/710',
     )
     expect(tracker).toContain(
       '0780925aca8fa7ebbf8abbaf2b7cf151b39b676a',
@@ -583,7 +583,7 @@ describe('Master Catalog authority consistency', () => {
       '| C-10 | At least three safe validation-error recoveries |',
       '| C-11 | 710-row performance baseline |',
       '| C-12 | Documentation consistency |',
-      '| Passed for P39R-S; monitor | Authority consistency and full repository checks passed; rerun after any P39R-L/P39R-C/P39R-U evidence update |',
+      '| Passed through P39R-L; monitor | Authority consistency and full repository checks passed; rerun after any P39R-C/P39R-U evidence update |',
       'one rejected stale attempt with zero effect, then exactly one accepted UI batch/change set',
       'does not require `npm run db:local:bootstrap`',
     ]) {

@@ -35,14 +35,16 @@ is open globally; a stale draft may only be inspected or audited-abandoned.
 Restore records pointer before/after and its effect on that draft. Forward
 migration `022` overlays accepted `020`/`021`; prior P39-S is historical and
 P39R-S passed on the corrected source candidate. Incremental `022` invariants
-passed; policy-only forward `023` now owns exact issued identity/code-pair staff
+passed; policy-only forward `023` owns exact issued identity/code-pair staff
 visibility and the accumulated-history harness correction. Corrected `023`
 applied without reset; the resumed live harness then exposed `021` row-trigger
 amplification during a 710-row clone. Bounded forward `024` replaces only that
 execution shape with statement-level transition tables and transaction-local
 version caches, without duplicating the mutation RPC or adding persistent
-derived state. P39R-L/P39R-C/P39R-U plus every Production approval remain
-separate gates.
+derived state. Exact pushed `b6d58ce6cfedafa5812821edb49b897c2856f049`
+applied `024` incrementally and passed full WP-6.6/WP-7.5 plus final
+invariants, so P39R-L is passed. P39R-C/P39R-U and every Production approval
+remain separate gates.
 
 **Reliability amendment:** 2026-07-11 — WP-6.5 now closes end-to-end
 idempotency, publish-block UX, P-20 hash portability, ADR-003 reusable

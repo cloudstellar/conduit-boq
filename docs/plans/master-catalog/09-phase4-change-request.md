@@ -24,7 +24,9 @@ requires forward policy-only `023` so staff code visibility follows the exact
 identity/code pair used in an issued snapshot. Corrected `023` then applied
 without reset; the continued harness safely exposed row-trigger amplification
 during a 710-row draft clone. Forward `024` is the bounded set-based trigger
-correction. Complete P39R-L, destructive bootstrap, Production, Factor F/hotfix
+correction. Exact pushed `b6d58ce6cfedafa5812821edb49b897c2856f049`
+applied `024` incrementally and full WP-6.6/WP-7.5 plus final invariants passed,
+closing P39R-L. Destructive P39R-C, owner P39R-U, Production, Factor F/hotfix
 expansion, and P-19 remain separately gated.
 
 **Owner decision recorded:** 2026-07-04 — approved according to the

@@ -129,12 +129,13 @@ all three catalog flags `false`, BOQ 198/1,547 with zero unversioned BOQs, and
 Factor F `2569.0.0`/36. Production was untouched and no Local reset occurred.
 
 The earlier P39-S source/static result is historical after P-39R. Corrected
-P39R-S is pushed; owner-approved incremental `022` invariants passed, while
-Incremental `022`/`023` invariants passed, but the full rerun exposed the `021`
-row-trigger clone timeout. P39R-L remains in progress for final forward `024`
-and the complete WP-6.6/WP-7.5 live rerun. After
-P39R-L, receive a fresh destructive-reset approval for P39R-C. Only after
-P39R-U proves the corrected
+P39R-S passed. Incremental `022`/`023` invariants passed, and the full rerun
+then exposed the `021` row-trigger clone timeout. Final forward `024` corrected
+that execution shape; exact pushed
+`b6d58ce6cfedafa5812821edb49b897c2856f049` passed incremental apply, complete
+WP-6.6/WP-7.5 live reruns, canonical readback, and final invariants without
+reset. P39R-L is passed. Receive a fresh destructive-reset approval for
+P39R-C. Only after P39R-U proves the corrected
 Card A behavior may the Owner resume Cards B-G. Do not request P-37 before that
 evidence, cleanup, authority update, exact verification, commit, and push are
 complete.
