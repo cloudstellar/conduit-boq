@@ -1,6 +1,6 @@
 'use client';
 
-import { useActionState, useDeferredValue, useEffect, useMemo, useState } from 'react';
+import { useActionState, useDeferredValue, useEffect, useMemo, useRef, useState } from 'react';
 import { useFormStatus } from 'react-dom';
 import { useRouter } from 'next/navigation';
 import {
@@ -113,8 +113,11 @@ export function MasterCatalogPlacementWorkspaceView({
   const [reviewFilter, setReviewFilter] = useState<PlacementReviewFilter>('all');
   const [page, setPage] = useState(0);
   const [confirmOpen, setConfirmOpen] = useState(false);
+  const confirmTriggerRef = useRef<HTMLButtonElement | null>(null);
   const [placementEditor, setPlacementEditor] = useState<PlacementEditorState | null>(null);
+  const placementEditorTriggerRef = useRef<HTMLButtonElement | null>(null);
   const [leaveConfirmOpen, setLeaveConfirmOpen] = useState(false);
+  const leaveConfirmTriggerRef = useRef<HTMLAnchorElement | null>(null);
   const [pendingNavigationHref, setPendingNavigationHref] = useState<string | null>(null);
   const [restoredFromStorage, setRestoredFromStorage] = useState(false);
   const [storageReady, setStorageReady] = useState(false);
@@ -466,6 +469,7 @@ export function MasterCatalogPlacementWorkspaceView({
 
       event.preventDefault();
       event.stopPropagation();
+      leaveConfirmTriggerRef.current = anchor;
       setPendingNavigationHref(
         `${destination.pathname}${destination.search}${destination.hash}`,
       );
@@ -587,7 +591,11 @@ export function MasterCatalogPlacementWorkspaceView({
               ) : null}
             </div>
             {!placementReviewAlreadyCurrent ? (
-              <Button type="button" disabled={!canConfirm} onClick={() => setConfirmOpen(true)}>
+              <Button
+                type="button"
+                disabled={!canConfirm}
+                onClick={(event) => openConfirm(event.currentTarget)}
+              >
                 <Check data-icon="inline-start" />
                 {canConfirm
                   ? 'ตรวจสรุปก่อนบันทึกทั้งชุด'
@@ -801,7 +809,7 @@ export function MasterCatalogPlacementWorkspaceView({
                       type="button"
                       variant="outline"
                       disabled={!workspace.editable}
-                      onClick={() => openPlacementEditor(item.identityId)}
+                      onClick={(event) => openPlacementEditor(item.identityId, event.currentTarget)}
                     >
                       <PencilLine data-icon="inline-start" />
                       เปลี่ยนตำแหน่ง
@@ -866,7 +874,11 @@ export function MasterCatalogPlacementWorkspaceView({
                 ? 'ตำแหน่งในฉบับร่างตรงกับชุดที่บันทึกไว้แล้ว'
                 : `ไม่ต้องยืนยันทีละรายการ ระบบจะบันทึกตำแหน่งใหม่ ${workspace.newItems.length.toLocaleString('th-TH')} รายการพร้อมกันหนึ่งครั้ง`}
             </p>
-            <Button type="button" disabled={!canConfirm} onClick={() => setConfirmOpen(true)}>
+            <Button
+              type="button"
+              disabled={!canConfirm}
+              onClick={(event) => openConfirm(event.currentTarget)}
+            >
               {placementReviewAlreadyCurrent
                 ? <CheckCircle2 data-icon="inline-start" />
                 : <Check data-icon="inline-start" />}
@@ -884,7 +896,16 @@ export function MasterCatalogPlacementWorkspaceView({
           if (!open) setPlacementEditor(null);
         }}
       >
-        <DialogContent className="max-h-[calc(100dvh-2rem)] min-w-0 overflow-x-hidden overflow-y-auto sm:max-w-2xl">
+        <DialogContent
+          className="max-h-[calc(100dvh-2rem)] min-w-0 overflow-x-hidden overflow-y-auto sm:max-w-2xl"
+          onCloseAutoFocus={(event) => {
+            const trigger = placementEditorTriggerRef.current;
+            placementEditorTriggerRef.current = null;
+            if (!trigger?.isConnected) return;
+            event.preventDefault();
+            trigger.focus({ preventScroll: true });
+          }}
+        >
           {placementEditor && placementEditorItem ? (
             <div className="grid min-w-0 gap-5">
               <DialogHeader>
@@ -976,7 +997,16 @@ export function MasterCatalogPlacementWorkspaceView({
       </Dialog>
 
       <Dialog open={confirmOpen} onOpenChange={setConfirmOpen}>
-        <DialogContent className="max-h-[calc(100dvh-2rem)] min-w-0 overflow-x-hidden overflow-y-auto sm:max-w-2xl">
+        <DialogContent
+          className="max-h-[calc(100dvh-2rem)] min-w-0 overflow-x-hidden overflow-y-auto sm:max-w-2xl"
+          onCloseAutoFocus={(event) => {
+            const trigger = confirmTriggerRef.current;
+            confirmTriggerRef.current = null;
+            if (!trigger?.isConnected) return;
+            event.preventDefault();
+            trigger.focus({ preventScroll: true });
+          }}
+        >
           <form
             action={formAction}
             className="grid gap-4"
@@ -1023,19 +1053,19 @@ export function MasterCatalogPlacementWorkspaceView({
               <p className="text-sm font-medium">
                 ตำแหน่งสุดท้ายของรายการใหม่ {placementImpactRows.length.toLocaleString('th-TH')} รายการ
               </p>
-              <ul className="max-h-60 divide-y overflow-y-auto rounded-md border" aria-label="รายการข้างเคียงสุดท้าย">
-                {placementImpactRows.map(({ item, previous, next }) => (
-                  <li key={item.identityId} className="grid gap-1 p-3 text-sm">
-                    <p className="font-medium">
-                      <span className="font-mono text-xs">{item.itemCode}</span>
-                      {' '}{item.itemName}
-                    </p>
-                    <p className="text-xs text-muted-foreground">
-                      ก่อนหน้า: {formatPlacementNeighbor(previous, 'เริ่มต้นบัญชี')}
-                    </p>
-                    <p className="text-xs text-muted-foreground">
-                      ถัดไป: {formatPlacementNeighbor(next, 'สิ้นสุดบัญชี')}
-                    </p>
+              <ul
+                className="max-h-60 divide-y overflow-y-auto rounded-md border"
+                aria-label="ตำแหน่งสุดท้ายของรายการใหม่"
+              >
+                {placementImpactRows.map(({ item, previewIndex, previous, next }) => (
+                  <li key={item.identityId} className="p-3">
+                    <PlacementPositionPreview
+                      compact
+                      finalPosition={previewIndex + 1}
+                      item={item}
+                      previous={previous}
+                      next={next}
+                    />
                   </li>
                 ))}
               </ul>
@@ -1067,7 +1097,15 @@ export function MasterCatalogPlacementWorkspaceView({
           if (!open) setPendingNavigationHref(null);
         }}
       >
-        <DialogContent>
+        <DialogContent
+          onCloseAutoFocus={(event) => {
+            const trigger = leaveConfirmTriggerRef.current;
+            leaveConfirmTriggerRef.current = null;
+            if (!trigger?.isConnected) return;
+            event.preventDefault();
+            trigger.focus({ preventScroll: true });
+          }}
+        >
           <DialogHeader>
             <DialogTitle className="pr-8">ออกจากหน้าที่มีตัวเลือกยังไม่ยืนยันหรือไม่</DialogTitle>
             <DialogDescription>
@@ -1095,15 +1133,21 @@ export function MasterCatalogPlacementWorkspaceView({
     </div>
   );
 
-  function openPlacementEditor(identityId: string) {
+  function openPlacementEditor(identityId: string, trigger: HTMLButtonElement) {
     const assignment = assignmentByIdentity.get(identityId);
     if (!assignment) return;
     const anchors = inheritedItemsByCategory.get(assignment.categoryId) ?? [];
+    placementEditorTriggerRef.current = trigger;
     setPlacementEditor({
       identityId,
       categoryId: assignment.categoryId,
       gapIndex: getCatalogPlacementGapIndex(anchors, assignment),
     });
+  }
+
+  function openConfirm(trigger: HTMLButtonElement) {
+    confirmTriggerRef.current = trigger;
+    setConfirmOpen(true);
   }
 
   function applyPlacementEditor() {
@@ -1210,16 +1254,23 @@ function PlacementGapCombobox({
 }
 
 function PlacementPositionPreview({
+  compact = false,
+  finalPosition,
   item,
   previous,
   next,
 }: {
+  compact?: boolean;
+  finalPosition?: number;
   item: CatalogWorkspaceItem;
   previous: CatalogWorkspaceItem | null;
   next: CatalogWorkspaceItem | null;
 }) {
   return (
-    <div className="grid min-w-0 gap-2 rounded-md bg-muted/45 p-3 sm:grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)_auto_minmax(0,1fr)] sm:items-center">
+    <div className={cn(
+      'grid min-w-0 gap-2 sm:grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)_auto_minmax(0,1fr)] sm:items-center',
+      !compact && 'rounded-md bg-muted/45 p-3',
+    )}>
       <PlacementPreviewItem
         label="ก่อนหน้า"
         value={formatPlacementNeighbor(previous, 'เริ่มต้นหมวด')}
@@ -1227,7 +1278,9 @@ function PlacementPositionPreview({
       <ChevronRight className="hidden size-4 text-muted-foreground sm:block" aria-hidden="true" />
       <PlacementPreviewItem
         current
-        label="รายการใหม่นี้"
+        label={finalPosition
+          ? `รายการใหม่นี้ · ลำดับหลังบันทึก ${finalPosition.toLocaleString('th-TH')}`
+          : 'รายการใหม่นี้'}
         value={`${item.itemCode} ${item.itemName}`}
       />
       <ChevronRight className="hidden size-4 text-muted-foreground sm:block" aria-hidden="true" />

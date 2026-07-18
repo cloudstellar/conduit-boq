@@ -242,14 +242,25 @@ describe('Master Catalog P-22 operator workflow', () => {
     expect(placementWorkspace).toContain('role="combobox"');
     expect(placementWorkspace).toContain('ช่วงที่จะวางรายการนี้');
     expect(placementWorkspace).toContain('ใช้ตำแหน่งนี้');
+    expect(placementWorkspace).toContain('placementEditorTriggerRef');
+    expect(placementWorkspace).toContain('confirmTriggerRef');
+    expect(placementWorkspace).toContain('leaveConfirmTriggerRef');
+    expect(placementWorkspace).toContain('leaveConfirmTriggerRef.current = anchor;');
+    expect(placementWorkspace.match(/onCloseAutoFocus=/g)).toHaveLength(3);
+    expect(placementWorkspace).toContain('onCloseAutoFocus={(event) => {');
+    expect(placementWorkspace).toContain('trigger.focus({ preventScroll: true });');
     expect(placementWorkspace).toContain('ตรวจสรุปก่อนบันทึกทั้งชุด');
     expect(placementWorkspace).toContain('<details className="group min-w-0">');
     expect(placementWorkspace).toContain('เปลี่ยนลำดับในช่วงนี้');
     expect(placementWorkspace).toContain('function PlacementPositionPreview');
     expect(placementWorkspace).toContain('placementCategoryLabels');
     expect(placementWorkspace).toContain('ตำแหน่งสุดท้ายของรายการใหม่');
-    expect(placementWorkspace).toContain('ก่อนหน้า: {formatPlacementNeighbor(previous');
-    expect(placementWorkspace).toContain('ถัดไป: {formatPlacementNeighbor(next');
+    expect(placementWorkspace).toContain('aria-label="ตำแหน่งสุดท้ายของรายการใหม่"');
+    expect(placementWorkspace.match(/<PlacementPositionPreview/g)).toHaveLength(3);
+    expect(placementWorkspace).toContain('compact\n                      finalPosition={previewIndex + 1}');
+    expect(placementWorkspace).toContain('label="ก่อนหน้า"');
+    expect(placementWorkspace).toContain('รายการใหม่นี้ · ลำดับหลังบันทึก');
+    expect(placementWorkspace).toContain('label="ถัดไป"');
   });
 
   it('confirms publish, recode, and retire before high-impact submission', () => {
