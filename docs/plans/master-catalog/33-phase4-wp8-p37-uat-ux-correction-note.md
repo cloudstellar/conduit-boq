@@ -1,7 +1,7 @@
 # Phase 4 WP-8 P-37 Intended-Admin UAT and Placement UX Correction Note
 
-**Status:** P-37 remains **HOLD only for the explicit owner accept/hold
-decision**. The first no-reset intended-admin Local UAT on 2026-07-17 failed the
+**Status:** P-37 remains **HOLD for unresolved closure evidence**. The first
+no-reset intended-admin Local UAT on 2026-07-17 failed the
 comprehension gate before any placement batch was confirmed. The bounded
 insertion-gap correction and its technical stale/accept/replay/accepted-state/
 cleanup continuation passed. A fresh no-reset Local session then passed
@@ -13,8 +13,11 @@ and editor/final-review focus return all passed. The owner also accepted the
 final previous/new/next presentation with an explicit post-save sequence
 number. Exact corrective source checkpoint
 `f36d896d672609653de6634e307dcc44bce6d519` is pushed. No placement batch was
-submitted. This usability approval is evidence for P-37 but is not silently
-treated as the still-pending explicit P-37 decision.
+submitted by the owner through the UI. This usability approval closes only its
+named keyboard/focus/presentation checks. Final owner UI submission, broader
+independent core-admin UAT, three safe-error recoveries, and named performance
+observations remain in [Closure Matrix #34](./34-phase4-wp8-p37-closure-matrix.md).
+C-12 authority alignment subsequently passed its executable checks.
 
 **Environment:** Local only. Production touched: **No**.
 
@@ -265,18 +268,28 @@ The temporary UAT fixture was audited-abandoned after evidence capture:
 
 ## 6. Remaining P-37 exit path
 
-All named technical, recovery, realistic-scale, keyboard, focus-return, and
-owner-presentation gates are now complete. The temporary fixture is cleaned and
-the disabled canonical baseline is exact. The owner does not need another Local
-fixture, reset, or placement submission.
+The named source, technical, recovery, realistic route-scale, keyboard,
+focus-return, owner-presentation, and cleanup checks are complete. The
+temporary fixture is cleaned and the disabled canonical baseline is exact.
+They are retained and do not need repetition unless the related source changes.
 
-The only remaining P-37 action is an explicit owner **accept** or **hold**
-decision against pushed corrective source checkpoint
-`f36d896d672609653de6634e307dcc44bce6d519`. Acceptance would close this WP-8
-release-readiness gate and permit only a later P-12 Production-readiness
-request. It would not authorize Production migration, deployment, feature
-enablement, publication, P-19, Factor F work, or hotfix expansion.
+The later line-by-line closure audit found that this note's former
+only-owner-decision conclusion exceeded its own evidence: the owner session
+explicitly did not activate **ยืนยันและบันทึกตำแหน่ง**, while the governing
+WP-8 plan requires one complete owner placement task. The broader independent
+core-admin UAT, three safe validation-error recoveries, and named import-
+preview/publish-readiness interaction baselines also remain unclosed.
 
-Until that explicit decision is recorded, WP-8 remains **In progress**, P-37
-remains **HOLD**, Add/Supplement remains hidden for release, and P-12 through
-P-15 remain unauthorized.
+[Closure Matrix #34](./34-phase4-wp8-p37-closure-matrix.md) is authoritative
+for the remaining path. First reconcile reusable evidence, then run only the
+missing rows in one bounded no-reset Local owner session. Do not run
+`npm run db:local:bootstrap`; if a reset becomes necessary, stop for a new
+explicit destructive-reset approval.
+
+After every open row passes, update the authorities, commit/push the exact
+checkpoint, and request an explicit owner **accept** or **hold** decision.
+Acceptance would close WP-8 and permit only a later P-12 request. It would not
+authorize Production migration, deployment, feature enablement, publication,
+P-19, Factor F work, or hotfix expansion. Until then WP-8 remains
+**In progress**, P-37 remains **HOLD**, Add/Supplement remains hidden, and P-12
+through P-15 remain unauthorized.

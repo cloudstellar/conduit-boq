@@ -18,9 +18,11 @@ state readback, and cleanup. Corrected source checkpoint
 `e6d79d77bd8fb8d6a0211d7d7b440d2136cb6512` is pushed. Later no-reset UAT
 passed leave/return/reload recovery and complete owner keyboard/focus/
 presentation review on pushed checkpoint
-`f36d896d672609653de6634e307dcc44bce6d519`. Only explicit owner acceptance
-remains; P-37 remains HOLD. See
-[Review Note #33](./33-phase4-wp8-p37-uat-ux-correction-note.md).
+`f36d896d672609653de6634e307dcc44bce6d519`. The owner did not submit the final
+placement batch through the UI, and broader independent WP-8 UAT/performance
+evidence remains open. P-37 remains HOLD. See
+[Review Note #33](./33-phase4-wp8-p37-uat-ux-correction-note.md) and
+[Closure Matrix #34](./34-phase4-wp8-p37-closure-matrix.md).
 
 **P-33 decision:** Accepted 2026-07-15 13:54 +07 for the exact bounded
 WP-7.5 technical checkpoint. This is not intended-admin UX or release
@@ -364,7 +366,7 @@ the category summary to categories receiving new rows. Its later Local
 technical continuation passed stale/confirmation/replay/cleanup. Later
 no-reset sessions passed leave/return/reload recovery and complete owner
 keyboard/focus/presentation UAT. Review Note #33 owns that evidence and the
-remaining explicit P-37 decision.
+closure matrix owns the remaining final UI submission and broader WP-8 gates.
 
 ## 7. Schedule and safe alternatives
 
@@ -377,7 +379,7 @@ to skip gates:
 | P-34 WP-8 placement UX source/static hardening | Completed on exact `0780925`; live acceptance not inferred |
 | P-35 `021` bootstrap source integration | Completed on exact source checkpoint `01eba0d49f2e4b6e65f0d9dd287fd461ba9ea19a` |
 | P-36 integrated technical rehearsal and realistic route rendering | Completed on exact `910cc3c`; independent interaction/UAT not inferred |
-| Remaining explicit P-37 accept/hold decision | Owner review only; no further Local fixture, reset, or placement submission required |
+| P-37 closure evidence | Reconcile prior evidence, then run only Closure Matrix #34 C-07 through C-11 in one bounded no-reset owner UAT; no bootstrap reset |
 | Earliest remaining path before any Production request | After independent UAT passes, authority closeout is reviewed, and P-37 is accepted; P-12 remains a separate decision |
 
 Limited safe alternative: preserve the completed WP-6.6/WP-7/WP-7.5 technical

@@ -122,8 +122,11 @@ one acceptance, exact-request replay, accepted-state route readback, cleanup,
 and post-evidence repository checks. Later no-reset UAT passed leave/return/
 reload recovery and complete owner keyboard/focus/presentation review. Final
 pushed checkpoint `f36d896d672609653de6634e307dcc44bce6d519` passed repository
-verification. Only explicit owner acceptance remains open. P-37 remains HOLD. See
-[Review Note #33](./33-phase4-wp8-p37-uat-ux-correction-note.md).
+verification. The owner did not submit the final placement batch through the
+UI, and Section 16 still requires broader independent core-admin UAT, three
+safe-error recoveries, and named import-preview/publish-readiness interaction
+evidence. P-37 remains HOLD. See [Review Note #33](./33-phase4-wp8-p37-uat-ux-correction-note.md)
+and [Closure Matrix #34](./34-phase4-wp8-p37-closure-matrix.md).
 
 **P-22 operator-workflow correction authorized:** 2026-07-12 — intended-admin
 review placed WP-6.6 closeout on Hold and accepted

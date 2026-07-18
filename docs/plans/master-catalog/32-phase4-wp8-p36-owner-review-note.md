@@ -34,7 +34,9 @@ leave/reload statement.
 the remaining owner `Tab`/`Shift+Tab`, `Enter`/`Space`, sibling-order, dialog
 focus-return, and final-presentation gates. Final pushed corrective checkpoint
 `f36d896d672609653de6634e307dcc44bce6d519` passed verification and cleanup.
-Only the explicit P-37 accept/hold decision remains; Note #33 is authoritative.
+The later closure audit found that the owner UI submission and broader WP-8
+UAT/error/performance gates were still open; Note #34 is authoritative for the
+remaining P-37 path while Note #33 owns the completed placement UX evidence.
 
 ## 1. Scope and provenance
 

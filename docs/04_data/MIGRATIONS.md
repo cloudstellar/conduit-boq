@@ -37,7 +37,7 @@
 | `018_master_catalog_phase4_draft_mutation.sql` | Draft create/manual/import RPCs with actor+payload request fingerprints, per-request/per-code locks, bounded runtime timeouts, full-payload preflight, audited mutation subtransaction rollback, and reusable ADR-003 transitions | **Draft — Local only, not applied to Production** |
 | `019_master_catalog_phase4_publish_pointer.sql` | Publish/restore, shared admin publish-readiness RPC, P-18 and structured-rollout boundary guards, P-19 inactive-row filing warning, catalog-only DB count/hash, runtime timeouts, and published immutability | **Draft — Local only, not applied to Production** |
 | `020_master_catalog_phase4_admin_workflow_hardening.sql` | WP-6.6 frozen first-rollout authority, resolve-only dictionaries/server allocator, exact read registers, readiness/provenance parity, correction path, schema hardening, P-22 working-draft lifecycle, P-23.1 reserved version sequence, P-24 annual-year range guard, and covering indexes for both frozen-authority foreign keys | **Owner-accepted Local-only migration in bootstrap source; SHA-256 `e07e0c4161077efba7bc4f6ebf95518d0cc1bc7e4628a43a128dd899bd1aef93`; G1R/G2 separate-apply evidence passed on exact checkout `721c2c2c4a234a4fd00e5686383be9af87ee15dd`; G3/WP-6.6 accepted on `78e96ab3ed9993707014c4aba1d285b7592b17a1`; owner-approved G4E combined clean bootstrap through `020` passed on exact execution checkout `15b707d443bec701f6b3a86aa7675ca1266604ba`; not Production-approved** |
-| `021_master_catalog_phase4_placement_governance.sql` | P-18/WP-7.5 new-identity placement revision/review and atomic order contract | **Owner-accepted Local-only migration in bootstrap source under P-35 on exact source checkpoint `01eba0d49f2e4b6e65f0d9dd287fd461ba9ea19a`; SHA-256 `e4de258756bbfbda0508e55d7b76ba2e907f644625b49bc29d4a4d7ac42fa714`; P-32 separate-apply evidence/P-33 technical acceptance/P-34 historical UX source-static/P-36 integrated technical evidence passed; first P-37 intended-admin UAT failed comprehension, while corrected technical/recovery evidence and the final owner keyboard/focus/presentation UAT later passed on pushed checkpoint `f36d896d672609653de6634e307dcc44bce6d519`; P-37 is HOLD only for the explicit owner accept/hold decision; DB contract unchanged; not Production-approved** |
+| `021_master_catalog_phase4_placement_governance.sql` | P-18/WP-7.5 new-identity placement revision/review and atomic order contract | **Owner-accepted Local-only migration in bootstrap source under P-35 on exact source checkpoint `01eba0d49f2e4b6e65f0d9dd287fd461ba9ea19a`; SHA-256 `e4de258756bbfbda0508e55d7b76ba2e907f644625b49bc29d4a4d7ac42fa714`; P-32 separate-apply evidence/P-33 technical acceptance/P-34 historical UX source-static/P-36 integrated technical evidence passed; first P-37 intended-admin UAT failed comprehension, while corrected technical/recovery evidence and the final owner keyboard/focus/presentation UAT later passed on pushed checkpoint `f36d896d672609653de6634e307dcc44bce6d519`; P-37 remains HOLD for the unresolved closure evidence in Note #34, including final owner UI submission and broader independent WP-8 UAT; DB contract unchanged; not Production-approved** |
 | `017+_master_catalog_phase4_*.sql` | Umbrella reference for the Local-only Phase 4 range; files exist and the current P-35 bootstrap source applies `017`-`021` after hotfix `016` | **Local-only range — P-36 clean-integrated `009`-`015`, hotfix `016`, and Phase 4 `017`-`021` execution passed on exact checkout `910cc3cc74660beecf18655d39cd0b0c085d1fc6`; P-37/P-12+ remain separate and every Production approval remains absent** |
 
 ### Local Schema Baseline (`supabase/local/`)
@@ -183,10 +183,13 @@ readback, and cleanup without changing migration `021`; corrected source
 checkpoint `e6d79d77bd8fb8d6a0211d7d7b440d2136cb6512` is pushed. Later
 no-reset sessions passed leave/return/reload recovery and the complete owner
 keyboard/focus/presentation path; final corrective checkpoint
-`f36d896d672609653de6634e307dcc44bce6d519` is pushed. Only the explicit
-P-37 owner accept/hold decision remains. The evidence is recorded in
+`f36d896d672609653de6634e307dcc44bce6d519` is pushed. The owner did not submit
+the final batch through the UI, and broader independent WP-8 evidence remains
+open under Closure Matrix #34 before any P-37 decision. The evidence is recorded in
 [P-37 UAT and UX Correction Note](../plans/master-catalog/33-phase4-wp8-p37-uat-ux-correction-note.md);
-no migration or DB/RPC contract changed.
+the remaining gates are in
+[P-37 Closure Matrix](../plans/master-catalog/34-phase4-wp8-p37-closure-matrix.md).
+No migration or DB/RPC contract changed.
 Applied hotfix `016` must not be edited.
 This is not a new Production hotfix and must not be applied to Production
 without the normal Phase 4 P-12+ approvals.

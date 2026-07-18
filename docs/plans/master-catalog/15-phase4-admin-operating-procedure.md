@@ -15,8 +15,11 @@ P-18 technical placement, and P-36 integrated rehearsal later passed. The
 corrected P-37 flow also passed Local stale/accept/replay/cleanup mechanics,
 final no-reset leave/return/reload recovery, and owner keyboard/focus/
 presentation UAT on pushed checkpoint `f36d896d672609653de6634e307dcc44bce6d519`.
-Explicit P-37 acceptance, P-19 when triggered, and the Production
-gates remain pending. The Local UI must not be treated as
+The owner did not submit the final placement batch through the UI. P-37 remains
+HOLD for that final independent submission plus the broader core-admin,
+safe-error, and performance rows in
+[Closure Matrix #34](./34-phase4-wp8-p37-closure-matrix.md). P-19 when triggered
+and all Production gates remain pending. The Local UI must not be treated as
 Production-ready until those gates pass.
 **Audience:** Active Master Catalog administrators
 **Rule:** A draft is not official; published versions are immutable

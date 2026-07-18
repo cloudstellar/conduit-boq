@@ -37,8 +37,10 @@ cleanup, and post-evidence repository checks. Corrected source checkpoint
 `e6d79d77bd8fb8d6a0211d7d7b440d2136cb6512` is pushed. Later no-reset UAT
 passed leave/return/reload recovery and complete owner keyboard/focus/
 presentation review on pushed checkpoint
-`f36d896d672609653de6634e307dcc44bce6d519`. Only explicit acceptance remains;
-P-37 is HOLD. See
+`f36d896d672609653de6634e307dcc44bce6d519`. The owner did not submit the final
+placement batch through the UI, and broader independent core-admin/error/
+performance evidence remains open. P-37 is HOLD under
+[Closure Matrix #34](./34-phase4-wp8-p37-closure-matrix.md). See also
 [Note #33](./33-phase4-wp8-p37-uat-ux-correction-note.md).
 
 **Environment:** Source/document audit only. No Local database reset, Production
@@ -235,8 +237,10 @@ The first P-37 session found a presentation defect; the bounded correction is
 now implemented, and technical stale/confirmation/replay/cleanup evidence plus
 post-evidence repository checks have passed. Corrected source checkpoint
 `e6d79d77bd8fb8d6a0211d7d7b440d2136cb6512` and final keyboard/focus checkpoint
-`f36d896d672609653de6634e307dcc44bce6d519` are pushed. The technical/UAT work
-is complete; only reviewer availability for the explicit P-37 decision remains.
+`f36d896d672609653de6634e307dcc44bce6d519` are pushed. The named technical,
+recovery, keyboard, focus, and presentation work is complete. Final owner UI
+submission, broader independent core-admin UAT, three safe-error recoveries,
+and named performance observations remain before the explicit P-37 decision.
 
 The confidence is higher than the earlier estimate because the work is now
 enumerated by capability and authoritative layer. Residual unknowns must be

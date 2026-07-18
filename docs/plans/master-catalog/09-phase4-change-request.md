@@ -171,9 +171,11 @@ repository checks, and corrected source checkpoint
 passed leave/return/reload recovery plus complete owner keyboard/focus/
 presentation review. Final pushed checkpoint
 `f36d896d672609653de6634e307dcc44bce6d519` passed repository verification.
-P-37 remains HOLD only for the explicit owner accept/hold decision. See
-[P-37 UAT and UX Correction Note](./33-phase4-wp8-p37-uat-ux-correction-note.md).
-No Production action is authorized.
+P-37 remains HOLD for the unresolved final owner UI submission, broader
+independent core-admin UAT, three safe-error recoveries, and named performance
+evidence. See [P-37 UAT and UX Correction Note](./33-phase4-wp8-p37-uat-ux-correction-note.md)
+and [Closure Matrix #34](./34-phase4-wp8-p37-closure-matrix.md). No Production
+action is authorized.
 
 ## 1. Decision requested
 
@@ -602,11 +604,13 @@ pretend a publishable candidate has been approved.
       integrated Local technical execution passed on exact `910cc3c`
 - [ ] P-37 WP-8 acceptance remains on HOLD after the first intended-admin
       comprehension failure. Corrected insertion-gap recovery plus complete
-      owner keyboard/focus/presentation UAT now pass; only explicit owner
-      acceptance remains. Final corrective source checkpoint
+      owner keyboard/focus/presentation UAT now pass, but the owner did not
+      submit the final placement batch through the UI. Final corrective source checkpoint
       `f36d896d672609653de6634e307dcc44bce6d519` is pushed; technical
       stale-response, one confirmation, exact replay, accepted-state readback,
-      and cleanup passed 2026-07-18;
+      and cleanup passed 2026-07-18. Close the broader independent core-admin
+      UAT, three safe-error recoveries, and named import-preview/
+      publish-readiness interaction baselines in Closure Matrix #34;
       Add/Supplement stays hidden
 - [ ] Owner explicitly approves the Production migration window
 

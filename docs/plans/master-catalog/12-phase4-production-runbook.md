@@ -42,6 +42,7 @@ catalog to roll back.
 - [Implementation Execution Pack](./23-phase4-implementation-execution-pack.md)
 - [Owner/Developer Capability Completeness Audit](./29-phase4-owner-dev-completeness-audit.md)
 - [P-18 Placement Governance Review Note](./28-phase4-p18-placement-governance-review-note.md)
+- [WP-8 P-37 Closure Matrix](./34-phase4-wp8-p37-closure-matrix.md)
 - [Execution Progress Tracker authority/evidence index](./25-phase4-execution-progress-tracker.md)
 - [Verification Report](./13-phase4-verification-report.md)
 - [Admin Operating Procedure](./15-phase4-admin-operating-procedure.md)
@@ -141,8 +142,11 @@ Stop immediately when any of these occurs:
     after the reset warning and the integrated Local technical rehearsal passed
     on exact checkout `910cc3c`. Corrected intended-admin interaction/recovery
     and complete owner keyboard/focus/presentation UAT later passed on pushed
-    checkpoint `f36d896d672609653de6634e307dcc44bce6d519`; the explicit P-37
-    accept/hold decision remains a P-37/P-14 gate. See
+    checkpoint `f36d896d672609653de6634e307dcc44bce6d519`. The owner did not
+    submit the final placement batch through the UI, and the broader independent
+    WP-8 UAT/performance rows remain open. Close every row in
+    [Closure Matrix #34](./34-phase4-wp8-p37-closure-matrix.md) before requesting
+    the explicit P-37 accept/hold decision or any P-12/P-14 gate. See also
     [P-37 UAT/UX Note](./33-phase4-wp8-p37-uat-ux-correction-note.md).
 
 **Exit gate:** All documents have owner/reviewer decisions; no unresolved row

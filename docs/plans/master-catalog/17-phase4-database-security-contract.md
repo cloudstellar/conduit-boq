@@ -47,9 +47,11 @@ path on exact checkout `910cc3cc74660beecf18655d39cd0b0c085d1fc6` and passed
 the DB/RLS/concurrency/P-20/WP-7/WP-7.5/advisor/final-invariant technical gates.
 It has not been applied to Production. Corrected P-37 intended-admin
 interaction/recovery and owner keyboard/focus/presentation UAT passed on
-pushed checkpoint `f36d896d672609653de6634e307dcc44bce6d519`; only the explicit
-owner P-37 accept/hold decision remains separate. See
-[P-37 UAT/UX Note](./33-phase4-wp8-p37-uat-ux-correction-note.md).
+pushed checkpoint `f36d896d672609653de6634e307dcc44bce6d519`; the owner did not
+submit the final batch through the UI, and broader independent WP-8 evidence
+remains open. See [P-37 UAT/UX Note](./33-phase4-wp8-p37-uat-ux-correction-note.md)
+and [Closure Matrix #34](./34-phase4-wp8-p37-closure-matrix.md). These evidence
+gaps do not change the accepted database contract.
 
 **Owner decision recorded:** 2026-07-04 — approved according to the
 recommendation as the technical backbone for Phase 4A and every Phase 4 write
@@ -881,7 +883,8 @@ P-35 adds unchanged `021` to bootstrap source. After the separately warned and
 approved P-36 decision, P-20, WP-7, WP-7.5, advisors, and the integrated
 technical rehearsal passed on exact `910cc3c`. Corrected live client recovery
 and complete owner keyboard/focus/presentation UAT later passed on exact
-`f36d896d672609653de6634e307dcc44bce6d519`; explicit P-37 acceptance remains.
+`f36d896d672609653de6634e307dcc44bce6d519`; the final owner UI submission and
+broader independent WP-8 closure remain under Note #34 before P-37 acceptance.
 
 Do not edit an applied migration file. Forward-fix with a new reviewed
 migration.

@@ -139,7 +139,7 @@ describe('Master Catalog authority consistency', () => {
       'P-32 separate-apply evidence/P-33 technical acceptance/P-34 historical UX source-static/P-36 integrated technical evidence passed; first P-37 intended-admin UAT failed comprehension, while corrected technical/recovery evidence and the final owner keyboard/focus/presentation UAT later passed',
     )
     expect(migrations).toContain(
-      'P-37 is HOLD only for the explicit owner accept/hold decision; DB contract unchanged; not Production-approved',
+      'P-37 remains HOLD for the unresolved closure evidence in Note #34, including final owner UI submission and broader independent WP-8 UAT; DB contract unchanged; not Production-approved',
     )
     expect(existsSync(resolve(
       root,
@@ -269,6 +269,8 @@ describe('Master Catalog authority consistency', () => {
     expect(decisions).toContain('| L-58 |')
     expect(decisions).toContain('| L-60 |')
     expect(decisions).toContain('| L-63 |')
+    expect(decisions).toContain('| L-64 |')
+    expect(decisions).not.toContain('and documentation alignment remain open')
     expect(decisions).toContain('review-by-exception')
     expect(decisions).toContain(
       'Accepted 2026-07-14 23:50 +07; WP-6.6 complete; G4 and all later gates remain separate',
@@ -290,6 +292,9 @@ describe('Master Catalog authority consistency', () => {
     const tracker = read(
       'docs/plans/master-catalog/25-phase4-execution-progress-tracker.md',
     )
+    const verificationReport = read(
+      'docs/plans/master-catalog/13-phase4-verification-report.md',
+    )
     expect(tracker).toMatch(/\| WP-5 \|[^\n]+\| Complete \|/)
     expect(tracker).toMatch(/\| WP-6\.5 \|[^\n]+\| Complete \|/)
     expect(tracker).toMatch(/\| WP-6\.6 \|[^\n]+\| Complete \|/)
@@ -302,7 +307,7 @@ describe('Master Catalog authority consistency', () => {
       /P-33 accepted that\s+exact bounded WP-7\.5 technical checkpoint at 2026-07-15 13:54 \+07/,
     )
     expect(tracker).toContain(
-      'WP-8 In progress; P-36 and every named P-37 technical/recovery/owner keyboard/focus/presentation gate passed; only explicit owner P-37 accept/hold remains',
+      'WP-8 In progress; P-36 and named P-37 technical/recovery/owner keyboard/focus/presentation checks plus C-12 documentation consistency passed; P-37 remains HOLD for Closure Matrix #34 C-07 through C-11',
     )
     expect(tracker).toContain(
       '| Current environment | Clean disabled Local baseline: pointer `2568.0.0`/710; zero working drafts;',
@@ -411,7 +416,16 @@ describe('Master Catalog authority consistency', () => {
       /pre-amendment operator\/browser preflight passed on\s+`c8f6dca`/,
     )
     expect(tracker).toContain(
-      'Status: P-37 HOLD retained; Add/Supplement remains hidden; no Production action authorized',
+      'Status: P-37 HOLD for unresolved closure evidence; Add/Supplement remains hidden; no Production action authorized',
+    )
+    expect(verificationReport).toContain(
+      'HOLD under Closure Matrix #34',
+    )
+    expect(verificationReport).toContain(
+      'Open: Closure Matrix #34 C-07 through C-10',
+    )
+    expect(verificationReport).toContain(
+      'Partial: Closure Matrix #34 C-11',
     )
     expect(existsSync(resolve(
       root,
@@ -433,7 +447,7 @@ describe('Master Catalog authority consistency', () => {
       'docs/plans/master-catalog/33-phase4-wp8-p37-uat-ux-correction-note.md',
     )
     expect(p37Correction).toContain(
-      'P-37 remains **HOLD only for the explicit owner accept/hold',
+      'P-37 remains **HOLD for unresolved closure evidence**',
     )
     expect(p37Correction).toContain('This is a genuine UAT failure, not operator error')
     expect(p37Correction).toContain('insertion gap')
@@ -448,6 +462,43 @@ describe('Master Catalog authority consistency', () => {
       'f36d896d672609653de6634e307dcc44bce6d519',
     )
     expect(p37Correction).toContain('Owner keyboard and final-presentation re-UAT')
+    expect(p37Correction).toMatch(
+      /the owner session\s+explicitly did not activate \*\*ยืนยันและบันทึกตำแหน่ง\*\*/,
+    )
+    expect(p37Correction).toContain('Closure Matrix #34')
+    expect(p37Correction).toContain(
+      'C-12 authority alignment subsequently passed its executable checks',
+    )
+    expect(p37Correction).not.toContain(
+      'The owner does not need another Local fixture, reset, or placement submission',
+    )
+    expect(existsSync(resolve(
+      root,
+      'docs/plans/master-catalog/34-phase4-wp8-p37-closure-matrix.md',
+    ))).toBe(true)
+    const p37Closure = read(
+      'docs/plans/master-catalog/34-phase4-wp8-p37-closure-matrix.md',
+    )
+    for (const contract of [
+      'P-37 remains **HOLD for unresolved closure evidence**',
+      '| C-07 | One complete independent placement task |',
+      '| C-09 | Independent core-admin UAT |',
+      '| C-10 | At least three safe validation-error recoveries |',
+      '| C-11 | 710-row performance baseline |',
+      '| C-12 | Documentation consistency |',
+      '| Passed | Keep the consistency assertions green',
+      '**ยืนยันและบันทึกตำแหน่ง** exactly once through the UI',
+      'does not require `npm run db:local:bootstrap`',
+    ]) {
+      expect(p37Closure).toContain(contract)
+    }
+    expect(executionPack).toContain(
+      'record comprehension and recovery from at least three safe',
+    )
+    expect(executionPack).toContain(
+      'an intended admin/data custodian completes the',
+    )
+    expect(threatModel).toContain('| T-52 |')
     expect(existsSync(resolve(
       root,
       'docs/plans/master-catalog/30-phase4-wp66-owner-review-note.md',
@@ -719,6 +770,7 @@ describe('Master Catalog authority consistency', () => {
       'docs/plans/master-catalog/31-phase4-wp66-operator-workflow-correction-plan.md',
       'docs/plans/master-catalog/32-phase4-wp8-p36-owner-review-note.md',
       'docs/plans/master-catalog/33-phase4-wp8-p37-uat-ux-correction-note.md',
+      'docs/plans/master-catalog/34-phase4-wp8-p37-closure-matrix.md',
     ]) {
       expectRelativeMarkdownLinksToExist(path)
       expectMarkdownTablesToBeWellShaped(path)

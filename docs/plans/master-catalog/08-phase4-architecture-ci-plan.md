@@ -13,10 +13,12 @@ accepted-state readback, cleanup, and post-evidence repository checks; corrected
 source checkpoint `e6d79d77bd8fb8d6a0211d7d7b440d2136cb6512` is pushed. Later
 no-reset sessions passed leave/return/reload recovery and the complete owner
 keyboard/focus/presentation path; final pushed checkpoint
-`f36d896d672609653de6634e307dcc44bce6d519` passed verification. Only the
-explicit owner P-37 accept/hold decision remains. P-37 remains HOLD, all Production gates
-remain separate, and Add/Supplement stays hidden. See
-[Review Note #33](./33-phase4-wp8-p37-uat-ux-correction-note.md).
+`f36d896d672609653de6634e307dcc44bce6d519` passed verification. P-37 remains
+HOLD because the final owner UI submission, broader independent core-admin
+UAT, three safe-error recoveries, and named import-preview/publish-readiness
+interaction baselines remain open. All Production gates remain separate, and
+Add/Supplement stays hidden. See [Review Note #33](./33-phase4-wp8-p37-uat-ux-correction-note.md)
+and [Closure Matrix #34](./34-phase4-wp8-p37-closure-matrix.md).
 
 **Date:** 2026-06-22
 
