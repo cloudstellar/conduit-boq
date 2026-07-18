@@ -198,7 +198,7 @@ async function buildEvidence() {
 
   return {
     source:
-      'Local Supabase restored from production-derived public snapshot plus root migrations 009-015, hotfix 016, and Phase 4 017-021',
+      'Local Supabase restored from production-derived public snapshot plus root migrations 009-015, hotfix 016, and Phase 4 017-022',
     productionAuthorityVersion: '2568.0.0',
     localDbContainer: DB_CONTAINER,
     version: first.version,

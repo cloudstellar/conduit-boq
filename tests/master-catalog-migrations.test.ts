@@ -57,6 +57,10 @@ describe('Master Catalog migration contracts', () => {
 
   it('keeps the canonical Local bootstrap on the fully rehearsed path', () => {
     const bootstrap = readFileSync(resolve(process.cwd(), 'scripts/bootstrap-local-db.sh'), 'utf8')
+    const canonicalHash = readFileSync(
+      resolve(process.cwd(), 'scripts/master-catalog-local-canonical-hash.mjs'),
+      'utf8',
+    )
 
     expect(bootstrap).toContain('migrations/011_master_catalog_phase1b_hardening.sql')
     expect(bootstrap).toContain('migrations/012_factor_f_version_foundation.sql')
@@ -87,6 +91,8 @@ describe('Master Catalog migration contracts', () => {
     expect(bootstrap).toContain("'factor_f_2569_row_count'")
     expect(bootstrap).toContain("'factor_f_partial_legacy_snapshots_remaining'")
     expect(bootstrap).toContain('npm run db:local:smoke-master-catalog')
+    expect(canonicalHash).toContain('Phase 4 017-022')
+    expect(canonicalHash).not.toContain('Phase 4 017-021')
   })
 
   it('publishes Factor F 2569 without backfilling existing BOQs', () => {
