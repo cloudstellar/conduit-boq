@@ -2,9 +2,12 @@
 
 **Status:** Owner-approved for the P-39R Local-only architecture correction,
 source, migration, documentation, and verification work on 2026-07-18. P39R-S
-passed on the corrected working-tree candidate; exact commit provenance,
-P39R-L/P39R-C/P39R-U, and Production approval remain pending. The earlier
-P39-S result is historical. Production remains unapproved and untouched.
+passed and exact source commits through `7997387` are pushed. Incremental `022`
+apply and business-invariant readback passed, but the live harness exposed a
+published-code RLS scope gap and a clean-baseline count assumption. Forward
+`023` and the accumulated-history harness correction are source/static only;
+P39R-L remains in progress, while P39R-C/P39R-U and Production approval remain
+pending. The earlier P39-S result is historical. Production remains untouched.
 
 **Supersedes for future execution:** P-23.1's rule that every created draft
 permanently consumes its proposed catalog version. P-23.1 evidence remains
@@ -70,7 +73,8 @@ P-22/P-23.1 execution wording without erasing their historical evidence.
   removed; supported mutation remains RPC-owned and server-authorized.
 - Published/archived snapshot reads include identities and codes for inactive
   catalog rows and for codes first created in an earlier draft. Authorization
-  follows use in an issued snapshot, not `is_active` or first-seen state.
+  follows the exact `(identity_id, item_code)` pair used in an issued snapshot,
+  not `is_active`, identity reuse alone, or first-seen state.
 - Pending, inactive, and suspended profiles must see no catalog state even when
   their authentication token remains valid.
 - Publish/restore audit records carry durable pointer-before and pointer-after
@@ -113,6 +117,13 @@ draft reference remain non-null and immutable. The next-number functions then
 consider issued or currently claimed tuples and naturally ignore released
 abandoned targets.
 
+Forward migration `023_master_catalog_phase4_published_code_rls_scope.sql`
+preserves applied `022` and narrows only `catalog_item_codes_select`: staff may
+read a registry code only when the exact identity/code pair occurs in an
+`active` or `archived` snapshot; active admins retain complete registry access.
+It performs no catalog-row, BOQ, or Factor F data writes. This fix-forward path
+preserves Local migration provenance instead of rewriting applied `022`.
+
 ## 4. Application and export contract
 
 The UI must not call a target an issued version before publication.
@@ -142,7 +153,8 @@ labels never become database authority.
 - Production `2568.0.0` remains authority for names, units, and prices.
 - No Production migration, flag, pointer, catalog row, BOQ, Factor F, or hotfix
   operation is authorized.
-- Migration `022` must not update BOQ or Factor F tables.
+- Migrations `022` and `023` must not update BOQ or Factor F tables; `023` must
+  not update catalog business rows.
 - The one-open-draft-global rule, current-base mutation requirement, audited
   abandon, placement, readiness, exact-lock publish, idempotency, RLS, and
   immutable-history rules remain.
@@ -155,13 +167,14 @@ labels never become database authority.
 1. **P39R-S source/static:** migration contract, version planner, read models,
    UI language, export metadata/filenames, authority consistency, TypeScript,
    lint, build, and full tests pass.
-2. **P39R-L incremental Local:** separately approve and apply `022` to the
-   disabled Local baseline without reset; prove existing abandoned rows are
-   backfilled/released, current pointer/BOQ/Factor F remain unchanged, and all
-   flags remain false.
+2. **P39R-L incremental Local:** separately approve and apply `022`, then the
+   forward-only `023` discovered by the live gate, to the disabled Local baseline
+   without reset; prove existing abandoned rows are backfilled/released, staff
+   code visibility requires an issued identity/code pair, current
+   pointer/BOQ/Factor F remain unchanged, and all flags return to false.
 3. **P39R-C clean chain:** after an explicit destructive-reset warning and
    separate Owner approval, bootstrap `009`-`015`, hotfix `016`, and Phase 4
-   `017`-`022`; rerun DB/RLS/concurrency/export/advisor/invariant evidence.
+   `017`-`023`; rerun DB/RLS/concurrency/export/advisor/invariant evidence.
 4. **P39R-U owner rerun:** prepare a new bounded no-reset UAT fixture. The Owner
    creates a draft, notes its draft reference and target, abandons it, creates a
    replacement, and confirms that the replacement receives a new draft
@@ -218,23 +231,48 @@ write, Factor F work, or hotfix expansion occurred. Exact commit provenance is
 recorded only after a commit exists. P39R-L remains a separately approved live
 gate and is not inferred from P39R-S.
 
+### 6.3 P39R-L incremental discovery and fix-forward
+
+On exact pushed source `7997387`, owner-approved incremental `022` apply passed
+its transaction and postconditions. Before/after evidence retained pointer
+`2568.0.0`/710 and canonical hash
+`sha256:2e3571ea7135fbc0bbb84c8cc330af1173e4c1d2345e5eb59958dc76e45558b8`;
+BOQ 198 and BOQ items 1,547 retained exact table hashes; Factor F retained two
+versions/73 rows and default `2569.0.0`/36; all flags were false and no draft
+remained. Historical Local attempts became `2568.16.0-D001` and
+`2568.17.0-D001`, retained 710 rows each, and released their official tuples.
+
+The live WP-6.6 harness then stopped safely before mutation because accumulated
+published history exposes 713 identities rather than the clean-baseline 710.
+Review confirmed that published-history identity union is intended, while the
+code policy also needed the exact code-pair predicate to prevent a future
+draft-only alias of an issued identity from leaking to staff. Cleanup restored
+all flags, pointer, zero drafts, and BOQ counts. Migration `023` SHA-256
+`fd0a75d961dac7cf61b98330430e9a10beb6910f735c7fcd1eb439d48b18b52c`
+owns the policy-only fix; P39R-L is not passed until `023`, transient RLS denial,
+the full live harness, and final invariants pass on one exact committed source.
+
 ## 7. Deployment and rollback compatibility
 
-All Master Catalog feature flags must be `false` while migration `022` and its
-matching application are deployed. Compatibility is intentionally bounded:
+All Master Catalog feature flags must be `false` while migrations `022`/`023`
+and their matching application are deployed. Compatibility is intentionally
+bounded:
 
 | Application | Database | Supported operation |
 |---|---|---|
 | Pre-P-39R | Pre-`022` | Existing behavior only |
-| Pre-P-39R | Post-`022` | Normal non-catalog paths while all catalog admin flags are off; do not use Master Catalog admin mutations |
+| Pre-P-39R | Post-`022`, pre-`023` | Normal non-catalog paths while all catalog admin flags are off; do not use Master Catalog admin mutations |
+| Pre-P-39R | Post-`023` | Normal non-catalog paths while all catalog admin flags are off; do not use Master Catalog admin mutations |
 | P-39R | Pre-`022` | Normal non-catalog paths while all catalog admin flags are off; do not use Master Catalog admin routes |
-| P-39R | Post-`022` | Supported P-39R combination after verification and explicit flag approval |
+| P-39R | Post-`022`, pre-`023` | Keep catalog flags off; P39R-L fix-forward is incomplete |
+| P-39R | Post-`023` | Supported P-39R combination after verification and explicit flag approval |
 
 After `022` is applied, an application-only rollback is not an approved way to
 resume catalog administration. Keep all catalog admin flags off and fix forward
-to the matching P-39R application. Migration `022` is transactional; an apply
-failure rolls back to the pre-`022` schema. Any rollback after a successful
-Production apply requires a separately reviewed data-safe plan.
+through `023` and the matching P-39R application. Both migrations are
+transactional; an apply failure rolls back that migration's transaction. Any
+rollback after a successful Production apply requires a separately reviewed
+data-safe plan.
 
 ## 8. P-38 interruption record
 

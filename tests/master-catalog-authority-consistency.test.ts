@@ -116,6 +116,7 @@ describe('Master Catalog authority consistency', () => {
       '020',
       '021',
       '022',
+      '023',
     ])
 
     expectInOrder(bootstrap, [
@@ -378,10 +379,10 @@ describe('Master Catalog authority consistency', () => {
       /P-33 accepted that\s+exact bounded WP-7\.5 technical checkpoint at 2026-07-15 13:54 \+07/,
     )
     expect(tracker).toContain(
-      '| Current work package | WP-8/P-37 HOLD; P-39R corrected Local-only P39R-S source/static gate passed; exact commit and P39R-L/P39R-C/P39R-U remain pending |',
+      '| Current work package | WP-8/P-37 HOLD; P-39R P39R-L in progress after successful incremental `022`; forward `023` source/static correction awaits exact commit/apply/rerun; P39R-C/P39R-U remain pending |',
     )
     expect(tracker).toContain(
-      '| Current environment | Clean disabled Local baseline before `022`: pointer `2568.0.0`/710; zero working drafts;',
+      '| Current environment | Disabled Local baseline after `022`, before `023`: pointer `2568.0.0`/710',
     )
     expect(tracker).toContain(
       '0780925aca8fa7ebbf8abbaf2b7cf151b39b676a',

@@ -61,7 +61,17 @@ SELECT json_build_object(
         )
     ),
     'p39r_identity_trigger_function',
-      to_regprocedure('private.prepare_catalog_version_identity()') IS NOT NULL
+      to_regprocedure('private.prepare_catalog_version_identity()') IS NOT NULL,
+    'p39r_published_code_policy_scoped', EXISTS (
+      SELECT 1
+      FROM pg_catalog.pg_policies policy
+      WHERE policy.schemaname = 'public'
+        AND policy.tablename = 'catalog_item_codes'
+        AND policy.policyname = 'catalog_item_codes_select'
+        AND policy.qual ILIKE '%catalog_row.identity_id = catalog_item_codes.identity_id%'
+        AND policy.qual ILIKE '%catalog_row.item_code = catalog_item_codes.item_code%'
+        AND policy.qual ILIKE '%version.status%active%archived%'
+    )
   ),
   'version', (
     SELECT json_build_object(
@@ -164,8 +174,9 @@ function assertQuality(snapshot) {
     && schema?.p39r_identity_trigger_function === false
   const isPostP39r = schema?.p39r_identity_columns === 6
     && schema?.p39r_identity_trigger_function === true
+  const hasPublishedCodeScope = schema?.p39r_published_code_policy_scoped === true
 
-  if (!isPreP39r && !isPostP39r) {
+  if ((!isPreP39r && !isPostP39r) || (isPreP39r && hasPublishedCodeScope)) {
     failures.push('migration 022 schema markers are partial or inconsistent')
   }
 
@@ -229,7 +240,11 @@ async function buildEvidence() {
 
   const migration022Detected = first.schema.p39r_identity_columns === 6
     && first.schema.p39r_identity_trigger_function === true
-  const phase4Range = migration022Detected ? '017-022' : '017-021'
+  const migration023Detected = migration022Detected
+    && first.schema.p39r_published_code_policy_scoped === true
+  const phase4Range = migration023Detected
+    ? '017-023'
+    : migration022Detected ? '017-022' : '017-021'
 
   return {
     source:
@@ -237,6 +252,7 @@ async function buildEvidence() {
     productionAuthorityVersion: '2568.0.0',
     localDbContainer: DB_CONTAINER,
     migration022Detected,
+    migration023Detected,
     schema: first.schema,
     version: first.version,
     quality: first.quality,

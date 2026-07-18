@@ -7,9 +7,11 @@ now controls future execution: immutable draft reference, target claim while
 mutable, issue on publish, release on audited abandon, and forward migration
 `022`. P-39R adds one open draft globally, audited stale abandonment, explicit
 restore effect/pointer audit, lifecycle/publication completeness, and narrowed
-role/state RLS. P-22/P-23.1 evidence remains historical. P39R-S passed on the
-corrected source candidate; P-38/WP-8 must not resume before
-P39R-L/P39R-C/P39R-U. Production remains unauthorized.
+role/state RLS. Incremental `022` invariants passed and live review produced
+forward policy-only `023`, which requires an exact issued identity/code pair for
+staff code-registry reads and correct accumulated-history harness expectations.
+P-22/P-23.1 evidence remains historical. P-38/WP-8 must not resume before the
+complete P39R-L/P39R-C/P39R-U gates. Production remains unauthorized.
 
 **Status:** Owner-approved for WP-0 through WP-8 implementation/local
 rehearsal; WP-9 Production execution requires separate P-12 through P-15

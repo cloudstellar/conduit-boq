@@ -34,8 +34,10 @@ and archived versions remain unique and permanently reserved. At most one draft
 is open globally; a stale draft may only be inspected or audited-abandoned.
 Restore records pointer before/after and its effect on that draft. Forward
 migration `022` overlays accepted `020`/`021`; prior P39-S is historical and
-P39R-S passed on the corrected source candidate. P39R-L/P39R-C/P39R-U plus
-every Production approval remain separate gates.
+P39R-S passed on the corrected source candidate. Incremental `022` invariants
+passed; policy-only forward `023` now owns exact issued identity/code-pair staff
+visibility and the accumulated-history harness correction. P39R-L/P39R-C/P39R-U
+plus every Production approval remain separate gates.
 
 **Reliability amendment:** 2026-07-11 — WP-6.5 now closes end-to-end
 idempotency, publish-block UX, P-20 hash portability, ADR-003 reusable

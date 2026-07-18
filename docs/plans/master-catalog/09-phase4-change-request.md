@@ -19,8 +19,11 @@ migration `022` preserves `020`/`021` and adds one open draft globally, audited
 stale abandonment, restore pointer/draft-effect audit, terminal lifecycle and
 publication completeness, and least-privilege role/state reads; see
 [Correction Plan #37](./37-phase4-p39-draft-identity-release-number-correction-plan.md).
-P-23.1 remains historical. Incremental Local apply, destructive bootstrap,
-Production, Factor F/hotfix expansion, and P-19 remain separately gated.
+P-23.1 remains historical. Incremental `022` invariants passed; live review
+requires forward policy-only `023` so staff code visibility follows the exact
+identity/code pair used in an issued snapshot. Complete P39R-L, destructive
+bootstrap, Production, Factor F/hotfix expansion, and P-19 remain separately
+gated.
 
 **Owner decision recorded:** 2026-07-04 — approved according to the
 recommendation for implementation/local rehearsal only. The gate structure,

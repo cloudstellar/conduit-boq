@@ -71,6 +71,12 @@ try {
   assert(schemaContract.anon_abandon_execute === false, 'Anon can execute draft abandon')
   assert(schemaContract.auth_abandon_execute === true, 'Authenticated draft abandon execute is missing')
   assert(schemaContract.catalog_state_policies === 7, 'Catalog state-scoped read policies are incomplete')
+  assert(schemaContract.published_code_policy_exact === true,
+    'Published code registry policy is not scoped by identity and code')
+  assert(schemaContract.published_identity_count >= 710,
+    'Published identity history is smaller than the authority baseline')
+  assert(schemaContract.published_code_count >= schemaContract.published_identity_count,
+    'Published code history is smaller than published identity history')
   assert(schemaContract.legacy_catalog_write_policies === 0, 'Legacy catalog DML policies remain')
   assert(schemaContract.authenticated_catalog_dml_tables === 0,
     'Authenticated retains direct DML on catalog tables')
@@ -80,6 +86,7 @@ try {
   assert(schemaContract.create_wrapper_security_definer === false,
     'Public draft creation wrapper unexpectedly runs with owner privileges')
   assert(schemaContract.disabled_capability_count === 3, 'Catalog capabilities do not default false')
+  assertDraftOnlyCodeHiddenFromStaff()
 
   currentStage = 'read and enable only the admin gate'
   originalAdminFlag = await readSetting('catalog_admin_enabled')
@@ -98,7 +105,7 @@ try {
   const base = await readCurrentCatalogVersion()
   originalPointerId = base.id
   assert(base.version_string === '2568.0.0', 'WP-6.6 smoke must start from 2568.0.0')
-  await verifyCatalogReadBoundaries(base)
+  await verifyCatalogReadBoundaries(base, schemaContract)
   await verifyPublishedMetadataNoopDenied(base)
   const beforeBoq = await readBoqSummary()
   const beforeFactor = await readFactorSummary()
@@ -814,13 +821,13 @@ async function verifyFrozenAuthorityRoleDenial() {
   }
 }
 
-async function verifyCatalogReadBoundaries(base) {
+async function verifyCatalogReadBoundaries(base, schemaContract) {
   const publishedScopes = [
     ['price_list_versions', (query) => query.eq('id', base.id), 1],
     ['price_list_default_version', (query) => query.eq('id', true), 1],
     ['price_list', (query) => query.eq('version_id', base.id), Number(base.item_count)],
-    ['catalog_item_identities', (query) => query, Number(base.item_count)],
-    ['catalog_item_codes', (query) => query, Number(base.item_count)],
+    ['catalog_item_identities', (query) => query, schemaContract.published_identity_count],
+    ['catalog_item_codes', (query) => query, schemaContract.published_code_count],
     ['price_list_categories', (query) => query.eq('version_id', base.id), null],
     ['catalog_code_groups', (query) => query.eq('version_id', base.id), null],
   ]
@@ -1445,6 +1452,38 @@ function readSchemaContract() {
           AND roles @> ARRAY['authenticated'::name]
           AND qual ILIKE '%status%active%'
       ),
+      'published_code_policy_exact', EXISTS (
+        SELECT 1
+        FROM pg_policies
+        WHERE schemaname = 'public'
+          AND tablename = 'catalog_item_codes'
+          AND policyname = 'catalog_item_codes_select'
+          AND cmd = 'SELECT'
+          AND roles = ARRAY['authenticated'::name]
+          AND qual ILIKE '%catalog_row.identity_id = catalog_item_codes.identity_id%'
+          AND qual ILIKE '%catalog_row.item_code = catalog_item_codes.item_code%'
+          AND qual ILIKE '%version.status%active%archived%'
+      ),
+      'published_identity_count', (
+        SELECT count(DISTINCT catalog_row.identity_id)
+        FROM public.price_list catalog_row
+        JOIN public.price_list_versions version
+          ON version.id = catalog_row.version_id
+        WHERE version.status IN ('active', 'archived')
+      ),
+      'published_code_count', (
+        SELECT count(*)
+        FROM public.catalog_item_codes code
+        WHERE EXISTS (
+          SELECT 1
+          FROM public.price_list catalog_row
+          JOIN public.price_list_versions version
+            ON version.id = catalog_row.version_id
+          WHERE catalog_row.identity_id = code.identity_id
+            AND catalog_row.item_code = code.item_code
+            AND version.status IN ('active', 'archived')
+        )
+      ),
       'legacy_catalog_write_policies', (
         SELECT count(*) FROM pg_policies
         WHERE schemaname = 'public'
@@ -1528,6 +1567,59 @@ function readSchemaContract() {
     sql,
   ], { encoding: 'utf8' }).trim()
   return JSON.parse(output)
+}
+
+function assertDraftOnlyCodeHiddenFromStaff() {
+  const sql = `
+    BEGIN;
+    SELECT 1 / CASE WHEN count(*) = 1 THEN 1 ELSE 0 END
+    FROM auth.users
+    WHERE email = 'local.staff@ntplc.co.th';
+    INSERT INTO public.catalog_item_codes (
+      item_code,
+      identity_id,
+      code_kind,
+      first_seen_version_id
+    )
+    SELECT
+      'RLS-TST-999',
+      catalog_row.identity_id,
+      'canonical',
+      pointer.version_id
+    FROM public.price_list_default_version pointer
+    JOIN public.price_list catalog_row
+      ON catalog_row.version_id = pointer.version_id
+    WHERE pointer.id = true
+    ORDER BY catalog_row.display_order, catalog_row.id
+    LIMIT 1;
+    SELECT set_config(
+      'request.jwt.claims',
+      jsonb_build_object(
+        'sub', (SELECT id FROM auth.users WHERE email = 'local.staff@ntplc.co.th'),
+        'role', 'authenticated'
+      )::text,
+      true
+    );
+    SET LOCAL ROLE authenticated;
+    SELECT 1 / CASE WHEN count(*) = 0 THEN 1 ELSE 0 END
+    FROM public.catalog_item_codes
+    WHERE item_code = 'RLS-TST-999';
+    RESET ROLE;
+    ROLLBACK;
+  `
+  execFileSync('docker', [
+    'exec',
+    'supabase_db_conduit-boq-local',
+    'psql',
+    '-v',
+    'ON_ERROR_STOP=1',
+    '-U',
+    'postgres',
+    '-d',
+    'postgres',
+    '-Atc',
+    sql,
+  ], { encoding: 'utf8' })
 }
 
 function assertCapacityBoundary() {

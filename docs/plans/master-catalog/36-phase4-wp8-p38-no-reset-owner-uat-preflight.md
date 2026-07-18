@@ -129,9 +129,10 @@ all three catalog flags `false`, BOQ 198/1,547 with zero unversioned BOQs, and
 Factor F `2569.0.0`/36. Production was untouched and no Local reset occurred.
 
 The earlier P39-S source/static result is historical after P-39R. Corrected
-P39R-S passed on the working-tree candidate; commit/push provenance remains
-pending. Receive separate approval for incremental P39R-L, then receive a fresh
-destructive-reset approval for P39R-C. Only after P39R-U proves the corrected
+P39R-S is pushed; owner-approved incremental `022` invariants passed, while
+P39R-L remains in progress for forward `023` and the full live rerun. After
+P39R-L, receive a fresh destructive-reset approval for P39R-C. Only after
+P39R-U proves the corrected
 Card A behavior may the Owner resume Cards B-G. Do not request P-37 before that
 evidence, cleanup, authority update, exact verification, commit, and push are
 complete.

@@ -55,7 +55,7 @@ and [Closure Matrix #34](./34-phase4-wp8-p37-closure-matrix.md). These evidence
 gaps do not change the accepted database contract.
 
 **P-39R authority amendment:** migration `022` is the forward-only
-owner-approved Local correction. It gives each draft an immutable internal
+owner-approved Local lifecycle correction. It gives each draft an immutable internal
 reference, stores an immutable target tuple, claims that tuple while the draft
 is mutable, issues it on publication, and releases it on audited abandonment.
 It enforces one open draft globally; permits only audited abandonment when a
@@ -66,6 +66,10 @@ direct-DML policies while retaining least-privilege role/state reads. P-22's
 per-base invariant and P-23.1 all-status permanent reservation are historical
 and must not govern future execution. See
 [Correction Plan #37](./37-phase4-p39-draft-identity-release-number-correction-plan.md).
+Incremental P39R-L then found that the code registry policy must match the exact
+`(identity_id, item_code)` pair used in an issued snapshot rather than identity
+alone. Forward migration `023` owns that policy-only correction without
+rewriting applied `022` or mutating catalog business rows, BOQs, or Factor F.
 
 **Owner decision recorded:** 2026-07-04 — approved according to the
 recommendation as the technical backbone for Phase 4A and every Phase 4 write
@@ -641,7 +645,7 @@ automatic Data API exposure is never assumed.
 |---|---:|---:|---:|---:|
 | Published versions/pointer/items/categories/groups | No rows | Select published/current permitted | Select all permitted | None |
 | Draft catalog data | No | No | Select permitted | None |
-| Identities/code registry | No | Select only as needed for published views | Select all | None |
+| Identities/code registry | No | Select identities used by published/archived history and only exact identity/code pairs used by those issued snapshots | Select all | None |
 | Imports/change sets/change items | No | No | Select | None |
 | Placement reviews (`021`) | No | No | Select through approved P-18/WP-7.5 path | None |
 | Public wrapper functions | No execute | No high-impact execute unless wrapper self-check rejects | Exact execute | Function-controlled |

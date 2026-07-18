@@ -246,6 +246,11 @@ Phase 4 does not rely on Supabase's historical automatic Data API grants.
 Active staff may read only published/archived catalog versions; active admins
 may additionally read drafts and audit records. Obsolete legacy direct-DML
 policies are removed rather than left dormant beside the RPC boundary.
+For the global code registry, staff visibility follows the exact
+`(identity_id, item_code)` pair present in an issued snapshot, not identity
+membership alone. Forward migration `023` records this fix after incremental
+Local `022`; preserving the forward sequence avoids rewriting an applied
+migration and prevents draft-only aliases of published identities from leaking.
 
 Catalog mutation functions are kept in an unexposed private schema. Any public
 wrapper has a fixed empty `search_path`, fully qualified objects, internal
