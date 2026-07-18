@@ -89,6 +89,7 @@ try {
 
   currentStage = 'allocate generic version and code fixtures'
   const versions = await allocateRevisionVersions(base, 4)
+  const reusableDraftVersion = versions[1]
   const contextCode = hasHardenedCapabilities ? null : await allocateCodeContext()
 
   currentStage = 'verify duplicate and nonmonotonic version transitions'
@@ -150,7 +151,7 @@ try {
   await assertRestoreRace(base.id, raceDraft.versionId)
 
   currentStage = 'run P-18 readiness and publish rejection'
-  const p18Draft = await createDraft(adminA, base, versions[1], 'P-18 guard')
+  const p18Draft = await createDraft(adminA, base, reusableDraftVersion, 'P-18 guard')
   const p18Change = hasHardenedCapabilities
     ? await approvedAddChange(p18Draft.versionId)
     : addChange(`${contextCode}-ADD-001`, contextCode)
@@ -211,7 +212,12 @@ try {
   }
 
   currentStage = 'run structured-code readiness and publish rejection'
-  const structuredDraft = await createDraft(adminA, base, versions[2], 'structured guard')
+  const structuredDraft = await createDraft(
+    adminA,
+    base,
+    hasHardenedCapabilities ? reusableDraftVersion : versions[2],
+    'structured guard',
+  )
   const baselineRow = await readBaselineItem(base.id)
   const structuredChange = hasHardenedCapabilities
     ? await frozenRecodeChange(structuredDraft.versionId)
@@ -272,7 +278,11 @@ try {
   }
 
   currentStage = 'verify duplicate-code mutation rollback'
-  const atomicDraft = await createDraftWithIdempotencyChecks(adminA, base, versions[3])
+  const atomicDraft = await createDraftWithIdempotencyChecks(
+    adminA,
+    base,
+    hasHardenedCapabilities ? reusableDraftVersion : versions[3],
+  )
   await assertDuplicateTargetPayloadRollsBack(
     atomicDraft,
     contextCode,

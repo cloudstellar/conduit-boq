@@ -130,6 +130,9 @@ describe('Master Catalog P-22 operator workflow', () => {
     expect(wp65Harness).toContain('abandonedFixtureDrafts === 3');
     expect(wp65Harness).toContain('minor: maxMinor + 1 + index');
     expect(wp65Harness).not.toContain('minor: maxMinor + 100 + index');
+    expect(wp65Harness).toContain('const reusableDraftVersion = versions[1]');
+    expect(wp65Harness).toContain('hasHardenedCapabilities ? reusableDraftVersion : versions[2]');
+    expect(wp65Harness).toContain('hasHardenedCapabilities ? reusableDraftVersion : versions[3]');
     expect(wp65Harness).toContain('assertVersionLifecycleNegatives(adminA, base)');
     expect(wp65Harness).toContain('assertWorkingDraftGuardPrecedence(');
     expect(wp65Harness).toContain('workingDraftGuardPrecedencePassed: true');
