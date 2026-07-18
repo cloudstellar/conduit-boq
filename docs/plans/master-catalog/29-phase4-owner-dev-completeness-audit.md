@@ -34,8 +34,11 @@ UI exposed reference-item/before-after mechanics. A bounded insertion-gap
 presentation correction is implemented. Its later Local technical continuation
 passed stale rejection, one acceptance, exact replay, accepted-state readback,
 cleanup, and post-evidence repository checks. Corrected source checkpoint
-`e6d79d77bd8fb8d6a0211d7d7b440d2136cb6512` is pushed. Owner
-keyboard/leave-reload re-UAT and explicit acceptance remain; P-37 is HOLD. See
+`e6d79d77bd8fb8d6a0211d7d7b440d2136cb6512` is pushed. Final fresh no-reset
+UAT passed leave/return/reload recovery and gap-list `ArrowDown`/`Enter`, while
+checkpoint `96c2ac6892e8ffe9d020c2dff641a847157cd4b2` fixed the stale
+recovery alert. Complete native-button keyboard traversal and explicit
+acceptance remain; P-37 is HOLD. See
 [Note #33](./33-phase4-wp8-p37-uat-ux-correction-note.md).
 
 **Environment:** Source/document audit only. No Local database reset, Production
@@ -231,8 +234,9 @@ the integrated technical rehearsal plus realistic route-render measurements.
 The first P-37 session found a presentation defect; the bounded correction is
 now implemented, and technical stale/confirmation/replay/cleanup evidence plus
 post-evidence repository checks have passed. Corrected source checkpoint
-`e6d79d77bd8fb8d6a0211d7d7b440d2136cb6512` is pushed. Owner
-keyboard/leave-reload re-UAT and the explicit decision remain approximately **0.5 focused engineering day**
+`e6d79d77bd8fb8d6a0211d7d7b440d2136cb6512` and recovery-state checkpoint
+`96c2ac6892e8ffe9d020c2dff641a847157cd4b2` are pushed. Complete
+native-button keyboard re-UAT and the explicit decision remain approximately **0.25 focused engineering day**
 plus reviewer availability if no further defect is found. This is an effort
 estimate, not permission to skip gates or a guaranteed date.
 

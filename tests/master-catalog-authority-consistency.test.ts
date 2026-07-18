@@ -136,10 +136,10 @@ describe('Master Catalog authority consistency', () => {
       '**Owner-accepted Local-only migration in bootstrap source; SHA-256 `e07e0c4161077efba7bc4f6ebf95518d0cc1bc7e4628a43a128dd899bd1aef93`; G1R/G2 separate-apply evidence passed on exact checkout `721c2c2c4a234a4fd00e5686383be9af87ee15dd`; G3/WP-6.6 accepted on `78e96ab3ed9993707014c4aba1d285b7592b17a1`; owner-approved G4E combined clean bootstrap through `020` passed on exact execution checkout `15b707d443bec701f6b3a86aa7675ca1266604ba`; not Production-approved**',
     )
     expect(migrations).toContain(
-      'P-32 separate-apply evidence/P-33 technical acceptance/P-34 historical UX source-static/P-36 integrated technical evidence passed; first P-37 intended-admin UAT failed comprehension, while the corrected-flow technical stale/accept/replay/cleanup continuation and post-evidence repository checks later passed',
+      'P-32 separate-apply evidence/P-33 technical acceptance/P-34 historical UX source-static/P-36 integrated technical evidence passed; first P-37 intended-admin UAT failed comprehension, while the corrected-flow technical stale/accept/replay/cleanup continuation and final no-reset leave/reload recovery plus gap-list keyboard interaction later passed',
     )
     expect(migrations).toContain(
-      'corrected source checkpoint `e6d79d77bd8fb8d6a0211d7d7b440d2136cb6512` is pushed; P-37 is HOLD for independent keyboard/leave-reload re-UAT and explicit owner acceptance; DB contract unchanged; not Production-approved',
+      'corrected-flow checkpoint `e6d79d77bd8fb8d6a0211d7d7b440d2136cb6512` and recovery-state checkpoint `96c2ac6892e8ffe9d020c2dff641a847157cd4b2` are pushed; P-37 is HOLD for complete native-button keyboard traversal and explicit owner acceptance; DB contract unchanged; not Production-approved',
     )
     expect(existsSync(resolve(
       root,
@@ -301,7 +301,7 @@ describe('Master Catalog authority consistency', () => {
       /P-33 accepted that\s+exact bounded WP-7\.5 technical checkpoint at 2026-07-15 13:54 \+07/,
     )
     expect(tracker).toContain(
-      'WP-8 In progress; P-36 integrated technical rehearsal passed; first P-37 intended-admin session failed comprehension; corrected placement source is pushed and awaits keyboard/leave-reload re-UAT plus explicit acceptance',
+      'WP-8 In progress; P-36 integrated technical rehearsal passed; P-37 leave/reload recovery and gap-search keyboard interaction passed on the corrected flow; complete native-button keyboard traversal plus explicit owner acceptance remain',
     )
     expect(tracker).toContain(
       '| Current environment | Clean disabled Local baseline: pointer `2568.0.0`/710; zero working drafts;',
@@ -437,6 +437,10 @@ describe('Master Catalog authority consistency', () => {
     expect(p37Correction).toContain('keeps the DB/RPC/readiness/audit/concurrency contract')
     expect(p37Correction).toContain('unchanged and replaces only the operator translation')
     expect(p37Correction).toContain('Production touched: **No**')
+    expect(p37Correction).toContain('leave/return/reload recovery')
+    expect(p37Correction).toContain(
+      '96c2ac6892e8ffe9d020c2dff641a847157cd4b2',
+    )
     expect(existsSync(resolve(
       root,
       'docs/plans/master-catalog/30-phase4-wp66-owner-review-note.md',
@@ -707,6 +711,7 @@ describe('Master Catalog authority consistency', () => {
       'docs/plans/master-catalog/30-phase4-wp66-owner-review-note.md',
       'docs/plans/master-catalog/31-phase4-wp66-operator-workflow-correction-plan.md',
       'docs/plans/master-catalog/32-phase4-wp8-p36-owner-review-note.md',
+      'docs/plans/master-catalog/33-phase4-wp8-p37-uat-ux-correction-note.md',
     ]) {
       expectRelativeMarkdownLinksToExist(path)
       expectMarkdownTablesToBeWellShaped(path)

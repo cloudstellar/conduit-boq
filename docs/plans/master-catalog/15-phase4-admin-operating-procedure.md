@@ -12,9 +12,10 @@ exact candidate `721c2c2`. The owner accepted G3/WP-6.6 on exact application
 checkpoint `78e96ab3ed9993707014c4aba1d285b7592b17a1` at
 2026-07-14 23:50 +07. Prior `3bfc74e` evidence is historical. G4,
 P-18 technical placement, and P-36 integrated rehearsal later passed. The
-corrected P-37 flow also passed Local stale/accept/replay/cleanup mechanics, but
-independent keyboard/leave-reload intended-admin WP-8 UAT, P-19 when triggered,
-and the Production gates remain pending. The Local UI must not be treated as
+corrected P-37 flow also passed Local stale/accept/replay/cleanup mechanics and
+final no-reset leave/return/reload recovery. Complete native-button keyboard
+traversal, explicit P-37 acceptance, P-19 when triggered, and the Production
+gates remain pending. The Local UI must not be treated as
 Production-ready until those gates pass.
 **Audience:** Active Master Catalog administrators
 **Rule:** A draft is not official; published versions are immutable
@@ -185,6 +186,12 @@ were saved. Use the supported return path or respond to the leave/reload warning
 so the pending choices can be continued safely. The warning states that browser
 recovery is not a draft save. A page-level accepted message must never override
 a locally dirty workspace state.
+
+After **ยกเลิกการปรับทั้งหมด**, verify that the counts return to the complete
+system-suggested batch, the reset action disappears, and any
+**กู้คืนตัวเลือกที่ยังไม่ยืนยันแล้ว** alert also disappears. A recovery alert
+must describe pending browser-local work only; do not continue from a stale
+claim.
 
 Adding/withdrawing a new identity or changing placement-relevant category,
 active state, order, or inherited-anchor topology makes the accepted placement

@@ -50,6 +50,7 @@ PUBLIC_DATA_SNAPSHOT=supabase/.snapshots/public-data-20260621-post009.sql \
 
 ## Local URLs
 
+- Web app and browser UAT: `http://localhost:3000`
 - App-facing API: `http://127.0.0.1:55321`
 - Database: `postgresql://postgres:postgres@127.0.0.1:55322/postgres`
 - Studio: `http://127.0.0.1:55323`
@@ -57,6 +58,13 @@ PUBLIC_DATA_SNAPSHOT=supabase/.snapshots/public-data-20260621-post009.sql \
 
 `npm run dev` reads `.env.development.local`, so development points to this
 local stack. Production environment variables are not changed.
+
+Use `http://localhost:3000` consistently for the web app, login, and browser
+UAT. Do not switch the app origin to `http://127.0.0.1:3000` mid-session:
+cookies/site data are origin-bound, and Next development resources can reject
+the alternate origin while still rendering server HTML, which leaves a page
+visible but not interactive. The Local Supabase API itself remains on
+`127.0.0.1:55321` as configured above.
 
 ## CLI target safety
 

@@ -151,9 +151,10 @@ after the owner received the destructive Local reset warning, exact checkout
 `016`, and Phase 4 `017`-`021`. Integrated WP-6.6/WP-6.5/P-20/WP-7/WP-7.5,
 export, advisor, repository, realistic-scale route-render, and cleanup evidence
 passed. The Browser automation runtime did not dispatch React/Radix client
-state changes, so independent intended-admin interaction, keyboard, stale/
-leave-reload recovery, and error-comprehension UAT remain open. P-37 HOLD is
-recommended; Add/Supplement remains hidden. See
+state changes, so at that P-36 checkpoint independent intended-admin
+interaction, keyboard, stale/leave-reload recovery, and error-comprehension UAT
+remained open. The later P-37 record below supersedes that checkpoint status.
+P-37 HOLD is recommended; Add/Supplement remains hidden. See
 [P-36 Owner Review Note](./32-phase4-wp8-p36-owner-review-note.md). This does
 not authorize P-12 or any other Production gate.
 
@@ -166,8 +167,11 @@ insertion gap; it maps back to the unchanged P-18 anchor/relation contract.
 The later Local technical continuation passed stale rejection, one acceptance,
 exact replay, accepted-state readback, audited cleanup, and post-evidence
 repository checks, and corrected source checkpoint
-`e6d79d77bd8fb8d6a0211d7d7b440d2136cb6512` is pushed. P-37 remains HOLD
-pending independent keyboard/leave-reload re-UAT and explicit owner acceptance. See
+`e6d79d77bd8fb8d6a0211d7d7b440d2136cb6512` is pushed. Final fresh no-reset
+UAT passed leave/return/reload recovery and gap-list `ArrowDown`/`Enter`, and
+pushed checkpoint `96c2ac6892e8ffe9d020c2dff641a847157cd4b2` corrected the stale
+recovery alert. P-37 remains HOLD pending complete native-button keyboard
+traversal and explicit owner acceptance. See
 [P-37 UAT and UX Correction Note](./33-phase4-wp8-p37-uat-ux-correction-note.md).
 No Production action is authorized.
 
@@ -597,11 +601,13 @@ pretend a publishable candidate has been approved.
 - [x] P-35 source integration places exact amended `021` after `020`; P-36
       integrated Local technical execution passed on exact `910cc3c`
 - [ ] P-37 WP-8 acceptance is on HOLD after the first intended-admin
-      comprehension failure. Owner re-UAT of the corrected insertion-gap flow,
-      keyboard and leave/reload recovery, and explicit acceptance must pass;
-      corrected source checkpoint `e6d79d77bd8fb8d6a0211d7d7b440d2136cb6512`
-      is pushed; technical stale-response, one confirmation,
-      exact replay, accepted-state readback, and cleanup passed 2026-07-18;
+      comprehension failure. Corrected insertion-gap leave/return/reload
+      recovery and gap-list `ArrowDown`/`Enter` now pass; complete native-button
+      keyboard traversal and explicit acceptance must still pass. Corrected
+      source checkpoints `e6d79d77bd8fb8d6a0211d7d7b440d2136cb6512` and
+      `96c2ac6892e8ffe9d020c2dff641a847157cd4b2` are pushed; technical
+      stale-response, one confirmation, exact replay, accepted-state readback,
+      and cleanup passed 2026-07-18;
       Add/Supplement stays hidden
 - [ ] Owner explicitly approves the Production migration window
 

@@ -2,13 +2,16 @@
 
 **Status:** P-37 remains **HOLD**. The first no-reset intended-admin Local UAT
 session on 2026-07-17 failed the comprehension gate before any placement batch
-was confirmed. A bounded UI correction is implemented and pushed. A
-2026-07-18 Local-only continuation then passed controlled stale-lock rejection,
-one accepted placement, same-request idempotent replay, accepted-state route
-readback, and audited cleanup. Corrected source checkpoint
-`e6d79d77bd8fb8d6a0211d7d7b440d2136cb6512` is pushed. Owner re-UAT for
-complete keyboard traversal and leave/reload recovery remains open; those
-operator gates are not inferred from RPC or screenshot evidence.
+was confirmed. The bounded insertion-gap correction and its technical
+stale/accept/replay/accepted-state/cleanup continuation passed. A final fresh
+no-reset Local session on 2026-07-18 then passed browser-local leave, return,
+reload, and recovery; insertion-gap search plus `ArrowDown`/`Enter`; final batch
+review; and cleanup. That session found and corrected one stale recovery-banner
+state. Exact corrective source checkpoint
+`96c2ac6892e8ffe9d020c2dff641a847157cd4b2` is pushed. Complete independent
+`Tab`/`Shift+Tab` traversal and native-button `Enter`/`Space` activation remain
+open because the in-app browser driver did not dispatch those keys. Explicit
+owner acceptance also remains open.
 
 **Environment:** Local only. Production touched: **No**.
 
@@ -116,10 +119,48 @@ reset or publication:
   flags returned to `false`, and the canonical pointer/BOQ/Factor F baseline
   remained exact.
 
-In the final Browser Use session, automated click/type calls focused controls
+In that earlier Browser Use session, automated click/type calls focused controls
 but did not dispatch this React/Radix client's state-changing events. The
 technical RPC/route evidence above is retained, but complete keyboard and
-leave/reload recovery are therefore deliberately not marked passed.
+leave/reload recovery were therefore deliberately not marked passed at that
+checkpoint.
+
+The later 2026-07-18 fresh no-reset re-UAT separated that tooling limitation
+from application behavior and added these facts:
+
+- the canonical app origin was `http://localhost:3000`; using
+  `http://127.0.0.1:3000` could render server HTML while Next development
+  resources were cross-origin blocked, leaving the page unhydrated. Local UAT
+  must use one origin consistently;
+- fresh draft `2568.14.0` contained the same 710 inherited plus 18 temporary
+  new rows and opened on all 18 system suggestions;
+- the gap search accepted keyboard input, `ArrowDown` moved the active option,
+  and `Enter` selected the intended gap between `ITEM-0011` and `ITEM-0012`,
+  closed the suggestion list, and returned focus to the gap combobox;
+- applying that staged choice showed 17 system suggestions plus one
+  **ปรับในหน้านี้ · ยังไม่บันทึก** row without a DB placement submission;
+- same-origin leave displayed the explicit keep-or-stay dialog, **ออกและเก็บไว้
+  ชั่วคราว** returned to the draft, and both returning to the route and a later
+  reload restored the one pending choice with the truthful recovery alert;
+- final review showed 18 new rows, 17 system suggestions, one local adjustment,
+  699 shifted inherited sequence numbers, one receiving category, zero
+  incomplete/invalid rows, and the required reason field; it was closed without
+  submission;
+- UAT found that **ยกเลิกการปรับทั้งหมด** restored 18/0 but left the recovery
+  alert visible. Checkpoint `96c2ac6892e8ffe9d020c2dff641a847157cd4b2`
+  now clears the recovered-state flag and renders the alert only while pending
+  local work exists. Re-UAT passed 18/0 with the alert and reset action gone;
+- browser warning/error logs were empty. The in-app driver still did not send
+  `Tab`, `Shift+Tab`, `Enter`, or `Space` to native buttons, so those complete
+  traversal/activation claims remain unaccepted even though the controls are
+  native buttons and existing Radix/shadcn components;
+- no Local reset, placement confirmation, publication, Factor F workflow,
+  hotfix expansion, or Production action occurred. Audited abandon closed
+  `2568.14.0` at lock `2` / placement revision `1`, and all disabled-baseline
+  invariants returned exact;
+- focused operator regression passed 1 file / 14 tests; the full suite passed
+  33 files / 184 tests; TypeScript, lint with 0 errors / 10 existing warnings,
+  authority 710/65/17, network-enabled production build, and diff check passed.
 
 External screenshots are review evidence only and must not be staged:
 
@@ -148,14 +189,23 @@ External screenshots are review evidence only and must not be staged:
   `/Users/cloud/.codex/visualizations/2026/07/06/019f36c9-8c72-7f30-9bd3-6161114f7c1b/p37-master-catalog/25-placement-accepted-local-metadata.json`
   and
   `/Users/cloud/.codex/visualizations/2026/07/06/019f36c9-8c72-7f30-9bd3-6161114f7c1b/p37-master-catalog/26-placement-cleaned-local-metadata.json`.
+- final no-reset recovery UAT evidence:
+  `/Users/cloud/.codex/visualizations/2026/07/06/019f36c9-8c72-7f30-9bd3-6161114f7c1b/p37-final-uat/03-placement-editor.png`,
+  `/Users/cloud/.codex/visualizations/2026/07/06/019f36c9-8c72-7f30-9bd3-6161114f7c1b/p37-final-uat/04-local-change-not-saved.png`,
+  `/Users/cloud/.codex/visualizations/2026/07/06/019f36c9-8c72-7f30-9bd3-6161114f7c1b/p37-final-uat/05-leave-confirmation.png`,
+  `/Users/cloud/.codex/visualizations/2026/07/06/019f36c9-8c72-7f30-9bd3-6161114f7c1b/p37-final-uat/06-recovered-after-reload.png`,
+  `/Users/cloud/.codex/visualizations/2026/07/06/019f36c9-8c72-7f30-9bd3-6161114f7c1b/p37-final-uat/07-final-batch-review.png`, and
+  `/Users/cloud/.codex/visualizations/2026/07/06/019f36c9-8c72-7f30-9bd3-6161114f7c1b/p37-final-uat/08-reset-clears-recovery-banner.png`.
 
 ## 4. Current Local state
 
 The temporary UAT fixture was audited-abandoned after evidence capture:
 
 - active pointer `2568.0.0`, 710 rows, canonical hash unchanged;
-- zero working drafts; test version `2568.13.0` is `abandoned` with 728 retained
-  audit rows, lock `4`, and placement revision `2`;
+- zero working drafts; technical test version `2568.13.0` remains `abandoned`
+  with 728 retained audit rows at lock `4` / placement revision `2`, and the
+  final no-reset UAT version `2568.14.0` is `abandoned` with 728 retained rows
+  at lock `2` / placement revision `1`;
 - `catalog_admin_enabled = false`, `catalog_new_identity_enabled = false`, and
   `catalog_retirement_enabled = false`;
 - 198 BOQs, 1,547 BOQ items, zero unversioned BOQs;
@@ -164,30 +214,27 @@ The temporary UAT fixture was audited-abandoned after evidence capture:
 
 ## 5. Remaining P-37 exit path
 
-P-37 may be reconsidered only after the intended admin can complete the
-remaining corrected-flow gates without developer or SQL guidance. The stale,
-single-confirmation, duplicate-replay, accepted-state, and cleanup mechanics in
-steps 5-7 below passed technically on 2026-07-18, but operator comprehension is
-not inferred:
+Codex has already exercised and recorded the corrected flow, realistic 710+18
+scale, leave/return/reload recovery, final review, stale rejection, one-batch
+confirmation mechanics, exact replay, accepted-state readback, reset, and
+cleanup. The owner does not need to repeat those gates or submit another
+placement batch.
 
-1. explain the system-suggested batch and the meaning of shifted inherited
-   sequence numbers;
-2. inspect all rows, search/filter, change one insertion gap, and reorder two
-   new rows in the same gap;
-3. complete the supported controls by keyboard with visible focus;
-4. leave/reload and recover the browser-local choices;
-5. recognize the stale-placement response and choose the correct recovery path
-   in the UI; the DB stale/retry/idempotency contract is already proven;
-6. inspect the final summary, enter a reason, and explain the one-batch
-   confirmation; the Local batch was already accepted once for technical
-   evidence;
-7. verify the accepted state/final review; audited fixture cleanup and disabled
-   baseline restoration are already complete;
-8. record exact commit/push provenance: corrected source checkpoint
-   `e6d79d77bd8fb8d6a0211d7d7b440d2136cb6512` is pushed. Focused/full tests,
-   TypeScript, lint, production build, authority consistency, and diff checks
-   passed on the same source candidate on 2026-07-18.
+P-37 may be reconsidered after one fresh no-reset, keyboard-only pass without
+developer or SQL guidance:
 
-Until owner keyboard/leave-reload re-UAT and explicit acceptance pass,
+1. Codex prepares a temporary Local-only 710+18 fixture; no Local reset is
+   required and no Production environment is involved;
+2. the owner uses `Tab`/`Shift+Tab` with visible focus and `Enter`/`Space` on
+   native buttons to open/close the row editor, operate category and insertion-
+   gap controls, move same-gap siblings, open/close final review, and verify
+   focus returns to the invoking control; gap search, `ArrowDown`, and `Enter`
+   selection are already passed and need only a brief confirmation in this
+   continuous keyboard path;
+3. stop before the final placement submission, then record an explicit owner
+   P-37 accept/hold decision against corrective source checkpoint
+   `96c2ac6892e8ffe9d020c2dff641a847157cd4b2`.
+
+Until complete owner keyboard re-UAT and explicit acceptance pass,
 WP-8 remains **In progress**, P-37 remains **HOLD**, Add/Supplement remains
 hidden for release, and P-12 through P-15 remain unauthorized.

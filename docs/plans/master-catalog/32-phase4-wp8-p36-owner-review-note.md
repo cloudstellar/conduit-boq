@@ -22,6 +22,14 @@ audited cleanup back to the disabled baseline. That evidence does not replace
 independent keyboard/leave-reload UAT or record P-37 acceptance; Note #33 remains
 the authority for the current hold.
 
+**2026-07-18 final supplement:** a later fresh no-reset `2568.14.0` session
+passed leave/return/reload recovery, gap-list `ArrowDown`/`Enter`, final review,
+reset, and cleanup. Pushed checkpoint
+`96c2ac6892e8ffe9d020c2dff641a847157cd4b2` corrected the stale recovery
+alert found by that session. Complete native-button keyboard traversal and
+explicit P-37 acceptance remain; Note #33 supersedes the earlier open
+leave/reload statement.
+
 ## 1. Scope and provenance
 
 - branch: `codex/master-catalog-phase4`;
