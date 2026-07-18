@@ -145,11 +145,6 @@ export function MasterCatalogOverviewView({
   gate: CatalogAdminGate;
   overview: CatalogAdminOverview;
 }) {
-  const currentBaseDrafts = overview.drafts.filter(
-    (version) =>
-      version.status === 'draft'
-      && version.basedOnVersionId === overview.defaultVersion?.id,
-  );
   const staleDrafts = overview.drafts.filter(
     (version) =>
       version.status === 'draft'
@@ -161,7 +156,7 @@ export function MasterCatalogOverviewView({
       <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
         <MetricCard
           title="บัญชีราคาที่ใช้งาน"
-          value={overview.defaultVersion?.versionString ?? '-'}
+          value={overview.defaultVersion?.officialVersionString ?? '-'}
           detail={`${formatThaiNumber(overview.counts.activeDefaultRows)} รายการใช้งาน`}
           icon={Database}
         />
@@ -191,8 +186,8 @@ export function MasterCatalogOverviewView({
       <MasterCatalogDraftCreatePanel
         key={overview.defaultVersion?.id ?? 'no-base'}
         defaultVersionId={overview.defaultVersion?.id ?? null}
-        defaultVersionString={overview.defaultVersion?.versionString ?? null}
-        draftVersions={currentBaseDrafts}
+        defaultVersionString={overview.defaultVersion?.officialVersionString ?? null}
+        draftVersions={overview.drafts}
         versionRegistry={overview.versionRegistry}
       />
 
@@ -200,13 +195,15 @@ export function MasterCatalogOverviewView({
         <Card>
           <CardHeader>
             <CardTitle>ฉบับร่างฐานเก่า</CardTitle>
-            <CardDescription>เปิดตรวจย้อนหลังได้ แต่แก้ไขและเผยแพร่ไม่ได้</CardDescription>
+            <CardDescription>
+              ร่างนี้บล็อกการสร้างร่างใหม่จนกว่าจะยกเลิก หรือคืนเวอร์ชันฐานเดิม
+            </CardDescription>
           </CardHeader>
           <CardContent className="flex flex-wrap gap-2">
             {staleDrafts.map((draft) => (
               <Button key={draft.id} variant="outline" size="sm" asChild>
                 <Link href={`/admin/master-catalog/versions/${draft.id}`}>
-                  {draft.versionString}
+                  {draft.draftReference ?? 'ฉบับร่าง'} · เป้าหมาย {draft.targetVersionString}
                 </Link>
               </Button>
             ))}
@@ -284,7 +281,7 @@ export function MasterCatalogVersionDetailView({
           <ShieldAlert />
           <AlertTitle>ฉบับร่างนี้อ้างอิงเวอร์ชันฐานเก่า</AlertTitle>
           <AlertDescription>
-            เปิดดูรายการและประวัติได้ แต่แก้ไข นำเข้า หรือเผยแพร่ไม่ได้ ให้สร้างฉบับร่างใหม่จากเวอร์ชันใช้งานปัจจุบันแล้วนำการเปลี่ยนแปลงที่ยังต้องการมาใช้ใหม่
+            เปิดดูรายการและประวัติได้ แต่แก้ไข นำเข้า หรือเผยแพร่ไม่ได้ ร่างนี้ยังเป็นร่างเดียวที่เปิดอยู่ จึงต้องยกเลิกร่างพร้อมเหตุผล หรือคืนเวอร์ชันฐานเดิมก่อนทำงานต่อ
           </AlertDescription>
         </Alert>
       ) : null}
@@ -293,7 +290,7 @@ export function MasterCatalogVersionDetailView({
           <ArchiveX />
           <AlertTitle>ฉบับร่างนี้ถูกยกเลิกและเก็บเป็นประวัติแล้ว</AlertTitle>
           <AlertDescription>
-            เปิดดูรายการและประวัติได้ แต่แก้ไข นำเข้า เผยแพร่ หรือส่งออกเป็นเอกสารทางการไม่ได้
+            รหัสร่าง {version.draftReference ?? '-'} และข้อมูลทั้งหมดเปิดดูย้อนหลังได้ แต่แก้ไข นำเข้า เผยแพร่ หรือส่งออกเป็นเอกสารทางการไม่ได้ เลขเป้าหมาย {version.targetVersionString} ไม่ได้ถูกออกเป็นเลขทางการและนำไปใช้กับร่างใหม่ได้
           </AlertDescription>
         </Alert>
       ) : null}
@@ -301,11 +298,20 @@ export function MasterCatalogVersionDetailView({
         <div className="flex flex-col justify-between gap-4 lg:flex-row lg:items-start">
           <div className="min-w-0">
             <div className="flex flex-wrap items-center gap-2">
-              <h2 className="text-xl font-semibold">{version.versionString}</h2>
+              <h2 className="text-xl font-semibold">
+                {version.status === 'draft' || version.status === 'abandoned'
+                  ? version.draftReference ?? 'ฉบับร่าง'
+                  : version.officialVersionString ?? version.targetVersionString}
+              </h2>
               <StatusBadge status={version.status} />
+              {version.status === 'draft' || version.status === 'abandoned' ? (
+                <Badge variant="outline">เป้าหมาย {version.targetVersionString}</Badge>
+              ) : null}
               {isCurrentVersion ? <Badge variant="secondary">ใช้งานปัจจุบัน</Badge> : null}
               {detail.baseVersion ? (
-                <Badge variant="outline">ฐาน {detail.baseVersion.versionString}</Badge>
+                <Badge variant="outline">
+                  ฐาน {detail.baseVersion.officialVersionString ?? detail.baseVersion.targetVersionString}
+                </Badge>
               ) : null}
             </div>
             <p className="mt-1 text-sm text-muted-foreground">{version.name}</p>
@@ -379,7 +385,6 @@ export function MasterCatalogVersionDetailView({
       <MasterCatalogVersionWorkspace
         version={{
           id: version.id,
-          versionString: version.versionString,
           lockVersion: version.lockVersion,
         }}
         items={detail.items}
@@ -413,6 +418,9 @@ export function MasterCatalogVersionDetailView({
           <KeyValue label="เลขที่เอกสารอนุมัติ" value={version.approvalReference ?? '-'} />
           <KeyValue label="วันที่เอกสารอนุมัติ" value={formatThaiDate(version.approvalDocumentDate)} />
           <KeyValue label="ที่เก็บเอกสารและไฟล์ฉบับอนุมัติ" value={version.physicalArchiveReference ?? '-'} />
+          {version.status === 'active' || version.status === 'archived' ? (
+            <KeyValue label="รหัสร่างต้นทาง" value={version.draftReference ?? '-'} />
+          ) : null}
           <KeyValue label="ค่าแฮชชุดข้อมูล" value={shortHash(version.datasetHash)} />
           <KeyValue label="หมวดงาน" value={formatThaiNumber(detail.counts.categories)} />
           <KeyValue label="กลุ่มรหัส" value={formatThaiNumber(detail.counts.codeGroups)} />
@@ -423,10 +431,21 @@ export function MasterCatalogVersionDetailView({
         <MasterCatalogPublishRestorePanel
           draftVersion={null}
           draftReadiness={null}
-          currentVersionString={detail.currentVersion?.versionString ?? null}
+          currentVersionString={
+            detail.currentVersion?.officialVersionString
+            ?? detail.currentVersion?.targetVersionString
+            ?? null
+          }
+          openDraft={detail.openDraft ? {
+            id: detail.openDraft.id,
+            draftReference: detail.openDraft.draftReference,
+            targetVersionString: detail.openDraft.targetVersionString,
+            basedOnVersionId: detail.openDraft.basedOnVersionId,
+          } : null}
           restorableVersions={[{
             id: version.id,
-            versionString: version.versionString,
+            officialVersionString:
+              version.officialVersionString ?? version.targetVersionString,
             itemCount: version.itemCount,
             datasetHash: version.datasetHash,
           }]}
@@ -438,11 +457,12 @@ export function MasterCatalogVersionDetailView({
         <RecentChangeSets changeSets={detail.changeSets} />
       </div>
 
-      {version.status === 'draft' && !detail.isStaleDraft ? (
+      {version.status === 'draft' ? (
         <MasterCatalogDraftAbandonPanel
           draftVersion={{
             id: version.id,
-            versionString: version.versionString,
+            targetVersionString: version.targetVersionString,
+            draftReference: version.draftReference,
             lockVersion: version.lockVersion,
           }}
         />
@@ -475,7 +495,12 @@ export function MasterCatalogPlacementView({
             <div className="flex flex-wrap items-center gap-2">
               <MapPin className="size-5" />
               <h2 className="text-xl font-semibold">ยืนยันตำแหน่งรายการใหม่</h2>
-              <Badge variant="outline">เวอร์ชัน {workspace.version.versionString}</Badge>
+              <Badge variant="secondary">
+                {workspace.version.draftReference ?? 'ฉบับร่าง'}
+              </Badge>
+              <Badge variant="outline">
+                เป้าหมาย {workspace.version.targetVersionString}
+              </Badge>
             </div>
             <p className="mt-1 text-sm text-muted-foreground">
               ตรวจตำแหน่งที่ระบบจัดให้ แก้เฉพาะรายการที่ต้องการ แล้วบันทึกทั้งชุดเพียงครั้งเดียว
@@ -526,8 +551,13 @@ export function MasterCatalogVersionReviewView({
           </Link>
         </Button>
         <div className="flex flex-wrap gap-2">
-          <Badge variant="secondary">ฉบับร่าง {version.versionString}</Badge>
-          <Badge variant="outline">ฐาน {baseVersion.versionString}</Badge>
+          <Badge variant="secondary">
+            {version.draftReference ?? 'ฉบับร่าง'}
+          </Badge>
+          <Badge variant="outline">เป้าหมาย {version.targetVersionString}</Badge>
+          <Badge variant="outline">
+            ฐาน {baseVersion.officialVersionString ?? baseVersion.targetVersionString}
+          </Badge>
           <Badge variant="outline">รุ่นแก้ไข {version.lockVersion}</Badge>
         </div>
       </div>
@@ -556,8 +586,10 @@ export function MasterCatalogVersionReviewView({
       ) : (
         <MasterCatalogFinalReviewWorkspace
           versionId={version.id}
-          baseVersionString={baseVersion.versionString}
-          draftVersionString={version.versionString}
+          baseVersionString={
+            baseVersion.officialVersionString ?? baseVersion.targetVersionString
+          }
+          draftVersionString={version.targetVersionString}
           diff={snapshot.diff}
         />
       )}
@@ -579,13 +611,18 @@ export function MasterCatalogVersionReviewView({
           <MasterCatalogPublishRestorePanel
             draftVersion={{
               id: version.id,
-              versionString: version.versionString,
+              targetVersionString: version.targetVersionString,
+              draftReference: version.draftReference,
               lockVersion: snapshot.reviewedLockVersion,
               itemCount: publishReadiness?.dataset?.itemCount ?? version.itemCount,
               datasetHash: publishReadiness?.dataset?.datasetHash ?? version.datasetHash,
             }}
             draftReadiness={publishReadiness}
-            currentVersionString={review.baseVersion.versionString}
+            currentVersionString={
+              review.baseVersion.officialVersionString
+              ?? review.baseVersion.targetVersionString
+            }
+            openDraft={null}
             restorableVersions={[]}
           />
         ) : null}
@@ -656,7 +693,8 @@ export function MasterCatalogImportView({
             </Link>
           </Button>
           <div className="flex flex-wrap gap-2">
-            <Badge variant="secondary">ฉบับร่าง {draft.versionString}</Badge>
+            <Badge variant="secondary">{draft.draftReference ?? 'ฉบับร่าง'}</Badge>
+            <Badge variant="outline">เป้าหมาย {draft.targetVersionString}</Badge>
             <Badge variant="outline">
               ฐาน {importContext.baseVersionString ?? (draft.isCurrentBase ? 'ปัจจุบัน' : 'เก่า')}
             </Badge>
@@ -847,8 +885,16 @@ function VersionTable({ versions }: { versions: CatalogVersionSummary[] }) {
               versions.map((version) => (
                 <TableRow key={version.id}>
                   <TableCell>
-                    <div className="font-medium">{version.versionString}</div>
-                    <div className="text-xs text-muted-foreground">{version.name}</div>
+                    <div className="font-medium">
+                      {version.status === 'draft' || version.status === 'abandoned'
+                        ? version.draftReference ?? 'ฉบับร่าง'
+                        : version.officialVersionString ?? version.targetVersionString}
+                    </div>
+                    <div className="text-xs text-muted-foreground">
+                      {version.status === 'draft' || version.status === 'abandoned'
+                        ? `เป้าหมาย ${version.targetVersionString} · ${version.name}`
+                        : version.name}
+                    </div>
                   </TableCell>
                   <TableCell>
                     <div className="flex flex-wrap gap-1">
@@ -1039,6 +1085,16 @@ function ChangeSetRows({
               <div className="text-xs text-muted-foreground">
                 รุ่นแก้ไข {item.beforeLockVersion ?? '-'} → {item.afterLockVersion ?? '-'}
               </div>
+              {item.pointerBeforeVersionId && item.pointerAfterVersionId ? (
+                <div className="text-xs text-muted-foreground">
+                  บันทึกเวอร์ชันใช้งานก่อนและหลังไว้ในหลักฐานแล้ว
+                </div>
+              ) : null}
+              {item.draftEffect ? (
+                <div className="text-xs text-muted-foreground">
+                  {draftEffectLabel(item.draftEffect)}
+                </div>
+              ) : null}
             </TableCell>
             {!compact ? <TableCell>{item.actorDisplayName}</TableCell> : null}
             <TableCell>{formatThaiDateTime(item.createdAt)}</TableCell>
@@ -1047,6 +1103,15 @@ function ChangeSetRows({
       </TableBody>
     </Table>
   );
+}
+
+function draftEffectLabel(effect: NonNullable<CatalogChangeSetSummary['draftEffect']>): string {
+  return ({
+    none: 'ไม่มีฉบับร่างได้รับผล',
+    becomes_current: 'ฉบับร่างกลับมาอ้างอิงฐานปัจจุบัน',
+    becomes_stale: 'ฉบับร่างเปลี่ยนเป็นฐานเก่า',
+    remains_stale: 'ฉบับร่างยังคงเป็นฐานเก่า',
+  } as const)[effect];
 }
 
 function StatusBadge({ status }: { status: CatalogVersionSummary['status'] }) {

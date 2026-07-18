@@ -1,5 +1,16 @@
 # Phase 4 Implementation Execution Pack
 
+**P-39R current amendment (2026-07-18):** P-38 Card A was stopped and safely
+cleaned after permanent abandoned-number reservation was found to create
+unexplained official-release gaps. [Correction Plan #37](./37-phase4-p39-draft-identity-release-number-correction-plan.md)
+now controls future execution: immutable draft reference, target claim while
+mutable, issue on publish, release on audited abandon, and forward migration
+`022`. P-39R adds one open draft globally, audited stale abandonment, explicit
+restore effect/pointer audit, lifecycle/publication completeness, and narrowed
+role/state RLS. P-22/P-23.1 evidence remains historical. P39R-S passed on the
+corrected source candidate; P-38/WP-8 must not resume before
+P39R-L/P39R-C/P39R-U. Production remains unauthorized.
+
 **Status:** Owner-approved for WP-0 through WP-8 implementation/local
 rehearsal; WP-9 Production execution requires separate P-12 through P-15
 approvals after WP-8 evidence review. Production migration, deploy, feature
@@ -484,7 +495,8 @@ Implementation rules:
 
 - manual edits and import use the same draft/diff/reason/audit model;
 - create draft from current default only;
-- stale base draft becomes read-only/nonpublishable;
+- stale base draft permits inspection and audited abandon only; it is otherwise
+  nonmutable/nonpublishable;
 - no hidden three-way rebase;
 - every mutation requires reason;
 - blank reason rejected;
@@ -594,7 +606,7 @@ Required sub-gates:
 | WP-6.5A End-to-end idempotency | Client/form creates one operation UUID for create/manual/import-apply/publish/restore, preserves it through an uncertain result, reuses it on retry, and replaces it only after a definitive terminal result or explicit new operation. Submitted non-secret editable values remain visible after uncertain/rejected results and reset only after success, so retry does not require reconstructing the payload. Test timeout-after-commit and same-ID/different-payload rejection. |
 | WP-6.5B Publish guards and early UX | Keep DB P-18 and structured-code guards as final invariants; show the same publication blockers in draft/import preview before apply/publish, with Thai reason and remediation. Warn separately when inactive rows require the still-pending P-19 PDF policy; do not silently turn that filing decision into a new DB publish rule. A user must not discover the blocker only after completing the draft. |
 | WP-6.5C Hash portability | Resolve P-20 and update migration, DB/hash/export contracts and fixtures atomically. No clean-reset/cross-environment equivalence claim until the selected contract passes. |
-| WP-6.5D Reusable version lifecycle | Remove `2568.1.0` hardcoding from reusable action/RPC validation. Require explicit annual/revision/patch intent, plan from the complete all-status reserved registry, and prove another valid version plus reserved annual, duplicate, stale-sequence, and nonmonotonic rejection. Keep `2568.1.0` only as the exact first-candidate fixture when unreserved. |
+| WP-6.5D Reusable version lifecycle | Remove `2568.1.0` hardcoding from reusable action/RPC validation. Require explicit annual/revision/patch intent, immutable draft references, and planning from the complete issued/currently-claimed registry. Prove target claim, audited release/reuse after abandon, permanent published/archived reservation, duplicate/stale/nonmonotonic denial, and concurrency/replay. Keep `2568.1.0` only as the exact first-target fixture when unissued/unclaimed. |
 | WP-6.5E Reproducible export evidence | Commit a semantic verifier under `scripts/` or tests. Discover headers by exact names, derive ranges, and verify schema version, sheets, row count/order, canonical hash, numeric cells, formula/link absence, PDF count/hash/pages, and binary hashes. Generated files remain untracked. |
 | WP-6.5F DB integration and concurrency harness | Establish a tracked Local DB suite for migrations, RPC/RLS/role denial, transaction rollback, two-session publish/restore races, lock timeout, stale state, and uncertain-response retry. WP-7 adds the permanent BOQ/hotfix/Factor F cases to this harness. |
 | WP-6.5G Operator UX and observability | Add route-level loading/error/not-found states, consistent Thai user messages with stable technical code/request ID, bounded structured logs containing operation/outcome/duration/version/request ID, and no raw payload/SQL detail. |
@@ -674,13 +686,13 @@ Required slices:
 | Slice | Required outcome |
 |---|---|
 | A Browse/history | Use deterministic paged data reads to defeat API row caps, then read/filter all rows client-side within the measured threshold; search/filter code/name/category/status/group; exact item route; paged version/audit registers; stable-identity timeline with field-level old/new values. |
-| B Draft targeting | Enforce one mutable draft per base; expose the one current-base workspace; retain stale/abandoned drafts read-only with clear recovery; no overview/import hidden draft choice. |
+| B Draft targeting | Enforce one mutable draft globally; expose that exact workspace; allow audited abandonment when stale while retaining all other stale/abandoned paths read-only; no overview/import hidden draft choice. |
 | C Dictionary/code authority | Freeze Production-derived versioned categories and approved P-06 22/65 code groups; ordinary mutation resolves existing IDs only; server allocator locks the approved group, uses next never-issued sequence, does not fill retired gaps, and stops at 900. |
 | D Import completion | Move the approved first-rollout mapping out of runtime `docs/*draft.csv` authority; reconcile future imports against the exact draft/dictionaries. Server returns complete add/update/recode/retire/unchanged diff and exact Full omissions; UI displays it before Apply; support real bounded batch/per-row price authority. |
 | E Publication provenance/readiness | Derive publisher UUID/display snapshot from authenticated profile; semantically validate ISO dates; require version-level archive reference including manual-only publication; readiness and publish consume one full stale-base/canonical-quality result. |
 | F Correction/editor | Prefill exact current item; require price authority only for name/unit/money changes; add audited `reactivate` and base-absent `withdraw` preserving identity/code/audit. |
 | G Schema/UX/evidence | After zero-null compatibility proof, add required null/order constraints; Thai-first copy, no synthetic Local/WP evidence, support IDs demoted; DB/role/race/browser/accessibility/authority tests pass. |
-| H Working-draft lifecycle | Partial unique draft-per-base invariant; safe concurrent create conflict; audited idempotent abandon with immutable retained rows/history; replacement starts from a fresh clone. |
+| H Working-draft lifecycle | Global partial unique draft invariant; safe concurrent create conflict; audited idempotent current/stale abandon with immutable retained rows/history; replacement starts from a fresh current-base clone. |
 | I Final snapshot review | Make the full searchable item workspace primary; compare complete draft/base snapshots by stable identity; show compound old/new changes/readiness; publish only the exact reviewed lock and force rereview after mutation. |
 | J Operator context/import/export semantics | Preserve signed-in admin identity and environment context; keep global navigation informational; bind import to the exact draft; distinguish approved workbook input from review-only Excel/PDF exports; keep import iterative rather than a misleading one-way wizard. |
 | K Version planning and recovery UX | Require business intent and owner-designated annual year; fail closed on incomplete registry; show reserved numbers; DB enforces next sequence after idempotent replay; successful create opens the exact draft; detailed metadata follows items; restore confirms current/target and BOQ effect. |
@@ -693,8 +705,8 @@ Required behavior:
 - two concurrent allocations in one group cannot receive the same code;
 - source preview and final Apply use the same exact draft/payload fingerprint;
 - stale draft controls are unavailable before a user can submit;
-- a second mutable draft for the same base and any destructive draft deletion
-  are impossible through UI, RPC, or concurrent callers;
+- a second mutable draft from the same or a different base and any destructive
+  draft deletion are impossible through UI, RPC, or concurrent callers;
 - an abandoned draft is read-only, nonpublishable, and retained with its audit;
 - preliminary readiness cannot be greener than final publish for base/quality;
 - `withdraw` cannot remove an identity inherited from the base or any published
@@ -1078,8 +1090,8 @@ Before asking for code review:
 - [ ] Published data is immutable.
 - [ ] Audit #29 C-01 through C-17 have exact implementation/evidence references
   or the affected capability is excluded from release visibility.
-- [ ] Full catalog/item history, one current-base workspace, and
-  stale/abandoned read-only targeting work.
+- [ ] Full catalog/item history, one global working workspace, stale
+  inspection/audited-abandon, and immutable abandoned targeting work.
 - [ ] Draft create/abandon idempotency, lock, role, race, rollback, immutable
   history, and zero-partial-effect tests pass.
 - [ ] Final database snapshot diff covers compound/reverted changes and publish

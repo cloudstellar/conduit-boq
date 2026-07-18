@@ -1,9 +1,11 @@
 # Phase 4 WP-8 P-37 Evidence Reconciliation and Owner UAT Script
 
 **Status:** Evidence reconciliation and the fail-closed developer preflight
-design are complete; P-37 remains **HOLD**. The read-only Local baseline and
-untracked input manifest passed, while the mutating prepare step and all Owner
-Cards remain pending. See [Preflight Note #36](./36-phase4-wp8-p38-no-reset-owner-uat-preflight.md).
+design are complete; P-37 remains **HOLD**. The first P-38 Card A attempt was
+stopped and safely cleaned after it exposed the abandoned-draft numbering gap.
+P-39R now supersedes that numbering rule and this UAT must not resume until the
+Local gates in [Correction Plan #37](./37-phase4-p39-draft-identity-release-number-correction-plan.md)
+pass. See [Preflight Note #36](./36-phase4-wp8-p38-no-reset-owner-uat-preflight.md).
 This note defines the smallest current-route Owner UAT that can close Closure
 Matrix #34 C-07 through C-11 without repeating evidence that already proves
 the same actor-independent contract.
@@ -114,13 +116,16 @@ approval.
 1. Confirm the header shows the intended active admin and Local environment.
 2. Open **บัญชีปัจจุบัน**, identify `2568.0.0` as Current, and explain why an
    existing working draft must be opened instead of creating a competing one.
-3. Create a **ปรับปรุง/เพิ่มเติม** test draft, record the planned version, then
-   abandon it with a specific Local UAT reason.
-4. Confirm the abandoned draft is read-only and its version number remains
-   reserved. Create the replacement draft proposed by the system.
+3. Create a **ปรับปรุง/เพิ่มเติม** test draft, record its immutable draft
+   reference and target version, then abandon it with a specific Local UAT
+   reason.
+4. Confirm the abandoned draft remains read-only under that reference and the
+   target was not issued. Create a replacement and confirm it receives a new
+   draft reference while reclaiming the same target.
 
-Pass: the Owner can explain one-working-draft, reserved-number, base-version,
-and abandoned/read-only behavior without an irreversible action.
+Pass: the Owner can explain one-working-draft, draft reference, target versus
+official version, base-version, and abandoned/read-only behavior without an
+irreversible action.
 
 ### Card B - browse, history, manual add, and withdraw
 
@@ -281,7 +286,8 @@ After Card G:
    `false`, unchanged BOQ/BOQ-item invariants, and Factor F `2569.0.0`/36.
 3. Confirm every rejected error produced zero unintended effect, the placement
    path produced exactly one accepted change set/review, uncertain retry
-   produced one effect, and both test drafts are audited-abandoned.
+   produced one effect, both test drafts are audited-abandoned, their draft
+   references differ, and their retained target is the same.
 4. Record fixture/input/evidence hashes. Keep `files/`, `tmp/`, and `output/`
    untracked unless the Owner separately approves a tracked artifact.
 5. Update Closure Matrix #34, Tracker, Verification Report, Decision Register,

@@ -43,11 +43,11 @@ describe('Master Catalog ADR-003 version lifecycle', () => {
     expect(formatCatalogVersion({ major: 2570, minor: 3, patch: 0 })).toBe('2570.3.0');
   });
 
-  it('plans the next revision and patch from the complete reserved registry', () => {
+  it('plans from issued or currently claimed versions and ignores abandoned targets', () => {
     const registry = [
-      { versionString: '2568.0.0', status: 'active' },
-      { versionString: '2568.1.0', status: 'abandoned' },
-      { versionString: 'not-a-version', status: 'abandoned' },
+      { targetVersionString: '2568.0.0', status: 'active' },
+      { targetVersionString: '2568.1.0', status: 'abandoned' },
+      { targetVersionString: 'not-a-version', status: 'abandoned' },
     ];
 
     expect(suggestCatalogVersion({
@@ -56,8 +56,8 @@ describe('Master Catalog ADR-003 version lifecycle', () => {
       registry,
     })).toEqual({
       transition: 'revision',
-      version: { major: 2568, minor: 2, patch: 0 },
-      reservedVersions: [{ versionString: '2568.1.0', status: 'abandoned' }],
+      version: { major: 2568, minor: 1, patch: 0 },
+      occupiedVersions: [],
     });
     expect(suggestCatalogVersion({
       baseVersionString: '2568.0.0',
@@ -66,25 +66,25 @@ describe('Master Catalog ADR-003 version lifecycle', () => {
     })).toEqual({
       transition: 'patch',
       version: { major: 2568, minor: 0, patch: 1 },
-      reservedVersions: [],
+      occupiedVersions: [],
     });
   });
 
-  it('keeps a void annual number reserved while allowing the same effective year', () => {
+  it('reuses an unissued annual target after its draft is abandoned', () => {
     const suggestion = suggestCatalogVersion({
       baseVersionString: '2568.0.0',
       transition: 'annual',
       effectiveYear: 2569,
       registry: [
-        { versionString: '2568.0.0', status: 'active' },
-        { versionString: '2569.0.0', status: 'abandoned' },
+        { targetVersionString: '2568.0.0', status: 'active' },
+        { targetVersionString: '2569.0.0', status: 'abandoned' },
       ],
     });
 
     expect(suggestion).toEqual({
       transition: 'annual',
-      version: { major: 2569, minor: 1, patch: 0 },
-      reservedVersions: [{ versionString: '2569.0.0', status: 'abandoned' }],
+      version: { major: 2569, minor: 0, patch: 0 },
+      occupiedVersions: [],
     });
     expect(suggestCatalogVersion({
       baseVersionString: '2568.0.0',
@@ -92,6 +92,25 @@ describe('Master Catalog ADR-003 version lifecycle', () => {
       effectiveYear: 2568,
       registry: [],
     })).toBeNull();
+  });
+
+  it('never reuses an issued or currently claimed target', () => {
+    expect(suggestCatalogVersion({
+      baseVersionString: '2568.0.0',
+      transition: 'revision',
+      registry: [
+        { targetVersionString: '2568.0.0', status: 'active' },
+        { targetVersionString: '2568.1.0', status: 'archived' },
+        { targetVersionString: '2568.2.0', status: 'draft' },
+      ],
+    })).toEqual({
+      transition: 'revision',
+      version: { major: 2568, minor: 3, patch: 0 },
+      occupiedVersions: [
+        { targetVersionString: '2568.1.0', status: 'archived' },
+        { targetVersionString: '2568.2.0', status: 'draft' },
+      ],
+    });
   });
 
   it('limits owner-designated annual years to the next ten years', () => {

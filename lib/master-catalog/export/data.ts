@@ -41,7 +41,9 @@ export interface CatalogExportProfile {
 
 export interface CatalogExportVersion {
   id: string;
-  versionString: string;
+  officialVersionString: string | null;
+  targetVersionString: string;
+  draftReference: string | null;
   name: string;
   status: CatalogExportVersionStatus;
   isDefaultMirror: boolean;
@@ -154,6 +156,8 @@ export class CatalogExportError extends Error {
 const VERSION_COLUMNS = [
   'id',
   'version_string',
+  'target_version_string',
+  'draft_reference',
   'name',
   'status',
   'is_default',
@@ -315,8 +319,29 @@ export function makeCatalogExportFilename(
 ): string {
   const dateForFilename = dataset.version.effectiveDate ?? dataset.exportedDateIsoIct;
   const compactDate = sanitizeDateForFilename(dateForFilename);
-  const version = sanitizeVersionForFilename(dataset.version.versionString);
-  const prefix = dataset.isDraftExport ? 'DRAFT-' : '';
+  const documentVersion = dataset.isDraftExport
+    ? dataset.version.targetVersionString
+    : dataset.version.officialVersionString;
+  if (!documentVersion) {
+    throw new CatalogExportError(
+      'CATALOG_EXPORT_OFFICIAL_VERSION_MISSING',
+      'Published catalog has no official version identifier',
+      409,
+    );
+  }
+  const version = sanitizeVersionForFilename(documentVersion);
+  let draftReference: string | null = null;
+  if (dataset.isDraftExport) {
+    if (!dataset.version.draftReference) {
+      throw new CatalogExportError(
+        'CATALOG_EXPORT_DRAFT_IDENTITY_MISSING',
+        'Draft catalog has no immutable draft reference',
+        409,
+      );
+    }
+    draftReference = sanitizeVersionForFilename(dataset.version.draftReference);
+  }
+  const prefix = draftReference ? `DRAFT-${draftReference}-` : '';
 
   return `${prefix}NT-Master-Catalog-v${version}-${compactDate}.${extension}`;
 }
@@ -334,6 +359,14 @@ function assertPublishedMetadataMatches(
     throw new CatalogExportError(
       'CATALOG_EXPORT_METADATA_INCOMPLETE',
       'Published catalog export metadata is incomplete',
+      409,
+    );
+  }
+
+  if (!version.officialVersionString) {
+    throw new CatalogExportError(
+      'CATALOG_EXPORT_OFFICIAL_VERSION_MISSING',
+      'Published catalog has no official version identifier',
       409,
     );
   }
@@ -362,6 +395,14 @@ async function assertExportAccess(
   profile: CatalogExportProfile,
 ): Promise<void> {
   if (version.status === 'draft') {
+    if (!version.targetVersionString || !version.draftReference) {
+      throw new CatalogExportError(
+        'CATALOG_EXPORT_DRAFT_IDENTITY_MISSING',
+        'Draft catalog has no immutable target or draft reference',
+        409,
+      );
+    }
+
     if (!profile.isActiveAdmin) {
       throw new CatalogExportError(
         'CATALOG_EXPORT_FORBIDDEN',
@@ -481,12 +522,20 @@ async function loadVersion(
   }
 
   const row = data as unknown as Record<string, unknown>;
+  const status = (row.status ?? 'draft') as CatalogExportVersionStatus;
+  const claimedVersionString = toNullableString(row.version_string);
+  const targetVersionString = String(
+    row.target_version_string ?? claimedVersionString ?? '',
+  );
 
   return {
     id: String(row.id),
-    versionString: String(row.version_string ?? ''),
+    officialVersionString:
+      status === 'active' || status === 'archived' ? claimedVersionString : null,
+    targetVersionString,
+    draftReference: toNullableString(row.draft_reference),
     name: String(row.name ?? ''),
-    status: (row.status ?? 'draft') as CatalogExportVersionStatus,
+    status,
     isDefaultMirror: Boolean(row.is_default),
     isCurrentDefault: false,
     basedOnVersionId: toNullableString(row.based_on_version_id),

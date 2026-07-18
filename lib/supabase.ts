@@ -72,10 +72,16 @@ export interface BOQItem {
 
 export interface PriceListVersion {
   id: string;
-  major: number;
-  minor: number;
-  patch: number;
-  version_string: string;
+  major: number | null;
+  minor: number | null;
+  patch: number | null;
+  version_string: string | null;
+  target_major: number;
+  target_minor: number;
+  target_patch: number;
+  target_version_string: string;
+  draft_attempt: number | null;
+  draft_reference: string | null;
   name: string;
   status: 'draft' | 'active' | 'archived' | 'abandoned';
   is_default: boolean;

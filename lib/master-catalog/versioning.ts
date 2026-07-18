@@ -7,14 +7,14 @@ export interface CatalogVersionNumber {
 export type CatalogVersionTransition = 'annual' | 'revision' | 'patch';
 
 export interface CatalogVersionRegistryEntry {
-  versionString: string;
+  targetVersionString: string;
   status?: string;
 }
 
 export interface CatalogVersionSuggestion {
   transition: CatalogVersionTransition;
   version: CatalogVersionNumber;
-  reservedVersions: CatalogVersionRegistryEntry[];
+  occupiedVersions: CatalogVersionRegistryEntry[];
 }
 
 export const CATALOG_VERSION_SEGMENT_MAX = 2_147_483_647;
@@ -79,7 +79,7 @@ export function suggestCatalogVersion(input: {
 
   const registry = normalizeRegistry(input.registry);
   let version: CatalogVersionNumber;
-  let reservedVersions: CatalogVersionRegistryEntry[];
+  let occupiedVersions: CatalogVersionRegistryEntry[];
 
   if (input.transition === 'annual') {
     const effectiveYear = input.effectiveYear;
@@ -93,7 +93,7 @@ export function suggestCatalogVersion(input: {
       minor: nextSegment(sameYear.map((entry) => entry.version.minor), -1),
       patch: 0,
     };
-    reservedVersions = sameYear.map(({ reference }) => reference);
+    occupiedVersions = sameYear.map(({ reference }) => reference);
   } else if (input.transition === 'revision') {
     const sameYear = registry.filter((entry) => entry.version.major === base.major);
     version = {
@@ -101,7 +101,7 @@ export function suggestCatalogVersion(input: {
       minor: nextSegment(sameYear.map((entry) => entry.version.minor), base.minor),
       patch: 0,
     };
-    reservedVersions = sameYear
+    occupiedVersions = sameYear
       .filter((entry) => entry.version.minor > base.minor)
       .map(({ reference }) => reference);
   } else {
@@ -113,7 +113,7 @@ export function suggestCatalogVersion(input: {
       minor: base.minor,
       patch: nextSegment(sameRevision.map((entry) => entry.version.patch), base.patch),
     };
-    reservedVersions = sameRevision
+    occupiedVersions = sameRevision
       .filter((entry) => entry.version.patch > base.patch)
       .map(({ reference }) => reference);
   }
@@ -123,7 +123,7 @@ export function suggestCatalogVersion(input: {
   return {
     transition: input.transition,
     version,
-    reservedVersions,
+    occupiedVersions,
   };
 }
 
@@ -162,9 +162,10 @@ function normalizeRegistry(registry: readonly CatalogVersionRegistryEntry[]) {
   }>();
 
   for (const reference of registry) {
-    const version = parseCatalogVersionString(reference.versionString);
-    if (!version || unique.has(reference.versionString)) continue;
-    unique.set(reference.versionString, { reference, version });
+    if (reference.status === 'abandoned') continue;
+    const version = parseCatalogVersionString(reference.targetVersionString);
+    if (!version || unique.has(reference.targetVersionString)) continue;
+    unique.set(reference.targetVersionString, { reference, version });
   }
 
   return [...unique.values()].sort((left, right) =>

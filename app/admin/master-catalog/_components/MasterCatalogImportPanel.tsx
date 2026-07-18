@@ -264,7 +264,7 @@ export function MasterCatalogImportPanel({
           นำเข้าชุดข้อมูลที่อนุมัติ
         </CardTitle>
         <CardDescription>
-          ฉบับร่าง {draft?.versionString ?? '-'} · ฐาน {baseVersionString ?? '-'}
+          {draft?.draftReference ?? 'ฉบับร่าง'} · เป้าหมาย {draft?.targetVersionString ?? '-'} · ฐาน {baseVersionString ?? '-'}
         </CardDescription>
       </CardHeader>
       <CardContent className="grid gap-5">

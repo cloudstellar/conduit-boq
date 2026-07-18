@@ -20,9 +20,16 @@ HOLD for that final independent submission plus the broader core-admin,
 safe-error, and performance rows in
 [Closure Matrix #34](./34-phase4-wp8-p37-closure-matrix.md). P-19 when triggered
 and all Production gates remain pending. The Local UI must not be treated as
-Production-ready until those gates pass. P-38 completed evidence reconciliation
-and authorizes one bounded no-reset continuation. The current scored sequence,
-named safe errors, measurement budget, and cleanup are in
+Production-ready until those gates pass. The first P-38 Card A run was stopped
+and cleaned after the owner identified that permanently consuming a number for
+an abandoned draft would create unexplained gaps in official releases. P-39 now
+separates immutable draft references from reusable, unissued target versions;
+see [Correction Plan #37](./37-phase4-p39-draft-identity-release-number-correction-plan.md).
+P-39R also permits only one open draft across the whole catalog. A stale draft
+must be inspected and audited-abandoned before another can be created; it cannot
+be edited, imported, placed, readied, or published. P-38 may resume only after
+the P-39R Local gates pass. The scored sequence,
+named safe errors, measurement budget, and cleanup remain in
 [Owner UAT Script #35](./35-phase4-wp8-p37-evidence-reconciliation-and-owner-uat-script.md);
 this section remains the general operating contract.
 **Audience:** Active Master Catalog administrators
@@ -57,7 +64,7 @@ factor version by assumption.
 | Draft | Working copy; not official | Yes, by active admin | No |
 | Published/Active | Official immutable version | No | Only when singleton pointer selects it |
 | Archived | Official historical version | No | No, but readable/exportable |
-| Stale Draft | Draft whose base is no longer Current; comparison only | No | No |
+| Stale Draft | Draft whose base is no longer Current; inspection and audited abandon only | No | No |
 | Abandoned | Never-published working attempt closed with an audited reason; history only | No | No |
 
 The “current” badge follows the singleton pointer, not a screen-local choice.
@@ -69,20 +76,25 @@ approved maintenance capability.
 
 1. Open **บัญชีราคามาตรฐาน → บัญชีปัจจุบัน**.
 2. Confirm the version marked current.
-3. Check whether the Current version already has a working draft. Only one is
-   allowed; open it rather than creating a competing release workspace.
+3. Check whether any working draft is already open. Only one is allowed across
+   the whole catalog; open it rather than creating a competing release
+   workspace. If it is stale, inspect and audited-abandon it before continuing.
 4. When none exists, choose the business intent:
    **ประจำปีใหม่**, **ปรับปรุง/เพิ่มเติม**, or **แก้ไขข้อมูลเดิม**.
 5. For **ประจำปีใหม่**, enter the owner-designated effective BE year. Do not
    infer it from the preparation, publication, or deployment date. It must be
    from the year after the current base through 10 years after that base; the
    form shows the exact allowed range.
-6. Review the system-planned version and every lower reserved number shown. The
-   registry includes active, archived, draft, and abandoned versions.
-7. Enter a specific draft name and reason, then acknowledge that the number will
-   remain reserved even if the draft is later abandoned.
+6. Review the system-planned **target version** and every lower issued or
+   currently claimed number shown. Published/archived versions are issued;
+   another mutable draft may temporarily claim a target. Abandoned attempts do
+   not consume an unissued target.
+7. Enter a specific draft name and reason, then acknowledge that publication
+   issues the target as an official version while abandonment releases it.
 8. Select **สร้างและเปิดพื้นที่ทำงาน** once. A successful create opens that
-   exact draft automatically. If another admin reserves the number first, the
+   exact draft automatically and shows its immutable reference, such as
+   `2568.1.0-D001`. The `Dnnn` suffix identifies the attempt for that target;
+   never treat it as part of the official release number. If another operation claims the target first, the
    screen reloads the registry and proposes the next valid number; review that
    new number before submitting again. Use **ลองโหลดทะเบียนใหม่** if the
    registry read itself failed. Do not resubmit a stale displayed number.
@@ -99,25 +111,27 @@ change contains both, use the higher-impact revision. Editing within the same
 unpublished draft does not create another catalog version.
 
 The new draft records `based_on_version_id`. If the current pointer changes
-later, the draft becomes stale and cannot publish. Create a new draft from the
-new Current version and deliberately reapply still-approved changes. The stale
-draft remains read-only for comparison; Phase 4 Core does not rebase it.
+later, the draft becomes stale and cannot mutate or publish. Inspect it, choose
+**ยกเลิกฉบับร่าง**, and record a specific reason. Only after that audited
+abandon may you create a new draft from the new Current version and deliberately
+reapply still-approved changes. Phase 4 Core does not rebase a stale draft.
 
-To start over while the same base remains Current, choose **Abandon draft**,
-confirm the exact draft/lock, and record a specific reason. The system retains
-all rows and audit history as read-only and then permits a fresh clone. Never
-delete a draft, use Archived for this purpose, or attempt to reopen an
-abandoned draft.
+To start over from a current or stale draft, choose **ยกเลิกฉบับร่าง**, confirm
+the exact draft reference/lock, and record a specific reason. The system
+retains the reference, target, all rows, and audit history as read-only and then
+permits a fresh clone. Never delete a draft, use Archived for this purpose, or
+attempt to reopen an abandoned draft.
 
-Abandon never frees its version number. A replacement uses the next reserved
-number in the selected lane. If an annual `{year}.0.0` draft was abandoned, keep
-the truthful owner-designated year and use the next patch-0 revision proposed by
-the system; never reuse the cancelled number or change the year merely to pass
-validation.
+Abandoning a never-published draft releases its target version. A replacement
+gets a new draft reference and may claim the same target. For example,
+abandoning `2568.1.0-D001` allows `2568.1.0-D002` to target `2568.1.0`; no
+official version was skipped. A target
+cannot be reused when it is published, archived, or claimed by another mutable
+draft.
 
 For first structured-code rollout, choose **ปรับปรุง/เพิ่มเติม** from
 `2568.0.0`; `2568.1.0` is the expected candidate only when that number has not
-already been reserved. Confirm all 710 names, units, and prices are unchanged
+already been issued or claimed. Confirm all 710 names, units, and prices are unchanged
 before applying mappings.
 
 ## 4. Manual add
@@ -400,8 +414,9 @@ Publication is high impact.
    except the approved `ITEM-0139` exception. An unchanged legacy-only clone does
    not activate this rollout guard.
 7. If any inactive/retired rows are present, confirm P-19 official PDF policy.
-8. Confirm the version number and current base/pointer.
-9. Obtain explicit owner approval for this exact version.
+8. Confirm the draft reference, target version, and current base/pointer.
+9. Obtain explicit owner approval to issue this exact target as the official
+   version.
 10. Select **ตรวจและยืนยันการเผยแพร่**. In the confirmation dialog, recheck the
     current version, target version, reviewed draft revision, item count,
     immutability, and BOQ effect.
@@ -413,8 +428,8 @@ Publication is high impact.
     operation ID until a definitive result and submits the exact reviewed lock
     version.
 
-If publication succeeds, the version is immutable and the pointer moves
-atomically. Do not attempt to edit it.
+If publication succeeds, the target becomes the immutable official version and
+the pointer moves atomically. Do not attempt to edit it.
 
 ## 11. Generate official exports
 
@@ -470,13 +485,13 @@ Use only when a published current version must stop being used for new BOQs.
 | Reconciliation required | Complete identity/code decision in the approved artifact |
 | Retirement approval required | Verify Full-import mode, type the exact retirement count, and enter the real owner approval reference |
 | Draft lock conflict | Refresh and reconcile the other admin's change |
-| Working draft already exists | Open the existing Current-base workspace; abandon it with a reason only when the attempt truly must be replaced |
+| Working draft already exists | Open the one existing workspace. If it is stale or the attempt truly must be replaced, inspect it and use audited abandon with a reason before creating another draft |
 | Draft review changed | The draft was edited after review. Return to final comparison, inspect the new state, and publish only with the refreshed lock |
 | เลขเวอร์ชันที่พิมพ์ไม่ตรง | Return to the confirmation summary and type the displayed target version exactly. Do not retry by changing the URL, request ID, or hidden fields |
-| Draft base stale | Create a new draft from Current and reapply approved changes; do not publish/rebase the stale draft |
+| Draft base stale | Inspect and audited-abandon the stale draft with a reason, then create a new draft from Current and deliberately reapply approved changes; do not publish/rebase it |
 | Current restore version unavailable | Keep Restore closed, reload the version data, and verify both current and target before confirming |
 | Publish evidence required | Complete real approval metadata; do not use placeholder text |
-| Draft is stale/read-only | Select/create a current-base draft and deliberately reapply approved changes; do not rebase or force the stale draft |
+| Draft is stale/read-only | The only allowed command is audited abandon. After abandoning it, create a current-base draft and deliberately reapply approved changes; do not rebase or force it |
 | Export hash mismatch | Do not distribute; report with request/version/hash details |
 | Placement review required | Keep the draft; open **จัดตำแหน่งรายการใหม่**, review every pending new item as one batch, confirm with a real reason, then reload publication readiness |
 | Placement changed after page load | Reload the exact draft and placement page, inspect the current batch, and confirm again; never force hidden revision/order values |
@@ -488,9 +503,10 @@ Use only when a published current version must stop being used for new BOQs.
 
 - Direct database/table edits outside approved migration/functions
 - Editing or deleting a published version
-- Deleting a draft, relabelling it Archived to start over, or mutating an
-  abandoned/stale draft
-- Creating competing mutable drafts from the same base
+- Deleting a draft, relabelling it Archived to start over, mutating an
+  abandoned draft, or performing any stale-draft command other than audited
+  abandon
+- Creating competing mutable drafts anywhere in the catalog workflow
 - Reusing an item code
 - Typing a new category/code-group definition or arbitrary code suffix through
   an ordinary item/import workflow
@@ -542,9 +558,11 @@ Developer DB/transport fault-injection evidence may prepare and verify the
 uncertain-response example, but it does not substitute for the intended admin
 recognizing the message and completing the recovery through the UI.
 
-1. identify the one current-base workspace, create an ADR-003-valid draft when
-   none exists, abandon/recreate one test attempt with a reason, and explain why
-   stale/abandoned drafts remain read-only;
+1. identify the one global workspace, create an ADR-003-valid draft when
+   none exists, record its immutable draft reference and target, abandon/recreate
+   one test attempt with a reason, verify the replacement has a new draft
+   reference but may reuse the unissued target, and explain why stale/abandoned
+   drafts remain read-only;
 2. search the complete catalog including first/middle/last rows and inspect one
    item's field-level history;
 3. preview an approved workbook and explain Full versus Supplement impact,

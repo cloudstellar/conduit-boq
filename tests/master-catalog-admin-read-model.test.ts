@@ -86,6 +86,8 @@ function createOverviewClientWithFactorPointerError(): Parameters<typeof loadCat
         limit: () => query,
         range: () => query,
         eq: () => query,
+        neq: () => query,
+        not: () => query,
         maybeSingle: async () => queryResult(table),
         then: (resolve: (value: unknown) => unknown, reject?: (reason: unknown) => unknown) =>
           Promise.resolve(queryResult(table)).then(resolve, reject),
@@ -100,7 +102,7 @@ function createOverviewClientWithPagedRegistry() {
   const defaultVersionId = '11111111-1111-4111-8111-111111111111';
   const registry = Array.from({ length: 1_001 }, (_, patch) => ({
     version_string: `2568.0.${patch}`,
-    status: patch === 0 ? 'active' : 'abandoned',
+    status: patch === 0 ? 'active' : 'archived',
   }));
   const defaultVersion = {
     id: defaultVersionId,
@@ -163,6 +165,8 @@ function createOverviewClientWithPagedRegistry() {
           state.filters[column] = value;
           return query;
         },
+        neq: () => query,
+        not: () => query,
         maybeSingle: async () => result(),
         then: (resolve: (value: unknown) => unknown, reject?: (reason: unknown) => unknown) =>
           Promise.resolve(result()).then(resolve, reject),
@@ -496,7 +500,7 @@ describe('Master Catalog admin overview', () => {
     expect(overview.warnings).toContain('โหลดตัวชี้เวอร์ชัน Factor F ที่ใช้งานไม่สำเร็จ');
   });
 
-  it('loads the complete reserved version registry across bounded pages', async () => {
+  it('loads the complete issued-or-claimed version registry across bounded pages', async () => {
     const fixture = createOverviewClientWithPagedRegistry();
 
     const overview = await loadCatalogAdminOverview(fixture.client);
@@ -504,8 +508,8 @@ describe('Master Catalog admin overview', () => {
     expect(fixture.registryRangeReads()).toBe(2);
     expect(overview.versionRegistry).toHaveLength(1_001);
     expect(overview.versionRegistry?.at(-1)).toEqual({
-      versionString: '2568.0.1000',
-      status: 'abandoned',
+      targetVersionString: '2568.0.1000',
+      status: 'archived',
     });
     expect(overview.warnings).not.toContain(
       'ทะเบียนเลขเวอร์ชันโหลดไม่ครบ จึงปิดการสร้างฉบับร่างไว้ก่อน',

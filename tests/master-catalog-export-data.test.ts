@@ -47,7 +47,8 @@ describe('Master Catalog export data loader', () => {
 
     const dataset = await loadCatalogExportDataset(client, VERSION_ID);
 
-    expect(dataset.version.versionString).toBe('2568.1.0');
+    expect(dataset.version.officialVersionString).toBe('2568.1.0');
+    expect(dataset.version.targetVersionString).toBe('2568.1.0');
     expect(dataset.version.basedOnVersionString).toBe('2568.0.0');
     expect(dataset.canonicalDatasetHash).toBe(datasetHash);
     expect(dataset.counts.rowCount).toBe(1);
@@ -67,7 +68,7 @@ describe('Master Catalog export data loader', () => {
     const dataset = await loadCatalogExportDataset(client, BASE_VERSION_ID);
 
     expect(dataset.version.id).toBe(BASE_VERSION_ID);
-    expect(dataset.version.versionString).toBe('2568.0.0');
+    expect(dataset.version.officialVersionString).toBe('2568.0.0');
     expect(dataset.version.isCurrentDefault).toBe(false);
     expect(dataset.canonicalDatasetHash).toBe(datasetHash);
     expect(makeCatalogExportFilename(dataset, 'xlsx'))
@@ -109,6 +110,7 @@ describe('Master Catalog export data loader', () => {
       featureFlag: false,
       versionOverrides: {
         status: 'draft',
+        draft_reference: '2568.1.0-D001',
         dataset_hash: null,
         item_count: 1,
         effective_date: null,
@@ -129,6 +131,7 @@ describe('Master Catalog export data loader', () => {
       featureFlag: true,
       versionOverrides: {
         status: 'draft',
+        draft_reference: '2568.1.0-D001',
         dataset_hash: null,
         item_count: null,
         effective_date: null,
@@ -143,9 +146,31 @@ describe('Master Catalog export data loader', () => {
 
     expect(dataset.isDraftExport).toBe(true);
     expect(dataset.isOfficialPublishedExport).toBe(false);
+    expect(dataset.version.officialVersionString).toBeNull();
+    expect(dataset.version.targetVersionString).toBe('2568.1.0');
     expect(dataset.canonicalDatasetHash).toBe(datasetHash);
     expect(makeCatalogExportFilename(dataset, 'pdf'))
-      .toMatch(/^DRAFT-NT-Master-Catalog-v2568\.1\.0-\d{8}\.pdf$/);
+      .toMatch(/^DRAFT-2568\.1\.0-D001-NT-Master-Catalog-v2568\.1\.0-\d{8}\.pdf$/);
+  });
+
+  it('fails closed when a draft has no immutable draft reference', async () => {
+    const datasetHash = await hashCanonicalCatalogDatasetRows([CANONICAL_ROW]);
+    const client = createExportClient({
+      datasetHash,
+      featureFlag: true,
+      versionOverrides: {
+        status: 'draft',
+        draft_reference: null,
+        dataset_hash: null,
+        item_count: null,
+      },
+    });
+
+    await expect(loadCatalogExportDataset(client, VERSION_ID))
+      .rejects.toMatchObject({
+        code: 'CATALOG_EXPORT_DRAFT_IDENTITY_MISSING',
+        status: 409,
+      });
   });
 
   it('keeps an abandoned draft as non-exportable audit history', async () => {
@@ -153,7 +178,11 @@ describe('Master Catalog export data loader', () => {
     const client = createExportClient({
       datasetHash,
       featureFlag: true,
-      versionOverrides: { status: 'abandoned' },
+      versionOverrides: {
+        status: 'abandoned',
+        version_string: null,
+        draft_reference: '2568.1.0-D001',
+      },
     });
 
     await expect(loadCatalogExportDataset(client, VERSION_ID))
@@ -179,6 +208,8 @@ function createExportClient(
   const versionRow = {
     id: VERSION_ID,
     version_string: '2568.1.0',
+    target_version_string: '2568.1.0',
+    draft_reference: null,
     name: 'Published catalog',
     status: 'active',
     is_default: true,
@@ -199,6 +230,7 @@ function createExportClient(
     ...versionRow,
     id: BASE_VERSION_ID,
     version_string: '2568.0.0',
+    target_version_string: '2568.0.0',
     based_on_version_id: null,
   };
 

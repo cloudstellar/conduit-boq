@@ -43,7 +43,7 @@ export function MasterCatalogVersionWorkspace({
   editable,
   allowAdd,
 }: {
-  version: { id: string; versionString: string; lockVersion: number };
+  version: { id: string; lockVersion: number };
   items: CatalogWorkspaceItem[];
   totalItems: number;
   categories: CatalogCategoryOption[];
@@ -300,7 +300,7 @@ function CatalogAddItemForm({
   categories,
   codeGroups,
 }: {
-  version: { id: string; versionString: string; lockVersion: number };
+  version: { id: string; lockVersion: number };
   categories: CatalogCategoryOption[];
   codeGroups: CatalogCodeGroupOption[];
 }) {

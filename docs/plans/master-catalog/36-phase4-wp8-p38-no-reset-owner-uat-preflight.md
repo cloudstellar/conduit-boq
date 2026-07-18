@@ -1,11 +1,12 @@
 # Phase 4 WP-8 P-38 No-reset Owner UAT Preflight
 
-**Status:** Tracked fail-closed preflight/cleanup tooling and untracked test
-inputs are prepared and independently verified. The read-only Local status
-check and repository verification passed. The mutating `prepare` command has
-not run because the tracked checkpoint is not yet committed/pushed and the
-clean-tree guard correctly blocked it. P-37 remains **HOLD** and Owner Cards
-A-G remain pending.
+**Status:** The tracked fail-closed tooling and inputs were prepared, committed,
+and used for the first P-38 session. Card A created Local attempts `2568.16.0`
+and `2568.17.0`; the owner then stopped the UAT after identifying the official
+number-gap problem. Both attempts were audited-abandoned and cleanup restored
+the exact disabled baseline without reset. P-39 is now in progress; Cards A-G
+must not resume until [Correction Plan #37](./37-phase4-p39-draft-identity-release-number-correction-plan.md)
+passes its Local gates. P-37 remains **HOLD**.
 
 **Boundary:** Local only, no reset. This note does not authorize successful
 publication, pointer movement, P-37 acceptance, P-19, Factor F work, hotfix
@@ -86,8 +87,10 @@ npm run db:local:p38:cleanup
 ```
 
 `cleanup` requires the same clean pushed HEAD used by `prepare`, zero working
-drafts, and exactly two new audited versions, both abandoned, non-default, and
-unpublished. With a valid session, it attempts to restore the original flags
+drafts, and exactly two new audited attempts, both abandoned, non-default, and
+unpublished. Under P-39 it also requires distinct immutable draft references,
+null official tuples, and the same retained target for both attempts. With a
+valid session, it attempts to restore the original flags
 even when source-provenance or pre-cleanup assertions fail, and then refuses
 evidence closure. A successful cleanup also requires the exact pointer,
 dataset hash, 710 rows, BOQ/BOQ-item counts, Factor F pointer/rows, and disabled
@@ -119,11 +122,16 @@ RPC or reset command.
 
 Production touched: **No**.
 
-## 5. Next safe step
+## 5. P-38 interruption result and next safe step
 
-Commit and push this exact verified tooling/documentation checkpoint. Re-run
-`verify-inputs` and `status`, then run `prepare` once. The Owner can then
-execute [Owner UAT Script #35](./35-phase4-wp8-p37-evidence-reconciliation-and-owner-uat-script.md)
-Cards A-G without live developer/SQL assistance. Do not request P-37 until the
-Owner evidence, cleanup, authority update, exact verification, commit, and
-push are complete.
+Cleanup on 2026-07-18 restored pointer `2568.0.0`/710, zero working drafts,
+all three catalog flags `false`, BOQ 198/1,547 with zero unversioned BOQs, and
+Factor F `2569.0.0`/36. Production was untouched and no Local reset occurred.
+
+The earlier P39-S source/static result is historical after P-39R. Corrected
+P39R-S passed on the working-tree candidate; commit/push provenance remains
+pending. Receive separate approval for incremental P39R-L, then receive a fresh
+destructive-reset approval for P39R-C. Only after P39R-U proves the corrected
+Card A behavior may the Owner resume Cards B-G. Do not request P-37 before that
+evidence, cleanup, authority update, exact verification, commit, and push are
+complete.

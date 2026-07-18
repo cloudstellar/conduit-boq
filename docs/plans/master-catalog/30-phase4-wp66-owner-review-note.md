@@ -36,6 +36,14 @@ and Production remains unauthorized.
 `59b17d3c3e7ed6180445ac5dc5e0b75db9fe9452`
 **Production touched:** No
 
+**P-39R historical-boundary note:** This note remains the accepted point-in-time
+WP-6.6 closeout. Its P-23.1 permanent abandoned-number reservation is
+superseded for future execution by
+[Correction Plan #37](./37-phase4-p39-draft-identity-release-number-correction-plan.md).
+P-39R uses forward migration `022`; accepted `020` evidence is not rewritten and
+does not by itself prove the new global-draft, claim/issue/release,
+restore-effect, RLS, or publication lifecycle.
+
 ## 1. Decision recorded
 
 The owner placed WP-6.6 closeout on Hold after intended-operator review found a
@@ -137,7 +145,7 @@ Final recorded owner response:
 | C-09/C-10 correction | Retire/reactivate, eligible withdraw, inherited-withdraw denial, preserved identity/code/audit, exact browser item action | P-19 if an official version contains inactive rows |
 | C-11/C-12 schema/UX | G1R/G2 passed final `020` constraints/grants, two authority FK indexes, DB lint/current advisor triage, and P-20 comparison; G1R passed Thai account/navigation/item/import/review/restore flow and bounded desktop/mobile layout. G3 independently passed the real-route stale-recovery and clean-closeout path. | Accepted for WP-6.6; formal keyboard traversal, measured performance, and independent UAT stay in WP-8 |
 | C-13 final review | G1R/G2 passed identity-based complete diff/readiness/exact-lock publication and restore invariants; P-25 passed 27/27 compound/high-volume checks. G3 then bound final review to lock 1, advanced the draft to lock 2 from another real route, rejected the stale publish with the expected Thai recovery message, retained entered publication fields, created no publish change set, and reloaded the latest lock. | Accepted for WP-6.6; broader UAT stays WP-8 |
-| C-14 version intent/reservation | G1R/G2 live sequence/race/replay/one-draft/abandon/replacement cases passed; G3 used explicit correction intent and permanently reserved abandoned Local proof version `2568.0.2` as designed. | Accepted for WP-6.6; rerun in WP-8 |
+| C-14 historical P-23.1 version intent/reservation | G1R/G2 live sequence/race/replay/one-draft/abandon/replacement cases passed; G3 used explicit correction intent and permanently reserved abandoned Local proof version `2568.0.2` under the then-current rule. | Point-in-time WP-6.6 evidence retained; permanent reservation and per-base draft scope are superseded by P-39R. P39R-S passed; P39R-L/P39R-C/P39R-U must prove the corrected live contract. |
 | C-15 create/item/restore flow | G1R/G2 passed the DB/repository contract and bounded browser route; G3 independently used the real create, exact workspace, item edit, final review, and audited-abandon routes. | Accepted for WP-6.6; full independent UAT stays WP-8 |
 | C-16 pre-G1R business/UX guard | Final G1R/G2 contracts and P-25 presentation passed. G3 independently observed durable Thai stale recovery, retained form values, explicit Local/account context, and clean disabled-gate closeout. | Accepted for WP-6.6; formal accessibility stays WP-8 |
 | C-17 high-impact human-intent guard | P-26 source/tests and real-route no-reset Local evidence passed. Recode and Retire showed exact item/target/reason/BOQ-audit summaries and were cancelled. Publish blocked mismatched `2568.0.2`, enabled exact DB-owned `2568.0.3`, and was cancelled without publication. Desktop and 390x844 layouts passed after title clearance; proof draft was audited-abandoned and all flags returned false. | Accepted for WP-6.6; repeat the final supported workflow during WP-8 UAT |

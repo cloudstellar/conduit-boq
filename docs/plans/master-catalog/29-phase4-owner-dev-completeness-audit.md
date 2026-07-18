@@ -51,6 +51,15 @@ Local reset/result is a separate owner-approved execution recorded in
 no-reset intended-admin session and bounded correction are recorded separately
 in [Review Note #33](./33-phase4-wp8-p37-uat-ux-correction-note.md).
 
+**P-39R supersession note:** The later P-38 Card A review and follow-up
+architecture audit exposed capabilities
+the original audit did not separate: internal draft-attempt identity versus
+official release identity. [Correction Plan #37](./37-phase4-p39-draft-identity-release-number-correction-plan.md)
+adds that explicit trace. It does not invalidate this audit's earlier safety and
+workflow findings; it supersedes permanent abandoned-number reservation and the
+per-base draft invariant for future execution, and reopens the affected
+source/Local/owner gates.
+
 ## 1. Correction to the earlier completeness statement
 
 The earlier statement that the Phase 4 architecture was "complete" was too
@@ -127,7 +136,7 @@ do not remove the need for the operator-completeness work below.
 | C-11 | Many labels/statuses remain English; production-capable forms contain Local/WP placeholder evidence; UUID/lock/change-set details are primary success content. | Make the workflow Thai-first, remove synthetic defaults, separate draft save from whole-version publish, and move copyable technical IDs to support details. |
 | C-12 | The DB contract promised post-preflight nullability/order hardening, but `price_list` still permits nullable required fields/display order and has no per-version unique order constraint. | In an additive fix-forward migration, prove compatibility then enforce required nullability and the order constraints owned by the accepted scope. Do not rewrite migrations `017`-`019`. |
 | C-13 | The publish panel appears before the full item workspace, and the only complete diff is import-specific. Manual plus import changes have no authoritative final draft-versus-base comparison immediately before publication. | Make the complete searchable catalog the primary workspace; compute final snapshot diff by stable identity; show overlapping change groups/old-new values/readiness; carry the reviewed expected lock into publish and require a fresh review after any mutation. |
-| C-14 | Draft creation always suggests a revision and exposes raw major/minor/patch inputs, although annual versus revision versus patch depends on business authority. The overview only has a 25-row display list, and an abandoned annual `{year}.0.0` can block a truthful replacement under the old transition shape. | Require explicit business intent and owner-designated annual year; load a complete all-status registry or fail closed; permanently reserve identifiers; derive/show the next lane candidate; enforce sequence in candidate `020`; permit the next patch-0 annual revision in the same target year when lower identifiers are reserved. |
+| C-14 | Draft creation always suggests a revision and exposes raw major/minor/patch inputs, although annual versus revision versus patch depends on business authority. The overview only has a 25-row display list, and one identifier historically conflated abandoned attempts with official releases. | Require explicit business intent/year; immutable draft references; complete issued/currently-claimed registry or fail closed; target claim while mutable; issue on publish; release on audited abandon; DB next-lane enforcement in forward `022`; published/archived tuples never reused. Historical P-23.1 permanent reservation is superseded by P-39. |
 | C-15 | Successful create leaves the admin on the overview, detailed metadata delays the item workspace, and pointer restore submits without a current-to-target human confirmation. | Open the exact new draft after success; place compact context/actions then items before detailed document metadata; separate restore as recovery and confirm current/target, reason, and new-versus-historical BOQ behavior. |
 | C-16 | Annual year accepts impractical far-future values; stale-sequence error copy can fall through to raw backend text or disappear when registry refresh remounts the form; internal P-labels and technical identifiers compete with the operator task; first-rollout authority and Factor F context can read as permanent workflow content. | Enforce base +1 through +10 in UI/server/DB; allowlist stable stale/range errors with Thai copy; key refresh state independently and focus a shared error alert; collapse support identifiers; remove internal labels; contextualize first-rollout authority and demote separate Factor F details. |
 | C-17 | Exact-lock and database readiness prevent stale or invalid publication, but the visible Publish action previously submitted after one click without a separate human-intent check. Recode and Retire likewise changed code/status immediately after the item form submit. This left a preventable mis-click path even though database integrity remained protected. | Add a summary confirmation for Recode and Retire. Publish must show current/target version, reviewed lock, item count, BOQ effect, and immutability; require the admin to type the exact DB-read target version. Keep the final Server Action comparison server-owned and fail closed before the publish RPC. Prove mismatch disabled, exact match enabled, cancel/no-write behavior, responsive layout, and clean Local cleanup. |
@@ -209,8 +218,9 @@ does not imply they are supported:
 - arbitrary reorder of inherited published identities;
 - creation/editing of new category or `AAA/TTT` dictionary definitions;
 - a second-person or multi-stage approval engine;
-- stale-draft rebase/merge and destructive audit deletion; P-22 adds only
-  audited abandon while stale/abandoned drafts remain read-only history;
+- stale-draft rebase/merge and destructive audit deletion; P-39R permits only
+  inspection and audited abandon while stale, after which the abandoned
+  snapshot/history is immutable;
 - server pagination/virtualization before the measured threshold;
 - BOQ Rebase, K-formula governance, new Factor F workflow, or hotfix expansion.
 

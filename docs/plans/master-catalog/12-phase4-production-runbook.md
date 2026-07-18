@@ -43,6 +43,7 @@ catalog to roll back.
 - [Owner/Developer Capability Completeness Audit](./29-phase4-owner-dev-completeness-audit.md)
 - [P-18 Placement Governance Review Note](./28-phase4-p18-placement-governance-review-note.md)
 - [WP-8 P-37 Closure Matrix](./34-phase4-wp8-p37-closure-matrix.md)
+- [P-39 Draft Identity and Release-Number Correction Plan](./37-phase4-p39-draft-identity-release-number-correction-plan.md)
 - [Execution Progress Tracker authority/evidence index](./25-phase4-execution-progress-tracker.md)
 - [Verification Report](./13-phase4-verification-report.md)
 - [Admin Operating Procedure](./15-phase4-admin-operating-procedure.md)
@@ -79,9 +80,10 @@ Stop immediately when any of these occurs:
 - a retryable UI/action path generates a fresh request ID after an uncertain
   response;
 - reusable version logic remains hardcoded to `2568.1.0` contrary to ADR-003;
-- version intent is not explicitly approved, the all-status registry is
-  incomplete, the reviewed candidate is no longer next, or an abandoned number
-  would be reused;
+- version intent is not explicitly approved, the issued/currently-claimed
+  registry is incomplete, the reviewed target is no longer next, a published or
+  archived number would be reused, or an abandoned attempt still consumes its
+  unissued target;
 - live DB/RPC/RLS/concurrency, tracked artifact verification, admin UAT, or
   documented recovery evidence required for the next gate is missing;
 - any Audit #29 C-01 through C-17 capability is visible as supported without
@@ -89,7 +91,7 @@ Stop immediately when any of these occurs:
 - an item/import path creates free-form taxonomy, accepts caller-owned code
   allocation/publisher identity, silently chooses a draft, or presents partial
   diff/readiness as final authority;
-- two mutable drafts can exist for one base, a draft/abandon action loses audit
+- two mutable drafts can exist globally, a draft/abandon action loses audit
   history, or publication can proceed without the exact final snapshot/lock
   state the operator reviewed;
 - Recode/Retire can cross the mutation boundary without their exact summary,
@@ -148,6 +150,13 @@ Stop immediately when any of these occurs:
     [Closure Matrix #34](./34-phase4-wp8-p37-closure-matrix.md) before requesting
     the explicit P-37 accept/hold decision or any P-12/P-14 gate. See also
     [P-37 UAT/UX Note](./33-phase4-wp8-p37-uat-ux-correction-note.md).
+15. Verify P-39R separately: the P-38 Card A session was safely cleaned and
+    P-23.1 permanent reservation is historical. Do not request P-37/P-12 until
+    corrected `022` has passed P39R-S, separately approved incremental P39R-L,
+    separately approved destructive P39R-C, and owner P39R-U. Confirm one open
+    draft globally, stale-draft abandonment, restore effect/pointer audit,
+    role/state RLS, complete publication metadata, and replay identity. No prior
+    reset approval applies.
 
 **Exit gate:** All documents have owner/reviewer decisions; no unresolved row
 or taxonomy blocker.
@@ -173,14 +182,16 @@ major image at an incompatible existing data directory.
 
 1. After explicit warning and owner approval for the destructive Local reset,
    start from the canonical bootstrap source that applies root `009`-`015`,
-   production hotfix `016`, and Phase 4 `017`-`021` in that order. G4 repository
+   production hotfix `016`, and Phase 4 `017`-`022` in that order. G4 repository
    integration placed accepted `020` in source on 2026-07-15, and P-29/G4E
    subsequently passed the combined clean execution. P-32 separately applied
    and proved amended P-18/WP-7.5 `021`; P-35 later placed that unchanged file
    in source. P-36 later supplied separate integrated execution evidence on
    exact `910cc3c` after explicit owner warning/approval. Any future destructive
    rerun still requires a fresh warning and approval; P-36 is not reusable
-   blanket reset permission.
+   blanket reset permission. Migration `022` is a P-39 forward correction; its
+   source inclusion is not clean-execution evidence, and P39R-C requires a fresh
+   destructive-reset warning and approval.
 2. If applying SQL manually for a focused rehearsal, apply hotfix `016` before
    any reviewed Phase 4A migration(s).
 3. Verify all new tables, constraints, indexes, grants, RLS policies, functions,
@@ -202,8 +213,9 @@ With feature flag disabled by default:
 2. Choose the approved annual/revision/patch intent. An annual effective year
    must be within base year +1 through +10 and must match the approved business
    year; do not bypass this guard with direct SQL. For the first structured
-   rollout choose revision from `2568.0.0`, review the complete reserved registry,
-   and accept `2568.1.0` only when it remains the system-planned next number.
+   rollout choose revision from `2568.0.0`, review the complete issued/currently-
+   claimed registry, and accept `2568.1.0` only when it remains the system-planned
+   target. Record the immutable draft reference separately.
 3. Assert all 710 name/unit/material/labor/unit values are identical.
 4. Apply approved code/category decisions; K fields must remain absent.
 5. Complete WP-6.6 before WP-7: load/search the full catalog; expose exact item
@@ -231,9 +243,9 @@ With feature flag disabled by default:
     reuses the same operation ID and returns the prior result.
 12. Run two-session publish/restore contention and bounded timeout fixtures.
 13. Verify item history across a recode and correction action.
-14. Prove all ADR-003 lanes, incomplete/stale sequence rejection, permanent
-    abandoned-number reservation, same-year annual recovery after a void lower
-    number, create race, and same-request replay.
+14. Prove all ADR-003 lanes, incomplete/stale sequence rejection, draft-reference
+    uniqueness, target claim, audited target release and reuse after abandonment,
+    permanent published/archived reservation, create race, and same-request replay.
 15. P-18 is accepted and the P-32 placed-new-identity technical path has passed.
     Repeat that path in the separately approved WP-8 scope, generate Excel/PDF,
     and compare count/hash before any release-readiness claim.
@@ -477,8 +489,9 @@ Disable the flag immediately if any smoke test fails.
 ## 12. Candidate preparation and publish gate
 
 1. Select the owner-approved business intent and let the guarded planner clone
-   current `2568.0.0` into the displayed next candidate. Expect `2568.1.0` only
-   when still unreserved; record the exact resulting version for every later step.
+   current `2568.0.0` into the displayed target. Expect `2568.1.0` only when it
+   is not issued or currently claimed; record both the immutable draft reference
+   and target for every later step. Publication, not draft creation, issues it.
 2. Run the 710-row preservation assertion before applying codes.
 3. Apply the approved reconciliation only.
 4. Confirm Full/Supplement mode and row outcomes.

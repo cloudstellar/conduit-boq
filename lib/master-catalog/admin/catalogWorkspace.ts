@@ -56,7 +56,8 @@ export interface CatalogVersionItemsSnapshot {
 
 export interface CatalogItemDetail extends CatalogWorkspaceItem {
   versionId: string;
-  versionString: string;
+  targetVersionString: string;
+  draftReference: string | null;
   versionStatus: string;
   lockVersion: number;
   basedOnVersionId: string | null;
@@ -220,7 +221,7 @@ export async function loadCatalogItemDetail(
     await Promise.all([
       supabase
         .from('price_list_versions')
-        .select('id,version_string,status,lock_version,based_on_version_id')
+        .select('id,version_string,target_version_string,draft_reference,status,lock_version,based_on_version_id')
         .eq('id', versionId)
         .maybeSingle(),
       supabase
@@ -294,7 +295,12 @@ export async function loadCatalogItemDetail(
   return {
     ...mapWorkspaceItem(object(itemResult.data) ?? {}),
     versionId,
-    versionString: String(versionResult.data.version_string ?? ''),
+    targetVersionString: String(
+      versionResult.data.target_version_string
+      ?? versionResult.data.version_string
+      ?? '',
+    ),
+    draftReference: nullableString(versionResult.data.draft_reference),
     versionStatus: String(versionResult.data.status ?? ''),
     lockVersion: number(versionResult.data.lock_version),
     basedOnVersionId,

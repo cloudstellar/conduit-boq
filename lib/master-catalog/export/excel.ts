@@ -53,13 +53,18 @@ const ALL_BORDERS = {
 export async function buildCatalogExportWorkbookBuffer(
   dataset: CatalogExportDataset,
 ): Promise<Buffer> {
+  const documentVersionString = catalogDocumentVersionString(dataset);
   const workbook = new ExcelJS.Workbook();
   workbook.creator = CATALOG_EXPORT_APP_NAME;
   workbook.lastModifiedBy = CATALOG_EXPORT_APP_NAME;
   workbook.created = dataset.exportedAt;
   workbook.modified = dataset.exportedAt;
-  workbook.subject = `Master Catalog ${dataset.version.versionString}`;
-  workbook.title = makeCatalogExportDocumentTitle(dataset.version.versionString);
+  workbook.subject = dataset.isDraftExport
+    ? `ฉบับร่าง ${dataset.version.draftReference ?? '-'} เป้าหมาย ${dataset.version.targetVersionString}`
+    : `Master Catalog ${documentVersionString}`;
+  workbook.title = dataset.isDraftExport
+    ? `${CATALOG_EXPORT_DOCUMENT_TITLE} - ${dataset.version.draftReference ?? 'ฉบับร่าง'} - เป้าหมาย ${dataset.version.targetVersionString}`
+    : makeCatalogExportDocumentTitle(documentVersionString);
   workbook.description = `Dataset hash: ${dataset.canonicalDatasetHash}`;
   workbook.company = 'National Telecom Public Company Limited';
 
@@ -100,7 +105,7 @@ function createDocumentInfoSheet(workbook: Workbook, dataset: CatalogExportDatas
 
   sheet.mergeCells(rowIndex, 1, rowIndex, 2);
   const year = sheet.getCell(rowIndex, 1);
-  year.value = makeCatalogExportYearLabel(dataset.version.versionString);
+  year.value = makeCatalogExportYearLabel(catalogDocumentVersionString(dataset));
   year.font = font({ bold: true, size: 20 });
   year.alignment = { horizontal: 'center', vertical: 'middle' };
   sheet.getRow(rowIndex).height = TITLE_ROW_HEIGHT;
@@ -109,7 +114,7 @@ function createDocumentInfoSheet(workbook: Workbook, dataset: CatalogExportDatas
   if (dataset.isDraftExport) {
     sheet.mergeCells(rowIndex, 1, rowIndex, 2);
     const draft = sheet.getCell(rowIndex, 1);
-    draft.value = 'DRAFT – ห้ามใช้อ้างอิง';
+    draft.value = 'ฉบับร่าง - ห้ามใช้อ้างอิง';
     draft.font = font({ bold: true, size: 18, color: 'FFB91C1C' });
     draft.fill = DRAFT_FILL;
     draft.alignment = { horizontal: 'center', vertical: 'middle' };
@@ -120,7 +125,12 @@ function createDocumentInfoSheet(workbook: Workbook, dataset: CatalogExportDatas
   const rows: Array<[string, string]> = [
     ['วัตถุประสงค์เอกสาร', 'เอกสารอ้างอิงบัญชีราคามาตรฐานที่ส่งออกจากรุ่นข้อมูลที่เลือก'],
     ['หน่วยงาน', 'บริษัท โทรคมนาคมแห่งชาติ จำกัด (มหาชน)'],
-    ['ฉบับบัญชีราคา', dataset.version.versionString],
+    ...(dataset.isDraftExport
+      ? [
+          ['รหัสร่าง', dataset.version.draftReference ?? '-'],
+          ['เลขฉบับเป้าหมาย', dataset.version.targetVersionString],
+        ] as Array<[string, string]>
+      : [['ฉบับบัญชีราคา', catalogDocumentVersionString(dataset)]] as Array<[string, string]>),
     ['ชื่อฉบับ', dataset.version.name],
     ['สถานะการเผยแพร่', displayStatusThai(dataset)],
     ['ฉบับที่ใช้งานปัจจุบัน', dataset.version.isCurrentDefault ? 'ใช่' : 'ไม่ใช่'],
@@ -187,7 +197,7 @@ function createPriceListSheet(workbook: Workbook, dataset: CatalogExportDataset)
   sheet.mergeCells(rowIndex, 1, rowIndex, 13);
   sheet.getCell(rowIndex, 1).value =
     dataset.isDraftExport
-      ? `DRAFT – ห้ามใช้อ้างอิง | ${CATALOG_EXPORT_DOCUMENT_TITLE}`
+      ? `ฉบับร่าง - ห้ามใช้อ้างอิง | ${CATALOG_EXPORT_DOCUMENT_TITLE}`
       : CATALOG_EXPORT_DOCUMENT_TITLE;
   sheet.getCell(rowIndex, 1).font = font({ bold: true, size: 18 });
   sheet.getCell(rowIndex, 1).alignment = { horizontal: 'center', vertical: 'middle' };
@@ -195,15 +205,18 @@ function createPriceListSheet(workbook: Workbook, dataset: CatalogExportDataset)
   rowIndex += 1;
 
   sheet.mergeCells(rowIndex, 1, rowIndex, 13);
-  sheet.getCell(rowIndex, 1).value = makeCatalogExportYearLabel(dataset.version.versionString);
+  sheet.getCell(rowIndex, 1).value = makeCatalogExportYearLabel(
+    catalogDocumentVersionString(dataset),
+  );
   sheet.getCell(rowIndex, 1).font = font({ bold: true, size: 18 });
   sheet.getCell(rowIndex, 1).alignment = { horizontal: 'center', vertical: 'middle' };
   sheet.getRow(rowIndex).height = TITLE_ROW_HEIGHT;
   rowIndex += 1;
 
   sheet.mergeCells(rowIndex, 1, rowIndex, 13);
-  sheet.getCell(rowIndex, 1).value =
-    `ฉบับบัญชีราคา ${dataset.version.versionString} | ${displayStatusThai(dataset)} | จำนวนรายการ ${dataset.counts.rowCount.toLocaleString('th-TH')} | ${dataset.canonicalDatasetHash}`;
+  sheet.getCell(rowIndex, 1).value = dataset.isDraftExport
+    ? `รหัสร่าง ${dataset.version.draftReference ?? '-'} | เลขฉบับเป้าหมาย ${dataset.version.targetVersionString} | ${displayStatusThai(dataset)} | จำนวนรายการ ${dataset.counts.rowCount.toLocaleString('th-TH')} | ${dataset.canonicalDatasetHash}`
+    : `ฉบับบัญชีราคา ${catalogDocumentVersionString(dataset)} | ${displayStatusThai(dataset)} | จำนวนรายการ ${dataset.counts.rowCount.toLocaleString('th-TH')} | ${dataset.canonicalDatasetHash}`;
   sheet.getCell(rowIndex, 1).font = font();
   sheet.getCell(rowIndex, 1).alignment = { horizontal: 'center', vertical: 'middle' };
   rowIndex += 1;
@@ -336,7 +349,12 @@ function createChangeSummarySheet(workbook: Workbook, dataset: CatalogExportData
 
   const totalCounts = totalActionCounts(dataset);
   const metadataRows: Array<[string, string]> = [
-    ['ฉบับบัญชีราคา', dataset.version.versionString],
+    ...(dataset.isDraftExport
+      ? [
+          ['รหัสร่าง', dataset.version.draftReference ?? '-'],
+          ['เลขฉบับเป้าหมาย', dataset.version.targetVersionString],
+        ] as Array<[string, string]>
+      : [['ฉบับบัญชีราคา', catalogDocumentVersionString(dataset)]] as Array<[string, string]>),
     ['ฉบับตั้งต้น', dataset.version.basedOnVersionString ?? '-'],
     ['เลขที่อ้างอิงการอนุมัติ', dataset.version.approvalReference ?? '-'],
     ['จำนวน เพิ่ม/แก้ไข/ยกเลิกใช้/ปรับรหัส', `${totalCounts.add}/${totalCounts.update}/${totalCounts.retire}/${totalCounts.recode}`],
@@ -561,12 +579,12 @@ function styleDataRow(sheet: Worksheet, rowIndex: number, columns: number) {
 
 function setFooter(sheet: Worksheet, dataset: CatalogExportDataset) {
   const statusOrDate = dataset.isDraftExport
-    ? 'Draft'
+    ? `${dataset.version.draftReference ?? 'ฉบับร่าง'} | ฉบับร่าง`
     : dataset.version.effectiveDate
       ? formatThaiDate(dataset.version.effectiveDate)
       : displayStatus(dataset);
   sheet.headerFooter.oddFooter =
-    `&L${CATALOG_EXPORT_DEPARTMENT_FOOTER}&CPage &P of &N&Rv${dataset.version.versionString} | ${statusOrDate}`;
+    `&L${CATALOG_EXPORT_DEPARTMENT_FOOTER}&CPage &P of &N&R${dataset.isDraftExport ? 'เป้าหมาย ' : ''}v${catalogDocumentVersionString(dataset)} | ${statusOrDate}`;
   sheet.headerFooter.evenFooter = sheet.headerFooter.oddFooter;
 }
 
@@ -663,6 +681,12 @@ function safeText(value: string): string {
 
 function nullableJsonText(value: string | null): string {
   return value === null ? 'null' : value;
+}
+
+function catalogDocumentVersionString(dataset: CatalogExportDataset): string {
+  return dataset.isDraftExport
+    ? dataset.version.targetVersionString
+    : dataset.version.officialVersionString ?? dataset.version.targetVersionString;
 }
 
 function displayStatus(dataset: CatalogExportDataset): string {

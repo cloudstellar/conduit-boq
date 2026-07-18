@@ -222,8 +222,22 @@ async function cleanup() {
     assert(createdVersions.every((version) =>
       version.status === 'abandoned'
       && version.is_default === false
-      && version.published_at === null),
+      && version.published_at === null
+      && version.version_string === null
+      && readDraftAttempt(
+        version.draft_reference,
+        version.target_version_string,
+      ) === version.draft_attempt),
     'Every P-38-created version must be abandoned, non-default, and unpublished')
+    assert(new Set(createdVersions.map((version) => version.draft_reference)).size === 2,
+      'P-39 requires a different immutable draft reference for each attempt')
+    assert(new Set(createdVersions.map((version) => version.target_version_string)).size === 1,
+      'P-39 requires the replacement draft to reuse the released target version')
+    const createdAttempts = createdVersions
+      .map((version) => version.draft_attempt)
+      .sort((left, right) => left - right)
+    assert(createdAttempts[1] === createdAttempts[0] + 1,
+      'P-39 requires consecutive target-scoped draft attempts')
   } catch (error) {
     preCleanupError = error
   } finally {
@@ -608,7 +622,7 @@ async function readVersion(service, versionId) {
   return readSingleRow(
     service,
     'price_list_versions',
-    'id,version_string,major,minor,patch,status,is_default,based_on_version_id,lock_version,placement_revision,item_count,dataset_hash,published_at,created_at',
+    'id,version_string,target_version_string,draft_attempt,draft_reference,major,minor,patch,status,is_default,based_on_version_id,lock_version,placement_revision,item_count,dataset_hash,published_at,created_at',
     (query) => query.eq('id', versionId),
   )
 }
@@ -616,7 +630,7 @@ async function readVersion(service, versionId) {
 async function readVersions(service) {
   const { data, error } = await service
     .from('price_list_versions')
-    .select('id,version_string,status,is_default,based_on_version_id,item_count,published_at,created_at')
+    .select('id,version_string,target_version_string,draft_attempt,draft_reference,status,is_default,based_on_version_id,item_count,published_at,created_at')
     .order('created_at')
     .order('id')
   if (error) throw error
@@ -890,4 +904,13 @@ function assertHeadPushed() {
 
 function assert(condition, message) {
   if (!condition) throw new Error(message)
+}
+
+function readDraftAttempt(reference, targetVersion) {
+  const prefix = `${targetVersion}-D`
+  if (typeof reference !== 'string' || !reference.startsWith(prefix)) return null
+  const attempt = reference.slice(prefix.length)
+  if (!/^\d{3,}$/.test(attempt)) return null
+  const value = Number(attempt)
+  return Number.isSafeInteger(value) && value > 0 ? value : null
 }

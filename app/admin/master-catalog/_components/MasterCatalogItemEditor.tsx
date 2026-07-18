@@ -138,7 +138,7 @@ export function MasterCatalogItemEditor({
       <div className="flex flex-wrap items-center justify-between gap-3">
         <Button variant="ghost" size="sm" asChild>
           <Link href={returnHref}>
-            <ArrowLeft />กลับไปเวอร์ชัน {item.versionString}
+            <ArrowLeft />กลับไปยัง {item.draftReference ?? `เป้าหมาย ${item.targetVersionString}`}
           </Link>
         </Button>
         <div className="flex gap-2">

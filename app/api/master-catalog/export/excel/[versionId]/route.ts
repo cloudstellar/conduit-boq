@@ -37,7 +37,9 @@ export async function GET(
       startedAt,
       requestId,
       versionId,
-      versionString: dataset.version.versionString,
+      officialVersionString: dataset.version.officialVersionString,
+      targetVersionString: dataset.version.targetVersionString,
+      draftReference: dataset.version.draftReference,
     });
 
     return new Response(body, {

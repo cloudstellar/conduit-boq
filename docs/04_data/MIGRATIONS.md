@@ -1,7 +1,7 @@
 # Migrations
 ## Conduit BOQ System
 
-**Last Updated:** 2026-07-15
+**Last Updated:** 2026-07-18
 **Status:** Canonical
 
 ---
@@ -38,7 +38,8 @@
 | `019_master_catalog_phase4_publish_pointer.sql` | Publish/restore, shared admin publish-readiness RPC, P-18 and structured-rollout boundary guards, P-19 inactive-row filing warning, catalog-only DB count/hash, runtime timeouts, and published immutability | **Draft — Local only, not applied to Production** |
 | `020_master_catalog_phase4_admin_workflow_hardening.sql` | WP-6.6 frozen first-rollout authority, resolve-only dictionaries/server allocator, exact read registers, readiness/provenance parity, correction path, schema hardening, P-22 working-draft lifecycle, P-23.1 reserved version sequence, P-24 annual-year range guard, and covering indexes for both frozen-authority foreign keys | **Owner-accepted Local-only migration in bootstrap source; SHA-256 `e07e0c4161077efba7bc4f6ebf95518d0cc1bc7e4628a43a128dd899bd1aef93`; G1R/G2 separate-apply evidence passed on exact checkout `721c2c2c4a234a4fd00e5686383be9af87ee15dd`; G3/WP-6.6 accepted on `78e96ab3ed9993707014c4aba1d285b7592b17a1`; owner-approved G4E combined clean bootstrap through `020` passed on exact execution checkout `15b707d443bec701f6b3a86aa7675ca1266604ba`; not Production-approved** |
 | `021_master_catalog_phase4_placement_governance.sql` | P-18/WP-7.5 new-identity placement revision/review and atomic order contract | **Owner-accepted Local-only migration in bootstrap source under P-35 on exact source checkpoint `01eba0d49f2e4b6e65f0d9dd287fd461ba9ea19a`; SHA-256 `e4de258756bbfbda0508e55d7b76ba2e907f644625b49bc29d4a4d7ac42fa714`; P-32 separate-apply evidence/P-33 technical acceptance/P-34 historical UX source-static/P-36 integrated technical evidence passed; first P-37 intended-admin UAT failed comprehension, while corrected technical/recovery evidence and the final owner keyboard/focus/presentation UAT later passed on pushed checkpoint `f36d896d672609653de6634e307dcc44bce6d519`; P-37 remains HOLD for the unresolved closure evidence in Note #34, including final owner UI submission and broader independent WP-8 UAT; DB contract unchanged; not Production-approved** |
-| `017+_master_catalog_phase4_*.sql` | Umbrella reference for the Local-only Phase 4 range; files exist and the current P-35 bootstrap source applies `017`-`021` after hotfix `016` | **Local-only range — P-36 clean-integrated `009`-`015`, hotfix `016`, and Phase 4 `017`-`021` execution passed on exact checkout `910cc3cc74660beecf18655d39cd0b0c085d1fc6`; P-37/P-12+ remain separate and every Production approval remains absent** |
+| `022_master_catalog_phase4_draft_identity_and_release_number.sql` | P-39R forward-only separation of immutable `{target}-D{nnn}` draft references from claimed/issued catalog versions; one open draft globally; audited stale/current abandonment; pointer/effect audit; hardened lifecycle/RLS/publication metadata | **P39R-S passed on corrected Local-only source SHA-256 `9fc8f951fa5b3f3d7de928cce877a265d9333fda46850dd7564b22cd424c41f3`; prior P39-S is historical; P39R-L/P39R-C/P39R-U pending; not applied to Local or Production** |
+| `017+_master_catalog_phase4_*.sql` | Umbrella reference for the Local-only Phase 4 range; the canonical bootstrap source now applies `017`-`022` after hotfix `016` | **Local-only range — P-36 clean-integrated execution through `021` and pre-P-39R P39-S remain historical evidence; corrected `022` passed P39R-S and still requires P39R-L/P39R-C/P39R-U before P-38 resumes; every Production approval remains absent** |
 
 ### Local Schema Baseline (`supabase/local/`)
 
@@ -193,11 +194,18 @@ P-38 completed evidence reconciliation and authorized only the bounded no-reset
 Local continuation in
 [Owner UAT Script #35](../plans/master-catalog/35-phase4-wp8-p37-evidence-reconciliation-and-owner-uat-script.md).
 [Preflight Note #36](../plans/master-catalog/36-phase4-wp8-p38-no-reset-owner-uat-preflight.md)
-records parser-aware E-01/E-02 inputs, a tracked fail-closed harness, and the
-passing read-only disabled Local baseline; mutating prepare and Owner Cards are
-still pending. The harness adds no migration and does not alter migration
-history.
-No migration or DB/RPC contract changed.
+records parser-aware E-01/E-02 inputs and a tracked fail-closed harness. The
+first Card A run was later stopped and safely cleaned after the owner identified
+that abandoned draft attempts could create unexplained gaps in official release
+numbers. P-39 supersedes the P-23.1 permanent all-status reservation rule for
+future execution while preserving its evidence as history. Forward migration
+`022` introduces immutable draft references, retains a draft's target in audit,
+and releases the unissued official tuple on abandonment. See
+[Correction Plan #37](../plans/master-catalog/37-phase4-p39-draft-identity-release-number-correction-plan.md).
+P-39R further replaces the per-base draft invariant with one open draft
+globally, permits audited abandonment of a stale draft, records restore impact
+and pointer transitions durably, and hardens RLS/lifecycle/publication metadata.
+P-38 remains paused until the P-39R gates pass.
 Applied hotfix `016` must not be edited.
 This is not a new Production hotfix and must not be applied to Production
 without the normal Phase 4 P-12+ approvals.
@@ -218,7 +226,7 @@ Supabase stack and receiving explicit approval, use
 Production baseline, restores scrubbed snapshots, applies root migrations
 `009` and `010`, applies all four `010a` concurrent indexes individually, then
 applies `011`, Factor F `012` through `015`, hotfix `016`, the draft
-local-only Phase 4 scripts `017` through `021`, and runs the bootstrap smoke
+local-only Phase 4 scripts `017` through `022`, and runs the bootstrap smoke
 tests. Source inclusion is not clean-execution evidence: record the exact
 integration commit and receive a separate owner approval before running this
 destructive command.

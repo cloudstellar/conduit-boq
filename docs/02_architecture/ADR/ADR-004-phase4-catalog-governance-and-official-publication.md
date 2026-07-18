@@ -32,8 +32,9 @@ selection, dictionary/code authority, import diff/evidence, publication
 provenance/readiness, correction paths, schema hardening, and operator UX. This
 is a planning correction, not Local reset or Production authorization.
 
-**P-22 operator-workflow correction recorded:** 2026-07-12 — owner review of
-the implemented Local flow accepts one mutable current-base working draft,
+**Historical P-22 operator-workflow correction recorded:** 2026-07-12 — owner
+review of the then-implemented Local flow accepted one mutable current-base
+working draft,
 audited abandon/read-only history, an item-first workspace, and an authoritative
 final draft-versus-base snapshot comparison before publication. Review remains
 inside the existing one-authorized-publisher model and is bound to the expected
@@ -41,6 +42,21 @@ draft lock; it is not a second-person approval engine. See
 [Correction Plan #31](../../plans/master-catalog/31-phase4-wp66-operator-workflow-correction-plan.md).
 This authorizes docs and Local-only implementation planning, not a Local reset,
 P-18/`021`, P-19, WP-7, Factor F/hotfix expansion, or Production.
+
+**P-39R draft-identity/release-number correction recorded:** 2026-07-18 — a
+never-published work attempt and an official catalog release use separate
+identifiers. Each draft has an immutable internal reference and claims a target
+while mutable. Publication issues the target; audited abandonment keeps the
+reference, target, snapshot, and history but releases the unissued official
+tuple. Published/archived versions remain permanent. See
+[Correction Plan #37](../../plans/master-catalog/37-phase4-p39-draft-identity-release-number-correction-plan.md).
+P-39R additionally permits at most one open draft globally, allows audited
+abandonment of a stale draft while all other stale mutations remain denied,
+records pointer before/after plus restore impact on the open draft, and narrows
+catalog reads to active staff/published history and active admins/drafts. It
+supersedes conflicting P-22/P-23.1 execution wording while retaining their
+point-in-time evidence. This Local-only correction does not authorize
+Production.
 
 **P-24 pre-G1R hardening recorded:** 2026-07-13 — before the first amended
 clean rebuild, the owner approved a bounded business/UX guard over the existing
@@ -149,23 +165,23 @@ publish, and pointer restore use the same controls:
 
 There is no unaudited manual-edit backdoor.
 
-For the V1 operator model, there is at most one mutable working draft for each
-base version. Pointer changes may leave a stale draft for read-only audit, and
-an admin may explicitly abandon a never-published draft through an audited
-function before creating a replacement from the same base. Draft rows and
-history are never deleted to make room for another attempt.
+For the V1 operator model, there is at most one mutable working draft globally.
+Pointer changes may leave that draft stale for read-only audit. An active admin
+may explicitly abandon a never-published current or stale draft through the
+audited function before creating a replacement from the current base. Draft
+rows and history are never deleted to make room for another attempt.
 
 Draft creation begins with explicit ADR-003 business intent (`annual`,
 `revision`, or `patch`), not editable raw version segments or an assumed
-revision. The UI plans from the complete version registry across every status;
-all issued draft numbers remain permanently reserved. The guarded database path
-rechecks that the candidate is the next number in the selected transition lane
-and rejects a stale sequence. If an annual `{year}.0.0` attempt was abandoned,
-the next annual attempt for that same owner-designated year uses the next
-revision with patch `0`; the cancelled number is not reused and the effective
-year is not falsified. An annual year must be within base year +1 through +10;
-the client hint is convenience only and both the server action and database
-function fail closed when the value is outside that approved horizon.
+revision. The UI plans from the complete issued/currently-claimed registry and
+shows the immutable draft reference separately from its target. The guarded
+database path rechecks that the target is next in the selected transition lane
+and rejects a stale sequence. If an annual `{year}.0.0` attempt is abandoned,
+its replacement may claim `{year}.0.0` under a new draft reference because no
+official version was issued. Published, archived, and currently claimed tuples
+cannot be reused. An annual year must be within base year +1 through +10; the
+client hint is convenience only and both the server action and database function
+fail closed when the value is outside that approved horizon.
 
 ### 6. Import trust boundary
 
@@ -186,15 +202,17 @@ Publication is one short database transaction that:
 3. verifies request ID, expected lock version, and draft status;
 4. rejects a stale draft when `based_on_version_id` differs from the current
    singleton pointer;
-5. validates counts, identity, codes, categories, code groups, costs, and
-   approval evidence;
+5. validates counts, identity, codes, categories, code groups, costs, complete
+   publication metadata, and approval evidence that cites the immutable draft
+   reference/target without pre-issuing the number;
 6. rejects a lock version that differs from the exact state reviewed by the
    operator;
 7. computes canonical dataset hash and item count from database rows;
 8. marks the version published/active;
 9. moves the singleton pointer;
 10. synchronizes legacy `is_default` flags while that column remains;
-11. appends the publish change set.
+11. appends the publish change set with durable pointer-before and
+    pointer-after identifiers.
 
 Phase 4 Core does not rebase stale drafts. The admin creates a new draft from
 Current and reapplies still-approved changes through new audited change sets.
@@ -207,10 +225,12 @@ returned to its original value. Any mutation after review increments the draft
 lock and requires review again before publish.
 
 Pointer restore remains a separate recovery operation. Before submit, the UI
-shows the current and target versions, the recorded reason, and the fact that
-existing BOQs retain their saved catalog version while new BOQs use the restored
-pointer. The database remains authoritative and auditable after that human
-confirmation.
+shows the current and target versions, the recorded reason, the effect on the
+one open draft (`becomes_current`, `becomes_stale`, `remains_stale`, or `none`),
+and the fact that existing BOQs retain their saved catalog version while new
+BOQs use the restored pointer.
+The database records pointer-before, pointer-after, affected draft, and effect
+so the audit remains authoritative after that human confirmation.
 
 External calls, workbook parsing, PDF generation, and Excel generation do not
 run inside this transaction.
@@ -223,6 +243,9 @@ behind the server identity/profile checks required for high-impact catalog
 operations.
 All new `public` tables enable RLS and receive explicit least-privilege grants;
 Phase 4 does not rely on Supabase's historical automatic Data API grants.
+Active staff may read only published/archived catalog versions; active admins
+may additionally read drafts and audit records. Obsolete legacy direct-DML
+policies are removed rather than left dormant beside the RPC boundary.
 
 Catalog mutation functions are kept in an unexposed private schema. Any public
 wrapper has a fixed empty `search_path`, fully qualified objects, internal

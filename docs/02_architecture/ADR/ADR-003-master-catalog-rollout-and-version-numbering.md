@@ -1,7 +1,8 @@
 # ADR-003: Master Catalog Rollout Start and Version Numbering
 
-**Status:** Accepted; Production baseline rollout implemented; version-intent,
-reserved-number, and bounded annual-year amendments accepted 2026-07-13
+**Status:** Accepted; Production baseline rollout implemented; version-intent
+and bounded annual-year amendments accepted 2026-07-13; P-39 draft-identity
+and P-39R release-number/lifecycle correction accepted 2026-07-18
 **Date:** 2026-06-05
 **Decision Makers:** Owner, Development Team
 **Implementation status:** Production `2568.0.0`, singleton pointer, Phase 2
@@ -95,7 +96,7 @@ instead of changing the primary sortable version key.
 | Documentation-only change, application-only change, or rollout procedure change | No catalog version bump | Catalog data did not change |
 | Factor F reference change | No `price_list` catalog version bump | Factor F is a separate calculation reference governed by ADR-005; it requires its own version, change request, approval evidence, and full-table verification |
 
-### Version planning and reserved numbers
+### Version planning, draft identity, and issued numbers
 
 The application must not infer `revision` merely because it is the most common
 next number. Before a draft is created, the active admin records one business
@@ -111,27 +112,47 @@ after the current base through 10 years after that base, inclusive. For example,
 a `2568.x.x` base permits `2569` through `2578`. This catches accidental or
 unreviewed far-future values while retaining a practical planning horizon; a
 need beyond that range requires an explicit ADR/business-rule amendment rather
-than a UI bypass. The system derives the other segments from the complete version registry. Every created version number
-is permanently reserved across `draft`, `active`, `archived`, and `abandoned`
-states. A number is never deleted or reused to hide a cancelled attempt.
+than a UI bypass. The system derives the other segments from the complete
+registry of **issued or currently claimed** versions. Creating a draft does not
+itself issue an official catalog number. Each draft receives a permanent
+internal reference, such as `2568.1.0-D001`, and claims a target version while
+it is mutable.
 
-For the selected lane, the server chooses the next number after every reserved
-number, not merely after the current pointer:
+The draft reference combines the immutable target with a target-scoped attempt
+ordinal. For example, abandoning `2568.1.0-D001` permits a replacement
+`2568.1.0-D002`. The `Dnnn` suffix is an audit identity, never part of the
+official release number. Business logic uses separate target/attempt columns;
+it must not parse display text to make lifecycle or numbering decisions.
+
+Publishing atomically issues that target as the official catalog version.
+Abandoning a never-published draft preserves its reference, target, snapshot,
+and audit history but releases the unissued target for a replacement draft.
+Published and archived numbers remain permanently reserved and are never
+reused.
+
+Phase 4 V1 permits at most one open draft globally. A pointer restore can make
+that draft stale; the stale draft may be inspected and audited-abandoned, but it
+cannot be imported into, edited, placed, readied, or published. External
+approval evidence cites the immutable draft reference and target, but the
+official number is not issued until the publish transaction succeeds.
+
+For the selected lane, the server chooses the next number after every issued or
+currently claimed number, not merely after the current pointer:
 
 - annual: selected effective year plus the next unused revision and patch `0`;
 - revision: current effective year plus the next revision and patch `0`; and
 - patch: current effective year/revision plus the next patch.
 
-Normally a new annual catalog is `{year}.0.0`. If `{year}.0.0` or another lower
-revision was already reserved by an abandoned or historical attempt, the next
-annual candidate may be `{year}.1.0`, `{year}.2.0`, and so on. Relative to a
-base from an earlier effective year this remains an `annual` transition; the
-nonzero middle segment records the reserved-number history and does not mean the
-system guessed a mid-year policy change. A year-changing candidate with a
-nonzero patch remains invalid.
+Normally a new annual catalog is `{year}.0.0`. An abandoned, never-published
+attempt does not force `{year}.1.0`; its replacement may claim `{year}.0.0`
+again under a new draft reference. A later revision is required only when a
+lower number was published, archived, or is claimed by a current mutable draft.
+A year-changing candidate with a nonzero patch remains invalid.
 
-The UI displays the allowed annual-year range, proposed number, and any earlier
-reserved numbers before confirmation. The application and database both
+The UI displays the allowed annual-year range, target number, and any earlier
+issued or currently claimed numbers before confirmation. It also explains
+which identifier is the permanent draft reference and when the target becomes
+official. The application and database both
 recheck the annual-year range; the database also rechecks the current base,
 transition shape, and next reserved sequence atomically enough to reject stale
 or tampered plans.
@@ -263,8 +284,8 @@ production release.
   revision for newly approved price policy.
 - The team must maintain an explicit import/audit trail for item-code
   renumbering or replacement.
-- Cancelled draft numbers remain visible as reserved gaps; the version register
-  and operator procedure must explain why they were not reused.
+- Draft and official identifiers require explicit labels in admin screens and
+  review artifacts; showing only the target would recreate the old ambiguity.
 - If structured codes become query dimensions, they may require future metadata
   columns instead of parsing `item_code` strings in application code.
 - The effective year is a business decision, so it must be recorded in the
@@ -285,9 +306,9 @@ production release.
    segment dictionary and import validation.
 6. Select and record annual/revision/patch business intent before creating a
    draft; do not ask an admin to type raw version segments as the primary flow.
-7. Treat all created version numbers as reserved. If a lower annual identifier
-   was abandoned, use the next revision in the same owner-designated year rather
-   than reusing the old number or changing the effective year.
+7. Give every draft a permanent internal reference. Treat its target as claimed
+   while mutable, issue it only on publication, and release it on audited
+   abandonment. Never reuse a published or archived official number.
 8. Do not include `factor_reference` in `price_list_versions`. Treat Factor F as
    separate reference data with its own ADR-005 versioning/change process.
 9. Do not promote a new default version without an audit log entry and owner
@@ -305,5 +326,6 @@ production release.
 - [Master Catalog implementation plan](../../plans/master-catalog/02-implementation.md)
 - [Master Catalog change request](../../plans/master-catalog/04-change-request.md)
 - [Master Catalog verification report](../../plans/master-catalog/05-verification-report.md)
+- [P-39 draft identity and release-number correction](../../plans/master-catalog/37-phase4-p39-draft-identity-release-number-correction-plan.md)
 - [Semantic Versioning](https://semver.org/)
 - [Calendar Versioning](https://calver.org/)

@@ -55,8 +55,8 @@ export async function createCatalogDraftAction(
     return createCatalogMutationError('ระบบบัญชีราคาสำหรับผู้ดูแลยังไม่เปิดใช้งาน', 'FORBIDDEN');
   }
 
-  const name = readRequiredActionText(formData, 'name', 'ชื่อฉบับร่าง');
-  const reason = readRequiredActionText(formData, 'reason', 'เหตุผล');
+  const name = readRequiredActionText(formData, 'name', 'ชื่อฉบับร่าง', 200);
+  const reason = readRequiredActionText(formData, 'reason', 'เหตุผล', 500);
   const baseVersionId = readRequiredActionText(formData, 'baseVersionId', 'เวอร์ชันฐาน');
   const versionIntent = readCatalogVersionIntent(formData);
   const expectedVersionString = readRequiredActionText(
@@ -137,14 +137,25 @@ export async function createCatalogDraftAction(
 
   const result = mapCatalogRpcActionResponse(
     data as CatalogRpcActionResponse,
-    `สร้างฉบับร่าง ${expectedVersionString} แล้ว`,
+    `สร้างฉบับร่างสำหรับเป้าหมาย ${expectedVersionString} แล้ว`,
   );
+  if (result.status === 'success' && result.draftReference) {
+    if (result.versionStatus === 'abandoned') {
+      result.message = `คำขอเดิมอ้างถึง ${result.draftReference} ซึ่งถูกยกเลิกและเก็บเป็นประวัติแล้ว`;
+    } else if (result.versionStatus === 'active' || result.versionStatus === 'archived') {
+      result.message = `คำขอเดิมอ้างถึง ${result.draftReference} ซึ่งเผยแพร่เป็นเวอร์ชัน ${result.officialVersionString ?? result.targetVersionString ?? expectedVersionString} แล้ว`;
+    } else {
+      result.message = `สร้างและเปิด ${result.draftReference} สำหรับเป้าหมาย ${result.targetVersionString ?? expectedVersionString} แล้ว`;
+    }
+  }
   logMasterCatalogOperation({
     operation: 'createCatalogDraft',
     outcome: result.status === 'success' ? 'success' : 'rejected',
     startedAt,
     requestId: result.requestId ?? requestId,
     versionId: result.versionId ?? baseVersionId,
+    targetVersionString: result.targetVersionString ?? expectedVersionString,
+    draftReference: result.draftReference,
     code: result.code,
   });
 
@@ -195,6 +206,8 @@ export async function abandonCatalogDraftAction(
     startedAt,
     requestId: result.requestId ?? requestId,
     versionId: result.versionId ?? args.p_version_id,
+    targetVersionString: result.targetVersionString,
+    draftReference: result.draftReference,
     code: result.code,
   });
 
@@ -497,20 +510,25 @@ export async function publishCatalogVersionAction(
 
   const { data: draftVersion, error: draftVersionError } = await supabase
     .from('price_list_versions')
-    .select('version_string')
+    .select('target_version_string,draft_reference')
     .eq('id', args.p_version_id)
     .maybeSingle();
 
-  if (draftVersionError || !draftVersion?.version_string) {
+  if (
+    draftVersionError
+    || !draftVersion
+    || !draftVersion.target_version_string
+    || !draftVersion.draft_reference
+  ) {
     return createCatalogMutationError(
-      'อ่านเลขเวอร์ชันฉบับร่างไม่สำเร็จ กรุณาโหลดข้อมูลล่าสุดแล้วลองอีกครั้ง',
+      'อ่านรหัสร่างและเลขเป้าหมายไม่สำเร็จ กรุณาโหลดข้อมูลล่าสุดแล้วลองอีกครั้ง',
       'DRAFT_NOT_FOUND',
     );
   }
 
   const confirmationError = validateCatalogPublishVersionConfirmation(
     confirmedVersionString,
-    String(draftVersion.version_string),
+    String(draftVersion.target_version_string),
   );
   if (confirmationError) {
     return confirmationError;
@@ -536,6 +554,10 @@ export async function publishCatalogVersionAction(
     startedAt,
     requestId: result.requestId ?? requestId,
     versionId: result.versionId ?? args.p_version_id,
+    officialVersionString: result.officialVersionString,
+    targetVersionString:
+      result.targetVersionString ?? String(draftVersion.target_version_string),
+    draftReference: result.draftReference ?? String(draftVersion.draft_reference),
     code: result.code,
   });
 
@@ -580,12 +602,19 @@ export async function restoreCatalogPointerAction(
     data as CatalogRpcActionResponse,
     'คืนเวอร์ชันบัญชีราคาที่ใช้งานแล้ว',
   );
+  if (result.status === 'success') {
+    result.message = restoreSuccessMessage(result);
+  }
   logMasterCatalogOperation({
     operation: 'restoreCatalogPointer',
     outcome: result.status === 'success' ? 'success' : 'rejected',
     startedAt,
     requestId: result.requestId ?? requestId,
     versionId: result.versionId ?? args.p_target_version_id,
+    officialVersionString: result.officialVersionString,
+    targetVersionString: result.targetVersionString,
+    draftReference: result.affectedDraftReference,
+    draftEffect: result.draftEffect,
     code: result.code,
   });
 
@@ -600,6 +629,7 @@ function readRequiredActionText(
   formData: FormData,
   key: string,
   label: string,
+  maxLength?: number,
 ): string | CatalogMutationState {
   const value = formData.get(key);
   const text = typeof value === 'string' ? value.trim().normalize('NFC') : '';
@@ -608,7 +638,27 @@ function readRequiredActionText(
     return createCatalogMutationError(`${label} ต้องไม่ว่าง`);
   }
 
+  if (maxLength !== undefined && text.length > maxLength) {
+    return createCatalogMutationError(`${label} ต้องไม่เกิน ${maxLength} ตัวอักษร`);
+  }
+
   return text;
+}
+
+function restoreSuccessMessage(result: CatalogMutationState): string {
+  const version = result.officialVersionString ?? result.targetVersionString ?? 'ที่เลือก';
+  const draft = result.affectedDraftReference ?? 'ฉบับร่างที่เปิดอยู่';
+
+  if (result.draftEffect === 'becomes_current') {
+    return `คืนเวอร์ชัน ${version} แล้ว และ ${draft} กลับมาแก้ไขต่อได้`;
+  }
+  if (result.draftEffect === 'becomes_stale') {
+    return `คืนเวอร์ชัน ${version} แล้ว และ ${draft} กลายเป็นร่างฐานเก่า`;
+  }
+  if (result.draftEffect === 'remains_stale') {
+    return `คืนเวอร์ชัน ${version} แล้ว โดย ${draft} ยังคงเป็นร่างฐานเก่า`;
+  }
+  return `คืนเวอร์ชัน ${version} เป็นเวอร์ชันใช้งานแล้ว`;
 }
 
 function readOperationRequestId(formData: FormData): string | CatalogMutationState {

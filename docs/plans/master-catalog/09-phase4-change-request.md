@@ -6,8 +6,21 @@ migration, deploy, feature enablement, or publication authorized
 **Change type:** Additive database governance, admin UI, import/manual change,
 audit history, and official Excel/PDF export
 **Production project:** `otlssvssvgkohqwuuiir`
-**Proposed first structured-code version:** `2568.1.0` when still unreserved;
-the guarded planner is authoritative
+**Proposed first structured-code target:** `2568.1.0` when not issued or
+currently claimed; the guarded planner is authoritative and publication issues
+the official version
+
+**P-39R amendment recorded:** 2026-07-18 — the first P-38 Card A run was stopped
+and safely cleaned after the owner identified that permanent reservation of
+abandoned draft numbers could create unexplained official-release gaps. Every
+draft now requires an immutable internal reference; its target is claimed while
+mutable, issued on publication, and released on audited abandonment. Forward
+migration `022` preserves `020`/`021` and adds one open draft globally, audited
+stale abandonment, restore pointer/draft-effect audit, terminal lifecycle and
+publication completeness, and least-privilege role/state reads; see
+[Correction Plan #37](./37-phase4-p39-draft-identity-release-number-correction-plan.md).
+P-23.1 remains historical. Incremental Local apply, destructive bootstrap,
+Production, Factor F/hotfix expansion, and P-19 remain separately gated.
 
 **Owner decision recorded:** 2026-07-04 — approved according to the
 recommendation for implementation/local rehearsal only. The gate structure,
@@ -52,10 +65,10 @@ clarity. Migration `020` is reserved for that fix-forward work; proposed P-18
 placement moves to `021`. This docs alignment does not authorize either
 migration, a Local reset, or Production action.
 
-**P-22 operator-workflow amendment recorded:** 2026-07-12 — intended-admin
+**Historical P-22 operator-workflow amendment recorded:** 2026-07-12 — intended-admin
 review placed WP-6.6 closeout on Hold and accepted
 [Correction Plan #31](./31-phase4-wp66-operator-workflow-correction-plan.md).
-The bounded Local correction enforces one mutable draft per base, adds audited
+The then-bounded Local correction enforced one mutable draft per base, added audited
 abandon/read-only retained history, makes the complete item workspace primary,
 and requires an authoritative lock-bound final snapshot review before publish.
 Candidate `020` is amended before freeze; prior `3bfc74e` evidence is historical
@@ -73,7 +86,8 @@ working-tree static/browser checkpoint passed on 2026-07-13; at that checkpoint
 the exact G2 candidate was still unnamed. The later exact candidate and G2
 result are recorded below. Production remains separately gated.
 
-**P-23.1 version-intent/workspace amendment recorded:** 2026-07-13 — owner
+**P-23.1 version-intent/workspace amendment recorded (historical numbering
+rule; superseded by P-39R):** 2026-07-13 — owner
 approved replacing raw segment entry and assumed revision with explicit
 annual/revision/patch business intent, complete-registry planning, permanent
 number reservation, a DB-enforced next sequence, direct post-create workspace
@@ -196,8 +210,8 @@ The owner is asked to confirm:
 1. Production `2568.0.0` remains authoritative for current names, units, and
    all price fields.
 2. The first structured-code revision begins as an exact 710-row clone and
-   initially changes only approved codes/classification. Its expected number is
-   `2568.1.0` only when that identifier remains unreserved.
+   initially changes only approved codes/classification. Its expected target is
+   `2568.1.0` only when that identifier is not issued or currently claimed.
 3. The published database version is the official source of truth.
 4. System-generated stamped Excel/PDF may be used as official reference copies.
 5. Source/approval files remain in the physical filing system.
@@ -267,11 +281,12 @@ Production has not started.
 After completion, an active admin can:
 
 - view all catalog versions and the current pointer;
-- open the one current-base working draft and see stale/abandoned drafts
+- open the one global working draft and see stale/abandoned drafts
   read-only;
 - clone a published version into a draft;
-- choose annual/revision/patch intent, review the all-status reserved candidate,
-  and open the exact created workspace without typing raw number segments;
+- choose annual/revision/patch intent, review the issued/currently-claimed
+  registry and proposed target, and open the exact draft-reference workspace
+  without typing raw number segments;
 - abandon a never-published draft with a reason while retaining its rows/history;
 - add, edit, retire, or recode an item without Excel;
 - after P-18/WP-7.5 acceptance, add several new identities to one draft and
@@ -301,7 +316,7 @@ After completion, an active admin can:
 - Versioned display categories and `AAA/TTT` code groups
 - Import metadata, change sets, and complete old/new snapshots
 - Draft-only manual/import mutation
-- One mutable draft per base plus audited immutable abandon history
+- One mutable draft globally plus audited current/stale abandon history
 - Published-row and published-metadata immutability
 - Idempotent high-impact writes and stale-draft protection
 - Transactional pointer change plus legacy `is_default` synchronization
@@ -314,8 +329,8 @@ After completion, an active admin can:
 - NT CI-compliant Master Catalog admin screens
 - Version list, version detail, diff, item history, manual edit, import, publish,
   exports, and pointer restore
-- Full-catalog search/filter, exact item editor, one current-base workspace, and
-  stale/abandoned read-only recovery
+- Full-catalog search/filter, exact item editor, one global workspace, and
+  stale inspection/audited-abandon plus immutable abandoned-history recovery
 - Identity-based final database snapshot comparison bound to the exact publish
   lock version
 - Resolve-only Production-derived versioned categories/P-06 code-group controls
@@ -469,13 +484,13 @@ scope.
 | Hotfix behavior regresses despite static tests | Medium | High | Permanent live DB/RPC suffix/authority/rollback suite | Any approved suffix or authoritative catalog field behaves incorrectly |
 | Admin learns a business blocker only at publish | Medium | Medium | Early preview/readiness warning plus final DB guard and UAT | UAT cannot identify/remediate placement or retired-row hold before publish |
 | Add/Supplement is visible but cannot complete | High if enabled before P-18 | Medium | Implement WP-7.5 before WP-8/P-14, or hide/disable both controls while retaining the DB guard | Intended admin can create a new identity but has no supported path to publication |
-| Admin can see only a sample or cannot identify the exact draft/item/history | High in current UI | High | WP-6.6 full browse/item history, one current-base workspace, and stale/abandoned read-only history | Intended admin needs developer/SQL help or mutates the wrong target |
+| Admin can see only a sample or cannot identify the exact draft/item/history | High in current UI | High | WP-6.6 full browse/item history, one global workspace, stale-only audited abandonment, and abandoned read-only history | Intended admin needs developer/SQL help or mutates the wrong target |
 | Free-form taxonomy or item code bypasses P-06 authority | Medium | High | Resolve-only dictionary IDs and locked next-never-issued allocator | Unknown group/category is created or caller-selected suffix is accepted as authority |
 | Import preview is not the final DB diff or cannot carry new-row price evidence | High for Supplement | High | Server-recomputed full diff/omission set and supported bounded authority reference | Admin cannot explain exact effects or an approved new row cannot complete safely |
 | Draft reconciliation evidence becomes runtime business authority | Medium | High | Freeze approved first-rollout mapping in reviewed seed/database authority; future imports use exact selected draft and approved dictionaries | Application reads `docs/*draft.csv` to decide a live mutation |
 | Publication actor/archive/readiness evidence is misleading or incomplete | Medium | High | Server-derived actor snapshot, version archive reference, and shared complete readiness helper | Caller-authored actor is stored, manual-only filing reference is absent, or UI shows false green |
 | Mistaken retire/add has no explicit correction path | Medium | Medium | Audited reactivate and base-absent withdraw while retaining identity/code/audit | Admin must discard/rebuild a draft or publish an unintended inactive row |
-| Concurrent or duplicate current-base drafts split release intent, or starting over destroys lineage | Medium | High | Partial unique draft-per-base invariant plus audited idempotent abandon; no draft/audit deletion | Two mutable drafts exist for one base or an abandoned attempt can mutate/publish |
+| Concurrent drafts from the same or different bases split release intent, or starting over destroys lineage | Medium | High | Global partial unique draft invariant plus audited idempotent current/stale abandon; no draft/audit deletion | More than one mutable draft exists globally or an abandoned attempt can mutate/publish |
 | Admin reaches publish without seeing cumulative manual/import effects, or publishes after the reviewed state changed | Medium | Critical | Complete identity-based snapshot diff before publish and exact reviewed `lock_version`; mutation forces rereview | Diff is incomplete/unstable or stale reviewed lock can publish |
 | Admin accidentally confirms a high-impact item or publication action | Medium without a separate intent barrier | High | Recode/Retire exact summary dialogs; Publish exact current/target/lock/count/BOQ summary plus DB-read typed target validation before RPC | One-click Recode/Retire/Publish crosses the boundary, mismatch reaches RPC, or cancel creates an effect |
 | UI-only reorder corrupts official order/audit | Medium without DB contract | High | Draft-only placement RPC, placement revision/review, unique contiguous order, base relative-order invariant, one transaction | Direct `display_order` write, duplicate/gapped order, inherited-row move, or missing review succeeds |

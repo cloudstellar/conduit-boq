@@ -33,6 +33,17 @@ acceptance, WP-8, and Production remain separate gates.
 
 **Production touched:** No
 
+**P-39R historical-boundary note:** The one-working-draft, audited-abandon,
+item-first, and exact-lock final-review decisions remain current, but P-39R
+changes the invariant from one draft per base to one open draft globally and
+permits audited abandonment when that draft is stale. The P-23.1
+rule that an abandoned attempt permanently consumes its target is superseded by
+[Correction Plan #37](./37-phase4-p39-draft-identity-release-number-correction-plan.md):
+each attempt keeps a permanent draft reference and audit snapshot, while an
+unissued target is released for a replacement. Forward `022` preserves `020`.
+Sections below retain the P-22 point-in-time contract and are not current
+execution authority where they conflict with P-39R.
+
 ## 1. Decision and purpose
 
 Owner review of the Local admin workflow found two reproducible comprehension
@@ -475,7 +486,11 @@ This checkpoint makes P-23 ready for owner review and commit. It does not name
 the exact G2 executable candidate, approve a destructive Local rebuild, close
 G3, add `020` to bootstrap, or authorize WP-7/Production work.
 
-## 14. P-23.1 version-intent and item-first correction
+## 14. Historical P-23.1 version-intent and item-first correction
+
+This section records the accepted 2026-07-13 design and evidence. Its permanent
+reservation rule is superseded for future execution by P-39R; the explicit
+business-intent and item-first portions remain current.
 
 Owner review on 2026-07-13 found that the create form could not know whether a
 change should be annual, revision, or patch, because the UI always suggested a

@@ -31,13 +31,20 @@ export function getNonCurrentPdfNotice(
 
 export function buildFieldFacingPdfStamp(input: {
   versionString: string;
+  draftReference?: string | null;
+  isDraft?: boolean;
   statusText: string;
   effectiveDate: string;
   itemCount: number;
   canonicalDatasetHash: string;
 }): FieldFacingPdfStampRow[] {
   return [
-    { label: 'ฉบับบัญชีราคา', value: input.versionString },
+    ...(input.isDraft
+      ? [
+          { label: 'รหัสร่าง', value: input.draftReference ?? '-' },
+          { label: 'เลขฉบับเป้าหมาย', value: input.versionString },
+        ]
+      : [{ label: 'ฉบับบัญชีราคา', value: input.versionString }]),
     { label: 'สถานะ', value: input.statusText },
     { label: 'วันที่มีผล', value: input.effectiveDate },
     { label: 'จำนวนรายการ', value: input.itemCount.toLocaleString('th-TH') },

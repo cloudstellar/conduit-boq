@@ -6,8 +6,9 @@ migration approval remain separate gates
 
 **Prepared:** 2026-06-22
 
-**Last updated:** 2026-07-15 to record the WP-6.6 capability/authority hardening
-from [Audit #29](./29-phase4-owner-dev-completeness-audit.md), the P-22
+**Last updated:** 2026-07-18 to record the P-39 draft-identity/release-number
+correction after the WP-6.6 capability/authority hardening from
+[Audit #29](./29-phase4-owner-dev-completeness-audit.md), the P-22
 [Operator Workflow Correction](./31-phase4-wp66-operator-workflow-correction-plan.md),
 and the accepted P-18/WP-7.5 placement extension. Existing migrations remain
 append-only. Candidate `020` was amended under P-22
@@ -52,6 +53,19 @@ submit the final batch through the UI, and broader independent WP-8 evidence
 remains open. See [P-37 UAT/UX Note](./33-phase4-wp8-p37-uat-ux-correction-note.md)
 and [Closure Matrix #34](./34-phase4-wp8-p37-closure-matrix.md). These evidence
 gaps do not change the accepted database contract.
+
+**P-39R authority amendment:** migration `022` is the forward-only
+owner-approved Local correction. It gives each draft an immutable internal
+reference, stores an immutable target tuple, claims that tuple while the draft
+is mutable, issues it on publication, and releases it on audited abandonment.
+It enforces one open draft globally; permits only audited abandonment when a
+draft is stale; preserves backfilled timestamps; makes terminal rows immutable
+even on no-op updates; requires complete publication metadata; records durable
+pointer-before/pointer-after and restore draft effect; and removes obsolete
+direct-DML policies while retaining least-privilege role/state reads. P-22's
+per-base invariant and P-23.1 all-status permanent reservation are historical
+and must not govern future execution. See
+[Correction Plan #37](./37-phase4-p39-draft-identity-release-number-correction-plan.md).
 
 **Owner decision recorded:** 2026-07-04 — approved according to the
 recommendation as the technical backbone for Phase 4A and every Phase 4 write
@@ -239,27 +253,39 @@ Add:
 | `dataset_hash` | `text null` | `sha256:` plus 64 lowercase hex characters |
 | `item_count` | `integer null` | Positive count computed by publish function |
 | `lock_version` | `integer not null default 0` | Optimistic concurrency token; nonnegative |
+| `target_major/minor/patch` | `integer not null` | Immutable publication target retained for every draft attempt and published version |
+| `target_version_string` | generated `text` | Display/audit form of the immutable target tuple |
+| `draft_attempt` | `integer null` | Positive target-scoped attempt ordinal; required and immutable for `draft`/`abandoned`; retained after publication |
+| `draft_reference` | generated `text` | `{target_version_string}-D{attempt padded to at least 3 digits without truncation}`; retained after publication; the pre-Phase-4 baseline may be null |
 
 Rules:
 
 - Existing version-number uniqueness remains `UNIQUE (major, minor, patch)`.
+  Official/claimed segments are nullable only after abandonment; target
+  segments remain non-null.
+- `draft_attempt` is allocated under a target-scoped transaction advisory lock
+  from persisted attempts. The generated `draft_reference` is a unique audit
+  identity such as `2568.1.0-D001`; no lifecycle rule parses this display text.
 - Reusable draft/publish functions accept and validate ADR-003 CalVer-first
   annual/revision/patch versions. `2568.1.0` is an exact rehearsal candidate,
   not a hardcoded function constraint.
 - The create UI records explicit annual/revision/patch business intent and the
-  annual owner-designated effective year. It plans from a complete all-status
-  registry; raw version segments are not the primary operator input.
+  annual owner-designated effective year. It plans from a complete registry of
+  issued or currently claimed tuples; raw version segments are not the primary
+  operator input.
 - An annual effective year must be greater than the base year and no more than
   10 years after it. UI `min`/`max` is guidance; the Server Action and private
   transition helper enforce the same rule, with the stable safe code
   `VERSION_EFFECTIVE_YEAR_OUT_OF_RANGE` for an out-of-range guarded create.
-- Every created tuple remains reserved under the existing
-  `UNIQUE (major, minor, patch)` constraint. The guarded create path requires the
-  next tuple in the selected transition lane and returns
-  `VERSION_SEQUENCE_STALE` when another operation reserved the reviewed number.
+- A mutable draft claims its target under `UNIQUE (major, minor, patch)`. The
+  guarded create path requires the next issued-or-claimed tuple in the selected
+  transition lane and returns `VERSION_SEQUENCE_STALE` when another operation
+  claimed the reviewed target. Publication makes the claim official;
+  abandonment releases only the official/claimed tuple and retains the target.
 - A year-changing annual candidate has patch `0`. Its revision is normally `0`
-  but may be the next higher revision when lower identifiers for that target
-  year are already reserved; a year-changing nonzero patch is invalid.
+  and increases only when lower identifiers for that target year are published,
+  archived, or currently claimed; an abandoned unissued target is reusable.
+  A year-changing nonzero patch is invalid.
 - Status is `draft`, `active`, `archived`, or `abandoned` in Phase 4 Core.
 - Phase 4 Core publishes to `active` and does not expose a new archive
   transition. Former current versions remain active/published; the singleton
@@ -268,11 +294,12 @@ Rules:
   owner-approved maintenance contract.
 - Phase 4-created drafts require a valid `based_on_version_id` referencing a
   published version.
-- At most one mutable `draft` may exist for the same `based_on_version_id`,
-  enforced by a partial unique index. Stale drafts based on another published
-  version remain readable but are nonmutable. A never-published draft may move
-  only from `draft` to `abandoned` through the audited function contract; it is
-  never deleted or relabelled `archived` to make room for a replacement.
+- At most one mutable `draft` may exist globally, enforced by a partial unique
+  index on `status = 'draft'`. A pointer restore may make that one draft stale;
+  it remains inspectable and every command is denied except audited
+  abandonment. A never-published current or stale draft may move only from
+  `draft` to `abandoned` through the audited function contract; it is never
+  deleted or relabelled `archived` to make room for a replacement.
 - Abandoned versions retain rows and audit history, cannot be mutated,
   published, restored, or officially exported, and cannot transition back to
   `draft`.
@@ -629,6 +656,10 @@ Policy requirements:
 - ensure `user_profiles.id` remains indexed by its primary key;
 - UPDATE policies require matching SELECT visibility, though normal application
   table UPDATE is revoked;
+- the seven public catalog read tables above have an exact one-policy-per-table
+  allowlist; migration preflight and postconditions reject any extra permissive
+  or restrictive policy name so an out-of-band policy cannot silently widen
+  access;
 - any view exposed to the API uses `security_invoker = true` or is not granted
   to application roles;
 - audit/import tables have no application UPDATE/DELETE policy;
@@ -641,8 +672,18 @@ PUBLIC/anon: no catalog table/function privileges
 authenticated: SELECT only on approved public catalog tables
 authenticated: EXECUTE only on exact public wrapper signatures
 private schema: not exposed in Data API settings
-secret/service role: server-only, never NEXT_PUBLIC
+secret/service role: server-only, never NEXT_PUBLIC; no user-command RPC execute
 ```
+
+The `service_role` remains available only for separately reviewed server-side
+maintenance and evidence collection that operates through an explicit operator
+runbook. It is deliberately denied `EXECUTE` on user-command catalog RPCs such
+as create, abandon, publish, restore, and version-page reads: those calls need a
+real `authenticated` actor so the function can enforce the active-admin check
+and write an attributable audit record. Do not treat `service_role` as a
+surrogate admin user or add it to wrapper/private-implementation grants. A
+future unattended maintenance job needs its own narrowly scoped function,
+credential, audit contract, and owner approval.
 
 ## 9. Function boundary
 
@@ -702,13 +743,15 @@ secret values, raw workbook cells, or internal policy details.
 3. Acquire the existing catalog-operation advisory lock, then lock the
    singleton pointer and base version in the established order.
 4. Require the requested base to be Current and reject any existing mutable
-   draft for that base with stable code `DRAFT_ALREADY_EXISTS`. The partial
+   draft globally with stable code `DRAFT_ALREADY_EXISTS`. The partial
    unique index is the final concurrent backstop; rejection creates no partial
    clone or audit rows.
 5. Derive the transition from base/candidate, require the candidate to be the
-   next all-status reserved number in that lane, and reject a stale sequence
+   next issued-or-claimed target in that lane, and reject a stale sequence
    before cloning. Same-request replay is resolved before this check.
-6. Insert draft/versioned categories/groups/items in deterministic order.
+6. Allocate the immutable `draft_reference`, copy the target into immutable
+   target columns, then insert versioned categories/groups/items in deterministic
+   order.
 7. Insert one clone change set; do not insert unchanged rows as artificial
    `add` change items.
 8. Commit; no file parsing or external call occurs inside the transaction.
@@ -718,12 +761,13 @@ secret values, raw workbook cells, or internal policy details.
 1. Authorize active admin and feature flag, then claim/fingerprint the request
    ID under the same per-request advisory-lock contract.
 2. Lock the exact version and compare expected/stored `lock_version`.
-3. Require `status = 'draft'`, require the draft to be based on Current, and
-   reject published, stale, archived, or already abandoned targets without any
-   write.
+3. Require `status = 'draft'`. Permit either a current-base or stale draft to be
+   abandoned; reject active/published, archived, or already abandoned targets
+   without any write. No other stale-draft command is permitted.
 4. Append one bounded-reason `abandon` change set and atomically transition the
-   version to `abandoned`; retain every price row, identity, code, and prior
-   audit row.
+   version to `abandoned`; release the official/claimed tuple while retaining
+   the immutable draft reference, target, every price row, identity, code, and
+   prior audit row.
 5. Same-request/same-payload replay returns the original result. Request reuse
    with different payload, concurrent abandon, or any post-write failure rolls
    back the transition and audit together.
@@ -911,8 +955,9 @@ migration.
 - anonymous reads/writes and function calls fail;
 - staff see only approved published data;
 - active admins see drafts/audit and can mutate only through functions;
-- at most one current-base working draft exists, stale and abandoned drafts are
-  nonmutable/readable, replacement requires audited abandon, and no
+- at most one open draft exists globally; a stale draft is readable and may be
+  audited-abandoned but cannot otherwise mutate; abandoned drafts are immutable,
+  replacement requires audited abandon, and no
   import/mutation silently chooses a different draft;
 - Production-derived versioned categories and approved P-06 code groups are
   frozen/resolved without free-form creation,
@@ -926,9 +971,9 @@ migration.
 - current app flows remain unchanged while feature flag is disabled;
 - clean-reset identity/hash output matches the P-20 approved portability model;
 - reusable version functions pass ADR-003 fixtures beyond `2568.1.0`;
-- annual/revision/patch planning uses the complete all-status registry, never
-  reuses abandoned identifiers, rejects an out-of-sequence create, and permits
-  the next patch-0 annual revision for a target year with a void lower number;
+- annual/revision/patch planning uses the complete issued-or-claimed registry,
+  reuses an abandoned unissued target under a new draft reference, never reuses
+  published/archived identifiers, and rejects an out-of-sequence create;
 - same-ID timeout/retry and two-session publish/restore behavior pass live Local
   DB tests;
 - duplicate/current-base creation, two-session creation, abandon replay/race,

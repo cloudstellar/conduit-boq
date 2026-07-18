@@ -10,7 +10,10 @@ export function logMasterCatalogOperation({
   startedAt,
   requestId,
   versionId,
-  versionString,
+  officialVersionString,
+  targetVersionString,
+  draftReference,
+  draftEffect,
   code,
 }: {
   operation: string;
@@ -18,7 +21,10 @@ export function logMasterCatalogOperation({
   startedAt: number;
   requestId: string;
   versionId?: string;
-  versionString?: string;
+  officialVersionString?: string | null;
+  targetVersionString?: string;
+  draftReference?: string | null;
+  draftEffect?: string;
   code?: string;
 }) {
   const event = {
@@ -28,7 +34,14 @@ export function logMasterCatalogOperation({
     durationMs: Math.max(0, Date.now() - startedAt),
     requestId: boundedLogToken(requestId),
     ...(versionId ? { versionId: boundedLogToken(versionId) } : {}),
-    ...(versionString ? { versionString: boundedLogToken(versionString) } : {}),
+    ...(officialVersionString
+      ? { officialVersionString: boundedLogToken(officialVersionString) }
+      : {}),
+    ...(targetVersionString
+      ? { targetVersionString: boundedLogToken(targetVersionString) }
+      : {}),
+    ...(draftReference ? { draftReference: boundedLogToken(draftReference) } : {}),
+    ...(draftEffect ? { draftEffect: boundedLogToken(draftEffect) } : {}),
     ...(code ? { code: boundedLogToken(code) } : {}),
   };
 

@@ -30,6 +30,8 @@ const service = client(secretKey)
 const adminA = client(publishableKey)
 const adminB = client(publishableKey)
 const staff = client(publishableKey)
+const pending = client(publishableKey)
+const suspended = client(publishableKey)
 const anonymous = client(publishableKey)
 
 let originalAdminFlag
@@ -43,11 +45,18 @@ try {
   await signIn(adminA, 'local.admin@ntplc.co.th')
   await signIn(adminB, 'local.admin@ntplc.co.th')
   await signIn(staff, 'local.staff@ntplc.co.th')
+  await signIn(pending, 'local.pending@ntplc.co.th')
+  await signIn(suspended, 'local.suspended@ntplc.co.th')
 
   currentStage = 'verify migration schema and security postconditions'
   const schemaContract = readSchemaContract()
   assert(schemaContract.required_constraints === 5, 'Required WP-6.6 constraints are incomplete')
-  assert(schemaContract.one_draft_index === true, 'One-draft-per-base index is missing')
+  assert(schemaContract.draft_identity_constraints === 5,
+    'Required P-39 draft identity constraints are incomplete')
+  assert(schemaContract.draft_identity_generated_columns === 2,
+    'Required P-39 generated identity columns are incomplete')
+  assert(schemaContract.one_draft_index === true, 'Global one-open-draft index is missing')
+  assert(schemaContract.draft_reference_index === true, 'Draft-reference unique index is missing')
   assert(schemaContract.authority_fk_indexes === 2, 'Frozen authority foreign-key indexes are missing')
   assert(schemaContract.nullable_required_columns === 0, 'Required price-list columns remain nullable')
   assert(schemaContract.authority_rls_tables === 3, 'Frozen authority RLS is incomplete')
@@ -56,9 +65,20 @@ try {
   assert(schemaContract.auth_versions_page_execute === true, 'Authenticated register execute is missing')
   assert(schemaContract.auth_private_allocator_execute === false, 'Authenticated can execute private allocator')
   assert(schemaContract.auth_version_planner_execute === false, 'Authenticated can execute private version planner')
+  assert(schemaContract.auth_draft_identity_trigger_execute === false,
+    'Authenticated can execute the private draft identity trigger')
   assert(schemaContract.auth_old_create_impl_execute === false, 'Authenticated can bypass guarded draft creation')
   assert(schemaContract.anon_abandon_execute === false, 'Anon can execute draft abandon')
   assert(schemaContract.auth_abandon_execute === true, 'Authenticated draft abandon execute is missing')
+  assert(schemaContract.catalog_state_policies === 7, 'Catalog state-scoped read policies are incomplete')
+  assert(schemaContract.legacy_catalog_write_policies === 0, 'Legacy catalog DML policies remain')
+  assert(schemaContract.authenticated_catalog_dml_tables === 0,
+    'Authenticated retains direct DML on catalog tables')
+  assert(schemaContract.pointer_audit_columns === 4, 'Pointer/draft-effect audit columns are incomplete')
+  assert(schemaContract.pointer_audit_indexes === 3, 'Pointer/draft-effect audit indexes are incomplete')
+  assert(schemaContract.audit_immutability_triggers === 2, 'Append-only audit triggers are incomplete')
+  assert(schemaContract.create_wrapper_security_definer === false,
+    'Public draft creation wrapper unexpectedly runs with owner privileges')
   assert(schemaContract.disabled_capability_count === 3, 'Catalog capabilities do not default false')
 
   currentStage = 'read and enable only the admin gate'
@@ -78,9 +98,12 @@ try {
   const base = await readCurrentCatalogVersion()
   originalPointerId = base.id
   assert(base.version_string === '2568.0.0', 'WP-6.6 smoke must start from 2568.0.0')
+  await verifyCatalogReadBoundaries(base)
+  await verifyPublishedMetadataNoopDenied(base)
   const beforeBoq = await readBoqSummary()
   const beforeFactor = await readFactorSummary()
   const versions = await allocateRevisionVersions(base, 4)
+  const expectedTargetVersion = versionString(versions[0])
 
   currentStage = 'verify annual effective-year business range'
   actionCode(
@@ -108,7 +131,7 @@ try {
     'VERSION_SEQUENCE_STALE',
   )
 
-  currentStage = 'verify one-current-base-draft create race and replay'
+  currentStage = 'verify global one-open-draft create race and replay'
   const createAttempts = [
     {
       target: adminA,
@@ -152,6 +175,17 @@ try {
     versionId: createWinner.versionId,
     lockVersion: createWinner.lockVersion,
   }
+  const workingDraftVersion = await readVersion(workingDraft.versionId)
+  assert(workingDraftVersion.version_string === expectedTargetVersion,
+    'Working draft did not claim the expected target version')
+  assert(workingDraftVersion.target_version_string === expectedTargetVersion,
+    'Working draft target metadata differs from its claimed tuple')
+  const workingDraftAttempt = readDraftAttempt(
+    workingDraftVersion.draft_reference,
+    expectedTargetVersion,
+  )
+  assert(workingDraftAttempt === workingDraftVersion.draft_attempt,
+    'Working draft did not receive an immutable draft reference')
   const createReplay = actionOk(
     await createDraftRequest(
       createWinnerAttempt.target,
@@ -164,6 +198,34 @@ try {
   )
   assert(createReplay.versionId === workingDraft.versionId, 'Create replay returned another draft')
   assert(createReplay.duplicateRequest === true, 'Create replay was not marked duplicate')
+  assert(createReplay.draftReference === workingDraftVersion.draft_reference,
+    'Create replay omitted the immutable draft reference')
+  assert(createReplay.targetVersionString === expectedTargetVersion,
+    'Create replay omitted the target version')
+  assert(createReplay.officialVersionString == null,
+    'Create replay exposed an unissued target as an official version')
+  const { data: staffDraftRows, error: staffDraftError } = await staff
+    .from('price_list_versions')
+    .select('id')
+    .eq('id', workingDraft.versionId)
+  if (staffDraftError) throw staffDraftError
+  assert(staffDraftRows.length === 0, 'Non-admin read a mutable draft through catalog RLS')
+  assert(
+    await visibleRowCount(
+      adminA,
+      'price_list',
+      (query) => query.eq('version_id', workingDraft.versionId),
+    ) > 0,
+    'Active admin could not read rows in the mutable draft',
+  )
+  assert(
+    await visibleRowCount(
+      staff,
+      'price_list',
+      (query) => query.eq('version_id', workingDraft.versionId),
+    ) === 0,
+    'Active staff read mutable draft rows through catalog RLS',
+  )
   actionCode(
     await createDraftRequest(staff, base, versions[2], 'staff denied', randomUUID()),
     'non-admin draft create',
@@ -355,6 +417,15 @@ try {
   assert(abandonReplay.versionId === abandonResult.versionId, 'Abandon replay changed target')
   const abandonedVersion = await readVersion(workingDraft.versionId)
   assert(abandonedVersion.status === 'abandoned', 'Draft did not become abandoned')
+  assert(abandonedVersion.version_string === null
+    && abandonedVersion.major === null
+    && abandonedVersion.minor === null
+    && abandonedVersion.patch === null,
+  'Abandoned draft did not release its unissued official tuple')
+  assert(abandonedVersion.target_version_string === expectedTargetVersion,
+    'Abandoned draft did not retain its immutable target')
+  assert(abandonedVersion.draft_reference === workingDraftVersion.draft_reference,
+    'Abandon changed the immutable draft reference')
   const abandonedSnapshotRows = await countRows(
     'price_list',
     (query) => query.eq('version_id', workingDraft.versionId),
@@ -381,7 +452,19 @@ try {
     'abandoned draft mutation denial',
     'DRAFT_NOT_EDITABLE',
   )
-  const rolloutDraft = await createDraft(adminA, base, versions[1], 'replacement first rollout')
+  const rolloutDraft = await createDraft(adminA, base, versions[0], 'replacement first rollout')
+  const replacementDraftVersion = await readVersion(rolloutDraft.versionId)
+  assert(replacementDraftVersion.target_version_string === expectedTargetVersion
+    && replacementDraftVersion.version_string === expectedTargetVersion,
+  'Replacement draft did not reclaim the released target')
+  const replacementDraftAttempt = readDraftAttempt(
+    replacementDraftVersion.draft_reference,
+    expectedTargetVersion,
+  )
+  assert(replacementDraftVersion.draft_reference !== abandonedVersion.draft_reference
+    && replacementDraftAttempt === workingDraftAttempt + 1
+    && replacementDraftAttempt === replacementDraftVersion.draft_attempt,
+  'Replacement draft did not receive a new immutable draft reference')
 
   currentStage = 'validate and apply the complete frozen first rollout'
   const importEvidence = await applyFirstRollout(adminA, rolloutDraft)
@@ -422,6 +505,11 @@ try {
     'publish frozen first rollout',
   )
   const publishedVersion = await readVersion(rolloutDraft.versionId)
+  assert(publishedVersion.version_string === expectedTargetVersion
+    && publishedVersion.target_version_string === expectedTargetVersion,
+  'Publication did not issue the claimed target version')
+  assert(publishedVersion.draft_reference === replacementDraftVersion.draft_reference,
+    'Publication changed the immutable draft reference')
   assert(publishedVersion.published_by === actor.id, 'Publisher UUID was not derived from auth')
   assert(
     publishedVersion.published_by_display_name === actor.display_name,
@@ -436,7 +524,67 @@ try {
     'Publication archive reference was not persisted',
   )
   assert(publication.itemCount === 710, 'Published first rollout does not contain 710 items')
-  await restorePointer(adminA, base.id, 'WP-6.6 restore baseline after publication')
+
+  currentStage = 'verify restore draft effect, global draft blocking, and stale abandon'
+  const [postPublishTarget] = await allocateRevisionVersions(publishedVersion, 1)
+  const postPublishDraft = await createDraft(
+    adminA,
+    publishedVersion,
+    postPublishTarget,
+    'restore impact draft',
+  )
+  const postPublishDraftVersion = await readVersion(postPublishDraft.versionId)
+  const restoreResult = await restorePointer(
+    adminA,
+    base.id,
+    'WP-6.6 restore baseline after publication',
+  )
+  assert(restoreResult.previousVersionId === publishedVersion.id,
+    'Restore response omitted the previous pointer')
+  assert(restoreResult.currentPointerVersionId === base.id,
+    'Restore response omitted the resulting pointer')
+  assert(restoreResult.affectedDraftVersionId === postPublishDraft.versionId
+    && restoreResult.affectedDraftReference === postPublishDraftVersion.draft_reference
+    && restoreResult.draftEffect === 'becomes_stale',
+  'Restore response did not explain the open draft becoming stale')
+  const { data: restoreAudit, error: restoreAuditError } = await service
+    .from('catalog_change_sets')
+    .select('pointer_before_version_id,pointer_after_version_id,affected_draft_version_id,draft_effect')
+    .eq('id', restoreResult.changeSetId)
+    .maybeSingle()
+  if (restoreAuditError) throw restoreAuditError
+  assert(restoreAudit?.pointer_before_version_id === publishedVersion.id
+    && restoreAudit?.pointer_after_version_id === base.id
+    && restoreAudit?.affected_draft_version_id === postPublishDraft.versionId
+    && restoreAudit?.draft_effect === 'becomes_stale',
+  'Restore audit did not persist pointer before/after and draft effect')
+  await verifyAuditAppendOnly(restoreResult.changeSetId)
+  const publishedAfterRestore = await readVersion(publishedVersion.id)
+  assert(
+    publishedAfterRestore.updated_at === publishedVersion.updated_at,
+    'Default-pointer movement changed immutable publication metadata timestamp',
+  )
+  actionCode(
+    await createDraftRequest(
+      adminA,
+      base,
+      versions[2],
+      'blocked by stale global draft',
+      randomUUID(),
+    ),
+    'global draft block after restore',
+    'DRAFT_ALREADY_EXISTS',
+  )
+  const staleAbandon = actionOk(
+    await abandonDraft(
+      adminA,
+      postPublishDraft,
+      'close stale draft after pointer restore',
+      randomUUID(),
+    ),
+    'stale draft abandon',
+  )
+  assert(staleAbandon.status === 'abandoned', 'Stale draft could not be audited-abandoned')
 
   currentStage = 'verify exact registers and role denial'
   const versionsPage = await readRegister(adminA, 'get_catalog_versions_page', {
@@ -496,6 +644,8 @@ try {
     versionPlanning: {
       outOfSequenceDenied: true,
       sameCandidateRaceNormalized: true,
+      releasedTargetReused: true,
+      issuedTarget: expectedTargetVersion,
     },
     allocator: {
       concurrentCodes: [rowA.item_code, rowB.item_code],
@@ -513,12 +663,16 @@ try {
       workingDraftVersionId: workingDraft.versionId,
       abandonedVersionId: abandonedVersion.id,
       abandonedStatus: abandonedVersion.status,
+      abandonedDraftReference: abandonedVersion.draft_reference,
+      abandonedTargetVersion: abandonedVersion.target_version_string,
       abandonedLockVersion: abandonedVersion.lock_version,
       abandonReplayDuplicate: abandonReplay.duplicateRequest,
       retainedSnapshotRows: abandonedSnapshotRows,
       abandonChangeSetCount,
       postAbandonMutationDenied: true,
       replacementDraftVersionId: rolloutDraft.versionId,
+      replacementDraftReference: replacementDraftVersion.draft_reference,
+      replacementTargetVersion: replacementDraftVersion.target_version_string,
     },
     correction: {
       retireReactivate: true,
@@ -575,6 +729,8 @@ try {
     adminA.auth.signOut().catch(() => {}),
     adminB.auth.signOut().catch(() => {}),
     staff.auth.signOut().catch(() => {}),
+    pending.auth.signOut().catch(() => {}),
+    suspended.auth.signOut().catch(() => {}),
   ])
 }
 
@@ -644,6 +800,99 @@ async function verifyFrozenAuthorityRoleDenial() {
     .limit(1)
   if (staffError) throw staffError
   assert(staffRows.length === 0, 'Non-admin read frozen authority through RLS')
+
+  for (const [label, target] of [
+    ['pending', pending],
+    ['suspended', suspended],
+  ]) {
+    const { data, error } = await target
+      .from('catalog_code_group_dictionary')
+      .select('work_context_code,item_type_code')
+      .limit(1)
+    if (error) throw error
+    assert(data.length === 0, `${label} account read frozen authority through RLS`)
+  }
+}
+
+async function verifyCatalogReadBoundaries(base) {
+  const publishedScopes = [
+    ['price_list_versions', (query) => query.eq('id', base.id), 1],
+    ['price_list_default_version', (query) => query.eq('id', true), 1],
+    ['price_list', (query) => query.eq('version_id', base.id), Number(base.item_count)],
+    ['catalog_item_identities', (query) => query, Number(base.item_count)],
+    ['catalog_item_codes', (query) => query, Number(base.item_count)],
+    ['price_list_categories', (query) => query.eq('version_id', base.id), null],
+    ['catalog_code_groups', (query) => query.eq('version_id', base.id), null],
+  ]
+
+  for (const [table, scope, expected] of publishedScopes) {
+    const staffCount = await visibleRowCount(staff, table, scope)
+    if (expected === null) {
+      assert(staffCount > 0, `Active staff could not read published ${table}`)
+    } else {
+      assert(staffCount === expected,
+        `Active staff published ${table} count was ${staffCount}; expected ${expected}`)
+    }
+
+    for (const [label, target] of [
+      ['pending', pending],
+      ['suspended', suspended],
+    ]) {
+      const blockedCount = await visibleRowCount(target, table, scope)
+      assert(blockedCount === 0, `${label} account read ${table} through catalog RLS`)
+    }
+  }
+}
+
+async function visibleRowCount(target, table, scope = (query) => query) {
+  const { count, error } = await scope(
+    target.from(table).select('*', { count: 'exact', head: true }),
+  )
+  if (error) throw error
+  return count ?? 0
+}
+
+async function verifyPublishedMetadataNoopDenied(version) {
+  const { error } = await service
+    .from('price_list_versions')
+    .update({ is_default: version.is_default })
+    .eq('id', version.id)
+  assert(
+    error?.message?.includes('CATALOG_PUBLISHED_VERSION_IMMUTABLE'),
+    'Published metadata accepted a no-op update',
+  )
+
+  const after = await readVersion(version.id)
+  assert(after.updated_at === version.updated_at,
+    'Rejected published metadata no-op changed updated_at')
+}
+
+async function verifyAuditAppendOnly(changeSetId) {
+  const { error: updateError } = await service
+    .from('catalog_change_sets')
+    .update({ reason: 'WP-6.6 forbidden audit rewrite' })
+    .eq('id', changeSetId)
+  assert(
+    updateError?.message?.includes('CATALOG_AUDIT_IMMUTABLE'),
+    'Catalog change-set audit accepted an update',
+  )
+
+  const { data: changeItem, error: changeItemError } = await service
+    .from('catalog_change_items')
+    .select('id')
+    .limit(1)
+    .maybeSingle()
+  if (changeItemError) throw changeItemError
+  assert(changeItem?.id, 'WP-6.6 did not produce a change item for append-only proof')
+
+  const { error: deleteError } = await service
+    .from('catalog_change_items')
+    .delete()
+    .eq('id', changeItem.id)
+  assert(
+    deleteError?.message?.includes('CATALOG_AUDIT_IMMUTABLE'),
+    'Catalog change-item audit accepted a delete',
+  )
 }
 
 async function readCurrentCatalogVersion() {
@@ -654,7 +903,7 @@ async function readCurrentCatalogVersion() {
 async function readVersion(versionId) {
   const { data, error } = await service
     .from('price_list_versions')
-    .select('id,version_string,major,minor,patch,status,is_default,based_on_version_id,lock_version,item_count,dataset_hash,published_by,published_by_display_name,physical_archive_reference')
+    .select('id,version_string,target_version_string,draft_attempt,draft_reference,major,minor,patch,name,status,is_default,based_on_version_id,lock_version,item_count,dataset_hash,published_by,published_by_display_name,physical_archive_reference,created_at,updated_at')
     .eq('id', versionId)
     .single()
   if (error) throw error
@@ -683,6 +932,10 @@ async function allocateRevisionVersions(base, count) {
     minor: maxMinor + 1 + index,
     patch: 0,
   }))
+}
+
+function versionString(version) {
+  return `${version.major}.${version.minor}.${version.patch}`
 }
 
 async function createDraft(target, base, version, label) {
@@ -1081,16 +1334,62 @@ function readSchemaContract() {
           )
           AND convalidated
       ),
+      'draft_identity_constraints', (
+        SELECT count(*) FROM pg_constraint
+        WHERE conrelid = 'public.price_list_versions'::regclass
+          AND conname IN (
+            'check_catalog_target_version',
+            'check_catalog_official_version_lifecycle',
+            'check_catalog_draft_reference',
+            'check_catalog_version_name',
+            'check_catalog_derived_publication_metadata'
+          )
+          AND convalidated
+      ),
+      'draft_identity_generated_columns', (
+        SELECT count(*)
+        FROM pg_attribute attribute
+        WHERE attribute.attrelid = 'public.price_list_versions'::regclass
+          AND attribute.attname IN ('target_version_string', 'draft_reference')
+          AND attribute.attgenerated = 's'
+          AND NOT attribute.attisdropped
+      ),
       'one_draft_index', EXISTS (
         SELECT 1
         FROM pg_class index_relation
         JOIN pg_namespace index_namespace ON index_namespace.oid = index_relation.relnamespace
         JOIN pg_index index_definition ON index_definition.indexrelid = index_relation.oid
         WHERE index_namespace.nspname = 'public'
-          AND index_relation.relname = 'uq_price_list_versions_one_draft_per_base'
+          AND index_relation.relname = 'uq_price_list_versions_one_open_draft'
           AND index_definition.indisunique
           AND index_definition.indisvalid
-          AND index_definition.indpred IS NOT NULL
+          AND pg_get_expr(index_definition.indpred, index_definition.indrelid)
+            = '(status = ''draft''::text)'
+      ),
+      'draft_reference_index', EXISTS (
+        SELECT 1
+        FROM pg_class index_relation
+        JOIN pg_namespace index_namespace ON index_namespace.oid = index_relation.relnamespace
+        JOIN pg_index index_definition ON index_definition.indexrelid = index_relation.oid
+        WHERE index_namespace.nspname = 'public'
+          AND index_relation.relname = 'uq_price_list_versions_target_draft_attempt'
+          AND index_definition.indisunique
+          AND index_definition.indisvalid
+          AND index_definition.indnkeyatts = 4
+          AND pg_get_expr(index_definition.indpred, index_definition.indrelid)
+            = '(draft_attempt IS NOT NULL)'
+          AND (
+            SELECT count(DISTINCT attribute.attname)
+            FROM pg_attribute attribute
+            WHERE attribute.attrelid = index_definition.indrelid
+              AND attribute.attnum = ANY(index_definition.indkey)
+              AND attribute.attname IN (
+                'target_major',
+                'target_minor',
+                'target_patch',
+                'draft_attempt'
+              )
+          ) = 4
       ),
       'authority_fk_indexes', (
         SELECT count(*)
@@ -1127,9 +1426,88 @@ function readSchemaContract() {
       'auth_versions_page_execute', has_function_privilege('authenticated','public.get_catalog_versions_page(integer,timestamptz,uuid)','EXECUTE'),
       'auth_private_allocator_execute', has_function_privilege('authenticated','private.catalog_allocate_code(uuid,uuid)','EXECUTE'),
       'auth_version_planner_execute', has_function_privilege('authenticated','private.catalog_version_candidate_is_next(integer,integer,integer,integer,integer,integer)','EXECUTE'),
+      'auth_draft_identity_trigger_execute', has_function_privilege('authenticated','private.prepare_catalog_version_identity()','EXECUTE'),
       'auth_old_create_impl_execute', has_function_privilege('authenticated','private.create_catalog_draft_impl(uuid,integer,integer,integer,text,text,uuid)','EXECUTE'),
       'anon_abandon_execute', has_function_privilege('anon','public.abandon_catalog_draft(uuid,integer,text,uuid)','EXECUTE'),
       'auth_abandon_execute', has_function_privilege('authenticated','public.abandon_catalog_draft(uuid,integer,text,uuid)','EXECUTE'),
+      'catalog_state_policies', (
+        SELECT count(*) FROM pg_policies
+        WHERE schemaname = 'public' AND (tablename, policyname) IN (
+          ('price_list_versions','catalog_versions_state_scoped_select'),
+          ('price_list','catalog_price_rows_state_scoped_select'),
+          ('price_list_default_version','catalog_default_pointer_active_select'),
+          ('catalog_item_identities','catalog_item_identities_select'),
+          ('catalog_item_codes','catalog_item_codes_select'),
+          ('price_list_categories','price_list_categories_select'),
+          ('catalog_code_groups','catalog_code_groups_select')
+        )
+          AND cmd = 'SELECT'
+          AND roles @> ARRAY['authenticated'::name]
+          AND qual ILIKE '%status%active%'
+      ),
+      'legacy_catalog_write_policies', (
+        SELECT count(*) FROM pg_policies
+        WHERE schemaname = 'public'
+          AND tablename IN ('price_list_versions','price_list','price_list_default_version')
+          AND policyname = 'Allow write to admin only'
+      ),
+      'authenticated_catalog_dml_tables', (
+        SELECT count(*)
+        FROM (
+          VALUES
+            ('public.price_list_versions'),
+            ('public.price_list'),
+            ('public.price_list_default_version'),
+            ('public.catalog_item_identities'),
+            ('public.catalog_item_codes'),
+            ('public.price_list_categories'),
+            ('public.catalog_code_groups'),
+            ('public.catalog_imports'),
+            ('public.catalog_change_sets'),
+            ('public.catalog_change_items'),
+            ('public.catalog_placement_reviews')
+        ) AS catalog_table(table_name)
+        WHERE has_table_privilege('authenticated', catalog_table.table_name, 'INSERT')
+           OR has_table_privilege('authenticated', catalog_table.table_name, 'UPDATE')
+           OR has_table_privilege('authenticated', catalog_table.table_name, 'DELETE')
+      ),
+      'pointer_audit_columns', (
+        SELECT count(*) FROM information_schema.columns
+        WHERE table_schema = 'public'
+          AND table_name = 'catalog_change_sets'
+          AND column_name IN (
+            'pointer_before_version_id',
+            'pointer_after_version_id',
+            'affected_draft_version_id',
+            'draft_effect'
+          )
+      ),
+      'pointer_audit_indexes', (
+        SELECT count(*)
+        FROM pg_index index_row
+        JOIN pg_class index_relation ON index_relation.oid = index_row.indexrelid
+        WHERE index_row.indrelid = 'public.catalog_change_sets'::regclass
+          AND index_relation.relname IN (
+            'idx_catalog_change_sets_pointer_before',
+            'idx_catalog_change_sets_pointer_after',
+            'idx_catalog_change_sets_affected_draft'
+          )
+          AND index_row.indisvalid
+      ),
+      'audit_immutability_triggers', (
+        SELECT count(*) FROM pg_trigger
+        WHERE tgname IN (
+          'trigger_prevent_catalog_change_set_mutation',
+          'trigger_prevent_catalog_change_item_mutation'
+        )
+          AND tgenabled = 'O'
+          AND NOT tgisinternal
+      ),
+      'create_wrapper_security_definer', (
+        SELECT prosecdef
+        FROM pg_proc
+        WHERE oid = 'public.create_catalog_draft(uuid,integer,integer,integer,text,text,uuid)'::regprocedure
+      ),
       'disabled_capability_count', (
         SELECT count(*) FROM public.app_settings
         WHERE key IN ('catalog_admin_enabled','catalog_new_identity_enabled','catalog_retirement_enabled') AND value = 'false'::jsonb
@@ -1233,6 +1611,15 @@ function stableJson(value) {
 
 function assert(condition, message) {
   if (!condition) throw new Error(message)
+}
+
+function readDraftAttempt(reference, targetVersion) {
+  const prefix = `${targetVersion}-D`
+  if (typeof reference !== 'string' || !reference.startsWith(prefix)) return null
+  const attempt = reference.slice(prefix.length)
+  if (!/^\d{3,}$/.test(attempt)) return null
+  const value = Number(attempt)
+  return Number.isSafeInteger(value) && value > 0 ? value : null
 }
 
 function currentCommit() {

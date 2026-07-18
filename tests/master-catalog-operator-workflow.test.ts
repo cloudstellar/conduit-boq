@@ -120,7 +120,7 @@ describe('Master Catalog P-22 operator workflow', () => {
     expect(actions).toContain("supabase.rpc('abandon_catalog_draft'");
     expect(actions).toContain("operation: 'abandonCatalogDraft'");
     expect(panel).toContain('<DialogTrigger asChild>');
-    expect(panel).toContain('ยืนยันการยกเลิกฉบับร่าง');
+    expect(panel).toContain("ยืนยันการยกเลิก {draftVersion.draftReference ?? 'ฉบับร่างนี้'}");
     expect(panel).toContain('ยืนยันและเก็บเป็นประวัติ');
     expect(panel).toContain('expectedLockVersion');
     expect(panel).not.toContain('delete_catalog_draft');
@@ -276,7 +276,7 @@ describe('Master Catalog P-22 operator workflow', () => {
     const publishAction = actions.slice(publishActionStart, restoreActionStart);
 
     expect(panel).toContain('ตรวจและยืนยันการเผยแพร่');
-    expect(panel).toContain('ยืนยันการเผยแพร่ {draftVersion.versionString}');
+    expect(panel).toContain('ยืนยันการเผยแพร่เป้าหมาย {draftVersion.targetVersionString}');
     expect(panel).toContain('name="confirmedVersionString"');
     expect(panel).toContain('publishConfirmationMatches');
     expect(panel).toContain('เลขเวอร์ชันต้องตรงทุกตัวก่อนระบบจะส่งคำสั่งเผยแพร่');
@@ -284,7 +284,16 @@ describe('Master Catalog P-22 operator workflow', () => {
 
     expect(publishActionStart).toBeGreaterThan(-1);
     expect(restoreActionStart).toBeGreaterThan(publishActionStart);
-    expect(publishAction).toContain(".select('version_string')");
+    expect(publishAction).toContain(
+      ".select('target_version_string,draft_reference')",
+    );
+    expect(publishAction).not.toContain("draftVersion?.status !== 'draft'");
+    expect(actions).toContain(
+      'คำขอเดิมอ้างถึง ${result.draftReference} ซึ่งถูกยกเลิก',
+    );
+    expect(actions).toContain(
+      'คำขอเดิมอ้างถึง ${result.draftReference} ซึ่งเผยแพร่เป็นเวอร์ชัน',
+    );
     expect(publishAction).toContain('validateCatalogPublishVersionConfirmation(');
     expect(publishAction.indexOf('validateCatalogPublishVersionConfirmation(')).toBeLessThan(
       publishAction.indexOf("supabase.rpc('publish_catalog_version'"),
@@ -332,7 +341,7 @@ describe('Master Catalog P-22 operator workflow', () => {
     expect(errorAlert).toContain('ข้อมูลสำหรับติดตามปัญหา');
   });
 
-  it('requires business intent, plans from the complete registry, and opens the new workspace', () => {
+  it('requires business intent, plans from issued or claimed versions, and opens the new workspace', () => {
     const panel = source(
       'app/admin/master-catalog/_components/MasterCatalogMutationPanel.tsx',
     );
@@ -341,6 +350,9 @@ describe('Master Catalog P-22 operator workflow', () => {
     );
     const actions = source('app/admin/master-catalog/actions.ts');
     const readModel = source('lib/master-catalog/admin/readModel.ts');
+    const placementWorkspace = source(
+      'app/admin/master-catalog/_components/MasterCatalogPlacementWorkspace.tsx',
+    );
 
     expect(panel).toContain('วัตถุประสงค์ของฉบับใหม่');
     expect(panel).toContain('ประจำปีใหม่');
@@ -349,8 +361,12 @@ describe('Master Catalog P-22 operator workflow', () => {
     expect(panel).toContain('suggestCatalogVersion');
     expect(panel).toContain('getCatalogAnnualEffectiveYearRange');
     expect(panel).toContain('effectiveYearRange?.max');
-    expect(panel).toContain('เลขฉบับที่จะสร้าง');
-    expect(panel).toContain('ระบบจึงไม่ใช้เลขเดิมซ้ำ');
+    expect(panel).toContain('เลขฉบับเป้าหมาย');
+    expect(panel).toContain('จะเป็นเลขทางการเมื่อเผยแพร่เท่านั้น');
+    expect(panel).toContain('นำกลับมาใช้กับร่างใหม่ได้');
+    expect(panel).toContain('เช่น 2568.1.0-D001');
+    expect(panel).toContain('ระบบมีร่างได้ครั้งละหนึ่งฉบับ');
+    expect(panel).toContain("ยืนยันการยกเลิก {draftVersion.draftReference ?? 'ฉบับร่างนี้'}");
     expect(panel).toContain("abandoned: 'ยกเลิกฉบับร่าง'");
     expect(panel).toContain('อ่านเวอร์ชันฐานหรือทะเบียนเลขเวอร์ชันไม่ครบ');
     expect(panel).toContain('ลองโหลดทะเบียนใหม่');
@@ -364,7 +380,13 @@ describe('Master Catalog P-22 operator workflow', () => {
     expect(actions).toContain("'baseVersionId'");
     expect(actions).toContain('isCatalogAnnualEffectiveYearAllowed');
     expect(actions).toContain("'VERSION_EFFECTIVE_YEAR_OUT_OF_RANGE'");
+    expect(actions).toContain('สร้างฉบับร่างสำหรับเป้าหมาย ${expectedVersionString} แล้ว');
     expect(readModel).toContain(".select('version_string,status', { count: 'exact' })");
+    expect(readModel).toContain(".neq('status', 'abandoned')");
+    expect(readModel).toContain(".not('version_string', 'is', null)");
+    expect(placementWorkspace).toContain(
+      'เลขเป้าหมาย {workspace.version.targetVersionString}',
+    );
     expect(readModel).toContain('VERSION_REGISTRY_PAGE_SIZE');
     expect(readModel).toContain('while (versionRegistryRows.length < versionRegistryCount)');
     expect(readModel).toContain('registryStrings.size === mappedVersionRegistry.length');
@@ -385,5 +407,8 @@ describe('Master Catalog P-22 operator workflow', () => {
     expect(panel).toContain('ยังยืนยันเวอร์ชันปัจจุบันไม่ได้');
     expect(panel).toContain('restorableVersions.length > 0 && currentVersionString');
     expect(panel).toContain('ยืนยันเปลี่ยนเวอร์ชันใช้งาน');
+    expect(panel).toContain("restoreDraftImpact === 'becomes_current'");
+    expect(panel).toContain('ผลต่อ {openDraft.draftReference');
+    expect(panel).toContain('จะอ้างอิงฐานอื่นและแก้ไขหรือเผยแพร่ไม่ได้');
   });
 });

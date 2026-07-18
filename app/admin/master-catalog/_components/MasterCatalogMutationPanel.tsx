@@ -77,25 +77,34 @@ type DraftCreatePanelProps = {
   versionRegistry: CatalogVersionRegistryEntry[] | null;
   draftVersions: Array<{
     id: string;
-    versionString: string;
+    targetVersionString: string;
+    draftReference: string | null;
     status: string;
     lockVersion: number;
+    basedOnVersionId: string | null;
   }>;
 };
 
 type PublishRestorePanelProps = {
   draftVersion: {
     id: string;
-    versionString: string;
+    targetVersionString: string;
+    draftReference: string | null;
     lockVersion: number;
     itemCount: number | null;
     datasetHash: string | null;
   } | null;
   draftReadiness: CatalogPublishReadiness | null;
   currentVersionString: string | null;
+  openDraft: {
+    id: string;
+    draftReference: string | null;
+    targetVersionString: string;
+    basedOnVersionId: string | null;
+  } | null;
   restorableVersions: Array<{
     id: string;
-    versionString: string;
+    officialVersionString: string;
     itemCount: number | null;
     datasetHash: string | null;
   }>;
@@ -137,6 +146,12 @@ export function MasterCatalogDraftCreatePanel({
   const suggestedVersionString = suggestion
     ? formatCatalogVersion(suggestion.version)
     : null;
+  const openDraft = draftVersions[0] ?? null;
+  const openDraftIsStale = Boolean(
+    openDraft
+    && defaultVersionId
+    && openDraft.basedOnVersionId !== defaultVersionId,
+  );
   const [requestIdInputRef, prepareOperation, preserveSubmittedInput] = useStableCatalogOperation(
     state,
     `${defaultVersionId ?? 'no-base'}:${transition || 'no-transition'}:${suggestedVersionString ?? 'no-suggestion'}`,
@@ -183,13 +198,25 @@ export function MasterCatalogDraftCreatePanel({
           </Alert>
         ) : draftVersions.length === 1 ? (
           <Alert>
-            <CheckCircle2 />
-            <AlertTitle>ฉบับร่างที่กำลังทำงาน</AlertTitle>
+            {openDraftIsStale ? <ShieldAlert /> : <CheckCircle2 />}
+            <AlertTitle>
+              {openDraftIsStale ? 'ฉบับร่างฐานเก่าที่ยังเปิดอยู่' : 'ฉบับร่างที่กำลังทำงาน'}
+            </AlertTitle>
             <AlertDescription>
               <div className="grid gap-2">
+                {openDraftIsStale ? (
+                  <p>
+                    ระบบมีร่างได้ครั้งละหนึ่งฉบับ จึงยังสร้างร่างใหม่ไม่ได้ เปิดร่างนี้เพื่อยกเลิกพร้อมเหตุผล หรือคืนเวอร์ชันฐานเดิม
+                  </p>
+                ) : null}
                 {draftVersions.map((draftVersion) => (
                   <div key={draftVersion.id} className="flex flex-wrap items-center gap-2">
-                    <Badge variant="secondary">{draftVersion.versionString}</Badge>
+                    <Badge variant="secondary">
+                      {draftVersion.draftReference ?? 'ฉบับร่าง'}
+                    </Badge>
+                    <Badge variant="outline">
+                      เป้าหมาย {draftVersion.targetVersionString}
+                    </Badge>
                     <Badge variant="outline">รุ่นแก้ไข {draftVersion.lockVersion}</Badge>
                     <Button variant="outline" size="sm" asChild>
                       <Link href={`/admin/master-catalog/versions/${draftVersion.id}`}>
@@ -284,32 +311,32 @@ export function MasterCatalogDraftCreatePanel({
                 <Alert aria-live="polite">
                   <CheckCircle2 />
                   <AlertTitle>
-                    เลขฉบับที่จะสร้าง{' '}
+                    เลขฉบับเป้าหมาย{' '}
                     <span className="font-mono">{suggestedVersionString}</span>
                   </AlertTitle>
                   <AlertDescription>
-                    ระบบคำนวณจากเวอร์ชันฐาน วัตถุประสงค์ที่เลือก และทะเบียนเลขทุกสถานะ
+                    ระบบคำนวณจากเวอร์ชันฐาน วัตถุประสงค์ที่เลือก และเลขทางการที่ออกแล้วหรือกำลังถูกใช้
                   </AlertDescription>
                 </Alert>
-                {suggestion.reservedVersions.length > 0 ? (
+                {suggestion.occupiedVersions.length > 0 ? (
                   <Alert>
                     <ArchiveX />
-                    <AlertTitle>มีเลขก่อนหน้าที่ถูกสงวนไว้</AlertTitle>
+                    <AlertTitle>มีเลขก่อนหน้าที่ออกแล้วหรือกำลังถูกใช้</AlertTitle>
                     <AlertDescription>
-                      {formatReservedVersionSummary(suggestion.reservedVersions)} ระบบจึงไม่ใช้เลขเดิมซ้ำ
+                      {formatOccupiedVersionSummary(suggestion.occupiedVersions)} ระบบจึงวางแผนเลขถัดไป
                     </AlertDescription>
                   </Alert>
                 ) : null}
                 <p className="text-sm text-muted-foreground">
-                  เมื่อสร้างแล้ว เลขฉบับนี้จะอยู่ในทะเบียนถาวร แม้ยกเลิกฉบับร่างภายหลัง
+                  ระบบจะสร้างรหัสร่างจากเลขเป้าหมายและลำดับการจัดทำ เช่น 2568.1.0-D001 รหัสนี้ใช้ติดตามงานและไม่ใช่เลขทางการ ส่วนเลขเป้าหมายจะเป็นเลขทางการเมื่อเผยแพร่เท่านั้น หากยกเลิกร่างก่อนเผยแพร่ เลขเป้าหมายนี้นำกลับมาใช้กับร่างใหม่ได้
                 </p>
                 <div className="grid gap-2">
                   <Label htmlFor="draft-name">ชื่อฉบับร่าง</Label>
-                  <Input id="draft-name" name="name" required />
+                  <Input id="draft-name" name="name" maxLength={200} required />
                 </div>
                 <div className="grid gap-2">
                   <Label htmlFor="draft-reason">เหตุผลที่สร้าง</Label>
-                  <Input id="draft-reason" name="reason" required />
+                  <Input id="draft-reason" name="reason" maxLength={500} required />
                 </div>
                 <CardFooter className="px-0">
                   <SubmitButton label="สร้างและเปิดพื้นที่ทำงาน" pendingLabel="กำลังสร้าง">
@@ -377,10 +404,10 @@ function VersionTransitionOption({
   );
 }
 
-function formatReservedVersionSummary(entries: CatalogVersionRegistryEntry[]): string {
+function formatOccupiedVersionSummary(entries: CatalogVersionRegistryEntry[]): string {
   const visible = entries.slice(0, 3).map((entry) => {
     const statusLabel = entry.status ? VERSION_STATUS_LABELS[entry.status] : null;
-    return `${entry.versionString}${statusLabel ? ` (${statusLabel})` : ''}`;
+    return `${entry.targetVersionString}${statusLabel ? ` (${statusLabel})` : ''}`;
   });
   const remaining = entries.length - visible.length;
   return remaining > 0
@@ -393,7 +420,8 @@ export function MasterCatalogDraftAbandonPanel({
 }: {
   draftVersion: {
     id: string;
-    versionString: string;
+    targetVersionString: string;
+    draftReference: string | null;
     lockVersion: number;
   };
 }) {
@@ -417,7 +445,7 @@ export function MasterCatalogDraftAbandonPanel({
           ยกเลิกฉบับร่างนี้
         </CardTitle>
         <CardDescription>
-          ปิดฉบับร่าง {draftVersion.versionString} เพื่อเริ่มใหม่จากเวอร์ชันฐานเดิม โดยระบบจะเก็บรายการและประวัติทั้งหมดไว้อ่านย้อนหลัง
+          ปิด {draftVersion.draftReference ?? 'ฉบับร่างนี้'} ซึ่งมีเลขเป้าหมาย {draftVersion.targetVersionString} โดยระบบจะเก็บรายการและประวัติทั้งหมดไว้อ่านย้อนหลัง
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -445,10 +473,10 @@ export function MasterCatalogDraftAbandonPanel({
               />
               <DialogHeader>
                 <DialogTitle className="pr-8">
-                  ยืนยันการยกเลิกฉบับร่าง {draftVersion.versionString}
+                  ยืนยันการยกเลิก {draftVersion.draftReference ?? 'ฉบับร่างนี้'}
                 </DialogTitle>
                 <DialogDescription>
-                  หลังยืนยันจะกลับมาแก้ฉบับนี้ไม่ได้ ระบบจะเก็บ snapshot และประวัติทั้งหมดไว้อ่านย้อนหลัง
+                  หลังยืนยันจะกลับมาแก้รหัสร่างนี้ไม่ได้ ระบบจะเก็บ snapshot และประวัติไว้อ่านย้อนหลัง แต่เลขเป้าหมาย {draftVersion.targetVersionString} จะยังไม่ถือว่าออกเป็นเลขทางการและสามารถใช้กับร่างใหม่ได้
                 </DialogDescription>
               </DialogHeader>
               <div className="grid gap-2">
@@ -487,6 +515,7 @@ export function MasterCatalogPublishRestorePanel({
   draftVersion,
   draftReadiness,
   currentVersionString,
+  openDraft,
   restorableVersions,
 }: PublishRestorePanelProps) {
   const [publishState, publishAction] = useActionState(publishCatalogVersionAction, initialState);
@@ -506,6 +535,11 @@ export function MasterCatalogPublishRestorePanel({
     (version) => version.id === selectedRestoreTargetId,
   ) ? selectedRestoreTargetId : firstRestorableVersionId;
   const restoreTarget = restorableVersions.find((version) => version.id === restoreTargetId) ?? null;
+  const restoreDraftImpact = !openDraft
+    ? null
+    : openDraft.basedOnVersionId === restoreTargetId
+      ? 'becomes_current'
+      : 'becomes_stale';
   const [
     publishRequestIdInputRef,
     preparePublishOperation,
@@ -524,7 +558,7 @@ export function MasterCatalogPublishRestorePanel({
   );
   const publishBlocked = !draftReadiness?.canPublish;
   const publishConfirmationMatches = confirmedVersionString.trim().normalize('NFC')
-    === draftVersion?.versionString.normalize('NFC');
+    === draftVersion?.targetVersionString.normalize('NFC');
 
   useEffect(() => {
     if (publishState.status === 'success' || restoreState.status === 'success') {
@@ -559,7 +593,10 @@ export function MasterCatalogPublishRestorePanel({
         {draftVersion ? (
           <div className="grid gap-4">
             <div className="flex flex-wrap items-center gap-2">
-              <Badge variant="secondary">{draftVersion.versionString}</Badge>
+              <Badge variant="secondary">
+                {draftVersion.draftReference ?? 'ฉบับร่าง'}
+              </Badge>
+              <Badge variant="outline">เป้าหมาย {draftVersion.targetVersionString}</Badge>
               <Badge variant="outline">รุ่นแก้ไข {draftVersion.lockVersion}</Badge>
               {draftVersion.itemCount != null ? (
                 <Badge variant="outline">{draftVersion.itemCount.toLocaleString('th-TH')} รายการ</Badge>
@@ -604,6 +641,7 @@ export function MasterCatalogPublishRestorePanel({
                   id="publish-approval-reference"
                   value={publishApprovalReference}
                   onChange={(event) => setPublishApprovalReference(event.target.value)}
+                  maxLength={500}
                   required
                 />
               </div>
@@ -623,6 +661,7 @@ export function MasterCatalogPublishRestorePanel({
                   id="publish-archive-reference"
                   value={publishArchiveReference}
                   onChange={(event) => setPublishArchiveReference(event.target.value)}
+                  maxLength={500}
                   required
                 />
               </div>
@@ -632,6 +671,7 @@ export function MasterCatalogPublishRestorePanel({
                   id="publish-reason"
                   value={publishReason}
                   onChange={(event) => setPublishReason(event.target.value)}
+                  maxLength={500}
                   required
                 />
               </div>
@@ -665,10 +705,10 @@ export function MasterCatalogPublishRestorePanel({
                   <input type="hidden" name="reason" value={publishReason} />
                   <DialogHeader>
                     <DialogTitle className="pr-8">
-                      ยืนยันการเผยแพร่ {draftVersion.versionString}
+                      ยืนยันการเผยแพร่เป้าหมาย {draftVersion.targetVersionString}
                     </DialogTitle>
                     <DialogDescription>
-                      หลังยืนยัน ฉบับนี้จะแก้ไขไม่ได้และจะเป็นเวอร์ชันใช้งานสำหรับ BOQ ใหม่
+                      เอกสารอนุมัติรับรองเนื้อหาและเป้าหมายนี้ ส่วนเลขทางการ {draftVersion.targetVersionString} จะถูกออกเมื่อกดยืนยันเผยแพร่ ฉบับนี้จะแก้ไขไม่ได้และจะเป็นเวอร์ชันใช้งานสำหรับ BOQ ใหม่
                       ส่วน BOQ เดิมยังคงผูกกับเวอร์ชันที่บันทึกไว้
                     </DialogDescription>
                   </DialogHeader>
@@ -680,7 +720,7 @@ export function MasterCatalogPublishRestorePanel({
                     </div>
                     <div>
                       <div className="text-xs font-medium text-muted-foreground">เวอร์ชันที่จะเผยแพร่</div>
-                      <div className="mt-1 font-mono font-medium">{draftVersion.versionString}</div>
+                      <div className="mt-1 font-mono font-medium">{draftVersion.targetVersionString}</div>
                     </div>
                     <div>
                       <div className="text-xs font-medium text-muted-foreground">รุ่นแก้ไขที่ตรวจแล้ว</div>
@@ -695,7 +735,7 @@ export function MasterCatalogPublishRestorePanel({
                   </div>
                   <div className="grid gap-2">
                     <Label htmlFor="publish-confirm-version">
-                      พิมพ์ {draftVersion.versionString} เพื่อยืนยัน
+                      พิมพ์ {draftVersion.targetVersionString} เพื่อยืนยัน
                     </Label>
                     <Input
                       id="publish-confirm-version"
@@ -765,7 +805,7 @@ export function MasterCatalogPublishRestorePanel({
                   <SelectGroup>
                     {restorableVersions.map((version) => (
                       <SelectItem key={version.id} value={version.id}>
-                        {version.versionString}
+                        {version.officialVersionString}
                       </SelectItem>
                     ))}
                   </SelectGroup>
@@ -795,7 +835,7 @@ export function MasterCatalogPublishRestorePanel({
               <DialogContent>
                 <DialogHeader>
                   <DialogTitle className="pr-8">
-                    ยืนยันการเปลี่ยนเวอร์ชันใช้งานเป็น {restoreTarget?.versionString ?? '-'}
+                    ยืนยันการเปลี่ยนเวอร์ชันใช้งานเป็น {restoreTarget?.officialVersionString ?? '-'}
                   </DialogTitle>
                   <DialogDescription>
                     การเปลี่ยนนี้จะมีผลกับ BOQ ใหม่หลังยืนยัน ส่วน BOQ เดิมยังคงผูกกับเวอร์ชันที่บันทึกไว้
@@ -811,6 +851,25 @@ export function MasterCatalogPublishRestorePanel({
                   <input type="hidden" name="targetVersionId" value={restoreTargetId} />
                   <input type="hidden" name="reason" value={restoreReason} />
                   <ActionStateAlert state={restoreState} />
+                  {openDraft ? (
+                    <Alert variant={restoreDraftImpact === 'becomes_current' ? 'default' : 'destructive'}>
+                      {restoreDraftImpact === 'becomes_current' ? <CheckCircle2 /> : <ShieldAlert />}
+                      <AlertTitle>ผลต่อ {openDraft.draftReference ?? 'ฉบับร่างที่เปิดอยู่'}</AlertTitle>
+                      <AlertDescription>
+                        {restoreDraftImpact === 'becomes_current'
+                          ? `ร่างเป้าหมาย ${openDraft.targetVersionString} จะกลับมาอ้างอิงฐานปัจจุบันและแก้ไขต่อได้`
+                          : `ร่างเป้าหมาย ${openDraft.targetVersionString} จะอ้างอิงฐานอื่นและแก้ไขหรือเผยแพร่ไม่ได้ จนกว่าจะคืนฐานของร่างหรือยกเลิกร่างพร้อมเหตุผล`}
+                      </AlertDescription>
+                    </Alert>
+                  ) : (
+                    <Alert>
+                      <CheckCircle2 />
+                      <AlertTitle>ไม่มีฉบับร่างที่ได้รับผล</AlertTitle>
+                      <AlertDescription>
+                        การคืนเวอร์ชันครั้งนี้เปลี่ยนเฉพาะเวอร์ชันใช้งานสำหรับ BOQ ใหม่
+                      </AlertDescription>
+                    </Alert>
+                  )}
                   <div className="grid gap-3 rounded-md border p-3 text-sm sm:grid-cols-2">
                     <div>
                       <div className="text-xs font-medium text-muted-foreground">เวอร์ชันปัจจุบัน</div>
@@ -818,7 +877,7 @@ export function MasterCatalogPublishRestorePanel({
                     </div>
                     <div>
                       <div className="text-xs font-medium text-muted-foreground">เวอร์ชันที่จะนำกลับมาใช้</div>
-                      <div className="mt-1 font-mono font-medium">{restoreTarget?.versionString ?? '-'}</div>
+                      <div className="mt-1 font-mono font-medium">{restoreTarget?.officialVersionString ?? '-'}</div>
                     </div>
                   </div>
                   <div className="rounded-md border p-3 text-sm">
@@ -971,14 +1030,23 @@ function ActionStateAlert({ state }: { state: CatalogMutationState }) {
       <Alert aria-live="polite">
         <CheckCircle2 />
         <AlertTitle>{state.message}</AlertTitle>
-        {state.lockVersion != null || state.changeSetId || state.requestId ? (
+        {state.lockVersion != null
+        || state.changeSetId
+        || state.requestId
+        || state.draftReference
+        || state.targetVersionString ? (
           <AlertDescription>
             <details className="mt-1 text-xs text-muted-foreground">
               <summary className="cursor-pointer">ข้อมูลสำหรับติดตามรายการ</summary>
               <div className="mt-2 grid gap-1 break-all">
                 {state.lockVersion != null ? <span>รุ่นแก้ไข {state.lockVersion}</span> : null}
+                {state.draftReference ? <span>รหัสร่าง {state.draftReference}</span> : null}
+                {state.targetVersionString ? (
+                  <span>เลขเป้าหมาย {state.targetVersionString}</span>
+                ) : null}
                 {state.changeSetId ? <span>ชุดการเปลี่ยนแปลง {state.changeSetId}</span> : null}
                 {state.requestId ? <span>รหัสคำขอ {state.requestId}</span> : null}
+                {state.duplicateRequest ? <span>เป็นผลเดิมจากรหัสคำขอที่ส่งซ้ำ</span> : null}
               </div>
             </details>
           </AlertDescription>

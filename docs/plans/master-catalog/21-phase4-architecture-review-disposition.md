@@ -60,7 +60,7 @@ Read-only Production evidence relevant to disputed findings:
 
 | Review finding | Decision | Revision 8 action and reason |
 |---|---|---|
-| Stale draft “explicit reconciliation” undefined | **Accepted** | Phase 4 Core has no rebase. Create a new draft from Current and deliberately reapply approved changes; stale draft becomes read-only/nonpublishable. |
+| Stale draft “explicit reconciliation” undefined | **Accepted; amended by P-39R** | Phase 4 Core has no rebase. Inspect and audited-abandon the stale attempt, then create a new draft from Current and deliberately reapply approved changes; the abandoned snapshot/history remains immutable. |
 | Large retirement has no threshold | **Accepted** | Defined as `max(10, ceil(2% of active base))`; 15 rows at the 710-row baseline. Exact typed count and owner reference are required. This catches a likely wrong Full source without blocking one correction. |
 | Archive workflow undefined | **Accepted by deferral** | Core exposes no archive transition. Former current remains Published/Active; pointer identifies Current. Archive mutation waits for a retention/visibility contract. |
 | Shortened hash length undefined | **Accepted** | Standardized on `sha256:` plus first 12 hex characters and `…`; it is a human cross-check only and the full hash remains authoritative. |

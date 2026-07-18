@@ -40,6 +40,23 @@ describe('Master Catalog field-facing PDF presentation', () => {
       .toBe('เอกสารอ้างอิงย้อนหลัง - ไม่ใช่รุ่นใช้งานปัจจุบัน');
   });
 
+  it('labels a review PDF by immutable draft reference and target version', () => {
+    const rows = buildFieldFacingPdfStamp({
+      versionString: '2568.1.0',
+      draftReference: '2568.1.0-D001',
+      isDraft: true,
+      statusText: 'ฉบับร่าง',
+      effectiveDate: '-',
+      itemCount: 710,
+      canonicalDatasetHash: 'sha256:test',
+    });
+
+    expect(rows.slice(0, 2)).toEqual([
+      { label: 'รหัสร่าง', value: '2568.1.0-D001' },
+      { label: 'เลขฉบับเป้าหมาย', value: '2568.1.0' },
+    ]);
+  });
+
   it('keeps the catalog year as a distinct Thai cover line', () => {
     expect(makeFieldFacingPdfYearLabel('2568.0.0')).toBe('ประจำปี 2568');
     expect(makeFieldFacingPdfYearLabel('2569.1.0')).toBe('ประจำปี 2569');

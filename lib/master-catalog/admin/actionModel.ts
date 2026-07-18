@@ -7,6 +7,10 @@ export interface CatalogMutationState {
   message: string;
   code?: string;
   versionId?: string;
+  officialVersionString?: string | null;
+  targetVersionString?: string;
+  draftReference?: string | null;
+  versionStatus?: string;
   lockVersion?: number;
   changeSetId?: string;
   itemCount?: number;
@@ -20,6 +24,12 @@ export interface CatalogMutationState {
   placementReviewId?: string;
   newIdentityCount?: number;
   affectedRows?: number;
+  previousVersionId?: string;
+  currentPointerVersionId?: string;
+  affectedDraftVersionId?: string;
+  affectedDraftReference?: string | null;
+  affectedDraftTargetVersionString?: string | null;
+  draftEffect?: 'none' | 'becomes_current' | 'becomes_stale' | 'remains_stale';
   duplicateRequest?: boolean;
   requestId?: string;
   retryable?: boolean;
@@ -38,6 +48,9 @@ export interface CatalogRpcActionResponse {
   requestId?: string;
   data?: {
     versionId?: string;
+    officialVersionString?: string | null;
+    targetVersionString?: string;
+    draftReference?: string | null;
     lockVersion?: number;
     changeSetId?: string;
     targetVersionId?: string;
@@ -52,6 +65,12 @@ export interface CatalogRpcActionResponse {
     placementReviewId?: string;
     newIdentityCount?: number;
     affectedRows?: number;
+    previousVersionId?: string;
+    currentPointerVersionId?: string;
+    affectedDraftVersionId?: string;
+    affectedDraftReference?: string | null;
+    affectedDraftTargetVersionString?: string | null;
+    draftEffect?: CatalogMutationState['draftEffect'];
     duplicateRequest?: boolean;
   };
   error?: {
@@ -173,8 +192,8 @@ const RPC_ACTION_ERROR_MESSAGES_TH: Record<string, string> = {
   CATALOG_WITHDRAW_NOT_ALLOWED: 'ถอนรายการนี้ออกจากฉบับร่างไม่ได้ กรุณาตรวจประวัติการเผยแพร่ก่อน',
   CATALOG_NEW_IDENTITY_DISABLED: 'ยังไม่เปิดการเพิ่มรายการใหม่สำหรับรอบเผยแพร่นี้',
   CATALOG_RETIREMENT_DISABLED: 'ยังไม่เปิดการยกเลิกใช้รายการสำหรับรอบเผยแพร่นี้',
-  DRAFT_ALREADY_EXISTS: 'เวอร์ชันฐานนี้มีฉบับร่างที่กำลังทำงานอยู่แล้ว กรุณาเปิดฉบับร่างเดิม หรือยกเลิกฉบับร่างเดิมพร้อมระบุเหตุผลก่อนสร้างใหม่',
-  DRAFT_BASE_STALE: 'ฉบับร่างนี้อ้างอิงเวอร์ชันฐานเก่า กรุณาสร้างฉบับร่างใหม่จากเวอร์ชันใช้งานปัจจุบัน',
+  DRAFT_ALREADY_EXISTS: 'มีฉบับร่างที่กำลังทำงานอยู่แล้ว กรุณาเปิดฉบับร่างเดิม หรือยกเลิกฉบับร่างเดิมพร้อมระบุเหตุผลก่อนสร้างใหม่',
+  DRAFT_BASE_STALE: 'ฉบับร่างนี้อ้างอิงเวอร์ชันฐานเก่า จึงแก้ไขหรือนำไปเผยแพร่ไม่ได้ กรุณาคืนเวอร์ชันฐานเดิมหรือยกเลิกร่างนี้ก่อนสร้างใหม่',
   DRAFT_LOCK_CONFLICT: 'ฉบับร่างถูกเปลี่ยนแปลงหลังเปิดหน้าจอนี้ กรุณาโหลดข้อมูลล่าสุดแล้วตรวจอีกครั้ง',
   DRAFT_NOT_EDITABLE: 'แก้ไขได้เฉพาะฉบับร่างที่อ้างอิงเวอร์ชันใช้งานปัจจุบัน',
   DRAFT_NOT_FOUND: 'ไม่พบฉบับร่างที่ระบุ',
@@ -297,6 +316,10 @@ export function mapCatalogRpcActionResponse(
     status: 'success',
     message: successMessage,
     versionId: response.data?.versionId ?? response.data?.targetVersionId,
+    officialVersionString: response.data?.officialVersionString,
+    targetVersionString: response.data?.targetVersionString,
+    draftReference: response.data?.draftReference,
+    versionStatus: response.data?.status,
     lockVersion: response.data?.lockVersion,
     changeSetId: response.data?.changeSetId,
     itemCount: response.data?.itemCount,
@@ -310,6 +333,12 @@ export function mapCatalogRpcActionResponse(
     placementReviewId: response.data?.placementReviewId,
     newIdentityCount: response.data?.newIdentityCount,
     affectedRows: response.data?.affectedRows,
+    previousVersionId: response.data?.previousVersionId,
+    currentPointerVersionId: response.data?.currentPointerVersionId,
+    affectedDraftVersionId: response.data?.affectedDraftVersionId,
+    affectedDraftReference: response.data?.affectedDraftReference,
+    affectedDraftTargetVersionString: response.data?.affectedDraftTargetVersionString,
+    draftEffect: response.data?.draftEffect,
     duplicateRequest: response.data?.duplicateRequest,
     requestId: response.requestId,
     outcomeUncertain: false,
@@ -389,10 +418,12 @@ export function buildPlaceCatalogItemsArgs(
       );
     }
 
-    const reason = readRequiredText(formData, 'reason', 'เหตุผลการยืนยันตำแหน่ง');
-    if (reason.length > 500) {
-      return createCatalogMutationError('เหตุผลการยืนยันตำแหน่งยาวเกิน 500 ตัวอักษร');
-    }
+    const reason = readRequiredText(
+      formData,
+      'reason',
+      'เหตุผลการยืนยันตำแหน่ง',
+      500,
+    );
 
     return {
       p_version_id: versionId,
@@ -444,15 +475,21 @@ export function buildPublishCatalogVersionArgs(
       p_expected_lock_version: expectedLockVersion,
       p_approval_metadata: {
         effectiveDate,
-        approvalReference: readRequiredText(formData, 'approvalReference', 'เลขที่เอกสารอนุมัติ'),
+        approvalReference: readRequiredText(
+          formData,
+          'approvalReference',
+          'เลขที่เอกสารอนุมัติ',
+          500,
+        ),
         approvalDocumentDate,
         physicalArchiveReference: readRequiredText(
           formData,
           'physicalArchiveReference',
           'ที่เก็บเอกสารและไฟล์ฉบับอนุมัติ',
+          500,
         ),
       },
-      p_reason: readRequiredText(formData, 'reason', 'เหตุผล'),
+      p_reason: readRequiredText(formData, 'reason', 'เหตุผล', 500),
       p_request_id: requestId,
     };
   } catch (error) {
@@ -506,7 +543,12 @@ export function buildAbandonCatalogDraftArgs(
     return {
       p_version_id: versionId,
       p_expected_lock_version: expectedLockVersion,
-      p_reason: readRequiredText(formData, 'reason', 'เหตุผลที่ยกเลิกฉบับร่าง'),
+      p_reason: readRequiredText(
+        formData,
+        'reason',
+        'เหตุผลที่ยกเลิกฉบับร่าง',
+        500,
+      ),
       p_request_id: requestId,
     };
   } catch (error) {
@@ -533,7 +575,7 @@ export function buildRestoreCatalogPointerArgs(
 
     return {
       p_target_version_id: targetVersionId,
-      p_reason: readRequiredText(formData, 'reason', 'เหตุผล'),
+      p_reason: readRequiredText(formData, 'reason', 'เหตุผล', 500),
       p_request_id: requestId,
     };
   } catch (error) {
@@ -734,12 +776,21 @@ function readMoneyFields(formData: FormData): Record<string, string> | CatalogMu
   return money;
 }
 
-function readRequiredText(formData: FormData, key: string, label: string): string {
+function readRequiredText(
+  formData: FormData,
+  key: string,
+  label: string,
+  maxLength?: number,
+): string {
   const value = formData.get(key);
   const text = typeof value === 'string' ? value.trim().normalize('NFC') : '';
 
   if (!text) {
     throw new RequiredFieldError(`${label} ต้องไม่ว่าง`);
+  }
+
+  if (maxLength !== undefined && text.length > maxLength) {
+    throw new RequiredFieldError(`${label} ต้องไม่เกิน ${maxLength} ตัวอักษร`);
   }
 
   return text;

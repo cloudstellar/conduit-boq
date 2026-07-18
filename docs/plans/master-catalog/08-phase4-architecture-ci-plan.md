@@ -18,9 +18,24 @@ HOLD because the final owner UI submission, broader independent core-admin
 UAT, three safe-error recoveries, and named import-preview/publish-readiness
 interaction baselines remain open. All Production gates remain separate, and
 Add/Supplement stays hidden. See [Review Note #33](./33-phase4-wp8-p37-uat-ux-correction-note.md)
-and [Closure Matrix #34](./34-phase4-wp8-p37-closure-matrix.md).
+and [Closure Matrix #34](./34-phase4-wp8-p37-closure-matrix.md). P-38 Card A was
+subsequently stopped and cleaned when the owner identified unexplained official
+version gaps caused by abandoned drafts. P-39R is now the controlling Local-only
+correction and P-38 remains paused until its gates pass; see
+[Correction Plan #37](./37-phase4-p39-draft-identity-release-number-correction-plan.md).
 
 **Date:** 2026-06-22
+
+**P-39R draft-identity/release-number amendment:** 2026-07-18 — each draft has
+an immutable internal reference and claims, but does not issue, a target catalog
+version. Publication issues that target; audited abandonment preserves the full
+attempt while releasing the unissued target for a replacement draft. Published
+and archived versions remain unique and permanently reserved. At most one draft
+is open globally; a stale draft may only be inspected or audited-abandoned.
+Restore records pointer before/after and its effect on that draft. Forward
+migration `022` overlays accepted `020`/`021`; prior P39-S is historical and
+P39R-S passed on the corrected source candidate. P39R-L/P39R-C/P39R-U plus
+every Production approval remain separate gates.
 
 **Reliability amendment:** 2026-07-11 — WP-6.5 now closes end-to-end
 idempotency, publish-block UX, P-20 hash portability, ADR-003 reusable
@@ -75,10 +90,10 @@ readiness parity, correction actions, schema constraints, and Thai operator UX
 must close in WP-6.6 before WP-7. This is a planning gate, not implementation or
 Production approval.
 
-**P-22 operator-workflow amendment:** 2026-07-12 — intended-admin review placed
+**Historical P-22 operator-workflow amendment:** 2026-07-12 — intended-admin review placed
 WP-6.6 closeout on Hold and accepted
 [Correction Plan #31](./31-phase4-wp66-operator-workflow-correction-plan.md).
-Phase 4 Core has at most one mutable draft per base, audited abandon with
+The then-current contract had at most one mutable draft per base, audited abandon with
 read-only retained history, an item-first workspace, and an authoritative final
 draft-versus-base snapshot review bound to publish `lock_version`. This remains
 the existing one-publisher model, not a multi-stage approval engine. Candidate
@@ -99,7 +114,8 @@ checkpoint G2 still had to independently clean-rebuild the later reviewed,
 committed, named candidate. Final G2 has now satisfied that requirement; G3
 owner closeout remains. No Production action is authorized by this checkpoint.
 
-**P-23.1 version-intent/item-first amendment:** 2026-07-13 — draft creation
+**P-23.1 version-intent/item-first amendment (historical; numbering rule
+superseded by P-39):** 2026-07-13 — draft creation
 requires explicit annual/revision/patch business intent, an owner-designated
 annual year, complete all-status registry planning, permanent number
 reservation, and a guarded next-sequence check. A lower abandoned annual number
@@ -109,7 +125,9 @@ workspace; items precede detailed document metadata; restore shows a
 current-to-target confirmation. Candidate `020` changed, so at that amendment
 checkpoint earlier G1 evidence became historical and separately approved
 G1R/G2 clean rebuilds were required before G3. The later G1R/G2 results are
-recorded below. No reset or Production action was authorized by this amendment.
+recorded below. Its permanent all-status reservation rule is retained only as
+historical evidence; P-39 controls future execution. No reset or Production
+action was authorized by this amendment.
 
 **P-24 pre-G1R hardening:** 2026-07-13 — the exact candidate must also enforce
 an annual effective-year horizon of base +1 through +10 at UI, Server Action,
@@ -610,9 +628,9 @@ Version rules:
   new draft from the new current version and deliberately reapply the still
   approved changes through new audited change sets. The stale draft remains a
   nonofficial read-only comparison artifact and can never be promoted.
-- At most one mutable `draft` may exist per `based_on_version_id`; the database
-  enforces this invariant. Version numbers remain globally unique.
-- The UI opens the one current-base working draft explicitly. Stale and
+- At most one mutable `draft` may exist globally; the database enforces this
+  invariant. Version targets remain globally unique while claimed or issued.
+- The UI opens the one global working draft explicitly. Stale and
   abandoned drafts remain visible read-only; it never silently targets another
   version for mutation/import.
 - Starting over requires an audited `draft -> abandoned` action. It never
@@ -1019,7 +1037,7 @@ Add `CHECK (unit_cost = material_cost + labor_cost) NOT VALID`, then run
 The first rollout does not import workbook prices:
 
 1. Choose **ปรับปรุง/เพิ่มเติม** from current default `2568.0.0`; the expected
-   candidate is `2568.1.0` only when that number remains unreserved.
+   target is `2568.1.0` only when that number is not issued or currently claimed.
 2. Clone all 710 Production rows and assign stable identities.
 3. Verify names, units, material costs, labor costs, and unit costs are byte-for-
    byte/numerically equal to the Production baseline.
@@ -1171,7 +1189,8 @@ Invalid input creates no uploaded file and no cleanup obligation.
 An active admin may change a draft through item forms without selecting a
 workbook:
 
-1. Open the one current-base working draft or clone Current when none exists.
+1. Open the one global working draft or clone Current when none exists; if the
+   open draft is stale, abandon it with a reason before creating a replacement.
 2. Choose add, edit, retire, or recode.
 3. Enter the proposed values and a mandatory reason.
 4. For price changes, show old/new material, labor, and unit costs together and
@@ -1621,8 +1640,10 @@ Proposed after P-18 acceptance:
 
 - Require one business intent: annual, revision, or patch. Annual additionally
   requires the owner-designated effective BE year.
-- Load the complete all-status registry or fail closed; show the planned number
-  and any lower reserved identifiers before creation.
+- Load the complete issued/currently-claimed registry or fail closed; show the
+  target and any lower issued/claimed identifiers before creation. Keep
+  abandoned attempts visible by immutable draft reference without consuming
+  their unissued targets.
 - Do not expose raw major/minor/patch segments as the primary operator control.
 - The guarded DB path owns current-base, next-sequence, concurrency, and replay
   checks; a stale proposal returns `VERSION_SEQUENCE_STALE` and creates nothing.
@@ -1788,15 +1809,17 @@ reviewed fix-forward, not an assumed destructive reverse operation.
 - Implement clone-from-current, manual add/edit/retire/recode, stale-draft
   protection, and item history timeline.
 - Implement reusable ADR-003 annual/revision/patch version creation with
-  explicit business intent, a complete all-status reserved-number registry, and
-  DB-enforced next-sequence validation. Keep `2568.1.0` only as the exact first
-  candidate when unreserved rather than hardcoding it in reusable paths.
+  explicit business intent, immutable draft references, a complete issued or
+  currently claimed version registry, and DB-enforced next-sequence validation.
+  Keep `2568.1.0` only as the exact first target when unclaimed/unissued rather
+  than hardcoding it in reusable paths.
 - Implement official Excel and PDF exports.
 - Complete WP-6.5 end-to-end request-id, publish-guard/early-warning,
   P-20 portability, DB integration/concurrency, route failure-state,
   observability, tracked export-verifier, and documentation-consistency gates.
 - Complete WP-6.6 from Audit #29: full catalog browse/item history, explicit
-  current-base workspace plus stale/abandoned read-only history, resolve-only versioned categories/P-06
+  current-base workspace plus stale inspection/audited-abandon and immutable
+  abandoned history, resolve-only versioned categories/P-06
   code groups and
   server code allocator, complete import diff/evidence, server-derived publisher
   plus version archive metadata, complete readiness parity, correction actions,
@@ -1933,7 +1956,7 @@ Do not advance when any gate fails:
   creating it.
 - Draft lineage points to the expected base version; publishing a stale-base
   draft is rejected.
-- A partial unique constraint prevents two mutable drafts for one base;
+- A partial unique constraint prevents more than one mutable draft globally;
   abandoned drafts retain immutable rows/audit and cannot publish or restore.
 - No duplicate version/item-code or version/identity pairs.
 - A code cannot be assigned to another identity.
@@ -2018,7 +2041,8 @@ Do not advance when any gate fails:
   old/new values
 - Audit history cannot be edited or deleted
 - Full 710-row browse/search and item history expose field-level old/new values;
-  stale drafts are read-only and no mutation/import silently selects a draft
+  stale drafts permit inspection and audited abandon only, and no
+  mutation/import silently selects a draft
 - New identities from manual Add and Supplement converge on one pending placement
   batch; confirming that batch does not create a new catalog version per item
 
@@ -2045,9 +2069,10 @@ Do not advance when any gate fails:
 - Reusable version create/publish accepts another ADR-003-valid
   annual/revision/patch version and rejects duplicates/invalid ordering without
   a hardcoded `2568.1.0` path
-- Reserved-number fixtures cover abandoned revision/patch candidates, a void
-  `{year}.0.0` followed by the next same-year annual revision, stale UI plans,
-  out-of-sequence requests, create races, and same-request replay
+- Draft-identity fixtures prove that abandoned revision/patch/annual attempts
+  retain distinct immutable references, release their unissued targets, and let
+  replacements reclaim those targets; stale UI plans, out-of-sequence requests,
+  create races, and same-request replay remain covered
 - Tracked semantic verifier remains correct when title rows move and fails
   closed on missing/renamed headers, wrong counts/types/hash, formulas, or links
 - A new-identity draft rejects before P-18 placement; after accepted placement,
@@ -2103,7 +2128,8 @@ Do not advance when any gate fails:
 - Every item exposes read-only history across versions and recodes using stable
   identity and full old/new row snapshots.
 - An admin can search/filter the complete current catalog, select the exact item
-  and draft, and see stale drafts as read-only without developer assistance.
+  and draft, and understand that stale drafts permit inspection/audited abandon
+  only without developer assistance.
 - Ordinary item/import workflows resolve only approved categories/code groups;
   code allocation is server-owned and never reuses a retired sequence.
 - An admin can add, edit, retire, or recode a draft item without uploading an
@@ -2136,8 +2162,8 @@ Do not advance when any gate fails:
   added row through explicit audited correction actions without deleting
   identity/code/audit history.
 - A stale-base draft cannot become current.
-- A second current-base mutable draft cannot be created; audited abandon retains
-  the old attempt as read-only history.
+- A second mutable draft cannot be created from any base; audited abandon of a
+  current or stale draft retains the old attempt as read-only history.
 - The item-first workspace and authoritative final snapshot review make every
   cumulative manual/import effect visible before the publish form.
 - P-20 establishes and proves the intended cross-environment identity/hash
@@ -2165,8 +2191,8 @@ Do not advance when any gate fails:
   data and publishes the authoritative dataset.
 - Published database versions and their stamped exports are official.
 - Draft manual edits require a reason.
-- Phase 4 Core allows at most one mutable working draft per base; stale and
-  abandoned drafts are retained read-only.
+- Phase 4 Core allows at most one mutable working draft globally; a stale draft
+  permits inspection/audited abandon only, while abandoned history is immutable.
 - Production is the authoritative initial source for name, unit, material cost,
   labor cost, and unit cost.
 - The first structured-code candidate is based on all 710 Production rows; the

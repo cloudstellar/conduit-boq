@@ -15,9 +15,16 @@ Add/Supplement, or infer Production readiness until every open row below is
 closed or carries an explicit owner risk acceptance with rationale, owner, and
 due date.
 
-**Current continuation:** Evidence reconciliation is complete in
+**Current continuation:** The first P-38 Card A run was stopped and safely
+cleaned after the owner identified unexplained official-release gaps caused by
+    permanently reserving abandoned draft numbers. P-39R now blocks continuation
+until immutable draft references and reusable unissued targets pass the gates in
+[Correction Plan #37](./37-phase4-p39-draft-identity-release-number-correction-plan.md).
+The evidence reconciliation remains complete in
 [Owner UAT Script #35](./35-phase4-wp8-p37-evidence-reconciliation-and-owner-uat-script.md).
-P-38 authorizes its bounded no-reset Local preparation and scored Owner UAT.
+P-38 authorizes its bounded no-reset Local preparation and scored Owner UAT only
+after the remaining P39R-L/P39R-C/P39R-U gates pass. The earlier P39-S result is
+historical; corrected P39R-S passed on the current working-tree candidate.
 The tracked harness, corrected E-01/E-02 input recipes, binary hashes, and
 read-only disabled-baseline proof are recorded in
 [Preflight Note #36](./36-phase4-wp8-p38-no-reset-owner-uat-preflight.md).
@@ -49,7 +56,7 @@ Local cleanup.
 
 | ID | WP-8/P-37 gate | Current evidence | Status | Required closure |
 |---|---|---|---|---|
-| C-01 | Clean integrated Local chain through `021` | P-36 exact checkout `910cc3cc74660beecf18655d39cd0b0c085d1fc6` applied `009`-`015`, hotfix `016`, and Phase 4 `017`-`021` | Passed | No rerun unless migration/bootstrap/toolchain source changes |
+| C-01 | Clean integrated Local chain through the current Phase 4 migration | P-36 exact checkout `910cc3cc74660beecf18655d39cd0b0c085d1fc6` passed through `021`; P-39R adds corrected `022` | Reopened for P39R-C | After P39R-S/P39R-L, run one separately approved clean bootstrap through `022` and retain the prior `021` evidence as historical |
 | C-02 | DB/RLS/role/rollback/race/idempotency/P-20/BOQ/Factor F invariants | P-36 harnesses passed; later P-37 technical continuation proved stale rejection, one acceptance, exact replay, accepted readback, and cleanup | Passed technically | Retain; the owner UI path remains separate under C-07 |
 | C-03 | Tracked official export verification | P-11 exact pair was owner-accepted; P-36 regenerated and independently verified the active 710-row Excel/PDF evidence | Passed | Production filing remains P-15, not P-37 |
 | C-04 | Security/performance advisor blocker review | P-36 returned no security blocker; baseline performance findings and the unused `v_row_count` are assigned to P-12 with owners and rationale | Passed for P-37 | Reassess/minimize before P-12; this is not a Production waiver |
@@ -60,7 +67,7 @@ Local cleanup.
 | C-09 | Independent core-admin UAT | G1R/G3/P-26 and P-36 prove version planning, item edit, import context, final review, publish guards, export, abandon, and recovery technically; WP-4 proves a historical one-row file-picker preview | Open | Evidence reconciliation is complete. The intended admin must complete Note #35 Cards A-G on current routes without live developer help |
 | C-10 | At least three safe validation-error recoveries | Several technical error paths exist, but no current WP-8 record identifies three errors completed by the intended admin in the independent session | Open | Record Note #35 E-01 invalid authority, E-02 retirement hold, and E-03 stale final review; stale placement and uncertain response remain separate evidence |
 | C-11 | 710-row performance baseline | P-36 measured 710+18 placement/final-review routes at 607-1,136 ms, deep paging at 746 ms, and verified export; P-37 exercised search/preview/sibling/focus without material stutter | Partial | Reuse those named results and complete Note #35's Full 710-row import-preview plus publish-readiness/current-interaction measurements against the written budget |
-| C-12 | Documentation consistency | Tracker, Verification Report, Decision Register, migration ledger, threat model, review notes, Closure Matrix #34, Owner UAT Script #35, and Preflight Note #36 distinguish retained evidence, developer preflight, Owner interaction, and C-07 through C-11; executable authority checks guard the current contract | Passed | Keep the consistency assertions green after every current-status or gate change |
+| C-12 | Documentation consistency | P-39R authority amendment aligns ADR-003/004, plans, contracts, runbook, tracker, UAT, migration ledger, threat model, compatibility matrix, and executable checks | Passed for P39R-S; monitor | Authority consistency and full repository checks passed; rerun after any P39R-L/P39R-C/P39R-U evidence update |
 | C-13 | Disabled clean Local baseline | Pointer `2568.0.0`/710, zero working drafts, all three catalog flags false, BOQ 198/1,547, Factor F `2569.0.0`/36; Production untouched | Passed | Repeat exact readback after the final bounded UAT fixture is audited-abandoned |
 
 ## 3. Minimal closure sequence

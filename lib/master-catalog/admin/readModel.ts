@@ -52,7 +52,9 @@ export type CatalogAdminGate =
 
 export interface CatalogVersionSummary {
   id: string;
-  versionString: string;
+  officialVersionString: string | null;
+  targetVersionString: string;
+  draftReference: string | null;
   name: string;
   status: CatalogVersionStatus;
   isDefault: boolean;
@@ -96,6 +98,10 @@ export interface CatalogChangeSetSummary {
   actorDisplayName: string;
   beforeLockVersion: number | null;
   afterLockVersion: number | null;
+  pointerBeforeVersionId: string | null;
+  pointerAfterVersionId: string | null;
+  affectedDraftVersionId: string | null;
+  draftEffect: 'none' | 'becomes_current' | 'becomes_stale' | 'remains_stale' | null;
   createdAt: string;
 }
 
@@ -141,7 +147,8 @@ export interface CatalogPublishReadiness {
 export interface CatalogPlacementWorkspace {
   version: {
     id: string;
-    versionString: string;
+    targetVersionString: string;
+    draftReference: string | null;
     status: CatalogVersionStatus;
     basedOnVersionId: string | null;
     lockVersion: number;
@@ -182,6 +189,7 @@ export interface CatalogVersionDetail {
   version: CatalogVersionSummary;
   baseVersion: CatalogVersionSummary | null;
   currentVersion: CatalogVersionSummary | null;
+  openDraft: CatalogVersionSummary | null;
   counts: {
     rows: number | null;
     activeRows: number | null;
@@ -228,6 +236,8 @@ export interface CatalogRegisterPage<T> {
 const VERSION_COLUMNS = [
   'id',
   'version_string',
+  'target_version_string',
+  'draft_reference',
   'name',
   'status',
   'is_default',
@@ -271,6 +281,10 @@ const CHANGE_SET_COLUMNS = [
   'actor_display_name',
   'before_lock_version',
   'after_lock_version',
+  'pointer_before_version_id',
+  'pointer_after_version_id',
+  'affected_draft_version_id',
+  'draft_effect',
   'created_at',
 ].join(',');
 
@@ -398,6 +412,8 @@ export async function loadCatalogAdminOverview(
       supabase
         .from('price_list_versions')
         .select('version_string,status', { count: 'exact' })
+        .neq('status', 'abandoned')
+        .not('version_string', 'is', null)
         .order('major', { ascending: true })
         .order('minor', { ascending: true })
         .order('patch', { ascending: true })
@@ -441,6 +457,8 @@ export async function loadCatalogAdminOverview(
       const pageResult = await supabase
         .from('price_list_versions')
         .select('version_string,status')
+        .neq('status', 'abandoned')
+        .not('version_string', 'is', null)
         .order('major', { ascending: true })
         .order('minor', { ascending: true })
         .order('patch', { ascending: true })
@@ -466,15 +484,19 @@ export async function loadCatalogAdminOverview(
   }
 
   const mappedVersionRegistry = versionRegistryRows.map((row) => ({
-    versionString: String(row.version_string ?? ''),
+    targetVersionString: String(row.version_string ?? ''),
     status: String(row.status ?? ''),
   }));
-  const registryStrings = new Set(mappedVersionRegistry.map((entry) => entry.versionString));
+  const registryStrings = new Set(
+    mappedVersionRegistry.map((entry) => entry.targetVersionString),
+  );
   let versionRegistry: CatalogVersionRegistryEntry[] | null = !versionRegistryLoadFailed
     && typeof versionRegistryCount === 'number'
     && versionRegistryCount === mappedVersionRegistry.length
     && registryStrings.size === mappedVersionRegistry.length
-    && mappedVersionRegistry.every((entry) => parseCatalogVersionString(entry.versionString))
+    && mappedVersionRegistry.every(
+      (entry) => parseCatalogVersionString(entry.targetVersionString),
+    )
     ? mappedVersionRegistry
     : null;
   if (versionRegistry === null) {
@@ -488,14 +510,16 @@ export async function loadCatalogAdminOverview(
   if (
     versionRegistry
     && defaultVersion
-    && !versionRegistry.some((entry) => entry.versionString === defaultVersion.versionString)
+    && !versionRegistry.some(
+      (entry) => entry.targetVersionString === defaultVersion.officialVersionString,
+    )
   ) {
     versionRegistry = null;
     warnings.push('ทะเบียนเลขเวอร์ชันไม่พบเวอร์ชันใช้งานปัจจุบัน จึงปิดการสร้างฉบับร่างไว้ก่อน');
   }
   const drafts = rowsFromResult(draftsResult.data).map(mapVersionSummary);
-  if (drafts.filter((draft) => draft.basedOnVersionId === defaultVersionId).length > 1) {
-    warnings.push('พบฉบับร่างที่กำลังทำงานจากเวอร์ชันฐานเดียวกันมากกว่าหนึ่งฉบับ จึงต้องแก้ฐานข้อมูลก่อนใช้งานต่อ');
+  if (drafts.length > 1) {
+    warnings.push('พบฉบับร่างที่กำลังทำงานมากกว่าหนึ่งฉบับ จึงต้องแก้ invariant ของฐานข้อมูลก่อนใช้งานต่อ');
   }
   const [
     activeDefaultRows,
@@ -599,7 +623,7 @@ export async function loadCatalogPlacementWorkspace(
   const warnings: string[] = [];
   const { data: versionData, error: versionError } = await supabase
     .from('price_list_versions')
-    .select('id,version_string,status,based_on_version_id,lock_version')
+    .select('id,version_string,target_version_string,draft_reference,status,based_on_version_id,lock_version')
     .eq('id', versionId)
     .maybeSingle();
 
@@ -643,7 +667,10 @@ export async function loadCatalogPlacementWorkspace(
   return {
     version: {
       id: String(versionRow.id),
-      versionString: String(versionRow.version_string ?? ''),
+      targetVersionString: String(
+        versionRow.target_version_string ?? versionRow.version_string ?? '',
+      ),
+      draftReference: toNullableString(versionRow.draft_reference),
       status,
       basedOnVersionId,
       lockVersion: toNullableNumber(versionRow.lock_version) ?? 0,
@@ -705,6 +732,7 @@ export async function loadCatalogVersionDetail(
     publishReadiness,
     capabilityResult,
     baseVersionResult,
+    openDraftResult,
   ] = await Promise.all([
     countPriceListRows(supabase, version.id, null, warnings, 'นับรายการทั้งหมดไม่สำเร็จ'),
     countPriceListRows(supabase, version.id, true, warnings, 'นับรายการใช้งานไม่สำเร็จ'),
@@ -724,10 +752,19 @@ export async function loadCatalogVersionDetail(
       : Promise.resolve(null),
     loadCatalogCapabilityFlags(supabase),
     baseVersionQuery,
+    supabase
+      .from('price_list_versions')
+      .select(VERSION_COLUMNS)
+      .eq('status', 'draft')
+      .order('created_at', { ascending: true })
+      .order('id', { ascending: true })
+      .limit(1)
+      .maybeSingle(),
   ]);
   warnings.push(...workspace.warnings);
   pushError(warnings, pointerResult.error, 'โหลดเวอร์ชันบัญชีราคาที่ใช้งานปัจจุบันไม่สำเร็จ');
   pushError(warnings, baseVersionResult.error, 'โหลดเวอร์ชันฐานไม่สำเร็จ');
+  pushError(warnings, openDraftResult.error, 'โหลดฉบับร่างที่เปิดอยู่ไม่สำเร็จ');
   if (capabilityResult.warning) warnings.push(capabilityResult.warning);
   const baseVersionRow = rowFromResult(baseVersionResult.data);
 
@@ -736,6 +773,8 @@ export async function loadCatalogVersionDetail(
     loadVersionChangeSets(supabase, version.id, 12, warnings),
   ]);
   const baseVersion = baseVersionRow ? mapVersionSummary(baseVersionRow) : null;
+  const openDraftRow = rowFromResult(openDraftResult.data);
+  const openDraft = openDraftRow ? mapVersionSummary(openDraftRow) : null;
   const currentVersionId = toNullableString(pointerResult.data?.version_id);
   let currentVersion: CatalogVersionSummary | null = null;
   if (currentVersionId === version.id) {
@@ -750,6 +789,7 @@ export async function loadCatalogVersionDetail(
     version,
     baseVersion,
     currentVersion,
+    openDraft,
     counts: {
       rows,
       activeRows,
@@ -1223,11 +1263,19 @@ function rowFromResult(data: unknown): Record<string, unknown> | null {
 }
 
 function mapVersionSummary(row: Record<string, unknown>): CatalogVersionSummary {
+  const status = (row.status ?? 'draft') as CatalogVersionStatus;
+  const claimedVersionString = toNullableString(row.version_string);
+  const targetVersionString = String(
+    row.target_version_string ?? claimedVersionString ?? '',
+  );
   return {
     id: String(row.id),
-    versionString: String(row.version_string ?? ''),
+    officialVersionString:
+      status === 'active' || status === 'archived' ? claimedVersionString : null,
+    targetVersionString,
+    draftReference: toNullableString(row.draft_reference),
     name: String(row.name ?? ''),
-    status: (row.status ?? 'draft') as CatalogVersionStatus,
+    status,
     isDefault: Boolean(row.is_default),
     basedOnVersionId: toNullableString(row.based_on_version_id),
     effectiveDate: toNullableString(row.effective_date),
@@ -1273,6 +1321,10 @@ function mapChangeSetSummary(row: Record<string, unknown>): CatalogChangeSetSumm
     actorDisplayName: String(row.actor_display_name ?? ''),
     beforeLockVersion: toNullableNumber(row.before_lock_version),
     afterLockVersion: toNullableNumber(row.after_lock_version),
+    pointerBeforeVersionId: toNullableString(row.pointer_before_version_id),
+    pointerAfterVersionId: toNullableString(row.pointer_after_version_id),
+    affectedDraftVersionId: toNullableString(row.affected_draft_version_id),
+    draftEffect: toNullableString(row.draft_effect) as CatalogChangeSetSummary['draftEffect'],
     createdAt: String(row.created_at ?? ''),
   };
 }

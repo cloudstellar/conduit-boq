@@ -15,7 +15,9 @@ describe('Master Catalog structured operation logs', () => {
       startedAt: Date.now() - 5,
       requestId: '00000000-0000-4000-8000-000000000101',
       versionId: '00000000-0000-4000-8000-000000000001',
-      versionString: '2568.1.0',
+      officialVersionString: '2568.1.0',
+      targetVersionString: '2568.1.0',
+      draftReference: '2568.1.0-D001',
     });
 
     expect(info).toHaveBeenCalledOnce();
@@ -26,17 +28,21 @@ describe('Master Catalog structured operation logs', () => {
       outcome: 'success',
       requestId: '00000000-0000-4000-8000-000000000101',
       versionId: '00000000-0000-4000-8000-000000000001',
-      versionString: '2568.1.0',
+      officialVersionString: '2568.1.0',
+      targetVersionString: '2568.1.0',
+      draftReference: '2568.1.0-D001',
     });
     expect(event.durationMs).toEqual(expect.any(Number));
     expect(Object.keys(event).sort()).toEqual([
+      'draftReference',
       'durationMs',
       'event',
+      'officialVersionString',
       'operation',
       'outcome',
       'requestId',
+      'targetVersionString',
       'versionId',
-      'versionString',
     ]);
   });
 

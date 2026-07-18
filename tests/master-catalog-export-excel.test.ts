@@ -66,7 +66,9 @@ describe('Master Catalog official Excel export', () => {
       'สรุปการเปลี่ยนแปลง',
       'ข้อมูลตรวจสอบ',
     ]);
-    expect(workbook.title).toBe(makeCatalogExportDocumentTitle(dataset.version.versionString));
+    expect(workbook.title).toBe(
+      makeCatalogExportDocumentTitle(dataset.version.officialVersionString ?? ''),
+    );
 
     const documentSheet = workbook.getWorksheet('ข้อมูลเอกสาร');
     expect(documentSheet).toBeDefined();
@@ -174,11 +176,17 @@ describe('Master Catalog official Excel export', () => {
     const priceSheet = workbook.getWorksheet('รายการราคา')!;
     const documentValues = collectSheetValues(documentSheet);
 
-    expect(documentValues).toContain('DRAFT – ห้ามใช้อ้างอิง');
+    expect(documentValues).toContain('ฉบับร่าง - ห้ามใช้อ้างอิง');
+    expect(documentValues).toContain('รหัสร่าง');
+    expect(documentValues).toContain('2568.1.0-D001');
+    expect(documentValues).toContain('เลขฉบับเป้าหมาย');
     expect(documentValues).toContain('ค่าแฮชชุดข้อมูลฉบับร่าง');
     expect(documentValues).toContain('ค่าแฮชชุดข้อมูลฉบับร่างไม่ใช่ค่าแฮชสำหรับการเผยแพร่อย่างเป็นทางการ');
     expect(priceSheet.getCell(1, 1).value)
-      .toBe(`DRAFT – ห้ามใช้อ้างอิง | ${CATALOG_EXPORT_DOCUMENT_TITLE}`);
+      .toBe(`ฉบับร่าง - ห้ามใช้อ้างอิง | ${CATALOG_EXPORT_DOCUMENT_TITLE}`);
+    expect(priceSheet.getCell(3, 1).value).toContain(
+      'รหัสร่าง 2568.1.0-D001 | เลขฉบับเป้าหมาย 2568.1.0',
+    );
   });
 
   it('uses Thai document-sheet labels while retaining canonical technical identifiers', async () => {
@@ -232,7 +240,9 @@ async function makeDataset(options: { draft?: boolean } = {}): Promise<CatalogEx
   return {
     version: {
       id: '00000000-0000-4000-8000-000000000100',
-      versionString: '2568.1.0',
+      officialVersionString: options.draft ? null : '2568.1.0',
+      targetVersionString: '2568.1.0',
+      draftReference: options.draft ? '2568.1.0-D001' : null,
       name: 'Phase 4 test catalog',
       status: options.draft ? 'draft' : 'active',
       isDefaultMirror: !options.draft,

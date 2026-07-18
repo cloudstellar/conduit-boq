@@ -15,7 +15,8 @@ import type {
 
 export interface CatalogImportDraftOption {
   id: string;
-  versionString: string;
+  targetVersionString: string;
+  draftReference: string | null;
   status: string;
   lockVersion: number;
   basedOnVersionId: string | null;
@@ -76,7 +77,7 @@ export async function loadCatalogImportContext(
       .maybeSingle(),
     supabase
       .from('price_list_versions')
-      .select('id,version_string,status,lock_version,based_on_version_id,created_at')
+      .select('id,version_string,target_version_string,draft_reference,status,lock_version,based_on_version_id,created_at')
       .eq('status', 'draft')
       .order('created_at', { ascending: false })
       .order('id', { ascending: false }),
@@ -96,7 +97,8 @@ export async function loadCatalogImportContext(
     const basedOnVersionId = nullableString(row.based_on_version_id);
     return {
       id: String(row.id ?? ''),
-      versionString: String(row.version_string ?? ''),
+      targetVersionString: String(row.target_version_string ?? row.version_string ?? ''),
+      draftReference: nullableString(row.draft_reference),
       status: String(row.status ?? ''),
       lockVersion: nonnegativeInteger(row.lock_version),
       basedOnVersionId,
@@ -104,8 +106,8 @@ export async function loadCatalogImportContext(
     };
   });
   const currentBaseDrafts = drafts.filter((candidate) => candidate.isCurrentBase);
-  if (currentBaseDrafts.length > 1) {
-    warnings.push('พบฉบับร่างที่กำลังทำงานจากเวอร์ชันฐานเดียวกันมากกว่าหนึ่งฉบับ จึงปิดการนำเข้าไว้ก่อน');
+  if (drafts.length > 1) {
+    warnings.push('พบฉบับร่างที่กำลังทำงานมากกว่าหนึ่งฉบับ จึงปิดการนำเข้าไว้ก่อน');
   }
   const draft = selectedDraftId
     ? drafts.find((candidate) => candidate.id === selectedDraftId) ?? null

@@ -1047,7 +1047,10 @@ export function MasterCatalogPlacementWorkspaceView({
                 ข้อมูลยังไม่ครบ {reviewCounts.incomplete.toLocaleString('th-TH')} รายการ
                 {' · '}ตำแหน่งไม่ถูกต้อง {reviewCounts.invalid.toLocaleString('th-TH')} รายการ
               </p>
-              <p>เวอร์ชัน {workspace.version.versionString}</p>
+              <p>
+                รหัสร่าง {workspace.version.draftReference ?? '-'}
+                {' · '}เลขเป้าหมาย {workspace.version.targetVersionString}
+              </p>
             </div>
             <div className="grid gap-2">
               <p className="text-sm font-medium">

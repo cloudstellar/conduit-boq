@@ -53,6 +53,7 @@ docker cp migrations/018_master_catalog_phase4_draft_mutation.sql "$DB_CONTAINER
 docker cp migrations/019_master_catalog_phase4_publish_pointer.sql "$DB_CONTAINER:/tmp/019.sql"
 docker cp migrations/020_master_catalog_phase4_admin_workflow_hardening.sql "$DB_CONTAINER:/tmp/020.sql"
 docker cp migrations/021_master_catalog_phase4_placement_governance.sql "$DB_CONTAINER:/tmp/021.sql"
+docker cp migrations/022_master_catalog_phase4_draft_identity_and_release_number.sql "$DB_CONTAINER:/tmp/022.sql"
 docker exec "$DB_CONTAINER" psql -v ON_ERROR_STOP=1 -U postgres -d postgres -f /tmp/009.sql
 docker exec "$DB_CONTAINER" psql -v ON_ERROR_STOP=1 -U postgres -d postgres -f /tmp/010.sql
 
@@ -78,6 +79,7 @@ docker exec "$DB_CONTAINER" psql -v ON_ERROR_STOP=1 -U postgres -d postgres -f /
 docker exec "$DB_CONTAINER" psql -v ON_ERROR_STOP=1 -U postgres -d postgres -f /tmp/019.sql
 docker exec "$DB_CONTAINER" psql -v ON_ERROR_STOP=1 -U postgres -d postgres -f /tmp/020.sql
 docker exec "$DB_CONTAINER" psql -v ON_ERROR_STOP=1 -U postgres -d postgres -f /tmp/021.sql
+docker exec "$DB_CONTAINER" psql -v ON_ERROR_STOP=1 -U postgres -d postgres -f /tmp/022.sql
 
 npm run db:local:seed-users
 npm run db:local:smoke-auth

@@ -83,7 +83,9 @@ async function loadPrintDataset(versionId: string): Promise<
       startedAt,
       requestId,
       versionId,
-      versionString: dataset.version.versionString,
+      officialVersionString: dataset.version.officialVersionString,
+      targetVersionString: dataset.version.targetVersionString,
+      draftReference: dataset.version.draftReference,
     });
 
     return { dataset };
@@ -120,6 +122,9 @@ async function loadPrintDataset(versionId: string): Promise<
 }
 
 function PrintDocument({ dataset }: { dataset: CatalogExportDataset }) {
+  const documentVersionString = dataset.isDraftExport
+    ? dataset.version.targetVersionString
+    : dataset.version.officialVersionString ?? dataset.version.targetVersionString;
   const pricePages = paginatePriceRows(dataset.rows);
   const filename = makeCatalogExportFilename(dataset, 'pdf');
   const statusText = getFieldFacingPdfStatus(dataset.version.status);
@@ -128,17 +133,19 @@ function PrintDocument({ dataset }: { dataset: CatalogExportDataset }) {
     dataset.version.isCurrentDefault,
   );
   const stampRows = buildFieldFacingPdfStamp({
-    versionString: dataset.version.versionString,
+    versionString: documentVersionString,
+    draftReference: dataset.version.draftReference,
+    isDraft: dataset.isDraftExport,
     statusText,
     effectiveDate: displayDateWithIso(dataset.version.effectiveDate),
     itemCount: dataset.counts.rowCount,
     canonicalDatasetHash: dataset.canonicalDatasetHash,
   });
   const footerRight = dataset.isDraftExport
-    ? `v${dataset.version.versionString} | Draft`
-    : `v${dataset.version.versionString} | ${formatThaiDate(dataset.version.effectiveDate)}`;
-  const priceListTitle = makeCatalogExportDocumentTitle(dataset.version.versionString);
-  const coverYearLabel = makeFieldFacingPdfYearLabel(dataset.version.versionString);
+    ? `${dataset.version.draftReference ?? 'ฉบับร่าง'} | เป้าหมาย v${documentVersionString}`
+    : `v${documentVersionString} | ${formatThaiDate(dataset.version.effectiveDate)}`;
+  const priceListTitle = makeCatalogExportDocumentTitle(documentVersionString);
+  const coverYearLabel = makeFieldFacingPdfYearLabel(documentVersionString);
 
   return (
     <main className={`${ntDocumentFont.className} print-root`}>
@@ -455,7 +462,7 @@ function PrintDocument({ dataset }: { dataset: CatalogExportDataset }) {
             </div>
           </header>
           {dataset.isDraftExport ? (
-            <div className="draft-banner">DRAFT – ห้ามใช้อ้างอิง</div>
+            <div className="draft-banner">ฉบับร่าง - ห้ามใช้อ้างอิง</div>
           ) : null}
           {nonCurrentNotice ? (
             <div className="non-current-banner">{nonCurrentNotice}</div>
