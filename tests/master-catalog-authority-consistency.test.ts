@@ -263,6 +263,10 @@ describe('Master Catalog authority consistency', () => {
       'cleanup restored Local flags before refusing evidence closure',
     )
     expect(p38Harness).toContain('must be a loopback URL for Local-only P-38 work')
+    expect(p38Harness).toContain('createViteServer')
+    expect(p38Harness).toContain("server.ssrLoadModule('/lib/master-catalog/import/workbookAdapter.ts')")
+    expect(p38Harness).toContain('applicationParser.profile.normalizeRow')
+    expect(p38Harness).toContain('Application parser row count differs')
     expect(p38Harness).not.toContain(".rpc(")
     expect(p38Harness).not.toContain('create_catalog_draft')
     expect(p38Harness).not.toContain('abandon_catalog_draft')
@@ -356,7 +360,12 @@ describe('Master Catalog authority consistency', () => {
     expect(decisions).toContain(
       'Approved and technically passed 2026-07-15 on exact gate/execution checkout `910cc3cc74660beecf18655d39cd0b0c085d1fc6`; Local only; interaction/UAT acceptance remains P-37',
     )
-    expect(decisions).toContain('Interrupted on Card A and safely cleaned 2026-07-18')
+    expect(decisions).toContain(
+      'First Card A was stopped and safely cleaned after the official-number-gap finding',
+    )
+    expect(decisions).toContain(
+      'A fresh scored Cards A-G rerun remains required before P-37',
+    )
     expect(decisions).toContain(
       'Approved 2026-07-18 for Local-only architecture/source/migration/docs/verification',
     )
@@ -402,7 +411,7 @@ describe('Master Catalog authority consistency', () => {
       /P-33 accepted that\s+exact bounded WP-7\.5 technical checkpoint at 2026-07-15 13:54 \+07/,
     )
     expect(tracker).toContain(
-      '| Current work package | WP-8/P-37 HOLD; P-39R P39R-S/P39R-L/P39R-C passed through clean `009`-`024`; P39R-U remains pending before P-38 resumes |',
+      '| Current work package | WP-8/P-37 HOLD; P39R-S/P39R-L/P39R-C/P39R-U passed; P-40 correction source/docs verification passed and a fresh scored P-38 Cards A-G rerun remains pending |',
     )
     expect(tracker).toContain(
       '| Current environment | Disabled clean Local baseline after `024`: pointer `2568.0.0`/710',
@@ -513,7 +522,7 @@ describe('Master Catalog authority consistency', () => {
       /pre-amendment operator\/browser preflight passed on\s+`c8f6dca`/,
     )
     expect(tracker).toContain(
-      'Status: P-38 safely interrupted/cleaned; Cards A-G paused; Add/Supplement hidden; no Production action authorized',
+      'Status: exploratory P-38 safely cleaned; correction checkpoint pending commit/push before a new no-reset scored UAT; Add/Supplement hidden; no Production action authorized',
     )
     expect(verificationReport).toContain(
       'HOLD under Closure Matrix #34',
@@ -583,7 +592,7 @@ describe('Master Catalog authority consistency', () => {
       '| C-10 | At least three safe validation-error recoveries |',
       '| C-11 | 710-row performance baseline |',
       '| C-12 | Documentation consistency |',
-      '| Passed through P39R-C; monitor | Authority consistency and full repository checks passed; rerun after P39R-U evidence update |',
+      '| Passed through P-40 source; monitor | Full repository checks passed 34 files/216 tests, TypeScript, lint 0 errors/10 existing warnings, real-parser input verification, network-enabled build, and diff check; rerun after scored UAT evidence update |',
       'one rejected stale attempt with zero effect, then exactly one accepted UI batch/change set',
       'does not require `npm run db:local:bootstrap`',
     ]) {
@@ -619,10 +628,22 @@ describe('Master Catalog authority consistency', () => {
     expect(p37OwnerUat).toContain('CIC-PVC-998')
     expect(p37OwnerUat).toContain('changing only a known mapped')
     expect(p37OwnerUat).toMatch(/Production `2568\.0\.0`\s+remains authority/)
-    expect(p37OwnerUat).toContain('Do not perform a successful publication')
+    expect(p37OwnerUat).toMatch(/Do not perform a\s+successful publication/)
+    const scoredCards = p37OwnerUat.slice(p37OwnerUat.indexOf('### Card A'))
+    expectInOrder(scoredCards, [
+      '### Card A',
+      'complete the old publish-confirmation form and submit',
+      '### Card B',
+      '### Card E',
+    ])
+    const cardE = scoredCards.slice(
+      scoredCards.indexOf('### Card E'),
+      scoredCards.indexOf('### Card F'),
+    )
+    expect(cardE).not.toContain('complete the old publish-confirmation form')
     expect(p37OwnerUat).toMatch(/Do not run\s+`npm run db:local:bootstrap`/)
     expect(p37OwnerUat).not.toContain('technical evidence is accepted as Owner evidence')
-    expect(tracker).toContain('P-38 safely interrupted/cleaned')
+    expect(tracker).toContain('exploratory P-38 safely cleaned')
     expect(verificationReport).toContain('P-38 P-37 evidence reconciliation')
     expect(threatModel).toContain('| T-52 |')
     expect(threatModel).toContain('| T-53 |')

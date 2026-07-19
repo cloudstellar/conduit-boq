@@ -1,4 +1,5 @@
 import type { CatalogImportDiff } from './importValidation';
+import { normalizeCatalogMoneyInput } from './money';
 
 export type CatalogMutationStatus = 'idle' | 'success' | 'error';
 
@@ -139,7 +140,6 @@ export interface CatalogPlaceItemsArgs {
 const UUID_PATTERN =
   /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 const DATE_PATTERN = /^\d{4}-\d{2}-\d{2}$/;
-const MONEY_PATTERN = /^(0|[1-9][0-9]*)\.[0-9]{2}$/;
 const MANUAL_ACTIONS = [
   'retire',
   'update',
@@ -759,18 +759,23 @@ function buildManualChange(
 }
 
 function readMoneyFields(formData: FormData): Record<string, string> | CatalogMutationState {
-  const money = {
-    materialCost: readRequiredText(formData, 'materialCost', 'material cost'),
-    laborCost: readRequiredText(formData, 'laborCost', 'labor cost'),
-    unitCost: readRequiredText(formData, 'unitCost', 'unit cost'),
-  };
+  const entries = [
+    ['materialCost', formData.get('materialCost')],
+    ['laborCost', formData.get('laborCost')],
+    ['unitCost', formData.get('unitCost')],
+  ] as const;
+  const money: Record<string, string> = {};
 
-  if (
-    !MONEY_PATTERN.test(money.materialCost) ||
-    !MONEY_PATTERN.test(money.laborCost) ||
-    !MONEY_PATTERN.test(money.unitCost)
-  ) {
-    return createCatalogMutationError('ราคา/ต้นทุนต้องเป็นเลขทศนิยมสองตำแหน่ง');
+  for (const [key, value] of entries) {
+    const normalized = typeof value === 'string'
+      ? normalizeCatalogMoneyInput(value)
+      : null;
+    if (!normalized) {
+      return createCatalogMutationError(
+        'ราคา/ต้นทุนต้องเป็นตัวเลขไม่ติดลบ และมีทศนิยมได้ไม่เกินสองตำแหน่ง',
+      );
+    }
+    money[key] = normalized;
   }
 
   return money;

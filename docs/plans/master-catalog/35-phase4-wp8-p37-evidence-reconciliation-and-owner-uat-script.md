@@ -1,14 +1,18 @@
 # Phase 4 WP-8 P-37 Evidence Reconciliation and Owner UAT Script
 
 **Status:** Evidence reconciliation and the fail-closed developer preflight
-design are complete; P-37 remains **HOLD**. The first P-38 Card A attempt was
-stopped and safely cleaned after it exposed the abandoned-draft numbering gap.
-P-39R now supersedes that numbering rule and this UAT must not resume until the
-Local gates in [Correction Plan #37](./37-phase4-p39-draft-identity-release-number-correction-plan.md)
-pass. See [Preflight Note #36](./36-phase4-wp8-p38-no-reset-owner-uat-preflight.md).
-This note defines the smallest current-route Owner UAT that can close Closure
-Matrix #34 C-07 through C-11 without repeating evidence that already proves
-the same actor-independent contract.
+design are complete; P-37 remains **HOLD**. P39R-U Card A passed in the later
+no-reset Local session: `2568.5.0-D001` was audited-abandoned and replacement
+`2568.5.0-D002` received a new immutable draft reference while reclaiming the
+same unissued target. The exploratory continuation used live developer
+collaboration, discovered UAT-01 through UAT-05, and therefore does not close
+the scored Cards A-G. Card F response-loss recovery passed as retained
+discovery evidence; cleanup restored the disabled baseline. The P-40 bounded
+correction and a fresh scored rerun remain required. See
+[Preflight Note #36](./36-phase4-wp8-p38-no-reset-owner-uat-preflight.md). This
+note defines the smallest current-route Owner UAT that can close Closure Matrix
+#34 C-07 through C-11 without repeating evidence that already proves the same
+actor-independent contract.
 
 **Environment:** Local only, no reset. Production access/write, successful
 publication or pointer movement, feature enablement outside the temporary Local
@@ -30,6 +34,26 @@ The remaining work is one written, independently executed Owner UAT. The
 developer may prepare Local state, test workbooks, fault injection, recording,
 and cleanup checks. During each scored task the Owner must use only the UI and
 this written script, without live developer or SQL guidance.
+
+The 2026-07-19 exploratory continuation is evidence for product correction,
+not gate closure. It found:
+
+- UAT-01: native exact-two-decimal validation produced an English browser
+  message for otherwise safe whole-number prices;
+- UAT-02: free-text units could drift from units already governed by the base
+  catalog;
+- UAT-03: successful withdrawal removed the row but left the operator on a
+  now-missing item route;
+- UAT-04: approved Excel cells store `source_row` and money as numbers, while
+  the parser accepted only text representations;
+- UAT-05: E-03 was sequenced after new structured codes made its publish action
+  unreachable through the independent structured-code guard.
+
+P-40 corrects those findings without a migration: shared Thai money
+normalization, a base-version unit chooser with an explicit custom-unit path,
+server-side withdrawal redirect and durable notice, safe numeric Excel-cell
+normalization through the application parser, and E-03 moved into Card A before
+Card B creates structured codes.
 
 ## 2. Retained evidence manifest
 
@@ -56,7 +80,7 @@ because this note cites them.
 | C-07 complete placement | C-02/C-06 technical, keyboard, focus, and presentation evidence | One current UI batch: one rejected stale attempt with zero effect, then exactly one accepted UI batch/change set; observe accepted state and accepted-to-local-dirty transition | Open |
 | C-08 stale placement | Technical stale rejection plus separate Owner leave/reload recovery | Owner creates and recovers the stale response in the same placement task using two UI tabs, without developer/SQL action | Partial |
 | C-09 core-admin UAT | G1R/G3/P-26 contracts and historical WP-4 picker proof | Current UI draft lifecycle, complete browse/history, manual add/withdraw, import review, placement, final review/readiness, review export, stale final review, and uncertain response | Open |
-| C-10 three safe errors | Technical negative-path coverage | Owner recovers E-01 invalid authority, E-02 retirement hold, and E-03 stale final review; stale placement and uncertain response are recorded separately and are not double-counted | Open |
+| C-10 three safe errors | Technical negative-path coverage | Owner recovers Card A E-03 stale final review before any structured-code add, then Card C E-01 invalid authority and E-02 retirement hold; stale placement and uncertain response are recorded separately and are not double-counted | Open |
 | C-11 710-row baseline | P-36 placement/final-review/deep-page/export timings and P-37 no-stutter observations | Name and measure Full 710-row import preview, publish-readiness/final-review load, and current Owner interactions | Partial |
 
 ## 4. Developer preflight - not scored
@@ -96,6 +120,9 @@ Run this section before handing the browser to the Owner.
    E-02. Record file SHA-256 values and the expected diagnostic before use.
    The exact recipes/hashes and compatibility verification are controlled by
    [Preflight Note #36](./36-phase4-wp8-p38-no-reset-owner-uat-preflight.md).
+   `verify-inputs` must execute the application's workbook adapter and
+   `nt-item-master-2568` profile over every retained row; opening the files with
+   ExcelJS alone is not sufficient parser evidence.
 8. Supply three exact existing search examples representing the first, middle,
    and last portions of the 710-row catalog. Do not tell the Owner where the UI
    controls are or what result to select.
@@ -122,10 +149,20 @@ approval.
 4. Confirm the abandoned draft remains read-only under that reference and the
    target was not issued. Create a replacement and confirm it receives a new
    draft reference while reclaiming the same target.
+5. Before adding any structured-code identity, open the replacement's final
+   review/publish context, record the reviewed lock, and keep that tab open.
+6. In a second UI tab, edit one inherited item's non-identity field with a
+   clearly Local-only authority reference. Save and record the newer lock.
+7. Return to the old review tab. Only when the two locks visibly differ,
+   complete the old publish-confirmation form and submit. E-03 must return the
+   durable Thai stale-review error, retain the entered form values, and produce
+   no publication or pointer movement. If the locks do not differ, stop.
+8. Load a fresh review and confirm it uses the newer lock. Do not perform a
+   successful publication.
 
 Pass: the Owner can explain one-working-draft, draft reference, target versus
-official version, base-version, and abandoned/read-only behavior without an
-irreversible action.
+official version, base-version, and abandoned/read-only behavior; E-03 is
+recovered before structured-code additions and no irreversible action occurs.
 
 ### Card B - browse, history, manual add, and withdraw
 
@@ -155,8 +192,9 @@ retired or deleted.
    add/update/recode/retire/unchanged/omission counts, authority-field count,
    and source/payload hashes. The two Local-only identities added in Card B are
    intentionally absent from the 710-row authority payload and must therefore
-   be visible as draft-only Full-import retire/omission candidates. Do not
-   apply the import.
+   be visible as draft-only Full-import retire/omission candidates. The one
+   inherited edit used for E-03 must also be visible as a reconciliation
+   candidate. Do not apply the import.
 3. E-01: select the invalid-authority derivative with no authority reference.
    It replaces mapped `CIC-PVC-001` with unmapped Local candidate
    `CIC-PVC-998`; it does not merely change a trusted mapped price. Record the
@@ -198,27 +236,23 @@ Thai error, a deliberate recovery, and no unintended write.
 Pass: stale recovery uses only the UI, one and only one batch is accepted, no
 duplicate effect occurs, and accepted-to-dirty truthfulness is unmistakable.
 
-### Card E - final review, readiness, stale review E-03, and review export
+### Card E - final review, readiness, and review export
 
 1. Open the authoritative final comparison and record its load time, reviewed
    lock, row totals, compound changes, reverted/unchanged behavior, and
    publication-readiness result.
-2. Keep that review/publish context open. In a second UI tab make and save one
-   further Local-only item edit. Confirm the second tab reports a newer lock.
-3. Return to the old context. Only when the old and new lock values visibly
-   differ, complete the old publish-confirmation form and submit it. E-03 must
-   return the durable Thai stale-review error with retained form values and no
-   pointer/publication effect. If the lock values do not differ, stop instead
-   of clicking Publish.
-4. Load a fresh final review/readiness result and verify it uses the new lock.
-   Do not perform a successful publication.
-5. Export the draft for review. In Excel/PDF locate version, draft status, row
+2. Confirm the current structured-code readiness blocker is visible after Card
+   B and is consistent with the database guard. Do not bypass the blocker or
+   attempt a successful publication.
+3. Reload a fresh final review and verify that the displayed lock and totals
+   remain current after the Card D placement acceptance.
+4. Export the draft for review. In Excel/PDF locate version, draft status, row
    count, dataset hash, and binary file hash, and explain why those hashes have
    different purposes.
 
-Pass: E-03 is recovered through current UI without publication, fresh review
-matches the current lock, and the review export is not mistaken for an import
-or official published document.
+Pass: readiness truthfully explains the current blocker, fresh review matches
+the current lock, and the review export is not mistaken for an import or
+official published document.
 
 ### Card F - uncertain response
 
@@ -263,12 +297,12 @@ remediation owner, and due date.
 
 | Card/gate | Result | Visible Thai message or key observation | Elapsed/browser | Evidence reference |
 |---|---|---|---|---|
-| A / C-09 draft lifecycle | Pending |  |  |  |
+| A / C-09/C-10 draft lifecycle + E-03 | Pending scored rerun; P39R-U discovery passed |  |  |  |
 | B / C-09 browse/manual/withdraw | Pending |  |  |  |
 | C / C-09/C-10/C-11 import + E-01/E-02 | Pending |  |  |  |
 | D / C-07/C-08 placement | Pending |  |  |  |
-| E / C-09/C-10/C-11 review + E-03/export | Pending |  |  |  |
-| F / C-09 uncertain response | Pending |  |  |  |
+| E / C-09/C-11 review/readiness/export | Pending |  |  |  |
+| F / C-09 uncertain response | Pending scored rerun; exploratory Card F passed |  |  | `tmp/master-catalog/wp65-evidence/p39ru-card-f-20260719-v2.json` |
 | G / safe close | Pending |  |  |  |
 
 Misunderstood wording, hesitation that changes the intended action, or any

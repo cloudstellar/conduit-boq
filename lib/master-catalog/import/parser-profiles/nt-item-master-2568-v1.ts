@@ -314,6 +314,31 @@ function readMoneyCell(
   header: string,
   field: string,
 ): string {
+  const rawValue = row[header]
+
+  if (typeof rawValue === 'number') {
+    const scaled = rawValue * 100
+    const rounded = Math.round(scaled)
+    const tolerance = Number.EPSILON * Math.max(1, Math.abs(scaled)) * 4
+
+    if (
+      !Number.isFinite(rawValue)
+      || rawValue < 0
+      || !Number.isSafeInteger(rounded)
+      || Math.abs(scaled - rounded) > tolerance
+    ) {
+      throw new CatalogParserProfileError('ตรวจข้อมูลในแถวไม่ผ่าน', [{
+        field,
+        code: 'VALIDATION_FAILED',
+        message: 'จำนวนเงินต้องเป็นตัวเลขไม่ติดลบและมีทศนิยมไม่เกินสองตำแหน่ง',
+      }])
+    }
+
+    const whole = Math.floor(rounded / 100)
+    const fraction = String(rounded % 100).padStart(2, '0')
+    return `${whole}.${fraction}`
+  }
+
   const value = readTextCell(row, header, field, 32)
 
   if (!MONEY_PATTERN.test(value)) {
@@ -328,6 +353,28 @@ function readMoneyCell(
 }
 
 function readSourceRow(row: UnknownWorkbookRow, header: string): number {
+  const value = row[header]
+
+  if (typeof value === 'number') {
+    if (!Number.isFinite(value) || !Number.isInteger(value) || value < 1) {
+      throw new CatalogParserProfileError('ตรวจข้อมูลในแถวไม่ผ่าน', [{
+        field: 'source_row',
+        code: 'VALIDATION_FAILED',
+        message: 'เลขแถวต้นทางต้องเป็นจำนวนเต็มบวก',
+      }])
+    }
+
+    if (!Number.isSafeInteger(value)) {
+      throw new CatalogParserProfileError('ตรวจข้อมูลในแถวไม่ผ่าน', [{
+        field: 'source_row',
+        code: 'VALIDATION_FAILED',
+        message: 'เลขแถวต้นทางมีค่ามากเกินขอบเขตที่รองรับ',
+      }])
+    }
+
+    return value
+  }
+
   const sourceRowText = readTextCell(row, header, 'source_row', 16)
 
   if (!SOURCE_ROW_PATTERN.test(sourceRowText)) {

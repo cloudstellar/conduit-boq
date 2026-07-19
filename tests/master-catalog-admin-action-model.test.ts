@@ -267,12 +267,32 @@ describe('Master Catalog admin action model', () => {
       itemName: 'รายการเพิ่มใหม่',
       unit: 'รายการ',
       materialCost: '10',
+      laborCost: '5.5',
+      unitCost: '15.5',
+      priceAuthorityReference: 'local-price-authority',
+    }), REQUEST_ID)).toMatchObject({
+      p_change_payload: {
+        changes: [{
+          materialCost: '10.00',
+          laborCost: '5.50',
+          unitCost: '15.50',
+        }],
+      },
+    });
+
+    expect(buildManualCatalogChangeArgs(baseForm({
+      action: 'add',
+      categoryId: CATEGORY_ID,
+      codeGroupId: GROUP_ID,
+      itemName: 'รายการเพิ่มใหม่',
+      unit: 'รายการ',
+      materialCost: '10.001',
       laborCost: '5.00',
       unitCost: '15.00',
       priceAuthorityReference: 'local-price-authority',
     }), REQUEST_ID)).toMatchObject({
       status: 'error',
-      message: 'ราคา/ต้นทุนต้องเป็นเลขทศนิยมสองตำแหน่ง',
+      message: 'ราคา/ต้นทุนต้องเป็นตัวเลขไม่ติดลบ และมีทศนิยมได้ไม่เกินสองตำแหน่ง',
     });
 
     expect(buildManualCatalogChangeArgs(baseForm({

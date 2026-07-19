@@ -1,6 +1,7 @@
 'use server';
 
 import { revalidatePath } from 'next/cache';
+import { redirect } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
 import { loadCatalogAdminGate } from '@/lib/master-catalog/admin/readModel';
 import {
@@ -27,6 +28,7 @@ import {
   validateCatalogPublishVersionConfirmation,
 } from '@/lib/master-catalog/admin/actionModel';
 import { logMasterCatalogOperation } from '@/lib/master-catalog/observability';
+import { catalogWithdrawSuccessHref } from '@/lib/master-catalog/admin/navigation';
 import {
   classifyCatalogVersionTransition,
   isCatalogAnnualEffectiveYearAllowed,
@@ -263,6 +265,15 @@ export async function applyCatalogManualChangeAction(
 
   if (result.status === 'success') {
     revalidateMasterCatalogPaths(result.versionId ?? args.p_version_id);
+    if (formData.get('action') === 'withdraw') {
+      const returnTo = formData.get('returnTo');
+      const itemCode = formData.get('targetItemCode');
+      redirect(catalogWithdrawSuccessHref(
+        typeof returnTo === 'string' ? returnTo : null,
+        result.versionId ?? args.p_version_id,
+        typeof itemCode === 'string' ? itemCode : '',
+      ));
+    }
   }
 
   return result;

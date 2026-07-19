@@ -7,9 +7,10 @@ import {
   rename,
   writeFile,
 } from 'node:fs/promises'
-import { dirname, isAbsolute, relative, resolve } from 'node:path'
+import { basename, dirname, isAbsolute, relative, resolve } from 'node:path'
 import ExcelJS from 'exceljs'
 import { createClient } from '@supabase/supabase-js'
+import { createServer as createViteServer } from 'vite'
 import { readLocalEnvFile } from './local-env.mjs'
 
 const MARKER = 'LOCAL-UAT-ONLY-NOT-AUTHORITY'
@@ -334,11 +335,19 @@ async function verifyInputs() {
     'Frozen authority must contain 17 source exclusions')
   assert(authority.code_groups.length === 65, 'Frozen authority must contain 65 code groups')
 
-  const [source, e01, e02] = await Promise.all([
-    readWorkbookRows(sourcePath),
-    readWorkbookRows(e01Path),
-    readWorkbookRows(e02Path),
-  ])
+  const applicationParser = await loadApplicationParser()
+  let source
+  let e01
+  let e02
+  try {
+    [source, e01, e02] = await Promise.all([
+      readWorkbookRows(sourcePath, applicationParser),
+      readWorkbookRows(e01Path, applicationParser),
+      readWorkbookRows(e02Path, applicationParser),
+    ])
+  } finally {
+    await applicationParser.close()
+  }
   assert(source.marker !== MARKER, 'Approved source workbook was marked as a Local derivative')
   assert(e01.marker === MARKER && e02.marker === MARKER,
     'Every P-38 derivative must visibly carry the Local-only marker')
@@ -407,7 +416,12 @@ async function verifyInputs() {
   return {
     manifestPath: relative(ROOT, inputsPath),
     manifestSha256: await sha256(inputsPath),
-    source: { path: manifest.source.path, sha256: manifest.source.sha256, rows: source.rows.length },
+    source: {
+      path: manifest.source.path,
+      sha256: manifest.source.sha256,
+      rows: source.rows.length,
+      applicationParserRows: source.applicationParserRows,
+    },
     frozenAuthority: {
       authoritySha256: authority.authority_sha256,
       mappings: authority.mappings.length,
@@ -418,6 +432,7 @@ async function verifyInputs() {
       path: manifest.e01.path,
       sha256: manifest.e01.sha256,
       rows: e01.rows.length,
+      applicationParserRows: e01.applicationParserRows,
       oldCode,
       localCode,
       initialExpectedCode: manifest.e01.initialExpectedCode,
@@ -426,6 +441,7 @@ async function verifyInputs() {
       path: manifest.e02.path,
       sha256: manifest.e02.sha256,
       rows: e02.rows.length,
+      applicationParserRows: e02.applicationParserRows,
       omittedMappedRows: omittedCodes.length,
       expectedRetireCountAfterCardB: manifest.e02.expectedRetireCountAfterCardB,
       initialExpectedCode: manifest.e02.initialExpectedCode,
@@ -684,7 +700,71 @@ function assertFlagState(rows, expected) {
   }
 }
 
-async function readWorkbookRows(path) {
+async function loadApplicationParser() {
+  const server = await createViteServer({
+    appType: 'custom',
+    configFile: false,
+    logLevel: 'silent',
+    root: ROOT,
+    server: {
+      hmr: false,
+      middlewareMode: true,
+    },
+  })
+
+  try {
+    const [adapter, profiles] = await Promise.all([
+      server.ssrLoadModule('/lib/master-catalog/import/workbookAdapter.ts'),
+      server.ssrLoadModule('/lib/master-catalog/import/parser-profiles/index.ts'),
+    ])
+    const parseWorkbook = adapter.parseCatalogWorkbookInfoFromXlsx
+    const profile = profiles.NT_ITEM_MASTER_2568_PROFILE
+    assert(typeof parseWorkbook === 'function',
+      'Application workbook adapter is unavailable to P-38 preflight')
+    assert(profile && typeof profile.detect === 'function' && typeof profile.normalizeRow === 'function',
+      'Application parser profile is unavailable to P-38 preflight')
+
+    return {
+      parseWorkbook,
+      profile,
+      close: () => server.close(),
+    }
+  } catch (error) {
+    await server.close()
+    throw error
+  }
+}
+
+async function readWorkbookRows(path, applicationParser) {
+  const bytes = await readFile(path)
+  const arrayBuffer = bytes.buffer.slice(
+    bytes.byteOffset,
+    bytes.byteOffset + bytes.byteLength,
+  )
+  const parsed = await applicationParser.parseWorkbook({
+    filename: basename(path),
+    sizeBytes: bytes.byteLength,
+    arrayBuffer,
+  })
+  const detection = applicationParser.profile.detect(parsed.workbookInfo)
+  assert(detection.matched,
+    `Application parser rejected ${relative(ROOT, path)}: ${JSON.stringify(detection.errors)}`)
+  const parserSheet = parsed.workbookInfo.sheets.find(
+    (sheet) => sheet.name.trim() === REQUIRED_SHEET,
+  )
+  assert(parserSheet, `Application parser did not expose ${REQUIRED_SHEET}`)
+  const categoryCodeByGroup = {}
+  for (const row of parserSheet.dataRows) {
+    const workContextCode = typeof row.AAA === 'string' ? row.AAA.trim() : ''
+    const itemTypeCode = typeof row.TTT === 'string' ? row.TTT.trim() : ''
+    if (workContextCode && itemTypeCode) {
+      categoryCodeByGroup[`${workContextCode}-${itemTypeCode}`] = 'LOCAL-UAT-PREFLIGHT'
+    }
+  }
+  const applicationRows = parserSheet.dataRows.map((row) => (
+    applicationParser.profile.normalizeRow(row, { categoryCodeByGroup })
+  ))
+
   const workbook = new ExcelJS.Workbook()
   await workbook.xlsx.readFile(path)
   const sheet = workbook.getWorksheet(REQUIRED_SHEET)
@@ -708,7 +788,13 @@ async function readWorkbookRows(path) {
     ]))
     if (Object.values(row).some(Boolean)) rows.push({ rowNumber, ...row })
   }
-  return { marker: readme.getCell('B2').text.trim(), rows }
+  assert(applicationRows.length === rows.length,
+    `Application parser row count differs for ${relative(ROOT, path)}`)
+  return {
+    marker: readme.getCell('B2').text.trim(),
+    rows,
+    applicationParserRows: applicationRows.length,
+  }
 }
 
 function rowsByCode(rows) {

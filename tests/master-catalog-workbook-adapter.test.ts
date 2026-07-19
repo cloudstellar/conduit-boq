@@ -92,11 +92,11 @@ function validWorkbookRow(overrides: Record<string, unknown> = {}): unknown[] {
     TTT_name_th: 'ชนิดทดสอบ',
     description_th: 'รายการทดสอบ 1',
     unit: 'ม.',
-    material_cost: '100.00',
-    labor_cost: '25.00',
-    total_cost: '125.00',
+    material_cost: 100,
+    labor_cost: 25,
+    total_cost: 125,
     source_sheet: '01_Item_Master_Final',
-    source_row: '2',
+    source_row: 2,
     k_formula_id: 'ignored-k',
     factor_f_version: 'ignored-factor-f-looking-column',
     ...overrides,
@@ -161,7 +161,7 @@ describe('Master Catalog browser XLSX workbook adapter', () => {
         }),
         validWorkbookRow({
           item_code: 'AAA-BBB-998',
-          source_row: '3',
+          source_row: 3,
           description_th: 'รายการทดสอบ Local เท่านั้น',
         }),
       ],
@@ -254,7 +254,7 @@ describe('Master Catalog browser XLSX workbook adapter', () => {
     const rowOverrunBuffer = await createWorkbookBuffer({
       rows: Array.from({ length: 1501 }, (_, index) => validWorkbookRow({
         item_code: `AAA-BBB-${String(index + 1).padStart(3, '0')}`,
-        source_row: String(index + 2),
+        source_row: index + 2,
       })),
     })
     const rowOverrun = await parseCatalogWorkbookInfoFromXlsx({

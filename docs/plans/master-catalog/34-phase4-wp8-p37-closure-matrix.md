@@ -17,13 +17,16 @@ due date.
 
 **Current continuation:** The first P-38 Card A run was stopped and safely
 cleaned after the owner identified unexplained official-release gaps caused by
-permanently reserving abandoned draft numbers. P-39R now blocks continuation
-until immutable draft references and reusable unissued targets pass the gates in
-[Correction Plan #37](./37-phase4-p39-draft-identity-release-number-correction-plan.md).
+permanently reserving abandoned draft numbers. P-39R corrected that contract,
+and P39R-U later passed with distinct `2568.5.0-D001`/`D002` references and the
+same reusable unissued target. The live-collaboration continuation was
+exploratory rather than scored; it found UAT-01 through UAT-05 and passed Card F
+before exact disabled-baseline cleanup. P-40 owns the bounded no-migration
+correction and a fresh scored Cards A-G rerun.
 The evidence reconciliation remains complete in
 [Owner UAT Script #35](./35-phase4-wp8-p37-evidence-reconciliation-and-owner-uat-script.md).
-P-38 authorizes its bounded no-reset Local preparation and scored Owner UAT only
-after P39R-U passes. The earlier P39-S result is historical; corrected P39R-S,
+P-38 authorizes its bounded no-reset Local preparation and scored Owner UAT. The
+earlier P39-S result is historical; corrected P39R-S,
 incremental P39R-L, and the separately approved P39R-C clean chain passed. The
 clean execution source is exact pushed
 `10531610eac53a97c6ef8f9d06418766b58bee36`.
@@ -66,11 +69,11 @@ Local cleanup.
 | C-06 | Placement comprehension, review by exception, keyboard, focus, and final presentation | Owner passed all named overview/gap/sibling/leave-reload/keyboard/focus/previous-new-next checks on no-reset `2568.15.0` | Passed for the exercised path | Do not repeat these controls unless the UI changes |
 | C-07 | One complete independent placement task | Technical automation/RPC submitted and read back one accepted batch; the owner UI session reached final review but never activated **ยืนยันและบันทึกตำแหน่ง** | Open | In Card D of Note #35, record one rejected stale attempt with zero effect, then exactly one accepted UI batch/change set; observe accepted state and prove a later local edit returns to **ยังไม่บันทึก** |
 | C-08 | Stale-placement recovery inside the independent owner task | Technical continuation proved stale rejection; owner separately proved leave/reload recovery and final review | Partial | Complete Note #35 Card D using two UI tabs in the same independent task without developer/SQL intervention |
-| C-09 | Independent core-admin UAT | G1R/G3/P-26 and P-36 prove version planning, item edit, import context, final review, publish guards, export, abandon, and recovery technically; WP-4 proves a historical one-row file-picker preview | Open | Evidence reconciliation is complete. The intended admin must complete Note #35 Cards A-G on current routes without live developer help |
-| C-10 | At least three safe validation-error recoveries | Several technical error paths exist, but no current WP-8 record identifies three errors completed by the intended admin in the independent session | Open | Record Note #35 E-01 invalid authority, E-02 retirement hold, and E-03 stale final review; stale placement and uncertain response remain separate evidence |
+| C-09 | Independent core-admin UAT | G1R/G3/P-26 and P-36 prove version planning, item edit, import context, final review, publish guards, export, abandon, and recovery technically; P39R-U Card A and exploratory Card F passed but used live collaboration | Open | Evidence reconciliation is complete. The intended admin must complete Note #35 Cards A-G on current routes without live developer help after P-40 |
+| C-10 | At least three safe validation-error recoveries | Several technical paths exist; the exploratory session showed why E-03 becomes unreachable if delayed until after structured-code additions | Open | Record Note #35 Card A E-03 before Card B, then Card C E-01 invalid authority and E-02 retirement hold; stale placement and uncertain response remain separate evidence |
 | C-11 | 710-row performance baseline | P-36 measured 710+18 placement/final-review routes at 607-1,136 ms, deep paging at 746 ms, and verified export; P-37 exercised search/preview/sibling/focus without material stutter | Partial | Reuse those named results and complete Note #35's Full 710-row import-preview plus publish-readiness/current-interaction measurements against the written budget |
-| C-12 | Documentation consistency | P-39R authority amendment aligns ADR-003/004, plans, contracts, runbook, tracker, UAT, migration ledger, threat model, compatibility matrix, and executable checks | Passed through P39R-C; monitor | Authority consistency and full repository checks passed; rerun after P39R-U evidence update |
-| C-13 | Disabled clean Local baseline | P39R-C final readback: pointer `2568.0.0`/710, zero working drafts, all three catalog flags false, BOQ 198/1,547, zero unversioned/cross-version BOQ items, Factor F `2569.0.0`/36; Production untouched | Passed | Repeat exact readback after the final bounded P39R-U/UAT fixture is audited-abandoned |
+| C-12 | Documentation consistency | P-40 aligns UAT ordering, preflight parser execution, correction scope, tracker, verification, decisions, migration ledger, threat model, and executable checks | Passed through P-40 source; monitor | Full repository checks passed 34 files/216 tests, TypeScript, lint 0 errors/10 existing warnings, real-parser input verification, network-enabled build, and diff check; rerun after scored UAT evidence update |
+| C-13 | Disabled clean Local baseline | P39R-C final readback passed; P39R-U exploratory cleanup repeated pointer `2568.0.0`/710, zero working drafts, all flags false, BOQ 198/1,547, and Factor F `2569.0.0`/36; Production untouched | Passed | Repeat exact readback after the final bounded scored UAT fixture is audited-abandoned |
 
 ## 3. Minimal closure sequence
 
@@ -83,7 +86,8 @@ interaction. No C-07 through C-11 gate was closed by reconciliation alone.
 ### B. One bounded no-reset Local owner UAT
 
 Use Note #35 as the sole scored script. It separates developer preflight from
-Owner Cards A-G, names the three non-destructive errors, clarifies that a stale
+Owner Cards A-G, places E-03 in Card A before structured-code additions, names
+the three non-destructive errors, clarifies that a stale
 placement attempt must have zero effect before exactly one accepted batch, and
 defines the measurement/cleanup record.
 

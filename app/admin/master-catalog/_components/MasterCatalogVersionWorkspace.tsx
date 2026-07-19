@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { useActionState, useEffect, useId, useMemo, useState } from 'react';
+import { useActionState, useEffect, useId, useMemo, useState, type FormEvent } from 'react';
 import { useFormStatus } from 'react-dom';
 import { CheckCircle2, ChevronLeft, ChevronRight, Loader2, Plus, Search } from 'lucide-react';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
@@ -26,8 +26,15 @@ import type {
   CatalogWorkspaceItem,
 } from '@/lib/master-catalog/admin/catalogWorkspace';
 import type { CatalogMutationState } from '@/lib/master-catalog/admin/actionModel';
+import {
+  normalizeCatalogMoneyInput,
+  sumCatalogMoneyInputs,
+} from '@/lib/master-catalog/admin/money';
+import { catalogWithdrawnItemCode } from '@/lib/master-catalog/admin/navigation';
 import { formatCatalogDictionaryLabel } from '@/lib/master-catalog/admin/presentation';
 import { applyCatalogManualChangeAction } from '../actions';
+import { CatalogMoneyInput } from './CatalogMoneyInput';
+import { CatalogUnitInput } from './CatalogUnitInput';
 import { useStableCatalogOperation } from './useStableCatalogOperation';
 import { MasterCatalogActionErrorAlert } from './MasterCatalogActionErrorAlert';
 
@@ -97,9 +104,27 @@ export function MasterCatalogVersionWorkspace({
   const pageCount = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
   const safePage = Math.min(page, pageCount - 1);
   const visibleItems = filtered.slice(safePage * PAGE_SIZE, (safePage + 1) * PAGE_SIZE);
+  const unitOptions = useMemo(
+    () => [...new Set(items.map((item) => item.unit.trim()).filter(Boolean))]
+      .sort((left, right) => left.localeCompare(right, 'th-TH')),
+    [items],
+  );
+  const withdrawnItemCode = catalogWithdrawnItemCode(
+    searchParams.get('notice'),
+    searchParams.get('itemCode'),
+  );
 
   return (
     <>
+      {withdrawnItemCode ? (
+        <Alert aria-live="polite">
+          <CheckCircle2 />
+          <AlertTitle>ถอนรายการใหม่ออกจากฉบับร่างแล้ว</AlertTitle>
+          <AlertDescription>
+            ถอน {withdrawnItemCode} ออกจากรายการในฉบับร่างแล้ว ระบบยังเก็บรหัสที่สงวนและประวัติไว้ตรวจสอบย้อนหลัง
+          </AlertDescription>
+        </Alert>
+      ) : null}
       <Card className="min-w-0">
         <CardHeader>
           <CardTitle>รายการในบัญชีราคา</CardTitle>
@@ -261,7 +286,12 @@ export function MasterCatalogVersionWorkspace({
       </Card>
 
       {editable && allowAdd ? (
-        <CatalogAddItemForm version={version} categories={categories} codeGroups={codeGroups} />
+        <CatalogAddItemForm
+          version={version}
+          categories={categories}
+          codeGroups={codeGroups}
+          unitOptions={unitOptions}
+        />
       ) : null}
     </>
   );
@@ -299,17 +329,21 @@ function CatalogAddItemForm({
   version,
   categories,
   codeGroups,
+  unitOptions,
 }: {
   version: { id: string; lockVersion: number };
   categories: CatalogCategoryOption[];
   codeGroups: CatalogCodeGroupOption[];
+  unitOptions: string[];
 }) {
   const [state, formAction] = useActionState(applyCatalogManualChangeAction, initialState);
   const [categoryId, setCategoryId] = useState(categories[0]?.id ?? '');
   const [codeGroupId, setCodeGroupId] = useState(codeGroups[0]?.id ?? '');
+  const [unit, setUnit] = useState('');
   const [materialCost, setMaterialCost] = useState('0.00');
   const [laborCost, setLaborCost] = useState('0.00');
-  const unitCost = sumMoney(materialCost, laborCost);
+  const [showMoneyErrors, setShowMoneyErrors] = useState(false);
+  const unitCost = sumCatalogMoneyInputs(materialCost, laborCost);
   const [requestIdRef, prepareOperation, preserveInput] = useStableCatalogOperation(
     state,
     `${version.id}:add`,
@@ -319,6 +353,15 @@ function CatalogAddItemForm({
   useEffect(() => {
     if (state.status === 'success') router.refresh();
   }, [router, state.status]);
+
+  function handleSubmitCapture(event: FormEvent<HTMLFormElement>) {
+    if (!normalizeCatalogMoneyInput(materialCost) || !normalizeCatalogMoneyInput(laborCost)) {
+      event.preventDefault();
+      setShowMoneyErrors(true);
+      return;
+    }
+    prepareOperation(event);
+  }
 
   return (
     <Card>
@@ -336,8 +379,9 @@ function CatalogAddItemForm({
         <form
           action={formAction}
           className="grid gap-4"
+          noValidate
           onReset={preserveInput}
-          onSubmitCapture={prepareOperation}
+          onSubmitCapture={handleSubmitCapture}
         >
           <input ref={requestIdRef} type="hidden" name="requestId" />
           <input type="hidden" name="versionId" value={version.id} />
@@ -352,10 +396,13 @@ function CatalogAddItemForm({
               <Label htmlFor="add-item-name">ชื่อรายการ</Label>
               <Input id="add-item-name" name="itemName" required />
             </div>
-            <div className="grid gap-2">
-              <Label htmlFor="add-unit">หน่วยนับ</Label>
-              <Input id="add-unit" name="unit" required />
-            </div>
+            <CatalogUnitInput
+              id="add-unit"
+              name="unit"
+              value={unit}
+              options={unitOptions}
+              onChange={setUnit}
+            />
             <ControlledSelect
               label="หมวดงาน"
               value={categoryId}
@@ -376,8 +423,24 @@ function CatalogAddItemForm({
                 }))}
               />
             </div>
-            <MoneyInput id="add-material" name="materialCost" label="ค่าวัสดุ" value={materialCost} onChange={setMaterialCost} />
-            <MoneyInput id="add-labor" name="laborCost" label="ค่าแรง" value={laborCost} onChange={setLaborCost} />
+            <CatalogMoneyInput
+              id="add-material"
+              name="materialCost"
+              label="ค่าวัสดุ"
+              value={materialCost}
+              onChange={setMaterialCost}
+              showError={showMoneyErrors}
+              onValidationRequest={() => setShowMoneyErrors(true)}
+            />
+            <CatalogMoneyInput
+              id="add-labor"
+              name="laborCost"
+              label="ค่าแรง"
+              value={laborCost}
+              onChange={setLaborCost}
+              showError={showMoneyErrors}
+              onValidationRequest={() => setShowMoneyErrors(true)}
+            />
             <div className="grid gap-2">
               <Label htmlFor="add-total">ราคารวมต่อหน่วย</Label>
               <Input id="add-total" value={unitCost} readOnly />
@@ -441,35 +504,6 @@ function ControlledSelect({
   );
 }
 
-function MoneyInput({
-  id,
-  name,
-  label,
-  value,
-  onChange,
-}: {
-  id: string;
-  name: string;
-  label: string;
-  value: string;
-  onChange: (value: string) => void;
-}) {
-  return (
-    <div className="grid gap-2">
-      <Label htmlFor={id}>{label}</Label>
-      <Input
-        id={id}
-        name={name}
-        inputMode="decimal"
-        pattern="(0|[1-9][0-9]*)\.[0-9]{2}"
-        value={value}
-        onChange={(event) => onChange(event.target.value)}
-        required
-      />
-    </div>
-  );
-}
-
 function SubmitButton({ label }: { label: string }) {
   const { pending } = useFormStatus();
   return (
@@ -490,11 +524,4 @@ function MutationStateAlert({ state }: { state: CatalogMutationState }) {
       <AlertDescription>{state.message}</AlertDescription>
     </Alert>
   );
-}
-
-function sumMoney(material: string, labor: string): string {
-  const materialValue = Number(material);
-  const laborValue = Number(labor);
-  if (!Number.isFinite(materialValue) || !Number.isFinite(laborValue)) return '0.00';
-  return (materialValue + laborValue).toFixed(2);
 }

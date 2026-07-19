@@ -248,7 +248,42 @@ describe('Master Catalog parser profile nt-item-master-2568 v1', () => {
     expect(normalized.categoryCode).toBe('2.2')
   })
 
-  it('rejects formula, error, numeric money, invalid sum, and missing reconciliation context', () => {
+  it('accepts safe numeric Excel money and source-row cells and canonicalizes money', () => {
+    const normalized = NT_ITEM_MASTER_2568_PROFILE.normalizeRow(
+      makeWorkbookRow({
+        material_cost: 100,
+        labor_cost: 25.5,
+        total_cost: 125.5,
+        source_row: 2,
+      }),
+      VALID_PARSE_CONTEXT,
+    )
+
+    expect(normalized).toMatchObject({
+      sourceRow: 2,
+      materialCost: '100.00',
+      laborCost: '25.50',
+      unitCost: '125.50',
+    })
+  })
+
+  it.each([
+    ['zero', 0],
+    ['negative', -1],
+    ['fraction', 2.5],
+    ['unsafe integer', Number.MAX_SAFE_INTEGER + 1],
+    ['formula', { kind: 'formula' as const, formula: '1+1' }],
+    ['date', new Date('2026-01-01T00:00:00.000Z')],
+    ['boolean', true],
+    ['blank', ''],
+  ])('rejects %s source-row cells', (_label, sourceRow) => {
+    expect(() => NT_ITEM_MASTER_2568_PROFILE.normalizeRow(
+      makeWorkbookRow({ source_row: sourceRow }),
+      VALID_PARSE_CONTEXT,
+    )).toThrow(CatalogParserProfileError)
+  })
+
+  it('rejects formula, error, unsafe numeric money, invalid sum, and missing reconciliation context', () => {
     expect(() => NT_ITEM_MASTER_2568_PROFILE.normalizeRow(
       makeWorkbookRow({ material_cost: { kind: 'formula', formula: '1+1' } }),
       VALID_PARSE_CONTEXT,
@@ -260,7 +295,12 @@ describe('Master Catalog parser profile nt-item-master-2568 v1', () => {
     )).toThrow(CatalogParserProfileError)
 
     expect(() => NT_ITEM_MASTER_2568_PROFILE.normalizeRow(
-      makeWorkbookRow({ total_cost: 125 }),
+      makeWorkbookRow({ total_cost: 125.001 }),
+      VALID_PARSE_CONTEXT,
+    )).toThrow(CatalogParserProfileError)
+
+    expect(() => NT_ITEM_MASTER_2568_PROFILE.normalizeRow(
+      makeWorkbookRow({ total_cost: Number.MAX_SAFE_INTEGER }),
       VALID_PARSE_CONTEXT,
     )).toThrow(CatalogParserProfileError)
 

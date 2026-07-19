@@ -1,13 +1,14 @@
 # Phase 4 WP-8 P-38 No-reset Owner UAT Preflight
 
 **Status:** The tracked fail-closed tooling and inputs were prepared, committed,
-and used for the first P-38 session. Card A created Local attempts `2568.16.0`
-and `2568.17.0`; the owner then stopped the UAT after identifying the official
-number-gap problem. Both attempts were audited-abandoned and cleanup restored
-the exact disabled baseline without reset. P39R-S, incremental P39R-L, and the
-separately approved clean P39R-C gate now pass; Cards A-G must not resume until
-P39R-U in [Correction Plan #37](./37-phase4-p39-draft-identity-release-number-correction-plan.md)
-passes. P-37 remains **HOLD**.
+and used for P-38. P39R-U Card A now passes: Local draft
+`2568.5.0-D001` was audited-abandoned and replacement `2568.5.0-D002`
+reclaimed target `2568.5.0` under a new immutable reference. The exploratory
+Cards B-F then found UAT-01/UAT-02/UAT-03/UAT-04/UAT-05; Card F passed, but the
+session used live developer collaboration and is not scored closure evidence.
+Both drafts were audited-abandoned and cleanup restored the exact disabled
+baseline without reset. The P-40 correction checkpoint and fresh scored Cards
+A-G rerun remain pending. P-37 remains **HOLD**.
 
 **Boundary:** Local only, no reset. This note does not authorize successful
 publication, pointer movement, P-37 acceptance, P-19, Factor F work, hotfix
@@ -55,9 +56,12 @@ exclusions with authority SHA-256
 The workbook preparation used the bundled spreadsheet runtime, preserved the
 source visual language, rendered every sheet, then performed a compatibility
 save through the bundled LibreOffice runtime. The final changed sheets were
-rendered again. The repository verifier subsequently opened both final files
-with the same ExcelJS dependency used by the application and compared every
-parser-required field against the source.
+rendered again. The repository verifier subsequently runs the application's
+actual workbook adapter and `nt-item-master-2568` profile through Vite over
+every source/E-01/E-02 row, then independently opens the final files with
+ExcelJS to compare every parser-required field, marker, and recipe against the
+source. This distinction matters because approved Excel cells store
+`source_row` and money as numeric values rather than formatted text.
 
 ## 3. Tracked Local harness
 
@@ -71,8 +75,10 @@ npm run db:local:p38:status
 npm run db:local:p38:prepare
 ```
 
-`verify-inputs` reads files only and rejects any manifest/source/authority/E-01/
-E-02 hash that differs from the tracked approved values. `status` reads Local
+`verify-inputs` reads files only, rejects any manifest/source/authority/E-01/
+E-02 hash that differs from the tracked approved values, and requires the
+application adapter/profile to normalize all 708/708/693 retained rows.
+`status` reads Local
 Supabase only. `prepare` requires a clean tracked tree whose HEAD exactly
 matches its configured pushed upstream, the verified manifest, exact disabled
 baseline including the canonical dataset hash, zero working drafts, and an
@@ -123,7 +129,7 @@ RPC or reset command.
 
 Production touched: **No**.
 
-## 5. P-38 interruption result and next safe step
+## 5. P39R-U exploratory result and next safe step
 
 Cleanup on 2026-07-18 restored pointer `2568.0.0`/710, zero working drafts,
 all three catalog flags `false`, BOQ 198/1,547 with zero unversioned BOQs, and
@@ -137,7 +143,14 @@ that execution shape; exact pushed
 WP-6.6/WP-7.5 live reruns, canonical readback, and final invariants without
 reset. P39R-L is passed. After a fresh warning/approval, P39R-C also passed the
 clean `009`-`024` bootstrap, DB/RLS/concurrency/export/advisor/invariant suite,
-and disabled-baseline cleanup on exact pushed `10531610`. Only after P39R-U
-proves the corrected Card A behavior may the Owner resume Cards B-G. Do not request P-37 before that
-evidence, cleanup, authority update, exact verification, commit, and push are
-complete.
+and disabled-baseline cleanup on exact pushed `10531610`.
+
+P39R-U later proved the corrected Card A behavior with
+`2568.5.0-D001`/`2568.5.0-D002` and the same unissued target. The exploratory
+continuation also proved Card F same-request recovery and exposed the five
+cross-layer findings now owned by P-40. Cleanup again passed pointer
+`2568.0.0`/710, zero drafts, all flags false, BOQ 198/1,547, and Factor F
+`2569.0.0`/36 without reset or Production access. Do not request P-37 before
+the P-40 source/docs checkpoint is committed and pushed, the fresh scored
+Cards A-G rerun and cleanup pass, and exact authority/repository verification
+is recorded.

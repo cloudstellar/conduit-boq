@@ -33,8 +33,15 @@ import type {
   CatalogIdentityHistoryPage,
   CatalogItemDetail,
 } from '@/lib/master-catalog/admin/catalogWorkspace';
+import {
+  normalizeCatalogMoneyInput,
+  sumCatalogMoneyInputs,
+} from '@/lib/master-catalog/admin/money';
+import { safeCatalogItemReturnHref } from '@/lib/master-catalog/admin/navigation';
 import { formatCatalogDictionaryLabel } from '@/lib/master-catalog/admin/presentation';
 import { applyCatalogManualChangeAction } from '../actions';
+import { CatalogMoneyInput } from './CatalogMoneyInput';
+import { CatalogUnitInput } from './CatalogUnitInput';
 import { useStableCatalogOperation } from './useStableCatalogOperation';
 import { MasterCatalogActionErrorAlert } from './MasterCatalogActionErrorAlert';
 
@@ -57,7 +64,7 @@ export function MasterCatalogItemEditor({
   history: CatalogIdentityHistoryPage;
 }) {
   const searchParams = useSearchParams();
-  const returnHref = safeItemReturnHref(
+  const returnHref = safeCatalogItemReturnHref(
     searchParams.get('returnTo'),
     item.versionId,
   );
@@ -77,17 +84,20 @@ export function MasterCatalogItemEditor({
   const [unit, setUnit] = useState(item.unit);
   const [materialCost, setMaterialCost] = useState(money(item.materialCost));
   const [laborCost, setLaborCost] = useState(money(item.laborCost));
+  const [showMoneyErrors, setShowMoneyErrors] = useState(false);
   const [categoryId, setCategoryId] = useState(item.categoryId);
   const [codeGroupId, setCodeGroupId] = useState(recodeGroups[0]?.id ?? '');
   const [pendingConfirmation, setPendingConfirmation] = useState<PendingItemConfirmation | null>(null);
   const mutationFormRef = useRef<HTMLFormElement>(null);
   const confirmedActionRef = useRef<ConfirmedItemAction | null>(null);
-  const unitCost = sumMoney(materialCost, laborCost);
+  const normalizedMaterialCost = normalizeCatalogMoneyInput(materialCost);
+  const normalizedLaborCost = normalizeCatalogMoneyInput(laborCost);
+  const unitCost = sumCatalogMoneyInputs(materialCost, laborCost);
   const authorityChanged =
     itemName.trim() !== item.itemName
     || unit.trim() !== item.unit
-    || materialCost !== money(item.materialCost)
-    || laborCost !== money(item.laborCost)
+    || normalizedMaterialCost !== money(item.materialCost)
+    || normalizedLaborCost !== money(item.laborCost)
     || unitCost !== money(item.unitCost);
   const [requestIdRef, prepareOperation, preserveInput] = useStableCatalogOperation(
     state,
@@ -97,12 +107,17 @@ export function MasterCatalogItemEditor({
 
   useEffect(() => {
     if (state.status !== 'success') return;
-    if (action === 'withdraw') {
-      router.replace(returnHref);
+    router.refresh();
+  }, [router, state.status]);
+
+  function handleSubmitCapture(event: FormEvent<HTMLFormElement>) {
+    if (action === 'update' && (!normalizedMaterialCost || !normalizedLaborCost)) {
+      event.preventDefault();
+      setShowMoneyErrors(true);
       return;
     }
-    router.refresh();
-  }, [action, returnHref, router, state.status]);
+    prepareOperation(event);
+  }
 
   function handleMutationSubmit(event: FormEvent<HTMLFormElement>) {
     if (action !== 'recode' && action !== 'retire') return;
@@ -179,8 +194,9 @@ export function MasterCatalogItemEditor({
                 ref={mutationFormRef}
                 action={formAction}
                 className="grid gap-5"
+                noValidate
                 onReset={preserveInput}
-                onSubmitCapture={prepareOperation}
+                onSubmitCapture={handleSubmitCapture}
                 onSubmit={handleMutationSubmit}
               >
                 <input ref={requestIdRef} type="hidden" name="requestId" />
@@ -189,6 +205,7 @@ export function MasterCatalogItemEditor({
                 <input type="hidden" name="targetIdentityId" value={item.identityId} />
                 <input type="hidden" name="targetItemCode" value={item.itemCode} />
                 <input type="hidden" name="action" value={action} />
+                <input type="hidden" name="returnTo" value={returnHref} />
                 <MutationAlert state={state} />
 
                 <div className="grid gap-2">
@@ -221,10 +238,13 @@ export function MasterCatalogItemEditor({
                         <Label htmlFor="edit-item-name">ชื่อรายการ</Label>
                         <Input id="edit-item-name" name="itemName" value={itemName} onChange={(event) => setItemName(event.target.value)} required />
                       </div>
-                      <div className="grid gap-2">
-                        <Label htmlFor="edit-unit">หน่วยนับ</Label>
-                        <Input id="edit-unit" name="unit" value={unit} onChange={(event) => setUnit(event.target.value)} required />
-                      </div>
+                      <CatalogUnitInput
+                        id="edit-unit"
+                        name="unit"
+                        value={unit}
+                        options={item.unitOptions}
+                        onChange={setUnit}
+                      />
                       <DictionarySelect
                         id="edit-category"
                         label="หมวดงาน"
@@ -235,8 +255,24 @@ export function MasterCatalogItemEditor({
                           label: formatCatalogDictionaryLabel(category.code, category.name),
                         }))}
                       />
-                      <MoneyField id="edit-material" name="materialCost" label="ค่าวัสดุ" value={materialCost} onChange={setMaterialCost} />
-                      <MoneyField id="edit-labor" name="laborCost" label="ค่าแรง" value={laborCost} onChange={setLaborCost} />
+                      <CatalogMoneyInput
+                        id="edit-material"
+                        name="materialCost"
+                        label="ค่าวัสดุ"
+                        value={materialCost}
+                        onChange={setMaterialCost}
+                        showError={showMoneyErrors}
+                        onValidationRequest={() => setShowMoneyErrors(true)}
+                      />
+                      <CatalogMoneyInput
+                        id="edit-labor"
+                        name="laborCost"
+                        label="ค่าแรง"
+                        value={laborCost}
+                        onChange={setLaborCost}
+                        showError={showMoneyErrors}
+                        onValidationRequest={() => setShowMoneyErrors(true)}
+                      />
                       <div className="grid gap-2">
                         <Label htmlFor="edit-unit-cost">ราคารวมต่อหน่วย</Label>
                         <Input id="edit-unit-cost" value={unitCost} readOnly />
@@ -371,24 +407,6 @@ export function MasterCatalogItemEditor({
   );
 }
 
-function safeItemReturnHref(value: string | null, versionId: string) {
-  const fallback = `/admin/master-catalog/versions/${versionId}`;
-  if (!value) return fallback;
-
-  const expectedPrefix = `${fallback}`;
-  if (!value.startsWith(expectedPrefix)) return fallback;
-  if (value.startsWith('//') || value.includes('://') || value.includes('\\')) return fallback;
-
-  try {
-    const parsed = new URL(value, 'http://local.invalid');
-    if (parsed.origin !== 'http://local.invalid') return fallback;
-    if (parsed.pathname !== fallback && parsed.pathname !== `${fallback}/review`) return fallback;
-    return `${parsed.pathname}${parsed.search}`;
-  } catch {
-    return fallback;
-  }
-}
-
 function availableActions(item: CatalogItemDetail): ItemAction[] {
   const recodeActions: ItemAction[] = item.codeGroups.some(
     (group) => group.id !== item.codeGroupId,
@@ -433,29 +451,6 @@ function DictionarySelect(props: {
           </SelectGroup>
         </SelectContent>
       </Select>
-    </div>
-  );
-}
-
-function MoneyField(props: {
-  id: string;
-  name: string;
-  label: string;
-  value: string;
-  onChange: (value: string) => void;
-}) {
-  return (
-    <div className="grid gap-2">
-      <Label htmlFor={props.id}>{props.label}</Label>
-      <Input
-        id={props.id}
-        name={props.name}
-        inputMode="decimal"
-        pattern="(0|[1-9][0-9]*)\.[0-9]{2}"
-        value={props.value}
-        onChange={(event) => props.onChange(event.target.value)}
-        required
-      />
     </div>
   );
 }
@@ -595,11 +590,6 @@ function displayValue(value: unknown): string {
 
 function money(value: number): string {
   return value.toFixed(2);
-}
-
-function sumMoney(material: string, labor: string): string {
-  const result = Number(material) + Number(labor);
-  return Number.isFinite(result) ? result.toFixed(2) : '0.00';
 }
 
 function formatThaiDateTime(value: string): string {

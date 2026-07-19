@@ -153,11 +153,15 @@ describe('Master Catalog P-22 operator workflow', () => {
     const itemEditor = source(
       'app/admin/master-catalog/_components/MasterCatalogItemEditor.tsx',
     );
+    const navigation = source('lib/master-catalog/admin/navigation.ts');
+    const actions = source('app/admin/master-catalog/actions.ts');
 
     expect(workspace).toContain('returnTo=');
     expect(finalReview).toContain('returnTo=');
-    expect(itemEditor).toContain('safeItemReturnHref');
-    expect(itemEditor).toContain('parsed.pathname !== `${fallback}/review`');
+    expect(itemEditor).toContain('safeCatalogItemReturnHref');
+    expect(navigation).toContain('parsed.pathname !== `${fallback}/review`');
+    expect(actions).toContain('redirect(catalogWithdrawSuccessHref(');
+    expect(workspace).toContain('ถอนรายการใหม่ออกจากฉบับร่างแล้ว');
   });
 
   it('keeps compound and high-volume final review scan-friendly', () => {

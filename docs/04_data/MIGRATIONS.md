@@ -41,7 +41,7 @@
 | `022_master_catalog_phase4_draft_identity_and_release_number.sql` | P-39R forward-only separation of immutable `{target}-D{nnn}` draft references from claimed/issued catalog versions; one open draft globally; audited stale/current abandonment; pointer/effect audit; hardened lifecycle/RLS/publication metadata | **P39R-S passed on Local-only source SHA-256 `9fc8f951fa5b3f3d7de928cce877a265d9333fda46850dd7564b22cd424c41f3`; incrementally applied to Local on exact source `7997387`; backfill, pointer, catalog, BOQ, and Factor F invariants passed; incremental P39R-L and clean-chain P39R-C later passed through `024`; not Production-applied** |
 | `023_master_catalog_phase4_published_code_rls_scope.sql` | P-39R forward-only RLS correction: active staff may read a code only when the exact `(identity_id, item_code)` pair occurs in an active/archived issued snapshot; active admins retain complete registry/history access | **Local-only SHA-256 `cbe01f63c6dd822edb29e1f7a31bfd27d5cb063e4d7d7e3878567875434d0a88`; first apply from `072294d` failed only its textual policy postcondition and rolled back completely; corrected exact source `6f01457` applied transactionally without reset; exact clean execution source `10531610eac53a97c6ef8f9d06418766b58bee36` repeated the RLS/role/history suite; not Production-applied** |
 | `024_master_catalog_phase4_set_based_placement_invalidation.sql` | P-39R forward-only execution-shape correction: replace migration `021` row-level placement invalidation with three transition-table statement triggers and transaction-local positive/negative version caches | **Local-only SHA-256 `d3aa11282fa4b2d4bac058bde3851287c551556ba5eac307277f086ba3d86b25`; committed/pushed/applied incrementally on exact `b6d58ce6cfedafa5812821edb49b897c2856f049`; WP-6.6/WP-7.5, canonical `017`-`024`, trigger inventory 3/0, and adjacent-data invariants passed in P39R-L and clean-chain P39R-C on exact `10531610eac53a97c6ef8f9d06418766b58bee36`; not Production-applied** |
-| `017+_master_catalog_phase4_*.sql` | Umbrella reference for the Local-only Phase 4 range; the canonical bootstrap source now applies `017`-`024` after hotfix `016` | **Local-only range — P-36 clean-integrated execution through `021` and pre-P-39R evidence remain historical; incremental P39R-L passed without reset; separately approved P39R-C clean-bootstrap/live/export/advisor/invariant evidence passed on exact `10531610eac53a97c6ef8f9d06418766b58bee36`; P39R-U remains before P-38 resumes; every Production approval remains absent** |
+| `017+_master_catalog_phase4_*.sql` | Umbrella reference for the Local-only Phase 4 range; the canonical bootstrap source now applies `017`-`024` after hotfix `016` | **Local-only range — P-36 through `021` and pre-P-39R evidence remain historical; incremental P39R-L and P39R-C clean evidence passed on exact `10531610eac53a97c6ef8f9d06418766b58bee36`; owner P39R-U later passed; P-40 changes application/parser/UAT/docs only and adds or changes no migration; every Production approval remains absent** |
 
 ### Local Schema Baseline (`supabase/local/`)
 
@@ -228,8 +228,11 @@ evidence detected `017`-`024`, three statement triggers and zero legacy row
 triggers, pointer `2568.0.0`/710, and unchanged catalog/BOQ/Factor F hashes.
 P39R-L passed. Separately approved P39R-C then passed a clean `009`-`024`
 bootstrap and the full live/export/advisor/invariant suite on exact pushed
-`10531610eac53a97c6ef8f9d06418766b58bee36`. P-38 remains paused until P39R-U
-passes.
+`10531610eac53a97c6ef8f9d06418766b58bee36`. Owner P39R-U later passed distinct
+draft identity plus reusable unissued target behavior. The exploratory P-38
+continuation found application/parser/UAT-order issues now corrected under
+P-40 without adding or changing a migration; a fresh scored Cards A-G rerun
+remains pending before P-37.
 Applied hotfix `016` must not be edited.
 This is not a new Production hotfix and must not be applied to Production
 without the normal Phase 4 P-12+ approvals.

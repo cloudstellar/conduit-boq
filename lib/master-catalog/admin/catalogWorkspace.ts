@@ -72,6 +72,7 @@ export interface CatalogItemDetail extends CatalogWorkspaceItem {
   }>;
   categories: CatalogCategoryOption[];
   codeGroups: CatalogCodeGroupOption[];
+  unitOptions: string[];
   capabilities: CatalogCapabilityFlags;
   mutationReady: boolean;
   warnings: string[];
@@ -266,6 +267,7 @@ export async function loadCatalogItemDetail(
   if (!versionResult.data || !itemResult.data) {
     return null;
   }
+  const itemRow = object(itemResult.data) ?? {};
 
   if (pointerResult.error) warnings.push('อ่านเวอร์ชันใช้งานปัจจุบันไม่สำเร็จ');
   if (categoriesResult.error) warnings.push('โหลดหมวดงานที่อนุมัติไว้ไม่สำเร็จ');
@@ -274,7 +276,7 @@ export async function loadCatalogItemDetail(
   if (capabilityResult.warning) warnings.push(capabilityResult.warning);
 
   const basedOnVersionId = nullableString(versionResult.data.based_on_version_id);
-  const [baseResult, publishedResult] = await Promise.all([
+  const [baseResult, publishedResult, unitOptionsResult] = await Promise.all([
     basedOnVersionId
       ? supabase
           .from('price_list')
@@ -287,13 +289,23 @@ export async function loadCatalogItemDetail(
       .select('version_id,price_list_versions!inner(status)', { count: 'exact', head: true })
       .eq('identity_id', identityId)
       .in('price_list_versions.status', ['active', 'archived']),
+    basedOnVersionId
+      ? loadCatalogUnitOptions(supabase, basedOnVersionId)
+      : Promise.resolve({ units: [] as string[], warning: null as string | null }),
   ]);
 
   if (baseResult.error) warnings.push('ตรวจสายสืบทอดจากเวอร์ชันฐานไม่สำเร็จ');
   if (publishedResult.error) warnings.push('ตรวจประวัติการเผยแพร่ของรายการไม่สำเร็จ');
+  if (unitOptionsResult.warning) warnings.push(unitOptionsResult.warning);
+
+  const currentUnit = String(itemRow.unit ?? '').trim();
+  const unitOptions = [...new Set([
+    ...unitOptionsResult.units,
+    ...(currentUnit ? [currentUnit] : []),
+  ])].sort((left, right) => left.localeCompare(right, 'th-TH'));
 
   return {
-    ...mapWorkspaceItem(object(itemResult.data) ?? {}),
+    ...mapWorkspaceItem(itemRow),
     versionId,
     targetVersionString: String(
       versionResult.data.target_version_string
@@ -315,6 +327,7 @@ export async function loadCatalogItemDetail(
     })),
     categories: mapCategories(categoriesResult.data),
     codeGroups: mapCodeGroups(groupsResult.data),
+    unitOptions,
     capabilities: capabilityResult.flags,
     mutationReady:
       !pointerResult.error
@@ -326,8 +339,45 @@ export async function loadCatalogItemDetail(
       && !codesResult.error
       && !capabilityResult.warning
       && !baseResult.error
-      && !publishedResult.error,
+      && !publishedResult.error
+      && !unitOptionsResult.warning,
     warnings,
+  };
+}
+
+async function loadCatalogUnitOptions(
+  supabase: SupabaseClient,
+  versionId: string,
+): Promise<{ units: string[]; warning: string | null }> {
+  const units = new Set<string>();
+
+  for (let offset = 0; offset < CATALOG_CLIENT_FILTER_ROW_LIMIT; offset += ITEM_PAGE_SIZE) {
+    const { data, error } = await supabase
+      .from('price_list')
+      .select('unit')
+      .eq('version_id', versionId)
+      .order('unit', { ascending: true })
+      .range(offset, offset + ITEM_PAGE_SIZE - 1);
+
+    if (error) {
+      return {
+        units: [...units],
+        warning: 'โหลดหน่วยนับที่ใช้อยู่ในเวอร์ชันฐานไม่สำเร็จ',
+      };
+    }
+
+    const page = rows(data);
+    for (const row of page) {
+      const unit = String(row.unit ?? '').trim();
+      if (unit) units.add(unit);
+    }
+
+    if (page.length < ITEM_PAGE_SIZE) break;
+  }
+
+  return {
+    units: [...units].sort((left, right) => left.localeCompare(right, 'th-TH')),
+    warning: null,
   };
 }
 
