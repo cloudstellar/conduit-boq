@@ -18,6 +18,13 @@ note defines the smallest current-route Owner UAT that can close Closure Matrix
 #34 C-07 through C-11 without repeating evidence that already proves the same
 actor-independent contract.
 
+P-41 additionally records UAT-06 through UAT-08 from continued guided
+discovery. The source correction and incremental Local migration `025` are in
+place and full working-tree verification passed, but this script must not be
+scored until exact push, clean-tree smoke, and a separately approved clean
+`017`-`025` chain pass. The discovery interactions remain product evidence
+only.
+
 **Environment:** Local only, no reset. Production access/write, successful
 publication or pointer movement, feature enablement outside the temporary Local
 fixture, P-19, Factor F work, and hotfix `016` expansion are prohibited.
@@ -52,12 +59,23 @@ not gate closure. It found:
   the parser accepted only text representations;
 - UAT-05: E-03 was sequenced after new structured codes made its publish action
   unreachable through the independent structured-code guard.
+- UAT-06: `categoryCode` was treated as a short code even though the versioned
+  authority dictionary uses full labels (Local maximum 89 characters).
+- UAT-07: a Full preview with retirement effects failed while retirement was
+  disabled instead of returning a complete read-only diff with Apply hidden.
+- UAT-08: withdrawing a draft-only row left a `display_order` gap; the client
+  masked it by resequencing while the database placement guard correctly
+  rejected the batch.
 
 P-40 corrects those findings without a migration: shared Thai money
 normalization, a base-version unit chooser with an explicit custom-unit path,
 server-side withdrawal redirect and durable notice, safe numeric Excel-cell
 normalization through the application parser, and E-03 moved into Card A before
 Card B creates structured codes.
+
+P-41 keeps the accepted guards and adds a shared 500-character category-key
+contract with live maximum preflight, non-persistent read-only preview
+semantics, client gap rejection, and forward-only `025` compaction.
 
 ## 2. Retained evidence manifest
 
@@ -103,9 +121,13 @@ Run this section before handing the browser to the Owner.
    and Factor F default `2569.0.0` with 36 rows.
 3. Confirm Local Supabase and the Local app are healthy. Do not run
    `npm run db:local:bootstrap`; this UAT must not reset Local Supabase.
+   Confirm the canonical detector reports Phase 4 `017`-`025` and the exact
+   withdraw-compaction trigger before preparing the scored fixture.
 4. Run `npm run db:local:p38:prepare -- --session "$P38_SESSION"` using the
    same recorded new path. The tracked harness must enable only the
    temporary Local admin and new-identity capabilities needed by the script.
+   Before changing flags, `prepare` must prove the longest live category key
+   fits the shared 500-character application contract.
    Keep the retirement capability disabled; retirement is previewed as a safe
    hold and is never applied. The harness must not create or abandon either
    Owner draft.
@@ -181,13 +203,14 @@ recovered before structured-code additions and no irreversible action occurs.
    `LOCAL-UAT-ONLY-NOT-AUTHORITY` price reference.
 3. Withdraw one never-published test identity through the UI. Explain that the
    temporary row is gone while identity, reserved code, and audit history are
-   retained.
+   retained. Confirm the workspace returns safely and placement can later load
+   without an order-gap warning.
 4. Confirm two new identities remain and that ordinary users/current BOQs are
    unaffected because the draft is not published/current.
 
 Pass: complete search/history is understood, three adds produce three audited
-effects, one withdraw produces one audited effect, and no inherited identity is
-retired or deleted.
+effects, one withdraw produces one audited effect, no inherited identity is
+retired/deleted, and the surviving draft order remains contiguous.
 
 ### Card C - import, 710-row measurement, and safe errors E-01/E-02
 
@@ -224,7 +247,9 @@ Thai error, a deliberate recovery, and no unintended write.
 ### Card D - placement, same-session stale recovery, and one accepted batch
 
 1. Open **จัดตำแหน่งรายการใหม่**. Confirm only the two remaining new identities
-   need placement; do not approve 710 inherited rows individually.
+   need placement; do not approve 710 inherited rows individually. If the page
+   reports a preexisting order gap or cannot build the preview, stop Card D and
+   record the failure; do not bypass or repair it manually.
 2. Inspect system suggestions, filter exceptions, change one insertion gap,
    set the two-row order within the same gap, use the supported leave/reload
    recovery, and return to final placement review.

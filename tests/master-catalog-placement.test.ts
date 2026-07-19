@@ -236,6 +236,20 @@ describe('Master Catalog placement model', () => {
     )).toBe(true);
   });
 
+  it('rejects a gapped draft order before showing a confirmable preview', () => {
+    expect(() => buildCatalogPlacementPreview(
+      [A, B, C],
+      [A, B, C, { ...X, displayOrder: 4 }],
+      [{
+        identityId: X.identityId,
+        categoryId: CATEGORY_A,
+        anchorIdentityId: B.identityId,
+        relation: 'after',
+        batchOrder: 0,
+      }],
+    )).toThrow('ลำดับปัจจุบันของฉบับร่างมีช่องว่าง');
+  });
+
   it('moves only within the same anchor and relation group', () => {
     const assignments = [
       {

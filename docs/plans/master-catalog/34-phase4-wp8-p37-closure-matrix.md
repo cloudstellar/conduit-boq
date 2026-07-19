@@ -38,6 +38,14 @@ read-only disabled-baseline proof are recorded in
 It does not authorize Local reset, successful publication, Production access,
 Factor F work, hotfix expansion, or P-19.
 
+Continued P-38 discovery then found UAT-06 through UAT-08. P-41 corrects the
+category-key bound, retirement-disabled read-only Full preview, and
+post-withdraw order compaction. Discovery drafts were closed and Local returned
+to the disabled baseline before incremental `025` apply. Focused tests passed,
+but the changed source means C-01/C-02/C-05/C-12 require current evidence; the
+failed placement attempt does not close C-07. A clean `017`-`025` run requires
+a new explicit destructive-reset warning/approval.
+
 ## 1. Why this matrix exists
 
 The final P-37 owner session proved that the corrected placement interaction is
@@ -63,19 +71,19 @@ Local cleanup.
 
 | ID | WP-8/P-37 gate | Current evidence | Status | Required closure |
 |---|---|---|---|---|
-| C-01 | Clean integrated Local chain through the current Phase 4 migration | Exact pushed `10531610eac53a97c6ef8f9d06418766b58bee36` clean-bootstrapped `009`-`015`, hotfix `016`, and Phase 4 `017`-`024`; DB/RLS/concurrency/export/advisor/invariant and cleanup evidence passed | Passed through P39R-C | Retain P-36 through `021` and P39R-L incremental evidence as historical/complementary provenance; any future reset requires a new warning/approval |
-| C-02 | DB/RLS/role/rollback/race/idempotency/P-20/BOQ/Factor F invariants | P-36 harnesses passed; later P-37 technical continuation proved stale rejection, one acceptance, exact replay, accepted readback, and cleanup | Passed technically | Retain; the owner UI path remains separate under C-07 |
+| C-01 | Clean integrated Local chain through the current Phase 4 migration | Exact pushed `10531610eac53a97c6ef8f9d06418766b58bee36` clean-bootstrapped through historical current `024`; `025` is incrementally applied but has no clean-chain evidence yet | Partial after P-41 | Retain P39R-C as history; after exact P-41 push, warn and obtain new approval before one clean `009`-`015`, `016`, `017`-`025` execution |
+| C-02 | DB/RLS/role/rollback/race/idempotency/P-20/BOQ/Factor F invariants | Earlier harnesses passed; P-41 adds exact trigger inventory, post-withdraw `0..N-1`, relative-order, and exactly-one revision assertions | Partial after P-41 | Run the current clean-tree WP-6.6 smoke and full integrated harnesses; preserve exact BOQ/Factor F pre/post evidence |
 | C-03 | Tracked official export verification | P-11 exact pair was owner-accepted; P-36 regenerated and independently verified the active 710-row Excel/PDF evidence | Passed | Production filing remains P-15, not P-37 |
 | C-04 | Security/performance advisor blocker review | P-36 returned no security blocker; baseline performance findings and the unused `v_row_count` are assigned to P-12 with owners and rationale | Passed for P-37 | Reassess/minimize before P-12; this is not a Production waiver |
-| C-05 | Repository/source quality | Exact source `f36d896d672609653de6634e307dcc44bce6d519` passed 33 files/184 tests, TypeScript, lint with 0 errors/10 existing warnings, authority 710/65/17, production build, and diff check | Passed | Rerun after any source change |
+| C-05 | Repository/source quality | Current P-41 working tree passed 34 files/220 tests, TypeScript, lint 0 errors/10 existing warnings, authority/input checks, syntax, network-enabled build, and diff check | Passed in working tree; exact push pending | Commit and push the exact source before Local smoke; rerun after later evidence-only updates |
 | C-06 | Placement comprehension, review by exception, keyboard, focus, and final presentation | Owner passed all named overview/gap/sibling/leave-reload/keyboard/focus/previous-new-next checks on no-reset `2568.15.0` | Passed for the exercised path | Do not repeat these controls unless the UI changes |
-| C-07 | One complete independent placement task | Technical automation/RPC submitted and read back one accepted batch; the owner UI session reached final review but never activated **ยืนยันและบันทึกตำแหน่ง** | Open | In Card D of Note #35, record one rejected stale attempt with zero effect, then exactly one accepted UI batch/change set; observe accepted state and prove a later local edit returns to **ยังไม่บันทึก** |
+| C-07 | One complete independent placement task | Earlier technical acceptance remains valid; P-41 discovery reached placement but DB rejected a hidden post-withdraw order gap, correctly producing no accepted batch | Open | After P-41 smoke/clean chain, Card D must open without a gap warning, record one rejected stale attempt with zero effect, then exactly one accepted UI batch/change set and accepted-to-dirty state |
 | C-08 | Stale-placement recovery inside the independent owner task | Technical continuation proved stale rejection; owner separately proved leave/reload recovery and final review | Partial | Complete Note #35 Card D using two UI tabs in the same independent task without developer/SQL intervention |
-| C-09 | Independent core-admin UAT | G1R/G3/P-26 and P-36 prove version planning, item edit, import context, final review, publish guards, export, abandon, and recovery technically; P39R-U Card A and exploratory Card F passed but used live collaboration | Open | Evidence reconciliation is complete. The intended admin must complete Note #35 Cards A-G on current routes without live developer help after P-40 |
+| C-09 | Independent core-admin UAT | Retained evidence remains valid; P-38 discovery through UAT-08 used live collaboration and is not scored | Open | The intended admin must complete Note #35 Cards A-G on exact pushed P-41 routes without live developer help after current smoke/clean-chain gates pass |
 | C-10 | At least three safe validation-error recoveries | Several technical paths exist; the exploratory session showed why E-03 becomes unreachable if delayed until after structured-code additions | Open | Record Note #35 Card A E-03 before Card B, then Card C E-01 invalid authority and E-02 retirement hold; stale placement and uncertain response remain separate evidence |
 | C-11 | 710-row performance baseline | P-36 measured 710+18 placement/final-review routes at 607-1,136 ms, deep paging at 746 ms, and verified export; P-37 exercised search/preview/sibling/focus without material stutter | Partial | Reuse those named results and complete Note #35's Full 710-row import-preview plus publish-readiness/current-interaction measurements against the written budget |
-| C-12 | Documentation consistency | P-40 aligns UAT ordering, immutable session-path use, preflight parser execution, correction scope, tracker, verification, decisions, migration ledger, threat model, and executable checks | Passed through exact pushed P-40 source; monitor | Full repository checks passed 34 files/216 tests, TypeScript, lint 0 errors/10 existing warnings, real-parser input verification, network-enabled build, and diff check; separate browser QA is recorded without substituting for scored UAT; rerun after scored evidence update |
-| C-13 | Disabled clean Local baseline | P39R-C final readback passed; P39R-U exploratory cleanup and the separate P-40 one-draft developer QA readback repeated pointer `2568.0.0`/710, zero working drafts, all flags false, BOQ 198/1,547, and Factor F `2569.0.0`/36; Production untouched | Passed | Repeat exact readback after the final bounded scored UAT fixture is audited-abandoned |
+| C-12 | Documentation consistency | P-41 alignment covers category authority, read-only preview, `025`, bootstrap/smoke, threat/decision/tracker/UAT status, and historical-versus-current evidence; executable consistency tests pass | Passed in working tree; exact push pending | Commit/push the exact source and rerun after scored evidence update |
+| C-13 | Disabled clean Local baseline | P-41 discovery cleanup and post-`025` readback repeated pointer `2568.0.0`/710, zero working drafts, all flags false, BOQ 198/1,547, and Factor F `2569.0.0`/36; Production untouched | Passed after incremental `025` | Repeat exact readback after smoke, clean chain, and final scored UAT cleanup |
 
 ## 3. Minimal closure sequence
 
@@ -85,7 +93,15 @@ The manifest and gate map in Note #35 retain actor-independent evidence and do
 not relabel implementer-driven RPC or route rendering as independent operator
 interaction. No C-07 through C-11 gate was closed by reconciliation alone.
 
-### B. One bounded no-reset Local owner UAT
+### B. Current source and database gates
+
+Commit/push the fully verified source, then run the clean-tree Local smoke
+against incremental `025`. Before a clean integrated chain, tell the owner
+that `npm run db:local:bootstrap` resets all Local Supabase and obtain a new
+explicit approval. The approved run must execute `009`-`015`, hotfix `016`, and
+Phase 4 `017`-`025`, then restore the disabled baseline.
+
+### C. One bounded no-reset Local owner UAT
 
 Use Note #35 as the sole scored script. It separates developer preflight from
 Owner Cards A-G, places E-03 in Card A before structured-code additions, names
@@ -97,11 +113,11 @@ Before handing over the browser, use Note #36 and the tracked
 `db:local:p38:*` commands. The harness verifies inputs/baseline, never creates
 or abandons an Owner draft, and keeps retirement disabled.
 
-This sequence does not require `npm run db:local:bootstrap` and must not reset
-Local Supabase. If Note #35 preflight shows that a clean reset is actually
-required, stop and obtain a new explicit destructive-reset approval first.
+The scored UAT itself does not reset Local Supabase. It starts only after the
+separately approved clean chain has passed and returned to the disabled
+baseline.
 
-### C. Repository and owner decision
+### D. Evidence and owner decision
 
 1. Rerun focused authority/operator tests, the full suite, TypeScript, lint,
    authority check, production build when source changed, and diff checks.

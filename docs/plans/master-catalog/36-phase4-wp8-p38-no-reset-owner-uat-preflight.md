@@ -15,6 +15,15 @@ all flags false, BOQ 198/1,547, and Factor F `2569.0.0`/36 without reset. It is
 not scored Cards A-G evidence. The fresh scored rerun remains pending and P-37
 remains **HOLD**.
 
+P-41 follows continued discovery: UAT-06 through UAT-08 corrected the
+category-key bound, retirement-disabled read-only Full preview, and
+post-withdraw order gap. Migration `025` SHA-256
+`00d79d7750aa52ba7f003f6bb82fedb1d31ab111be417d74329c1cd3d899f76f`
+is incrementally applied to the disabled Local baseline without reset and
+full working-tree verification passes. This is not a scored preflight yet:
+exact push, clean-tree smoke, and a newly approved clean `017`-`025` chain must
+pass before a new immutable scored session is prepared.
+
 **Boundary:** Local only, no reset. This note does not authorize successful
 publication, pointer movement, P-37 acceptance, P-19, Factor F work, hotfix
 `016` expansion, Production feature enablement, or Production access/write.
@@ -84,7 +93,11 @@ npm run db:local:p38:prepare -- --session "$P38_SESSION"
 
 `verify-inputs` reads files only, rejects any manifest/source/authority/E-01/
 E-02 hash that differs from the tracked approved values, and requires the
-application adapter/profile to normalize all 708/708/693 retained rows.
+application adapter/profile to normalize all 708/708/693 retained rows. P-41
+also requires it to expose the positive shared 500-character category-key
+contract. The later `prepare` command reads the live versioned category
+dictionary before changing flags and fails when its longest key exceeds that
+contract (current Local maximum 89).
 `status` reads Local
 Supabase only. `prepare` requires a clean tracked tree whose HEAD exactly
 matches its configured pushed upstream, the verified manifest, exact disabled
@@ -169,3 +182,25 @@ not present.
 Read-only status confirmed the disabled baseline above. Do not request P-37
 before the fresh scored Cards A-G rerun and cleanup pass and exact
 authority/repository verification is recorded.
+
+## 6. P-41 discovery correction gate
+
+The continued guided session used D005 as discovery only. After Card B
+withdrawal, the draft had 712 rows but `display_order` ranged from 0 through
+712 with one gap. The client had been resequencing that state for presentation;
+the database correctly rejected placement with `PLACEMENT_ORDER_INVALID`.
+D005 was audited-abandoned and cleanup restored pointer `2568.0.0`/710, zero
+working drafts, all flags false, BOQ 198/1,547, and Factor F `2569.0.0`/36.
+
+Forward-only `025` was then applied incrementally without reset. Before the
+next scored `prepare`, require all of the following:
+
+1. exact pushed P-41 source matching the passed full
+   repository/authority/build/diff checks;
+2. clean-tree WP-6.6 smoke proving one compaction trigger, exact contiguous
+   order after withdrawal, preserved relative order, and one revision advance;
+3. a newly warned and explicitly approved clean bootstrap through `017`-`025`,
+   followed by the exact disabled-baseline readback;
+4. a new immutable `P38_SESSION`; do not reuse D005 or its discovery evidence.
+
+No Local reset is authorized by this note. Production touched: **No**.

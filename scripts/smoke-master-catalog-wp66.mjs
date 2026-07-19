@@ -77,6 +77,8 @@ try {
     'Set-based placement invalidation triggers are incomplete')
   assert(schemaContract.placement_row_triggers === 0,
     'Legacy row-level placement invalidation trigger remains')
+  assert(schemaContract.withdraw_order_compaction_triggers === 1,
+    'Draft-withdraw order-compaction trigger is incomplete')
   assert(schemaContract.published_identity_count >= 710,
     'Published identity history is smaller than the authority baseline')
   assert(schemaContract.published_code_count >= schemaContract.published_identity_count,
@@ -307,6 +309,7 @@ try {
   assert(rowA.item_code !== rowB.item_code, 'Serialized allocators returned the same code')
   assert(codeGroupPrefix(rowA.item_code) === codeGroupPrefix(rowB.item_code), 'Allocator fixtures did not use one group')
 
+  const versionBeforeWithdrawA = await readVersion(workingDraft.versionId)
   const withdrawA = actionOk(
     await applyManual(adminA, {
       ...workingDraft,
@@ -314,6 +317,13 @@ try {
     }, [withdrawChange(rowA)], 'withdraw allocator A'),
     'withdraw allocator A',
   )
+  const versionAfterWithdrawA = await readVersion(workingDraft.versionId)
+  assert(
+    versionAfterWithdrawA.placement_revision === versionBeforeWithdrawA.placement_revision + 1,
+    'One withdrawal did not advance placement revision exactly once',
+  )
+  await assertContiguousDraftOrder(workingDraft.versionId, 711)
+
   actionOk(
     await applyManual(adminB, {
       ...workingDraft,
@@ -322,6 +332,11 @@ try {
     'withdraw allocator B',
   )
   const withdrawBVersion = await readVersion(workingDraft.versionId)
+  assert(
+    withdrawBVersion.placement_revision === versionAfterWithdrawA.placement_revision + 1,
+    'Second withdrawal did not advance placement revision exactly once',
+  )
+  await assertContiguousDraftOrder(workingDraft.versionId, 710)
   await assertWithdrawPreservedRegistry(rowA)
   await assertWithdrawPreservedRegistry(rowB)
 
@@ -337,6 +352,8 @@ try {
     workingDraft.versionId,
     addAfterWithdraw.itemName,
   )
+  const versionAfterAddC = await readVersion(workingDraft.versionId)
+  await assertContiguousDraftOrder(workingDraft.versionId, 711)
   assert(
     codeSequence(rowAfterWithdraw.item_code) > Math.max(
       codeSequence(rowA.item_code),
@@ -351,6 +368,12 @@ try {
     }, [withdrawChange(rowAfterWithdraw)], 'withdraw allocator C'),
     'withdraw allocator C',
   )
+  const versionAfterWithdrawC = await readVersion(workingDraft.versionId)
+  assert(
+    versionAfterWithdrawC.placement_revision === versionAfterAddC.placement_revision + 1,
+    'Post-allocation withdrawal did not advance placement revision exactly once',
+  )
+  await assertContiguousDraftOrder(workingDraft.versionId, 710)
   await assertWithdrawPreservedRegistry(rowAfterWithdraw)
   assertCapacityBoundary()
   await setSetting('catalog_new_identity_enabled', false)
@@ -914,11 +937,28 @@ async function readCurrentCatalogVersion() {
 async function readVersion(versionId) {
   const { data, error } = await service
     .from('price_list_versions')
-    .select('id,version_string,target_version_string,draft_attempt,draft_reference,major,minor,patch,name,status,is_default,based_on_version_id,lock_version,item_count,dataset_hash,published_by,published_by_display_name,physical_archive_reference,created_at,updated_at')
+    .select('id,version_string,target_version_string,draft_attempt,draft_reference,major,minor,patch,name,status,is_default,based_on_version_id,lock_version,placement_revision,item_count,dataset_hash,published_by,published_by_display_name,physical_archive_reference,created_at,updated_at')
     .eq('id', versionId)
     .single()
   if (error) throw error
   return data
+}
+
+async function assertContiguousDraftOrder(versionId, expectedCount) {
+  const { data, error } = await service
+    .from('price_list')
+    .select('identity_id,item_code,display_order')
+    .eq('version_id', versionId)
+    .order('display_order')
+    .order('identity_id')
+  if (error) throw error
+  assert(data.length === expectedCount, `Expected ${expectedCount} draft rows, found ${data.length}`)
+  data.forEach((row, index) => {
+    assert(
+      row.display_order === index,
+      `Draft order gap at ${row.item_code}: expected ${index}, found ${row.display_order}`,
+    )
+  })
 }
 
 async function readCurrentPointer() {
@@ -1490,6 +1530,21 @@ function readSchemaContract() {
           AND trigger_row.tgfoid =
             'private.touch_catalog_placement_revision()'::regprocedure
           AND (trigger_row.tgtype & 1) = 1
+          AND trigger_row.tgenabled = 'O'
+          AND NOT trigger_row.tgisinternal
+      ),
+      'withdraw_order_compaction_triggers', (
+        SELECT count(*)
+        FROM pg_trigger trigger_row
+        WHERE trigger_row.tgrelid = 'public.price_list'::regclass
+          AND trigger_row.tgname = 'trigger_compact_catalog_draft_order_delete'
+          AND trigger_row.tgfoid =
+            'private.compact_catalog_draft_order_after_delete()'::regprocedure
+          AND (trigger_row.tgtype & 1) = 0
+          AND (trigger_row.tgtype & 66) = 0
+          AND (trigger_row.tgtype & 60) = 8
+          AND trigger_row.tgoldtable = 'deleted_rows'
+          AND trigger_row.tgnewtable IS NULL
           AND trigger_row.tgenabled = 'O'
           AND NOT trigger_row.tgisinternal
       ),

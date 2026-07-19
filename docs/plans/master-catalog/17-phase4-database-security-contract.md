@@ -71,6 +71,20 @@ Incremental P39R-L then found that the code registry policy must match the exact
 alone. Forward migration `023` owns that policy-only correction without
 rewriting applied `022` or mutating catalog business rows, BOQs, or Factor F.
 
+**P-41 withdrawal-order amendment:** 2026-07-19 — preserve migrations
+`017`-`024` and append `025_master_catalog_phase4_withdraw_order_compaction.sql`.
+An audited withdrawal of an identity absent from the base removes only that
+draft price row, then compacts surviving rows to exact zero-based contiguous
+`display_order` in the same transaction while preserving relative order. The
+existing migration `024` transaction-local invalidation marker ensures the
+withdrawal transaction advances `placement_revision` once even though the
+compaction performs set-based updates. Direct DML remains revoked; the client
+must reject a preexisting gap rather than conceal it. `025` is Local-only and
+incrementally applied with SHA-256
+`00d79d7750aa52ba7f003f6bb82fedb1d31ab111be417d74329c1cd3d899f76f`;
+clean-chain/live-smoke/Owner-UAT and all Production
+gates remain open.
+
 **Owner decision recorded:** 2026-07-04 — approved according to the
 recommendation as the technical backbone for Phase 4A and every Phase 4 write
 path. The owner accepts the additive `017+` migration contract after production
@@ -803,7 +817,9 @@ secret values, raw workbook cells, or internal policy details.
    code/identity allocations, and audit writes in that block roll back.
 8. Append change set/items and increment lock version. `reactivate` keeps the
    identity/code; `withdraw` is limited to an identity absent from the base and
-   preserves identity/code/audit while removing only its draft price row.
+   preserves identity/code/audit while removing only its draft price row. The
+   same transaction compacts surviving `display_order` values to `0..N-1`,
+   preserves relative order, and advances placement revision exactly once.
 9. Mark import applied when applicable.
 
 ### Publish
@@ -934,6 +950,13 @@ and complete owner keyboard/focus/presentation UAT later passed on exact
 `f36d896d672609653de6634e307dcc44bce6d519`; the final owner UI submission and
 broader independent WP-8 closure remain under Note #34 before P-37 acceptance.
 
+P-39R migrations `022`-`024` are accepted history and must not be edited.
+P-41 appends `025_master_catalog_phase4_withdraw_order_compaction.sql` after
+`024`; the canonical Local bootstrap range is now `017`-`025`. Incremental
+Local apply is not a substitute for a clean integrated execution. Run the clean
+chain only after a new explicit destructive-reset warning/approval, then record
+the exact source and migration SHA-256.
+
 Do not edit an applied migration file. Forward-fix with a new reviewed
 migration.
 
@@ -970,7 +993,8 @@ migration.
 - Phase 4-created publication stores a version-level archive reference and
   authenticated actor snapshot;
 - reactivate/base-absent-withdraw correction paths preserve identity/code/audit
-  and are atomic;
+  and are atomic; withdrawal leaves exact contiguous zero-based order, retains
+  surviving relative order, and advances placement revision once;
 - pointer and legacy `is_default` mirror agree;
 - current app flows remain unchanged while feature flag is disabled;
 - clean-reset identity/hash output matches the P-20 approved portability model;
@@ -986,6 +1010,9 @@ migration.
 - after P-18/WP-7.5, valid placement shifts numeric positions atomically while
   preserving inherited relative order; invalid/stale/concurrent placement has no
   partial row, audit, revision, pointer, BOQ, or Factor F effect;
+- exactly one enabled AFTER DELETE statement trigger with OLD transition table
+  owns draft-withdraw compaction; no row-level or duplicate compaction trigger
+  exists;
 - security/performance advisors have no unresolved blocker.
 
 The current Local Studio advisor rule set used at G2 reports eight

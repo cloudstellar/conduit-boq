@@ -97,6 +97,11 @@ async function prepare() {
     const actor = await signInAdmin(local)
     const before = await readBaseline(local.service)
     assertCanonicalBaseline(before)
+    const categoryContract = await verifyLocalCategoryContract(
+      local.service,
+      before.pointer.id,
+      inputs.applicationContract.categoryCodeLimit,
+    )
     originalFlags = Object.fromEntries(before.flags.map((row) => [row.key, row.value]))
 
     const [versionsBefore, auditBefore, searchExamples] = await Promise.all([
@@ -133,6 +138,7 @@ async function prepare() {
         manifestSha256: await sha256(inputsPath),
         verification: inputs,
       },
+      categoryContract,
       searchExamples,
       originalFlags,
       enabledFlags: Object.fromEntries(enabledFlags.map((row) => [row.key, row.value])),
@@ -151,6 +157,7 @@ async function prepare() {
       actor: metadata.actor,
       pointer: summarizePointer(before.pointer),
       searchExamples,
+      categoryContract,
       flags: metadata.enabledFlags,
       ownerMustCreateDraftsInUi: true,
       productionTouched: false,
@@ -427,6 +434,9 @@ async function verifyInputs() {
       mappings: authority.mappings.length,
       sourceExclusions: authority.source_exclusions.length,
       codeGroups: authority.code_groups.length,
+    },
+    applicationContract: {
+      categoryCodeLimit: applicationParser.categoryCodeLimit,
     },
     e01: {
       path: manifest.e01.path,
@@ -713,9 +723,10 @@ async function loadApplicationParser() {
   })
 
   try {
-    const [adapter, profiles] = await Promise.all([
+    const [adapter, profiles, payload] = await Promise.all([
       server.ssrLoadModule('/lib/master-catalog/import/workbookAdapter.ts'),
       server.ssrLoadModule('/lib/master-catalog/import/parser-profiles/index.ts'),
+      server.ssrLoadModule('/lib/master-catalog/import/payload.ts'),
     ])
     const parseWorkbook = adapter.parseCatalogWorkbookInfoFromXlsx
     const profile = profiles.NT_ITEM_MASTER_2568_PROFILE
@@ -723,15 +734,47 @@ async function loadApplicationParser() {
       'Application workbook adapter is unavailable to P-38 preflight')
     assert(profile && typeof profile.detect === 'function' && typeof profile.normalizeRow === 'function',
       'Application parser profile is unavailable to P-38 preflight')
+    assert(Number.isInteger(payload.CATALOG_IMPORT_CATEGORY_CODE_LIMIT)
+      && payload.CATALOG_IMPORT_CATEGORY_CODE_LIMIT > 0,
+    'Application category-code contract is unavailable to P-38 preflight')
 
     return {
       parseWorkbook,
       profile,
+      categoryCodeLimit: payload.CATALOG_IMPORT_CATEGORY_CODE_LIMIT,
       close: () => server.close(),
     }
   } catch (error) {
     await server.close()
     throw error
+  }
+}
+
+async function verifyLocalCategoryContract(service, versionId, categoryCodeLimit) {
+  const { data, error } = await service
+    .from('price_list_categories')
+    .select('id,code')
+    .eq('version_id', versionId)
+    .order('display_order', { ascending: true })
+    .limit(1_000)
+  if (error) throw error
+
+  const categories = rows(data)
+  assert(categories.length > 0, 'P-38 Local category dictionary is empty')
+  const lengths = categories.map((category) => ({
+    code: String(category.code ?? ''),
+    length: String(category.code ?? '').length,
+  }))
+  const invalid = lengths.find((category) => (
+    category.length === 0 || category.length > categoryCodeLimit
+  ))
+  assert(!invalid,
+    `P-38 category-code contract rejects Local authority value length ${invalid?.length}`)
+
+  return {
+    categories: categories.length,
+    maxCodeLength: Math.max(...lengths.map((category) => category.length)),
+    categoryCodeLimit,
   }
 }
 

@@ -41,7 +41,8 @@
 | `022_master_catalog_phase4_draft_identity_and_release_number.sql` | P-39R forward-only separation of immutable `{target}-D{nnn}` draft references from claimed/issued catalog versions; one open draft globally; audited stale/current abandonment; pointer/effect audit; hardened lifecycle/RLS/publication metadata | **P39R-S passed on Local-only source SHA-256 `9fc8f951fa5b3f3d7de928cce877a265d9333fda46850dd7564b22cd424c41f3`; incrementally applied to Local on exact source `7997387`; backfill, pointer, catalog, BOQ, and Factor F invariants passed; incremental P39R-L and clean-chain P39R-C later passed through `024`; not Production-applied** |
 | `023_master_catalog_phase4_published_code_rls_scope.sql` | P-39R forward-only RLS correction: active staff may read a code only when the exact `(identity_id, item_code)` pair occurs in an active/archived issued snapshot; active admins retain complete registry/history access | **Local-only SHA-256 `cbe01f63c6dd822edb29e1f7a31bfd27d5cb063e4d7d7e3878567875434d0a88`; first apply from `072294d` failed only its textual policy postcondition and rolled back completely; corrected exact source `6f01457` applied transactionally without reset; exact clean execution source `10531610eac53a97c6ef8f9d06418766b58bee36` repeated the RLS/role/history suite; not Production-applied** |
 | `024_master_catalog_phase4_set_based_placement_invalidation.sql` | P-39R forward-only execution-shape correction: replace migration `021` row-level placement invalidation with three transition-table statement triggers and transaction-local positive/negative version caches | **Local-only SHA-256 `d3aa11282fa4b2d4bac058bde3851287c551556ba5eac307277f086ba3d86b25`; committed/pushed/applied incrementally on exact `b6d58ce6cfedafa5812821edb49b897c2856f049`; WP-6.6/WP-7.5, canonical `017`-`024`, trigger inventory 3/0, and adjacent-data invariants passed in P39R-L and clean-chain P39R-C on exact `10531610eac53a97c6ef8f9d06418766b58bee36`; not Production-applied** |
-| `017+_master_catalog_phase4_*.sql` | Umbrella reference for the Local-only Phase 4 range; the canonical bootstrap source now applies `017`-`024` after hotfix `016` | **Local-only range — P-36 through `021` and pre-P-39R evidence remain historical; incremental P39R-L and P39R-C clean evidence passed on exact `10531610eac53a97c6ef8f9d06418766b58bee36`; owner P39R-U later passed; P-40 changes application/parser/UAT/docs only and adds or changes no migration; every Production approval remains absent** |
+| `025_master_catalog_phase4_withdraw_order_compaction.sql` | P-41 forward-only correction: compact a draft's `display_order` atomically after never-published-row withdrawal while preserving relative order and one placement-revision advance per transaction | **Local-only SHA-256 `00d79d7750aa52ba7f003f6bb82fedb1d31ab111be417d74329c1cd3d899f76f`; incrementally applied without reset on 2026-07-19 after closing discovery drafts and restoring all feature flags; full working-tree verification passed 34 files/220 tests, TypeScript, lint 0 errors/10 existing warnings, authority/input/syntax/build/diff checks; exact pushed checkpoint, clean `017`-`025` execution, live smoke, and fresh scored Owner UAT remain pending; not Production-applied** |
+| `017+_master_catalog_phase4_*.sql` | Umbrella reference for the Local-only Phase 4 range; the canonical bootstrap source now applies `017`-`025` after hotfix `016` | **Local-only range — P-36 through `021`, P39R-L, and clean P39R-C through `024` remain historical evidence; P-40 changed no migration; P-41 appends `025` after a Local discovery finding and requires new exact-source verification/clean-chain evidence before closure; every Production approval remains absent** |
 
 ### Local Schema Baseline (`supabase/local/`)
 
@@ -235,6 +236,22 @@ P-40 checkpoint `dc83c35` without adding or changing a migration. Separate
 no-reset developer browser QA passed the corrected money/unit/withdraw paths
 and restored the disabled Local baseline; a fresh scored Cards A-G rerun
 remains pending before P-37.
+
+P-41 records three additional P-38 discovery findings. First,
+`categoryCode` is the official versioned category dictionary key and may be the
+full Thai authority label; the Local maximum is 89 characters, so the former
+64-character application ceiling was drift, not invalid authority. Second, a
+Full import with retirements must still produce a complete read-only preview
+when retirement capability is disabled, without creating an import/change set
+or exposing Apply. Third, withdrawing a never-published row could leave a
+hidden `display_order` gap: the client preview silently resequenced while the
+database correctly failed closed. Application validation now rejects a gapped
+draft, and forward-only migration `025` owns atomic post-delete compaction.
+`025` was applied incrementally to the disabled Local baseline without reset;
+full working-tree source verification passed, while a clean pushed checkpoint,
+live smoke, a separately
+approved clean `017`-`025` bootstrap, and fresh scored Owner UAT remain open.
+No Production, BOQ, Factor F, or hotfix scope was authorized.
 Applied hotfix `016` must not be edited.
 This is not a new Production hotfix and must not be applied to Production
 without the normal Phase 4 P-12+ approvals.
@@ -255,7 +272,7 @@ Supabase stack and receiving explicit approval, use
 Production baseline, restores scrubbed snapshots, applies root migrations
 `009` and `010`, applies all four `010a` concurrent indexes individually, then
 applies `011`, Factor F `012` through `015`, hotfix `016`, the draft
-local-only Phase 4 scripts `017` through `024`, and runs the bootstrap smoke
+local-only Phase 4 scripts `017` through `025`, and runs the bootstrap smoke
 tests. Source inclusion is not clean-execution evidence: record the exact
 integration commit and receive a separate owner approval before running this
 destructive command.

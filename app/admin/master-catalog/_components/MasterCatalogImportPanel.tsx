@@ -44,7 +44,10 @@ import type {
   CatalogImportDraftOption,
   CatalogImportEvidenceCounts,
 } from '@/lib/master-catalog/admin/importContext';
-import type { CatalogMutationState } from '@/lib/master-catalog/admin/actionModel';
+import {
+  canPersistCatalogImportPreview,
+  type CatalogMutationState,
+} from '@/lib/master-catalog/admin/actionModel';
 import {
   CATALOG_IMPORT_PAYLOAD_PROFILE_ID,
   CATALOG_IMPORT_PAYLOAD_PROFILE_VERSION,
@@ -623,7 +626,10 @@ function PreparedPreview({
       {previewState.status === 'success'
       && previewState.importId
       && previewState.importPreview
-      && (retirementEnabled || previewState.importPreview.summary.retire === 0) ? (
+      && canPersistCatalogImportPreview(
+        previewState.importPreview.summary.retire,
+        retirementEnabled,
+      ) ? (
         <form
           action={applyAction}
           className="flex flex-wrap items-center gap-2"
@@ -641,8 +647,10 @@ function PreparedPreview({
         </form>
       ) : null}
       {previewState.importPreview
-      && previewState.importPreview.summary.retire > 0
-      && !retirementEnabled ? (
+      && !canPersistCatalogImportPreview(
+        previewState.importPreview.summary.retire,
+        retirementEnabled,
+      ) ? (
         <Alert variant="destructive">
           <ShieldAlert />
           <AlertTitle>ยังไม่เปิดการยกเลิกใช้สำหรับรอบเผยแพร่นี้</AlertTitle>

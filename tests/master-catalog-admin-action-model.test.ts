@@ -5,6 +5,7 @@ import {
   buildPlaceCatalogItemsArgs,
   buildRestoreCatalogPointerArgs,
   buildManualCatalogChangeArgs,
+  canPersistCatalogImportPreview,
   createCatalogRpcTransportError,
   isDefinitiveCatalogMutationOutcome,
   mapCatalogRpcActionResponse,
@@ -462,6 +463,12 @@ describe('Master Catalog admin action model', () => {
       importStatus: 'validated',
       normalizedPayloadHash: 'a'.repeat(64),
     });
+  });
+
+  it('keeps retirement previews read-only until the capability is enabled', () => {
+    expect(canPersistCatalogImportPreview(0, false)).toBe(true);
+    expect(canPersistCatalogImportPreview(2, false)).toBe(false);
+    expect(canPersistCatalogImportPreview(2, true)).toBe(true);
   });
 
   it('rotates a client request ID only after a definitive outcome', () => {

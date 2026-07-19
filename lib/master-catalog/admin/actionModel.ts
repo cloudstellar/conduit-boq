@@ -266,6 +266,13 @@ export function shouldPreserveCatalogOperationInput(
   return state.status !== 'success';
 }
 
+export function canPersistCatalogImportPreview(
+  retirementCount: number,
+  retirementEnabled: boolean,
+): boolean {
+  return retirementCount === 0 || retirementEnabled;
+}
+
 export function createCatalogMutationError(
   message: string,
   code = 'VALIDATION_FAILED',

@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import {
+  CATALOG_IMPORT_CATEGORY_CODE_LIMIT,
   CATALOG_IMPORT_NORMALIZED_PAYLOAD_LIMIT_BYTES,
   CATALOG_IMPORT_RAW_FILE_LIMIT_BYTES,
   CatalogImportPayloadValidationError,
@@ -299,6 +300,29 @@ describe('Master Catalog import payload v2 authority contract', () => {
       canonicalizeCatalogImportPayloadV2(validated.payload as CatalogImportPayloadV2),
     )
     expect(validated.normalizedPayloadHash).toMatch(/^[0-9a-f]{64}$/)
+  })
+
+  it('preserves official category labels longer than the old 64-character ceiling', async () => {
+    const officialCategory =
+      '1.3.   งานวางท่อ HDPE หุ้มคอนกรีตเสริมเหล็ก (ค.ส.ล.)  (High Density Polyethylene Conduit)'
+
+    expect(officialCategory.length).toBeGreaterThan(64)
+    await expect(validateCatalogImportPayloadV2(payloadV2({
+      rows: [rowV2({ categoryCode: officialCategory })],
+    }))).resolves.toMatchObject({
+      payload: {
+        rows: [expect.objectContaining({ categoryCode: officialCategory })],
+      },
+    })
+
+    await expect(validateCatalogImportPayloadV2(payloadV2({
+      rows: [rowV2({
+        categoryCode: 'ก'.repeat(CATALOG_IMPORT_CATEGORY_CODE_LIMIT + 1),
+      })],
+    }))).rejects.toMatchObject({
+      code: 'VALIDATION_FAILED',
+      diagnostics: [expect.objectContaining({ field: 'rows.0.categoryCode' })],
+    })
   })
 
   it('removes caller-selected codes for new identities and keeps approved dictionary IDs', async () => {

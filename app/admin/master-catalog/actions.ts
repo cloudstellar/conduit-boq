@@ -14,6 +14,9 @@ import {
   validateCatalogImportAgainstDraft,
 } from '@/lib/master-catalog/admin/importValidation';
 import {
+  loadCatalogCapabilityFlags,
+} from '@/lib/master-catalog/admin/capabilities';
+import {
   type CatalogRpcTransportOperation,
   type CatalogMutationState,
   type CatalogRpcActionResponse,
@@ -22,6 +25,7 @@ import {
   buildPlaceCatalogItemsArgs,
   buildRestoreCatalogPointerArgs,
   buildManualCatalogChangeArgs,
+  canPersistCatalogImportPreview,
   createCatalogMutationError,
   createCatalogRpcTransportError,
   mapCatalogRpcActionResponse,
@@ -343,6 +347,7 @@ export async function previewCatalogImportAction(
     return validated;
   }
 
+  const startedAt = Date.now();
   let importPreview;
   try {
     importPreview = await validateCatalogImportAgainstDraft(supabase, validated.payload);
@@ -350,7 +355,30 @@ export async function previewCatalogImportAction(
     return mapImportValidationError(error);
   }
 
-  const startedAt = Date.now();
+  const capabilityResult = await loadCatalogCapabilityFlags(supabase);
+  if (!canPersistCatalogImportPreview(
+    importPreview.summary.retire,
+    capabilityResult.flags.retirementEnabled,
+  )) {
+    logMasterCatalogOperation({
+      operation: 'previewCatalogImport',
+      outcome: 'success',
+      startedAt,
+      requestId: validated.payload.requestId,
+      versionId: validated.payload.versionId,
+      code: 'CATALOG_RETIREMENT_DISABLED',
+    });
+    return {
+      status: 'success',
+      message: 'เซิร์ฟเวอร์ตรวจผลต่างแบบอ่านอย่างเดียวแล้ว ปุ่มบันทึกยังปิดอยู่',
+      code: 'CATALOG_RETIREMENT_DISABLED',
+      requestId: validated.payload.requestId,
+      versionId: validated.payload.versionId,
+      normalizedPayloadHash: validated.normalizedPayloadHash,
+      importPreview,
+    };
+  }
+
   const { data, error } = await supabase.rpc('apply_catalog_changes', {
     p_version_id: validated.payload.versionId,
     p_change_payload: {

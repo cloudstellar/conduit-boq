@@ -96,6 +96,21 @@ SELECT json_build_object(
         AND (trigger_row.tgtype & 1) = 1
         AND trigger_row.tgenabled = 'O'
         AND NOT trigger_row.tgisinternal
+    ),
+    'phase4_withdraw_order_compaction_triggers', (
+      SELECT count(*)
+      FROM pg_catalog.pg_trigger trigger_row
+      WHERE trigger_row.tgrelid = 'public.price_list'::regclass
+        AND trigger_row.tgname = 'trigger_compact_catalog_draft_order_delete'
+        AND trigger_row.tgfoid =
+          to_regprocedure('private.compact_catalog_draft_order_after_delete()')
+        AND (trigger_row.tgtype & 1) = 0
+        AND (trigger_row.tgtype & 66) = 0
+        AND (trigger_row.tgtype & 60) = 8
+        AND trigger_row.tgoldtable = 'deleted_rows'
+        AND trigger_row.tgnewtable IS NULL
+        AND trigger_row.tgenabled = 'O'
+        AND NOT trigger_row.tgisinternal
     )
   ),
   'version', (
@@ -204,6 +219,8 @@ function assertQuality(snapshot) {
     && schema?.p39r_placement_row_triggers === 1
   const hasSetBasedPlacementTriggers = schema?.p39r_placement_statement_triggers === 3
     && schema?.p39r_placement_row_triggers === 0
+  const withdrawCompactionTriggerCount = schema?.phase4_withdraw_order_compaction_triggers
+  const hasWithdrawOrderCompaction = withdrawCompactionTriggerCount === 1
 
   if ((!isPreP39r && !isPostP39r) || (isPreP39r && hasPublishedCodeScope)) {
     failures.push('migration 022 schema markers are partial or inconsistent')
@@ -215,6 +232,14 @@ function assertQuality(snapshot) {
 
   if (hasSetBasedPlacementTriggers && (!isPostP39r || !hasPublishedCodeScope)) {
     failures.push('migration 024 placement triggers exist without migrations 022/023')
+  }
+
+  if (![0, 1].includes(withdrawCompactionTriggerCount)) {
+    failures.push('migration 025 withdraw-order compaction trigger inventory is inconsistent')
+  }
+
+  if (hasWithdrawOrderCompaction && !hasSetBasedPlacementTriggers) {
+    failures.push('migration 025 withdraw-order compaction exists without migration 024')
   }
 
   if (version?.version_string !== '2568.0.0') {
@@ -282,7 +307,11 @@ async function buildEvidence() {
   const migration024Detected = migration023Detected
     && first.schema.p39r_placement_statement_triggers === 3
     && first.schema.p39r_placement_row_triggers === 0
-  const phase4Range = migration024Detected
+  const migration025Detected = migration024Detected
+    && first.schema.phase4_withdraw_order_compaction_triggers === 1
+  const phase4Range = migration025Detected
+    ? '017-025'
+    : migration024Detected
     ? '017-024'
     : migration023Detected
     ? '017-023'
@@ -296,6 +325,7 @@ async function buildEvidence() {
     migration022Detected,
     migration023Detected,
     migration024Detected,
+    migration025Detected,
     schema: first.schema,
     version: first.version,
     quality: first.quality,

@@ -16,6 +16,15 @@ the complete authoritative diff/omission result and support real new-row price
 authority evidence. Client diagnostics remain advisory. See
 [Audit #29](./29-phase4-owner-dev-completeness-audit.md).
 
+**P-41 authority-key/read-only-preview amendment:** 2026-07-19 —
+`categoryCode` is the key of the versioned authority dictionary and may be the
+full official category label, not a short display prefix. Its bounded payload
+limit is 500 characters; Local preflight must prove the longest live key fits
+that contract (current maximum 89). When Full validation detects retirements
+while retirement capability is disabled, the server still returns the complete
+read-only diff/omission preview without persisting an import/change set or
+exposing Apply. Validation and mutation remain separate operations.
+
 **Owner decision recorded:** 2026-07-04 — approved according to the
 recommendation for implementation/local rehearsal. This approval accepts the
 deterministic parser profile, file/row/payload limits, browser-as-convenience
@@ -207,6 +216,13 @@ payload. Client-supplied identity outcomes, price authority references, and
 retirement confirmations are accepted only when they match the approved
 reconciliation, code registry, draft state, and server-computed counts.
 
+`categoryCode` identifies an exact row in the versioned category dictionary.
+It is not assumed to be an abbreviated machine code: an approved dictionary
+may use the complete official Thai label as its stable key. The parser/server
+therefore enforce the shared 500-character bound and exact dictionary match;
+the P-38 preflight compares the longest live key with this same constant so a
+dictionary/application contract drift fails before Owner UAT.
+
 Money fields are decimal strings, never JavaScript floating-point numbers.
 Accepted syntax is `^(0|[1-9][0-9]*)\.[0-9]{2}$`. Negative, exponent, comma,
 currency symbol, formula cell, Boolean, error, or date values are rejected.
@@ -251,6 +267,13 @@ when an import contributes to the version.
 
 This separation keeps request idempotency unambiguous: retrying validation and
 retrying mutation are different operations with different effects.
+
+If validation is otherwise complete but would retire rows while
+`catalog_retirement_enabled` is false, return the authoritative preview as a
+successful read-only result. It must include all counts/omissions and explain
+why Apply is unavailable. Do not call the persistence RPC, create
+`catalog_imports`/change-set rows, or manufacture a partial diff merely to
+avoid the disabled capability.
 
 ## 7. Server validation
 

@@ -104,6 +104,15 @@ UAT-01 through UAT-05, and safely cleaned back to the disabled baseline. P-40
 owns the no-migration source/docs correction; P-38/P-37 remain on Hold until a
 fresh scored Cards A-G rerun. See
 [Correction Plan #37](./37-phase4-p39-draft-identity-release-number-correction-plan.md).
+
+P-41 now owns three further P-38 discovery findings: the real versioned
+category key exceeded the former application ceiling, retirement-disabled Full
+preview was coupled to persistence, and withdrawal left a hidden
+`display_order` gap. The bounded app/migration correction is in progress.
+Discovery drafts were audited-abandoned, flags and adjacent-data readback were
+restored, and migration `025` was applied incrementally to Local without reset.
+Full working-tree verification passed; exact commit/push, live smoke, a newly
+approved clean `017`-`025` chain, and fresh scored Cards A-G remain open.
 **Purpose:** Owner-facing progress tracker for Master Catalog Phase 4 local
 implementation and rehearsal. This file is the authority for current WP status,
 blockers, next safe step, and the authority/evidence index. Detailed decisions,
@@ -138,13 +147,13 @@ Allowed statuses:
 | Current branch | `codex/master-catalog-phase4` |
 | Owner-accepted G3/WP-6.6 checkpoint | `78e96ab3ed9993707014c4aba1d285b7592b17a1` at 2026-07-14 23:50 +07 |
 | Named evidence commits | `dc83c35602fec81d124f43013824649664b8eecb` is the exact pushed P-40 correction checkpoint; `10531610eac53a97c6ef8f9d06418766b58bee36` is the exact pushed P39R-C execution source; `b79992f39fce6b902f19efa4bc0b96e5827171b6` is its bounded PostgREST-readiness fix; `f36d896d672609653de6634e307dcc44bce6d519` is the final pushed P-37 owner keyboard/focus/presentation checkpoint; `96c2ac6892e8ffe9d020c2dff641a847157cd4b2` is the recovery-state correction; `e6d79d77bd8fb8d6a0211d7d7b440d2136cb6512` is the insertion-gap corrected-flow source; `910cc3cc74660beecf18655d39cd0b0c085d1fc6` is the P-36 execution checkout; `01eba0d49f2e4b6e65f0d9dd287fd461ba9ea19a` is P-35 bootstrap source integration; `80b2574bbaccc5bb14093aa204a46fcc50ba1d5c` is the WP-7.5 DB source; `7d60ab60e5c7a9f80f4bb40faa665eee88423923` is the selected-version artifact proof; `99fa56c3d3c68e1886fbd308d8536e598eaee02f` is the prior accepted-state UX checkpoint; and `4e3574a31a2697f4d727acabc8f55f34a4233bff` is the historical source/static checkpoint superseded by the `42704` finding. Earlier G4/G3/G1R/G2/P-24 provenance remains preserved in the detailed log. |
-| Current work package | WP-8/P-37 HOLD; P39R-S/P39R-L/P39R-C/P39R-U passed; exact P-40 correction is pushed and separate developer browser QA passed; a fresh scored P-38 Cards A-G rerun remains pending |
-| Current environment | Disabled clean Local baseline after `024`: pointer `2568.0.0`/710 and canonical hash `sha256:2e3571...`; three statement placement triggers/zero legacy row triggers; zero working drafts; all three catalog flags false; BOQ 198/1,547 with zero unversioned/cross-version items; Factor F `2569.0.0`/36; harnesses preserved adjacent business data; Production untouched |
+| Current work package | WP-8/P-37 HOLD; P-41 category/read-only-preview/withdraw-order correction in progress after P-38 discovery; exact pushed source, live smoke, clean `017`-`025`, and fresh scored Cards A-G remain pending |
+| Current environment | Disabled Local baseline after incremental `025`: pointer `2568.0.0`/710 and canonical hash `sha256:2e3571...`; three statement placement triggers/zero legacy row triggers plus one withdraw-compaction statement trigger; zero working drafts; all three catalog flags false; BOQ 198/1,547 with zero unversioned/cross-version items; Factor F `2569.0.0`/36; Production untouched; tracked source is intentionally dirty until P-41 verification/commit |
 | Production write allowed | No |
 | Feature flag default | Disabled |
-| Latest owner decision | The Owner approved P39R-U continuation and the P-40 bounded correction after exploratory UAT findings. No reset, Production action, Factor F/hotfix expansion, P-19, or migration change is authorized by P-40. |
-| Latest technical result | P-40 accepts whole/one/two-decimal admin prices with Thai validation, governs unit selection from the base catalog with an explicit custom path, redirects successful withdrawal to a durable workspace notice, accepts safe numeric Excel source-row/money cells through the actual application parser, and moves E-03 before structured-code adds. Exact `dc83c35` is pushed; real-parser input verification passed 708/708/693; full 34 files/216 tests, TypeScript, lint 0 errors/10 existing warnings, network-enabled build, and diff check passed. Separate no-reset developer browser QA passed existing/custom unit selection, `1250` to `1250.00`, Thai invalid-money guidance, add/withdraw, and notice reload. Draft `2568.5.0-D003` was abandoned; pointer/working-draft/flags/BOQ/Factor F readback returned to the disabled baseline. No migration/reset/Production action. |
-| Next owner review point | Run a fresh bounded no-reset scored Cards A-G UAT from a new immutable session path and pass exact cleanup before any P-37 accept/hold request. |
+| Latest owner decision | The Owner approved continuing with the recommended P-41 Local-only correction. Incremental Local apply was permitted without reset; no P-37 acceptance, destructive clean bootstrap, Production action, P-19, BOQ/Factor F work, or hotfix expansion is inferred. |
+| Latest technical result | UAT-06/UAT-07/UAT-08 are diagnosed and corrected in source: shared 500-character category-key contract plus live maximum preflight; complete read-only/no-Apply Full preview while retirement is disabled; client rejection of preexisting order gaps; and migration `025` atomic post-withdraw compaction with one-revision smoke assertions. Discovery draft D005 was abandoned, cleanup restored all flags/readback, and `025` SHA-256 `00d79d7750aa52ba7f003f6bb82fedb1d31ab111be417d74329c1cd3d899f76f` applied incrementally without reset. Full working-tree verification passed 34 files/220 tests, TypeScript, lint 0 errors/10 existing warnings, authority 710/65/17, pinned inputs 708/708/693 with category limit 500, script syntax, network-enabled build, and diff checks. Exact push remains pending. |
+| Next owner review point | Commit and push the exact P-41 checkpoint, run clean-tree Local smoke, then request a new explicit reset approval for the clean `017`-`025` chain before fresh scored Cards A-G. |
 | Last updated | 2026-07-19 |
 
 ## 2.1 Canonical authority and evidence manifest
@@ -638,14 +647,15 @@ scope.
 | 2026-07-11 01:36 +07 | WP-6.5/WP-8 | Route failure states, Thai recovery copy, correlation logging, admin UAT, and measured performance were incomplete | Loading/error/not-found and bounded mutation/export logs implemented; request ID shown for uncertain/error paths | P-36 passed 710+18 route-render measurements and prior same-ID recovery remains valid. Independent live client interaction/keyboard/recovery/intended-admin UAT remains P-37/P-14. |
 | 2026-07-12 01:37 +07 | WP-6.6 planning | End-to-end owner/developer capability trace found C-01 through C-12 despite the bounded WP-6.5 safety evidence | Resolved; P-27 accepted final C-01 through C-17 closeout | Initial `3bfc74e` evidence was historical; the amended final path passed G1R/G2/P-25/G3/P-26 and was owner-accepted on exact `78e96ab`. P-28 moved unchanged `020` into bootstrap source and P-29/G4E passed the integrated execution. P-30 later authorized P-18/`021` Local-only source work; no Production access/write, new Factor F workflow, or hotfix expansion occurred. |
 | 2026-07-18/19 | P-39/P-39R | P-23.1 conflated attempts with releases; follow-up audit found per-base draft, restore audit, RLS, terminal metadata, compatibility gaps, accumulated-history code scope, and row-trigger amplification | Preserve incremental `022`/`023`; add final set-based `024`; align app/docs/tests/harness; retain earlier evidence as history | P39R-S/P39R-L/P39R-C passed; P39R-U remains open; no Production action authorized |
+| 2026-07-19 | P-41 | P-38 discovery found category-key bound drift, persistence-coupled retirement-disabled preview, and a hidden order gap after base-absent withdrawal | Keep accepted guards; add shared category bound/live preflight, read-only preview, client gap rejection, and forward-only `025` compaction; rerun exact gates | Discovery cleanup/readback and incremental Local `025` apply passed; full working-tree verification passed 34 files/220 tests plus type/lint/authority/input/syntax/build/diff; exact push/smoke/clean chain/scored UAT pending; Production untouched |
 
 ## 7. Handoff note template
 
 Use this template at the end of each implementation session:
 
 ```text
-Current WP: WP-8/P-37 HOLD; P39R-S/P39R-L/P39R-C/P39R-U passed; exact P-40 correction is pushed and developer browser QA passed; fresh scored Cards A-G pending
-Status: exploratory P-38 and separate P-40 developer QA safely returned to the disabled baseline; scored Owner UAT remains open; Add/Supplement hidden; no Production action authorized
+Current WP: WP-8/P-37 HOLD; P-41 category/read-only-preview/withdraw-order correction in progress; exact push, smoke, clean 017-025, and fresh scored Cards A-G pending
+Status: P-38 discovery drafts are closed and Local is disabled after incremental 025; P-41 working-tree verification passed while exact push/smoke/clean chain and scored Owner UAT remain open; Add/Supplement hidden; no Production action authorized
 Branch: codex/master-catalog-phase4
 Execution provenance: P-40 exact pushed source dc83c35602fec81d124f43013824649664b8eecb; P39R-C exact source 10531610eac53a97c6ef8f9d06418766b58bee36 with readiness fix b79992f; P39R-L 022 execution source 7997387; corrected 023 execution source 6f01457; 024 execution source b6d58ce6cfedafa5812821edb49b897c2856f049; P39R-S source 67c167c plus evidence corrections 842ecb8/7997387; P-37 final owner keyboard/focus/presentation f36d896d672609653de6634e307dcc44bce6d519; P-36 execution 910cc3cc74660beecf18655d39cd0b0c085d1fc6; earlier provenance remains in the evidence log
 Migration 020 SHA-256: e07e0c4161077efba7bc4f6ebf95518d0cc1bc7e4628a43a128dd899bd1aef93; prior combined clean execution through 020 passed
@@ -653,12 +663,13 @@ Migration 021 SHA-256: e4de258756bbfbda0508e55d7b76ba2e907f644625b49bc29d4a4d7ac
 Migration 022 SHA-256: 9fc8f951fa5b3f3d7de928cce877a265d9333fda46850dd7564b22cd424c41f3; incrementally applied on 7997387; business invariants passed
 Migration 023 SHA-256: cbe01f63c6dd822edb29e1f7a31bfd27d5cb063e4d7d7e3878567875434d0a88; first 072294d apply failed closed and rolled back; corrected 6f01457 apply/invariants passed
 Migration 024 SHA-256: d3aa11282fa4b2d4bac058bde3851287c551556ba5eac307277f086ba3d86b25; committed/pushed/applied on b6d58ce; WP-6.6/WP-7.5/canonical/final invariants passed
+Migration 025 SHA-256: 00d79d7750aa52ba7f003f6bb82fedb1d31ab111be417d74329c1cd3d899f76f; incrementally applied without reset after discovery cleanup; exact push, live smoke, and clean-chain evidence pending
 Prior named evidence commits: 721c2c2 for exact G1R/G2 and FK-index closure; 2b1ccec/be157d4/bfccbb3/f9f0bd7 for truthful harness corrections; 050c998 for P-24 closure lineage; 88d0711 for P-24 base repository/static; 31fd689 for P-23/P-23.1 source; c8f6dca for historical operator/UI; e463270 for historical P-22 G1 DB/P-20; 777df75 for accepted P-11
-Files changed: P-40 admin money/unit/withdraw UX, workbook parser compatibility, preflight real-parser execution, tests, and authority documents; migrations 022-024 unchanged; untracked files/, tmp/, output/ excluded
-Evidence produced: P39R-U behavior and exploratory Card F retained as discovery evidence; P-40 source/docs verification and separate developer browser QA passed; one-draft QA was abandoned and readback restored the exact disabled baseline; this is not scored Owner evidence
-Tests/checks run: full 34 files/216 tests, TypeScript, lint 0 errors/10 existing warnings, real-parser pinned input verification 708/708/693, script syntax, network-enabled production build, and diff checks
-Blockers: fresh scored Closure Matrix #34 C-07 through C-11 evidence; P-19 only when affected; P-12 readiness debt disposition
-Owner decisions needed: the Owner performs fresh scored Cards A-G after exact prepare; no Production decision is requested
-Next safe step: choose a new immutable P-38 session path; run bounded no-reset prepare; complete scored Cards A-G and cleanup; then update evidence and request P-37 accept/hold
+Files changed: P-41 category/read-only preview, placement-gap rejection, forward-only migration 025/bootstrap/smoke/tests, and authority documents; migrations 017-024 unchanged; untracked files/, tmp/, output/ excluded
+Evidence produced: discovery D005 abandoned; disabled baseline restored; migration 025 incrementally applied without reset; full working-tree verification passed; this is not scored Owner evidence
+Tests/checks run: full 34 files/220 tests, TypeScript, lint 0 errors/10 existing warnings, authority 710/65/17, pinned inputs 708/708/693 with category limit 500, shell/Node syntax, network-enabled production build, and diff checks
+Blockers: exact P-41 push, live smoke, newly approved clean 017-025 chain, and fresh scored Closure Matrix #34 C-07 through C-11 evidence; P-19 only when affected; P-12 readiness debt disposition
+Owner decisions needed: a new destructive-reset approval is required before clean 017-025; after that, the Owner performs fresh scored Cards A-G; no Production decision is requested
+Next safe step: commit/push the exact P-41 checkpoint, run clean-tree smoke, then request the clean-chain reset approval
 Production touched: No
 ```

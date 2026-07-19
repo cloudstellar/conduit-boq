@@ -118,6 +118,7 @@ describe('Master Catalog authority consistency', () => {
       '022',
       '023',
       '024',
+      '025',
     ])
 
     expectInOrder(bootstrap, [
@@ -137,6 +138,7 @@ describe('Master Catalog authority consistency', () => {
       '`022_master_catalog_phase4_draft_identity_and_release_number.sql`',
       '`023_master_catalog_phase4_published_code_rls_scope.sql`',
       '`024_master_catalog_phase4_set_based_placement_invalidation.sql`',
+      '`025_master_catalog_phase4_withdraw_order_compaction.sql`',
     ])
 
     expect(migrations).toContain(
@@ -168,6 +170,10 @@ describe('Master Catalog authority consistency', () => {
       root,
       'migrations/024_master_catalog_phase4_set_based_placement_invalidation.sql',
     ))).toBe(true)
+    expect(existsSync(resolve(
+      root,
+      'migrations/025_master_catalog_phase4_withdraw_order_compaction.sql',
+    ))).toBe(true)
     const migration022Sha256 = createHash('sha256')
       .update(read('migrations/022_master_catalog_phase4_draft_identity_and_release_number.sql'))
       .digest('hex')
@@ -191,6 +197,20 @@ describe('Master Catalog authority consistency', () => {
       'docs/plans/master-catalog/37-phase4-p39-draft-identity-release-number-correction-plan.md',
     ]) {
       expect(read(authorityPath)).toContain(migration024Sha256)
+    }
+    const migration025Sha256 = createHash('sha256')
+      .update(read('migrations/025_master_catalog_phase4_withdraw_order_compaction.sql'))
+      .digest('hex')
+    for (const authorityPath of [
+      'docs/04_data/MIGRATIONS.md',
+      'docs/plans/master-catalog/13-phase4-verification-report.md',
+      'docs/plans/master-catalog/17-phase4-database-security-contract.md',
+      'docs/plans/master-catalog/18-phase4-threat-model.md',
+      'docs/plans/master-catalog/19-phase4-decision-register.md',
+      'docs/plans/master-catalog/25-phase4-execution-progress-tracker.md',
+      'docs/plans/master-catalog/36-phase4-wp8-p38-no-reset-owner-uat-preflight.md',
+    ]) {
+      expect(read(authorityPath)).toContain(migration025Sha256)
     }
 
     const packageJson = JSON.parse(read('package.json')) as {
@@ -392,6 +412,8 @@ describe('Master Catalog authority consistency', () => {
       'Approved 2026-07-15 10:24 +07 for exact tracked checkpoint commit/push only; Local DB/browser evidence, bootstrap inclusion, WP-8, Production, and adjacent domains remain separate',
     )
     expect(decisions).toContain('DB-read version in the Server Action before the publish RPC')
+    expect(decisions).toContain('| P-41 |')
+    expect(decisions).toContain('Migration `025` SHA-256')
 
     const tracker = read(
       'docs/plans/master-catalog/25-phase4-execution-progress-tracker.md',
@@ -411,10 +433,10 @@ describe('Master Catalog authority consistency', () => {
       /P-33 accepted that\s+exact bounded WP-7\.5 technical checkpoint at 2026-07-15 13:54 \+07/,
     )
     expect(tracker).toContain(
-      '| Current work package | WP-8/P-37 HOLD; P39R-S/P39R-L/P39R-C/P39R-U passed; exact P-40 correction is pushed and separate developer browser QA passed; a fresh scored P-38 Cards A-G rerun remains pending |',
+      '| Current work package | WP-8/P-37 HOLD; P-41 category/read-only-preview/withdraw-order correction in progress after P-38 discovery; exact pushed source, live smoke, clean `017`-`025`, and fresh scored Cards A-G remain pending |',
     )
     expect(tracker).toContain(
-      '| Current environment | Disabled clean Local baseline after `024`: pointer `2568.0.0`/710',
+      '| Current environment | Disabled Local baseline after incremental `025`: pointer `2568.0.0`/710',
     )
     expect(tracker).toContain(
       '0780925aca8fa7ebbf8abbaf2b7cf151b39b676a',
@@ -522,7 +544,7 @@ describe('Master Catalog authority consistency', () => {
       /pre-amendment operator\/browser preflight passed on\s+`c8f6dca`/,
     )
     expect(tracker).toContain(
-      'Status: exploratory P-38 and separate P-40 developer QA safely returned to the disabled baseline; scored Owner UAT remains open; Add/Supplement hidden; no Production action authorized',
+      'Status: P-38 discovery drafts are closed and Local is disabled after incremental 025; P-41 working-tree verification passed while exact push/smoke/clean chain and scored Owner UAT remain open; Add/Supplement hidden; no Production action authorized',
     )
     expect(verificationReport).toContain(
       'HOLD under Closure Matrix #34',
@@ -592,12 +614,12 @@ describe('Master Catalog authority consistency', () => {
       '| C-10 | At least three safe validation-error recoveries |',
       '| C-11 | 710-row performance baseline |',
       '| C-12 | Documentation consistency |',
-      '| Passed through exact pushed P-40 source; monitor | Full repository checks passed 34 files/216 tests, TypeScript, lint 0 errors/10 existing warnings, real-parser input verification, network-enabled build, and diff check; separate browser QA is recorded without substituting for scored UAT; rerun after scored evidence update |',
+      '| Passed in working tree; exact push pending | Commit/push the exact source and rerun after scored evidence update |',
       'one rejected stale attempt with zero effect, then exactly one accepted UI batch/change set',
-      'does not require `npm run db:local:bootstrap`',
     ]) {
       expect(p37Closure).toContain(contract)
     }
+    expect(p37Closure).toMatch(/obtain a new\s+explicit approval/)
     expect(executionPack).toContain(
       'record comprehension and recovery from at least three safe',
     )
@@ -645,10 +667,12 @@ describe('Master Catalog authority consistency', () => {
     expect(cardE).not.toContain('complete the old publish-confirmation form')
     expect(p37OwnerUat).toMatch(/Do not run\s+`npm run db:local:bootstrap`/)
     expect(p37OwnerUat).not.toContain('technical evidence is accepted as Owner evidence')
-    expect(tracker).toContain('separate P-40 developer QA safely returned')
+    expect(tracker).toContain('P-38 discovery drafts are closed')
     expect(verificationReport).toContain('P-38 P-37 evidence reconciliation')
     expect(threatModel).toContain('| T-52 |')
     expect(threatModel).toContain('| T-53 |')
+    expect(threatModel).toContain('| T-58 |')
+    expect(threatModel).toContain('| T-59 |')
     expect(threatModel).toContain('Owner UAT Script #35')
     expect(existsSync(resolve(
       root,
@@ -674,6 +698,12 @@ describe('Master Catalog authority consistency', () => {
     expect(p38Preflight).toMatch(
       /It never\s+creates, edits, publishes, or abandons a draft/,
     )
+    expect(p38Preflight).toContain('P-41 discovery correction gate')
+    expect(p38Preflight).toContain('clean `017`-`025` chain')
+    expect(p37OwnerUat).toContain('UAT-06')
+    expect(p37OwnerUat).toContain('UAT-07')
+    expect(p37OwnerUat).toContain('UAT-08')
+    expect(p37OwnerUat).toContain('reports a preexisting order gap')
     expect(existsSync(resolve(
       root,
       'docs/plans/master-catalog/30-phase4-wp66-owner-review-note.md',

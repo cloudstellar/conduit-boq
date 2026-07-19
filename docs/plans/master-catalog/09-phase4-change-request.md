@@ -30,6 +30,19 @@ closing P39R-L. Separately approved destructive P39R-C then passed the clean
 `009`-`024` chain on exact pushed `10531610`. Owner P39R-U, Production, Factor
 F/hotfix expansion, and P-19 remain separately gated.
 
+**P-41 discovery correction recorded:** 2026-07-19 — P-38 discovery found an
+application ceiling below the real versioned category-key length, an
+retirement-disabled Full-preview path that failed instead of remaining
+read-only, and a hidden order gap after withdrawing a never-published row.
+The approved Local-only correction raises the bounded category contract to 500
+characters with a live dictionary preflight, keeps complete preview available
+without persistence or Apply when retirement is disabled, rejects preexisting
+order gaps in the client, and appends forward-only migration `025` for atomic
+post-withdraw compaction. Incremental Local apply and full working-tree source
+verification are complete; exact push, clean-chain, smoke, and fresh scored
+Owner-UAT evidence remain open. This does
+not authorize Production, reset, Factor F, BOQ, P-19, or hotfix expansion.
+
 **Owner decision recorded:** 2026-07-04 — approved according to the
 recommendation for implementation/local rehearsal only. The gate structure,
 abort conditions, reconciliation counts, fail-closed governance, and missing
@@ -699,7 +712,9 @@ Detailed execution is in the
 - Unauthorized roles cannot read administrative audit details or mutate data.
 - Stale/duplicate requests fail safely.
 - Mistaken retirement and never-published addition have explicit audited
-  reactivate/withdraw correction paths without deleting identity/code/audit.
+  reactivate/withdraw correction paths without deleting identity/code/audit;
+  withdrawal also leaves the surviving draft order contiguous while preserving
+  relative order and advances placement revision once for the transaction.
 - One mutable current-base workspace is enforced; audited abandon preserves the
   prior attempt as immutable read-only history.
 - The final database snapshot diff shows all cumulative manual/import effects,

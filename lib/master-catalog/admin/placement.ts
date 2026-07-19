@@ -67,6 +67,13 @@ export function buildCatalogPlacementPreview(
   const inherited = draft.filter((item) => baseIdentityIds.has(item.identityId));
   const newItems = draft.filter((item) => !baseIdentityIds.has(item.identityId));
 
+  if (!draft.every((item, index) => item.displayOrder === index)) {
+    throw new CatalogPlacementValidationError(
+      'PLACEMENT_ORDER_INVALID',
+      'ลำดับปัจจุบันของฉบับร่างมีช่องว่าง กรุณาโหลดฉบับร่างที่ซ่อมลำดับแล้ว',
+    );
+  }
+
   if (!sameIdentityOrder(base, inherited)) {
     throw new CatalogPlacementValidationError(
       'PLACEMENT_ORDER_INVALID',

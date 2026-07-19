@@ -76,6 +76,7 @@ describe('Master Catalog migration contracts', () => {
     expect(bootstrap).toContain('migrations/022_master_catalog_phase4_draft_identity_and_release_number.sql')
     expect(bootstrap).toContain('migrations/023_master_catalog_phase4_published_code_rls_scope.sql')
     expect(bootstrap).toContain('migrations/024_master_catalog_phase4_set_based_placement_invalidation.sql')
+    expect(bootstrap).toContain('migrations/025_master_catalog_phase4_withdraw_order_compaction.sql')
     expect(bootstrap).toContain('supabase/local/production-baseline.sql')
     expect(bootstrap).toContain('PUBLIC_DATA_SNAPSHOT=')
     expect(bootstrap).toContain('docker cp "$PUBLIC_DATA_SNAPSHOT"')
@@ -91,6 +92,7 @@ describe('Master Catalog migration contracts', () => {
     expect(bootstrap).toContain('psql -v ON_ERROR_STOP=1 -U postgres -d postgres -f /tmp/022.sql')
     expect(bootstrap).toContain('psql -v ON_ERROR_STOP=1 -U postgres -d postgres -f /tmp/023.sql')
     expect(bootstrap).toContain('psql -v ON_ERROR_STOP=1 -U postgres -d postgres -f /tmp/024.sql')
+    expect(bootstrap).toContain('psql -v ON_ERROR_STOP=1 -U postgres -d postgres -f /tmp/025.sql')
     expect(bootstrap).toContain('wait_for_local_rest_schema()')
     expect(bootstrap).toContain('LOCAL_SUPABASE_SECRET_KEY:?Missing LOCAL_SUPABASE_SECRET_KEY')
     expect(bootstrap).toContain('$LOCAL_API_URL/rest/v1/organizations?select=id&limit=1')
@@ -99,6 +101,7 @@ describe('Master Catalog migration contracts', () => {
     expect(bootstrap).toContain("'factor_f_2569_row_count'")
     expect(bootstrap).toContain("'factor_f_partial_legacy_snapshots_remaining'")
     expect(bootstrap).toContain('npm run db:local:smoke-master-catalog')
+    expect(canonicalHash).toContain("? '017-025'")
     expect(canonicalHash).toContain("? '017-024'")
     expect(canonicalHash).toContain("? '017-023'")
     expect(canonicalHash).toContain("? '017-022' : '017-021'")
@@ -108,8 +111,14 @@ describe('Master Catalog migration contracts', () => {
     expect(canonicalHash).toContain('p39r_placement_statement_triggers')
     expect(canonicalHash).toContain('p39r_placement_row_triggers')
     expect(canonicalHash).toContain('migration024Detected')
+    expect(canonicalHash).toContain('migration025Detected')
+    expect(canonicalHash).toContain('phase4_withdraw_order_compaction_triggers')
     expect(canonicalHash).toContain('migration 022 schema markers are partial or inconsistent')
     expect(canonicalHash).toContain('migration 024 placement-trigger markers are partial or inconsistent')
+    expect(canonicalHash).toContain('migration 025 withdraw-order compaction trigger inventory is inconsistent')
+    expect(canonicalHash).toContain("to_regprocedure('private.compact_catalog_draft_order_after_delete()')")
+    expect(canonicalHash).toContain("trigger_row.tgoldtable = 'deleted_rows'")
+    expect(canonicalHash).toContain('(trigger_row.tgtype & 60) = 8')
   })
 
   it('publishes Factor F 2569 without backfilling existing BOQs', () => {
@@ -679,6 +688,39 @@ describe('Master Catalog migration contracts', () => {
     expect(sql).not.toContain('ALTER TABLE public.boq')
     expect(sql).not.toMatch(/\b(?:UPDATE|INSERT INTO|DELETE FROM)\s+public\.boq\b/i)
     expect(sql).not.toMatch(/\b(?:UPDATE|INSERT INTO|DELETE FROM)\s+public\.factor_/i)
+  })
+
+  it('compacts draft order atomically after a draft-only withdrawal', () => {
+    const sql = readMigration('025_master_catalog_phase4_withdraw_order_compaction.sql')
+
+    expect(sql).toContain('Migration 025: Master Catalog Phase 4 - Withdraw Order Compaction')
+    expect(sql).toContain('migrations 021/024 are incomplete')
+    expect(sql).toContain('all catalog feature flags must be false')
+    expect(sql).toContain('mutable drafts must be closed before installation')
+    expect(sql).toContain('CREATE OR REPLACE FUNCTION private.compact_catalog_draft_order_after_delete()')
+    expect(sql).toContain('SET CONSTRAINTS public.uq_price_list_version_display_order DEFERRED')
+    expect(sql).toContain("'master_catalog_order:' || v_version_id::text")
+    expect(sql).toContain('row_number() OVER (')
+    expect(sql).toContain('candidate.display_order IS DISTINCT FROM ranked.target_display_order')
+    expect(sql).toContain('CREATE TRIGGER trigger_compact_catalog_draft_order_delete')
+    expect(sql).toContain('REFERENCING OLD TABLE AS deleted_rows')
+    expect(sql).toContain('FOR EACH STATEMENT')
+    expect(sql).toContain('CATALOG_DRAFT_ORDER_COMPACTION_FAILED')
+    expect(sql).toContain('FROM PUBLIC, anon, authenticated, service_role')
+    expect(sql).toContain('trigger inventory is incomplete')
+    expect(sql.match(/^BEGIN;$/gm)).toHaveLength(1)
+    expect(sql.match(/^COMMIT;$/gm)).toHaveLength(1)
+    expect(sql).not.toContain('ALTER TABLE public.boq')
+    expect(sql).not.toMatch(/\b(?:UPDATE|INSERT INTO|DELETE FROM)\s+public\.boq\b/i)
+    expect(sql).not.toMatch(/\b(?:UPDATE|INSERT INTO|DELETE FROM)\s+public\.factor_/i)
+
+    const smoke = readFileSync(
+      resolve(process.cwd(), 'scripts', 'smoke-master-catalog-wp66.mjs'),
+      'utf8',
+    )
+    expect(smoke).toContain('schemaContract.withdraw_order_compaction_triggers === 1')
+    expect(smoke).toContain("'withdraw_order_compaction_triggers'")
+    expect(smoke).toContain("trigger_row.tgoldtable = 'deleted_rows'")
   })
 
   it('keeps the Production snapshot outside the Supabase remote migration ledger', () => {

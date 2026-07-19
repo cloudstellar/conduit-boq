@@ -18,6 +18,8 @@ export const CATALOG_IMPORT_PAYLOAD_PROFILE_VERSION = '1'
 export const CATALOG_IMPORT_NORMALIZED_PAYLOAD_LIMIT_BYTES = 750 * 1024
 export const CATALOG_IMPORT_RAW_FILE_LIMIT_BYTES = 20 * 1024 * 1024
 export const CATALOG_IMPORT_ROW_LIMIT = 1500
+// The 2568 authority preserves the full official category label as its dictionary key.
+export const CATALOG_IMPORT_CATEGORY_CODE_LIMIT = 500
 
 const TOP_LEVEL_KEYS = [
   'schemaVersion',
@@ -624,7 +626,11 @@ function normalizeRow(value: unknown, index: number): NormalizedCatalogRowCandid
     materialCost,
     laborCost,
     unitCost,
-    categoryCode: readText(row.categoryCode, `rows.${index}.categoryCode`, 64),
+    categoryCode: readText(
+      row.categoryCode,
+      `rows.${index}.categoryCode`,
+      CATALOG_IMPORT_CATEGORY_CODE_LIMIT,
+    ),
     identityOutcome: readIdentityOutcome(row.identityOutcome, `rows.${index}.identityOutcome`),
     priceAuthorityReference: readOptionalText(
       row.priceAuthorityReference,
@@ -730,7 +736,11 @@ function normalizeRowV2(value: unknown, index: number): NormalizedCatalogImportR
     laborCost,
     unitCost,
     categoryId: readPatternText(row.categoryId, `${path}.categoryId`, UUID_PATTERN, 64),
-    categoryCode: readText(row.categoryCode, `${path}.categoryCode`, 64),
+    categoryCode: readText(
+      row.categoryCode,
+      `${path}.categoryCode`,
+      CATALOG_IMPORT_CATEGORY_CODE_LIMIT,
+    ),
     codeGroupId,
     identityOutcome,
     priceAuthorityReference: readOptionalText(

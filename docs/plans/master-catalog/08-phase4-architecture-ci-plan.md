@@ -48,6 +48,20 @@ clean `009`-`024` DB/RLS/concurrency/export/advisor/invariant chain on exact
 pushed `10531610eac53a97c6ef8f9d06418766b58bee36`. P39R-U and every Production
 approval remain separate gates.
 
+**P-41 P-38 discovery correction:** 2026-07-19 — the architecture remains one
+versioned draft, one authoritative server diff, one atomic mutation boundary,
+and one DB-owned placement order. Three cross-layer assumptions are corrected:
+`categoryCode` is a versioned authority key/full label rather than a short
+prefix; retirement-disabled Full imports remain complete read-only previews
+with no persistence or Apply control; and base-absent withdrawal must compact
+the remaining draft order atomically instead of relying on a later placement
+screen to repair it. Preserve accepted migrations through `024` and append
+forward-only `025`; do not edit migration history. `025` is applied
+incrementally on Local and full working-tree source verification passed, but an
+exact pushed checkpoint, clean `017`-`025`
+execution, live smoke, and fresh scored Owner UAT remain gates. Production,
+BOQ, Factor F, and hotfix scope are unchanged.
+
 **Reliability amendment:** 2026-07-11 — WP-6.5 now closes end-to-end
 idempotency, publish-block UX, P-20 hash portability, ADR-003 reusable
 versioning, live DB/concurrency evidence, tracked export verification,
@@ -1699,7 +1713,9 @@ Proposed after P-18 acceptance:
 - After save, update the diff and history timeline without implying publication.
 - Support audited `reactivate`; support `withdraw` only for a never-published
   identity absent from the base, while preserving its identity/code reservation
-  and audit evidence.
+  and audit evidence. The same transaction compacts the surviving draft rows to
+  a contiguous zero-based `display_order` while preserving their relative order;
+  placement remains an approval workflow, not a repair mechanism.
 - Thai is the primary operator language. Remove rehearsal-only default values
   from production-capable fields and keep draft save linguistically distinct
   from whole-version publish.
