@@ -759,7 +759,7 @@ async function verifyLocalCategoryContract(service, versionId, categoryCodeLimit
     .limit(1_000)
   if (error) throw error
 
-  const categories = rows(data)
+  const categories = data ?? []
   assert(categories.length > 0, 'P-38 Local category dictionary is empty')
   const lengths = categories.map((category) => ({
     code: String(category.code ?? ''),

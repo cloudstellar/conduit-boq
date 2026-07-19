@@ -25,6 +25,13 @@ source verification and live WP-6.6 smoke. Owner-approved exact execution
 source `adcca3939f3080cdf64bc6ad807051e9e85fed94` now passes the clean
 `017`-`025` chain and final disabled-baseline readback. A new immutable scored
 session may be prepared after this evidence update is committed and pushed.
+The first such attempt on exact pushed
+`2c39dddd10c361bd1244292f4bd79e06f167c919` failed closed before feature-flag
+or session mutation because the Local category preflight referenced an
+undefined `rows` helper. Immediate status confirmed pointer `2568.0.0`/710,
+zero drafts, all flags false, BOQ 198/1,547, and Factor F `2569.0.0`/36. The
+bounded correction consumes the nullable Supabase result array directly and
+adds a regression assertion; a fresh session path remains required.
 
 **Boundary:** Local only, no reset. This note does not authorize successful
 publication, pointer movement, P-37 acceptance, P-19, Factor F work, hotfix
@@ -209,6 +216,7 @@ next scored `prepare`, require all of the following:
    `017`-`025`; WP-6.5/WP-6.6/WP-7/WP-7.5, canonical, and exact
    disabled-baseline readback passed;
 4. **Pending after this evidence commit is pushed:** prepare a new immutable
-   `P38_SESSION`; do not reuse D005 or its discovery evidence.
+   `P38_SESSION`; the first path on `2c39ddd` created no session and must not be
+   reused. Do not reuse D005 or its discovery evidence.
 
 No Local reset is authorized by this note. Production touched: **No**.

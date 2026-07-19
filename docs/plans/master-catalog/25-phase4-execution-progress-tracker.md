@@ -117,7 +117,11 @@ remained open at that checkpoint. The owner then approved the warned
 Local reset; exact pushed `adcca3939f3080cdf64bc6ad807051e9e85fed94` passed
 the complete clean chain, all four integrated smoke suites, canonical
 verification, and final disabled-baseline readback. Fresh scored Cards A-G are
-now the next gate.
+now the next gate. The first post-evidence `prepare` on exact pushed
+`2c39dddd10c361bd1244292f4bd79e06f167c919` failed closed before flag or
+session mutation because the Local category preflight referenced an undefined
+helper. Readback confirmed the disabled baseline; a bounded no-migration
+normalizer correction and regression assertion now precede the scored session.
 **Purpose:** Owner-facing progress tracker for Master Catalog Phase 4 local
 implementation and rehearsal. This file is the authority for current WP status,
 blockers, next safe step, and the authority/evidence index. Detailed decisions,
@@ -152,13 +156,13 @@ Allowed statuses:
 | Current branch | `codex/master-catalog-phase4` |
 | Owner-accepted G3/WP-6.6 checkpoint | `78e96ab3ed9993707014c4aba1d285b7592b17a1` at 2026-07-14 23:50 +07 |
 | Named evidence commits | `adcca3939f3080cdf64bc6ad807051e9e85fed94` is the exact pushed P-41 clean-chain execution source; `bb27b0d28e116e97ce1e7ee3e582f39bcc4edf22` is the exact pushed P-41 correction and incremental-smoke source; `dc83c35602fec81d124f43013824649664b8eecb` is the exact pushed P-40 correction checkpoint; `10531610eac53a97c6ef8f9d06418766b58bee36` is the exact pushed P39R-C execution source; `b79992f39fce6b902f19efa4bc0b96e5827171b6` is its bounded PostgREST-readiness fix; `f36d896d672609653de6634e307dcc44bce6d519` is the final pushed P-37 owner keyboard/focus/presentation checkpoint; `96c2ac6892e8ffe9d020c2dff641a847157cd4b2` is the recovery-state correction; `e6d79d77bd8fb8d6a0211d7d7b440d2136cb6512` is the insertion-gap corrected-flow source; `910cc3cc74660beecf18655d39cd0b0c085d1fc6` is the P-36 execution checkout; `01eba0d49f2e4b6e65f0d9dd287fd461ba9ea19a` is P-35 bootstrap source integration; `80b2574bbaccc5bb14093aa204a46fcc50ba1d5c` is the WP-7.5 DB source; `7d60ab60e5c7a9f80f4bb40faa665eee88423923` is the selected-version artifact proof; `99fa56c3d3c68e1886fbd308d8536e598eaee02f` is the prior accepted-state UX checkpoint; and `4e3574a31a2697f4d727acabc8f55f34a4233bff` is the historical source/static checkpoint superseded by the `42704` finding. Earlier G4/G3/G1R/G2/P-24 provenance remains preserved in the detailed log. |
-| Current work package | WP-8/P-37 HOLD; P-41 exact source, incremental smoke, and clean `017`-`025` passed; fresh scored Cards A-G remain pending |
+| Current work package | WP-8/P-37 HOLD; P-41 exact source, incremental smoke, and clean `017`-`025` passed; bounded prepared-session runtime correction precedes fresh scored Cards A-G |
 | Current environment | Post-clean-chain disabled Local baseline: pointer `2568.0.0`/710 and canonical hash `sha256:2e3571ea7135fbc0bbb84c8cc330af1173e4c1d2345e5eb59958dc76e45558b8`; three statement placement triggers/zero legacy row triggers plus one withdraw-compaction statement trigger; zero working drafts; all three catalog flags false; BOQ 198/1,547 with zero unversioned/cross-version items; Factor F `2569.0.0`/36; Production untouched |
 | Production write allowed | No |
 | Feature flag default | Disabled |
 | Latest owner decision | The Owner approved the warned destructive Local reset for the P-41 clean chain. It passed; no P-37 acceptance, Production action, P-19, BOQ/Factor F work, or hotfix expansion is inferred. |
-| Latest technical result | Exact pushed execution `adcca3939f3080cdf64bc6ad807051e9e85fed94` clean-applied `009`-`015`, hotfix `016`, and `017`-`025`. WP-6.5/WP-6.6/WP-7/WP-7.5 evidence SHA-256 values are `4b69e44dde915ca25c3f78379a1c45b002b31cb8aebcbf361ec3b58670f9e245`, `e9e28eb1bb6f312a4638c0d67b00cb420864d5433295ffb80a95a12ee9e14251`, `5b6a01837d2836a33a000489ff6dad4519ca40ca67e48464cc384b84721c8195`, and `0fd213f5ace8e077790d81a1c49b78a3fff3f1912a01aef5b52b7df6d1460240`. Canonical detected `017`-`025`, trigger inventory 3/0 plus one compaction trigger, hash `sha256:2e3571...`, and 471,777 bytes. Final readback returned pointer `2568.0.0`/710, zero drafts, flags false, BOQ 198/1,547, Factor F `2569.0.0`/36, and Production untouched. |
-| Next owner review point | Verify inputs, prepare a new immutable P-38 session on the clean baseline, then hand the intended admin the browser for fresh scored Cards A-G without live developer/SQL assistance. |
+| Latest technical result | Exact pushed execution `adcca3939f3080cdf64bc6ad807051e9e85fed94` clean-applied `009`-`015`, hotfix `016`, and `017`-`025`. WP-6.5/WP-6.6/WP-7/WP-7.5 evidence SHA-256 values are `4b69e44dde915ca25c3f78379a1c45b002b31cb8aebcbf361ec3b58670f9e245`, `e9e28eb1bb6f312a4638c0d67b00cb420864d5433295ffb80a95a12ee9e14251`, `5b6a01837d2836a33a000489ff6dad4519ca40ca67e48464cc384b84721c8195`, and `0fd213f5ace8e077790d81a1c49b78a3fff3f1912a01aef5b52b7df6d1460240`. Canonical detected `017`-`025`, trigger inventory 3/0 plus one compaction trigger, hash `sha256:2e3571...`, and 471,777 bytes. Final readback returned pointer `2568.0.0`/710, zero drafts, flags false, BOQ 198/1,547, Factor F `2569.0.0`/36, and Production untouched. P-38 input verification then passed 708/708/693 rows and authority 710/65/17. The first `prepare` on `2c39ddd` stopped before mutation on an undefined Local-category result normalizer; immediate status retained zero sessions/drafts and all flags false. |
+| Next owner review point | Commit/push the bounded prepared-session correction, prepare one new immutable P-38 session on the unchanged clean baseline, then hand the intended admin the browser for fresh scored Cards A-G without live developer/SQL assistance. |
 | Last updated | 2026-07-19 |
 
 ## 2.1 Canonical authority and evidence manifest
@@ -659,8 +663,8 @@ scope.
 Use this template at the end of each implementation session:
 
 ```text
-Current WP: WP-8/P-37 HOLD; P-41 exact source, incremental smoke, and clean 017-025 passed; fresh scored Cards A-G pending
-Status: Local is disabled after the exact P-41 clean chain; scored Owner UAT remains open; Add/Supplement hidden; no Production action authorized
+Current WP: WP-8/P-37 HOLD; P-41 exact source, incremental smoke, and clean 017-025 passed; prepared-session runtime correction precedes fresh scored Cards A-G
+Status: Local remains disabled after fail-closed prepare on 2c39ddd; scored Owner UAT remains open; Add/Supplement hidden; no Production action authorized
 Branch: codex/master-catalog-phase4
 Execution provenance: P-41 clean-chain execution adcca3939f3080cdf64bc6ad807051e9e85fed94 and correction source bb27b0d28e116e97ce1e7ee3e582f39bcc4edf22; P-40 exact pushed source dc83c35602fec81d124f43013824649664b8eecb; P39R-C exact source 10531610eac53a97c6ef8f9d06418766b58bee36 with readiness fix b79992f; P39R-L 022 execution source 7997387; corrected 023 execution source 6f01457; 024 execution source b6d58ce6cfedafa5812821edb49b897c2856f049; P39R-S source 67c167c plus evidence corrections 842ecb8/7997387; P-37 final owner keyboard/focus/presentation f36d896d672609653de6634e307dcc44bce6d519; P-36 execution 910cc3cc74660beecf18655d39cd0b0c085d1fc6; earlier provenance remains in the evidence log
 Migration 020 SHA-256: e07e0c4161077efba7bc4f6ebf95518d0cc1bc7e4628a43a128dd899bd1aef93; prior combined clean execution through 020 passed
@@ -675,6 +679,6 @@ Evidence produced: clean WP-6.5/WP-6.6/WP-7/WP-7.5 files under tmp/master-catalo
 Tests/checks run: full 34 files/220 tests, TypeScript, lint 0 errors/10 existing warnings, authority 710/65/17, pinned inputs 708/708/693 with category limit 500, shell/Node syntax, network-enabled production build, diff checks, clean bootstrap, all four integrated smoke suites, final status, and canonical readback
 Blockers: fresh scored Closure Matrix #34 C-07 through C-11 evidence; P-19 only when affected; P-12 readiness debt disposition
 Owner decisions needed: the intended admin performs fresh scored Cards A-G without live developer/SQL assistance; no Production decision is requested
-Next safe step: commit/push clean-chain evidence, verify inputs, prepare a new immutable P38 session, and hand over the Local browser
+Next safe step: commit/push the bounded preflight correction, prepare a new immutable P38 session, and hand over the Local browser
 Production touched: No
 ```

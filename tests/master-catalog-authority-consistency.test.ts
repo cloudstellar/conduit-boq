@@ -287,6 +287,8 @@ describe('Master Catalog authority consistency', () => {
     expect(p38Harness).toContain("server.ssrLoadModule('/lib/master-catalog/import/workbookAdapter.ts')")
     expect(p38Harness).toContain('applicationParser.profile.normalizeRow')
     expect(p38Harness).toContain('Application parser row count differs')
+    expect(p38Harness).toContain('const categories = data ?? []')
+    expect(p38Harness).not.toContain('rows(data)')
     expect(p38Harness).not.toContain(".rpc(")
     expect(p38Harness).not.toContain('create_catalog_draft')
     expect(p38Harness).not.toContain('abandon_catalog_draft')
@@ -442,7 +444,7 @@ describe('Master Catalog authority consistency', () => {
       /P-33 accepted that\s+exact bounded WP-7\.5 technical checkpoint at 2026-07-15 13:54 \+07/,
     )
     expect(tracker).toContain(
-      '| Current work package | WP-8/P-37 HOLD; P-41 exact source, incremental smoke, and clean `017`-`025` passed; fresh scored Cards A-G remain pending |',
+      '| Current work package | WP-8/P-37 HOLD; P-41 exact source, incremental smoke, and clean `017`-`025` passed; bounded prepared-session runtime correction precedes fresh scored Cards A-G |',
     )
     expect(tracker).toContain(
       '| Current environment | Post-clean-chain disabled Local baseline: pointer `2568.0.0`/710',
@@ -553,8 +555,10 @@ describe('Master Catalog authority consistency', () => {
       /pre-amendment operator\/browser preflight passed on\s+`c8f6dca`/,
     )
     expect(tracker).toContain(
-      'Status: Local is disabled after the exact P-41 clean chain; scored Owner UAT remains open; Add/Supplement hidden; no Production action authorized',
+      'Status: Local remains disabled after fail-closed prepare on 2c39ddd; scored Owner UAT remains open; Add/Supplement hidden; no Production action authorized',
     )
+    expect(tracker).toContain('2c39dddd10c361bd1244292f4bd79e06f167c919')
+    expect(verificationReport).toContain('undefined `rows` helper')
     expect(verificationReport).toContain(
       'HOLD under Closure Matrix #34',
     )

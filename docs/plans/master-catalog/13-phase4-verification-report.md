@@ -143,6 +143,13 @@ compaction trigger, exact hash
 and 471,777 bytes. Final readback repeated pointer `2568.0.0`/710, zero working
 drafts, all flags false, BOQ 198/1,547, zero unversioned BOQs, and Factor F
 `2569.0.0`/36. Fresh scored Cards A-G remain pending.
+The first post-evidence `prepare` on exact pushed checkpoint
+`2c39dddd10c361bd1244292f4bd79e06f167c919` failed closed before session or
+feature-flag mutation because the new Local category preflight referenced an
+undefined `rows` helper. Immediate readback confirmed the exact disabled
+baseline. The bounded correction uses the Supabase result array directly and
+adds an authority regression assertion; no migration, reset, draft, BOQ,
+Factor F, hotfix, or Production action is involved.
 Discovery drafts are not scored Owner evidence.
 **Prepared:** 2026-06-22
 **Production project:** `otlssvssvgkohqwuuiir`
