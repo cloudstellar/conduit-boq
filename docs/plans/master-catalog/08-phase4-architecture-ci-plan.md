@@ -57,10 +57,12 @@ with no persistence or Apply control; and base-absent withdrawal must compact
 the remaining draft order atomically instead of relying on a later placement
 screen to repair it. Preserve accepted migrations through `024` and append
 forward-only `025`; do not edit migration history. `025` is applied
-incrementally on Local and full working-tree source verification passed, but an
-exact pushed checkpoint, clean `017`-`025`
-execution, live smoke, and fresh scored Owner UAT remain gates. Production,
-BOQ, Factor F, and hotfix scope are unchanged.
+incrementally on Local. Exact pushed source
+`bb27b0d28e116e97ce1e7ee3e582f39bcc4edf22` passed the full source gates and
+live WP-6.6 smoke, including post-withdraw contiguity, relative-order, and
+one-revision assertions. A separately approved clean `017`-`025` execution and
+fresh scored Owner UAT remain gates. Production, BOQ, Factor F, and hotfix
+scope are unchanged.
 
 **Reliability amendment:** 2026-07-11 — WP-6.5 now closes end-to-end
 idempotency, publish-block UX, P-20 hash portability, ADR-003 reusable

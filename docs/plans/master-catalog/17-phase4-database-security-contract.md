@@ -82,8 +82,9 @@ compaction performs set-based updates. Direct DML remains revoked; the client
 must reject a preexisting gap rather than conceal it. `025` is Local-only and
 incrementally applied with SHA-256
 `00d79d7750aa52ba7f003f6bb82fedb1d31ab111be417d74329c1cd3d899f76f`;
-clean-chain/live-smoke/Owner-UAT and all Production
-gates remain open.
+exact pushed source `bb27b0d28e116e97ce1e7ee3e582f39bcc4edf22` and live
+WP-6.6 smoke passed. Clean-chain/Owner-UAT and all Production gates remain
+open.
 
 **Owner decision recorded:** 2026-07-04 — approved according to the
 recommendation as the technical backbone for Phase 4A and every Phase 4 write

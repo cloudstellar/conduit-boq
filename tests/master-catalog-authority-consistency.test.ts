@@ -414,6 +414,12 @@ describe('Master Catalog authority consistency', () => {
     expect(decisions).toContain('DB-read version in the Server Action before the publish RPC')
     expect(decisions).toContain('| P-41 |')
     expect(decisions).toContain('Migration `025` SHA-256')
+    expect(decisions).toContain(
+      'bb27b0d28e116e97ce1e7ee3e582f39bcc4edf22',
+    )
+    expect(decisions).toContain(
+      '8d118e14c69f7ea9209123852011b1610d4c63687ff5133136bd6f15875463ed',
+    )
 
     const tracker = read(
       'docs/plans/master-catalog/25-phase4-execution-progress-tracker.md',
@@ -433,10 +439,10 @@ describe('Master Catalog authority consistency', () => {
       /P-33 accepted that\s+exact bounded WP-7\.5 technical checkpoint at 2026-07-15 13:54 \+07/,
     )
     expect(tracker).toContain(
-      '| Current work package | WP-8/P-37 HOLD; P-41 category/read-only-preview/withdraw-order correction in progress after P-38 discovery; exact pushed source, live smoke, clean `017`-`025`, and fresh scored Cards A-G remain pending |',
+      '| Current work package | WP-8/P-37 HOLD; P-41 exact source and incremental live smoke passed; clean `017`-`025` and fresh scored Cards A-G remain pending |',
     )
     expect(tracker).toContain(
-      '| Current environment | Disabled Local baseline after incremental `025`: pointer `2568.0.0`/710',
+      '| Current environment | Post-smoke disabled Local baseline after incremental `025`: pointer `2568.0.0`/710',
     )
     expect(tracker).toContain(
       '0780925aca8fa7ebbf8abbaf2b7cf151b39b676a',
@@ -544,7 +550,7 @@ describe('Master Catalog authority consistency', () => {
       /pre-amendment operator\/browser preflight passed on\s+`c8f6dca`/,
     )
     expect(tracker).toContain(
-      'Status: P-38 discovery drafts are closed and Local is disabled after incremental 025; P-41 working-tree verification passed while exact push/smoke/clean chain and scored Owner UAT remain open; Add/Supplement hidden; no Production action authorized',
+      'Status: P-38 discovery drafts are closed and Local is disabled after incremental 025; exact pushed P-41 source and smoke passed while clean chain and scored Owner UAT remain open; Add/Supplement hidden; no Production action authorized',
     )
     expect(verificationReport).toContain(
       'HOLD under Closure Matrix #34',
@@ -614,11 +620,14 @@ describe('Master Catalog authority consistency', () => {
       '| C-10 | At least three safe validation-error recoveries |',
       '| C-11 | 710-row performance baseline |',
       '| C-12 | Documentation consistency |',
-      '| Passed in working tree; exact push pending | Commit/push the exact source and rerun after scored evidence update |',
+      '| Passed for exact source/smoke checkpoint | Rerun after the clean chain and scored evidence update |',
       'one rejected stale attempt with zero effect, then exactly one accepted UI batch/change set',
     ]) {
       expect(p37Closure).toContain(contract)
     }
+    expect(p37Closure).toContain(
+      '8d118e14c69f7ea9209123852011b1610d4c63687ff5133136bd6f15875463ed',
+    )
     expect(p37Closure).toMatch(/obtain a new\s+explicit approval/)
     expect(executionPack).toContain(
       'record comprehension and recovery from at least three safe',
@@ -700,6 +709,9 @@ describe('Master Catalog authority consistency', () => {
     )
     expect(p38Preflight).toContain('P-41 discovery correction gate')
     expect(p38Preflight).toContain('clean `017`-`025` chain')
+    expect(p38Preflight).toContain(
+      '**Pending new Owner approval:** a clean bootstrap through `017`-`025`',
+    )
     expect(p37OwnerUat).toContain('UAT-06')
     expect(p37OwnerUat).toContain('UAT-07')
     expect(p37OwnerUat).toContain('UAT-08')

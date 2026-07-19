@@ -20,9 +20,10 @@ category-key bound, retirement-disabled read-only Full preview, and
 post-withdraw order gap. Migration `025` SHA-256
 `00d79d7750aa52ba7f003f6bb82fedb1d31ab111be417d74329c1cd3d899f76f`
 is incrementally applied to the disabled Local baseline without reset and
-full working-tree verification passes. This is not a scored preflight yet:
-exact push, clean-tree smoke, and a newly approved clean `017`-`025` chain must
-pass before a new immutable scored session is prepared.
+exact pushed source `bb27b0d28e116e97ce1e7ee3e582f39bcc4edf22` passes full
+source verification and live WP-6.6 smoke. This is not a scored preflight yet:
+a newly approved clean `017`-`025` chain must pass before a new immutable
+scored session is prepared.
 
 **Boundary:** Local only, no reset. This note does not authorize successful
 publication, pointer movement, P-37 acceptance, P-19, Factor F work, hotfix
@@ -195,12 +196,16 @@ working drafts, all flags false, BOQ 198/1,547, and Factor F `2569.0.0`/36.
 Forward-only `025` was then applied incrementally without reset. Before the
 next scored `prepare`, require all of the following:
 
-1. exact pushed P-41 source matching the passed full
+1. **Passed:** exact pushed P-41 source
+   `bb27b0d28e116e97ce1e7ee3e582f39bcc4edf22` matches the passed full
    repository/authority/build/diff checks;
-2. clean-tree WP-6.6 smoke proving one compaction trigger, exact contiguous
-   order after withdrawal, preserved relative order, and one revision advance;
-3. a newly warned and explicitly approved clean bootstrap through `017`-`025`,
+2. **Passed:** exact-source WP-6.6 smoke proves one compaction trigger, exact
+   contiguous order after withdrawal, preserved relative order, and one
+   revision advance; evidence SHA-256
+   `8d118e14c69f7ea9209123852011b1610d4c63687ff5133136bd6f15875463ed`;
+3. **Pending new Owner approval:** a clean bootstrap through `017`-`025`,
    followed by the exact disabled-baseline readback;
-4. a new immutable `P38_SESSION`; do not reuse D005 or its discovery evidence.
+4. **Pending after the clean chain:** a new immutable `P38_SESSION`; do not
+   reuse D005 or its discovery evidence.
 
 No Local reset is authorized by this note. Production touched: **No**.
