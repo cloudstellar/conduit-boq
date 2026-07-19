@@ -230,8 +230,10 @@ P39R-L passed. Separately approved P39R-C then passed a clean `009`-`024`
 bootstrap and the full live/export/advisor/invariant suite on exact pushed
 `10531610eac53a97c6ef8f9d06418766b58bee36`. Owner P39R-U later passed distinct
 draft identity plus reusable unissued target behavior. The exploratory P-38
-continuation found application/parser/UAT-order issues now corrected under
-P-40 without adding or changing a migration; a fresh scored Cards A-G rerun
+continuation found application/parser/UAT-order issues corrected and pushed at
+P-40 checkpoint `dc83c35` without adding or changing a migration. Separate
+no-reset developer browser QA passed the corrected money/unit/withdraw paths
+and restored the disabled Local baseline; a fresh scored Cards A-G rerun
 remains pending before P-37.
 Applied hotfix `016` must not be edited.
 This is not a new Production hotfix and must not be applied to Production

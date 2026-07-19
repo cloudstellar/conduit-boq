@@ -7,8 +7,12 @@ no-reset Local session: `2568.5.0-D001` was audited-abandoned and replacement
 same unissued target. The exploratory continuation used live developer
 collaboration, discovered UAT-01 through UAT-05, and therefore does not close
 the scored Cards A-G. Card F response-loss recovery passed as retained
-discovery evidence; cleanup restored the disabled baseline. The P-40 bounded
-correction and a fresh scored rerun remain required. See
+discovery evidence; cleanup restored the disabled baseline. Exact P-40 source
+checkpoint `dc83c35602fec81d124f43013824649664b8eecb` is pushed. A separate
+one-draft developer browser QA then passed governed/custom unit selection,
+Thai whole-number money normalization and invalid-money guidance, successful
+withdrawal redirect, and notice persistence after reload. That assisted QA is
+not scored Owner evidence; a fresh scored rerun remains required. See
 [Preflight Note #36](./36-phase4-wp8-p38-no-reset-owner-uat-preflight.md). This
 note defines the smallest current-route Owner UAT that can close Closure Matrix
 #34 C-07 through C-11 without repeating evidence that already proves the same
@@ -89,14 +93,18 @@ Run this section before handing the browser to the Owner.
 
 1. Confirm branch `codex/master-catalog-phase4`, exact pushed HEAD, and a clean
    tracked tree. Ignore and do not stage `files/`, `tmp/`, or `output/`. Run
-   `npm run db:local:p38:verify-inputs` and
-   `npm run db:local:p38:status`; both must pass before `prepare`.
+   `npm run db:local:p38:verify-inputs`. Set `P38_SESSION` to a new untracked
+   path under `tmp/master-catalog/p38-owner-uat/` as shown in Note #36, confirm
+   it does not exist, and run `status` with that path; input verification and
+   the read-only baseline must pass before `prepare`. Never overwrite a prior
+   session record.
 2. Read the Local baseline without mutation: pointer `2568.0.0`, 710 rows, zero
    working drafts, all catalog flags `false`, BOQ/BOQ-item counts unchanged,
    and Factor F default `2569.0.0` with 36 rows.
 3. Confirm Local Supabase and the Local app are healthy. Do not run
    `npm run db:local:bootstrap`; this UAT must not reset Local Supabase.
-4. Run `npm run db:local:p38:prepare`. The tracked harness must enable only the
+4. Run `npm run db:local:p38:prepare -- --session "$P38_SESSION"` using the
+   same recorded new path. The tracked harness must enable only the
    temporary Local admin and new-identity capabilities needed by the script.
    Keep the retirement capability disabled; retirement is previewed as a safe
    hold and is never applied. The harness must not create or abandon either
@@ -314,8 +322,9 @@ the affected card on a fresh bounded fixture.
 
 After Card G:
 
-1. Run `npm run db:local:p38:cleanup`. It must restore all temporary Local
-   feature flags and must fail closed rather than abandon an Owner draft.
+1. Run `npm run db:local:p38:cleanup -- --session "$P38_SESSION"` with the
+   exact path used by `prepare`. It must restore all temporary Local feature
+   flags and must fail closed rather than abandon an Owner draft.
 2. Read back pointer `2568.0.0`/710, zero working drafts, all catalog flags
    `false`, unchanged BOQ/BOQ-item invariants, and Factor F `2569.0.0`/36.
 3. Confirm every rejected error produced zero unintended effect, the placement

@@ -7,8 +7,13 @@ reclaimed target `2568.5.0` under a new immutable reference. The exploratory
 Cards B-F then found UAT-01/UAT-02/UAT-03/UAT-04/UAT-05; Card F passed, but the
 session used live developer collaboration and is not scored closure evidence.
 Both drafts were audited-abandoned and cleanup restored the exact disabled
-baseline without reset. The P-40 correction checkpoint and fresh scored Cards
-A-G rerun remain pending. P-37 remains **HOLD**.
+baseline without reset. Exact P-40 checkpoint
+`dc83c35602fec81d124f43013824649664b8eecb` is committed and pushed. A
+separate one-draft developer browser QA passed the corrected money, unit, and
+withdrawal paths and returned to pointer `2568.0.0`/710, zero working drafts,
+all flags false, BOQ 198/1,547, and Factor F `2569.0.0`/36 without reset. It is
+not scored Cards A-G evidence. The fresh scored rerun remains pending and P-37
+remains **HOLD**.
 
 **Boundary:** Local only, no reset. This note does not authorize successful
 publication, pointer movement, P-37 acceptance, P-19, Factor F work, hotfix
@@ -70,9 +75,11 @@ The tracked script is
 `codex/master-catalog-phase4` after its exact checkpoint is pushed.
 
 ```bash
+P38_SESSION="tmp/master-catalog/p38-owner-uat/session-$(date -u +%Y%m%dT%H%M%SZ)-$(git rev-parse --short HEAD).json"
+test ! -e "$P38_SESSION"
 npm run db:local:p38:verify-inputs
-npm run db:local:p38:status
-npm run db:local:p38:prepare
+npm run db:local:p38:status -- --session "$P38_SESSION"
+npm run db:local:p38:prepare -- --session "$P38_SESSION"
 ```
 
 `verify-inputs` reads files only, rejects any manifest/source/authority/E-01/
@@ -87,10 +94,14 @@ capabilities, keeps retirement disabled, records the actor/baseline/first-
 middle-last search examples, and writes an untracked session record. It never
 creates, edits, publishes, or abandons a draft.
 
+Record `P38_SESSION` with the UAT evidence and use that exact path for every
+later status/cleanup command. Session records are immutable; a retry uses a new
+path rather than overwriting an earlier attempt.
+
 After the Owner completes Card G:
 
 ```bash
-npm run db:local:p38:cleanup
+npm run db:local:p38:cleanup -- --session "$P38_SESSION"
 ```
 
 `cleanup` requires the same clean pushed HEAD used by `prepare`, zero working
@@ -150,7 +161,11 @@ P39R-U later proved the corrected Card A behavior with
 continuation also proved Card F same-request recovery and exposed the five
 cross-layer findings now owned by P-40. Cleanup again passed pointer
 `2568.0.0`/710, zero drafts, all flags false, BOQ 198/1,547, and Factor F
-`2569.0.0`/36 without reset or Production access. Do not request P-37 before
-the P-40 source/docs checkpoint is committed and pushed, the fresh scored
-Cards A-G rerun and cleanup pass, and exact authority/repository verification
-is recorded.
+`2569.0.0`/36 without reset or Production access. P-40 checkpoint `dc83c35`
+was then pushed and its separate developer browser QA passed. That QA used one
+draft (`2568.5.0-D003`), so the cleanup harness correctly restored flags and
+refused scored evidence closure because the two-attempt Card A/G contract was
+not present.
+Read-only status confirmed the disabled baseline above. Do not request P-37
+before the fresh scored Cards A-G rerun and cleanup pass and exact
+authority/repository verification is recorded.

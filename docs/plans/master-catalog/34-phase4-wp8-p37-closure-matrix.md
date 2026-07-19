@@ -21,8 +21,10 @@ permanently reserving abandoned draft numbers. P-39R corrected that contract,
 and P39R-U later passed with distinct `2568.5.0-D001`/`D002` references and the
 same reusable unissued target. The live-collaboration continuation was
 exploratory rather than scored; it found UAT-01 through UAT-05 and passed Card F
-before exact disabled-baseline cleanup. P-40 owns the bounded no-migration
-correction and a fresh scored Cards A-G rerun.
+before exact disabled-baseline cleanup. Exact P-40 correction `dc83c35` is
+pushed and separate one-draft developer browser QA passed its corrected unit,
+money, and withdrawal paths before disabled-baseline readback. That assisted QA
+does not close any independent row; a fresh scored Cards A-G rerun remains.
 The evidence reconciliation remains complete in
 [Owner UAT Script #35](./35-phase4-wp8-p37-evidence-reconciliation-and-owner-uat-script.md).
 P-38 authorizes its bounded no-reset Local preparation and scored Owner UAT. The
@@ -72,8 +74,8 @@ Local cleanup.
 | C-09 | Independent core-admin UAT | G1R/G3/P-26 and P-36 prove version planning, item edit, import context, final review, publish guards, export, abandon, and recovery technically; P39R-U Card A and exploratory Card F passed but used live collaboration | Open | Evidence reconciliation is complete. The intended admin must complete Note #35 Cards A-G on current routes without live developer help after P-40 |
 | C-10 | At least three safe validation-error recoveries | Several technical paths exist; the exploratory session showed why E-03 becomes unreachable if delayed until after structured-code additions | Open | Record Note #35 Card A E-03 before Card B, then Card C E-01 invalid authority and E-02 retirement hold; stale placement and uncertain response remain separate evidence |
 | C-11 | 710-row performance baseline | P-36 measured 710+18 placement/final-review routes at 607-1,136 ms, deep paging at 746 ms, and verified export; P-37 exercised search/preview/sibling/focus without material stutter | Partial | Reuse those named results and complete Note #35's Full 710-row import-preview plus publish-readiness/current-interaction measurements against the written budget |
-| C-12 | Documentation consistency | P-40 aligns UAT ordering, preflight parser execution, correction scope, tracker, verification, decisions, migration ledger, threat model, and executable checks | Passed through P-40 source; monitor | Full repository checks passed 34 files/216 tests, TypeScript, lint 0 errors/10 existing warnings, real-parser input verification, network-enabled build, and diff check; rerun after scored UAT evidence update |
-| C-13 | Disabled clean Local baseline | P39R-C final readback passed; P39R-U exploratory cleanup repeated pointer `2568.0.0`/710, zero working drafts, all flags false, BOQ 198/1,547, and Factor F `2569.0.0`/36; Production untouched | Passed | Repeat exact readback after the final bounded scored UAT fixture is audited-abandoned |
+| C-12 | Documentation consistency | P-40 aligns UAT ordering, immutable session-path use, preflight parser execution, correction scope, tracker, verification, decisions, migration ledger, threat model, and executable checks | Passed through exact pushed P-40 source; monitor | Full repository checks passed 34 files/216 tests, TypeScript, lint 0 errors/10 existing warnings, real-parser input verification, network-enabled build, and diff check; separate browser QA is recorded without substituting for scored UAT; rerun after scored evidence update |
+| C-13 | Disabled clean Local baseline | P39R-C final readback passed; P39R-U exploratory cleanup and the separate P-40 one-draft developer QA readback repeated pointer `2568.0.0`/710, zero working drafts, all flags false, BOQ 198/1,547, and Factor F `2569.0.0`/36; Production untouched | Passed | Repeat exact readback after the final bounded scored UAT fixture is audited-abandoned |
 
 ## 3. Minimal closure sequence
 

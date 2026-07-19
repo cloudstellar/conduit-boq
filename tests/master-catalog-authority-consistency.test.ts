@@ -411,7 +411,7 @@ describe('Master Catalog authority consistency', () => {
       /P-33 accepted that\s+exact bounded WP-7\.5 technical checkpoint at 2026-07-15 13:54 \+07/,
     )
     expect(tracker).toContain(
-      '| Current work package | WP-8/P-37 HOLD; P39R-S/P39R-L/P39R-C/P39R-U passed; P-40 correction source/docs verification passed and a fresh scored P-38 Cards A-G rerun remains pending |',
+      '| Current work package | WP-8/P-37 HOLD; P39R-S/P39R-L/P39R-C/P39R-U passed; exact P-40 correction is pushed and separate developer browser QA passed; a fresh scored P-38 Cards A-G rerun remains pending |',
     )
     expect(tracker).toContain(
       '| Current environment | Disabled clean Local baseline after `024`: pointer `2568.0.0`/710',
@@ -522,7 +522,7 @@ describe('Master Catalog authority consistency', () => {
       /pre-amendment operator\/browser preflight passed on\s+`c8f6dca`/,
     )
     expect(tracker).toContain(
-      'Status: exploratory P-38 safely cleaned; correction checkpoint pending commit/push before a new no-reset scored UAT; Add/Supplement hidden; no Production action authorized',
+      'Status: exploratory P-38 and separate P-40 developer QA safely returned to the disabled baseline; scored Owner UAT remains open; Add/Supplement hidden; no Production action authorized',
     )
     expect(verificationReport).toContain(
       'HOLD under Closure Matrix #34',
@@ -592,7 +592,7 @@ describe('Master Catalog authority consistency', () => {
       '| C-10 | At least three safe validation-error recoveries |',
       '| C-11 | 710-row performance baseline |',
       '| C-12 | Documentation consistency |',
-      '| Passed through P-40 source; monitor | Full repository checks passed 34 files/216 tests, TypeScript, lint 0 errors/10 existing warnings, real-parser input verification, network-enabled build, and diff check; rerun after scored UAT evidence update |',
+      '| Passed through exact pushed P-40 source; monitor | Full repository checks passed 34 files/216 tests, TypeScript, lint 0 errors/10 existing warnings, real-parser input verification, network-enabled build, and diff check; separate browser QA is recorded without substituting for scored UAT; rerun after scored evidence update |',
       'one rejected stale attempt with zero effect, then exactly one accepted UI batch/change set',
       'does not require `npm run db:local:bootstrap`',
     ]) {
@@ -625,6 +625,8 @@ describe('Master Catalog authority consistency', () => {
     }
     expect(p37OwnerUat).toContain('This UAT requires no clean reset')
     expect(p37OwnerUat).toContain('npm run db:local:p38:verify-inputs')
+    expect(p37OwnerUat).toContain('npm run db:local:p38:prepare -- --session "$P38_SESSION"')
+    expect(p37OwnerUat).toContain('npm run db:local:p38:cleanup -- --session "$P38_SESSION"')
     expect(p37OwnerUat).toContain('CIC-PVC-998')
     expect(p37OwnerUat).toContain('changing only a known mapped')
     expect(p37OwnerUat).toMatch(/Production `2568\.0\.0`\s+remains authority/)
@@ -643,7 +645,7 @@ describe('Master Catalog authority consistency', () => {
     expect(cardE).not.toContain('complete the old publish-confirmation form')
     expect(p37OwnerUat).toMatch(/Do not run\s+`npm run db:local:bootstrap`/)
     expect(p37OwnerUat).not.toContain('technical evidence is accepted as Owner evidence')
-    expect(tracker).toContain('exploratory P-38 safely cleaned')
+    expect(tracker).toContain('separate P-40 developer QA safely returned')
     expect(verificationReport).toContain('P-38 P-37 evidence reconciliation')
     expect(threatModel).toContain('| T-52 |')
     expect(threatModel).toContain('| T-53 |')
@@ -656,17 +658,19 @@ describe('Master Catalog authority consistency', () => {
       'docs/plans/master-catalog/36-phase4-wp8-p38-no-reset-owner-uat-preflight.md',
     )
     for (const contract of [
-      'P-37 remains **HOLD**',
       'IMPORT_PRICE_AUTHORITY_REQUIRED',
       'IMPORT_RETIREMENT_APPROVAL_REQUIRED',
       '`CIC-PVC-998`',
       'npm run db:local:p38:verify-inputs',
       'npm run db:local:p38:cleanup',
+      'test ! -e "$P38_SESSION"',
+      '--session "$P38_SESSION"',
       'No Local reset',
       'Production touched',
     ]) {
       expect(p38Preflight).toContain(contract)
     }
+    expect(p38Preflight).toMatch(/P-37\s+remains \*\*HOLD\*\*/)
     expect(p38Preflight).toMatch(
       /It never\s+creates, edits, publishes, or abandons a draft/,
     )
