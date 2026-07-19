@@ -708,7 +708,7 @@ Required slices:
 | F Correction/editor | Prefill exact current item; require price authority only for name/unit/money changes; add audited `reactivate` and base-absent `withdraw` preserving identity/code/audit. |
 | G Schema/UX/evidence | After zero-null compatibility proof, add required null/order constraints; Thai-first copy, no synthetic Local/WP evidence, support IDs demoted; DB/role/race/browser/accessibility/authority tests pass. |
 | H Working-draft lifecycle | Global partial unique draft invariant; safe concurrent create conflict; audited idempotent current/stale abandon with immutable retained rows/history; replacement starts from a fresh current-base clone. |
-| I Final snapshot review | Make the full searchable item workspace primary; compare complete draft/base snapshots by stable identity; show compound old/new changes/readiness; publish only the exact reviewed lock and force rereview after mutation. |
+| I Final snapshot review | Make the full searchable item workspace primary; compare complete draft/base snapshots by stable identity; show compound old/new changes/readiness; bind mutable review URLs to the exact reviewed lock; hard-stop a mismatched URL without diff/publish controls; publish only the current exact reviewed lock and force rereview after mutation; render terminal review as read-only history. |
 | J Operator context/import/export semantics | Preserve signed-in admin identity and environment context; keep global navigation informational; bind import to the exact draft; distinguish approved workbook input from review-only Excel/PDF exports; keep import iterative rather than a misleading one-way wizard. |
 | K Version planning and recovery UX | Require business intent and owner-designated annual year; fail closed on incomplete registry; show reserved numbers; DB enforces next sequence after idempotent replay; successful create opens the exact draft; detailed metadata follows items; restore confirms current/target and BOQ effect. |
 | L High-impact human-intent confirmation | Recode/Retire show exact item/target/reason/BOQ-audit summaries. Publish shows current/target versions, reviewed lock, item count, immutability, and BOQ effect; require the exact DB-read target version and reject mismatch before the publish RPC. Prove cancel/no-write and responsive behavior. |
@@ -728,7 +728,8 @@ Required behavior:
   identity/code/audit row;
 - all current rows and history are discoverable, not only a sample;
 - final review reflects cumulative database state rather than only import or
-  change-event summaries, and a stale reviewed lock cannot publish;
+  change-event summaries; an old review URL cannot silently adopt a newer lock,
+  and a stale reviewed lock cannot publish;
 - unsupported Add/Supplement/Retire controls are hidden at release when their
   downstream P-18/P-19 gates are not accepted.
 - an admin cannot submit raw version segments without intent, reuse an abandoned

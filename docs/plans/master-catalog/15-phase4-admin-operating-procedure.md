@@ -28,7 +28,15 @@ see [Correction Plan #37](./37-phase4-p39-draft-identity-release-number-correcti
 P-39R also permits only one open draft across the whole catalog. A stale draft
 must be inspected and audited-abandoned before another can be created; it cannot
 be edited, imported, placed, readied, or published. P-38 may resume only after
-the P-39R Local gates pass. The scored sequence,
+the P-39R Local gates pass. P-42 further requires every mutable final-review URL
+to show and retain its exact `reviewLock`. After another tab changes the draft,
+reload the original review URL: it must show old/current locks, hide the diff
+and publication form, and offer **เปิดฉบับตรวจล่าสุด**. Never submit a request
+already known to be stale merely to prove a guard. Published and abandoned
+review pages are read-only history and must not display draft-only stale-base
+wording. See
+[Incident Note #38](./38-phase4-p42-final-review-snapshot-binding-incident-note.md).
+The scored sequence,
 named safe errors, measurement budget, and cleanup remain in
 [Owner UAT Script #35](./35-phase4-wp8-p37-evidence-reconciliation-and-owner-uat-script.md);
 this section remains the general operating contract.
@@ -345,7 +353,8 @@ They require the separate Factor F process.
 
 Choose **ตรวจฉบับสุดท้าย** from the draft workspace. It must compare the
 complete final database snapshots against the exact base by stable identity,
-not only list import events.
+not only list import events. The URL and page must show the same reviewed
+`reviewLock`; record it with the review evidence.
 
 For a high-volume review, use the page as a controlled review queue:
 
@@ -361,8 +370,9 @@ For a high-volume review, use the page as a controlled review queue:
    every old/new value. Use **ขยายรายละเอียดทั้งหมดในหน้านี้** only when reviewing
    all compound rows on the current page as one batch.
 4. When opening an item from review, return through the provided review link so
-   search, type, page size, and page context are retained. Recheck the row after
-   saving because the draft lock and totals can change.
+   reviewed lock, search, type, page size, and page context are retained. After
+   saving, the original review becomes stale. Reload its same URL, verify that
+   it hides diff/publication controls, then use **เปิดฉบับตรวจล่าสุด**.
 5. On a narrow screen, use the stacked item list; it contains the same change
    types, old/new values, and exact-item edit route as the desktop table. Do not
    treat mobile layout as a reduced evidence view.
@@ -542,7 +552,8 @@ For the current P-37 closure run, execute Cards A-G in
 [Owner UAT Script #35](./35-phase4-wp8-p37-evidence-reconciliation-and-owner-uat-script.md)
 instead of improvising from this general checklist. Note #35 reuses only
 actor-independent evidence and requires E-01 invalid authority, E-02 retirement
-hold, and E-03 stale final review as the three non-destructive errors. Stale
+hold, and the URL-bound stale final-review prevention/recovery state as the
+three non-destructive recovery checks. Stale
 placement and uncertain response are recorded separately and are not
 double-counted.
 
@@ -574,8 +585,9 @@ recognizing the message and completing the recovery through the UI.
    shifted-row count; change one accepted local assignment and recognize that
    it is **ยังไม่ยืนยัน**; exercise the leave/reload recovery; and recover from
    one stale-placement response;
-5. recognize and recover from at least three other representative safe
-   failures, including stale lock/base, retirement hold, or invalid authority;
+5. recognize and recover from at least three representative safe
+   validation/prevention states, including URL-bound stale final review,
+   retirement hold, and invalid authority;
 6. perform one eligible reactivate or never-published withdraw correction and
    explain what identity/code/audit evidence remains;
 7. review the authoritative final snapshot diff, compound/reverted behavior,
@@ -587,8 +599,9 @@ recognizing the message and completing the recovery through the UI.
    submitted fields remain unchanged before retry, and confirm they reset only
    after success;
 10. restore to a safe screen without an irreversible mistake or developer help.
-11. edit after opening final review, observe the stale-review conflict, and
-    complete a fresh review before any successful publication rehearsal.
+11. edit after opening final review, reload the original lock-bound URL,
+    observe that its publication controls are removed, and open a fresh review;
+    do not perform a successful publication rehearsal.
 
 Record task completion, misunderstood wording, recovery outcome, elapsed time,
 browser/device, and reviewer. A failed or developer-dependent critical task

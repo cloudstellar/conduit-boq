@@ -44,6 +44,15 @@ unissued target is released for a replacement. Forward `022` preserves `020`.
 Sections below retain the P-22 point-in-time contract and are not current
 execution authority where they conflict with P-39R.
 
+**P-42 final-review amendment:** The exact-lock decision now also applies to
+the review representation itself. A mutable review URL is canonical only with
+`reviewLock={expected_lock_version}`. Reloading a URL whose lock no longer
+matches the draft must show a hard stale state and no diff/publication panel;
+it must not silently adopt the current lock. Published/abandoned review is
+read-only historical comparison and never displays draft-only stale-base
+wording. This application/UAT amendment changes no DB guard or migration. See
+[Incident Note #38](./38-phase4-p42-final-review-snapshot-binding-incident-note.md).
+
 ## 1. Decision and purpose
 
 Owner review of the Local admin workflow found two reproducible comprehension
@@ -182,6 +191,13 @@ The read model must:
 - read the draft lock before and after the paged snapshot reads and fail closed
   when it changes or either dataset is incomplete.
 
+For a mutable draft, the route must canonicalize the reviewed lock into the
+URL. A mismatched URL is not allowed to render the current snapshot under the
+old tab identity: show requested/current locks, hide comparison and publication
+controls, and provide an explicit latest-review link. Item edit return paths
+preserve the reviewed lock and filters. For terminal versions, comparison uses
+status-neutral **ค่าจากฐาน** / **ค่าของฉบับนี้** wording and read-only actions.
+
 No new approval table is added for this V1. The review page carries the exact
 expected lock into the existing publish path; publish locks/rechecks the draft,
 recomputes readiness and canonical hash, and returns `DRAFT_LOCK_CONFLICT` when
@@ -270,7 +286,8 @@ The review page must:
   may contribute to more than one category count;
 - hide unchanged rows by default but make them available;
 - support search/filter and a direct return-to-edit path;
-- present `ค่าปัจจุบัน` and `ค่าฉบับร่าง` labels, not arrow/color alone;
+- present status-neutral `ค่าจากฐาน` and `ค่าของฉบับนี้` labels, not
+  arrow/color alone, so historical published review remains truthful;
 - keep one-field rows compact with old/new values visible immediately, while
   compound rows show the changed-field count and names before exposing all
   old/new values through per-row and expand-all-on-page controls;
@@ -281,7 +298,8 @@ The review page must:
 - separate database readiness from P-18/P-19 filing/governance warnings;
 - place the exact-version publish form after the diff and blockers;
 - separate pointer restore from the normal draft-publication workflow;
-- remain Thai-first and demote UUID/request/lock details to support information.
+- remain Thai-first; show the reviewed lock as primary stale-safety context,
+  while demoting UUID/request details to support information.
 
 ## 7. Implementation ownership
 

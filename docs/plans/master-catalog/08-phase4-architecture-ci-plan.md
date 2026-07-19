@@ -1723,12 +1723,17 @@ Proposed after P-18 acceptance:
 - Thai is the primary operator language. Remove rehearsal-only default values
   from production-capable fields and keep draft save linguistically distinct
   from whole-version publish.
-- Keep lock versions, UUIDs, request IDs, and change-set IDs available in compact
-  support details rather than presenting them as the primary success message.
+- Keep UUIDs, request IDs, and change-set IDs available in compact support
+  details. The reviewed lock is primary safety context on final review and must
+  agree with the lock bound into the mutable review URL.
 - Place the complete searchable item workspace before publication controls.
   Publication is available from a dedicated final-review surface that compares
   draft/base snapshots by stable identity, shows compound old/new changes and
-  readiness/governance warnings, and carries the exact reviewed lock.
+  readiness/governance warnings, and carries the exact reviewed lock. A mutable
+  URL without a lock canonicalizes to the current lock; a mismatched old URL is
+  a hard read-only stop with no diff/publication controls and an explicit link
+  to the latest review. Published/abandoned review uses read-only historical
+  wording and never reuses draft-only stale-base alerts.
 
 ### Owner-approved placement UX
 
@@ -1757,6 +1762,10 @@ Proposed after P-18 acceptance:
 - Draft screens and exports show “DRAFT – ห้ามใช้อ้างอิง”.
 - Publish requires the exact reviewed lock and final snapshot. Pointer restore
   requires a current-to-target summary, reason, and explicit confirmation.
+- The final-review representation is also lock-bound: it must never silently
+  replace an old tab's reviewed lock with the latest lock. The database
+  expected-lock guard remains final authority even when an already-rendered tab
+  becomes stale before its next reload.
 - Retire and recode require an explicit confirmation dialog; ordinary field
   edits do not use disruptive confirmation dialogs.
 - Publish confirmation shows the exact current/target versions, reviewed lock,

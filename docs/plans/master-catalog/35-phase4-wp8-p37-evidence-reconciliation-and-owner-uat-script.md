@@ -24,18 +24,30 @@ place. Exact pushed `bb27b0d28e116e97ce1e7ee3e582f39bcc4edf22` passed full
 source verification and live WP-6.6 smoke. Owner-approved exact execution
 source `adcca3939f3080cdf64bc6ad807051e9e85fed94` then passed the clean
 `017`-`025` chain, all four integrated smoke suites, canonical verification,
-and final disabled-baseline readback. This script may now begin only from a new
-immutable prepared session; the discovery interactions remain product evidence
-only.
+and final disabled-baseline readback. Exact pushed `d00c941` later prepared a
+new immutable scored session, but its Card A is invalid under P-42: Local
+`2568.5.0-D002` was successfully published as `2568.5.0`, then the terminal
+page displayed the false draft-only warning **อ้างอิงเวอร์ชันฐานเก่า**. Cards
+B-G stopped. See
+[Incident Note #38](./38-phase4-p42-final-review-snapshot-binding-incident-note.md).
+This script may restart only after exact P-42 commit/push, a separately warned
+and approved clean Local bootstrap, exact disabled-baseline readback, and a new
+immutable prepared session. Discovery and interrupted interactions remain
+product evidence only.
 
-**Environment:** Local only, no reset. Production access/write, successful
-publication or pointer movement, feature enablement outside the temporary Local
-fixture, P-19, Factor F work, and hotfix `016` expansion are prohibited.
+**Environment:** Local only. The scored Cards A-G themselves perform no reset.
+P-42 now requires one separately approved recovery reset before a new session
+is prepared. Production access/write, successful publication or pointer
+movement during UAT, feature enablement outside the temporary Local fixture,
+P-19, Factor F work, and hotfix `016` expansion are prohibited.
 
 **Owner decision boundary:** P-38 authorizes documentation alignment and
 preparation/execution of this bounded no-reset Local UAT. It does not accept
-P-37. P-37 can be accepted or held only after the scored Owner tasks, cleanup,
-evidence update, exact repository verification, commit, and push are complete.
+P-37. The P-42 incident makes one clean recovery reset necessary, but that reset
+is not authorized by P-38 or this script and must receive its own warning and
+owner approval. P-37 can be accepted or held only after the fresh scored Owner
+tasks, cleanup, evidence update, exact repository verification, commit, and
+push are complete.
 
 ## 1. Reconciliation conclusion
 
@@ -69,6 +81,10 @@ not gate closure. It found:
 - UAT-08: withdrawing a draft-only row left a `display_order` gap; the client
   masked it by resequencing while the database placement guard correctly
   rejected the batch.
+- UAT-09: final-review URLs did not preserve the reviewed lock, so an old tab
+  could silently become current and make the scripted stale submission valid.
+- UAT-10: after successful publication, draft-only stale-base and comparison
+  wording remained visible and made success look like rejection.
 
 P-40 corrects those findings without a migration: shared Thai money
 normalization, a base-version unit chooser with an explicit custom-unit path,
@@ -79,6 +95,12 @@ Card B creates structured codes.
 P-41 keeps the accepted guards and adds a shared 500-character category-key
 contract with live maximum preflight, non-persistent read-only preview
 semantics, client gap rejection, and forward-only `025` compaction.
+
+P-42 adds no migration. It binds mutable review routes to `reviewLock`, blocks
+a mismatched old tab without diff/publish controls, preserves lock context on
+return, restricts stale-base wording to drafts, and renders terminal review as
+read-only history. The DB stale-lock guard remains final authority; the Owner
+script no longer asks a user to submit a request already known to be stale.
 
 ## 2. Retained evidence manifest
 
@@ -104,8 +126,8 @@ because this note cites them.
 |---|---|---|---|
 | C-07 complete placement | C-02/C-06 technical, keyboard, focus, and presentation evidence | One current UI batch: one rejected stale attempt with zero effect, then exactly one accepted UI batch/change set; observe accepted state and accepted-to-local-dirty transition | Open |
 | C-08 stale placement | Technical stale rejection plus separate Owner leave/reload recovery | Owner creates and recovers the stale response in the same placement task using two UI tabs, without developer/SQL action | Partial |
-| C-09 core-admin UAT | G1R/G3/P-26 contracts and historical WP-4 picker proof | Current UI draft lifecycle, complete browse/history, manual add/withdraw, import review, placement, final review/readiness, review export, stale final review, and uncertain response | Open |
-| C-10 three safe errors | Technical negative-path coverage | Owner recovers Card A E-03 stale final review before any structured-code add, then Card C E-01 invalid authority and E-02 retirement hold; stale placement and uncertain response are recorded separately and are not double-counted | Open |
+| C-09 core-admin UAT | G1R/G3/P-26 contracts and historical WP-4 picker proof | Current UI draft lifecycle, complete browse/history, manual add/withdraw, import review, placement, final review/readiness, review export, URL-bound stale final-review prevention, and uncertain response | Open |
+| C-10 three safe recovery states | Technical negative-path coverage, including DB `DRAFT_LOCK_CONFLICT` | Owner recovers Card A's hard stale-review state before any structured-code add, then Card C E-01 invalid authority and E-02 retirement hold; stale placement and uncertain response are recorded separately and are not double-counted | Open |
 | C-11 710-row baseline | P-36 placement/final-review/deep-page/export timings and P-37 no-stutter observations | Name and measure Full 710-row import preview, publish-readiness/final-review load, and current Owner interactions | Partial |
 
 ## 4. Developer preflight - not scored
@@ -183,19 +205,24 @@ approval.
    target was not issued. Create a replacement and confirm it receives a new
    draft reference while reclaiming the same target.
 5. Before adding any structured-code identity, open the replacement's final
-   review/publish context, record the reviewed lock, and keep that tab open.
+   review/publish context. Record the `reviewLock` in the URL and the matching
+   **ฉบับตรวจ รุ่นแก้ไข** value on the page, then keep that tab open.
 6. In a second UI tab, edit one inherited item's non-identity field with a
    clearly Local-only authority reference. Save and record the newer lock.
-7. Return to the old review tab. Only when the two locks visibly differ,
-   complete the old publish-confirmation form and submit. E-03 must return the
-   durable Thai stale-review error, retain the entered form values, and produce
-   no publication or pointer movement. If the locks do not differ, stop.
-8. Load a fresh review and confirm it uses the newer lock. Do not perform a
-   successful publication.
+7. Return to the original review tab and reload that same URL. Only when the
+   two locks visibly differ, confirm that the page says the tab is an old review,
+   shows both lock values, does not display the diff or publication form, and
+   offers **เปิดฉบับตรวจล่าสุด**. Do not attempt to publish from this tab. If
+   the locks do not differ or publication controls remain visible, stop.
+8. Use **เปิดฉบับตรวจล่าสุด** and confirm the URL/page uses the newer lock.
+   Confirm the Local pointer/version did not move. Do not perform a successful
+   publication.
 
 Pass: the Owner can explain one-working-draft, draft reference, target versus
-official version, base-version, and abandoned/read-only behavior; E-03 is
-recovered before structured-code additions and no irreversible action occurs.
+official version, base-version, and abandoned/read-only behavior; the stale
+review is prevented and recovered before structured-code additions, the DB
+stale guard remains covered by retained technical evidence, and no irreversible
+action occurs.
 
 ### Card B - browse, history, manual add, and withdraw
 
@@ -333,7 +360,7 @@ remediation owner, and due date.
 
 | Card/gate | Result | Visible Thai message or key observation | Elapsed/browser | Evidence reference |
 |---|---|---|---|---|
-| A / C-09/C-10 draft lifecycle + E-03 | Pending scored rerun; P39R-U discovery passed |  |  |  |
+| A / C-09/C-10 draft lifecycle + stale-review prevention | Prior scored attempt invalid under P-42; fresh rerun pending after approved clean recovery |  |  |  |
 | B / C-09 browse/manual/withdraw | Pending |  |  |  |
 | C / C-09/C-10/C-11 import + E-01/E-02 | Pending |  |  |  |
 | D / C-07/C-08 placement | Pending |  |  |  |
@@ -370,6 +397,7 @@ After Card G:
 7. Only then ask the Owner to accept or hold P-37. Acceptance permits a later
    P-12 request only; it does not authorize any Production action.
 
-This UAT requires no clean reset. If preparation discovers that a reset is
-necessary, stop and obtain a new explicit destructive Local reset approval
-before running `npm run db:local:bootstrap`.
+Cards A-G require no reset after preparation. The P-42 incident has already
+made one clean recovery necessary: do not run `npm run db:local:bootstrap`
+until exact P-42 is committed/pushed and the owner has received the destructive
+Local warning and explicitly approved that run.

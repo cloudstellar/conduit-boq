@@ -33,9 +33,23 @@ zero drafts, all flags false, BOQ 198/1,547, and Factor F `2569.0.0`/36. The
 bounded correction consumes the nullable Supabase result array directly and
 adds a regression assertion; a fresh session path remains required.
 
-**Boundary:** Local only, no reset. This note does not authorize successful
-publication, pointer movement, P-37 acceptance, P-19, Factor F work, hotfix
-`016` expansion, Production feature enablement, or Production access/write.
+Exact pushed `d00c941ac11a271c2a149bc016da045cea870a26` then passed the
+correction and prepared immutable session
+`tmp/master-catalog/p38-owner-uat/session-p41-scored-20260719-d00c941.json`.
+That session is now incident evidence, not a reusable scored session. Card A
+issued Local `2568.5.0` from `2568.5.0-D002` and stopped under P-42 before
+Cards B-G. Read-only status records zero working drafts, admin/new-identity
+flags true, retirement false, BOQ 198/1,547, Factor F `2569.0.0`/36, and
+Production untouched. See
+[Incident Note #38](./38-phase4-p42-final-review-snapshot-binding-incident-note.md).
+A new session requires exact P-42 commit/push and a separately warned and
+approved clean Local bootstrap first.
+
+**Boundary:** Local only. This note itself authorizes no reset; the required
+P-42 recovery bootstrap is a new owner gate. It does not authorize successful
+publication, pointer movement during UAT, P-37 acceptance, P-19, Factor F work,
+hotfix `016` expansion, Production feature enablement, or Production
+access/write.
 
 ## 1. Why the E-01 recipe changed
 
@@ -215,8 +229,31 @@ next scored `prepare`, require all of the following:
    `adcca3939f3080cdf64bc6ad807051e9e85fed94` clean-applied through
    `017`-`025`; WP-6.5/WP-6.6/WP-7/WP-7.5, canonical, and exact
    disabled-baseline readback passed;
-4. **Pending after this evidence commit is pushed:** prepare a new immutable
-   `P38_SESSION`; the first path on `2c39ddd` created no session and must not be
-   reused. Do not reuse D005 or its discovery evidence.
+4. **Superseded by P-42 incident evidence:** exact pushed `d00c941` prepared a
+   new immutable session after the failed `2c39ddd` path. Do not reuse that
+   prepared session, D005, `2568.5.0-D001`/`D002`, or their discovery/incident
+   evidence as a fresh scored run.
 
 No Local reset is authorized by this note. Production touched: **No**.
+
+## 7. P-42 recovery precondition
+
+The current Local pointer is issued `2568.5.0`/710 with dataset hash
+`sha256:46b4b61abdb8cee77065ae979b85ae6df39b4dcc0a6c9ff083aa3f768d202912`.
+Pointer restore alone does not reproduce the clean scored baseline because the
+issued version and publication audit would remain in history. Do not delete or
+rewrite that evidence with ad hoc SQL.
+
+Before another `prepare`:
+
+1. pass P-42 source/docs/browser/repository checks and commit/push the exact
+   checkpoint;
+2. tell the owner that `npm run db:local:bootstrap` destroys and rebuilds the
+   whole Local Supabase stack, then obtain explicit approval for that one run;
+3. bootstrap the unchanged `009`-`015`, hotfix `016`, `017`-`025` chain;
+4. repeat exact read-only pointer/hash/draft/flag/BOQ/Factor F and pinned-input
+   verification;
+5. create a new immutable session path whose file does not already exist.
+
+The scored Cards A-G remain no-reset after that preparation. Production
+touched: **No**.

@@ -415,6 +415,8 @@ describe('Master Catalog authority consistency', () => {
     )
     expect(decisions).toContain('DB-read version in the Server Action before the publish RPC')
     expect(decisions).toContain('| P-41 |')
+    expect(decisions).toContain('| P-42 |')
+    expect(decisions).toContain('Bind every mutable draft review URL to its exact `reviewLock`')
     expect(decisions).toContain('Migration `025` SHA-256')
     expect(decisions).toContain(
       'bb27b0d28e116e97ce1e7ee3e582f39bcc4edf22',
@@ -444,10 +446,10 @@ describe('Master Catalog authority consistency', () => {
       /P-33 accepted that\s+exact bounded WP-7\.5 technical checkpoint at 2026-07-15 13:54 \+07/,
     )
     expect(tracker).toContain(
-      '| Current work package | WP-8/P-37 HOLD; P-41 exact source, incremental smoke, and clean `017`-`025` passed; bounded prepared-session runtime correction precedes fresh scored Cards A-G |',
+      '| Current work package | WP-8/P-37 HOLD; P-42 final-review snapshot correction in progress; interrupted scored Card A is invalid and Cards B-G are stopped |',
     )
     expect(tracker).toContain(
-      '| Current environment | Post-clean-chain disabled Local baseline: pointer `2568.0.0`/710',
+      '| Current environment | Local incident evidence state: pointer/default `2568.5.0` from `2568.5.0-D002`',
     )
     expect(tracker).toContain(
       '0780925aca8fa7ebbf8abbaf2b7cf151b39b676a',
@@ -473,6 +475,7 @@ describe('Master Catalog authority consistency', () => {
     expect(threatModel).toContain('| T-50 |')
     expect(threatModel).toContain('| T-54 |')
     expect(threatModel).toContain('| T-55 |')
+    expect(threatModel).toContain('| T-60 |')
     expect(tracker).toContain(
       '80b2574bbaccc5bb14093aa204a46fcc50ba1d5c',
     )
@@ -555,7 +558,7 @@ describe('Master Catalog authority consistency', () => {
       /pre-amendment operator\/browser preflight passed on\s+`c8f6dca`/,
     )
     expect(tracker).toContain(
-      'Status: Local remains disabled after fail-closed prepare on 2c39ddd; scored Owner UAT remains open; Add/Supplement hidden; no Production action authorized',
+      'Status: Local incident evidence has issued/default 2568.5.0 from D002, zero drafts, admin/new-identity flags true, retirement false',
     )
     expect(tracker).toContain('2c39dddd10c361bd1244292f4bd79e06f167c919')
     expect(verificationReport).toContain('undefined `rows` helper')
@@ -632,10 +635,11 @@ describe('Master Catalog authority consistency', () => {
       'P-37 remains **HOLD for unresolved closure evidence**',
       '| C-07 | One complete independent placement task |',
       '| C-09 | Independent core-admin UAT |',
-      '| C-10 | At least three safe validation-error recoveries |',
+      '| C-10 | At least three safe validation-error/prevention recoveries |',
       '| C-11 | 710-row performance baseline |',
       '| C-12 | Documentation consistency |',
-      '| Passed for clean-chain checkpoint | Rerun after scored evidence update |',
+      '| C-13 | Disabled clean Local baseline |',
+      '| In progress for P-42 |',
       'one rejected stale attempt with zero effect, then exactly one accepted UI batch/change set',
     ]) {
       expect(p37Closure).toContain(contract)
@@ -646,7 +650,8 @@ describe('Master Catalog authority consistency', () => {
     expect(p37Closure).toContain(
       'e9e28eb1bb6f312a4638c0d67b00cb420864d5433295ffb80a95a12ee9e14251',
     )
-    expect(p37Closure).toContain('No additional reset is')
+    expect(p37Closure).not.toContain('No additional reset is')
+    expect(p37Closure).toContain('obtain a new explicit owner approval')
     expect(executionPack).toContain(
       'record comprehension and recovery from at least three safe',
     )
@@ -665,28 +670,29 @@ describe('Master Catalog authority consistency', () => {
       'without live developer or SQL guidance',
       'E-01 invalid authority',
       'E-02 retirement hold',
-      'E-03 stale final review',
+      'URL-bound stale final-review prevention',
       'one rejected stale attempt with zero effect, then exactly one accepted UI batch/change set',
       '**ปรับในหน้านี้ · ยังไม่บันทึก**',
       'Full 710-row client preparation plus server diff',
     ]) {
       expect(p37OwnerUat).toContain(contract)
     }
-    expect(p37OwnerUat).toContain('This UAT requires no clean reset')
+    expect(p37OwnerUat).toContain('Cards A-G require no reset after preparation')
     expect(p37OwnerUat).toContain('npm run db:local:p38:verify-inputs')
     expect(p37OwnerUat).toContain('npm run db:local:p38:prepare -- --session "$P38_SESSION"')
     expect(p37OwnerUat).toContain('npm run db:local:p38:cleanup -- --session "$P38_SESSION"')
     expect(p37OwnerUat).toContain('CIC-PVC-998')
     expect(p37OwnerUat).toContain('changing only a known mapped')
     expect(p37OwnerUat).toMatch(/Production `2568\.0\.0`\s+remains authority/)
-    expect(p37OwnerUat).toMatch(/Do not perform a\s+successful publication/)
+    expect(p37OwnerUat).toMatch(/Do not perform a\s+successful\s+publication/)
     const scoredCards = p37OwnerUat.slice(p37OwnerUat.indexOf('### Card A'))
     expectInOrder(scoredCards, [
       '### Card A',
-      'complete the old publish-confirmation form and submit',
+      'reload that same URL',
       '### Card B',
       '### Card E',
     ])
+    expect(scoredCards).not.toContain('complete the old publish-confirmation form and submit')
     const cardE = scoredCards.slice(
       scoredCards.indexOf('### Card E'),
       scoredCards.indexOf('### Card F'),
@@ -726,6 +732,7 @@ describe('Master Catalog authority consistency', () => {
       /It never\s+creates, edits, publishes, or abandons a draft/,
     )
     expect(p38Preflight).toContain('P-41 discovery correction gate')
+    expect(p38Preflight).toContain('P-42 recovery precondition')
     expect(p38Preflight).toMatch(/clean\s+`017`-`025` chain/)
     expect(p38Preflight).toContain(
       '**Passed:** after a new warning and Owner approval',
@@ -733,7 +740,20 @@ describe('Master Catalog authority consistency', () => {
     expect(p37OwnerUat).toContain('UAT-06')
     expect(p37OwnerUat).toContain('UAT-07')
     expect(p37OwnerUat).toContain('UAT-08')
+    expect(p37OwnerUat).toContain('UAT-09')
+    expect(p37OwnerUat).toContain('UAT-10')
     expect(p37OwnerUat).toContain('reports a preexisting order gap')
+    expect(existsSync(resolve(
+      root,
+      'docs/plans/master-catalog/38-phase4-p42-final-review-snapshot-binding-incident-note.md',
+    ))).toBe(true)
+    const p42Incident = read(
+      'docs/plans/master-catalog/38-phase4-p42-final-review-snapshot-binding-incident-note.md',
+    )
+    expect(p42Incident).toContain('Production was not accessed or changed')
+    expect(p42Incident).toContain('reviewLock={current_lock}')
+    expect(p42Incident).toMatch(/does\s+not render the diff\/publish panel/)
+    expect(p42Incident).toContain('Pointer restore alone')
     expect(existsSync(resolve(
       root,
       'docs/plans/master-catalog/30-phase4-wp66-owner-review-note.md',
@@ -799,6 +819,8 @@ describe('Master Catalog authority consistency', () => {
     expect(correctionPlan).toContain('| G4E | Owner-approved and passed 2026-07-15')
     expect(correctionPlan).toContain('## 21. P-28 G4 repository integration')
     expect(correctionPlan).toContain('## 22. P-29 G4E clean Local execution')
+    expect(correctionPlan).toContain('P-42 final-review amendment')
+    expect(correctionPlan).toContain('`reviewLock={expected_lock_version}`')
   })
 
   it('keeps reliability commands and route recovery files tracked by contract', () => {
@@ -1005,6 +1027,7 @@ describe('Master Catalog authority consistency', () => {
     )
 
     expect(audit).toContain('| C-17 |')
+    expect(audit).toContain('| C-18 |')
     expect(audit).toContain('- L: high-impact human-intent confirmation')
     expect(executionPack).toContain('| L High-impact human-intent confirmation |')
     expect(procedure).toContain('**ยืนยันและเผยแพร่** disabled')
@@ -1059,6 +1082,7 @@ describe('Master Catalog authority consistency', () => {
       'docs/plans/master-catalog/35-phase4-wp8-p37-evidence-reconciliation-and-owner-uat-script.md',
       'docs/plans/master-catalog/36-phase4-wp8-p38-no-reset-owner-uat-preflight.md',
       'docs/plans/master-catalog/37-phase4-p39-draft-identity-release-number-correction-plan.md',
+      'docs/plans/master-catalog/38-phase4-p42-final-review-snapshot-binding-incident-note.md',
     ]) {
       expectRelativeMarkdownLinksToExist(path)
       expectMarkdownTablesToBeWellShaped(path)

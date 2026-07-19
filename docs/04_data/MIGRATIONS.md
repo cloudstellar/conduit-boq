@@ -42,7 +42,7 @@
 | `023_master_catalog_phase4_published_code_rls_scope.sql` | P-39R forward-only RLS correction: active staff may read a code only when the exact `(identity_id, item_code)` pair occurs in an active/archived issued snapshot; active admins retain complete registry/history access | **Local-only SHA-256 `cbe01f63c6dd822edb29e1f7a31bfd27d5cb063e4d7d7e3878567875434d0a88`; first apply from `072294d` failed only its textual policy postcondition and rolled back completely; corrected exact source `6f01457` applied transactionally without reset; exact clean execution source `10531610eac53a97c6ef8f9d06418766b58bee36` repeated the RLS/role/history suite; not Production-applied** |
 | `024_master_catalog_phase4_set_based_placement_invalidation.sql` | P-39R forward-only execution-shape correction: replace migration `021` row-level placement invalidation with three transition-table statement triggers and transaction-local positive/negative version caches | **Local-only SHA-256 `d3aa11282fa4b2d4bac058bde3851287c551556ba5eac307277f086ba3d86b25`; committed/pushed/applied incrementally on exact `b6d58ce6cfedafa5812821edb49b897c2856f049`; WP-6.6/WP-7.5, canonical `017`-`024`, trigger inventory 3/0, and adjacent-data invariants passed in P39R-L and clean-chain P39R-C on exact `10531610eac53a97c6ef8f9d06418766b58bee36`; not Production-applied** |
 | `025_master_catalog_phase4_withdraw_order_compaction.sql` | P-41 forward-only correction: compact a draft's `display_order` atomically after never-published-row withdrawal while preserving relative order and one placement-revision advance per transaction | **Local-only SHA-256 `00d79d7750aa52ba7f003f6bb82fedb1d31ab111be417d74329c1cd3d899f76f`; incrementally applied without reset on 2026-07-19 after closing discovery drafts and restoring all feature flags; exact pushed source `bb27b0d28e116e97ce1e7ee3e582f39bcc4edf22` passed 34 files/220 tests and incremental smoke; owner-approved exact execution source `adcca3939f3080cdf64bc6ad807051e9e85fed94` then clean-applied `009`-`015`, hotfix `016`, and Phase 4 `017`-`025`; WP-6.5/WP-6.6/WP-7/WP-7.5, canonical and final disabled-baseline readback passed; fresh scored Owner UAT remains pending; not Production-applied** |
-| `017+_master_catalog_phase4_*.sql` | Umbrella reference for the Local-only Phase 4 range; the canonical bootstrap source now applies `017`-`025` after hotfix `016` | **Local-only range — P-36 through `021`, P39R-L, and clean P39R-C through `024` remain historical evidence; P-40 changed no migration; P-41 appends `025`, and its exact-source plus clean-chain evidence passed on 2026-07-19; fresh scored Owner UAT remains before P-37; every Production approval remains absent** |
+| `017+_master_catalog_phase4_*.sql` | Umbrella reference for the Local-only Phase 4 range; the canonical bootstrap source now applies `017`-`025` after hotfix `016` | **Local-only range — P-36 through `021`, P39R-L, and clean P39R-C through `024` remain historical evidence; P-40 changed no migration; P-41 appends `025`, and its exact-source plus clean-chain evidence passed on 2026-07-19; P-42 is an application/UAT correction and adds no migration; the interrupted scored session requires a separately approved Local reset before a fresh Cards A-G run; every Production approval remains absent** |
 
 ### Local Schema Baseline (`supabase/local/`)
 
@@ -263,6 +263,20 @@ repeated pointer `2568.0.0`/710, canonical hash
 `sha256:2e3571ea7135fbc0bbb84c8cc330af1173e4c1d2345e5eb59958dc76e45558b8`,
 zero working drafts, all flags false, BOQ 198/1,547, and Factor F
 `2569.0.0`/36. Fresh scored Owner UAT remains open.
+
+The first fresh scored Card A then exposed P-42: final-review URLs did not bind
+the reviewed lock, and a successful Local publication was followed by the
+false draft-only warning **ฉบับร่างนี้อ้างอิงเวอร์ชันฐานเก่า**. Read-only
+evidence shows one current-lock publication effect, not a stale-lock bypass.
+Local `2568.5.0` is now published/default with 710 rows; scored Cards B-G are
+stopped. P-42 binds draft review URLs to `reviewLock`, hard-stops stale tabs,
+and makes published review read-only with accurate labels. It changes no SQL,
+migration order, DB guard, BOQ, Factor F, or hotfix. See
+[P-42 Incident Note #38](../plans/master-catalog/38-phase4-p42-final-review-snapshot-binding-incident-note.md).
+An exact clean scored baseline now requires a newly warned and explicitly
+approved Local bootstrap after the P-42 checkpoint is committed and pushed;
+pointer restore alone is insufficient because it would retain the issued Local
+version in history.
 No Production, BOQ, Factor F, or hotfix scope was authorized.
 Applied hotfix `016` must not be edited.
 This is not a new Production hotfix and must not be applied to Production

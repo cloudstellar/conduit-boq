@@ -8,6 +8,10 @@ import {
   MasterCatalogGateView,
   MasterCatalogVersionReviewView,
 } from '../../../_components/MasterCatalogAdminViews';
+import {
+  parseCatalogReviewLock,
+  resolveCatalogReviewBinding,
+} from '@/lib/master-catalog/admin/reviewBinding';
 
 export const dynamic = 'force-dynamic';
 
@@ -16,17 +20,24 @@ const UUID_PATTERN =
 
 export default async function MasterCatalogVersionReviewPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ versionId: string }>;
+  searchParams: Promise<{ reviewLock?: string | string[] }>;
 }) {
-  const { versionId } = await params;
+  const [{ versionId }, query] = await Promise.all([params, searchParams]);
   if (!UUID_PATTERN.test(versionId)) notFound();
+
+  const requestedLockVersion = parseCatalogReviewLock(query.reviewLock);
+  const reviewPath = `/admin/master-catalog/versions/${versionId}/review${
+    requestedLockVersion === null ? '' : `?reviewLock=${requestedLockVersion}`
+  }`;
 
   const supabase = await createClient();
   const gate = await loadCatalogAdminGate(supabase);
 
   if (gate.state === 'unauthenticated') {
-    redirect(`/login?redirectTo=/admin/master-catalog/versions/${versionId}/review`);
+    redirect(`/login?redirectTo=${encodeURIComponent(reviewPath)}`);
   }
 
   if (gate.state !== 'enabled') {
@@ -36,5 +47,21 @@ export default async function MasterCatalogVersionReviewPage({
   const review = await loadCatalogVersionReview(supabase, versionId);
   if (!review) notFound();
 
-  return <MasterCatalogVersionReviewView gate={gate} review={review} />;
+  const reviewBinding = resolveCatalogReviewBinding({
+    isDraft: review.version.status === 'draft',
+    requestedLockVersion,
+    currentLockVersion: review.version.lockVersion,
+  });
+
+  if (reviewBinding.state === 'canonicalize') {
+    redirect(`${reviewPath}?reviewLock=${reviewBinding.currentLockVersion}`);
+  }
+
+  return (
+    <MasterCatalogVersionReviewView
+      gate={gate}
+      review={review}
+      reviewBinding={reviewBinding}
+    />
+  );
 }

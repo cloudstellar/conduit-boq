@@ -140,6 +140,7 @@ do not remove the need for the operator-completeness work below.
 | C-15 | Successful create leaves the admin on the overview, detailed metadata delays the item workspace, and pointer restore submits without a current-to-target human confirmation. | Open the exact new draft after success; place compact context/actions then items before detailed document metadata; separate restore as recovery and confirm current/target, reason, and new-versus-historical BOQ behavior. |
 | C-16 | Annual year accepts impractical far-future values; stale-sequence error copy can fall through to raw backend text or disappear when registry refresh remounts the form; internal P-labels and technical identifiers compete with the operator task; first-rollout authority and Factor F context can read as permanent workflow content. | Enforce base +1 through +10 in UI/server/DB; allowlist stable stale/range errors with Thai copy; key refresh state independently and focus a shared error alert; collapse support identifiers; remove internal labels; contextualize first-rollout authority and demote separate Factor F details. |
 | C-17 | Exact-lock and database readiness prevent stale or invalid publication, but the visible Publish action previously submitted after one click without a separate human-intent check. Recode and Retire likewise changed code/status immediately after the item form submit. This left a preventable mis-click path even though database integrity remained protected. | Add a summary confirmation for Recode and Retire. Publish must show current/target version, reviewed lock, item count, BOQ effect, and immutability; require the admin to type the exact DB-read target version. Keep the final Server Action comparison server-owned and fail closed before the publish RPC. Prove mismatch disabled, exact match enabled, cancel/no-write behavior, responsive layout, and clean Local cleanup. |
+| C-18 | The mutation contract carried an exact reviewed lock, but the final-review URL did not identify that lock. An old-looking tab could reload as current; after publication the same route reused draft-only stale-base/value wording, obscuring whether an irreversible action succeeded. | Canonicalize mutable review URLs to exact `reviewLock`; make mismatch a hard stale state with no diff/publish controls and explicit latest-review recovery; preserve lock in item return paths; render terminal review read-only with base/this-version wording; retain DB expected-lock/idempotency authority; prove published-state copy and a fresh Owner old-tab reload with zero publication effect. |
 
 P-18 placement and P-19 retired-row PDF policy are already recorded gates, not
 new discoveries from this audit. WP-7 BOQ/hotfix `016`/Factor F regression and
@@ -150,7 +151,7 @@ WP-8 clean rehearsal/UAT/performance/advisors also remain required.
 | Order | Work package | Exit meaning |
 |---:|---|---|
 | 1 | WP-6.5 reliability and publish-boundary hardening | Preserve passed evidence for idempotency, concurrency, fail-closed guards, portability, and recovery. It is not an operator-completeness certificate. |
-| 2 | WP-6.6 admin workflow completeness and authority hardening | Close C-01 through C-17 with migration/RPC/UI/audit/tests and owner browser review. No Local reset is implied by planning this work. |
+| 2 | WP-6.6 admin workflow completeness and authority hardening | Historical closeout covered C-01 through C-17 with migration/RPC/UI/audit/tests and owner browser review. C-18 is a later WP-8/P-42 release correction and does not reopen the accepted DB contract. No Local reset is implied by planning this work. |
 | 3 | WP-7 permanent BOQ/hotfix `016` and Factor F regression preservation | Regression-only; no new Factor F or hotfix workflow. |
 | 4 | P-18 decision and WP-7.5 placement governance | Required for full Add/Supplement release; preserve inherited relative order while auditing every shifted numeric position. |
 | 5 | P-19 decision when Retire is in release scope | Resolve official PDF treatment before filing a candidate with inactive rows. |
@@ -265,6 +266,8 @@ authorized the first Local-only implementation; P-22/P-23/P-23.1 authorize the
 bounded operator corrections described in
 [Doc #31](./31-phase4-wp66-operator-workflow-correction-plan.md). P-26
 authorizes the bounded application/test/documentation correction for C-17.
+P-42 and [Incident Note #38](./38-phase4-p42-final-review-snapshot-binding-incident-note.md)
+own the later C-18 correction and its clean-recovery gate.
 These decisions, including P-28 source integration, do not authorize a Local
 database reset. P-29 separately authorized and completed exactly one bounded
 G4E Local reset. P-30 later accepted WP-7 and the five-rule P-18 V1 contract for

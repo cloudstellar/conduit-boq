@@ -102,13 +102,21 @@ describe('Master Catalog P-22 operator workflow', () => {
     expect(review.indexOf('<MasterCatalogPublishRestorePanel')).toBeGreaterThan(
       review.indexOf('<MasterCatalogFinalReviewWorkspace'),
     );
-    expect(review).toContain('lockVersion: snapshot.reviewedLockVersion');
+    expect(review).toContain("reviewBinding.state === 'current'");
+    expect(review).toContain('key={`${version.id}:${reviewBinding.requestedLockVersion}`}');
+    expect(review).toContain('lockVersion: reviewBinding.requestedLockVersion');
+    expect(review).toContain('ฉบับตรวจในแท็บนี้เป็นรุ่นเก่าและเผยแพร่ไม่ได้');
+    expect(review).toContain("isDraftReview && !review.isCurrentBase");
 
     const route = source(
       'app/admin/master-catalog/versions/[versionId]/review/page.tsx',
     );
     expect(route).toContain('loadCatalogVersionReview');
     expect(route).toContain('MasterCatalogVersionReviewView');
+    expect(route).toContain('parseCatalogReviewLock');
+    expect(route).toContain('resolveCatalogReviewBinding');
+    expect(route).toContain('currentLockVersion: review.version.lockVersion');
+    expect(route).toContain('?reviewLock=${reviewBinding.currentLockVersion}');
   });
 
   it('keeps abandon server-owned, audited, and separate from deletion', () => {
@@ -179,6 +187,10 @@ describe('Master Catalog P-22 operator workflow', () => {
     expect(finalReview).toContain('className="divide-y rounded-md border lg:hidden"');
     expect(finalReview).toContain('className="hidden overflow-x-auto lg:block"');
     expect(finalReview).toContain('<Label htmlFor="final-review-page" className="sr-only">');
+    expect(finalReview).toContain("editable ? 'ผลเปรียบเทียบฉบับสุดท้าย' : 'ผลเปรียบเทียบที่บันทึกไว้'");
+    expect(finalReview).toContain('ค่าจากฐาน:');
+    expect(finalReview).toContain('ค่าของฉบับนี้:');
+    expect(finalReview).not.toContain('ค่าฉบับร่าง:');
   });
 
   it('keeps operator labels accessible and compact on narrow screens', () => {

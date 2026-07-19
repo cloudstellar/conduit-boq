@@ -77,6 +77,7 @@ import type {
 import { MasterCatalogItemEditor } from './MasterCatalogItemEditor';
 import { MasterCatalogHeaderUtilities } from './MasterCatalogHeaderUtilities';
 import { MasterCatalogPlacementWorkspaceView } from './MasterCatalogPlacementWorkspace';
+import type { CatalogReviewBinding } from '@/lib/master-catalog/admin/reviewBinding';
 
 const sectionLinks: Array<{
   section: CatalogAdminSection;
@@ -535,11 +536,34 @@ export function MasterCatalogPlacementView({
 export function MasterCatalogVersionReviewView({
   gate,
   review,
+  reviewBinding,
 }: {
   gate: CatalogAdminGate;
   review: CatalogVersionReview;
+  reviewBinding: CatalogReviewBinding;
 }) {
   const { version, baseVersion, snapshot, publishReadiness } = review;
+  const isDraftReview = version.status === 'draft';
+  const isStaleReview = reviewBinding.state === 'stale';
+  const reviewLockVersion = isDraftReview
+    ? reviewBinding.requestedLockVersion
+    : version.lockVersion;
+  const versionLabel = isDraftReview || version.status === 'abandoned'
+    ? version.draftReference ?? 'ฉบับร่าง'
+    : version.officialVersionString ?? version.targetVersionString;
+  const latestReviewHref = reviewBinding.currentLockVersion === null
+    ? null
+    : `/admin/master-catalog/versions/${version.id}/review?reviewLock=${reviewBinding.currentLockVersion}`;
+  const reviewedVersionLabel = isDraftReview
+    ? `ฉบับร่าง ${version.draftReference ?? version.targetVersionString} (เป้าหมาย ${version.targetVersionString})`
+    : version.status === 'abandoned'
+      ? `ฉบับร่างที่ยกเลิก ${version.draftReference ?? version.targetVersionString}`
+      : `เวอร์ชัน ${version.officialVersionString ?? version.targetVersionString}`;
+  const reviewHeading = isDraftReview
+    ? 'ตรวจฉบับสุดท้ายก่อนเผยแพร่'
+    : version.status === 'abandoned'
+      ? 'ผลเปรียบเทียบฉบับร่างที่ยกเลิก'
+      : 'ผลเปรียบเทียบฉบับที่เผยแพร่';
 
   return (
     <MasterCatalogFrame activeSection="versions" gate={gate}>
@@ -547,31 +571,60 @@ export function MasterCatalogVersionReviewView({
         <Button variant="ghost" size="sm" asChild>
           <Link href={`/admin/master-catalog/versions/${version.id}`}>
             <ArrowLeft data-icon="inline-start" />
-            กลับไปแก้ไขฉบับร่าง
+            {isDraftReview ? 'กลับไปแก้ไขฉบับร่าง' : `กลับไปยัง ${versionLabel}`}
           </Link>
         </Button>
         <div className="flex flex-wrap gap-2">
-          <Badge variant="secondary">
-            {version.draftReference ?? 'ฉบับร่าง'}
-          </Badge>
-          <Badge variant="outline">เป้าหมาย {version.targetVersionString}</Badge>
+          <Badge variant="secondary">{versionLabel}</Badge>
+          <StatusBadge status={version.status} />
+          {isDraftReview || version.status === 'abandoned' ? (
+            <Badge variant="outline">เป้าหมาย {version.targetVersionString}</Badge>
+          ) : null}
           <Badge variant="outline">
             ฐาน {baseVersion.officialVersionString ?? baseVersion.targetVersionString}
           </Badge>
-          <Badge variant="outline">รุ่นแก้ไข {version.lockVersion}</Badge>
+          <Badge variant="outline">
+            {isDraftReview ? 'ฉบับตรวจ ' : ''}รุ่นแก้ไข {reviewLockVersion ?? '-'}
+          </Badge>
+          {isStaleReview && reviewBinding.currentLockVersion !== null ? (
+            <Badge variant="outline">ล่าสุด {reviewBinding.currentLockVersion}</Badge>
+          ) : null}
         </div>
       </div>
 
       <Warnings warnings={review.warnings} />
 
       <section className="grid gap-2 border-b pb-4">
-        <h2 className="text-lg font-semibold">ตรวจฉบับสุดท้ายก่อนเผยแพร่</h2>
+        <h2 className="text-lg font-semibold">{reviewHeading}</h2>
         <p className="text-sm text-muted-foreground">
-          ผลด้านล่างมาจากรายการทั้งหมดของฉบับร่างและเวอร์ชันฐานที่อ่านจากฐานข้อมูลด้วยตัวตนรายการเดียวกัน
+          {isDraftReview
+            ? 'ผลด้านล่างผูกกับรุ่นแก้ไขที่ระบุในแท็บนี้ และเปรียบเทียบรายการทั้งหมดกับเวอร์ชันฐานด้วยตัวตนรายการเดียวกัน'
+            : 'ผลด้านล่างใช้ตรวจสอบย้อนหลัง โดยเปรียบเทียบรายการทั้งหมดกับเวอร์ชันฐานด้วยตัวตนรายการเดียวกัน'}
         </p>
       </section>
 
-      {snapshot.state !== 'ready' || !snapshot.diff ? (
+      {isStaleReview ? (
+        <Alert variant="destructive">
+          <ShieldAlert />
+          <AlertTitle>ฉบับตรวจในแท็บนี้เป็นรุ่นเก่าและเผยแพร่ไม่ได้</AlertTitle>
+          <AlertDescription>
+            <div className="grid gap-3">
+              <p>
+                แท็บนี้ผูกกับรุ่นแก้ไข {reviewBinding.requestedLockVersion ?? '-'} แต่ฉบับร่างล่าสุดเป็นรุ่นแก้ไข {reviewBinding.currentLockVersion ?? '-'}
+                {' '}ระบบจะไม่เปลี่ยนแท็บนี้เป็นฉบับล่าสุดโดยอัตโนมัติ
+              </p>
+              {latestReviewHref ? (
+                <Button variant="outline" className="w-fit" asChild>
+                  <Link href={latestReviewHref}>
+                    <ClipboardCheck data-icon="inline-start" />
+                    เปิดฉบับตรวจล่าสุด
+                  </Link>
+                </Button>
+              ) : null}
+            </div>
+          </AlertDescription>
+        </Alert>
+      ) : snapshot.state !== 'ready' || !snapshot.diff ? (
         <Alert variant="destructive">
           <ShieldAlert />
           <AlertTitle>ยังยืนยันผลเปรียบเทียบฉบับสุดท้ายไม่ได้</AlertTitle>
@@ -589,12 +642,14 @@ export function MasterCatalogVersionReviewView({
           baseVersionString={
             baseVersion.officialVersionString ?? baseVersion.targetVersionString
           }
-          draftVersionString={version.targetVersionString}
+          reviewedVersionLabel={reviewedVersionLabel}
           diff={snapshot.diff}
+          reviewLockVersion={isDraftReview ? reviewLockVersion : null}
+          editable={isDraftReview && review.isCurrentBase}
         />
       )}
 
-      {!review.isCurrentBase ? (
+      {isDraftReview && !review.isCurrentBase ? (
         <Alert variant="destructive">
           <ShieldAlert />
           <AlertTitle>ฉบับร่างนี้อ้างอิงเวอร์ชันฐานเก่า</AlertTitle>
@@ -606,14 +661,17 @@ export function MasterCatalogVersionReviewView({
 
       {version.status === 'draft'
         && review.isCurrentBase
+        && reviewBinding.state === 'current'
         && snapshot.state === 'ready'
         && snapshot.reviewedLockVersion !== null ? (
           <MasterCatalogPublishRestorePanel
+            key={`${version.id}:${reviewBinding.requestedLockVersion}`}
             draftVersion={{
               id: version.id,
               targetVersionString: version.targetVersionString,
               draftReference: version.draftReference,
-              lockVersion: snapshot.reviewedLockVersion,
+              lockVersion: reviewBinding.requestedLockVersion
+                ?? snapshot.reviewedLockVersion,
               itemCount: publishReadiness?.dataset?.itemCount ?? version.itemCount,
               datasetHash: publishReadiness?.dataset?.datasetHash ?? version.datasetHash,
             }}
@@ -630,7 +688,11 @@ export function MasterCatalogVersionReviewView({
       {version.status !== 'draft' ? (
         <Alert>
           <ArchiveX />
-          <AlertTitle>เวอร์ชันนี้เปิดตรวจย้อนหลังเท่านั้น</AlertTitle>
+          <AlertTitle>
+            {version.status === 'abandoned'
+              ? 'ฉบับร่างนี้ถูกยกเลิกและเปิดตรวจย้อนหลังเท่านั้น'
+              : 'เวอร์ชันนี้เผยแพร่แล้วและเปิดตรวจย้อนหลังเท่านั้น'}
+          </AlertTitle>
           <AlertDescription>
             สถานะ {statusLabel(version.status)} ไม่อนุญาตให้แก้ไขหรือเผยแพร่ซ้ำ
           </AlertDescription>

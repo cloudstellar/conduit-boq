@@ -68,13 +68,17 @@ const SUMMARY_FILTERS: Array<{
 export function MasterCatalogFinalReviewWorkspace({
   versionId,
   baseVersionString,
-  draftVersionString,
+  reviewedVersionLabel,
   diff,
+  reviewLockVersion,
+  editable,
 }: {
   versionId: string;
   baseVersionString: string;
-  draftVersionString: string;
+  reviewedVersionLabel: string;
   diff: CatalogFinalSnapshotDiff;
+  reviewLockVersion: number | null;
+  editable: boolean;
 }) {
   const searchParams = useSearchParams();
   const initialType = searchParams.get('reviewType');
@@ -154,9 +158,11 @@ export function MasterCatalogFinalReviewWorkspace({
   return (
     <Card className="min-w-0">
       <CardHeader>
-        <CardTitle>ผลเปรียบเทียบฉบับสุดท้าย</CardTitle>
+        <CardTitle>
+          {editable ? 'ผลเปรียบเทียบฉบับสุดท้าย' : 'ผลเปรียบเทียบที่บันทึกไว้'}
+        </CardTitle>
         <CardDescription>
-          เปรียบเทียบฉบับร่าง {draftVersionString} กับเวอร์ชันฐาน {baseVersionString}{' '}
+          เปรียบเทียบ {reviewedVersionLabel} กับเวอร์ชันฐาน {baseVersionString}{' '}
           จากข้อมูลครบ {diff.summary.draftItemCount.toLocaleString('th-TH')} รายการ
         </CardDescription>
       </CardHeader>
@@ -270,7 +276,9 @@ export function MasterCatalogFinalReviewWorkspace({
                 <TableHead className="min-w-72">รายการ</TableHead>
                 <TableHead className="min-w-52">ประเภท</TableHead>
                 <TableHead className="min-w-[360px]">ค่าที่เปลี่ยน</TableHead>
-                <TableHead className="w-24 text-right">แก้ไข</TableHead>
+                <TableHead className="w-24 text-right">
+                  {editable ? 'แก้ไข' : 'ดู'}
+                </TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -309,13 +317,14 @@ export function MasterCatalogFinalReviewWorkspace({
                           <Link href={itemHref({
                             versionId,
                             identityId: row.identityId,
+                            reviewLockVersion,
                             query,
                             changeType,
                             showUnchanged,
                             page: safePage,
                             pageSize,
                           })}>
-                            เปิด
+                            {editable ? 'เปิดแก้ไข' : 'เปิดดู'}
                           </Link>
                         </Button>
                       ) : '-'}
@@ -349,13 +358,14 @@ export function MasterCatalogFinalReviewWorkspace({
                       <Link href={itemHref({
                         versionId,
                         identityId: row.identityId,
+                        reviewLockVersion,
                         query,
                         changeType,
                         showUnchanged,
                         page: safePage,
                         pageSize,
                       })}>
-                        เปิดแก้ไข
+                        {editable ? 'เปิดแก้ไข' : 'เปิดดู'}
                       </Link>
                     </Button>
                   ) : null}
@@ -553,10 +563,10 @@ function FieldDifferences({ fields }: { fields: CatalogFieldDifference[] }) {
           <div className="text-xs font-medium">{fieldLabel(field.field)}</div>
           <div className="grid gap-1 text-xs sm:grid-cols-2">
             <span className="break-words text-muted-foreground">
-              ค่าปัจจุบัน: {formatFieldValue(field)}
+              ค่าจากฐาน: {formatFieldValue(field)}
             </span>
             <span className="break-words font-medium">
-              ค่าฉบับร่าง: {formatFieldValue(field, true)}
+              ค่าของฉบับนี้: {formatFieldValue(field, true)}
             </span>
           </div>
         </div>
@@ -599,7 +609,7 @@ function changeTypeLabel(type: CatalogFinalChangeType) {
     category: 'หมวดงาน',
     status: 'สถานะ',
     order: 'ลำดับ',
-    missing: 'ขาดจากฉบับร่าง',
+    missing: 'ไม่พบในฉบับนี้',
     unchanged: 'รายการเดิม',
   } as Record<CatalogFinalChangeType, string>)[type];
 }
@@ -607,6 +617,7 @@ function changeTypeLabel(type: CatalogFinalChangeType) {
 function itemHref({
   versionId,
   identityId,
+  reviewLockVersion,
   query,
   changeType,
   showUnchanged,
@@ -615,6 +626,7 @@ function itemHref({
 }: {
   versionId: string;
   identityId: string;
+  reviewLockVersion: number | null;
   query: string;
   changeType: ReviewChangeFilter;
   showUnchanged: boolean;
@@ -622,6 +634,9 @@ function itemHref({
   pageSize: ReviewPageSize;
 }) {
   const returnParams = new URLSearchParams();
+  if (reviewLockVersion !== null) {
+    returnParams.set('reviewLock', String(reviewLockVersion));
+  }
   if (query.trim()) returnParams.set('reviewQ', query.trim());
   if (changeType !== 'all') returnParams.set('reviewType', changeType);
   if (showUnchanged) returnParams.set('reviewUnchanged', '1');
