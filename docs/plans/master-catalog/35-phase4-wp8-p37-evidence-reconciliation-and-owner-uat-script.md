@@ -21,9 +21,12 @@ actor-independent contract.
 P-41 additionally records UAT-06 through UAT-08 from continued guided
 discovery. The source correction and incremental Local migration `025` are in
 place. Exact pushed `bb27b0d28e116e97ce1e7ee3e582f39bcc4edf22` passed full
-source verification and live WP-6.6 smoke, but this script must not be scored
-until a separately approved clean `017`-`025` chain passes. The discovery
-interactions remain product evidence only.
+source verification and live WP-6.6 smoke. Owner-approved exact execution
+source `adcca3939f3080cdf64bc6ad807051e9e85fed94` then passed the clean
+`017`-`025` chain, all four integrated smoke suites, canonical verification,
+and final disabled-baseline readback. This script may now begin only from a new
+immutable prepared session; the discovery interactions remain product evidence
+only.
 
 **Environment:** Local only, no reset. Production access/write, successful
 publication or pointer movement, feature enablement outside the temporary Local

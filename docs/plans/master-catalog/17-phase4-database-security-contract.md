@@ -83,8 +83,10 @@ must reject a preexisting gap rather than conceal it. `025` is Local-only and
 incrementally applied with SHA-256
 `00d79d7750aa52ba7f003f6bb82fedb1d31ab111be417d74329c1cd3d899f76f`;
 exact pushed source `bb27b0d28e116e97ce1e7ee3e582f39bcc4edf22` and live
-WP-6.6 smoke passed. Clean-chain/Owner-UAT and all Production gates remain
-open.
+WP-6.6 smoke passed. Owner-approved exact execution source
+`adcca3939f3080cdf64bc6ad807051e9e85fed94` then passed the clean
+`009`-`015`, hotfix `016`, `017`-`025` chain and final disabled-baseline
+readback. Owner-UAT and all Production gates remain open.
 
 **Owner decision recorded:** 2026-07-04 — approved according to the
 recommendation as the technical backbone for Phase 4A and every Phase 4 write
@@ -954,9 +956,10 @@ broader independent WP-8 closure remain under Note #34 before P-37 acceptance.
 P-39R migrations `022`-`024` are accepted history and must not be edited.
 P-41 appends `025_master_catalog_phase4_withdraw_order_compaction.sql` after
 `024`; the canonical Local bootstrap range is now `017`-`025`. Incremental
-Local apply is not a substitute for a clean integrated execution. Run the clean
-chain only after a new explicit destructive-reset warning/approval, then record
-the exact source and migration SHA-256.
+Local apply was not treated as a substitute: after a new explicit
+destructive-reset warning/approval, the clean integrated execution passed on
+exact pushed `adcca3939f3080cdf64bc6ad807051e9e85fed94`. Any future reset still
+requires its own warning and approval.
 
 Do not edit an applied migration file. Forward-fix with a new reviewed
 migration.

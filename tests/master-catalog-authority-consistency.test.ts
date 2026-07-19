@@ -420,6 +420,9 @@ describe('Master Catalog authority consistency', () => {
     expect(decisions).toContain(
       '8d118e14c69f7ea9209123852011b1610d4c63687ff5133136bd6f15875463ed',
     )
+    expect(decisions).toContain(
+      'adcca3939f3080cdf64bc6ad807051e9e85fed94',
+    )
 
     const tracker = read(
       'docs/plans/master-catalog/25-phase4-execution-progress-tracker.md',
@@ -439,10 +442,10 @@ describe('Master Catalog authority consistency', () => {
       /P-33 accepted that\s+exact bounded WP-7\.5 technical checkpoint at 2026-07-15 13:54 \+07/,
     )
     expect(tracker).toContain(
-      '| Current work package | WP-8/P-37 HOLD; P-41 exact source and incremental live smoke passed; clean `017`-`025` and fresh scored Cards A-G remain pending |',
+      '| Current work package | WP-8/P-37 HOLD; P-41 exact source, incremental smoke, and clean `017`-`025` passed; fresh scored Cards A-G remain pending |',
     )
     expect(tracker).toContain(
-      '| Current environment | Post-smoke disabled Local baseline after incremental `025`: pointer `2568.0.0`/710',
+      '| Current environment | Post-clean-chain disabled Local baseline: pointer `2568.0.0`/710',
     )
     expect(tracker).toContain(
       '0780925aca8fa7ebbf8abbaf2b7cf151b39b676a',
@@ -550,7 +553,7 @@ describe('Master Catalog authority consistency', () => {
       /pre-amendment operator\/browser preflight passed on\s+`c8f6dca`/,
     )
     expect(tracker).toContain(
-      'Status: P-38 discovery drafts are closed and Local is disabled after incremental 025; exact pushed P-41 source and smoke passed while clean chain and scored Owner UAT remain open; Add/Supplement hidden; no Production action authorized',
+      'Status: Local is disabled after the exact P-41 clean chain; scored Owner UAT remains open; Add/Supplement hidden; no Production action authorized',
     )
     expect(verificationReport).toContain(
       'HOLD under Closure Matrix #34',
@@ -561,6 +564,14 @@ describe('Master Catalog authority consistency', () => {
     expect(verificationReport).toContain(
       'Partial: Closure Matrix #34 C-11',
     )
+    for (const cleanEvidenceHash of [
+      '4b69e44dde915ca25c3f78379a1c45b002b31cb8aebcbf361ec3b58670f9e245',
+      'e9e28eb1bb6f312a4638c0d67b00cb420864d5433295ffb80a95a12ee9e14251',
+      '5b6a01837d2836a33a000489ff6dad4519ca40ca67e48464cc384b84721c8195',
+      '0fd213f5ace8e077790d81a1c49b78a3fff3f1912a01aef5b52b7df6d1460240',
+    ]) {
+      expect(verificationReport).toContain(cleanEvidenceHash)
+    }
     expect(existsSync(resolve(
       root,
       'docs/plans/master-catalog/32-phase4-wp8-p36-owner-review-note.md',
@@ -620,15 +631,18 @@ describe('Master Catalog authority consistency', () => {
       '| C-10 | At least three safe validation-error recoveries |',
       '| C-11 | 710-row performance baseline |',
       '| C-12 | Documentation consistency |',
-      '| Passed for exact source/smoke checkpoint | Rerun after the clean chain and scored evidence update |',
+      '| Passed for clean-chain checkpoint | Rerun after scored evidence update |',
       'one rejected stale attempt with zero effect, then exactly one accepted UI batch/change set',
     ]) {
       expect(p37Closure).toContain(contract)
     }
     expect(p37Closure).toContain(
-      '8d118e14c69f7ea9209123852011b1610d4c63687ff5133136bd6f15875463ed',
+      'adcca3939f3080cdf64bc6ad807051e9e85fed94',
     )
-    expect(p37Closure).toMatch(/obtain a new\s+explicit approval/)
+    expect(p37Closure).toContain(
+      'e9e28eb1bb6f312a4638c0d67b00cb420864d5433295ffb80a95a12ee9e14251',
+    )
+    expect(p37Closure).toContain('No additional reset is')
     expect(executionPack).toContain(
       'record comprehension and recovery from at least three safe',
     )
@@ -676,7 +690,7 @@ describe('Master Catalog authority consistency', () => {
     expect(cardE).not.toContain('complete the old publish-confirmation form')
     expect(p37OwnerUat).toMatch(/Do not run\s+`npm run db:local:bootstrap`/)
     expect(p37OwnerUat).not.toContain('technical evidence is accepted as Owner evidence')
-    expect(tracker).toContain('P-38 discovery drafts are closed')
+    expect(tracker).toContain('Discovery drafts were audited-abandoned')
     expect(verificationReport).toContain('P-38 P-37 evidence reconciliation')
     expect(threatModel).toContain('| T-52 |')
     expect(threatModel).toContain('| T-53 |')
@@ -708,9 +722,9 @@ describe('Master Catalog authority consistency', () => {
       /It never\s+creates, edits, publishes, or abandons a draft/,
     )
     expect(p38Preflight).toContain('P-41 discovery correction gate')
-    expect(p38Preflight).toContain('clean `017`-`025` chain')
+    expect(p38Preflight).toMatch(/clean\s+`017`-`025` chain/)
     expect(p38Preflight).toContain(
-      '**Pending new Owner approval:** a clean bootstrap through `017`-`025`',
+      '**Passed:** after a new warning and Owner approval',
     )
     expect(p37OwnerUat).toContain('UAT-06')
     expect(p37OwnerUat).toContain('UAT-07')

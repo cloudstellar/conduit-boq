@@ -41,8 +41,8 @@
 | `022_master_catalog_phase4_draft_identity_and_release_number.sql` | P-39R forward-only separation of immutable `{target}-D{nnn}` draft references from claimed/issued catalog versions; one open draft globally; audited stale/current abandonment; pointer/effect audit; hardened lifecycle/RLS/publication metadata | **P39R-S passed on Local-only source SHA-256 `9fc8f951fa5b3f3d7de928cce877a265d9333fda46850dd7564b22cd424c41f3`; incrementally applied to Local on exact source `7997387`; backfill, pointer, catalog, BOQ, and Factor F invariants passed; incremental P39R-L and clean-chain P39R-C later passed through `024`; not Production-applied** |
 | `023_master_catalog_phase4_published_code_rls_scope.sql` | P-39R forward-only RLS correction: active staff may read a code only when the exact `(identity_id, item_code)` pair occurs in an active/archived issued snapshot; active admins retain complete registry/history access | **Local-only SHA-256 `cbe01f63c6dd822edb29e1f7a31bfd27d5cb063e4d7d7e3878567875434d0a88`; first apply from `072294d` failed only its textual policy postcondition and rolled back completely; corrected exact source `6f01457` applied transactionally without reset; exact clean execution source `10531610eac53a97c6ef8f9d06418766b58bee36` repeated the RLS/role/history suite; not Production-applied** |
 | `024_master_catalog_phase4_set_based_placement_invalidation.sql` | P-39R forward-only execution-shape correction: replace migration `021` row-level placement invalidation with three transition-table statement triggers and transaction-local positive/negative version caches | **Local-only SHA-256 `d3aa11282fa4b2d4bac058bde3851287c551556ba5eac307277f086ba3d86b25`; committed/pushed/applied incrementally on exact `b6d58ce6cfedafa5812821edb49b897c2856f049`; WP-6.6/WP-7.5, canonical `017`-`024`, trigger inventory 3/0, and adjacent-data invariants passed in P39R-L and clean-chain P39R-C on exact `10531610eac53a97c6ef8f9d06418766b58bee36`; not Production-applied** |
-| `025_master_catalog_phase4_withdraw_order_compaction.sql` | P-41 forward-only correction: compact a draft's `display_order` atomically after never-published-row withdrawal while preserving relative order and one placement-revision advance per transaction | **Local-only SHA-256 `00d79d7750aa52ba7f003f6bb82fedb1d31ab111be417d74329c1cd3d899f76f`; incrementally applied without reset on 2026-07-19 after closing discovery drafts and restoring all feature flags; exact pushed source `bb27b0d28e116e97ce1e7ee3e582f39bcc4edf22` passed 34 files/220 tests, TypeScript, lint 0 errors/10 existing warnings, authority/input/syntax/build/diff checks, and live WP-6.6 smoke; smoke evidence SHA-256 `8d118e14c69f7ea9209123852011b1610d4c63687ff5133136bd6f15875463ed`; clean `017`-`025` execution and fresh scored Owner UAT remain pending; not Production-applied** |
-| `017+_master_catalog_phase4_*.sql` | Umbrella reference for the Local-only Phase 4 range; the canonical bootstrap source now applies `017`-`025` after hotfix `016` | **Local-only range — P-36 through `021`, P39R-L, and clean P39R-C through `024` remain historical evidence; P-40 changed no migration; P-41 appends `025` after a Local discovery finding and requires new exact-source verification/clean-chain evidence before closure; every Production approval remains absent** |
+| `025_master_catalog_phase4_withdraw_order_compaction.sql` | P-41 forward-only correction: compact a draft's `display_order` atomically after never-published-row withdrawal while preserving relative order and one placement-revision advance per transaction | **Local-only SHA-256 `00d79d7750aa52ba7f003f6bb82fedb1d31ab111be417d74329c1cd3d899f76f`; incrementally applied without reset on 2026-07-19 after closing discovery drafts and restoring all feature flags; exact pushed source `bb27b0d28e116e97ce1e7ee3e582f39bcc4edf22` passed 34 files/220 tests and incremental smoke; owner-approved exact execution source `adcca3939f3080cdf64bc6ad807051e9e85fed94` then clean-applied `009`-`015`, hotfix `016`, and Phase 4 `017`-`025`; WP-6.5/WP-6.6/WP-7/WP-7.5, canonical and final disabled-baseline readback passed; fresh scored Owner UAT remains pending; not Production-applied** |
+| `017+_master_catalog_phase4_*.sql` | Umbrella reference for the Local-only Phase 4 range; the canonical bootstrap source now applies `017`-`025` after hotfix `016` | **Local-only range — P-36 through `021`, P39R-L, and clean P39R-C through `024` remain historical evidence; P-40 changed no migration; P-41 appends `025`, and its exact-source plus clean-chain evidence passed on 2026-07-19; fresh scored Owner UAT remains before P-37; every Production approval remains absent** |
 
 ### Local Schema Baseline (`supabase/local/`)
 
@@ -249,14 +249,20 @@ database correctly failed closed. Application validation now rejects a gapped
 draft, and forward-only migration `025` owns atomic post-delete compaction.
 `025` was applied incrementally to the disabled Local baseline without reset.
 Exact pushed source `bb27b0d28e116e97ce1e7ee3e582f39bcc4edf22` passed the
-full source gates and live WP-6.6 smoke. The untracked smoke evidence at
-`tmp/master-catalog/wp66-evidence/20260719-p41-bb27b0d.json` has SHA-256
-`8d118e14c69f7ea9209123852011b1610d4c63687ff5133136bd6f15875463ed` and
-remains excluded from Git. Final readback repeated pointer `2568.0.0`/710,
-canonical hash `sha256:2e3571ea7135fbc0bbb84c8cc330af1173e4c1d2345e5eb59958dc76e45558b8`,
+full source gates and incremental WP-6.6 smoke. The owner then approved one
+warned destructive Local reset. Exact pushed execution source
+`adcca3939f3080cdf64bc6ad807051e9e85fed94` clean-applied `009`-`015`, hotfix
+`016`, and Phase 4 `017`-`025`. WP-6.5, WP-6.6, WP-7, and WP-7.5 evidence
+SHA-256 values are respectively
+`4b69e44dde915ca25c3f78379a1c45b002b31cb8aebcbf361ec3b58670f9e245`,
+`e9e28eb1bb6f312a4638c0d67b00cb420864d5433295ffb80a95a12ee9e14251`,
+`5b6a01837d2836a33a000489ff6dad4519ca40ca67e48464cc384b84721c8195`, and
+`0fd213f5ace8e077790d81a1c49b78a3fff3f1912a01aef5b52b7df6d1460240`.
+The evidence files remain untracked under `tmp/master-catalog/`. Final readback
+repeated pointer `2568.0.0`/710, canonical hash
+`sha256:2e3571ea7135fbc0bbb84c8cc330af1173e4c1d2345e5eb59958dc76e45558b8`,
 zero working drafts, all flags false, BOQ 198/1,547, and Factor F
-`2569.0.0`/36. A separately approved clean `017`-`025` bootstrap and fresh
-scored Owner UAT remain open.
+`2569.0.0`/36. Fresh scored Owner UAT remains open.
 No Production, BOQ, Factor F, or hotfix scope was authorized.
 Applied hotfix `016` must not be edited.
 This is not a new Production hotfix and must not be applied to Production

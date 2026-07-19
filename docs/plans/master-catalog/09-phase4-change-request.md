@@ -40,9 +40,12 @@ without persistence or Apply when retirement is disabled, rejects preexisting
 order gaps in the client, and appends forward-only migration `025` for atomic
 post-withdraw compaction. Incremental Local apply, exact push at
 `bb27b0d28e116e97ce1e7ee3e582f39bcc4edf22`, full source verification, and
-live WP-6.6 smoke are complete; a separately approved clean `017`-`025` chain
-and fresh scored Owner-UAT evidence remain open. This does
-not authorize Production, reset, Factor F, BOQ, P-19, or hotfix expansion.
+live WP-6.6 smoke are complete. The owner separately approved one warned Local
+reset; exact pushed `adcca3939f3080cdf64bc6ad807051e9e85fed94` then passed the
+clean `009`-`015`, hotfix `016`, `017`-`025` chain and full integrated
+harnesses. Fresh scored Owner-UAT evidence remains open. This does
+not authorize Production, another reset, Factor F, BOQ, P-19, or hotfix
+expansion.
 
 **Owner decision recorded:** 2026-07-04 — approved according to the
 recommendation for implementation/local rehearsal only. The gate structure,

@@ -60,9 +60,11 @@ forward-only `025`; do not edit migration history. `025` is applied
 incrementally on Local. Exact pushed source
 `bb27b0d28e116e97ce1e7ee3e582f39bcc4edf22` passed the full source gates and
 live WP-6.6 smoke, including post-withdraw contiguity, relative-order, and
-one-revision assertions. A separately approved clean `017`-`025` execution and
-fresh scored Owner UAT remain gates. Production, BOQ, Factor F, and hotfix
-scope are unchanged.
+one-revision assertions. After a fresh warning and approval, exact pushed
+`adcca3939f3080cdf64bc6ad807051e9e85fed94` clean-applied `009`-`015`, hotfix
+`016`, and `017`-`025`; WP-6.5/WP-6.6/WP-7/WP-7.5 plus canonical/final
+readback passed. Fresh scored Owner UAT remains the next gate. Production, BOQ,
+Factor F, and hotfix scope are unchanged.
 
 **Reliability amendment:** 2026-07-11 — WP-6.5 now closes end-to-end
 idempotency, publish-block UX, P-20 hash portability, ADR-003 reusable
