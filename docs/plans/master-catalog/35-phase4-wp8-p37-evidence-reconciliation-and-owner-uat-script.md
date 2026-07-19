@@ -30,7 +30,8 @@ new immutable scored session, but its Card A is invalid under P-42: Local
 page displayed the false draft-only warning **อ้างอิงเวอร์ชันฐานเก่า**. Cards
 B-G stopped. See
 [Incident Note #38](./38-phase4-p42-final-review-snapshot-binding-incident-note.md).
-This script may restart only after exact P-42 commit/push, a separately warned
+Exact P-42 correction `b2500b5e6859a915bfa3f70d558934f252943f82`
+passed and is pushed. This script may restart only after a separately warned
 and approved clean Local bootstrap, exact disabled-baseline readback, and a new
 immutable prepared session. Discovery and interrupted interactions remain
 product evidence only.
@@ -399,5 +400,6 @@ After Card G:
 
 Cards A-G require no reset after preparation. The P-42 incident has already
 made one clean recovery necessary: do not run `npm run db:local:bootstrap`
-until exact P-42 is committed/pushed and the owner has received the destructive
-Local warning and explicitly approved that run.
+unless using exact pushed P-42
+`b2500b5e6859a915bfa3f70d558934f252943f82` and the owner has received the
+destructive Local warning and explicitly approved that run.

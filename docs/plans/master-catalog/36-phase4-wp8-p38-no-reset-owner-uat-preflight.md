@@ -42,7 +42,8 @@ Cards B-G. Read-only status records zero working drafts, admin/new-identity
 flags true, retirement false, BOQ 198/1,547, Factor F `2569.0.0`/36, and
 Production untouched. See
 [Incident Note #38](./38-phase4-p42-final-review-snapshot-binding-incident-note.md).
-A new session requires exact P-42 commit/push and a separately warned and
+Exact P-42 correction `b2500b5e6859a915bfa3f70d558934f252943f82`
+passed and is pushed. A new session now requires a separately warned and
 approved clean Local bootstrap first.
 
 **Boundary:** Local only. This note itself authorizes no reset; the required
@@ -246,8 +247,8 @@ rewrite that evidence with ad hoc SQL.
 
 Before another `prepare`:
 
-1. pass P-42 source/docs/browser/repository checks and commit/push the exact
-   checkpoint;
+1. **Passed:** P-42 source/docs/browser/repository checks on exact pushed
+   checkpoint `b2500b5e6859a915bfa3f70d558934f252943f82`;
 2. tell the owner that `npm run db:local:bootstrap` destroys and rebuilds the
    whole Local Supabase stack, then obtain explicit approval for that one run;
 3. bootstrap the unchanged `009`-`015`, hotfix `016`, `017`-`025` chain;

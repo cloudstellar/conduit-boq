@@ -273,8 +273,9 @@ stopped. P-42 binds draft review URLs to `reviewLock`, hard-stops stale tabs,
 and makes published review read-only with accurate labels. It changes no SQL,
 migration order, DB guard, BOQ, Factor F, or hotfix. See
 [P-42 Incident Note #38](../plans/master-catalog/38-phase4-p42-final-review-snapshot-binding-incident-note.md).
-An exact clean scored baseline now requires a newly warned and explicitly
-approved Local bootstrap after the P-42 checkpoint is committed and pushed;
+Exact P-42 application/docs checkpoint
+`b2500b5e6859a915bfa3f70d558934f252943f82` is pushed. An exact clean scored
+baseline now requires a newly warned and explicitly approved Local bootstrap;
 pointer restore alone is insufficient because it would retain the issued Local
 version in history.
 No Production, BOQ, Factor F, or hotfix scope was authorized.

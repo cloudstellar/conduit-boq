@@ -1,7 +1,9 @@
 # Phase 4 P-42 Final-review Snapshot Binding Incident Note
 
-**Status:** Local-only correction in progress. The scored P-38 Owner UAT is
-stopped and P-37 remains **HOLD**. Production was not accessed or changed.
+**Status:** Exact Local-only correction
+`b2500b5e6859a915bfa3f70d558934f252943f82` passed and is pushed. The scored
+P-38 Owner UAT is stopped and P-37 remains **HOLD**. Production was not
+accessed or changed.
 
 **Scope:** Application, tests, Owner UAT procedure, and authority-document
 alignment only. No migration, database-contract, BOQ, Factor F, hotfix `016`,
@@ -156,5 +158,6 @@ The bounded P-42 correction passed on 2026-07-19:
 The first sandboxed build attempt could not reach Google Fonts. The same build
 passed unchanged with network access; this was an environment constraint, not
 an application failure. No migration, Local reset, Local repair, or Production
-action occurred during this verification. Exact commit/push and the separately
-approved recovery reset remain later gates.
+action occurred during this verification. Exact correction
+`b2500b5e6859a915bfa3f70d558934f252943f82` is pushed; the separately approved
+recovery reset remains the next gate.

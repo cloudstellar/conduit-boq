@@ -446,8 +446,9 @@ describe('Master Catalog authority consistency', () => {
       /P-33 accepted that\s+exact bounded WP-7\.5 technical checkpoint at 2026-07-15 13:54 \+07/,
     )
     expect(tracker).toContain(
-      '| Current work package | WP-8/P-37 HOLD; P-42 final-review snapshot correction in progress; interrupted scored Card A is invalid and Cards B-G are stopped |',
+      '| Current work package | WP-8/P-37 HOLD; exact P-42 correction is pushed; interrupted scored Card A is invalid, Cards B-G are stopped, and clean Local recovery awaits a new owner approval |',
     )
+    expect(tracker).toContain('b2500b5e6859a915bfa3f70d558934f252943f82')
     expect(tracker).toContain(
       '| Current environment | Local incident evidence state: pointer/default `2568.5.0` from `2568.5.0-D002`',
     )
@@ -639,7 +640,7 @@ describe('Master Catalog authority consistency', () => {
       '| C-11 | 710-row performance baseline |',
       '| C-12 | Documentation consistency |',
       '| C-13 | Disabled clean Local baseline |',
-      '| In progress for P-42 |',
+      '| Passed for P-42 checkpoint |',
       'one rejected stale attempt with zero effect, then exactly one accepted UI batch/change set',
     ]) {
       expect(p37Closure).toContain(contract)
@@ -750,7 +751,8 @@ describe('Master Catalog authority consistency', () => {
     const p42Incident = read(
       'docs/plans/master-catalog/38-phase4-p42-final-review-snapshot-binding-incident-note.md',
     )
-    expect(p42Incident).toContain('Production was not accessed or changed')
+    expect(p42Incident).toMatch(/Production was not\s+accessed or changed/)
+    expect(p42Incident).toContain('b2500b5e6859a915bfa3f70d558934f252943f82')
     expect(p42Incident).toContain('reviewLock={current_lock}')
     expect(p42Incident).toMatch(/does\s+not render the diff\/publish panel/)
     expect(p42Incident).toContain('Pointer restore alone')
