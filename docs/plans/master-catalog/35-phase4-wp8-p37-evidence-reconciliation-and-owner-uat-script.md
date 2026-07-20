@@ -115,11 +115,22 @@ close; they do not invalidate completed Card B-E evidence.
 | `P42-UAT-D02` | Browser-only placement storage is schema 3, records whether the admin actually changed a suggestion, discards stale lock/revision keys, and shows an explicit warning before any fresh confirmation | Implemented; Spot-check 3 pending |
 | `P42-UAT-E01` | The export menu says **เปิดหน้าพิมพ์/บันทึก PDF**, matching the browser print/save-PDF behavior | Implemented; Spot-check 1 pending |
 | `P42-UAT-F02` | Uncertain transport outcomes use diagnostic code `CATALOG_OUTCOME_UNCERTAIN` while retaining the same request ID and replay-safe input | Implemented; Spot-check 4 pending |
+| `P42-UAT-OV01` | The fixed 380 px overview activity rail now renders compact imports/change sets as stacked lists, applies `min-width: 0` through the rail, and keeps generic tables inside an overflow container | Exact `bcc041772b3f537de66b655c5115c4e3c2da9325`; Owner accepted before Spot-check 1 |
 
 The added-code confirmation is presentation enrichment from the immutable
 audit effect; failure of that follow-up read cannot reverse or duplicate the
 already committed mutation. Placement recovery remains session storage only,
 and database lock/revision checks remain the final authority.
+
+`P42-UAT-OV01` was found before a test draft was created. At the Owner's
+1,443 px viewport, the 380 px card contained a 543 px table and expanded the
+document beyond the viewport. After exact `bcc0417`, the card and content have
+equal contained widths, the document has no horizontal overflow, and the
+390 x 844 mobile check also has no overflow. The Owner confirmed **อยู่ในกรอบแล้ว**.
+This accepted pre-check does not add a fifth spot-check or invalidate retained
+Card B-E evidence. The initial prepared session at `738be76` created no draft;
+its flags were restored after the application source advanced, so a fresh
+exact-source no-reset session is required before Step 1.
 
 ### 1.2 Minimal post-correction Owner spot-check
 
@@ -406,6 +417,7 @@ remediation owner, and due date.
 
 | Card/gate | Result | Visible Thai message or key observation | Elapsed/browser | Evidence reference |
 |---|---|---|---|---|
+| Overview / responsive containment | Passed after bounded correction | **รายการล่าสุด** remains inside its card without window resizing; compact activity is a readable vertical list | Local in-app Browser at 1,443 px and 390 x 844 | Exact `bcc041772b3f537de66b655c5115c4e3c2da9325`; Owner confirmation 2026-07-20 |
 | A / C-09/C-10 draft lifecycle + stale-review prevention | Functional pass; strict score HOLD because live guidance was used | D001 abandoned; D002 reused target `2568.1.0`; old review lock `0` hard-stopped after lock `1`; no publish | Local in-app Browser | `tmp/master-catalog/p38-owner-uat/p42-card-a-owner-evidence.json` |
 | B / C-09 browse/manual/withdraw | Functional pass retained; only B01 Spot-check 1 remains | Search/history passed; allocated `CIC-GIP-007`/`008`/`009`; withdrew `007`; add-success omitted allocated code/direct link | Local in-app Browser | `tmp/master-catalog/p38-owner-uat/p42-card-b-owner-evidence.json` |
 | C / C-09/C-10/C-11 import + E-01/E-02 | Functional pass retained; only C01/C02 Spot-check 2 remains | Client and server phases each under 1 second; complete read-only preview; E-01 authority and E-02 retirement holds recovered without persistence | Local in-app Browser | `tmp/master-catalog/p38-owner-uat/p42-card-c-owner-evidence.json` |

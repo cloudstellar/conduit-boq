@@ -452,6 +452,8 @@ describe('Master Catalog authority consistency', () => {
     expect(tracker).toContain('f8c670901997a4e6663db7c4db1218efc03d51c6')
     expect(tracker).toContain('1c901855a32b100013fb5c9472c2e909e3dd1c59')
     expect(tracker).toContain('bdc104f77f18ea8fc776950259bc25e68c2fd42a')
+    expect(tracker).toContain('bcc041772b3f537de66b655c5115c4e3c2da9325')
+    expect(tracker).toContain('P42-UAT-OV01')
     expect(tracker).toContain(
       '| Current environment | Clean Local post-UAT baseline: pointer/default `2568.0.0`',
     )
@@ -649,6 +651,8 @@ describe('Master Catalog authority consistency', () => {
       '| Passed for current checkpoint |',
       'one stale rejection with zero effect and exactly one accepted UI batch/change set',
       'bdc104f77f18ea8fc776950259bc25e68c2fd42a',
+      'bcc041772b3f537de66b655c5115c4e3c2da9325',
+      'P42-UAT-OV01',
       'four post-correction Owner spot-checks',
     ]) {
       expect(p37Closure).toContain(contract)
