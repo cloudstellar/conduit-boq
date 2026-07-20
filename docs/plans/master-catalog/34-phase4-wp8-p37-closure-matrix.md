@@ -24,10 +24,12 @@ exploratory rather than scored; it found UAT-01 through UAT-05 and passed Card F
 before exact disabled-baseline cleanup. Exact P-40 correction `dc83c35` is
 pushed and separate one-draft developer browser QA passed its corrected unit,
 money, and withdrawal paths before disabled-baseline readback. That assisted QA
-does not close any independent row; a fresh scored Cards A-G rerun remains.
+did not close any independent row at that checkpoint. The later P-42 recovery
+run and bounded-correction decision supersede that former full-rerun posture.
 The evidence reconciliation remains complete in
 [Owner UAT Script #35](./35-phase4-wp8-p37-evidence-reconciliation-and-owner-uat-script.md).
-P-38 authorizes its bounded no-reset Local preparation and scored Owner UAT. The
+P-38 originally authorized bounded no-reset Local preparation and scored Owner
+UAT. The
 earlier P39-S result is historical; corrected P39R-S,
 incremental P39R-L, and the separately approved P39R-C clean chain passed. The
 clean execution source is exact pushed
@@ -61,16 +63,17 @@ guidance and developer-operated Cards F-G mean the run is not strict
 independent Owner evidence. D001/D002 were audited-abandoned and cleanup
 restored zero drafts/all flags false. At that checkpoint P-37 remained HOLD
 while bounded UX/procedure findings were corrected or explicitly disposed and
-affected cards were independently rerun.
+their corrected surfaces were independently checked.
 
 The Owner approved the recommended bounded finding corrections on 2026-07-20.
 Exact evidence checkpoint `1c901855a32b100013fb5c9472c2e909e3dd1c59`
 preserves the completed recovery run, and exact source checkpoint
 `bdc104f77f18ea8fc776950259bc25e68c2fd42a` implements all seven findings
 without a migration or Local reset. Repository gates and clean read-only Local
-status passed. This changes the remaining work from implementation/disposition
-to independent rendered confirmation of targeted Cards B/C/D/E/F and cleanup;
-it does not change the P-37 HOLD.
+status passed. The Owner retained the completed Card B-E functional evidence
+and selected proportional revalidation: only the four post-correction Owner spot-checks
+in Note #35 Section 1.2 plus cleanup remain. This does not change
+the P-37 HOLD until those checks pass.
 
 ## 1. Why this matrix exists
 
@@ -101,14 +104,14 @@ Local cleanup.
 | C-02 | DB/RLS/role/rollback/race/idempotency/P-20/BOQ/Factor F invariants | Clean WP-6.5/WP-6.6/WP-7/WP-7.5 passed trigger inventory, post-withdraw `0..N-1`, relative order, exactly-one revision, rollback/race/replay, role/RLS, pointer, BOQ, Factor F, suffix, and no-Production assertions; evidence SHA-256 `4b69e44dde915ca25c3f78379a1c45b002b31cb8aebcbf361ec3b58670f9e245`, `e9e28eb1bb6f312a4638c0d67b00cb420864d5433295ffb80a95a12ee9e14251`, `5b6a01837d2836a33a000489ff6dad4519ca40ca67e48464cc384b84721c8195`, `0fd213f5ace8e077790d81a1c49b78a3fff3f1912a01aef5b52b7df6d1460240` | Passed after P-41 clean chain | Rerun affected harnesses only after later source/migration changes |
 | C-03 | Tracked official export verification | P-11 exact pair was owner-accepted; P-36 regenerated and independently verified the active 710-row Excel/PDF evidence | Passed | Production filing remains P-15, not P-37 |
 | C-04 | Security/performance advisor blocker review | P-36 returned no security blocker; baseline performance findings and the unused `v_row_count` are assigned to P-12 with owners and rationale | Passed for P-37 | Reassess/minimize before P-12; this is not a Production waiver |
-| C-05 | Repository/source quality | Exact evidence checkpoint `1c901855a32b100013fb5c9472c2e909e3dd1c59` records the P-42 recovery. Exact bounded correction `bdc104f77f18ea8fc776950259bc25e68c2fd42a` passed focused 3 files/31 tests, full 36 files/229 tests, TypeScript, lint 0 errors/10 existing warnings, authority/input checks, network-enabled build, diff check, and clean read-only Local status. Earlier P-41/P-42/recovery provenance remains retained | Passed for corrected source | Independently rerun the affected rendered cards; rerun application build only if application, dependency, or migration source changes again |
+| C-05 | Repository/source quality | Exact evidence checkpoint `1c901855a32b100013fb5c9472c2e909e3dd1c59` records the P-42 recovery. Exact bounded correction `bdc104f77f18ea8fc776950259bc25e68c2fd42a` passed focused 3 files/31 tests, full 36 files/229 tests, TypeScript, lint 0 errors/10 existing warnings, authority/input checks, network-enabled build, diff check, and clean read-only Local status. Earlier P-41/P-42/recovery provenance remains retained | Passed for corrected source | Complete the four rendered spot-checks; rerun application build only if application, dependency, or migration source changes again |
 | C-06 | Placement comprehension, review by exception, keyboard, focus, and final presentation | Owner passed all named overview/gap/sibling/leave-reload/keyboard/focus/previous-new-next checks on no-reset `2568.15.0` | Passed for the exercised path | Do not repeat these controls unless the UI changes |
-| C-07 | One complete independent placement task | P-42 recovery Card D functionally recorded one stale rejection with zero effect and exactly one accepted UI batch/change set. Exact `bdc104f77...` corrects D01 wheel scrolling and D02 stale-user-choice disclosure while preserving DB authority | Partial | Rerun corrected Card D independently and retain the accepted-state/current-order evidence |
-| C-08 | Stale-placement recovery inside the independent owner task | The prior Card D functionally passed two-tab stale rejection, fresh recovery, one accepted batch, and current-state readback. Exact `bdc104f77...` adds explicit stale-choice discard feedback | Partial | Rerun corrected Card D without developer/SQL intervention |
-| C-09 | Independent core-admin UAT | Exact `f8c6709` Cards A-G passed functionally; exact `bdc104f77...` implements/disposes P42-UAT-B01, C01/C02, D01/D02, E01, and F02. The prior live guidance and developer-operated Cards F-G still violate the independent-operator condition | Open | Prepare a fresh exact-source no-reset session when the clean baseline remains suitable; independently rerun targeted Cards B/C/D/E/F and cleanup |
-| C-10 | At least three safe validation-error/prevention recoveries | Functionally passed: Card A URL-bound stale-review hard stop, Card C E-01 invalid authority and E-02 retirement approval hold, Card D stale placement, and Card F uncertain-response retry all produced safe recovery/zero duplicate effect. Corrected procedure/copy/error semantics are in exact `bdc104f77...` | Partial | Independently rerun the affected Card C/D/F prevention and recovery paths |
-| C-11 | 710-row performance baseline | Retained P-36 route results remain valid. P-42 Card C client preparation and server review each completed under 1 second for 710 prepared rows/712 compared rows; Card E final review completed about 1 second for 712 rows and export verification passed. E01 wording is corrected in exact `bdc104f77...` | Partial | Preserve measurements and obtain an independent Owner observation on the corrected import/review/export path |
-| C-12 | Documentation consistency | Exact `1c901855...` records the P-42 recovery/evidence boundary. Exact `bdc104f77...` aligns implemented UI/procedure/error contracts; Architecture, Verification, Threat Model, Decision Register, Tracker, and this matrix now distinguish source completion from independent rendered acceptance | Passed for current checkpoint | Preserve alignment after the targeted rerun; continue excluding `files/`, `tmp/`, and `output/` from commits |
+| C-07 | One complete independent placement task | P-42 recovery Card D functionally recorded one stale rejection with zero effect and exactly one accepted UI batch/change set. Exact `bdc104f77...` corrects D01 wheel scrolling and D02 stale-user-choice disclosure while preserving DB authority | Partial | Complete Spot-check 3; retain the accepted batch/current-order evidence without replaying it |
+| C-08 | Stale-placement recovery inside the independent owner task | The prior Card D functionally passed two-tab stale rejection, fresh recovery, one accepted batch, and current-state readback. Exact `bdc104f77...` adds explicit stale-choice discard feedback | Partial | Complete Spot-check 3 without developer/SQL repair |
+| C-09 | Independent core-admin UAT | Exact `f8c6709` Cards A-G passed functionally; exact `bdc104f77...` implements/disposes P42-UAT-B01, C01/C02, D01/D02, E01, and F02. The Owner retained completed Card B-E evidence and approved proportional revalidation of only the changed surfaces | Open | Prepare one exact-source no-reset fixture; complete four Owner spot-checks and cleanup |
+| C-10 | At least three safe validation-error/prevention recoveries | Functionally passed: Card A URL-bound stale-review hard stop, Card C E-01 invalid authority and E-02 retirement hold, Card D stale placement, and Card F uncertain-response retry all produced safe recovery/zero duplicate effect. Corrected procedure/copy/error semantics are in exact `bdc104f77...` | Partial | Complete Spots 2-4; retain the prior safe-error counts and zero-write evidence |
+| C-11 | 710-row performance baseline | Retained P-36 route results remain valid. P-42 Card C client preparation and server review each completed under 1 second for 710 prepared rows/712 compared rows; Card E final review completed about 1 second for 712 rows and export verification passed. E01 wording is corrected in exact `bdc104f77...` | Partial | Complete the wording checks in Spots 1-2; preserve the existing measurements and export evidence |
+| C-12 | Documentation consistency | Exact `1c901855...` records the P-42 recovery/evidence boundary. Exact `bdc104f77...` aligns implemented UI/procedure/error contracts; Architecture, Verification, Threat Model, Decision Register, Tracker, and this matrix now distinguish source completion from independent rendered acceptance | Passed for current checkpoint | Preserve alignment after the four spot-checks; continue excluding `files/`, `tmp/`, and `output/` from commits |
 | C-13 | Disabled clean Local baseline | Separately approved recovery bootstrap restored the canonical `2568.0.0`/710 baseline. Final cleanup of session `session-p42-scored-20260719-f8c6709.json` confirmed zero working drafts, all catalog flags false, canonical hash `sha256:2e3571...`, unchanged BOQ/Factor F invariants, and Production untouched | Passed after P-42 recovery | Preserve the cleaned session; every future reset remains separately gated |
 
 ## 3. Minimal closure sequence
@@ -147,13 +150,12 @@ read-only clean-baseline check passed. Controlled post-change rendered QA was
 not claimed because that browser had no authenticated Local session and the
 clean baseline had no working draft.
 
-### C. One bounded no-reset Local owner UAT
+### C. One bounded no-reset Local owner spot-check
 
-Use Note #35 as the sole scored script. It separates developer preflight from
-Owner Cards A-G, places stale-review prevention in Card A before structured-code
-additions, names the three non-destructive recovery states, clarifies that a stale
-placement attempt must have zero effect before exactly one accepted batch, and
-defines the measurement/cleanup record.
+Use Note #35 Section 1.2 as the sole current script. It separates developer
+preflight from four Owner-visible correction checks and retains the completed
+Card B-E functional, scale, error-recovery, placement-acceptance, and export
+evidence.
 
 Before handing over the browser, use Note #36 and the tracked
 `db:local:p38:*` commands. The harness verifies inputs/baseline, never creates
@@ -162,9 +164,9 @@ or abandons an Owner draft, and keeps retirement disabled.
 The scored UAT itself does not reset Local Supabase. The separately approved
 P-42 recovery reset completed before session
 `session-p42-scored-20260719-f8c6709.json` was prepared. That run passed
-functionally but was guided/developer-assisted, so the next independent
-affected-card session remains separately prepared and does not imply another
-reset.
+functionally but was guided/developer-assisted. Prepare one fresh exact-source
+session for only the four spot-checks and cleanup; this does not imply another
+reset or another full Card B-E run.
 
 ### D. Evidence and owner decision
 

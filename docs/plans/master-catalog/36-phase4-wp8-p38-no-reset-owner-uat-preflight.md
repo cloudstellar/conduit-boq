@@ -12,8 +12,9 @@ baseline without reset. Exact P-40 checkpoint
 separate one-draft developer browser QA passed the corrected money, unit, and
 withdrawal paths and returned to pointer `2568.0.0`/710, zero working drafts,
 all flags false, BOQ 198/1,547, and Factor F `2569.0.0`/36 without reset. It is
-not scored Cards A-G evidence. The fresh scored rerun remains pending and P-37
-remains **HOLD**.
+not scored Cards A-G evidence. At that checkpoint the fresh scored rerun
+remained pending; the later P-42 functional run and proportional-revalidation
+decision below supersede that former full-rerun posture. P-37 remains **HOLD**.
 
 P-41 follows continued discovery: UAT-06 through UAT-08 corrected the
 category-key bound, retirement-disabled read-only Full preview, and
@@ -209,10 +210,11 @@ cross-layer findings now owned by P-40. Cleanup again passed pointer
 was then pushed and its separate developer browser QA passed. That QA used one
 draft (`2568.5.0-D003`), so the cleanup harness correctly restored flags and
 refused scored evidence closure because the two-attempt Card A/G contract was
-not present.
-Read-only status confirmed the disabled baseline above. Do not request P-37
-before the fresh scored Cards A-G rerun and cleanup pass and exact
-authority/repository verification is recorded.
+not present. Read-only status confirmed the disabled baseline above. At that
+checkpoint, the next requirement was a fresh scored Cards A-G run. The
+later P-42 run now supplies retained functional Card B-E evidence; current
+closure is limited to Note #35 Section 1.2 plus cleanup and exact
+authority/repository verification.
 
 ## 6. P-41 discovery correction gate
 
@@ -243,8 +245,10 @@ next scored `prepare`, require all of the following:
    evidence as a fresh scored run;
 5. **Functionally passed, strict score HOLD:** exact pushed `f8c6709` prepared
    the post-recovery P-42 session. Cards A-G passed their functional contracts,
-   but live guidance and developer-operated Cards F-G require bounded finding
-   correction/disposition and independent targeted rerun before P-37.
+   but live guidance and developer-operated Cards F-G required bounded finding
+   correction/disposition. Those source corrections now pass; the Owner retains
+   completed functional Card B-E evidence and will run only the four
+   post-correction spot-checks in Note #35 Section 1.2 plus cleanup before P-37.
 
 No Local reset is authorized by this note. Production touched: **No**.
 
@@ -269,6 +273,8 @@ The recovery precondition is complete:
    D001/D002 audited-abandoned against reusable target `2568.1.0`, no
    post-prepare reset, and no Production action.
 
-Do not reuse the cleaned session for a scored rerun. After bounded findings are
-corrected and pushed, prepare a new immutable session; the affected cards must
-remain no-reset and independently operated. Production touched: **No**.
+Do not reuse the cleaned session. After bounded findings are corrected and
+pushed, prepare one new immutable no-reset session for the four concise
+post-correction spot-checks in Note #35 Section 1.2. Completed Card B-E
+functional evidence remains valid and must not be replayed merely to obtain new
+screenshots. Production touched: **No**.

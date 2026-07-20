@@ -386,7 +386,7 @@ describe('Master Catalog authority consistency', () => {
       'First Card A was stopped and safely cleaned after the official-number-gap finding',
     )
     expect(decisions).toContain(
-      'A fresh scored Cards A-G rerun remains required before P-37',
+      'P-42 later retained completed Card B-E evidence and narrowed current closure',
     )
     expect(decisions).toContain(
       'Approved 2026-07-18 for Local-only architecture/source/migration/docs/verification',
@@ -446,7 +446,7 @@ describe('Master Catalog authority consistency', () => {
       /P-33 accepted that\s+exact bounded WP-7\.5 technical checkpoint at 2026-07-15 13:54 \+07/,
     )
     expect(tracker).toContain(
-      '| Current work package | WP-8/P-37 HOLD; P-42 recovery and bounded source corrections passed, but strict independent Owner evidence for targeted Cards B/C/D/E/F and cleanup remains open |',
+      '| Current work package | WP-8/P-37 HOLD; P-42 recovery and bounded source corrections passed; completed functional Card B-E evidence is retained, while four post-correction Owner spot-checks from Note #35 Section 1.2 and cleanup remain open |',
     )
     expect(tracker).toContain('b2500b5e6859a915bfa3f70d558934f252943f82')
     expect(tracker).toContain('f8c670901997a4e6663db7c4db1218efc03d51c6')
@@ -649,7 +649,7 @@ describe('Master Catalog authority consistency', () => {
       '| Passed for current checkpoint |',
       'one stale rejection with zero effect and exactly one accepted UI batch/change set',
       'bdc104f77f18ea8fc776950259bc25e68c2fd42a',
-      'targeted Cards B/C/D/E/F and cleanup',
+      'four post-correction Owner spot-checks',
     ]) {
       expect(p37Closure).toContain(contract)
     }
@@ -677,10 +677,11 @@ describe('Master Catalog authority consistency', () => {
     for (const contract of [
       'P-37 remains **HOLD**',
       'without live developer or SQL guidance',
-      'E-01 invalid authority',
-      'E-02 retirement hold',
-      'URL-bound stale final-review prevention',
-      'one rejected stale attempt with zero effect, then exactly one accepted UI batch/change set',
+      'Card C E-01/E-02',
+      'P-42 recovery retained one stale rejection with zero effect and exactly one accepted UI batch',
+      'Four Owner-visible correction spot-checks',
+      'do not rerun scale measurements',
+      'CATALOG_OUTCOME_UNCERTAIN',
       '**ปรับในหน้านี้ · ยังไม่บันทึก**',
       'Full 710-row client preparation plus server diff',
     ]) {
@@ -691,7 +692,7 @@ describe('Master Catalog authority consistency', () => {
     expect(p37OwnerUat).toContain('npm run db:local:p38:prepare -- --session "$P38_SESSION"')
     expect(p37OwnerUat).toContain('npm run db:local:p38:cleanup -- --session "$P38_SESSION"')
     expect(p37OwnerUat).toContain('CIC-PVC-998')
-    expect(p37OwnerUat).toContain('changing only a known mapped')
+    expect(p37OwnerUat).toContain('does not merely change a trusted mapped price')
     expect(p37OwnerUat).toMatch(/Production `2568\.0\.0`\s+remains authority/)
     expect(p37OwnerUat).toMatch(/Do not perform a\s+successful\s+publication/)
     const scoredCards = p37OwnerUat.slice(p37OwnerUat.indexOf('### Card A'))
