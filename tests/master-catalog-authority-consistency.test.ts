@@ -446,10 +446,12 @@ describe('Master Catalog authority consistency', () => {
       /P-33 accepted that\s+exact bounded WP-7\.5 technical checkpoint at 2026-07-15 13:54 \+07/,
     )
     expect(tracker).toContain(
-      '| Current work package | WP-8/P-37 HOLD; P-42 recovery and developer-assisted functional Cards A-G passed, but strict independent Owner evidence and bounded UX/procedure findings remain open |',
+      '| Current work package | WP-8/P-37 HOLD; P-42 recovery and bounded source corrections passed, but strict independent Owner evidence for targeted Cards B/C/D/E/F and cleanup remains open |',
     )
     expect(tracker).toContain('b2500b5e6859a915bfa3f70d558934f252943f82')
     expect(tracker).toContain('f8c670901997a4e6663db7c4db1218efc03d51c6')
+    expect(tracker).toContain('1c901855a32b100013fb5c9472c2e909e3dd1c59')
+    expect(tracker).toContain('bdc104f77f18ea8fc776950259bc25e68c2fd42a')
     expect(tracker).toContain(
       '| Current environment | Clean Local post-UAT baseline: pointer/default `2568.0.0`',
     )
@@ -480,6 +482,7 @@ describe('Master Catalog authority consistency', () => {
     expect(threatModel).toContain('| T-54 |')
     expect(threatModel).toContain('| T-55 |')
     expect(threatModel).toContain('| T-60 |')
+    expect(threatModel).toContain('| T-61 |')
     expect(tracker).toContain(
       '80b2574bbaccc5bb14093aa204a46fcc50ba1d5c',
     )
@@ -643,8 +646,10 @@ describe('Master Catalog authority consistency', () => {
       '| C-11 | 710-row performance baseline |',
       '| C-12 | Documentation consistency |',
       '| C-13 | Disabled clean Local baseline |',
-      '| Passed in working tree; exact evidence commit pending |',
+      '| Passed for current checkpoint |',
       'one stale rejection with zero effect and exactly one accepted UI batch/change set',
+      'bdc104f77f18ea8fc776950259bc25e68c2fd42a',
+      'targeted Cards B/C/D/E/F and cleanup',
     ]) {
       expect(p37Closure).toContain(contract)
     }

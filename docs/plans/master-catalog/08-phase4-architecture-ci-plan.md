@@ -1005,12 +1005,22 @@ migration and tests must create them.
   values visible so the operator can verify or correct the same operation. The
   form resets only after definitive success; an uncertain retry must not depend
   on the operator reconstructing the prior payload from memory.
+- A transport outcome whose commit status cannot be known uses the dedicated
+  diagnostic code `CATALOG_OUTCOME_UNCERTAIN`, preserves the same request ID,
+  and remains distinct from a definitive internal rejection. This distinction
+  changes operator recovery language only; database idempotency remains final
+  authority.
 - Every newly published structured-code row has identity, category, and code
   group mappings.
 - A draft with new identities remains unpublishable unless the P-18 extension is
   accepted and its current placement revision has an accepted DB review.
 - Placement confirmation preserves inherited base relative order and validates
   unique contiguous `display_order`; no client-only reorder is authoritative.
+- Browser-only placement choices are convenience state scoped to the exact
+  version, draft lock, and placement revision. The client records whether the
+  admin actually changed a suggestion, never replays a stale scope, and
+  explicitly reports when stale user choices are discarded. Database state and
+  the accepted placement review remain final authority.
 - K-formula fields are not written by Phase 4 Core.
 - External calls and file parsing occur before database transactions. Database
   transactions contain only validation, locking, writes, hash/count work, and
@@ -1738,6 +1748,9 @@ Proposed after P-18 acceptance:
 ### Owner-approved placement UX
 
 - Manual Add handles one or a few exceptions; Supplement remains the bulk path.
+- A successful Manual Add shows the database-allocated item code and item name
+  from the audited change effect and links directly to that item. The client
+  never predicts or allocates the code.
 - Both paths create provisional new identities in the same draft and converge on
   one pending-placement list.
 - The admin places all pending rows, reviews the affected neighborhoods, and
