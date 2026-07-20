@@ -367,7 +367,7 @@ export function MasterCatalogVersionDetailView({
                   <DropdownMenuItem asChild>
                     <Link href={`/admin/master-catalog/versions/${version.id}/print`}>
                       <Printer />
-                      PDF สำหรับอ่าน/พิมพ์
+                      เปิดหน้าพิมพ์/บันทึก PDF
                     </Link>
                   </DropdownMenuItem>
                 </DropdownMenuContent>

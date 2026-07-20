@@ -152,9 +152,12 @@ completed on exact pushed source
 Prior P-41 clean-chain evidence remains valid because P-42 changes no migration
 or DB contract. The recovery and functional run do not close P-37: live
 guidance and developer-operated Cards F-G prevent a strict independent score,
-and findings P42-UAT-B01, C01/C02, D01/D02, E01, and F02 remain open. A future
-affected-card rerun must use a new exact-source session and independent intended
-admin operation. No further reset and no Production action are authorized.
+and findings P42-UAT-B01, C01/C02, D01/D02, E01, and F02 remain open. Their
+bounded source/procedure corrections add no migration and are controlled by
+[Owner UAT Script #35](./35-phase4-wp8-p37-evidence-reconciliation-and-owner-uat-script.md#11-bounded-p-42-finding-corrections).
+A future affected-card rerun must use a new exact-source session and independent
+intended-admin operation. No further reset and no Production action are
+authorized.
 
 ## 7. Working-tree verification
 

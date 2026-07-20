@@ -14,6 +14,9 @@ export interface CatalogMutationState {
   versionStatus?: string;
   lockVersion?: number;
   changeSetId?: string;
+  createdIdentityId?: string;
+  createdItemCode?: string;
+  createdItemName?: string;
   itemCount?: number;
   datasetHash?: string;
   importId?: string;
@@ -291,7 +294,7 @@ export function createCatalogRpcTransportError(
 ): CatalogMutationState {
   return createCatalogMutationError(
     `${RPC_TRANSPORT_ERROR_MESSAGES[operation]} ผลลัพธ์อาจถูกบันทึกแล้ว กรุณาลองซ้ำด้วยรหัสคำขอเดิม`,
-    'INTERNAL_ERROR',
+    'CATALOG_OUTCOME_UNCERTAIN',
     undefined,
     { requestId, retryable: true, outcomeUncertain: true },
   );

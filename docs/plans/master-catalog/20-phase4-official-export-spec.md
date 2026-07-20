@@ -477,7 +477,8 @@ On the export screen:
   download/print;
 - group draft actions under `ส่งออกเพื่อตรวจ` and published actions under
   `ส่งออกเอกสาร`, with choices `Excel สำหรับตรวจสอบ` and
-  `PDF สำหรับอ่าน/พิมพ์`;
+  `เปิดหน้าพิมพ์/บันทึก PDF`; the latter opens the browser print view rather
+  than downloading a PDF binary directly;
 - do not imply that the generated five-sheet workbook is an import template;
   the approved import profile remains a separate input contract;
 - warn clearly when exporting an older published version, but allow it;

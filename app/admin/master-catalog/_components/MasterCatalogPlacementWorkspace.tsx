@@ -1,6 +1,13 @@
 'use client';
 
-import { useActionState, useDeferredValue, useEffect, useMemo, useRef, useState } from 'react';
+import {
+  useActionState,
+  useDeferredValue,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 import { useFormStatus } from 'react-dom';
 import { useRouter } from 'next/navigation';
 import {
@@ -68,6 +75,12 @@ import {
   type CatalogPlacementAssignment,
   type CatalogPlacementAssignmentValidity,
 } from '@/lib/master-catalog/admin/placement';
+import {
+  catalogPlacementStorageKey,
+  catalogPlacementStoragePrefix,
+  createCatalogPlacementStoragePayload,
+  parseCatalogPlacementStoragePayload,
+} from '@/lib/master-catalog/admin/placementStorage';
 import { formatCatalogDictionaryLabel } from '@/lib/master-catalog/admin/presentation';
 import { placeCatalogItemsAction } from '../actions';
 import { MasterCatalogActionErrorAlert } from './MasterCatalogActionErrorAlert';
@@ -75,7 +88,6 @@ import { useStableCatalogOperation } from './useStableCatalogOperation';
 
 const initialState: CatalogMutationState = { status: 'idle', message: '' };
 const PAGE_SIZE = 50;
-const STORAGE_SCHEMA_VERSION = 2;
 
 type PlacementReviewFilter =
   | 'attention'
@@ -120,8 +132,15 @@ export function MasterCatalogPlacementWorkspaceView({
   const leaveConfirmTriggerRef = useRef<HTMLAnchorElement | null>(null);
   const [pendingNavigationHref, setPendingNavigationHref] = useState<string | null>(null);
   const [restoredFromStorage, setRestoredFromStorage] = useState(false);
-  const [storageReady, setStorageReady] = useState(false);
-  const storageKey = `master-catalog-placement:${workspace.version.id}:${workspace.version.lockVersion}:${workspace.placementRevision}`;
+  const [discardedStalePlacementChoices, setDiscardedStalePlacementChoices] = useState(false);
+  const [readyStorageKey, setReadyStorageKey] = useState<string | null>(null);
+  const storagePrefix = catalogPlacementStoragePrefix(workspace.version.id);
+  const storageKey = catalogPlacementStorageKey(
+    workspace.version.id,
+    workspace.version.lockVersion,
+    workspace.placementRevision,
+  );
+  const storageReady = readyStorageKey === storageKey;
   const [requestIdRef, prepareOperation, preserveInput] = useStableCatalogOperation(
     state,
     `${workspace.version.id}:placement:${workspace.version.lockVersion}:${workspace.placementRevision}`,
@@ -369,29 +388,53 @@ export function MasterCatalogPlacementWorkspaceView({
     if (state.status === 'success') {
       window.sessionStorage.removeItem(storageKey);
       setRestoredFromStorage(false);
+      setDiscardedStalePlacementChoices(false);
       setConfirmOpen(false);
       router.refresh();
     }
   }, [router, state.status, storageKey]);
 
   useEffect(() => {
+    setAssignments(suggestedAssignments);
+    setRestoredFromStorage(false);
+
+    let discardedUserChoices = false;
+    for (let index = window.sessionStorage.length - 1; index >= 0; index -= 1) {
+      const candidateKey = window.sessionStorage.key(index);
+      if (!candidateKey?.startsWith(storagePrefix) || candidateKey === storageKey) continue;
+
+      const staleValue = window.sessionStorage.getItem(candidateKey);
+      if (staleValue) {
+        try {
+          const stalePayload = parseCatalogPlacementStoragePayload(
+            JSON.parse(staleValue) as unknown,
+            suggestedAssignments,
+            { requireSameScope: false },
+          );
+          discardedUserChoices ||= stalePayload?.hasUserChanges === true;
+        } catch {
+          // Invalid browser-only state is discarded below.
+        }
+      }
+      window.sessionStorage.removeItem(candidateKey);
+    }
+    setDiscardedStalePlacementChoices(discardedUserChoices);
+
     const stored = window.sessionStorage.getItem(storageKey);
     if (stored) {
       try {
-        const parsed = JSON.parse(stored) as unknown;
-        const storedAssignments = parseStoredPlacementAssignments(
-          parsed,
-          workspace.newItems.length,
+        const storedPayload = parseCatalogPlacementStoragePayload(
+          JSON.parse(stored) as unknown,
+          suggestedAssignments,
         );
-        if (storedAssignments) {
-          buildCatalogPlacementPreview(workspace.baseItems, draftItems, storedAssignments);
-          setAssignments(storedAssignments);
-          setRestoredFromStorage(storedAssignments.some((entry) => (
-            !catalogPlacementAssignmentsEqual(
-              entry,
-              suggestedAssignmentByIdentity.get(entry.identityId),
-            )
-          )));
+        if (storedPayload) {
+          buildCatalogPlacementPreview(
+            workspace.baseItems,
+            draftItems,
+            storedPayload.assignments,
+          );
+          setAssignments(storedPayload.assignments);
+          setRestoredFromStorage(storedPayload.hasUserChanges);
         } else {
           window.sessionStorage.removeItem(storageKey);
         }
@@ -399,23 +442,26 @@ export function MasterCatalogPlacementWorkspaceView({
         window.sessionStorage.removeItem(storageKey);
       }
     }
-    setStorageReady(true);
+    setReadyStorageKey(storageKey);
   }, [
     draftItems,
     storageKey,
-    suggestedAssignmentByIdentity,
+    storagePrefix,
+    suggestedAssignments,
     workspace.baseItems,
-    workspace.newItems.length,
   ]);
 
   useEffect(() => {
     if (storageReady) {
-      window.sessionStorage.setItem(storageKey, JSON.stringify({
-        schemaVersion: STORAGE_SCHEMA_VERSION,
-        assignments,
-      }));
+      window.sessionStorage.setItem(
+        storageKey,
+        JSON.stringify(createCatalogPlacementStoragePayload(
+          assignments,
+          suggestedAssignments,
+        )),
+      );
     }
-  }, [assignments, storageKey, storageReady]);
+  }, [assignments, storageKey, storageReady, suggestedAssignments]);
 
   useEffect(() => {
     if (!hasPendingLocalChanges) return undefined;
@@ -501,6 +547,18 @@ export function MasterCatalogPlacementWorkspaceView({
           <AlertDescription>
             ยืนยัน {state.newIdentityCount?.toLocaleString('th-TH') ?? workspace.newItems.length.toLocaleString('th-TH')} รายการใหม่
             และบันทึกผลกระทบ {state.affectedRows?.toLocaleString('th-TH') ?? '-'} รายการแล้ว
+          </AlertDescription>
+        </Alert>
+      ) : null}
+
+      {discardedStalePlacementChoices && state.status !== 'success' ? (
+        <Alert>
+          <CircleAlert />
+          <AlertTitle>ยกเลิกตัวเลือกเดิมที่อ้างอิงฉบับร่างเก่าแล้ว</AlertTitle>
+          <AlertDescription>
+            ฉบับร่างหรือชุดจัดตำแหน่งเปลี่ยนหลังจากเก็บตัวเลือกชั่วคราว
+            ระบบจึงไม่นำตัวเลือกเดิมมาใช้และคำนวณข้อเสนอจากข้อมูลล่าสุด
+            กรุณาตรวจตำแหน่งอีกครั้งก่อนยืนยันทั้งชุด
           </AlertDescription>
         </Alert>
       ) : null}
@@ -1201,7 +1259,18 @@ function PlacementGapCombobox({
   onValueChange: (gapIndex: number) => void;
 }) {
   const [open, setOpen] = useState(false);
+  const listRef = useRef<HTMLDivElement | null>(null);
   const gapOptions = Array.from({ length: anchors.length + 1 }, (_, index) => index);
+
+  useEffect(() => {
+    const list = listRef.current;
+    if (!open || !list) return undefined;
+
+    // The dialog locks wheel events outside its own portal; handle this nested portal locally.
+    const handleWheel = (event: WheelEvent) => scrollPlacementGapList(list, event);
+    list.addEventListener('wheel', handleWheel, { passive: false });
+    return () => list.removeEventListener('wheel', handleWheel);
+  }, [open]);
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
@@ -1226,7 +1295,7 @@ function PlacementGapCombobox({
       <PopoverContent className="w-[min(640px,calc(100vw-2rem))] p-0" align="start">
         <Command>
           <CommandInput placeholder="ค้นหารหัสหรือชื่อรายการก่อนหน้า/ถัดไป" />
-          <CommandList>
+          <CommandList ref={listRef}>
             <CommandEmpty>ไม่พบช่วงที่ตรงกับคำค้น</CommandEmpty>
             <CommandGroup>
               {gapOptions.map((optionGapIndex) => (
@@ -1254,6 +1323,28 @@ function PlacementGapCombobox({
       </PopoverContent>
     </Popover>
   );
+}
+
+function scrollPlacementGapList(list: HTMLDivElement, event: WheelEvent) {
+  if (event.deltaY === 0 || list.scrollHeight <= list.clientHeight) return;
+
+  const multiplier = event.deltaMode === 1
+    ? 16
+    : event.deltaMode === 2
+      ? list.clientHeight
+      : 1;
+  const nextScrollTop = Math.max(
+    0,
+    Math.min(
+      list.scrollHeight - list.clientHeight,
+      list.scrollTop + (event.deltaY * multiplier),
+    ),
+  );
+  if (nextScrollTop === list.scrollTop) return;
+
+  list.scrollTop = nextScrollTop;
+  event.preventDefault();
+  event.stopPropagation();
 }
 
 function PlacementPositionPreview({
@@ -1367,39 +1458,4 @@ function formatPlacementNeighbor(
   fallback: string,
 ) {
   return item ? `${item.itemCode} ${item.itemName}` : fallback;
-}
-
-function parseStoredPlacementAssignments(
-  value: unknown,
-  expectedLength: number,
-): CatalogPlacementAssignment[] | null {
-  if (
-    value
-    && typeof value === 'object'
-    && 'schemaVersion' in value
-    && value.schemaVersion === STORAGE_SCHEMA_VERSION
-    && 'assignments' in value
-    && isStoredPlacementAssignments(value.assignments, expectedLength)
-  ) {
-    return value.assignments;
-  }
-  return null;
-}
-
-function isStoredPlacementAssignments(
-  value: unknown,
-  expectedLength: number,
-): value is CatalogPlacementAssignment[] {
-  return Array.isArray(value)
-    && value.length === expectedLength
-    && value.every((entry) => (
-      entry
-      && typeof entry === 'object'
-      && typeof entry.identityId === 'string'
-      && typeof entry.categoryId === 'string'
-      && typeof entry.anchorIdentityId === 'string'
-      && (entry.relation === 'before' || entry.relation === 'after')
-      && Number.isSafeInteger(entry.batchOrder)
-      && entry.batchOrder >= 0
-    ));
 }

@@ -33,7 +33,7 @@ describe('Master Catalog P-22 operator workflow', () => {
     );
     expect(detail).toContain('ส่งออกเพื่อตรวจ');
     expect(detail).toContain('Excel สำหรับตรวจสอบ');
-    expect(detail).toContain('PDF สำหรับอ่าน/พิมพ์');
+    expect(detail).toContain('เปิดหน้าพิมพ์/บันทึก PDF');
     expect(detail).not.toContain('ส่งออก Excel');
     expect(detail).not.toContain('เผยแพร่เวอร์ชันนี้');
     expect(detail).toContain('<MasterCatalogDraftAbandonPanel');
@@ -170,6 +170,11 @@ describe('Master Catalog P-22 operator workflow', () => {
     expect(navigation).toContain('parsed.pathname !== `${fallback}/review`');
     expect(actions).toContain('redirect(catalogWithdrawSuccessHref(');
     expect(workspace).toContain('ถอนรายการใหม่ออกจากฉบับร่างแล้ว');
+    expect(actions).toContain(".from('catalog_change_items')");
+    expect(actions).toContain('createdIdentityId');
+    expect(workspace).toContain('รหัสที่ระบบจัดสรร');
+    expect(workspace).toContain('เปิดรายการนี้');
+    expect(workspace).toContain('createdItemHref={createdItemHref}');
   });
 
   it('keeps compound and high-volume final review scan-friendly', () => {
@@ -246,11 +251,18 @@ describe('Master Catalog P-22 operator workflow', () => {
     const placementWorkspace = source(
       'app/admin/master-catalog/_components/MasterCatalogPlacementWorkspace.tsx',
     );
+    const placementStorage = source(
+      'lib/master-catalog/admin/placementStorage.ts',
+    );
 
-    expect(placementWorkspace).toContain('const STORAGE_SCHEMA_VERSION = 2');
+    expect(placementStorage).toContain('CATALOG_PLACEMENT_STORAGE_SCHEMA_VERSION = 3');
+    expect(placementStorage).toContain('hasUserChanges');
+    expect(placementWorkspace).toContain('const storageReady = readyStorageKey === storageKey');
     expect(placementWorkspace).toContain("window.addEventListener('beforeunload'");
     expect(placementWorkspace).toContain("document.addEventListener('click', guardSameOriginNavigation, true)");
     expect(placementWorkspace).toContain('กู้คืนตัวเลือกที่ยังไม่ยืนยันแล้ว');
+    expect(placementWorkspace).toContain('ยกเลิกตัวเลือกเดิมที่อ้างอิงฉบับร่างเก่าแล้ว');
+    expect(placementWorkspace).toContain('setDiscardedStalePlacementChoices');
     expect(placementWorkspace).toContain('restoredFromStorage && hasPendingLocalChanges');
     expect(placementWorkspace).toContain('setRestoredFromStorage(false)');
     expect(placementWorkspace).toContain('ต้องแก้');
@@ -258,6 +270,8 @@ describe('Master Catalog P-22 operator workflow', () => {
     expect(placementWorkspace).toContain('ข้อมูลยังไม่ครบ');
     expect(placementWorkspace).toContain('ตำแหน่งไม่ถูกต้อง');
     expect(placementWorkspace).toContain('function PlacementGapCombobox');
+    expect(placementWorkspace).toContain("list.addEventListener('wheel', handleWheel, { passive: false })");
+    expect(placementWorkspace).toContain('list.scrollTop = nextScrollTop');
     expect(placementWorkspace).toContain('role="combobox"');
     expect(placementWorkspace).toContain('ช่วงที่จะวางรายการนี้');
     expect(placementWorkspace).toContain('ใช้ตำแหน่งนี้');

@@ -18,9 +18,10 @@ against the same unissued target `2568.1.0`. Cleanup passed with pointer
 `2568.0.0`/710, canonical hash
 `sha256:2e3571ea7135fbc0bbb84c8cc330af1173e4c1d2345e5eb59958dc76e45558b8`,
 zero working drafts, all three catalog flags `false`, unchanged BOQ/Factor F
-invariants, no post-prepare reset, and no Production action. Findings
-P42-UAT-B01, C01/C02, D01/D02, E01, and F02 require bounded correction or
-explicit disposition before an independent targeted rerun. See
+invariants, no post-prepare reset, and no Production action. Bounded source and
+procedure corrections for findings P42-UAT-B01, C01/C02, D01/D02, E01, and
+F02 are recorded in Section 1.1; the findings remain open until an independent
+targeted rerun confirms the rendered behavior. See
 [Preflight Note #36](./36-phase4-wp8-p38-no-reset-owner-uat-preflight.md) and
 [Incident Note #38](./38-phase4-p42-final-review-snapshot-binding-incident-note.md).
 The untracked consolidated evidence index is
@@ -68,7 +69,8 @@ not gate closure. It found:
 - UAT-06: `categoryCode` was treated as a short code even though the versioned
   authority dictionary uses full labels (current Local maximum 96 characters).
 - UAT-07: a Full preview with retirement effects failed while retirement was
-  disabled instead of returning a complete read-only diff with Apply hidden.
+  disabled instead of returning a complete read-only diff with
+  **ยืนยันและบันทึกลงฉบับร่าง** hidden.
 - UAT-08: withdrawing a draft-only row left a `display_order` gap; the client
   masked it by resequencing while the database placement guard correctly
   rejected the batch.
@@ -92,6 +94,28 @@ a mismatched old tab without diff/publish controls, preserves lock context on
 return, restricts stale-base wording to drafts, and renders terminal review as
 read-only history. The DB stale-lock guard remains final authority; the Owner
 script no longer asks a user to submit a request already known to be stale.
+
+### 1.1 Bounded P-42 finding corrections
+
+The following corrections stay inside the existing Phase 4 architecture and
+add no migration, capability, Production action, or new business workflow.
+They require a fresh independent rerun of only the affected cards before the
+findings can close.
+
+| Finding | Bounded correction | Gate state |
+|---|---|---|
+| `P42-UAT-B01` | After a successful manual add, the server action reads the audited `catalog_change_items` add snapshot and returns the allocated code/identity for a direct item link; allocation remains database-owned and the current list context is preserved | Implemented; targeted Owner rerun pending |
+| `P42-UAT-C01` | Card C now names **เตรียมรายการตรวจสอบ** as browser-only preparation and **ให้เซิร์ฟเวอร์ตรวจผลต่าง** as the point where server authority/retirement rules run | Procedure corrected; targeted Owner rerun pending |
+| `P42-UAT-C02` | Owner-facing instructions use the visible Thai action **ยืนยันและบันทึกลงฉบับร่าง** and no longer use “Apply” | Procedure corrected; targeted Owner rerun pending |
+| `P42-UAT-D01` | The insertion-gap list handles wheel/trackpad movement on its actual scroll container before modal body-scroll containment consumes the event; scrollbar dragging and keyboard behavior remain unchanged | Implemented; rendered interaction rerun pending |
+| `P42-UAT-D02` | Browser-only placement storage is schema 3, records whether the admin actually changed a suggestion, discards stale lock/revision keys, and shows an explicit warning before any fresh confirmation | Implemented; stale-recovery rerun pending |
+| `P42-UAT-E01` | The export menu says **เปิดหน้าพิมพ์/บันทึก PDF**, matching the browser print/save-PDF behavior | Implemented; targeted Owner rerun pending |
+| `P42-UAT-F02` | Uncertain transport outcomes use diagnostic code `CATALOG_OUTCOME_UNCERTAIN` while retaining the same request ID and replay-safe input | Implemented; response-loss rerun pending |
+
+The added-code confirmation is presentation enrichment from the immutable
+audit effect; failure of that follow-up read cannot reverse or duplicate the
+already committed mutation. Placement recovery remains session storage only,
+and database lock/revision checks remain the final authority.
 
 ## 2. Retained evidence manifest
 
@@ -162,8 +186,9 @@ Run this section before handing the browser to the Owner.
    - E-02, a Local-only derivative with at least the exact retirement-threshold
      number of mapped identities omitted;
    - one official review-export workbook for the optional wrong-profile check.
-7. Mark every derivative `LOCAL-UAT-ONLY-NOT-AUTHORITY`; never apply E-01 or
-   E-02. Record file SHA-256 values and the expected diagnostic before use.
+7. Mark every derivative `LOCAL-UAT-ONLY-NOT-AUTHORITY`; never click
+   **ยืนยันและบันทึกลงฉบับร่าง** for E-01 or E-02. Record file SHA-256 values
+   and the expected diagnostic before use.
    The exact recipes/hashes and compatibility verification are controlled by
    [Preflight Note #36](./36-phase4-wp8-p38-no-reset-owner-uat-preflight.md).
    `verify-inputs` must execute the application's workbook adapter and
@@ -239,27 +264,34 @@ retired/deleted, and the surviving draft order remains contiguous.
    the official review-export workbook and confirm the Thai wrong-profile
    message explains that review export is not an import template.
 2. Select the approved Full input. Explain **ครบทั้งบัญชี** versus
-   **เฉพาะรายการเพิ่มเติม**, then prepare and ask the server to review the
-   complete diff. Record client-prepare and server-review elapsed time, total,
+   **เฉพาะรายการเพิ่มเติม**. Click **เตรียมรายการตรวจสอบ** first; this reads
+   and normalizes the file in the browser and does not yet test it against the
+   draft. After preparation succeeds, click **ให้เซิร์ฟเวอร์ตรวจผลต่าง**;
+   server-side authority, retirement, and draft rules are evaluated only at
+   this step. Record browser-prepare and server-review elapsed time, total,
    add/update/recode/retire/unchanged/omission counts, authority-field count,
    and source/payload hashes. The two Local-only identities added in Card B are
    intentionally absent from the 710-row authority payload and must therefore
    be visible as draft-only Full-import retire/omission candidates. The one
    inherited edit used for E-03 must also be visible as a reconciliation
-   candidate. Do not apply the import.
+   candidate. Do not click **ยืนยันและบันทึกลงฉบับร่าง**.
 3. E-01: select the invalid-authority derivative with no authority reference.
    It replaces mapped `CIC-PVC-001` with unmapped Local candidate
    `CIC-PVC-998`; it does not merely change a trusted mapped price. Record the
    Thai `IMPORT_PRICE_AUTHORITY_REQUIRED` rejection and zero-write state. Add
-   the clearly Local-only authority reference, rerun server review, confirm
-   that retirement remains disabled and Apply is unavailable, then stop.
+   the clearly Local-only authority reference, click
+   **เตรียมรายการตรวจสอบ** again and then **ให้เซิร์ฟเวอร์ตรวจผลต่าง**.
+   Confirm that retirement remains disabled and
+   **ยืนยันและบันทึกลงฉบับร่าง** is unavailable, then stop.
 4. E-02: select the retirement-hold derivative with no retirement approval or
    confirmed count. It omits 15 frozen-mapped rows; after Card B the expected
    server count is 17 because the two remaining Local-only identities are also
    absent. Record the Thai rejection and zero-write state. Enter the exact
-   count displayed by the server plus Local-only approval reference, rerun
-   validation, and confirm Apply remains unavailable for this UAT.
-5. Return to the draft workspace without applying any import.
+   count displayed by the server plus Local-only approval reference, click
+   **เตรียมรายการตรวจสอบ** again and then **ให้เซิร์ฟเวอร์ตรวจผลต่าง**.
+   Confirm **ยืนยันและบันทึกลงฉบับร่าง** remains unavailable for this UAT.
+5. Return to the draft workspace without clicking
+   **ยืนยันและบันทึกลงฉบับร่าง**.
 
 Pass: the Owner can explain source authority, Full/Supplement, omissions,
 price authority, and dataset-versus-file hash; E-01/E-02 each show a durable

@@ -266,14 +266,14 @@ The contextual import page must:
 - show draft/base context without a second draft selector;
 - label the source as an approved input workbook, not an exported workbook;
 - show three ordered states: select file/evidence, server-review the complete
-  diff, then confirm apply;
-- return to the same draft workspace after a successful apply and show a
-  visible success result; and
+  diff, then select **ยืนยันและบันทึกลงฉบับร่าง**;
+- return to the same draft workspace after a successful save and show a visible
+  success result; and
 - preserve all existing authority, expected-lock, idempotency, stale-base, and
   server-validation controls.
 
 Draft exports must be grouped under `ส่งออกเพื่อตรวจ` with distinct
-`Excel สำหรับตรวจสอบ` and `PDF สำหรับอ่าน/พิมพ์` choices. The UI must not imply
+`Excel สำหรับตรวจสอบ` and `เปิดหน้าพิมพ์/บันทึก PDF` choices. The UI must not imply
 that the official/review Excel workbook is an import template. A future
 round-trip bulk editor requires a separately versioned parser/conflict contract
 and owner decision.

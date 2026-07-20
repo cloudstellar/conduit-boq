@@ -291,6 +291,13 @@ export function MasterCatalogVersionWorkspace({
           categories={categories}
           codeGroups={codeGroups}
           unitOptions={unitOptions}
+          itemHrefContext={{
+            query,
+            status,
+            categoryId,
+            codeGroupId,
+            page: safePage,
+          }}
         />
       ) : null}
     </>
@@ -330,11 +337,19 @@ function CatalogAddItemForm({
   categories,
   codeGroups,
   unitOptions,
+  itemHrefContext,
 }: {
   version: { id: string; lockVersion: number };
   categories: CatalogCategoryOption[];
   codeGroups: CatalogCodeGroupOption[];
   unitOptions: string[];
+  itemHrefContext: {
+    query: string;
+    status: string;
+    categoryId: string;
+    codeGroupId: string;
+    page: number;
+  };
 }) {
   const [state, formAction] = useActionState(applyCatalogManualChangeAction, initialState);
   const [categoryId, setCategoryId] = useState(categories[0]?.id ?? '');
@@ -349,6 +364,13 @@ function CatalogAddItemForm({
     `${version.id}:add`,
   );
   const router = useRouter();
+  const createdItemHref = state.createdIdentityId
+    ? workspaceItemHref({
+        versionId: version.id,
+        identityId: state.createdIdentityId,
+        ...itemHrefContext,
+      })
+    : null;
 
   useEffect(() => {
     if (state.status === 'success') router.refresh();
@@ -390,7 +412,7 @@ function CatalogAddItemForm({
           <input type="hidden" name="categoryId" value={categoryId} />
           <input type="hidden" name="codeGroupId" value={codeGroupId} />
           <input type="hidden" name="unitCost" value={unitCost} />
-          <MutationStateAlert state={state} />
+          <MutationStateAlert state={state} createdItemHref={createdItemHref} />
           <div className="grid gap-4 md:grid-cols-2">
             <div className="grid gap-2 md:col-span-2">
               <Label htmlFor="add-item-name">ชื่อรายการ</Label>
@@ -514,14 +536,39 @@ function SubmitButton({ label }: { label: string }) {
   );
 }
 
-function MutationStateAlert({ state }: { state: CatalogMutationState }) {
+function MutationStateAlert({
+  state,
+  createdItemHref,
+}: {
+  state: CatalogMutationState;
+  createdItemHref: string | null;
+}) {
   if (state.status === 'idle') return null;
   if (state.status === 'error') return <MasterCatalogActionErrorAlert state={state} />;
   return (
     <Alert aria-live="polite">
       <CheckCircle2 />
       <AlertTitle>บันทึกฉบับร่างแล้ว</AlertTitle>
-      <AlertDescription>{state.message}</AlertDescription>
+      <AlertDescription className="grid gap-2">
+        <span>{state.message}</span>
+        {state.createdItemCode ? (
+          <div className="flex flex-wrap items-center gap-2">
+            <span>
+              รหัสที่ระบบจัดสรร{' '}
+              <strong className="font-mono text-foreground">{state.createdItemCode}</strong>
+              {state.createdItemName ? ` · ${state.createdItemName}` : ''}
+            </span>
+            {createdItemHref ? (
+              <Button asChild size="sm" variant="outline">
+                <Link href={createdItemHref}>
+                  เปิดรายการนี้
+                  <ChevronRight data-icon="inline-end" />
+                </Link>
+              </Button>
+            ) : null}
+          </div>
+        ) : null}
+      </AlertDescription>
     </Alert>
   );
 }

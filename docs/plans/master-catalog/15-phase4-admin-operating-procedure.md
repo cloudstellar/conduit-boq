@@ -306,19 +306,24 @@ bulk editor requires a separate owner-approved contract.
 
 Every Full-import omission is shown. If retirements reach
 `max(10, ceil(2% of active base))`—15 rows for the current 710-row
-baseline—obtain an owner approval reference for the exact count before apply.
+baseline—obtain an owner approval reference for the exact count before selecting
+**ยืนยันและบันทึกลงฉบับร่าง**.
 
 ### Parse and preview
 
 1. Select the local `.xlsx`; the raw file stays in the browser.
-2. Wait for sheet/header/profile and source hash validation.
+2. Select **เตรียมรายการตรวจสอบ** and wait for sheet/header/profile and source
+   hash validation. This step runs in the browser and does not yet check the
+   candidate against the draft.
 3. Enter physical archive reference and reason.
-4. Review the complete server-recomputed row diff, not only browser summary
+4. Select **ให้เซิร์ฟเวอร์ตรวจผลต่าง**. Review the complete server-recomputed
+   row diff, not only browser summary
    counts. Confirm add/update/recode/retire/unchanged rows and every exact Full
    omission.
 5. Filter errors, warnings, price differences, adds, retires, and recodes.
 6. Review publication holds for new-identity placement and retired-row PDF
-   policy before applying; the UI must not present apply as publication-ready.
+   policy before saving; the UI must not present a draft save as
+   publication-ready.
 7. For approved new rows, enter the real batch price-authority reference and
    any explicit row override where the evidence differs.
 8. Resolve every blocking row.
@@ -327,20 +332,21 @@ Browser validation is only a preview. The server revalidates the submitted
 normalized data. Browser-only preview creates no import record; server
 validation records `validated` or `rejected`.
 
-### Apply
+### Confirm and save to the draft
 
 1. Confirm expected draft and lock version.
 2. When the mass-retirement threshold is reached, type the exact count and
    enter the owner approval reference.
-3. Apply once. The system resubmits the normalized payload for server hash
-   comparison; the raw workbook still stays local and is not uploaded.
-4. The screen creates and retains one apply operation ID; the validated import
+3. Select **ยืนยันและบันทึกลงฉบับร่าง** once. The system resubmits the
+   normalized payload for server hash comparison; the raw workbook still stays
+   local and is not uploaded.
+4. The screen creates and retains one save operation ID; the validated import
    transitions once to `applied`.
 5. If the result is uncertain, confirm that the submitted editable values remain
    visible, then refresh import/change history before retrying. Retry the same
-   intended apply with the same operation ID so the prior result is returned.
+   intended save with the same operation ID so the prior result is returned.
    Do not reconstruct the payload from memory or start a new operation ID until
-   the prior result is known or the operator explicitly begins a different apply.
+   the prior result is known or the operator explicitly begins a different save.
 6. After success, return to the same draft workspace and confirm the success
    notice, created change set, item histories, and incremented draft revision.
 
@@ -445,7 +451,8 @@ the pointer moves atomically. Do not attempt to edit it.
 
 1. Open the published version, not merely “current.”
 2. Choose **ส่งออกเอกสาร → Excel สำหรับตรวจสอบ** or
-   **PDF สำหรับอ่าน/พิมพ์**. On a draft the equivalent menu is
+   **เปิดหน้าพิมพ์/บันทึก PDF**. The PDF choice opens the browser print view;
+   print or save the file from that view. On a draft the equivalent menu is
    **ส่งออกเพื่อตรวจ** and every artifact remains non-official.
 3. Verify the field-facing PDF cover includes only organization,
    `ฉบับบัญชีราคา`, Thai status, effective date, item count, and full dataset

@@ -74,8 +74,8 @@ to the source. The parser must classify it as `candidate_add`, and the server
 must reject the first review without an authority reference. After the Owner
 enters `LOCAL-UAT-ONLY-NOT-AUTHORITY`, the server may review the diff, but the
 missing original identity plus the two Card B identities are retirement
-candidates. Retirement remains disabled, so the Apply action must stay
-unavailable.
+candidates. Retirement remains disabled, so
+**ยืนยันและบันทึกลงฉบับร่าง** must stay unavailable.
 
 E-02 removes exactly 15 frozen-mapped workbook rows. After Card B leaves two
 Local-only identities in the draft, the expected Full-import omission count is
@@ -90,8 +90,8 @@ release artifact.
 | Input | Rows | SHA-256 | Intended safe result |
 |---|---:|---|---|
 | `files/NT_Item_Code_Master_K_Mapping_2568.xlsx` | 708 raw; 710 after frozen supplemental context | `ae72ac34caf37aeb024e15b0b7462f21ca34987aac448a07bde4d69f7e92ec3b` | Approved Full source; Production `2568.0.0` still owns names, units, and prices |
-| E-01 `LOCAL-UAT-ONLY-NOT-AUTHORITY-E01-invalid-authority.xlsx` | 708 | `86eb347d2b1601a531d4f001cd31e556200f33228a11585bcfd516030e099eed` | First server review returns `IMPORT_PRICE_AUTHORITY_REQUIRED`; recovery review only; never Apply |
-| E-02 `LOCAL-UAT-ONLY-NOT-AUTHORITY-E02-retirement-hold.xlsx` | 693 | `089393094b6bd5f46e1709acb5658a325deb99ec7824bb728ae43d0b035cd114` | First server review returns `IMPORT_RETIREMENT_APPROVAL_REQUIRED`; recovery review only; never Apply |
+| E-01 `LOCAL-UAT-ONLY-NOT-AUTHORITY-E01-invalid-authority.xlsx` | 708 | `86eb347d2b1601a531d4f001cd31e556200f33228a11585bcfd516030e099eed` | First **ให้เซิร์ฟเวอร์ตรวจผลต่าง** returns `IMPORT_PRICE_AUTHORITY_REQUIRED`; recovery review only; never click **ยืนยันและบันทึกลงฉบับร่าง** |
+| E-02 `LOCAL-UAT-ONLY-NOT-AUTHORITY-E02-retirement-hold.xlsx` | 693 | `089393094b6bd5f46e1709acb5658a325deb99ec7824bb728ae43d0b035cd114` | First **ให้เซิร์ฟเวอร์ตรวจผลต่าง** returns `IMPORT_RETIREMENT_APPROVAL_REQUIRED`; recovery review only; never click **ยืนยันและบันทึกลงฉบับร่าง** |
 | `workbooks-ready/manifest.json` | N/A | `1296f1056f6c1cd768b23c5ac3e6c00462dce018c3bb7710f62c067ee0e63b92` | Tracked harness pins this manifest plus the source, frozen authority file/content, recipes, row counts, and derivative binary hashes |
 
 The frozen authority remains 710 mappings, 65 code groups, and 17 source

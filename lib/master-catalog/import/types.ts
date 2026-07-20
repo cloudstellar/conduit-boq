@@ -23,6 +23,7 @@ export type CatalogErrorCode =
   | 'PUBLISH_EVIDENCE_REQUIRED'
   | 'PUBLISH_VALIDATION_FAILED'
   | 'EXPORT_HASH_MISMATCH'
+  | 'CATALOG_OUTCOME_UNCERTAIN'
   | 'INTERNAL_ERROR'
 
 export type CanonicalImportField =

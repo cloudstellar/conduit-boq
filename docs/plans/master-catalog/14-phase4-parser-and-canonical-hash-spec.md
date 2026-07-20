@@ -350,6 +350,7 @@ Required stable codes:
 | `PUBLISH_EVIDENCE_REQUIRED` | Approval metadata incomplete | No |
 | `PUBLISH_VALIDATION_FAILED` | Database publish invariant failed | No |
 | `EXPORT_HASH_MISMATCH` | Generated export does not match DB | Yes after investigation |
+| `CATALOG_OUTCOME_UNCERTAIN` | The transport response was lost after a mutation may have reached the database; preserve input and retry only with the same request ID | Yes, same request ID only |
 | `INTERNAL_ERROR` | Unexpected failure; no sensitive details | Yes |
 
 Log technical context server-side with request ID. User messages must not expose

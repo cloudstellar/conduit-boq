@@ -423,7 +423,7 @@ describe('Master Catalog admin action model', () => {
 
     expect(createCatalogRpcTransportError('previewCatalogImport', REQUEST_ID)).toMatchObject({
       status: 'error',
-      code: 'INTERNAL_ERROR',
+      code: 'CATALOG_OUTCOME_UNCERTAIN',
       message: expect.stringContaining('ผลลัพธ์อาจถูกบันทึกแล้ว'),
       requestId: REQUEST_ID,
       retryable: true,
@@ -432,7 +432,7 @@ describe('Master Catalog admin action model', () => {
 
     expect(createCatalogRpcTransportError('publishCatalogVersion', REQUEST_ID)).toMatchObject({
       status: 'error',
-      code: 'INTERNAL_ERROR',
+      code: 'CATALOG_OUTCOME_UNCERTAIN',
       message: expect.stringContaining('ผลลัพธ์อาจถูกบันทึกแล้ว'),
       requestId: REQUEST_ID,
       outcomeUncertain: true,
@@ -440,7 +440,7 @@ describe('Master Catalog admin action model', () => {
 
     expect(createCatalogRpcTransportError('abandonCatalogDraft', REQUEST_ID)).toMatchObject({
       status: 'error',
-      code: 'INTERNAL_ERROR',
+      code: 'CATALOG_OUTCOME_UNCERTAIN',
       message: expect.stringContaining('ยกเลิกฉบับร่างไม่สำเร็จ'),
       requestId: REQUEST_ID,
       outcomeUncertain: true,

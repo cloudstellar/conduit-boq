@@ -254,10 +254,37 @@ export async function applyCatalogManualChangeAction(
     });
   }
 
-  const result = mapCatalogRpcActionResponse(
+  let result = mapCatalogRpcActionResponse(
     data as CatalogRpcActionResponse,
     'บันทึกการเปลี่ยนแปลงในฉบับร่างแล้ว',
   );
+
+  if (
+    result.status === 'success'
+    && formData.get('action') === 'add'
+    && result.changeSetId
+  ) {
+    const { data: createdItem } = await supabase
+      .from('catalog_change_items')
+      .select('identity_id,new_values')
+      .eq('change_set_id', result.changeSetId)
+      .eq('action', 'add')
+      .limit(1)
+      .maybeSingle();
+    const newValues = readActionRecord(createdItem?.new_values);
+    const createdIdentityId = readActionString(createdItem?.identity_id);
+    const createdItemCode = readActionString(newValues?.itemCode);
+    const createdItemName = readActionString(newValues?.itemName);
+
+    if (createdIdentityId && createdItemCode) {
+      result = {
+        ...result,
+        createdIdentityId,
+        createdItemCode,
+        createdItemName: createdItemName ?? undefined,
+      };
+    }
+  }
   logMasterCatalogOperation({
     operation: 'applyCatalogManualChange',
     outcome: result.status === 'success' ? 'success' : 'rejected',
@@ -824,4 +851,14 @@ function mapRpcTransportError(
   });
 
   return createCatalogRpcTransportError(operation, requestId);
+}
+
+function readActionRecord(value: unknown): Record<string, unknown> | null {
+  return value !== null && typeof value === 'object' && !Array.isArray(value)
+    ? value as Record<string, unknown>
+    : null;
+}
+
+function readActionString(value: unknown): string | null {
+  return typeof value === 'string' && value.trim() ? value.trim() : null;
 }
