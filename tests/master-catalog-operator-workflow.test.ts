@@ -221,6 +221,20 @@ describe('Master Catalog P-22 operator workflow', () => {
     expect(importPanel).toContain('aria-label="หน้าถัดไป"');
   });
 
+  it('keeps overview activity inside its narrow rail', () => {
+    const adminViews = source(
+      'app/admin/master-catalog/_components/MasterCatalogAdminViews.tsx',
+    );
+    const table = source('components/ui/table.tsx');
+
+    expect(adminViews).toContain('<Card className="min-w-0">');
+    expect(adminViews).toContain('<CardContent className="grid min-w-0 gap-5">');
+    expect(adminViews).toContain('<ul className="min-w-0 divide-y rounded-md border">');
+    expect(adminViews).toContain('className="break-all text-sm font-medium leading-5"');
+    expect(adminViews).toContain('className="break-words text-sm font-medium leading-5"');
+    expect(table).toContain('className="relative w-full overflow-x-auto"');
+  });
+
   it('keeps accepted placement status distinct from a new pending change', () => {
     const placementWorkspace = source(
       'app/admin/master-catalog/_components/MasterCatalogPlacementWorkspace.tsx',

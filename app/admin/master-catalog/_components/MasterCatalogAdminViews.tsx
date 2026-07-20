@@ -214,12 +214,12 @@ export function MasterCatalogOverviewView({
 
       <div className="grid gap-4 xl:grid-cols-[minmax(0,1fr)_380px]">
         <VersionTable versions={overview.versions.slice(0, 8)} />
-        <Card>
+        <Card className="min-w-0">
           <CardHeader>
             <CardTitle>รายการล่าสุด</CardTitle>
             <CardDescription>การนำเข้าและการเปลี่ยนแปลงล่าสุด</CardDescription>
           </CardHeader>
-          <CardContent className="grid gap-5">
+          <CardContent className="grid min-w-0 gap-5">
             <RecentImports imports={overview.recentImports} compact />
             <RecentChangeSets changeSets={overview.recentChangeSets} compact />
           </CardContent>
@@ -991,7 +991,7 @@ function RecentImports({
 }) {
   if (compact) {
     return (
-      <section className="grid gap-3">
+      <section className="grid min-w-0 gap-3">
         <div>
           <h2 className="flex items-center gap-2 text-base font-semibold">
             <FileSpreadsheet className="size-4" />
@@ -1029,7 +1029,7 @@ function RecentChangeSets({
 }) {
   if (compact) {
     return (
-      <section className="grid gap-3">
+      <section className="grid min-w-0 gap-3">
         <div>
           <h2 className="flex items-center gap-2 text-base font-semibold">
             <History className="size-4" />
@@ -1069,14 +1069,41 @@ function ImportRows({
     return <p className="text-sm text-muted-foreground">ยังไม่มีชุดการนำเข้า</p>;
   }
 
+  if (compact) {
+    return (
+      <ul className="min-w-0 divide-y rounded-md border">
+        {imports.map((item) => (
+          <li key={item.id} className="grid min-w-0 gap-2 p-3">
+            <p className="break-all text-sm font-medium leading-5">{item.sourceFilename}</p>
+            <Badge
+              variant={item.status === 'rejected' ? 'destructive' : 'secondary'}
+              className="max-w-full whitespace-normal text-left"
+            >
+              {importStatusLabel(item.status)}
+            </Badge>
+            {item.errorSummary ? (
+              <p className="break-words text-xs text-destructive">{item.errorSummary}</p>
+            ) : null}
+            <div className="flex flex-wrap gap-x-3 gap-y-1 text-xs text-muted-foreground">
+              <span>
+                {importModeLabel(item.mode)} · {formatThaiNumber(item.sourceFileSize)} ไบต์
+              </span>
+              <span>{formatThaiDateTime(item.createdAt)}</span>
+            </div>
+          </li>
+        ))}
+      </ul>
+    );
+  }
+
   return (
     <Table>
       <TableHeader>
         <TableRow>
           <TableHead>ไฟล์</TableHead>
           <TableHead>สถานะ</TableHead>
-          {!compact ? <TableHead>ค่าแฮชไฟล์</TableHead> : null}
-          {!compact ? <TableHead>ที่เก็บไฟล์ต้นฉบับ</TableHead> : null}
+          <TableHead>ค่าแฮชไฟล์</TableHead>
+          <TableHead>ที่เก็บไฟล์ต้นฉบับ</TableHead>
           <TableHead>สร้างเมื่อ</TableHead>
         </TableRow>
       </TableHeader>
@@ -1097,16 +1124,12 @@ function ImportRows({
                 <div className="mt-1 max-w-[240px] text-xs text-destructive">{item.errorSummary}</div>
               ) : null}
             </TableCell>
-            {!compact ? (
-              <TableCell className="font-mono text-xs">{shortHash(item.sourceFileSha256)}</TableCell>
-            ) : null}
-            {!compact ? (
-              <TableCell>
-                <div className="max-w-[260px] break-words text-xs">
-                  {item.physicalArchiveReference ?? '-'}
-                </div>
-              </TableCell>
-            ) : null}
+            <TableCell className="font-mono text-xs">{shortHash(item.sourceFileSha256)}</TableCell>
+            <TableCell>
+              <div className="max-w-[260px] break-words text-xs">
+                {item.physicalArchiveReference ?? '-'}
+              </div>
+            </TableCell>
             <TableCell>{formatThaiDateTime(item.createdAt)}</TableCell>
           </TableRow>
         ))}
@@ -1126,13 +1149,44 @@ function ChangeSetRows({
     return <p className="text-sm text-muted-foreground">ยังไม่มีชุดการเปลี่ยนแปลง</p>;
   }
 
+  if (compact) {
+    return (
+      <ul className="min-w-0 divide-y rounded-md border">
+        {changeSets.map((item) => (
+          <li key={item.id} className="grid min-w-0 gap-2 p-3">
+            <Badge variant="outline" className="max-w-full whitespace-normal text-left">
+              {changeTypeLabel(item.changeType)}
+            </Badge>
+            <p className="break-words text-sm font-medium leading-5">{item.reason}</p>
+            <div className="flex flex-wrap gap-x-3 gap-y-1 text-xs text-muted-foreground">
+              <span>
+                รุ่นแก้ไข {item.beforeLockVersion ?? '-'} → {item.afterLockVersion ?? '-'}
+              </span>
+              <span>{formatThaiDateTime(item.createdAt)}</span>
+            </div>
+            {item.pointerBeforeVersionId && item.pointerAfterVersionId ? (
+              <p className="text-xs text-muted-foreground">
+                บันทึกเวอร์ชันใช้งานก่อนและหลังไว้ในหลักฐานแล้ว
+              </p>
+            ) : null}
+            {item.draftEffect ? (
+              <p className="text-xs text-muted-foreground">
+                {draftEffectLabel(item.draftEffect)}
+              </p>
+            ) : null}
+          </li>
+        ))}
+      </ul>
+    );
+  }
+
   return (
     <Table>
       <TableHeader>
         <TableRow>
           <TableHead>ประเภท</TableHead>
           <TableHead>เหตุผล</TableHead>
-          {!compact ? <TableHead>ผู้ดำเนินการ</TableHead> : null}
+          <TableHead>ผู้ดำเนินการ</TableHead>
           <TableHead>สร้างเมื่อ</TableHead>
         </TableRow>
       </TableHeader>
@@ -1158,7 +1212,7 @@ function ChangeSetRows({
                 </div>
               ) : null}
             </TableCell>
-            {!compact ? <TableCell>{item.actorDisplayName}</TableCell> : null}
+            <TableCell>{item.actorDisplayName}</TableCell>
             <TableCell>{formatThaiDateTime(item.createdAt)}</TableCell>
           </TableRow>
         ))}
