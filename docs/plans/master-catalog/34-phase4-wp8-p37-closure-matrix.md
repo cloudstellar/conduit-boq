@@ -54,7 +54,14 @@ final-review URL allowed an old-looking tab to use the current lock, Local
 the false draft-only warning **อ้างอิงเวอร์ชันฐานเก่า**. Audit/gateway evidence
 shows one current-lock publication, not a DB guard bypass. Cards B-G did not
 continue. [Incident Note #38](./38-phase4-p42-final-review-snapshot-binding-incident-note.md)
-owns the source/UAT correction and separately approved clean-recovery gate.
+owns the source/UAT correction. The Owner subsequently approved the warned
+clean recovery. Exact pushed source `f8c6709` restored `2568.0.0`/710 and
+prepared a new immutable session. Cards A-G all passed functionally, but live
+guidance and developer-operated Cards F-G mean the run is not strict
+independent Owner evidence. D001/D002 were audited-abandoned and cleanup
+restored zero drafts/all flags false. P-37 therefore remains HOLD while bounded
+UX/procedure findings are corrected or explicitly disposed and affected cards
+are independently rerun.
 
 ## 1. Why this matrix exists
 
@@ -85,15 +92,15 @@ Local cleanup.
 | C-02 | DB/RLS/role/rollback/race/idempotency/P-20/BOQ/Factor F invariants | Clean WP-6.5/WP-6.6/WP-7/WP-7.5 passed trigger inventory, post-withdraw `0..N-1`, relative order, exactly-one revision, rollback/race/replay, role/RLS, pointer, BOQ, Factor F, suffix, and no-Production assertions; evidence SHA-256 `4b69e44dde915ca25c3f78379a1c45b002b31cb8aebcbf361ec3b58670f9e245`, `e9e28eb1bb6f312a4638c0d67b00cb420864d5433295ffb80a95a12ee9e14251`, `5b6a01837d2836a33a000489ff6dad4519ca40ca67e48464cc384b84721c8195`, `0fd213f5ace8e077790d81a1c49b78a3fff3f1912a01aef5b52b7df6d1460240` | Passed after P-41 clean chain | Rerun affected harnesses only after later source/migration changes |
 | C-03 | Tracked official export verification | P-11 exact pair was owner-accepted; P-36 regenerated and independently verified the active 710-row Excel/PDF evidence | Passed | Production filing remains P-15, not P-37 |
 | C-04 | Security/performance advisor blocker review | P-36 returned no security blocker; baseline performance findings and the unused `v_row_count` are assigned to P-12 with owners and rationale | Passed for P-37 | Reassess/minimize before P-12; this is not a Production waiver |
-| C-05 | Repository/source quality | Exact pushed `bb27b0d28e116e97ce1e7ee3e582f39bcc4edf22` passed 34 files/220 tests, TypeScript, lint 0 errors/10 existing warnings, authority/input checks, syntax, network-enabled build, diff check, and Local smoke. Exact pushed `d00c941` corrected the prepare normalizer and produced the interrupted scored session. Exact pushed P-42 `b2500b5e6859a915bfa3f70d558934f252943f82` passed focused 3 files/26 tests, full 35 files/225 tests, TypeScript, lint, authority/input checks, network-enabled build, diff check, and published-state browser QA | Passed for P-42 source | Require successful clean recovery and new immutable prepare before scoring; rerun source gates after later evidence changes |
+| C-05 | Repository/source quality | Exact pushed `bb27b0d28e116e97ce1e7ee3e582f39bcc4edf22` passed 34 files/220 tests, TypeScript, lint 0 errors/10 existing warnings, authority/input checks, syntax, network-enabled build, diff check, and Local smoke. Exact pushed `d00c941` corrected the prepare normalizer and produced the interrupted session. Exact pushed P-42 `b2500b5e6859a915bfa3f70d558934f252943f82` passed focused 3 files/26 tests, full 35 files/225 tests, TypeScript, lint, authority/input checks, network-enabled build, diff check, and published-state browser QA. Exact pushed `f8c6709` is the recovery-session source. The current evidence-doc working tree passed focused 7/7, full 35 files/225 tests, TypeScript, lint 0 errors/10 existing warnings, authority/input, JSON/link, and diff checks | Passed in working tree; exact evidence commit pending | Record the exact evidence commit before independent rerun; rerun application build only if application, dependency, or migration source changes |
 | C-06 | Placement comprehension, review by exception, keyboard, focus, and final presentation | Owner passed all named overview/gap/sibling/leave-reload/keyboard/focus/previous-new-next checks on no-reset `2568.15.0` | Passed for the exercised path | Do not repeat these controls unless the UI changes |
-| C-07 | One complete independent placement task | Earlier technical acceptance remains valid; P-41 discovery reached placement but DB rejected a hidden post-withdraw order gap, correctly producing no accepted batch | Open | Card D must open without a gap warning, record one rejected stale attempt with zero effect, then exactly one accepted UI batch/change set and accepted-to-dirty state |
-| C-08 | Stale-placement recovery inside the independent owner task | Technical continuation proved stale rejection; owner separately proved leave/reload recovery and final review | Partial | Complete Note #35 Card D using two UI tabs in the same independent task without developer/SQL intervention |
-| C-09 | Independent core-admin UAT | Retained evidence remains valid; P-38 discovery through UAT-08 used live collaboration, and the first scored P-42 Card A is invalid because it ended in successful Local publication | Open | After exact P-42 and separately approved clean recovery, the intended admin must restart Note #35 Cards A-G from Card A without live developer help |
-| C-10 | At least three safe validation-error/prevention recoveries | Technical `DRAFT_LOCK_CONFLICT` evidence remains valid. P-42 shows that requiring an intended admin to submit a known-stale destructive form is the wrong product gate | Open | Record Card A's URL-bound stale-review hard stop, hidden publication controls, latest-review recovery, and zero effect; then Card C E-01 invalid authority and E-02 retirement hold. Stale placement and uncertain response remain separate evidence |
-| C-11 | 710-row performance baseline | P-36 measured 710+18 placement/final-review routes at 607-1,136 ms, deep paging at 746 ms, and verified export; P-37 exercised search/preview/sibling/focus without material stutter | Partial | Reuse those named results and complete Note #35's Full 710-row import-preview plus publish-readiness/current-interaction measurements against the written budget |
-| C-12 | Documentation consistency | P-41 alignment passed. Exact pushed P-42 `b2500b5e6859a915bfa3f70d558934f252943f82` aligns the incident, review-lock contract, safer Card A, current Local state, and reset gate across Note #38 and the authority set; executable consistency/full repository checks passed | Passed for P-42 checkpoint | Rerun after scored evidence update |
-| C-13 | Disabled clean Local baseline | P-41 clean-chain evidence remains valid historically, but current Local points to issued `2568.5.0`/710 with admin/new-identity flags true after interrupted Card A; Production is untouched | Open after P-42 incident | Obtain a new destructive-reset approval, bootstrap to pointer `2568.0.0`/710 with zero drafts/all flags false, and repeat exact readback after final scored cleanup |
+| C-07 | One complete independent placement task | P-42 recovery Card D functionally recorded one stale rejection with zero effect and exactly one accepted UI batch/change set; accepted-to-dirty and final order were verified. Live guidance and D01/D02 usability findings prevent independent closure | Partial | Correct/dispose gap-list wheel scrolling and explicit stale-choice discard messaging, then rerun Card D independently |
+| C-08 | Stale-placement recovery inside the independent owner task | The same Card D functionally passed two-tab stale rejection, fresh recovery, one accepted batch, and current-state readback; the developer clarified post-conflict navigation | Partial | Rerun the corrected Card D without developer/SQL intervention |
+| C-09 | Independent core-admin UAT | Exact `f8c6709` Cards A-G passed functionally and produced item/import/placement/review/export/idempotency/cleanup evidence, but live guidance and developer-operated Cards F-G violate the independent-operator condition | Open | Correct/dispose P42-UAT-B01, C01/C02, D01/D02, E01, and F02; prepare a fresh exact-source session and independently rerun the affected cards |
+| C-10 | At least three safe validation-error/prevention recoveries | Functionally passed: Card A URL-bound stale-review hard stop, Card C E-01 invalid authority and E-02 retirement approval hold, Card D stale placement, and Card F uncertain-response retry all produced safe recovery/zero duplicate effect | Partial | Independently rerun the affected prevention/recovery cards after procedure/UX findings are resolved |
+| C-11 | 710-row performance baseline | Retained P-36 route results remain valid. P-42 Card C client preparation and server review each completed under 1 second for 710 prepared rows/712 compared rows; Card E final review completed about 1 second for 712 rows and export verification passed | Partial | Preserve measurements, correct E01 wording, and obtain an independent Owner observation on the affected import/review path |
+| C-12 | Documentation consistency | P-42 source docs were previously aligned; this checkpoint records the completed recovery, functional Cards A-G, strict-score boundary, clean Local baseline, evidence paths, and live category maximum 96 across the authority set. Focused authority consistency, full tests, TypeScript, lint, authority/input, JSON/link, and diff checks passed | Passed in working tree; exact checkpoint pending | Commit/push the exact evidence checkpoint without staging `files/`, `tmp/`, or `output/` |
+| C-13 | Disabled clean Local baseline | Separately approved recovery bootstrap restored the canonical `2568.0.0`/710 baseline. Final cleanup of session `session-p42-scored-20260719-f8c6709.json` confirmed zero working drafts, all catalog flags false, canonical hash `sha256:2e3571...`, unchanged BOQ/Factor F invariants, and Production untouched | Passed after P-42 recovery | Preserve the cleaned session; every future reset remains separately gated |
 
 ## 3. Minimal closure sequence
 
@@ -114,13 +121,14 @@ valid for the unchanged DB contract, but the current Local environment is no
 longer the scored baseline after P-42.
 
 Exact P-42 source/docs/browser checkpoint
-`b2500b5e6859a915bfa3f70d558934f252943f82` passed and is pushed. Warn that
-`npm run db:local:bootstrap` destroys the whole Local Supabase
-stack and obtain a new explicit owner approval. Pointer restore alone is not a
-clean scored recovery because issued Local `2568.5.0` would remain in history.
-After an approved bootstrap, require exact `2568.0.0`/710, zero drafts, all
-flags false, BOQ 198/1,547, Factor F `2569.0.0`/36, pinned-input verification,
-and a new immutable prepared-session path.
+`b2500b5e6859a915bfa3f70d558934f252943f82` passed and is pushed. The Owner
+then received the destructive-Local warning and approved one recovery
+bootstrap. Exact pushed source `f8c6709` restored `2568.0.0`/710, zero drafts,
+all flags false, BOQ 198/1,547, Factor F `2569.0.0`/36, pinned inputs
+708/708/693, and live category maximum 96 under the 500-character contract.
+The completed session was cleaned back to that baseline. No further reset is
+authorized; a later independent rerun requires a new exact-source session and
+its own reset decision only if the baseline has first become unsuitable.
 
 ### C. One bounded no-reset Local owner UAT
 
@@ -135,8 +143,11 @@ Before handing over the browser, use Note #36 and the tracked
 or abandons an Owner draft, and keeps retirement disabled.
 
 The scored UAT itself does not reset Local Supabase. The separately approved
-P-42 recovery reset must finish before the new session is prepared and handed
-to the owner.
+P-42 recovery reset completed before session
+`session-p42-scored-20260719-f8c6709.json` was prepared. That run passed
+functionally but was guided/developer-assisted, so the next independent
+affected-card session remains separately prepared and does not imply another
+reset.
 
 ### D. Evidence and owner decision
 

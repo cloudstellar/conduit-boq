@@ -1,54 +1,44 @@
 # Phase 4 WP-8 P-37 Evidence Reconciliation and Owner UAT Script
 
-**Status:** Evidence reconciliation and the fail-closed developer preflight
-design are complete; P-37 remains **HOLD**. P39R-U Card A passed in the later
-no-reset Local session: `2568.5.0-D001` was audited-abandoned and replacement
-`2568.5.0-D002` received a new immutable draft reference while reclaiming the
-same unissued target. The exploratory continuation used live developer
-collaboration, discovered UAT-01 through UAT-05, and therefore does not close
-the scored Cards A-G. Card F response-loss recovery passed as retained
-discovery evidence; cleanup restored the disabled baseline. Exact P-40 source
-checkpoint `dc83c35602fec81d124f43013824649664b8eecb` is pushed. A separate
-one-draft developer browser QA then passed governed/custom unit selection,
-Thai whole-number money normalization and invalid-money guidance, successful
-withdrawal redirect, and notice persistence after reload. That assisted QA is
-not scored Owner evidence; a fresh scored rerun remains required. See
-[Preflight Note #36](./36-phase4-wp8-p38-no-reset-owner-uat-preflight.md). This
-note defines the smallest current-route Owner UAT that can close Closure Matrix
-#34 C-07 through C-11 without repeating evidence that already proves the same
-actor-independent contract.
+**Status:** Evidence reconciliation and the fail-closed developer preflight are
+complete; P-37 remains **HOLD**. After the P-42 incident, the Owner separately
+approved one warned recovery bootstrap. Exact pushed source
+`f8c670901997a4e6663db7c4db1218efc03d51c6` restored the canonical Local
+`2568.0.0`/710 baseline and prepared immutable session
+`tmp/master-catalog/p38-owner-uat/session-p42-scored-20260719-f8c6709.json`.
+Cards A-G then passed their functional contracts, including stale-review
+prevention, three-add/one-withdraw, 710-row read-only import checks, one stale
+and one accepted placement batch, final review/export, same-request
+response-loss recovery, and safe abandonment. The Owner received live guidance
+and the developer operated parts of Cards F-G, so this run is product and
+functional evidence rather than strict independent Owner-scored closure.
 
-P-41 additionally records UAT-06 through UAT-08 from continued guided
-discovery. The source correction and incremental Local migration `025` are in
-place. Exact pushed `bb27b0d28e116e97ce1e7ee3e582f39bcc4edf22` passed full
-source verification and live WP-6.6 smoke. Owner-approved exact execution
-source `adcca3939f3080cdf64bc6ad807051e9e85fed94` then passed the clean
-`017`-`025` chain, all four integrated smoke suites, canonical verification,
-and final disabled-baseline readback. Exact pushed `d00c941` later prepared a
-new immutable scored session, but its Card A is invalid under P-42: Local
-`2568.5.0-D002` was successfully published as `2568.5.0`, then the terminal
-page displayed the false draft-only warning **อ้างอิงเวอร์ชันฐานเก่า**. Cards
-B-G stopped. See
+Both test drafts, `2568.1.0-D001` and `2568.1.0-D002`, are audited-abandoned
+against the same unissued target `2568.1.0`. Cleanup passed with pointer
+`2568.0.0`/710, canonical hash
+`sha256:2e3571ea7135fbc0bbb84c8cc330af1173e4c1d2345e5eb59958dc76e45558b8`,
+zero working drafts, all three catalog flags `false`, unchanged BOQ/Factor F
+invariants, no post-prepare reset, and no Production action. Findings
+P42-UAT-B01, C01/C02, D01/D02, E01, and F02 require bounded correction or
+explicit disposition before an independent targeted rerun. See
+[Preflight Note #36](./36-phase4-wp8-p38-no-reset-owner-uat-preflight.md) and
 [Incident Note #38](./38-phase4-p42-final-review-snapshot-binding-incident-note.md).
-Exact P-42 correction `b2500b5e6859a915bfa3f70d558934f252943f82`
-passed and is pushed. This script may restart only after a separately warned
-and approved clean Local bootstrap, exact disabled-baseline readback, and a new
-immutable prepared session. Discovery and interrupted interactions remain
-product evidence only.
+The untracked consolidated evidence index is
+`tmp/master-catalog/p38-owner-uat/p42-owner-uat-functional-summary.json`; it is
+Local evidence and must not be staged or committed.
 
-**Environment:** Local only. The scored Cards A-G themselves perform no reset.
-P-42 now requires one separately approved recovery reset before a new session
-is prepared. Production access/write, successful publication or pointer
+**Environment:** Local only. The separately approved P-42 recovery reset is
+complete; Cards A-G themselves performed no reset. No further reset is
+authorized. Production access/write, successful publication or pointer
 movement during UAT, feature enablement outside the temporary Local fixture,
-P-19, Factor F work, and hotfix `016` expansion are prohibited.
+P-19, Factor F work, and hotfix `016` expansion remain prohibited.
 
-**Owner decision boundary:** P-38 authorizes documentation alignment and
-preparation/execution of this bounded no-reset Local UAT. It does not accept
-P-37. The P-42 incident makes one clean recovery reset necessary, but that reset
-is not authorized by P-38 or this script and must receive its own warning and
-owner approval. P-37 can be accepted or held only after the fresh scored Owner
-tasks, cleanup, evidence update, exact repository verification, commit, and
-push are complete.
+**Owner decision boundary:** The Owner approved the recovery reset and later
+delegated developer-assisted completion of the remaining functional checks.
+That delegation does not accept P-37 or waive independent Owner evidence. P-37
+can be accepted or explicitly risk-accepted only after findings are disposed,
+the affected cards are rerun independently on a fresh exact-source fixture,
+cleanup passes again, and the evidence/docs/repository checkpoint is complete.
 
 ## 1. Reconciliation conclusion
 
@@ -76,7 +66,7 @@ not gate closure. It found:
 - UAT-05: E-03 was sequenced after new structured codes made its publish action
   unreachable through the independent structured-code guard.
 - UAT-06: `categoryCode` was treated as a short code even though the versioned
-  authority dictionary uses full labels (Local maximum 89 characters).
+  authority dictionary uses full labels (current Local maximum 96 characters).
 - UAT-07: a Full preview with retirement effects failed while retirement was
   disabled instead of returning a complete read-only diff with Apply hidden.
 - UAT-08: withdrawing a draft-only row left a `display_order` gap; the client
@@ -361,13 +351,13 @@ remediation owner, and due date.
 
 | Card/gate | Result | Visible Thai message or key observation | Elapsed/browser | Evidence reference |
 |---|---|---|---|---|
-| A / C-09/C-10 draft lifecycle + stale-review prevention | Prior scored attempt invalid under P-42; fresh rerun pending after approved clean recovery |  |  |  |
-| B / C-09 browse/manual/withdraw | Pending |  |  |  |
-| C / C-09/C-10/C-11 import + E-01/E-02 | Pending |  |  |  |
-| D / C-07/C-08 placement | Pending |  |  |  |
-| E / C-09/C-11 review/readiness/export | Pending |  |  |  |
-| F / C-09 uncertain response | Pending scored rerun; exploratory Card F passed |  |  | `tmp/master-catalog/wp65-evidence/p39ru-card-f-20260719-v2.json` |
-| G / safe close | Pending |  |  |  |
+| A / C-09/C-10 draft lifecycle + stale-review prevention | Functional pass; strict score HOLD because live guidance was used | D001 abandoned; D002 reused target `2568.1.0`; old review lock `0` hard-stopped after lock `1`; no publish | Local in-app Browser | `tmp/master-catalog/p38-owner-uat/p42-card-a-owner-evidence.json` |
+| B / C-09 browse/manual/withdraw | Functional pass; strict score HOLD for B01 correction and independent rerun | Search/history passed; allocated `CIC-GIP-007`/`008`/`009`; withdrew `007`; add-success omitted allocated code/direct link | Local in-app Browser | `tmp/master-catalog/p38-owner-uat/p42-card-b-owner-evidence.json` |
+| C / C-09/C-10/C-11 import + E-01/E-02 | Functional pass; strict score HOLD for procedure alignment and targeted rerun | Client and server phases each under 1 second; complete read-only preview; E-01 authority and E-02 retirement holds recovered without persistence | Local in-app Browser | `tmp/master-catalog/p38-owner-uat/p42-card-c-owner-evidence.json` |
+| D / C-07/C-08 placement | Functional pass; strict score HOLD for D01/D02 correction and independent rerun | Stale lock rejected with zero effect; exactly one batch accepted; final order `ITEM-0011 → CIC-GIP-008 → CIC-GIP-009 → ITEM-0012` | Local in-app Browser | `tmp/master-catalog/p38-owner-uat/p42-card-d-owner-evidence.json` |
+| E / C-09/C-11 review/readiness/export | Functional pass; strict score HOLD for E01 wording and independent rerun | Review about 1 second; 712 rows; readiness blocked truthfully; Excel/PDF and canonical/binary hashes verified | Local in-app Browser + independent artifact inspection | `tmp/master-catalog/p38-owner-uat/p42-card-e-owner-evidence.json` |
+| F / C-09 uncertain response | Functional pass; strict score HOLD because the developer operated the fault proxy/UI | Request `35defa1c-4195-4177-bb7e-8f9981662e57` retried unchanged; one change set and one item effect; fields retained until definitive success | Local proxy + in-app Browser | `tmp/master-catalog/p38-owner-uat/p42-card-f-owner-evidence.json` |
+| G / safe close | Functional pass; strict score HOLD because the developer performed closeout | D002 abandoned at lock `8 → 9`; D001/D002 immutable; cleanup left zero drafts, flags false, pointer `2568.0.0` | Local in-app Browser + tracked cleanup harness | `tmp/master-catalog/p38-owner-uat/p42-card-g-owner-evidence.json` |
 
 Misunderstood wording, hesitation that changes the intended action, or any
 developer-only recovery is a finding, not operator error. Stop the scored task,
@@ -398,8 +388,7 @@ After Card G:
 7. Only then ask the Owner to accept or hold P-37. Acceptance permits a later
    P-12 request only; it does not authorize any Production action.
 
-Cards A-G require no reset after preparation. The P-42 incident has already
-made one clean recovery necessary: do not run `npm run db:local:bootstrap`
-unless using exact pushed P-42
-`b2500b5e6859a915bfa3f70d558934f252943f82` and the owner has received the
-destructive Local warning and explicitly approved that run.
+Cards A-G require no reset after preparation. The one separately warned and
+approved P-42 recovery bootstrap is complete. Do not run
+`npm run db:local:bootstrap` again without a new destructive-Local warning,
+explicit Owner approval, exact pushed source, and a new immutable session path.

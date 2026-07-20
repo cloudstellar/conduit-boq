@@ -446,12 +446,15 @@ describe('Master Catalog authority consistency', () => {
       /P-33 accepted that\s+exact bounded WP-7\.5 technical checkpoint at 2026-07-15 13:54 \+07/,
     )
     expect(tracker).toContain(
-      '| Current work package | WP-8/P-37 HOLD; exact P-42 correction is pushed; interrupted scored Card A is invalid, Cards B-G are stopped, and clean Local recovery awaits a new owner approval |',
+      '| Current work package | WP-8/P-37 HOLD; P-42 recovery and developer-assisted functional Cards A-G passed, but strict independent Owner evidence and bounded UX/procedure findings remain open |',
     )
     expect(tracker).toContain('b2500b5e6859a915bfa3f70d558934f252943f82')
+    expect(tracker).toContain('f8c670901997a4e6663db7c4db1218efc03d51c6')
     expect(tracker).toContain(
-      '| Current environment | Local incident evidence state: pointer/default `2568.5.0` from `2568.5.0-D002`',
+      '| Current environment | Clean Local post-UAT baseline: pointer/default `2568.0.0`',
     )
+    expect(tracker).toContain('zero working drafts; all catalog flags false')
+    expect(tracker).toContain('no further reset is implied')
     expect(tracker).toContain(
       '0780925aca8fa7ebbf8abbaf2b7cf151b39b676a',
     )
@@ -559,7 +562,7 @@ describe('Master Catalog authority consistency', () => {
       /pre-amendment operator\/browser preflight passed on\s+`c8f6dca`/,
     )
     expect(tracker).toContain(
-      'Status: Local incident evidence has issued/default 2568.5.0 from D002, zero drafts, admin/new-identity flags true, retirement false',
+      'Status: Clean Local pointer 2568.0.0/710, zero working drafts, all catalog flags false; D001/D002 audited-abandoned against unissued target 2568.1.0; no Production action authorized',
     )
     expect(tracker).toContain('2c39dddd10c361bd1244292f4bd79e06f167c919')
     expect(verificationReport).toContain('undefined `rows` helper')
@@ -640,8 +643,8 @@ describe('Master Catalog authority consistency', () => {
       '| C-11 | 710-row performance baseline |',
       '| C-12 | Documentation consistency |',
       '| C-13 | Disabled clean Local baseline |',
-      '| Passed for P-42 checkpoint |',
-      'one rejected stale attempt with zero effect, then exactly one accepted UI batch/change set',
+      '| Passed in working tree; exact evidence commit pending |',
+      'one stale rejection with zero effect and exactly one accepted UI batch/change set',
     ]) {
       expect(p37Closure).toContain(contract)
     }
@@ -651,8 +654,8 @@ describe('Master Catalog authority consistency', () => {
     expect(p37Closure).toContain(
       'e9e28eb1bb6f312a4638c0d67b00cb420864d5433295ffb80a95a12ee9e14251',
     )
-    expect(p37Closure).not.toContain('No additional reset is')
-    expect(p37Closure).toContain('obtain a new explicit owner approval')
+    expect(p37Closure).toMatch(/No further reset is\s+authorized/)
+    expect(p37Closure).not.toContain('recovery reset must finish')
     expect(executionPack).toContain(
       'record comprehension and recovery from at least three safe',
     )
@@ -733,7 +736,7 @@ describe('Master Catalog authority consistency', () => {
       /It never\s+creates, edits, publishes, or abandons a draft/,
     )
     expect(p38Preflight).toContain('P-41 discovery correction gate')
-    expect(p38Preflight).toContain('P-42 recovery precondition')
+    expect(p38Preflight).toContain('P-42 recovery execution')
     expect(p38Preflight).toMatch(/clean\s+`017`-`025` chain/)
     expect(p38Preflight).toContain(
       '**Passed:** after a new warning and Owner approval',
@@ -753,9 +756,12 @@ describe('Master Catalog authority consistency', () => {
     )
     expect(p42Incident).toMatch(/Production was not\s+accessed or changed/)
     expect(p42Incident).toContain('b2500b5e6859a915bfa3f70d558934f252943f82')
+    expect(p42Incident).toContain('f8c670901997a4e6663db7c4db1218efc03d51c6')
     expect(p42Incident).toContain('reviewLock={current_lock}')
     expect(p42Incident).toMatch(/does\s+not render the diff\/publish panel/)
     expect(p42Incident).toContain('Pointer restore alone')
+    expect(p42Incident).toContain('functional Cards A-G')
+    expect(p42Incident).toContain('No further reset')
     expect(existsSync(resolve(
       root,
       'docs/plans/master-catalog/30-phase4-wp66-owner-review-note.md',

@@ -43,14 +43,21 @@ flags true, retirement false, BOQ 198/1,547, Factor F `2569.0.0`/36, and
 Production untouched. See
 [Incident Note #38](./38-phase4-p42-final-review-snapshot-binding-incident-note.md).
 Exact P-42 correction `b2500b5e6859a915bfa3f70d558934f252943f82`
-passed and is pushed. A new session now requires a separately warned and
-approved clean Local bootstrap first.
+passed and is pushed. The Owner then separately approved the destructive Local
+recovery bootstrap. Exact pushed source
+`f8c670901997a4e6663db7c4db1218efc03d51c6` restored the canonical baseline,
+verified inputs 708/708/693 and authority 710/65/17, and prepared immutable
+session `tmp/master-catalog/p38-owner-uat/session-p42-scored-20260719-f8c6709.json`.
+Cards A-G passed functionally but used live developer guidance/assistance, so
+they do not close strict Owner-scored evidence. Cleanup audited-abandoned
+`2568.1.0-D001`/`D002`, restored all catalog flags to `false`, and confirmed
+pointer `2568.0.0`/710 with zero working drafts and Production untouched.
 
-**Boundary:** Local only. This note itself authorizes no reset; the required
-P-42 recovery bootstrap is a new owner gate. It does not authorize successful
-publication, pointer movement during UAT, P-37 acceptance, P-19, Factor F work,
-hotfix `016` expansion, Production feature enablement, or Production
-access/write.
+**Boundary:** Local only. The one P-42 recovery reset was separately warned,
+approved, and completed; this note authorizes no further reset. It does not
+authorize successful publication, pointer movement during UAT, P-37
+acceptance, P-19, Factor F work, hotfix `016` expansion, Production feature
+enablement, or Production access/write.
 
 ## 1. Why the E-01 recipe changed
 
@@ -121,7 +128,7 @@ application adapter/profile to normalize all 708/708/693 retained rows. P-41
 also requires it to expose the positive shared 500-character category-key
 contract. The later `prepare` command reads the live versioned category
 dictionary before changing flags and fails when its longest key exceeds that
-contract (current Local maximum 89).
+contract (current Local maximum 96).
 `status` reads Local
 Supabase only. `prepare` requires a clean tracked tree whose HEAD exactly
 matches its configured pushed upstream, the verified manifest, exact disabled
@@ -233,28 +240,35 @@ next scored `prepare`, require all of the following:
 4. **Superseded by P-42 incident evidence:** exact pushed `d00c941` prepared a
    new immutable session after the failed `2c39ddd` path. Do not reuse that
    prepared session, D005, `2568.5.0-D001`/`D002`, or their discovery/incident
-   evidence as a fresh scored run.
+   evidence as a fresh scored run;
+5. **Functionally passed, strict score HOLD:** exact pushed `f8c6709` prepared
+   the post-recovery P-42 session. Cards A-G passed their functional contracts,
+   but live guidance and developer-operated Cards F-G require bounded finding
+   correction/disposition and independent targeted rerun before P-37.
 
 No Local reset is authorized by this note. Production touched: **No**.
 
-## 7. P-42 recovery precondition
+## 7. P-42 recovery execution
 
-The current Local pointer is issued `2568.5.0`/710 with dataset hash
-`sha256:46b4b61abdb8cee77065ae979b85ae6df39b4dcc0a6c9ff083aa3f768d202912`.
-Pointer restore alone does not reproduce the clean scored baseline because the
-issued version and publication audit would remain in history. Do not delete or
-rewrite that evidence with ad hoc SQL.
-
-Before another `prepare`:
+The recovery precondition is complete:
 
 1. **Passed:** P-42 source/docs/browser/repository checks on exact pushed
    checkpoint `b2500b5e6859a915bfa3f70d558934f252943f82`;
-2. tell the owner that `npm run db:local:bootstrap` destroys and rebuilds the
-   whole Local Supabase stack, then obtain explicit approval for that one run;
-3. bootstrap the unchanged `009`-`015`, hotfix `016`, `017`-`025` chain;
-4. repeat exact read-only pointer/hash/draft/flag/BOQ/Factor F and pinned-input
-   verification;
-5. create a new immutable session path whose file does not already exist.
+2. **Passed:** the Owner received the destructive Local warning and explicitly
+   approved one `npm run db:local:bootstrap` run;
+3. **Passed:** the unchanged `009`-`015`, hotfix `016`, and `017`-`025` chain
+   restored pointer `2568.0.0`/710 and canonical hash
+   `sha256:2e3571ea7135fbc0bbb84c8cc330af1173e4c1d2345e5eb59958dc76e45558b8`;
+4. **Passed:** exact read-only pointer/hash/draft/flag/BOQ/Factor F and
+   pinned-input checks passed, including live category maximum 96 under the
+   shared 500-character contract;
+5. **Passed:** immutable session
+   `tmp/master-catalog/p38-owner-uat/session-p42-scored-20260719-f8c6709.json`
+   was prepared on exact pushed source `f8c6709`, completed, and cleaned;
+6. **Passed cleanup:** zero working drafts, all three catalog flags `false`,
+   D001/D002 audited-abandoned against reusable target `2568.1.0`, no
+   post-prepare reset, and no Production action.
 
-The scored Cards A-G remain no-reset after that preparation. Production
-touched: **No**.
+Do not reuse the cleaned session for a scored rerun. After bounded findings are
+corrected and pushed, prepare a new immutable session; the affected cards must
+remain no-reset and independently operated. Production touched: **No**.

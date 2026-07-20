@@ -1,9 +1,12 @@
 # Phase 4 P-42 Final-review Snapshot Binding Incident Note
 
 **Status:** Exact Local-only correction
-`b2500b5e6859a915bfa3f70d558934f252943f82` passed and is pushed. The scored
-P-38 Owner UAT is stopped and P-37 remains **HOLD**. Production was not
-accessed or changed.
+`b2500b5e6859a915bfa3f70d558934f252943f82` passed and is pushed. The Owner
+later approved one warned recovery bootstrap; exact pushed source
+`f8c670901997a4e6663db7c4db1218efc03d51c6` completed functional Cards A-G
+and disabled-baseline cleanup. The run used live guidance and developer
+assistance for Cards F-G, so strict independent Owner evidence remains open and
+P-37 remains **HOLD**. Production was not accessed or changed.
 
 **Scope:** Application, tests, Owner UAT procedure, and authority-document
 alignment only. No migration, database-contract, BOQ, Factor F, hotfix `016`,
@@ -26,8 +29,9 @@ guard was not bypassed. After publication, the same page displayed
 rendered for a now-published version. That false post-success warning made the
 successful irreversible Local action look like another rejected stale attempt.
 
-The scored session is invalid and Cards B-G must not continue from this Local
-state.
+That scored session is invalid and Cards B-G did not continue from that Local
+state. A later separately approved clean recovery created a new immutable
+session; its functional result is recorded in Section 6.
 
 ## 2. Preserved evidence
 
@@ -119,26 +123,38 @@ destructive request. Closure Matrix C-10 may count that explicit stale-review
 prevention/recovery state together with E-01 and E-02; stale placement and
 uncertain response remain separate.
 
-## 6. Recovery and next gate
+## 6. Recovery execution and next gate
 
-Do not delete, edit, archive, or relabel the published Local version to conceal
-the event. Pointer restore alone would leave issued `2568.5.0` history and is
-not an exact scored-UAT baseline.
+Before the separately approved recovery, the issued Local version was not
+deleted, edited, archived, or relabeled with ad hoc SQL. Pointer restore alone
+would have retained issued `2568.5.0` history and was not an exact scored-UAT
+baseline, so the incident was first preserved in the immutable session,
+screenshots, audit, and gateway evidence and then recovered through the warned
+full Local bootstrap.
 
-The clean recovery is:
+The owner separately approved the warned recovery, and the following sequence
+completed on exact pushed source
+`f8c670901997a4e6663db7c4db1218efc03d51c6`:
 
-1. finish and verify this bounded source/docs correction;
-2. commit and push one exact checkpoint;
-3. warn the owner that `npm run db:local:bootstrap` destroys and rebuilds the
-   whole Local Supabase stack and obtain a new explicit approval;
-4. reset Local to the canonical `2568.0.0`/710 disabled baseline;
-5. rerun exact read-only baseline/input checks and prepare a new immutable
-   session path;
-6. restart scored Cards A-G from Card A under the corrected script.
+1. verified and pushed the bounded P-42 source/docs correction;
+2. warned that `npm run db:local:bootstrap` destroys and rebuilds the whole
+   Local Supabase stack and obtained explicit owner approval;
+3. restored the canonical `2568.0.0`/710 disabled baseline;
+4. passed exact read-only baseline/input checks and prepared immutable session
+   `tmp/master-catalog/p38-owner-uat/session-p42-scored-20260719-f8c6709.json`;
+5. completed Cards A-G functionally, including one stale-review hard stop,
+   import authority/retirement holds, one accepted placement batch, selected-
+   draft exports, one same-request response-loss effect, and audited abandon;
+6. ran the tracked cleanup harness and reconfirmed pointer `2568.0.0`, 710
+   rows, zero working drafts, all catalog flags false, unchanged BOQ 198/1,547,
+   unchanged Factor F `2569.0.0`/36, and `productionTouched = false`.
 
 Prior P-41 clean-chain evidence remains valid because P-42 changes no migration
-or DB contract. The recovery reset and fresh prepared-session baseline still
-require exact evidence. No step above authorizes Production.
+or DB contract. The recovery and functional run do not close P-37: live
+guidance and developer-operated Cards F-G prevent a strict independent score,
+and findings P42-UAT-B01, C01/C02, D01/D02, E01, and F02 remain open. A future
+affected-card rerun must use a new exact-source session and independent intended
+admin operation. No further reset and no Production action are authorized.
 
 ## 7. Working-tree verification
 
@@ -159,5 +175,8 @@ The first sandboxed build attempt could not reach Google Fonts. The same build
 passed unchanged with network access; this was an environment constraint, not
 an application failure. No migration, Local reset, Local repair, or Production
 action occurred during this verification. Exact correction
-`b2500b5e6859a915bfa3f70d558934f252943f82` is pushed; the separately approved
-recovery reset remains the next gate.
+`b2500b5e6859a915bfa3f70d558934f252943f82` is pushed. The separately approved
+recovery later completed on exact pushed `f8c6709`; Cards A-G passed
+functionally and cleanup restored the disabled baseline. The next gate is
+bounded finding disposition followed by independent affected-card evidence,
+not another reset by implication.

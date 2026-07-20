@@ -20,7 +20,7 @@ authority evidence. Client diagnostics remain advisory. See
 `categoryCode` is the key of the versioned authority dictionary and may be the
 full official category label, not a short display prefix. Its bounded payload
 limit is 500 characters; Local preflight must prove the longest live key fits
-that contract (current maximum 89). When Full validation detects retirements
+that contract (current Local maximum 96). When Full validation detects retirements
 while retirement capability is disabled, the server still returns the complete
 read-only diff/omission preview without persisting an import/change set or
 exposing Apply. Validation and mutation remain separate operations.
