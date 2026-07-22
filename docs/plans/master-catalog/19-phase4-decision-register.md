@@ -254,6 +254,22 @@ session. The legacy D003 session remains immutable evidence: cleanup restored
 flags before refusing closure, and readback confirmed pointer `2568.0.0`/710,
 zero drafts, unchanged BOQ/Factor F, and Production untouched.
 
+**P-42 D004 placement-modal correction recorded:** 2026-07-22 — D004 passed
+the corrected Spot-check 2: all three import progress labels matched, E-01
+returned `IMPORT_PRICE_AUTHORITY_REQUIRED`, the actual persistence action was
+absent, and no import was written. Real Browser Spot-check 3 then showed that
+the nested popover still did not wheel-scroll inside the placement modal. Exact
+checkpoint `16e88c6487307c4bb0606a048dc53e05e9dcee18` replaces it with a
+searchable list inside the modal boundary. The Owner confirmed physical wheel
+scrolling and outside-click dismissal on identical tree content. D004 was
+prepared from the preceding source, so that confirmation is correction
+evidence and exact-source Spot-check 3 remains open. D004 was
+audited-abandoned; schema-2 cleanup passed with one attempt and restored pointer
+`2568.0.0`/710, zero drafts, all flags false, unchanged BOQ/Factor F, and
+Production untouched. Retain Spots 1-2 and completed Card B-E evidence; run
+only exact-source Spots 3-4 plus final cleanup. This authorizes no reset,
+migration, publication, Production, P-19, BOQ, Factor F, or hotfix work.
+
 **Capability-completeness alignment recorded:** 2026-07-12 — owner requested a
 full owner/developer audit and plan correction. Audit #29 adds WP-6.6 before
 WP-7 and reserves migration `020` for fix-forward authority/workflow hardening;
@@ -663,6 +679,7 @@ Production migration, deploy, feature enablement, or publication.
 | P-41 P-38 discovery correction | Exact source, incremental smoke, and clean integrated chain passed; P-37/scored-UAT acceptance not inferred | Owner + developer | 2026-07-19 | UAT-06/UAT-07/UAT-08; `025` passed incremental and owner-approved clean execution; exact `adcca3939f3080cdf64bc6ad807051e9e85fed94`; all four smoke suites, canonical and final baseline passed. Fresh Cards A-G were open at this checkpoint; current P-42 closure is four spot-checks plus cleanup. |
 | P-42 final-review correction and recovery | Exact correction, separately approved recovery, functional Cards A-G, cleanup, and bounded finding source correction passed; strict independent score remains HOLD | Owner + developer | 2026-07-19/20 | Final-review correction `b2500b5e...`; recovery source `f8c6709...`; evidence checkpoint `1c901855...`; bounded finding correction `bdc104f77...`; session `session-p42-scored-20260719-f8c6709.json`. Final Local state is pointer `2568.0.0`/710, zero drafts, all catalog flags false, and unchanged BOQ/Factor F invariants. Findings B01, C01/C02, D01/D02, E01, and F02 are implemented/disposed. Completed functional Card B-E evidence is retained; only the four post-correction spot-checks in Note #35 Section 1.2 and cleanup remain open. No full replay, further reset, or Production action is authorized. |
 | P-42 proportional spot-check correction | P42-UAT-C03/G01 corrected; Spot-check 1 retained; P-37 remains HOLD | Owner + developer | 2026-07-22 | Exact `44f54a72b03549de995b431d6705ec1b2eeb3fa6` aligns the third import progress label and adds immutable full/two-attempt versus bounded/one-attempt cleanup scenarios without weakening persistence guards. D003 is audited-abandoned; Local is pointer `2568.0.0`/710, zero drafts, flags false. Only Spots 2-4 and corrected cleanup remain; no reset or Production action. |
+| P-42 D004 import/cleanup and placement-modal correction | Spot-check 2 and schema-2 cleanup passed; P42-UAT-D01 corrected; P-37 remains HOLD | Owner + developer | 2026-07-22 | D004 safely repeated E-01 with no persistence, then exposed the real nested-popover wheel failure. Exact `16e88c6487307c4bb0606a048dc53e05e9dcee18` keeps the searchable list inside the modal. Owner confirmed wheel and outside-click behavior; D004 cleanup restored pointer `2568.0.0`/710, zero drafts, flags false. Retain Spots 1-2; only exact-source Spots 3-4 and final cleanup remain. No migration, reset, or Production action. |
 | Production migration | Not requested |  |  | P-12; request after WP-8 evidence review |
 | Deploy / feature enable | Not requested |  |  | P-13–P-14; request only after preceding Production gate passes |
 | Publish named version | Not requested |  |  | P-15 |

@@ -84,8 +84,16 @@ two-attempt Card A/G shape. Readback confirmed pointer `2568.0.0`/710, zero
 drafts, flags false, unchanged BOQ/Factor F, and Production untouched. Exact
 implementation `44f54a72b03549de995b431d6705ec1b2eeb3fa6` aligns the import label
 and binds cleanup to immutable full/two-attempt or bounded/one-attempt
-scenarios. Spot-check 1 remains valid; only Spots 2-4 and corrected cleanup are
-open.
+scenarios. At that checkpoint Spot-check 1 remained valid and Spots 2-4 plus
+corrected cleanup were open.
+
+D004 subsequently passed the corrected Spot-check 2 and schema-2 bounded
+cleanup. Spot-check 3 then exposed that the nested popover still did not
+wheel-scroll in the real modal. Exact checkpoint
+`16e88c6487307c4bb0606a048dc53e05e9dcee18` moves the searchable gap list
+inside the modal boundary. The Owner confirmed physical wheel scrolling and
+outside-click dismissal on identical tree content. Since D004 was bound to the
+preceding source, only exact-source Spots 3-4 and final cleanup remain open.
 
 ## 1. Why this matrix exists
 
@@ -116,15 +124,15 @@ Local cleanup.
 | C-02 | DB/RLS/role/rollback/race/idempotency/P-20/BOQ/Factor F invariants | Clean WP-6.5/WP-6.6/WP-7/WP-7.5 passed trigger inventory, post-withdraw `0..N-1`, relative order, exactly-one revision, rollback/race/replay, role/RLS, pointer, BOQ, Factor F, suffix, and no-Production assertions; evidence SHA-256 `4b69e44dde915ca25c3f78379a1c45b002b31cb8aebcbf361ec3b58670f9e245`, `e9e28eb1bb6f312a4638c0d67b00cb420864d5433295ffb80a95a12ee9e14251`, `5b6a01837d2836a33a000489ff6dad4519ca40ca67e48464cc384b84721c8195`, `0fd213f5ace8e077790d81a1c49b78a3fff3f1912a01aef5b52b7df6d1460240` | Passed after P-41 clean chain | Rerun affected harnesses only after later source/migration changes |
 | C-03 | Tracked official export verification | P-11 exact pair was owner-accepted; P-36 regenerated and independently verified the active 710-row Excel/PDF evidence | Passed | Production filing remains P-15, not P-37 |
 | C-04 | Security/performance advisor blocker review | P-36 returned no security blocker; baseline performance findings and the unused `v_row_count` are assigned to P-12 with owners and rationale | Passed for P-37 | Reassess/minimize before P-12; this is not a Production waiver |
-| C-05 | Repository/source quality | Earlier exact recovery, bounded, and responsive checkpoints remain retained. Exact `44f54a72b03549de995b431d6705ec1b2eeb3fa6` corrects P42-UAT-C03/G01 and passed focused 2 files/22 tests, full 36 files/230 tests, TypeScript, lint 0 errors/10 existing warnings, authority 710/65/17, script syntax, network-enabled production build, and diff check | Passed for corrected source | Complete Spots 2-4 and corrected cleanup; no additional build is required unless application, dependency, or migration source changes again |
-| C-06 | Placement comprehension, review by exception, keyboard, focus, and final presentation | Owner passed all named overview/gap/sibling/leave-reload/keyboard/focus/previous-new-next checks on no-reset `2568.15.0` | Passed for the exercised path | Do not repeat these controls unless the UI changes |
-| C-07 | One complete independent placement task | P-42 recovery Card D functionally recorded one stale rejection with zero effect and exactly one accepted UI batch/change set. Exact `bdc104f77...` corrects D01 wheel scrolling and D02 stale-user-choice disclosure while preserving DB authority | Partial | Complete Spot-check 3; retain the accepted batch/current-order evidence without replaying it |
+| C-05 | Repository/source quality | Earlier exact recovery, bounded, responsive, and C03/G01 checkpoints remain retained. Exact `16e88c6487307c4bb0606a048dc53e05e9dcee18` replaces the ineffective nested-popover wheel interception with a modal-contained inline combobox and passed focused 1 file/15 tests, full 36 files/230 tests, TypeScript, lint 0 errors/10 existing warnings, authority 710/65/17, input verification, network-enabled production build, Browser wheel/outside-dismiss checks, and diff check | Passed for corrected source | Complete exact-source Spots 3-4 and cleanup; no additional build is required unless application, dependency, or migration source changes again |
+| C-06 | Placement comprehension, review by exception, keyboard, focus, and final presentation | Owner passed all named overview/gap/sibling/leave-reload/keyboard/focus/previous-new-next checks on no-reset `2568.15.0`; the later affected gap control changed under exact `16e88c6` and its wheel/outside-dismiss behavior was Owner-confirmed | Passed for the exercised paths | Repeat only the affected exact-source Spot-check 3 interaction, not the broader accepted controls |
+| C-07 | One complete independent placement task | P-42 recovery Card D functionally recorded one stale rejection with zero effect and exactly one accepted UI batch/change set. Exact `16e88c6` corrects real Browser D01 wheel behavior without changing DB authority; D02 storage/discard behavior remains unchanged | Partial | Complete exact-source Spot-check 3; retain the accepted batch/current-order evidence without replaying it |
 | C-08 | Stale-placement recovery inside the independent owner task | The prior Card D functionally passed two-tab stale rejection, fresh recovery, one accepted batch, and current-state readback. Exact `bdc104f77...` adds explicit stale-choice discard feedback | Partial | Complete Spot-check 3 without developer/SQL repair |
-| C-09 | Independent core-admin UAT | Functional Cards B-E and accepted responsive finding P42-UAT-OV01 remain retained; Spot-check 1 passed on `fd36be2`; P42-UAT-C03/G01 are corrected by exact `44f54a7` without weakening guards | Open | Prepare one fresh exact-source `bounded-spot-check` fixture; complete Spots 2-4 and cleanup |
-| C-10 | At least three safe validation-error/prevention recoveries | Retained safe recoveries remain valid. The latest E-01 run again returned `IMPORT_PRICE_AUTHORITY_REQUIRED` with no persistence; exact `44f54a7` corrects only the procedure/observability contract | Partial | Complete Spots 2-4; retain prior safe-error counts and zero-write evidence |
-| C-11 | 710-row performance baseline | Retained P-36/P-42 measurements remain valid. Spot-check 1 passed add/PDF wording; Spot-check 2 stopped on action observability rather than performance | Partial | Rerun Spot-check 2 wording only; preserve existing measurements and export evidence |
-| C-12 | Documentation consistency | Exact `44f54a7` aligns UI/test/harness contracts; Note #35, Preflight #36, Verification, Decision Register, Tracker, and this matrix record C03/G01 and proportional retention | Passed for current checkpoint | Preserve alignment after Spots 2-4; continue excluding `files/`, `tmp/`, and `output/` from commits |
-| C-13 | Disabled clean Local baseline | Historical scored cleanup remains passed. Interrupted D003 closeout restored pointer `2568.0.0`/710, zero drafts, all flags false, and unchanged BOQ/Factor F; the legacy session remains unclosed evidence because its version-count assertion failed closed | Passed baseline; new scenario cleanup pending | Prove one successful schema-2 `bounded-spot-check` cleanup; every reset remains separately gated |
+| C-09 | Independent core-admin UAT | Functional Cards B-E and accepted responsive finding P42-UAT-OV01 remain retained; Spot-checks 1-2 passed; D004 correction-round cleanup passed; exact `16e88c6` corrects the affected placement control | Open | Prepare one fresh exact-source `bounded-spot-check` fixture; complete only Spots 3-4 and cleanup |
+| C-10 | At least three safe validation-error/prevention recoveries | Retained safe recoveries remain valid. D004 Spot-check 2 again returned `IMPORT_PRICE_AUTHORITY_REQUIRED` with no persistence and correct action visibility | Partial | Complete Spots 3-4; retain prior safe-error counts and zero-write evidence |
+| C-11 | 710-row performance baseline | Retained P-36/P-42 measurements remain valid. Spot-check 1 passed add/PDF wording and D004 Spot-check 2 passed corrected import wording without repeating scale measurements | Passed | Preserve existing measurements and export evidence |
+| C-12 | Documentation consistency | Exact `16e88c6` aligns the placement interaction with the real modal boundary; Note #35, Verification, Decision Register, Tracker, and this matrix record the D004 finding/cleanup and proportional retention | Passed for current checkpoint | Preserve alignment after Spots 3-4; continue excluding `files/`, `tmp/`, and `output/` from commits |
+| C-13 | Disabled clean Local baseline | Historical scored cleanup remains passed. Schema-2 D004 cleanup also passed with exactly one audited-abandoned attempt and restored pointer `2568.0.0`/710, zero drafts, all flags false, and unchanged BOQ/Factor F | Passed baseline; final exact-source session cleanup pending | Repeat cleanup only for the final Spots 3-4 session; every reset remains separately gated |
 
 ## 3. Minimal closure sequence
 
@@ -157,17 +165,19 @@ its own reset decision only if the baseline has first become unsuitable.
 Exact evidence checkpoint `1c901855a32b100013fb5c9472c2e909e3dd1c59`, bounded
 source checkpoint `bdc104f77f18ea8fc776950259bc25e68c2fd42a`, and
 Owner-accepted responsive checkpoint
-`bcc041772b3f537de66b655c5115c4e3c2da9325` are the current correction basis.
+`bcc041772b3f537de66b655c5115c4e3c2da9325` and
+`16e88c6487307c4bb0606a048dc53e05e9dcee18` are the current correction basis.
 They add no migration and did not reset Local. Source gates, a network-enabled
 build, clean-baseline readback, and authenticated desktop/mobile containment
-checks passed. Spot-check 1 then passed on exact `fd36be2`; exact `44f54a7`
-corrects the bounded findings exposed in Spot-check 2 and closeout. Prepare a
-fresh exact-source schema-2 `bounded-spot-check` session before Spots 2-4.
+checks passed. Spot-check 1 then passed on exact `fd36be2`; D004 Spot-check 2
+and schema-2 cleanup passed on `2160815`. Exact `16e88c6` corrects the real
+Browser wheel behavior exposed in Spot-check 3. Prepare a fresh exact-source
+schema-2 `bounded-spot-check` session before Spots 3-4.
 
 ### C. One bounded no-reset Local owner spot-check
 
-Use Note #35 Section 1.2 as the sole current script. Spot-check 1 is passed and
-retained. It separates developer preflight from the remaining Spots 2-4 and
+Use Note #35 Section 1.2 as the sole current script. Spot-checks 1-2 are passed
+and retained. It separates developer preflight from the remaining Spots 3-4 and
 retains completed Card B-E functional, scale, error-recovery,
 placement-acceptance, and export evidence.
 
@@ -179,7 +189,7 @@ The scored UAT itself does not reset Local Supabase. The separately approved
 P-42 recovery reset completed before session
 `session-p42-scored-20260719-f8c6709.json` was prepared. That run passed
 functionally but was guided/developer-assisted. Prepare one fresh exact-source
-session with `--scenario bounded-spot-check` for only Spots 2-4 and cleanup;
+session with `--scenario bounded-spot-check` for only Spots 3-4 and cleanup;
 this does not imply another reset or another full Card B-E run.
 
 ### D. Evidence and owner decision

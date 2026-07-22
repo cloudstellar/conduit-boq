@@ -452,7 +452,7 @@ describe('Master Catalog authority consistency', () => {
       /P-33 accepted that\s+exact bounded WP-7\.5 technical checkpoint at 2026-07-15 13:54 \+07/,
     )
     expect(tracker).toContain(
-      '| Current work package | WP-8/P-37 HOLD; Spot-check 1 passed and is retained; P42-UAT-C03/G01 are corrected on exact `44f54a7`; Spot-checks 2-4 plus scenario-bound cleanup remain open |',
+      '| Current work package | WP-8/P-37 HOLD; Spot-checks 1-2 and D004 schema-2 cleanup passed and are retained; exact-source Spot-checks 3-4 plus final scenario-bound cleanup remain open |',
     )
     expect(tracker).toContain('P42-UAT-C03')
     expect(tracker).toContain('P42-UAT-G01')
@@ -463,7 +463,10 @@ describe('Master Catalog authority consistency', () => {
     expect(tracker).toContain('bcc041772b3f537de66b655c5115c4e3c2da9325')
     expect(tracker).toContain('P42-UAT-OV01')
     expect(tracker).toContain(
-      '| Current environment | Clean Local post-spot-check baseline: pointer/default `2568.0.0`',
+      '16e88c6487307c4bb0606a048dc53e05e9dcee18',
+    )
+    expect(tracker).toContain(
+      '| Current environment | Clean Local post-D004 baseline: pointer/default `2568.0.0`',
     )
     expect(tracker).toContain('zero working drafts; all catalog flags false')
     expect(tracker).toContain('no further reset is implied')
@@ -575,7 +578,7 @@ describe('Master Catalog authority consistency', () => {
       /pre-amendment operator\/browser preflight passed on\s+`c8f6dca`/,
     )
     expect(tracker).toContain(
-      'Status: Clean Local pointer 2568.0.0/710, zero working drafts, all catalog flags false; D003 audited-abandoned and its legacy session retained as unclosed evidence; no Production action authorized',
+      'Status: Clean Local pointer 2568.0.0/710, zero working drafts, all catalog flags false; D004 audited-abandoned and cleaned; D003 retained as historical fail-closed evidence; no Production action authorized',
     )
     expect(tracker).toContain('2c39dddd10c361bd1244292f4bd79e06f167c919')
     expect(verificationReport).toContain('undefined `rows` helper')
@@ -583,10 +586,10 @@ describe('Master Catalog authority consistency', () => {
       'HOLD under Closure Matrix #34',
     )
     expect(verificationReport).toContain(
-      'Open: Closure Matrix #34 C-07 through C-10',
+      'Open: Closure Matrix #34 C-07 through C-10 for Spots 3-4 only',
     )
     expect(verificationReport).toContain(
-      'Partial: Closure Matrix #34 C-11',
+      'Passed: Closure Matrix #34 C-11',
     )
     for (const cleanEvidenceHash of [
       '4b69e44dde915ca25c3f78379a1c45b002b31cb8aebcbf361ec3b58670f9e245',
@@ -662,6 +665,7 @@ describe('Master Catalog authority consistency', () => {
       'bcc041772b3f537de66b655c5115c4e3c2da9325',
       'P42-UAT-OV01',
       'four post-correction Owner spot-checks',
+      'only exact-source Spots 3-4 and final cleanup remain open',
     ]) {
       expect(p37Closure).toContain(contract)
     }
@@ -690,8 +694,8 @@ describe('Master Catalog authority consistency', () => {
       'P-37 remains **HOLD**',
       'Card C E-01/E-02',
       'P-42 recovery retained one stale rejection with zero effect and exactly one accepted UI batch',
-      'Owner-visible Spots 2-4 plus clean closeout',
-      'do not rerun scale measurements',
+      'Owner-visible Spots 3-4 plus clean closeout',
+      'No scale measurement rerun remains',
       'CATALOG_OUTCOME_UNCERTAIN',
       '**ปรับในหน้านี้ · ยังไม่บันทึก**',
       'Full 710-row client preparation plus server diff',
@@ -708,6 +712,12 @@ describe('Master Catalog authority consistency', () => {
     expect(p37OwnerUat).toContain('npm run db:local:p38:cleanup -- --session "$P38_SESSION"')
     expect(p37OwnerUat).toContain('P42-UAT-C03')
     expect(p37OwnerUat).toContain('P42-UAT-G01')
+    expect(p37OwnerUat).toContain(
+      '16e88c6487307c4bb0606a048dc53e05e9dcee18',
+    )
+    expect(p37OwnerUat).toContain(
+      'D004 schema-2 cleanup passed with one audited-abandoned attempt',
+    )
     expect(p37OwnerUat).toMatch(
       /actual\s+\*\*ยืนยันและบันทึกลงฉบับร่าง\*\* action is absent/,
     )
