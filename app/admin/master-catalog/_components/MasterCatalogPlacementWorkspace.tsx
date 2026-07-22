@@ -4,6 +4,7 @@ import {
   useActionState,
   useDeferredValue,
   useEffect,
+  useId,
   useMemo,
   useRef,
   useState,
@@ -48,7 +49,6 @@ import {
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import {
   Select,
   SelectContent,
@@ -1259,43 +1259,65 @@ function PlacementGapCombobox({
   onValueChange: (gapIndex: number) => void;
 }) {
   const [open, setOpen] = useState(false);
-  const listRef = useRef<HTMLDivElement | null>(null);
+  const listId = useId();
+  const containerRef = useRef<HTMLDivElement | null>(null);
+  const triggerRef = useRef<HTMLButtonElement | null>(null);
   const gapOptions = Array.from({ length: anchors.length + 1 }, (_, index) => index);
 
   useEffect(() => {
-    const list = listRef.current;
-    if (!open || !list) return undefined;
+    if (!open) return undefined;
 
-    // The dialog locks wheel events outside its own portal; handle this nested portal locally.
-    const handleWheel = (event: WheelEvent) => scrollPlacementGapList(list, event);
-    list.addEventListener('wheel', handleWheel, { passive: false });
-    return () => list.removeEventListener('wheel', handleWheel);
+    const closeWhenPointerLeaves = (event: PointerEvent) => {
+      const target = event.target;
+      if (target instanceof Node && containerRef.current?.contains(target)) return;
+      setOpen(false);
+    };
+    document.addEventListener('pointerdown', closeWhenPointerLeaves);
+    return () => document.removeEventListener('pointerdown', closeWhenPointerLeaves);
   }, [open]);
 
   return (
-    <Popover open={open} onOpenChange={setOpen}>
-      <PopoverTrigger asChild>
-        <Button
-          type="button"
-          variant="outline"
-          role="combobox"
-          aria-expanded={open}
-          aria-label={`ช่วงที่จะวาง ${itemCode}`}
-          disabled={anchors.length === 0}
-          className="w-full min-w-0 justify-between overflow-hidden font-normal"
-        >
-          <span className="truncate text-left">
-            {anchors.length > 0
-              ? formatPlacementGapLabel(anchors, gapIndex)
-              : 'ไม่มีรายการเดิมในหมวดนี้'}
-          </span>
-          <ChevronsUpDown className="opacity-50" />
-        </Button>
-      </PopoverTrigger>
-      <PopoverContent className="w-[min(640px,calc(100vw-2rem))] p-0" align="start">
-        <Command>
-          <CommandInput placeholder="ค้นหารหัสหรือชื่อรายการก่อนหน้า/ถัดไป" />
-          <CommandList ref={listRef}>
+    <div
+      ref={containerRef}
+      className="grid min-w-0 gap-2"
+      onBlur={(event) => {
+        const nextFocus = event.relatedTarget;
+        if (nextFocus instanceof Node && event.currentTarget.contains(nextFocus)) return;
+        setOpen(false);
+      }}
+    >
+      <Button
+        ref={triggerRef}
+        type="button"
+        variant="outline"
+        role="combobox"
+        aria-controls={listId}
+        aria-expanded={open}
+        aria-label={`ช่วงที่จะวาง ${itemCode}`}
+        disabled={anchors.length === 0}
+        className="w-full min-w-0 justify-between overflow-hidden font-normal"
+        onClick={() => setOpen((current) => !current)}
+      >
+        <span className="truncate text-left">
+          {anchors.length > 0
+            ? formatPlacementGapLabel(anchors, gapIndex)
+            : 'ไม่มีรายการเดิมในหมวดนี้'}
+        </span>
+        <ChevronsUpDown className="opacity-50" />
+      </Button>
+      {open ? (
+        <Command className="min-w-0 rounded-md border bg-popover text-popover-foreground shadow-sm">
+          <CommandInput
+            autoFocus
+            placeholder="ค้นหารหัสหรือชื่อรายการก่อนหน้า/ถัดไป"
+            onKeyDown={(event) => {
+              if (event.key !== 'Escape') return;
+              event.preventDefault();
+              setOpen(false);
+              triggerRef.current?.focus();
+            }}
+          />
+          <CommandList id={listId} className="max-h-[40dvh] overscroll-contain">
             <CommandEmpty>ไม่พบช่วงที่ตรงกับคำค้น</CommandEmpty>
             <CommandGroup>
               {gapOptions.map((optionGapIndex) => (
@@ -1306,6 +1328,7 @@ function PlacementGapCombobox({
                   onSelect={() => {
                     onValueChange(optionGapIndex);
                     setOpen(false);
+                    triggerRef.current?.focus();
                   }}
                 >
                   <Check className={cn(
@@ -1320,31 +1343,9 @@ function PlacementGapCombobox({
             </CommandGroup>
           </CommandList>
         </Command>
-      </PopoverContent>
-    </Popover>
+      ) : null}
+    </div>
   );
-}
-
-function scrollPlacementGapList(list: HTMLDivElement, event: WheelEvent) {
-  if (event.deltaY === 0 || list.scrollHeight <= list.clientHeight) return;
-
-  const multiplier = event.deltaMode === 1
-    ? 16
-    : event.deltaMode === 2
-      ? list.clientHeight
-      : 1;
-  const nextScrollTop = Math.max(
-    0,
-    Math.min(
-      list.scrollHeight - list.clientHeight,
-      list.scrollTop + (event.deltaY * multiplier),
-    ),
-  );
-  if (nextScrollTop === list.scrollTop) return;
-
-  list.scrollTop = nextScrollTop;
-  event.preventDefault();
-  event.stopPropagation();
 }
 
 function PlacementPositionPreview({

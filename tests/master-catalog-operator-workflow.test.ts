@@ -287,8 +287,11 @@ describe('Master Catalog P-22 operator workflow', () => {
     expect(placementWorkspace).toContain('ข้อมูลยังไม่ครบ');
     expect(placementWorkspace).toContain('ตำแหน่งไม่ถูกต้อง');
     expect(placementWorkspace).toContain('function PlacementGapCombobox');
-    expect(placementWorkspace).toContain("list.addEventListener('wheel', handleWheel, { passive: false })");
-    expect(placementWorkspace).toContain('list.scrollTop = nextScrollTop');
+    expect(placementWorkspace).toContain('aria-controls={listId}');
+    expect(placementWorkspace).toContain('className="max-h-[40dvh] overscroll-contain"');
+    expect(placementWorkspace).not.toContain('<PopoverContent');
+    expect(placementWorkspace).toContain("document.addEventListener('pointerdown', closeWhenPointerLeaves)");
+    expect(placementWorkspace).toContain('onBlur={(event) => {');
     expect(placementWorkspace).toContain('role="combobox"');
     expect(placementWorkspace).toContain('ช่วงที่จะวางรายการนี้');
     expect(placementWorkspace).toContain('ใช้ตำแหน่งนี้');
