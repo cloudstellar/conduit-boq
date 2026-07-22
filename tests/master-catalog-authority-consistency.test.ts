@@ -452,8 +452,10 @@ describe('Master Catalog authority consistency', () => {
       /P-33 accepted that\s+exact bounded WP-7\.5 technical checkpoint at 2026-07-15 13:54 \+07/,
     )
     expect(tracker).toContain(
-      '| Current work package | WP-8/P-37 HOLD; P-42 recovery and bounded source corrections passed; completed functional Card B-E evidence is retained, while four post-correction Owner spot-checks from Note #35 Section 1.2 and cleanup remain open |',
+      '| Current work package | WP-8/P-37 HOLD; Spot-check 1 passed and is retained; P42-UAT-C03/G01 are corrected on exact `44f54a7`; Spot-checks 2-4 plus scenario-bound cleanup remain open |',
     )
+    expect(tracker).toContain('P42-UAT-C03')
+    expect(tracker).toContain('P42-UAT-G01')
     expect(tracker).toContain('b2500b5e6859a915bfa3f70d558934f252943f82')
     expect(tracker).toContain('f8c670901997a4e6663db7c4db1218efc03d51c6')
     expect(tracker).toContain('1c901855a32b100013fb5c9472c2e909e3dd1c59')
@@ -461,7 +463,7 @@ describe('Master Catalog authority consistency', () => {
     expect(tracker).toContain('bcc041772b3f537de66b655c5115c4e3c2da9325')
     expect(tracker).toContain('P42-UAT-OV01')
     expect(tracker).toContain(
-      '| Current environment | Clean Local post-UAT baseline: pointer/default `2568.0.0`',
+      '| Current environment | Clean Local post-spot-check baseline: pointer/default `2568.0.0`',
     )
     expect(tracker).toContain('zero working drafts; all catalog flags false')
     expect(tracker).toContain('no further reset is implied')
@@ -573,7 +575,7 @@ describe('Master Catalog authority consistency', () => {
       /pre-amendment operator\/browser preflight passed on\s+`c8f6dca`/,
     )
     expect(tracker).toContain(
-      'Status: Clean Local pointer 2568.0.0/710, zero working drafts, all catalog flags false; D001/D002 audited-abandoned against unissued target 2568.1.0; no Production action authorized',
+      'Status: Clean Local pointer 2568.0.0/710, zero working drafts, all catalog flags false; D003 audited-abandoned and its legacy session retained as unclosed evidence; no Production action authorized',
     )
     expect(tracker).toContain('2c39dddd10c361bd1244292f4bd79e06f167c919')
     expect(verificationReport).toContain('undefined `rows` helper')
@@ -686,10 +688,9 @@ describe('Master Catalog authority consistency', () => {
     )
     for (const contract of [
       'P-37 remains **HOLD**',
-      'without live developer or SQL guidance',
       'Card C E-01/E-02',
       'P-42 recovery retained one stale rejection with zero effect and exactly one accepted UI batch',
-      'Four Owner-visible correction spot-checks',
+      'Owner-visible Spots 2-4 plus clean closeout',
       'do not rerun scale measurements',
       'CATALOG_OUTCOME_UNCERTAIN',
       '**ปรับในหน้านี้ · ยังไม่บันทึก**',
@@ -697,10 +698,19 @@ describe('Master Catalog authority consistency', () => {
     ]) {
       expect(p37OwnerUat).toContain(contract)
     }
+    expect(p37OwnerUat).toMatch(/without live developer or SQL\s+guidance/)
     expect(p37OwnerUat).toContain('Cards A-G require no reset after preparation')
     expect(p37OwnerUat).toContain('npm run db:local:p38:verify-inputs')
-    expect(p37OwnerUat).toContain('npm run db:local:p38:prepare -- --session "$P38_SESSION"')
+    expect(p37OwnerUat).toContain(
+      'npm run db:local:p38:prepare -- --session "$P38_SESSION" --scenario',
+    )
+    expect(p37OwnerUat).toContain('bounded-spot-check')
     expect(p37OwnerUat).toContain('npm run db:local:p38:cleanup -- --session "$P38_SESSION"')
+    expect(p37OwnerUat).toContain('P42-UAT-C03')
+    expect(p37OwnerUat).toContain('P42-UAT-G01')
+    expect(p37OwnerUat).toMatch(
+      /actual\s+\*\*ยืนยันและบันทึกลงฉบับร่าง\*\* action is absent/,
+    )
     expect(p37OwnerUat).toContain('CIC-PVC-998')
     expect(p37OwnerUat).toContain('does not merely change a trusted mapped price')
     expect(p37OwnerUat).toMatch(/Production `2568\.0\.0`\s+remains authority/)
@@ -742,6 +752,9 @@ describe('Master Catalog authority consistency', () => {
       'npm run db:local:p38:cleanup',
       'test ! -e "$P38_SESSION"',
       '--session "$P38_SESSION"',
+      '--scenario bounded-spot-check',
+      'full-owner-uat',
+      'schema-2',
       'No Local reset',
       'Production touched',
     ]) {
@@ -749,7 +762,7 @@ describe('Master Catalog authority consistency', () => {
     }
     expect(p38Preflight).toMatch(/P-37\s+remains \*\*HOLD\*\*/)
     expect(p38Preflight).toMatch(
-      /It never\s+creates, edits, publishes, or abandons a draft/,
+      /It never\s+creates,\s+edits,\s+publishes,\s+or abandons a draft/,
     )
     expect(p38Preflight).toContain('P-41 discovery correction gate')
     expect(p38Preflight).toContain('P-42 recovery execution')

@@ -54,6 +54,18 @@ they do not close strict Owner-scored evidence. Cleanup audited-abandoned
 `2568.1.0-D001`/`D002`, restored all catalog flags to `false`, and confirmed
 pointer `2568.0.0`/710 with zero working drafts and Production untouched.
 
+The first proportional post-correction run on exact `fd36be2` passed Spot-check
+1 and stopped during Spot-check 2. The Owner correctly found that E-01 hides the
+real save action after server rejection, while the procedure incorrectly asked
+to expose it and the always-visible progress label omitted **และ**. D003 was
+audited-abandoned. The legacy cleanup restored all flags, then refused evidence
+closure because schema 1 hard-coded the historical two-attempt Card A/G shape.
+Readback remained safe: pointer `2568.0.0`/710, zero drafts, all flags false,
+BOQ 198/1,547, Factor F `2569.0.0`/36, and Production untouched. Exact
+implementation `44f54a72b03549de995b431d6705ec1b2eeb3fa6` introduces immutable
+scenario-bound session schema 2 and aligns the third progress label. The old
+session stays immutable evidence and must not be relabeled or reused.
+
 **Boundary:** Local only. The one P-42 recovery reset was separately warned,
 approved, and completed; this note authorizes no further reset. It does not
 authorize successful publication, pointer movement during UAT, P-37
@@ -123,6 +135,14 @@ npm run db:local:p38:status -- --session "$P38_SESSION"
 npm run db:local:p38:prepare -- --session "$P38_SESSION"
 ```
 
+The command above retains the default `full-owner-uat` scenario for the
+historical Cards A-G contract. For the current proportional rerun, prepare a new
+path with the closed bounded scenario instead:
+
+```bash
+npm run db:local:p38:prepare -- --session "$P38_SESSION" --scenario bounded-spot-check
+```
+
 `verify-inputs` reads files only, rejects any manifest/source/authority/E-01/
 E-02 hash that differs from the tracked approved values, and requires the
 application adapter/profile to normalize all 708/708/693 retained rows. P-41
@@ -136,8 +156,10 @@ matches its configured pushed upstream, the verified manifest, exact disabled
 baseline including the canonical dataset hash, zero working drafts, and an
 active Local admin. It then enables only Local admin and new-identity
 capabilities, keeps retirement disabled, records the actor/baseline/first-
-middle-last search examples, and writes an untracked session record. It never
-creates, edits, publishes, or abandons a draft.
+middle-last search examples, binds `full-owner-uat` or `bounded-spot-check` into
+an immutable schema-2 session record, and writes it untracked. It never creates,
+edits, publishes, or abandons a draft. The scenario cannot be supplied again to
+`status` or `cleanup` and therefore cannot be changed after preparation.
 
 Record `P38_SESSION` with the UAT evidence and use that exact path for every
 later status/cleanup command. Session records are immutable; a retry uses a new
@@ -150,10 +172,14 @@ npm run db:local:p38:cleanup -- --session "$P38_SESSION"
 ```
 
 `cleanup` requires the same clean pushed HEAD used by `prepare`, zero working
-drafts, and exactly two new audited attempts, both abandoned, non-default, and
-unpublished. Under P-39 it also requires distinct immutable draft references,
-null official tuples, and the same retained target for both attempts. With a
-valid session, it attempts to restore the original flags
+drafts, and the scenario-bound version shape. `full-owner-uat` requires exactly
+two new audited attempts plus the P-39 distinct-reference, same-target, and
+consecutive-attempt proof. `bounded-spot-check` requires exactly one new audited
+attempt. Every created version in either scenario must be abandoned,
+non-default, unpublished, have a null official tuple, and carry a valid
+target-scoped draft reference. Legacy schema-1 sessions remain interpreted as
+`full-owner-uat`; they are never silently reclassified. With a valid session,
+cleanup attempts to restore the original flags
 even when source-provenance or pre-cleanup assertions fail, and then refuses
 evidence closure. A successful cleanup also requires the exact pointer,
 dataset hash, 710 rows, BOQ/BOQ-item counts, Factor F pointer/rows, and disabled
@@ -247,8 +273,8 @@ next scored `prepare`, require all of the following:
    the post-recovery P-42 session. Cards A-G passed their functional contracts,
    but live guidance and developer-operated Cards F-G required bounded finding
    correction/disposition. Those source corrections now pass; the Owner retains
-   completed functional Card B-E evidence and will run only the four
-   post-correction spot-checks in Note #35 Section 1.2 plus cleanup before P-37.
+   completed functional Card B-E evidence and Spot-check 1, and will run only
+   Spots 2-4 in Note #35 Section 1.2 plus cleanup before P-37.
 
 No Local reset is authorized by this note. Production touched: **No**.
 
@@ -274,7 +300,7 @@ The recovery precondition is complete:
    post-prepare reset, and no Production action.
 
 Do not reuse the cleaned session. After bounded findings are corrected and
-pushed, prepare one new immutable no-reset session for the four concise
-post-correction spot-checks in Note #35 Section 1.2. Completed Card B-E
-functional evidence remains valid and must not be replayed merely to obtain new
-screenshots. Production touched: **No**.
+pushed, prepare one new immutable no-reset `bounded-spot-check` session for
+Spots 2-4 in Note #35 Section 1.2. Spot-check 1 and completed Card B-E functional
+evidence remain valid and must not be replayed merely to obtain new screenshots.
+Production touched: **No**.

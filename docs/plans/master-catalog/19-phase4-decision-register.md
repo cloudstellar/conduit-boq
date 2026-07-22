@@ -238,6 +238,22 @@ and approved proportional revalidation of only the four corrected surfaces in
 Section 1.2, followed by clean disabled-baseline cleanup. No full Card B-E
 replay, migration, Local reset, or Production action was authorized.
 
+**P-42 proportional spot-check correction recorded:** 2026-07-22 — the Owner
+approved the recommended bounded correction after Spot-check 2 exposed
+P42-UAT-C03/G01. The real **ยืนยันและบันทึกลงฉบับร่าง** action remains hidden
+after failed server validation; only the always-visible third progress label is
+aligned to that exact wording. The tracked harness now binds one of two closed
+scenarios into immutable schema-2 session metadata: `full-owner-uat` preserves
+the historical two-attempt P-39 proof, while `bounded-spot-check` requires one
+audited-abandoned attempt. A scenario cannot be changed during status or
+cleanup. Exact implementation
+`44f54a72b03549de995b431d6705ec1b2eeb3fa6` adds no migration, reset,
+Production action, capability, or business workflow. Spot-check 1 is retained;
+only Spots 2-4 and corrected cleanup are authorized on a fresh exact-source
+session. The legacy D003 session remains immutable evidence: cleanup restored
+flags before refusing closure, and readback confirmed pointer `2568.0.0`/710,
+zero drafts, unchanged BOQ/Factor F, and Production untouched.
+
 **Capability-completeness alignment recorded:** 2026-07-12 — owner requested a
 full owner/developer audit and plan correction. Audit #29 adds WP-6.6 before
 WP-7 and reserves migration `020` for fix-forward authority/workflow hardening;
@@ -646,6 +662,7 @@ Production migration, deploy, feature enablement, or publication.
 | P-40 exploratory-UAT correction | Exact source checkpoint pushed and developer browser QA passed; scored UAT pending | Owner + developer | 2026-07-19 | `dc83c35`; money/unit/withdraw/parser/E-03 ordering corrected without migration/reset/Production/Factor F/hotfix change; real-parser inputs 708/708/693 and 34 files/216 tests passed; separate one-draft QA restored disabled baseline and is not scored evidence. |
 | P-41 P-38 discovery correction | Exact source, incremental smoke, and clean integrated chain passed; P-37/scored-UAT acceptance not inferred | Owner + developer | 2026-07-19 | UAT-06/UAT-07/UAT-08; `025` passed incremental and owner-approved clean execution; exact `adcca3939f3080cdf64bc6ad807051e9e85fed94`; all four smoke suites, canonical and final baseline passed. Fresh Cards A-G were open at this checkpoint; current P-42 closure is four spot-checks plus cleanup. |
 | P-42 final-review correction and recovery | Exact correction, separately approved recovery, functional Cards A-G, cleanup, and bounded finding source correction passed; strict independent score remains HOLD | Owner + developer | 2026-07-19/20 | Final-review correction `b2500b5e...`; recovery source `f8c6709...`; evidence checkpoint `1c901855...`; bounded finding correction `bdc104f77...`; session `session-p42-scored-20260719-f8c6709.json`. Final Local state is pointer `2568.0.0`/710, zero drafts, all catalog flags false, and unchanged BOQ/Factor F invariants. Findings B01, C01/C02, D01/D02, E01, and F02 are implemented/disposed. Completed functional Card B-E evidence is retained; only the four post-correction spot-checks in Note #35 Section 1.2 and cleanup remain open. No full replay, further reset, or Production action is authorized. |
+| P-42 proportional spot-check correction | P42-UAT-C03/G01 corrected; Spot-check 1 retained; P-37 remains HOLD | Owner + developer | 2026-07-22 | Exact `44f54a72b03549de995b431d6705ec1b2eeb3fa6` aligns the third import progress label and adds immutable full/two-attempt versus bounded/one-attempt cleanup scenarios without weakening persistence guards. D003 is audited-abandoned; Local is pointer `2568.0.0`/710, zero drafts, flags false. Only Spots 2-4 and corrected cleanup remain; no reset or Production action. |
 | Production migration | Not requested |  |  | P-12; request after WP-8 evidence review |
 | Deploy / feature enable | Not requested |  |  | P-13–P-14; request only after preceding Production gate passes |
 | Publish named version | Not requested |  |  | P-15 |
