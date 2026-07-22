@@ -132,7 +132,9 @@ export function MasterCatalogPlacementWorkspaceView({
   const leaveConfirmTriggerRef = useRef<HTMLAnchorElement | null>(null);
   const [pendingNavigationHref, setPendingNavigationHref] = useState<string | null>(null);
   const [restoredFromStorage, setRestoredFromStorage] = useState(false);
-  const [discardedStalePlacementChoices, setDiscardedStalePlacementChoices] = useState(false);
+  const [discardedStalePlacementScope, setDiscardedStalePlacementScope] = useState<string | null>(
+    null,
+  );
   const [readyStorageKey, setReadyStorageKey] = useState<string | null>(null);
   const storagePrefix = catalogPlacementStoragePrefix(workspace.version.id);
   const storageKey = catalogPlacementStorageKey(
@@ -140,6 +142,7 @@ export function MasterCatalogPlacementWorkspaceView({
     workspace.version.lockVersion,
     workspace.placementRevision,
   );
+  const discardedStalePlacementChoices = discardedStalePlacementScope === storagePrefix;
   const storageReady = readyStorageKey === storageKey;
   const [requestIdRef, prepareOperation, preserveInput] = useStableCatalogOperation(
     state,
@@ -388,7 +391,7 @@ export function MasterCatalogPlacementWorkspaceView({
     if (state.status === 'success') {
       window.sessionStorage.removeItem(storageKey);
       setRestoredFromStorage(false);
-      setDiscardedStalePlacementChoices(false);
+      setDiscardedStalePlacementScope(null);
       setConfirmOpen(false);
       router.refresh();
     }
@@ -418,7 +421,12 @@ export function MasterCatalogPlacementWorkspaceView({
       }
       window.sessionStorage.removeItem(candidateKey);
     }
-    setDiscardedStalePlacementChoices(discardedUserChoices);
+    // Strict Mode may replay this effect after the stale keys were removed.
+    setDiscardedStalePlacementScope((currentScope) => (
+      discardedUserChoices || currentScope === storagePrefix
+        ? storagePrefix
+        : null
+    ));
 
     const stored = window.sessionStorage.getItem(storageKey);
     if (stored) {

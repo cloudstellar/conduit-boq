@@ -283,7 +283,15 @@ describe('Master Catalog P-22 operator workflow', () => {
     expect(placementWorkspace).toContain("document.addEventListener('click', guardSameOriginNavigation, true)");
     expect(placementWorkspace).toContain('กู้คืนตัวเลือกที่ยังไม่ยืนยันแล้ว');
     expect(placementWorkspace).toContain('ยกเลิกตัวเลือกเดิมที่อ้างอิงฉบับร่างเก่าแล้ว');
-    expect(placementWorkspace).toContain('setDiscardedStalePlacementChoices');
+    expect(placementWorkspace).toContain(
+      'const discardedStalePlacementChoices = discardedStalePlacementScope === storagePrefix',
+    );
+    expect(placementWorkspace).toContain(
+      'setDiscardedStalePlacementScope((currentScope) => (',
+    );
+    expect(placementWorkspace).toContain(
+      'discardedUserChoices || currentScope === storagePrefix',
+    );
     expect(placementWorkspace).toContain('restoredFromStorage && hasPendingLocalChanges');
     expect(placementWorkspace).toContain('setRestoredFromStorage(false)');
     expect(placementWorkspace).toContain('ต้องแก้');
