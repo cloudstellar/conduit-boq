@@ -15,6 +15,21 @@ import { readLocalEnvFile } from './local-env.mjs'
 
 const MARKER = 'LOCAL-UAT-ONLY-NOT-AUTHORITY'
 const INPUT_SCHEMA = 'master-catalog-p38-owner-uat-inputs/1'
+const LEGACY_SESSION_SCHEMA = 'master-catalog-p38-owner-uat-session/1'
+const SESSION_SCHEMA = 'master-catalog-p38-owner-uat-session/2'
+const DEFAULT_SESSION_SCENARIO = 'full-owner-uat'
+const SESSION_SCENARIOS = Object.freeze({
+  'full-owner-uat': Object.freeze({
+    expectedCreatedVersions: 2,
+    requiresReplacementPair: true,
+    label: 'Owner Card A/G',
+  }),
+  'bounded-spot-check': Object.freeze({
+    expectedCreatedVersions: 1,
+    requiresReplacementPair: false,
+    label: 'Bounded post-correction spot-check',
+  }),
+})
 const REQUIRED_SHEET = '01_Item_Master_Final'
 const README_SHEET = '00_README'
 const ADMIN_EMAIL = 'local.admin@ntplc.co.th'
@@ -66,6 +81,11 @@ const inputsPath = readScopedPath(
   '--inputs',
   '.json',
 )
+const requestedScenario = mode === 'prepare'
+  ? readSessionScenario(options.scenario ?? DEFAULT_SESSION_SCENARIO)
+  : null
+assert(mode === 'prepare' || options.scenario === undefined,
+  '--scenario is accepted only by prepare and is then bound into the session')
 
 if (mode === 'verify-inputs') {
   console.log(JSON.stringify({ ok: true, mode, inputs: await verifyInputs() }, null, 2))
@@ -78,7 +98,9 @@ if (mode === 'verify-inputs') {
 } else {
   throw new Error(
     'Usage: manage-master-catalog-p38-owner-uat.mjs '
-      + '<verify-inputs|prepare|status|cleanup> [--session <tmp/...json>] [--inputs <tmp/...json>]',
+      + '<verify-inputs|prepare|status|cleanup> [--session <tmp/...json>] '
+      + '[--inputs <tmp/...json>] '
+      + '[--scenario <full-owner-uat|bounded-spot-check>]',
   )
 }
 
@@ -120,7 +142,8 @@ async function prepare() {
     })
 
     const metadata = {
-      schemaVersion: 'master-catalog-p38-owner-uat-session/1',
+      schemaVersion: SESSION_SCHEMA,
+      scenario: requestedScenario,
       status: 'prepared',
       preparedAt: new Date().toISOString(),
       sourceHead: gitHead(),
@@ -154,6 +177,7 @@ async function prepare() {
       mode,
       sessionPath: relative(ROOT, sessionPath),
       sourceHead: metadata.sourceHead,
+      scenario: metadata.scenario,
       actor: metadata.actor,
       pointer: summarizePointer(before.pointer),
       searchExamples,
@@ -195,6 +219,8 @@ async function status() {
 async function cleanup() {
   const metadata = await readJson(sessionPath, true)
   assertSessionMetadata(metadata)
+  const scenario = readMetadataScenario(metadata)
+  const scenarioContract = SESSION_SCENARIOS[scenario]
   const local = readLocalClients()
   let provenanceError = null
   let preCleanup
@@ -225,8 +251,10 @@ async function cleanup() {
     assertPointerUnchanged(preCleanup, metadata.before)
     assert(preCleanup.workingDrafts === 0,
       `Owner must abandon every UAT draft in the UI; found ${preCleanup.workingDrafts}`)
-    assert(createdVersions.length === 2,
-      `Owner Card A/G must leave exactly two new audited versions; found ${createdVersions.length}`)
+    assert(createdVersions.length === scenarioContract.expectedCreatedVersions,
+      `${scenarioContract.label} must leave exactly `
+        + `${scenarioContract.expectedCreatedVersions} new audited version(s); `
+        + `found ${createdVersions.length}`)
     assert(createdVersions.every((version) =>
       version.status === 'abandoned'
       && version.is_default === false
@@ -237,15 +265,17 @@ async function cleanup() {
         version.target_version_string,
       ) === version.draft_attempt),
     'Every P-38-created version must be abandoned, non-default, and unpublished')
-    assert(new Set(createdVersions.map((version) => version.draft_reference)).size === 2,
-      'P-39 requires a different immutable draft reference for each attempt')
-    assert(new Set(createdVersions.map((version) => version.target_version_string)).size === 1,
-      'P-39 requires the replacement draft to reuse the released target version')
-    const createdAttempts = createdVersions
-      .map((version) => version.draft_attempt)
-      .sort((left, right) => left - right)
-    assert(createdAttempts[1] === createdAttempts[0] + 1,
-      'P-39 requires consecutive target-scoped draft attempts')
+    if (scenarioContract.requiresReplacementPair) {
+      assert(new Set(createdVersions.map((version) => version.draft_reference)).size === 2,
+        'P-39 requires a different immutable draft reference for each attempt')
+      assert(new Set(createdVersions.map((version) => version.target_version_string)).size === 1,
+        'P-39 requires the replacement draft to reuse the released target version')
+      const createdAttempts = createdVersions
+        .map((version) => version.draft_attempt)
+        .sort((left, right) => left - right)
+      assert(createdAttempts[1] === createdAttempts[0] + 1,
+        'P-39 requires consecutive target-scoped draft attempts')
+    }
   } catch (error) {
     preCleanupError = error
   } finally {
@@ -603,8 +633,7 @@ function assertPointerUnchanged(current, before) {
 }
 
 function assertSessionMetadata(metadata) {
-  assert(metadata.schemaVersion === 'master-catalog-p38-owner-uat-session/1',
-    'P-38 session schema is invalid')
+  readMetadataScenario(metadata)
   assert(metadata.status === 'prepared', `P-38 session status is ${metadata.status}`)
   assert(metadata.branch === 'codex/master-catalog-phase4',
     'P-38 session branch is invalid')
@@ -877,8 +906,11 @@ function readOptions(args) {
   for (let index = 0; index < args.length; index += 2) {
     const key = args[index]
     const value = args[index + 1]
-    if (!['--session', '--inputs'].includes(key) || !value) {
-      throw new Error('Options must be --session <path> and/or --inputs <path>')
+    if (!['--session', '--inputs', '--scenario'].includes(key) || !value) {
+      throw new Error(
+        'Options must be --session <path>, --inputs <path>, and/or '
+          + '--scenario <full-owner-uat|bounded-spot-check>',
+      )
     }
     result[key.slice(2)] = value
   }
@@ -986,6 +1018,7 @@ function summarizePointer(pointer) {
 function summarizeSession(metadata) {
   return {
     status: metadata.status,
+    scenario: readMetadataScenario(metadata),
     preparedAt: metadata.preparedAt,
     cleanedAt: metadata.cleanedAt ?? null,
     sourceHead: metadata.sourceHead,
@@ -994,6 +1027,20 @@ function summarizeSession(metadata) {
     productionTouched: metadata.productionTouched,
     localResetPerformed: metadata.localResetPerformed,
   }
+}
+
+function readSessionScenario(value) {
+  assert(typeof value === 'string' && Object.hasOwn(SESSION_SCENARIOS, value),
+    `P-38 session scenario is invalid: ${value}`)
+  return value
+}
+
+function readMetadataScenario(metadata) {
+  if (metadata.schemaVersion === LEGACY_SESSION_SCHEMA) {
+    return DEFAULT_SESSION_SCENARIO
+  }
+  assert(metadata.schemaVersion === SESSION_SCHEMA, 'P-38 session schema is invalid')
+  return readSessionScenario(metadata.scenario)
 }
 
 function assertTrackedTreeClean() {

@@ -85,7 +85,10 @@ describe('Master Catalog P-22 operator workflow', () => {
     expect(panel).not.toContain('/admin/master-catalog/import?draftId=');
     expect(panel).toContain('เลือกไฟล์และหลักฐาน');
     expect(panel).toContain('ตรวจผลต่างกับเซิร์ฟเวอร์');
-    expect(panel).toContain('ยืนยันบันทึกลงฉบับร่าง');
+    expect(panel).toContain('ยืนยันและบันทึกลงฉบับร่าง');
+    expect(panel).not.toContain("'ยืนยันบันทึกลงฉบับร่าง'");
+    expect(panel).toContain('ปุ่มบันทึกถูกซ่อนไว้จนกว่าจะอนุมัติเปิดความสามารถนี้');
+    expect(panel).toContain('canPersistCatalogImportPreview(');
     expect(panel).toContain('01_Item_Master_Final');
     expect(panel).toContain('?notice=import-applied');
   });

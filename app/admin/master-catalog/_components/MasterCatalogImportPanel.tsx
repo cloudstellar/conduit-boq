@@ -472,7 +472,7 @@ function ImportProgress({ currentStep }: { currentStep: 1 | 2 | 3 }) {
   const steps = [
     'เลือกไฟล์และหลักฐาน',
     'ตรวจผลต่างกับเซิร์ฟเวอร์',
-    'ยืนยันบันทึกลงฉบับร่าง',
+    'ยืนยันและบันทึกลงฉบับร่าง',
   ] as const;
 
   return (
