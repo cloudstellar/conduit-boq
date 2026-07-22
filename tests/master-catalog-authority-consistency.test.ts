@@ -452,7 +452,7 @@ describe('Master Catalog authority consistency', () => {
       /P-33 accepted that\s+exact bounded WP-7\.5 technical checkpoint at 2026-07-15 13:54 \+07/,
     )
     expect(tracker).toContain(
-      '| Current work package | WP-8/P-37 HOLD; Spot-checks 1-2 and D004 schema-2 cleanup passed and are retained; exact-source Spot-checks 3-4 plus final scenario-bound cleanup remain open |',
+      '| Current work package | WP-8/P-37 HOLD only for explicit Owner accept/hold; proportional exact-source execution and final scenario-bound cleanup are complete |',
     )
     expect(tracker).toContain('P42-UAT-C03')
     expect(tracker).toContain('P42-UAT-G01')
@@ -466,10 +466,10 @@ describe('Master Catalog authority consistency', () => {
       '16e88c6487307c4bb0606a048dc53e05e9dcee18',
     )
     expect(tracker).toContain(
-      '| Current environment | Clean Local post-D004 baseline: pointer/default `2568.0.0`',
+      '| Current environment | Clean Local post-D005 baseline: pointer/default `2568.0.0`',
     )
     expect(tracker).toContain('zero working drafts; all catalog flags false')
-    expect(tracker).toContain('no further reset is implied')
+    expect(tracker).toContain('No reset or Production decision is requested')
     expect(tracker).toContain(
       '0780925aca8fa7ebbf8abbaf2b7cf151b39b676a',
     )
@@ -578,15 +578,15 @@ describe('Master Catalog authority consistency', () => {
       /pre-amendment operator\/browser preflight passed on\s+`c8f6dca`/,
     )
     expect(tracker).toContain(
-      'Status: Clean Local pointer 2568.0.0/710, zero working drafts, all catalog flags false; D004 audited-abandoned and cleaned; D003 retained as historical fail-closed evidence; no Production action authorized',
+      'Status: Exact-source D005 execution and scenario-bound cleanup passed; clean Local pointer 2568.0.0/710, zero working drafts, all catalog flags false; no Production action authorized',
     )
     expect(tracker).toContain('2c39dddd10c361bd1244292f4bd79e06f167c919')
     expect(verificationReport).toContain('undefined `rows` helper')
     expect(verificationReport).toContain(
-      'HOLD under Closure Matrix #34',
+      'P-37 remains **HOLD** only for',
     )
     expect(verificationReport).toContain(
-      'Open: Closure Matrix #34 C-07 through C-10 for Spots 3-4 only',
+      'Execution passed; Closure Matrix #34 C-08/C-09 await explicit Owner disposition',
     )
     expect(verificationReport).toContain(
       'Passed: Closure Matrix #34 C-11',
@@ -652,20 +652,20 @@ describe('Master Catalog authority consistency', () => {
       'docs/plans/master-catalog/34-phase4-wp8-p37-closure-matrix.md',
     )
     for (const contract of [
-      'P-37 remains **HOLD for unresolved closure evidence**',
+      'P-37 remains **HOLD only for the explicit Owner accept/hold',
       '| C-07 | One complete independent placement task |',
       '| C-09 | Independent core-admin UAT |',
       '| C-10 | At least three safe validation-error/prevention recoveries |',
       '| C-11 | 710-row performance baseline |',
       '| C-12 | Documentation consistency |',
       '| C-13 | Disabled clean Local baseline |',
-      '| Passed for current checkpoint |',
+      '| Passed after final consistency gate |',
       'one stale rejection with zero effect and exactly one accepted UI batch/change set',
       'bdc104f77f18ea8fc776950259bc25e68c2fd42a',
       'bcc041772b3f537de66b655c5115c4e3c2da9325',
       'P42-UAT-OV01',
       'four post-correction Owner spot-checks',
-      'only exact-source Spots 3-4 and final cleanup remain open',
+      'same-request portion of Spot-check 4, and cleanup passed',
     ]) {
       expect(p37Closure).toContain(contract)
     }
@@ -691,10 +691,10 @@ describe('Master Catalog authority consistency', () => {
       'docs/plans/master-catalog/35-phase4-wp8-p37-evidence-reconciliation-and-owner-uat-script.md',
     )
     for (const contract of [
-      'P-37 remains **HOLD**',
+      'P-37 remains **HOLD only for an explicit Owner accept/hold decision**',
       'Card C E-01/E-02',
       'P-42 recovery retained one stale rejection with zero effect and exactly one accepted UI batch',
-      'Owner-visible Spots 3-4 plus clean closeout',
+      'Spots 1-3, same-request Spot 4, and final cleanup are retained',
       'No scale measurement rerun remains',
       'CATALOG_OUTCOME_UNCERTAIN',
       '**ปรับในหน้านี้ · ยังไม่บันทึก**',
@@ -702,7 +702,7 @@ describe('Master Catalog authority consistency', () => {
     ]) {
       expect(p37OwnerUat).toContain(contract)
     }
-    expect(p37OwnerUat).toMatch(/without live developer or SQL\s+guidance/)
+    expect(p37OwnerUat).toContain('strict score HOLD because live guidance was used')
     expect(p37OwnerUat).toContain('Cards A-G require no reset after preparation')
     expect(p37OwnerUat).toContain('npm run db:local:p38:verify-inputs')
     expect(p37OwnerUat).toContain(
@@ -716,7 +716,7 @@ describe('Master Catalog authority consistency', () => {
       '16e88c6487307c4bb0606a048dc53e05e9dcee18',
     )
     expect(p37OwnerUat).toContain(
-      'D004 schema-2 cleanup passed with one audited-abandoned attempt',
+      'D004 and final D005 schema-2 cleanup each passed with one audited-abandoned attempt',
     )
     expect(p37OwnerUat).toMatch(
       /actual\s+\*\*ยืนยันและบันทึกลงฉบับร่าง\*\* action is absent/,
