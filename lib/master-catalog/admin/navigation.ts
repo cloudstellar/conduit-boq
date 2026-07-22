@@ -1,4 +1,11 @@
 const ITEM_CODE_NOTICE_PATTERN = /^[A-Z0-9-]{1,64}$/;
+const UUID_NOTICE_PATTERN =
+  /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+
+export interface CatalogItemMutationNotice {
+  recoveredRequest: boolean;
+  requestId: string | null;
+}
 
 export function safeCatalogItemReturnHref(value: string | null, versionId: string): string {
   const fallback = catalogVersionWorkspaceHref(versionId);
@@ -43,6 +50,38 @@ export function catalogWithdrawnItemCode(
     return null;
   }
   return itemCode;
+}
+
+export function catalogItemMutationSuccessHref(
+  returnTo: string | null,
+  versionId: string,
+  identityId: string,
+  duplicateRequest: boolean,
+  requestId: string | null,
+): string {
+  const target = new URL(
+    `${catalogVersionWorkspaceHref(versionId)}/items/${identityId}`,
+    'http://local.invalid',
+  );
+  target.searchParams.set('returnTo', safeCatalogItemReturnHref(returnTo, versionId));
+  target.searchParams.set('notice', 'item-saved');
+  if (duplicateRequest) target.searchParams.set('outcome', 'recovered');
+  if (requestId && UUID_NOTICE_PATTERN.test(requestId)) {
+    target.searchParams.set('requestId', requestId);
+  }
+  return `${target.pathname}${target.search}`;
+}
+
+export function catalogItemMutationNotice(
+  notice: string | null,
+  outcome: string | null,
+  requestId: string | null,
+): CatalogItemMutationNotice | null {
+  if (notice !== 'item-saved') return null;
+  return {
+    recoveredRequest: outcome === 'recovered',
+    requestId: requestId && UUID_NOTICE_PATTERN.test(requestId) ? requestId : null,
+  };
 }
 
 function catalogVersionWorkspaceHref(versionId: string): string {

@@ -1,8 +1,8 @@
 'use client';
 
 import Link from 'next/link';
-import { useRouter, useSearchParams } from 'next/navigation';
-import { useActionState, useEffect, useRef, useState, type FormEvent } from 'react';
+import { useSearchParams } from 'next/navigation';
+import { useActionState, useRef, useState, type FormEvent } from 'react';
 import { useFormStatus } from 'react-dom';
 import { ArrowLeft, CheckCircle2, History, Loader2, Save, ShieldAlert } from 'lucide-react';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
@@ -37,7 +37,10 @@ import {
   normalizeCatalogMoneyInput,
   sumCatalogMoneyInputs,
 } from '@/lib/master-catalog/admin/money';
-import { safeCatalogItemReturnHref } from '@/lib/master-catalog/admin/navigation';
+import {
+  catalogItemMutationNotice,
+  safeCatalogItemReturnHref,
+} from '@/lib/master-catalog/admin/navigation';
 import { formatCatalogDictionaryLabel } from '@/lib/master-catalog/admin/presentation';
 import { applyCatalogManualChangeAction } from '../actions';
 import { CatalogMoneyInput } from './CatalogMoneyInput';
@@ -103,12 +106,11 @@ export function MasterCatalogItemEditor({
     state,
     `${item.versionId}:${item.identityId}:${action}`,
   );
-  const router = useRouter();
-
-  useEffect(() => {
-    if (state.status !== 'success') return;
-    router.refresh();
-  }, [router, state.status]);
+  const mutationNotice = catalogItemMutationNotice(
+    searchParams.get('notice'),
+    searchParams.get('outcome'),
+    searchParams.get('requestId'),
+  );
 
   function handleSubmitCapture(event: FormEvent<HTMLFormElement>) {
     if (action === 'update' && (!normalizedMaterialCost || !normalizedLaborCost)) {
@@ -190,23 +192,42 @@ export function MasterCatalogItemEditor({
           </CardHeader>
           <CardContent>
             {canMutate ? (
-              <form
-                ref={mutationFormRef}
-                action={formAction}
-                className="grid gap-5"
-                noValidate
-                onReset={preserveInput}
-                onSubmitCapture={handleSubmitCapture}
-                onSubmit={handleMutationSubmit}
-              >
-                <input ref={requestIdRef} type="hidden" name="requestId" />
-                <input type="hidden" name="versionId" value={item.versionId} />
-                <input type="hidden" name="expectedLockVersion" value={item.lockVersion} />
-                <input type="hidden" name="targetIdentityId" value={item.identityId} />
-                <input type="hidden" name="targetItemCode" value={item.itemCode} />
-                <input type="hidden" name="action" value={action} />
-                <input type="hidden" name="returnTo" value={returnHref} />
-                <MutationAlert state={state} />
+              <div className="grid gap-5">
+                {state.status === 'idle' && mutationNotice ? (
+                  <Alert aria-live="polite">
+                    <CheckCircle2 />
+                    <AlertTitle>บันทึกฉบับร่างแล้ว</AlertTitle>
+                    <AlertDescription className="grid gap-1">
+                      <span>
+                        {mutationNotice.recoveredRequest
+                          ? 'ระบบยืนยันว่าคำขอเดิมถูกบันทึกไว้แล้ว โดยไม่บันทึกซ้ำ'
+                          : 'บันทึกการเปลี่ยนแปลงในฉบับร่างแล้ว'}
+                      </span>
+                      {mutationNotice.requestId ? (
+                        <span className="text-xs text-muted-foreground">
+                          รหัสคำขอ {mutationNotice.requestId}
+                        </span>
+                      ) : null}
+                    </AlertDescription>
+                  </Alert>
+                ) : null}
+                <form
+                  ref={mutationFormRef}
+                  action={formAction}
+                  className="grid gap-5"
+                  noValidate
+                  onReset={preserveInput}
+                  onSubmitCapture={handleSubmitCapture}
+                  onSubmit={handleMutationSubmit}
+                >
+                  <input ref={requestIdRef} type="hidden" name="requestId" />
+                  <input type="hidden" name="versionId" value={item.versionId} />
+                  <input type="hidden" name="expectedLockVersion" value={item.lockVersion} />
+                  <input type="hidden" name="targetIdentityId" value={item.identityId} />
+                  <input type="hidden" name="targetItemCode" value={item.itemCode} />
+                  <input type="hidden" name="action" value={action} />
+                  <input type="hidden" name="returnTo" value={returnHref} />
+                  <MutationAlert state={state} />
 
                 <div className="grid gap-2">
                   <Label htmlFor="item-action">การดำเนินการ</Label>
@@ -312,12 +333,13 @@ export function MasterCatalogItemEditor({
                 {action === 'reactivate' ? <ConfirmNote text="เปิดใช้ตัวตนรายการและรหัสเดิมอีกครั้ง พร้อมบันทึกข้อมูลก่อนและหลังการเปลี่ยนแปลง" /> : null}
                 {action === 'withdraw' ? <ConfirmNote text="ลบเฉพาะแถวชั่วคราวจากฉบับร่าง โดยคงตัวตนรายการ รหัสที่สงวน และประวัติทั้งหมด" /> : null}
 
-                <div className="grid gap-2">
-                  <Label htmlFor="item-change-reason">เหตุผล</Label>
-                  <Input id="item-change-reason" name="reason" required />
-                </div>
-                <div><SubmitButton /></div>
-              </form>
+                  <div className="grid gap-2">
+                    <Label htmlFor="item-change-reason">เหตุผล</Label>
+                    <Input id="item-change-reason" name="reason" required />
+                  </div>
+                  <div><SubmitButton /></div>
+                </form>
+              </div>
             ) : (
               <ReadOnlyFields item={item} />
             )}

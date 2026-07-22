@@ -175,6 +175,10 @@ describe('Master Catalog P-22 operator workflow', () => {
     expect(workspace).toContain('ถอนรายการใหม่ออกจากฉบับร่างแล้ว');
     expect(actions).toContain(".from('catalog_change_items')");
     expect(actions).toContain('createdIdentityId');
+    expect(actions).toContain('catalogItemMutationSuccessHref(');
+    expect(itemEditor).toContain('ระบบยืนยันว่าคำขอเดิมถูกบันทึกไว้แล้ว โดยไม่บันทึกซ้ำ');
+    expect(itemEditor).toContain('catalogItemMutationNotice(');
+    expect(itemEditor).not.toContain('router.refresh();');
     expect(workspace).toContain('รหัสที่ระบบจัดสรร');
     expect(workspace).toContain('เปิดรายการนี้');
     expect(workspace).toContain('createdItemHref={createdItemHref}');

@@ -32,7 +32,10 @@ import {
   validateCatalogPublishVersionConfirmation,
 } from '@/lib/master-catalog/admin/actionModel';
 import { logMasterCatalogOperation } from '@/lib/master-catalog/observability';
-import { catalogWithdrawSuccessHref } from '@/lib/master-catalog/admin/navigation';
+import {
+  catalogItemMutationSuccessHref,
+  catalogWithdrawSuccessHref,
+} from '@/lib/master-catalog/admin/navigation';
 import {
   classifyCatalogVersionTransition,
   isCatalogAnnualEffectiveYearAllowed,
@@ -296,7 +299,8 @@ export async function applyCatalogManualChangeAction(
 
   if (result.status === 'success') {
     revalidateMasterCatalogPaths(result.versionId ?? args.p_version_id);
-    if (formData.get('action') === 'withdraw') {
+    const action = formData.get('action');
+    if (action === 'withdraw') {
       const returnTo = formData.get('returnTo');
       const itemCode = formData.get('targetItemCode');
       redirect(catalogWithdrawSuccessHref(
@@ -304,6 +308,19 @@ export async function applyCatalogManualChangeAction(
         result.versionId ?? args.p_version_id,
         typeof itemCode === 'string' ? itemCode : '',
       ));
+    }
+    if (action !== 'add') {
+      const returnTo = formData.get('returnTo');
+      const identityId = formData.get('targetIdentityId');
+      if (typeof identityId === 'string') {
+        redirect(catalogItemMutationSuccessHref(
+          typeof returnTo === 'string' ? returnTo : null,
+          result.versionId ?? args.p_version_id,
+          identityId,
+          result.duplicateRequest === true,
+          result.requestId ?? requestId,
+        ));
+      }
     }
   }
 
