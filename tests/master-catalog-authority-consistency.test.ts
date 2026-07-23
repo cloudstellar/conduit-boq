@@ -148,7 +148,7 @@ describe('Master Catalog authority consistency', () => {
       'P-32 separate-apply evidence/P-33 technical acceptance/P-34 historical UX source-static/P-36 integrated technical evidence passed; first P-37 intended-admin UAT failed comprehension, while corrected technical/recovery evidence and the final owner keyboard/focus/presentation UAT later passed',
     )
     expect(migrations).toContain(
-      'P-37 remains HOLD for the unresolved closure evidence in Note #34, including final owner UI submission and broader independent WP-8 UAT; DB contract unchanged; not Production-approved',
+      'exact no-reset D007 on pushed `8fb9839a6c9d169dd8c48bd5314d96c2801a28fa` closed C-08 and restored the disabled baseline; P-37 remains HOLD only for explicit Owner accept/hold; DB contract unchanged; not Production-approved',
     )
     expect(existsSync(resolve(
       root,
@@ -389,10 +389,10 @@ describe('Master Catalog authority consistency', () => {
       'Approved and technically passed 2026-07-15 on exact gate/execution checkout `910cc3cc74660beecf18655d39cd0b0c085d1fc6`; Local only; interaction/UAT acceptance remains P-37',
     )
     expect(decisions).toContain(
-      'First Card A was stopped and safely cleaned after the official-number-gap finding',
+      'fresh independent scored Card A later stopped under P-42 after an unintended',
     )
     expect(decisions).toContain(
-      'P-42 later retained completed Card B-E evidence and narrowed current closure',
+      'P-42 later retained Card B-E evidence and reduced the current pass to four spot-checks',
     )
     expect(decisions).toContain(
       'Approved 2026-07-18 for Local-only architecture/source/migration/docs/verification',
@@ -445,8 +445,8 @@ describe('Master Catalog authority consistency', () => {
     expect(tracker).toMatch(/\| WP-6\.6 \|[^\n]+\| Complete \|/)
     expect(tracker).toMatch(/\| WP-7 \|[^\n]+\| Complete \|/)
     expect(tracker).toMatch(/\| WP-7\.5 \|[^\n]+\| Complete \|/)
-    expect(tracker).toMatch(/\| WP-8 \|[^\n]+\| In progress \|/)
-    expect(tracker).toContain('independent intended-admin UAT remains WP-8')
+    expect(tracker).toMatch(/\| WP-8 \|[^\n]+\| Ready for owner review \|/)
+    expect(tracker).toContain('P-37 is HOLD only for explicit Owner accept/hold')
     expect(tracker).toContain('| Production write allowed | No |')
     expect(tracker).toMatch(
       /P-33 accepted that\s+exact bounded WP-7\.5 technical checkpoint at 2026-07-15 13:54 \+07/,
@@ -466,7 +466,7 @@ describe('Master Catalog authority consistency', () => {
       '16e88c6487307c4bb0606a048dc53e05e9dcee18',
     )
     expect(tracker).toContain(
-      '| Current environment | Clean Local post-D005 baseline: pointer/default `2568.0.0`',
+      '| Current environment | Clean Local post-D007 baseline: pointer/default `2568.0.0`',
     )
     expect(tracker).toContain('zero working drafts; all catalog flags false')
     expect(tracker).toContain('No reset or Production decision is requested')
@@ -578,7 +578,7 @@ describe('Master Catalog authority consistency', () => {
       /pre-amendment operator\/browser preflight passed on\s+`c8f6dca`/,
     )
     expect(tracker).toContain(
-      'Status: Exact-source D005 execution and scenario-bound cleanup passed; clean Local pointer 2568.0.0/710, zero working drafts, all catalog flags false; no Production action authorized',
+      'Status: Exact-source D005 execution plus exact D007 stale-choice replay and scenario-bound cleanup passed; clean Local pointer 2568.0.0/710, zero working drafts, all catalog flags false; no Production action authorized',
     )
     expect(tracker).toContain('2c39dddd10c361bd1244292f4bd79e06f167c919')
     expect(verificationReport).toContain('undefined `rows` helper')
@@ -586,7 +586,7 @@ describe('Master Catalog authority consistency', () => {
       'P-37 remains **HOLD** only for',
     )
     expect(verificationReport).toContain(
-      'Execution passed; Closure Matrix #34 C-08/C-09 await explicit Owner disposition',
+      'Execution passed; Closure Matrix #34 C-08 passed and C-09 awaits explicit Owner accept/hold',
     )
     expect(verificationReport).toContain(
       'Passed: Closure Matrix #34 C-11',

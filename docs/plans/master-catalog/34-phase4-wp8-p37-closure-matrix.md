@@ -7,14 +7,18 @@ decision**. Exact pushed execution source
 interaction and same-request response-loss recovery, and D005 cleanup restored
 the disabled `2568.0.0`/710 baseline without reset or Production access.
 Follow-up application checkpoint `b639c03` keeps definitive recovered-success
-feedback visible across refresh. The only observation not separately captured
-before cleanup is the post-reload stale-choice-discard banner; its underlying
-lock/revision discard is covered by retained Card D evidence and automated
-contracts.
+feedback visible across refresh. Exact pushed checkpoint
+`8fb9839a6c9d169dd8c48bd5314d96c2801a28fa` then corrected the development
+Strict Mode replay of the stale-choice notice and passed one bounded no-reset
+visual replay. Draft `2568.1.0-D007` displayed
+**ยกเลิกตัวเลือกเดิมที่อ้างอิงฉบับร่างเก่าแล้ว**, discarded the old browser-only
+choice, restored the current system suggestion, and was audited-abandoned.
+Scenario-bound cleanup restored the disabled `2568.0.0`/710 baseline with zero
+working drafts, zero placement reviews, no reset, and no Production access.
 
-**Decision posture:** The Owner may now accept P-37 with the bounded banner
-observation recorded as managed residual evidence, or request one narrow
-no-reset visual replay. Do not infer that decision from “ทำต่อ”. P-12,
+**Decision posture:** C-08 is now passed. The Owner may accept or hold P-37
+against the complete bounded evidence; do not infer that decision from
+“ทำต่อ”. P-12,
 Add/Supplement, Production readiness, deployment, enablement, publication,
 P-19, Factor F, and hotfix work remain separate gates.
 
@@ -99,7 +103,10 @@ physical scrolling and one unconfirmed gap change. Spot-check 4 retained form
 values and recovered one same-request effect with request
 `533ad2d2-c2b4-4207-8f72-1c8b8b8692b1`. D005 was audited-abandoned and
 schema-2 cleanup passed. The stale-choice-discard banner was not separately
-captured before cleanup; no response-loss or full-flow replay remains.
+captured before that cleanup. The later exact-source D007 no-reset replay on
+`8fb9839a6c9d169dd8c48bd5314d96c2801a28fa` captured the banner, confirmed
+the stale choice was discarded without a placement write, and closed with a
+clean scenario-bound readback. No response-loss or full-flow replay remains.
 
 ## 1. Why this matrix exists
 
@@ -130,15 +137,15 @@ Local cleanup.
 | C-02 | DB/RLS/role/rollback/race/idempotency/P-20/BOQ/Factor F invariants | Clean WP-6.5/WP-6.6/WP-7/WP-7.5 passed trigger inventory, post-withdraw `0..N-1`, relative order, exactly-one revision, rollback/race/replay, role/RLS, pointer, BOQ, Factor F, suffix, and no-Production assertions; evidence SHA-256 `4b69e44dde915ca25c3f78379a1c45b002b31cb8aebcbf361ec3b58670f9e245`, `e9e28eb1bb6f312a4638c0d67b00cb420864d5433295ffb80a95a12ee9e14251`, `5b6a01837d2836a33a000489ff6dad4519ca40ca67e48464cc384b84721c8195`, `0fd213f5ace8e077790d81a1c49b78a3fff3f1912a01aef5b52b7df6d1460240` | Passed after P-41 clean chain | Rerun affected harnesses only after later source/migration changes |
 | C-03 | Tracked official export verification | P-11 exact pair was owner-accepted; P-36 regenerated and independently verified the active 710-row Excel/PDF evidence | Passed | Production filing remains P-15, not P-37 |
 | C-04 | Security/performance advisor blocker review | P-36 returned no security blocker; baseline performance findings and the unused `v_row_count` are assigned to P-12 with owners and rationale | Passed for P-37 | Reassess/minimize before P-12; this is not a Production waiver |
-| C-05 | Repository/source quality | Earlier exact recovery, bounded, responsive `P42-UAT-OV01`, and C03/G01 checkpoints remain retained. Exact `16e88c6487307c4bb0606a048dc53e05e9dcee18` corrected the modal boundary; exact D005 passed the affected interaction. Follow-up `b639c03` adds durable normal/recovered success feedback with focused navigation/operator contracts | Passed for corrected source | Preserve the final repository gate results; no migration or DB harness rerun is required |
+| C-05 | Repository/source quality | Earlier exact recovery, bounded, responsive `P42-UAT-OV01`, and C03/G01 checkpoints remain retained. Exact `16e88c6487307c4bb0606a048dc53e05e9dcee18` corrected the modal boundary; exact D005 passed the affected interaction. Follow-up `b639c03` adds durable normal/recovered success feedback, and exact `8fb9839a6c9d169dd8c48bd5314d96c2801a28fa` preserves the stale-choice notice across Strict Mode effect replay with focused operator/storage regression coverage | Passed for corrected source | Preserve the final repository gate results; no migration or DB harness rerun is required |
 | C-06 | Placement comprehension, review by exception, keyboard, focus, and final presentation | Owner passed all named overview/gap/sibling/leave-reload/keyboard/focus/previous-new-next checks and later physically scrolled the exact modal-contained list and changed one gap without saving | Passed | Preserve retained controls; do not replay the full placement task |
 | C-07 | One complete independent placement task | Retained Card D recorded one stale rejection with zero effect and exactly one accepted UI batch/change set; final exact-source Spot-check 3 passed the corrected interaction without submitting a second batch | Passed | None for execution; Owner accept/hold remains |
-| C-08 | Stale-placement recovery inside the independent owner task | Retained Card D passed two-tab stale rejection, fresh recovery, one accepted batch, and current-state readback. Schema-3 storage binds choices to version/lock/revision. The final post-reload discard banner was not separately captured before D005 cleanup | Owner disposition required | Accept the bounded visual-observation residual or request only one no-reset banner replay |
+| C-08 | Stale-placement recovery inside the independent owner task | Retained Card D passed two-tab stale rejection, fresh recovery, one accepted batch, and current-state readback. Schema-3 storage binds choices to version/lock/revision. Exact no-reset D007 on pushed `8fb9839a6c9d169dd8c48bd5314d96c2801a28fa` displayed the discard banner, removed the stale browser choice, restored the current system suggestion, wrote no placement review, and cleaned to the disabled baseline | Passed | None for execution; Owner accept/hold remains C-09 |
 | C-09 | Independent core-admin UAT | Functional Cards B-E, responsive containment, Spots 1-3, same-request Spot 4, and final cleanup passed; no full-flow replay remains | Ready for Owner decision | Explicitly accept or hold P-37; “ทำต่อ” is not acceptance |
 | C-10 | At least three safe validation-error/prevention recoveries | Stale review, E-01/E-02, stale placement, and uncertain-response recovery passed without unintended writes; final retry reused one request and one effect | Passed | Preserve request/effect evidence; do not repeat response-loss |
 | C-11 | 710-row performance baseline | Retained P-36/P-42 measurements remain valid. Spot-check 1 passed add/PDF wording and D004 Spot-check 2 passed corrected import wording without repeating scale measurements | Passed | Preserve existing measurements and export evidence |
-| C-12 | Documentation consistency | Note #35, Verification, Decision Register, Tracker, and this matrix record exact D005 execution, the bounded residual, durable success feedback, and cleanup facts | Passed after final consistency gate | Continue excluding `files/`, `tmp/`, and `output/` from commits |
-| C-13 | Disabled clean Local baseline | Final schema-2 D005 cleanup passed with exactly one audited-abandoned attempt and restored pointer `2568.0.0`/710, zero drafts, all flags false, BOQ 198/1,547, Factor F `2569.0.0`/36 | Passed | Every future reset remains separately gated |
+| C-12 | Documentation consistency | Note #35, Verification, Decision Register, Tracker, and this matrix record exact D005 execution, exact D007 banner closure, durable success feedback, and cleanup facts | Passed after final consistency gate | Continue excluding `files/`, `tmp/`, and `output/` from commits |
+| C-13 | Disabled clean Local baseline | Final exact-source D007 cleanup passed with exactly one audited-abandoned attempt and restored pointer `2568.0.0`/710, zero drafts, all flags false, BOQ/Factor F unchanged, no reset, and Production untouched | Passed | Every future reset remains separately gated |
 
 ## 3. Minimal closure sequence
 
@@ -181,6 +188,12 @@ Browser wheel behavior exposed in Spot-check 3. Final exact-source session
 `session-p42-final-spotcheck-20260722-6fe3a6a.json` then passed the affected
 placement interaction, same-request recovery, and final schema-2 cleanup.
 Application checkpoint `b639c03` closes the durable-success feedback finding.
+Exact checkpoint `8fb9839a6c9d169dd8c48bd5314d96c2801a28fa` then closed the
+stale-choice visual finding. Session
+`session-p42-banner-replay-final-20260723-8fb9839.json` created only D007,
+advanced its draft lock in a second tab, displayed the discard banner on
+return, and completed scenario-bound cleanup with no reset or Production
+action.
 
 ### C. One bounded no-reset Local owner spot-check
 
@@ -193,12 +206,12 @@ Before handing over the browser, use Note #36 and the tracked
 `db:local:p38:*` commands. The harness verifies inputs/baseline, never creates
 or abandons an Owner draft, and keeps retirement disabled.
 
-The scored UAT itself did not reset Local Supabase. The separately approved
+The scored UAT and final banner replay did not reset Local Supabase. The separately approved
 P-42 recovery reset completed before session
 `session-p42-scored-20260719-f8c6709.json`; final D005 then used a no-reset
-`bounded-spot-check` session and cleaned back to the disabled baseline. Do not
-prepare another fixture unless the Owner requests only the bounded
-stale-choice-banner replay.
+`bounded-spot-check` session and cleaned back to the disabled baseline. The
+separately requested bounded stale-choice-banner replay is now complete; do
+not prepare another fixture without a new explicit Owner request.
 
 ### D. Evidence and owner decision
 
