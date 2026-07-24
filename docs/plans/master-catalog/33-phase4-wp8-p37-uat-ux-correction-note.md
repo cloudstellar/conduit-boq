@@ -1,6 +1,8 @@
 # Phase 4 WP-8 P-37 Intended-Admin UAT and Placement UX Correction Note
 
-**Status:** P-37 remains **HOLD for unresolved closure evidence**. The first
+**Status:** The bounded execution, correction, and cleanup evidence is complete.
+P-37 remains **HOLD only for explicit Owner accept/hold** against exact
+correction `df44b827b290933463da5e14fa9125314660022a`. The first
 no-reset intended-admin Local UAT on 2026-07-17 failed the
 comprehension gate before any placement batch was confirmed. The bounded
 insertion-gap correction and its technical stale/accept/replay/accepted-state/
@@ -28,9 +30,10 @@ browser. The bounded no-migration correction moves the confirmed-success
 redirect into the Server Action, makes the selected-file badge depend on an
 actual current browser selection, and renders a durable workspace notice with
 the filename, resulting draft row count, revision, and direct review/re-import
-actions. Fresh
-Local draft `2568.1.0-D009` then passed the complete 710-row preview/apply/
-redirect path. This correction does not change the P-37 decision boundary:
+actions. Fresh Local draft `2568.1.0-D009` then passed the complete 710-row
+preview/apply/redirect path. Exact correction
+`df44b827b290933463da5e14fa9125314660022a` preserves that bounded source,
+tests, and aligned documentation. This correction does not change the P-37 decision boundary:
 execution evidence is complete, but explicit Owner accept/hold remains
 separate.
 
@@ -339,24 +342,29 @@ focus-return, owner-presentation, and cleanup checks are complete. The
 temporary fixture is cleaned and the disabled canonical baseline is exact.
 They are retained and do not need repetition unless the related source changes.
 
-The later line-by-line closure audit found that this note's former
-only-owner-decision conclusion exceeded its own evidence: the owner session
-explicitly did not activate **ยืนยันและบันทึกตำแหน่ง**, while the governing
-WP-8 plan requires one complete owner placement task. The broader independent
-core-admin UAT, three safe validation-error recoveries, and named import-
-preview/publish-readiness interaction baselines also remain unclosed.
+The earlier line-by-line closure audit correctly found that this note's former
+only-owner-decision conclusion exceeded the evidence then available: the owner
+session explicitly did not activate **ยืนยันและบันทึกตำแหน่ง**, while the
+governing WP-8 plan requires one complete owner placement task. Subsequent
+bounded P-42 execution closed that historical gap with one stale rejection
+having zero effect and exactly one accepted UI batch/change set. Retained Cards
+A-G, at least three safe validation/prevention recoveries, the D007
+stale-choice replay, and the D009 real Full-import save/redirect then closed the
+remaining named interaction rows. The historical finding remains the reason
+those checks were required; it is no longer an open execution blocker.
 
 [Closure Matrix #34](./34-phase4-wp8-p37-closure-matrix.md) is authoritative
-for gate status. P-38 completed the evidence reconciliation; use
-[Owner UAT Script #35](./35-phase4-wp8-p37-evidence-reconciliation-and-owner-uat-script.md)
-for the remaining Cards A-G in one bounded no-reset Local owner session. Do not run
-`npm run db:local:bootstrap`; if a reset becomes necessary, stop for a new
-explicit destructive-reset approval.
+for gate status. P-38 reconciliation and the later proportional execution are
+complete. [Owner UAT Script #35](./35-phase4-wp8-p37-evidence-reconciliation-and-owner-uat-script.md)
+preserves the retained evidence; no new fixture, reset, or full-flow replay is
+required merely to refresh proof. Do not run `npm run db:local:bootstrap`; if a
+reset becomes necessary for a later scope, stop for a new explicit
+destructive-reset approval.
 
-After every open row passes, update the authorities, commit/push the exact
-checkpoint, and request an explicit owner **accept** or **hold** decision.
-Acceptance would close WP-8 and permit only a later P-12 request. It would not
-authorize Production migration, deployment, feature enablement, publication,
-P-19, Factor F work, or hotfix expansion. Until then WP-8 remains
-**In progress**, P-37 remains **HOLD**, Add/Supplement remains hidden, and P-12
-through P-15 remain unauthorized.
+Exact correction `df44b827b290933463da5e14fa9125314660022a` preserves the final
+source/tests/docs checkpoint. WP-8 is **Ready for owner review** and P-37
+remains **HOLD only for the explicit Owner accept/hold decision**. Acceptance
+would close WP-8 and permit only a later P-12 request. It would not authorize
+Production migration, deployment, feature enablement, publication, P-19,
+Factor F work, or hotfix expansion. Add/Supplement remains hidden, and P-12
+through P-15 remain unauthorized until their separate gates.

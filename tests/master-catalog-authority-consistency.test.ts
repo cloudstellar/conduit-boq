@@ -424,6 +424,7 @@ describe('Master Catalog authority consistency', () => {
     expect(decisions).toContain('| P-42 |')
     expect(decisions).toContain('P37-UAT-C04')
     expect(decisions).toMatch(/Fresh no-reset\s+D009/)
+    expect(decisions).toContain('df44b827b290933463da5e14fa9125314660022a')
     expect(decisions).toContain('Bind every mutable draft review URL to its exact `reviewLock`')
     expect(decisions).toContain('Migration `025` SHA-256')
     expect(decisions).toContain(
@@ -627,7 +628,7 @@ describe('Master Catalog authority consistency', () => {
       'docs/plans/master-catalog/33-phase4-wp8-p37-uat-ux-correction-note.md',
     )
     expect(p37Correction).toContain(
-      'P-37 remains **HOLD for unresolved closure evidence**',
+      'P-37 remains **HOLD only for explicit Owner accept/hold**',
     )
     expect(p37Correction).toContain('This is a genuine UAT failure, not operator error')
     expect(p37Correction).toContain('insertion gap')
@@ -643,7 +644,7 @@ describe('Master Catalog authority consistency', () => {
     )
     expect(p37Correction).toContain('Owner keyboard and final-presentation re-UAT')
     expect(p37Correction).toMatch(
-      /the owner session\s+explicitly did not activate \*\*ยืนยันและบันทึกตำแหน่ง\*\*/,
+      /the owner\s+session\s+explicitly did not activate \*\*ยืนยันและบันทึกตำแหน่ง\*\*/,
     )
     expect(p37Correction).toContain('Closure Matrix #34')
     expect(p37Correction).toContain(
@@ -667,7 +668,7 @@ describe('Master Catalog authority consistency', () => {
       '| C-11 | 710-row performance baseline |',
       '| C-12 | Documentation consistency |',
       '| C-13 | Disabled clean Local baseline |',
-      '| Passed after final working-tree consistency gate; exact commit pending |',
+      '| Passed against the exact correction checkpoint |',
       'one stale rejection with zero effect and exactly one accepted UI batch/change set',
       'bdc104f77f18ea8fc776950259bc25e68c2fd42a',
       'bcc041772b3f537de66b655c5115c4e3c2da9325',
