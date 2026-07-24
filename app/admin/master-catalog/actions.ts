@@ -33,6 +33,7 @@ import {
 } from '@/lib/master-catalog/admin/actionModel';
 import { logMasterCatalogOperation } from '@/lib/master-catalog/observability';
 import {
+  catalogImportSuccessHref,
   catalogItemMutationSuccessHref,
   catalogWithdrawSuccessHref,
 } from '@/lib/master-catalog/admin/navigation';
@@ -556,7 +557,9 @@ export async function applyCatalogImportAction(
   });
 
   if (result.status === 'success') {
-    revalidateMasterCatalogPaths(result.versionId ?? validated.payload.versionId);
+    const versionId = result.versionId ?? validated.payload.versionId;
+    revalidateMasterCatalogPaths(versionId);
+    redirect(catalogImportSuccessHref(versionId));
   }
 
   return result;

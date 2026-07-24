@@ -72,6 +72,10 @@ export function catalogItemMutationSuccessHref(
   return `${target.pathname}${target.search}`;
 }
 
+export function catalogImportSuccessHref(versionId: string): string {
+  return `${catalogVersionWorkspaceHref(versionId)}?notice=import-applied`;
+}
+
 export function catalogItemMutationNotice(
   notice: string | null,
   outcome: string | null,

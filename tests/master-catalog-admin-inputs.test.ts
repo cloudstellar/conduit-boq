@@ -5,6 +5,7 @@ import {
   sumCatalogMoneyInputs,
 } from '../lib/master-catalog/admin/money'
 import {
+  catalogImportSuccessHref,
   catalogItemMutationNotice,
   catalogItemMutationSuccessHref,
   catalogWithdrawSuccessHref,
@@ -16,6 +17,13 @@ const VERSION_ID = '00000000-0000-4000-8000-000000000001'
 const IDENTITY_ID = '00000000-0000-4000-8000-000000000002'
 const REQUEST_ID = '00000000-0000-4000-8000-000000000003'
 const WORKSPACE = `/admin/master-catalog/versions/${VERSION_ID}`
+
+describe('Master Catalog import navigation', () => {
+  it('returns to the exact draft workspace with a durable success notice', () => {
+    expect(catalogImportSuccessHref(VERSION_ID))
+      .toBe(`${WORKSPACE}?notice=import-applied`)
+  })
+})
 
 describe('Master Catalog admin money input', () => {
   it.each([

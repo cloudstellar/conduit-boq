@@ -1,7 +1,9 @@
 # Phase 4 WP-8 P-37 Evidence Reconciliation and Owner UAT Script
 
 **Status:** The proportional post-correction execution and final cleanup are
-complete. P-37 remains **HOLD only for an explicit Owner accept/hold decision**.
+complete. The 2026-07-24 real Full-import continuation also passed after a
+bounded post-save feedback correction. P-37 remains **HOLD only for an explicit
+Owner accept/hold decision** after the exact source/docs checkpoint is pushed.
 Exact pushed source `6fe3a6a1b2c04a418187167c143960ba412672da`
 prepared immutable no-reset session
 `tmp/master-catalog/p38-owner-uat/session-p42-final-spotcheck-20260722-6fe3a6a.json`
@@ -37,6 +39,17 @@ test and full Card B-E flow were not repeated. See
 The untracked consolidated evidence index is
 `tmp/master-catalog/p38-owner-uat/p42-owner-uat-functional-summary.json`; it is
 Local evidence and must not be staged or committed.
+
+The later D008 Full-import observation exposed UAT-11: the database apply
+succeeded, but client navigation was lost when revalidation remounted the
+lock-keyed import panel. The working-tree correction moves success navigation
+into the Server Action and makes the browser file-selection badge truthful.
+Fresh no-reset D009 then passed the approved 710-row Full preview, apply, `303`
+redirect, and durable workspace notice with filename/count/revision and
+review/re-import actions. D008 and D009 were audited-abandoned; final readback
+again showed pointer `2568.0.0`/710, zero working drafts, all catalog flags
+`false`, BOQ 198/1,547 with zero unversioned BOQs, Factor F `2569.0.0`/36, no
+Local reset, and no Production action.
 
 **Environment:** Local only. The separately approved P-42 recovery reset is
 complete; Cards A-G themselves performed no reset. No further reset is
@@ -90,6 +103,11 @@ not gate closure. It found:
   could silently become current and make the scripted stale submission valid.
 - UAT-10: after successful publication, draft-only stale-base and comparison
   wording remained visible and made success look like rejection.
+- UAT-11: after a successful 710-row import apply, revalidation changed the
+  draft lock and remounted the keyed client import panel before its success
+  effect could navigate. The form silently returned to Step 1 and the badge
+  implied that a browser-local source file remained selected even though the
+  file input was empty.
 
 P-40 corrects those findings without a migration: shared Thai money
 normalization, a base-version unit chooser with an explicit custom-unit path,
@@ -120,6 +138,7 @@ completed Card B-E evidence.
 | `P42-UAT-C01` | Card C now names **เตรียมรายการตรวจสอบ** as browser-only preparation and **ให้เซิร์ฟเวอร์ตรวจผลต่าง** as the point where server authority/retirement rules run | Passed in retained Spot-check 2 rerun |
 | `P42-UAT-C02` | Owner-facing instructions use the visible Thai action **ยืนยันและบันทึกลงฉบับร่าง** and no longer use “Apply” | Passed in retained Spot-check 2 rerun |
 | `P42-UAT-C03` | The always-visible third progress step now uses the exact action wording **ยืนยันและบันทึกลงฉบับร่าง**; E-01 verifies that server rejection leaves the real persistence action absent rather than asking the Owner to find an impossible disabled button | Exact `44f54a72b03549de995b431d6705ec1b2eeb3fa6`; passed in retained Spot-check 2 rerun |
+| `P37-UAT-C04` | Confirmed import success now redirects from the Server Action after revalidation, opens the exact draft workspace, and displays filename/count/revision plus review/re-import actions. The selected-file badge exists only while the current browser file input contains a selection. | D008 exposed UAT-11; fresh D009 passed the 710-row preview/apply/redirect path on the working-tree correction |
 | `P42-UAT-D01` | Real Browser testing showed the nested popover remained outside the modal scroll boundary despite local wheel interception. Exact `16e88c6487307c4bb0606a048dc53e05e9dcee18` keeps the searchable gap list inline inside the dialog with native overflow/overscroll containment and standard selection, `Esc`, focus-out, and outside-click dismissal | Passed on exact-source D005 Spot-check 3; no placement batch was submitted |
 | `P42-UAT-D02` | Browser-only placement storage is schema 3, records whether the admin actually changed a suggestion, discards stale lock/revision keys, and shows an explicit warning before any fresh confirmation | Lock/revision discard remains covered by retained Card D and automated contracts; the final visible discard banner is the one bounded Owner-disposition item |
 | `P42-UAT-E01` | The export menu says **เปิดหน้าพิมพ์/บันทึก PDF**, matching the browser print/save-PDF behavior | Passed in retained Spot-check 1 |
@@ -447,13 +466,14 @@ remediation owner, and due date.
 | Final exact-source Spot-check 4 / D005 | Same-request transport and one-effect checks passed; stale-choice banner not separately captured | First response was intentionally lost after upstream HTTP 200; fields remained; retry reused request `533ad2d2-c2b4-4207-8f72-1c8b8b8692b1`, returned `duplicateRequest=true`, and recovered the same version without a second effect. Follow-up `b639c03` makes definitive recovered success visible after refresh | Local response-loss proxy + in-app Browser | `tmp/master-catalog/wp65-evidence/p42-final-spot4-20260722-6fe3a6a-01.json`; application checkpoint `b639c03` |
 | Final bounded cleanup / D005 | Passed | D005 audited-abandoned; pointer `2568.0.0`/710, zero drafts, all flags false, BOQ 198/1,547, Factor F `2569.0.0`/36; no reset and Production untouched | Local in-app Browser + tracked cleanup | Session `tmp/master-catalog/p38-owner-uat/session-p42-final-spotcheck-20260722-6fe3a6a.json`, status `cleaned` |
 | Final stale-choice replay / D007 | Passed | After one unsaved gap choice and a second-tab lock advance, the page displayed **ยกเลิกตัวเลือกเดิมที่อ้างอิงฉบับร่างเก่าแล้ว**, returned to **ระบบจัดให้ 1 / ปรับในหน้านี้ 0**, and wrote zero placement reviews | Local in-app Browser + tracked cleanup | Exact `8fb9839a6c9d169dd8c48bd5314d96c2801a28fa`; session `tmp/master-catalog/p38-owner-uat/session-p42-banner-replay-final-20260723-8fb9839.json`; screenshot `p42-stale-choice-banner-final-20260723-8fb9839.png` |
+| Full-import post-save correction / D008-D009 | Passed on working-tree correction | D008 completed a real 710-row apply but silently remounted to Step 1. Fresh D009 previewed 709 recodes/one unchanged row in 187 ms, applied in 275 ms, returned `303` to `?notice=import-applied`, and showed filename, resulting draft count 710, revision 1, **ตรวจรายการที่เปลี่ยน**, and **นำเข้าไฟล์อื่นเพิ่ม**. Both drafts were audited-abandoned; final status is pointer `2568.0.0`/710, zero drafts, flags false, unchanged BOQ/Factor F. | Local in-app Browser + server operation log + read-only Local status | Working-tree source/tests/docs; exact commit/push pending. The old one-version session remains `prepared` because strict cleanup refused to certify the deliberate second attempt, but its fail-safe restored flags. |
 | A / C-09/C-10 draft lifecycle + stale-review prevention | Functional pass; strict score HOLD because live guidance was used | D001 abandoned; D002 reused target `2568.1.0`; old review lock `0` hard-stopped after lock `1`; no publish | Local in-app Browser | `tmp/master-catalog/p38-owner-uat/p42-card-a-owner-evidence.json` |
 | B / C-09 browse/manual/withdraw | Functional pass retained; B01 correction passed in Spot-check 1 | Search/history passed; allocated `CIC-GIP-007`/`008`/`009`; withdrew `007`; later Spot-check 1 showed the allocated code and direct link | Local in-app Browser | `tmp/master-catalog/p38-owner-uat/p42-card-b-owner-evidence.json`; `p42-spotcheck-1a-add-success-fd36be2.png` |
-| C / C-09/C-10/C-11 import + E-01/E-02 | Functional pass and corrected wording rerun retained | Client and server phases each under 1 second; complete read-only preview; E-01 authority and E-02 retirement holds recovered without persistence; corrected labels/action visibility passed in D004 | Local in-app Browser | `tmp/master-catalog/p38-owner-uat/p42-card-c-owner-evidence.json`; D004 session above |
+| C / C-09/C-10/C-11 import + E-01/E-02 | Functional pass, corrected wording, real Full save, and post-save feedback passed | Retained client/server phases each under 1 second; complete read-only preview; E-01 authority and E-02 retirement holds recovered without persistence. D009 then completed the 710-row Full save and durable result redirect after UAT-11 correction. | Local in-app Browser | `tmp/master-catalog/p38-owner-uat/p42-card-c-owner-evidence.json`; D004 session and D008-D009 row above |
 | D / C-07/C-08 placement | Passed | Stale lock rejected with zero effect; exactly one batch accepted; final order `ITEM-0011 → CIC-GIP-008 → CIC-GIP-009 → ITEM-0012`; D005 physically scrolled and changed one unsaved gap; D007 displayed the stale-choice discard notice and restored the current suggestion without another placement write | Local in-app Browser | `tmp/master-catalog/p38-owner-uat/p42-card-d-owner-evidence.json`; exact `16e88c6487307c4bb0606a048dc53e05e9dcee18`; exact D007 session above |
 | E / C-09/C-11 review/readiness/export | Functional pass retained; E01 correction passed in Spot-check 1 | Review about 1 second; 712 rows; readiness blocked truthfully; Excel/PDF and canonical/binary hashes verified; later Spot-check 1 confirmed print/save-PDF wording | Local in-app Browser + independent artifact inspection | `tmp/master-catalog/p38-owner-uat/p42-card-e-owner-evidence.json`; `p42-spotcheck-1b-pdf-wording-fd36be2.png` |
 | F / C-09 uncertain response | Functional pass retained; exact-source same-request Spot-check 4 passed | D005 request `533ad2d2-c2b4-4207-8f72-1c8b8b8692b1` retained fields and recovered one effect without duplication; `b639c03` keeps definitive success visible | Local proxy + in-app Browser | `tmp/master-catalog/wp65-evidence/p42-final-spot4-20260722-6fe3a6a-01.json` |
-| G / safe close | Functional pass retained; final D005 closeout passed | D005 audited-abandoned; cleanup left zero drafts, flags false, pointer `2568.0.0`, and unchanged BOQ/Factor F invariants | Local in-app Browser + tracked cleanup harness | Final D005 session above |
+| G / safe close | Functional pass retained; D005 and latest D009 readback passed | D005 tracked cleanup remains the scored closeout. After the deliberate D008/D009 correction attempts, both were audited-abandoned and independent status again showed zero drafts, flags false, pointer `2568.0.0`, and unchanged BOQ/Factor F. | Local in-app Browser + tracked cleanup/read-only status | Final D005 session plus D008-D009 row above; the older D008 session is not relabeled as cleaned |
 
 Misunderstood wording, hesitation that changes the intended action, or any
 developer-only recovery is a finding, not operator error. Stop the spot-check,

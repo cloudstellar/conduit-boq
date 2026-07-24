@@ -347,8 +347,18 @@ validation records `validated` or `rejected`.
    intended save with the same operation ID so the prior result is returned.
    Do not reconstruct the payload from memory or start a new operation ID until
    the prior result is known or the operator explicitly begins a different save.
-6. After success, return to the same draft workspace and confirm the success
-   notice, created change set, item histories, and incremented draft revision.
+6. After success, the server redirects to the same draft workspace. Confirm the
+   durable success notice shows the source filename, resulting draft row count,
+   and incremented draft revision. Use **ตรวจรายการที่เปลี่ยน** to continue review;
+   use **นำเข้าไฟล์อื่นเพิ่ม** only for a deliberately separate import.
+7. Confirm the applied import record, created change set, and affected item
+   histories before leaving the workflow.
+8. If the form silently returns to Step 1 without the success notice, or a
+   selected-file badge remains after a fresh page load while the file input is
+   empty, stop. Do not choose the file or submit again merely to obtain visual
+   confirmation. Open the draft workspace and change/import history to
+   determine whether the operation was applied, and retain any displayed
+   request/problem code for recovery.
 
 K-formula columns are ignored/excluded in Phase 4 Core.
 

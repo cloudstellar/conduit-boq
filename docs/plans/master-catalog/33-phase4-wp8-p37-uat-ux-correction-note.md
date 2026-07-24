@@ -19,6 +19,21 @@ independent core-admin UAT, three safe-error recoveries, and named performance
 observations remain in [Closure Matrix #34](./34-phase4-wp8-p37-closure-matrix.md).
 C-12 authority alignment subsequently passed its executable checks.
 
+On 2026-07-24 the Owner completed a real 710-row Full import and exposed one
+additional operator-feedback defect after the database had already committed:
+the import panel was keyed by the draft lock, so revalidation remounted the
+client component before its success effect could navigate. The screen silently
+returned to Step 1 and incorrectly implied that the source file remained in the
+browser. The bounded no-migration correction moves the confirmed-success
+redirect into the Server Action, makes the selected-file badge depend on an
+actual current browser selection, and renders a durable workspace notice with
+the filename, resulting draft row count, revision, and direct review/re-import
+actions. Fresh
+Local draft `2568.1.0-D009` then passed the complete 710-row preview/apply/
+redirect path. This correction does not change the P-37 decision boundary:
+execution evidence is complete, but explicit Owner accept/hold remains
+separate.
+
 **Environment:** Local only. Production touched: **No**.
 
 ## 1. UAT finding
@@ -266,7 +281,58 @@ The temporary UAT fixture was audited-abandoned after evidence capture:
 - Factor F current `2569.0.0`, 36 rows;
 - Production touched: **No**.
 
-## 6. Remaining P-37 exit path
+The 2026-07-24 import-feedback correction used two additional Local-only
+attempts against the same unissued target:
+
+- `2568.1.0-D008` retained the first successful 710-row Full import and was
+  audited-abandoned after the silent post-save state was diagnosed;
+- re-previewing the already-recoded D008 payload returned `VALIDATION_FAILED`
+  and wrote no import, which confirms that a completed first-rollout draft is
+  not silently recoded a second time;
+- fresh `2568.1.0-D009` previewed 709 recodes plus one unchanged row, then
+  applied once. Server operation timing was 187 ms for preview and 275 ms for
+  apply; the POST returned `303` to
+  `?notice=import-applied`, whose workspace notice displayed the source
+  filename, resulting draft count 710, revision 1, **ตรวจรายการที่เปลี่ยน**, and
+  **นำเข้าไฟล์อื่นเพิ่ม**;
+- D009 was audited-abandoned after evidence capture. A strict cleanup attempt
+  intentionally refused to certify the older one-version session because this
+  correction added a second audited attempt and the tracked tree contained the
+  correction. Its fail-safe still restored the original flags. Final read-only
+  status confirmed pointer `2568.0.0`/710, zero working drafts, all three flags
+  false, BOQ 198/1,547, Factor F `2569.0.0`/36, no reset, and no Production
+  action. The old session remains `prepared` and is not represented as a
+  scored cleanup artifact.
+
+The correction adds no migration, database contract, authority-data, hotfix,
+Factor F, retirement, or Production scope. Focused admin/operator/authority
+tests passed 3 files/41 tests; the full suite passed 36 files/233 tests;
+TypeScript passed; ESLint exited with zero errors and the same 10 existing
+warnings.
+
+## 6. Import post-save UX contract
+
+A successful import must now satisfy all of these operator-visible conditions:
+
+1. The server confirms the `applied` result before redirecting; client remount
+   timing is not part of correctness.
+2. The browser leaves the import form and opens the exact draft workspace with
+   `notice=import-applied`.
+3. The notice states that the import was written and shows the source filename,
+   resulting draft row count, and current draft revision.
+4. The next safe actions are explicit: review changed items or intentionally
+   start another import.
+5. A selected-file badge is visible only while the current file input actually
+   contains a browser-local selection.
+6. Refreshing or opening the import page again never claims that the previous
+   local file is still selected.
+
+These conditions preserve Post/Redirect/Get behavior, exact-lock protection,
+append-only history, and the existing import idempotency contract. A later copy
+or layout adjustment can change the presentation without changing this
+boundary, so the correction creates no structural UI debt.
+
+## 7. Remaining P-37 exit path
 
 The named source, technical, recovery, realistic route-scale, keyboard,
 focus-return, owner-presentation, and cleanup checks are complete. The

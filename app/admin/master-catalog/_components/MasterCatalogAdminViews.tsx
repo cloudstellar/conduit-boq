@@ -263,16 +263,50 @@ export function MasterCatalogVersionDetailView({
   const version = detail.version;
   const isEditableDraft = version.status === 'draft' && !detail.isStaleDraft;
   const isCurrentVersion = detail.currentVersionId === version.id;
+  const latestAppliedImport = notice === 'import-applied'
+    ? detail.imports.find((item) => item.status === 'applied') ?? null
+    : null;
 
   return (
     <MasterCatalogFrame activeSection="versions" gate={gate}>
       {notice === 'import-applied' ? (
-        <Alert>
+        <Alert aria-live="polite">
           <CheckCircle2 />
           <AlertTitle>นำเข้าชุดข้อมูลลงฉบับร่างแล้ว</AlertTitle>
           <AlertDescription>
-            ระบบบันทึกผลการนำเข้าและประวัติการเปลี่ยนแปลงไว้ในฉบับร่างนี้แล้ว
-            โปรดตรวจรายการที่เปลี่ยนก่อนตรวจฉบับสุดท้าย
+            <div className="grid gap-3">
+              <p>
+                ระบบบันทึกผลการนำเข้าและประวัติการเปลี่ยนแปลงไว้ในฉบับร่างนี้แล้ว
+                โปรดตรวจรายการที่เปลี่ยนก่อนดำเนินการต่อ
+              </p>
+              <div className="flex flex-wrap gap-2">
+                {latestAppliedImport ? (
+                  <Badge variant="secondary">{latestAppliedImport.sourceFilename}</Badge>
+                ) : null}
+                <Badge variant="outline">
+                  ฉบับร่างมี {formatThaiNumber(detail.counts.rows)} รายการ
+                </Badge>
+                <Badge variant="outline">
+                  รุ่นแก้ไข {formatThaiNumber(version.lockVersion)}
+                </Badge>
+              </div>
+              {isEditableDraft ? (
+                <div className="flex flex-wrap gap-2">
+                  <Button size="sm" asChild>
+                    <Link href={`/admin/master-catalog/versions/${version.id}/review`}>
+                      <ClipboardCheck data-icon="inline-start" />
+                      ตรวจรายการที่เปลี่ยน
+                    </Link>
+                  </Button>
+                  <Button size="sm" variant="outline" asChild>
+                    <Link href={`/admin/master-catalog/versions/${version.id}/import`}>
+                      <Upload data-icon="inline-start" />
+                      นำเข้าไฟล์อื่นเพิ่ม
+                    </Link>
+                  </Button>
+                </div>
+              ) : null}
+            </div>
           </AlertDescription>
         </Alert>
       ) : null}

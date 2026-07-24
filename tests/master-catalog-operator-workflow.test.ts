@@ -69,6 +69,10 @@ describe('Master Catalog P-22 operator workflow', () => {
     const panel = source(
       'app/admin/master-catalog/_components/MasterCatalogImportPanel.tsx',
     );
+    const actions = source('app/admin/master-catalog/actions.ts');
+    const views = source(
+      'app/admin/master-catalog/_components/MasterCatalogAdminViews.tsx',
+    );
     const readModel = source('lib/master-catalog/admin/readModel.ts');
 
     expect(contextualRoute).toContain('loadCatalogImportContext(supabase, versionId)');
@@ -90,7 +94,15 @@ describe('Master Catalog P-22 operator workflow', () => {
     expect(panel).toContain('ปุ่มบันทึกถูกซ่อนไว้จนกว่าจะอนุมัติเปิดความสามารถนี้');
     expect(panel).toContain('canPersistCatalogImportPreview(');
     expect(panel).toContain('01_Item_Master_Final');
-    expect(panel).toContain('?notice=import-applied');
+    expect(panel).not.toContain("applyState.status === 'success'");
+    expect(actions).toContain('redirect(catalogImportSuccessHref(versionId))');
+    expect(views).toContain('notice === \'import-applied\'');
+    expect(views).toContain('ตรวจรายการที่เปลี่ยน');
+    expect(views).toContain('นำเข้าไฟล์อื่นเพิ่ม');
+    expect(views).toContain('ฉบับร่างมี {formatThaiNumber(detail.counts.rows)} รายการ');
+    expect(panel).toContain('selectedSourceFilename ? (');
+    expect(panel).toContain('เลือกไฟล์ต้นฉบับแล้ว');
+    expect(panel).not.toContain('ไฟล์ต้นฉบับยังอยู่ในเบราว์เซอร์');
   });
 
   it('renders final snapshot comparison before the exact-lock publish panel', () => {

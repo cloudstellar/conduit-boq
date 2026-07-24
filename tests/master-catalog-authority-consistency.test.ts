@@ -422,6 +422,8 @@ describe('Master Catalog authority consistency', () => {
     expect(decisions).toContain('DB-read version in the Server Action before the publish RPC')
     expect(decisions).toContain('| P-41 |')
     expect(decisions).toContain('| P-42 |')
+    expect(decisions).toContain('P37-UAT-C04')
+    expect(decisions).toMatch(/Fresh no-reset\s+D009/)
     expect(decisions).toContain('Bind every mutable draft review URL to its exact `reviewLock`')
     expect(decisions).toContain('Migration `025` SHA-256')
     expect(decisions).toContain(
@@ -466,7 +468,7 @@ describe('Master Catalog authority consistency', () => {
       '16e88c6487307c4bb0606a048dc53e05e9dcee18',
     )
     expect(tracker).toContain(
-      '| Current environment | Clean Local post-D007 baseline: pointer/default `2568.0.0`',
+      '| Current environment | Clean Local post-D009 readback: pointer/default `2568.0.0`',
     )
     expect(tracker).toContain('zero working drafts; all catalog flags false')
     expect(tracker).toContain('No reset or Production decision is requested')
@@ -486,6 +488,12 @@ describe('Master Catalog authority consistency', () => {
     expect(operatorProcedure).toContain('select one insertion gap')
     expect(operatorProcedure).toContain('must immediately show **ปรับในหน้านี้ · ยังไม่บันทึก**')
     expect(operatorProcedure).toContain('keyboard-incomplete required control blocks P-14')
+    expect(operatorProcedure).toContain(
+      'durable success notice shows the source filename, resulting draft row count',
+    )
+    expect(operatorProcedure).toContain(
+      'If the form silently returns to Step 1 without the success notice',
+    )
 
     const threatModel = read(
       'docs/plans/master-catalog/18-phase4-threat-model.md',
@@ -659,7 +667,7 @@ describe('Master Catalog authority consistency', () => {
       '| C-11 | 710-row performance baseline |',
       '| C-12 | Documentation consistency |',
       '| C-13 | Disabled clean Local baseline |',
-      '| Passed after final consistency gate |',
+      '| Passed after final working-tree consistency gate; exact commit pending |',
       'one stale rejection with zero effect and exactly one accepted UI batch/change set',
       'bdc104f77f18ea8fc776950259bc25e68c2fd42a',
       'bcc041772b3f537de66b655c5115c4e3c2da9325',
@@ -690,8 +698,10 @@ describe('Master Catalog authority consistency', () => {
     const p37OwnerUat = read(
       'docs/plans/master-catalog/35-phase4-wp8-p37-evidence-reconciliation-and-owner-uat-script.md',
     )
+    expect(p37OwnerUat).toMatch(
+      /P-37 remains \*\*HOLD only for an explicit\s+Owner accept\/hold decision\*\*/,
+    )
     for (const contract of [
-      'P-37 remains **HOLD only for an explicit Owner accept/hold decision**',
       'Card C E-01/E-02',
       'P-42 recovery retained one stale rejection with zero effect and exactly one accepted UI batch',
       'Spots 1-3, same-request Spot 4, and final cleanup are retained',

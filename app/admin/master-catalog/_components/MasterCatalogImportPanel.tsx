@@ -121,6 +121,8 @@ export function MasterCatalogImportPanel({
   const [retirementApprovalReference, setRetirementApprovalReference] = useState('');
   const [retirementConfirmedCount, setRetirementConfirmedCount] = useState('');
   const [isPreparing, setIsPreparing] = useState(false);
+  const [selectedSourceFilename, setSelectedSourceFilename] =
+    useState<string | null>(null);
   const [prepared, setPrepared] = useState<PreparedImportPreview | null>(null);
   const [prepareError, setPrepareError] = useState<string | null>(null);
   const [diagnostics, setDiagnostics] = useState<ParserDiagnostic[]>([]);
@@ -315,7 +317,8 @@ export function MasterCatalogImportPanel({
               id="catalog-import-file"
               type="file"
               accept=".xlsx"
-              onChange={() => {
+              onChange={(event) => {
+                setSelectedSourceFilename(event.currentTarget.files?.[0]?.name ?? null);
                 setPrepared(null);
                 setPrepareError(null);
                 setDiagnostics([]);
@@ -420,7 +423,9 @@ export function MasterCatalogImportPanel({
             {isPreparing ? <Loader2 data-icon="inline-start" className="animate-spin" /> : <Upload data-icon="inline-start" />}
             {isPreparing ? 'กำลังอ่านไฟล์' : 'เตรียมรายการตรวจสอบ'}
           </Button>
-          <Badge variant="secondary">ไฟล์ต้นฉบับยังอยู่ในเบราว์เซอร์</Badge>
+          {selectedSourceFilename ? (
+            <Badge variant="secondary">เลือกไฟล์ต้นฉบับแล้ว</Badge>
+          ) : null}
         </div>
 
         <ClientDiagnostics
@@ -433,7 +438,6 @@ export function MasterCatalogImportPanel({
           <PreparedPreview
             key={prepared.normalizedPayloadHash}
             prepared={prepared}
-            draftId={draft?.id ?? ''}
             retirementEnabled={capabilities.retirementEnabled}
             onReviewStateChange={setServerReviewed}
           />
@@ -515,12 +519,10 @@ function ImportProgress({ currentStep }: { currentStep: 1 | 2 | 3 }) {
 
 function PreparedPreview({
   prepared,
-  draftId,
   retirementEnabled,
   onReviewStateChange,
 }: {
   prepared: PreparedImportPreview;
-  draftId: string;
   retirementEnabled: boolean;
   onReviewStateChange: (reviewed: boolean) => void;
 }) {
@@ -550,10 +552,7 @@ function PreparedPreview({
     if (previewState.status === 'error') {
       onReviewStateChange(false);
     }
-    if (applyState.status === 'success' && draftId) {
-      router.push(`/admin/master-catalog/versions/${draftId}?notice=import-applied`);
-    }
-  }, [applyState.status, draftId, onReviewStateChange, previewState.status, router]);
+  }, [onReviewStateChange, previewState.status, router]);
 
   return (
     <div className="grid gap-4 rounded-md border bg-background p-4">
