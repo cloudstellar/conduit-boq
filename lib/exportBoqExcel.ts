@@ -1,6 +1,6 @@
 'use client';
 
-import type { Workbook, Worksheet, Style, Border, Fill } from 'exceljs';
+import type { Workbook, Worksheet, Border, Fill } from 'exceljs';
 import {
   calculateInterpolatedFactorFromRefs,
   formatFactorReferenceCondition,

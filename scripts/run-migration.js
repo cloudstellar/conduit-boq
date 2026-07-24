@@ -26,20 +26,6 @@ if (!supabaseUrl || !supabaseKey) {
 
 const supabase = createClient(supabaseUrl, supabaseKey);
 
-// Helper function to run SQL query
-async function runSQL(sql, description) {
-  console.log(`\n🔄 ${description}...`);
-  try {
-    const { data, error } = await supabase.rpc('exec_sql', { sql_query: sql });
-    if (error) throw error;
-    console.log(`✅ ${description} - Success`);
-    return data;
-  } catch (error) {
-    console.error(`❌ ${description} - Failed:`, error.message);
-    throw error;
-  }
-}
-
 // Main migration function
 async function runMigration() {
   console.log('╔════════════════════════════════════════════════════════════╗');
@@ -174,4 +160,3 @@ if (args.includes('--verify')) {
 } else {
   runMigration();
 }
-

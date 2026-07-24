@@ -22,7 +22,6 @@ async function importPriceList() {
   const items = [];
 
   for (const row of data) {
-    const itemNo = row['__EMPTY_4'];
     const itemName = row['__EMPTY_5']?.toString().trim();
     const unit = row['__EMPTY_7'];
     const materialCost = row['__EMPTY_8'];
@@ -79,4 +78,3 @@ async function importPriceList() {
 }
 
 importPriceList().catch(console.error);
-

@@ -1,5 +1,7 @@
 'use client';
 
+/* eslint-disable @next/next/no-img-element -- Native images keep browser print/PDF rendering deterministic. */
+
 import { useState, useEffect, useMemo } from 'react';
 import { useParams } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
@@ -23,7 +25,6 @@ import {
   chunkItems,
   chunkSummaryRoutes,
   countBOQPages,
-  countItemRows,
   PRINT_CONSTANTS,
 } from '@/lib/printUtils';
 import { Button } from '@/components/ui/button';
@@ -480,8 +481,6 @@ export default function PrintBOQPage() {
   const [factorCondition, setFactorCondition] = useState<FactorReferenceCondition | null>(null);
   const [factorError, setFactorError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-
-  const VAT_RATE = 0.07;
 
   useEffect(() => {
     const fetchData = async () => {

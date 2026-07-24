@@ -101,22 +101,6 @@ export async function updateSession(request: NextRequest) {
       }
     }
 
-    // Pages allowed for pending users (can create/edit own BOQ)
-    const allowedForPending = [
-      '/profile',
-      '/auth/callback',
-      '/boq',        // BOQ list
-      '/boq/create', // Create BOQ
-      '/price-list', // View price list
-    ]
-
-    // Also allow BOQ edit/print pages
-    const isDynamicBOQPath = request.nextUrl.pathname.match(/^\/boq\/[^/]+\/(edit|print)/)
-
-    const isAllowedPath = allowedForPending.some(path =>
-      request.nextUrl.pathname === path || request.nextUrl.pathname.startsWith(path + '/')
-    ) || isDynamicBOQPath
-
     // Inactive/Suspended users can only access profile (which shows blocked message)
     if (profile && (profile.status === 'inactive' || profile.status === 'suspended')) {
       if (request.nextUrl.pathname !== '/profile') {
@@ -141,4 +125,3 @@ export async function updateSession(request: NextRequest) {
 
   return supabaseResponse
 }
-

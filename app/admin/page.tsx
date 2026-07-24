@@ -304,26 +304,6 @@ function AdminContent() {
     )
   }
 
-  const getStatusBadge = (status: string) => {
-    const variants: Record<string, 'default' | 'secondary' | 'destructive' | 'outline'> = {
-      active: 'default',
-      inactive: 'secondary',
-      suspended: 'destructive',
-      pending: 'outline',
-    }
-    const labels: Record<string, string> = {
-      active: 'ใช้งาน',
-      inactive: 'ไม่ใช้งาน',
-      suspended: 'ระงับ',
-      pending: 'รอการอนุมัติ',
-    }
-    return (
-      <Badge variant={variants[status] || 'secondary'} className={status === 'pending' ? 'bg-yellow-100 text-yellow-800' : ''}>
-        {labels[status] || status}
-      </Badge>
-    )
-  }
-
   const pendingCount = users.filter(u => u.status === 'pending').length
 
   return (

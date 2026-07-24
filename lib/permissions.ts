@@ -64,7 +64,7 @@ export function can(
 
   // Committee
   if (resource === 'committee') {
-    return canCommittee(user, action, context)
+    return canCommittee(user, action)
   }
 
   return false
@@ -182,8 +182,7 @@ function canBOQ(
 
 function canCommittee(
   user: UserProfileWithOrg,
-  action: Action,
-  _ctx?: BOQContext
+  action: Action
 ): boolean {
   if (user.role === 'admin') return true
 
@@ -224,4 +223,3 @@ export function getRoleBadgeColor(role: UserRole): string {
   }
   return colors[role] || 'bg-gray-100 text-gray-800'
 }
-
