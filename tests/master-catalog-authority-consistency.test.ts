@@ -148,7 +148,7 @@ describe('Master Catalog authority consistency', () => {
       'P-32 separate-apply evidence/P-33 technical acceptance/P-34 historical UX source-static/P-36 integrated technical evidence passed; first P-37 intended-admin UAT failed comprehension, while corrected technical/recovery evidence and the final owner keyboard/focus/presentation UAT later passed',
     )
     expect(migrations).toContain(
-      'exact no-reset D007 on pushed `8fb9839a6c9d169dd8c48bd5314d96c2801a28fa` closed C-08 and restored the disabled baseline; P-37 remains HOLD only for explicit Owner accept/hold; DB contract unchanged; not Production-approved',
+      'exact no-reset D007 on pushed `8fb9839a6c9d169dd8c48bd5314d96c2801a28fa` closed C-08 and restored the disabled baseline; P-37 was Owner-accepted on 2026-07-25 under the explicitly recorded guided-UAT variance against exact implementation checkpoint `df44b827b290933463da5e14fa9125314660022a`; evidence remains labelled guided rather than independent; DB contract unchanged; not Production-approved',
     )
     expect(existsSync(resolve(
       root,
@@ -302,9 +302,15 @@ describe('Master Catalog authority consistency', () => {
   })
 
   it('keeps work-package sequencing and owner decisions explicit', () => {
+    const reviewGuide = read(
+      'docs/plans/master-catalog/00-phase4-review-guide.md',
+    )
     const executionPack = read(
       'docs/plans/master-catalog/23-phase4-implementation-execution-pack.md',
     )
+    expect(reviewGuide).toContain('WP-0 ถึง WP-8 complete')
+    expect(reviewGuide).toContain('guided-UAT variance')
+    expect(reviewGuide).not.toContain('WP-8 ยัง In progress')
     expectInOrder(executionPack, [
       '## 11. WP-6 official Excel/PDF export',
       '## 12. WP-6.5 reliability and publish-boundary hardening',
@@ -448,14 +454,16 @@ describe('Master Catalog authority consistency', () => {
     expect(tracker).toMatch(/\| WP-6\.6 \|[^\n]+\| Complete \|/)
     expect(tracker).toMatch(/\| WP-7 \|[^\n]+\| Complete \|/)
     expect(tracker).toMatch(/\| WP-7\.5 \|[^\n]+\| Complete \|/)
-    expect(tracker).toMatch(/\| WP-8 \|[^\n]+\| Ready for owner review \|/)
-    expect(tracker).toContain('P-37 is HOLD only for explicit Owner accept/hold')
+    expect(tracker).toMatch(/\| WP-8 \|[^\n]+\| Complete \|/)
+    expect(tracker).toContain(
+      'P-37 Owner-accepted on 2026-07-25 under the explicit guided-UAT variance',
+    )
     expect(tracker).toContain('| Production write allowed | No |')
     expect(tracker).toMatch(
       /P-33 accepted that\s+exact bounded WP-7\.5 technical checkpoint at 2026-07-15 13:54 \+07/,
     )
     expect(tracker).toContain(
-      '| Current work package | WP-8/P-37 HOLD only for explicit Owner accept/hold; proportional exact-source execution and final scenario-bound cleanup are complete |',
+      '| Current work package | WP-8 Complete; P-37 Owner-accepted on 2026-07-25 under the explicit guided-UAT variance |',
     )
     expect(tracker).toContain('P42-UAT-C03')
     expect(tracker).toContain('P42-UAT-G01')
@@ -472,7 +480,9 @@ describe('Master Catalog authority consistency', () => {
       '| Current environment | Clean Local post-D009 readback: pointer/default `2568.0.0`',
     )
     expect(tracker).toContain('zero working drafts; all catalog flags false')
-    expect(tracker).toContain('No reset or Production decision is requested')
+    expect(tracker).toContain(
+      'Owner decisions needed: none now. A later P-12 request, P-14 Add/Supplement gate, and every Production action remain separate',
+    )
     expect(tracker).toContain(
       '0780925aca8fa7ebbf8abbaf2b7cf151b39b676a',
     )
@@ -587,15 +597,19 @@ describe('Master Catalog authority consistency', () => {
       /pre-amendment operator\/browser preflight passed on\s+`c8f6dca`/,
     )
     expect(tracker).toContain(
-      'Status: Exact-source D005 execution plus exact D007 stale-choice replay and scenario-bound cleanup passed; clean Local pointer 2568.0.0/710, zero working drafts, all catalog flags false; no Production action authorized',
+      'Status: Exact-source D005 execution, D007 stale-choice replay, D009 Full-import correction, and scenario-bound cleanup passed',
     )
+    expect(tracker).toContain(
+      'Owner accepted combined guided UI plus developer fault-injection/cleanup evidence without relabelling it independent',
+    )
+    expect(tracker).toContain('no Production action authorized')
     expect(tracker).toContain('2c39dddd10c361bd1244292f4bd79e06f167c919')
     expect(verificationReport).toContain('undefined `rows` helper')
     expect(verificationReport).toContain(
-      'P-37 remains **HOLD** only for',
+      'Passed under the 2026-07-25 guided-UAT Owner variance; Closure Matrix #34 C-08/C-09 passed',
     )
     expect(verificationReport).toContain(
-      'Execution passed; Closure Matrix #34 C-08 passed and C-09 awaits explicit Owner accept/hold',
+      'The evidence is not relabelled independent/no-assistance.',
     )
     expect(verificationReport).toContain(
       'Passed: Closure Matrix #34 C-11',
@@ -628,7 +642,7 @@ describe('Master Catalog authority consistency', () => {
       'docs/plans/master-catalog/33-phase4-wp8-p37-uat-ux-correction-note.md',
     )
     expect(p37Correction).toContain(
-      'P-37 remains **HOLD only for explicit Owner accept/hold**',
+      'P-37 Owner-accepted on 2026-07-25 under the explicit guided-UAT',
     )
     expect(p37Correction).toContain('This is a genuine UAT failure, not operator error')
     expect(p37Correction).toContain('insertion gap')
@@ -661,9 +675,9 @@ describe('Master Catalog authority consistency', () => {
       'docs/plans/master-catalog/34-phase4-wp8-p37-closure-matrix.md',
     )
     for (const contract of [
-      'P-37 remains **HOLD only for the explicit Owner accept/hold',
-      '| C-07 | One complete independent placement task |',
-      '| C-09 | Independent core-admin UAT |',
+      'Accepted by the Owner on 2026-07-25 under an explicit guided-UAT',
+      '| C-07 | One complete Owner-operated guided placement task |',
+      '| C-09 | Owner-approved guided core-admin UAT |',
       '| C-10 | At least three safe validation-error/prevention recoveries |',
       '| C-11 | 710-row performance baseline |',
       '| C-12 | Documentation consistency |',
@@ -678,6 +692,15 @@ describe('Master Catalog authority consistency', () => {
     ]) {
       expect(p37Closure).toContain(contract)
     }
+    expect(p37Closure).not.toContain(
+      '| C-07 | One complete independent placement task |',
+    )
+    expect(p37Closure).not.toContain(
+      '| C-09 | Independent core-admin UAT |',
+    )
+    expect(p37Closure).toMatch(
+      /The evidence\s+must not be relabelled as independent or no-assistance\./,
+    )
     expect(p37Closure).toContain(
       'adcca3939f3080cdf64bc6ad807051e9e85fed94',
     )
@@ -700,7 +723,7 @@ describe('Master Catalog authority consistency', () => {
       'docs/plans/master-catalog/35-phase4-wp8-p37-evidence-reconciliation-and-owner-uat-script.md',
     )
     expect(p37OwnerUat).toMatch(
-      /P-37 remains \*\*HOLD only for an explicit\s+Owner accept\/hold decision\*\*/,
+      /P-37 was Owner-accepted on 2026-07-25\s+under an explicit guided-UAT variance/,
     )
     for (const contract of [
       'Card C E-01/E-02',
@@ -714,6 +737,9 @@ describe('Master Catalog authority consistency', () => {
       expect(p37OwnerUat).toContain(contract)
     }
     expect(p37OwnerUat).toContain('strict score HOLD because live guidance was used')
+    expect(p37OwnerUat).toMatch(
+      /no evidence is relabelled\s+independent or no-assistance/,
+    )
     expect(p37OwnerUat).toContain('Cards A-G require no reset after preparation')
     expect(p37OwnerUat).toContain('npm run db:local:p38:verify-inputs')
     expect(p37OwnerUat).toContain(
@@ -781,7 +807,12 @@ describe('Master Catalog authority consistency', () => {
     ]) {
       expect(p38Preflight).toContain(contract)
     }
-    expect(p38Preflight).toMatch(/P-37\s+remains \*\*HOLD\*\*/)
+    expect(p38Preflight).toContain(
+      'Current P-37 disposition (2026-07-25)',
+    )
+    expect(p38Preflight).toContain(
+      'guided-UAT variance',
+    )
     expect(p38Preflight).toMatch(
       /It never\s+creates,\s+edits,\s+publishes,\s+or abandons a draft/,
     )
@@ -804,7 +835,9 @@ describe('Master Catalog authority consistency', () => {
     const p42Incident = read(
       'docs/plans/master-catalog/38-phase4-p42-final-review-snapshot-binding-incident-note.md',
     )
-    expect(p42Incident).toMatch(/Production was not\s+accessed or changed/)
+    expect(p42Incident).toMatch(
+      /Production was not\s+accessed or\s+changed/,
+    )
     expect(p42Incident).toContain('b2500b5e6859a915bfa3f70d558934f252943f82')
     expect(p42Incident).toContain('f8c670901997a4e6663db7c4db1218efc03d51c6')
     expect(p42Incident).toContain('reviewLock={current_lock}')
@@ -1044,6 +1077,10 @@ describe('Master Catalog authority consistency', () => {
     )
     expect(changeRequest).toContain(
       'One mutable draft globally plus audited current/stale abandon history',
+    )
+    expect(changeRequest).toContain('Current P-37 disposition (2026-07-25)')
+    expect(changeRequest).toContain(
+      'Owner-accepted under the explicit guided-UAT variance',
     )
     expect(executionPack).toContain(
       'a second mutable draft from the same or a different base',

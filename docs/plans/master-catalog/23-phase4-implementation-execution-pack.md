@@ -21,10 +21,11 @@ P39R-C then passed the clean `009`-`024` technical chain on exact pushed
 before P39R-U passes.
 Production remains unauthorized.
 
-**Status:** Owner-approved for WP-0 through WP-8 implementation/local
-rehearsal; WP-9 Production execution requires separate P-12 through P-15
-approvals after WP-8 evidence review. Production migration, deploy, feature
-enablement, and publication remain normal sequential owner decisions.
+**Status:** WP-0 through WP-8 complete. P-37 was Owner-accepted on 2026-07-25
+under the explicit guided-UAT variance against exact checkpoint
+`df44b827b290933463da5e14fa9125314660022a`. WP-9 Production execution still
+requires separate P-12 through P-15 approvals. Production migration, deploy,
+feature enablement, and publication remain normal sequential owner decisions.
 
 **Prepared:** 2026-06-29
 
@@ -130,8 +131,9 @@ clean chain through `021`, integrated DB/RLS/concurrency/P-20/WP-7/WP-7.5,
 export/advisors/repository gates, realistic 710+18 route rendering, and
 disabled-baseline cleanup. Browser automation did not dispatch React/Radix
 client state changes, so the live interaction, keyboard/recovery/error-
-comprehension, and independent intended-admin portions of Section 16 remain
-open. P-37 HOLD is recommended and Add/Supplement remains hidden. See
+comprehension, and independent intended-admin portions of Section 16 remained
+open. P-37 HOLD was recommended at that checkpoint and Add/Supplement remained
+hidden. See
 [P-36 Owner Review Note](./32-phase4-wp8-p36-owner-review-note.md).
 
 **P-37 intended-admin UAT correction recorded:** 2026-07-17 — the first
@@ -146,7 +148,7 @@ pushed checkpoint `f36d896d672609653de6634e307dcc44bce6d519` passed repository
 verification. The owner did not submit the final placement batch through the
 UI, and Section 16 still requires broader independent core-admin UAT, three
 safe-error recoveries, and named import-preview/publish-readiness interaction
-evidence. P-37 remains HOLD. See [Review Note #33](./33-phase4-wp8-p37-uat-ux-correction-note.md)
+evidence. P-37 remained HOLD at that checkpoint. See [Review Note #33](./33-phase4-wp8-p37-uat-ux-correction-note.md)
 and [Closure Matrix #34](./34-phase4-wp8-p37-closure-matrix.md).
 
 **P-38 evidence reconciliation and no-reset continuation recorded:**
@@ -163,6 +165,16 @@ records the corrected unmapped-candidate E-01, 15-omission E-02, exact binary
 hashes, tracked fail-closed Local commands, and passing read-only disabled
 baseline. Commit/push that checkpoint before running mutating `prepare`; the
 Owner must still create/abandon both drafts and complete Cards A-G.
+
+**P-37 Owner acceptance recorded:** 2026-07-25 — the Owner confirms the live
+button-by-button guidance was requested and intentional, and accepts the
+combined Owner-operated guided UI evidence plus developer-operated
+fault-injection/cleanup evidence as sufficient for WP-8. The original
+no-assistance rule below remains the default and the P-14 release criterion;
+this explicit variance does not relabel historical evidence or waive technical
+guards. Acceptance permits only a later P-12 request. Add/Supplement remains
+hidden until P-14, and no Production, P-19, Factor F, or hotfix action is
+authorized.
 
 **P-22 operator-workflow correction authorized:** 2026-07-12 — intended-admin
 review placed WP-6.6 closeout on Hold and accepted
@@ -958,6 +970,11 @@ Placement UX hard gates for the full Add/Supplement release:
   unconfirmed versus accepted state, explains the shifted-row count, recovers
   from one stale-placement response, and returns to final review without an
   irreversible mistake.
+
+The 2026-07-25 P-37 decision records a one-gate guided-UAT variance from the
+independent-comprehension scoring rule. It does not claim that the no-assistance
+criterion passed and does not remove that criterion from P-14 or future
+release-level UAT.
 
 These gates harden the accepted V1 architecture; they do not add arbitrary
 reorder of inherited identities, taxonomy editing, a second approval role, or a

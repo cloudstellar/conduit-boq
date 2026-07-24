@@ -9,6 +9,14 @@ feature enablement, publication, P-19, Factor F work, or hotfix `016` expansion.
 
 **Recorded:** 2026-07-15
 
+**Current superseding disposition (2026-07-25):** this note's P-36-era
+**P-37 HOLD is recommended** statement remains historical. After the later
+bounded corrections and evidence, the Owner accepted P-37 under an explicit
+guided-UAT variance against exact
+`df44b827b290933463da5e14fa9125314660022a`. The evidence remains labelled
+guided, not independent/no-assistance. WP-8 is complete; P-12, P-14, and every
+Production action remain separate.
+
 **2026-07-17 supplement:** the first intended-admin UAT failed comprehension
 before confirmation. The resulting UI-only insertion-gap correction and current
 P-37 HOLD are recorded in

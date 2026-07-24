@@ -1,9 +1,12 @@
 # Phase 4 WP-8 P-37 Closure Matrix
 
-**Status:** The required bounded execution and clean Local closeout are
-complete. P-37 remains **HOLD only for the explicit Owner accept/hold
-decision** against exact Full-import feedback correction
-`df44b827b290933463da5e14fa9125314660022a`. Exact pushed execution source
+**Status:** **Accepted by the Owner on 2026-07-25 under an explicit guided-UAT
+variance** against exact Full-import feedback correction
+`df44b827b290933463da5e14fa9125314660022a`. The Owner confirms that
+button-by-button live guidance was requested and intentional, and accepts the
+combined Owner-operated guided UI evidence plus developer-operated
+fault-injection and cleanup evidence as sufficient for WP-8/P-37. The evidence
+must not be relabelled as independent or no-assistance. Exact pushed execution source
 `6fe3a6a1b2c04a418187167c143960ba412672da` passed the real modal placement
 interaction and same-request response-loss recovery, and D005 cleanup restored
 the disabled `2568.0.0`/710 baseline without reset or Production access.
@@ -25,9 +28,10 @@ review/re-import actions. Both attempts are audited-abandoned. Final read-only
 status again confirms pointer `2568.0.0`/710, zero drafts, all flags false,
 unchanged BOQ/Factor F, no reset, and no Production access.
 
-**Decision posture:** C-08 is now passed. The Owner may accept or hold P-37
-against the complete bounded evidence; do not infer that decision from
-“ทำต่อ”. P-12,
+**Decision posture:** C-08 and C-09 are passed under the recorded guided-UAT
+variance, WP-8 is complete, and P-37 is accepted. This acceptance permits only
+a later P-12 readiness request. It does not waive database, authorization,
+idempotency, or audit controls. P-12,
 Add/Supplement, Production readiness, deployment, enablement, publication,
 P-19, Factor F, and hotfix work remain separate gates.
 
@@ -127,7 +131,7 @@ clean scenario-bound readback. No response-loss or full-flow replay remains.
 
 The final P-37 owner session proved that the corrected placement interaction is
 usable by keyboard and that the previous/new/next summary is understandable.
-However, the controlling WP-8 plan still requires:
+The original controlling WP-8 plan required:
 
 - independent admin UAT without developer or SQL assistance, including
   recovery from at least three safe validation errors;
@@ -142,7 +146,9 @@ Review Note #33 truthfully records that the dangerous
 conclusion that no further placement submission was required exceeded the
 recorded evidence. This matrix corrects only the gate accounting; it does not
 invalidate the source fix, DB evidence, owner usability findings, or clean
-Local cleanup.
+Local cleanup. The 2026-07-25 Owner decision explicitly accepts the completed
+guided evidence instead of pretending the original no-assistance condition was
+met.
 
 ## 2. Gate-to-evidence matrix
 
@@ -154,12 +160,12 @@ Local cleanup.
 | C-04 | Security/performance advisor blocker review | P-36 returned no security blocker; baseline performance findings and the unused `v_row_count` are assigned to P-12 with owners and rationale | Passed for P-37 | Reassess/minimize before P-12; this is not a Production waiver |
 | C-05 | Repository/source quality | Earlier exact recovery, responsive, modal, durable-success, and stale-choice checkpoints remain retained. Exact `df44b827b290933463da5e14fa9125314660022a` replaces a remount-sensitive client success effect with a Server Action redirect, adds one navigation helper, conditions browser-file state on a current selection, and adds focused operator/navigation regression coverage without changing a DB contract. | Passed on exact correction checkpoint | Preserve final repository gates; no migration or DB harness rerun is required |
 | C-06 | Placement comprehension, review by exception, keyboard, focus, and final presentation | Owner passed all named overview/gap/sibling/leave-reload/keyboard/focus/previous-new-next checks and later physically scrolled the exact modal-contained list and changed one gap without saving | Passed | Preserve retained controls; do not replay the full placement task |
-| C-07 | One complete independent placement task | Retained Card D recorded one stale rejection with zero effect and exactly one accepted UI batch/change set; final exact-source Spot-check 3 passed the corrected interaction without submitting a second batch | Passed | None for execution; Owner accept/hold remains |
-| C-08 | Stale-placement recovery inside the independent owner task | Retained Card D passed two-tab stale rejection, fresh recovery, one accepted batch, and current-state readback. Schema-3 storage binds choices to version/lock/revision. Exact no-reset D007 on pushed `8fb9839a6c9d169dd8c48bd5314d96c2801a28fa` displayed the discard banner, removed the stale browser choice, restored the current system suggestion, wrote no placement review, and cleaned to the disabled baseline | Passed | None for execution; Owner accept/hold remains C-09 |
-| C-09 | Independent core-admin UAT | Functional Cards A-G, responsive containment, Spots 1-3, same-request Spot 4, D007 stale-choice recovery, and D009 real 710-row Full-import save/redirect passed; no full-flow replay remains | Ready for Owner decision against exact `df44b827b290933463da5e14fa9125314660022a` | Explicitly accept or hold P-37; “ทำต่อ” is not acceptance |
+| C-07 | One complete Owner-operated guided placement task | Retained Card D recorded one stale rejection with zero effect and exactly one accepted UI batch/change set; final exact-source Spot-check 3 passed the corrected interaction without submitting a second batch | Passed under the explicit guided-UAT variance | None |
+| C-08 | Stale-placement recovery inside the Owner-operated guided task | Retained Card D passed two-tab stale rejection, fresh recovery, one accepted batch, and current-state readback. Schema-3 storage binds choices to version/lock/revision. Exact no-reset D007 on pushed `8fb9839a6c9d169dd8c48bd5314d96c2801a28fa` displayed the discard banner, removed the stale browser choice, restored the current system suggestion, wrote no placement review, and cleaned to the disabled baseline | Passed | None |
+| C-09 | Owner-approved guided core-admin UAT | Functional Cards A-G, responsive containment, Spots 1-3, same-request Spot 4, D007 stale-choice recovery, and D009 real 710-row Full-import save/redirect passed. The Owner explicitly requested live guidance and accepted the combined evidence without relabelling it independent. | Accepted 2026-07-25 against exact `df44b827b290933463da5e14fa9125314660022a` | None; retain the guided-evidence label |
 | C-10 | At least three safe validation-error/prevention recoveries | Stale review, E-01/E-02, stale placement, and uncertain-response recovery passed without unintended writes; final retry reused one request and one effect | Passed | Preserve request/effect evidence; do not repeat response-loss |
 | C-11 | 710-row performance baseline | Retained P-36/P-42 measurements remain valid. D009 added a real Full-import server preview at 187 ms and apply at 275 ms before the `303` result redirect. | Passed | Preserve existing measurements and export evidence |
-| C-12 | Documentation consistency | Review Note, Verification, Decision Register, Tracker, Owner Script, this matrix, and the Operating Procedure record D008 diagnosis, D009 evidence, exact Local cleanup readback, exact correction `df44b827b290933463da5e14fa9125314660022a`, and the unchanged decision boundary. | Passed against the exact correction checkpoint | Continue excluding `files/`, `tmp/`, and `output/` from commits |
+| C-12 | Documentation consistency | Review Note, Verification, Decision Register, Tracker, Owner Script, this matrix, and the Operating Procedure record D008 diagnosis, D009 evidence, exact Local cleanup readback, exact correction `df44b827b290933463da5e14fa9125314660022a`, and the 2026-07-25 guided-UAT Owner acceptance boundary. | Passed against the exact correction checkpoint | Continue excluding `files/`, `tmp/`, and `output/` from commits |
 | C-13 | Disabled clean Local baseline | D007 scenario cleanup remains retained. After D008/D009, both attempts were audited-abandoned. The older one-version session correctly refused strict certification after the deliberate second attempt and dirty source, but restored flags by fail-safe; final status independently confirmed pointer `2568.0.0`/710, zero drafts, all flags false, BOQ/Factor F unchanged, no reset, and Production untouched. | Passed current readback; the older session remains `prepared` and is not a scored cleanup artifact | Every future reset remains separately gated |
 
 ## 3. Minimal closure sequence
@@ -235,9 +241,10 @@ not prepare another fixture without a new explicit Owner request.
 2. Update Tracker, Verification Report, Decision Register, and this matrix with
    exact evidence and cleanup facts.
 3. Commit and push the exact source/document checkpoint.
-4. Ask the owner to accept or hold P-37 against that exact pushed checkpoint.
+4. Record the Owner's explicit P-37 decision against that exact pushed
+   checkpoint without changing the evidence label.
 
-P-37 acceptance would close WP-8 and permit only a later P-12 request. It would
+P-37 acceptance closes WP-8 and permits only a later P-12 request. It does
 not authorize Production migration, deployment, feature enablement,
 publication, P-19, Factor F work, or hotfix expansion.
 
@@ -250,5 +257,5 @@ publication, P-19, Factor F work, or hotfix expansion.
 | Existing lint/advisor findings and unused `v_row_count` | Zero lint errors; advisor findings and database warning have rationale, owner, and forward-fix rule | Developer + database/security reviewer | Before P-12 as recorded in the Verification Report |
 
 These items are visible and assigned, so they are managed debt rather than a
-hidden release assumption. None authorizes scope expansion before the open
-P-37 evidence is closed.
+hidden release assumption. None authorizes scope expansion before P-12 or the
+separate P-14 Add/Supplement gate.

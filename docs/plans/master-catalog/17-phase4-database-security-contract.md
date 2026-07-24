@@ -6,8 +6,17 @@ migration approval remain separate gates
 
 **Prepared:** 2026-06-22
 
-**Last updated:** 2026-07-18 to record the P-39 draft-identity/release-number
-correction after the WP-6.6 capability/authority hardening from
+**Current P-37 disposition (2026-07-25):** WP-8 was Owner-accepted under an
+explicit guided-UAT variance against exact application checkpoint
+`df44b827b290933463da5e14fa9125314660022a`. This is an evidence-governance
+decision only: it does not change this database/security contract, weaken a
+guard, authorize SQL repair, or authorize Production. Add/Supplement remains
+hidden until P-14 and P-12 remains a separate readiness request.
+
+**Last updated:** 2026-07-25 to record the P-37 evidence-governance decision;
+the database contract remains unchanged after the P-39
+draft-identity/release-number correction and WP-6.6 capability/authority
+hardening from
 [Audit #29](./29-phase4-owner-dev-completeness-audit.md), the P-22
 [Operator Workflow Correction](./31-phase4-wp66-operator-workflow-correction-plan.md),
 and the accepted P-18/WP-7.5 placement extension. Existing migrations remain

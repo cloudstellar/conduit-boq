@@ -10,6 +10,13 @@ audit history, and official Excel/PDF export
 currently claimed; the guarded planner is authoritative and publication issues
 the official version
 
+**Current P-37 disposition (2026-07-25):** WP-8 is complete and P-37 was
+Owner-accepted under the explicit guided-UAT variance against exact
+`df44b827b290933463da5e14fa9125314660022a`. Requested live guidance remains
+disclosed rather than relabelled independent/no-assistance. This permits only a
+later P-12 readiness request; Add/Supplement remains hidden until P-14, and no
+Production action is authorized.
+
 **P-39R amendment recorded:** 2026-07-18 — the first P-38 Card A run was stopped
 and safely cleaned after the owner identified that permanent reservation of
 abandoned draft numbers could create unexplained official-release gaps. Every
@@ -193,7 +200,7 @@ passed. The Browser automation runtime did not dispatch React/Radix client
 state changes, so at that P-36 checkpoint independent intended-admin
 interaction, keyboard, stale/leave-reload recovery, and error-comprehension UAT
 remained open. The later P-37 record below supersedes that checkpoint status.
-P-37 HOLD is recommended; Add/Supplement remains hidden. See
+P-37 HOLD was recommended at that checkpoint; Add/Supplement remained hidden. See
 [P-36 Owner Review Note](./32-phase4-wp8-p36-owner-review-note.md). This does
 not authorize P-12 or any other Production gate.
 
@@ -210,11 +217,13 @@ repository checks, and corrected source checkpoint
 passed leave/return/reload recovery plus complete owner keyboard/focus/
 presentation review. Final pushed checkpoint
 `f36d896d672609653de6634e307dcc44bce6d519` passed repository verification.
-P-37 remains HOLD for the unresolved final owner UI submission, broader
+At that checkpoint P-37 remained HOLD for the unresolved final owner UI submission, broader
 independent core-admin UAT, three safe-error recoveries, and named performance
 evidence. See [P-37 UAT and UX Correction Note](./33-phase4-wp8-p37-uat-ux-correction-note.md)
 and [Closure Matrix #34](./34-phase4-wp8-p37-closure-matrix.md). No Production
-action is authorized.
+action was authorized. The later bounded D005/D007/D009 execution and the
+2026-07-25 Owner decision supersede that HOLD status without rewriting the
+historical evidence.
 
 ## 1. Decision requested
 
@@ -646,16 +655,13 @@ pretend a publishable candidate has been approved.
       remains active
 - [x] P-35 source integration places exact amended `021` after `020`; P-36
       integrated Local technical execution passed on exact `910cc3c`
-- [ ] P-37 WP-8 acceptance remains on HOLD after the first intended-admin
-      comprehension failure. Corrected insertion-gap recovery plus complete
-      owner keyboard/focus/presentation UAT now pass, but the owner did not
-      submit the final placement batch through the UI. Final corrective source checkpoint
-      `f36d896d672609653de6634e307dcc44bce6d519` is pushed; technical
-      stale-response, one confirmation, exact replay, accepted-state readback,
-      and cleanup passed 2026-07-18. Close the broader independent core-admin
-      UAT, three safe-error recoveries, and named import-preview/
-      publish-readiness interaction baselines in Closure Matrix #34;
-      Add/Supplement stays hidden
+- [x] P-37 WP-8 acceptance recorded 2026-07-25 under the explicit guided-UAT
+      variance against exact
+      `df44b827b290933463da5e14fa9125314660022a`. D005/D007/D009, safe-error
+      recovery, named performance evidence, and cleanup passed; requested live
+      guidance remains disclosed and is not relabelled independent/no-assistance.
+      This closes WP-8 only. Add/Supplement stays hidden until P-14, and all
+      Production preconditions above must still be rerun or closed under P-12.
 - [ ] Owner explicitly approves the Production migration window
 
 When all checks above are green, package the evidence for owner/verifier review

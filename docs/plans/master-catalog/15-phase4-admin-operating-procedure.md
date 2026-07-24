@@ -15,9 +15,9 @@ P-18 technical placement, and P-36 integrated rehearsal later passed. The
 corrected P-37 flow also passed Local stale/accept/replay/cleanup mechanics,
 final no-reset leave/return/reload recovery, and owner keyboard/focus/
 presentation UAT on pushed checkpoint `f36d896d672609653de6634e307dcc44bce6d519`.
-The owner did not submit the final placement batch through the UI. P-37 remains
-HOLD for that final independent submission plus the broader core-admin,
-safe-error, and performance rows in
+At that checkpoint the owner did not submit the final placement batch through
+the UI, so P-37 remained HOLD for that final independent submission plus the
+broader core-admin, safe-error, and performance rows in
 [Closure Matrix #34](./34-phase4-wp8-p37-closure-matrix.md). P-19 when triggered
 and all Production gates remain pending. The Local UI must not be treated as
 Production-ready until those gates pass. The first P-38 Card A run was stopped
@@ -40,6 +40,14 @@ The scored sequence,
 named safe errors, measurement budget, and cleanup remain in
 [Owner UAT Script #35](./35-phase4-wp8-p37-evidence-reconciliation-and-owner-uat-script.md);
 this section remains the general operating contract.
+
+**Current P-37 disposition (2026-07-25):** the Owner explicitly accepted the
+completed package under a guided-UAT variance against exact
+`df44b827b290933463da5e14fa9125314660022a`. The requested button-by-button
+guidance remains disclosed; this procedure must not describe that evidence as
+independent/no-assistance. WP-8 is complete. Add/Supplement remains hidden
+until P-14, and this procedure still grants no Production authority.
+
 **Audience:** Active Master Catalog administrators
 **Rule:** A draft is not official; published versions are immutable
 

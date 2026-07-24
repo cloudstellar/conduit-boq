@@ -2,9 +2,12 @@
 
 **Status:** The proportional post-correction execution and final cleanup are
 complete. The 2026-07-24 real Full-import continuation also passed after a
-bounded post-save feedback correction. P-37 remains **HOLD only for an explicit
-Owner accept/hold decision** against exact correction
-`df44b827b290933463da5e14fa9125314660022a`.
+bounded post-save feedback correction. **P-37 was Owner-accepted on 2026-07-25
+under an explicit guided-UAT variance** against exact correction
+`df44b827b290933463da5e14fa9125314660022a`. The Owner requested the live
+button-by-button guidance and accepts combined Owner-operated guided UI plus
+developer-operated fault-injection/cleanup evidence; no evidence is relabelled
+independent or no-assistance.
 Exact pushed source `6fe3a6a1b2c04a418187167c143960ba412672da`
 prepared immutable no-reset session
 `tmp/master-catalog/p38-owner-uat/session-p42-final-spotcheck-20260722-6fe3a6a.json`
@@ -60,11 +63,12 @@ movement during UAT, feature enablement outside the temporary Local fixture,
 P-19, Factor F work, and hotfix `016` expansion remain prohibited.
 
 **Owner decision boundary:** Execution findings, including C-08, are disposed
-and cleanup is complete, but “ทำต่อ” is not recorded as P-37 acceptance. The
-Owner explicitly accepts or holds P-37 against the complete bounded evidence
-and exact correction `df44b827b290933463da5e14fa9125314660022a`. Neither choice
-authorizes Production, P-12, deploy, feature enablement, publication, P-19,
-Factor F work, or hotfix expansion.
+and cleanup is complete. The explicit 2026-07-25 decision accepts P-37 against
+the complete bounded evidence and exact correction
+`df44b827b290933463da5e14fa9125314660022a` under the guided-UAT variance.
+Earlier “ทำต่อ” messages were not acceptance and remain historical. The
+decision does not authorize Production, P-12 execution, deploy, feature
+enablement, publication, P-19, Factor F work, or hotfix expansion.
 
 ## 1. Reconciliation conclusion
 
@@ -513,8 +517,9 @@ Production.
 7. Run focused authority/operator tests, full tests, TypeScript, lint,
    authority check, build when application/dependency source changed, and diff
    checks. Commit and push the exact evidence checkpoint.
-8. Only then ask the Owner to accept or hold P-37. Acceptance permits a later
-   P-12 request only; it does not authorize any Production action.
+8. Record the Owner's explicit P-37 decision without changing the evidence
+   label. The 2026-07-25 acceptance permits a later P-12 request only; it does
+   not authorize any Production action.
 
 Cards A-G require no reset after preparation. The one separately warned and
 approved P-42 recovery bootstrap is complete. Do not run

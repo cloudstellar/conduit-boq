@@ -13,16 +13,26 @@ accepted-state readback, cleanup, and post-evidence repository checks; corrected
 source checkpoint `e6d79d77bd8fb8d6a0211d7d7b440d2136cb6512` is pushed. Later
 no-reset sessions passed leave/return/reload recovery and the complete owner
 keyboard/focus/presentation path; final pushed checkpoint
-`f36d896d672609653de6634e307dcc44bce6d519` passed verification. P-37 remains
-HOLD because the final owner UI submission, broader independent core-admin
-UAT, three safe-error recoveries, and named import-preview/publish-readiness
-interaction baselines remain open. All Production gates remain separate, and
+`f36d896d672609653de6634e307dcc44bce6d519` passed verification. At that
+checkpoint P-37 remained HOLD because the final owner UI submission, broader
+independent core-admin UAT, three safe-error recoveries, and named
+import-preview/publish-readiness interaction baselines remained open. All
+Production gates remain separate, and
 Add/Supplement stays hidden. See [Review Note #33](./33-phase4-wp8-p37-uat-ux-correction-note.md)
 and [Closure Matrix #34](./34-phase4-wp8-p37-closure-matrix.md). P-38 Card A was
 subsequently stopped and cleaned when the owner identified unexplained official
 version gaps caused by abandoned drafts. P-39R is now the controlling Local-only
 correction and P-38 remains paused until its gates pass; see
 [Correction Plan #37](./37-phase4-p39-draft-identity-release-number-correction-plan.md).
+
+**Current P-37 disposition (2026-07-25):** Owner-accepted under an explicit
+guided-UAT variance against exact implementation checkpoint
+`df44b827b290933463da5e14fa9125314660022a`. The Owner requested the
+button-by-button guidance and accepts combined Owner-operated guided UI plus
+developer-operated fault-injection/cleanup evidence as sufficient for WP-8.
+This does not relabel the evidence as independent/no-assistance or alter the
+database architecture. WP-8 is complete. Add/Supplement remains hidden until
+P-14; P-12 and every Production action remain separately gated.
 
 **Date:** 2026-06-22
 

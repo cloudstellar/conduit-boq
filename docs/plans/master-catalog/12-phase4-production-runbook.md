@@ -5,6 +5,12 @@
 **Production project:** `otlssvssvgkohqwuuiir`
 **Default posture:** Feature flag disabled; stop on any failed gate
 
+**Current P-37 disposition (2026-07-25):** WP-8 is Owner-accepted under the
+explicit guided-UAT variance recorded in the Decision Register against exact
+checkpoint `df44b827b290933463da5e14fa9125314660022a`. This permits only a
+later P-12 readiness request. It is not permission to run any Production step,
+open Add/Supplement before P-14, decide P-19, or change Factor F/hotfix scope.
+
 ## 1. Safety statement
 
 This runbook is an execution checklist, not standing permission to change
@@ -144,11 +150,13 @@ Stop immediately when any of these occurs:
     after the reset warning and the integrated Local technical rehearsal passed
     on exact checkout `910cc3c`. Corrected intended-admin interaction/recovery
     and complete owner keyboard/focus/presentation UAT later passed on pushed
-    checkpoint `f36d896d672609653de6634e307dcc44bce6d519`. The owner did not
-    submit the final placement batch through the UI, and the broader independent
-    WP-8 UAT/performance rows remain open. Close every row in
-    [Closure Matrix #34](./34-phase4-wp8-p37-closure-matrix.md) before requesting
-    the explicit P-37 accept/hold decision or any P-12/P-14 gate. See also
+    checkpoint `f36d896d672609653de6634e307dcc44bce6d519`. That historical
+    no-assistance scoring gap is retained in the evidence. The Owner later
+    accepted the combined guided UI and developer fault-injection/cleanup
+    package under an explicit variance on 2026-07-25; do not relabel it as
+    independent. Verify the accepted rows in
+    [Closure Matrix #34](./34-phase4-wp8-p37-closure-matrix.md) before any
+    separate P-12/P-14 request. See also
     [P-37 UAT/UX Note](./33-phase4-wp8-p37-uat-ux-correction-note.md).
 15. Verify P-39R separately: the P-38 Card A session was safely cleaned and
     P-23.1 permanent reservation is historical. Corrected `022`, forward

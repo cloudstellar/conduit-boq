@@ -1,8 +1,13 @@
 # Phase 4 WP-8 P-37 Intended-Admin UAT and Placement UX Correction Note
 
-**Status:** The bounded execution, correction, and cleanup evidence is complete.
-P-37 remains **HOLD only for explicit Owner accept/hold** against exact
-correction `df44b827b290933463da5e14fa9125314660022a`. The first
+**Status:** **P-37 Owner-accepted on 2026-07-25 under the explicit guided-UAT
+variance** against exact correction
+`df44b827b290933463da5e14fa9125314660022a`. The Owner confirms that
+button-by-button guidance was requested and intentional, accepts combined
+Owner-operated guided UI plus developer-operated fault-injection/cleanup
+evidence, and requires the evidence to remain labelled guided rather than
+independent/no-assistance. The bounded execution, correction, and cleanup
+evidence is complete. The first
 no-reset intended-admin Local UAT on 2026-07-17 failed the
 comprehension gate before any placement batch was confirmed. The bounded
 insertion-gap correction and its technical stale/accept/replay/accepted-state/
@@ -33,9 +38,9 @@ the filename, resulting draft row count, revision, and direct review/re-import
 actions. Fresh Local draft `2568.1.0-D009` then passed the complete 710-row
 preview/apply/redirect path. Exact correction
 `df44b827b290933463da5e14fa9125314660022a` preserves that bounded source,
-tests, and aligned documentation. This correction does not change the P-37 decision boundary:
-execution evidence is complete, but explicit Owner accept/hold remains
-separate.
+tests, and aligned documentation. The correction itself did not decide P-37;
+the separate 2026-07-25 Owner decision above accepts the complete package and
+closes WP-8 without authorizing P-12, P-14, or Production.
 
 **Environment:** Local only. Production touched: **No**.
 
@@ -335,7 +340,7 @@ append-only history, and the existing import idempotency contract. A later copy
 or layout adjustment can change the presentation without changing this
 boundary, so the correction creates no structural UI debt.
 
-## 7. Remaining P-37 exit path
+## 7. P-37 exit disposition
 
 The named source, technical, recovery, realistic route-scale, keyboard,
 focus-return, owner-presentation, and cleanup checks are complete. The
@@ -362,9 +367,9 @@ reset becomes necessary for a later scope, stop for a new explicit
 destructive-reset approval.
 
 Exact correction `df44b827b290933463da5e14fa9125314660022a` preserves the final
-source/tests/docs checkpoint. WP-8 is **Ready for owner review** and P-37
-remains **HOLD only for the explicit Owner accept/hold decision**. Acceptance
-would close WP-8 and permit only a later P-12 request. It would not authorize
+source/tests/docs checkpoint. WP-8 is **Complete** and P-37 is
+**Owner-accepted on 2026-07-25 under the explicit guided-UAT variance**.
+Acceptance permits only a later P-12 request. It does not authorize
 Production migration, deployment, feature enablement, publication, P-19,
 Factor F work, or hotfix expansion. Add/Supplement remains hidden, and P-12
 through P-15 remain unauthorized until their separate gates.

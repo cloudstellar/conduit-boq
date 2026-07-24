@@ -14,7 +14,14 @@ withdrawal paths and returned to pointer `2568.0.0`/710, zero working drafts,
 all flags false, BOQ 198/1,547, and Factor F `2569.0.0`/36 without reset. It is
 not scored Cards A-G evidence. At that checkpoint the fresh scored rerun
 remained pending; the later P-42 functional run and proportional-revalidation
-decision below supersede that former full-rerun posture. P-37 remains **HOLD**.
+decision below superseded that former full-rerun posture. P-37 remained
+**HOLD** at that checkpoint.
+
+**Current P-37 disposition (2026-07-25):** the Owner accepted the completed
+package under the explicit guided-UAT variance against exact
+`df44b827b290933463da5e14fa9125314660022a`. The live guidance remains
+disclosed rather than relabelled independent. This closes WP-8 only; it does
+not authorize another Local reset, Add/Supplement, or Production.
 
 P-41 follows continued discovery: UAT-06 through UAT-08 corrected the
 category-key bound, retirement-disabled read-only Full preview, and

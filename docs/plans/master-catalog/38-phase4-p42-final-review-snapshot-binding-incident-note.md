@@ -6,7 +6,16 @@ later approved one warned recovery bootstrap; exact pushed source
 `f8c670901997a4e6663db7c4db1218efc03d51c6` completed functional Cards A-G
 and disabled-baseline cleanup. The run used live guidance and developer
 assistance for Cards F-G, so strict independent Owner evidence remains open and
-P-37 remains **HOLD**. Production was not accessed or changed.
+P-37 remained **HOLD** at that checkpoint. Production was not accessed or
+changed.
+
+**Current P-37 disposition (2026-07-25):** after the later bounded corrections,
+D005/D007/D009 evidence, and clean closeout, the Owner explicitly accepted
+P-37 under a guided-UAT variance against exact
+`df44b827b290933463da5e14fa9125314660022a`. The guidance remains disclosed
+and is not called independent/no-assistance. The incident's technical findings
+and controls remain valid; WP-8 is complete, while P-12, P-14, and Production
+remain separate.
 
 **Scope:** Application, tests, Owner UAT procedure, and authority-document
 alignment only. No migration, database-contract, BOQ, Factor F, hotfix `016`,

@@ -9,20 +9,16 @@
 - Current Master Catalog: **`2568.0.0`, 710 รายการ**
 - Factor F versioning: **เสร็จแล้วก่อน Phase 4; default ปัจจุบันคือ
   `2569.0.0` และ BOQ เก่าไม่ได้ถูก backfill**
-- Phase 4 Admin/Import/Publish/Official Export: **WP-0 ถึง WP-7.5 ผ่านตาม
-  ขอบเขตที่บันทึกไว้; WP-8 ยัง In progress และ P-37 ยัง HOLD ตาม
-  [Closure Matrix #34](./34-phase4-wp8-p37-closure-matrix.md). Corrected
-  placement UI ผ่าน technical/recovery/keyboard/focus/presentation evidence
-  บน `f36d896`, แต่ final owner UI submission, broader independent core-admin
-  UAT, three safe-error recoveries และ named import-preview/publish-readiness
-  interaction baselines ยังต้องปิดตาม
-  [Owner UAT Script #35](./35-phase4-wp8-p37-evidence-reconciliation-and-owner-uat-script.md).
-  [Preflight Note #36](./36-phase4-wp8-p38-no-reset-owner-uat-preflight.md)
-  บันทึก corrected safe-error inputs, tracked no-reset harness และ read-only
-  baseline ที่ผ่านแล้ว; mutating prepare/Owner Cards ยังไม่รัน.
-  P-38 อนุมัติเฉพาะ bounded no-reset Local continuation; Add/Supplement ยังซ่อน
-  และ Production P-12 ถึง P-15 ยังไม่ได้อนุมัติ. ใช้ Tracker เป็น authority
-  ของ volatile status และใช้ Verification Report เป็น authority ของหลักฐานละเอียด**
+- Phase 4 Admin/Import/Publish/Official Export: **WP-0 ถึง WP-8 complete.
+  Owner accepted P-37 เมื่อ 2026-07-25 ภายใต้ guided-UAT variance ที่เปิดเผย
+  ตาม [Closure Matrix #34](./34-phase4-wp8-p37-closure-matrix.md) โดยไม่อ้างว่า
+  เป็น independent/no-assistance. D005/D007/D009, safe-error recovery,
+  performance baseline และ cleanup ผ่านตาม
+  [Owner UAT Script #35](./35-phase4-wp8-p37-evidence-reconciliation-and-owner-uat-script.md);
+  Local ปิดที่ `2568.0.0`/710, ไม่มี working draft และ flags ปิดทั้งหมด.
+  Add/Supplement ยังซ่อนจนถึง P-14 และ Production P-12 ถึง P-15
+  ยังไม่ได้อนุมัติ. ใช้ Tracker เป็น authority ของ volatile status และใช้
+  Verification Report เป็น authority ของหลักฐานละเอียด**
 - รอบถัดไปของ Phase 4: **เริ่มจาก baseline หลัง Factor F `012-015` และ
   production hotfix `016`; Phase 4 migrations คือ `017+`**
 - เอกสาร Phase 4 ต้องใช้ live preflight count เสมอ เพราะ BOQ ใหม่อาจเพิ่ม

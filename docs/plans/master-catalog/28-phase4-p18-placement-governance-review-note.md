@@ -20,9 +20,16 @@ passed leave/return/reload recovery and complete owner keyboard/focus/
 presentation review on pushed checkpoint
 `f36d896d672609653de6634e307dcc44bce6d519`. The owner did not submit the final
 placement batch through the UI, and broader independent WP-8 UAT/performance
-evidence remains open. P-37 remains HOLD. See
+evidence remained open at that checkpoint. P-37 therefore remained HOLD. See
 [Review Note #33](./33-phase4-wp8-p37-uat-ux-correction-note.md) and
 [Closure Matrix #34](./34-phase4-wp8-p37-closure-matrix.md).
+
+**Current P-37 disposition (2026-07-25):** Owner-accepted under the explicit
+guided-UAT variance against exact
+`df44b827b290933463da5e14fa9125314660022a`. The requested guidance remains
+disclosed and is not relabelled independent/no-assistance. This closes WP-8,
+not P-14 Add/Supplement or any Production gate; the P-18 database contract is
+unchanged.
 
 **P-33 decision:** Accepted 2026-07-15 13:54 +07 for the exact bounded
 WP-7.5 technical checkpoint. This is not intended-admin UX or release
