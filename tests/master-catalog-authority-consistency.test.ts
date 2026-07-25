@@ -455,15 +455,15 @@ describe('Master Catalog authority consistency', () => {
     expect(tracker).toMatch(/\| WP-7 \|[^\n]+\| Complete \|/)
     expect(tracker).toMatch(/\| WP-7\.5 \|[^\n]+\| Complete \|/)
     expect(tracker).toMatch(/\| WP-8 \|[^\n]+\| Complete \|/)
-    expect(tracker).toContain(
-      'P-37 Owner-accepted on 2026-07-25 under the explicit guided-UAT variance',
+    expect(tracker).toMatch(
+      /Owner accepted P-37 on 2026-07-25 under an explicit guided-UAT variance/,
     )
     expect(tracker).toContain('| Production write allowed | No |')
     expect(tracker).toMatch(
       /P-33 accepted that\s+exact bounded WP-7\.5 technical checkpoint at 2026-07-15 13:54 \+07/,
     )
     expect(tracker).toContain(
-      '| Current work package | WP-8 Complete; P-37 Owner-accepted on 2026-07-25 under the explicit guided-UAT variance |',
+      '| Current work package | P-12 readiness package prepared; HOLD pending separately authorized Production and backup/restore evidence |',
     )
     expect(tracker).toContain('P42-UAT-C03')
     expect(tracker).toContain('P42-UAT-G01')
@@ -477,11 +477,14 @@ describe('Master Catalog authority consistency', () => {
       '16e88c6487307c4bb0606a048dc53e05e9dcee18',
     )
     expect(tracker).toContain(
-      '| Current environment | Clean Local post-D009 readback: pointer/default `2568.0.0`',
+      '| Current environment | Fresh Local read-only P-12 preparation readback: pointer/default `2568.0.0`',
     )
     expect(tracker).toContain('zero working drafts; all catalog flags false')
     expect(tracker).toContain(
-      'Owner decisions needed: none now. A later P-12 request, P-14 Add/Supplement gate, and every Production action remain separate',
+      'Owner decisions needed: later authorize or hold the bounded Production read-only and backup/restore evidence window; this is not migration approval',
+    )
+    expect(tracker).toContain(
+      '[P-12 Readiness Package #39](./39-phase4-p12-production-readiness-package.md)',
     )
     expect(tracker).toContain(
       '0780925aca8fa7ebbf8abbaf2b7cf151b39b676a',
@@ -597,10 +600,10 @@ describe('Master Catalog authority consistency', () => {
       /pre-amendment operator\/browser preflight passed on\s+`c8f6dca`/,
     )
     expect(tracker).toContain(
-      'Status: Exact-source D005 execution, D007 stale-choice replay, D009 Full-import correction, and scenario-bound cleanup passed',
+      'Status: WP-8/P-37 remains Owner-accepted under the guided-UAT variance; exact readiness source 6827ebc passed repository/build gates',
     )
     expect(tracker).toContain(
-      'Owner accepted combined guided UI plus developer fault-injection/cleanup evidence without relabelling it independent',
+      'accepting combined Owner-operated guided UI plus developer-operated fault-injection/cleanup evidence',
     )
     expect(tracker).toContain('no Production action authorized')
     expect(tracker).toContain('2c39dddd10c361bd1244292f4bd79e06f167c919')
@@ -1178,6 +1181,7 @@ describe('Master Catalog authority consistency', () => {
       'docs/plans/master-catalog/36-phase4-wp8-p38-no-reset-owner-uat-preflight.md',
       'docs/plans/master-catalog/37-phase4-p39-draft-identity-release-number-correction-plan.md',
       'docs/plans/master-catalog/38-phase4-p42-final-review-snapshot-binding-incident-note.md',
+      'docs/plans/master-catalog/39-phase4-p12-production-readiness-package.md',
     ]) {
       expectRelativeMarkdownLinksToExist(path)
       expectMarkdownTablesToBeWellShaped(path)

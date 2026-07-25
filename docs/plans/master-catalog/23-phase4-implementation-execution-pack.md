@@ -1013,7 +1013,8 @@ current evidence for:
 
 - clean Local reset and full workflow success;
 - reviewed migration filename and SHA-256;
-- exact branch/commit and deployment artifact fingerprint;
+- exact branch/commit and deployable application build evidence; the actual
+  deployed artifact fingerprint is a P-13 gate;
 - stable operation-ID timeout/retry and structured-log evidence;
 - live Local DB migration/RPC/RLS/concurrency evidence;
 - P-20 cross-environment hash/identity portability evidence;
@@ -1038,6 +1039,11 @@ current evidence for:
 - P-11 export preview/count/hash evidence;
 - authority/document consistency check;
 - owner/verifier readiness review outcome.
+
+The current row-by-row disposition is maintained in
+[P-12 Production Readiness Package #39](./39-phase4-p12-production-readiness-package.md).
+Its 2026-07-25 verdict is HOLD pending separately authorized fresh Production
+read-only evidence, backup/restore proof, and the exact P-12 window decision.
 
 Normal Production sequencing:
 

@@ -11,6 +11,13 @@ checkpoint `df44b827b290933463da5e14fa9125314660022a`. This permits only a
 later P-12 readiness request. It is not permission to run any Production step,
 open Add/Supplement before P-14, decide P-19, or change Factor F/hotfix scope.
 
+**Current P-12 readiness disposition (2026-07-25):** the desk and Local
+read-only package is prepared at
+[P-12 Production Readiness Package #39](./39-phase4-p12-production-readiness-package.md).
+Its verdict is HOLD. Fresh Production baseline/ledger/advisor evidence,
+backup/restore proof, the exact executor window, and explicit P-12 approval are
+still absent. No Production access or write is inferred.
+
 ## 1. Safety statement
 
 This runbook is an execution checklist, not standing permission to change
@@ -50,6 +57,7 @@ catalog to roll back.
 - [P-18 Placement Governance Review Note](./28-phase4-p18-placement-governance-review-note.md)
 - [WP-8 P-37 Closure Matrix](./34-phase4-wp8-p37-closure-matrix.md)
 - [P-39 Draft Identity and Release-Number Correction Plan](./37-phase4-p39-draft-identity-release-number-correction-plan.md)
+- [P-12 Production Readiness Package](./39-phase4-p12-production-readiness-package.md)
 - [Execution Progress Tracker authority/evidence index](./25-phase4-execution-progress-tracker.md)
 - [Verification Report](./13-phase4-verification-report.md)
 - [Admin Operating Procedure](./15-phase4-admin-operating-procedure.md)
@@ -297,8 +305,9 @@ time to decide whether the rollout is truly ready before requesting P-12.
 Before requesting P-12, record:
 
 - WP-8 verification report evidence for clean Local reset and full workflow;
-- current branch/commit, migration filename, migration SHA-256, and deployment
-  artifact fingerprint;
+- current branch/commit, migration filename, migration SHA-256, and deployable
+  application build evidence; record the actual deployed artifact fingerprint
+  later at P-13 before accepting the deployment;
 - hotfix `016` evidence in the remote ledger and clean Local bootstrap path
   before any Phase 4 `017+` evidence is accepted;
 - fresh read-only Production baseline and schema drift result;
@@ -320,6 +329,10 @@ Before requesting P-12, record:
 - security/performance advisor results with no unresolved Phase 4 blocker;
 - feature flag state proving the Phase 4 UI remains disabled by default;
 - owner go/no-go for P-12 Production migration.
+
+Record these rows in
+[P-12 Production Readiness Package #39](./39-phase4-p12-production-readiness-package.md).
+Package preparation is not P-12 approval.
 
 P-13 deploy, P-14 feature enablement, and P-15 publication are requested only
 after the immediately preceding gate passes. P-15 remains separate and requires
