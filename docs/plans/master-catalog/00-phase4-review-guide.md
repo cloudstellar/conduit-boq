@@ -19,12 +19,19 @@
   [P-12 Readiness Package #39](./39-phase4-p12-production-readiness-package.md)
   เตรียม desk review, Local read-only verification และ Owner-authorized
   Production database/ledger/advisor read-only evidence แล้ว โดยไม่เขียน
-  Production. สถานะยังเป็น **HOLD** เพราะยังต้องพิสูจน์ Production Data API
-  exposed schemas, ทำ encrypted backup + isolated restore ผ่านช่องทางที่อนุมัติ,
-  ตัดสิน managed residual และระบุ executor/window. Add/Supplement ยังซ่อน
-  จนถึง P-14 และ Production P-12 ถึง P-15 ยังไม่ได้อนุมัติ. ใช้ Tracker เป็น
-  authority ของ volatile status และใช้ Verification Report เป็น authority
-  ของหลักฐานละเอียด**
+  Production. Management API ยืนยันแล้วว่า Data API ไม่ expose `private`;
+  exact Supabase PG17 synthetic/Local application-only restore ผ่านและ
+  encrypted container เตรียมแล้ว. หลังรหัสสองค่าถูกปฏิเสธและลบ รหัสค่าที่สาม
+  ผ่าน bounded read-only identity query; encrypted Production
+  application-only readiness backup SHA-256 `9d306a47...` และ exact-image
+  network-isolated restore ผ่าน โดยไม่ dump Auth/Storage และไม่เขียน
+  Production. สถานะยังเป็น **HOLD** จนกว่าจะตัดสิน security/single-device
+  managed residual, ได้ remote exact-head CI, ระบุ executor/independent
+  verifier/window และขอ P-12 แยกต่างหาก. ต้องทำ fresh backup อีกครั้ง
+  ทันทีก่อน migration เพราะ Production ยังมีข้อมูลเพิ่มต่อเนื่อง.
+  Add/Supplement ยังซ่อนจนถึง P-14 และ
+  Production P-12 ถึง P-15 ยังไม่ได้อนุมัติ. ใช้ Tracker เป็น authority ของ
+  volatile status และใช้ Verification Report เป็น authority ของหลักฐานละเอียด**
 - รอบถัดไปของ Phase 4: **เริ่มจาก baseline หลัง Factor F `012-015` และ
   production hotfix `016`; Phase 4 migrations คือ `017+`**
 - เอกสาร Phase 4 ต้องใช้ live preflight count เสมอ เพราะ BOQ ใหม่อาจเพิ่ม
@@ -46,7 +53,7 @@
 12. [WP-8 P-37 Closure Matrix](./34-phase4-wp8-p37-closure-matrix.md) — เทียบ exit gate กับหลักฐานและระบุ UAT ที่ยังขาดโดยไม่ตีความเกินหลักฐาน
 13. [WP-8 P-37 Evidence Reconciliation and Owner UAT Script](./35-phase4-wp8-p37-evidence-reconciliation-and-owner-uat-script.md) — ใช้เป็นสคริปต์เดียวสำหรับ Owner Cards A-G, safe errors, performance และ cleanup
 14. [WP-8 P-38 No-reset Owner UAT Preflight](./36-phase4-wp8-p38-no-reset-owner-uat-preflight.md) — corrected E-01/E-02, input hashes, tracked fail-closed commands และ read-only Local baseline
-15. [P-12 Production Readiness Package](./39-phase4-p12-production-readiness-package.md) — ดู exact source/migration hashes, ผล Production database/ledger/advisor read-only, residual disposition และ Data API/backup/isolated-restore evidence ที่ยังขาดก่อนขอ P-12
+15. [P-12 Production Readiness Package](./39-phase4-p12-production-readiness-package.md) — ดู exact source/migration hashes, ผล Production database/ledger/advisor/Data API read-only, readiness backup/isolated restore ที่ผ่านแล้ว และ residual/executor/window ที่ยังขาดก่อนขอ P-12
 16. [Reconciliation Report](./11-phase4-reconciliation-report.md) — ตรวจว่าข้อมูล 710/708 ถูกจัดการอย่างไร
 17. [Code Dictionary](./10-phase4-structured-code-dictionary.md) — ตรวจความหมาย AAA/TTT และจุดผิด 16 Crossing
 18. [Database/Security Contract](./17-phase4-database-security-contract.md) — ตรวจ schema, RLS/grants, function และ migration order
@@ -81,7 +88,7 @@
 | WP-8/P-37 gate closure and remaining UAT | [P-37 Closure Matrix #34](./34-phase4-wp8-p37-closure-matrix.md) |
 | WP-8/P-37 evidence reuse, Owner tasks, safe errors, performance budget และ cleanup | [Owner UAT Script #35](./35-phase4-wp8-p37-evidence-reconciliation-and-owner-uat-script.md) |
 | WP-8/P-38 reproducible inputs, no-reset preflight/cleanup และ exact Local baseline | [Preflight Note #36](./36-phase4-wp8-p38-no-reset-owner-uat-preflight.md) |
-| P-12 source/migration manifest, readiness matrix, managed residual และหลักฐาน Production/backup ที่ยังขาด | [P-12 Readiness Package #39](./39-phase4-p12-production-readiness-package.md) |
+| P-12 source/migration manifest, readiness matrix, managed residual และหลักฐาน Production/backup | [P-12 Readiness Package #39](./39-phase4-p12-production-readiness-package.md) |
 | End-to-end capability completeness and release visibility | [Completeness Audit #29](./29-phase4-owner-dev-completeness-audit.md) |
 | One-working-draft, abandon และ final snapshot review | [P-22 Correction Plan #31](./31-phase4-wp66-operator-workflow-correction-plan.md) |
 | Version intent, reserved sequence และ item-first/create/restore correction | ADR-003 และ [P-22/P-23.1 Correction Plan #31](./31-phase4-wp66-operator-workflow-correction-plan.md) |
@@ -134,7 +141,7 @@ checkpoint.
 | P-18 placement governance สำหรับ add/supplement | P-30 รับรองกติกา V1, amended WP-7.5 ผ่าน P-32 Local DB/browser/export evidence และ P-33 รับรองขอบเขตเทคนิคแล้วตาม [Review Note #28](./28-phase4-p18-placement-governance-review-note.md). P-36 integrated Local technical rehearsal และ corrected P-37 recovery/owner keyboard/focus/presentation UAT ผ่านบน pushed checkpoint `f36d896d672609653de6634e307dcc44bce6d519`; Add/Supplement ยังต้องซ่อน/ปิดจน final owner UI submission และ open WP-8 gates ใน [Closure Matrix #34](./34-phase4-wp8-p37-closure-matrix.md) ปิดครบแล้วจึงค่อยขอ explicit P-37 decision |
 | P-19 PDF policy สำหรับรายการยกเลิกใช้ | ถ้า version ใดมี inactive/retired rows ต้องตัดสินใจว่าจะ exclude/mark/appendix ก่อน filed PDF |
 | P-20 canonical hash portability | Owner approved deterministic baseline identity จาก Production-derived `price_list.id`; independent two-rebuild proof ผ่านแล้ว และต้อง rerun หลัง migration change รวมถึง WP-8/P-15 |
-| P-12 Production readiness | Owner-authorized Production database/ledger/advisor read-only evidence ผ่านในขอบเขตฐานข้อมูล: `2568.0.0`/710 และ authority hash ตรง Local, BOQ/Factor F links ปกติ, ledger `009`-`016` ครบ และ hotfix `016` ตรง source. Package #39 ยัง HOLD สำหรับ Data API exposed-schema proof, encrypted backup + isolated restore, security residual, executor/window และ exact P-12 approval; evidence window นี้ไม่ใช่การอนุมัติ migration |
+| P-12 Production readiness | Owner-authorized Production database/ledger/advisor read-only evidence ผ่านในขอบเขตฐานข้อมูล: `2568.0.0`/710 และ authority hash ตรง Local, BOQ/Factor F links ปกติ, ledger `009`-`016` ครบ และ hotfix `016` ตรง source. Management API ยืนยันว่า Data API ไม่ expose `private`. รหัสค่าที่สามผ่าน secure bounded identity query หลังสองค่าก่อนหน้าถูกปฏิเสธและลบ; encrypted Production readiness dump `9d306a47...` จับ 234 BOQs/2,270 items และ exact-image network-isolated restore เทียบ hash/integrity ผ่านโดยไม่ dump Auth/Storage หรือเขียน Production. Package #39 ยัง HOLD สำหรับ security/single-device residual, remote exact-head CI, executor/independent verifier/window และ exact P-12 approval; fresh in-window backup ยังบังคับก่อน migration และ evidence window นี้ไม่ใช่การอนุมัติ migration |
 | WP-6.6 capability completeness | G1R/G2 ผ่าน DB/concurrency/P-20/advisor/repository บน exact candidate `721c2c2`; P-25/G3/P-26 technical paths ผ่าน และ owner accepted G3 บน exact `78e96ab` แล้ว. G4 ยังแยก ส่วน independent UAT/performance/formal accessibility อยู่ WP-8 |
 | P-21/P-22/P-23/P-23.1/P-24/P-25/P-26/P-27 WP-6.6 Local-only | `020` SHA-256 `e07e0c4161077efba7bc4f6ebf95518d0cc1bc7e4628a43a128dd899bd1aef93` ผ่าน G1R/G2, P-28 เพิ่มเข้า bootstrap และ P-29/G4E ผ่าน clean chain; G3/P-26 accepted บน exact application checkpoint `78e96ab`. ไม่รวม `021` bootstrap, Factor F/hotfix expansion หรือ Production |
 | Version lifecycle ตาม ADR-003 | Admin ต้องเลือก annual/revision/patch; annual year มาจาก owner; ระบบใช้ทะเบียนทุกสถานะและไม่ reuse เลข; DB บังคับเลขถัดไป. Live G1R/G2/G3 และ owner closeout ผ่านแล้ว; WP-8/P-14 ยังรอ |

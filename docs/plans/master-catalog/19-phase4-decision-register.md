@@ -356,13 +356,56 @@ Production function body exactly matches migration `016` at SHA-256
 `7187ffb568617783146d4b5f8db8021147cd212a578e655879c49f32f9fb54f0`.
 Fresh advisors were captured and classified as pre-Phase-4 baseline.
 
-The evidence window remains **HOLD** because the Production Data API
-exposed-schema setting is not yet proven, no approved credential/secure
-location or separately cost-confirmed platform path was available for a fresh
-backup and isolated restore, and security-residual plus executor/window
-decisions remain open. No backup/restore was attempted. This decision is not
-P-12 and authorizes no Production DDL/DML, migration, deploy, feature flag,
-publication, P-19, Factor F, or hotfix change.
+The Data API row is now Ready: an Owner-authorized Management API `GET` at
+2026-07-26 19:29 +07 shows exposed schemas `public, graphql_public` and
+`private_exposed=false`, without emitting a token or `jwt_secret` or changing
+configuration. Exact Supabase PostgreSQL `17.6.1.063` synthetic and Local
+application-only restore rehearsals also passed, and an AES-256 encrypted
+off-repository sparse bundle is prepared with Keychain-held credentials.
+
+The exact primary pooler host was subsequently read through the
+Owner-authorized Management API. Frozen Supabase CLI `2.107.0` maps it to
+Session target
+`postgres.otlssvssvgkohqwuuiir@aws-1-ap-south-1.pooler.supabase.com:5432/postgres`,
+and a TCP-only reachability check passed without authentication.
+
+At 2026-07-26 21:47 and 22:04 +07, two candidate database passwords supplied
+one at a time through the native secure prompt and temporary login-Keychain item
+failed the authentication/read-only identity query with PostgreSQL `password
+authentication failed`. Each rejected item and temporary `.pgpass` was deleted
+immediately.
+
+Immediately before 2026-07-26 22:48 +07, a third Owner-entered candidate passed
+the same bounded read-only identity query against Production PostgreSQL 17.6
+and is retained only in the macOS login Keychain. No password was emitted or
+written to Git, backup evidence, chat, command arguments, or shell history. No
+password reset occurred.
+
+The already authorized application-only readiness backup then completed with
+no Production write. The AES-256 sparse bundle now contains package
+`pre-p12-readiness-20260726T154815Z`: 352,642-byte custom dump SHA-256
+`9d306a478b8ada65d0a32ab31bca19587c55efa3ae979ae4dd8ad5871d575932`,
+234 BOQs, 2,270 BOQ items, 710 price-list rows, one catalog version, two Factor
+F versions, and 73 Factor F rows. Read-only source metrics before and after the
+dump were identical.
+
+The dump restored successfully into exact image
+`public.ecr.aws/supabase/postgres:17.6.1.063` in an ephemeral container with no
+network or host port. Auth/Storage data remained excluded; 20 UUID-only
+ephemeral Auth stubs satisfied application foreign-key validation and contained
+zero sensitive payload. Comparable business counts/hashes matched and all
+constraint, trigger, version-link, Factor F snapshot, and pointer checks passed.
+The container was deleted. Earlier isolated failures were tooling discoveries
+and failed closed; no attempt contacted or changed Production.
+
+The evidence window remains **HOLD**, but no longer for the readiness
+backup/restore. Open rows are the guarded-definer/Auth/dead-assignment and
+single-device custody disposition, remote exact-head CI, named
+executor/independent verifier, exact window, and separate P-12 go/no-go. A
+fresh backup is still mandatory immediately before migration because
+Production remains live. This decision is not P-12 and authorizes no Production
+DDL/DML, migration, deploy, feature flag, publication, P-19, Factor F, or
+hotfix change.
 
 **Capability-completeness alignment recorded:** 2026-07-12 — owner requested a
 full owner/developer audit and plan correction. Audit #29 adds WP-6.6 before
@@ -601,7 +644,7 @@ this register. In particular:
 | P-09 | Approve exact candidate version, effective date, approval reference, and physical archive reference | Limited approval only: reserve `2568.1.0` as the candidate draft/rehearsal version string for the Master Catalog Phase 4 structured-code rollout. This does not approve the candidate business `effective_date` (which is owner-designated and not automatically the publish/deploy date), `approval_reference`, `approval_document_date`, `physical_archive_reference`, approver/publisher snapshot, final diff/count/hash, Production publication, or P-15. Those values must be approved after candidate freeze, verification, release-note/export filing evidence, and final owner review. | Owner | Candidate draft/publish rehearsal | Partially approved 2026-07-04; publication metadata pending |
 | P-10 | Approve which NT fonts/logo derivatives may be committed and deployed | Approved limited runtime CI asset scope for Master Catalog Phase 4. Owner confirms the project has rights to use all supplied NT CI assets under `/CI/` for NT business operations, including fonts, logos, guidelines, and supporting graphics. Repository/deployment approval is limited to `app/fonts/nt/NT-Regular.woff2` from `CI/NT Regular.ttf`, `app/fonts/nt/NT-Bold.woff2` from `CI/NT Bold.ttf`, `public/brand/nt/nt-logo-primary.png` from `CI/NT_1_v3.png`, and `public/brand/nt/nt-logo-company-lockup.png` from `CI/NT_4_v3.png`. Original `/CI/` source files remain local-only; existing `public/nt_logo.svg` and `public/nt_logo.png` must be replaced by approved derivatives or explicitly retained with source/provenance evidence. Implementation must follow [Doc #24](./24-phase4-nt-ci-runtime-asset-analysis.md). P-11 replacement artifact acceptance was recorded on 2026-07-11; remaining app-wide asset cleanup stays under P-10. | Owner/brand custodian | Phase 4B UI implementation | Approved 2026-07-04 |
 | P-11 | Approve the official Excel/PDF visual sample and field order | Direction approved for implementation: official human-facing PDF uses A4 portrait price-list layout and title `รายการบัญชีราคามาตรฐานงานก่อสร้างท่อร้อยสายสื่อสารใต้ดิน`; the main PDF table shows sequence, item description, counting unit, material cost, labor cost, and total unit price; PDF item-unit column label is `หน่วยนับ`; `(หน่วยเงิน: บาท)` appears as a repeated right-aligned note above the PDF price columns; field-facing PDF price pages, including the published Production PDF, must use the price-disclaimer watermark wording/style from `files/รายการบัญชีราคามาตรฐานงานก่อสร้างท่อร้อยสาย 2568.pdf` and the exact three-line owner-provided wording recorded in the export spec; this watermark is not a Draft/Preview status mark; `item_code` is not a dedicated PDF table column; Excel remains the full 13-column canonical/business export with visible `ข้อมูลตรวจสอบ`; footer shows department, page `x/y`, and right-side version/status or version/effective-date text using the examples recorded in the export spec; no truncated SHA-256 in the field-facing PDF footer; no technical verification page in the final field-facing PDF; QR code is deferred unless a stable owner-approved verification URL exists. Owner refinement 2026-07-10: the PDF summary shows only organization, catalog version, Thai status, effective date, item count, and full dataset hash. It excludes technical `Current Default`, approval reference/date, approved-by/publisher, exported-at/by, generated-by, and export-spec fields. A non-current published version instead carries a plain Thai retrospective-reference warning. The excluded values remain in Excel metadata and the release/filing manifest. Owner refinement 2026-07-11 21:49 +07: the editable Excel export uses `TH Sarabun New` on every populated cell with a 16-point body baseline and larger title hierarchy; the PDF retains embedded NT runtime fonts. The exact replacement pair from `777df75` passed semantic, typography, five-sheet workbook, 19-page PDF, and unchanged Local readback checks. At 22:20 +07 the owner confirmed `รูปแบบ pdf excel ok เลยครับ`, accepting those exact Local binaries as final P-11/WP-6 artifact evidence. This does not approve Production filing, migration, deploy, enablement, publication, P-18/P-19, or Factor F changes. | Owner | Export implementation acceptance | Accepted 2026-07-11 22:20 +07; WP-6 complete; Production filing remains separate |
-| P-12 | Approve the named Production migration window | Request only after WP-8 evidence review is complete: Local evidence green, remote migration ledger includes hotfix `016`, clean Local bootstrap has applied `009`-`015`, `016`, and Phase 4 `017+`, fresh read-only Production baseline and schema drift check match, backup/restore evidence complete, P-20 portability and reviewed migration fingerprint match, live DB/RPC/RLS/concurrency and permanent BOQ/Factor F regressions pass, advisors have no unresolved blocker, and owner gives go/no-go for the actual window. Package #39 contains the row-by-row readiness disposition. | Owner | Production migration | HOLD; Owner-authorized Production database/ledger/advisor read-only evidence completed 2026-07-26 with no write. Database baseline and ledger rows are Ready; Data API exposed-schema proof, encrypted backup + isolated restore, security residual, executor/window, and exact P-12 approval remain pending. P-12 is not requested. |
+| P-12 | Approve the named Production migration window | Request only after WP-8 evidence review is complete: Local evidence green, remote migration ledger includes hotfix `016`, clean Local bootstrap has applied `009`-`015`, `016`, and Phase 4 `017+`, fresh read-only Production baseline and schema drift check match, backup/restore evidence complete, P-20 portability and reviewed migration fingerprint match, live DB/RPC/RLS/concurrency and permanent BOQ/Factor F regressions pass, advisors have no unresolved blocker, and owner gives go/no-go for the actual window. Package #39 contains the row-by-row readiness disposition. | Owner | Production migration | HOLD; Owner-authorized Production database/ledger/advisor and Data API read-only evidence completed 2026-07-26 with no write. The encrypted Production application-only readiness dump `9d306a47...` and exact-image network-isolated restore passed; no Auth/Storage data or Production write. Security/single-device residual, remote exact-head CI, executor/independent-verifier/window, fresh in-window rollback backup, and exact P-12 approval remain pending. P-12 is not requested. |
 | P-13 | Approve application deploy and admin-only smoke window | Request only after P-12 migration verification passes, CI/deployment fingerprint matches, current user flows and Factor F/BOQ invariants remain unchanged, and the Phase 4 feature flag stays disabled by default. | Owner | Production deploy | Not requested; request after migration verification |
 | P-14 | Approve feature enablement | Request only after P-13 deploy and admin-only smoke pass, authorization/UI/accessibility/error-recovery checks, intended-admin UAT, reusable ADR-003 version evidence, structured logs, performance baseline, and non-admin denial tests pass. Enable admin scope only; do not publish a catalog version under P-14. | Owner | User visibility | Not requested; request after deploy/admin smoke verification |
 | P-15 | Approve publication of the exact named catalog version and its final diff/count/hash | Migration/deploy/enablement approval does not imply publish approval. Requires WP-6.6 capability evidence, exact final version metadata, effective date, approval reference/date, version-level physical archive reference, authenticated publisher snapshot, final diff totals, item count, P-20-compliant dataset hash, tracked-verifier official Excel/PDF evidence, stable request-ID/concurrency evidence, WP-6.5 P-18 add/supplement guard evidence when relevant, WP-6.5 structured-code exception guard evidence, P-19 inactive-row export policy when relevant, and owner go/no-go. | Owner | Production publication | Not requested |
@@ -775,7 +818,7 @@ Production migration, deploy, feature enablement, or publication.
 | P-42 proportional spot-check correction | P42-UAT-C03/G01 corrected; Spot-check 1 retained; P-37 remained HOLD at this checkpoint | Owner + developer | 2026-07-22 | Exact `44f54a72b03549de995b431d6705ec1b2eeb3fa6` aligns the third import progress label and adds immutable full/two-attempt versus bounded/one-attempt cleanup scenarios without weakening persistence guards. D003 is audited-abandoned; Local is pointer `2568.0.0`/710, zero drafts, flags false. Only Spots 2-4 and corrected cleanup remain; no reset or Production action. |
 | P-42 D004 import/cleanup and placement-modal correction | Spot-check 2 and schema-2 cleanup passed; P42-UAT-D01 corrected; P-37 remained HOLD at this checkpoint | Owner + developer | 2026-07-22 | D004 safely repeated E-01 with no persistence, then exposed the real nested-popover wheel failure. Exact `16e88c6487307c4bb0606a048dc53e05e9dcee18` keeps the searchable list inside the modal. Owner confirmed wheel and outside-click behavior; D004 cleanup restored pointer `2568.0.0`/710, zero drafts, flags false. At that checkpoint Spots 1-2 were retained and only exact-source Spots 3-4 plus final cleanup remained; the later D005 row records their execution. No migration, reset, or Production action. |
 | P-42 final exact-source spot-check and cleanup | Execution passed; this was the pre-decision checkpoint and P-37 was later accepted on 2026-07-25 | Owner + developer | 2026-07-23 | Exact D005 source/session passed Spot 3 and same-request Spot 4; `b639c03` keeps recovered success visible. Exact D007 on `8fb9839...` displayed the stale-choice discard notice and cleanup restored the disabled baseline without reset. Production untouched. |
-| Production migration | HOLD; P-12 not requested |  |  | Production database/ledger/advisor read-only evidence completed without write on 2026-07-26. Package #39 still requires Data API proof, encrypted backup + isolated restore, residual disposition, executor, and exact-window evidence before requesting P-12. |
+| Production migration | HOLD; P-12 not requested |  |  | Production database/ledger/advisor and Data API read-only evidence completed without write on 2026-07-26. Encrypted Production readiness backup `9d306a47...` and exact-image isolated restore passed. Package #39 still requires residual/custody disposition, remote exact-head CI, executor/independent verifier, and exact-window evidence before requesting P-12; a fresh backup remains mandatory inside the approved window. |
 | Deploy / feature enable | Not requested |  |  | P-13–P-14; request only after preceding Production gate passes |
 | Publish named version | Not requested |  |  | P-15 |
 

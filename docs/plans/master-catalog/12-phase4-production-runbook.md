@@ -15,11 +15,15 @@ open Add/Supplement before P-14, decide P-19, or change Factor F/hotfix scope.
 prepared at
 [P-12 Production Readiness Package #39](./39-phase4-p12-production-readiness-package.md).
 Its verdict is HOLD. The authorized Production database/ledger/advisor
-read-only evidence is complete without a Production write. Production Data API
-configuration proof, backup/isolated-restore evidence, security-residual
-disposition, the exact executor window, remote exact-head CI, and explicit P-12
-approval remain open. No further Production access or any Production write is
-inferred.
+read-only evidence and Data API exposed-schema proof are complete without a
+Production write. Exact Supabase PostgreSQL 17 synthetic and Local
+application-only restore rehearsals also passed without Production access. A
+third Owner-entered credential passed after two rejected candidates were
+deleted, and the authorized encrypted Production application-only readiness
+backup plus exact-image network-isolated restore passed with no Production
+write. Security/custody disposition, the exact executor/verifier window,
+remote exact-head CI, and explicit P-12 approval remain open. This readiness
+evidence does not authorize further Production access or any Production write.
 
 ## 1. Safety statement
 
@@ -78,6 +82,9 @@ Stop immediately when any of these occurs:
 - current Production counts/invariants differ without explanation;
 - a reviewed file fingerprint differs;
 - backup or restore test is incomplete;
+- the Production DB credential fails authentication, is guessed, or a password
+  reset is proposed without a separate Owner approval and external direct/
+  intermittent consumer update plan;
 - reconciliation does not cover all 710 Production UUIDs;
 - a Production price/name/unit changes during code-only rollout;
 - a code maps to multiple identities or an identity duplicates inside a version;
@@ -314,6 +321,9 @@ Before requesting P-12, record:
 - hotfix `016` evidence in the remote ledger and clean Local bootstrap path
   before any Phase 4 `017+` evidence is accepted;
 - fresh read-only Production baseline and schema drift result;
+- validated secure custody of the existing Production DB credential, or a
+  separately approved controlled reset with direct/intermittent consumer
+  inventory and credential-update verification;
 - fresh logical backup manifest plus restore-test evidence;
 - BOQ regression evidence, including price-list version links and Factor F
   version/snapshot invariants;
@@ -438,13 +448,29 @@ Also verify:
 
 ## 8. Backup gate
 
-1. Create an encrypted logical schema/data backup immediately before migration.
-2. Create a manifest with timestamp, source project, included tables, excluded
-   auth fields, row counts, and SHA-256 fingerprints.
-3. Restore the backup into clean Local and run critical checks.
-4. Record backup location by reference; do not commit secrets or production
-   dumps.
-5. Owner/executor/verifier sign the backup gate.
+1. Before requesting P-12, prove the recovery procedure with one authorized
+   read-only Production application-only backup and an isolated PostgreSQL 17
+   restore. This readiness rehearsal passed on 2026-07-26 and is not the final
+   rollback source.
+2. Inside the separately approved P-12 window, create a fresh encrypted logical
+   backup immediately before migration because Production remains live.
+3. Include application schemas `public, private`; retain the
+   `public.price_list_audit_logs` definition but exclude its data; do not dump
+   Auth or Storage data.
+4. Create a manifest with timestamp, source project, scope, row counts, source
+   before/after hashes, dump SHA-256, tool/image versions, and exclusions.
+5. Restore into an ephemeral non-Production PostgreSQL 17 target with no
+   network or host port. If Auth data remains excluded, use only UUID-only
+   ephemeral stubs needed to validate application foreign keys; do not treat
+   them as an Auth recovery.
+6. Require matching comparable business counts/hashes, validated constraints,
+   enabled triggers, valid catalog/BOQ/Factor F links, and valid default
+   pointers.
+7. Record backup location by reference; do not commit secrets or Production
+   dumps. Copy the encrypted final rollback source to an independent
+   Owner-controlled device or record explicit acceptance of the
+   single-device-loss residual.
+8. Owner/executor/independent verifier sign the final in-window backup gate.
 
 No verified restore means no Production migration.
 

@@ -4,9 +4,11 @@
 
 **Last updated:** 2026-07-26
 
-**Status:** HOLD - the authorized Production read-only database/ledger/advisor
-window is complete; Data API configuration, backup/isolated restore, executor,
-and exact-window evidence remain open; P-12 has not been requested or approved
+**Status:** HOLD - the authorized Production read-only database/ledger/advisor,
+Data API configuration, and readiness backup/isolated-restore evidence are
+complete; security disposition, independent custody, remote exact-head CI,
+executor, and exact-window evidence remain open; P-12 has not been requested
+or approved
 
 **Readiness baseline checkpoint:**
 `6827ebc1a729b7675fe91db58e129c9381b33ddb`
@@ -28,18 +30,17 @@ advisor reads without a Production write.
 The actual P-12 Production migration must remain on HOLD because these required
 rows are still open:
 
-- Production Data API exposed-schema configuration is not yet proven;
-- no fresh encrypted logical backup manifest or successful isolated restore
-  rehearsal exists;
 - the exact executor/tooling and maintenance-window record is not fixed;
-- the fresh security findings still need the explicit Owner disposition named
-  below; and
+- remote CI has not yet reported on the eventual exact reviewed head;
+- the fresh security findings and same-device backup residual still need the
+  explicit Owner disposition named below; and
 - the Owner has not given a go/no-go for an exact P-12 window.
 
-Preparing or accepting this document does not authorize any further Production
-access beyond the completed read-only evidence, any Production write, a Local
-reset, a Local migration apply, deployment, feature enablement, Add/Supplement
-release, publication, Factor F work, or a change to hotfix `016`.
+Preparing or accepting this document authorizes only the separately recorded
+read-only logical-backup/isolated-restore rehearsal. It does not authorize any
+Production write, a Local reset, a Local migration apply, deployment, feature
+enablement, Add/Supplement release, publication, Factor F work, or a change to
+hotfix `016`.
 
 ## 2. Authority and scope
 
@@ -269,13 +270,19 @@ and Factor F pointers/hashes.
 - Phase 4 catalog edit sessions cannot exist because the Phase 4 objects are
   absent.
 
-The Production Data API exposed-schema setting remains **unproven**. The
-database setting is platform-managed and was not visible through
-`current_setting` or role settings. A direct read-only profile probe using the
-publishable keys returned `401` for `public`, `graphql_public`, and `private`,
-so it proves neither exposure nor non-exposure. An authorized Dashboard or
-Management API read must show that `private` is not exposed before P-12 can be
-requested.
+The Production Data API exposed-schema setting is **proven Ready**. At
+2026-07-26 19:29 +07, an Owner-authorized Management API `GET` for project
+`otlssvssvgkohqwuuiir` returned:
+
+- exposed schemas: `public`, `graphql_public`;
+- `private` exposed: `false`;
+- extra search path: `public`, `extensions`;
+- maximum rows: `1000`.
+
+Supabase CLI `2.107.0` read its existing access token from macOS Keychain in
+memory. The evidence command emitted only the non-secret fields above; it did
+not print or persist the access token or the response `jwt_secret`. No setting
+was changed. This supersedes the earlier inconclusive publishable-key probe.
 
 ### 7.4 Advisor disposition
 
@@ -307,15 +314,136 @@ finding.
 
 ### 7.5 Backup and restore disposition
 
-No backup or restore was performed. The available connector does not list or
-download platform backups. The unlinked repository CLI can create a logical
-dump only with an explicitly supplied database URL/password, and the connector
-does not expose that secret. A Supabase development branch is not acceptable
-restore evidence because it excludes Production data. Restoring to a new
-project may incur cost and requires a separate cost confirmation.
+The Owner authorized the low-cost application-only logical path on 2026-07-26.
+Tooling preparation first passed without Production access:
 
-This row stays **HOLD**, not failed. The next authorized backup step must name
-one of these paths:
+- Docker client/server `29.5.3`;
+- exact Supabase PostgreSQL image
+  `public.ecr.aws/supabase/postgres:17.6.1.063` at server `17.6`, matching the
+  Production engine/release line;
+- macOS AES-256 encrypted APFS sparse-bundle detach/remount round trip;
+- an integrated custom-format dump/restore and source/restored row-hash
+  comparison using three synthetic rows; and
+- a second application-data rehearsal using Local read-only source schemas
+  `public, private`, with only `public.price_list_audit_logs` table data
+  excluded. Restore into the exact Supabase image reproduced the critical Local
+  counts, including
+  7,107 `price_list` rows, 10 versions, one default pointer, 198 BOQs, 1,547
+  BOQ items, two Factor F versions, and 73 Factor F rows. The complete
+  `price_list` row hash matched at
+  `sha256:5bd6c22224cd3f255e30ccd9ca1d54cf6ba5c2fa75cdaedf9a1eb25970d28d0f`.
+
+The synthetic and Local rehearsals deleted their temporary containers and dump
+files. They proved the local toolchain and application-only restore contract
+before any Production credential was accepted.
+
+The approved off-repository container is prepared at
+`/Users/cloud/Backups/ConduitBOQ/production/phase4/pre-p12/pre-p12-rehearsal.sparsebundle`.
+It is an 8 GiB logical sparse bundle, reports `encrypted: YES`, is restricted
+to the local user, and has a randomly generated passphrase held in the macOS
+login Keychain under service `Conduit BOQ Phase4 Backup`, account
+`otlssvssvgkohqwuuiir-pre-p12`. A separate end-to-end check retrieved the
+passphrase from Keychain and reopened the detached bundle without displaying
+the secret.
+
+The first empty sparse bundle prepared earlier in the session reported
+encryption but had no retrievable Keychain item. The recovery check therefore
+rejected it. At 2026-07-26 21:25 +07, before any Production data existed, it
+was replaced with the current bundle; the replacement passed create,
+encryption, detach/remount, Keychain store/readback, and a separate
+Keychain-to-bundle reopen. The unrecoverable and temporary replacement bundles
+were removed.
+
+At 2026-07-26 21:47 and 22:04 +07, the Owner supplied two candidate database
+passwords one at a time through the native secure prompt. PostgreSQL rejected
+both before a successful query or dump. Each rejected Keychain item and
+temporary `.pgpass` was deleted immediately.
+
+Immediately before the 22:48 +07 capture, a third Owner-entered candidate
+passed the same authentication/read-only identity query through the proven
+Session endpoint, returning database `postgres`, user `postgres`, and server
+`17.6`. The valid credential is retained only in the macOS login Keychain under
+service `Conduit BOQ Production DB`, account `otlssvssvgkohqwuuiir`. No
+candidate value was shown in chat, command arguments, shell history, Git,
+backup metadata, or evidence files. A controlled project-password reset was
+not used and is not authorized by this package.
+
+The authorized Production readiness backup then completed with no Production
+write:
+
+- captured at `2026-07-26T15:48:22Z` (`22:48:22 +07`);
+- PostgreSQL custom-format, gzip level 9, `pg_dump` 17.6, no owner or ACL
+  replay, serializable-deferrable read posture, and a 10-second lock wait;
+- included schemas `public, private`;
+- retained the `public.price_list_audit_logs` table definition but excluded its
+  data; and
+- did not dump `auth` or `storage` data.
+
+The package is stored inside the encrypted sparse bundle under
+`pre-p12-readiness-20260726T154815Z/`. The dump is 352,642 bytes with SHA-256
+`9d306a478b8ada65d0a32ab31bca19587c55efa3ae979ae4dd8ad5871d575932`.
+Read-only metrics immediately before and after the dump were identical. This
+later live capture contains 234 BOQs and 2,270 BOQ items, up from the morning
+232/2,183 baseline, plus 710 price-list rows, one catalog version, two Factor F
+versions, and 73 Factor F rows. The growth is normal live Production activity,
+not schema or authority drift.
+
+The dump was restored into an ephemeral container using the exact image
+`public.ecr.aws/supabase/postgres:17.6.1.063`. The container had
+`--network none`, no host port, and was deleted after the check. Restore ran in
+`pre-data`, `data`, and `post-data` phases. Because Auth data is deliberately
+out of scope while application tables retain foreign keys to `auth.users`, the
+isolated target received 20 UUID-only ephemeral user stubs before post-data
+constraints were created. Those stubs contained zero email, password, app
+metadata, or user metadata values and disappeared with the container.
+
+All comparable business counts and row hashes matched the read-only source
+metrics; the diff file is empty. The restore also reported zero invalid
+constraints, disabled user triggers, missing catalog-version links,
+cross-version BOQ-item links, partial Factor F snapshots, invalid default
+pointers, and audit-log rows. Earlier isolated attempts failed closed and
+identified readiness timing, the target's default `public` schema, the
+intentional Auth dependency, and an image-version-specific Auth column
+assumption. The final phased restore corrected those tooling assumptions
+without weakening or skipping a constraint. No failed attempt contacted
+Production.
+
+A point-in-time `pg_stat_activity` inventory showed only standard Supabase
+services such as PostgREST, Storage, cron, `pg_net`, and monitoring; no obvious
+external direct client was connected at that instant. This does not prove that
+an intermittent ETL, BI tool, desktop client, or scheduled script does not use
+the password.
+
+The readiness backup/restore row is now **Ready**. It is not the final rollback
+source because Production remains live. A fresh backup with the same gates is
+still mandatory immediately before migration inside the separately approved
+P-12 window.
+
+The sparse bundle remains on the same physical computer as the working copy.
+Its passphrase and earlier detach/reopen path are proven, and the completed
+package passes its portable `SHA256SUMS`. A post-write detach/reopen was not
+forced because Docker Desktop retained read handles after the isolated
+bind-mount; stopping Docker would also stop the active Local Supabase stack.
+Repeat the non-force detach/reopen checksum after Docker is intentionally
+stopped. Before Production execution, copy the encrypted package to an
+independent Owner-controlled device or explicitly accept the single-device-loss
+residual.
+
+The non-secret connection target is already proven:
+
+- host `aws-1-ap-south-1.pooler.supabase.com`;
+- port `5432` for Supavisor Session mode;
+- user `postgres.otlssvssvgkohqwuuiir`;
+- database `postgres`; and
+- TLS required.
+
+The Owner-authorized Management API read returned the same primary host and
+transaction endpoint `6543`; frozen Supabase CLI `2.107.0` maps that primary
+pooler host to port `5432` for Session mode. A TCP-only check from this machine
+to port `5432` passed without authenticating or issuing a database command. The
+direct database hostname remains IPv6-only from this machine and has no route.
+
+The accepted paths remain:
 
 1. an encrypted `supabase db dump --db-url ...`/`pg_dump` to an approved
    off-repository secure location, followed by restore into isolated
@@ -323,9 +451,11 @@ one of these paths:
 2. an approved platform backup/clone into a separately cost-confirmed
    non-Production project.
 
-In both cases, exclude auth secrets, record the manifest/counts/hashes, and run
-the Production Runbook section 8 integrity checks. No verified restore means no
-P-12.
+For the logical path, freeze Supabase CLI `2.107.0`; dump only application
+schemas `public, private`; retain the `public.price_list_audit_logs` table
+definition but exclude its data; and do not dump `auth` or `storage` data.
+Record the manifest/counts/hashes and run the Production Runbook section 8
+integrity checks. No verified restore means no P-12.
 
 ## 8. Readiness matrix
 
@@ -346,14 +476,15 @@ P-12.
 | Local security/RLS | No Local runtime blocker; dead assignment and baseline minimization residuals documented | Hold - exact Owner residual decision pending |
 | Production migration ledger | Expected `009`-`016` set present; no unexpected later entry; `010a` indexes valid/ready; exact hotfix body matches | Ready |
 | Production baseline/schema drift | PostgreSQL 17.6; `2568.0.0`/710; Local/Production authority hash match; BOQ/Factor F/RLS/triggers clean; Phase 4 absent as expected | Ready for database scope |
-| Production Data API schemas | Platform configuration must prove `private` is not exposed | Hold - authorized Dashboard/Management read pending |
-| Backup/restore | Fresh encrypted backup manifest and isolated restore test | Hold - approved secure path/credentials or cost-confirmed platform path pending |
+| Production Data API schemas | Management API shows `public, graphql_public`; `private` is not exposed; evidence excluded token and `jwt_secret` | Ready |
+| Backup/restore | Third secure credential candidate passed the bounded read-only identity query. Encrypted Production application-only dump `9d306a47...` captured 234 BOQs/2,270 items and passed source-before/after metrics. Exact-image, network-isolated phased restore matched all comparable counts/hashes and passed constraints, triggers, version links, Factor F snapshots, and pointer checks. No Auth/Storage data or Production write. | Ready for readiness rehearsal; fresh in-window backup remains mandatory |
 | Production advisors | Fresh output captured; no Phase 4 object exists, but guarded definer/Auth-hardening residuals need Owner disposition | Hold - Owner/security decision pending |
 | Migration executor record | Exact tool version, reviewed hashes, timeouts, executor, verifier, window, and stop conditions | Hold - window proposal pending |
 | P-12 Owner go/no-go | Exact Production window approval | Hold - not requested |
 
 Overall result: **HOLD**. The implementation is ready to collect the remaining
-Data API, backup/restore, security disposition, and executor/window evidence.
+security/custody disposition, remote exact-head CI, and executor/window
+evidence.
 It is not ready to execute the Production migration.
 
 ## 9. Next bounded approval
@@ -364,14 +495,12 @@ stale. Use
 [Owner Decision Checklist #40](./40-phase4-p12-owner-decision-checklist.md)
 to request a narrowly scoped decision covering:
 
-1. an authorized read of Production Data API exposed schemas;
-2. the exact encrypted logical-backup path and secure off-repository location,
-   or the cost-confirmed platform restore path;
-3. restoration only into isolated non-Production PostgreSQL 17 and the named
-   integrity checks;
-4. acceptance/remediation timing for the guarded-definer, leaked-password, and
-   Local dead-assignment residuals; and
-5. the proposed executor, independent verifier, tooling, timeouts, and
+1. acceptance/remediation timing for the guarded-definer, leaked-password,
+   single-device backup, and Local dead-assignment residuals;
+2. post-write non-force sparse-bundle reopen when Docker can be stopped, plus
+   the final independent-device custody decision;
+3. remote CI status for the eventual exact reviewed head; and
+4. the proposed executor, independent verifier, tooling, timeouts, and
    maintenance window.
 
 That approval must explicitly state that no Production DDL/DML, feature flag,
