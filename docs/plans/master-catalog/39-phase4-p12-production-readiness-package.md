@@ -2,8 +2,11 @@
 
 **Prepared:** 2026-07-25
 
-**Status:** HOLD - desk review and Local read-only verification are complete;
-P-12 has not been requested or approved
+**Last updated:** 2026-07-26
+
+**Status:** HOLD - the authorized Production read-only database/ledger/advisor
+window is complete; Data API configuration, backup/isolated restore, executor,
+and exact-window evidence remain open; P-12 has not been requested or approved
 
 **Implementation checkpoint:**
 `6827ebc1a729b7675fe91db58e129c9381b33ddb`
@@ -14,23 +17,26 @@ P-12 has not been requested or approved
 
 WP-8 and P-37 are complete under the explicitly recorded guided-UAT variance.
 The repository, accepted Local migration chain, and clean Local baseline are
-ready for a bounded Production-readiness evidence window.
+ready. The Owner then authorized the recommended bounded readiness evidence
+window. On 2026-07-26 that window completed the read-only Production database
+baseline, migration ledger, critical schema/grant/trigger inventory, and fresh
+advisor reads without a Production write.
 
-The actual P-12 Production migration must remain on HOLD because the following
-evidence intentionally does not exist yet:
+The actual P-12 Production migration must remain on HOLD because these required
+rows are still open:
 
-- a freshly authorized read-only Production baseline and schema-drift report;
-- a fresh Production migration-ledger check proving hotfix `016`;
-- a fresh backup manifest and successful restore rehearsal in an isolated
-  environment;
-- fresh Production security/performance advisor output;
-- the exact executor/tooling record for the proposed migration window; and
-- the Owner's explicit go/no-go for that exact window.
+- Production Data API exposed-schema configuration is not yet proven;
+- no fresh encrypted logical backup manifest or successful isolated restore
+  rehearsal exists;
+- the exact executor/tooling and maintenance-window record is not fixed;
+- the fresh security findings still need the explicit Owner disposition named
+  below; and
+- the Owner has not given a go/no-go for an exact P-12 window.
 
-Preparing or accepting this document does not authorize Production access,
-Production writes, a Local reset, a Local migration apply, deployment, feature
-enablement, Add/Supplement release, publication, Factor F work, or a change to
-hotfix `016`.
+Preparing or accepting this document does not authorize any further Production
+access beyond the completed read-only evidence, any Production write, a Local
+reset, a Local migration apply, deployment, feature enablement, Add/Supplement
+release, publication, Factor F work, or a change to hotfix `016`.
 
 ## 2. Authority and scope
 
@@ -166,10 +172,141 @@ The latest accepted Local advisor baseline remains:
   unused-index information findings;
 - both Phase 4 frozen-authority foreign keys have covering indexes.
 
-Fresh Production advisors remain mandatory because Local findings cannot prove
-the current Production state.
+## 7. Authorized Production read-only evidence
 
-## 7. Readiness matrix
+The Owner authorized the bounded evidence window recorded in the Decision
+Register and Tracker. The queries below were run against Supabase project
+`otlssvssvgkohqwuuiir`
+(`Conduit Price List`) using read-only `SELECT` and advisor operations only.
+The evidence timestamp was 2026-07-26 09:53 +07. The project was
+`ACTIVE_HEALTHY`, PostgreSQL was `17.6`, and no DDL, DML, migration, feature
+flag, deploy, publication, Factor F mutation, or hotfix change was performed.
+
+### 7.1 Ledger and hotfix
+
+The remote ledger contains the reviewed Production sequence with no unexpected
+entry at or after `009`:
+
+| Root file | Remote ledger |
+|---|---|
+| `009_master_catalog_p0_containment.sql` | `20260621045208_master_catalog_p0_containment` |
+| `010_master_catalog_phase1a_versioning.sql` | `20260621052517_master_catalog_phase1a_versioning` |
+| `011_master_catalog_phase1b_hardening.sql` | `20260621104056_master_catalog_phase1b_hardening` |
+| `012_factor_f_version_foundation.sql` | `20260628190218_factor_f_version_foundation` |
+| `013_factor_f_seed_current_baseline.sql` | `20260628190357_factor_f_seed_current_baseline` |
+| `014_factor_f_publish_2569_0_0.sql` | `20260628190621_factor_f_publish_2569_0_0` |
+| `015_factor_f_repair_legacy_snapshot_metadata.sql` | `20260628190757_factor_f_repair_legacy_snapshot_metadata` |
+| `016_hotfix_preserve_boq_item_suffix.sql` | `20260706090832_hotfix_preserve_boq_item_suffix` |
+
+`010a` is an operational concurrent-index runbook rather than a ledger row.
+All four named indexes are present with `indisvalid=true` and
+`indisready=true`.
+
+The previous `20260706090246` timestamp in two authority documents was stale.
+The deployed `save_boq_with_routes(uuid,jsonb,jsonb)` body is 7,451
+characters and matches the reviewed `016` body exactly at
+`sha256:7187ffb568617783146d4b5f8db8021147cd212a578e655879c49f32f9fb54f0`.
+Production also reports `SECURITY DEFINER`, pinned `search_path=''`,
+`anon` denied, and `authenticated` allowed. The timestamp correction therefore
+does not represent a different hotfix or schema defect.
+
+### 7.2 Catalog, BOQ, and Factor F baseline
+
+| Invariant | Production readback |
+|---|---|
+| Current/default catalog | `2568.0.0`, active/default |
+| Catalog rows/codes | 710 rows; 710 distinct codes |
+| Missing/invalid authority values | 0 missing code/name/unit/cost; 0 unit-cost mismatches |
+| Authority value hash | `sha256:ecd457c625c6eeb445607f30d374734c3e7ebd2a6d5489912f4c7ec42b3019a5` |
+| Local/Production value parity | Same 710-row authority value hash |
+| BOQ | 232 BOQs; 2,183 BOQ items |
+| BOQ catalog integrity | 0 missing version; 0 non-current BOQ; 0 missing price row; 0 cross-version item binding |
+| Factor F default | `2569.0.0`, active, 36 rows |
+| Factor F history | 2 versions; 73 total rows |
+| Factor F default hash | `sha256:4f35b267bde3007439aebb193be1e53bdcea5a7acce95b5a7bbf5828018ef1a6` |
+| BOQ Factor F split | 30 version-bound to `2569.0.0`; 127 usable legacy snapshots; 75 legacy rows without `factor_f`; 0 partial snapshots |
+
+The BOQ count is a live operational count and is expected to differ from the
+older scrubbed Local snapshot. It is not catalog drift. The relevant
+invariants are the zero broken version relationships and unchanged authority
+and Factor F pointers/hashes.
+
+### 7.3 Schema, RLS, and activity
+
+- no Phase 4 `catalog_*` table or function, Phase 4
+  `price_list_versions` column, or catalog feature setting exists yet;
+- RLS is enabled on the current catalog, BOQ, audit, and Factor F tables;
+- current price-list/version/default tables expose no `anon` or
+  `authenticated` direct write grant;
+- legacy BOQ and `factor_reference` table grants remain, but their write
+  policies are restricted to `authenticated` and enforce the existing role/
+  ownership checks; `anon` has no matching RLS policy;
+- all seven expected catalog/BOQ/Factor F pointer and immutability triggers are
+  present and enabled;
+- the evidence read found no other active transaction, idle-in-transaction
+  session, lock waiter, or open transaction; and
+- Phase 4 catalog edit sessions cannot exist because the Phase 4 objects are
+  absent.
+
+The Production Data API exposed-schema setting remains **unproven**. The
+database setting is platform-managed and was not visible through
+`current_setting` or role settings. A direct read-only profile probe using the
+publishable keys returned `401` for `public`, `graphql_public`, and `private`,
+so it proves neither exposure nor non-exposure. An authorized Dashboard or
+Management API read must show that `private` is not exposed before P-12 can be
+requested.
+
+### 7.4 Advisor disposition
+
+The fresh Production security advisor returned eight warnings:
+
+- seven `authenticated`-callable `SECURITY DEFINER` functions; and
+- Supabase Auth leaked-password protection is disabled.
+
+The seven function findings are generic exposure warnings, not proof of an
+authorization bypass. All seven deny `anon`. The mutating admin/BOQ facades
+retain active-role, ownership, or target checks; `get_my_profile` is
+self-scoped. `get_user_role(uuid)` and `is_admin(uuid)` are read-only baseline
+helpers but have a broader parameter surface than ideal. Do not alter them in
+this evidence window. Record a separate usage/minimization review and require
+new regression/RLS evidence before any future replacement.
+
+Leaked-password protection is a genuine global Auth hardening opportunity, not
+a Phase 4 database migration defect. Recommendation: the Owner should approve
+enabling it as a separately controlled Auth configuration change before P-14,
+or explicitly accept the residual for the exact release. It does not authorize
+an Auth change in this window.
+
+The performance advisor returned pre-Phase-4 baseline findings: 8 unindexed-FK
+information rows, 19 RLS init-plan warnings, 16 unused-index information rows,
+and 5 multiple-permissive-policy warnings. Phase 4 objects are absent, so none
+was introduced by `017`-`025`. Do not add or remove indexes speculatively.
+Capture a fresh post-migration diff and stop if Phase 4 adds an unreviewed
+finding.
+
+### 7.5 Backup and restore disposition
+
+No backup or restore was performed. The available connector does not list or
+download platform backups. The unlinked repository CLI can create a logical
+dump only with an explicitly supplied database URL/password, and the connector
+does not expose that secret. A Supabase development branch is not acceptable
+restore evidence because it excludes Production data. Restoring to a new
+project may incur cost and requires a separate cost confirmation.
+
+This row stays **HOLD**, not failed. The next authorized backup step must name
+one of these paths:
+
+1. an encrypted `supabase db dump --db-url ...`/`pg_dump` to an approved
+   off-repository secure location, followed by restore into isolated
+   PostgreSQL 17; or
+2. an approved platform backup/clone into a separately cost-confirmed
+   non-Production project.
+
+In both cases, exclude auth secrets, record the manifest/counts/hashes, and run
+the Production Runbook section 8 integrity checks. No verified restore means no
+P-12.
+
+## 8. Readiness matrix
 
 | Gate | Evidence | Status |
 |---|---|---|
@@ -184,34 +321,39 @@ the current Production state.
 | Official export | Owner-accepted Excel/PDF pair plus tracked semantic verifier | Ready |
 | Feature isolation | All three Phase 4 flags are false | Ready |
 | Repository lint/build debt | 0 ESLint warnings; Next.js proxy convention applied; production build passed | Ready |
-| Local security/RLS | No Local blocker; managed residuals documented | Ready for Owner residual decision |
-| Production migration ledger | Must freshly prove `009`-`016` and no unreviewed drift | Pending authorization |
-| Production baseline/schema drift | Must freshly compare pointer, counts, hashes, BOQ, Factor F, grants, RLS, functions, and PostgreSQL version | Pending authorization |
-| Backup/restore | Fresh backup manifest and isolated restore test | Pending authorization |
-| Production advisors | Fresh security/performance output with no unresolved Phase 4 blocker | Pending authorization |
-| Migration executor record | Exact tool version, reviewed hashes, timeouts, executor, verifier, window, and stop conditions | Pending window proposal |
-| P-12 Owner go/no-go | Exact Production window approval | Not requested |
+| Local security/RLS | No Local runtime blocker; dead assignment and baseline minimization residuals documented | Hold - exact Owner residual decision pending |
+| Production migration ledger | Expected `009`-`016` set present; no unexpected later entry; `010a` indexes valid/ready; exact hotfix body matches | Ready |
+| Production baseline/schema drift | PostgreSQL 17.6; `2568.0.0`/710; Local/Production authority hash match; BOQ/Factor F/RLS/triggers clean; Phase 4 absent as expected | Ready for database scope |
+| Production Data API schemas | Platform configuration must prove `private` is not exposed | Hold - authorized Dashboard/Management read pending |
+| Backup/restore | Fresh encrypted backup manifest and isolated restore test | Hold - approved secure path/credentials or cost-confirmed platform path pending |
+| Production advisors | Fresh output captured; no Phase 4 object exists, but guarded definer/Auth-hardening residuals need Owner disposition | Hold - Owner/security decision pending |
+| Migration executor record | Exact tool version, reviewed hashes, timeouts, executor, verifier, window, and stop conditions | Hold - window proposal pending |
+| P-12 Owner go/no-go | Exact Production window approval | Hold - not requested |
 
 Overall result: **HOLD**. The implementation is ready to collect the remaining
-Production evidence, but it is not yet ready to execute the Production
-migration.
+Data API, backup/restore, security disposition, and executor/window evidence.
+It is not ready to execute the Production migration.
 
-## 8. Next bounded approval
+## 9. Next bounded approval
 
-The safest next request is not P-12 itself. Request one bounded readiness
-evidence window that authorizes only:
+The safest next request is still not P-12 itself. The database/ledger/advisor
+read-only portion is complete and should not be repeated unless it becomes
+stale. Request a narrowly scoped decision covering:
 
-1. read-only Production baseline and schema-drift queries;
-2. read-only remote migration-ledger verification;
-3. fresh security/performance advisor reads;
-4. creation of a fresh logical backup through the approved platform path; and
-5. restoration of that backup into an isolated non-Production environment,
-   followed by the named integrity checks.
+1. an authorized read of Production Data API exposed schemas;
+2. the exact encrypted logical-backup path and secure off-repository location,
+   or the cost-confirmed platform restore path;
+3. restoration only into isolated non-Production PostgreSQL 17 and the named
+   integrity checks;
+4. acceptance/remediation timing for the guarded-definer, leaked-password, and
+   Local dead-assignment residuals; and
+5. the proposed executor, independent verifier, tooling, timeouts, and
+   maintenance window.
 
 That approval must explicitly state that no Production DDL/DML, feature flag,
 deploy, publication, Factor F mutation, or hotfix change is authorized.
 
-After the evidence is attached to this package:
+After the remaining evidence is attached to this package:
 
 1. classify every row Ready, Hold, or Blocked;
 2. record the proposed executor, verifier, timeout values, exact hashes, and
@@ -220,7 +362,7 @@ After the evidence is attached to this package:
 4. request P-12 only if every blocking row is Ready; and
 5. keep P-13, P-14, and P-15 separate.
 
-## 9. Stop conditions
+## 10. Stop conditions
 
 Stop without migration if any of the following occurs:
 

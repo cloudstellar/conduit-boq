@@ -463,7 +463,7 @@ describe('Master Catalog authority consistency', () => {
       /P-33 accepted that\s+exact bounded WP-7\.5 technical checkpoint at 2026-07-15 13:54 \+07/,
     )
     expect(tracker).toContain(
-      '| Current work package | P-12 readiness package prepared; HOLD pending separately authorized Production and backup/restore evidence |',
+      '| Current work package | P-12 readiness evidence window partially complete; HOLD pending Data API configuration, backup/isolated restore, security-residual disposition, and executor/window evidence |',
     )
     expect(tracker).toContain('P42-UAT-C03')
     expect(tracker).toContain('P42-UAT-G01')
@@ -477,11 +477,23 @@ describe('Master Catalog authority consistency', () => {
       '16e88c6487307c4bb0606a048dc53e05e9dcee18',
     )
     expect(tracker).toContain(
-      '| Current environment | Fresh Local read-only P-12 preparation readback: pointer/default `2568.0.0`',
+      '| Current environment | Authorized Production read-only evidence at 2026-07-26 09:53 +07: PostgreSQL 17.6; pointer/default `2568.0.0`',
     )
-    expect(tracker).toContain('zero working drafts; all catalog flags false')
+    expect(tracker).toMatch(/zero\s+working drafts with all catalog flags false/)
     expect(tracker).toContain(
-      'Owner decisions needed: later authorize or hold the bounded Production read-only and backup/restore evidence window; this is not migration approval',
+      'Owner decisions needed: authorize a Data API settings read; choose a secure logical-dump path or separately cost-confirmed platform restore; decide residual timing; this is not migration approval',
+    )
+    expect(tracker).toContain(
+      'sha256:ecd457c625c6eeb445607f30d374734c3e7ebd2a6d5489912f4c7ec42b3019a5',
+    )
+    expect(verificationReport).toContain(
+      '20260706090832 hotfix_preserve_boq_item_suffix',
+    )
+    expect(verificationReport).toContain(
+      '| Production Data API schemas | Platform configuration proves `private` is not exposed |',
+    )
+    expect(verificationReport).toContain(
+      'No backup or restore was attempted',
     )
     expect(tracker).toContain(
       '[P-12 Readiness Package #39](./39-phase4-p12-production-readiness-package.md)',
@@ -602,8 +614,8 @@ describe('Master Catalog authority consistency', () => {
     expect(tracker).toContain(
       'Status: WP-8/P-37 remains Owner-accepted under the guided-UAT variance; exact readiness source 6827ebc passed repository/build gates',
     )
-    expect(tracker).toContain(
-      'accepting combined Owner-operated guided UI plus developer-operated fault-injection/cleanup evidence',
+    expect(decisions).toContain(
+      'accepts combined Owner-operated guided UI plus developer-operated fault-injection/cleanup evidence',
     )
     expect(tracker).toContain('no Production action authorized')
     expect(tracker).toContain('2c39dddd10c361bd1244292f4bd79e06f167c919')

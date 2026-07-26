@@ -284,7 +284,7 @@ Production migration ledger includes:
 - `20260628190357_factor_f_seed_current_baseline`
 - `20260628190621_factor_f_publish_2569_0_0`
 - `20260628190757_factor_f_repair_legacy_snapshot_metadata`
-- `20260706090246_hotfix_preserve_boq_item_suffix`
+- `20260706090832_hotfix_preserve_boq_item_suffix`
 
 Supabase MCP verified after the Factor F rollout that root migrations `012`
 through `015` are applied, current Factor F default is `2569.0.0`, and legacy
