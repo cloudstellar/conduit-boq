@@ -781,10 +781,10 @@ scope.
 Use this template at the end of each implementation session:
 
 ```text
-Current WP: P-12 readiness evidence window partially complete; bounded general-user version-transparency candidate verified; HOLD pending exact candidate commit plus Data API, backup/restore, security-residual, executor, and exact-window evidence
-Status: WP-8/P-37 remains Owner-accepted under the guided-UAT variance; readiness baseline 6827ebc and the later uncommitted user-visibility candidate passed their named gates; fresh Production database/ledger/advisor read-only scope is captured and clean; Package #39 is HOLD and P-12 is not requested
+Current WP: P-12 readiness evidence window partially complete; exact general-user version-transparency candidate committed; HOLD pending Data API, backup/restore, security-residual, executor, and exact-window evidence
+Status: WP-8/P-37 remains Owner-accepted under the guided-UAT variance; readiness baseline 6827ebc and exact application candidate 5068f94 passed their named gates; fresh Production database/ledger/advisor read-only scope is captured and clean; Package #39 is HOLD and P-12 is not requested
 Branch: codex/master-catalog-phase4
-Implementation checkpoint: readiness baseline 6827ebc1a729b7675fe91db58e129c9381b33ddb; bounded general-user version-transparency candidate awaits commit/fingerprint; P-37 source provenance remains in the evidence log
+Implementation checkpoint: readiness baseline 6827ebc1a729b7675fe91db58e129c9381b33ddb; bounded general-user version-transparency candidate 5068f944af2aa3fe8446c77c8ae8d48673cb260b; P-37 source provenance remains in the evidence log
 Migration 020 SHA-256: e07e0c4161077efba7bc4f6ebf95518d0cc1bc7e4628a43a128dd899bd1aef93; prior combined clean execution through 020 passed
 Migration 021 SHA-256: e4de258756bbfbda0508e55d7b76ba2e907f644625b49bc29d4a4d7ac42fa714; P-32 separate-apply evidence/P-33 acceptance passed; P-35 source-integrated after 020; P-36 integrated execution passed
 Migration 022 SHA-256: 9fc8f951fa5b3f3d7de928cce877a265d9333fda46850dd7564b22cd424c41f3; incrementally applied on 7997387; business invariants passed
@@ -794,9 +794,9 @@ Migration 025 SHA-256: 00d79d7750aa52ba7f003f6bb82fedb1d31ab111be417d74329c1cd3d
 Prior named evidence commits: 721c2c2 for exact G1R/G2 and FK-index closure; 99fa56c3d3c68e1886fbd308d8536e598eaee02f for P-18 real-route placement; 2b1ccec/be157d4/bfccbb3/f9f0bd7 for truthful harness corrections; 050c998 for P-24 closure lineage; 88d0711 for P-24 base repository/static; 31fd689 for P-23/P-23.1 source; c8f6dca for historical operator/UI; e463270 for historical P-22 G1 DB/P-20; 777df75 for accepted P-11
 Files changed: bounded current/bound catalog-version display and fail-closed loading in dashboard, price list, BOQ create/edit/print/Excel; aligned tests and authority docs; no migration changed; untracked files/, tmp/, output/ remain excluded
 Evidence produced: exact migration manifest; Local pointer/hash/order/flags/BOQ/Factor F readback; fresh Production pointer/authority hash/BOQ/Factor F/ledger/index/trigger/RLS/grant/session/advisor readback; general-user desktop/mobile Browser smoke; real Excel version-label verification; residual disposition; repository/build gates
-Tests/checks run: latest working-tree candidate 37 files/239 tests, TypeScript, lint 0 errors/0 warnings, network-enabled production build, desktop/mobile Browser smoke with no console error or horizontal overflow, migration SHA-256 verification, prior Local and Production read-only SQL, fresh Production advisors, and git diff check
-Blockers: exact candidate commit/fingerprint, Production Data API exposed-schema proof, approved backup/isolated restore, guarded-definer/leaked-password/dead-assignment disposition, exact executor/window record, and P-12 decision
+Tests/checks run: exact candidate 5068f94 passed 37 files/239 tests, TypeScript, lint 0 errors/0 warnings, network-enabled production build, desktop/mobile Browser smoke with no console error or horizontal overflow, migration SHA-256 verification, prior Local and Production read-only SQL, fresh Production advisors, and git diff check
+Blockers: Production Data API exposed-schema proof, approved backup/isolated restore, guarded-definer/leaked-password/dead-assignment disposition, exact executor/window record, and P-12 decision
 Owner decisions needed: authorize a Data API settings read; choose a secure logical-dump path or separately cost-confirmed platform restore; decide residual timing; this is not migration approval
-Next safe step after the bounded candidate is committed/pushed and Package #39 receives that exact fingerprint: obtain only the remaining bounded decisions; do not request P-12 while any HOLD row remains
+Next safe step: use Owner Checklist #40 to obtain only the remaining bounded decisions; do not request P-12 while any HOLD row remains
 Production touched: Read-only evidence queries/advisors only; writes: No
 ```
