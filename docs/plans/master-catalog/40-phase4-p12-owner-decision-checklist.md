@@ -50,6 +50,29 @@ Alternative:
 
 No verified restore means P-12 remains HOLD.
 
+#### Frozen backup/snapshot timeline
+
+1. **Readiness rehearsal before requesting P-12:** create an authorized
+   read-only encrypted logical backup from the current Production database,
+   restore it into isolated non-Production PostgreSQL 17, and pass the critical
+   count/hash/integrity checks. This proves the recovery process but is not the
+   final rollback source.
+2. **Final pre-migration backup:** inside the separately approved P-12
+   maintenance window, confirm no catalog admin is editing, repeat the baseline
+   checks, then create a fresh encrypted logical backup immediately before
+   applying `017`-`025`. Verify its manifest and restore gate. This is the
+   primary rollback source for the migration window.
+3. **Post-migration checkpoint:** after immediate P-12 verification passes and
+   while all Phase 4 flags remain disabled, create the post-migration logical
+   backup/manifest before P-13 deployment.
+4. **Post-publication checkpoint:** after a separately approved P-15
+   publication passes pointer, count, hash, Excel/PDF, and BOQ regression
+   checks, create the final post-publication logical backup/manifest.
+
+Here, snapshot means an encrypted logical backup with a manifest. It is not a
+Local database copy or reset. A platform snapshot may supplement this plan only
+when its restore path and cost are separately approved.
+
 ### C. Managed residual disposition
 
 Recommended disposition:

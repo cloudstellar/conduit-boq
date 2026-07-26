@@ -11,12 +11,15 @@ checkpoint `df44b827b290933463da5e14fa9125314660022a`. This permits only a
 later P-12 readiness request. It is not permission to run any Production step,
 open Add/Supplement before P-14, decide P-19, or change Factor F/hotfix scope.
 
-**Current P-12 readiness disposition (2026-07-25):** the desk and Local
-read-only package is prepared at
+**Current P-12 readiness disposition (2026-07-26):** the readiness package is
+prepared at
 [P-12 Production Readiness Package #39](./39-phase4-p12-production-readiness-package.md).
-Its verdict is HOLD. Fresh Production baseline/ledger/advisor evidence,
-backup/restore proof, the exact executor window, and explicit P-12 approval are
-still absent. No Production access or write is inferred.
+Its verdict is HOLD. The authorized Production database/ledger/advisor
+read-only evidence is complete without a Production write. Production Data API
+configuration proof, backup/isolated-restore evidence, security-residual
+disposition, the exact executor window, remote exact-head CI, and explicit P-12
+approval remain open. No further Production access or any Production write is
+inferred.
 
 ## 1. Safety statement
 

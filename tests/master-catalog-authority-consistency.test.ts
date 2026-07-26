@@ -1158,9 +1158,29 @@ describe('Master Catalog authority consistency', () => {
     const threatModel = read(
       'docs/plans/master-catalog/18-phase4-threat-model.md',
     )
+    const productionRunbook = read(
+      'docs/plans/master-catalog/12-phase4-production-runbook.md',
+    )
+    const ownerP12Checklist = read(
+      'docs/plans/master-catalog/40-phase4-p12-owner-decision-checklist.md',
+    )
     const threatIds = [...threatModel.matchAll(/^\| (T-\d+) \|/gm)]
       .map((match) => match[1])
     expect(new Set(threatIds).size).toBe(threatIds.length)
+    expect(productionRunbook).toContain(
+      'The authorized Production database/ledger/advisor\nread-only evidence is complete without a Production write.',
+    )
+    expect(productionRunbook).not.toContain(
+      'Fresh Production baseline/ledger/advisor evidence',
+    )
+    for (const checkpoint of [
+      'Readiness rehearsal before requesting P-12',
+      'Final pre-migration backup',
+      'Post-migration checkpoint',
+      'Post-publication checkpoint',
+    ]) {
+      expect(ownerP12Checklist).toContain(checkpoint)
+    }
 
     for (const path of [
       'docs/01_overview/IMPLEMENTATION_PLAN.md',
@@ -1194,6 +1214,7 @@ describe('Master Catalog authority consistency', () => {
       'docs/plans/master-catalog/37-phase4-p39-draft-identity-release-number-correction-plan.md',
       'docs/plans/master-catalog/38-phase4-p42-final-review-snapshot-binding-incident-note.md',
       'docs/plans/master-catalog/39-phase4-p12-production-readiness-package.md',
+      'docs/plans/master-catalog/40-phase4-p12-owner-decision-checklist.md',
     ]) {
       expectRelativeMarkdownLinksToExist(path)
       expectMarkdownTablesToBeWellShaped(path)
