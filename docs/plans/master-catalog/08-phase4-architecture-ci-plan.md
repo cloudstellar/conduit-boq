@@ -1812,6 +1812,30 @@ Replace only the hardcoded year/version fragments in:
 Derive the year/version from the default pointer while preserving surrounding
 Production wording exactly.
 
+### General-user version transparency
+
+The pointer-derived copy correction above is complete in the bounded pre-P-12
+application candidate. The same review also closed the user-facing ambiguity
+between the catalog that is current now and the catalog already bound to a BOQ:
+
+- the dashboard and price-list page show the exact current/default version and
+  derive the displayed year from that pointer;
+- the new-BOQ page shows the exact version that will be bound, re-reads the
+  pointer immediately before create, and asks the user to review and retry if
+  the displayed pointer changed;
+- an existing BOQ reads its own `price_list_version_id`, not the current
+  pointer, and shows that exact active or archived version on edit/read-only
+  screens;
+- BOQ print preview and generated Excel carry the BOQ-bound catalog version;
+  every printed page uses a small bottom-right version stamp while preserving
+  the original official `บัญชีราคา` heading; and
+- a missing, invalid, draft, or otherwise unpublished bound version fails
+  closed instead of silently substituting the current version.
+
+This is disclosure and fail-closed hardening only. It does not reprice an
+existing BOQ, mutate its catalog binding, change Factor F, alter hotfix `016`,
+add a migration, enable a Phase 4 feature, or authorize Production activity.
+
 ---
 
 ## 9. Implementation and Rollout

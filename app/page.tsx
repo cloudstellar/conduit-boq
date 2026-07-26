@@ -103,7 +103,10 @@ export default function Home() {
           />
 
           {/* Quick Action Navigation Hub */}
-          <ActionHub canCreateBOQ={canCreateBOQ} />
+          <ActionHub
+            canCreateBOQ={canCreateBOQ}
+            catalogVersion={stats?.priceListVersionString}
+          />
 
           {/* Desktop/Tablet 2-Column Split Workspace */}
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -149,7 +152,8 @@ export default function Home() {
                     <div className="space-y-1">
                       <h5 className="text-xs font-semibold text-slate-900">การแบ่งประเภทหมวดหมู่งาน</h5>
                       <p className="text-[11px] text-slate-500 leading-relaxed">
-                        โปรดระบุหมวดหมู่งานหลัก เช่น งานก่อสร้างท่อร้อยสาย, งานบ่อพัก, งานขุดเปิด/ขุดเจาะท่อลอด HDD ให้สอดคล้องตามลำดับโครงสร้างราคากลางปี 2568
+                        โปรดระบุหมวดหมู่งานหลัก เช่น งานก่อสร้างท่อร้อยสาย, งานบ่อพัก, งานขุดเปิด/ขุดเจาะท่อลอด HDD ให้สอดคล้องตามลำดับโครงสร้างราคากลาง
+                        {stats?.priceListYear ? `ปี ${stats.priceListYear}` : 'ฉบับปัจจุบัน'}
                       </p>
                     </div>
                   </div>

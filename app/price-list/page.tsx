@@ -4,7 +4,9 @@ import { useState, useEffect, useMemo } from 'react';
 import Link from 'next/link';
 import { createClient } from '@/lib/supabase/client';
 import { PriceListItem } from '@/lib/supabase';
-import { getActiveDefaultPriceListVersionId } from '@/lib/catalog/defaultVersion';
+import type { CatalogVersionSummary } from '@/lib/catalog/defaultVersion';
+import { getActiveDefaultPriceListVersion } from '@/lib/catalog/defaultVersion';
+import CatalogVersionNotice from '@/components/catalog/CatalogVersionNotice';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -57,20 +59,22 @@ export default function PriceListPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
+  const [catalogVersion, setCatalogVersion] = useState<CatalogVersionSummary | null>(null);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const defaultVersionId = await getActiveDefaultPriceListVersionId(supabase);
+        const defaultVersion = await getActiveDefaultPriceListVersion(supabase);
         const { data: itemsData, error: itemsError } = await supabase
           .from('price_list')
           .select('*')
-          .eq('version_id', defaultVersionId)
+          .eq('version_id', defaultVersion.id)
           .eq('is_active', true)
           .order('category')
           .order('item_code');
 
         if (itemsError) throw itemsError;
+        setCatalogVersion(defaultVersion);
 
         if (itemsData) {
           setItems(itemsData);
@@ -163,9 +167,20 @@ export default function PriceListPage() {
     <div className="min-h-screen bg-gray-50 py-4 md:py-8">
       <div className="max-w-7xl mx-auto px-4">
         <div className="mb-4 md:mb-6">
-          <h1 className="text-xl md:text-2xl font-bold text-gray-800">บัญชีราคามาตรฐาน ปี 2568</h1>
+          <h1 className="text-xl md:text-2xl font-bold text-gray-800">
+            บัญชีราคามาตรฐาน
+            {catalogVersion ? ` ปี ${catalogVersion.year}` : ''}
+          </h1>
           <p className="text-sm md:text-base text-muted-foreground">รายการราคามาตรฐานงานก่อสร้างท่อร้อยสายสื่อสารใต้ดิน</p>
         </div>
+
+        {catalogVersion && (
+          <CatalogVersionNotice
+            versionString={catalogVersion.versionString}
+            context="current"
+            className="mb-4 md:mb-6"
+          />
+        )}
 
         {error && (
           <div className="mb-4 rounded-md border border-red-200 bg-red-50 p-4 text-sm text-red-700">
@@ -201,7 +216,7 @@ export default function PriceListPage() {
               </div>
             </div>
             <p className="mt-2 text-xs md:text-sm text-muted-foreground">
-              แสดง {startIndex + 1}-{Math.min(endIndex, filteredItems.length)} จาก {filteredItems.length} รายการ
+              แสดง {filteredItems.length === 0 ? 0 : startIndex + 1}-{Math.min(endIndex, filteredItems.length)} จาก {filteredItems.length} รายการ
               {filteredItems.length !== items.length && ` (ทั้งหมด ${items.length} รายการ)`}
             </p>
           </CardContent>

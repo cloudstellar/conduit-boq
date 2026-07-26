@@ -1,8 +1,11 @@
 import type { SupabaseClient } from '@supabase/supabase-js'
 import { describe, expect, it } from 'vitest'
 import {
+  BOUND_CATALOG_UNAVAILABLE_MESSAGE,
   DEFAULT_CATALOG_UNAVAILABLE_MESSAGE,
+  getActiveDefaultPriceListVersion,
   getActiveDefaultPriceListVersionId,
+  getPriceListVersionSummary,
 } from '../lib/catalog/defaultVersion'
 
 interface QueryResponse {
@@ -44,7 +47,38 @@ describe('active default catalog lookup', () => {
         error: null,
       },
       price_list_versions: {
-        data: { id: 'version-2568', status: 'active' },
+        data: {
+          id: 'version-2568',
+          status: 'active',
+          version_string: '2568.0.0',
+        },
+        error: null,
+      },
+    }, calls)
+
+    await expect(getActiveDefaultPriceListVersion(supabase))
+      .resolves.toEqual({
+        id: 'version-2568',
+        status: 'active',
+        versionString: '2568.0.0',
+        year: 2568,
+      })
+    expect(calls).toContain('select:price_list_versions:id, version_string, status')
+  })
+
+  it('keeps the ID-only lookup as a backwards-compatible wrapper', async () => {
+    const calls: string[] = []
+    const supabase = createSupabaseMock({
+      price_list_default_version: {
+        data: { version_id: 'version-2568' },
+        error: null,
+      },
+      price_list_versions: {
+        data: {
+          id: 'version-2568',
+          status: 'active',
+          version_string: '2568.0.0',
+        },
         error: null,
       },
     }, calls)
@@ -78,5 +112,41 @@ describe('active default catalog lookup', () => {
 
     await expect(getActiveDefaultPriceListVersionId(supabase))
       .rejects.toThrow(DEFAULT_CATALOG_UNAVAILABLE_MESSAGE)
+  })
+
+  it('reads archived versions for historical BOQs', async () => {
+    const supabase = createSupabaseMock({
+      price_list_versions: {
+        data: {
+          id: 'version-2568',
+          status: 'archived',
+          version_string: '2568.0.0',
+        },
+        error: null,
+      },
+    }, [])
+
+    await expect(getPriceListVersionSummary(supabase, 'version-2568'))
+      .resolves.toMatchObject({
+        id: 'version-2568',
+        status: 'archived',
+        versionString: '2568.0.0',
+      })
+  })
+
+  it('fails closed for an invalid or unpublished bound version', async () => {
+    const supabase = createSupabaseMock({
+      price_list_versions: {
+        data: {
+          id: 'draft-version',
+          status: 'draft',
+          version_string: '2568.1.0',
+        },
+        error: null,
+      },
+    }, [])
+
+    await expect(getPriceListVersionSummary(supabase, 'draft-version'))
+      .rejects.toThrow(BOUND_CATALOG_UNAVAILABLE_MESSAGE)
   })
 })

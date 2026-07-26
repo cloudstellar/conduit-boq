@@ -48,6 +48,7 @@ function makeBoq(projectName: string, factor: number): ExportBOQData {
     factor_f_upper_cost: 30_000_000,
     factor_f_lower_value: factor,
     factor_f_upper_value: factor,
+    price_list_version_string: '2568.0.0',
   }
 }
 
@@ -143,5 +144,17 @@ describe('BOQ Excel Factor F version labels', () => {
       expect(text).toContain(testCase.expected)
       expect(text).not.toContain(testCase.forbidden)
     }
+  })
+
+  it('writes the BOQ-bound catalog version into route and summary sheets', async () => {
+    const boq = makeBoq('catalog-version-bound', 1.1422)
+    const workbook = await exportAndReadWorkbook(
+      boq,
+      makeCondition('2566.0.0', 7),
+    )
+    const text = workbookText(workbook)
+
+    expect(text).toContain('บัญชีราคา: ฉบับ 2568.0.0')
+    expect(text).toContain('สรุปรวม บัญชีราคา ฉบับ 2568.0.0')
   })
 })

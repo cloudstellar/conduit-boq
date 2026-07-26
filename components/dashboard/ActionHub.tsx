@@ -6,9 +6,10 @@ import { Plus, FileText, BookOpen, ChevronRight } from 'lucide-react';
 
 interface ActionHubProps {
   canCreateBOQ: boolean;
+  catalogVersion?: string;
 }
 
-export default function ActionHub({ canCreateBOQ }: ActionHubProps) {
+export default function ActionHub({ canCreateBOQ, catalogVersion }: ActionHubProps) {
   return (
     <div className="grid grid-cols-1 md:grid-cols-3 gap-5 mb-6">
 
@@ -87,11 +88,14 @@ export default function ActionHub({ canCreateBOQ }: ActionHubProps) {
             <div className="mt-4">
               <h3 className="text-base font-semibold text-slate-900 leading-snug group-hover:text-nt-blue transition-colors">
                 บัญชีราคามาตรฐาน
-              </h3>
-              <p className="text-xs text-slate-500 mt-1 leading-relaxed">
-                สืบค้นและดูบัญชีราคาค่าวัสดุและค่าแรงก่อสร้างมาตรฐานประจำปีบัญชี 2568
-              </p>
-            </div>
+                </h3>
+                <p className="text-xs text-slate-500 mt-1 leading-relaxed">
+                  สืบค้นบัญชีราคาค่าวัสดุและค่าแรง
+                  {catalogVersion
+                    ? ` ฉบับ ${catalogVersion} ที่ใช้งานปัจจุบัน`
+                    : ' ฉบับที่ใช้งานปัจจุบัน'}
+                </p>
+              </div>
           </CardContent>
         </Card>
       </Link>

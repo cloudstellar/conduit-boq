@@ -5,7 +5,7 @@ import { createClient } from '@/lib/supabase/client';
 import { BOQ } from '@/lib/supabase';
 import { UserProfileWithOrg } from '@/lib/types/auth';
 import { PostgrestError } from '@supabase/supabase-js';
-import { getActiveDefaultPriceListVersionId } from '@/lib/catalog/defaultVersion';
+import { getActiveDefaultPriceListVersion } from '@/lib/catalog/defaultVersion';
 
 export interface DashboardStats {
   myBoqsCount: number;
@@ -15,6 +15,8 @@ export interface DashboardStats {
   myApprovedCount: number;
   priceItemsCount: number;
   priceCategoriesCount: number;
+  priceListVersionString: string;
+  priceListYear: number;
   // Team stats (displayed for managers/admins only)
   teamBoqsCount?: number;
   teamTotalValue?: number;
@@ -44,7 +46,7 @@ export function useDashboardData(user: UserProfileWithOrg | null) {
     setError(null);
 
     try {
-      const defaultVersionPromise = getActiveDefaultPriceListVersionId(supabase);
+      const defaultVersionPromise = getActiveDefaultPriceListVersion(supabase);
 
       // 3. Fetch BOQs created by this user
       // We retrieve only the exact columns required for layout metrics and listing
@@ -74,19 +76,19 @@ export function useDashboardData(user: UserProfileWithOrg | null) {
         teamBoqsPromise = query as unknown as Promise<{ data: TeamBOQData[] | null; error: PostgrestError | null }>;
       }
 
-      const defaultVersionId = await defaultVersionPromise;
+      const defaultVersion = await defaultVersionPromise;
 
       // Fetch only the active default catalog. BOQ queries above are already in flight.
       const priceItemsPromise = supabase
         .from('price_list')
         .select('id', { count: 'exact', head: true })
-        .eq('version_id', defaultVersionId)
+        .eq('version_id', defaultVersion.id)
         .eq('is_active', true);
 
       const categoriesPromise = supabase
         .from('price_list')
         .select('category')
-        .eq('version_id', defaultVersionId)
+        .eq('version_id', defaultVersion.id)
         .eq('is_active', true);
 
       // Execute all queries in parallel to eliminate waterfall delays (async-parallel)
@@ -169,6 +171,8 @@ export function useDashboardData(user: UserProfileWithOrg | null) {
         myApprovedCount,
         priceItemsCount,
         priceCategoriesCount,
+        priceListVersionString: defaultVersion.versionString,
+        priceListYear: defaultVersion.year,
         ...(isManagerOrAdmin ? { teamBoqsCount, teamTotalValue } : {})
       });
 

@@ -172,11 +172,11 @@ export default function StatsGrid({ stats, isLoading, userRole }: StatsGridProps
               </div>
               <div>
                 <p className="text-2xl font-bold text-slate-900 tracking-tight leading-none mt-1">
-                  2568
+                  {stats.priceListYear}
                 </p>
                 <div className="mt-2">
                   <Badge className="bg-amber-100 hover:bg-amber-100 text-amber-800 text-[10px] py-0 px-1.5 border border-amber-200/50 font-normal">
-                    ปีบัญชีปัจจุบัน
+                    ฉบับ {stats.priceListVersionString}
                   </Badge>
                 </div>
               </div>

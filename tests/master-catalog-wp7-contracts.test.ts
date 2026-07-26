@@ -73,7 +73,7 @@ describe('Master Catalog WP-7 regression contracts', () => {
     const printPage = read('app/boq/[id]/print/page.tsx')
     const smoke = read('scripts/smoke-master-catalog-wp7.mjs')
 
-    expect(createPage).toContain('price_list_version_id: priceListVersionId')
+    expect(createPage).toContain('price_list_version_id: latestCatalogVersion.id')
     expect(createPage).toContain('factor_reference_version_id: factorReferenceVersion.id')
     expect(listPage).toContain('price_list_version_id: originalBOQ.price_list_version_id')
     expect(listPage).toContain('factor_reference_version_id: originalBOQ.factor_reference_version_id')

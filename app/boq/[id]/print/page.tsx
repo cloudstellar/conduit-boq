@@ -17,6 +17,8 @@ import {
   getActiveFactorReferenceVersion,
   getFactorReferenceRowsForVersion,
 } from '@/lib/factorFReference';
+import type { CatalogVersionSummary } from '@/lib/catalog/defaultVersion';
+import { getPriceListVersionSummary } from '@/lib/catalog/defaultVersion';
 import { formatConstructionAreas } from '@/lib/constructionAreaUtils';
 import {
   splitText,
@@ -56,6 +58,7 @@ interface BOQData {
   factor_f_lower_value: number | null;
   factor_f_upper_value: number | null;
   factor_reference_version_id: string | null;
+  price_list_version_id: string | null;
 }
 
 interface BOQRoute {
@@ -169,7 +172,13 @@ function PageHeader({ currentPage, totalPages, formLabel }: {
   );
 }
 
-function InfoSection({ boq, routeName, routeLabel, constructionArea, department }: {
+function InfoSection({
+  boq,
+  routeName,
+  routeLabel,
+  constructionArea,
+  department,
+}: {
   boq: BOQData;
   routeName: string;
   routeLabel?: string;
@@ -187,6 +196,14 @@ function InfoSection({ boq, routeName, routeLabel, constructionArea, department 
         <div><span className="label">โครงการ</span> {boq.project_name}</div>
         <div><span className="label">พื้นที่ก่อสร้าง</span> {constructionArea || '-'}</div>
       </div>
+    </div>
+  );
+}
+
+function CatalogVersionStamp({ versionString }: { versionString: string }) {
+  return (
+    <div className="catalog-version-stamp">
+      ฉบับบัญชีราคา {versionString}
     </div>
   );
 }
@@ -260,11 +277,13 @@ function ContinueIndicator() {
 
 function FactorFSupplementPage({
   boq,
+  catalogVersionString,
   lowerFactorRef,
   upperFactorRef,
   factorCondition,
 }: {
   boq: BOQData;
+  catalogVersionString: string;
   lowerFactorRef: FactorReference | null;
   upperFactorRef: FactorReference | null;
   factorCondition?: FactorReferenceCondition | null;
@@ -295,6 +314,7 @@ function FactorFSupplementPage({
         <div className="supplement-condition">
           ไม่พบข้อมูลอ้างอิง Factor F ที่ครอบค่างาน {formatNumber(A)} บาท
         </div>
+        <CatalogVersionStamp versionString={catalogVersionString} />
       </div>
     );
   }
@@ -432,6 +452,7 @@ function FactorFSupplementPage({
           </div>
         </div>
       </div>
+      <CatalogVersionStamp versionString={catalogVersionString} />
     </div>
   );
 }
@@ -480,23 +501,36 @@ export default function PrintBOQPage() {
   const [upperFactorRef, setUpperFactorRef] = useState<FactorReference | null>(null);
   const [factorCondition, setFactorCondition] = useState<FactorReferenceCondition | null>(null);
   const [factorError, setFactorError] = useState<string | null>(null);
+  const [catalogVersion, setCatalogVersion] = useState<CatalogVersionSummary | null>(null);
+  const [loadError, setLoadError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const { data: boqData } = await supabase
+        const { data: boqData, error: boqError } = await supabase
           .from('boq')
           .select('*')
           .eq('id', boqId)
           .single();
+        if (boqError) throw boqError;
+        if (!boqData) throw new Error('ไม่พบข้อมูล BOQ');
+        if (!boqData.price_list_version_id) {
+          throw new Error('ใบประมาณราคานี้ยังไม่ได้ผูกกับฉบับบัญชีราคา');
+        }
         setBOQ(boqData);
 
-        const { data: routesData } = await supabase
-          .from('boq_routes')
-          .select('*')
-          .eq('boq_id', boqId)
-          .order('route_order');
+        const [boundCatalogVersion, routesResult] = await Promise.all([
+          getPriceListVersionSummary(supabase, boqData.price_list_version_id),
+          supabase
+            .from('boq_routes')
+            .select('*')
+            .eq('boq_id', boqId)
+            .order('route_order'),
+        ]);
+        if (routesResult.error) throw routesResult.error;
+        setCatalogVersion(boundCatalogVersion);
+        const routesData = routesResult.data;
 
         if (routesData && routesData.length > 0) {
           setRoutes(routesData);
@@ -553,7 +587,7 @@ export default function PrintBOQPage() {
         }
       } catch (err) {
         console.error('Error:', err);
-        setFactorError(err instanceof Error ? err.message : 'ไม่สามารถอ่านข้อมูล Factor F ได้');
+        setLoadError(err instanceof Error ? err.message : 'ไม่สามารถโหลดข้อมูลสำหรับพิมพ์ได้');
       } finally {
         setIsLoading(false);
       }
@@ -578,12 +612,12 @@ export default function PrintBOQPage() {
   }
 
   // ──── Error State ────
-  if (!boq) {
+  if (loadError || !boq || !catalogVersion) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
         <Alert variant="destructive" className="max-w-md">
           <AlertCircle className="h-4 w-4" />
-          <AlertDescription>ไม่พบข้อมูล BOQ</AlertDescription>
+          <AlertDescription>{loadError || 'ไม่พบข้อมูล BOQ'}</AlertDescription>
         </Alert>
       </div>
     );
@@ -596,7 +630,10 @@ export default function PrintBOQPage() {
       const routeCosts = routes.map(r => r.total_cost);
       const alloc = allocateToRoutes(routeCosts, factor);
       await exportBoqToExcel(
-        boq,
+        {
+          ...boq,
+          price_list_version_string: catalogVersion.versionString,
+        },
         routes,
         routeItems,
         factor,
@@ -728,6 +765,9 @@ export default function PrintBOQPage() {
   const summaryMaxLastPage = Math.max(3, summaryMaxPerPage - 8);
   const summaryChunks = chunkSummaryRoutes(routes, summaryMaxPerPage, summaryMaxLastPage);
   const summaryTotalPages = summaryChunks.length;
+  const factorSupplementPageCount = boq.factor_f != null ? 1 : 0;
+  const previewTotalPages =
+    boqTotalPages + summaryTotalPages + factorSupplementPageCount;
 
   // ──────────────────────────────────
   // Render
@@ -744,7 +784,7 @@ export default function PrintBOQPage() {
             <ArrowLeft className="w-4 h-4 mr-1" /> กลับ
           </Button>
           <div className="text-sm text-muted-foreground">
-            📄 Preview: {boq.project_name} ({boqTotalPages + summaryTotalPages} หน้า)
+            Preview: {boq.project_name} · บัญชีราคา {catalogVersion.versionString} ({previewTotalPages} หน้า)
           </div>
           <div className="flex gap-2">
             <Button size="sm" variant="outline" onClick={handleExportExcel}>
@@ -821,6 +861,7 @@ export default function PrintBOQPage() {
               ) : (
                 <ContinueIndicator />
               )}
+              <CatalogVersionStamp versionString={catalogVersion.versionString} />
             </div>
           );
         });
@@ -880,6 +921,7 @@ export default function PrintBOQPage() {
             ) : (
               <ContinueIndicator />
             )}
+            <CatalogVersionStamp versionString={catalogVersion.versionString} />
           </div>
         );
       })}
@@ -1017,6 +1059,7 @@ export default function PrintBOQPage() {
             ) : (
               <ContinueIndicator />
             )}
+            <CatalogVersionStamp versionString={catalogVersion.versionString} />
           </div>
         );
       })}
@@ -1025,6 +1068,7 @@ export default function PrintBOQPage() {
       {boq.factor_f != null && (
         <FactorFSupplementPage
           boq={boq}
+          catalogVersionString={catalogVersion.versionString}
           lowerFactorRef={lowerFactorRef}
           upperFactorRef={upperFactorRef}
           factorCondition={factorCondition}
@@ -1058,10 +1102,22 @@ export default function PrintBOQPage() {
           width: 297mm;
           height: 210mm;
           overflow: hidden;
+          position: relative;
           padding: 8mm 10mm;
           margin: 0 auto 20px;
           background: white;
           box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+
+        .catalog-version-stamp {
+          position: absolute;
+          right: 10mm;
+          bottom: 3mm;
+          color: #6b7280;
+          font-size: 8pt;
+          font-weight: normal;
+          line-height: 1;
+          white-space: nowrap;
         }
 
         .header {

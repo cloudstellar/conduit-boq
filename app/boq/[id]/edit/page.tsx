@@ -5,6 +5,8 @@ import { useParams, useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
 import { useAuth } from '@/lib/context/AuthContext';
 import { can, BOQContext } from '@/lib/permissions';
+import type { CatalogVersionSummary } from '@/lib/catalog/defaultVersion';
+import { getPriceListVersionSummary } from '@/lib/catalog/defaultVersion';
 import {
   FactorReferenceVersionData,
   getActiveDefaultFactorReferenceVersion,
@@ -15,6 +17,7 @@ import ProjectInfoForm from '@/components/boq/ProjectInfoForm';
 import MultiRouteEditor from '@/components/boq/MultiRouteEditor';
 import BOQPageHeader from '@/components/boq/BOQPageHeader';
 import BOQAccessBanner from '@/components/boq/BOQAccessBanner';
+import CatalogVersionNotice from '@/components/catalog/CatalogVersionNotice';
 import { Route } from '@/components/boq/RouteManager';
 import { LineItem } from '@/components/boq/LineItemsTable';
 import { ProjectInfo } from '@/app/boq/create/page';
@@ -44,6 +47,7 @@ export default function EditBOQPage() {
   });
   const [boqContext, setBOQContext] = useState<BOQContext | null>(null);
   const [priceListVersionId, setPriceListVersionId] = useState<string | null>(null);
+  const [catalogVersion, setCatalogVersion] = useState<CatalogVersionSummary | null>(null);
   const [factorReferenceVersionId, setFactorReferenceVersionId] = useState<string | null>(null);
   const [factorVersionOptions, setFactorVersionOptions] = useState<FactorReferenceVersionData[]>([]);
   const [selectedFactorCopyVersionId, setSelectedFactorCopyVersionId] = useState<string>('');
@@ -87,7 +91,13 @@ export default function EditBOQPage() {
           throw new Error('ใบประมาณราคานี้ยังไม่ได้ผูกกับเวอร์ชันราคากลาง');
         }
 
+        const boundCatalogVersion = await getPriceListVersionSummary(
+          supabase,
+          boq.price_list_version_id,
+        );
+
         setPriceListVersionId(boq.price_list_version_id);
+        setCatalogVersion(boundCatalogVersion);
         setFactorReferenceVersionId(boq.factor_reference_version_id ?? null);
 
         setProjectInfo({
@@ -432,6 +442,14 @@ export default function EditBOQPage() {
         <div className="mb-4">
           <BOQAccessBanner mode="edit" boq={boqContext} />
         </div>
+
+        {catalogVersion && (
+          <CatalogVersionNotice
+            versionString={catalogVersion.versionString}
+            context="bound-boq"
+            className="mb-4"
+          />
+        )}
 
         {/* Action buttons */}
         <div className="mb-4 flex flex-col justify-end gap-2 sm:flex-row">

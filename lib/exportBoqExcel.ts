@@ -26,6 +26,7 @@ export interface ExportBOQData {
   factor_f_lower_value: number | null;
   factor_f_upper_value: number | null;
   factor_reference_version_id?: string | null;
+  price_list_version_string?: string | null;
 }
 
 export interface ExportBOQRoute {
@@ -240,7 +241,7 @@ function createRouteSheet(
   ws.mergeCells(r, 6, r, 10);
   r++;
 
-  ws.getCell(r, 1).value = `บัญชีราคา: งานจ้างเหมาก่อสร้างท่อร้อยสายสื่อสารใต้ดินและบ่อพัก`;
+  ws.getCell(r, 1).value = `บัญชีราคา: ฉบับ ${boq.price_list_version_string || '-'}`;
   ws.getCell(r, 1).font = defaultFont();
   ws.mergeCells(r, 1, r, 5);
   ws.getCell(r, 6).value = `พื้นที่ก่อสร้าง: ${route.construction_area || '-'}`;
@@ -412,7 +413,7 @@ function createSummarySheet(
   ws.mergeCells(r, 1, r, 9);
   r++;
 
-  ws.getCell(r, 1).value = 'สรุปรวม บัญชีราคา งานจ้างเหมาก่อสร้างท่อร้อยสายสื่อสารใต้ดินและบ่อพัก';
+  ws.getCell(r, 1).value = `สรุปรวม บัญชีราคา ฉบับ ${boq.price_list_version_string || '-'}`;
   ws.getCell(r, 1).font = defaultFont({ bold: true, size: 15 });
   ws.mergeCells(r, 1, r, 9);
   r++;

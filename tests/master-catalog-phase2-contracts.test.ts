@@ -11,7 +11,7 @@ describe('Master Catalog Phase 2 application contracts', () => {
     const createPage = readSource('app/boq/create/page.tsx')
     const listPage = readSource('app/boq/page.tsx')
 
-    expect(createPage).toContain('price_list_version_id: priceListVersionId')
+    expect(createPage).toContain('price_list_version_id: latestCatalogVersion.id')
     expect(listPage).toContain('price_list_version_id: originalBOQ.price_list_version_id')
     expect(listPage).toContain('category: item.category')
   })
@@ -37,9 +37,9 @@ describe('Master Catalog Phase 2 application contracts', () => {
     const dashboard = readSource('lib/hooks/useDashboardData.ts')
     const priceListPage = readSource('app/price-list/page.tsx')
 
-    expect(dashboard).toContain('getActiveDefaultPriceListVersionId')
+    expect(dashboard).toContain('getActiveDefaultPriceListVersion')
     expect(dashboard).toContain('const priceItemsCount = priceItemsRes.count ?? 0')
     expect(dashboard).not.toMatch(/682|priceCategoriesCount = 52/)
-    expect(priceListPage).toContain('getActiveDefaultPriceListVersionId')
+    expect(priceListPage).toContain('getActiveDefaultPriceListVersion')
   })
 })

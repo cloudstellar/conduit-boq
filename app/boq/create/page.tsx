@@ -1,13 +1,18 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { createClient } from '@/lib/supabase/client';
-import { getActiveDefaultPriceListVersionId } from '@/lib/catalog/defaultVersion';
+import type { CatalogVersionSummary } from '@/lib/catalog/defaultVersion';
+import {
+  DEFAULT_CATALOG_UNAVAILABLE_MESSAGE,
+  getActiveDefaultPriceListVersion,
+} from '@/lib/catalog/defaultVersion';
 import { getActiveDefaultFactorReferenceVersion } from '@/lib/factorFReference';
 import { useAuth } from '@/lib/context/AuthContext';
 import { can } from '@/lib/permissions';
+import CatalogVersionNotice from '@/components/catalog/CatalogVersionNotice';
 import ProjectInfoForm from '@/components/boq/ProjectInfoForm';
 import BOQPageHeader from '@/components/boq/BOQPageHeader';
 import BOQAccessBanner from '@/components/boq/BOQAccessBanner';
@@ -22,7 +27,7 @@ export interface ProjectInfo {
 
 export default function CreateBOQPage() {
   const router = useRouter();
-  const supabase = createClient();
+  const supabase = useMemo(() => createClient(), []);
   const { user, isLoading: isUserLoading } = useAuth();
   const canCreate = can(user, 'create', 'boq');
 
@@ -34,6 +39,29 @@ export default function CreateBOQPage() {
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [catalogVersion, setCatalogVersion] = useState<CatalogVersionSummary | null>(null);
+  const [catalogError, setCatalogError] = useState<string | null>(null);
+  const [isCatalogLoading, setIsCatalogLoading] = useState(true);
+
+  const loadCatalogVersion = useCallback(async () => {
+    setIsCatalogLoading(true);
+    setCatalogError(null);
+
+    try {
+      setCatalogVersion(await getActiveDefaultPriceListVersion(supabase));
+    } catch (err) {
+      setCatalogVersion(null);
+      setCatalogError(
+        err instanceof Error ? err.message : DEFAULT_CATALOG_UNAVAILABLE_MESSAGE,
+      );
+    } finally {
+      setIsCatalogLoading(false);
+    }
+  }, [supabase]);
+
+  useEffect(() => {
+    void loadCatalogVersion();
+  }, [loadCatalogVersion]);
 
   // Auto-fill from user profile
   useEffect(() => {
@@ -71,15 +99,26 @@ export default function CreateBOQPage() {
     setError(null);
 
     try {
-      const [authResult, priceListVersionId, factorReferenceVersion] = await Promise.all([
+      if (!catalogVersion) {
+        throw new Error(DEFAULT_CATALOG_UNAVAILABLE_MESSAGE);
+      }
+
+      const [authResult, latestCatalogVersion, factorReferenceVersion] = await Promise.all([
         supabase.auth.getUser(),
-        getActiveDefaultPriceListVersionId(supabase),
+        getActiveDefaultPriceListVersion(supabase),
         getActiveDefaultFactorReferenceVersion(supabase),
       ]);
       const authUser = authResult.data.user;
 
       if (!authUser) {
         throw new Error('ไม่พบผู้ใช้ที่เข้าสู่ระบบ');
+      }
+
+      if (latestCatalogVersion.id !== catalogVersion.id) {
+        setCatalogVersion(latestCatalogVersion);
+        throw new Error(
+          `ฉบับบัญชีราคาปัจจุบันเปลี่ยนเป็น ${latestCatalogVersion.versionString} แล้ว กรุณาตรวจสอบฉบับที่แสดงและกดบันทึกอีกครั้ง`,
+        );
       }
 
       const { data, error: insertError } = await supabase
@@ -90,7 +129,7 @@ export default function CreateBOQPage() {
           project_name: projectInfo.project_name,
           department: projectInfo.department || null,
           status: 'draft',
-          price_list_version_id: priceListVersionId,
+          price_list_version_id: latestCatalogVersion.id,
           factor_reference_version_id: factorReferenceVersion.id,
           // Ownership fields (injected from authenticated user)
           created_by: authUser.id,
@@ -149,6 +188,30 @@ export default function CreateBOQPage() {
           <BOQAccessBanner mode="create" />
         </div>
 
+        {catalogVersion && (
+          <CatalogVersionNotice
+            versionString={catalogVersion.versionString}
+            context="new-boq"
+            className="mb-4"
+          />
+        )}
+
+        {catalogError && (
+          <div className="mb-4 flex flex-col gap-3 rounded-md border border-red-200 bg-red-50 p-4 text-sm text-red-700 sm:flex-row sm:items-center sm:justify-between">
+            <span>{catalogError}</span>
+            <Button
+              type="button"
+              size="sm"
+              variant="outline"
+              onClick={loadCatalogVersion}
+              disabled={isCatalogLoading}
+              className="shrink-0 border-red-200 bg-white text-red-700 hover:bg-red-100 hover:text-red-800"
+            >
+              {isCatalogLoading ? 'กำลังโหลด...' : 'ลองโหลดฉบับอีกครั้ง'}
+            </Button>
+          </div>
+        )}
+
         <div className="bg-white rounded-lg shadow-md p-4 md:p-6">
           {error && (
             <div className="mb-4 p-3 md:p-4 bg-red-50 border border-red-200 text-red-700 rounded-md text-sm md:text-base">
@@ -173,10 +236,14 @@ export default function CreateBOQPage() {
             <Button
               type="button"
               onClick={handleSaveDraft}
-              disabled={isSubmitting}
+              disabled={isSubmitting || isCatalogLoading || !catalogVersion}
               className="w-full sm:w-auto"
             >
-              {isSubmitting ? 'กำลังบันทึก...' : 'บันทึกและดำเนินการต่อ'}
+              {isSubmitting
+                ? 'กำลังบันทึก...'
+                : isCatalogLoading
+                  ? 'กำลังตรวจฉบับบัญชีราคา...'
+                  : 'บันทึกและดำเนินการต่อ'}
             </Button>
           </div>
         </div>

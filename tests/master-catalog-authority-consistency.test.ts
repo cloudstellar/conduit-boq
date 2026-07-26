@@ -612,7 +612,7 @@ describe('Master Catalog authority consistency', () => {
       /pre-amendment operator\/browser preflight passed on\s+`c8f6dca`/,
     )
     expect(tracker).toContain(
-      'Status: WP-8/P-37 remains Owner-accepted under the guided-UAT variance; exact readiness source 6827ebc passed repository/build gates',
+      'Status: WP-8/P-37 remains Owner-accepted under the guided-UAT variance; readiness baseline 6827ebc and the later uncommitted user-visibility candidate passed their named gates',
     )
     expect(decisions).toContain(
       'accepts combined Owner-operated guided UI plus developer-operated fault-injection/cleanup evidence',

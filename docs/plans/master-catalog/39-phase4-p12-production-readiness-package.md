@@ -8,8 +8,11 @@
 window is complete; Data API configuration, backup/isolated restore, executor,
 and exact-window evidence remain open; P-12 has not been requested or approved
 
-**Implementation checkpoint:**
+**Readiness baseline checkpoint:**
 `6827ebc1a729b7675fe91db58e129c9381b33ddb`
+
+**Bounded application candidate:** general-user catalog-version transparency;
+verified in the working tree and awaiting an exact commit fingerprint
 
 **Branch:** `codex/master-catalog-phase4`
 
@@ -25,6 +28,7 @@ advisor reads without a Production write.
 The actual P-12 Production migration must remain on HOLD because these required
 rows are still open:
 
+- the bounded application candidate has not yet been committed and fingerprinted;
 - Production Data API exposed-schema configuration is not yet proven;
 - no fresh encrypted logical backup manifest or successful isolated restore
   rehearsal exists;
@@ -57,7 +61,7 @@ The following authority remains unchanged:
 
 ## 3. Exact source and repository gates
 
-The reviewed application source is exact commit
+The reviewed readiness baseline is exact commit
 `6827ebc1a729b7675fe91db58e129c9381b33ddb`. It contains:
 
 - the P-37 Owner-accepted implementation lineage;
@@ -76,6 +80,25 @@ Checks on this exact source:
 | `npm run catalog:authority:check` | Passed: 710 mappings, 65 groups, 17 exclusions |
 | `npm run build` | Passed with Next.js 16.2.9; no middleware deprecation warning remains |
 | Git tracked state before documentation | Clean |
+
+After that baseline, the Owner approved a bounded correction for ordinary-user
+catalog-version clarity. The candidate:
+
+- derives dashboard and price-list year/version copy from the active default
+  pointer;
+- shows and rechecks the exact pointer before creating a BOQ;
+- shows the BOQ-bound active or archived version on edit/read-only and print
+  preview, stamps it at the bottom right of every printed page without changing
+  the official `บัญชีราคา` heading, and writes it to generated Excel; and
+- fails closed instead of substituting the current pointer when a bound version
+  is missing, draft, or otherwise unpublished.
+
+Final working-tree candidate checks passed: 37 files/239 tests, TypeScript,
+zero-warning lint, production build, desktop/mobile Local staff Browser smoke
+without horizontal overflow or console errors, and binary Excel inspection.
+The preview page total also counts the Factor F supplement. This candidate is
+not an exact P-12 source until it is committed and this package records that
+commit.
 
 The Local preparation used Supabase CLI `2.107.0` and PostgreSQL major version
 17. The exact CLI/container versions must be frozen in the later executor
@@ -311,12 +334,13 @@ P-12.
 | Gate | Evidence | Status |
 |---|---|---|
 | WP-8/P-37 | Owner-accepted with guided-UAT variance; evidence remains truthfully labelled | Ready |
-| Exact application source | Commit `6827ebc1a729b7675fe91db58e129c9381b33ddb` and repository gates above | Ready |
+| Exact application source | Baseline `6827ebc1a729b7675fe91db58e129c9381b33ddb` is exact; the later bounded general-user version-transparency candidate passed its gates but awaits commit/fingerprint | Hold - commit and record exact candidate |
 | Migration source manifest | Exact `017`-`025` filenames and hashes above | Ready |
 | Local clean-chain authority | Owner-approved clean bootstrap and later no-reset evidence; canonical order unchanged | Ready |
 | P-20 portability | Repeated 710-row identity/hash evidence and canonical hash match | Ready |
 | Idempotency/concurrency | Stable request ID, mismatch rejection, lock conflict, replay, and one-effect recovery passed | Ready |
 | BOQ/hotfix regression | Suffix preservation, version links, save/print/export, and Local invariants passed | Ready |
+| General-user version visibility | Pointer-derived current version plus immutable BOQ-bound version appear on dashboard/price list/create/edit/print/Excel; invalid bindings fail closed; desktop/mobile smoke and binary Excel proof passed | Ready in candidate; exact source fingerprint pending |
 | Factor F isolation | Pointer, rows, hashes, and BOQ snapshot behavior unchanged | Ready |
 | Official export | Owner-accepted Excel/PDF pair plus tracked semantic verifier | Ready |
 | Feature isolation | All three Phase 4 flags are false | Ready |
