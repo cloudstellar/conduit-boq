@@ -153,6 +153,126 @@ SELECT json_build_object(
         AND trigger_row.tgnewtable IS NULL
         AND trigger_row.tgenabled = 'O'
         AND NOT trigger_row.tgisinternal
+    ),
+    'phase4_catalog_action_error_acl', EXISTS (
+      SELECT 1
+      FROM pg_catalog.pg_proc target_proc
+      JOIN pg_catalog.pg_language language
+        ON language.oid = target_proc.prolang
+      WHERE target_proc.oid = to_regprocedure(
+              'private.catalog_action_error(uuid,text,text,boolean,jsonb)'
+            )
+        AND target_proc.prokind = 'f'
+        AND pg_get_userbyid(target_proc.proowner) = 'postgres'
+        AND language.lanname = 'sql'
+        AND target_proc.prorettype = 'jsonb'::regtype
+        AND NOT target_proc.proretset
+        AND NOT target_proc.prosecdef
+        AND NOT target_proc.proleakproof
+        AND NOT target_proc.proisstrict
+        AND target_proc.provolatile = 'v'
+        AND target_proc.proparallel = 'u'
+        AND target_proc.pronargdefaults = 2
+        AND pg_get_expr(target_proc.proargdefaults, 0) =
+          'false, NULL::jsonb'
+        AND target_proc.proconfig IS NOT DISTINCT FROM
+          ARRAY['search_path=""']::text[]
+        AND (
+          SELECT count(*)
+          FROM pg_catalog.pg_proc named_proc
+          WHERE named_proc.pronamespace = to_regnamespace('private')
+            AND named_proc.proname = 'catalog_action_error'
+        ) = 1
+        AND encode(
+              pg_catalog.sha256(
+                pg_catalog.convert_to(target_proc.prosrc, 'UTF8')
+              ),
+              'hex'
+            ) =
+              '4c912b7a1bef09fff13735c9d676aff310f638eb3f08e6ba529f387b31909646'
+        AND (
+          SELECT count(*)
+          FROM aclexplode(
+            coalesce(
+              target_proc.proacl,
+              acldefault('f', target_proc.proowner)
+            )
+          ) privilege
+        ) = 2
+        AND EXISTS (
+          SELECT 1
+          FROM aclexplode(
+            coalesce(
+              target_proc.proacl,
+              acldefault('f', target_proc.proowner)
+            )
+          ) privilege
+          WHERE privilege.grantee = target_proc.proowner
+            AND privilege.grantor = target_proc.proowner
+            AND privilege.privilege_type = 'EXECUTE'
+            AND NOT privilege.is_grantable
+        )
+        AND EXISTS (
+          SELECT 1
+          FROM aclexplode(
+            coalesce(
+              target_proc.proacl,
+              acldefault('f', target_proc.proowner)
+            )
+          ) privilege
+          WHERE privilege.grantee = to_regrole('authenticated')
+            AND privilege.grantor = target_proc.proowner
+            AND privilege.privilege_type = 'EXECUTE'
+            AND NOT privilege.is_grantable
+        )
+        AND NOT EXISTS (
+          SELECT 1
+          FROM aclexplode(
+            coalesce(
+              target_proc.proacl,
+              acldefault('f', target_proc.proowner)
+            )
+          ) privilege
+          WHERE privilege.grantee NOT IN (
+            target_proc.proowner,
+            to_regrole('authenticated')
+          )
+        )
+        AND NOT EXISTS (
+          SELECT 1
+          FROM aclexplode(
+            coalesce(
+              target_proc.proacl,
+              acldefault('f', target_proc.proowner)
+            )
+          ) privilege
+          WHERE privilege.grantee = 0
+        )
+        AND has_schema_privilege(
+              to_regrole('authenticated'),
+              to_regnamespace('private'),
+              'USAGE'
+            )
+        AND has_function_privilege(
+              to_regrole('authenticated'),
+              target_proc.oid,
+              'EXECUTE'
+            )
+        AND NOT has_function_privilege(
+              to_regrole('authenticated'),
+              target_proc.oid,
+              'EXECUTE WITH GRANT OPTION'
+            )
+        AND NOT has_function_privilege(
+              to_regrole('anon'),
+              target_proc.oid,
+              'EXECUTE'
+            )
+        AND NOT has_function_privilege(
+              to_regrole('service_role'),
+              target_proc.oid,
+              'EXECUTE'
+            )
     )
   ),
   'version', (
@@ -263,6 +383,8 @@ function assertQuality(snapshot) {
     && schema?.p39r_placement_row_triggers === 0
   const withdrawCompactionTriggerCount = schema?.phase4_withdraw_order_compaction_triggers
   const hasWithdrawOrderCompaction = withdrawCompactionTriggerCount === 1
+  const hasCatalogActionErrorAcl =
+    schema?.phase4_catalog_action_error_acl === true
 
   if (schema?.phase4_global_function_default_acl !== true) {
     failures.push('migration 017a global function default ACL is missing or inconsistent')
@@ -286,6 +408,10 @@ function assertQuality(snapshot) {
 
   if (hasWithdrawOrderCompaction && !hasSetBasedPlacementTriggers) {
     failures.push('migration 025 withdraw-order compaction exists without migration 024')
+  }
+
+  if (hasCatalogActionErrorAcl && !hasWithdrawOrderCompaction) {
+    failures.push('migration 026 catalog-action-error ACL exists without migration 025')
   }
 
   if (version?.version_string !== '2568.0.0') {
@@ -357,7 +483,11 @@ async function buildEvidence() {
     && first.schema.p39r_placement_row_triggers === 0
   const migration025Detected = migration024Detected
     && first.schema.phase4_withdraw_order_compaction_triggers === 1
-  const phase4Range = migration025Detected
+  const migration026Detected = migration025Detected
+    && first.schema.phase4_catalog_action_error_acl === true
+  const phase4Range = migration026Detected
+    ? '017, 017a, 018-026'
+    : migration025Detected
     ? '017, 017a, 018-025'
     : migration024Detected
     ? '017, 017a, 018-024'
@@ -377,6 +507,7 @@ async function buildEvidence() {
     migration023Detected,
     migration024Detected,
     migration025Detected,
+    migration026Detected,
     schema: first.schema,
     version: first.version,
     quality: first.quality,

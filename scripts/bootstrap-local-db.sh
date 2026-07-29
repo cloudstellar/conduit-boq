@@ -83,6 +83,7 @@ docker cp migrations/022_master_catalog_phase4_draft_identity_and_release_number
 docker cp migrations/023_master_catalog_phase4_published_code_rls_scope.sql "$DB_CONTAINER:/tmp/023.sql"
 docker cp migrations/024_master_catalog_phase4_set_based_placement_invalidation.sql "$DB_CONTAINER:/tmp/024.sql"
 docker cp migrations/025_master_catalog_phase4_withdraw_order_compaction.sql "$DB_CONTAINER:/tmp/025.sql"
+docker cp migrations/026_master_catalog_phase4_catalog_action_error_acl.sql "$DB_CONTAINER:/tmp/026.sql"
 docker exec "$DB_CONTAINER" psql -v ON_ERROR_STOP=1 -U postgres -d postgres -f /tmp/009.sql
 docker exec "$DB_CONTAINER" psql -v ON_ERROR_STOP=1 -U postgres -d postgres -f /tmp/010.sql
 
@@ -113,6 +114,7 @@ docker exec "$DB_CONTAINER" psql -v ON_ERROR_STOP=1 -U postgres -d postgres -f /
 docker exec "$DB_CONTAINER" psql -v ON_ERROR_STOP=1 -U postgres -d postgres -f /tmp/023.sql
 docker exec "$DB_CONTAINER" psql -v ON_ERROR_STOP=1 -U postgres -d postgres -f /tmp/024.sql
 docker exec "$DB_CONTAINER" psql -v ON_ERROR_STOP=1 -U postgres -d postgres -f /tmp/025.sql
+docker exec "$DB_CONTAINER" psql -v ON_ERROR_STOP=1 -U postgres -d postgres -f /tmp/026.sql
 
 wait_for_local_rest_schema
 npm run db:local:seed-users

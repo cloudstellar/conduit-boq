@@ -118,7 +118,7 @@ deployment, flag enablement, publication, Factor F change, or hotfix.
 ### 7.2 2026-07-29 PRE-P-12 review-identity disposition
 
 P-43 accepts the existing authenticated GitHub review surface rather than a
-custom signing/PKI subsystem. Schema-contract v2 binds one immutable PR-review
+custom signing/PKI subsystem. Schema-contract v3 binds one immutable PR-review
 envelope to the exact source HEAD, kit, pass-1 evidence, reviewed payload,
 authenticated human login, approved state, and review time. The runner stays
 offline and verifies only canonical structure, hashes, identity equality, and
@@ -139,6 +139,40 @@ human contract review; pass 2; remaining gates; separate P-12 GO; then a
 separately authorized Checklist-only GO commit. This amendment authorizes only
 working-tree authority/tooling alignment.
 
+### 7.3 2026-07-29 P-46/P-47 helper-callability disposition
+
+P-46 consumed the one authorized canonical Local bootstrap on exact pushed
+source `d92d8ced42fc882481ebc2c4579adcf1edbebea7`. The corrected chain through
+`025` applied, but WP-6.5 failed closed when the authenticated
+`SECURITY INVOKER` draft-create wrapper reached a guarded error branch and
+could not execute the owner-only pure `private.catalog_action_error` formatter.
+This is an underprivilege/availability defect, not evidence that the global
+default-privilege bridge or private-definer boundary is overbroad.
+
+Architecture review accepts append-only
+`026_master_catalog_phase4_catalog_action_error_acl.sql` after `025`. The
+helper remains a pure SQL JSON formatter with the same signature, body, owner,
+defaults, and empty `search_path`; it becomes `SECURITY INVOKER` and its exact
+ACL becomes owner plus `authenticated`. `PUBLIC`, `anon`, and `service_role`
+remain denied. The `017a` global/schema owner-only defaults remain unchanged.
+This is the least-privilege correction because the helper needs no owner
+authority and is a direct dependency of authenticated invoker wrappers.
+
+The earlier statement that an after-`025` patch is unsafe remains true only
+when such a patch is proposed as a substitute for the required `017a` bridge:
+it cannot retroactively protect helpers at creation time. It does not prohibit
+a later, distinct, preconditioned forward migration that corrects a newly
+observed callability defect while preserving `017a`. Migration `026` is that
+distinct fix; it neither edits reviewed history nor relaxes future-object
+defaults.
+
+P-47 authorizes repository implementation, tests/tooling, and authority
+alignment only. It does not authorize Local cleanup/reset/apply, disposable
+execution, kit/pass execution, Production, Git publication, feature
+enablement, Factor F change, hotfix work, or the unrelated unused
+`v_row_count` cleanup. P-12 remains HOLD. See
+[Finding #44](./44-phase4-p46-catalog-action-error-callability-finding.md).
+
 The independent review's top-level conclusion is accepted: the Phase 4
 architecture has no fundamental showstopper and does not require redesign.
 Revision 8 resolves the useful ambiguities without adding Storage, a workflow
@@ -157,3 +191,4 @@ and Official Export Spec must be read together according to the
 - [Database and Security Contract](./17-phase4-database-security-contract.md)
 - [Parser and Canonical Hash Specification](./14-phase4-parser-and-canonical-hash-spec.md)
 - [Phase 4 Verification Report](./13-phase4-verification-report.md)
+- [P-46 catalog-action-error callability finding](./44-phase4-p46-catalog-action-error-callability-finding.md)

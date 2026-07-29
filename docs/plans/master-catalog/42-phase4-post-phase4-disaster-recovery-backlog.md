@@ -15,10 +15,10 @@ backup design into a whole-service disaster-recovery capability after the
 Phase 4 P-15 closeout, or under separately approved work if the rollout is
 abandoned.
 
-The PRE-P-12 readiness rehearsal, fresh pre-migration P-12 rollback package,
-post-migration application-only backup/manifest after `017`, `017a`, and
-`018`-`025` verification and before P-13, and post-publication P-15 checkpoint
-remain governed by:
+The PRE-P-12 readiness rehearsal; fresh pre-migration P-12 rollback package;
+post-migration application-only backup/manifest after verification of `017`,
+`017a`, `018`-`025`, and targeted ACL correction `026` and before P-13; and
+post-publication P-15 checkpoint remain governed by:
 
 - [Production Runbook #12](./12-phase4-production-runbook.md);
 - [P-12 Readiness Package #39](./39-phase4-p12-production-readiness-package.md);
@@ -58,7 +58,8 @@ does not contain the object bytes stored through the Storage API; it contains
 only the related database metadata.
 
 The current Phase 4 application backup is proportionate to migrations `017`,
-`017a`, and `018`-`025`, which do not introduce an Auth or Storage workflow.
+`017a`, `018`-`025`, and `026`, which do not introduce an Auth or Storage
+workflow.
 Expanding the P-12 rollback package into an unreviewed Auth/Storage recovery
 system would add credentials, sensitive identity data, new restore behavior,
 and configuration dependencies during a frozen migration review. That
@@ -344,7 +345,7 @@ Until then, describe the current protection accurately as a verified
 **application-database readiness rehearsal**, not the final rollback source and
 not whole-service disaster recovery. During a separately approved rollout, add
 the fresh pre-migration P-12 rollback package, the post-migration
-application-only backup/manifest after `017`, `017a`, and `018`-`025`
+application-only backup/manifest after `017`, `017a`, `018`-`025`, and `026`
 verification and before P-13, and the post-publication P-15 package. Copy the
 latest verified package to an independent Owner-controlled encrypted failure
 domain before any planned pause exceeding 24 consecutive hours; if an

@@ -2,8 +2,8 @@
 
 **Prepared:** 2026-07-28
 
-**Status:** OPTION B CANDIDATE IMPLEMENTED - Production HOLD; P-12 not
-requested
+**Status:** P-47 REPOSITORY/STATIC READY; P-48 exact Git-only publication
+authorized - replacement result/Local/Production gates HOLD; P-12 not requested
 
 This runbook defines the exact command-line and evidence contract for a future
 Owner-approved P-12 execution. It does not approve P-12, Production access,
@@ -13,18 +13,15 @@ any migration outside the separately approved scope.
 The 2026-07-28 isolated PostgreSQL 17 rehearsal applied `017` and then stopped
 before `018`. The stop exposed the security defect described in section 11.
 The Owner selected Option B for repository-only correction. The exact `017a`
-candidate is inserted between `017` and `018`. P-43 authorized authority/tooling
-reconciliation only. Independent source/architecture/security review and
-static checks are complete. P-44 froze the exact reviewed executable
-migration/application/bootstrap/generator/runner content at clean pushed
-`ed94c03`, with `Vercel=success` and no PR-triggered
-GitHub Actions run. P-45 authorizes the exact 11-file authority/status-only
-descendant commit/push; its clean pushed Remote-ready result becomes the sole
-kit-bound source/tooling HEAD. P-46 conditionally authorizes exactly one
-destructive corrected Local bootstrap at that same HEAD. It invokes
-`supabase db reset --local --no-seed`, rebuilds all Local Supabase data, and
-leaves Production untouched. Failure/drift requires evidence preservation and
-stop; no retry/reset/patch absent fresh Owner approval. Kit, pass 1, structured
+candidate is inserted between `017` and `018`. P-45 later completed at
+pushed/upstream-equal `d92d8ced42fc882481ebc2c4579adcf1edbebea7`.
+The one P-46 Local authorization was consumed: bootstrap completed through
+`025`, then WP-6.5 stopped fail-closed because the authenticated public invoker
+could not execute owner-only `private.catalog_action_error(...)`. P-47
+authorizes only repository implementation/static review of append-only `026`
+and required tooling/test/authority alignment. It does not authorize Local
+cleanup/application/reset/retry, disposable execution, Git writes, or
+Production. Kit, pass 1, structured
 authenticated GitHub review, pass 2/closeout, and Production remain separately
 unauthorized. This document remains an execution-contract candidate only.
 
@@ -39,8 +36,9 @@ Read this runbook with:
 - [Decision Register #19](./19-phase4-decision-register.md);
 - [Progress Tracker #25](./25-phase4-execution-progress-tracker.md);
 - [P-12 Readiness Package #39](./39-phase4-p12-production-readiness-package.md);
+- [Owner Decision Checklist #40](./40-phase4-p12-owner-decision-checklist.md);
   and
-- [Owner Decision Checklist #40](./40-phase4-p12-owner-decision-checklist.md).
+- [P-46 Callability Finding #44](./44-phase4-p46-catalog-action-error-callability-finding.md).
 
 Conversation text, this runbook, an external JSON file, or a successful
 rehearsal is not P-12 approval. The Decision Register, Progress Tracker, and
@@ -91,6 +89,7 @@ including hotfix `016` at `20260706090832`. Do not rerun any historical file.
 | `023` | `20260728002300 master_catalog_phase4_published_code_rls_scope` | `cbe01f63c6dd822edb29e1f7a31bfd27d5cb063e4d7d7e3878567875434d0a88` |
 | `024` | `20260728002400 master_catalog_phase4_set_based_placement_invalidation` | `d3aa11282fa4b2d4bac058bde3851287c551556ba5eac307277f086ba3d86b25` |
 | `025` | `20260728002500 master_catalog_phase4_withdraw_order_compaction` | `00d79d7750aa52ba7f003f6bb82fedb1d31ab111be417d74329c1cd3d899f76f` |
+| `026` | `20260729002600 master_catalog_phase4_catalog_action_error_acl` | `472fa04b81bc8e96e9b507e20fc20cfee3114c80fda45f2ffba3893480920d8a` |
 
 Do not change a reviewed migration to correct a defect. Append a forward
 migration with separate security/architecture review, a new accepted hash, a
@@ -98,29 +97,23 @@ new ledger contract, and a new Owner scope decision.
 
 ## 4. Build the external kit at the source/tooling HEAD
 
-Generate the one reusable execution kit only after the bridge-aware
-migrations, runner, generator, tests, and authority candidate pass independent
-review/static checks; P-44 executable migration/application/bootstrap/
-generator/runner content remains immutable at pushed `ed94c03`; the
-P-45-authorized exact authority/status-only descendant is clean, pushed, equal
-to upstream, and has truthful Remote CI/status evidence showing Remote-ready;
-and conditional P-46 has passed exactly one corrected Local canonical
-bootstrap plus consolidated
-invariants at that same HEAD. That P-45 descendant is the sole
-**source/tooling HEAD**. Historical two-rebuild P-20 evidence remains valid
-because `017a` is data-free/ACL-only. If the P-46 run failed or drifted, stop
-and preserve secret-free immutable external evidence; do not retry, patch
-Local, or reset a second time without fresh approval. After P-45, do not change
-any tracked path except Checklist #40. Future bounded kit/pass authority must
-be separately Owner-approved and committed/pushed before action through a
-Checklist-#40-only PRE-GO authority checkpoint with no GO marker. Run the
-authorized action from a clean dedicated execution checkout pinned to the
-unchanged P-45 source/tooling HEAD; the authority checkpoint is not a new
-source HEAD. Multiple Checklist-only authority commits preserve the runner's
-net-path rule because the final net delta from P-45 to the GO HEAD remains
-exactly Checklist #40. Keep Remote and Local results external and hash-bound to
-the exact source/tooling HEAD. This mechanism is not current kit/pass
-authorization. Checklist #40 must not yet contain the committed P-12 GO marker:
+Generate the one reusable execution kit only after P-47 migrations, runner,
+generator, tests, and authority pass independent review/static checks; the
+replacement source/tooling Git publication is separately authorized, clean,
+pushed, upstream-equal, and has truthful Remote CI/status recorded; and a fresh explicitly authorized
+Local canonical bootstrap plus consolidated invariants passes at that same
+HEAD. Historical two-rebuild P-20 evidence remains valid because `017a` and
+`026` are data-free ACL-only changes. P-46 failed closed and cannot be reused;
+do not clean, retry, patch Local, or reset without fresh approval. After the
+replacement source/tooling freeze, do not change any tracked path except
+Checklist #40. Future kit/pass authority must be separately Owner-approved and
+committed/pushed before action through a Checklist-#40-only PRE-GO authority
+checkpoint with no GO marker. Run the authorized action from a clean dedicated
+execution checkout pinned to the unchanged replacement source/tooling HEAD.
+The final net delta from that HEAD to the GO HEAD must remain exactly Checklist
+#40. Keep Remote and Local results external and hash-bound to the exact
+source/tooling HEAD. This mechanism is not current kit/pass authorization.
+Checklist #40 must not yet contain the committed P-12 GO marker:
 
 ```sh
 node scripts/prepare-master-catalog-p12-cli-kit.mjs \
@@ -204,7 +197,7 @@ Each later stage is a separate manual invocation and adds:
 
 The command applies at most one migration, never invokes the next stage,
 requires the same capture executor throughout the chain, and emits
-`conduit-boq/master-catalog-p12-schema-calibration-evidence-manifest/v1`.
+`conduit-boq/master-catalog-p12-schema-calibration-evidence-manifest/v2`.
 Every manifest binds its raw schema capture, outcome, exact kit path/hash,
 source/tooling HEAD, generator/runner hashes, cumulative fingerprints, and the
 canonical path/SHA-256 of the preceding manifest. The preflight file is
@@ -213,10 +206,11 @@ recorded in a separate hash-bound
 `01-calibration-write-boundary.json` after the native CLI returns.
 
 The frozen calibration order is now
-`016` → `017` → `017a` → `018` → … → `025`. The bridge is one independent
-file/invocation with its own evidence and verifier hand-off. The runner rejects
-any sequence in which `018` follows `017` directly. Candidate creation does
-not make the bridge Production-approved; pass 1 must restart from a fresh
+`016` → `017` → `017a` → `018` → … → `026`. The bridge and final correction
+are independent files/invocations with their own evidence and verifier
+hand-offs. The runner rejects any sequence in which `018` follows `017`
+directly or `026` does not follow `025`. Candidate creation does not make
+either migration Production-approved; pass 1 must restart from a fresh
 `016` baseline after independent source review.
 
 The second, verifying rehearsal uses normal one-file mode. Step `017`:
@@ -238,7 +232,7 @@ node scripts/run-master-catalog-p12-cli-step.mjs \
 
 Execution starts with `017`, which must not receive
 `--prior-step-signoff`. Every subsequent migration—`017a` and `018` through
-`025`—must add:
+`026`—must add:
 
 ```text
 --prior-step-signoff <ABSOLUTE_EXTERNAL_0600_JSON>
@@ -269,7 +263,7 @@ Before and immediately before the migration write, the runner revalidates:
 
 The exact schema-shape contract is an external owner-only `0600` JSON document
 using schema
-`conduit-boq/master-catalog-p12-schema-shape-contract/v2`. It binds the
+`conduit-boq/master-catalog-p12-schema-shape-contract/v3`. It binds the
 application candidate, source/tooling HEAD, canonical kit-manifest path and
 SHA-256, generator/runner source SHA-256 values, PostgreSQL/Supabase CLI
 versions, all accepted migration hashes, the pass-1 capture executor, the
@@ -302,7 +296,7 @@ Production mode requires the contract `githubReview.reviewerLogin` to equal the
 approved independent verifier, differ from the pass-1 capture executor, and
 differ from the migration executor. The same login must sign the pass-2 and
 Production handoffs. The frozen candidate stage list is exact `016`, `017`,
-`017a`, `018`-`025`; no stage may be invented, omitted, or reordered.
+`017a`, `018`-`026`; no stage may be invented, omitted, or reordered.
 
 The `githubReview` envelope binds fixed provider/repository, positive PR number,
 decimal review ID, exact canonical immutable review URL, lowercase authenticated
@@ -331,7 +325,7 @@ with independent key custody before Production.
 |---|---|
 | Before `017` | All three Phase 4 rows absent |
 | After `017` through `019`, including `017a` | Only `catalog_admin_enabled` exists and is `false` |
-| After `020` through `025` | All three rows exist and are `false` |
+| After `020` through `026` | All three rows exist and are `false` |
 
 Function defaults and private-schema usage are also stage-specific.
 Immediately after `017`, `PUBLIC`, `anon`, and `authenticated` have no private
@@ -346,7 +340,10 @@ onward, `authenticated` receives the reviewed schema usage for explicit
 private implementation routines, while `PUBLIC` and `anon` remain denied.
 Every routine's exact EXECUTE ACL, including `service_role`, security mode,
 `search_path`, and body fingerprint remains a separate verifier gate; schema
-usage alone never authorizes a call.
+usage alone never authorizes a call. After `026`, the formatter is exact
+`SECURITY INVOKER` with unchanged owner/body/signature/empty search path,
+direct `EXECUTE` only for owner plus `authenticated`, no grant option, and
+effective denial for `PUBLIC`, `anon`, and `service_role`.
 
 After the native CLI exits, and **before any post-CLI evidence-file write**, the
 runner attempts the complete bounded read-only after-state: exact ledger, flag
@@ -403,7 +400,7 @@ equality.
 
 The verifier must be a named human distinct from the executor. Migration
 execution begins with `017`, which has no previous Phase 4 migration. Before
-each subsequent migration—`017a` and `018` through `025`—the immediately
+each subsequent migration—`017a` and `018` through `026`—the immediately
 preceding migration needs a 0600 JSON record with exact schema
 `conduit-boq/master-catalog-p12-prior-step-verifier-signoff/v1` and these
 fields:
@@ -437,7 +434,7 @@ verifier, references any other step/head/kit, predates the outcome, binds a
 stale advisor artifact, contains extra fields, or attempts to continue from an
 uncertain or mechanically failed outcome.
 
-After `025`, the independent human verifier must review the step-`025`
+After `026`, the independent human verifier must review the step-`026`
 evidence, fresh advisor artifact, and the same security scope, then issue the
 distinct final sign-off. The runner must then re-prove the live final state in
 read-only closeout mode before P-13 can be requested:
@@ -448,7 +445,7 @@ node scripts/run-master-catalog-p12-cli-step.mjs closeout \
   --kit <ABSOLUTE_EXTERNAL_KIT> \
   --db-url <EXACT_PASSWORDLESS_URL> \
   --evidence <ABSOLUTE_NEW_EXTERNAL_CLOSEOUT_EVIDENCE_DIRECTORY> \
-  --step-025-evidence-manifest <ABSOLUTE_STEP_025_EVIDENCE_MANIFEST> \
+  --final-migration-evidence-manifest <ABSOLUTE_STEP_026_EVIDENCE_MANIFEST> \
   --final-signoff <ABSOLUTE_EXTERNAL_0600_JSON> \
   --verifier-label '<INDEPENDENT_VERIFIER>' \
   --schema-shape-contract <ABSOLUTE_EXTERNAL_0600_REVIEWED_JSON> \
@@ -459,24 +456,24 @@ node scripts/run-master-catalog-p12-cli-step.mjs closeout \
 
 Rehearsal supplies its sentinel; Production supplies the same approval record
 used for the sequence. The sign-off schema is
-`conduit-boq/master-catalog-p12-final-verifier-closeout/v1`. It binds the exact
-HEAD, kit, `025` executor/evidence/outcome/postflight hashes and, in Production,
+`conduit-boq/master-catalog-p12-final-verifier-closeout/v2`. It binds the exact
+HEAD, kit, final migration `026` executor/evidence/outcome/postflight hashes and, in Production,
 the approval hash. It requires the independent verifier to affirm security,
 advisor, owner/ACL/RLS, function/hotfix-body, Factor-F/BOQ-fingerprint,
 ledger, and flag review. It also binds
-`schemaShapeContractSha256`, the reviewed `025` schema fingerprint,
+`schemaShapeContractSha256`, the reviewed `026` schema fingerprint,
 `advisorArtifactPath`, and `advisorArtifactSha256`.
 
 Closeout reruns the live read-only final snapshot, requires the exact ordered
-ledger `009`-`016`, then `017`, `017a`, and `018`-`025`, all three Phase 4
-flags `false`, and no hotfix/Factor-F/BOQ fingerprint drift from `025`. It
+ledger `009`-`016`, then `017`, `017a`, `018`-`025`, and `026`, all three Phase 4
+flags `false`, and no hotfix/Factor-F/BOQ fingerprint drift from `026`. It
 emits a separately hashed closeout evidence manifest, applies no migration,
 sets `p13Authorized=false`, and never requests or approves P-13.
 
 For pass 2, that final closeout manifest is not accepted as a shallow
 attestation. The Production runner rehashes its three files, the fresh
-post-`025` advisor, the final verifier sign-off, and transitively the referenced
-step-`025` evidence/outcome/postflight chain. It also verifies the rehearsal
+post-`026` advisor, the final verifier sign-off, and transitively the referenced
+step-`026` evidence/outcome/postflight chain. It also verifies the rehearsal
 identity/sentinel, live final snapshot, source/tooling HEAD, kit, contract, and
 chronology: contract review precedes pass 2; sign-off precedes the live
 closeout; live closeout precedes outcome/manifest; pass 2 precedes Owner
@@ -495,7 +492,7 @@ Production mode requires all of the following:
    two commits is exactly Checklist #40;
 4. generator, runner, and migration hashes equal the contract at both HEADs;
 5. the external approval binds exact committed hashes for Migration Authority,
-   #12, #19, #25, #39, #40, this runbook, and Finding #43;
+   #12, #19, #25, #39, #40, this runbook, Finding #43, and Finding #44;
 6. exactly one committed `P12_RUNNER_AUTHORITY_V1` marker in Checklist #40
    records GO, candidate, Owner reference/time, different executor and
    verifier, `schemaShapeContractSha256`,
@@ -511,7 +508,7 @@ Production mode requires all of the following:
    stop/fix-forward posture, and no-automatic-next-step rule.
 
 The external approval schema is
-`conduit-boq/master-catalog-p12-production-approval/v2`. Immediately before the
+`conduit-boq/master-catalog-p12-production-approval/v3`. Immediately before the
 GO decision, the Owner or distinct verifier must repeat the authenticated
 GitHub review check and record `githubReviewCheckedAt` after pass-2 completion
 and no later than `approvedAt`. A missing, unavailable, mismatched, dismissed,
@@ -540,7 +537,7 @@ The readiness rehearsal is not the final rollback source.
 - Before `017`, create the fresh in-window encrypted application-only
   Production backup, isolated restore, full checksum, manifest, and
   executor/verifier sign-off.
-- After the full sequence `017` → `017a` → `018` → … → `025`, its immediate
+- After the full sequence `017` → `017a` → `018` → … → `026`, its immediate
   ledger/security/BOQ/Factor-F/flag verification, and final read-only closeout
   pass, create and verify the post-migration application-only backup and
   manifest before requesting P-13.
@@ -621,38 +618,54 @@ Recorded disposition:
 6. P-12 remains HOLD until those rehearsals and every other Package #39 gate
    pass.
 
+### 11.1 2026-07-29 P-46 fail-closed callability finding
+
+P-45 completed at pushed/upstream-equal `d92d8ce`. The single P-46 Local
+bootstrap authorization was consumed and the canonical chain completed through
+`025`. The following WP-6.5 wrapper-precedence check failed closed with
+`permission denied for function catalog_action_error`: the authenticated
+public `SECURITY INVOKER` wrapper directly reaches a pure private formatter
+whose exact ACL is owner-only. The stop preserved the external package
+`p46-local-bootstrap-20260729T121635Z-d92d8ce`; no cleanup, retry, reset, kit,
+or Production action followed.
+
+P-47 adds `026_master_catalog_phase4_catalog_action_error_acl.sql`, ledger
+`20260729002600_master_catalog_phase4_catalog_action_error_acl`, SHA-256
+`472fa04b81bc8e96e9b507e20fc20cfee3114c80fda45f2ffba3893480920d8a`.
+It alters only the existing helper security mode/ACL: preserve exact body,
+owner, signature, defaults, and empty search path; use invoker context; retain
+owner execution; grant authenticated without grant option; deny PUBLIC, anon,
+and service_role; preserve `017a` global/schema defaults, all flags, and all
+business data. See Finding #44. P-47 is repository-only authority.
+
 ## 12. Current stop state
 
 Stop without Production migration because:
 
-- the Option B source candidate passed repository independent review/static
-  checks but has not passed either fresh bridge-aware rehearsal;
-- the final `025` independent-verifier closeout is machine-enforced in the
-  repository candidate but has not been exercised because the exact rehearsal
-  correctly stopped after `017`;
+- the P-47 `026` source/tooling/authority candidate passed independent
+  review/static closure but is not frozen at a replacement Git HEAD;
+- no replacement clean pushed/upstream-equal source/tooling HEAD or truthful
+  Remote record is frozen;
+- no fresh Owner authorization exists for the destructive Local bootstrap,
+  and no clean rehearsal through `026` has passed;
+- the final `026` independent-verifier closeout is machine-enforced in the
+  repository candidate but has not been exercised;
 - the exact bridge-aware schema-shape contract has not been derived,
   independently reviewed, or passed through the mandatory second isolated
   rehearsal;
-- the prior pass-1 evidence proves only the old `016` and `017` path and is
-  insufficient for the new `017a` stage;
+- prior pass evidence is historical and insufficient for the new `026` stage;
 - no pass-2 final closeout evidence manifest is available or bound;
 - no exact advisor artifact path/SHA-256 is bound into a P-12 approval;
-- exact end-to-end CLI rehearsal has not passed beyond `017`;
-- P-44 content freeze is pushed at `ed94c03` and its truthful Remote record is
-  complete, but the P-45 source/tooling SHA/upstream/Remote record is not yet
-  recorded;
-- conditional P-46 authorizes one corrected Local bootstrap, but it has not
-  run;
+- exact end-to-end CLI rehearsal has not passed through `026`;
 - no named Production executor/verifier/window/current-user record exists;
 - no fresh in-window final rollback backup exists; and
 - no separate P-12 GO has been recorded.
 
-Repository-only independent review, authority reconciliation, static
-verification, and P-44 content freeze are complete. P-45 authorizes the exact
-11-file authority/status descendant commit/push only. After its resulting clean
-source/tooling HEAD, upstream equality, and truthful Remote-ready status exist,
-P-46 permits exactly one corrected Local bootstrap. The destructive warning,
-stop/no-retry rule, and external-evidence rule above apply. Kit generation and
-disposable pass 1 are later gates. Current authorization is not kit/rehearsal
-execution, Production access/write, P-12, PR creation, or the later
-Checklist-only GO commit.
+P-47 repository implementation/static review passed. P-48 authorizes only the
+exact recorded 25-file one-commit/one-push Git publication, with no PR; its
+replacement HEAD and Remote truth must then be recorded. A destructive Local
+rehearsal requires another fresh, explicit warning/approval. The
+stop/no-retry/external-evidence rules above apply. Kit generation and
+disposable pass 1 remain later gates. No current authorization covers any
+other Git write, Local cleanup/reset/apply, kit/rehearsal execution, Production
+access/write, P-12, PR creation, or the later Checklist-only GO commit.

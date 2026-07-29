@@ -1,3 +1,4 @@
+import { createHash } from 'node:crypto'
 import { readFileSync } from 'node:fs'
 import { resolve } from 'node:path'
 import { describe, expect, it } from 'vitest'
@@ -78,6 +79,7 @@ describe('Master Catalog migration contracts', () => {
     expect(bootstrap).toContain('migrations/023_master_catalog_phase4_published_code_rls_scope.sql')
     expect(bootstrap).toContain('migrations/024_master_catalog_phase4_set_based_placement_invalidation.sql')
     expect(bootstrap).toContain('migrations/025_master_catalog_phase4_withdraw_order_compaction.sql')
+    expect(bootstrap).toContain('migrations/026_master_catalog_phase4_catalog_action_error_acl.sql')
     expect(bootstrap).toContain('supabase/local/production-baseline.sql')
     expect(bootstrap).toContain('PUBLIC_DATA_SNAPSHOT=')
     expect(bootstrap).toContain('docker cp "$PUBLIC_DATA_SNAPSHOT"')
@@ -95,6 +97,7 @@ describe('Master Catalog migration contracts', () => {
     expect(bootstrap).toContain('psql -v ON_ERROR_STOP=1 -U postgres -d postgres -f /tmp/023.sql')
     expect(bootstrap).toContain('psql -v ON_ERROR_STOP=1 -U postgres -d postgres -f /tmp/024.sql')
     expect(bootstrap).toContain('psql -v ON_ERROR_STOP=1 -U postgres -d postgres -f /tmp/025.sql')
+    expect(bootstrap).toContain('psql -v ON_ERROR_STOP=1 -U postgres -d postgres -f /tmp/026.sql')
     expect(bootstrap).toContain('wait_for_local_rest_schema()')
     expect(bootstrap).toContain('LOCAL_SUPABASE_SECRET_KEY:?Missing LOCAL_SUPABASE_SECRET_KEY')
     expect(bootstrap).toContain('$LOCAL_API_URL/rest/v1/organizations?select=id&limit=1')
@@ -103,7 +106,8 @@ describe('Master Catalog migration contracts', () => {
     expect(bootstrap).toContain("'factor_f_2569_row_count'")
     expect(bootstrap).toContain("'factor_f_partial_legacy_snapshots_remaining'")
     expect(bootstrap).toContain('npm run db:local:smoke-master-catalog')
-    expect(canonicalHash).toContain("? '017, 017a, 018-025'")
+    expect(canonicalHash).toContain("? '017, 017a, 018-026'")
+    expect(canonicalHash).toContain(": migration025Detected\n    ? '017, 017a, 018-025'")
     expect(canonicalHash).toContain("? '017, 017a, 018-024'")
     expect(canonicalHash).toContain("? '017, 017a, 018-023'")
     expect(canonicalHash).toContain("? '017, 017a, 018-022'")
@@ -121,11 +125,29 @@ describe('Master Catalog migration contracts', () => {
     expect(canonicalHash).toContain('p39r_placement_row_triggers')
     expect(canonicalHash).toContain('migration024Detected')
     expect(canonicalHash).toContain('migration025Detected')
+    expect(canonicalHash).toContain('migration026Detected')
     expect(canonicalHash).toContain('phase4_withdraw_order_compaction_triggers')
+    expect(canonicalHash).toContain('phase4_catalog_action_error_acl')
     expect(canonicalHash).toContain('migration 022 schema markers are partial or inconsistent')
     expect(canonicalHash).toContain('migration 024 placement-trigger markers are partial or inconsistent')
     expect(canonicalHash).toContain('migration 025 withdraw-order compaction trigger inventory is inconsistent')
+    expect(canonicalHash).toContain('migration 026 catalog-action-error ACL exists without migration 025')
     expect(canonicalHash).toContain("to_regprocedure('private.compact_catalog_draft_order_after_delete()')")
+    expect(canonicalHash).toContain(
+      "to_regprocedure(\n              'private.catalog_action_error(uuid,text,text,boolean,jsonb)'",
+    )
+    expect(canonicalHash).toContain('AND NOT target_proc.prosecdef')
+    expect(canonicalHash).toContain("ARRAY['search_path=\"\"']::text[]")
+    expect(canonicalHash).toContain(
+      "'4c912b7a1bef09fff13735c9d676aff310f638eb3f08e6ba529f387b31909646'",
+    )
+    expect(canonicalHash).toContain("to_regrole('authenticated')")
+    expect(canonicalHash).toContain("to_regrole('anon')")
+    expect(canonicalHash).toContain("to_regrole('service_role')")
+    expect(canonicalHash).toContain('WHERE privilege.grantee = 0')
+    expect(canonicalHash).toContain(
+      "named_proc.proname = 'catalog_action_error'",
+    )
     expect(canonicalHash).toContain("trigger_row.tgoldtable = 'deleted_rows'")
     expect(canonicalHash).toContain('(trigger_row.tgtype & 60) = 8')
   })
@@ -758,6 +780,75 @@ describe('Master Catalog migration contracts', () => {
     expect(smoke).toContain('schemaContract.withdraw_order_compaction_triggers === 1')
     expect(smoke).toContain("'withdraw_order_compaction_triggers'")
     expect(smoke).toContain("trigger_row.tgoldtable = 'deleted_rows'")
+  })
+
+  it('repairs catalog-action error callability with the exact narrow ACL contract', () => {
+    const sql = readMigration('026_master_catalog_phase4_catalog_action_error_acl.sql')
+
+    expect(createHash('sha256').update(sql).digest('hex')).toBe(
+      '472fa04b81bc8e96e9b507e20fc20cfee3114c80fda45f2ffba3893480920d8a',
+    )
+    expect(sql).toContain('Migration 026: Master Catalog Phase 4 - Catalog Action Error ACL')
+    expect(sql).toContain("SET LOCAL lock_timeout = '10s'")
+    expect(sql).toContain("SET LOCAL statement_timeout = '60s'")
+    expect(sql).toContain("session_user <> 'postgres' OR current_user <> 'postgres'")
+    expect(sql).toContain(
+      "'private.catalog_action_error(uuid,text,text,boolean,jsonb)'",
+    )
+    expect(sql).toContain(
+      "'4c912b7a1bef09fff13735c9d676aff310f638eb3f08e6ba529f387b31909646'",
+    )
+    expect(sql).toContain('expected exact owner-only helper ACL')
+    expect(sql).toContain('ALTER FUNCTION private.catalog_action_error(')
+    expect(sql).toContain(') SECURITY INVOKER;')
+    expect(sql).toContain(
+      'FROM PUBLIC, anon, authenticated, service_role;',
+    )
+    expect(sql).toContain('TO authenticated;')
+    expect(sql).toContain(
+      'direct ACL is not exact owner plus authenticated',
+    )
+    expect(sql).toContain('all three Phase 4 flags must exist and remain false')
+    expect(sql).toContain('migration-017a global owner-only default drifted')
+    expect(sql).not.toMatch(/CREATE(?: OR REPLACE)? FUNCTION/i)
+    expect(sql).not.toMatch(/\b(?:UPDATE|INSERT INTO|DELETE FROM)\b/i)
+    expect(sql).not.toMatch(/\bpublic\.(?:boq|factor_reference_)/i)
+    expect(sql.match(/^BEGIN;$/gm)).toHaveLength(1)
+    expect(sql.match(/^COMMIT;$/gm)).toHaveLength(1)
+
+    const bootstrap = readFileSync(resolve(process.cwd(), 'scripts/bootstrap-local-db.sh'), 'utf8')
+    expect(bootstrap.indexOf('-f /tmp/025.sql'))
+      .toBeLessThan(bootstrap.indexOf('-f /tmp/026.sql'))
+  })
+
+  it('audits best-effort WP-6.5 fixture cleanup and surfaces cleanup failures', () => {
+    const smoke = readFileSync(
+      resolve(process.cwd(), 'scripts', 'smoke-master-catalog-wp65.mjs'),
+      'utf8',
+    )
+
+    expect(smoke).toContain('const trackedFixtureDrafts = new Map()')
+    const trackBeforeRpc = smoke.indexOf(
+      'trackedFixtureDrafts.set(requestId, trackedFixture)',
+    )
+    const createRpc = smoke.indexOf(
+      "await target.rpc('create_catalog_draft'",
+      trackBeforeRpc,
+    )
+    expect(trackBeforeRpc).toBeGreaterThan(-1)
+    expect(createRpc).toBeGreaterThan(trackBeforeRpc)
+    expect(smoke).toContain('readCommittedFixtureByRequestId(fixture.requestId)')
+    expect(smoke).toContain(".from('catalog_change_sets')")
+    expect(smoke).toContain(".eq('request_id', requestId)")
+    expect(smoke).toContain("action: 'no-committed-fixture'")
+    expect(smoke).toContain("'request-reconciled-audited-abandon'")
+    expect(smoke).toContain('cleanupTrackedFixtureDrafts()')
+    expect(smoke).toContain("action: 'best-effort-audited-abandon'")
+    expect(smoke).toContain(": 'audited-abandon'")
+    expect(smoke).toContain('WP-6.5 cleanup failed:')
+    expect(smoke).toContain('WP-6.5 cleanup audit:')
+    expect(smoke).not.toContain('restoreOriginalPointer(originalPointerId).catch(() => {})')
+    expect(smoke).not.toContain('setCatalogAdminEnabled(originalFlagValue).catch(() => {})')
   })
 
   it('keeps the Production snapshot outside the Supabase remote migration ledger', () => {

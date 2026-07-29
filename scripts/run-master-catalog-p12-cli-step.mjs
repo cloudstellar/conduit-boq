@@ -42,9 +42,9 @@ import {
 } from './prepare-master-catalog-p12-cli-kit.mjs'
 
 export const APPROVAL_SCHEMA =
-  'conduit-boq/master-catalog-p12-production-approval/v2'
+  'conduit-boq/master-catalog-p12-production-approval/v3'
 export const APPROVAL_SCOPE =
-  'P-12-migrations-017-017a-018-through-025-only'
+  'P-12-migrations-017-017a-018-through-026-only'
 export const PRODUCTION_PROJECT_REF = 'otlssvssvgkohqwuuiir'
 export const PRODUCTION_DATABASE_HOST =
   'aws-1-ap-south-1.pooler.supabase.com'
@@ -67,11 +67,13 @@ export const PRIOR_STEP_SIGNOFF_SCHEMA =
 export const EVIDENCE_MANIFEST_SCHEMA =
   'conduit-boq/master-catalog-p12-cli-evidence-manifest/v1'
 export const FINAL_CLOSEOUT_SIGNOFF_SCHEMA =
-  'conduit-boq/master-catalog-p12-final-verifier-closeout/v1'
+  'conduit-boq/master-catalog-p12-final-verifier-closeout/v2'
 export const FINAL_CLOSEOUT_EVIDENCE_MANIFEST_SCHEMA =
-  'conduit-boq/master-catalog-p12-final-closeout-evidence-manifest/v1'
+  'conduit-boq/master-catalog-p12-final-closeout-evidence-manifest/v2'
+export const FINAL_CLOSEOUT_CONTEXT_SCHEMA =
+  'conduit-boq/master-catalog-p12-final-closeout-evidence/v2'
 export const SCHEMA_SHAPE_CONTRACT_SCHEMA =
-  'conduit-boq/master-catalog-p12-schema-shape-contract/v2'
+  'conduit-boq/master-catalog-p12-schema-shape-contract/v3'
 export const SCHEMA_SHAPE_SCOPE =
   'public-private-table-columns-constraints-indexes/v1'
 export const SCHEMA_SHAPE_GITHUB_REVIEW_PROVIDER =
@@ -79,7 +81,7 @@ export const SCHEMA_SHAPE_GITHUB_REVIEW_PROVIDER =
 export const SCHEMA_SHAPE_GITHUB_REPOSITORY =
   'cloudstellar/conduit-boq'
 export const SCHEMA_CALIBRATION_EVIDENCE_MANIFEST_SCHEMA =
-  'conduit-boq/master-catalog-p12-schema-calibration-evidence-manifest/v1'
+  'conduit-boq/master-catalog-p12-schema-calibration-evidence-manifest/v2'
 export const SCHEMA_CALIBRATION_MODE =
   'rehearsal-schema-calibration'
 export const HOTFIX_016_FUNCTION_SIGNATURE =
@@ -87,6 +89,11 @@ export const HOTFIX_016_FUNCTION_SIGNATURE =
 export const HOTFIX_016_PROSRC_LENGTH = 7451
 export const HOTFIX_016_PROSRC_SHA256 =
   '7187ffb568617783146d4b5f8db8021147cd212a578e655879c49f32f9fb54f0'
+export const CATALOG_ACTION_ERROR_SIGNATURE =
+  'private.catalog_action_error(uuid,text,text,boolean,jsonb)'
+export const FINAL_MIGRATION =
+  PHASE4_MIGRATIONS[PHASE4_MIGRATIONS.length - 1]
+export const FINAL_MIGRATION_ORDINAL = FINAL_MIGRATION.ordinal
 export const QUERY_TIMEOUT_MS = 30_000
 export const INTERRUPT_GRACE_MS = 5_000
 export const SNAPSHOT_QUERY_BUDGET_COUNT = 15
@@ -123,14 +130,15 @@ export const P12_AUTHORITY_FILES = Object.freeze([
   'docs/plans/master-catalog/40-phase4-p12-owner-decision-checklist.md',
   'docs/plans/master-catalog/41-phase4-p12-cli-execution-runbook.md',
   'docs/plans/master-catalog/43-phase4-p12-private-function-default-privilege-finding.md',
+  'docs/plans/master-catalog/44-phase4-p46-catalog-action-error-callability-finding.md',
 ])
 export const P12_RUNNER_AUTHORITY_FILE =
   'docs/plans/master-catalog/40-phase4-p12-owner-decision-checklist.md'
 export const P12_RUNNER_AUTHORITY_MARKER = 'P12_RUNNER_AUTHORITY_V1'
 export const CLI_USAGE = `Usage:
-  node scripts/run-master-catalog-p12-cli-step.mjs --mode <rehearsal|production> --kit <absolute-path> --step <017|017a|018-025> --db-url <passwordless-url> --evidence <absolute-new-path> --executor-label <label> --schema-shape-contract <absolute-0600-json> --advisor-artifact <absolute-path> --advisor-artifact-sha256 <sha256> [mode-specific options]
-  node scripts/run-master-catalog-p12-cli-step.mjs closeout --mode <rehearsal|production> --kit <absolute-path> --db-url <passwordless-url> --evidence <absolute-new-path> --step-025-evidence-manifest <absolute-path> --final-signoff <absolute-0600-json> --verifier-label <label> --schema-shape-contract <absolute-0600-json> --advisor-artifact <absolute-path> --advisor-artifact-sha256 <sha256> [mode-specific options]
-  node scripts/run-master-catalog-p12-cli-step.mjs calibrate-schema --kit <absolute-path> --stage <016|017|017a|018-025> --db-url <isolated-rehearsal-passwordless-url> --evidence <absolute-new-path> --executor-label <label> --rehearsal-sentinel <nonce> [--prior-calibration-manifest <absolute-path>]
+  node scripts/run-master-catalog-p12-cli-step.mjs --mode <rehearsal|production> --kit <absolute-path> --step <017|017a|018-026> --db-url <passwordless-url> --evidence <absolute-new-path> --executor-label <label> --schema-shape-contract <absolute-0600-json> --advisor-artifact <absolute-path> --advisor-artifact-sha256 <sha256> [mode-specific options]
+  node scripts/run-master-catalog-p12-cli-step.mjs closeout --mode <rehearsal|production> --kit <absolute-path> --db-url <passwordless-url> --evidence <absolute-new-path> --final-migration-evidence-manifest <absolute-path> --final-signoff <absolute-0600-json> --verifier-label <label> --schema-shape-contract <absolute-0600-json> --advisor-artifact <absolute-path> --advisor-artifact-sha256 <sha256> [mode-specific options]
+  node scripts/run-master-catalog-p12-cli-step.mjs calibrate-schema --kit <absolute-path> --stage <016|017|017a|018-026> --db-url <isolated-rehearsal-passwordless-url> --evidence <absolute-new-path> --executor-label <label> --rehearsal-sentinel <nonce> [--prior-calibration-manifest <absolute-path>]
 
 Migration mode-specific options:
   rehearsal: --rehearsal-sentinel <nonce>; every step after 017 also requires --prior-step-signoff <absolute-0600-json>
@@ -461,11 +469,11 @@ export function validateApprovalRecord(
     ],
     'Approval record',
   )
-  assert(record.schema === APPROVAL_SCHEMA, 'Approval record schema is not frozen P-12 v2')
+  assert(record.schema === APPROVAL_SCHEMA, 'Approval record schema is not frozen P-12 v3')
   assert(record.decision === 'GO', 'Approval record must contain an explicit GO decision')
   assert(
     record.scope === APPROVAL_SCOPE,
-    'Approval record scope is not the exact P-12 017, 017a, 018-025 sequence',
+    'Approval record scope is not the exact P-12 017, 017a, 018-026 sequence',
   )
   assert(record.projectRef === PRODUCTION_PROJECT_REF, 'Approval record project ref is not Production')
   assert(
@@ -799,7 +807,7 @@ export function validateLedgerRows(rows, expectedMigrations, label = 'Migration 
   }))
   assert(
     JSON.stringify(actual) === JSON.stringify(expected),
-    `${label} does not match the exact expected 009-025 prefix`,
+    `${label} does not match the exact expected migration prefix`,
   )
   return actual
 }
@@ -919,8 +927,9 @@ export function assertReviewedBridgeSequence(stage) {
         '023',
         '024',
         '025',
+        '026',
       ]),
-    'Frozen Phase 4 sequence must be exactly 017, 017a, 018 through 025',
+    'Frozen Phase 4 sequence must be exactly 017, 017a, 018 through 026',
   )
   assert(
     new Set(ordinals).size === ordinals.length,
@@ -1019,7 +1028,7 @@ export async function loadSchemaShapeContract(
   )
   assert(
     record.schema === SCHEMA_SHAPE_CONTRACT_SCHEMA,
-    'Schema-shape contract schema is not frozen v2',
+    'Schema-shape contract schema is not frozen v3',
   )
   assert(
     record.scope === SCHEMA_SHAPE_SCOPE,
@@ -1192,7 +1201,7 @@ export async function loadPass2VerificationEvidenceManifest(
 ) {
   const pass2Kit = await verifyKit(
     kit.kitRoot,
-    '025',
+    FINAL_MIGRATION_ORDINAL,
     'rehearsal',
   )
   const pass2KitManifestSha256 =
@@ -1241,7 +1250,7 @@ export async function loadPass2VerificationEvidenceManifest(
       'mode',
       'gitHead',
       'kitManifestSha256',
-      'step025EvidenceManifestSha256',
+      'finalMigrationEvidenceManifestSha256',
       'finalCloseoutSignoffSha256',
       'p13Authorized',
       'files',
@@ -1351,11 +1360,11 @@ export async function loadPass2VerificationEvidenceManifest(
       'advisorArtifactSha256',
       'advisorArtifactBytes',
       'advisorArtifactCapturedAt',
-      'step025EvidenceManifestPath',
-      'step025EvidenceManifestSha256',
+      'finalMigrationEvidenceManifestPath',
+      'finalMigrationEvidenceManifestSha256',
       'finalCloseoutSignoffPath',
       'finalCloseoutSignoffSha256',
-      'step025Executor',
+      'finalMigrationExecutor',
       'independentVerifier',
       'rehearsalSentinelNonceSha256',
       'supabaseCliVersion',
@@ -1377,7 +1386,7 @@ export async function loadPass2VerificationEvidenceManifest(
       'securityContractReviewed',
       'advisorDeltaTriaged',
       'liveBoundaryRechecked',
-      'step025EvidenceConsumed',
+      'finalMigrationEvidenceConsumed',
       'finalSignoffConsumed',
       'readOnly',
       'migrationPerformed',
@@ -1390,8 +1399,7 @@ export async function loadPass2VerificationEvidenceManifest(
     'Pass-2 closeout outcome',
   )
   assert(
-    context.schema
-      === 'conduit-boq/master-catalog-p12-final-closeout-evidence/v1'
+    context.schema === FINAL_CLOSEOUT_CONTEXT_SCHEMA
       && context.mode === 'rehearsal'
       && context.gitHead
         === schemaShapeContract.record.sourceToolingGitHead
@@ -1427,9 +1435,9 @@ export async function loadPass2VerificationEvidenceManifest(
     context.expectedSchemaShapeSha256
       === expectedSchemaShapeFingerprint(
         schemaShapeContract,
-        '025',
+        FINAL_MIGRATION_ORDINAL,
       ),
-    'Pass-2 closeout context has a different reviewed 025 schema shape',
+    'Pass-2 closeout context has a different reviewed final-migration schema shape',
   )
   assert(
     context.independentVerifier
@@ -1474,17 +1482,17 @@ export async function loadPass2VerificationEvidenceManifest(
     'Pass-2 final closeout signoff path or SHA-256 binding differs',
   )
   assert(
-    context.step025EvidenceManifestPath
-      === finalCloseoutSignoff.step025Evidence.path
-      && context.step025EvidenceManifestSha256
-        === finalCloseoutSignoff.step025Evidence.sha256
-      && manifest.step025EvidenceManifestSha256
-        === finalCloseoutSignoff.step025Evidence.sha256,
-    'Pass-2 step 025 evidence path or SHA-256 binding differs',
+    context.finalMigrationEvidenceManifestPath
+      === finalCloseoutSignoff.finalMigrationEvidence.path
+      && context.finalMigrationEvidenceManifestSha256
+        === finalCloseoutSignoff.finalMigrationEvidence.sha256
+      && manifest.finalMigrationEvidenceManifestSha256
+        === finalCloseoutSignoff.finalMigrationEvidence.sha256,
+    'Pass-2 final-migration evidence path or SHA-256 binding differs',
   )
   assert(
-    context.step025Executor
-      === finalCloseoutSignoff.signoff.step025Executor
+    context.finalMigrationExecutor
+      === finalCloseoutSignoff.signoff.finalMigrationExecutor
       && context.independentVerifier
         === finalCloseoutSignoff.signoff.independentVerifier
       && context.advisorArtifactCapturedAt
@@ -1497,7 +1505,7 @@ export async function loadPass2VerificationEvidenceManifest(
   )
   validateIdentity([liveSnapshot.identity], 'rehearsal')
   assertFinalCloseoutSnapshotMatches(
-    finalCloseoutSignoff.step025Evidence.postflight,
+    finalCloseoutSignoff.finalMigrationEvidence.postflight,
     liveSnapshot,
   )
   for (const sentinel of [
@@ -1525,7 +1533,7 @@ export async function loadPass2VerificationEvidenceManifest(
       && outcome.securityContractReviewed === true
       && outcome.advisorDeltaTriaged === true
       && outcome.liveBoundaryRechecked === true
-      && outcome.step025EvidenceConsumed === true
+      && outcome.finalMigrationEvidenceConsumed === true
       && outcome.finalSignoffConsumed === true
       && outcome.readOnly === true
       && outcome.migrationPerformed === false
@@ -1703,7 +1711,7 @@ export async function verifyKit(kitPath, ordinal, mode) {
   }
   const manifest = JSON.parse(await readFile(manifestPath, 'utf8'))
 
-  assert(manifest.schema === KIT_SCHEMA, 'Kit manifest schema is not frozen v1')
+  assert(manifest.schema === KIT_SCHEMA, 'Kit manifest schema is not frozen v2')
   assert(
     typeof manifest.sourceGitHead === 'string'
       && /^[0-9a-f]{40}$/.test(manifest.sourceGitHead),
@@ -3311,6 +3319,67 @@ function validateRoutineAcl(rows, expectedMigrations) {
   }
 }
 
+export function validateCatalogActionErrorAcl(
+  rows,
+  expectedMigrations,
+) {
+  const migration026Applied = expectedMigrations.some(
+    (migration) => migration.ordinal === '026',
+  )
+  if (!migration026Applied) {
+    return
+  }
+
+  const namedRoutines = rows.filter(
+    (row) =>
+      row.schema_name === 'private'
+      && row.object_name === 'catalog_action_error'
+      && row.oid,
+  )
+  assert(
+    namedRoutines.length === 1,
+    'Migration 026 requires exactly one catalog_action_error routine',
+  )
+  const row = namedRoutines[0]
+  assert(
+    row.signature === CATALOG_ACTION_ERROR_SIGNATURE,
+    'Migration 026 catalog_action_error signature differs from the frozen helper',
+  )
+  assert(
+    row.owner === REQUIRED_CURRENT_USER,
+    'Migration 026 catalog_action_error is not owned by postgres',
+  )
+  assert(
+    row.security_definer === false,
+    'Migration 026 catalog_action_error must be SECURITY INVOKER',
+  )
+  assert(
+    row.function_config === 'search_path=""',
+    'Migration 026 catalog_action_error search_path is not exactly empty',
+  )
+  assert(
+    row.acl
+      === '{postgres=X/postgres,authenticated=X/postgres}',
+    'Migration 026 catalog_action_error ACL is not exactly owner plus authenticated EXECUTE without grant option',
+  )
+  assert(
+    row.public_execute === false,
+    'Migration 026 catalog_action_error grants EXECUTE to PUBLIC',
+  )
+  assert(
+    row.anon_execute === false,
+    'Migration 026 catalog_action_error is executable by anon',
+  )
+  assert(
+    row.authenticated_execute === true,
+    'Migration 026 catalog_action_error is not executable by authenticated',
+  )
+  assert(
+    row.service_role_execute === false,
+    'Migration 026 catalog_action_error is executable by service_role',
+  )
+}
+
 export function validateRequiredFunctionDefaultAcl(rows) {
   const globalFunctionAcl = rows.find(
     (row) => row.schema_name === '' && row.object_type === 'f',
@@ -3510,6 +3579,10 @@ async function collectSnapshot({
       'Routine',
     )
     validateRoutineAcl(routineRows, expectedMigrations)
+    validateCatalogActionErrorAcl(
+      routineRows,
+      expectedMigrations,
+    )
     const foundationApplied = expectedMigrations.some(
       (migration) => migration.ordinal === '017',
     )
@@ -4691,6 +4764,10 @@ async function loadSuccessfulStepEvidenceManifest(
     postflight.ownershipAndAclInventory.routines,
     expectedStepMigrations,
   )
+  validateCatalogActionErrorAcl(
+    postflight.ownershipAndAclInventory.routines,
+    expectedStepMigrations,
+  )
   validateFunctionDefaultAclForMigrations(
     postflight.ownershipAndAclInventory.defaultPrivileges,
     expectedStepMigrations,
@@ -4781,7 +4858,7 @@ export async function loadFinalCloseoutSignoff(
       'step',
       'executionGitHead',
       'kitManifestSha256',
-      'step025Executor',
+      'finalMigrationExecutor',
       'independentVerifier',
       'independentVerificationCompleted',
       'securityContractReviewed',
@@ -4792,30 +4869,33 @@ export async function loadFinalCloseoutSignoff(
       'factorAndBoqFingerprintsReviewed',
       'ledgerAndFlagsReviewed',
       'schemaShapeContractSha256',
-      'step025SchemaShapeFingerprintSha256',
+      'finalMigrationSchemaShapeFingerprintSha256',
       'advisorArtifactPath',
       'advisorArtifactSha256',
       'advisorArtifactCapturedAt',
       'p13Authorized',
       'automaticNextStep',
       'reviewedAt',
-      'step025EvidenceManifestPath',
-      'step025EvidenceManifestSha256',
-      'step025OutcomeSha256',
-      'step025PostflightSha256',
+      'finalMigrationEvidenceManifestPath',
+      'finalMigrationEvidenceManifestSha256',
+      'finalMigrationOutcomeSha256',
+      'finalMigrationPostflightSha256',
       ...(approval ? ['approvalRecordSha256'] : []),
     ],
     'Final closeout signoff',
   )
   assert(
     signoff.schema === FINAL_CLOSEOUT_SIGNOFF_SCHEMA,
-    'Final closeout signoff schema is not frozen v1',
+    'Final closeout signoff schema is not frozen v2',
   )
   assert(
     signoff.decision === 'P12_EXECUTION_VERIFIED',
     'Final closeout decision must be P12_EXECUTION_VERIFIED',
   )
-  assert(signoff.step === '025', 'Final closeout must be bound to step 025')
+  assert(
+    signoff.step === FINAL_MIGRATION_ORDINAL,
+    `Final closeout must be bound to step ${FINAL_MIGRATION_ORDINAL}`,
+  )
   assert(signoff.executionGitHead === currentHead, 'Final closeout is bound to a different Git HEAD')
   assert(signoff.kitManifestSha256 === kitManifestSha256, 'Final closeout is bound to a different kit')
   assert(
@@ -4823,12 +4903,15 @@ export async function loadFinalCloseoutSignoff(
       === schemaShapeContract.sha256,
     'Final closeout is bound to a different schema-shape contract',
   )
-  const expectedStep025SchemaShapeFingerprint =
-    expectedSchemaShapeFingerprint(schemaShapeContract, '025')
+  const expectedFinalMigrationSchemaShapeFingerprint =
+    expectedSchemaShapeFingerprint(
+      schemaShapeContract,
+      FINAL_MIGRATION_ORDINAL,
+    )
   assert(
-    signoff.step025SchemaShapeFingerprintSha256
-      === expectedStep025SchemaShapeFingerprint,
-    'Final closeout schema-shape fingerprint differs from the reviewed 025 stage contract',
+    signoff.finalMigrationSchemaShapeFingerprintSha256
+      === expectedFinalMigrationSchemaShapeFingerprint,
+    'Final closeout schema-shape fingerprint differs from the reviewed final-migration stage contract',
   )
   assert(
     signoff.advisorArtifactPath === advisorArtifact.path,
@@ -4843,7 +4926,7 @@ export async function loadFinalCloseoutSignoff(
     'Final closeout advisorArtifactCapturedAt',
   )
   for (const [field, label] of [
-    ['step025Executor', 'step 025 executor'],
+    ['finalMigrationExecutor', 'final-migration executor'],
     ['independentVerifier', 'independent verifier'],
   ]) {
     assert(
@@ -4856,9 +4939,9 @@ export async function loadFinalCloseoutSignoff(
     )
   }
   assert(
-    signoff.step025Executor.toLocaleLowerCase()
+    signoff.finalMigrationExecutor.toLocaleLowerCase()
       !== signoff.independentVerifier.toLocaleLowerCase(),
-    'Final closeout verifier must be distinct from the step 025 executor',
+    'Final closeout verifier must be distinct from the final-migration executor',
   )
   assert(
     signoff.independentVerifier
@@ -4882,17 +4965,17 @@ export async function loadFinalCloseoutSignoff(
   assertTimestampWithZone(signoff.reviewedAt, 'Final closeout reviewedAt')
   assert(Date.parse(signoff.reviewedAt) <= now.getTime(), 'Final closeout review is in the future')
   for (const field of [
-    'step025EvidenceManifestSha256',
-    'step025OutcomeSha256',
-    'step025PostflightSha256',
-    'step025SchemaShapeFingerprintSha256',
+    'finalMigrationEvidenceManifestSha256',
+    'finalMigrationOutcomeSha256',
+    'finalMigrationPostflightSha256',
+    'finalMigrationSchemaShapeFingerprintSha256',
     'advisorArtifactSha256',
   ]) {
     assert(/^[0-9a-f]{64}$/.test(signoff[field]), `${field} must be a SHA-256`)
   }
 
   if (approval) {
-    assert(signoff.step025Executor === approval.executor, 'Final closeout executor differs from the P-12 approval')
+    assert(signoff.finalMigrationExecutor === approval.executor, 'Final closeout executor differs from the P-12 approval')
     assert(signoff.independentVerifier === approval.independentVerifier, 'Final closeout verifier differs from the P-12 approval')
     assert(
       signoff.approvalRecordSha256 === approvalRecordSha256,
@@ -4912,77 +4995,80 @@ export async function loadFinalCloseoutSignoff(
     )
   }
 
-  const step025Evidence = await loadSuccessfulStepEvidenceManifest(
-    signoff.step025EvidenceManifestPath,
-    {
-      step: '025',
-      mode,
-      currentHead,
-      kitManifestSha256,
-      objectTargets,
-      approvalRecordSha256,
-      schemaShapeContract,
-    },
-  )
+  const finalMigrationEvidence =
+    await loadSuccessfulStepEvidenceManifest(
+      signoff.finalMigrationEvidenceManifestPath,
+      {
+        step: FINAL_MIGRATION_ORDINAL,
+        mode,
+        currentHead,
+        kitManifestSha256,
+        objectTargets,
+        approvalRecordSha256,
+        schemaShapeContract,
+      },
+    )
   if (approval) {
     assertApprovedCatalogFingerprint(
-      step025Evidence.postflight.catalog,
+      finalMigrationEvidence.postflight.catalog,
       approval,
     )
   }
   assert(
-    step025Evidence.sha256 === signoff.step025EvidenceManifestSha256,
-    'Step 025 evidence manifest SHA-256 differs from the final closeout signoff',
+    finalMigrationEvidence.sha256
+      === signoff.finalMigrationEvidenceManifestSha256,
+    'Final-migration evidence manifest SHA-256 differs from the final closeout signoff',
   )
   assert(
-    step025Evidence.manifest.files['02-migration-outcome.json']
-      === signoff.step025OutcomeSha256,
-    'Step 025 outcome SHA-256 differs from the final closeout signoff',
+    finalMigrationEvidence.manifest.files['02-migration-outcome.json']
+      === signoff.finalMigrationOutcomeSha256,
+    'Final-migration outcome SHA-256 differs from the final closeout signoff',
   )
   assert(
-    step025Evidence.manifest.files['03-postflight.json']
-      === signoff.step025PostflightSha256,
-    'Step 025 postflight SHA-256 differs from the final closeout signoff',
+    finalMigrationEvidence.manifest.files['03-postflight.json']
+      === signoff.finalMigrationPostflightSha256,
+    'Final-migration postflight SHA-256 differs from the final closeout signoff',
   )
   assert(
-    step025Evidence.context.executor === signoff.step025Executor,
-    'Step 025 evidence executor differs from the final closeout signoff',
+    finalMigrationEvidence.context.executor
+      === signoff.finalMigrationExecutor,
+    'Final-migration evidence executor differs from the final closeout signoff',
   )
   assert(
-    step025Evidence.context.schemaShapeContractSha256
+    finalMigrationEvidence.context.schemaShapeContractSha256
       === schemaShapeContract.sha256,
-    'Step 025 evidence schema-shape contract differs from the final closeout signoff',
+    'Final-migration evidence schema-shape contract differs from the final closeout signoff',
   )
   assert(
     Date.parse(signoff.reviewedAt)
-      >= Date.parse(step025Evidence.outcome.finishedAt),
-    'Final closeout review predates the step 025 outcome',
+      >= Date.parse(finalMigrationEvidence.outcome.finishedAt),
+    'Final closeout review predates the final-migration outcome',
   )
   assert(
     Date.parse(signoff.reviewedAt)
-      >= Date.parse(step025Evidence.postflight.capturedAt),
-    'Final closeout review predates the step 025 postflight',
+      >= Date.parse(finalMigrationEvidence.postflight.capturedAt),
+    'Final closeout review predates the final-migration postflight',
   )
   assert(
     Date.parse(signoff.advisorArtifactCapturedAt)
-      >= Date.parse(step025Evidence.postflight.capturedAt)
+      >= Date.parse(finalMigrationEvidence.postflight.capturedAt)
       && Date.parse(signoff.advisorArtifactCapturedAt)
-        >= Date.parse(step025Evidence.outcome.finishedAt)
+        >= Date.parse(finalMigrationEvidence.outcome.finishedAt)
       && Date.parse(signoff.advisorArtifactCapturedAt)
         <= Date.parse(signoff.reviewedAt),
-    'Final advisor artifact was not freshly captured after step 025 and before closeout review',
+    'Final advisor artifact was not freshly captured after the final migration and before closeout review',
   )
   assert(
     Date.parse(signoff.reviewedAt)
-      >= Date.parse(step025Evidence.manifest.createdAt),
-    'Final closeout review predates the step 025 evidence manifest',
+      >= Date.parse(finalMigrationEvidence.manifest.createdAt),
+    'Final closeout review predates the final-migration evidence manifest',
   )
 
   return {
     path: resolvedPath,
     sha256: sha256Bytes(Buffer.from(raw, 'utf8')),
     signoff,
-    step025Evidence,
+    finalMigrationEvidence,
   }
 }
 
@@ -5083,7 +5169,7 @@ export function parseCloseoutArguments(args) {
         '--evidence',
         '--approval-record',
         '--rehearsal-sentinel',
-        '--step-025-evidence-manifest',
+        '--final-migration-evidence-manifest',
         '--final-signoff',
         '--verifier-label',
         '--schema-shape-contract',
@@ -5101,7 +5187,7 @@ export function parseCloseoutArguments(args) {
     'kit',
     'db_url',
     'evidence',
-    'step_025_evidence_manifest',
+    'final_migration_evidence_manifest',
     'final_signoff',
     'verifier_label',
     'schema_shape_contract',
@@ -5774,38 +5860,43 @@ export function validateWriteBoundaryRow({
   }
 }
 
-function assertFinalCloseoutSnapshotMatches(step025Postflight, liveSnapshot) {
+function assertFinalCloseoutSnapshotMatches(
+  finalMigrationPostflight,
+  liveSnapshot,
+) {
   assert(
     canonicalJson(liveSnapshot.ledger)
-      === canonicalJson(step025Postflight.ledger),
-    'Live final-closeout ledger differs from step 025 postflight',
+      === canonicalJson(finalMigrationPostflight.ledger),
+    'Live final-closeout ledger differs from final-migration postflight',
   )
   assert(
     canonicalJson(liveSnapshot.flags)
-      === canonicalJson(step025Postflight.flags),
-    'Live final-closeout feature flags differ from step 025 postflight',
+      === canonicalJson(finalMigrationPostflight.flags),
+    'Live final-closeout feature flags differ from final-migration postflight',
   )
   assertCatalogUnchanged(
-    step025Postflight.catalog,
+    finalMigrationPostflight.catalog,
     liveSnapshot.catalog,
   )
   assertFactorAndBoqUnchanged(
-    step025Postflight.factorAndBoq,
+    finalMigrationPostflight.factorAndBoq,
     liveSnapshot.factorAndBoq,
   )
   assertHotfix016Unchanged(
-    step025Postflight.hotfix016,
+    finalMigrationPostflight.hotfix016,
     liveSnapshot.hotfix016,
   )
   assert(
     canonicalJson(liveSnapshot.schemaShape)
-      === canonicalJson(step025Postflight.schemaShape),
-    'Live final-closeout schema shape differs from step 025 postflight',
+      === canonicalJson(finalMigrationPostflight.schemaShape),
+    'Live final-closeout schema shape differs from final-migration postflight',
   )
   assert(
     canonicalJson(liveSnapshot.ownershipAndAclInventory)
-      === canonicalJson(step025Postflight.ownershipAndAclInventory),
-    'Live final-closeout ownership/ACL/RLS inventory differs from step 025 postflight',
+      === canonicalJson(
+        finalMigrationPostflight.ownershipAndAclInventory,
+      ),
+    'Live final-closeout ownership/ACL/RLS inventory differs from final-migration postflight',
   )
 }
 
@@ -5832,8 +5923,8 @@ async function writeFinalCloseoutEvidenceManifest(
     mode: context.mode,
     gitHead: context.gitHead,
     kitManifestSha256: context.kitManifestSha256,
-    step025EvidenceManifestSha256:
-      context.step025EvidenceManifestSha256,
+    finalMigrationEvidenceManifestSha256:
+      context.finalMigrationEvidenceManifestSha256,
     finalCloseoutSignoffSha256:
       context.finalCloseoutSignoffSha256,
     p13Authorized: false,
@@ -5859,7 +5950,11 @@ export async function executeP12FinalCloseout(options) {
     validateRehearsalSentinelNonce(options.rehearsal_sentinel)
   }
 
-  const kit = await verifyKit(options.kit, '025', options.mode)
+  const kit = await verifyKit(
+    options.kit,
+    FINAL_MIGRATION_ORDINAL,
+    options.mode,
+  )
   const evidenceRoot = await resolveNewEvidenceDirectory(options.evidence)
   const kitManifestSha256 = await sha256File(kit.manifestPath)
 
@@ -5938,16 +6033,16 @@ export async function executeP12FinalCloseout(options) {
     '--verifier-label differs from the final closeout signoff',
   )
   const {
-    resolvedPath: cliStep025EvidenceManifestPath,
+    resolvedPath: cliFinalMigrationEvidenceManifestPath,
   } = await resolveExistingExternalPath(
-    options.step_025_evidence_manifest,
-    'CLI step 025 evidence manifest',
+    options.final_migration_evidence_manifest,
+    'CLI final-migration evidence manifest',
     'file',
   )
   assert(
-    cliStep025EvidenceManifestPath
-      === finalCloseoutSignoff.step025Evidence.path,
-    '--step-025-evidence-manifest differs from the final closeout signoff',
+    cliFinalMigrationEvidenceManifestPath
+      === finalCloseoutSignoff.finalMigrationEvidence.path,
+    '--final-migration-evidence-manifest differs from the final closeout signoff',
   )
 
   const password = options.mode === 'production'
@@ -5955,7 +6050,7 @@ export async function executeP12FinalCloseout(options) {
     : readRehearsalPassword()
   await mkdir(evidenceRoot, { mode: 0o700 })
   const closeoutContext = {
-    schema: 'conduit-boq/master-catalog-p12-final-closeout-evidence/v1',
+    schema: FINAL_CLOSEOUT_CONTEXT_SCHEMA,
     mode: options.mode,
     gitHead,
     applicationCandidate: APPLICATION_CANDIDATE,
@@ -5978,20 +6073,23 @@ export async function executeP12FinalCloseout(options) {
     pass2VerificationEvidenceManifestSha256:
       pass2VerificationEvidence?.sha256,
     expectedSchemaShapeSha256:
-      expectedSchemaShapeFingerprint(schemaShapeContract, '025'),
+      expectedSchemaShapeFingerprint(
+        schemaShapeContract,
+        FINAL_MIGRATION_ORDINAL,
+      ),
     advisorArtifactPath: advisorArtifact.path,
     advisorArtifactSha256: advisorArtifact.sha256,
     advisorArtifactBytes: advisorArtifact.bytes,
     advisorArtifactCapturedAt:
       finalCloseoutSignoff.signoff.advisorArtifactCapturedAt,
-    step025EvidenceManifestPath:
-      finalCloseoutSignoff.step025Evidence.path,
-    step025EvidenceManifestSha256:
-      finalCloseoutSignoff.step025Evidence.sha256,
+    finalMigrationEvidenceManifestPath:
+      finalCloseoutSignoff.finalMigrationEvidence.path,
+    finalMigrationEvidenceManifestSha256:
+      finalCloseoutSignoff.finalMigrationEvidence.sha256,
     finalCloseoutSignoffPath: finalCloseoutSignoff.path,
     finalCloseoutSignoffSha256: finalCloseoutSignoff.sha256,
-    step025Executor:
-      finalCloseoutSignoff.signoff.step025Executor,
+    finalMigrationExecutor:
+      finalCloseoutSignoff.signoff.finalMigrationExecutor,
     independentVerifier: options.verifier_label,
     rehearsalSentinelNonceSha256: options.rehearsal_sentinel
       ? sha256Bytes(Buffer.from(options.rehearsal_sentinel, 'utf8'))
@@ -6014,7 +6112,7 @@ export async function executeP12FinalCloseout(options) {
   try {
     const immediateKit = await verifyKit(
       options.kit,
-      '025',
+      FINAL_MIGRATION_ORDINAL,
       options.mode,
     )
     assert(
@@ -6107,19 +6205,22 @@ export async function executeP12FinalCloseout(options) {
       dbUrl: options.db_url,
       password,
       mode: options.mode,
-      step: '025',
+      step: FINAL_MIGRATION_ORDINAL,
       workdir: immediateKit.stepRoot,
       expectedMigrations: [
         ...HISTORICAL_MIGRATIONS,
         ...PHASE4_MIGRATIONS,
       ],
       expectedSchemaShapeFingerprint:
-        expectedSchemaShapeFingerprint(schemaShapeContract, '025'),
+        expectedSchemaShapeFingerprint(
+          schemaShapeContract,
+          FINAL_MIGRATION_ORDINAL,
+        ),
       objectTargets: immediateKit.step.objectTargetsAfter,
     })
     liveSnapshot.disposableRehearsalTarget = disposableTarget
     assertFinalCloseoutSnapshotMatches(
-      finalCloseoutSignoff.step025Evidence.postflight,
+      finalCloseoutSignoff.finalMigrationEvidence.postflight,
       liveSnapshot,
     )
     if (approval) {
@@ -6229,7 +6330,7 @@ export async function executeP12FinalCloseout(options) {
     advisorDeltaTriaged:
       finalCloseoutSignoff.signoff.advisorDeltaTriaged,
     liveBoundaryRechecked: finalCloseoutVerified,
-    step025EvidenceConsumed: true,
+    finalMigrationEvidenceConsumed: true,
     finalSignoffConsumed: true,
     readOnly: true,
     migrationPerformed: false,

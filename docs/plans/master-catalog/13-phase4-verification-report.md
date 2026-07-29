@@ -23,7 +23,7 @@ checksum passed. Exact pushed readiness/documentation HEAD
 `Vercel=success`; no PR-triggered GitHub Actions run is claimed. The fresh
 in-window rollback backup remains an execution gate; a post-migration
 application-only backup/manifest must also pass after `017`, `017a`, and
-`018`-`025` verification and before any P-13 request. The Owner has accepted
+`018`-`026` verification and before any P-13 request. The Owner has accepted
 same-device-loss risk only for approved P-12 execution through separately
 approved P-15 verification, amended to expire at the earlier of the
 start of the post-publication checkpoint after separately approved P-15
@@ -37,11 +37,18 @@ protection remains a separate P-14 Auth gate. P-44 froze the exact reviewed
 executable migration/application/bootstrap/generator/runner content at clean
 pushed commit
 `ed94c0304be2741217c7ea2c36322b426de1dfe5`; its Remote record is
-`Vercel=success` and no PR-triggered GitHub Actions run exists. P-45 authorizes
-only the bounded authority/status descendant commit/push from `ed94c03`, and
-P-46 conditionally authorizes exactly one destructive Local bootstrap after
-that descendant is clean, pushed, HEAD-equal-to-upstream, and Remote-ready.
-Resulting P-45 HEAD/Remote evidence, the P-46 Local result, exact named-human
+`Vercel=success` and no PR-triggered GitHub Actions run exists. P-45 completed
+at pushed/upstream-equal `d92d8ced42fc882481ebc2c4579adcf1edbebea7`.
+The one P-46 Local authorization was consumed: canonical bootstrap completed
+through `025`, then WP-6.5 failed closed because an authenticated public
+invoker wrapper could not execute owner-only
+`private.catalog_action_error(uuid,text,text,boolean,jsonb)`. P-47 authorizes
+only repository implementation/static review of append-only `026` and its
+required tooling/test/authority alignment; that repository/static closure has
+passed. No Local cleanup/application/reset/retry, disposable execution, Git
+write, kit/pass, or Production action is authorized. Replacement
+source/tooling HEAD/Remote evidence, a fresh
+separately authorized corrected Local result, exact named-human
 executor and distinct named-human independent verifier,
 path/`current_user`/object-owner/window, and exact P-12 decision remain open.
 P-12 is not requested.
@@ -59,18 +66,16 @@ bare lowercase 64-hex value before a mechanically
 `productionEligible=true` source kit may be used in Production or P-12 may be
 requested.
 
-The CLI candidate now separates the clean pushed source/tooling HEAD from the
-later Checklist-#40-only GO HEAD. Independent source review passed and P-44
-froze the immutable executable-content ancestor at `ed94c03`. P-45
-authorizes an authority/status-only descendant commit/push; no migration,
-application, bootstrap, generator, or runner source may change. Truthful Remote
-CI/status must be recorded for the resulting clean pushed descendant, which
-then becomes the actual kit-bound source/tooling HEAD. P-46 conditionally
-authorizes exactly one corrected destructive Local bootstrap plus consolidated
-smoke/invariants at that same HEAD. The run resets/rebuilds all Local Supabase
-data but does not touch Production; failure or drift stops the sequence, with
-no retry, patch, or second reset without fresh Owner approval. Only after it
-passes may a later separately authorized source kit drive executable
+The P-47 CLI candidate continues to separate the future clean pushed
+source/tooling HEAD from the later Checklist-#40-only GO HEAD. Because P-46
+exposed a new defect, the P-44/P-45 freeze is historical. After independent
+review/static closure passed, P-48 separately authorized the exact 25-file
+Git-only publication. Its replacement clean pushed HEAD and exact Remote record
+are required. Local bootstrap
+resets/rebuilds all Local Supabase data and therefore needs fresh explicit
+Owner authorization; P-46 cannot be reused. Only after that corrected run
+passes may a later
+separately authorized source kit drive executable
 `calibrate-schema` pass 1, independent contract
 review, and a second fresh full isolated rehearsal with a transitive pass-2
 closeout and fresh advisor rotation. Production reuses that same kit. The Owner
@@ -79,14 +84,20 @@ candidate `017a_master_catalog_phase4_global_function_default_privileges.sql`,
 ledger `20260728001730_master_catalog_phase4_global_function_default_privileges`,
 SHA-256
 `12cf6687b6339efa17635ac29ddfdb5150210a96e0640b0e9182a4cda64497a7`,
-in `017` -> `017a` -> `018` order. The authenticated schema-contract review
+in `017` -> `017a` -> `018` order. The distinct P-47 candidate
+`026_master_catalog_phase4_catalog_action_error_acl.sql`, ledger
+`20260729002600_master_catalog_phase4_catalog_action_error_acl`, SHA-256
+`472fa04b81bc8e96e9b507e20fc20cfee3114c80fda45f2ffba3893480920d8a`,
+follows immutable `025`; it preserves the helper body/owner/signature/empty
+search path, uses invoker context, grants only authenticated, and changes no
+data/default privileges. The authenticated schema-contract review
 and both rehearsal passes remain open; no pass-1 completion, pass-2 manifest,
 or GO HEAD is claimed.
 
-P-43 replaces free-form schema-contract reviewer claims with contract v2's
+P-43 replaces free-form schema-contract reviewer claims with contract v3's
 structured immutable GitHub PR-review envelope and exact payload marker. A
 distinct human must check the review while authenticated before contract freeze
-and again after pass 2 immediately before GO; approval v2 records
+and again after pass 2 immediately before GO; approval v3 records
 `githubReviewCheckedAt`. The offline runner validates canonical
 structure/hash/identity/chronology but does not authenticate GitHub or prove
 non-repudiation. No custom signing/PKI is added under the accepted
@@ -105,8 +116,8 @@ absent default-ACL row is recorded in
 [Finding #43](./43-phase4-p12-private-function-default-privilege-finding.md).
 Do not edit `017`, weaken the verifier, continue the disposable sequence, or
 claim exact-path acceptance. The Owner selected a separately reviewed Option B
-bridge ordered immediately after `017` and before `018`, never an after-`025`
-correction. Migration `018` creates
+bridge ordered immediately after `017` and before `018`; a late correction
+cannot substitute for that global-default bridge. Migration `018` creates
 twelve private `SECURITY DEFINER` helpers without explicit per-function
 revokes and grants `authenticated` `USAGE` on schema `private`; without the
 effective global default denial, those helpers inherit `PUBLIC EXECUTE`.
@@ -117,14 +128,15 @@ global default ACL as the transient post-`017` state and enforces the
 `017` -> `017a` -> `018` handoff. The historical runner correctly stopped
 after `017`. The selected candidate has the exact filename/ledger/hash above,
 removes `PUBLIC` and API-role defaults including `service_role` at global,
-`public`, and `private` scopes, and is not migration `026`. This is
+`public`, and `private` scopes. The later `026` is not the bridge; it is the
+separate P-46 callability correction described above. This is
 repository-candidate authority only. Do not edit `017` or `018`, or apply
 `017a` to the existing post-`025` Local. Independent
-review passed and P-44 froze the content at `ed94c03`. Use only the
-P-45-authorized authority/status descendant to establish the clean exact
-source/tooling HEAD; record its Remote status; then, under conditional P-46,
-run exactly one corrected Local bootstrap and consolidated invariants. A
-failed or drifting run stops without retry or patch until fresh approval.
+review of the bridge passed and P-44 froze it at `ed94c03`; P-46 then exposed
+the distinct helper issue. Review/freeze a replacement P-47 source/tooling
+HEAD, record its Remote status, and obtain fresh reset approval before a
+corrected Local bootstrap. A failed or drifting run stops without retry or
+patch until fresh approval.
 Kit generation, pass 1, independent contract freeze, and pass 2 on fresh
 disposable targets remain later separately gated steps.
 
@@ -132,7 +144,7 @@ The P-12 flag gate is stage-aware. Before `017`, rows for
 `catalog_admin_enabled`, `catalog_new_identity_enabled`, and
 `catalog_retirement_enabled` must all be absent. After `017`, `017a`, `018`,
 and `019`, only `catalog_admin_enabled` may exist and its JSON value must be
-boolean `false`. After each of `020`-`025`, all three rows must exist and each
+boolean `false`. After each of `020`-`026`, all three rows must exist and each
 JSON value must be boolean `false`. No Phase 4 flag may be boolean `true` at
 any checkpoint.
 
@@ -865,7 +877,7 @@ is not sufficient for WP-7/WP-8 readiness.
 | Isolated restore target | Ephemeral network-isolated non-Production PostgreSQL 17; never Local Supabase | Pending |
 | Restored counts/checksums match |  | Pending |
 | Rollback/fix-forward plan documented |  | Pending |
-| Post-migration application-only backup/manifest | After `017`, `017a`, and `018`-`025` immediate verification and before requesting P-13, while all Phase 4 flags remain disabled | Pending |
+| Post-migration application-only backup/manifest | After `017`, `017a`, and `018`-`026` immediate verification and before requesting P-13, while all Phase 4 flags remain disabled | Pending |
 | Post-publication backup/external copy | After separately approved P-15 verification; checksum and record independent Owner-controlled custody | Pending |
 
 ## 6.4 WP-6.5 implementation and live Local checkpoint
@@ -1071,15 +1083,15 @@ fixed and reviewed.
 |---|---|---|---|
 | WP-8 clean Local rehearsal | Passed with no unresolved execution blocker | P-36 technical rehearsal, retained functional Card B-E evidence, proportional Spots 1-3, same-request Spot 4, final D005 cleanup, exact D007 stale-choice-banner replay, and D009 Full-import correction passed. Local is pointer `2568.0.0`/710, zero drafts, and flags false. | P-37 Owner-accepted 2026-07-25 under the guided-UAT variance; P-12 remains a separate request |
 | WP-6.6 capability matrix | Audit #29 C-01 through C-17 implemented/evidenced, or unsupported controls removed from release visibility | Final G1R/G2/P-25/G3/P-26 path was owner-accepted at `78e96ab`; P-36 integrated rerun passed. The later Owner decision accepts WP-8 under the explicitly labelled guided-UAT variance rather than relabelling it independent. | Accepted/Complete for WP-6.6 and WP-8/P-37 under the recorded variance |
-| Reviewed migration fingerprint | Every filename and SHA-256 matches the accepted manifest | Package #39 records exact hashes for ten-file candidate `017`, `017a`, `018`-`025`; the nine historical hashes remain unchanged and new `017a` is frozen at `12cf6687...`. P-44 executable migration/application/bootstrap/generator/runner content is frozen at `ed94c03`; P-45 authority/status checkpoint scope cannot change those files. | Review/static/content-freeze Ready — candidate identity is frozen; P-45 resulting-HEAD/Remote record, P-46 Local result, and fresh two-pass evidence remain HOLD |
-| Migration execution freeze | Exact tool versions, per-file transaction/timeouts, identity/owner continuity, stop behavior, and rollback are recorded before naming the window | Package #39 section 4.1 freezes Supabase CLI `2.107.0`, PostgreSQL major 17, ten candidate hashes, one transaction/file, 10s migration lock timeout, 60s statement timeout except `020` at 90s, no concurrent operation, one ledger row/file, the same `current_user`/object-owner for `017`, `017a`, and `018`-`025`, stage-aware default/routine ACL verification, per-file ownership/ACL deltas, final owner/ACL/RLS inventory, stop-after-current-file rollback, and forward-fix-only post-commit recovery. | Candidate frozen on paper and source/static review passed; exact-path acceptance awaits corrected Local integration, pass 1, authenticated schema-contract review, and pass 2 |
-| Disposable PostgreSQL 17 CLI rehearsal | Complete approved migration sequence passes all mandatory per-file postflights on fresh disposable targets | Historical rehearsal-only dirty-tree kit applied `017`, recorded its ledger row only in the disposable database, and correctly hard-stopped before `018` on the absent private-function default ACL. Exact candidate-only positive ACL and post-`025` negative fail-closed proofs subsequently passed on PostgreSQL 17.10 and the frozen Supabase PostgreSQL 17.6 image under `--network none`, read-only root filesystems, tmpfs data, and automatic container removal. Owner selected exact `017a` candidate after `017`/before `018`; Production has no `017`, Local was not reset or patched, and Production was not written. See [Finding #43](./43-phase4-p12-private-function-default-privilege-finding.md). | HOLD — bounded SQL mechanism and independent source/security review passed; fresh CLI pass 1, independent schema-contract freeze, and fresh CLI pass 2 remain |
-| Repository/deployment fingerprint | Exact branch/commit and deployable build pass before P-12; actual deployed artifact is recorded at P-13 | Exact baseline `6827ebc1a729b7675fe91db58e129c9381b33ddb` passed its gates. The bounded general-user version-transparency candidate is committed at `5068f944af2aa3fe8446c77c8ae8d48673cb260b` and passed 37 files/239 tests, TypeScript, zero-warning lint, production build, and desktop/mobile Browser smoke. Exact pushed readiness/documentation head `07d1d3399cea363a2ff923c6393d4a3259ce623c` matched the remote branch and recorded `Vercel=success`; the PR-triggered GitHub Actions run list was empty. P-44 content-freeze commit `ed94c0304be2741217c7ea2c36322b426de1dfe5` is also pushed, matches upstream, and records `Vercel=success` with no PR-triggered GitHub Actions run. P-45 authorizes a bounded authority/status-only descendant commit/push; its resulting SHA and truthful Remote CI/status must be recorded outside its own commit. | Historical readiness and P-44 content-freeze Remote records Ready; P-45 resulting-HEAD Remote gate HOLD. No remote GitHub Actions test suite is claimed, and deployed artifact remains P-13 |
+| Reviewed migration fingerprint | Every filename and SHA-256 matches the accepted manifest | Package #39 records exact hashes for the eleven-file candidate `017`, `017a`, `018`-`025`, and append-only `026`; all earlier reviewed hashes remain unchanged and `026` is fixed at `472fa04b...`. P-47 repository/static review passed; P-48 authorizes its exact Git publication, while the resulting replacement source/tooling HEAD remains unrecorded. | Repository/static Ready — P-48 publication result and fresh Local gates HOLD |
+| Migration execution freeze | Exact tool versions, per-file transaction/timeouts, identity/owner continuity, stop behavior, and rollback are recorded before naming the window | Package #39 section 4.1 freezes Supabase CLI `2.107.0`, PostgreSQL major 17, eleven candidate hashes, one transaction/file, 10s migration lock timeout, 60s statement timeout except `020` at 90s, no concurrent operation, one ledger row/file, the same `current_user`/object-owner for `017`, `017a`, and `018`-`026`, stage-aware default/routine ACL verification, per-file ownership/ACL deltas, final owner/ACL/RLS inventory, stop-after-current-file rollback, and forward-fix-only post-commit recovery. | Paper/static Ready; exact-path acceptance awaits replacement Git/Remote, corrected Local integration, pass 1, authenticated schema-contract review, and pass 2 |
+| Disposable PostgreSQL 17 CLI rehearsal | Complete approved migration sequence passes all mandatory per-file postflights on fresh disposable targets | Historical rehearsal applied `017` and correctly stopped before `018` on Finding #43. P-46 later completed the canonical Local chain through `025` and failed closed on helper callability; its evidence is preserved. Append-only `026` has not been applied to Local, disposable, or Production. See [Finding #43](./43-phase4-p12-private-function-default-privilege-finding.md) and [Finding #44](./44-phase4-p46-catalog-action-error-callability-finding.md). | HOLD — replacement source freeze, fresh authorized Local proof, pass 1, independent schema-contract freeze, and pass 2 remain |
+| Repository/deployment fingerprint | Exact branch/commit and deployable build pass before P-12; actual deployed artifact is recorded at P-13 | Exact baseline `6827ebc1a729b7675fe91db58e129c9381b33ddb` and bounded application candidate `5068f944af2aa3fe8446c77c8ae8d48673cb260b` passed their recorded gates. Historical readiness/P-44 records remain valid. P-45 completed at pushed/upstream-equal `d92d8ce`, but P-46 exposed the new helper-callability defect. P-48 authorizes the exact replacement publication; its source/tooling HEAD and truthful Remote CI/status remain unrecorded. | Historical application/readiness evidence Ready; P-48 publication authorized, replacement Git/Remote result HOLD. Deployed artifact remains P-13 |
 | Fresh Production preflight | Live counts, pointer, Factor F, BOQ split, drift, and the pre-`017` flag stage recorded | Owner-authorized read-only evidence at 2026-07-26 09:53 +07 found PostgreSQL 17.6, pointer/default `2568.0.0`, 710 complete distinct authority rows, and value hash `sha256:ecd457c625c6eeb445607f30d374734c3e7ebd2a6d5489912f4c7ec42b3019a5`, exactly matching Local. Production has 232 BOQs/2,183 items with zero missing or cross-version catalog links. Factor F remains `2569.0.0`/36 with no partial snapshot. Phase 4 objects/settings, including all three Phase 4 flag rows, are absent as expected before `017`. | Ready for database scope; no Production write occurred |
 | Production Data API schemas | Platform configuration proves `private` is not exposed | Owner-authorized Management API `GET` at 2026-07-26 19:29 +07 returned exposed schemas `public, graphql_public`, extra search path `public, extensions`, and `private_exposed=false`. No token or `jwt_secret` was emitted or persisted; no setting changed. | Ready |
 | Operational catalog-authority fingerprint | Bind the runner's new `catalogAuthorityFingerprintSha256`; historical `ecd457...` is not reusable because its canonical SQL was not committed | Derive only through a separately authorized read-only query from the encrypted readiness snapshot's isolated restore or fresh in-window Production/restore evidence. Record the exact value/source in #39/#40 and bind the same value in external Production approval. | HOLD — UNCOMPUTED; a mechanically `productionEligible=true` kit is not authorized for Production and P-12 request remains prohibited |
 | Backup/restore gate | Fresh encrypted backup manifest and isolated PostgreSQL 17 restore test pass | After two rejected candidates were deleted, a third secure Owner-entered credential passed the bounded read-only identity query. At 22:48 +07 the encrypted Production application-only dump captured 234 BOQs/2,270 items and 710 catalog rows with identical source-before/after metrics. Custom dump SHA-256 is `9d306a478b8ada65d0a32ab31bca19587c55efa3ae979ae4dd8ad5871d575932`. Exact image `public.ecr.aws/supabase/postgres:17.6.1.063` restored it in a network-isolated ephemeral container using 20 UUID-only Auth dependency stubs with zero sensitive payload. Comparable counts/hashes matched; constraints, triggers, version links, Factor F snapshots, and pointers passed; container removed. On 2026-07-27 the Owner-authorized non-force detach/read-only reopen passed all eight `SHA256SUMS` entries; the bundle was detached again, Docker/Local returned healthy, and Local invariants remained exact without reset. This readiness rehearsal is not the final rollback source. Same-device acceptance expires at the earlier of the start of the post-publication checkpoint after separately approved P-15 verification or seven days (168 hours) after the recorded P-12 start. If a planned pause will exceed 24 consecutive hours, create and checksum-verify an independent encrypted copy before the pause. If an unplanned pause reaches 24 hours, stop before any further gate and complete that copy before resuming. Production writes 0. | Passed readiness rehearsal, post-write custody check, and PRE-P-12 custody decision content. Fresh in-window rollback backup/restore/sign-off, a named-human executor and distinct named-human independent verifier, the post-migration application-only backup/manifest before P-13, and final external-copy closeout remain required |
-| Hotfix `016` / migration order | Remote ledger includes `016`; corrected clean bootstrap must apply `009`-`015`, hotfix `016`, then exact `017`, `017a`, `018`-`025` before P-12 evidence is accepted | Production ledger contains the expected `009`-`016` set and no unexpected later row. The actual hotfix ledger entry is `20260706090832 hotfix_preserve_boq_item_suffix`; deployed `save_boq_with_routes` exactly matches migration `016` at SHA-256 `7187ffb568617783146d4b5f8db8021147cd212a578e655879c49f32f9fb54f0`. All four `010a` indexes are valid/ready. Existing clean Local evidence through `025` is historical pre-bridge evidence only; Local was not reset or patched. Independent review and P-44 content freeze passed. After the P-45 authority/status descendant is clean, pushed, and Remote-ready, P-46 permits exactly one corrected Local bootstrap plus consolidated invariants before any later kit/pass-1 authorization. Historical two-rebuild P-20 evidence remains valid because `017a` is data-free/ACL-only. Failure/drift stops with no retry or patch without fresh approval. | HOLD for corrected chain — P-45 resulting-HEAD/Remote status, P-46 Local result, kit, and fresh pass-1/contract/pass-2 evidence remain |
+| Hotfix `016` / migration order | Remote ledger includes `016`; a corrected clean bootstrap must apply `009`-`015`, hotfix `016`, then exact `017`, `017a`, `018`-`025`, and `026` before P-12 evidence is accepted | Production ledger contains exact `20260706090832 hotfix_preserve_boq_item_suffix` within the expected `009`-`016` set and no unexpected later row. The deployed hotfix body remains exact and must not be rerun. P-46 consumed one Local reset, reached `025`, and failed closed; no cleanup/retry is authorized. P-47 preserves every reviewed prior migration and appends only `026`; its repository/static review passed. A replacement clean pushed source/tooling HEAD plus fresh explicit reset approval is required before one new canonical Local run through `026`; failure/drift stops without retry, patch, or cleanup. | HOLD for replacement Git/Remote, fresh Local evidence, kit, and pass-1/contract/pass-2 evidence |
 | End-to-end request idempotency | UI/action/DB reuse one operation ID after timeout; changed payload with same ID rejects | Prior DB/transport/browser recovery passed; P-36 repeated replay/mismatch/race contracts; D005 recovered request `533ad2d2-c2b4-4207-8f72-1c8b8b8692b1` with one effect and no duplicate | Passed Local technical and intended-admin recovery scope |
 | Live DB integration/concurrency | Migrations, RPC/RLS/roles, rollback, two-session races, and lock timeouts pass | P-36 integrated through `021` and passed WP-6.6/WP-6.5/WP-7.5 role/rollback/race/timeout/final-cleanup evidence | Passed P-36 technical gate |
 | P-20 hash portability | Approved clean-reset/cross-environment identity/hash model passes | Final G1R/G2 comparison and P-36 integrated run reproduced 710 rows, dataset hash `sha256:2e3571ea7135fbc0bbb84c8cc330af1173e4c1d2345e5eb59958dc76e45558b8`, and mapping SHA-256 `5f68993ce5aa5c7735b0d9e6de6d27946b4846fb8a6eb77d1b6b3bd6c4a73de7` | Passed WP-8 technical rerun; P-15 acceptance pending |
@@ -1087,13 +1099,13 @@ fixed and reviewed.
 | Tracked export verifier | Clean-checkout semantic Excel/PDF verification passes | Exact `777df75` replacement pair remains owner-accepted; P-36 generated a separate active-baseline pair on `910cc3c` and its embedded/independent verifier passed with 710 rows and the same P-20 hash | Passed/accepted P-11 and passed P-36 rerun |
 | Admin UAT and recovery | Default rule: intended admin completes core workflow and representative failures without developer/SQL assistance; an Owner variance must be explicit and preserve the truthful evidence label | Placement overview/gap/sibling/leave-reload/keyboard/focus/presentation checks passed across bounded sessions. Functional Cards B-E, Spots 1-3, same-request Spot 4, final D005 cleanup, exact D007 stale-choice-banner replay, and D009 Full-import correction passed. The Owner requested live guidance and accepted the combined evidence without relabelling it independent. | Passed under the 2026-07-25 guided-UAT Owner variance; Closure Matrix #34 C-08/C-09 passed |
 | 710-row performance baseline | Import preview, readiness, export, and admin interactions meet reviewed budget | P-36 recorded 710+18 route render/deep paging/export measurements; P-42 recorded Card C phases under 1 second, Card E about 1 second, and retained export behavior. No scale measurement rerun remains. | Passed: Closure Matrix #34 C-11 |
-| Authority/document consistency | Migration/WP order, decision IDs, authority links, current status, and Markdown table shapes agree | P-37 closure remains accepted. Decision Register #19, Tracker #25, this report, Package #39, Checklist #40, CLI Runbook #41, Finding #43, and architecture/security amendments record the same Owner-selected `017a` identity/security contract and P-43 order. Independent review/static checks and P-44 content freeze passed. P-45 authorizes only the authority/status descendant; P-46 conditionally authorizes exactly one corrected Local bootstrap. Kit/pass 1/authenticated review/pass 2 and all later gates remain separate. | Content freeze Ready; P-45/P-46 recorded; HOLD at resulting-HEAD/Remote and Local evidence; P-12 remains unrequested |
+| Authority/document consistency | Migration/WP order, decision IDs, authority links, current status, and Markdown table shapes agree | P-37 closure remains accepted. Decision Register #19, Tracker #25, this report, Package #39, Checklist #40, CLI Runbook #41, Findings #43/#44, and architecture/security amendments record the same immutable `017a` bridge, P-46 fail-closed result, append-only `026` contract, P-47 static closure, and exact P-48 Git-only authority. Kit/pass 1/authenticated review/pass 2 and all later gates remain separate. | P-47 repository/static Ready; P-48 Git-only publication authorized; P-12 remains HOLD and unrequested |
 | General-user catalog-version visibility | Current/default pages show pointer-derived year/version; a new BOQ discloses and rechecks its pending binding; existing BOQ edit/print/Excel show the immutable bound version rather than the later current pointer | Local staff desktop/mobile Browser smoke showed current `2568.0.0` on dashboard, price list, and create; an existing BOQ edit/read-only page showed bound `2568.0.0`. Printed pages preserve the official `บัญชีราคา` heading and carry a small bottom-right bound-version stamp. No horizontal overflow or console error was observed. Binary Excel verification checks route and summary labels. Invalid/unpublished bindings fail closed. | Candidate passed; no data mutation, migration, reset, Production access, Factor F, or hotfix change |
 | BOQ regression | Current BOQ flows and historical version links unchanged | P-29/G4E permanent suffix/save/print/export and binding-copy harness passed; P-36 repeated it after integrated `021`; final baseline remains 198 BOQs/1,547 items with zero unversioned BOQs | Passed WP-7 and P-36 Local rerun |
 | Factor F before/after assertion | Pointer, rows, hashes, grants, RLS, and BOQ bindings unchanged | P-29/G4E structural/regression harness passed; P-36 and final P-37 cleanup retained default `2569.0.0` with 36 rows and unchanged BOQ bindings | Passed WP-7 and later Local reruns; no new Factor F scope |
 | Advisors | No unresolved Phase 4 blocker | Fresh Production security output has seven authenticated-callable baseline definers plus disabled leaked-password protection. All seven deny `anon`; mutating facades retain internal authorization, while `get_user_role(uuid)`/`is_admin(uuid)` remain post-Phase-4 minimization candidates. Performance output has 19 init-plan, 5 multiple-permissive-policy, 8 unindexed-FK, and 16 unused-index baseline findings. The Owner accepted the guarded-definer and `v_row_count` dispositions and accepts leaked-password protection disabled for P-12/P-13 only. | Ready for PRE-P-12 content; fresh post-migration diff mandatory and P-14 Auth decision remains HOLD |
-| Feature-flag lifecycle | Before `017`: all three rows absent. After `017`, `017a`, `018`, and `019`: only `catalog_admin_enabled` exists and is boolean `false`. After `020`-`025`: all three rows exist and are boolean `false`. No stage permits boolean `true`. | Fresh Production preflight is at the expected pre-`017` absent state; historical clean-chain and final Local evidence are at the expected post-`025` all-three-false state. | Stage contract Ready; corrected-chain live after-file verification remains mandatory and deploy/enablement remain P-13/P-14 |
-| P-12 readiness package | Evidence reviewed before Production migration request | [Package #39](./39-phase4-p12-production-readiness-package.md) contains exact source/build, ten-file candidate manifest, historical Local baseline, security/debt disposition, selected `017a` contract, remaining evidence, and stop conditions | HOLD; independent source/static review and P-44 content freeze passed; P-45 checkpoint and conditional P-46 one-time Local authority are recorded, while their resulting-HEAD/Remote and Local evidence plus fresh two-pass rehearsal remain; P-12 not requested |
+| Feature-flag lifecycle | Before `017`: all three rows absent. After `017`, `017a`, `018`, and `019`: only `catalog_admin_enabled` exists and is boolean `false`. After `020`-`026`: all three rows exist and are boolean `false`. No stage permits boolean `true`. | Fresh Production preflight is at the expected pre-`017` absent state; P-46's post-`025` Local state retained all three false. A fresh authorized corrected-chain run must prove the same state after `026`. | Stage contract Ready; corrected-chain live after-file verification remains mandatory and deploy/enablement remain P-13/P-14 |
+| P-12 readiness package | Evidence reviewed before Production migration request | [Package #39](./39-phase4-p12-production-readiness-package.md) contains exact source/build, eleven-file candidate manifest, historical and P-46 Local evidence, security/debt disposition, `017a` and `026` contracts, remaining evidence, and stop conditions | HOLD; replacement Git/Remote, fresh Local, and two-pass rehearsal remain; P-12 not requested |
 | P-13 readiness package | Evidence reviewed after migration verification and the post-migration application-only backup/manifest, before deploy request |  | Pending |
 | P-14 readiness package | Evidence reviewed after deploy/admin smoke and before enablement request |  | Pending |
 | P-15 separation | Publication not implied; final metadata/diff/count/hash/export approval still separate |  | Pending |

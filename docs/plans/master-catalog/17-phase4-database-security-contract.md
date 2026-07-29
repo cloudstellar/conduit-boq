@@ -13,8 +13,8 @@ decision only: it does not change this database/security contract, weaken a
 guard, authorize SQL repair, or authorize Production. Add/Supplement remains
 hidden until P-14 and P-12 remains a separate readiness request.
 
-**Last updated:** 2026-07-25 to record the P-37 evidence-governance decision;
-the database contract remains unchanged after the P-39
+**Last updated:** 2026-07-29 to record the P-46/P-47 helper-callability
+correction; the database contract otherwise remains unchanged after the P-39
 draft-identity/release-number correction and WP-6.6 capability/authority
 hardening from
 [Audit #29](./29-phase4-owner-dev-completeness-audit.md), the P-22
@@ -96,6 +96,20 @@ WP-6.6 smoke passed. Owner-approved exact execution source
 `adcca3939f3080cdf64bc6ad807051e9e85fed94` then passed the clean
 `009`-`015`, hotfix `016`, `017`-`025` chain and final disabled-baseline
 readback. Owner-UAT and all Production gates remain open.
+
+**P-46/P-47 helper-callability amendment:** 2026-07-29 — the single
+Owner-authorized P-46 canonical Local bootstrap on exact pushed source
+`d92d8ced42fc882481ebc2c4579adcf1edbebea7` applied through `025`, then WP-6.5
+failed closed when authenticated draft creation entered a guarded error branch
+and the invoker wrapper could not execute
+`private.catalog_action_error(uuid,text,text,boolean,jsonb)`. P-47 authorizes
+the repository-only append-only `026` candidate to retain the helper's exact
+owner/signature/body/empty-search-path metadata, remove unnecessary definer
+authority, and grant execute only to owner plus `authenticated`. The `017a`
+global/schema defaults remain owner-only; `PUBLIC`, `anon`, and `service_role`
+remain denied. No Local reset/apply, disposable execution, Production action,
+Git publication, Factor F change, hotfix work, or unused-`v_row_count` cleanup
+is authorized.
 
 **Owner decision recorded:** 2026-07-04 — approved according to the
 recommendation as the technical backbone for Phase 4A and every Phase 4 write
@@ -758,6 +772,17 @@ Revoke `EXECUTE` from `PUBLIC` and `anon` on every signature. Grant only the
 minimum `private` schema usage/function execution necessary for the public
 wrapper call path. Verify that `private` is not an exposed Data API schema.
 
+Pure private helpers are not privileged merely because they reside in
+`private`. The exact
+`private.catalog_action_error(uuid,text,text,boolean,jsonb)` formatter reads no
+relation, performs no side effect, and only constructs caller-context JSON.
+Because authenticated `SECURITY INVOKER` wrappers call it directly, its final
+contract is `SECURITY INVOKER`, `SET search_path = ''`, owner `postgres`, and
+an exact owner-plus-`authenticated` `EXECUTE` ACL. `PUBLIC`, `anon`, and
+`service_role` remain denied. Any future pure-helper exception requires its own
+reviewed signature, caller graph, body fingerprint, and explicit ACL; it does
+not weaken the definer rules for privileged transactional implementations.
+
 ### Function output
 
 Return stable machine codes and identifiers. Map them to the application
@@ -966,7 +991,9 @@ P-39R migrations `022`-`024` are accepted history and must not be edited.
 P-41 appends `025_master_catalog_phase4_withdraw_order_compaction.sql` after
 `024`; the historical pre-bridge Local bootstrap covered `017` through `025`.
 For the corrected PRE-P-12 chain, the canonical order is `017` → `017a` →
-`018` → … → `025`. Incremental Local apply was not treated as a substitute:
+`018` → … → `025` → `026`, where `026` is the distinct targeted helper-ACL
+correction described below. Incremental Local apply was not treated as a
+substitute:
 after a new explicit destructive-reset warning/approval, the historical clean
 integrated execution passed on exact pushed
 `adcca3939f3080cdf64bc6ad807051e9e85fed94`. Any future reset still requires
@@ -1001,6 +1028,48 @@ and verifies `pg_default_acl` structurally. It contains no table/data/flag,
 BOQ, Factor F, Auth, or Storage mutation. Any unexpected private routine,
 unknown default-ACL grantee/grantor, wrong owner, or wrong stub posture aborts
 the transaction.
+
+## 12.2 PRE-P-12 catalog-action-error callability correction
+
+P-46 consumed its one-run Local authorization and failed closed after the
+corrected chain applied successfully. The defect is underprivilege, not an
+authorization bypass: the authenticated public invoker wrapper is executable,
+but its guarded response path calls the owner-only pure formatter. The
+append-only fix is:
+
+| Field | Exact value |
+|---|---|
+| Source file | `026_master_catalog_phase4_catalog_action_error_acl.sql` |
+| Ledger | `20260729002600 master_catalog_phase4_catalog_action_error_acl` |
+| SHA-256 | `472fa04b81bc8e96e9b507e20fc20cfee3114c80fda45f2ffba3893480920d8a` |
+| Required predecessor | `025_master_catalog_phase4_withdraw_order_compaction.sql` |
+
+Migration `026` must preflight the exact post-`025` state: both session and
+current role are `postgres`; the schema/function owner, exact signature,
+single-overload shape, SQL language, `jsonb` result, volatile/parallel/strict/
+leakproof metadata, two defaults, empty `search_path`, reviewed source-body
+fingerprint, owner-only starting ACL, authenticated private-schema usage, three
+disabled Phase 4 flags, and the `017a` global/schema owner-only defaults. It
+then:
+
+1. alters only the exact helper to `SECURITY INVOKER`;
+2. revokes execute from `PUBLIC`, `anon`, `authenticated`, and `service_role`;
+3. grants execute back only to `authenticated`; and
+4. post-verifies exact owner-plus-authenticated ACL and all preserved metadata,
+   flags, and default privileges.
+
+Owner execution remains available for private definer callers through normal
+ownership. The helper body, owner, signature, defaults, empty `search_path`,
+and result contract do not change. No global or schema default privilege,
+business row, feature flag, BOQ, Factor F, Auth, Storage, hotfix `016`, or
+other function ACL changes. The separate unused `v_row_count` observation is
+not part of `026`; it remains non-runtime readability debt for a later
+separately reviewed forward change.
+
+P-47 authorizes only repository implementation, tooling/tests, and authority
+alignment. It does not authorize Local cleanup/reset/apply, disposable
+execution, kit/pass execution, Production, or Git publication. See
+[Finding #44](./44-phase4-p46-catalog-action-error-callability-finding.md).
 
 ## 13. Required pre/post assertions
 
@@ -1055,6 +1124,9 @@ the transaction.
 - exactly one enabled AFTER DELETE statement trigger with OLD transition table
   owns draft-withdraw compaction; no row-level or duplicate compaction trigger
   exists;
+- the exact catalog-action-error helper is invoker, retains its reviewed body/
+  owner/signature/empty-search-path metadata, grants execute only to owner plus
+  `authenticated`, and remains denied to `PUBLIC`, `anon`, and `service_role`;
 - security/performance advisors have no unresolved blocker.
 
 The current Local Studio advisor rule set used at G2 reports eight
@@ -1113,3 +1185,4 @@ covering indexes.
 - [Parser and canonical hash specification](./14-phase4-parser-and-canonical-hash-spec.md)
 - [Phase 4 verification report](./13-phase4-verification-report.md)
 - [Post-Factor-F adjustment plan](./22-phase4-post-factor-f-adjustment-plan.md)
+- [P-46 catalog-action-error callability finding](./44-phase4-p46-catalog-action-error-callability-finding.md)

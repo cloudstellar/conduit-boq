@@ -29,7 +29,7 @@ import { fileURLToPath, pathToFileURL } from 'node:url'
 import { createHash } from 'node:crypto'
 import { createRequire } from 'node:module'
 
-export const KIT_SCHEMA = 'conduit-boq/master-catalog-p12-cli-kit/v1'
+export const KIT_SCHEMA = 'conduit-boq/master-catalog-p12-cli-kit/v2'
 export const REQUIRED_SUPABASE_CLI_VERSION = '2.107.0'
 export const REQUIRED_POSTGRES_MAJOR = 17
 export const CLIENT_TIMEOUT_SECONDS = 180
@@ -163,6 +163,14 @@ export const PHASE4_MIGRATIONS = Object.freeze([
     version: '20260728002500',
     ledgerName: 'master_catalog_phase4_withdraw_order_compaction',
     sha256: '00d79d7750aa52ba7f003f6bb82fedb1d31ab111be417d74329c1cd3d899f76f',
+  },
+  {
+    ordinal: '026',
+    sourceFile:
+      '026_master_catalog_phase4_catalog_action_error_acl.sql',
+    version: '20260729002600',
+    ledgerName: 'master_catalog_phase4_catalog_action_error_acl',
+    sha256: '472fa04b81bc8e96e9b507e20fc20cfee3114c80fda45f2ffba3893480920d8a',
   },
 ])
 
@@ -319,7 +327,7 @@ export function extractOwnedObjectTargets(sql) {
   const relationPattern =
     /\b(?:CREATE\s+TABLE(?:\s+IF\s+NOT\s+EXISTS)?|ALTER\s+TABLE(?:\s+IF\s+EXISTS)?)\s+(public|private)\.([a-zA-Z_][a-zA-Z0-9_$]*)/gi
   const routinePattern =
-    /\bCREATE\s+(?:OR\s+REPLACE\s+)?FUNCTION\s+(public|private)\.([a-zA-Z_][a-zA-Z0-9_$]*)\s*\(/gi
+    /\b(?:CREATE\s+(?:OR\s+REPLACE\s+)?|ALTER\s+)FUNCTION\s+(public|private)\.([a-zA-Z_][a-zA-Z0-9_$]*)\s*\(/gi
 
   for (const match of sql.matchAll(relationPattern)) {
     relations.push({ schema: match[1].toLowerCase(), name: match[2] })

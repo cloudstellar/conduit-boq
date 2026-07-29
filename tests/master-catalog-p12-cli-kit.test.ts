@@ -37,9 +37,12 @@ import {
   APPROVAL_SCHEMA,
   APPROVAL_SCOPE,
   CLI_USAGE,
+  CATALOG_ACTION_ERROR_SIGNATURE,
   EVIDENCE_MANIFEST_SCHEMA,
+  FINAL_CLOSEOUT_CONTEXT_SCHEMA,
   FINAL_CLOSEOUT_EVIDENCE_MANIFEST_SCHEMA,
   FINAL_CLOSEOUT_SIGNOFF_SCHEMA,
+  FINAL_MIGRATION_ORDINAL,
   HOTFIX_016_FUNCTION_SIGNATURE,
   HOTFIX_016_PROSRC_LENGTH,
   HOTFIX_016_PROSRC_SHA256,
@@ -88,6 +91,7 @@ import {
   schemaShapeContractReviewPayloadSha256,
   snapshotQueryDefinitions,
   validateApprovalRecord,
+  validateCatalogActionErrorAcl,
   validateCatalogSnapshot,
   validateFactorAndBoq,
   validateFlags,
@@ -394,6 +398,26 @@ function privateSchemaAcl(authenticatedUsage: boolean) {
   };
 }
 
+function catalogActionErrorRoutine(
+  overrides: Record<string, unknown> = {},
+) {
+  return {
+    schema_name: 'private',
+    object_name: 'catalog_action_error',
+    oid: '42',
+    signature: CATALOG_ACTION_ERROR_SIGNATURE,
+    owner: REQUIRED_CURRENT_USER,
+    security_definer: false,
+    function_config: 'search_path=""',
+    acl: '{postgres=X/postgres,authenticated=X/postgres}',
+    public_execute: false,
+    anon_execute: false,
+    authenticated_execute: true,
+    service_role_execute: false,
+    ...overrides,
+  };
+}
+
 function processIsAlive(pid: number) {
   try {
     process.kill(pid, 0);
@@ -612,12 +636,16 @@ describe.sequential('Master Catalog P-12 CLI kit', () => {
       ['023', '20260728002300'],
       ['024', '20260728002400'],
       ['025', '20260728002500'],
+      ['026', '20260729002600'],
     ]);
     expect(PHASE4_MIGRATIONS.every(
       (migration) => /^[0-9a-f]{64}$/.test(migration.sha256),
     )).toBe(true);
     expect(P12_AUTHORITY_FILES).toContain(
       'docs/plans/master-catalog/43-phase4-p12-private-function-default-privilege-finding.md',
+    );
+    expect(P12_AUTHORITY_FILES).toContain(
+      'docs/plans/master-catalog/44-phase4-p46-catalog-action-error-callability-finding.md',
     );
   });
 
@@ -630,7 +658,7 @@ describe.sequential('Master Catalog P-12 CLI kit', () => {
     expect((await stat(LOCAL_SUPABASE_CLI)).isFile()).toBe(true);
   });
 
-  it('prepares ten cumulative one-pending-file workdirs with byte-exact copies', async () => {
+  it('prepares eleven cumulative one-pending-file workdirs with byte-exact copies', async () => {
     const root = await temporaryRoot();
     const outputPath = join(root, 'kit');
     const result = await prepareP12CliKit({
@@ -645,7 +673,7 @@ describe.sequential('Master Catalog P-12 CLI kit', () => {
     expect(result.outputPath).toBe(await realpath(outputPath));
     expect(result.manifest.schema).toBe(KIT_SCHEMA);
     expect(result.manifest.productionEligible).toBe(true);
-    expect(result.manifest.steps).toHaveLength(10);
+    expect(result.manifest.steps).toHaveLength(11);
     expect(result.manifest.applicationCandidate).toBe(APPLICATION_CANDIDATE);
     expect(result.manifest.generatorSourceSha256).toBe(
       await sha256File(join(REPOSITORY_ROOT, P12_KIT_GENERATOR_SOURCE)),
@@ -740,6 +768,48 @@ describe.sequential('Master Catalog P-12 CLI kit', () => {
       schema: 'public',
       name: 'apply_catalog_changes',
     });
+  });
+
+  it('keeps the migration 026 ALTER FUNCTION target in both ownership inventories', async () => {
+    const migration026 = PHASE4_MIGRATIONS.find(
+      (migration) => migration.ordinal === '026',
+    );
+    expect(migration026).toBeDefined();
+    const sql = await readFile(
+      join(
+        REPOSITORY_ROOT,
+        'migrations',
+        migration026!.sourceFile,
+      ),
+      'utf8',
+    );
+    expect(extractOwnedObjectTargets(sql).routines).toContainEqual({
+      schema: 'private',
+      name: 'catalog_action_error',
+    });
+
+    const root = await temporaryRoot();
+    const result = await prepareP12CliKit({
+      outputPath: join(root, 'kit'),
+      checkCliVersion: false,
+      repositoryState: {
+        gitHead: 'a'.repeat(40),
+        trackedWorktreeClean: true,
+      },
+    });
+    const step026 = result.manifest.steps.find(
+      (step: { ordinal: string }) => step.ordinal === '026',
+    );
+    const expectedTarget = {
+      schema: 'private',
+      name: 'catalog_action_error',
+    };
+    expect(step026?.objectTargetsBefore.routines).toContainEqual(
+      expectedTarget,
+    );
+    expect(step026?.objectTargetsAfter.routines).toContainEqual(
+      expectedTarget,
+    );
   });
 
   it('accepts only passwordless loopback rehearsal and frozen Production URLs', () => {
@@ -986,7 +1056,7 @@ describe.sequential('Master Catalog P-12 CLI kit', () => {
   it('binds schema review to an exact approved GitHub PR review envelope', () => {
     const record = schemaShapeContractRecord();
     expect(SCHEMA_SHAPE_CONTRACT_SCHEMA).toBe(
-      'conduit-boq/master-catalog-p12-schema-shape-contract/v2',
+      'conduit-boq/master-catalog-p12-schema-shape-contract/v3',
     );
     expect(validateSchemaShapeGithubReview(record, {
       now: new Date('2026-07-28T09:00:00+07:00'),
@@ -1089,9 +1159,14 @@ describe.sequential('Master Catalog P-12 CLI kit', () => {
       now: new Date('2026-07-28T09:00:00+07:00'),
     });
     expect(
-      expectedSchemaShapeFingerprint(contract, '025'),
-    ).toBe(distinctSchemaFingerprints['025']);
-    expect(contract.pass1Evidence.manifest.stage).toBe('025');
+      expectedSchemaShapeFingerprint(
+        contract,
+        FINAL_MIGRATION_ORDINAL,
+      ),
+    ).toBe(distinctSchemaFingerprints[FINAL_MIGRATION_ORDINAL]);
+    expect(contract.pass1Evidence.manifest.stage).toBe(
+      FINAL_MIGRATION_ORDINAL,
+    );
 
     await chmod(contractPath, 0o400);
     await expect(loadSchemaShapeContract(contractPath, {
@@ -1320,6 +1395,51 @@ describe.sequential('Master Catalog P-12 CLI kit', () => {
       ...HISTORICAL_MIGRATIONS,
       ...PHASE4_MIGRATIONS.slice(0, 3),
     ])).toThrow('service_role');
+  });
+
+  it('requires the exact least-privilege catalog_action_error posture after migration 026', () => {
+    const through025 = [
+      ...HISTORICAL_MIGRATIONS,
+      ...PHASE4_MIGRATIONS.slice(0, -1),
+    ];
+    expect(() => validateCatalogActionErrorAcl(
+      [catalogActionErrorRoutine({ security_definer: true })],
+      through025,
+    )).not.toThrow();
+
+    const through026 = [
+      ...HISTORICAL_MIGRATIONS,
+      ...PHASE4_MIGRATIONS,
+    ];
+    expect(() => validateCatalogActionErrorAcl(
+      [catalogActionErrorRoutine()],
+      through026,
+    )).not.toThrow();
+    expect(() => validateCatalogActionErrorAcl(
+      [catalogActionErrorRoutine({ security_definer: true })],
+      through026,
+    )).toThrow('SECURITY INVOKER');
+    expect(() => validateCatalogActionErrorAcl(
+      [catalogActionErrorRoutine({
+        acl:
+          '{postgres=X/postgres,authenticated=X*/postgres}',
+      })],
+      through026,
+    )).toThrow('without grant option');
+    expect(() => validateCatalogActionErrorAcl(
+      [catalogActionErrorRoutine({ service_role_execute: true })],
+      through026,
+    )).toThrow('service_role');
+    expect(() => validateCatalogActionErrorAcl(
+      [
+        catalogActionErrorRoutine(),
+        catalogActionErrorRoutine({
+          oid: '43',
+          signature: 'private.catalog_action_error(text)',
+        }),
+      ],
+      through026,
+    )).toThrow('exactly one');
   });
 
   it('requires disposable sentinel and prior verifier signoff CLI boundaries', () => {
@@ -1738,8 +1858,8 @@ describe.sequential('Master Catalog P-12 CLI kit', () => {
       '--db-url',
       `postgresql://postgres@127.0.0.1:55432/${REHEARSAL_DATABASE_NAME}?sslmode=disable`,
       '--evidence', '/external/closeout-evidence',
-      '--step-025-evidence-manifest',
-      '/external/025/05-evidence-manifest.json',
+      '--final-migration-evidence-manifest',
+      '/external/026/05-evidence-manifest.json',
       '--final-signoff', '/external/final-signoff.json',
       '--verifier-label', 'verifier-b',
       '--schema-shape-contract', '/external/schema-shape-contract.json',
@@ -1750,12 +1870,12 @@ describe.sequential('Master Catalog P-12 CLI kit', () => {
     expect(parseCloseoutArguments(common)).toMatchObject({
       mode: 'rehearsal',
       verifier_label: 'verifier-b',
-      step_025_evidence_manifest:
-        '/external/025/05-evidence-manifest.json',
+      final_migration_evidence_manifest:
+        '/external/026/05-evidence-manifest.json',
     });
     expect(() => parseCloseoutArguments([
       ...common,
-      '--step', '025',
+      '--step', FINAL_MIGRATION_ORDINAL,
     ])).toThrow('Unknown closeout argument');
     expect(() => parseCloseoutArguments(
       common.filter((value, index) =>
@@ -1899,7 +2019,7 @@ describe.sequential('Master Catalog P-12 CLI kit', () => {
     })).rejects.toThrow('not freshly captured');
   });
 
-  it('requires an exact 0600 final verifier closeout bound to complete step 025 evidence', async () => {
+  it('requires an exact 0600 final verifier closeout bound to complete final-migration evidence', async () => {
     const root = await realpath(await temporaryRoot());
     const gitHead = 'a'.repeat(40);
     const preparedKit = await prepareP12CliKit({
@@ -1912,7 +2032,7 @@ describe.sequential('Master Catalog P-12 CLI kit', () => {
     });
     const kit = await verifyKit(
       preparedKit.outputPath,
-      '025',
+      FINAL_MIGRATION_ORDINAL,
       'rehearsal',
     );
     const kitManifestSha256 = await sha256File(kit.manifestPath);
@@ -1952,17 +2072,26 @@ describe.sequential('Master Catalog P-12 CLI kit', () => {
         }),
       ),
       routines: kit.step.objectTargetsAfter.routines.map(
-        (target: { schema: string; name: string }, index: number) => ({
-          schema_name: target.schema,
-          object_name: target.name,
-          oid: String(index + 1),
-          owner: REQUIRED_CURRENT_USER,
-          signature: `${target.schema}.${target.name}()`,
-          public_execute: false,
-          anon_execute: false,
-          authenticated_execute: false,
-          service_role_execute: false,
-        }),
+        (target: { schema: string; name: string }, index: number) =>
+          target.schema === 'private'
+            && target.name === 'catalog_action_error'
+            ? catalogActionErrorRoutine({
+                oid: String(index + 1),
+              })
+            : {
+                schema_name: target.schema,
+                object_name: target.name,
+                oid: String(index + 1),
+                owner: REQUIRED_CURRENT_USER,
+                signature: `${target.schema}.${target.name}()`,
+                security_definer: false,
+                function_config: 'search_path=""',
+                acl: '{postgres=X/postgres}',
+                public_execute: false,
+                anon_execute: false,
+                authenticated_execute: false,
+                service_role_execute: false,
+              },
       ),
       policies: [],
       relationGrants: [],
@@ -1976,7 +2105,7 @@ describe.sequential('Master Catalog P-12 CLI kit', () => {
     const files: Record<string, unknown> = {
       '00-context.json': {
         mode: 'rehearsal',
-        step: '025',
+        step: FINAL_MIGRATION_ORDINAL,
         gitHead,
         kitManifestSha256,
         executor: 'Executor A',
@@ -2026,7 +2155,7 @@ describe.sequential('Master Catalog P-12 CLI kit', () => {
         factorAndBoq: factorAndBoqSnapshot(),
         hotfix016: hotfix016Snapshot(),
         schemaShape: schemaShapeSnapshot(
-          distinctSchemaFingerprints['025'],
+          distinctSchemaFingerprints[FINAL_MIGRATION_ORDINAL],
         ),
         ownershipAndAclInventory,
       },
@@ -2046,7 +2175,7 @@ describe.sequential('Master Catalog P-12 CLI kit', () => {
     await writeSecureJson(evidenceManifestPath, {
       schema: EVIDENCE_MANIFEST_SCHEMA,
       createdAt: '2026-07-28T10:02:00+07:00',
-      step: '025',
+      step: FINAL_MIGRATION_ORDINAL,
       mode: 'rehearsal',
       gitHead,
       kitManifestSha256,
@@ -2056,10 +2185,10 @@ describe.sequential('Master Catalog P-12 CLI kit', () => {
     const signoff = {
       schema: FINAL_CLOSEOUT_SIGNOFF_SCHEMA,
       decision: 'P12_EXECUTION_VERIFIED',
-      step: '025',
+      step: FINAL_MIGRATION_ORDINAL,
       executionGitHead: gitHead,
       kitManifestSha256,
-      step025Executor: 'Executor A',
+      finalMigrationExecutor: 'Executor A',
       independentVerifier: 'verifier-b',
       independentVerificationCompleted: true,
       securityContractReviewed: true,
@@ -2070,23 +2199,23 @@ describe.sequential('Master Catalog P-12 CLI kit', () => {
       factorAndBoqFingerprintsReviewed: true,
       ledgerAndFlagsReviewed: true,
       schemaShapeContractSha256: schemaShapeContract.sha256,
-      step025SchemaShapeFingerprintSha256:
-        distinctSchemaFingerprints['025'],
+      finalMigrationSchemaShapeFingerprintSha256:
+        distinctSchemaFingerprints[FINAL_MIGRATION_ORDINAL],
       advisorArtifactPath: advisorArtifact.path,
       advisorArtifactSha256: advisorArtifact.sha256,
       advisorArtifactCapturedAt: '2026-07-28T10:02:30+07:00',
       p13Authorized: false,
       automaticNextStep: false,
       reviewedAt: '2026-07-28T10:03:00+07:00',
-      step025EvidenceManifestPath: evidenceManifestPath,
-      step025EvidenceManifestSha256:
+      finalMigrationEvidenceManifestPath: evidenceManifestPath,
+      finalMigrationEvidenceManifestSha256:
         await sha256File(evidenceManifestPath),
-      step025OutcomeSha256:
+      finalMigrationOutcomeSha256:
         fileHashes['02-migration-outcome.json'],
-      step025PostflightSha256:
+      finalMigrationPostflightSha256:
         fileHashes['03-postflight.json'],
     };
-    const signoffPath = join(root, '025-final-signoff.json');
+    const signoffPath = join(root, 'final-migration-signoff.json');
     await writeSecureJson(signoffPath, signoff, 0o600);
 
     await expect(loadFinalCloseoutSignoff(signoffPath, {
@@ -2104,10 +2233,52 @@ describe.sequential('Master Catalog P-12 CLI kit', () => {
         independentVerifier: 'verifier-b',
         p13Authorized: false,
       },
-      step025Evidence: {
+      finalMigrationEvidence: {
         path: evidenceManifestPath,
       },
     });
+
+    const staleStep025Signoff: Record<string, unknown> = {
+      ...signoff,
+      schema:
+        'conduit-boq/master-catalog-p12-final-verifier-closeout/v1',
+      step: '025',
+      step025Executor: signoff.finalMigrationExecutor,
+      step025SchemaShapeFingerprintSha256:
+        signoff.finalMigrationSchemaShapeFingerprintSha256,
+      step025EvidenceManifestPath:
+        signoff.finalMigrationEvidenceManifestPath,
+      step025EvidenceManifestSha256:
+        signoff.finalMigrationEvidenceManifestSha256,
+      step025OutcomeSha256:
+        signoff.finalMigrationOutcomeSha256,
+      step025PostflightSha256:
+        signoff.finalMigrationPostflightSha256,
+    };
+    for (const field of [
+      'finalMigrationExecutor',
+      'finalMigrationSchemaShapeFingerprintSha256',
+      'finalMigrationEvidenceManifestPath',
+      'finalMigrationEvidenceManifestSha256',
+      'finalMigrationOutcomeSha256',
+      'finalMigrationPostflightSha256',
+    ]) {
+      delete staleStep025Signoff[field];
+    }
+    await writeSecureJson(
+      signoffPath,
+      staleStep025Signoff,
+      0o600,
+    );
+    await expect(loadFinalCloseoutSignoff(signoffPath, {
+      mode: 'rehearsal',
+      currentHead: gitHead,
+      kitManifestSha256,
+      objectTargets: kit.step.objectTargetsAfter,
+      schemaShapeContract,
+      advisorArtifact,
+      now: new Date('2026-07-28T10:04:00+07:00'),
+    })).rejects.toThrow('keys do not match the frozen manifest');
 
     await writeSecureJson(signoffPath, {
       ...signoff,
@@ -2142,8 +2313,7 @@ describe.sequential('Master Catalog P-12 CLI kit', () => {
     await mkdir(pass2Root, { mode: 0o700 });
     const rehearsalSentinelNonceSha256 = 'd'.repeat(64);
     const closeoutContext = {
-      schema:
-        'conduit-boq/master-catalog-p12-final-closeout-evidence/v1',
+      schema: FINAL_CLOSEOUT_CONTEXT_SCHEMA,
       mode: 'rehearsal',
       gitHead,
       applicationCandidate: APPLICATION_CANDIDATE,
@@ -2156,18 +2326,18 @@ describe.sequential('Master Catalog P-12 CLI kit', () => {
       pass1EvidenceManifestSha256:
         schemaShapeContract.record.pass1EvidenceManifestSha256,
       expectedSchemaShapeSha256:
-        distinctSchemaFingerprints['025'],
+        distinctSchemaFingerprints[FINAL_MIGRATION_ORDINAL],
       advisorArtifactPath: advisorArtifact.path,
       advisorArtifactSha256: advisorArtifact.sha256,
       advisorArtifactBytes: (await stat(advisorArtifact.path)).size,
       advisorArtifactCapturedAt:
         signoff.advisorArtifactCapturedAt,
-      step025EvidenceManifestPath: evidenceManifestPath,
-      step025EvidenceManifestSha256:
-        signoff.step025EvidenceManifestSha256,
+      finalMigrationEvidenceManifestPath: evidenceManifestPath,
+      finalMigrationEvidenceManifestSha256:
+        signoff.finalMigrationEvidenceManifestSha256,
       finalCloseoutSignoffPath: signoffPath,
       finalCloseoutSignoffSha256: await sha256File(signoffPath),
-      step025Executor: signoff.step025Executor,
+      finalMigrationExecutor: signoff.finalMigrationExecutor,
       independentVerifier: signoff.independentVerifier,
       rehearsalSentinelNonceSha256,
       supabaseCliVersion: REQUIRED_SUPABASE_CLI_VERSION,
@@ -2197,7 +2367,7 @@ describe.sequential('Master Catalog P-12 CLI kit', () => {
       securityContractReviewed: true,
       advisorDeltaTriaged: true,
       liveBoundaryRechecked: true,
-      step025EvidenceConsumed: true,
+      finalMigrationEvidenceConsumed: true,
       finalSignoffConsumed: true,
       readOnly: true,
       migrationPerformed: false,
@@ -2234,8 +2404,8 @@ describe.sequential('Master Catalog P-12 CLI kit', () => {
       mode: 'rehearsal',
       gitHead,
       kitManifestSha256,
-      step025EvidenceManifestSha256:
-        signoff.step025EvidenceManifestSha256,
+      finalMigrationEvidenceManifestSha256:
+        signoff.finalMigrationEvidenceManifestSha256,
       finalCloseoutSignoffSha256:
         closeoutContext.finalCloseoutSignoffSha256,
       p13Authorized: false,
@@ -2268,7 +2438,7 @@ describe.sequential('Master Catalog P-12 CLI kit', () => {
       path: pass2ManifestPath,
       finalCloseoutSignoff: {
         path: signoffPath,
-        step025Evidence: {
+        finalMigrationEvidence: {
           path: evidenceManifestPath,
         },
       },
@@ -2362,6 +2532,14 @@ describe.sequential('Master Catalog P-12 CLI kit', () => {
       minimumRemainingMs: INITIAL_WINDOW_BUDGET_MS,
       windowPhase: 'test initial budget',
     })).not.toThrow();
+    expect(() => validateApprovalRecord(approvalRecord({
+      schema:
+        'conduit-boq/master-catalog-p12-production-approval/v2',
+      scope: 'P-12-migrations-017-017a-018-through-025-only',
+    }), {
+      now,
+      currentHead: 'a'.repeat(40),
+    })).toThrow('not frozen P-12 v3');
     expect(() => validateApprovalRecord(approvalRecord({
       independentVerifier: 'Executor A',
     }), {

@@ -76,6 +76,26 @@ one-revision assertions. After a fresh warning and approval, exact pushed
 readback passed. Fresh scored Owner UAT remains the next gate. Production, BOQ,
 Factor F, and hotfix scope are unchanged.
 
+**P-46/P-47 PRE-P-12 callability amendment:** 2026-07-29 — the one authorized
+P-46 canonical Local bootstrap on exact pushed source
+`d92d8ced42fc882481ebc2c4579adcf1edbebea7` applied the corrected chain through
+`025` and then failed closed in WP-6.5. The authenticated
+`SECURITY INVOKER` draft-create wrapper reached the guarded
+`DRAFT_ALREADY_EXISTS` branch but could not execute the owner-only pure
+`private.catalog_action_error` formatter. P-47 authorizes repository-only
+append-only correction
+`026_master_catalog_phase4_catalog_action_error_acl.sql`; it preserves the
+helper's signature, SQL body, owner, empty `search_path`, and pure JSON
+semantics, changes it to `SECURITY INVOKER`, and grants `EXECUTE` only to the
+owner and `authenticated`. `PUBLIC`, `anon`, and `service_role` remain denied,
+and the global/schema default-privilege guard from `017a` is unchanged. This is
+a distinct least-privilege callability correction after `025`, not a substitute
+for placing `017a` between `017` and `018`. P-46 is consumed; P-12 remains
+HOLD, and P-47 authorizes no Local reset/apply, disposable execution,
+Production action, Git publication, feature enablement, Factor F change, or
+hotfix work. See
+[Finding #44](./44-phase4-p46-catalog-action-error-callability-finding.md).
+
 **Reliability amendment:** 2026-07-11 — WP-6.5 now closes end-to-end
 idempotency, publish-block UX, P-20 hash portability, ADR-003 reusable
 versioning, live DB/concurrency evidence, tracked export verification,
@@ -2432,6 +2452,42 @@ feature-flag, or application-candidate change. It adds one explicit migration
 and verification stage rather than a new owner role or DDL framework; the
 dedicated-owner alternative remains deferred because its role lifecycle and
 restore cost are disproportionate to this release.
+
+### 13.12 PRE-P-12 targeted helper-callability correction
+
+P-46 proved that the global fail-closed default installed by `017a` worked as
+designed, but it also exposed one omitted reviewed grant: the public
+`SECURITY INVOKER` draft-create wrapper directly calls the pure
+`private.catalog_action_error(uuid,text,text,boolean,jsonb)` result formatter.
+That helper requires no owner authority, reads no table, and has no side
+effect. Keeping it `SECURITY DEFINER` while denying the invoker execute
+privilege is both unnecessary privilege and an application availability
+defect.
+
+P-47 therefore assigns the next append-only slot to:
+
+| Field | Exact value |
+|---|---|
+| Source file | `026_master_catalog_phase4_catalog_action_error_acl.sql` |
+| Ledger | `20260729002600 master_catalog_phase4_catalog_action_error_acl` |
+| SHA-256 | `472fa04b81bc8e96e9b507e20fc20cfee3114c80fda45f2ffba3893480920d8a` |
+| Exact order | `017` → `017a` → `018` → … → `025` → `026` |
+
+Migration `026` must fail closed unless the reviewed post-`025` helper
+signature, body fingerprint, owner, metadata, owner-only ACL, feature flags,
+private-schema usage, and `017a` default-privilege guard are exact. It changes
+only the helper security mode to invoker and its ACL to owner plus
+`authenticated`; it must leave every other routine, global/schema default,
+table row, feature flag, BOQ, Factor F, Auth, Storage, and hotfix `016`
+contract unchanged. Direct helper calls by `PUBLIC`, `anon`, and
+`service_role` remain denied.
+
+This correction does not absorb the separate unused `v_row_count` cleanup:
+that readability debt has no runtime/security effect and remains deferred to a
+separately reviewed forward change. P-47 covers repository source, tooling,
+tests, and authority alignment only. Fresh Local bootstrap/regression,
+disposable rehearsal, kit/pass execution, Git publication, and every
+Production decision require separate authority.
 
 ---
 

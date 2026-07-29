@@ -2,9 +2,9 @@
 
 **Prepared:** 2026-07-28
 
-**Status:** OPTION B REVIEWED; P-44 CONTENT FROZEN AT `ed94c03`; P-45/P-46
-AUTHORIZED WITHIN BOUNDS; P-12 HOLD at P-45 resulting-HEAD/Remote and P-46
-Local evidence; no Production approval
+**Status:** OPTION B/`017a` REMAINS REQUIRED; P-45 COMPLETED AT `d92d8ce`;
+P-46 CONSUMED AND FAILED CLOSED; P-47 REPOSITORY-ONLY `026` CORRECTION
+AUTHORIZED; P-12 HOLD; no Production approval
 
 ## 1. Finding
 
@@ -241,9 +241,11 @@ review rejects Option B.
 
 The Owner authorized repository-only design and implementation of Option B on
 2026-07-28. The candidate must execute after `017` and before `018`; do not
-edit either reviewed migration. An
-after-`025`-only correction is unsafe because the twelve `018` helpers would
-already have inherited `PUBLIC EXECUTE`.
+edit either reviewed migration. An after-`025`-only correction **of this
+default-privilege defect** is unsafe because the twelve `018` helpers would
+already have inherited `PUBLIC EXECUTE`. This ordering statement does not
+forbid a distinct later forward fix for a separately discovered routine-level
+callability defect.
 
 The review must freeze:
 
@@ -267,9 +269,10 @@ The review must freeze:
   independent review passed, while fresh two-pass evidence must still prove it
   before the candidate can become rollout authority;
   and
-- whether the Owner expands the future P-12 scope to include the bridge
-  migration in exact `017`, bridge, `018`-`025` order, or requests the explicit
-  helper-ACL alternative under Option A.
+- whether the Owner expands the future P-12 scope to include the bridge and
+  distinct helper-callability correction in exact `017`, bridge, `018`-`025`,
+  `026` order. Option A remains non-controlling for the default-privilege
+  finding.
 
 The candidate identity is now frozen for review:
 
@@ -280,7 +283,7 @@ The candidate identity is now frozen for review:
 | Ledger name | `master_catalog_phase4_global_function_default_privileges` |
 | Source SHA-256 | `12cf6687b6339efa17635ac29ddfdb5150210a96e0640b0e9182a4cda64497a7` |
 | Exact order | `017` → `017a` → `018` |
-| Current authorization | Repository implementation, completed P-43 reconciliation/static/independent review, and P-44 content freeze at pushed `ed94c03`; P-45 authorizes only the exact 11-file authority/status descendant commit/push; P-46 conditionally authorizes exactly one corrected destructive Local bootstrap after clean/upstream/push/Remote-ready proof. Kit/pass execution and Production remain unauthorized |
+| Current authorization | `017a` remains the frozen required bridge. P-45 completed at exact pushed `d92d8ce`; P-46 consumed its one Local bootstrap and failed closed on the separate helper-callability finding. P-47 repository/static append-only `026` alignment passed; P-48 authorizes only its exact 25-file Git publication. Local execution, kit/pass execution, every other Git write, and Production remain unauthorized |
 
 The label `017a` is an operator-ordering aid, not an edit to migration `017`.
 The exact ledger version is a valid 14-digit Supabase migration version
@@ -305,8 +308,12 @@ schema-specific `service_role` EXECUTE on the four public stubs. After `017a`:
 The negative fixture created one private routine before `017a`. The exact
 preflight rejected it with `expected zero private routines after migration
 017, found 1`; the failed transaction left the global default absent and the
-pre-bridge ACL state unchanged. This proves the candidate cannot be used as an
-after-`025` patch.
+pre-bridge ACL state unchanged. This proves `017a` cannot be moved to or
+replaced by an after-`025` patch: only the bridge in the exact pre-`018`
+position protects every later function at creation time. It does not prohibit
+a distinct append-only migration after `025` from correcting a separately
+observed, exact helper callability defect while retaining the bridge and its
+default-privilege guard.
 
 These proofs did not use the Supabase migration ledger or the full corrected
 chain. They are not pass 1, independent schema-contract review, pass 2,
@@ -319,32 +326,26 @@ On 2026-07-28 the Owner selected:
 > Authorize Option B as a no-tech-debt forward-migration candidate and make the
 > repository contract correct.
 
-This decision authorizes the source candidate, bootstrap/runner/test/authority
+This decision authorized the source candidate, bootstrap/runner/test/authority
 alignment, static verification, and isolated disposable rehearsal
-**preparation**. P-43 additionally authorizes working-tree reconciliation of the
-canonical gate order and the structured authenticated GitHub human-review
-contract. P-44 separately authorized and completed the exact reviewed
-executable migration/application/bootstrap/generator/runner content freeze at
-pushed `ed94c03`, with no GO marker, PR, or
-protected-untracked-path change. P-45 now authorizes only the exact 11-file
-authority/status descendant commit/push. P-46 conditionally authorizes exactly
-one destructive Local bootstrap after the P-45 descendant is clean, pushed,
-equal to upstream, and Remote-ready. These decisions do not authorize kit or
-disposable pass execution, Production access or migration, deployment, feature
-enablement, publication, Factor F mutation, hotfix work, P-13, P-14, or P-15.
+**preparation**. P-43 additionally authorized working-tree reconciliation of
+the canonical gate order and structured authenticated GitHub human-review
+contract. P-44 separately completed the reviewed content freeze at pushed
+`ed94c03`, and P-45 completed its bounded authority/status descendant at exact
+pushed `d92d8ced42fc882481ebc2c4579adcf1edbebea7`.
 
-P-12 remains HOLD. Independent architecture/security/source review and static
-checks passed; P-44 content is frozen and Remote-ready at `ed94c03`. Execute
-only the P-45-authorized 11-file authority/status descendant commit/push and
-record its truthful exact-head Remote/upstream evidence. Then conditional P-46
-permits exactly one `npm run db:local:bootstrap`, which invokes
-`supabase db reset --local --no-seed`, rebuilds all Local Supabase data, applies
-`009`-`015`, `016`, `017`, `017a`, `018`-`025`, and runs consolidated
-security/business invariants. Production remains untouched. On failure/drift,
-preserve secret-free external evidence and stop; no retry/reset/patch without
-fresh Owner approval. Kit generation, pass 1, the structured authenticated
-GitHub human-review contract, and pass 2/closeout remain separately gated.
-Complete named executor/verifier/path/role/window and all other
-PRE-P-12 gates, then ask the Owner separately for P-12. The fresh final rollback
-backup is created/restored/checksummed only inside the later approved P-12
-window before `017`; it is not a pre-GO action.
+P-46 then consumed its one authorized destructive Local bootstrap. The reset
+applied `009`-`015`, `016`, `017`, `017a`, and `018`-`025`, but WP-6.5 failed
+closed on the distinct `catalog_action_error` callability defect described in
+[Finding #44](./44-phase4-p46-catalog-action-error-callability-finding.md).
+No retry, cleanup, or additional reset is authorized by P-46.
+
+P-47 now authorizes repository-only append-only `026` source/tool/test/
+authority alignment. It does not reopen or replace `017a`, and it does not
+authorize Local cleanup/reset/apply, disposable execution, kit/pass execution,
+Production access or migration, deployment, feature enablement, publication,
+Factor F mutation, hotfix work, Git stage/commit/push, P-13, P-14, or P-15.
+P-12 remains HOLD. A fresh explicit Owner decision is required before any Local
+bootstrap/regression, and later gates still require new exact source freeze,
+Remote evidence, isolated passes, named executor/verifier/window, final backup,
+and a separate P-12 Go/No-Go.

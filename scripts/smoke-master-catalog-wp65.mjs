@@ -40,6 +40,10 @@ let newIdentityCapabilityGuardPassed = false
 let retirementCapabilityGuardPassed = false
 let abandonedFixtureDrafts = 0
 let currentStage = 'initialize Local clients'
+const trackedFixtureDrafts = new Map()
+let finalEvidence = null
+let runFailure = null
+const cleanupAudit = []
 
 try {
   currentStage = 'sign in Local test users'
@@ -327,7 +331,7 @@ try {
   assert(stableJson(afterFactor) === stableJson(beforeFactor), 'Factor F changed during WP-6.5 smoke')
   assert(stableJson(afterBoq) === stableJson(beforeBoq), 'BOQ bindings changed during WP-6.5 smoke')
 
-  const evidence = {
+  finalEvidence = {
     schemaVersion: 1,
     status: 'passed',
     generatedAt: new Date().toISOString(),
@@ -356,35 +360,69 @@ try {
     productionTouched: false,
   }
 
-  currentStage = 'write Local evidence output'
-  if (evidenceOutputPath) {
-    await mkdir(dirname(evidenceOutputPath), { recursive: true })
-    await writeFile(evidenceOutputPath, `${JSON.stringify(evidence, null, 2)}\n`, {
-      flag: 'wx',
-    })
-  }
-  console.log(JSON.stringify(evidence, null, 2))
 } catch (error) {
-  throw new Error(formatHarnessError(currentStage, error))
+  runFailure = new Error(formatHarnessError(currentStage, error))
 } finally {
+  cleanupAudit.push(...await cleanupTrackedFixtureDrafts())
+
   if (originalPointerId) {
-    await restoreOriginalPointer(originalPointerId).catch(() => {})
+    await recordCleanup(
+      cleanupAudit,
+      'restore original catalog pointer',
+      () => restoreOriginalPointer(originalPointerId),
+    )
   }
   if (typeof originalFlagValue !== 'undefined') {
-    await setCatalogAdminEnabled(originalFlagValue).catch(() => {})
+    await recordCleanup(
+      cleanupAudit,
+      'restore catalog_admin_enabled',
+      () => setCatalogAdminEnabled(originalFlagValue),
+    )
   }
   if (typeof originalNewIdentityFlagValue !== 'undefined') {
-    await setCatalogCapability('catalog_new_identity_enabled', originalNewIdentityFlagValue).catch(() => {})
+    await recordCleanup(
+      cleanupAudit,
+      'restore catalog_new_identity_enabled',
+      () => setCatalogCapability('catalog_new_identity_enabled', originalNewIdentityFlagValue),
+    )
   }
   if (typeof originalRetirementFlagValue !== 'undefined') {
-    await setCatalogCapability('catalog_retirement_enabled', originalRetirementFlagValue).catch(() => {})
+    await recordCleanup(
+      cleanupAudit,
+      'restore catalog_retirement_enabled',
+      () => setCatalogCapability('catalog_retirement_enabled', originalRetirementFlagValue),
+    )
   }
-  await Promise.all([
-    adminA.auth.signOut().catch(() => {}),
-    adminB.auth.signOut().catch(() => {}),
-    staff.auth.signOut().catch(() => {}),
-  ])
+
+  await recordCleanup(cleanupAudit, 'sign out Local admin A', () => adminA.auth.signOut())
+  await recordCleanup(cleanupAudit, 'sign out Local admin B', () => adminB.auth.signOut())
+  await recordCleanup(cleanupAudit, 'sign out Local staff', () => staff.auth.signOut())
+
+  const cleanupFailures = cleanupAudit.filter((entry) => entry.outcome === 'failed')
+  if (runFailure || cleanupFailures.length > 0) {
+    const messages = []
+    if (runFailure) messages.push(runFailure.message)
+    if (cleanupFailures.length > 0) {
+      messages.push(
+        `WP-6.5 cleanup failed: ${cleanupFailures
+          .map((entry) => `${entry.step}: ${entry.error}`)
+          .join('; ')}`,
+      )
+    }
+    messages.push(`WP-6.5 cleanup audit: ${JSON.stringify(cleanupAudit)}`)
+    throw new Error(messages.join('\n'), runFailure ? { cause: runFailure } : undefined)
+  }
 }
+
+assert(finalEvidence, 'WP-6.5 completed without evidence')
+finalEvidence.cleanupAudit = cleanupAudit
+if (evidenceOutputPath) {
+  await mkdir(dirname(evidenceOutputPath), { recursive: true })
+  await writeFile(evidenceOutputPath, `${JSON.stringify(finalEvidence, null, 2)}\n`, {
+    flag: 'wx',
+  })
+}
+console.log(JSON.stringify(finalEvidence, null, 2))
 
 function client(key) {
   return createClient(url, key, {
@@ -504,6 +542,19 @@ async function allocateRevisionVersions(base, count) {
 }
 
 async function createDraft(target, base, version, label, requestId = randomUUID()) {
+  const trackedFixture = trackedFixtureDrafts.get(requestId) ?? {
+    requestId,
+    label,
+    version,
+    versionId: null,
+  }
+  assert(
+    trackedFixture.label === label
+      && stableJson(trackedFixture.version) === stableJson(version),
+    'Reused fixture request ID has different draft intent',
+  )
+  trackedFixtureDrafts.set(requestId, trackedFixture)
+
   const data = actionOk(
     await target.rpc('create_catalog_draft', {
       p_base_version_id: base.id,
@@ -516,7 +567,9 @@ async function createDraft(target, base, version, label, requestId = randomUUID(
     }),
     `create ${label} draft`,
   )
-  return { versionId: data.versionId, lockVersion: data.lockVersion, requestId, version }
+  const draft = { versionId: data.versionId, lockVersion: data.lockVersion, requestId, version }
+  trackedFixture.versionId = draft.versionId
+  return draft
 }
 
 function abandonDraft(target, draft, lockVersion, label) {
@@ -526,6 +579,136 @@ function abandonDraft(target, draft, lockVersion, label) {
     p_reason: `WP-6.5 close ${label}`,
     p_request_id: randomUUID(),
   })
+}
+
+async function cleanupTrackedFixtureDrafts() {
+  const audit = []
+
+  for (const fixture of trackedFixtureDrafts.values()) {
+    const step = `close Local fixture draft ${fixture.label}`
+    try {
+      let reconciledFromRequest = false
+      if (!fixture.versionId) {
+        const committed = await readCommittedFixtureByRequestId(fixture.requestId)
+        if (!committed) {
+          audit.push({
+            step,
+            outcome: 'passed',
+            action: 'no-committed-fixture',
+            requestId: fixture.requestId,
+          })
+          continue
+        }
+        assert(
+          committed.change_type === 'clone',
+          'tracked fixture request resolved to a non-clone change set',
+        )
+        fixture.versionId = committed.version_id
+        reconciledFromRequest = true
+      }
+
+      const before = await readFixtureVersionState(fixture.versionId)
+      if (!before) {
+        throw new Error('tracked fixture version is missing')
+      }
+
+      if (before.status !== 'draft') {
+        audit.push({
+          step,
+          outcome: 'passed',
+          action: 'already-closed',
+          versionId: fixture.versionId,
+          catalogStatus: before.status,
+        })
+        continue
+      }
+
+      actionOk(
+        await abandonDraft(
+          adminA,
+          fixture,
+          before.lock_version,
+          `finally cleanup ${fixture.label}`,
+        ),
+        step,
+      )
+
+      const after = await readFixtureVersionState(fixture.versionId)
+      if (after?.status !== 'abandoned') {
+        throw new Error(
+          `audited abandon returned but status is ${after?.status ?? 'missing'}`,
+        )
+      }
+
+      audit.push({
+        step,
+        outcome: 'passed',
+        action: reconciledFromRequest
+          ? 'request-reconciled-audited-abandon'
+          : 'audited-abandon',
+        versionId: fixture.versionId,
+        requestId: fixture.requestId,
+        catalogStatus: after.status,
+      })
+    } catch (error) {
+      audit.push({
+        step,
+        outcome: 'failed',
+        action: 'best-effort-audited-abandon',
+        versionId: fixture.versionId,
+        requestId: fixture.requestId,
+        error: safeErrorMessage(error),
+      })
+    }
+  }
+
+  return audit
+}
+
+async function readCommittedFixtureByRequestId(requestId) {
+  const { data, error } = await service
+    .from('catalog_change_sets')
+    .select('version_id,change_type')
+    .eq('request_id', requestId)
+    .maybeSingle()
+  if (error) throw localDataError('reconcile tracked fixture request', error)
+  return data
+}
+
+async function readFixtureVersionState(versionId) {
+  const { data, error } = await service
+    .from('price_list_versions')
+    .select('status,lock_version')
+    .eq('id', versionId)
+    .maybeSingle()
+  if (error) throw localDataError('read tracked fixture state', error)
+  return data
+}
+
+async function recordCleanup(audit, step, operation) {
+  try {
+    const result = await operation()
+    if (result?.error) throw result.error
+    audit.push({ step, outcome: 'passed' })
+  } catch (error) {
+    audit.push({
+      step,
+      outcome: 'failed',
+      error: safeErrorMessage(error),
+    })
+  }
+}
+
+function safeErrorMessage(error) {
+  const code = error && typeof error === 'object' && typeof error.code === 'string'
+    ? ` [${error.code.slice(0, 64)}]`
+    : ''
+  const message = error instanceof Error
+    ? error.message
+    : error && typeof error === 'object' && typeof error.message === 'string'
+      ? error.message
+      : 'no safe error message returned'
+  return `${message}${code}`
 }
 
 async function createDraftWithIdempotencyChecks(target, base, version) {

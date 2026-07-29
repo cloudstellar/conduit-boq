@@ -120,6 +120,7 @@ describe('Master Catalog authority consistency', () => {
       '023',
       '024',
       '025',
+      '026',
     ])
 
     expectInOrder(bootstrap, [
@@ -141,6 +142,7 @@ describe('Master Catalog authority consistency', () => {
       '`023_master_catalog_phase4_published_code_rls_scope.sql`',
       '`024_master_catalog_phase4_set_based_placement_invalidation.sql`',
       '`025_master_catalog_phase4_withdraw_order_compaction.sql`',
+      '`026_master_catalog_phase4_catalog_action_error_acl.sql`',
     ])
 
     expect(migrations).toContain(
@@ -175,6 +177,10 @@ describe('Master Catalog authority consistency', () => {
     expect(existsSync(resolve(
       root,
       'migrations/025_master_catalog_phase4_withdraw_order_compaction.sql',
+    ))).toBe(true)
+    expect(existsSync(resolve(
+      root,
+      'migrations/026_master_catalog_phase4_catalog_action_error_acl.sql',
     ))).toBe(true)
     const migration022Sha256 = createHash('sha256')
       .update(read('migrations/022_master_catalog_phase4_draft_identity_and_release_number.sql'))
@@ -213,6 +219,25 @@ describe('Master Catalog authority consistency', () => {
       'docs/plans/master-catalog/36-phase4-wp8-p38-no-reset-owner-uat-preflight.md',
     ]) {
       expect(read(authorityPath)).toContain(migration025Sha256)
+    }
+    const migration026Sha256 = createHash('sha256')
+      .update(read('migrations/026_master_catalog_phase4_catalog_action_error_acl.sql'))
+      .digest('hex')
+    for (const authorityPath of [
+      'docs/04_data/MIGRATIONS.md',
+      'docs/plans/master-catalog/08-phase4-architecture-ci-plan.md',
+      'docs/plans/master-catalog/12-phase4-production-runbook.md',
+      'docs/plans/master-catalog/13-phase4-verification-report.md',
+      'docs/plans/master-catalog/17-phase4-database-security-contract.md',
+      'docs/plans/master-catalog/18-phase4-threat-model.md',
+      'docs/plans/master-catalog/19-phase4-decision-register.md',
+      'docs/plans/master-catalog/25-phase4-execution-progress-tracker.md',
+      'docs/plans/master-catalog/39-phase4-p12-production-readiness-package.md',
+      'docs/plans/master-catalog/40-phase4-p12-owner-decision-checklist.md',
+      'docs/plans/master-catalog/41-phase4-p12-cli-execution-runbook.md',
+      'docs/plans/master-catalog/44-phase4-p46-catalog-action-error-callability-finding.md',
+    ]) {
+      expect(read(authorityPath)).toContain(migration026Sha256)
     }
 
     const packageJson = JSON.parse(read('package.json')) as {
@@ -319,7 +344,7 @@ describe('Master Catalog authority consistency', () => {
       expect(authority).toMatch(
         /after[\s\S]{0,80}`017`[\s\S]{0,40}`017a`[\s\S]{0,40}`018`[\s\S]{0,40}`019`/i,
       )
-      expect(authority).toMatch(/after(?: each of)? `020`-`025`/i)
+      expect(authority).toMatch(/after(?: each of)? `020`-`026`/i)
       expect(authority).toContain('`catalog_admin_enabled`')
       expect(authority).toContain('`catalog_new_identity_enabled`')
       expect(authority).toContain('`catalog_retirement_enabled`')
@@ -503,7 +528,7 @@ describe('Master Catalog authority consistency', () => {
       /P-33 accepted that\s+exact bounded WP-7\.5 technical checkpoint at 2026-07-15 13:54 \+07/,
     )
     expect(tracker).toContain(
-      '| Current work package | PRE-P-12 P-45 authority/status checkpoint, followed conditionally by P-46 corrected Local bootstrap.',
+      '| Current work package | PRE-P-12 P-48 exact replacement source/tooling Git publication.',
     )
     expect(tracker).toContain('P42-UAT-C03')
     expect(tracker).toContain('P42-UAT-G01')
@@ -517,11 +542,13 @@ describe('Master Catalog authority consistency', () => {
       '16e88c6487307c4bb0606a048dc53e05e9dcee18',
     )
     expect(tracker).toContain(
-      '| Current environment | Authorized Production read-only evidence at 2026-07-26 09:53 +07: PostgreSQL 17.6; pointer/default `2568.0.0`',
+      '| Current environment | Production read-only evidence remains historical/freshness-gated and Production writes remain zero.',
     )
-    expect(tracker).toMatch(/zero\s+working drafts with all catalog flags false/)
     expect(tracker).toContain(
-      'Owner decisions needed: P-45 and P-46 are already authorized within their exact bounds.',
+      'one retained evidence draft `2568.2.0`, all three flags false',
+    )
+    expect(tracker).toContain(
+      'Owner decisions needed: P-48 Git-only publication is authorized.',
     )
     expect(tracker).toContain(
       'sha256:ecd457c625c6eeb445607f30d374734c3e7ebd2a6d5489912f4c7ec42b3019a5',
@@ -571,13 +598,85 @@ describe('Master Catalog authority consistency', () => {
       '- [ ] Propose the maintenance window: `________________`.',
     )
     expect(ownerChecklist).toContain(
-      '- [x] P-45 separately authorizes one exact 11-file authority/status-only',
+      '- [x] P-47 authorizes repository-only migration `026` plus required bootstrap',
     )
     expect(decisions).toContain(
       '| P-45 | Authorize the exact PRE-P-12 authority/status checkpoint commit and push |',
     )
     expect(decisions).toContain(
       '| P-46 | Authorize exactly one corrected destructive Local bootstrap under fail-closed conditions |',
+    )
+    expect(decisions).toContain(
+      '| P-47 | Authorize repository-only append-only `026` correction and static closure |',
+    )
+    expect(decisions).toContain(
+      '| P-48 | Authorize exact P-47 replacement source/tooling commit and push |',
+    )
+    expect(decisions).toContain(
+      'The exact P-48 repository-relative allowlist is:',
+    )
+    const p48DecisionSection = decisions.slice(
+      decisions.indexOf(
+        '**P-48 exact replacement source/tooling Git publication authorized:**',
+      ),
+      decisions.indexOf(
+        '**Post-Phase-4 DR follow-up recorded (not a P-12 blocker):**',
+      ),
+    )
+    expect(p48DecisionSection).toContain(
+      '`d92d8ced42fc882481ebc2c4579adcf1edbebea7`',
+    )
+    expect(p48DecisionSection).toContain(
+      '`Close P-47 helper ACL correction`',
+    )
+    expect(p48DecisionSection).toContain('push exactly once')
+    expect(p48DecisionSection).toContain('Do not create a PR.')
+    expect(p48DecisionSection).toContain(
+      'It must not include `files/`, `tmp/`, `output/`, any',
+    )
+    expect(p48DecisionSection).toContain('other untracked path')
+    const p48AllowlistSection = decisions.slice(
+      decisions.indexOf('The exact P-48 repository-relative allowlist is:'),
+      decisions.indexOf('The exact P-45 repository-relative allowlist is:'),
+    )
+    const p48Allowlist = [
+      'docs/04_data/MIGRATIONS.md',
+      'docs/plans/master-catalog/00-phase4-review-guide.md',
+      'docs/plans/master-catalog/08-phase4-architecture-ci-plan.md',
+      'docs/plans/master-catalog/12-phase4-production-runbook.md',
+      'docs/plans/master-catalog/13-phase4-verification-report.md',
+      'docs/plans/master-catalog/17-phase4-database-security-contract.md',
+      'docs/plans/master-catalog/18-phase4-threat-model.md',
+      'docs/plans/master-catalog/19-phase4-decision-register.md',
+      'docs/plans/master-catalog/21-phase4-architecture-review-disposition.md',
+      'docs/plans/master-catalog/25-phase4-execution-progress-tracker.md',
+      'docs/plans/master-catalog/39-phase4-p12-production-readiness-package.md',
+      'docs/plans/master-catalog/40-phase4-p12-owner-decision-checklist.md',
+      'docs/plans/master-catalog/41-phase4-p12-cli-execution-runbook.md',
+      'docs/plans/master-catalog/42-phase4-post-phase4-disaster-recovery-backlog.md',
+      'docs/plans/master-catalog/43-phase4-p12-private-function-default-privilege-finding.md',
+      'docs/plans/master-catalog/44-phase4-p46-catalog-action-error-callability-finding.md',
+      'migrations/026_master_catalog_phase4_catalog_action_error_acl.sql',
+      'scripts/bootstrap-local-db.sh',
+      'scripts/master-catalog-local-canonical-hash.mjs',
+      'scripts/prepare-master-catalog-p12-cli-kit.mjs',
+      'scripts/run-master-catalog-p12-cli-step.mjs',
+      'scripts/smoke-master-catalog-wp65.mjs',
+      'tests/master-catalog-authority-consistency.test.ts',
+      'tests/master-catalog-migrations.test.ts',
+      'tests/master-catalog-p12-cli-kit.test.ts',
+    ]
+    const recordedP48Paths = Array.from(
+      p48AllowlistSection.matchAll(/^- `([^`]+)`$/gm),
+      (match) => match[1],
+    )
+    expect(recordedP48Paths).toEqual(p48Allowlist)
+    expect(new Set(recordedP48Paths).size).toBe(25)
+    expect(ownerChecklist).toContain(
+      '- [x] P-48 authorizes exactly one commit/push from base `d92d8ce`',
+    )
+    expect(ownerChecklist).toContain(
+      '- [ ] After P-48 execution, record the replacement clean pushed',
     )
     expect(decisions).toContain(
       '`ed94c0304be2741217c7ea2c36322b426de1dfe5`',
@@ -608,11 +707,8 @@ describe('Master Catalog authority consistency', () => {
     )
     expect(readinessPackage).toContain('two operational binding HEADs')
     expect(readinessPackage).not.toContain('uses two Git commits')
-    expect(readinessPackage).toContain(
-      'AUTHORIZED CONDITIONALLY — UNRUN — HOLD',
-    )
     expect(ownerChecklist).toContain(
-      'AUTHORIZED CONDITIONALLY — UNRUN — HOLD',
+      '`UNAUTHORIZED — HOLD`',
     )
     expect(ownerChecklist).toContain(
       '`supabase db reset --local --no-seed`',
@@ -625,7 +721,7 @@ describe('Master Catalog authority consistency', () => {
       expect(authority).toMatch(/net\s+changed\s+path/)
     }
     expect(readinessPackage).toContain(
-      'The same `current_user` must execute `017`,\n  `017a`, and `018`-`025` because `ALTER DEFAULT PRIVILEGES`',
+      'The same `current_user` must execute `017`,\n  `017a`, and `018`-`026` because `ALTER DEFAULT PRIVILEGES`',
     )
     expect(readinessPackage).toMatch(
       /object\s+ownership\/ACL delta for objects created or replaced by that file/,
@@ -785,7 +881,7 @@ describe('Master Catalog authority consistency', () => {
       /pre-amendment operator\/browser preflight passed on\s+`c8f6dca`/,
     )
     expect(tracker).toContain(
-      'Status: WP-8/P-37 remains Owner-accepted under the guided-UAT variance; readiness baseline 6827ebc, exact application candidate 5068f94, and exact pushed readiness/documentation head 07d1d33 retain their named evidence; Package #39 is HOLD for corrected-chain evidence and the remaining named gates; P-12 is not requested',
+      'Status: WP-8/P-37 remains Owner-accepted under the guided-UAT variance; readiness baseline 6827ebc and exact application candidate 5068f94 remain unchanged; Package #39 is HOLD for replacement source/tooling HEAD/Remote, fresh separately authorized Local rehearsal, two-pass evidence, named humans/window, and separate P-12',
     )
     expect(decisions).toContain(
       'accepts combined Owner-operated guided UI plus developer-operated fault-injection/cleanup evidence',
@@ -1126,7 +1222,7 @@ describe('Master Catalog authority consistency', () => {
     for (const path of backupAuthorityPaths.slice(0, -1)) {
       const authority = read(path)
       expect(authority).toContain('`017a`')
-      expect(authority).toContain('`018`-`025`')
+      expect(authority).toContain('`018`-`026`')
     }
 
     const exactCustodyPaths = backupAuthorityPaths.slice(1)
@@ -1209,7 +1305,7 @@ describe('Master Catalog authority consistency', () => {
       './43-phase4-p12-private-function-default-privilege-finding.md'
     const finding = read(findingPath)
     expect(finding).toMatch(
-      /\*\*Status:\*\* OPTION B REVIEWED; P-44 CONTENT FROZEN AT `ed94c03`; P-45\/P-46\s+AUTHORIZED WITHIN BOUNDS; P-12 HOLD at P-45 resulting-HEAD\/Remote and P-46\s+Local evidence; no Production approval/,
+      /\*\*Status:\*\* OPTION B\/`017a` REMAINS REQUIRED; P-45 COMPLETED AT `d92d8ce`;\s+P-46 CONSUMED AND FAILED CLOSED; P-47 REPOSITORY-ONLY `026` CORRECTION\s+AUTHORIZED; P-12 HOLD; no Production approval/,
     )
     expect(finding).toContain(
       'The first isolated PostgreSQL 17 CLI rehearsal applied only migration `017`',
@@ -1234,7 +1330,9 @@ describe('Master Catalog authority consistency', () => {
     expect(finding).toContain(
       'Migration `018` also grants `authenticated` usage on schema `private`.',
     )
-    expect(finding).toMatch(/An\s+after-`025`-only correction is unsafe/)
+    expect(finding).toMatch(
+      /An after-`025`-only correction \*\*of this\s+default-privilege defect\*\* is unsafe/,
+    )
     expect(finding).toContain(
       'The Owner authorized repository-only design and implementation of Option B',
     )
@@ -1262,7 +1360,9 @@ describe('Master Catalog authority consistency', () => {
       expect(authority).toMatch(
         /after\s+`017`[\s\S]{0,40}before\s+`018`|หลัง `017` และก่อน\s+`018`/,
       )
-      expect(authority).toMatch(/after-`025`/)
+      expect(authority).toMatch(
+        /after-`025`|after `025`|หลัง `025`|follows immutable `025`/,
+      )
       expect(authority).toContain('SECURITY DEFINER')
       expect(authority).toContain('PUBLIC EXECUTE')
       expect(authority).toContain(
@@ -1382,10 +1482,10 @@ describe('Master Catalog authority consistency', () => {
     )
     expect(ownerChecklist).toContain('UNRECORDED — UNBOUND — HOLD')
     expect(cliRunbook).toContain(
-      'conduit-boq/master-catalog-p12-schema-shape-contract/v2',
+      'conduit-boq/master-catalog-p12-schema-shape-contract/v3',
     )
     expect(cliRunbook).toContain(
-      'conduit-boq/master-catalog-p12-production-approval/v2',
+      'conduit-boq/master-catalog-p12-production-approval/v3',
     )
     expect(cliRunbook).toContain('githubReviewCheckedAt')
     expect(cliRunbook).toContain('--schema-shape-contract')
@@ -1397,12 +1497,12 @@ describe('Master Catalog authority consistency', () => {
       /Execution starts with `017`, which must not receive\s+`--prior-step-signoff`\./,
     )
     expect(cliRunbook).toMatch(
-      /Every subsequent migration—`017a` and `018` through\s+`025`—must add:/,
+      /Every subsequent migration—`017a` and `018` through\s+`026`—must add:/,
     )
     expect(cliRunbook).toMatch(
       /Migration\s+execution begins with `017`, which has no previous Phase 4 migration\./,
     )
-    expect(cliRunbook).not.toContain('Steps `017a`-`025` must add:')
+    expect(cliRunbook).not.toContain('Steps `017a`-`026` must add:')
     expect(cliRunbook).toContain('21 minutes 15 seconds')
     expect(cliRunbook).toContain('12 minutes 30 seconds')
     expect(cliRunbook).toContain('8 minutes 45 seconds')
@@ -1487,7 +1587,7 @@ describe('Master Catalog authority consistency', () => {
 
     const requestGate = ownerChecklist.slice(
       ownerChecklist.indexOf(
-        '- [x] Independent architecture/security/source review',
+        '- [x] Complete P-47 `026` independent architecture/security/source review',
       ),
       ownerChecklist.indexOf(
         '- [ ] Owner receives a separate exact P-12 go/no-go request.',
@@ -1511,7 +1611,9 @@ describe('Master Catalog authority consistency', () => {
       ownerChecklist,
       cliRunbook,
     ]) {
-      expect(authority).toMatch(/one (?:new )?corrected Local|exactly one corrected|one-time corrected/i)
+      expect(authority).toMatch(
+        /one (?:new |fresh )?corrected Local|exactly one corrected|one-time corrected|fresh(?:ly)?[\s\S]{0,50}authorized[\s\S]{0,30}Local|fresh explicit reset approval/i,
+      )
       expect(authority).toMatch(/separate Git authorization|separately authorized/i)
       expect(authority).toMatch(/Remote (?:CI\/)?status/i)
       expect(authority).toMatch(/honest-but-fallible/i)
@@ -1526,10 +1628,10 @@ describe('Master Catalog authority consistency', () => {
     expect(ownerChecklist).toContain('githubReviewCheckedAt')
     expect(cliRunbook).toContain('githubReviewCheckedAt')
     expect(runner).toContain(
-      'conduit-boq/master-catalog-p12-schema-shape-contract/v2',
+      'conduit-boq/master-catalog-p12-schema-shape-contract/v3',
     )
     expect(runner).toContain(
-      'conduit-boq/master-catalog-p12-production-approval/v2',
+      'conduit-boq/master-catalog-p12-production-approval/v3',
     )
     expect(runner).not.toContain('api.github.com')
     expect(runner).not.toMatch(/\bgh\s+api\b/)
