@@ -4,19 +4,19 @@
 
 **Last updated:** 2026-07-29
 
-**Status:** PRE-P-12 HOLD - P-48 completed at replacement clean
-pushed/upstream-equal source/tooling HEAD
-`7fbfe1bb8f71df03a78762b00e93aded7bdd6e42`. The exact 25-file commit
-`Close P-47 helper ACL correction` was pushed once from parent
-`d92d8ced42fc882481ebc2c4579adcf1edbebea7` on
-`codex/master-catalog-phase4`, with no PR and no protected/unrelated untracked
-path. Its truthful exact-head Remote record is `Vercel=success`; no
-PR-triggered GitHub Actions run exists, and no GitHub Actions lint/test/build
-run is claimed. Local cleanup/apply/reset/retry,
-disposable execution, every other Git write except the exact Checklist-only
-status checkpoint authorized below, kit/pass work, Production,
-application/UI/export changes, flags, publication, Factor F, hotfix `016`,
-and P-12 remain unauthorized.
+**Status:** PRE-P-12 HOLD - immutable replacement source/tooling HEAD
+`7fbfe1bb8f71df03a78762b00e93aded7bdd6e42` and its truthful
+`Vercel=success` record are frozen. The post-P-48 Checklist-only status
+checkpoint completed at pushed/upstream-equal
+`28673b39962a092472c2334843e95aaafdfce97b`, also with
+`Vercel=success`, no PR, zero PR-triggered GitHub Actions runs, and no GitHub
+Actions lint/test/build claim. After the explicit destructive-reset warning,
+the Owner authorized the exact corrected Local gate below. That authorization
+is not consumed until its Checklist-only authority checkpoint is clean,
+pushed, and upstream-equal. No Local execution result is claimed yet.
+Disposable execution, kit/pass work, Production, application/UI/export
+changes, flags, publication, Factor F, hotfix `016`, and P-12 remain
+unauthorized.
 
 **Exact application candidate:**
 `5068f944af2aa3fe8446c77c8ae8d48673cb260b`
@@ -34,10 +34,16 @@ source by the P-46 finding
 **Replacement source/tooling HEAD:**
 `7fbfe1bb8f71df03a78762b00e93aded7bdd6e42`
 
+**Completed post-P-48 Checklist-only status-checkpoint HEAD:**
+`28673b39962a092472c2334843e95aaafdfce97b`
+
 **Current authority sync:** P-45/P-46 remain historical evidence. P-47
 repository/static closure passed for the exact recorded migration identity/hash.
 P-48 then froze the replacement source/tooling HEAD and truthful Remote record
-above. A separately authorized fresh Local rehearsal remains pending.
+above. The post-P-48 status checkpoint is complete. The Owner has now
+authorized exactly one fresh corrected Local rehearsal under the fail-closed
+contract below; execution remains pending until the exact authorization
+checkpoint is pushed/upstream-equal.
 
 **Post-freeze status/authority overlay:** only from the exact P-48 replacement
 freeze above through the final GO HEAD, this Checklist is the sole live tracked
@@ -85,6 +91,41 @@ source/tooling HEAD above and
 authorizes no Local cleanup/apply/reset/retry, disposable execution, kit/pass,
 Production, deploy, flags, publication, Factor F, hotfix `016`, `v_row_count`,
 or P-12 action.
+
+**Post-P-48 corrected-Local PRE-GO authority recorded:** 2026-07-29 — after
+being explicitly warned that `npm run db:local:bootstrap` invokes
+`supabase db reset --local --no-seed` and destroys/rebuilds all Local Supabase
+data, the Owner instructed the team to continue with the recommended next
+step.
+
+This decision first authorizes exactly one Checklist-only authority checkpoint
+from base `28673b39962a092472c2334843e95aaafdfce97b` on branch
+`codex/master-catalog-phase4`: change only
+`docs/plans/master-catalog/40-phase4-p12-owner-decision-checklist.md`, commit
+once as `docs: authorize corrected local rehearsal`, and push once to the
+existing branch. Do not create a PR or stage/modify `files/`, `tmp/`,
+`output/`, or any other untracked path. This commit contains no P-12 GO marker.
+Record the resulting Checklist-only authority-checkpoint SHA, upstream
+equality, and truthful Remote status in the secret-free external handoff only;
+no recursive tracked commit is authorized or required merely to record its own
+SHA.
+
+Only after that checkpoint is clean, pushed, and upstream-equal, this decision
+authorizes exactly one invocation of `npm run db:local:bootstrap` from a clean
+dedicated checkout pinned to immutable source/tooling HEAD
+`7fbfe1bb8f71df03a78762b00e93aded7bdd6e42`, using frozen Supabase CLI
+`2.107.0`. It may reset/rebuild Local Supabase, apply `009`-`015`, hotfix
+`016`, `017`, `017a`, and `018`-`026`, then run the reviewed consolidated
+smoke/security/business invariant checks and preserve secret-free immutable
+external evidence bound to that source HEAD. Production remains untouched and
+all three Phase 4 flags must finish boolean `false`.
+
+Do not clean or patch the retained P-46 Local state before the reset. If any
+precondition, migration, hash/order, invariant, ACL/security, evidence, or
+drift check fails, preserve evidence and stop. No retry, manual Local cleanup,
+patch, ad hoc SQL, second reset, disposable rehearsal, kit/pass, Production
+action, PR, P-12, or further tracked commit is authorized without a new Owner
+decision and separately pushed Checklist-only authority checkpoint.
 
 **Post-freeze fingerprint binding:** frozen references in Package #39 and CLI
 Runbook #41 that say to record the future
@@ -431,14 +472,21 @@ weaken the verifier, or continue that disposable sequence.
   this file only, one commit/push, exact message
   `docs: record p48 source freeze`, and no PR. This is Git-only authority and
   does not authorize the Local gate below.
-- [ ] Receive a fresh explicit Owner warning/approval before any canonical
-  Local bootstrap at the replacement HEAD (`009`-`015`, hotfix `016`, `017`,
-  `017a`, `018`-`026`) plus consolidated smoke/security/business invariants:
-  `UNAUTHORIZED — HOLD`. The command invokes
+- [x] The post-P-48 status checkpoint completed at exact
+  pushed/upstream-equal `28673b39962a092472c2334843e95aaafdfce97b`;
+  its truthful Remote record is `Vercel=success`, with no PR, zero
+  PR-triggered GitHub Actions runs, and no GitHub Actions lint/test/build claim.
+- [x] After the explicit destructive-reset warning, the Owner authorized
+  exactly one canonical Local bootstrap at replacement HEAD `7fbfe1b`
+  (`009`-`015`, hotfix `016`, `017`, `017a`, `018`-`026`) plus the reviewed
+  consolidated smoke/security/business invariants. The authorization must
+  first be frozen through the exact Checklist-only commit/push above.
+- [ ] Execute and verify that one Local gate:
+  `AUTHORIZED — NOT YET CONSUMED`. The command invokes
   `supabase db reset --local --no-seed` and rebuilds all Local Supabase data.
-  Do not clean or patch the residual Local state. On failure/drift, preserve
-  evidence and stop; no retry, patch, cleanup, or second reset without fresh
-  Owner approval.
+  Do not clean or patch the residual Local state before reset. On
+  failure/drift, preserve evidence and stop; no retry, manual cleanup, patch,
+  ad hoc SQL, or second reset without fresh Owner approval.
 - [ ] Only after the corrected Local gate passes, build one external kit at
   that source/tooling HEAD under later separate authorization and record its
   canonical manifest path/SHA-256, generator source SHA-256, runner source
@@ -596,9 +644,12 @@ Request P-12 only when every HOLD row in Package #39 is Ready:
   `7fbfe1bb8f71df03a78762b00e93aded7bdd6e42` and truthful exact-head Remote
   status are recorded: `Vercel=success`, with zero PR-triggered GitHub Actions
   runs and no PR; no GitHub Actions lint/test/build run is claimed.
-- [ ] Obtain fresh explicit reset approval and pass the corrected Local
-  bootstrap plus consolidated invariants through `026`. On failure/drift,
-  preserve evidence and stop; no retry, patch, cleanup, or reset without fresh
+- [x] Fresh explicit reset approval is recorded for exactly one corrected
+  Local bootstrap and consolidated-invariant run through `026`, subject to the
+  exact Checklist-only authorization checkpoint above.
+- [ ] Execute and pass that corrected Local gate:
+  `AUTHORIZED — NOT YET CONSUMED`. On failure/drift, preserve evidence and
+  stop; no retry, manual cleanup, patch, ad hoc SQL, or reset without fresh
   approval.
 - [ ] Build and hash-bind the one clean source kit only after the new-HEAD
   Remote and corrected-Local gates and later separate authorization; complete
