@@ -46,6 +46,48 @@ rows AS (
 )
 SELECT json_build_object(
   'schema', json_build_object(
+    'phase4_global_function_default_acl', EXISTS (
+      SELECT 1
+      FROM pg_catalog.pg_default_acl default_acl
+      WHERE default_acl.defaclrole = to_regrole('postgres')
+        AND default_acl.defaclnamespace = 0
+        AND default_acl.defaclobjtype = 'f'
+        AND (
+          SELECT count(*)
+          FROM aclexplode(default_acl.defaclacl)
+        ) = 1
+        AND EXISTS (
+          SELECT 1
+          FROM aclexplode(default_acl.defaclacl) privilege
+          WHERE privilege.grantor = to_regrole('postgres')
+            AND privilege.grantee = to_regrole('postgres')
+            AND privilege.privilege_type = 'EXECUTE'
+            AND NOT privilege.is_grantable
+        )
+        AND NOT EXISTS (
+          SELECT 1
+          FROM pg_catalog.pg_default_acl schema_default
+          JOIN pg_catalog.pg_namespace namespace
+            ON namespace.oid = schema_default.defaclnamespace
+          WHERE schema_default.defaclrole = to_regrole('postgres')
+            AND namespace.nspname IN ('public', 'private')
+            AND schema_default.defaclobjtype = 'f'
+            AND (
+              (
+                SELECT count(*)
+                FROM aclexplode(schema_default.defaclacl)
+              ) <> 1
+              OR NOT EXISTS (
+                SELECT 1
+                FROM aclexplode(schema_default.defaclacl) privilege
+                WHERE privilege.grantor = to_regrole('postgres')
+                  AND privilege.grantee = to_regrole('postgres')
+                  AND privilege.privilege_type = 'EXECUTE'
+                  AND NOT privilege.is_grantable
+              )
+            )
+        )
+    ),
     'p39r_identity_columns', (
       SELECT count(*)
       FROM information_schema.columns
@@ -222,6 +264,10 @@ function assertQuality(snapshot) {
   const withdrawCompactionTriggerCount = schema?.phase4_withdraw_order_compaction_triggers
   const hasWithdrawOrderCompaction = withdrawCompactionTriggerCount === 1
 
+  if (schema?.phase4_global_function_default_acl !== true) {
+    failures.push('migration 017a global function default ACL is missing or inconsistent')
+  }
+
   if ((!isPreP39r && !isPostP39r) || (isPreP39r && hasPublishedCodeScope)) {
     failures.push('migration 022 schema markers are partial or inconsistent')
   }
@@ -302,6 +348,8 @@ async function buildEvidence() {
 
   const migration022Detected = first.schema.p39r_identity_columns === 6
     && first.schema.p39r_identity_trigger_function === true
+  const migration017aDetected =
+    first.schema.phase4_global_function_default_acl === true
   const migration023Detected = migration022Detected
     && first.schema.p39r_published_code_policy_scoped === true
   const migration024Detected = migration023Detected
@@ -310,18 +358,21 @@ async function buildEvidence() {
   const migration025Detected = migration024Detected
     && first.schema.phase4_withdraw_order_compaction_triggers === 1
   const phase4Range = migration025Detected
-    ? '017-025'
+    ? '017, 017a, 018-025'
     : migration024Detected
-    ? '017-024'
+    ? '017, 017a, 018-024'
     : migration023Detected
-    ? '017-023'
-    : migration022Detected ? '017-022' : '017-021'
+    ? '017, 017a, 018-023'
+    : migration022Detected
+    ? '017, 017a, 018-022'
+    : '017, 017a, 018-021'
 
   return {
     source:
       `Local Supabase schema includes root migrations 009-015, hotfix 016, and detected Phase 4 ${phase4Range}`,
     productionAuthorityVersion: '2568.0.0',
     localDbContainer: DB_CONTAINER,
+    migration017aDetected,
     migration022Detected,
     migration023Detected,
     migration024Detected,

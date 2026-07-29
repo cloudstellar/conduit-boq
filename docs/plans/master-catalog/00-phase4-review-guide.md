@@ -25,10 +25,64 @@
   ผ่าน bounded read-only identity query; encrypted Production
   application-only readiness backup SHA-256 `9d306a47...` และ exact-image
   network-isolated restore ผ่าน โดยไม่ dump Auth/Storage และไม่เขียน
-  Production. สถานะยังเป็น **HOLD** จนกว่าจะตัดสิน security/single-device
-  managed residual, ได้ remote exact-head CI, ระบุ executor/independent
-  verifier/window และขอ P-12 แยกต่างหาก. ต้องทำ fresh backup อีกครั้ง
-  ทันทีก่อน migration เพราะ Production ยังมีข้อมูลเพิ่มต่อเนื่อง.
+  Production. เมื่อ 2026-07-27 Owner อนุมัติหยุด Docker ชั่วคราวเฉพาะ
+  non-force detach/read-only reopen/full checksum; ผ่านทั้งแปดรายการ,
+  bundle ถูก detach อีกครั้ง และ Local services/invariants กลับมาครบโดยไม่
+  reset. Exact pushed readiness/documentation HEAD `07d1d33` บันทึก remote
+  `Vercel=success`; ไม่มี PR-triggered GitHub Actions run และไม่ได้อ้างว่า
+  remote lint/test/build ผ่าน. เมื่อ 2026-07-28 Owner รับ disposition ของ
+  guarded definers, leaked-password สำหรับ P-12/P-13 เท่านั้น และ
+  `v_row_count` debt แล้ว; leaked-password ยังเป็น gate แยกก่อน P-14.
+  Owner ยอมรับ single-device-loss residual แบบจำกัดเฉพาะ rollout นี้ โดยหมดอายุ
+  เมื่อเริ่ม post-publication checkpoint หลัง P-15 verification ที่อนุมัติแยก
+  หรือ 168 ชั่วโมงหลังบันทึกเวลาเริ่ม P-12 แล้วแต่ว่าอะไรถึงก่อน. หากวางแผน
+  หยุดเกิน 24 ชั่วโมงต่อเนื่อง ต้องทำและตรวจ checksum ของ independent
+  encrypted copy ก่อนหยุด; หากหยุดโดยไม่ได้วางแผนครบ 24 ชั่วโมง ต้องหยุด
+  gate ถัดไปและทำ copy ให้เสร็จก่อนดำเนินการต่อ. สถานะยังเป็น **HOLD** เพราะ
+  decision/tooling sync นี้ยัง
+  อยู่ใน working tree; P-44 อนุมัติ exact 23-file commit/push โดยไม่มี GO marker
+  หรือ PR และไม่รวม protected untracked paths แล้ว แต่ resulting HEAD/Remote
+  status ยังต้องบันทึกตามจริง และยังต้องระบุ
+  named-human executor และ named-human independent verifier ที่เป็นคนละคน,
+  exact path/`current_user`/object-owner/window ก่อนขอ P-12 แยกต่างหาก. Fresh
+  backup ก่อน migration, post-migration
+  application-only backup/manifest หลัง verification ของ `017`, `017a`,
+  `018`-`025` และก่อน P-13, รวมทั้ง final external copy/checksum ยังคงบังคับ.
+  Rehearsal-only kit
+  จาก dirty working tree ใช้ disposable network-isolated PostgreSQL 17 และ
+  apply ได้เฉพาะ `017` ก่อน hard-stop เพราะ private-function default ACL ไม่มี;
+  ไม่ได้รัน `018`-`025` และไม่ได้ migrate/write Local หรือ Production.
+  [Finding #43](./43-phase4-p12-private-function-default-privilege-finding.md)
+  ต้องมี Owner decision และ selected architecture/security remediation ผ่าน
+  fresh complete exact-source rehearsal ก่อนขอ P-12. Recommended Option B ต้อง
+  เป็น separately reviewed **bridge migration** ในลำดับหลัง `017` และก่อน
+  `018` เท่านั้น; after-`025` ไม่ปลอดภัย. เหตุผลคือ `018` สร้าง private
+  `SECURITY DEFINER` helpers 12 ตัวโดยไม่มี explicit per-function revoke และ
+  grant `authenticated` ให้ `USAGE` บน schema `private`; หาก global default
+  deny ยังไม่เกิด helpers เหล่านี้จะ inherit `PUBLIC EXECUTE`. Production ยัง
+  ไม่ได้รับ `017` และ Production Data API ไม่ expose `private` จึงยังไม่มี
+  Production exposure ใหม่ แต่ ACL/defense-in-depth contract ยัง fail.
+  Owner เลือก Option B สำหรับ design/implementation/review ใน repository แล้ว:
+  `017a_master_catalog_phase4_global_function_default_privileges.sql`, ledger
+  `20260728001730_master_catalog_phase4_global_function_default_privileges`,
+  SHA-256
+  `12cf6687b6339efa17635ac29ddfdb5150210a96e0640b0e9182a4cda64497a7`,
+  ลำดับ exact `017` -> `017a` -> `018`. Candidate ถอน inherited EXECUTE ของ
+  `PUBLIC`/API roles รวม `service_role` ทั้ง global/`public`/`private` และ
+  reassert เฉพาะ grant ที่ตั้งใจ. ห้ามแก้ `017`/`018`, ห้ามเอา `017a` ไป patch
+  Local ที่ผ่าน `025` แล้ว และ migration `026` ไม่ใช่ security fix นี้.
+  Evidence candidate ผ่าน independent source/architecture/security review และ
+  static checks แล้ว. P-44 อนุมัติ exact reviewed 23-file commit/push เพื่อ
+  freeze clean source/tooling HEAD ที่ไม่มี GO marker หรือ PR และไม่รวม
+  protected untracked paths. หลัง push ต้องบันทึก resulting HEAD และ Remote
+  CI/status ตามจริง แล้วขอ destructive Local approval แยกเพื่อทำ corrected
+  canonical bootstrap **หนึ่งครั้ง** พร้อม consolidated smoke/invariants.
+  จากนั้นจึงสร้าง kit เดียวสำหรับ
+  `calibrate-schema` pass 1, independent contract review และ second fresh full
+  isolated rehearsal พร้อม transitive pass-2 closeout. หลัง explicit Owner
+  P-12 GO เท่านั้นจึงให้ Checklist #40 เป็น sole net change ที่ descendant GO
+  HEAD และ Production reuse source kit. การเลือก Option B ไม่ใช่ P-12; P-12
+  ยัง HOLD.
   Add/Supplement ยังซ่อนจนถึง P-14 และ
   Production P-12 ถึง P-15 ยังไม่ได้อนุมัติ. ใช้ Tracker เป็น authority ของ
   volatile status และใช้ Verification Report เป็น authority ของหลักฐานละเอียด**
@@ -54,16 +108,20 @@
 13. [WP-8 P-37 Evidence Reconciliation and Owner UAT Script](./35-phase4-wp8-p37-evidence-reconciliation-and-owner-uat-script.md) — ใช้เป็นสคริปต์เดียวสำหรับ Owner Cards A-G, safe errors, performance และ cleanup
 14. [WP-8 P-38 No-reset Owner UAT Preflight](./36-phase4-wp8-p38-no-reset-owner-uat-preflight.md) — corrected E-01/E-02, input hashes, tracked fail-closed commands และ read-only Local baseline
 15. [P-12 Production Readiness Package](./39-phase4-p12-production-readiness-package.md) — ดู exact source/migration hashes, ผล Production database/ledger/advisor/Data API read-only, readiness backup/isolated restore ที่ผ่านแล้ว และ residual/executor/window ที่ยังขาดก่อนขอ P-12
-16. [Reconciliation Report](./11-phase4-reconciliation-report.md) — ตรวจว่าข้อมูล 710/708 ถูกจัดการอย่างไร
-17. [Code Dictionary](./10-phase4-structured-code-dictionary.md) — ตรวจความหมาย AAA/TTT และจุดผิด 16 Crossing
-18. [Database/Security Contract](./17-phase4-database-security-contract.md) — ตรวจ schema, RLS/grants, function และ migration order
-19. [Lean Threat Model](./18-phase4-threat-model.md) — ตรวจความเสี่ยง/control/หลักฐานทดสอบ
-20. [Parser/Hash Specification](./14-phase4-parser-and-canonical-hash-spec.md) — สัญญาเชิงเทคนิคที่ทำให้ import/export ทำซ้ำได้
-21. [Official Export Specification](./20-phase4-official-export-spec.md) — อนุมัติรูปแบบ Excel/PDF, stamp และ hash
-22. [Production Runbook](./12-phase4-production-runbook.md) — ขั้นตอนจริง จุดหยุด และ rollback
-23. [Verification Report](./13-phase4-verification-report.md) — หลักฐานที่ต้องกรอกเมื่อ implement/rollout
-24. [Admin Operating Procedure](./15-phase4-admin-operating-procedure.md) — วิธีใช้งานของผู้ดูแลระบบ
-25. [Release Note Template](./16-phase4-release-note-template.md) — เอกสารต่อหนึ่งเวอร์ชันที่ publish
+16. [P-12 Owner Decision Checklist](./40-phase4-p12-owner-decision-checklist.md) — ดู decision ที่บันทึกแล้วและ human/window/authority-sync rows ที่ยังเปิด
+17. [P-12 CLI Execution Runbook](./41-phase4-p12-cli-execution-runbook.md) — exact one-file ledger, secret, timeout, owner/ACL และ rehearsal contract
+18. [P-12 Private-Function Default-Privilege Finding](./43-phase4-p12-private-function-default-privilege-finding.md) — blocker จาก disposable `017` rehearsal; Owner เลือก exact Option B `017a` bridge หลัง `017`/ก่อน `018`, ไม่ใช่ after-`025`; independent source/static review ผ่านแล้ว แต่ Git/Remote/Local และ two-pass evidence รวมถึง P-12 ยังเปิด
+19. [Post-Phase-4 DR Backlog](./42-phase4-post-phase4-disaster-recovery-backlog.md) — งาน RPO/RTO/Auth/Storage/off-device restore ภายหลัง; ไม่ใช่ P-12 blocker
+20. [Reconciliation Report](./11-phase4-reconciliation-report.md) — ตรวจว่าข้อมูล 710/708 ถูกจัดการอย่างไร
+21. [Code Dictionary](./10-phase4-structured-code-dictionary.md) — ตรวจความหมาย AAA/TTT และจุดผิด 16 Crossing
+22. [Database/Security Contract](./17-phase4-database-security-contract.md) — ตรวจ schema, RLS/grants, function และ migration order
+23. [Lean Threat Model](./18-phase4-threat-model.md) — ตรวจความเสี่ยง/control/หลักฐานทดสอบ
+24. [Parser/Hash Specification](./14-phase4-parser-and-canonical-hash-spec.md) — สัญญาเชิงเทคนิคที่ทำให้ import/export ทำซ้ำได้
+25. [Official Export Specification](./20-phase4-official-export-spec.md) — อนุมัติรูปแบบ Excel/PDF, stamp และ hash
+25. [Production Runbook](./12-phase4-production-runbook.md) — ขั้นตอนจริง จุดหยุด และ rollback
+26. [Verification Report](./13-phase4-verification-report.md) — หลักฐานที่ต้องกรอกเมื่อ implement/rollout
+27. [Admin Operating Procedure](./15-phase4-admin-operating-procedure.md) — วิธีใช้งานของผู้ดูแลระบบ
+28. [Release Note Template](./16-phase4-release-note-template.md) — เอกสารต่อหนึ่งเวอร์ชันที่ publish
 
 ระหว่าง implementation ให้ใช้
 [Execution Progress Tracker](./25-phase4-execution-progress-tracker.md)
@@ -89,6 +147,9 @@
 | WP-8/P-37 evidence reuse, Owner tasks, safe errors, performance budget และ cleanup | [Owner UAT Script #35](./35-phase4-wp8-p37-evidence-reconciliation-and-owner-uat-script.md) |
 | WP-8/P-38 reproducible inputs, no-reset preflight/cleanup และ exact Local baseline | [Preflight Note #36](./36-phase4-wp8-p38-no-reset-owner-uat-preflight.md) |
 | P-12 source/migration manifest, readiness matrix, managed residual และหลักฐาน Production/backup | [P-12 Readiness Package #39](./39-phase4-p12-production-readiness-package.md) |
+| P-12 Owner decisions, human roles, exact owner/window และ authority-sync gate | [Owner Checklist #40](./40-phase4-p12-owner-decision-checklist.md) |
+| P-12 exact CLI kit/ledger/secret/timeout/ownership execution contract | [CLI Execution Runbook #41](./41-phase4-p12-cli-execution-runbook.md) |
+| Post-Phase-4 whole-service DR backlog | [DR Backlog #42](./42-phase4-post-phase4-disaster-recovery-backlog.md) |
 | End-to-end capability completeness and release visibility | [Completeness Audit #29](./29-phase4-owner-dev-completeness-audit.md) |
 | One-working-draft, abandon และ final snapshot review | [P-22 Correction Plan #31](./31-phase4-wp66-operator-workflow-correction-plan.md) |
 | Version intent, reserved sequence และ item-first/create/restore correction | ADR-003 และ [P-22/P-23.1 Correction Plan #31](./31-phase4-wp66-operator-workflow-correction-plan.md) |
@@ -138,10 +199,10 @@ checkpoint.
 | Runtime font/logo derivative ใด commit/deploy ได้ | P-10 approved แบบจำกัด; ใช้เฉพาะ runtime derivatives ตาม Decision Register และ [Doc #24](./24-phase4-nt-ci-runtime-asset-analysis.md) |
 | Metadata จริงของ baseline `2568.0.0` | P-08 approved: effective `2026-01-01`; approval ref `เอ็นที วทฐฐ./405 ลงวันที่ 27 พ.ย. 2568`; publisher `ผู้จัดการฝ่ายท่อร้อยสาย (ทฐฐ.)` |
 | รูปแบบตัวอย่าง Excel/PDF ตาม Export Spec | P-11/WP-6 accepted สำหรับ exact Local pair แล้ว; Production filing/P-15 ยังแยก |
-| P-18 placement governance สำหรับ add/supplement | P-30 รับรองกติกา V1, amended WP-7.5 ผ่าน P-32 Local DB/browser/export evidence และ P-33 รับรองขอบเขตเทคนิคแล้วตาม [Review Note #28](./28-phase4-p18-placement-governance-review-note.md). P-36 integrated Local technical rehearsal และ corrected P-37 recovery/owner keyboard/focus/presentation UAT ผ่านบน pushed checkpoint `f36d896d672609653de6634e307dcc44bce6d519`; Add/Supplement ยังต้องซ่อน/ปิดจน final owner UI submission และ open WP-8 gates ใน [Closure Matrix #34](./34-phase4-wp8-p37-closure-matrix.md) ปิดครบแล้วจึงค่อยขอ explicit P-37 decision |
+| P-18 placement governance สำหรับ add/supplement | P-30 รับรองกติกา V1, amended WP-7.5 ผ่าน P-32 Local DB/browser/export evidence และ P-33 รับรองขอบเขตเทคนิคแล้วตาม [Review Note #28](./28-phase4-p18-placement-governance-review-note.md). P-36 integrated Local technical rehearsal และ corrected P-37 recovery/owner keyboard/focus/presentation UAT ผ่าน; Owner accepted P-37 เมื่อ 2026-07-25 ภายใต้ guided-UAT variance ที่บันทึกตามจริง. Add/Supplement ยังซ่อน/ปิดจนถึง P-14 และต้อง re-evaluate residual ก่อน enablement |
 | P-19 PDF policy สำหรับรายการยกเลิกใช้ | ถ้า version ใดมี inactive/retired rows ต้องตัดสินใจว่าจะ exclude/mark/appendix ก่อน filed PDF |
-| P-20 canonical hash portability | Owner approved deterministic baseline identity จาก Production-derived `price_list.id`; independent two-rebuild proof ผ่านแล้ว และต้อง rerun หลัง migration change รวมถึง WP-8/P-15 |
-| P-12 Production readiness | Owner-authorized Production database/ledger/advisor read-only evidence ผ่านในขอบเขตฐานข้อมูล: `2568.0.0`/710 และ authority hash ตรง Local, BOQ/Factor F links ปกติ, ledger `009`-`016` ครบ และ hotfix `016` ตรง source. Management API ยืนยันว่า Data API ไม่ expose `private`. รหัสค่าที่สามผ่าน secure bounded identity query หลังสองค่าก่อนหน้าถูกปฏิเสธและลบ; encrypted Production readiness dump `9d306a47...` จับ 234 BOQs/2,270 items และ exact-image network-isolated restore เทียบ hash/integrity ผ่านโดยไม่ dump Auth/Storage หรือเขียน Production. Package #39 ยัง HOLD สำหรับ security/single-device residual, remote exact-head CI, executor/independent verifier/window และ exact P-12 approval; fresh in-window backup ยังบังคับก่อน migration และ evidence window นี้ไม่ใช่การอนุมัติ migration |
+| P-20 canonical hash portability | Owner approved deterministic baseline identity จาก Production-derived `price_list.id`; independent two-rebuild proof ของ data-bearing chain ผ่านแล้ว. `017a` เป็น data-free ACL-only bridge จึงต้องทำ corrected integration bootstrap ใหม่หนึ่งครั้ง แต่ไม่ทำให้ต้อง reset ซ้ำสองรอบ; rerun เพิ่มเฉพาะเมื่อ source ที่กระทบ data/identity เปลี่ยนหรือรอบใหม่ fail และต้องมี Owner reset approval ใหม่. P-15 final hash acceptance ยังแยก |
+| P-12 Production readiness | Owner-authorized Production database/ledger/advisor read-only evidence ผ่านในขอบเขตฐานข้อมูล: `2568.0.0`/710 และ authority hash ตรง Local, BOQ/Factor F links ปกติ, ledger `009`-`016` ครบ และ hotfix `016` ตรง source. Management API ยืนยันว่า Data API ไม่ expose `private`. Encrypted readiness dump `9d306a47...` จับ 234 BOQs/2,270 items; exact-image isolated restore และ 2026-07-27 non-force detach/read-only reopen/full checksum ผ่านโดยไม่ dump Auth/Storage, reset Local หรือเขียน Production. Exact pushed HEAD `07d1d33` มี `Vercel=success` และไม่มี PR Actions run ให้บันทึก. เมื่อ 2026-07-28 Owner รับ guarded-definer, P-12/P-13 leaked-password และ `v_row_count` disposition; P-14 Auth decision ยังแยก. Same-device residual หมดอายุเมื่อเริ่ม post-publication checkpoint หลัง P-15 verification ที่อนุมัติแยก หรือ 168 ชั่วโมงหลัง P-12 เริ่ม แล้วแต่ว่าอะไรถึงก่อน และใช้กฎหยุด 24 ชั่วโมง. Independent source/architecture/security review และ static checks ผ่านแล้ว. P-44 อนุมัติ exact reviewed 23-file source/tooling commit/push โดยไม่มี GO marker หรือ PR และไม่รวม protected untracked paths. Package #39 ยัง HOLD ที่ resulting-HEAD/Remote status, one-time corrected Local bootstrap, kit/pass 1/authenticated review/pass 2, named-human executor และ independent verifier ที่เป็นคนละคน, exact path/approved `current_user`/object-owner/window และ exact P-12 approval; fresh in-window backup/restore/sign-off, post-migration application-only backup/manifest ก่อน P-13 และ final external-copy closeout ยังบังคับ. Evidence window นี้ไม่ใช่การอนุมัติ migration |
 | WP-6.6 capability completeness | G1R/G2 ผ่าน DB/concurrency/P-20/advisor/repository บน exact candidate `721c2c2`; P-25/G3/P-26 technical paths ผ่าน และ owner accepted G3 บน exact `78e96ab` แล้ว. G4 ยังแยก ส่วน independent UAT/performance/formal accessibility อยู่ WP-8 |
 | P-21/P-22/P-23/P-23.1/P-24/P-25/P-26/P-27 WP-6.6 Local-only | `020` SHA-256 `e07e0c4161077efba7bc4f6ebf95518d0cc1bc7e4628a43a128dd899bd1aef93` ผ่าน G1R/G2, P-28 เพิ่มเข้า bootstrap และ P-29/G4E ผ่าน clean chain; G3/P-26 accepted บน exact application checkpoint `78e96ab`. ไม่รวม `021` bootstrap, Factor F/hotfix expansion หรือ Production |
 | Version lifecycle ตาม ADR-003 | Admin ต้องเลือก annual/revision/patch; annual year มาจาก owner; ระบบใช้ทะเบียนทุกสถานะและไม่ reuse เลข; DB บังคับเลขถัดไป. Live G1R/G2/G3 และ owner closeout ผ่านแล้ว; WP-8/P-14 ยังรอ |

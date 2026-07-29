@@ -2401,6 +2401,38 @@ hashes. Other documents link to those facts instead of copying them. A tracked
 consistency check must cover migration order, WP ordering, pending decision IDs,
 and required authority links before WP-8.
 
+### 13.11 PRE-P-12 Option B function-privilege amendment
+
+The 2026-07-28 isolated PostgreSQL 17 rehearsal proved that the
+schema-scoped function default revoke in frozen migration `017` cannot remove
+PostgreSQL's global `PUBLIC EXECUTE` default. The Owner selected the
+least-privilege Option B design for repository-only implementation.
+
+The architecture contract is:
+
+- do not rewrite `017` or `018`;
+- insert `017a_master_catalog_phase4_global_function_default_privileges.sql`
+  at ledger `20260728001730` immediately after `017` and before `018`;
+- require `session_user=current_user=postgres`, which is also the owner role
+  for every Phase 4 routine;
+- remove the global `PUBLIC` default and additive `public`/`private`
+  function-default grants for `anon`, `authenticated`, and `service_role`;
+- keep global defaults owner-only and schema-specific function defaults
+  owner-only or absent;
+- allow the known `017` transient only for the four rejecting
+  `SECURITY INVOKER` stubs, then require no Phase 4 routine to be executable by
+  `PUBLIC`, `anon`, or `service_role` from `017a` onward;
+- require every intended application RPC to receive an explicit reviewed
+  grant; an omitted grant must fail closed as an application error; and
+- bind the exact migration hash, ledger order, ACL inventory, two-pass
+  isolated rehearsal, independent verifier, and final closeout before P-12.
+
+This is a database-owner security policy, not a Factor F, BOQ, Auth, Storage,
+feature-flag, or application-candidate change. It adds one explicit migration
+and verification stage rather than a new owner role or DDL framework; the
+dedicated-owner alternative remains deferred because its role lifecycle and
+restore cost are disproportionate to this release.
+
 ---
 
 ## 14. Gate-Specific Checklists

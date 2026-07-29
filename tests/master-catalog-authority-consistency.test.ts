@@ -98,7 +98,7 @@ function expectMarkdownTablesToBeWellShaped(path: string) {
 describe('Master Catalog authority consistency', () => {
   it('keeps the canonical Local migration path in the approved order', () => {
     const bootstrap = read('scripts/bootstrap-local-db.sh')
-    const appliedMigrations = [...bootstrap.matchAll(/-f \/tmp\/(\d{3})\.sql/g)]
+    const appliedMigrations = [...bootstrap.matchAll(/-f \/tmp\/(\d{3}[a-z]?)\.sql/g)]
       .map((match) => match[1])
 
     expect(appliedMigrations).toEqual([
@@ -111,6 +111,7 @@ describe('Master Catalog authority consistency', () => {
       '015',
       '016',
       '017',
+      '017a',
       '018',
       '019',
       '020',
@@ -131,6 +132,7 @@ describe('Master Catalog authority consistency', () => {
     expectInOrder(migrations, [
       '`016_hotfix_preserve_boq_item_suffix.sql`',
       '`017_master_catalog_phase4_foundation.sql`',
+      '`017a_master_catalog_phase4_global_function_default_privileges.sql`',
       '`018_master_catalog_phase4_draft_mutation.sql`',
       '`019_master_catalog_phase4_publish_pointer.sql`',
       '`020_master_catalog_phase4_admin_workflow_hardening.sql`',
@@ -301,6 +303,44 @@ describe('Master Catalog authority consistency', () => {
     expect(p38Harness).not.toContain('db:local:bootstrap')
   })
 
+  it('keeps Phase 4 feature-flag gates aligned to migration stage', () => {
+    const stageAuthorityPaths = [
+      'docs/plans/master-catalog/12-phase4-production-runbook.md',
+      'docs/plans/master-catalog/13-phase4-verification-report.md',
+      'docs/plans/master-catalog/19-phase4-decision-register.md',
+      'docs/plans/master-catalog/25-phase4-execution-progress-tracker.md',
+      'docs/plans/master-catalog/39-phase4-p12-production-readiness-package.md',
+      'docs/plans/master-catalog/40-phase4-p12-owner-decision-checklist.md',
+    ]
+
+    for (const authorityPath of stageAuthorityPaths) {
+      const authority = read(authorityPath)
+      expect(authority).toContain('before `017`')
+      expect(authority).toMatch(
+        /after[\s\S]{0,80}`017`[\s\S]{0,40}`017a`[\s\S]{0,40}`018`[\s\S]{0,40}`019`/i,
+      )
+      expect(authority).toMatch(/after(?: each of)? `020`-`025`/i)
+      expect(authority).toContain('`catalog_admin_enabled`')
+      expect(authority).toContain('`catalog_new_identity_enabled`')
+      expect(authority).toContain('`catalog_retirement_enabled`')
+      expect(authority).toContain('boolean `false`')
+      expect(authority).toMatch(/boolean\s+`true`/)
+    }
+
+    const migration017 = read(
+      'migrations/017_master_catalog_phase4_foundation.sql',
+    )
+    const migration020 = read(
+      'migrations/020_master_catalog_phase4_admin_workflow_hardening.sql',
+    )
+
+    expect(migration017).toContain("'catalog_admin_enabled'")
+    expect(migration017).not.toContain("'catalog_new_identity_enabled'")
+    expect(migration017).not.toContain("'catalog_retirement_enabled'")
+    expect(migration020).toContain("'catalog_new_identity_enabled'")
+    expect(migration020).toContain("'catalog_retirement_enabled'")
+  })
+
   it('keeps work-package sequencing and owner decisions explicit', () => {
     const reviewGuide = read(
       'docs/plans/master-catalog/00-phase4-review-guide.md',
@@ -463,7 +503,7 @@ describe('Master Catalog authority consistency', () => {
       /P-33 accepted that\s+exact bounded WP-7\.5 technical checkpoint at 2026-07-15 13:54 \+07/,
     )
     expect(tracker).toContain(
-      '| Current work package | P-12 readiness evidence window partially complete; HOLD pending Data API configuration, backup/isolated restore, security-residual disposition, and executor/window evidence |',
+      '| Current work package | PRE-P-12 Option B source/tooling freeze.',
     )
     expect(tracker).toContain('P42-UAT-C03')
     expect(tracker).toContain('P42-UAT-G01')
@@ -481,7 +521,7 @@ describe('Master Catalog authority consistency', () => {
     )
     expect(tracker).toMatch(/zero\s+working drafts with all catalog flags false/)
     expect(tracker).toContain(
-      'Owner decisions needed: authorize a Data API settings read; choose a secure logical-dump path or separately cost-confirmed platform restore; decide residual timing; this is not migration approval',
+      'Owner decisions needed: P-44 already authorizes the exact source/tooling commit/push.',
     )
     expect(tracker).toContain(
       'sha256:ecd457c625c6eeb445607f30d374734c3e7ebd2a6d5489912f4c7ec42b3019a5',
@@ -493,8 +533,96 @@ describe('Master Catalog authority consistency', () => {
       '| Production Data API schemas | Platform configuration proves `private` is not exposed |',
     )
     expect(verificationReport).toContain(
-      'No backup or restore was attempted',
+      '9d306a478b8ada65d0a32ab31bca19587c55efa3ae979ae4dd8ad5871d575932',
     )
+    expect(verificationReport).toContain(
+      'Owner-authorized non-force detach/read-only reopen passed all eight `SHA256SUMS` entries',
+    )
+    expect(decisions).toContain(
+      '**PRE-P-12 time-bounded backup-custody decision recorded:** 2026-07-27',
+    )
+    expect(decisions).toContain(
+      '**PRE-P-12 managed-residual decision recorded:** 2026-07-28',
+    )
+    expect(decisions).toContain('seven days (168 hours)')
+    expect(decisions).toContain('planned pause will exceed 24 consecutive hours')
+    const ownerChecklist = read(
+      'docs/plans/master-catalog/40-phase4-p12-owner-decision-checklist.md',
+    )
+    expect(ownerChecklist).toContain(
+      '- [x] Accept the seven currently `authenticated`-callable guarded',
+    )
+    expect(ownerChecklist).toContain(
+      '- [x] Accept disabled leaked-password protection for P-12 and P-13 only',
+    )
+    expect(ownerChecklist).toContain(
+      '- [x] Accept the unused `v_row_count` assignment as low-risk managed',
+    )
+    expect(ownerChecklist).toContain(
+      '- [ ] Name the migration executor: `________________`.',
+    )
+    expect(ownerChecklist).toContain(
+      '- [ ] Name an independent verifier: `________________`.',
+    )
+    expect(ownerChecklist).toContain(
+      '- [ ] Record the approved Production `session_user`, `current_user`, and',
+    )
+    expect(ownerChecklist).toContain(
+      '- [ ] Propose the maintenance window: `________________`.',
+    )
+    expect(ownerChecklist).toContain(
+      '- [x] P-44 separately authorizes one commit/push of the exact reviewed',
+    )
+    const readinessPackage = read(
+      'docs/plans/master-catalog/39-phase4-p12-production-readiness-package.md',
+    )
+    expect(readinessPackage).toContain(
+      '| Source/tooling and GO authority sync |',
+    )
+    expect(readinessPackage).toContain(
+      'The same `current_user` must execute `017`,\n  `017a`, and `018`-`025` because `ALTER DEFAULT PRIVILEGES`',
+    )
+    expect(readinessPackage).toMatch(
+      /object\s+ownership\/ACL delta for objects created or replaced by that file/,
+    )
+    expect(readinessPackage).toContain(
+      'full\n  owner/ACL/RLS inventory',
+    )
+    const migrationsAuthority = read('docs/04_data/MIGRATIONS.md')
+    const productionExecutionSection = migrationsAuthority
+      .split('### Production execution')[1]
+      ?.split('## 3. Rollback Procedures')[0] ?? ''
+    expect(productionExecutionSection).not.toContain(
+      'Copy entire contents and paste into SQL Editor',
+    )
+    expect(productionExecutionSection).toContain(
+      'one\nidentifiable remote migration-ledger row per file',
+    )
+    expect(productionExecutionSection).toContain(
+      'same frozen\n`current_user`/object-owner role',
+    )
+    expect(productionExecutionSection).toContain(
+      '39-phase4-p12-production-readiness-package.md',
+    )
+    const productionRunbook = read(
+      'docs/plans/master-catalog/12-phase4-production-runbook.md',
+    )
+    expect(productionRunbook).toContain(
+      'Post-Phase 4 DR follow-up (not a P-12 blocker)',
+    )
+    expect(productionRunbook).toContain('business-approved RPO/RTO')
+    expect(productionRunbook).toContain('Auth recovery/session implications')
+    expect(productionRunbook).toContain('Storage object')
+    expect(productionRunbook).toContain('not full-service DR')
+    const drBacklog = read(
+      'docs/plans/master-catalog/42-phase4-post-phase4-disaster-recovery-backlog.md',
+    )
+    expect(drBacklog).toContain('BACKLOG ONLY')
+    expect(drBacklog).toContain('not a PRE-P-12 blocker')
+    expect(drBacklog).toContain('Auth sessions and signing material')
+    expect(drBacklog).toContain('Storage object bytes')
+    expect(drBacklog).toContain('RPO')
+    expect(drBacklog).toContain('RTO')
     expect(tracker).toContain(
       '[P-12 Readiness Package #39](./39-phase4-p12-production-readiness-package.md)',
     )
@@ -612,7 +740,7 @@ describe('Master Catalog authority consistency', () => {
       /pre-amendment operator\/browser preflight passed on\s+`c8f6dca`/,
     )
     expect(tracker).toContain(
-      'Status: WP-8/P-37 remains Owner-accepted under the guided-UAT variance; readiness baseline 6827ebc and exact application candidate 5068f94 passed their named gates',
+      'Status: WP-8/P-37 remains Owner-accepted under the guided-UAT variance; readiness baseline 6827ebc, exact application candidate 5068f94, and exact pushed readiness/documentation head 07d1d33 retain their named evidence; Package #39 is HOLD for corrected-chain evidence and the remaining named gates; P-12 is not requested',
     )
     expect(decisions).toContain(
       'accepts combined Owner-operated guided UI plus developer-operated fault-injection/cleanup evidence',
@@ -929,6 +1057,439 @@ describe('Master Catalog authority consistency', () => {
     expect(correctionPlan).toContain('`reviewLock={expected_lock_version}`')
   })
 
+  it('keeps PRE-P-12 backup, custody, restore, and verifier gates synchronized', () => {
+    const backupAuthorityPaths = [
+      'docs/plans/master-catalog/00-phase4-review-guide.md',
+      'docs/plans/master-catalog/12-phase4-production-runbook.md',
+      'docs/plans/master-catalog/13-phase4-verification-report.md',
+      'docs/plans/master-catalog/19-phase4-decision-register.md',
+      'docs/plans/master-catalog/25-phase4-execution-progress-tracker.md',
+      'docs/plans/master-catalog/39-phase4-p12-production-readiness-package.md',
+      'docs/plans/master-catalog/40-phase4-p12-owner-decision-checklist.md',
+      'docs/plans/master-catalog/42-phase4-post-phase4-disaster-recovery-backlog.md',
+    ]
+
+    for (const path of backupAuthorityPaths) {
+      const authority = read(path)
+      expect(authority).toMatch(/post-migration/i)
+      expect(authority).toContain('application-only')
+      expect(authority).toContain('P-13')
+      expect(authority).toMatch(/post-publication/i)
+      expect(authority).toMatch(/168 (?:hours|ชั่วโมง)/)
+      expect(authority).toContain('24')
+    }
+    for (const path of backupAuthorityPaths.slice(0, -1)) {
+      const authority = read(path)
+      expect(authority).toContain('`017a`')
+      expect(authority).toContain('`018`-`025`')
+    }
+
+    const exactCustodyPaths = backupAuthorityPaths.slice(1)
+    for (const path of exactCustodyPaths) {
+      const authority = read(path)
+      expect(authority).toMatch(
+        /start of the post-publication\s+checkpoint after separately\s+approved P-15\s+verification[\s\S]{0,160}168 hours/i,
+      )
+      expect(authority).toMatch(
+        /planned\s+pause\s+(?:will\s+exceed|exceeding)\s+24 consecutive\s+hours/i,
+      )
+      expect(authority).toMatch(
+        /unplanned\s+pause\s+reaches\s+24\s+hours/i,
+      )
+    }
+
+    for (const path of [
+      'docs/plans/master-catalog/12-phase4-production-runbook.md',
+      'docs/plans/master-catalog/13-phase4-verification-report.md',
+      'docs/plans/master-catalog/19-phase4-decision-register.md',
+      'docs/plans/master-catalog/39-phase4-p12-production-readiness-package.md',
+      'docs/plans/master-catalog/40-phase4-p12-owner-decision-checklist.md',
+      'docs/plans/master-catalog/42-phase4-post-phase4-disaster-recovery-backlog.md',
+    ]) {
+      expect(read(path)).toMatch(
+        /readiness[\s\S]{0,160}not the\s+final\s+rollback source/i,
+      )
+    }
+
+    const verificationReport = read(
+      'docs/plans/master-catalog/13-phase4-verification-report.md',
+    )
+    expect(verificationReport).not.toContain('Restore to clean Local')
+    expect(verificationReport).toContain(
+      'Ephemeral network-isolated non-Production PostgreSQL 17; never Local Supabase',
+    )
+    expect(verificationReport).toContain('Exact schemas `public, private`')
+    expect(verificationReport).toContain('Exclude all Auth and Storage data')
+    expect(verificationReport).toContain('UUID-only ephemeral stubs')
+    expect(verificationReport).toMatch(
+      /At that\s+checkpoint P-37 remained HOLD/,
+    )
+    expect(verificationReport).not.toMatch(
+      /P-37 remains\s+HOLD for bounded finding disposition/,
+    )
+
+    const runbook = read(
+      'docs/plans/master-catalog/12-phase4-production-runbook.md',
+    )
+    expect(runbook).toContain(
+      'For P-12, a named human distinct from the Executor',
+    )
+
+    const ownerChecklist = read(
+      'docs/plans/master-catalog/40-phase4-p12-owner-decision-checklist.md',
+    )
+    expect(ownerChecklist).toContain(
+      'the verifier is a named human distinct from the executor',
+    )
+
+    const readinessPackage = read(
+      'docs/plans/master-catalog/39-phase4-p12-production-readiness-package.md',
+    )
+    expect(readinessPackage).toContain(
+      'distinct named-human independent verifier',
+    )
+    expect(readinessPackage).toContain('**Status:** HOLD')
+    expect(ownerChecklist).toContain('**Status:** PRE-P-12 HOLD')
+
+    const decisions = read(
+      'docs/plans/master-catalog/19-phase4-decision-register.md',
+    )
+    expect(decisions).not.toContain(
+      'The current application-only backup remains a migration rollback source',
+    )
+
+    const findingPath =
+      'docs/plans/master-catalog/43-phase4-p12-private-function-default-privilege-finding.md'
+    const findingLink =
+      './43-phase4-p12-private-function-default-privilege-finding.md'
+    const finding = read(findingPath)
+    expect(finding).toMatch(
+      /\*\*Status:\*\* OPTION B REVIEWED; P-44 SOURCE FREEZE AUTHORIZED; P-12 HOLD at\s+resulting-HEAD\/Remote evidence; no Local execution or Production approval/,
+    )
+    expect(finding).toContain(
+      'The first isolated PostgreSQL 17 CLI rehearsal applied only migration `017`',
+    )
+    expect(finding).toContain(
+      'no `pg_default_acl` row for `postgres` functions in `private`',
+    )
+    expect(finding).toContain('did not start `018`')
+    expect(finding).toContain(
+      'No Local Supabase reset/write and no Production access/write occurred.',
+    )
+    expect(finding).toContain(
+      '### Option B - Forward migration with a global function default revoke',
+    )
+    expect(finding).toContain(
+      'The candidate must execute after `017` and before `018`; do not',
+    )
+    expect(finding).toContain('edit either reviewed migration.')
+    expect(finding).toMatch(
+      /twelve private\s+`SECURITY DEFINER` helpers without an explicit per-function revoke/,
+    )
+    expect(finding).toContain(
+      'Migration `018` also grants `authenticated` usage on schema `private`.',
+    )
+    expect(finding).toMatch(/An\s+after-`025`-only correction is unsafe/)
+    expect(finding).toContain(
+      'The Owner authorized repository-only design and implementation of Option B',
+    )
+    expect(finding).toContain(
+      '`017a_master_catalog_phase4_global_function_default_privileges.sql`',
+    )
+    expect(finding).toContain('`20260728001730`')
+    expect(finding).toContain(
+      '`12cf6687b6339efa17635ac29ddfdb5150210a96e0640b0e9182a4cda64497a7`',
+    )
+
+    for (const path of [
+      'docs/plans/master-catalog/00-phase4-review-guide.md',
+      'docs/plans/master-catalog/12-phase4-production-runbook.md',
+      'docs/plans/master-catalog/13-phase4-verification-report.md',
+      'docs/plans/master-catalog/19-phase4-decision-register.md',
+      'docs/plans/master-catalog/25-phase4-execution-progress-tracker.md',
+      'docs/plans/master-catalog/39-phase4-p12-production-readiness-package.md',
+      'docs/plans/master-catalog/40-phase4-p12-owner-decision-checklist.md',
+    ]) {
+      const authority = read(path)
+      expect(authority).toContain(findingLink)
+      expect(authority).toContain('P-12')
+      expect(authority).toMatch(/HOLD/)
+      expect(authority).toMatch(
+        /after\s+`017`[\s\S]{0,40}before\s+`018`|หลัง `017` และก่อน\s+`018`/,
+      )
+      expect(authority).toMatch(/after-`025`/)
+      expect(authority).toContain('SECURITY DEFINER')
+      expect(authority).toContain('PUBLIC EXECUTE')
+      expect(authority).toContain(
+        '017a_master_catalog_phase4_global_function_default_privileges.sql',
+      )
+      expect(authority).toContain('20260728001730')
+      expect(authority).toContain(
+        '12cf6687b6339efa17635ac29ddfdb5150210a96e0640b0e9182a4cda64497a7',
+      )
+      expect(authority).toMatch(
+        /not Production-approved|no Production approval|not P-12|ไม่ใช่ P-12|repository(?:-| )candidate/i,
+      )
+    }
+
+    for (const path of [
+      'docs/plans/master-catalog/19-phase4-decision-register.md',
+      'docs/plans/master-catalog/25-phase4-execution-progress-tracker.md',
+      'docs/plans/master-catalog/39-phase4-p12-production-readiness-package.md',
+      'docs/plans/master-catalog/40-phase4-p12-owner-decision-checklist.md',
+    ]) {
+      const authority = read(path)
+      expect(authority).toContain('`026` solely')
+      expect(authority).not.toMatch(
+        /security migration whose working name is[\s\S]{0,80}`026`/,
+      )
+    }
+  })
+
+  it('keeps the new P-12 operational catalog fingerprint fail closed', () => {
+    const fingerprintAuthorityPaths = [
+      'docs/plans/master-catalog/12-phase4-production-runbook.md',
+      'docs/plans/master-catalog/13-phase4-verification-report.md',
+      'docs/plans/master-catalog/19-phase4-decision-register.md',
+      'docs/plans/master-catalog/25-phase4-execution-progress-tracker.md',
+      'docs/plans/master-catalog/39-phase4-p12-production-readiness-package.md',
+      'docs/plans/master-catalog/40-phase4-p12-owner-decision-checklist.md',
+    ]
+    const historicalAuthorityHash =
+      'sha256:ecd457c625c6eeb445607f30d374734c3e7ebd2a6d5489912f4c7ec42b3019a5'
+
+    for (const path of fingerprintAuthorityPaths) {
+      const authority = read(path)
+      expect(authority).toContain('`catalogAuthorityFingerprintSha256`')
+      expect(authority).toMatch(/new\s+operational\s+fingerprint/i)
+      expect(authority).toMatch(/UNCOMPUTED\s+—\s+HOLD/)
+      expect(authority).toContain(historicalAuthorityHash)
+      expect(authority).toMatch(
+        /historical canonical SQL was not committed/i,
+      )
+      expect(authority).toMatch(
+        /separately\s+authorized read-only query/i,
+      )
+      expect(authority).toMatch(
+        /encrypted\s+Production\s+readiness\s+snapshot's\s+isolated\s+restore/i,
+      )
+      expect(authority).toMatch(
+        /fresh\s+in-window\s+Production\/restore\s+evidence/i,
+      )
+      expect(authority).toMatch(/external\s+Production approval/i)
+      expect(authority).toContain('`productionEligible=true`')
+      expect(authority).toContain('P-12')
+    }
+
+    const readinessPackage = read(
+      'docs/plans/master-catalog/39-phase4-p12-production-readiness-package.md',
+    )
+    const ownerChecklist = read(
+      'docs/plans/master-catalog/40-phase4-p12-owner-decision-checklist.md',
+    )
+
+    for (const authority of [readinessPackage, ownerChecklist]) {
+      expect(authority).toContain('UNCOMPUTED — HOLD')
+      expect(authority).toContain('UNRECORDED — HOLD')
+      expect(authority).toContain('UNBOUND — HOLD')
+    }
+
+    expect(readinessPackage).toContain(
+      'These placeholders are deliberately invalid approval values.',
+    )
+    expect(ownerChecklist).toContain(
+      'P-12 must not be requested.',
+    )
+  })
+
+  it('keeps schema-shape and advisor evidence independently hash-bound', () => {
+    const readinessPackage = read(
+      'docs/plans/master-catalog/39-phase4-p12-production-readiness-package.md',
+    )
+    const ownerChecklist = read(
+      'docs/plans/master-catalog/40-phase4-p12-owner-decision-checklist.md',
+    )
+    const cliRunbook = read(
+      'docs/plans/master-catalog/41-phase4-p12-cli-execution-runbook.md',
+    )
+
+    for (const authority of [
+      readinessPackage,
+      ownerChecklist,
+      cliRunbook,
+    ]) {
+      expect(authority).toContain('schemaShapeContractSha256')
+      expect(authority).toContain('advisor artifact')
+      expect(authority).toContain('calibrate-schema')
+      expect(authority).toMatch(/source\/tooling HEAD/)
+      expect(authority).toMatch(/pass-1/i)
+      expect(authority).toMatch(/pass-2/i)
+      expect(authority).toMatch(/step `017` only/)
+      expect(authority).toMatch(/fresh post-previous-step advisor artifact/i)
+      expect(authority).toMatch(/SHA-256/)
+      expect(authority).toMatch(/independent verifier/i)
+      expect(authority).toMatch(/second\s+fresh\s+full\s+isolated rehearsal/i)
+      expect(authority).toContain('P-12')
+    }
+
+    expect(ownerChecklist).toContain(
+      'UNCREATED — UNREVIEWED — UNBOUND — HOLD',
+    )
+    expect(ownerChecklist).toContain('UNRECORDED — UNBOUND — HOLD')
+    expect(cliRunbook).toContain(
+      'conduit-boq/master-catalog-p12-schema-shape-contract/v2',
+    )
+    expect(cliRunbook).toContain(
+      'conduit-boq/master-catalog-p12-production-approval/v2',
+    )
+    expect(cliRunbook).toContain('githubReviewCheckedAt')
+    expect(cliRunbook).toContain('--schema-shape-contract')
+    expect(cliRunbook).toContain('--advisor-artifact-sha256')
+    expect(cliRunbook).toContain(
+      '`pass2VerificationEvidenceManifestSha256`',
+    )
+    expect(cliRunbook).toMatch(
+      /Execution starts with `017`, which must not receive\s+`--prior-step-signoff`\./,
+    )
+    expect(cliRunbook).toMatch(
+      /Every subsequent migration—`017a` and `018` through\s+`025`—must add:/,
+    )
+    expect(cliRunbook).toMatch(
+      /Migration\s+execution begins with `017`, which has no previous Phase 4 migration\./,
+    )
+    expect(cliRunbook).not.toContain('Steps `017a`-`025` must add:')
+    expect(cliRunbook).toContain('21 minutes 15 seconds')
+    expect(cliRunbook).toContain('12 minutes 30 seconds')
+    expect(cliRunbook).toContain('8 minutes 45 seconds')
+    expect(cliRunbook).toContain('8 minutes 50 seconds')
+    expect(cliRunbook).toMatch(
+      /Do\s+not regenerate it after the GO-marker commit\./,
+    )
+    for (const authority of [
+      readinessPackage,
+      ownerChecklist,
+      cliRunbook,
+    ]) {
+      expect(authority).toMatch(
+        /before any post-CLI\s+evidence-file write/i,
+      )
+      expect(authority).toContain('05-evidence-manifest.json')
+      expect(authority).toMatch(/evidence-medium/)
+      expect(authority).toMatch(/atomic rename/)
+      expect(authority).toMatch(/uncertain/i)
+    }
+    expect(ownerChecklist).not.toContain('P12_RUNNER_AUTHORITY_V1')
+
+    for (const path of [
+      'docs/04_data/MIGRATIONS.md',
+      'docs/plans/master-catalog/00-phase4-review-guide.md',
+      'docs/plans/master-catalog/12-phase4-production-runbook.md',
+      'docs/plans/master-catalog/13-phase4-verification-report.md',
+      'docs/plans/master-catalog/19-phase4-decision-register.md',
+      'docs/plans/master-catalog/25-phase4-execution-progress-tracker.md',
+      'docs/plans/master-catalog/39-phase4-p12-production-readiness-package.md',
+      'docs/plans/master-catalog/40-phase4-p12-owner-decision-checklist.md',
+      'docs/plans/master-catalog/41-phase4-p12-cli-execution-runbook.md',
+    ]) {
+      const authority = read(path)
+      expect(authority).toMatch(/source\/tooling HEAD/)
+      expect(authority).toContain('calibrate-schema')
+      expect(authority).toMatch(/second\s+fresh\s+full\s+isolated rehearsal/i)
+      expect(authority).toMatch(/pass-2/i)
+      expect(authority).toMatch(/GO\s+HEAD/)
+      expect(authority).toMatch(/HOLD/)
+    }
+  })
+
+  it('keeps the P-43 authority order, one-reset rule, and review trust boundary explicit', () => {
+    const decisionRegister = read(
+      'docs/plans/master-catalog/19-phase4-decision-register.md',
+    )
+    const tracker = read(
+      'docs/plans/master-catalog/25-phase4-execution-progress-tracker.md',
+    )
+    const readinessPackage = read(
+      'docs/plans/master-catalog/39-phase4-p12-production-readiness-package.md',
+    )
+    const ownerChecklist = read(
+      'docs/plans/master-catalog/40-phase4-p12-owner-decision-checklist.md',
+    )
+    const cliRunbook = read(
+      'docs/plans/master-catalog/41-phase4-p12-cli-execution-runbook.md',
+    )
+    const threatModel = read(
+      'docs/plans/master-catalog/18-phase4-threat-model.md',
+    )
+    const runner = read('scripts/run-master-catalog-p12-cli-step.mjs')
+
+    const p43TrackerRow = tracker
+      .split(/\r?\n/)
+      .find((line) => line.includes('PRE-P-12/P-43'))
+    expect(p43TrackerRow).toBeDefined()
+    const p43Resolution = p43TrackerRow!.split('|')[4]
+    expectInOrder(p43Resolution, [
+      'review',
+      'commit/push',
+      'Remote status',
+      'corrected Local bootstrap',
+      'kit',
+      'pass 1',
+      'GitHub review',
+      'pass 2',
+      'P-12 GO',
+      'Checklist-only GO commit',
+    ])
+
+    const requestGate = ownerChecklist.slice(
+      ownerChecklist.indexOf(
+        '- [x] Independent architecture/security/source review',
+      ),
+      ownerChecklist.indexOf(
+        '- [ ] Owner receives a separate exact P-12 go/no-go request.',
+      ),
+    )
+    expectInOrder(requestGate, [
+      'review',
+      'commit/push',
+      'Remote CI/status',
+      'corrected Local',
+      'Build and hash-bind',
+      'pass 1',
+      'GitHub contract review',
+      'pass 2',
+    ])
+
+    for (const authority of [
+      decisionRegister,
+      tracker,
+      readinessPackage,
+      ownerChecklist,
+      cliRunbook,
+    ]) {
+      expect(authority).toMatch(/one (?:new )?corrected Local|exactly one corrected|one-time corrected/i)
+      expect(authority).toMatch(/separate Git authorization|separately authorized/i)
+      expect(authority).toMatch(/Remote (?:CI\/)?status/i)
+      expect(authority).toMatch(/honest-but-fallible/i)
+      expect(authority).toMatch(/custom (?:signing\/)?PKI/i)
+    }
+
+    expect(decisionRegister).toContain('| P-43 |')
+    expect(threatModel).toContain('| T-63 |')
+    expect(threatModel).toMatch(/account compromise/i)
+    expect(threatModel).toMatch(/signed attestations/i)
+    expect(readinessPackage).toContain('P12_SCHEMA_REVIEW_V1')
+    expect(ownerChecklist).toContain('githubReviewCheckedAt')
+    expect(cliRunbook).toContain('githubReviewCheckedAt')
+    expect(runner).toContain(
+      'conduit-boq/master-catalog-p12-schema-shape-contract/v2',
+    )
+    expect(runner).toContain(
+      'conduit-boq/master-catalog-p12-production-approval/v2',
+    )
+    expect(runner).not.toContain('api.github.com')
+    expect(runner).not.toMatch(/\bgh\s+api\b/)
+  })
+
   it('keeps reliability commands and route recovery files tracked by contract', () => {
     const packageJson = JSON.parse(read('package.json')) as {
       scripts: Record<string, string>
@@ -1215,6 +1776,9 @@ describe('Master Catalog authority consistency', () => {
       'docs/plans/master-catalog/38-phase4-p42-final-review-snapshot-binding-incident-note.md',
       'docs/plans/master-catalog/39-phase4-p12-production-readiness-package.md',
       'docs/plans/master-catalog/40-phase4-p12-owner-decision-checklist.md',
+      'docs/plans/master-catalog/41-phase4-p12-cli-execution-runbook.md',
+      'docs/plans/master-catalog/42-phase4-post-phase4-disaster-recovery-backlog.md',
+      'docs/plans/master-catalog/43-phase4-p12-private-function-default-privilege-finding.md',
     ]) {
       expectRelativeMarkdownLinksToExist(path)
       expectMarkdownTablesToBeWellShaped(path)

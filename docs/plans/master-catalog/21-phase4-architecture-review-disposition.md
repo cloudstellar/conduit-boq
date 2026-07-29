@@ -95,6 +95,50 @@ Read-only Production evidence relevant to disputed findings:
 
 ## 7. Conclusion
 
+### 7.1 2026-07-28 new-evidence disposition
+
+Finding #43 is new evidence after the original disposition: PostgreSQL's
+schema-scoped default privilege cannot revoke the global function
+`PUBLIC EXECUTE` default, and the canonical Supabase baseline also carries an
+additive `public` function default for `service_role`.
+
+The Owner selected Option B for repository-only implementation. Architecture
+review accepts a separate forward bridge after `017` and before `018`, using
+the same `postgres` owner and explicit global plus `public`/`private` default
+revokes. This preserves the existing private-definer/public-facade boundary and
+turns an omitted future grant into a fail-closed application error. It avoids
+rewriting reviewed migrations and avoids introducing a dedicated role/DDL
+framework whose lifecycle cost is not justified at the current scale.
+
+This disposition is conditional: exact source/hash/ledger, stage-aware runner
+checks, independent security review, and two fresh isolated rehearsals must
+pass. It is not P-12 GO and authorizes no Local reset, Production migration,
+deployment, flag enablement, publication, Factor F change, or hotfix.
+
+### 7.2 2026-07-29 PRE-P-12 review-identity disposition
+
+P-43 accepts the existing authenticated GitHub review surface rather than a
+custom signing/PKI subsystem. Schema-contract v2 binds one immutable PR-review
+envelope to the exact source HEAD, kit, pass-1 evidence, reviewed payload,
+authenticated human login, approved state, and review time. The runner stays
+offline and verifies only canonical structure, hashes, identity equality, and
+chronology; a distinct human must check the review while authenticated before
+contract freeze and again immediately before GO.
+
+This is proportionate to the accepted honest-but-fallible operator model and
+avoids new private-key custody, rotation, recovery, and revocation debt. It does
+not claim non-repudiation or malicious-operator resistance. Account compromise,
+collusion/deliberate fabrication, and review deletion after the final check are
+explicit residuals. If those threats enter scope, the architecture must stop
+and add independently custodied signed attestations before Production.
+
+P-43 also reconciles execution order: independent review/static checks;
+separately authorized source commit/push; exact new-HEAD Remote status;
+separately authorized one corrected Local bootstrap; kit; pass 1; authenticated
+human contract review; pass 2; remaining gates; separate P-12 GO; then a
+separately authorized Checklist-only GO commit. This amendment authorizes only
+working-tree authority/tooling alignment.
+
 The independent review's top-level conclusion is accepted: the Phase 4
 architecture has no fundamental showstopper and does not require redesign.
 Revision 8 resolves the useful ambiguities without adding Storage, a workflow

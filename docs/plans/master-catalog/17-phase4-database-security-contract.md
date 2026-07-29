@@ -964,14 +964,43 @@ broader independent WP-8 closure remain under Note #34 before P-37 acceptance.
 
 P-39R migrations `022`-`024` are accepted history and must not be edited.
 P-41 appends `025_master_catalog_phase4_withdraw_order_compaction.sql` after
-`024`; the canonical Local bootstrap range is now `017`-`025`. Incremental
-Local apply was not treated as a substitute: after a new explicit
-destructive-reset warning/approval, the clean integrated execution passed on
-exact pushed `adcca3939f3080cdf64bc6ad807051e9e85fed94`. Any future reset still
-requires its own warning and approval.
+`024`; the historical pre-bridge Local bootstrap covered `017` through `025`.
+For the corrected PRE-P-12 chain, the canonical order is `017` → `017a` →
+`018` → … → `025`. Incremental Local apply was not treated as a substitute:
+after a new explicit destructive-reset warning/approval, the historical clean
+integrated execution passed on exact pushed
+`adcca3939f3080cdf64bc6ad807051e9e85fed94`. Any future reset still requires
+its own warning and approval.
 
 Do not edit an applied migration file. Forward-fix with a new reviewed
 migration.
+
+## 12.1 PRE-P-12 function default-privilege bridge
+
+Migration `017a_master_catalog_phase4_global_function_default_privileges.sql`
+is the Owner-selected forward correction for Finding #43. Its exact candidate
+ledger is
+`20260728001730 master_catalog_phase4_global_function_default_privileges`,
+SHA-256
+`12cf6687b6339efa17635ac29ddfdb5150210a96e0640b0e9182a4cda64497a7`.
+It is Local/isolated-rehearsal only and does not approve P-12.
+
+The required state machine is:
+
+| Stage | Function-default and private-schema contract |
+|---|---|
+| After `017`, before `017a` | `private` exists, is owned by `postgres`, has no private routine, and denies `PUBLIC`/`anon`/`authenticated` schema usage. The global function guard is not yet installed. The four exact rejecting public stubs may still have the known baseline `service_role` execute grant; no other Phase 4 routine exists. Only `017a` may follow. |
+| After `017a`, before `018` | Global `postgres` function defaults are exactly owner-only. Any `public`/`private` schema-specific function-default row is owner-only or absent. The four stubs are owner plus `authenticated` only; `PUBLIC`, `anon`, and `service_role` cannot execute them. No private routine exists and authenticated private-schema usage remains denied. |
+| From `018` onward | The global/schema default guard remains exact. `authenticated` private-schema usage is permitted only for the reviewed helper calls, while every routine has an explicit owner/security mode/empty `search_path`/body/ACL inventory. No Phase 4 routine is executable by `PUBLIC`, `anon`, or `service_role` unless a later separately reviewed contract grants it. |
+
+The bridge runs as `session_user=current_user=postgres`; default privileges are
+not inherited from another membership role. It removes PostgreSQL's global
+`PUBLIC EXECUTE` default and the Supabase baseline's additive schema-specific
+API-role defaults in the same transaction, reasserts the existing stub ACLs,
+and verifies `pg_default_acl` structurally. It contains no table/data/flag,
+BOQ, Factor F, Auth, or Storage mutation. Any unexpected private routine,
+unknown default-ACL grantee/grantor, wrong owner, or wrong stub posture aborts
+the transaction.
 
 ## 13. Required pre/post assertions
 
