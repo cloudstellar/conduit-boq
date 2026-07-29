@@ -17,11 +17,15 @@ was consumed: bootstrap through `026`, WP-7, WP-6.5, and canonical hash/schema
 verification passed, then the error-level Local DB lint returned exit code
 `1`. The run stopped without retry, cleanup, patch, ad hoc SQL, final
 invariant query, package completion, kit/pass work, or Production action.
-The Owner has now authorized only the bounded read-only lint diagnosis below;
-it remains pending until its own Checklist-only authority checkpoint is clean,
-pushed, and upstream-equal. Disposable execution, final Local-gate
-continuation, kit/pass work, Production, application/UI/export changes, flags,
-publication, Factor F, hotfix `016`, and P-12 remain unauthorized.
+The bounded read-only lint diagnosis was then consumed exactly once and
+classified the sole emitted finding as Package #39's frozen known
+`pg_temp.catalog_placement_input` analyzer limitation, with zero unknown
+findings. This classification does not pass or close the Local gate. The Owner
+has now authorized only the Checklist-only result checkpoint below; it remains
+pending until clean, pushed, and upstream-equal. Disposable execution, final
+Local-gate continuation, evidence-package completion, kit/pass work,
+Production, application/UI/export changes, flags, publication, Factor F,
+hotfix `016`, and P-12 remain unauthorized.
 
 **Exact application candidate:**
 `5068f944af2aa3fe8446c77c8ae8d48673cb260b`
@@ -52,8 +56,11 @@ above. The post-P-48 status checkpoint and corrected-Local authorization
 checkpoint are complete. The single corrected-Local reset was consumed; all
 gates through canonical verification passed, and error-level DB lint then
 failed closed with exit code `1`. The retained evidence package is incomplete
-by design. The Owner has authorized one bounded read-only lint diagnosis under
-the fail-closed contract below; no later Local gate is inferred.
+by design. The one bounded read-only lint diagnosis completed under the
+fail-closed contract below and matched only the frozen known
+`private.place_catalog_items_impl` temp-table analyzer finding; no unknown
+finding was emitted. The Owner has authorized only its Checklist-only result
+checkpoint; no later Local gate is inferred.
 
 **Post-freeze status/authority overlay:** only from the exact P-48 replacement
 freeze above through the final GO HEAD, this Checklist is the sole live tracked
@@ -200,6 +207,54 @@ appears, preserve the evidence and stop. Even an exact known-finding match
 authorizes only classification and a report to the Owner; resuming final
 invariants or closing the Local gate requires another explicit Owner decision
 and separately pushed Checklist-only authority checkpoint.
+
+**Post-P-48 Local-lint diagnostic result and status-checkpoint authority
+recorded:** 2026-07-30 — after being told that the authorized read-only
+diagnostic was consumed exactly once and matched only Package #39's frozen
+known finding, the Owner instructed the team to continue with the recommended
+next step.
+
+The retained secret-free
+`06a-db-lint-diagnostic.json` binds authority checkpoint
+`79e4f922681047e585df9b048401fb9a874e6022`, immutable source/tooling HEAD
+`7fbfe1bb8f71df03a78762b00e93aded7bdd6e42`, Supabase CLI `2.107.0`, Local
+target, and exactly one invocation of the authorized `--fail-on none`
+machine-output command. Its file SHA-256 is
+`9f356092de16d5a6b0d8b0a370ae843626c085c6522e2dd21bd0cc33f894288a`.
+The command returned exit code `0` because its
+fail-on threshold was intentionally `none`; that exit code is not a clean-lint
+claim. Machine parsing found exactly one error-severity finding:
+`private.place_catalog_items_impl` reported that
+`pg_temp.catalog_placement_input` does not exist. It was classified as the
+frozen known generic-analyzer limitation. Unknown-finding count was zero; the
+accepted unused `private.catalog_placement_state.v_row_count` finding was not
+emitted at the selected error level. No raw output or secret material was
+retained and Production was not touched.
+
+This result completes only the bounded diagnostic/classification action. The
+original error-level lint gate remains truthfully stopped with exit code `1`,
+and final invariants, evidence-package completion/checksums, Local-gate
+closeout, kit/pass work, and P-12 remain unexecuted and unauthorized.
+
+The Owner's instruction authorizes exactly one Checklist-only result
+checkpoint from base
+`79e4f922681047e585df9b048401fb9a874e6022` on branch
+`codex/master-catalog-phase4`: change only
+`docs/plans/master-catalog/40-phase4-p12-owner-decision-checklist.md`, commit
+once as `docs: record local lint diagnosis`, and push once to the existing
+branch. Do not create a PR or stage/modify `files/`, `tmp/`, `output/`, or any
+other untracked path. This commit contains no P-12 GO marker. Record its SHA,
+upstream equality, and truthful Remote status in the secret-free external
+handoff only; no recursive tracked commit is authorized or required merely to
+record its own SHA.
+
+This status-checkpoint authority permits no reset, migration application,
+lint retry, second diagnostic, DDL, DML, manual/ad hoc SQL, final invariant
+query, evidence-package completion, Local-gate closeout, cleanup, patch,
+source edit, kit/pass work, Production access/write, feature-flag change,
+publication, P-12, PR, or other Git action. Resuming the corrected Local gate
+requires a new explicit Owner decision and separately pushed Checklist-only
+authority checkpoint.
 
 **Post-freeze fingerprint binding:** frozen references in Package #39 and CLI
 Runbook #41 that say to record the future
@@ -374,7 +429,8 @@ Alternative:
 The verified restore removes the backup-rehearsal blocker. P-47
 repository/static closure has passed. P-12 remains HOLD at a separately
 authorized but incomplete corrected Local gate (replacement Git freeze/Remote
-record complete; reset consumed; stopped fail-closed at DB lint),
+record complete; reset consumed; known lint finding classified; final
+invariants/package closeout not authorized),
 later-authorized kit/pass-1/authenticated-review/pass-2 evidence, named-human
 executor/distinct verifier/path/object-owner/window, and the separate P-12
 decision below.
@@ -566,12 +622,18 @@ weaken the verifier, or continue that disposable sequence.
 - [x] After that fail-closed report, the Owner authorized only the exact
   read-only lint diagnosis recorded above, subject to its separate
   Checklist-only commit/push from `fbd0d3c`.
-- [ ] Execute and classify that lint diagnosis:
-  `AUTHORIZED — NOT YET CONSUMED`. Run the one exact `--fail-on none`
-  machine-output command only after its authority checkpoint is clean,
-  pushed, and upstream-equal. Stop after classification; even an exact match
-  to Package #39's frozen known findings does not authorize final invariants
-  or Local-gate closeout.
+- [x] Execute and classify that lint diagnosis:
+  `CONSUMED — EXACT FROZEN KNOWN FINDING — UNKNOWN FINDINGS 0`. The one
+  authorized command ran from source `7fbfe1b` under authority checkpoint
+  `79e4f922`; it emitted only the documented
+  `private.place_catalog_items_impl` / `pg_temp.catalog_placement_input`
+  analyzer finding. The `--fail-on none` exit code `0` is not a clean-lint or
+  Local-gate-pass claim. Final invariants and Local-gate closeout remain
+  separately unauthorized.
+- [x] Owner authorized exactly one Checklist-only result checkpoint from
+  `79e4f922`, changing this file only, with commit message
+  `docs: record local lint diagnosis` and one push/no PR. This is status-only
+  authority and does not authorize later Local execution.
 - [ ] Only after the corrected Local gate passes, build one external kit at
   that source/tooling HEAD under later separate authorization and record its
   canonical manifest path/SHA-256, generator source SHA-256, runner source
@@ -739,10 +801,14 @@ Request P-12 only when every HOLD row in Package #39 is Ready:
 - [x] Fresh Owner authority is recorded for one read-only Local lint
   diagnostic with no reset, SQL, mutation, cleanup, patch, or later-gate
   inference, subject to its exact Checklist-only checkpoint.
-- [ ] Execute and classify that diagnostic:
-  `AUTHORIZED — NOT YET CONSUMED`. Exact match to Package #39's frozen
-  triaged findings still requires a separate Owner decision/checkpoint before
-  final invariants or Local-gate closeout.
+- [x] Execute and classify that diagnostic:
+  `CONSUMED — EXACT FROZEN KNOWN FINDING — UNKNOWN FINDINGS 0`. The known
+  `place_catalog_items_impl` temp-table analyzer limitation was the sole
+  finding; the diagnostic exit code `0` reflects `--fail-on none`, not a
+  clean-lint or corrected-Local-gate pass.
+- [x] Fresh Owner authority is recorded for exactly one Checklist-only result
+  checkpoint from `79e4f922`, changing this file only, one commit/push and no
+  PR. It authorizes no final invariants or Local-gate closeout.
 - [ ] Build and hash-bind the one clean source kit only after the new-HEAD
   Remote and corrected-Local gates and later separate authorization; complete
   pass 1, structured authenticated GitHub contract review, pass 2, and the
