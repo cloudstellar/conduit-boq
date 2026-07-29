@@ -23,8 +23,10 @@ classified the sole emitted finding as Package #39's frozen known
 findings. This classification does not pass or close the Local gate. The Owner
 authorized Checklist-only result checkpoint completed at pushed/upstream-equal
 `c1759a4098acf9d7eaf939b4fde4058a9817f836`, with `Vercel=success`, no PR,
-and zero PR-triggered GitHub Actions runs. The Owner has now explicitly
-authorized only the no-reset/read-only Local-gate closeout below; it remains
+and zero PR-triggered GitHub Actions runs. The earlier external-runner
+Local-closeout authority reached static review but was never executed and is
+superseded unconsumed by the Recovery closeout below. The Owner has explicitly
+authorized only that no-reset/read-only Recovery closeout, which remains
 pending until its own Checklist-only authority checkpoint is clean, pushed,
 and upstream-equal. Disposable execution, kit/pass work, Production,
 application/UI/export changes, flags, publication, Factor F, hotfix `016`,
@@ -66,8 +68,9 @@ by design. The one bounded read-only lint diagnosis completed under the
 fail-closed contract below and matched only the frozen known
 `private.place_catalog_items_impl` temp-table analyzer finding; no unknown
 finding was emitted. Its Checklist-only result checkpoint is complete. The
-Owner has now authorized only the separately checkpointed no-reset/read-only
-Local closeout below; no kit/pass or later gate is inferred.
+earlier external runner was never invoked and produced no closeout evidence.
+The Owner has now authorized only the separately checkpointed no-reset/
+read-only Recovery closeout below; no kit/pass or later gate is inferred.
 
 **Post-freeze status/authority overlay:** only from the exact P-48 replacement
 freeze above through the final GO HEAD, this Checklist is the sole live tracked
@@ -377,6 +380,94 @@ kit generation, disposable pass 1, Production access/write, P-12, deploy,
 feature flag, publication, Factor F mutation, hotfix work, or PR. A separate
 Checklist-only result checkpoint must later bind the final runner, evidence,
 package-status, and `SHA256SUMS` hashes before any kit/pass request.
+
+**Post-P-48 simplified Recovery closeout supersession recorded:**
+2026-07-30 — after the exact external runner above accumulated implementation
+complexity during static review, but before it or any final-invariant database
+query was invoked, the Owner explicitly approved:
+
+> อนุมัติ Recovery closeout ตามคำแนะนำ: ยกเลิก runner ที่ไม่เคย execute,
+> คง 01–06a, ใช้ one short Local read-only transaction และหลักฐานสุดท้าย
+> หนึ่งไฟล์พร้อม SHA โดยไม่ reset, rerun หรือแตะ Production
+
+This decision supersedes only the unconsumed ad hoc Local-closeout runner and
+its proposed `07-final-invariants.json`, `08-package-status.json`, and
+`SHA256SUMS` packaging. It does not change the frozen source/tooling HEAD,
+Production kit/generator/runner contracts, migration hashes/order, database or
+security architecture, business authority, timeouts, or P-12 through P-15
+separation.
+
+The external runner at
+`/private/tmp/conduit-pre-p12-local-20260729T164944Z.m56rcG/run-final-invariants-and-closeout-once.mjs`
+is `ABANDONED — NEVER EXECUTED`. Preserve it without invocation and do not use
+its bytes, self-hash, or static-review drafts as release evidence. At
+supersession, `07-final-invariants.json`, `08-package-status.json`, and
+`SHA256SUMS` were absent. The seven owner-only `01`-`06a` files and exact hashes
+recorded above remain the accepted retained inputs and must not be modified,
+renamed, deleted, or regenerated.
+
+This Recovery decision first authorizes exactly one Checklist-only authority
+checkpoint from base
+`3707cd721b7a8b51d72df81c5c94bc72f6f2b07c` on branch
+`codex/master-catalog-phase4`: change only this Checklist, commit once as
+`docs: simplify local gate closeout`, and push once to the existing branch.
+Do not create a PR or stage/modify `files/`, `tmp/`, `output/`, or any other
+untracked repository path. The commit contains no P-12 GO marker.
+
+Only after that checkpoint is clean, pushed, and upstream-equal, this decision
+authorizes the following bounded Recovery action:
+
+1. Reverify the exact source/tooling HEAD, authority HEAD/upstream, tracked
+   cleanliness, CLI `2.107.0`, Local project/loopback target, PostgreSQL major
+   `17`, healthy `supabase_db_conduit-boq-local`, all seven retained evidence
+   hashes/owner/mode, and absence of
+   `local-closeout-final.json`, `07-final-invariants.json`,
+   `08-package-status.json`, and `SHA256SUMS`.
+2. Make exactly one database invocation directly through Local
+   `docker exec -i ... psql -X -qAt` with SQL on standard input. It must contain
+   one `REPEATABLE READ, READ ONLY` transaction, a 10-second statement timeout,
+   a 5-second lock timeout, and one sanitized JSON `SELECT`. Do not use or
+   invoke an external runner.
+3. Verify from that one transaction: database and session/current-user
+   identity, PostgreSQL major/read-only posture; default active catalog
+   `2568.0.0` with 710 rows and stored canonical
+   `sha256:2e3571ea7135fbc0bbb84c8cc330af1173e4c1d2345e5eb59958dc76e45558b8`;
+   zero drafts; all three Phase 4 flags present as boolean `false`; 198 BOQs,
+   1,547 BOQ items, zero unversioned BOQs, zero missing catalog categories,
+   and zero cross-version items; unchanged active/default Factor F
+   `2569.0.0` with 36 actual rows, two versions/73 total rows, stored
+   `sha256:4f35b267bde3007439aebb193be1e53bdcea5a7acce95b5a7bbf5828018ef1a6`,
+   and zero partial legacy snapshots; exact global owner-only function default
+   ACL; unchanged hotfix `016` body/security posture; and exact migration `026`
+   owner/body/invoker/default/search-path/ACL posture.
+4. Persist no raw business rows, SQL output, CLI output, environment values, or
+   secret material. If and only if every invariant passes, create exactly one
+   new owner `cloud`, mode `0600`, exclusive no-overwrite evidence file:
+   `local-closeout-final.json` in the retained evidence directory. It must
+   record only sanitized facts, exact authority/source/query hashes, the seven
+   input-evidence hashes, `databaseInvocationCount=1`,
+   `localLedgerAsserted=false`, the preserved known-lint disposition,
+   `productionTouched=false`, `kitAuthorized=false`, and
+   `p12Authorized=false`.
+5. Compute the file's SHA-256 and bind that single hash in one later
+   Checklist-only result checkpoint. Do not create `08-package-status.json` or
+   any checksum-manifest file; this Checklist is the status record and the
+   recorded file SHA is the integrity binding.
+
+Any preflight, query, parse, invariant, exclusive-write, permission, or hash
+failure stops the Recovery action without retry, cleanup, overwrite, reset,
+lint/smoke rerun, migration apply, ad hoc SQL, kit/pass work, or Production
+access. Preserve any partial evidence exactly and require a new Owner
+decision. Success closes only the corrected Local gate. It does not authorize
+kit generation, disposable pass 1, P-12, deploy, flags, publication, Factor F
+mutation, hotfix work, or any Production action.
+
+After success, this decision authorizes exactly one Checklist-only result
+checkpoint from the pushed Recovery authority HEAD: change only this
+Checklist, record the query/evidence hash and result, commit once as
+`docs: record local gate closeout`, push once to the existing branch, and
+create no PR. No recursive tracked commit is required merely to record its own
+SHA.
 
 **Post-freeze fingerprint binding:** frozen references in Package #39 and CLI
 Runbook #41 that say to record the future
@@ -759,9 +850,14 @@ weaken the verifier, or continue that disposable sequence.
 - [x] Owner authorized the exact no-reset/read-only Local-gate closeout
   recorded above, subject to its separate Checklist-only authority checkpoint
   from `c1759a4`.
-- [ ] Execute that closeout once and complete its owner-only evidence package:
-  `AUTHORIZED — NOT YET CONSUMED`. Do not reset, rerun lint or smoke suites,
-  contact Production, or infer kit/pass/P-12 authority.
+- [x] Supersede that external-runner closeout before invocation:
+  `ABANDONED — NEVER EXECUTED`; its proposed `07`, `08`, and checksum manifest
+  were never created.
+- [ ] Execute the simplified one-query Recovery closeout and create only
+  `local-closeout-final.json`: `AUTHORIZED — NOT YET CONSUMED`, subject to its
+  separate Checklist-only authority checkpoint from `3707cd7`. Do not reset,
+  rerun lint or smoke suites, contact Production, or infer kit/pass/P-12
+  authority.
 - [ ] Only after the corrected Local gate passes, build one external kit at
   that source/tooling HEAD under later separate authorization and record its
   canonical manifest path/SHA-256, generator source SHA-256, runner source
@@ -940,9 +1036,12 @@ Request P-12 only when every HOLD row in Package #39 is Ready:
 - [x] Fresh Owner authority is recorded for the exact no-reset/read-only
   Local-gate closeout and owner-only package finalization above, subject to its
   separate Checklist-only checkpoint from `c1759a4`.
-- [ ] Execute that Local closeout once:
-  `AUTHORIZED — NOT YET CONSUMED`. Success closes only the corrected Local
-  gate; kit/pass work and P-12 remain separate.
+- [x] Supersede that exact-runner Local closeout before invocation:
+  `ABANDONED — NEVER EXECUTED`.
+- [ ] Execute the simplified one-query Recovery closeout and single-file
+  evidence contract: `AUTHORIZED — NOT YET CONSUMED`, subject to its separate
+  Checklist-only authority checkpoint from `3707cd7`. Success closes only the
+  corrected Local gate; kit/pass work and P-12 remain separate.
 - [ ] Build and hash-bind the one clean source kit only after the new-HEAD
   Remote and corrected-Local gates and later separate authorization; complete
   pass 1, structured authenticated GitHub contract review, pass 2, and the
