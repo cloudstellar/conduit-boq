@@ -5,13 +5,16 @@
 **Last updated:** 2026-07-29
 
 **Status:** PRE-P-12 HOLD - independent source/architecture/security review and
-static checks are complete. P-44 authorizes the exact reviewed 23-file
-source/tooling freeze commit/push from `07d1d33` to
-`codex/master-catalog-phase4`, with no GO marker or PR and protected untracked
-paths excluded. After the push succeeds, the canonical open order is truthful
-Remote status for that new HEAD; separately authorized one corrected Local
-bootstrap; kit; pass 1; structured authenticated named-human GitHub contract
-review; and pass 2/closeout. Named-human executor/distinct verifier/path/
+static checks are complete. P-44 froze the exact reviewed executable migration/
+application/bootstrap/generator/runner content at clean pushed
+`ed94c0304be2741217c7ea2c36322b426de1dfe5`;
+its exact-head Remote record is `Vercel=success` and no PR-triggered GitHub
+Actions run exists. P-45 authorizes one exact 11-file authority/status-only
+descendant commit/push from `ed94c03`. P-46 conditionally authorizes exactly
+one destructive corrected Local bootstrap only after that descendant is clean,
+pushed, equal to upstream, and Remote-ready. Kit, pass 1, structured
+authenticated named-human GitHub contract review, and pass 2/closeout remain
+unauthorized later gates. Named-human executor/distinct verifier/path/
 object-owner/window and the separate P-12 decision also remain open
 
 **Exact application candidate:**
@@ -20,10 +23,24 @@ object-owner/window and the separate P-12 decision also remain open
 **Exact pushed readiness/documentation head:**
 `07d1d3399cea363a2ff923c6393d4a3259ce623c`
 
-**Current authority sync:** independently reviewed working tree with P-44
-commit/push authorization recorded; execution/resulting HEAD remains pending,
-and `07d1d33` remains the last pushed authority head until the authorized push
-succeeds.
+**Immutable P-44 executable-content ancestor:**
+`ed94c0304be2741217c7ea2c36322b426de1dfe5`
+
+**P-45 kit-bound source/tooling HEAD:** **UNRECORDED — HOLD**
+
+**Current authority sync:** P-44 content/Remote freeze is complete. P-45/P-46
+decisions are recorded; the P-45 resulting HEAD/Remote and P-46 Local evidence
+remain pending.
+
+**Future PRE-GO authority rule:** after P-45, no tracked path other than this
+Checklist may change. Every later bounded kit/pass action requires a new
+explicit Owner decision and separate Git authorization recorded before action
+in a clean pushed/upstream-equal Checklist-only PRE-GO authority checkpoint
+with no committed P-12 GO marker. Execute that action from a clean
+dedicated checkout pinned to the unchanged P-45 source/tooling HEAD. Such
+authority commits are not new source HEADs or Production approval; the final
+runner evaluates the net changed path from P-45 to GO, which must remain
+exactly this Checklist. This rule authorizes no kit or pass now.
 
 **Authority:** Production `2568.0.0` remains authoritative for item names,
 units, and prices. The local workbook remains reconciliation/reference evidence
@@ -40,9 +57,19 @@ only.
 - [x] Owner-selected `017a` candidate identity is frozen in exact `017` ->
   `017a` -> `018` order; independent review/static checks passed and the
   corrected-chain rehearsal remains open.
-- [x] P-44 authorizes the exact reviewed 23-file source/tooling freeze
-  commit/push from base `07d1d33`, with no GO marker or PR and with `files/`,
-  `tmp/`, and `output/` excluded. This is Git authority only.
+- [x] P-44 exact reviewed 23-file content freeze was committed/pushed at
+  `ed94c0304be2741217c7ea2c36322b426de1dfe5`, with no GO marker, PR, or
+  `files/`, `tmp/`, or `output/` content. Local/upstream equality and
+  `Vercel=success` passed; no PR-triggered GitHub Actions run exists.
+- [x] P-45 authorizes one exact 11-file authority/status-only descendant
+  commit/push from `ed94c03`; no migration, application, bootstrap, generator,
+  runner, GO-marker, PR, or protected-untracked-path change.
+- [x] P-46 conditionally authorizes exactly one destructive
+  `npm run db:local:bootstrap` after P-45 clean/upstream/push/Remote-ready
+  proof. The Owner was warned that it invokes
+  `supabase db reset --local --no-seed` and destroys/rebuilds all Local
+  Supabase data. Failure/drift requires evidence preservation and stop; no
+  retry, reset, or patch without fresh Owner approval.
 - [x] Production read-only baseline, authority hash, migration ledger, BOQ,
   Factor F, RLS/grant/trigger inventory, and advisor baseline were captured
   without a Production write.
@@ -167,11 +194,12 @@ Alternative:
 - [ ] Use a platform backup/clone only after its separate cost is confirmed.
 
 The verified restore removes the backup-rehearsal blocker, and independent
-review/static checks are now complete. P-12 remains HOLD starting at separately
-authorized authority-sync commit/push, then new-HEAD Remote status, separately
-authorized one corrected Local bootstrap, kit/pass-1/authenticated-review/
-pass-2 evidence, named-human executor/distinct verifier/path/object-owner/
-window, and the separate P-12 decision below.
+review/static checks and P-44 content freeze are now complete. P-12 remains
+HOLD at the P-45 authority/status commit/push and new-HEAD Remote record, the
+conditionally authorized but unrun P-46 corrected Local bootstrap,
+later-authorized kit/pass-1/authenticated-review/pass-2 evidence, named-human
+executor/distinct verifier/path/object-owner/window, and the separate P-12
+decision below.
 
 #### Frozen backup/snapshot timeline
 
@@ -304,24 +332,34 @@ weaken the verifier, or continue that disposable sequence.
   no blocking defect; exact candidate tests passed, and documentation wording
   corrections were reconciled. This review does not authorize Git, Local
   reset/application, disposable execution, or Production.
-- [x] P-44 separately authorizes one commit/push of the exact reviewed
-  bridge-aware 23-file source/tooling candidate with no P-12 GO marker or PR.
-  This row records authorization, not the resulting self-referential HEAD.
+- [x] P-44 exact reviewed bridge-aware 23-file content freeze completed at
+  clean pushed `ed94c0304be2741217c7ea2c36322b426de1dfe5`, with
+  `Vercel=success`, no PR-triggered GitHub Actions run, no P-12 GO marker, and
+  no PR.
+- [x] P-45 separately authorizes one exact 11-file authority/status-only
+  descendant commit/push from `ed94c03`. `ed94c03` remains the immutable
+  executable-content ancestor; no migration, application, bootstrap, generator,
+  or runner file may change.
+- [x] P-46 conditionally authorizes exactly one corrected destructive Local
+  bootstrap after the P-45 source HEAD is clean, pushed, upstream-equal, and
+  Remote-ready. This authorization does not include a retry.
 - [ ] Record the exact clean, pushed **source/tooling HEAD** outside its own
-  source commit (PR/Remote record and later kit manifest first):
+  P-45 commit (Remote record and later kit manifest first):
   `UNRECORDED — HOLD`. The later Checklist-#40-only GO commit records this
   earlier SHA; do not create a self-referential source commit.
 - [ ] Record truthful Remote CI/status for that exact new source/tooling HEAD:
-  `UNRECORDED — HOLD`. The historical `07d1d33` status does not satisfy this
-  gate.
-- [ ] After a separate explicit warning/Owner approval, run exactly one
-  corrected canonical Local bootstrap at that same HEAD (`009`-`015`, hotfix
-  `016`, `017`, `017a`, `018`-`025`) plus consolidated smoke/security/business
-  invariants: `UNAPPROVED — UNRUN — HOLD`. Do not patch the existing post-`025`
-  Local. Do not run a second new reset unless source that can affect
-  data/identity changes or the run fails, and then only with fresh approval.
+  `UNRECORDED — HOLD`. Historical `07d1d33` and P-44 `ed94c03` statuses do not
+  satisfy the P-45 exact-head gate.
+- [ ] Under conditional P-46, run exactly one corrected canonical Local
+  bootstrap at that same HEAD (`009`-`015`, hotfix `016`, `017`, `017a`,
+  `018`-`025`) plus consolidated smoke/security/business invariants:
+  `AUTHORIZED CONDITIONALLY — UNRUN — HOLD`. The command invokes
+  `supabase db reset --local --no-seed` and rebuilds all Local Supabase data.
+  Do not patch the existing post-`025` Local. On failure/drift, preserve
+  secret-free immutable external evidence and stop; no retry, patch, or second
+  reset without fresh Owner approval.
 - [ ] Only after the corrected Local gate passes, build one external kit at
-  that source/tooling HEAD and record its
+  that source/tooling HEAD under later separate authorization and record its
   canonical manifest path/SHA-256, generator source SHA-256, runner source
   SHA-256, and `productionEligible=true`: `UNBUILT — UNBOUND — HOLD`.
   Reuse this exact kit for pass 1, pass 2, and Production; do not regenerate it
@@ -466,18 +504,22 @@ Request P-12 only when every HOLD row in Package #39 is Ready:
   resistance triggers signed attestations with independent key custody before
   Production.
 - [x] Independent architecture/security/source review and static checks pass.
-- [x] P-44 separately authorizes the exact bridge-aware 23-file source/tooling
-  commit/push with no GO marker or PR.
-- [ ] After that push succeeds, record its SHA externally and its truthful
-  Remote CI/status before any Local bootstrap or kit.
-- [ ] Under separate explicit reset approval, exactly one corrected Local
-  bootstrap plus consolidated invariants passes at that same source HEAD. No
-  second reset unless source that can affect data/identity changes or the run
-  fails, with fresh approval.
+- [x] P-44 bridge-aware executable migration/application/bootstrap/generator/
+  runner content is frozen at pushed
+  `ed94c03`; exact-head `Vercel=success` and no PR-triggered Actions run are
+  recorded.
+- [x] P-45 authorizes the exact 11-file authority/status descendant
+  commit/push; P-46 conditionally authorizes exactly one destructive bootstrap
+  after its clean/upstream/push/Remote-ready proof.
+- [ ] Record the P-45 SHA externally and its truthful Remote CI/status before
+  any Local bootstrap or kit.
+- [ ] Exercise P-46 exactly once and pass the corrected Local bootstrap plus
+  consolidated invariants at that same source HEAD. On failure/drift, preserve
+  evidence and stop; no retry, patch, or reset without fresh approval.
 - [ ] Build and hash-bind the one clean source kit only after the new-HEAD
-  Remote and corrected-Local gates; complete pass 1, structured authenticated
-  GitHub contract review, pass 2, and the transitive final closeout at that same
-  source/tooling HEAD.
+  Remote and corrected-Local gates and later separate authorization; complete
+  pass 1, structured authenticated GitHub contract review, pass 2, and the
+  transitive final closeout at that same source/tooling HEAD.
 - [ ] Record the schema contract SHA-256, final pass-1 manifest path/SHA-256,
   pass-2 final closeout manifest path/SHA-256, and fresh post-pass-2 step-`017`
   advisor baseline path/SHA-256/timestamp.

@@ -503,7 +503,7 @@ describe('Master Catalog authority consistency', () => {
       /P-33 accepted that\s+exact bounded WP-7\.5 technical checkpoint at 2026-07-15 13:54 \+07/,
     )
     expect(tracker).toContain(
-      '| Current work package | PRE-P-12 Option B source/tooling freeze.',
+      '| Current work package | PRE-P-12 P-45 authority/status checkpoint, followed conditionally by P-46 corrected Local bootstrap.',
     )
     expect(tracker).toContain('P42-UAT-C03')
     expect(tracker).toContain('P42-UAT-G01')
@@ -521,7 +521,7 @@ describe('Master Catalog authority consistency', () => {
     )
     expect(tracker).toMatch(/zero\s+working drafts with all catalog flags false/)
     expect(tracker).toContain(
-      'Owner decisions needed: P-44 already authorizes the exact source/tooling commit/push.',
+      'Owner decisions needed: P-45 and P-46 are already authorized within their exact bounds.',
     )
     expect(tracker).toContain(
       'sha256:ecd457c625c6eeb445607f30d374734c3e7ebd2a6d5489912f4c7ec42b3019a5',
@@ -571,14 +571,59 @@ describe('Master Catalog authority consistency', () => {
       '- [ ] Propose the maintenance window: `________________`.',
     )
     expect(ownerChecklist).toContain(
-      '- [x] P-44 separately authorizes one commit/push of the exact reviewed',
+      '- [x] P-45 separately authorizes one exact 11-file authority/status-only',
     )
+    expect(decisions).toContain(
+      '| P-45 | Authorize the exact PRE-P-12 authority/status checkpoint commit and push |',
+    )
+    expect(decisions).toContain(
+      '| P-46 | Authorize exactly one corrected destructive Local bootstrap under fail-closed conditions |',
+    )
+    expect(decisions).toContain(
+      '`ed94c0304be2741217c7ea2c36322b426de1dfe5`',
+    )
+    expect(decisions).toContain(
+      'do not retry, patch Local, or reset a second time without fresh Owner approval',
+    )
+    for (const path of [
+      'docs/04_data/MIGRATIONS.md',
+      'docs/plans/master-catalog/00-phase4-review-guide.md',
+      'docs/plans/master-catalog/12-phase4-production-runbook.md',
+      'docs/plans/master-catalog/13-phase4-verification-report.md',
+      'docs/plans/master-catalog/19-phase4-decision-register.md',
+      'docs/plans/master-catalog/25-phase4-execution-progress-tracker.md',
+      'docs/plans/master-catalog/39-phase4-p12-production-readiness-package.md',
+      'docs/plans/master-catalog/40-phase4-p12-owner-decision-checklist.md',
+      'docs/plans/master-catalog/41-phase4-p12-cli-execution-runbook.md',
+      'docs/plans/master-catalog/43-phase4-p12-private-function-default-privilege-finding.md',
+      'tests/master-catalog-authority-consistency.test.ts',
+    ]) {
+      expect(decisions).toContain(`- \`${path}\``)
+    }
     const readinessPackage = read(
       'docs/plans/master-catalog/39-phase4-p12-production-readiness-package.md',
     )
     expect(readinessPackage).toContain(
       '| Source/tooling and GO authority sync |',
     )
+    expect(readinessPackage).toContain('two operational binding HEADs')
+    expect(readinessPackage).not.toContain('uses two Git commits')
+    expect(readinessPackage).toContain(
+      'AUTHORIZED CONDITIONALLY — UNRUN — HOLD',
+    )
+    expect(ownerChecklist).toContain(
+      'AUTHORIZED CONDITIONALLY — UNRUN — HOLD',
+    )
+    expect(ownerChecklist).toContain(
+      '`supabase db reset --local --no-seed`',
+    )
+    for (const authority of [decisions, readinessPackage, ownerChecklist]) {
+      expect(authority).toContain('PRE-GO authority checkpoint')
+      expect(authority).toMatch(
+        /clean\s+dedicated\s+(?:execution\s+)?checkout/,
+      )
+      expect(authority).toMatch(/net\s+changed\s+path/)
+    }
     expect(readinessPackage).toContain(
       'The same `current_user` must execute `017`,\n  `017a`, and `018`-`025` because `ALTER DEFAULT PRIVILEGES`',
     )
@@ -1164,7 +1209,7 @@ describe('Master Catalog authority consistency', () => {
       './43-phase4-p12-private-function-default-privilege-finding.md'
     const finding = read(findingPath)
     expect(finding).toMatch(
-      /\*\*Status:\*\* OPTION B REVIEWED; P-44 SOURCE FREEZE AUTHORIZED; P-12 HOLD at\s+resulting-HEAD\/Remote evidence; no Local execution or Production approval/,
+      /\*\*Status:\*\* OPTION B REVIEWED; P-44 CONTENT FROZEN AT `ed94c03`; P-45\/P-46\s+AUTHORIZED WITHIN BOUNDS; P-12 HOLD at P-45 resulting-HEAD\/Remote and P-46\s+Local evidence; no Production approval/,
     )
     expect(finding).toContain(
       'The first isolated PostgreSQL 17 CLI rehearsal applied only migration `017`',

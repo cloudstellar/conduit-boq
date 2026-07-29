@@ -53,11 +53,21 @@ The Owner accepted the three managed-residual recommendations and
 single-device-loss risk only for the bounded P-12-through-P-15 sequence. The
 custody exception expires at the earlier of the post-publication checkpoint or
 168 hours after P-12 starts and carries the 24-hour pause rule below. Those
-decisions are recorded in the reviewed source/tooling candidate. P-44
-authorizes its exact 23-file commit/push with no GO marker or PR and with
-protected untracked paths excluded. Resulting-HEAD/Remote evidence, corrected
-two-pass evidence, exact executor/verifier/path/`current_user`/
-object-owner/window record, and explicit P-12 approval remain open.
+decisions are recorded in the reviewed source/tooling candidate. P-44 froze
+the executable migration/application/bootstrap/generator/runner content at
+clean pushed commit
+`ed94c0304be2741217c7ea2c36322b426de1dfe5`; its Remote record is
+`Vercel=success`, with no PR-triggered GitHub Actions run. P-45 authorizes only
+one bounded authority/status descendant commit/push from `ed94c03`, with no
+migration, application, bootstrap, generator, runner, GO-marker, PR, or
+protected-untracked-path change. P-46 conditionally authorizes exactly one
+destructive Local bootstrap after that descendant is clean, pushed,
+HEAD-equal-to-upstream, and Remote-ready. It resets/rebuilds all Local Supabase
+data but does not touch Production; failure or drift requires evidence
+preservation, a stop, and fresh Owner approval before any retry or second
+reset. Resulting-HEAD/Remote evidence, corrected Local/two-pass evidence, exact
+executor/verifier/path/`current_user`/object-owner/window record, and explicit
+P-12 approval remain open.
 Leaked-password protection requires a separate decision before P-14. This
 readiness evidence and custody decision do not authorize further Production
 access or any Production write.
@@ -77,15 +87,18 @@ Production approval. Until that binding is exact, even a mechanically
 must not be requested.
 
 The exact CLI evidence order is also fail-closed. Independent source/security
-review and static checks are complete; P-44 authorizes one exact reviewed
-23-file commit/push to freeze a clean source/tooling HEAD without a GO marker
-or PR and excluding protected untracked paths. The remaining evidence order is
-truthful Remote CI/status for that exact resulting HEAD; separate Owner
-approval for exactly one corrected canonical Local bootstrap plus consolidated
-smoke/invariants at that HEAD; one external kit; executable `calibrate-schema`
-pass 1; independent contract review; a second fresh full isolated rehearsal and
-transitive pass-2 closeout with rotating advisor artifacts; then the remaining
-PRE-P-12 gates.
+review and static checks are complete, and P-44 froze the reviewed executable
+content at `ed94c03`. P-45 authorizes one exact bounded authority/status-only descendant
+commit/push; the resulting clean pushed Remote-ready descendant becomes the
+actual kit-bound source/tooling HEAD. P-46 conditionally authorizes exactly one
+corrected canonical Local bootstrap plus consolidated smoke/invariants at that
+HEAD. The remaining evidence order is truthful Remote CI/status for that exact
+descendant; the one authorized Local run; one later-authorized external kit;
+executable `calibrate-schema` pass 1; independent contract review; a second
+fresh full isolated rehearsal and transitive pass-2 closeout with rotating
+advisor artifacts; then the remaining PRE-P-12 gates. A failed or drifting
+Local run stops the sequence and cannot be retried or patched without fresh
+Owner approval.
 Only after explicit Owner P-12 GO and separate Git authorization may a
 descendant Checklist-#40-only GO HEAD and external approval be created. The
 same source kit is reused. The candidate stage order is exact `016`, `017`,

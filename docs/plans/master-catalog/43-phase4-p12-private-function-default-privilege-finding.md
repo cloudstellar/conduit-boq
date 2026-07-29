@@ -2,8 +2,9 @@
 
 **Prepared:** 2026-07-28
 
-**Status:** OPTION B REVIEWED; P-44 SOURCE FREEZE AUTHORIZED; P-12 HOLD at
-resulting-HEAD/Remote evidence; no Local execution or Production approval
+**Status:** OPTION B REVIEWED; P-44 CONTENT FROZEN AT `ed94c03`; P-45/P-46
+AUTHORIZED WITHIN BOUNDS; P-12 HOLD at P-45 resulting-HEAD/Remote and P-46
+Local evidence; no Production approval
 
 ## 1. Finding
 
@@ -279,7 +280,7 @@ The candidate identity is now frozen for review:
 | Ledger name | `master_catalog_phase4_global_function_default_privileges` |
 | Source SHA-256 | `12cf6687b6339efa17635ac29ddfdb5150210a96e0640b0e9182a4cda64497a7` |
 | Exact order | `017` → `017a` → `018` |
-| Current authorization | Repository implementation, completed P-43 authority/tooling reconciliation, static verification, independent source review, and P-44 exact reviewed 23-file commit/push only; isolated pass execution, Local application, and Production remain unauthorized |
+| Current authorization | Repository implementation, completed P-43 reconciliation/static/independent review, and P-44 content freeze at pushed `ed94c03`; P-45 authorizes only the exact 11-file authority/status descendant commit/push; P-46 conditionally authorizes exactly one corrected destructive Local bootstrap after clean/upstream/push/Remote-ready proof. Kit/pass execution and Production remain unauthorized |
 
 The label `017a` is an operator-ordering aid, not an edit to migration `017`.
 The exact ledger version is a valid 14-digit Supabase migration version
@@ -322,21 +323,28 @@ This decision authorizes the source candidate, bootstrap/runner/test/authority
 alignment, static verification, and isolated disposable rehearsal
 **preparation**. P-43 additionally authorizes working-tree reconciliation of the
 canonical gate order and the structured authenticated GitHub human-review
-contract. P-44 separately authorizes the exact reviewed 23-file source/tooling
-commit/push with no GO marker or PR and with protected untracked paths excluded.
-Neither decision authorizes Local reset/application, disposable pass execution,
-Production access or migration, deployment, feature enablement, publication,
-Factor F mutation, hotfix work, P-13, P-14, or P-15.
+contract. P-44 separately authorized and completed the exact reviewed
+executable migration/application/bootstrap/generator/runner content freeze at
+pushed `ed94c03`, with no GO marker, PR, or
+protected-untracked-path change. P-45 now authorizes only the exact 11-file
+authority/status descendant commit/push. P-46 conditionally authorizes exactly
+one destructive Local bootstrap after the P-45 descendant is clean, pushed,
+equal to upstream, and Remote-ready. These decisions do not authorize kit or
+disposable pass execution, Production access or migration, deployment, feature
+enablement, publication, Factor F mutation, hotfix work, P-13, P-14, or P-15.
 
 P-12 remains HOLD. Independent architecture/security/source review and static
-checks passed on the working-tree candidate. P-44 authorizes the exact reviewed
-23-file commit/push to freeze one clean source/tooling HEAD without a GO marker
-or PR. After that push, record truthful Remote CI/status for the resulting HEAD.
-Under separate explicit
-destructive-Local approval, run exactly one corrected canonical bootstrap plus
-consolidated invariants at that HEAD. Only then build the kit, run pass 1,
-freeze the structured authenticated GitHub human-review contract, and run pass
-2/closeout. Complete named executor/verifier/path/role/window and all other
+checks passed; P-44 content is frozen and Remote-ready at `ed94c03`. Execute
+only the P-45-authorized 11-file authority/status descendant commit/push and
+record its truthful exact-head Remote/upstream evidence. Then conditional P-46
+permits exactly one `npm run db:local:bootstrap`, which invokes
+`supabase db reset --local --no-seed`, rebuilds all Local Supabase data, applies
+`009`-`015`, `016`, `017`, `017a`, `018`-`025`, and runs consolidated
+security/business invariants. Production remains untouched. On failure/drift,
+preserve secret-free external evidence and stop; no retry/reset/patch without
+fresh Owner approval. Kit generation, pass 1, the structured authenticated
+GitHub human-review contract, and pass 2/closeout remain separately gated.
+Complete named executor/verifier/path/role/window and all other
 PRE-P-12 gates, then ask the Owner separately for P-12. The fresh final rollback
 backup is created/restored/checksummed only inside the later approved P-12
 window before `017`; it is not a pre-GO action.

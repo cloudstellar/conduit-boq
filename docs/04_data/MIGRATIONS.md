@@ -1,7 +1,7 @@
 # Migrations
 ## Conduit BOQ System
 
-**Last Updated:** 2026-07-28
+**Last Updated:** 2026-07-29
 **Status:** Canonical
 
 ---
@@ -34,7 +34,7 @@
 | `015_factor_f_repair_legacy_snapshot_metadata.sql` | Repair missing legacy Factor F snapshot metadata for BOQs whose saved `factor_f` exactly matches `2566.0.0`; does not bind legacy BOQs to a version | **Applied to Production 2026-06-29** (`20260628190757`) — no reprice and no legacy version backfill |
 | `016_hotfix_preserve_boq_item_suffix.sql` | Redeploy `save_boq_with_routes` to preserve approved BOQ item suffix labels while keeping catalog-backed unit, price, category, and version checks authoritative | **Applied to Production 2026-07-06** (`20260706090832`; fresh read-only ledger and exact function-body hash reverified 2026-07-26) |
 | `017_master_catalog_phase4_foundation.sql` | Master Catalog Phase 4 additive governance foundation, including P-20 deterministic baseline identity from Production-derived `price_list.id`, request fingerprints, RLS/grants, and disabled feature flag | **Draft — Local only, not applied to Production. A 2026-07-28 dirty-tree rehearsal-only CLI kit applied `017` to a disposable network-isolated PostgreSQL 17 database, then hard-stopped before `018` because the intended private-function default ACL was absent. PostgreSQL's global `PUBLIC EXECUTE` default cannot be removed by the schema-scoped default revoke in this reviewed file. Do not edit `017`; the Owner-selected Option B correction is the separate `017a` candidate below.** |
-| `017a_master_catalog_phase4_global_function_default_privileges.sql` | PRE-P-12 Option B bridge: establish owner-only global function defaults, remove additive `public`/`private` API-role defaults including `service_role`, normalize the four `017` stubs, and fail closed before any private Phase 4 helper exists | **Owner-selected reviewed repository candidate; exact ledger `20260728001730 master_catalog_phase4_global_function_default_privileges`; SHA-256 `12cf6687b6339efa17635ac29ddfdb5150210a96e0640b0e9182a4cda64497a7`; required order is `017` → `017a` → `018`; independent source/architecture/security review and static checks passed; P-44 authorizes the exact reviewed 23-file source/tooling commit/push only; not applied to Local or Production; P-12 remains HOLD at resulting-HEAD/Remote evidence, separate Local approval, and fresh two-pass isolated rehearsal.** |
+| `017a_master_catalog_phase4_global_function_default_privileges.sql` | PRE-P-12 Option B bridge: establish owner-only global function defaults, remove additive `public`/`private` API-role defaults including `service_role`, normalize the four `017` stubs, and fail closed before any private Phase 4 helper exists | **Owner-selected reviewed repository candidate; exact ledger `20260728001730 master_catalog_phase4_global_function_default_privileges`; SHA-256 `12cf6687b6339efa17635ac29ddfdb5150210a96e0640b0e9182a4cda64497a7`; required order is `017` → `017a` → `018`; independent source/architecture/security review and static checks passed; P-44 executable migration/application/bootstrap/generator/runner content was committed and pushed at `ed94c0304be2741217c7ea2c36322b426de1dfe5` with `Vercel=success` and no PR-triggered GitHub Actions run; P-45 authorizes only the bounded authority/status descendant commit/push, and P-46 conditionally authorizes exactly one destructive Local bootstrap after that descendant is clean, pushed, and Remote-ready; not applied to Local or Production; P-12 remains HOLD.** |
 | `018_master_catalog_phase4_draft_mutation.sql` | Draft create/manual/import RPCs with actor+payload request fingerprints, per-request/per-code locks, bounded runtime timeouts, full-payload preflight, audited mutation subtransaction rollback, and reusable ADR-003 transitions | **Draft — Local only, not applied to Production** |
 | `019_master_catalog_phase4_publish_pointer.sql` | Publish/restore, shared admin publish-readiness RPC, P-18 and structured-rollout boundary guards, P-19 inactive-row filing warning, catalog-only DB count/hash, runtime timeouts, and published immutability | **Draft — Local only, not applied to Production** |
 | `020_master_catalog_phase4_admin_workflow_hardening.sql` | WP-6.6 frozen first-rollout authority, resolve-only dictionaries/server allocator, exact read registers, readiness/provenance parity, correction path, schema hardening, P-22 working-draft lifecycle, P-23.1 reserved version sequence, P-24 annual-year range guard, and covering indexes for both frozen-authority foreign keys | **Owner-accepted Local-only migration in bootstrap source; SHA-256 `e07e0c4161077efba7bc4f6ebf95518d0cc1bc7e4628a43a128dd899bd1aef93`; G1R/G2 separate-apply evidence passed on exact checkout `721c2c2c4a234a4fd00e5686383be9af87ee15dd`; G3/WP-6.6 accepted on `78e96ab3ed9993707014c4aba1d285b7592b17a1`; owner-approved G4E combined clean bootstrap through `020` passed on exact execution checkout `15b707d443bec701f6b3a86aa7675ca1266604ba`; not Production-approved** |
@@ -56,12 +56,21 @@ P-12 remains HOLD until the exact corrected sequence passes both fresh isolated
 rehearsals and the remaining Package #39 gates.
 
 The current CLI candidate makes that future evidence executable but does not
-authorize it. P-44 authorizes exactly one reviewed 23-file commit/push to
-freeze a clean source/tooling HEAD with no GO marker or PR and with protected
-untracked paths excluded. After that push, record truthful Remote CI/status for
-the exact resulting HEAD. Under a later explicit destructive-Local
-approval, run exactly one corrected canonical Local bootstrap plus consolidated
-smoke/invariants at that same HEAD. Only then build its exact kit, run
+authorize Production or disposable-pass execution. P-44 froze the reviewed
+executable migration/application/bootstrap/generator/runner content at clean pushed commit
+`ed94c0304be2741217c7ea2c36322b426de1dfe5`; its truthful Remote record is
+`Vercel=success` with no PR-triggered GitHub Actions run. That commit remains
+the immutable executable-content ancestor. P-45 authorizes one bounded
+authority/status-only descendant commit/push from `ed94c03`; no migration,
+application, bootstrap, generator, or runner source may change. The resulting
+clean pushed Remote-ready descendant becomes the actual kit-bound
+source/tooling HEAD. P-46 conditionally authorizes exactly one invocation of
+the destructive Local bootstrap at that same HEAD after HEAD/upstream
+equality, tracked-clean status, and truthful Remote readiness are confirmed.
+The command resets and rebuilds all Local Supabase data; it does not touch
+Production. On failure or drift, preserve evidence and stop—no retry, patch, or
+second reset without fresh Owner approval. Only after that Local gate passes
+may a later separately authorized step build its exact kit and run
 `calibrate-schema` pass 1 one stage at a time, require independent contract
 review, and run a second fresh full isolated rehearsal with a transitive pass-2
 closeout. The frozen stage order is `017`, `017a`, `018`-`025`; `018` cannot

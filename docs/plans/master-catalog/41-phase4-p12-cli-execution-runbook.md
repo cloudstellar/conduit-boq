@@ -13,14 +13,20 @@ any migration outside the separately approved scope.
 The 2026-07-28 isolated PostgreSQL 17 rehearsal applied `017` and then stopped
 before `018`. The stop exposed the security defect described in section 11.
 The Owner selected Option B for repository-only correction. The exact `017a`
-candidate is inserted between `017` and `018`. P-43 authorizes authority/tooling
+candidate is inserted between `017` and `018`. P-43 authorized authority/tooling
 reconciliation only. Independent source/architecture/security review and
-static checks are now recorded complete. P-44 authorizes the exact reviewed
-23-file source/tooling freeze commit/push with no GO marker or PR. After it
-succeeds, the remaining order is new-HEAD Remote status; separately authorized
-one corrected Local bootstrap; kit; pass 1; structured authenticated GitHub
-review; and pass 2/closeout. None of the Local/rehearsal/Production gates is
-inferred. This document remains an execution-contract candidate only.
+static checks are complete. P-44 froze the exact reviewed executable
+migration/application/bootstrap/generator/runner content at clean pushed
+`ed94c03`, with `Vercel=success` and no PR-triggered
+GitHub Actions run. P-45 authorizes the exact 11-file authority/status-only
+descendant commit/push; its clean pushed Remote-ready result becomes the sole
+kit-bound source/tooling HEAD. P-46 conditionally authorizes exactly one
+destructive corrected Local bootstrap at that same HEAD. It invokes
+`supabase db reset --local --no-seed`, rebuilds all Local Supabase data, and
+leaves Production untouched. Failure/drift requires evidence preservation and
+stop; no retry/reset/patch absent fresh Owner approval. Kit, pass 1, structured
+authenticated GitHub review, pass 2/closeout, and Production remain separately
+unauthorized. This document remains an execution-contract candidate only.
 
 ## 1. Governing authority
 
@@ -94,15 +100,27 @@ new ledger contract, and a new Owner scope decision.
 
 Generate the one reusable execution kit only after the bridge-aware
 migrations, runner, generator, tests, and authority candidate pass independent
-review/static checks; the P-44-authorized exact 23-file commit/push creates a
-clean pushed **source/tooling HEAD** with no GO marker or PR and protected
-untracked paths excluded; truthful Remote CI/status is recorded for that
-resulting HEAD; and a separately approved one-time corrected Local canonical
-bootstrap plus consolidated invariants passes at that same HEAD. Historical
-two-rebuild P-20 evidence remains valid because `017a` is data-free/ACL-only.
-Do not run a second new Local reset unless source that can affect data/identity
-changes or the corrected integration run fails, and then only with fresh
-approval. Checklist #40 must not yet contain the committed P-12 GO marker:
+review/static checks; P-44 executable migration/application/bootstrap/
+generator/runner content remains immutable at pushed `ed94c03`; the
+P-45-authorized exact authority/status-only descendant is clean, pushed, equal
+to upstream, and has truthful Remote CI/status evidence showing Remote-ready;
+and conditional P-46 has passed exactly one corrected Local canonical
+bootstrap plus consolidated
+invariants at that same HEAD. That P-45 descendant is the sole
+**source/tooling HEAD**. Historical two-rebuild P-20 evidence remains valid
+because `017a` is data-free/ACL-only. If the P-46 run failed or drifted, stop
+and preserve secret-free immutable external evidence; do not retry, patch
+Local, or reset a second time without fresh approval. After P-45, do not change
+any tracked path except Checklist #40. Future bounded kit/pass authority must
+be separately Owner-approved and committed/pushed before action through a
+Checklist-#40-only PRE-GO authority checkpoint with no GO marker. Run the
+authorized action from a clean dedicated execution checkout pinned to the
+unchanged P-45 source/tooling HEAD; the authority checkpoint is not a new
+source HEAD. Multiple Checklist-only authority commits preserve the runner's
+net-path rule because the final net delta from P-45 to the GO HEAD remains
+exactly Checklist #40. Keep Remote and Local results external and hash-bound to
+the exact source/tooling HEAD. This mechanism is not current kit/pass
+authorization. Checklist #40 must not yet contain the committed P-12 GO marker:
 
 ```sh
 node scripts/prepare-master-catalog-p12-cli-kit.mjs \
@@ -620,19 +638,21 @@ Stop without Production migration because:
 - no pass-2 final closeout evidence manifest is available or bound;
 - no exact advisor artifact path/SHA-256 is bound into a P-12 approval;
 - exact end-to-end CLI rehearsal has not passed beyond `017`;
-- P-44 authorizes the exact reviewed source/tooling commit/push, but its
-  resulting SHA and truthful Remote record are not recorded in this candidate;
-- the one
-  corrected Local bootstrap has not been separately approved or run;
+- P-44 content freeze is pushed at `ed94c03` and its truthful Remote record is
+  complete, but the P-45 source/tooling SHA/upstream/Remote record is not yet
+  recorded;
+- conditional P-46 authorizes one corrected Local bootstrap, but it has not
+  run;
 - no named Production executor/verifier/window/current-user record exists;
 - no fresh in-window final rollback backup exists; and
 - no separate P-12 GO has been recorded.
 
-Repository-only independent review, authority reconciliation, and static
-verification are complete on the working-tree candidate. P-44 authorizes the
-exact 23-file source/tooling freeze commit/push only. After the resulting clean
-source/tooling HEAD and truthful Remote status exist, the Owner must receive a
-separate destructive-reset warning/request for exactly one corrected Local
-bootstrap. Kit generation and disposable pass 1 are later gates. Current
-authorization is not Local reset/application, rehearsal execution, Production
-access, P-12, PR creation, or the later Checklist-only GO commit.
+Repository-only independent review, authority reconciliation, static
+verification, and P-44 content freeze are complete. P-45 authorizes the exact
+11-file authority/status descendant commit/push only. After its resulting clean
+source/tooling HEAD, upstream equality, and truthful Remote-ready status exist,
+P-46 permits exactly one corrected Local bootstrap. The destructive warning,
+stop/no-retry rule, and external-evidence rule above apply. Kit generation and
+disposable pass 1 are later gates. Current authorization is not kit/rehearsal
+execution, Production access/write, P-12, PR creation, or the later
+Checklist-only GO commit.
