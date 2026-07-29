@@ -2,7 +2,7 @@
 
 **Prepared:** 2026-07-26
 
-**Last updated:** 2026-07-29
+**Last updated:** 2026-07-30
 
 **Status:** PRE-P-12 HOLD - immutable replacement source/tooling HEAD
 `7fbfe1bb8f71df03a78762b00e93aded7bdd6e42` and its truthful
@@ -10,13 +10,18 @@
 checkpoint completed at pushed/upstream-equal
 `28673b39962a092472c2334843e95aaafdfce97b`, also with
 `Vercel=success`, no PR, zero PR-triggered GitHub Actions runs, and no GitHub
-Actions lint/test/build claim. After the explicit destructive-reset warning,
-the Owner authorized the exact corrected Local gate below. That authorization
-is not consumed until its Checklist-only authority checkpoint is clean,
-pushed, and upstream-equal. No Local execution result is claimed yet.
-Disposable execution, kit/pass work, Production, application/UI/export
-changes, flags, publication, Factor F, hotfix `016`, and P-12 remain
-unauthorized.
+Actions lint/test/build claim. The corrected-Local authorization checkpoint
+then completed at pushed/upstream-equal
+`fbd0d3ca43eee69f1543731efa7832ef72de99d9`. Its one reset authorization
+was consumed: bootstrap through `026`, WP-7, WP-6.5, and canonical hash/schema
+verification passed, then the error-level Local DB lint returned exit code
+`1`. The run stopped without retry, cleanup, patch, ad hoc SQL, final
+invariant query, package completion, kit/pass work, or Production action.
+The Owner has now authorized only the bounded read-only lint diagnosis below;
+it remains pending until its own Checklist-only authority checkpoint is clean,
+pushed, and upstream-equal. Disposable execution, final Local-gate
+continuation, kit/pass work, Production, application/UI/export changes, flags,
+publication, Factor F, hotfix `016`, and P-12 remain unauthorized.
 
 **Exact application candidate:**
 `5068f944af2aa3fe8446c77c8ae8d48673cb260b`
@@ -37,13 +42,18 @@ source by the P-46 finding
 **Completed post-P-48 Checklist-only status-checkpoint HEAD:**
 `28673b39962a092472c2334843e95aaafdfce97b`
 
+**Completed corrected-Local authorization-checkpoint HEAD:**
+`fbd0d3ca43eee69f1543731efa7832ef72de99d9`
+
 **Current authority sync:** P-45/P-46 remain historical evidence. P-47
 repository/static closure passed for the exact recorded migration identity/hash.
 P-48 then froze the replacement source/tooling HEAD and truthful Remote record
-above. The post-P-48 status checkpoint is complete. The Owner has now
-authorized exactly one fresh corrected Local rehearsal under the fail-closed
-contract below; execution remains pending until the exact authorization
-checkpoint is pushed/upstream-equal.
+above. The post-P-48 status checkpoint and corrected-Local authorization
+checkpoint are complete. The single corrected-Local reset was consumed; all
+gates through canonical verification passed, and error-level DB lint then
+failed closed with exit code `1`. The retained evidence package is incomplete
+by design. The Owner has authorized one bounded read-only lint diagnosis under
+the fail-closed contract below; no later Local gate is inferred.
 
 **Post-freeze status/authority overlay:** only from the exact P-48 replacement
 freeze above through the final GO HEAD, this Checklist is the sole live tracked
@@ -126,6 +136,70 @@ drift check fails, preserve evidence and stop. No retry, manual Local cleanup,
 patch, ad hoc SQL, second reset, disposable rehearsal, kit/pass, Production
 action, PR, P-12, or further tracked commit is authorized without a new Owner
 decision and separately pushed Checklist-only authority checkpoint.
+
+**Post-P-48 Local-lint diagnostic PRE-GO authority recorded:** 2026-07-30 —
+after being told that the single corrected-Local authorization was consumed,
+that bootstrap/WP-7/WP-6.5/canonical verification passed, and that the
+error-level DB-lint command returned exit code `1` before final invariants,
+the Owner instructed the team to follow the recommended read-only lint
+failure triage without reset.
+
+The retained secret-free external evidence directory is:
+
+`/Users/cloud/Backups/ConduitBOQ/evidence/phase4/pre-p12/post-p48-local-bootstrap-20260729T164944Z-7fbfe1b`
+
+Files `01-preflight.json` through `05-canonical-hash.json` record the passed
+preflight, one consumed bootstrap, WP-7, WP-6.5, and canonical proof.
+`06-db-lint.json` records only the stopped lint summary and exit code `1`;
+the wrapper intentionally persisted no raw CLI output. No final invariant
+evidence, completed package status, or package checksum manifest is claimed.
+The frozen authority-consistency test passes 12/12 at the immutable
+source/tooling checkout `7fbfe1b`. At this later Checklist-only descendant,
+the same frozen test still asserts the pre-P-48 pending-status snapshot and
+therefore is not claimed as passing; the sole-live-overlay rule prohibits
+changing that source test merely to follow later Checklist status.
+
+This decision first authorizes exactly one Checklist-only authority checkpoint
+from base `fbd0d3ca43eee69f1543731efa7832ef72de99d9` on branch
+`codex/master-catalog-phase4`: change only
+`docs/plans/master-catalog/40-phase4-p12-owner-decision-checklist.md`, commit
+once as `docs: authorize local lint triage`, and push once to the existing
+branch. Do not create a PR or stage/modify `files/`, `tmp/`, `output/`, or any
+other untracked path. This commit contains no P-12 GO marker. Record its SHA,
+upstream equality, and truthful Remote status in the secret-free external
+handoff only; no recursive tracked commit is authorized or required merely to
+record its own SHA.
+
+Only after that checkpoint is clean, pushed, and upstream-equal, this decision
+authorizes exactly one read-only diagnostic invocation from the retained clean
+dedicated checkout pinned to immutable source/tooling HEAD
+`7fbfe1bb8f71df03a78762b00e93aded7bdd6e42`, using Supabase CLI `2.107.0`:
+
+```text
+node_modules/.bin/supabase db lint --local --level error --fail-on none --output-format json
+```
+
+Capture only machine-parsed, secret-free finding identity/severity/message
+fields and invocation metadata in a new owner-only external
+`06a-db-lint-diagnostic.json`; do not overwrite `06-db-lint.json` or persist
+raw CLI output. Compare the result only against Package #39's frozen,
+already-triaged lint findings: the generic analyzer's inability to see
+function-created `pg_temp.catalog_placement_input` in
+`private.place_catalog_items_impl`, and the accepted unused
+`private.catalog_placement_state.v_row_count` assignment if the selected
+error-level output includes it. The diagnostic must not infer that a known
+finding is new, nor suppress, normalize away, or accept any other finding.
+
+This authority permits no reset, migration application, DDL, DML, manual/ad
+hoc SQL, Data API mutation, feature-flag change, cleanup, patch, source edit,
+second lint invocation, final invariant query, evidence-package completion,
+kit/pass work, Production access/write, P-12, or other Git action. If the
+command itself fails, its machine output cannot be parsed exactly, the retained
+checkout/source/CLI/Local target has drifted, or any new/untriaged finding
+appears, preserve the evidence and stop. Even an exact known-finding match
+authorizes only classification and a report to the Owner; resuming final
+invariants or closing the Local gate requires another explicit Owner decision
+and separately pushed Checklist-only authority checkpoint.
 
 **Post-freeze fingerprint binding:** frozen references in Package #39 and CLI
 Runbook #41 that say to record the future
@@ -299,8 +373,8 @@ Alternative:
 
 The verified restore removes the backup-rehearsal blocker. P-47
 repository/static closure has passed. P-12 remains HOLD at a separately
-authorized replacement Git freeze/Remote record, a freshly authorized
-corrected Local bootstrap,
+authorized but incomplete corrected Local gate (replacement Git freeze/Remote
+record complete; reset consumed; stopped fail-closed at DB lint),
 later-authorized kit/pass-1/authenticated-review/pass-2 evidence, named-human
 executor/distinct verifier/path/object-owner/window, and the separate P-12
 decision below.
@@ -479,14 +553,25 @@ weaken the verifier, or continue that disposable sequence.
 - [x] After the explicit destructive-reset warning, the Owner authorized
   exactly one canonical Local bootstrap at replacement HEAD `7fbfe1b`
   (`009`-`015`, hotfix `016`, `017`, `017a`, `018`-`026`) plus the reviewed
-  consolidated smoke/security/business invariants. The authorization must
-  first be frozen through the exact Checklist-only commit/push above.
-- [ ] Execute and verify that one Local gate:
-  `AUTHORIZED — NOT YET CONSUMED`. The command invokes
-  `supabase db reset --local --no-seed` and rebuilds all Local Supabase data.
-  Do not clean or patch the residual Local state before reset. On
-  failure/drift, preserve evidence and stop; no retry, manual cleanup, patch,
-  ad hoc SQL, or second reset without fresh Owner approval.
+  consolidated smoke/security/business invariants. Its exact Checklist-only
+  authorization checkpoint completed at pushed/upstream-equal
+  `fbd0d3ca43eee69f1543731efa7832ef72de99d9`.
+- [ ] Complete and verify that one Local gate:
+  `RESET AUTHORIZATION CONSUMED — PARTIAL GATES PASSED — STOPPED AT LINT`.
+  Bootstrap through `026`, WP-7, WP-6.5, and canonical proof passed from the
+  dedicated `7fbfe1b` checkout. Error-level DB lint returned exit code `1`;
+  raw output was intentionally not persisted, final invariants were not run,
+  and the package was not completed. No retry, cleanup, patch, ad hoc SQL, or
+  second reset occurred.
+- [x] After that fail-closed report, the Owner authorized only the exact
+  read-only lint diagnosis recorded above, subject to its separate
+  Checklist-only commit/push from `fbd0d3c`.
+- [ ] Execute and classify that lint diagnosis:
+  `AUTHORIZED — NOT YET CONSUMED`. Run the one exact `--fail-on none`
+  machine-output command only after its authority checkpoint is clean,
+  pushed, and upstream-equal. Stop after classification; even an exact match
+  to Package #39's frozen known findings does not authorize final invariants
+  or Local-gate closeout.
 - [ ] Only after the corrected Local gate passes, build one external kit at
   that source/tooling HEAD under later separate authorization and record its
   canonical manifest path/SHA-256, generator source SHA-256, runner source
@@ -648,9 +733,16 @@ Request P-12 only when every HOLD row in Package #39 is Ready:
   Local bootstrap and consolidated-invariant run through `026`, subject to the
   exact Checklist-only authorization checkpoint above.
 - [ ] Execute and pass that corrected Local gate:
-  `AUTHORIZED — NOT YET CONSUMED`. On failure/drift, preserve evidence and
-  stop; no retry, manual cleanup, patch, ad hoc SQL, or reset without fresh
-  approval.
+  `RESET AUTHORIZATION CONSUMED — PARTIAL GATES PASSED — STOPPED AT LINT`.
+  Bootstrap/WP-7/WP-6.5/canonical proof passed; error-level DB lint returned
+  exit code `1`, so final invariants and package closeout remain unexecuted.
+- [x] Fresh Owner authority is recorded for one read-only Local lint
+  diagnostic with no reset, SQL, mutation, cleanup, patch, or later-gate
+  inference, subject to its exact Checklist-only checkpoint.
+- [ ] Execute and classify that diagnostic:
+  `AUTHORIZED — NOT YET CONSUMED`. Exact match to Package #39's frozen
+  triaged findings still requires a separate Owner decision/checkpoint before
+  final invariants or Local-gate closeout.
 - [ ] Build and hash-bind the one clean source kit only after the new-HEAD
   Remote and corrected-Local gates and later separate authorization; complete
   pass 1, structured authenticated GitHub contract review, pass 2, and the
