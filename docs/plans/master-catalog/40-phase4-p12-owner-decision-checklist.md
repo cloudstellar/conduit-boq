@@ -4,18 +4,19 @@
 
 **Last updated:** 2026-07-29
 
-**Status:** PRE-P-12 HOLD - P-45 completed at pushed/upstream-equal
-`d92d8ced42fc882481ebc2c4579adcf1edbebea7`. The one authorized P-46 Local
-bootstrap was consumed and stopped fail-closed during WP-6.5 because the
-authenticated public invoker wrapper could not execute owner-only
-`private.catalog_action_error(uuid,text,text,boolean,jsonb)`. P-47 now
-has completed repository design/implementation/static review of a narrow
-append-only migration `026` after immutable `025` and its required tooling,
-tests, architecture/security, and authority alignment. P-48 separately
-authorizes exactly one 25-file commit/push from `d92d8ce`, with no PR. Local
-cleanup/apply/reset/retry, disposable execution, every other Git write, kit/pass
-work, Production, application/UI/export changes, flags, publication, Factor F,
-hotfix `016`, and P-12 remain unauthorized
+**Status:** PRE-P-12 HOLD - P-48 completed at replacement clean
+pushed/upstream-equal source/tooling HEAD
+`7fbfe1bb8f71df03a78762b00e93aded7bdd6e42`. The exact 25-file commit
+`Close P-47 helper ACL correction` was pushed once from parent
+`d92d8ced42fc882481ebc2c4579adcf1edbebea7` on
+`codex/master-catalog-phase4`, with no PR and no protected/unrelated untracked
+path. Its truthful exact-head Remote record is `Vercel=success`; no
+PR-triggered GitHub Actions run exists, and no GitHub Actions lint/test/build
+run is claimed. Local cleanup/apply/reset/retry,
+disposable execution, every other Git write except the exact Checklist-only
+status checkpoint authorized below, kit/pass work, Production,
+application/UI/export changes, flags, publication, Factor F, hotfix `016`,
+and P-12 remain unauthorized.
 
 **Exact application candidate:**
 `5068f944af2aa3fe8446c77c8ae8d48673cb260b`
@@ -30,28 +31,75 @@ hotfix `016`, and P-12 remain unauthorized
 `d92d8ced42fc882481ebc2c4579adcf1edbebea7` — superseded as a future kit
 source by the P-46 finding
 
-**Replacement source/tooling HEAD:** **UNRECORDED — HOLD**
+**Replacement source/tooling HEAD:**
+`7fbfe1bb8f71df03a78762b00e93aded7bdd6e42`
 
-**Current authority sync:** P-45 completed and P-46 evidence is preserved.
-P-47 repository/static closure passed for the exact recorded migration
-identity/hash. P-48 records the exact Git-only publication scope; the resulting
-replacement clean pushed HEAD/Remote record and a separately authorized fresh
-Local rehearsal remain pending.
+**Current authority sync:** P-45/P-46 remain historical evidence. P-47
+repository/static closure passed for the exact recorded migration identity/hash.
+P-48 then froze the replacement source/tooling HEAD and truthful Remote record
+above. A separately authorized fresh Local rehearsal remains pending.
 
-**Future PRE-GO authority rule:** the former post-P-45 Checklist-only rule is
-suspended because P-46 exposed a new source defect. P-47 review has passed; the
-rule resumes only after the correction is frozen at a replacement
-source/tooling HEAD and its separately authorized clean Local rehearsal passes.
-From that replacement
-freeze onward, no tracked path other than this Checklist may change. Every
-later bounded kit/pass action requires a new
-explicit Owner decision and separate Git authorization recorded before action
-in a clean pushed/upstream-equal Checklist-only PRE-GO authority checkpoint
-with no committed P-12 GO marker. Execute that action from a clean
-dedicated checkout pinned to the unchanged replacement source/tooling HEAD. Such
-authority commits are not new source HEADs or Production approval; the final
+**Post-freeze status/authority overlay:** only from the exact P-48 replacement
+freeze above through the final GO HEAD, this Checklist is the sole live tracked
+status and decision overlay. It does not reassign the general pre-freeze status
+authority from the Progress Tracker. Pending P-48 labels in the immutable
+source-head copies of every other tracked authority document, and their
+related HOLD placeholders, are frozen pre-result snapshots; do not synchronize
+them through later tracked edits. This overlay may record only later decisions,
+status, and exact external-evidence bindings. It may not amend or waive the
+frozen migration hashes/order, CLI/PostgreSQL versions, ACL/RLS/function
+contracts, fingerprint formula, runner, timeouts, stop/recovery rules,
+architecture, security, or business authority. A later Checklist entry may
+mark a frozen Package #39 HOLD gate satisfied only by naming the unchanged
+requirement and binding its exact external evidence.
+
+**Future PRE-GO authority rule:** the former post-P-45 Checklist-only rule was
+suspended when P-46 exposed a source defect and resumed immediately when P-48
+froze the replacement source/tooling HEAD above. From that freeze onward, no
+tracked path other than this Checklist may change. A separately authorized
+clean Local rehearsal is the next prerequisite before kit/pass work; it is not
+a condition that delays the source freeze. Every later bounded PRE-GO
+action—including the Local rehearsal, fingerprint derivation, kit, and pass
+work—requires a new explicit Owner decision and separate Git authorization
+recorded before action in a clean pushed/upstream-equal Checklist-only PRE-GO
+authority checkpoint with no committed P-12 GO marker. Execute that action
+from a clean dedicated checkout pinned to the unchanged replacement
+source/tooling HEAD. Such authority commits are not new source HEADs or
+Production approval; the final
 runner evaluates the net changed path from the replacement freeze to GO, which
 must remain exactly this Checklist. This rule authorizes no kit or pass now.
+
+**Exact post-P-48 Checklist-only status checkpoint authorized:** the Owner's
+2026-07-29 instruction authorizes exactly one commit and one push from base
+`7fbfe1bb8f71df03a78762b00e93aded7bdd6e42` on branch
+`codex/master-catalog-phase4`, with commit message
+`docs: record p48 source freeze`. Its repository-relative allowlist is only
+`docs/plans/master-catalog/40-phase4-p12-owner-decision-checklist.md`. Do not
+create a PR. Do not stage or modify `files/`, `tmp/`, `output/`, or any other
+untracked path. Record the resulting Checklist-only authority-checkpoint SHA,
+upstream equality, and truthful Remote status in the secret-free external
+handoff only; do not create another tracked commit merely to record that
+checkpoint's own SHA. No follow-on tracked commit is authorized or required for
+that self-record. This checkpoint does not replace the immutable
+source/tooling HEAD above and
+authorizes no Local cleanup/apply/reset/retry, disposable execution, kit/pass,
+Production, deploy, flags, publication, Factor F, hotfix `016`, `v_row_count`,
+or P-12 action.
+
+**Post-freeze fingerprint binding:** frozen references in Package #39 and CLI
+Runbook #41 that say to record the future
+`catalogAuthorityFingerprintSha256` in both Package #39 and this Checklist are
+implemented after the freeze by recording the live value and evidence source
+in this Checklist plus the external Production approval. Package #39 remains
+the immutable source-head formula/control snapshot and must not be edited
+before the P-12 GO/Production boundary under this release path. This changes
+only the tracked recording location. The separately authorized read-only
+derivation, frozen formula, allowed evidence source, exact-equality checks, and
+stop conditions remain unchanged. The value must remain the exact bare
+lowercase 64-hex required by #39/#41, without a `sha256:` prefix. Until the
+value, source, and external binding are recorded here exactly, the fingerprint
+gate remains HOLD; even a `productionEligible=true` kit must not be used in
+Production and P-12 must not be requested.
 
 **Authority:** Production `2568.0.0` remains authoritative for item names,
 units, and prices. The local workbook remains reconciliation/reference evidence
@@ -88,8 +136,11 @@ only.
 - [x] Phase 4 flag stages are reconciled: Production before `017` has all
   three Phase 4 rows absent, while clean post-`025` Local evidence has all
   three rows present with boolean `false`.
-- [x] Exact pushed head matches the remote branch and records
-  `Vercel=success`; no PR-triggered GitHub Actions run is claimed.
+- [x] Exact P-48 replacement source/tooling HEAD
+  `7fbfe1bb8f71df03a78762b00e93aded7bdd6e42` was pushed/upstream-equal at
+  P-48 closeout, remains the immutable source-head ancestor, and records
+  `Vercel=success`; no PR-triggered GitHub Actions run exists and no GitHub
+  Actions lint/test/build run is claimed.
 - [x] Post-write encrypted-bundle non-force detach, read-only reopen, full
   eight-entry `SHA256SUMS`, final detach, Docker/Local restart, and Local
   invariant readback passed without reset.
@@ -369,9 +420,17 @@ weaken the verifier, or continue that disposable sequence.
   `codex/master-catalog-phase4`, using the Decision Register's exact 25-file
   allowlist and commit message `Close P-47 helper ACL correction`. No PR;
   `files/`, `tmp/`, `output/`, and unrelated untracked paths are excluded.
-- [ ] After P-48 execution, record the replacement clean pushed
-  **source/tooling HEAD**, upstream equality, and truthful Remote status:
-  `UNRECORDED — HOLD`.
+- [x] P-48 executed exactly once at replacement clean pushed/upstream-equal
+  **source/tooling HEAD**
+  `7fbfe1bb8f71df03a78762b00e93aded7bdd6e42`; the commit contains the exact
+  25-file allowlist, no PR, and no protected/unrelated untracked path. Truthful
+  exact-head Remote status is `Vercel=success`, with zero PR-triggered GitHub
+  Actions runs; no GitHub Actions lint/test/build run is claimed.
+- [x] Owner authorized the exact post-P-48 Checklist-only status checkpoint
+  recorded above: base/source HEAD `7fbfe1bb8f71df03a78762b00e93aded7bdd6e42`,
+  this file only, one commit/push, exact message
+  `docs: record p48 source freeze`, and no PR. This is Git-only authority and
+  does not authorize the Local gate below.
 - [ ] Receive a fresh explicit Owner warning/approval before any canonical
   Local bootstrap at the replacement HEAD (`009`-`015`, hotfix `016`, `017`,
   `017a`, `018`-`026`) plus consolidated smoke/security/business invariants:
@@ -533,8 +592,10 @@ Request P-12 only when every HOLD row in Package #39 is Ready:
   independent re-reviews passed without database or Git action.
 - [x] P-48 separately authorizes the exact 25-file Git publication commit/push
   from `d92d8ce`, with no PR and no later action inferred.
-- [ ] Record the replacement exact pushed/upstream-equal source/tooling SHA plus
-  truthful Remote CI/status after P-48 executes.
+- [x] Replacement exact pushed/upstream-equal source/tooling SHA
+  `7fbfe1bb8f71df03a78762b00e93aded7bdd6e42` and truthful exact-head Remote
+  status are recorded: `Vercel=success`, with zero PR-triggered GitHub Actions
+  runs and no PR; no GitHub Actions lint/test/build run is claimed.
 - [ ] Obtain fresh explicit reset approval and pass the corrected Local
   bootstrap plus consolidated invariants through `026`. On failure/drift,
   preserve evidence and stop; no retry, patch, cleanup, or reset without fresh
@@ -554,8 +615,9 @@ Request P-12 only when every HOLD row in Package #39 is Ready:
   path/account/client timeout/ledger behavior, `current_user`/object-owner
   role, ownership/ACL checks, and exact window recorded.
 - [ ] New operational `catalogAuthorityFingerprintSha256` and its authorized
-  query/evidence source are recorded exactly in #39/#40 and bound to the
-  external Production approval; historical `ecd457...` is not substituted and
+  query/evidence source are recorded exactly in this Checklist and bound to
+  the external Production approval. Package #39 remains the frozen
+  source-head control snapshot; historical `ecd457...` is not substituted and
   the clean kit is verified `productionEligible=true`.
 - [ ] Owner receives a separate exact P-12 go/no-go request.
 - [ ] Only after an explicit Owner GO and separate Git authorization, commit
