@@ -26,9 +26,14 @@ authorized Checklist-only result checkpoint completed at pushed/upstream-equal
 and zero PR-triggered GitHub Actions runs. The earlier external-runner
 Local-closeout authority reached static review but was never executed and is
 superseded unconsumed by the Recovery closeout below. The Owner has explicitly
-authorized only that no-reset/read-only Recovery closeout, which remains
-pending until its own Checklist-only authority checkpoint is clean, pushed,
-and upstream-equal. Disposable execution, kit/pass work, Production,
+authorized that no-reset/read-only Recovery closeout. Its Checklist-only
+authority checkpoint completed at pushed/upstream-equal
+`18ec61f5f20edf98ee08acde0a17d8d12d146af5`, and the one-query closeout then
+passed from immutable source `7fbfe1b`. The owner-only final evidence file is
+bound below at SHA-256
+`70d1a4f1d98f186f06a0ed79dd86d1764d90c1f9e88c7eabe71179ac8958c2c1`.
+This closes only the corrected Local gate under the frozen known-lint
+disposition. Disposable execution, kit/pass work, Production,
 application/UI/export changes, flags, publication, Factor F, hotfix `016`,
 and P-12 remain unauthorized.
 
@@ -57,6 +62,9 @@ source by the P-46 finding
 **Completed Local-lint diagnostic result-checkpoint HEAD:**
 `c1759a4098acf9d7eaf939b4fde4058a9817f836`
 
+**Completed Recovery closeout authority-checkpoint HEAD:**
+`18ec61f5f20edf98ee08acde0a17d8d12d146af5`
+
 **Current authority sync:** P-45/P-46 remain historical evidence. P-47
 repository/static closure passed for the exact recorded migration identity/hash.
 P-48 then froze the replacement source/tooling HEAD and truthful Remote record
@@ -69,8 +77,10 @@ fail-closed contract below and matched only the frozen known
 `private.place_catalog_items_impl` temp-table analyzer finding; no unknown
 finding was emitted. Its Checklist-only result checkpoint is complete. The
 earlier external runner was never invoked and produced no closeout evidence.
-The Owner has now authorized only the separately checkpointed no-reset/
-read-only Recovery closeout below; no kit/pass or later gate is inferred.
+The separately checkpointed no-reset/read-only Recovery closeout below then
+passed with one Local database invocation and one final evidence file. The
+corrected Local gate is closed under the preserved known-lint disposition; no
+kit/pass or later gate is inferred.
 
 **Post-freeze status/authority overlay:** only from the exact P-48 replacement
 freeze above through the final GO HEAD, this Checklist is the sole live tracked
@@ -89,10 +99,9 @@ requirement and binding its exact external evidence.
 **Future PRE-GO authority rule:** the former post-P-45 Checklist-only rule was
 suspended when P-46 exposed a source defect and resumed immediately when P-48
 froze the replacement source/tooling HEAD above. From that freeze onward, no
-tracked path other than this Checklist may change. A separately authorized
-clean Local rehearsal is the next prerequisite before kit/pass work; it is not
-a condition that delays the source freeze. Every later bounded PRE-GO
-action—including the Local rehearsal, fingerprint derivation, kit, and pass
+tracked path other than this Checklist may change. The separately authorized
+clean Local gate has passed without changing the source freeze. Every later
+bounded PRE-GO action—including fingerprint derivation, kit, and pass
 work—requires a new explicit Owner decision and separate Git authorization
 recorded before action in a clean pushed/upstream-equal Checklist-only PRE-GO
 authority checkpoint with no committed P-12 GO marker. Execute that action
@@ -469,6 +478,48 @@ Checklist, record the query/evidence hash and result, commit once as
 create no PR. No recursive tracked commit is required merely to record its own
 SHA.
 
+**Post-P-48 simplified Recovery closeout result recorded:** 2026-07-30 —
+the authority checkpoint above completed at clean pushed/upstream-equal
+`18ec61f5f20edf98ee08acde0a17d8d12d146af5`. The abandoned external runner
+remained uninvoked and `01`-`06a` remained unchanged. One initial Codex host
+sandbox delivery attempt was denied before reaching the Docker API, so it
+started no container process and made no database invocation. The same exact
+SQL bytes were then delivered through the approved host boundary and made the
+single authorized Local database invocation.
+
+That invocation used query SHA-256
+`e226faa7d6c609e93f6bf2ac98db160aede5fd3fe2c11e880da58282e521c385`
+through the exact Local `docker exec -i ... psql -X -qAt` path. Its one
+`REPEATABLE READ, READ ONLY` transaction reported PostgreSQL major `17`,
+`session_user=postgres`, `current_user=postgres`, Unix-socket Local access,
+`statement_timeout=10s`, and `lock_timeout=5s`. The sanitized result passed:
+
+- catalog default `2568.0.0`, active/default, stored and actual rows `710`,
+  active rows `710`, exact frozen dataset hash, and zero drafts;
+- all three Phase 4 flags present as boolean `false`;
+- BOQ `198`/items `1,547`, with zero unversioned BOQs, missing referenced
+  price rows, cross-version items, missing catalog categories, or partial
+  legacy Factor F snapshots;
+- Factor F default `2569.0.0`, active, stored/actual rows `36`, two
+  versions/`73` total rows, and exact frozen dataset hash; and
+- exact global function-default ACL, hotfix `016`, and migration `026`
+  security/function contracts.
+
+Exactly one new file was created with exclusive no-overwrite semantics:
+`/Users/cloud/Backups/ConduitBOQ/evidence/phase4/pre-p12/post-p48-local-bootstrap-20260729T164944Z-7fbfe1b/local-closeout-final.json`,
+owner `cloud`, mode `0600`, 3,283 bytes, SHA-256
+`70d1a4f1d98f186f06a0ed79dd86d1764d90c1f9e88c7eabe71179ac8958c2c1`.
+It records `databaseInvocationCount=1`, `localLedgerAsserted=false`, the
+preserved known-lint disposition, and false Production/kit/P-12 authority.
+No raw business rows or raw SQL/CLI output, environment value, or secret
+material was persisted. No reset, lint/smoke rerun, migration, Production access,
+`07`, `08`, or checksum-manifest creation occurred.
+
+The corrected Local gate is therefore
+`PASSED — FROZEN KNOWN-LINT DISPOSITION PRESERVED`. This result authorizes no
+kit generation, disposable pass, Production action, P-12, deploy, flag,
+publication, Factor F mutation, or hotfix work.
+
 **Post-freeze fingerprint binding:** frozen references in Package #39 and CLI
 Runbook #41 that say to record the future
 `catalogAuthorityFingerprintSha256` in both Package #39 and this Checklist are
@@ -640,11 +691,9 @@ Alternative:
 - [ ] Use a platform backup/clone only after its separate cost is confirmed.
 
 The verified restore removes the backup-rehearsal blocker. P-47
-repository/static closure has passed. P-12 remains HOLD at a separately
-authorized but incomplete corrected Local gate (replacement Git freeze/Remote
-record complete; reset consumed; known lint finding classified; final
-invariants/package closeout not authorized),
-later-authorized kit/pass-1/authenticated-review/pass-2 evidence, named-human
+repository/static closure and the corrected Local gate have passed. P-12
+remains HOLD at later-authorized
+kit/pass-1/authenticated-review/pass-2 evidence, named-human
 executor/distinct verifier/path/object-owner/window, and the separate P-12
 decision below.
 
@@ -825,13 +874,14 @@ weaken the verifier, or continue that disposable sequence.
   consolidated smoke/security/business invariants. Its exact Checklist-only
   authorization checkpoint completed at pushed/upstream-equal
   `fbd0d3ca43eee69f1543731efa7832ef72de99d9`.
-- [ ] Complete and verify that one Local gate:
-  `RESET AUTHORIZATION CONSUMED — PARTIAL GATES PASSED — STOPPED AT LINT`.
-  Bootstrap through `026`, WP-7, WP-6.5, and canonical proof passed from the
-  dedicated `7fbfe1b` checkout. Error-level DB lint returned exit code `1`;
-  raw output was intentionally not persisted, final invariants were not run,
-  and the package was not completed. No retry, cleanup, patch, ad hoc SQL, or
-  second reset occurred.
+- [x] Complete and verify that one Local gate:
+  `PASSED — FROZEN KNOWN-LINT DISPOSITION PRESERVED`. Bootstrap through `026`,
+  WP-7, WP-6.5, and canonical proof passed from the dedicated `7fbfe1b`
+  checkout. Error-level DB lint returned exit code `1`; the one separately
+  authorized diagnosis classified only the frozen known analyzer limitation,
+  with zero unknown findings. The later simplified Recovery closeout passed
+  in one Local read-only transaction and produced the single hash-bound
+  evidence file recorded above. No second reset or lint/smoke rerun occurred.
 - [x] After that fail-closed report, the Owner authorized only the exact
   read-only lint diagnosis recorded above, subject to its separate
   Checklist-only commit/push from `fbd0d3c`.
@@ -853,11 +903,13 @@ weaken the verifier, or continue that disposable sequence.
 - [x] Supersede that external-runner closeout before invocation:
   `ABANDONED — NEVER EXECUTED`; its proposed `07`, `08`, and checksum manifest
   were never created.
-- [ ] Execute the simplified one-query Recovery closeout and create only
-  `local-closeout-final.json`: `AUTHORIZED — NOT YET CONSUMED`, subject to its
-  separate Checklist-only authority checkpoint from `3707cd7`. Do not reset,
-  rerun lint or smoke suites, contact Production, or infer kit/pass/P-12
-  authority.
+- [x] Execute the simplified one-query Recovery closeout and create only
+  `local-closeout-final.json`: `CONSUMED ONCE — PASSED`. Authority checkpoint
+  `18ec61f5`, query SHA-256 `e226faa7d6c609e93f6bf2ac98db160aede5fd3fe2c11e880da58282e521c385`,
+  and evidence SHA-256
+  `70d1a4f1d98f186f06a0ed79dd86d1764d90c1f9e88c7eabe71179ac8958c2c1`
+  are bound above. No reset, lint/smoke rerun, Production access, or
+  kit/pass/P-12 authority occurred.
 - [ ] Only after the corrected Local gate passes, build one external kit at
   that source/tooling HEAD under later separate authorization and record its
   canonical manifest path/SHA-256, generator source SHA-256, runner source
@@ -1018,10 +1070,12 @@ Request P-12 only when every HOLD row in Package #39 is Ready:
 - [x] Fresh explicit reset approval is recorded for exactly one corrected
   Local bootstrap and consolidated-invariant run through `026`, subject to the
   exact Checklist-only authorization checkpoint above.
-- [ ] Execute and pass that corrected Local gate:
-  `RESET AUTHORIZATION CONSUMED — PARTIAL GATES PASSED — STOPPED AT LINT`.
+- [x] Execute and pass that corrected Local gate:
+  `PASSED — FROZEN KNOWN-LINT DISPOSITION PRESERVED`.
   Bootstrap/WP-7/WP-6.5/canonical proof passed; error-level DB lint returned
-  exit code `1`, so final invariants and package closeout remain unexecuted.
+  exit code `1`; the bounded diagnosis matched only the frozen known finding;
+  and the later one-query Recovery closeout passed with the single hash-bound
+  evidence file recorded above.
 - [x] Fresh Owner authority is recorded for one read-only Local lint
   diagnostic with no reset, SQL, mutation, cleanup, patch, or later-gate
   inference, subject to its exact Checklist-only checkpoint.
@@ -1038,10 +1092,13 @@ Request P-12 only when every HOLD row in Package #39 is Ready:
   separate Checklist-only checkpoint from `c1759a4`.
 - [x] Supersede that exact-runner Local closeout before invocation:
   `ABANDONED — NEVER EXECUTED`.
-- [ ] Execute the simplified one-query Recovery closeout and single-file
-  evidence contract: `AUTHORIZED — NOT YET CONSUMED`, subject to its separate
-  Checklist-only authority checkpoint from `3707cd7`. Success closes only the
-  corrected Local gate; kit/pass work and P-12 remain separate.
+- [x] Execute the simplified one-query Recovery closeout and single-file
+  evidence contract: `CONSUMED ONCE — PASSED`, bound to authority checkpoint
+  `18ec61f5`, query SHA-256 `e226faa7d6c609e93f6bf2ac98db160aede5fd3fe2c11e880da58282e521c385`,
+  and evidence SHA-256
+  `70d1a4f1d98f186f06a0ed79dd86d1764d90c1f9e88c7eabe71179ac8958c2c1`.
+  This closes only the corrected Local gate; kit/pass work and P-12 remain
+  separate and unauthorized.
 - [ ] Build and hash-bind the one clean source kit only after the new-HEAD
   Remote and corrected-Local gates and later separate authorization; complete
   pass 1, structured authenticated GitHub contract review, pass 2, and the
