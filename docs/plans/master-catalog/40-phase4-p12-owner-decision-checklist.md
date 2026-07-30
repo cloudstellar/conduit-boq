@@ -45,9 +45,11 @@ the necessary quarantine parent and the narrow optional-root-sidecar policy
 recorded below. The manifest-controlled payload remains exact. This restores
 the corrected Local closeout evidence binding and kit custody without a
 database query/reset, repeated cleanup, kit regeneration, filesystem hardening,
-or source change. Disposable execution, fingerprint/pass work, Production,
-application/UI/export changes, flags, publication, Factor F, hotfix `016`, and
-P-12 remain unauthorized.
+or source change. The later separately authorized operational-fingerprint
+derivation passed and is recorded below. The bounded authority added on
+2026-07-31 permits only read-only recovery-recipe inspection; disposable
+database execution, pass 1, Production, application/UI/export changes, flags,
+publication, Factor F, hotfix `016`, and P-12 remain unauthorized.
 
 **Exact application candidate:**
 `5068f944af2aa3fe8446c77c8ae8d48673cb260b`
@@ -1296,6 +1298,79 @@ value, source, and external binding are recorded here exactly, the fingerprint
 gate remains HOLD; even a `productionEligible=true` kit must not be used in
 Production and P-12 must not be requested.
 
+**Pass-1 baseline-recipe inspection authority recorded:** 2026-07-31 ICT —
+after the operational fingerprint was recorded, the Owner instructed
+`ทำตามที่แนะนำครับ` in response to the recommendation to reconcile the stale
+fingerprint rows and prepare the next isolated pass-1 step. Read-only review
+then found a narrower prerequisite that must be closed before pass 1 can be
+authorized safely: the frozen runner validates but does not provision the
+restored `016` baseline, while the tracked authority currently records the
+historical restore result but not its exact target-creation, Auth-stub, ACL,
+ledger, and sentinel recipe. Guessing those writes would make the rehearsal
+non-reproducible and is not authorized.
+
+This decision therefore authorizes exactly one Checklist-only authority
+checkpoint from base
+`7f96916d796fcb35717dcf2d27d47e54650845ac` on branch
+`codex/master-catalog-phase4`: change only this Checklist to reconcile the
+completed fingerprint rows and record this bounded inspection authority,
+commit once as `docs: authorize pre-p12 baseline recipe inspection`, push once
+to the existing branch, and create no PR. Do not stage, modify, or delete
+`files/`, `tmp/`, `output/`, or any other untracked repository path. The
+commit contains no P-12 GO marker and does not change the source/tooling HEAD,
+kit, runner, generator, migration, Package #39, or Runbook #41.
+
+Only after that checkpoint is tracked-clean, pushed, and upstream-equal, this
+decision authorizes one read-only inspection with all of these limits:
+
+1. use only encrypted sparse bundle
+   `/Users/cloud/Backups/ConduitBOQ/production/phase4/pre-p12/pre-p12-rehearsal.sparsebundle`,
+   readiness package `pre-p12-readiness-20260726T154815Z`, and backup
+   passphrase already held in the macOS login Keychain under service
+   `Conduit BOQ Phase4 Backup`, account
+   `otlssvssvgkohqwuuiir-pre-p12`; do not access the Production database
+   credential;
+2. create only exact temporary mountpoint
+   `/private/tmp/conduit-p12-pass1-recipe-mount-7f96916`, retrieve the
+   passphrase without displaying or persisting it, attach the bundle read-only
+   through standard input, and require fresh proof that it is encrypted and
+   not writeable;
+3. require exact package membership and a passing eight-entry
+   `SHA256SUMS`, including 352,642-byte `production-app.dump` SHA-256
+   `9d306a478b8ada65d0a32ab31bca19587c55efa3ae979ae4dd8ad5871d575932`;
+   inspect only the seven checksum-bound non-dump records
+   `RECOVERY_MANIFEST.txt`, `RESTORE_STATUS`, `STATUS`,
+   `source-before.metrics`, `source-after.metrics`, `restored.metrics`, and
+   `restored.integrity`, plus a metadata-only PostgreSQL 17
+   `pg_restore --list` of that dump. Do not emit, copy, or persist raw SQL,
+   table rows, UUIDs, passwords, or dump contents;
+4. determine whether those checksum-bound records provide the exact historical
+   target initialization, ordered `pre-data`/`data`/Auth-stub/`post-data`
+   restore, role/ownership/ACL, and integrity procedure. Separately classify
+   every still-missing pass-1-specific requirement: exact
+   `conduit_p12_rehearsal` creation, loopback-only isolation, `postgres`
+   login/session/current-user posture, historical `009`-`016` ledger,
+   rehearsal sentinel plus ACL, source-checkout transition to
+   `7fbfe1bb8f71df03a78762b00e93aded7bdd6e42`, evidence layout, and cleanup;
+5. after closing all file handles, detach the exact bundle without force and
+   remove only the exact temporary mountpoint. Any checksum, membership,
+   encryption, read-only, content, handle, or detach difference is a hard stop
+   without retry, alternate bundle, Docker stop, or force detach; and
+6. do not create/start/stop a container or network, reserve/publish a port,
+   create/connect/write a database, invoke `calibrate-schema`, switch/detach
+   Git HEAD, access Local Supabase or Production, change a credential, or
+   modify any tracked source.
+
+If and only if the inspection and independent read-only verification complete,
+this decision authorizes one Checklist-only result checkpoint from the pushed
+inspection-authority HEAD: change only this Checklist, record what exact
+recipe was recovered and every remaining gap, commit once as
+`docs: record pre-p12 baseline recipe inspection`, push once to the existing
+branch, and create no PR. That result may recommend a separately bounded
+baseline-provisioning/pass-1 authority, but it may not grant it. Pass 1,
+GitHub review, contract freeze, pass 2, Production access, and P-12 remain
+separately unauthorized.
+
 **Authority:** Production `2568.0.0` remains authoritative for item names,
 units, and prices. The local workbook remains reconciliation/reference evidence
 only.
@@ -1693,18 +1768,28 @@ weaken the verifier, or continue that disposable sequence.
   hashes, per-file transactions, database statement/lock timeouts, stop
   conditions, and fix-forward rollback procedure as recorded in
   [Package #39 section 4.1](./39-phase4-p12-production-readiness-package.md).
-- [ ] Separately authorize the read-only derivation of the **new operational
-  fingerprint** required as `catalogAuthorityFingerprintSha256` from the
-  encrypted Production readiness snapshot's isolated restore or fresh
-  in-window Production/restore evidence.
+- [x] Separately authorize and complete the read-only derivation of the **new
+  operational fingerprint** required as
+  `catalogAuthorityFingerprintSha256` from the encrypted Production readiness
+  snapshot's isolated restore.
   It is not a recomputation or reuse of historical
   `sha256:ecd457c625c6eeb445607f30d374734c3e7ebd2a6d5489912f4c7ec42b3019a5`
   because the historical canonical SQL was not committed. Use only the formula
   frozen in CLI Execution Runbook #41 and the reviewed runner.
-- [ ] Record `catalogAuthorityFingerprintSha256`:
-  `UNCOMPUTED — HOLD`.
-- [ ] Record the exact authorized query/evidence source:
-  `UNRECORDED — HOLD`.
+- [x] Record `catalogAuthorityFingerprintSha256`:
+  `0fbaf215018200bacbc728af330e990b98c7e6128165982289ed429c93ad13f2`.
+- [x] Record the exact authorized query/evidence source: readiness package
+  `pre-p12-readiness-20260726T154815Z`; source/tooling HEAD
+  `7fbfe1bb8f71df03a78762b00e93aded7bdd6e42`; 352,642-byte dump SHA-256
+  `9d306a478b8ada65d0a32ab31bca19587c55efa3ae979ae4dd8ad5871d575932`;
+  frozen runner SHA-256
+  `be2f1aa3ee74137e4b7c3d9a193cb39b59fdfe30ae8ae1a17f8535580920fa89`;
+  frozen query SHA-256
+  `9f2e34e6d68d10c18b0139c945bef1946af5ebf3bbd3f26d5fef89d15ac2bd9d`;
+  canonical evidence
+  `/Users/cloud/Backups/ConduitBOQ/evidence/phase4/pre-p12/catalog-authority-fingerprint-readiness-20260730T165413Z-be86d77-r3/fingerprint-evidence-v1.json`;
+  evidence SHA-256
+  `2992f7b3a49b98f96736464fb3c8fbd1dd9c034f63e0c34e2f1b7faa15d91908`.
 - [ ] Bind the same exact bare lowercase 64-hex value in the external
   Production approval before the source kit may be used in Production:
   `UNBOUND — HOLD`. `productionEligible=true` by itself records only a clean
@@ -1755,10 +1840,11 @@ weaken the verifier, or continue that disposable sequence.
   bound by its verifier sign-off; after `026`, require a fresh artifact bound
   by final closeout. Do not reuse the approval baseline for the whole sequence.
 
-The fingerprint derivation must remain a separately authorized read-only query.
-Until its value, source, and external approval binding are complete and
-exact, a mechanically `productionEligible=true` source kit must not be used in
-Production and P-12 must not be requested.
+The fingerprint derivation completed through its separately authorized
+read-only query, and its exact value and source are recorded above. Until the
+same value is bound in the external Production approval, a mechanically
+`productionEligible=true` source kit must not be used in Production and P-12
+must not be requested.
 
 - [ ] Select and rehearse the exact execution path/account and client timeout;
   prove it handles the 394,076-byte `020`, records one remote ledger row per
@@ -1890,11 +1976,12 @@ Request P-12 only when every HOLD row in Package #39 is Ready:
 - [ ] Named-human executor, distinct named-human verifier, exact
   path/account/client timeout/ledger behavior, `current_user`/object-owner
   role, ownership/ACL checks, and exact window recorded.
-- [ ] New operational `catalogAuthorityFingerprintSha256` and its authorized
-  query/evidence source are recorded exactly in this Checklist and bound to
-  the external Production approval. Package #39 remains the frozen
-  source-head control snapshot; historical `ecd457...` is not substituted and
-  the clean kit is verified `productionEligible=true`.
+- [x] New operational `catalogAuthorityFingerprintSha256` and its authorized
+  query/evidence source are recorded exactly in this Checklist. Package #39
+  remains the frozen source-head control snapshot; historical `ecd457...` is
+  not substituted and the clean kit is verified `productionEligible=true`.
+- [ ] Bind that same exact value and authorized evidence source in the
+  external Production approval: `UNBOUND — HOLD`.
 - [ ] Owner receives a separate exact P-12 go/no-go request.
 - [ ] Only after an explicit Owner GO and separate Git authorization, commit
   and push Checklist #40 as the sole net changed path from the source/tooling
