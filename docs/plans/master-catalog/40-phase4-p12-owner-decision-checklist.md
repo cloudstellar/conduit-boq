@@ -37,8 +37,9 @@ disposition. Disposable execution, kit/pass work, Production,
 application/UI/export changes, flags, publication, Factor F, hotfix `016`,
 and P-12 remain unauthorized. The Owner has now named the executor/verifier,
 proposed the exact window below, and authorized only the one-kit preparation
-scope recorded after the Recovery result. The kit remains unbuilt until that
-Checklist-only authority checkpoint is clean, pushed, and upstream-equal.
+scope recorded after the Recovery result. That authority checkpoint and the
+single authorized kit generation have now passed. The exact kit is bound
+below; fingerprint/pass/review/Production work and P-12 remain HOLD.
 
 **Exact application candidate:**
 `5068f944af2aa3fe8446c77c8ae8d48673cb260b`
@@ -590,6 +591,48 @@ no PR. That result commit authorizes no pass, fingerprint, database, or
 Production action. No recursive tracked commit is required merely to record
 its own SHA.
 
+**P-12 one-kit preparation result recorded:** 2026-07-30 — the authority
+checkpoint above completed at exact clean pushed/upstream-equal
+`a82a4b9d6c64939db1f7f4790c21a61048cef2fa`, with `Vercel=success`, no PR,
+and zero PR-triggered GitHub Actions runs. The one authorized generator
+invocation then completed at `2026-07-30T02:54:32.112Z` from detached
+source/tooling HEAD
+`7fbfe1bb8f71df03a78762b00e93aded7bdd6e42`.
+
+Canonical kit:
+
+`/Users/cloud/Backups/ConduitBOQ/production/phase4/pre-p12/p12-cli-kit-v2-7fbfe1bb8f71df03`
+
+Canonical manifest:
+
+`/Users/cloud/Backups/ConduitBOQ/production/phase4/pre-p12/p12-cli-kit-v2-7fbfe1bb8f71df03/manifest.json`
+
+The manifest SHA-256 is
+`0e4235ffe91853d8066e99f41f297ab5b62f39e14ad6bfa8c9ee432c04733987`.
+It binds generator SHA-256
+`9bf6ad36bbfc98a9e5ce767de412e737d23226af8bb4afd0f0d7bf07e06b1d69`,
+runner SHA-256
+`be2f1aa3ee74137e4b7c3d9a193cb39b59fdfe30ae8ae1a17f8535580920fa89`,
+application candidate
+`5068f944af2aa3fe8446c77c8ae8d48673cb260b`, native Supabase CLI `2.107.0`,
+PostgreSQL major `17`, client timeout `180` seconds, exact ordered `017`,
+`017a`, `018`-`026` hashes, `automaticNextStep=false`, tracked source
+cleanliness, and `productionEligible=true`.
+
+Read-only result verification passed owner/mode, no-symlink, exact manifest
+fields, eleven-step order/hash, and manifest-hash checks across 35 directories
+and 166 files. Directories are owner-only mode `0700`; files are read-only mode
+`0400`. The retained checkout's untracked `tmp/` evidence remained untouched.
+No database connection, migration, Local reset/query, Keychain access,
+fingerprint derivation, calibration/pass, GitHub review, contract freeze,
+Production access, P-12, deploy, flag, publication, Factor F mutation, or
+hotfix action occurred.
+
+This exact kit is now frozen for later separately authorized pass 1, pass 2,
+and Production reuse. Do not regenerate it. Its `productionEligible=true`
+state proves only clean source packaging and is not P-12 or Production
+approval.
+
 **Post-freeze fingerprint binding:** frozen references in Package #39 and CLI
 Runbook #41 that say to record the future
 `catalogAuthorityFingerprintSha256` in both Package #39 and this Checklist are
@@ -980,12 +1023,13 @@ weaken the verifier, or continue that disposable sequence.
   `70d1a4f1d98f186f06a0ed79dd86d1764d90c1f9e88c7eabe71179ac8958c2c1`
   are bound above. No reset, lint/smoke rerun, Production access, or
   kit/pass/P-12 authority occurred.
-- [ ] Only after the corrected Local gate passes, build one external kit at
+- [x] Only after the corrected Local gate passes, build one external kit at
   that source/tooling HEAD under later separate authorization and record its
   canonical manifest path/SHA-256, generator source SHA-256, runner source
-  SHA-256, and `productionEligible=true`:
-  `AUTHORIZED ONCE — NOT YET CONSUMED — UNBUILT — UNBOUND — HOLD`, subject to
-  the Checklist-only authority checkpoint above.
+  SHA-256, and `productionEligible=true`: `CONSUMED ONCE — BUILT — BOUND`.
+  Exact path and manifest SHA-256
+  `0e4235ffe91853d8066e99f41f297ab5b62f39e14ad6bfa8c9ee432c04733987`
+  are recorded above.
   Reuse this exact kit for pass 1, pass 2, and Production; do not regenerate it
   at the later GO HEAD.
 - [x] Name the migration executor: `Suthorn Kaewkorn`.
@@ -1176,10 +1220,12 @@ Request P-12 only when every HOLD row in Package #39 is Ready:
   `70d1a4f1d98f186f06a0ed79dd86d1764d90c1f9e88c7eabe71179ac8958c2c1`.
   This closes only the corrected Local gate; kit/pass work and P-12 remain
   separate and unauthorized.
-- [ ] Build and hash-bind the one clean source kit only after the new-HEAD
-  Remote and corrected-Local gates and later separate authorization; complete
-  pass 1, structured authenticated GitHub contract review, pass 2, and the
-  transitive final closeout at that same source/tooling HEAD.
+- [x] Build and hash-bind the one clean source kit only after the new-HEAD
+  Remote and corrected-Local gates and later separate authorization. The exact
+  source kit and manifest SHA-256 are recorded above.
+- [ ] Complete pass 1, structured authenticated GitHub contract review, pass
+  2, and the transitive final closeout at that same source/tooling HEAD and
+  with that same frozen kit.
 - [ ] Record the schema contract SHA-256, final pass-1 manifest path/SHA-256,
   pass-2 final closeout manifest path/SHA-256, and fresh post-pass-2 step-`017`
   advisor baseline path/SHA-256/timestamp.
