@@ -35,7 +35,10 @@ bound below at SHA-256
 This closes only the corrected Local gate under the frozen known-lint
 disposition. Disposable execution, kit/pass work, Production,
 application/UI/export changes, flags, publication, Factor F, hotfix `016`,
-and P-12 remain unauthorized.
+and P-12 remain unauthorized. The Owner has now named the executor/verifier,
+proposed the exact window below, and authorized only the one-kit preparation
+scope recorded after the Recovery result. The kit remains unbuilt until that
+Checklist-only authority checkpoint is clean, pushed, and upstream-equal.
 
 **Exact application candidate:**
 `5068f944af2aa3fe8446c77c8ae8d48673cb260b`
@@ -520,6 +523,73 @@ The corrected Local gate is therefore
 kit generation, disposable pass, Production action, P-12, deploy, flag,
 publication, Factor F mutation, or hotfix work.
 
+**P-12 roles/window proposal and one-kit preparation PRE-GO authority
+recorded:** 2026-07-30 — the Owner named `Suthorn Kaewkorn` as migration
+executor and named the distinct-human GitHub login `Lukkxh` as independent
+verifier. `Lukkxh` repository access, authenticated review identity, review
+content, and availability remain unverified until the required live review;
+naming the verifier is not verifier sign-off.
+
+The Owner proposed Saturday 2026-08-01 from `18:00` through `23:00` ICT
+(`+07:00`), with a `17:00` ICT readiness cutoff. This is only a window
+proposal. It does not approve P-12, permit an early start, guarantee GO, or
+waive any HOLD row. If every prerequisite is not Ready by the cutoff, the
+result is No-Go without migration. If a later exact approved window differs,
+record and approve it before any Production connection.
+
+The Owner then explicitly instructed `ทำต่อ` after being told that the next
+bounded step would record these roles/window and authorize one frozen
+execution-kit build without migration, rehearsal, reset, or Production
+access. This decision first authorizes exactly one Checklist-only authority
+checkpoint from base
+`1a382abb7d64ca20b9c95f06a4e2ddf495ffbcd9` on branch
+`codex/master-catalog-phase4`: change only this Checklist, commit once as
+`docs: authorize p12 kit preparation`, push once to the existing branch, and
+create no PR. Do not stage, modify, or delete `files/`, `tmp/`, `output/`, or
+any other untracked repository path. The commit contains no P-12 GO marker.
+
+Only after that checkpoint is clean, pushed, upstream-equal, and has truthful
+exact-head Remote status, this decision authorizes exactly one invocation of
+the already reviewed generator from the retained, tracked-clean, detached
+source/tooling checkout at
+`/private/tmp/conduit-pre-p12-local-20260729T164944Z.m56rcG/repo`, exact HEAD
+`7fbfe1bb8f71df03a78762b00e93aded7bdd6e42`:
+
+```sh
+node scripts/prepare-master-catalog-p12-cli-kit.mjs \
+  --output /Users/cloud/Backups/ConduitBOQ/production/phase4/pre-p12/p12-cli-kit-v2-7fbfe1bb8f71df03
+```
+
+The output path is a new owner-only external-repository directory on the
+FileVault-encrypted Data volume and was absent at authorization preflight. The
+parent is owner `cloud`, mode `0700`. The generator must independently verify
+native Supabase CLI `2.107.0`, every accepted migration hash, tracked
+cleanliness, and byte-for-byte copies; bind source/tooling HEAD, application
+candidate, generator SHA-256
+`9bf6ad36bbfc98a9e5ce767de412e737d23226af8bb4afd0f0d7bf07e06b1d69`,
+runner SHA-256
+`be2f1aa3ee74137e4b7c3d9a193cb39b59fdfe30ae8ae1a17f8535580920fa89`,
+and emit `productionEligible=true`. The retained checkout's existing
+untracked `tmp/` evidence must remain untouched.
+
+On success, verify only the kit tree's owner/modes, exact source/application/
+CLI/PostgreSQL fields, eleven ordered Phase 4 hashes, generator/runner hashes,
+and `manifest.json` SHA-256. This does not authorize fingerprint derivation,
+`calibrate-schema`, pass 1, GitHub review, contract freeze, pass 2, Local
+reset/query, database connection, Keychain access, Production read or write,
+P-12, deploy, flags, publication, Factor F mutation, hotfix work, or any
+automatic next step. Any generator, permission, hash, source, or manifest
+failure stops without retry or replacement-path generation.
+
+If and only if the one kit succeeds, this decision also authorizes one later
+Checklist-only result checkpoint from the pushed authority HEAD: change only
+this Checklist, bind the exact canonical kit path, manifest SHA-256,
+generator/runner hashes, source HEAD, and `productionEligible=true`; commit
+once as `docs: record p12 kit`, push once to the existing branch, and create
+no PR. That result commit authorizes no pass, fingerprint, database, or
+Production action. No recursive tracked commit is required merely to record
+its own SHA.
+
 **Post-freeze fingerprint binding:** frozen references in Package #39 and CLI
 Runbook #41 that say to record the future
 `catalogAuthorityFingerprintSha256` in both Package #39 and this Checklist are
@@ -913,15 +983,20 @@ weaken the verifier, or continue that disposable sequence.
 - [ ] Only after the corrected Local gate passes, build one external kit at
   that source/tooling HEAD under later separate authorization and record its
   canonical manifest path/SHA-256, generator source SHA-256, runner source
-  SHA-256, and `productionEligible=true`: `UNBUILT — UNBOUND — HOLD`.
+  SHA-256, and `productionEligible=true`:
+  `AUTHORIZED ONCE — NOT YET CONSUMED — UNBUILT — UNBOUND — HOLD`, subject to
+  the Checklist-only authority checkpoint above.
   Reuse this exact kit for pass 1, pass 2, and Production; do not regenerate it
   at the later GO HEAD.
-- [ ] Name the migration executor: `________________`.
-- [ ] Name an independent verifier: `________________`.
-- [ ] Confirm that the verifier is a named human distinct from the executor;
-  self-verification is not accepted for P-12.
-- [ ] Record the approved Production `session_user`, `current_user`, and
-  object-owner role: `________________`.
+- [x] Name the migration executor: `Suthorn Kaewkorn`.
+- [x] Name an independent verifier: GitHub login `Lukkxh`; repository access,
+  authenticated identity, availability, and the actual review remain pending.
+- [x] Confirm that the verifier is a named human distinct from the executor;
+  self-verification is not accepted for P-12. This names the roles only and
+  does not claim that verification has occurred.
+- [x] Record the required Production `session_user`, `current_user`, and
+  object-owner role: `postgres` / `postgres` / `postgres`. Fresh in-window
+  readback and unchanged after-each-file identity remain mandatory.
 - [x] Freeze Supabase CLI `2.107.0`, PostgreSQL major `17`, exact migration
   hashes, per-file transactions, database statement/lock timeouts, stop
   conditions, and fix-forward rollback procedure as recorded in
@@ -1027,7 +1102,9 @@ Production and P-12 must not be requested.
   query starts without separately authorized bounded read-only forensic
   reconciliation. This ordering reduces but cannot eliminate sudden
   evidence-medium failure.
-- [ ] Propose the maintenance window: `________________`.
+- [x] Propose the maintenance window: Saturday 2026-08-01,
+  `18:00`-`23:00` ICT (`+07:00`), readiness cutoff `17:00` ICT. This is a
+  proposal only; P-12 approval and every prerequisite remain separate.
 
 Preparing this record does not authorize the window.
 
