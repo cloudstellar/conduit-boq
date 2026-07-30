@@ -1114,6 +1114,107 @@ Production approval binding remains `UNBOUND — HOLD`; pass 1, GitHub review,
 contract freeze, pass 2, Production access, and P-12 remain separately
 unauthorized.
 
+**Selector-corrected operational catalog fingerprint PRE-GO authority
+recorded:** 2026-07-30 — the image-default authority checkpoint above
+completed at exact clean pushed/upstream-equal
+`be86d77474c6276136771c742af8142cb2c91215`. Its one image-default attempt
+passed the exact source, bundle, checksum, dump, image, credential,
+target-absence, network-none, tmpfs, and no-published-port gates. The frozen
+image initialized successfully without user/database/trust overrides, and the
+isolated session proved `session_user=supabase_admin`,
+`current_user=supabase_admin`, database `postgres`, and PostgreSQL `17.6`.
+The credential file was unlinked immediately after exact disposable container
+`conduit-p12-fingerprint-f66e39f-r2` was created.
+
+The dump was then copied only into container tmpfs with its exact size and
+SHA-256 preserved. Read-only TOC inspection found exactly one `TABLE` and one
+`TABLE DATA` entry for each of `public.price_list` and
+`public.price_list_default_version`, and both relations were initially absent.
+The first pre-data `pg_restore` stopped before creating either relation because
+its table qualifiers incorrectly included their schema:
+`--table=public.price_list` and
+`--table=public.price_list_default_version`. PostgreSQL 17 `pg_restore`
+requires schema selection separately and does not permit a schema name inside
+`--table`; `--strict-names` therefore reported table
+`public.price_list` not found.
+
+Post-stop verification proved both selected relations still absent and the
+frozen fingerprint query was never invoked. No state/result evidence,
+Production access, Local Supabase database access/change, post-data, Auth
+stub, or full restore occurred. The exact container/tmpfs was removed, the
+bundle detached without force after a no-open-handle check, every exact
+temporary/evidence target remained absent, and the same seven existing Local
+containers retained their exact identities and running/health states. The
+actual fingerprint-query counts for the first, corrected, and image-default
+attempts are therefore `0`, `0`, and `0`; total invocation count remains zero.
+
+After receiving that fail-closed result and the recommendation to correct only
+the PostgreSQL 17 selector form, the Owner explicitly instructed:
+
+> อนุมัติ selector-corrected fingerprint attempt หนึ่งครั้ง โดยคง default supabase_admin และขอบเขตเดิมทั้งหมด
+
+This decision first authorizes exactly one Checklist-only selector-corrected
+authority checkpoint from base
+`be86d77474c6276136771c742af8142cb2c91215` on branch
+`codex/master-catalog-phase4`: change only this Checklist, commit once as
+`docs: authorize selector-corrected pre-p12 fingerprint`, push once to the
+existing branch, and create no PR. Do not stage, modify, or delete `files/`,
+`tmp/`, `output/`, or any other untracked repository path. The commit contains
+no P-12 GO marker.
+
+Only after that checkpoint is clean, pushed, and upstream-equal, this decision
+authorizes exactly one selector-corrected attempt under every unchanged
+source, snapshot, checksum, image-default `supabase_admin`, credential,
+two-relation restore, runner/generator/query, isolation, evidence, stop,
+cleanup, secret-handling, and exclusion rule in the three immediately
+preceding authorities, with only these bounded corrections:
+
+1. use new exact mountpoint
+   `/private/tmp/conduit-p12-fingerprint-mount-be86d77-r3`, new exact container
+   name `conduit-p12-fingerprint-be86d77-r3`, new exact credential path
+   `/private/tmp/conduit-p12-fingerprint-be86d77-r3.env`, new exact temporary
+   state path
+   `/private/tmp/conduit-p12-fingerprint-be86d77-r3-state.json`, and new exact
+   final evidence directory
+   `/Users/cloud/Backups/ConduitBOQ/evidence/phase4/pre-p12/catalog-authority-fingerprint-readiness-20260730T165413Z-be86d77-r3`;
+2. after the unchanged four-entry TOC allowlist passes and before any database
+   restore, run each intended section once through the same container
+   PostgreSQL 17 `pg_restore` with no database target and output directed only
+   to `/dev/null`. Require both no-write selector validations to succeed under
+   `--strict-names`, one for `pre-data` and then one for `data`; display or
+   persist no rendered SQL or row data;
+3. in both no-write validations and both actual ordered restores, replace only
+   the invalid schema-qualified table selectors with exact separate selectors
+   `--schema=public`, `--table=price_list`, and
+   `--table=price_list_default_version`. Retain `--strict-names`,
+   `--exit-on-error`, `--no-owner`, `--no-privileges`, separate `pre-data`
+   then `data` sections, the two-relation scope, and no post-data; and
+4. bind all three prior pre-query stops/cleanups in the temporary state and
+   final evidence, with
+   `firstAttemptFingerprintQueryInvocationCount=0`,
+   `correctedAttemptFingerprintQueryInvocationCount=0`,
+   `imageDefaultAttemptFingerprintQueryInvocationCount=0`,
+   `selectorCorrectedAttemptFingerprintQueryInvocationCount=1`, and
+   `totalFingerprintQueryInvocationCount=1`. The last two values become `1`
+   only if the frozen query is actually invoked; a pre-query stop records both
+   as `0`, while a post-query evidence/cleanup stop retains both as `1` and
+   never permits a retry.
+
+Any selector validation, restore, inherited gate, query, evidence, or cleanup
+difference stops without retry, alternate selector/identity/credential path,
+further Git action, Production/Local access, pass work, or P-12. Cleanup of
+only the exact selector-corrected-attempt resources remains mandatory.
+
+If and only if the selector-corrected operation and complete independent
+read-only verification pass, this decision authorizes exactly one
+Checklist-only result checkpoint from the pushed selector-corrected authority
+HEAD: change only this Checklist, record the bare fingerprint and exact
+evidence source/path/SHA-256, commit once as
+`docs: record pre-p12 catalog fingerprint`, push once to the existing branch,
+and create no PR. Package #39 remains frozen. External Production approval
+binding remains `UNBOUND — HOLD`; pass 1, GitHub review, contract freeze, pass
+2, Production access, and P-12 remain separately unauthorized.
+
 **Post-freeze fingerprint binding:** frozen references in Package #39 and CLI
 Runbook #41 that say to record the future
 `catalogAuthorityFingerprintSha256` in both Package #39 and this Checklist are
