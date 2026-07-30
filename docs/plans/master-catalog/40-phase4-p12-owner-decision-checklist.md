@@ -2,7 +2,7 @@
 
 **Prepared:** 2026-07-26
 
-**Last updated:** 2026-07-30
+**Last updated:** 2026-07-31
 
 **Status:** PRE-P-12 HOLD - immutable replacement source/tooling HEAD
 `7fbfe1bb8f71df03a78762b00e93aded7bdd6e42` and its truthful
@@ -1214,6 +1214,72 @@ evidence source/path/SHA-256, commit once as
 and create no PR. Package #39 remains frozen. External Production approval
 binding remains `UNBOUND — HOLD`; pass 1, GitHub review, contract freeze, pass
 2, Production access, and P-12 remain separately unauthorized.
+
+**Selector-corrected operational catalog fingerprint result recorded:**
+2026-07-31 ICT — selector-corrected authority checkpoint
+`bac0d8936532068a99fcb063e0a9b35f9e7e2ec3` was exact clean,
+pushed/upstream-equal, and changed only this Checklist before the one
+authorized attempt began.
+
+That attempt passed every inherited source, frozen-image, encrypted-snapshot,
+credential, isolation, checksum, TOC, selector-validation, scoped-restore,
+query, evidence, and cleanup gate. The frozen image initialized as
+`supabase_admin`; the isolated session proved
+`session_user=supabase_admin`, `current_user=supabase_admin`, database
+`postgres`, and PostgreSQL `17.6`. Both no-database selector validations
+passed with output discarded, then `pg_restore` materialized only
+`public.price_list` and `public.price_list_default_version` in exact
+`pre-data` then `data` order. No post-data, Auth stub, or full-restore/full-
+integrity claim occurred.
+
+The exact exported `catalog` query from source/tooling commit
+`7fbfe1bb8f71df03a78762b00e93aded7bdd6e42`, runner SHA-256
+`be2f1aa3ee74137e4b7c3d9a193cb39b59fdfe30ae8ae1a17f8535580920fa89`,
+1,921 UTF-8 bytes, and query SHA-256
+`9f2e34e6d68d10c18b0139c945bef1946af5ebf3bbd3f26d5fef89d15ac2bd9d`
+was invoked exactly once. It returned 710 price rows, 710 distinct codes,
+zero missing codes/names/units/costs, zero unit-cost mismatches, zero
+non-current rows, and this bare operational fingerprint:
+
+`0fbaf215018200bacbc728af330e990b98c7e6128165982289ed429c93ad13f2`
+
+Evidence source: encrypted readiness snapshot package
+`pre-p12-readiness-20260726T154815Z`, isolated two-relation restore from
+352,642-byte `production-app.dump` SHA-256
+`9d306a478b8ada65d0a32ab31bca19587c55efa3ae979ae4dd8ad5871d575932`.
+
+Canonical evidence:
+
+`/Users/cloud/Backups/ConduitBOQ/evidence/phase4/pre-p12/catalog-authority-fingerprint-readiness-20260730T165413Z-be86d77-r3/fingerprint-evidence-v1.json`
+
+Evidence SHA-256:
+
+`2992f7b3a49b98f96736464fb3c8fbd1dd9c034f63e0c34e2f1b7faa15d91908`
+
+The evidence is the sole regular single-link file in its owner `cloud`, mode
+`0700` directory; the file is owner `cloud`, mode `0600`. Independent
+read-only checks passed its schema/content/hash, frozen runner/generator/query
+provenance, exact four-entry TOC, restore scope/sections, aggregate result,
+and query accounting:
+`firstAttemptFingerprintQueryInvocationCount=0`,
+`correctedAttemptFingerprintQueryInvocationCount=0`,
+`imageDefaultAttemptFingerprintQueryInvocationCount=0`,
+`selectorCorrectedAttemptFingerprintQueryInvocationCount=1`, and
+`totalFingerprintQueryInvocationCount=1`.
+
+The exact disposable container and tmpfs were removed, the sparse bundle was
+detached without force after a no-open-handle check, and the temporary
+credential, state, and mountpoint are absent. The same seven existing Local
+containers retain their exact identities and running/health states.
+Production was not connected, no Production credential was accessed, the
+Local Supabase database was not accessed, the frozen kit and Package #39 were
+not modified, and no rehearsal pass began.
+
+The operational fingerprint is now derived and recorded in this Checklist,
+but its external Production approval binding remains
+`UNBOUND — HOLD`. Pass 1, GitHub review, contract freeze, pass 2, Production
+execution, and P-12 remain separately unauthorized; there is no automatic
+next step.
 
 **Post-freeze fingerprint binding:** frozen references in Package #39 and CLI
 Runbook #41 that say to record the future
