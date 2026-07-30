@@ -32,14 +32,18 @@ authority checkpoint completed at pushed/upstream-equal
 passed from immutable source `7fbfe1b`. The owner-only final evidence file is
 bound below at SHA-256
 `70d1a4f1d98f186f06a0ed79dd86d1764d90c1f9e88c7eabe71179ac8958c2c1`.
-This closes only the corrected Local gate under the frozen known-lint
-disposition. Disposable execution, kit/pass work, Production,
-application/UI/export changes, flags, publication, Factor F, hotfix `016`,
-and P-12 remain unauthorized. The Owner has now named the executor/verifier,
-proposed the exact window below, and authorized only the one-kit preparation
-scope recorded after the Recovery result. That authority checkpoint and the
-single authorized kit generation have now passed. The exact kit is bound
-below; fingerprint/pass/review/Production work and P-12 remain HOLD.
+A later read-only checkpoint audit found that this file contains one malformed
+embedded input hash even though its outer SHA-256 and the actual retained input
+hashes remain available. The same audit found one post-freeze `.DS_Store`
+outside the kit manifest. The corrected Local closeout claim and exact kit-tree
+custody therefore return to HOLD until the evidence-only repair authorized
+below passes. This does not infer Local database, migration `026`, manifest,
+or reviewed source drift. Disposable execution, fingerprint/pass work,
+Production, application/UI/export changes, flags, publication, Factor F,
+hotfix `016`, and P-12 remain unauthorized. The Owner has named the
+executor/verifier and proposed the exact window below; the one-kit preparation
+authority and generation completed, but the exact kit must not be used until
+the integrity-repair result is recorded.
 
 **Exact application candidate:**
 `5068f944af2aa3fe8446c77c8ae8d48673cb260b`
@@ -632,6 +636,89 @@ This exact kit is now frozen for later separately authorized pass 1, pass 2,
 and Production reuse. Do not regenerate it. Its `productionEligible=true`
 state proves only clean source packaging and is not P-12 or Production
 approval.
+
+**Post-kit evidence-only integrity repair PRE-GO authority recorded:**
+2026-07-30 — a read-only checkpoint audit after commit
+`c1d36c843a5699fccac0f4cb6125909adc7a8379` found exactly two custody/evidence
+differences:
+
+1. `local-closeout-final.json` remains owner `cloud`, mode `0600`, 3,283
+   bytes, with its recorded outer SHA-256
+   `70d1a4f1d98f186f06a0ed79dd86d1764d90c1f9e88c7eabe71179ac8958c2c1`.
+   Six embedded input hashes match. Its embedded value for `06-db-lint.json`
+   is the malformed 57-hex
+   `6e7c2fda35836a82ce8fd0a185d48b77eb947ab6a6d958fddfb9d0185`; the
+   unchanged actual file and the earlier authority table both bind the exact
+   64-hex
+   `6e7c2fda6f876da35836a82ce8fd0a185d48b77eb947ab6a6d958fddfb9d0185`.
+2. The frozen kit manifest, its SHA-256, all expected directories/files,
+   generator/runner hashes, and eleven ordered migration hashes still match.
+   A post-freeze root file `.DS_Store`, not referenced by the manifest, was
+   created after the kit result commit. It is owner `cloud`, mode `0644`,
+   6,148 bytes, SHA-256
+   `1f46a677ea3ef4b22ec6ed81510b8fa898ba04e3df816f5d9dcbb2ca0a701bec`,
+   and makes the current tree 167 rather than the recorded 166 files.
+
+The Owner accepted the minimal plan: keep `c1d36c8` as the completed kit-result
+checkpoint, make one purposeful authority commit, perform one bounded
+evidence-only repair without database work, verify once, and make one result
+commit before returning to the fingerprint gate.
+
+This decision first authorizes exactly one Checklist-only authority checkpoint
+from base `c1d36c843a5699fccac0f4cb6125909adc7a8379` on branch
+`codex/master-catalog-phase4`: change only this Checklist, commit once as
+`docs: authorize pre-p12 integrity repair`, push once to the existing branch,
+and create no PR. Do not stage, modify, or delete `files/`, `tmp/`, `output/`,
+or any other untracked repository path. This commit contains no P-12 GO marker.
+
+Only after that checkpoint is clean, pushed, and upstream-equal, this decision
+authorizes exactly one bounded external evidence/custody repair:
+
+1. Reverify the original closeout file and all seven retained inputs by exact
+   path, owner, mode, size, SHA-256 syntax, and actual SHA-256. Do not modify,
+   rename, delete, or regenerate any of those eight files.
+2. Create exactly one new owner-only mode `0700` quarantine directory:
+   `/Users/cloud/Backups/ConduitBOQ/production/phase4/pre-p12/quarantine/p12-cli-kit-v2-7fbfe1bb8f71df03-post-freeze-ds-store`.
+   Move only the exact root `.DS_Store` into it as `DS_Store.quarantined`,
+   preserving its bytes, set the quarantined file to owner-only mode `0600`,
+   and verify the SHA-256 above. Do not delete it or alter any manifest-listed
+   kit path.
+3. Reverify that the kit contains exactly the recorded 35 directories and 166
+   files, zero symlinks, directories mode `0700`, files mode `0400`, unchanged
+   manifest SHA-256, exact source/application/tool fields, and all expected
+   cumulative migration copies and hashes.
+4. If and only if every check passes, create with exclusive no-overwrite
+   semantics exactly one owner `cloud`, mode `0600`, append-only correction:
+   `/Users/cloud/Backups/ConduitBOQ/evidence/phase4/pre-p12/post-p48-local-bootstrap-20260729T164944Z-7fbfe1b/local-closeout-integrity-correction-v1.json`.
+   It must use schema
+   `conduit-boq/master-catalog-p12-local-closeout-integrity-correction/v1`
+   and bind the authority/source commits, original closeout path/SHA-256,
+   malformed embedded value, exact seven actual input paths/SHA-256 values,
+   kit path/manifest SHA-256, quarantined file path/SHA-256, post-repair
+   directory/file/symlink/mode checks, and
+   `databaseInvocationCount=0`, `localResetInvocationCount=0`,
+   `keychainAccessed=false`, `productionTouched=false`,
+   `kitRegenerated=false`, `originalEvidenceModified=false`,
+   `fingerprintDerived=false`, `rehearsalStarted=false`, and
+   `p12Authorized=false`. Persist no raw business rows, SQL/CLI output,
+   environment values, or secret material.
+
+Any source/authority drift, missing or extra artifact, owner/mode/hash
+difference, pre-existing target, move failure, verification failure, exclusive
+write failure, parse failure, or secret-scan failure stops without retry,
+overwrite, cleanup, deletion, regeneration, database query/reset, Keychain
+access, Production access, fingerprint derivation, rehearsal/pass work, or
+other Git action.
+
+If and only if the repair and complete read-only verification pass, this
+decision also authorizes exactly one Checklist-only result checkpoint from the
+pushed authority HEAD: change only this Checklist, bind the authority commit,
+quarantine path/SHA-256, correction path/SHA-256, and verified final kit/evidence
+state, commit once as `docs: record pre-p12 integrity repair`, push once to the
+existing branch, and create no PR. No recursive tracked commit is required to
+record its own SHA. That result restores only the Local closeout evidence
+binding and exact kit-tree custody; fingerprint derivation, pass 1, GitHub
+review, pass 2, Production, and P-12 remain separately unauthorized.
 
 **Post-freeze fingerprint binding:** frozen references in Package #39 and CLI
 Runbook #41 that say to record the future
