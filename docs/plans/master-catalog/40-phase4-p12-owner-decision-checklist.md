@@ -1026,6 +1026,94 @@ Production approval binding remains `UNBOUND — HOLD`; pass 1, GitHub review,
 contract freeze, pass 2, Production access, and P-12 remain separately
 unauthorized.
 
+**Image-default operational catalog fingerprint PRE-GO authority recorded:**
+2026-07-30 — the corrected-attempt authority checkpoint above completed at
+exact clean pushed/upstream-equal
+`f66e39f6ac1e5194a13ad32756d91f447cb7e98c`. Its one corrected attempt again
+passed the exact source, bundle, checksum, dump, image, and target-absence
+preconditions. The exclusive owner-only credential file satisfied its
+64-lowercase-hex contract, was consumed only by Docker `--env-file`, and was
+unlinked immediately after exact disposable container
+`conduit-p12-fingerprint-e7b2423-r1` was created.
+
+That container also stopped with exit code `2` before any dump copy, TOC
+inspection, restore, fingerprint query, state/result evidence, Local Supabase
+access/change, or Production access. The ephemeral password was present, but
+the command overrode the frozen image's default `POSTGRES_USER=supabase_admin`
+with `postgres`. PostgreSQL therefore created `postgres` rather than the
+`supabase_admin` role required by the image's own `migrate.sh`; the internal
+password-authenticated connection failed because role `supabase_admin` did not
+exist. The exact container/tmpfs was removed, the bundle detached without
+force, all exact temporary and evidence targets remained absent, and the same
+seven existing Local containers remained up and healthy. Total fingerprint
+query invocation count remained zero.
+
+After receiving that fail-closed result and the recommendation to retain the
+image's frozen default initialization identity, the Owner explicitly
+instructed:
+
+> อนุมัติ fingerprint attempt ถัดไป โดยใช้ default supabase_admin ของ frozen image และขอบเขตเดิมทั้งหมด
+
+This decision first authorizes exactly one Checklist-only image-default
+authority checkpoint from base
+`f66e39f6ac1e5194a13ad32756d91f447cb7e98c` on branch
+`codex/master-catalog-phase4`: change only this Checklist, commit once as
+`docs: authorize image-default pre-p12 fingerprint`, push once to the existing
+branch, and create no PR. Do not stage, modify, or delete `files/`, `tmp/`,
+`output/`, or any other untracked repository path. The commit contains no
+P-12 GO marker.
+
+Only after that checkpoint is clean, pushed, and upstream-equal, this decision
+authorizes exactly one image-default attempt under every unchanged source,
+snapshot, checksum, image, two-relation restore, runner/generator/query,
+isolation, evidence, stop, cleanup, secret-handling, and exclusion rule in the
+two immediately preceding authorities, with only these bounded corrections:
+
+1. use new exact mountpoint
+   `/private/tmp/conduit-p12-fingerprint-mount-f66e39f-r2`, new exact container
+   name `conduit-p12-fingerprint-f66e39f-r2`, new exact credential path
+   `/private/tmp/conduit-p12-fingerprint-f66e39f-r2.env`, new exact temporary
+   state path
+   `/private/tmp/conduit-p12-fingerprint-f66e39f-r2-state.json`, and new exact
+   final evidence directory
+   `/Users/cloud/Backups/ConduitBOQ/evidence/phase4/pre-p12/catalog-authority-fingerprint-readiness-20260730T162153Z-f66e39f-r2`;
+2. create/use/unlink the credential file under the same exclusive
+   owner/type/mode/link, random 32-byte, one-line, no-display/no-persistence
+   contract, but pass no `POSTGRES_USER`, `POSTGRES_DB`, or
+   `POSTGRES_HOST_AUTH_METHOD` override to Docker;
+3. before creation, require the locally cached frozen image configuration to
+   bind exact defaults `POSTGRES_USER=supabase_admin`, `POSTGRES_DB=postgres`,
+   and `POSTGRES_HOST=/var/run/postgresql`; after initialization, require
+   `session_user=supabase_admin`, `current_user=supabase_admin`, database
+   `postgres`, and PostgreSQL `17.6`;
+4. use only that isolated `supabase_admin` identity for the scoped TOC,
+   two-relation `pg_restore`, and one frozen read-only query. This disposable
+   restore identity does not amend the separately frozen future Production
+   execution identity `postgres`; and
+5. bind both prior pre-query stops/cleanups in the temporary state and final
+   evidence, with `firstAttemptFingerprintQueryInvocationCount=0`,
+   `correctedAttemptFingerprintQueryInvocationCount=0`,
+   `imageDefaultAttemptFingerprintQueryInvocationCount=1`, and
+   `totalFingerprintQueryInvocationCount=1`. Final evidence creation and
+   temporary-state unlink retain the same post-container-removal,
+   post-non-force-detach order.
+
+Any image-default, credential, initialization, identity, readiness, inherited
+gate, query, evidence, or cleanup difference stops without retry, alternate
+identity/credential path, further Git action, Production/Local access, pass
+work, or P-12. Cleanup of only the exact image-default-attempt resources
+remains mandatory.
+
+If and only if the image-default operation and complete independent read-only
+verification pass, this decision authorizes exactly one Checklist-only result
+checkpoint from the pushed image-default authority HEAD: change only this
+Checklist, record the bare fingerprint and exact evidence source/path/SHA-256,
+commit once as `docs: record pre-p12 catalog fingerprint`, push once to the
+existing branch, and create no PR. Package #39 remains frozen. External
+Production approval binding remains `UNBOUND — HOLD`; pass 1, GitHub review,
+contract freeze, pass 2, Production access, and P-12 remain separately
+unauthorized.
+
 **Post-freeze fingerprint binding:** frozen references in Package #39 and CLI
 Runbook #41 that say to record the future
 `catalogAuthorityFingerprintSha256` in both Package #39 and this Checklist are
