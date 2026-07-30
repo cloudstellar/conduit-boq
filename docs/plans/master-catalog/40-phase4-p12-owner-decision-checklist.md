@@ -941,6 +941,91 @@ and create no PR. Package #39 remains frozen. The external Production approval
 binding, pass 1, GitHub review, contract freeze, pass 2, Production access,
 and P-12 remain separately unauthorized.
 
+**Corrected operational catalog fingerprint PRE-GO authority recorded:**
+2026-07-30 — the authority checkpoint above completed at exact clean
+pushed/upstream-equal
+`e7b2423c9480f7f5a0bb831ffb6fd7e337d62c66`. Its one authorized attempt
+mounted the exact bundle encrypted/read-only/non-browsable, passed the
+eight-member checksum and dump-hash gates, and created exact disposable
+container `conduit-p12-fingerprint-57ef1d9` from the already-local frozen image
+with no network or published port. The image initialized PostgreSQL `17.6`,
+then its Supabase `migrate.sh` failed with exit code `2` because the internal
+client required password authentication and no password had been supplied.
+The stop occurred before any dump copy, TOC inspection, restore, fingerprint
+query, result evidence, Local Supabase access/change, or Production access.
+The exact container/tmpfs was removed, the bundle detached without force, the
+mountpoint disappeared, the intended evidence target remained absent, and the
+same seven existing Local containers remained up and healthy.
+
+After receiving that fail-closed result and the recommendation to change only
+the disposable container's credential delivery, the Owner explicitly
+instructed:
+
+> อนุมัติ corrected fingerprint attempt ตามขอบเขตที่แนะนำ
+
+This decision first authorizes exactly one Checklist-only corrected-attempt
+authority checkpoint from base
+`e7b2423c9480f7f5a0bb831ffb6fd7e337d62c66` on branch
+`codex/master-catalog-phase4`: change only this Checklist, commit once as
+`docs: authorize corrected pre-p12 catalog fingerprint`, push once to the
+existing branch, and create no PR. Do not stage, modify, or delete `files/`,
+`tmp/`, `output/`, or any other untracked repository path. The commit contains
+no P-12 GO marker.
+
+Only after that checkpoint is clean, pushed, and upstream-equal, this decision
+authorizes exactly one corrected attempt under every unchanged source,
+snapshot, checksum, image, two-relation restore, runner/generator/query,
+isolation, evidence, stop, cleanup, and exclusion rule in the immediately
+preceding authority, with only these bounded corrections:
+
+1. use new exact mountpoint
+   `/private/tmp/conduit-p12-fingerprint-mount-e7b2423-r1`, new exact container
+   name `conduit-p12-fingerprint-e7b2423-r1`, and new exact final evidence
+   directory
+   `/Users/cloud/Backups/ConduitBOQ/evidence/phase4/pre-p12/catalog-authority-fingerprint-readiness-20260730T160106Z-e7b2423-r1`;
+2. exclusively create owner `cloud`, mode `0600`, regular single-link
+   `/private/tmp/conduit-p12-fingerprint-e7b2423-r1.env` containing only one
+   `POSTGRES_PASSWORD=<64 lowercase hex>` line generated from 32 random bytes;
+   display or persist no value, pass the file only through Docker
+   `--env-file`, do not set `POSTGRES_HOST_AUTH_METHOD=trust`, and unlink the
+   file immediately after container creation or on any failure;
+3. inside the isolated container only, use its retained
+   `POSTGRES_PASSWORD` as `PGPASSWORD` without printing it, placing it in a
+   command argument, or copying it into evidence; the secret must disappear
+   with the exact container;
+4. after the one frozen query, exclusively create owner `cloud`, mode `0600`,
+   regular single-link
+   `/private/tmp/conduit-p12-fingerprint-e7b2423-r1-state.json` containing
+   only validated non-sensitive hashes, identities, timestamps, aggregate
+   counters, and the derived fingerprint—not raw SQL/CLI output, rows,
+   environment values, or secrets; and
+5. after exact container removal and non-force bundle detach, exclusively
+   create the final owner `cloud`, mode `0700` evidence directory and its one
+   owner `cloud`, mode `0600` `fingerprint-evidence-v1.json`, then unlink the
+   exact temporary state. The final evidence must additionally bind the first
+   attempt's pre-restore stop/cleanup and record that this corrected attempt is
+   the first and only fingerprint-query invocation, with
+   `firstAttemptFingerprintQueryInvocationCount=0`,
+   `correctedAttemptFingerprintQueryInvocationCount=1`, and
+   `totalFingerprintQueryInvocationCount=1`.
+
+Any temporary credential/state pre-existence, owner/type/mode/link difference,
+credential-generation or secure-use failure, container initialization or
+readiness failure, unchanged prior-authority gate failure, final evidence
+failure, or cleanup difference stops without retry, alternate credential
+path, further Git action, Production/Local access, pass work, or P-12. Cleanup
+of only the exact corrected-attempt resources remains mandatory.
+
+If and only if the corrected operation and complete independent read-only
+verification pass, this decision authorizes exactly one Checklist-only result
+checkpoint from the pushed corrected-attempt authority HEAD: change only this
+Checklist, record the bare fingerprint and exact evidence source/path/SHA-256,
+commit once as `docs: record pre-p12 catalog fingerprint`, push once to the
+existing branch, and create no PR. Package #39 remains frozen. External
+Production approval binding remains `UNBOUND — HOLD`; pass 1, GitHub review,
+contract freeze, pass 2, Production access, and P-12 remain separately
+unauthorized.
+
 **Post-freeze fingerprint binding:** frozen references in Package #39 and CLI
 Runbook #41 that say to record the future
 `catalogAuthorityFingerprintSha256` in both Package #39 and this Checklist are
