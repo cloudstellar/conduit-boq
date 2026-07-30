@@ -818,6 +818,129 @@ allowlisted `.DS_Store`; its presence or absence does not advance a gate. This
 result is hygiene/evidence restoration only and does not advance a later gate
 automatically.
 
+**Operational catalog fingerprint PRE-GO authority recorded:** 2026-07-30 —
+after being reminded that the next plan item is only the separately authorized
+read-only derivation of `catalogAuthorityFingerprintSha256`, not pass 1,
+Production access, or P-12, the Owner instructed `ทำต่อตามแผนครับ`. This
+decision applies only to that next PRE-P-12 item.
+
+This decision first authorizes exactly one Checklist-only authority checkpoint
+from base `57ef1d9349af89763dbf3e88fd69aa01f5fdb68b` on branch
+`codex/master-catalog-phase4`: change only this Checklist, commit once as
+`docs: authorize pre-p12 catalog fingerprint`, push once to the existing
+branch, and create no PR. Do not stage, modify, or delete `files/`, `tmp/`,
+`output/`, or any other untracked repository path. The commit contains no
+P-12 GO marker.
+
+Only after that checkpoint is clean, pushed, and upstream-equal, this decision
+authorizes exactly one bounded derivation from the existing encrypted
+Production readiness snapshot's isolated restore. The source is exact
+read-only sparse bundle
+`/Users/cloud/Backups/ConduitBOQ/production/phase4/pre-p12/pre-p12-rehearsal.sparsebundle`,
+package `pre-p12-readiness-20260726T154815Z`, and 352,642-byte
+`production-app.dump` SHA-256
+`9d306a478b8ada65d0a32ab31bca19587c55efa3ae979ae4dd8ad5871d575932`.
+The bounded operation may:
+
+1. retrieve only the bundle passphrase from login-Keychain service
+   `Conduit BOQ Phase4 Backup`, account
+   `otlssvssvgkohqwuuiir-pre-p12`, without displaying or persisting it;
+2. attach the exact bundle read-only and non-browsable without force, verify
+   its encryption and the package's exact eight `SHA256SUMS` entries:
+   `production-app.dump`, `RECOVERY_MANIFEST.txt`, `RESTORE_STATUS`, `STATUS`,
+   `source-before.metrics`, `source-after.metrics`, `restored.metrics`, and
+   `restored.integrity`; require safe direct basenames and regular non-symlink
+   files, record `SHA256SUMS`'s own SHA-256, and use exact temporary mountpoint
+   `/private/tmp/conduit-p12-fingerprint-mount-57ef1d9`;
+3. restore that application-only dump once into one fresh disposable
+   network-isolated, no-published-port container named
+   `conduit-p12-fingerprint-57ef1d9`, using the already-local exact image
+   `public.ecr.aws/supabase/postgres:17.6.1.063` with literal `--pull=never`;
+   confine all writable database and temporary dump-copy state to container
+   tmpfs, with no named, anonymous, or host database volume and no bundle bind
+   mount; require the dump TOC to contain the unique definitions/data for
+   `public.price_list` and `public.price_list_default_version`, require both
+   relations initially absent, then use the container's PostgreSQL 17 tools
+   with `--exit-on-error`, `--no-owner`, `--no-privileges`, `--strict-names`,
+   exact table filters, and separate `pre-data` then `data` sections to
+   materialize only those two relations, with no post-data or Auth-stub work;
+4. execute once against that isolated restore the exact read-only `catalog`
+   query frozen in source/tooling commit
+   `7fbfe1bb8f71df03a78762b00e93aded7bdd6e42`, runner SHA-256
+   `be2f1aa3ee74137e4b7c3d9a193cb39b59fdfe30ae8ae1a17f8535580920fa89`;
+   and
+5. remove the exact disposable container, detach the bundle without force,
+   create the exact new evidence parent as owner `cloud`, mode `0700`, and
+   preserve exactly one secret-free owner `cloud`, mode `0600`, exclusive
+   no-overwrite result using schema
+   `conduit-boq/master-catalog-p12-catalog-authority-fingerprint-evidence/v1`
+   at
+   `/Users/cloud/Backups/ConduitBOQ/evidence/phase4/pre-p12/catalog-authority-fingerprint-readiness-20260730T151143Z-57ef1d9/fingerprint-evidence-v1.json`.
+
+The retained source checkout used during kit preparation no longer exists,
+and this handoff prohibits a fresh worktree. Therefore, for this derivation
+only, require the current tracked runner and generator to be byte-identical to
+their immutable blobs at the exact Git object above and to the frozen kit
+manifest hashes: runner
+`be2f1aa3ee74137e4b7c3d9a193cb39b59fdfe30ae8ae1a17f8535580920fa89`
+and generator
+`9bf6ad36bbfc98a9e5ce767de412e737d23226af8bb4afd0f0d7bf07e06b1d69`.
+The existing checkout's tracked tree must be clean. Import the unchanged
+current runner and obtain exactly one `catalog` query only through its exported
+`snapshotQueryDefinitions({relations: [], routines: []})`; require the
+extracted UTF-8 query to be exactly 1,921 bytes with SHA-256
+`9f2e34e6d68d10c18b0139c945bef1946af5ebf3bbd3f26d5fef89d15ac2bd9d`.
+Rehash both source files after extraction, create no worktree, and do not
+manually reimplement the formula.
+This bounded execution-source variance does not amend the frozen formula,
+runner, generator, source/tooling HEAD, or no-fresh-worktree rule.
+
+The query must return exactly one aggregate result row reporting
+`price_rows=710`, `distinct_codes=710`, zero missing codes/names/units/costs,
+zero unit-cost mismatches, zero non-current rows, and one bare lowercase
+64-hex fingerprint. The evidence must bind the authority
+checkpoint, source/tooling and application commits, exact bundle/package/dump,
+container image identity and PostgreSQL version, frozen runner/generator/query
+hashes,
+non-sensitive query result, all eight package member hashes including the
+historical full-restore status/integrity members, cleanup/detach result,
+`restoreScope=["public.price_list","public.price_list_default_version"]`,
+`restoreSections=["pre-data","data"]`, `postDataRestored=false`,
+`authStubsCreated=false`, `fullRestoreClaimed=false`,
+`fullIntegrityClaimed=false`, and
+`productionConnected=false`, `productionCredentialAccessed=false`,
+`localSupabaseDatabaseAccessed=false`,
+`existingLocalSupabaseServicesChanged=false`,
+`disposableIsolatedContainerCreated=true`,
+`disposableIsolatedContainerRemoved=true`,
+`kitModified=false`, `rehearsalPassStarted=false`, `p12Authorized=false`, and
+`automaticNextStep=false`. Persist no raw business rows, SQL/CLI dump output,
+environment values, password, or other secret.
+
+This catalog-only isolated re-materialization is sufficient only for the two
+relations referenced by the frozen fingerprint query. It does not repeat or
+replace the historical full readiness restore, validate unrelated
+constraints, constitute rehearsal pass 1, or satisfy the fresh in-window
+rollback backup/restore gate.
+
+Any Git/source, bundle, Keychain, checksum, package, image, PostgreSQL,
+container-name, dump-TOC allowlist, two-relation restore, query-byte,
+query-result, evidence-target, cleanup, or detach difference stops without
+retry, image pull, alternate source, Production/Local access, kit
+regeneration, calibration/pass work, Docker prune, or other Git action.
+Do not start, stop, or restart Docker Desktop or any existing Local service;
+Docker unavailability is a stop. Cleanup of only the exact container, its
+tmpfs, and the exact mountpoint remains required after a stopped attempt.
+
+If and only if the operation and complete independent read-only verification
+pass, this decision also authorizes exactly one Checklist-only result
+checkpoint from the pushed authority HEAD: change only this Checklist, record
+the bare fingerprint and exact evidence source/path/SHA-256, commit once as
+`docs: record pre-p12 catalog fingerprint`, push once to the existing branch,
+and create no PR. Package #39 remains frozen. The external Production approval
+binding, pass 1, GitHub review, contract freeze, pass 2, Production access,
+and P-12 remain separately unauthorized.
+
 **Post-freeze fingerprint binding:** frozen references in Package #39 and CLI
 Runbook #41 that say to record the future
 `catalogAuthorityFingerprintSha256` in both Package #39 and this Checklist are
