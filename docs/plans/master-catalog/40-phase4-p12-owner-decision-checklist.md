@@ -35,15 +35,19 @@ bound below at SHA-256
 A later read-only checkpoint audit found that this file contains one malformed
 embedded input hash even though its outer SHA-256 and the actual retained input
 hashes remain available. The same audit found one post-freeze `.DS_Store`
-outside the kit manifest. The corrected Local closeout claim and exact kit-tree
-custody therefore return to HOLD until the evidence-only repair authorized
-below passes. This does not infer Local database, migration `026`, manifest,
-or reviewed source drift. Disposable execution, fingerprint/pass work,
-Production, application/UI/export changes, flags, publication, Factor F,
-hotfix `016`, and P-12 remain unauthorized. The Owner has named the
-executor/verifier and proposed the exact window below; the one-kit preparation
-authority and generation completed, but the exact kit must not be used until
-the integrity-repair result is recorded.
+outside the kit manifest. The evidence-only repair below passed under authority
+checkpoint `74043f10ef54094b7a979010236ea13ecab0cc90`: the original closeout
+remains immutable, an append-only correction binds all seven exact input
+hashes, and the first observed sidecar is preserved in owner-only quarantine.
+A later root `.DS_Store` recurrence proved that whole-tree physical file count
+is not a stable execution invariant on this macOS volume. The Owner accepted
+the necessary quarantine parent and the narrow optional-root-sidecar policy
+recorded below. The manifest-controlled payload remains exact. This restores
+the corrected Local closeout evidence binding and kit custody without a
+database query/reset, repeated cleanup, kit regeneration, filesystem hardening,
+or source change. Disposable execution, fingerprint/pass work, Production,
+application/UI/export changes, flags, publication, Factor F, hotfix `016`, and
+P-12 remain unauthorized.
 
 **Exact application candidate:**
 `5068f944af2aa3fe8446c77c8ae8d48673cb260b`
@@ -720,6 +724,100 @@ record its own SHA. That result restores only the Local closeout evidence
 binding and exact kit-tree custody; fingerprint derivation, pass 1, GitHub
 review, pass 2, Production, and P-12 remain separately unauthorized.
 
+**Post-kit evidence-only integrity repair result recorded:** 2026-07-30 —
+the authority checkpoint above completed at exact clean pushed/upstream-equal
+`74043f10ef54094b7a979010236ea13ecab0cc90`. The repair ran once. Its
+evidence, hash, and manifest-payload checks passed. Creation of the previously
+absent quarantine parent was an authority variance later accepted below, and
+the optional root sidecar appeared only after the point-in-time repair
+verification.
+
+During result review, two non-payload custody facts required explicit Owner
+disposition. The nested authorized quarantine path required creation of its
+previously absent parent
+`/Users/cloud/Backups/ConduitBOQ/production/phase4/pre-p12/quarantine`,
+owner `cloud`, mode `0700`. Later, after the point-in-time repair evidence had
+passed, Finder metadata reappeared at the exact kit-root `.DS_Store` path. The
+Owner instructed `ทำตามที่แนะนำครับ` after receiving the recommendation to
+accept and bind that necessary parent and one strictly allowlisted optional
+root Finder sidecar, avoid recurring cleanup/filesystem hardening, perform no
+further external action, and finish the one Checklist-only result commit/push.
+This is the explicit disposition for both facts.
+
+The original owner-only `local-closeout-final.json` remains byte-for-byte
+unchanged at 3,283 bytes, mode `0600`, SHA-256
+`70d1a4f1d98f186f06a0ed79dd86d1764d90c1f9e88c7eabe71179ac8958c2c1`.
+All seven retained input paths, sizes, owner/modes, and actual SHA-256 values
+match the earlier authority table. The malformed 57-hex embedded value is
+corrected only by this new append-only owner `cloud`, mode `0600` evidence:
+
+`/Users/cloud/Backups/ConduitBOQ/evidence/phase4/pre-p12/post-p48-local-bootstrap-20260729T164944Z-7fbfe1b/local-closeout-integrity-correction-v1.json`
+
+It is 7,329 bytes, uses exact schema
+`conduit-boq/master-catalog-p12-local-closeout-integrity-correction/v1`, and
+has SHA-256
+`18a5c4096a46e2f1e845478382e0ec4f8ed312871c1bedbfbdf85fb986992b17`.
+Independent read-only verification passed every recorded path/hash/size/mode,
+the exact malformed/correct value pair, authority/source binding, restricted
+field set, and secret/raw-row scan.
+
+The unexpected `.DS_Store` moved by same-filesystem no-overwrite rename and is
+preserved as owner `cloud`, mode `0600`, 6,148 bytes at:
+
+`/Users/cloud/Backups/ConduitBOQ/production/phase4/pre-p12/quarantine/p12-cli-kit-v2-7fbfe1bb8f71df03-post-freeze-ds-store/DS_Store.quarantined`
+
+Its SHA-256 remains
+`1f46a677ea3ef4b22ec6ed81510b8fa898ba04e3df816f5d9dcbb2ca0a701bec`;
+the original kit path was absent at the correction evidence's verified
+timestamp. At that point the post-repair kit had exactly 35 directories, 166
+regular files, zero symlinks or other/unexpected entries, all directories owner
+`cloud` mode `0700`, and all generated files owner `cloud` mode `0400`.
+All eleven step configs, 154 cumulative migration-copy hashes,
+generator/runner bindings, source/application fields, and manifest SHA-256
+`0e4235ffe91853d8066e99f41f297ab5b62f39e14ad6bfa8c9ee432c04733987`
+passed.
+
+The later optional root `.DS_Store` observation is a regular non-symlink,
+single-link file, owner `cloud`, mode `0644`, 6,148 bytes, born/modified
+`2026-07-30T21:49:45+07:00`, observed SHA-256
+`f5920e2f137302530478daec429ae37e9658e6cda31560327c309316b406910a`,
+with no open handle found during the read-only review. Its bytes, hash, size,
+and timestamps are observational metadata, not frozen execution or custody
+gates.
+
+The durable kit-tree contract is therefore:
+
+- manifest-controlled payload: exactly 35 directories and 166 generated
+  regular files with every existing owner/mode/path/hash/config/migration check;
+- root entries: exactly `manifest.json`, `steps/`, and zero or one optional
+  `.DS_Store`;
+- if present, `.DS_Store` must be a direct root child no larger than 64 KiB,
+  regular, non-symlink, single-link, owner `cloud`, non-executable, and not
+  writable by group/other; kit root must remain owner `cloud`, mode `0700`;
+- physical regular-file count may therefore be 166 or 167, while
+  `canonicalRegularFileCount=166`, `permittedAmbientEntryCount=0|1`, and
+  `unexpectedEntryCount=0`; and
+- any other root entry, nested sidecar, symlink, owner/type/mode violation, or
+  manifest-controlled payload drift is a hard stop.
+
+Result:
+
+- `EVIDENCE BINDING REPAIRED APPEND-ONLY — ORIGINAL PRESERVED`;
+- `KIT MANIFEST PAYLOAD EXACT — OPTIONAL ROOT FINDER SIDECAR ACCEPTED OUTSIDE
+  MANIFEST`;
+- `automaticNextStep=false`;
+- database invocations/resets, Local service actions, Keychain access,
+  Production access, kit regeneration, runner/rehearsal execution, fingerprint
+  derivation, and secret/raw-row persistence were all zero or false; and
+- P-12, fingerprint, and pass 1 remain unauthorized.
+
+Before pass 1, pass 2, or Production reuse, reverify read-only that the kit
+still satisfies the exact manifest-controlled payload and optional-root-sidecar
+allowlist above. Do not quarantine, delete, hash-freeze, or otherwise mutate an
+allowlisted `.DS_Store`; its presence or absence does not advance a gate. This
+result is hygiene/evidence restoration only and does not advance a later gate
+automatically.
+
 **Post-freeze fingerprint binding:** frozen references in Package #39 and CLI
 Runbook #41 that say to record the future
 `catalogAuthorityFingerprintSha256` in both Package #39 and this Checklist are
@@ -1310,6 +1408,12 @@ Request P-12 only when every HOLD row in Package #39 is Ready:
 - [x] Build and hash-bind the one clean source kit only after the new-HEAD
   Remote and corrected-Local gates and later separate authorization. The exact
   source kit and manifest SHA-256 are recorded above.
+- [x] Close the post-kit integrity incident without database work:
+  original Local closeout preserved, exact seven input hashes rebound by the
+  append-only correction above, first `.DS_Store` quarantined recoverably,
+  necessary quarantine parent accepted, and the exact 35-directory/166-file
+  manifest payload independently reverified with the narrow optional root
+  Finder-sidecar policy above.
 - [ ] Complete pass 1, structured authenticated GitHub contract review, pass
   2, and the transitive final closeout at that same source/tooling HEAD and
   with that same frozen kit.
