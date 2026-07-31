@@ -49,6 +49,8 @@ or source change. The later separately authorized operational-fingerprint
 derivation passed and is recorded below. The bounded recovery-recipe
 inspection was then consumed once: package custody and historical restore
 results passed, but no reproducible baseline-provisioning recipe was recovered.
+The bounded authority recorded on 2026-08-01 permits only metadata-assisted,
+non-database design and review of one external baseline-provisioning contract.
 Disposable database execution, pass 1, Production, application/UI/export
 changes, flags, publication, Factor F, hotfix `016`, and P-12 remain
 unauthorized.
@@ -1444,6 +1446,179 @@ required before any target creation or `calibrate-schema` invocation. Do not
 infer commands from the result-only metadata or use unbound restore logs as
 authority.
 
+**Pass-1 baseline-provisioning contract design authority recorded:**
+2026-08-01 ICT — after the Owner asked why this prerequisite was needed, it
+was explained as the reproducible recipe for constructing the disposable
+pre-migration test database so pass 1 measures the frozen migrations rather
+than ad hoc setup differences. The Owner then instructed
+`ทำต่อตามที่แนะนำครับ`. Independent review then correctly stopped before Git,
+Keychain, or Docker action because that instruction did not explicitly name
+the sensitive metadata-inspection mechanics. The exact one-use scope was
+presented: backup-Keychain passphrase access; read-only/nobrowse sparse-bundle
+mount; at most three hardened, network-none, non-server Docker tool
+invocations; normalized structural metadata only; owner-only external
+contract/review/checksum publication; complete cleanup; and no Local,
+Production, database, or pass-1 action. The Owner explicitly approved
+`อนุมัติ metadata-assisted contract design ตามขอบเขตที่ระบุ`.
+
+This decision first authorizes exactly one Checklist-only authority checkpoint
+from base `ed3e79a8782bd1c5eab937760926e648f36b34f7` on branch
+`codex/master-catalog-phase4`: change only this Checklist, commit once as
+`docs: authorize pre-p12 baseline contract design`, push once to the existing
+branch, and create no PR. Do not stage, modify, or delete `files/`, `tmp/`,
+`output/`, or any other untracked repository path. The commit contains no
+P-12 GO marker and does not change the source/tooling HEAD, frozen kit,
+runner, generator, migration, Package #39, or Runbook #41.
+
+Only after that checkpoint is tracked-clean, pushed, and upstream-equal, this
+decision authorizes one metadata-assisted, non-database contract-design
+lifecycle with these exact boundaries:
+
+1. use only source/tooling HEAD
+   `7fbfe1bb8f71df03a78762b00e93aded7bdd6e42`, application candidate
+   `5068f944af2aa3fe8446c77c8ae8d48673cb260b`, frozen kit
+   `/Users/cloud/Backups/ConduitBOQ/production/phase4/pre-p12/p12-cli-kit-v2-7fbfe1bb8f71df03`,
+   kit-manifest SHA-256
+   `0e4235ffe91853d8066e99f41f297ab5b62f39e14ad6bfa8c9ee432c04733987`,
+   frozen generator SHA-256
+   `9bf6ad36bbfc98a9e5ce767de412e737d23226af8bb4afd0f0d7bf07e06b1d69`,
+   frozen runner SHA-256
+   `be2f1aa3ee74137e4b7c3d9a193cb39b59fdfe30ae8ae1a17f8535580920fa89`,
+   already-present arm64 image
+   `public.ecr.aws/supabase/postgres:17.6.1.063` at image ID
+   `sha256:178f0976b54a39237096bfa310c1a352dbc82fb1b08dda45cdb8acb5d40c1426`,
+   encrypted bundle
+   `/Users/cloud/Backups/ConduitBOQ/production/phase4/pre-p12/pre-p12-rehearsal.sparsebundle`,
+   readiness package `pre-p12-readiness-20260726T154815Z`, and exact
+   `production-app.dump` of 352,642 bytes at SHA-256
+   `9d306a478b8ada65d0a32ab31bca19587c55efa3ae979ae4dd8ad5871d575932`.
+   These package/image bindings are already recorded in owner-only evidence
+   `/Users/cloud/Backups/ConduitBOQ/evidence/phase4/pre-p12/catalog-authority-fingerprint-readiness-20260730T165413Z-be86d77-r3/fingerprint-evidence-v1.json`
+   at SHA-256
+   `2992f7b3a49b98f96736464fb3c8fbd1dd9c034f63e0c34e2f1b7faa15d91908`;
+   do not regenerate, edit, or replace any frozen input;
+2. create only owner-mode-`0700` temporary directory
+   `/private/tmp/conduit-p12-baseline-contract-ed3e79a` and exact mountpoint
+   `/private/tmp/conduit-p12-baseline-contract-mount-ed3e79a`. Mount that exact
+   encrypted sparse bundle read-only/nobrowse at most once, using only the
+   backup passphrase in Keychain service `Conduit BOQ Phase4 Backup`, account
+   `otlssvssvgkohqwuuiir-pre-p12`, delivered through standard input. Reprove
+   encryption/read-only state and all eight package checksums, including
+   `SHA256SUMS` SHA-256
+   `a7c013b93da5635972beb7675af7154b811ca23e7e6cebaefeed636f21ab2fdf`;
+   do not access the Production database credential;
+3. before any tool invocation, create and statically inspect exactly
+   `pgrestore-help-parser.sh`, `pgrestore-toc-parser.sh`, and
+   `pgrestore-schema-parser.sh` only inside
+   `/private/tmp/conduit-p12-baseline-contract-ed3e79a`. Record
+   each parser file's byte size/SHA-256 and the byte size/SHA-256 of its exact
+   canonical executed UTF-8 source in the contract and review. Canonicalization
+   removes only trailing LF bytes, and the exact result is passed as one
+   argument. The parsers must execute inside the applicable tool container,
+   accept PostgreSQL metadata on an internal pipe, and emit only structural
+   counts, object/schema names, foreign-key table/column mappings, presence or
+   absence of owner/ACL records, tool version/capabilities, and a hash of only
+   normalized safe output. They must not echo, copy, or persist raw SQL, table
+   rows, COPY payload, UUID values, passwords, or dump bytes. Do not require or
+   retain a raw TOC or schema-stream hash. During metadata inspection and
+   before drafting the item-7 files, apart from those three reviewed parser
+   source files, persist only exact normalized safe outputs
+   `pgrestore-help-metadata-v1.json`, `pgrestore-toc-metadata-v1.json`, and
+   `pgrestore-schema-metadata-v1.json` inside the exact temporary directory for
+   hashing, contract drafting, review, and mandatory cleanup;
+4. permit at most three exact tool-only `docker run --rm` invocations named
+   `conduit-p12-contract-pgrestore-help-ed3e79a`,
+   `conduit-p12-contract-toc-ed3e79a`, and
+   `conduit-p12-contract-schema-ed3e79a`. Each must use the already-present
+   exact immutable image ID above, after one read-only tag-to-ID inspection,
+   with `--pull=never`, `--network=none`, `--read-only`, `--cap-drop=ALL`,
+   `--security-opt=no-new-privileges:true`, `--ipc=none`, `--pids-limit=32`,
+   `--memory=256m`, `--memory-swap=256m`, `--cpus=1`, core/nofile limits,
+   a non-root user, no logging, no restart, no published port, no Docker
+   volume/bind mount, no inherited image environment, no secret environment,
+   and no PostgreSQL server process. Each invocation must set a literal
+   non-server `/usr/bin/env` entrypoint instead of using the image default,
+   clear the image environment, establish only deterministic non-secret
+   process variables, and have a bounded timeout. Pass the reviewed non-secret
+   parser source as one process argument, not through the dump's standard
+   input. The first must internally reduce `pg_restore` version/help to safe
+   version/capability fields; any missing required option stops before the
+   second invocation. The second must stream the exact read-only
+   mounted dump through standard input and internal
+   `pg_restore --format=custom --list` output directly into the reviewed TOC
+   parser. The third must stream that same dump through standard input and
+   internal `pg_restore --format=custom --schema-only --schema=public
+   --schema=private --strict-names --no-owner --no-privileges --no-comments
+   --no-security-labels --no-publications --no-subscriptions --no-tablespaces
+   --restrict-key=ConduitP12ContractEd3e79a --file=-` output directly into
+   the reviewed schema parser; the parser must ignore PostgreSQL 17
+   `\\restrict`/`\\unrestrict` records without exposing their values. Never
+   pass `--dbname` or `--jobs`, create a dump copy, or route raw output through
+   a host parser. Raw tool output must never reach terminal output, Docker
+   logs, or persistent storage;
+5. write no database and invoke no Supabase database command. Static source
+   inspection may use only the frozen runner, kit manifest/workdirs, migrations
+   `009`-`016`, and authority documents to derive exact ledger identities,
+   runner preconditions, hotfix posture, sentinel contract, source-checkout
+   boundary, evidence layout, and cleanup rules;
+6. draft exactly one secret-free external JSON contract using schema
+   `conduit-boq/master-catalog-p12-baseline-provisioning-contract/v1`. Every
+   operational assertion must be classified as `frozen`, `metadataDerived`,
+   or `requiresExecutionProof`. The contract must specify one target lifecycle,
+   exact presently proven resources/commands, password handling, target
+   initialization, loopback isolation, phased restore, Auth-stub derivation,
+   ownership/ACL, ledger `009`-`016`, sentinel, stage-`016` handoff,
+   stop/uncertainty behavior, evidence, same-checkout source transition,
+   return, and cleanup. For an execution step whose exact safe command is not
+   established, record a null command and the exact proof required to unhold
+   it; never guess a write. At minimum, the initialized-image
+   `supabase_admin`-to-`postgres` role transition, live Auth-stub UUID
+   derivation/insert shape and exact-20 proof, ledger mutation mechanism, and
+   resulting ownership/ACL posture remain `requiresExecutionProof`. Metadata
+   may derive TOC/FK structure but cannot prove row values or a successful
+   target state. Every unresolved fact remains a hard pre-write proof gate; do
+   not present it as already proven;
+7. independently review schema/exact keys, provenance/hashes, command safety,
+   secret and raw-data exclusion, all runner requirements, absence of an
+   automatic next step, and the distinction between static readiness and
+   execution proof. Draft only exact temporary files
+   `baseline-provisioning-contract-v1.json`,
+   `baseline-provisioning-contract-review-v1.json`, and `SHA256SUMS` in the
+   exact temporary directory. Only if review passes, publish exactly one
+   contract plus its two review/integrity records:
+   `baseline-provisioning-contract-v1.json`,
+   `baseline-provisioning-contract-review-v1.json`, and `SHA256SUMS` in new
+   owner-mode-`0700` directory
+   `/Users/cloud/Backups/ConduitBOQ/evidence/phase4/pre-p12/p12-baseline-contract-20260731T175700Z-ed3e79a`,
+   with all three files owner `cloud`, mode `0600`, regular, non-symlink, and
+   single-link; and
+8. after success or any hard stop, close all handles, detach the bundle without
+   force, remove only any interrupted leftover among the three exact named
+   tool containers, confirm all three absent, and delete only the nine exact
+   temporary files named in items 3 and 7. Then remove only the now-empty exact
+   temporary directory and exact mountpoint. Do not stop/restart Docker Desktop
+   or Local services, prune Docker, pull an image, switch/detach Git HEAD,
+   access Local Supabase
+   or Production, create/reserve a port/network/database, invoke
+   `calibrate-schema`, or retain a raw TOC/schema/dump artifact.
+
+Any image/hash, parser, metadata, contract, review, publication, permission,
+handle, detach, or cleanup difference stops without retry, alternate image or
+dump, database work, pass 1, or further Git action. A successfully reviewed
+contract remains `executionProven=false`, `executionAuthorized=false`,
+`pass1Authorized=false`, `productionAuthorized=false`, and
+`automaticNextStep=false`.
+
+If and only if design, independent review, publication, and cleanup all
+pass, this decision authorizes one Checklist-only result checkpoint from the
+pushed design-authority HEAD: change only this Checklist, bind the exact
+publication directory, all three file paths, and all three SHA-256 values,
+including the checksum file's own SHA-256, commit once as
+`docs: record pre-p12 baseline contract`, push once to the existing branch,
+and create no PR. That result does not authorize target creation, execution
+proof, pass 1, GitHub schema-contract review, pass 2, Production access, or
+P-12.
+
 **Authority:** Production `2568.0.0` remains authoritative for item names,
 units, and prices. The local workbook remains reconciliation/reference evidence
 only.
@@ -1867,6 +2042,11 @@ weaken the verifier, or continue that disposable sequence.
   Production approval before the source kit may be used in Production:
   `UNBOUND — HOLD`. `productionEligible=true` by itself records only a clean
   source/tooling worktree and is not authorization.
+- [ ] Produce and independently review the exact external
+  `conduit-boq/master-catalog-p12-baseline-provisioning-contract/v1` under the
+  bounded metadata-assisted design authority above: `AUTHORIZED ONCE — NOT YET
+  EXECUTED`. This does not authorize target creation, execution proof, or
+  pass 1.
 - [ ] After the P-47 replacement candidate is separately Git-published and
   frozen,
   run `calibrate-schema` one stage per manual invocation on a fresh disposable
