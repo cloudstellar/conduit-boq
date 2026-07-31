@@ -52,8 +52,12 @@ results passed, but no reproducible baseline-provisioning recipe was recovered.
 The bounded metadata-assisted authority recorded on 2026-08-01 was consumed
 once and stopped at the TOC parser's fixed safe error `E74`; no schema stream,
 database, contract publication, or result Git action occurred, and mandatory
-cleanup passed. The Owner now authorizes exactly one corrected TOC-only,
-non-database metadata attempt under the narrower contract recorded below.
+cleanup passed. The subsequent corrected TOC-only attempt was also consumed
+once and stopped at fixed safe error `E72`; static review then found that the
+bound Docker argv omitted Docker `--interactive`, so the dump stream was not
+attached to container standard input. The Owner now authorizes exactly one
+aggregate E72-corrected TOC-only, non-database metadata attempt under the
+narrower contract recorded below.
 Disposable database execution, pass 1, Production, application/UI/export
 changes, flags, publication, Factor F, hotfix `016`, and P-12 remain
 unauthorized.
@@ -1767,6 +1771,217 @@ branch, and create no PR. That result authorizes no schema-only attempt,
 contract drafting/publication, target creation, execution proof, pass 1,
 Production access, or P-12.
 
+**Corrected TOC-only E72 result and aggregate E72 correction authority
+recorded:** 2026-08-01 ICT — the corrected-TOC authority checkpoint completed
+at pushed/upstream-equal
+`9fbc3a2e3c888100974884a52b5e4615155ecbaf`. The parser file was 9,746 bytes
+at SHA-256
+`304289fdac3a0e7009c823818e1717848b876c368603bca985bd278bd4f5994c`;
+its trailing-LF-canonical source was 9,745 bytes at SHA-256
+`dd7aec126ca5eee0ec208e3d1987464e89b719795c81a5676a92899968210b84`.
+All six synthetic cases passed; their 3,657-byte safe record had SHA-256
+`01ae4f240e1c6c71744e52d476d719d609fbbf8eaffe8ea05b99ad41f8c891ad`.
+The bound Docker and local invocation specifications had SHA-256 values
+`b07921026dafd1d3d642381a354f5a5abe41de677d60cd0c2b0400849387634a`
+and
+`5ddb67faa92cd56337f8c99095a6b234aa40476f9a6fd60f3514925df0efe47a`.
+
+The exact image/digest/architecture, reserved-name absence, read-only/nobrowse
+encrypted mount, all eight package checksums, dump size/hash, and package
+custody passed. The one hardened container invocation exited `1` and
+emitted only the fixed 97-byte safe record
+`{"schema":"conduit-boq/master-catalog-p12-pgrestore-parser-error/v1","stage":"toc","code":"E72"}`
+at SHA-256
+`9c6498321fe49b7778f95fc308e68cc2003206f3e613670feb63de5696ea643d`.
+No raw TOC/dump output, schema stream, database, contract, Local, Production,
+target, runner, or pass-1 action occurred. The exact container was absent;
+the bundle detached without force; the temporary paths were removed; Git
+remained tracked-clean/upstream-equal; and no result commit was made. During a
+read-handle check, one unauthorized empty `.lsof-check` fourth temporary file
+was created and immediately removed. It contained no data or secret, but is
+recorded as an audit deviation and must not recur.
+
+Static comparison of the bound Docker argv found the transport defect. It had
+no Docker `-i`/`--interactive` option before the immutable image token. The
+only `-i` occurred after the image and belonged to `/usr/bin/env -i`; it
+cleared the container process environment but did not attach Docker standard
+input. Consequently the intended dump pipe was not a proven container input.
+Because stderr and TOC stdout were merged, the fixed E72 record cannot identify
+the exact rejected line. This is a transport/protocol correction, not evidence
+that the dump is corrupt or that its metadata is valid.
+
+After that diagnosis and the fail-closed design were explained, the Owner
+explicitly approved
+`อนุมัติ aggregate E72-corrected TOC-only attempt หนึ่งครั้ง ตามขอบเขตที่แนะนำ`.
+This decision first authorizes exactly one Checklist-only authority checkpoint
+from base `9fbc3a2e3c888100974884a52b5e4615155ecbaf` on branch
+`codex/master-catalog-phase4`: change only this Checklist, commit once as
+`docs: authorize aggregate pre-p12 toc metadata`, push once to the existing
+branch, and create no PR. Do not stage, modify, or delete `files/`, `tmp/`,
+`output/`, or any other untracked repository path. The checkpoint contains no
+P-12 GO marker and changes no source/tooling, kit, generator, runner,
+migration, application, flag, Package #39, or Runbook #41 content.
+
+Only after that checkpoint is tracked-clean, pushed, and upstream-equal, this
+decision authorizes exactly one aggregate E72-corrected TOC-only attempt:
+
+1. retain every frozen input and security boundary from the preceding
+   corrected attempt, including source/tooling HEAD
+   `7fbfe1bb8f71df03a78762b00e93aded7bdd6e42`, accepted application candidate
+   `5068f944af2aa3fe8446c77c8ae8d48673cb260b`, frozen kit
+   `/Users/cloud/Backups/ConduitBOQ/production/phase4/pre-p12/p12-cli-kit-v2-7fbfe1bb8f71df03`,
+   manifest SHA-256
+   `0e4235ffe91853d8066e99f41f297ab5b62f39e14ad6bfa8c9ee432c04733987`,
+   generator SHA-256
+   `9bf6ad36bbfc98a9e5ce767de412e737d23226af8bb4afd0f0d7bf07e06b1d69`,
+   runner SHA-256
+   `be2f1aa3ee74137e4b7c3d9a193cb39b59fdfe30ae8ae1a17f8535580920fa89`,
+   and exact arm64 image ID
+   `sha256:178f0976b54a39237096bfa310c1a352dbc82fb1b08dda45cdb8acb5d40c1426`,
+   encrypted sparse bundle, readiness package, 352,642-byte dump SHA-256
+   `9d306a478b8ada65d0a32ab31bca19587c55efa3ae979ae4dd8ad5871d575932`,
+   and `SHA256SUMS` SHA-256
+   `a7c013b93da5635972beb7675af7154b811ca23e7e6cebaefeed636f21ab2fdf`;
+   do not regenerate, edit, copy, replace, or broaden any frozen input;
+2. create only owner-mode-`0700` temporary directory
+   `/private/tmp/conduit-p12-aggregate-toc-9fbc3a2` and empty mountpoint
+   `/private/tmp/conduit-p12-aggregate-toc-mount-9fbc3a2`. The exact temporary
+   file allowlist, each regular/non-symlink/single-link owner-`cloud` mode
+   `0600`, is `pgrestore-toc-aggregate-parser.sh`,
+   `run-pgrestore-toc-aggregate-tests.sh`,
+   `pgrestore-toc-aggregate-tests-v1.json`,
+   `run-pgrestore-toc-aggregate-once.pl`, and
+   `pgrestore-toc-aggregate-v1.json`. No probe, log, stderr, raw, FIFO, socket,
+   or other temporary file may be created;
+3. build the parser as an inventory classifier, not a general parser for
+   PostgreSQL names. It may emit only schema
+   `conduit-boq/master-catalog-p12-pgrestore-toc-stream-analysis/v1` with
+   strict numeric archive/header fields, selected/declared/unlisted counts,
+   exactly six descriptor-family counts named `schema`, `relation`,
+   `tableData`, `foreignKeyConstraint`, `accessControl`, and `other`, and these
+   exact diagnostic counters: `inputLineCount`, `blankLineCount`,
+   `commentLineCount`, `entryLineCount`, `unexpectedNonTocLineCount`,
+   `malformedNumericPrefixCount`, `requiredHeaderMissingCount`,
+   `requiredHeaderDuplicateCount`, `markerProtocolViolationCount`,
+   `duplicateDumpIdCount`, `formatMismatchCount`,
+   `invalidCountRelationCount`, `toolStatusNonzeroCount`,
+   `toolStatusMarkerMissingCount`, `toolStatusMarkerDuplicateCount`,
+   `toolStatusMarkerMalformedCount`, `toolPostStatusLineCount`,
+   `toolStderrByteCount`, `toolStderrLineCount`, `toolStderrNonemptyCount`,
+   `toolStderrOverflowCount`, and
+   exact issue sum `candidateCount`. That sum includes only
+   `unexpectedNonTocLineCount`, `malformedNumericPrefixCount`,
+   `requiredHeaderMissingCount`, `requiredHeaderDuplicateCount`,
+   `markerProtocolViolationCount`, `duplicateDumpIdCount`,
+   `formatMismatchCount`, `invalidCountRelationCount`,
+   `toolStatusNonzeroCount`, `toolStatusMarkerMissingCount`,
+   `toolStatusMarkerDuplicateCount`, `toolStatusMarkerMalformedCount`,
+   `toolStderrNonemptyCount`, and `toolStderrOverflowCount`;
+   `toolPostStatusLineCount` and ordinary line/byte counts are observations,
+   not additional candidates. Match descriptor families longest-first: `SCHEMA`
+   is `schema`; plain `TABLE`, `FOREIGN TABLE`, `VIEW`, `MATERIALIZED VIEW`,
+   and `SEQUENCE` are `relation`; `TABLE DATA` and `MATERIALIZED VIEW DATA` are
+   `tableData`; plain `FK CONSTRAINT` is `foreignKeyConstraint`; `ACL` and
+   `DEFAULT ACL` are `accessControl`; and `TABLE ATTACH`, `FK CONSTRAINT
+   ATTACH`, `SEQUENCE OWNED BY`, `SEQUENCE SET`, plus every remaining valid
+   numeric entry are `other`. The six counts must sum exactly to
+   `entryLineCount`. Never parse, normalize, compare, or emit schema/object/
+   constraint/owner identities; never split or rejoin their whitespace tokens,
+   infer quoting, or treat TOC text as proof of FK semantics, ACLs, ownership,
+   row values, roles, ledger, or target state;
+4. keep raw channels separate inside the parser with dedicated file
+   descriptors: `pg_restore` stdout streams only to the inventory classifier;
+   `pg_restore` stderr plus exactly one fixed numeric tool-status marker streams
+   only to a bounded stderr classifier that discards every raw line and emits
+   one fixed numeric channel summary. Only that safe summary may then be
+   appended after TOC stdout for the inventory classifier. Give nonzero tool
+   status precedence and exit with the matching fixed safe status; the
+   container shell and owner-mode host wrapper must propagate parser/container
+   status without a generic-success or pipeline mask. Container/Docker stderr
+   outside that internal classifier must be counted streaming in memory, with
+   both internal and host counts saturating at 65,537 bytes or 4,097 lines,
+   raw chunks discarded immediately, and no text retained. Container stdout
+   may contain only the parser's one safe record. The wrapper must cap safe
+   stdout at 65,536 bytes and one newline-terminated record. It may emit only
+   `conduit-boq/master-catalog-p12-pgrestore-toc-aggregate/v1`, with outcome
+   `metadata` or `diagnostic`; the exact parser counters and six descriptor
+   counts above; `containerExitCode`, `containerSignal`, `timedOut`,
+   `stderrByteCount`, `stderrLineCount`, `stderrOverflow`, `stdoutByteCount`,
+   `stdoutRecordCount`, `stdoutRecordValid`, `stdinTransportAttached`,
+   `rawRetained=false`, `metadataUsable`, and `automaticNextStep=false`.
+   Invalid, multiple, oversized, partial, or absent safe stdout; status/schema
+   disagreement; nonzero status; internal `toolStderrByteCount > 0`; outer
+   `stderrByteCount > 0`; either stderr overflow; timeout; or any parser
+   diagnostic makes `metadataUsable=false` and is a hard stop;
+5. before any mount, run only fixed literal, non-dump synthetic fixtures. They
+   must prove equal and lower selected counts, absent input, unexpected
+   non-TOC input, names with spaces treated as opaque, valid numeric entries
+   classified as `other`, missing/duplicate headers, marker ordering, duplicate
+   dump ID, non-CUSTOM format, invalid count relation, combined aggregate
+   candidates, wrapper success, nonempty-stderr, nonzero-status,
+   invalid/multiple/oversized output, internal-stderr saturation and marker
+   separation, and timeout classification. The wrapper's
+   literal argv inspection must prove exactly one Docker `--interactive`
+   before the immutable image token, no `--tty`, and the separate
+   `/usr/bin/env -i` after the image. Record `stdinTransportAttached=true` and
+   exact file/canonical byte sizes and SHA-256 values in only the safe test
+   record. All wrapper cases must use only pure internal unit mode with any
+   fake behavior embedded in the allowlisted test script; they may not create
+   a sixth file or call host Docker, Keychain, the bundle, mount, or dump.
+   Independent
+   parser, fixture, wrapper, local-test argv, real argv, safe-output, timeout,
+   secret-exclusion, and no-persistence review must pass before Keychain use;
+6. only after all static/synthetic review passes, use the same exact backup
+   Keychain service/account and standard-input passphrase path to mount the
+   exact sparse bundle read-only/nobrowse at most once. Reprove encryption,
+   read-only state, all eight checksums, regular/non-symlink/single-link
+   owner-`cloud` mode-`0600` package files, and exact dump size/hash. Do not
+   access a Production database credential;
+7. after one read-only tag-to-ID/architecture/digest inspection and proof that
+   exact reserved name `conduit-p12-aggregate-toc-9fbc3a2` is absent, permit at
+   most one `docker run --rm --interactive` with that name. `--interactive`
+   must occur before the image token and no TTY may be allocated. Preserve all
+   prior network-none, read-only, capability-drop, no-new-privileges, IPC,
+   PID, memory/swap, CPU, ulimit, non-root, no-log, no-restart, no-port,
+   no-volume, immutable-image, clean-process-environment, `/usr/bin/env -i`,
+   and exact-child timeout controls. Stream the mounted dump only through host
+   and Docker standard input into internal
+   `pg_restore --format=custom --list` exactly once; append only its numeric
+   exit status as the fixed parser-internal marker; never pass
+   `--dbname`/`--jobs`. Persist only the wrapper's one structurally validated
+   safe aggregate record;
+8. even on metadata success, do not run schema-only inspection, draft or
+   publish the contract/review/checksums, create a target/network/port, access
+   or write any database, invoke a Supabase database command, switch Git HEAD,
+   run the frozen runner or `calibrate-schema`, begin pass 1, or take an
+   automatic next step; and
+9. after success or any hard stop, close handles; confirm/remove only the exact
+   reserved container if interrupted and confirm it absent; detach the bundle
+   without force; delete only the five exact allowlisted temporary files; and
+   remove only the empty exact temp directory and mountpoint. Do not create an
+   lsof/probe file, stop/restart Docker Desktop or Local services, prune/pull,
+   touch protected repository paths, or retain raw or safe temporary output.
+
+Any binding, parser, test, wrapper, argv, transport, mount, checksum, Docker,
+safe-record, permission, handle, detach, or cleanup difference stops without
+retry, alternate parser/image/dump, schema/database/contract work, pass 1, or
+unapproved Git action. `automaticNextStep=false`.
+
+After the one real Docker invocation yields either one validated metadata
+result or one validated aggregate diagnostic, and only after complete cleanup,
+this decision authorizes exactly one Checklist-only result checkpoint from the
+pushed aggregate authority HEAD. A preflight, static-review, synthetic-test,
+mount, or pre-invocation failure authorizes no result Git action. For an
+eligible real-invocation result:
+change only this Checklist; record all file/canonical hashes and sizes, test
+record hash, corrected Docker specification hash, exact invocation count,
+safe outcome/hash/counters, `stdinTransportAttached`, cleanup, and any
+deviation; commit once as `docs: record aggregate pre-p12 toc metadata` for
+metadata or `docs: record aggregate pre-p12 toc diagnosis` for a diagnostic;
+push once to the existing branch; and create no PR. That result authorizes no
+retry, schema-only attempt, contract work, target, execution proof, pass 1,
+Production access, or P-12.
+
 **Authority:** Production `2568.0.0` remains authoritative for item names,
 units, and prices. The local workbook remains reconciliation/reference evidence
 only.
@@ -2193,7 +2408,8 @@ weaken the verifier, or continue that disposable sequence.
 - [ ] Produce and independently review the exact external
   `conduit-boq/master-catalog-p12-baseline-provisioning-contract/v1` under the
   bounded metadata-assisted design authority above: `INITIAL ATTEMPT CONSUMED
-  — E74 HARD STOP — CORRECTED TOC-ONLY AUTHORIZED ONCE — NOT YET EXECUTED`.
+  — E74 HARD STOP — CORRECTED TOC-ONLY CONSUMED — E72 HARD STOP — AGGREGATE
+  E72-CORRECTED TOC-ONLY AUTHORIZED ONCE — NOT YET EXECUTED`.
   This does not authorize schema metadata inspection, target creation,
   execution proof, or pass 1.
 - [ ] After the P-47 replacement candidate is separately Git-published and
