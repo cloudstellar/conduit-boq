@@ -49,8 +49,11 @@ or source change. The later separately authorized operational-fingerprint
 derivation passed and is recorded below. The bounded recovery-recipe
 inspection was then consumed once: package custody and historical restore
 results passed, but no reproducible baseline-provisioning recipe was recovered.
-The bounded authority recorded on 2026-08-01 permits only metadata-assisted,
-non-database design and review of one external baseline-provisioning contract.
+The bounded metadata-assisted authority recorded on 2026-08-01 was consumed
+once and stopped at the TOC parser's fixed safe error `E74`; no schema stream,
+database, contract publication, or result Git action occurred, and mandatory
+cleanup passed. The Owner now authorizes exactly one corrected TOC-only,
+non-database metadata attempt under the narrower contract recorded below.
 Disposable database execution, pass 1, Production, application/UI/export
 changes, flags, publication, Factor F, hotfix `016`, and P-12 remain
 unauthorized.
@@ -1619,6 +1622,151 @@ and create no PR. That result does not authorize target creation, execution
 proof, pass 1, GitHub schema-contract review, pass 2, Production access, or
 P-12.
 
+**Initial metadata-assisted design result and corrected TOC-only authority
+recorded:** 2026-08-01 ICT — the design-authority checkpoint completed at
+pushed/upstream-equal
+`ac723501ce44d90ec49f4b8ddddf80c7d50d0aeb`. The authorized lifecycle was
+consumed once. The exact image identity/architecture/digest, absence of the
+three reserved container names, read-only/nobrowse encrypted mount, exact
+`SHA256SUMS` hash, all eight package checksums, package file custody, dump size,
+and dump SHA-256 passed. The hardened help-only container ran once and passed:
+`pg_restore 17.6`, PostgreSQL major `17`, all 14 required capabilities present,
+normalized safe payload SHA-256
+`38bc1ce59961b23079928b82e5c33008359d857f60d438e82c073c2cbbb481ee`,
+and safe output-file SHA-256
+`52cbe813eade3b10fe81eea534cc70608e5d08ec52b5d674dc33b6f779b8526f`.
+
+The hardened TOC-only container then ran exactly once, with the mounted dump
+streamed only through standard input and no raw dump or TOC retained. The tool
+completed but the parser emitted only the fixed safe failure
+`{"schema":"conduit-boq/master-catalog-p12-pgrestore-parser-error/v1","stage":"toc","code":"E74"}`.
+The outer wrapper did not propagate that parser failure correctly; validation
+therefore treated the safe error record as a hard stop before any schema-only
+container. No raw output reached the terminal or Docker logs. No schema
+inspection, contract/review/checksum drafting or publication, database,
+network, port, Local, Production, target, runner, `calibrate-schema`, or pass-1
+action occurred. All three exact containers were absent after cleanup; the
+bundle was detached without force; the exact temp/mount paths and all allowed
+temporary files were removed; the intended external contract directory was
+never created; and Git remained tracked-clean/upstream-equal.
+
+Static review of the deleted, reviewed TOC parser at file SHA-256
+`ad9e2be7f11a64a2e3faed56c9c7183f0da841415afe8e7aa70ec485e43c758a`
+and canonical executed-source SHA-256
+`a10943cd7ed3e3ce2f80ba934e3c89964934547ddef0b1b21e02829e3faa057e`
+isolated one narrow correction: the archive header's positive total TOC count
+must not be required to equal the positive parsed entry count beneath
+`Selected TOC Entries`; the parsed count may be lower, but never higher.
+Remaining checks
+that formerly shared `E74` must receive distinct fixed safe codes, and the
+outer wrapper must fail closed on any non-success parser record or nonzero
+container status. This is a parser-contract correction only, not evidence that
+the dump's TOC is valid.
+
+After that result and scope were explained, the Owner explicitly approved
+`อนุมัติ corrected TOC-only metadata attempt หนึ่งครั้ง ตามขอบเขตเดิม`.
+This decision first authorizes exactly one Checklist-only authority checkpoint
+from base `ac723501ce44d90ec49f4b8ddddf80c7d50d0aeb` on branch
+`codex/master-catalog-phase4`: change only this Checklist, commit once as
+`docs: authorize corrected pre-p12 toc metadata`, push once to the existing
+branch, and create no PR. Do not stage, modify, or delete `files/`, `tmp/`,
+`output/`, or any other untracked repository path. The checkpoint contains no
+P-12 GO marker and changes no source/tooling, kit, generator, runner,
+migration, application, flag, Package #39, or Runbook #41 content.
+
+Only after that checkpoint is tracked-clean, pushed, and upstream-equal, this
+decision authorizes exactly one corrected TOC-only metadata attempt with these
+boundaries:
+
+1. retain every frozen input and security boundary from the preceding design
+   authority: source/tooling HEAD `7fbfe1bb8f71df03a78762b00e93aded7bdd6e42`,
+   application candidate `5068f944af2aa3fe8446c77c8ae8d48673cb260b`,
+   frozen kit/manifest/generator/runner identities, exact arm64 image
+   `public.ecr.aws/supabase/postgres:17.6.1.063` at image ID
+   `sha256:178f0976b54a39237096bfa310c1a352dbc82fb1b08dda45cdb8acb5d40c1426`,
+   encrypted sparse bundle, readiness package, exact 352,642-byte dump at
+   SHA-256
+   `9d306a478b8ada65d0a32ab31bca19587c55efa3ae979ae4dd8ad5871d575932`,
+   and `SHA256SUMS` SHA-256
+   `a7c013b93da5635972beb7675af7154b811ca23e7e6cebaefeed636f21ab2fdf`;
+   no frozen input may be regenerated, edited, copied, or replaced;
+2. create only owner-mode-`0700` temporary directory
+   `/private/tmp/conduit-p12-corrected-toc-ac72350` and empty mountpoint
+   `/private/tmp/conduit-p12-corrected-toc-mount-ac72350`, then create only
+   mode-`0600` `pgrestore-toc-parser.sh` in the exact temp directory.
+   Canonicalize it only by removing trailing LF bytes and record
+   both file and canonical executed-source byte sizes/SHA-256 values. Preserve
+   the previously reviewed grammar and safe-output allowlist except for the
+   narrow count correction: require `declaredEntries > 0`, `entryCount > 0`,
+   and `entryCount <= declaredEntries`; emit only their nonnegative difference
+   as `unlistedTocEntries`; and split the former `E74` gates into fixed `E76`
+   for non-`CUSTOM` format, `E77` for duplicate normalized FK identity, `E78`
+   for missing required header/status metadata, and `E79` for an invalid count
+   relation. Before the first local synthetic invocation, independently inspect
+   the exact corrected parser source/canonical binding and the exact
+   clean-environment local test executable/argv with its test-only
+   `pg_restore`/`sha256sum` functions; any mismatch stops without executing it.
+   Then run the exact parser locally against only fixed, literal, non-dump
+   synthetic TOC inputs proving equal counts pass, lower selected count passes
+   with the exact difference, and the four split gates fail with their exact
+   assigned codes. Persist only normalized safe
+   `pgrestore-toc-parser-tests-v1.json`; any mismatch stops before mount. After
+   the tests and before Keychain, mount, or Docker use, independently inspect
+   the literal fixtures/results, exact Docker executable/argv and `exec`-based
+   exit-propagating wrapper, safe-output allowlist, fixed error behavior, and
+   absence of secrets/raw-data persistence. Bind canonical byte sizes and
+   SHA-256 values for both invocation specifications inside the safe test
+   record;
+3. only after item 2 passes, use the same exact backup-Keychain service/account
+   and standard-input passphrase path to mount the exact sparse bundle
+   read-only/nobrowse at most once. Reprove encryption, read-only state, all
+   eight checksums, regular/non-symlink/single-link owner-`cloud` mode-`0600`
+   package files, and the exact dump size/hash. Do not access a Production
+   database credential;
+4. after one read-only tag-to-ID/architecture/digest inspection and proof that
+   the reserved name is absent, permit at most one `docker run --rm` named
+   `conduit-p12-corrected-toc-ac72350`. Apply every unchanged hardened
+   network-none, read-only, capability, privilege, IPC, PID, memory/swap, CPU,
+   ulimit, non-root, no-log, no-restart, no-port, no-volume, clean-process-env,
+   literal `/usr/bin/env` entrypoint, and timeout control from the preceding
+   authority. Pass the canonical reviewed parser source as one argument and
+   stream the exact mounted dump only through standard input into internal
+   `pg_restore --format=custom --list` and then the parser. Persist only safe
+   normalized `pgrestore-toc-metadata-v1.json`. The wrapper must propagate the
+   exact container status and accept only a success-schema record that passes
+   all exact structural validation; a safe error record or nonzero status is a
+   hard stop. Never pass `--dbname`/`--jobs`, expose raw tool output, or retain
+   raw TOC/dump bytes or a raw-stream hash;
+5. even on success, do not run help again, run the schema-only parser, draft or
+   publish the baseline contract/review/`SHA256SUMS`, inspect static sources
+   further, access/write any database, create a network/port/target, invoke a
+   Supabase database command, switch Git HEAD, run the frozen runner or
+   `calibrate-schema`, or begin pass 1. Success proves only that the corrected
+   TOC parser accepted and safely normalized this exact dump; and
+6. after success or any hard stop, close all handles, confirm/remove only the
+   exact reserved container if interrupted, confirm it absent, detach the
+   bundle without force, delete only the three exact temporary files named in
+   items 2 and 4 if present, and remove only the empty exact temp directory and
+   mountpoint. Do not stop/restart Docker Desktop or Local services, prune or
+   pull, touch protected untracked repository paths, or retain any raw or safe
+   temporary artifact.
+
+Any binding, parser, synthetic-test, mount, checksum, Docker, normalized
+metadata, permission, handle, detach, or cleanup difference stops without
+retry, alternate parser/image/dump, schema work, database work, contract work,
+pass 1, or further Git action. `automaticNextStep=false`.
+
+If and only if the corrected TOC-only attempt, exact normalized validation,
+and complete cleanup all pass, this decision authorizes one Checklist-only
+result checkpoint from the pushed corrected-TOC authority HEAD: change only
+this Checklist, record the parser file/canonical hashes and byte sizes,
+synthetic-test safe-output hash, normalized TOC safe fields/output hash, exact
+one-invocation count, and cleanup proof; commit once as
+`docs: record corrected pre-p12 toc metadata`, push once to the existing
+branch, and create no PR. That result authorizes no schema-only attempt,
+contract drafting/publication, target creation, execution proof, pass 1,
+Production access, or P-12.
+
 **Authority:** Production `2568.0.0` remains authoritative for item names,
 units, and prices. The local workbook remains reconciliation/reference evidence
 only.
@@ -2044,9 +2192,10 @@ weaken the verifier, or continue that disposable sequence.
   source/tooling worktree and is not authorization.
 - [ ] Produce and independently review the exact external
   `conduit-boq/master-catalog-p12-baseline-provisioning-contract/v1` under the
-  bounded metadata-assisted design authority above: `AUTHORIZED ONCE — NOT YET
-  EXECUTED`. This does not authorize target creation, execution proof, or
-  pass 1.
+  bounded metadata-assisted design authority above: `INITIAL ATTEMPT CONSUMED
+  — E74 HARD STOP — CORRECTED TOC-ONLY AUTHORIZED ONCE — NOT YET EXECUTED`.
+  This does not authorize schema metadata inspection, target creation,
+  execution proof, or pass 1.
 - [ ] After the P-47 replacement candidate is separately Git-published and
   frozen,
   run `calibrate-schema` one stage per manual invocation on a fresh disposable
