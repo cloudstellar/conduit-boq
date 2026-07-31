@@ -1982,6 +1982,93 @@ push once to the existing branch; and create no PR. That result authorizes no
 retry, schema-only attempt, contract work, target, execution proof, pass 1,
 Production access, or P-12.
 
+**Corrected aggregate synthetic-gate continuation authority recorded:**
+2026-08-01 ICT — the aggregate authority checkpoint completed at
+pushed/upstream-equal
+`8e8c5f5543e51109f35e0b4def002380c8c4307c`. The reviewed parser was 14,061
+bytes at SHA-256
+`bff949c00ad02ce010cd7e1a98b3b09057eb8b1470827807e62eeede8db2f2f8`
+and its trailing-LF-canonical source was 14,060 bytes at SHA-256
+`23fecdca51d9fc01b4100daa38fc49e9b10c485477cb1a13c5d7f1f5ed2906bb`.
+The reviewed wrapper was 38,536 bytes at SHA-256
+`d20e8f6f9c2f682a6579004f3f35d4dac7856a02e0b690e994703049101e9980`
+and its canonical source was 38,535 bytes at SHA-256
+`31b0abe4b5ece00cd863854087bfe60b79c4b217666bee4a4e8e331cb40d9e0f`.
+The reviewed pre-correction harness was 23,650 bytes at SHA-256
+`956627d9ad0aa98b93373a30846af8519bd46747a54fba2955d20aae4f43ba45`
+and its canonical source was 23,649 bytes at SHA-256
+`7f1e2b57d06d42e08230de9c87b8ae9e90c9754d861531a90646196935715ce6`.
+The corrected Docker specification SHA-256 was
+`480478ce99e66e97b30dc99a4e3e3f5f25b256b42b3fefcc5f6e5546b4d9ebc8`.
+
+The approved synthetic harness was invoked exactly once under its clean
+environment. It exited `1` in approximately 0.2 seconds, emitted no
+stdout/stderr, and created no test record. No Keychain, bundle, mount, dump,
+Docker, container, database, Local, Production, schema, contract, or pass-1
+action occurred. The five-file allowlist never exceeded the three reviewed
+source files, and mandatory cleanup removed both exact temporary directories
+and all temporary source files. Git remained tracked-clean/upstream-equal and
+no result checkpoint was authorized or made.
+
+Independent static postmortem established the deterministic first failure.
+The `duplicate-header` fixture used ordinary single quotes around `\n`, so
+Bash supplied literal backslash-plus-`n` bytes rather than one LF. The parser
+correctly returned `E72` for one malformed `Format` header with
+`markerProtocolViolationCount = 1`, `requiredHeaderMissingCount = 1`, and
+`requiredHeaderDuplicateCount = 0`; the fixture-specific validator instead
+required one duplicate and zero missing headers, returned `1`, and `set -e`
+stopped the harness before record creation. This is a synthetic-fixture bug,
+not evidence about the dump, parser, backup, or Production state.
+
+After that result, root cause, and the narrow correction were explained, the
+Owner instructed `ทำต่อตามที่แนะนำครับ`. This decision first authorizes one
+Checklist-only authority checkpoint from base
+`8e8c5f5543e51109f35e0b4def002380c8c4307c` on branch
+`codex/master-catalog-phase4`: change only this Checklist, commit once as
+`docs: authorize corrected pre-p12 aggregate synthetic gate`, push once to the
+existing branch, and create no PR. Do not stage, modify, or delete `files/`,
+`tmp/`, `output/`, or any other untracked repository path. The checkpoint
+contains no P-12 GO marker and changes no source/tooling, kit, generator,
+runner, migration, application, flag, Package #39, or Runbook #41 content.
+
+Only after that checkpoint is tracked-clean, pushed, and upstream-equal, this
+decision authorizes exactly one corrected aggregate synthetic-gate
+continuation:
+
+1. recover the three reviewed temporary sources only by replaying their
+   successful recorded `apply_patch` construction from read-only local Codex
+   session log
+   `/Users/cloud/.codex/sessions/2026/07/30/rollout-2026-07-30T10-25-56-019fb10e-ace8-73d2-a6b5-5d5ea3d97ec8.jsonl`
+   into the same exact allowlisted owner-mode paths. Before any correction,
+   require exact agreement with all file/canonical sizes and hashes above; no
+   manual reconstruction, alternate source, or additional temporary file is
+   allowed;
+2. preserve every parser and wrapper byte. In the byte-identical reviewed
+   harness, change only the `duplicate_header_fixture` replacement from
+   ordinary single quoting to ANSI-C quoting by adding exactly one `$` before
+   its replacement quote, so the existing `\n` becomes one runtime LF. Bind
+   the corrected harness file/canonical sizes and hashes and independently
+   verify that the parser/wrapper hashes and Docker specification remain
+   unchanged;
+3. run that corrected synthetic harness exactly once under the same clean
+   environment and all prior file, argv, safe-output, timeout,
+   secret-exclusion, and no-persistence boundaries. It may not access
+   Keychain, the bundle, mountpoint, dump, Docker, a database, Local,
+   Production, or schema work;
+4. only if every one of the 20 parser fixtures, 20 wrapper unit cases,
+   binding, safe-output validator, permission check, and cleanup check passes
+   may the still-unused Keychain/mount/image inspection and one
+   `docker run --rm --interactive` proceed under unchanged aggregate-authority
+   items 6–9. The real Docker invocation count remains zero until that gate;
+5. any recovery, hash, fixture, test, output, permission, mount, checksum,
+   Docker, handle, or cleanup difference stops without retry, alternate
+   parser/image/dump, schema/database/contract work, pass 1, or unapproved Git
+   action. A corrected synthetic failure or any later pre-invocation failure
+   authorizes no result Git action; and
+6. only a validated result from the one real Docker invocation followed by
+   complete cleanup retains the existing Checklist-only metadata/diagnostic
+   result-checkpoint authority. `automaticNextStep=false`.
+
 **Authority:** Production `2568.0.0` remains authoritative for item names,
 units, and prices. The local workbook remains reconciliation/reference evidence
 only.
@@ -2409,7 +2496,8 @@ weaken the verifier, or continue that disposable sequence.
   `conduit-boq/master-catalog-p12-baseline-provisioning-contract/v1` under the
   bounded metadata-assisted design authority above: `INITIAL ATTEMPT CONSUMED
   — E74 HARD STOP — CORRECTED TOC-ONLY CONSUMED — E72 HARD STOP — AGGREGATE
-  E72-CORRECTED TOC-ONLY AUTHORIZED ONCE — NOT YET EXECUTED`.
+  E72-CORRECTED SYNTHETIC GATE HARD STOP — CORRECTED AGGREGATE SYNTHETIC GATE
+  AUTHORIZED ONCE — NOT YET EXECUTED`.
   This does not authorize schema metadata inspection, target creation,
   execution proof, or pass 1.
 - [ ] After the P-47 replacement candidate is separately Git-published and
