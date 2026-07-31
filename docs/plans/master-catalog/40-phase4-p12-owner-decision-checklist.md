@@ -2,7 +2,7 @@
 
 **Prepared:** 2026-07-26
 
-**Last updated:** 2026-07-31
+**Last updated:** 2026-08-01
 
 **Status:** PRE-P-12 HOLD - immutable replacement source/tooling HEAD
 `7fbfe1bb8f71df03a78762b00e93aded7bdd6e42` and its truthful
@@ -46,10 +46,12 @@ recorded below. The manifest-controlled payload remains exact. This restores
 the corrected Local closeout evidence binding and kit custody without a
 database query/reset, repeated cleanup, kit regeneration, filesystem hardening,
 or source change. The later separately authorized operational-fingerprint
-derivation passed and is recorded below. The bounded authority added on
-2026-07-31 permits only read-only recovery-recipe inspection; disposable
-database execution, pass 1, Production, application/UI/export changes, flags,
-publication, Factor F, hotfix `016`, and P-12 remain unauthorized.
+derivation passed and is recorded below. The bounded recovery-recipe
+inspection was then consumed once: package custody and historical restore
+results passed, but no reproducible baseline-provisioning recipe was recovered.
+Disposable database execution, pass 1, Production, application/UI/export
+changes, flags, publication, Factor F, hotfix `016`, and P-12 remain
+unauthorized.
 
 **Exact application candidate:**
 `5068f944af2aa3fe8446c77c8ae8d48673cb260b`
@@ -78,6 +80,9 @@ source by the P-46 finding
 
 **Completed Recovery closeout authority-checkpoint HEAD:**
 `18ec61f5f20edf98ee08acde0a17d8d12d146af5`
+
+**Completed pass-1 baseline-recipe inspection authority-checkpoint HEAD:**
+`c6c0fdb3a5feda504c788b010a6ae2027a7ddc4f`
 
 **Current authority sync:** P-45/P-46 remain historical evidence. P-47
 repository/static closure passed for the exact recorded migration identity/hash.
@@ -1371,6 +1376,74 @@ baseline-provisioning/pass-1 authority, but it may not grant it. Pass 1,
 GitHub review, contract freeze, pass 2, Production access, and P-12 remain
 separately unauthorized.
 
+**Pass-1 baseline-recipe inspection result recorded:** 2026-08-01 ICT — the
+inspection-authority checkpoint
+`c6c0fdb3a5feda504c788b010a6ae2027a7ddc4f` was exact, tracked-clean,
+pushed, and upstream-equal before the inspection. After the exact Keychain
+scope and risks were stated again, the Owner instructed `ทำต่อครับ`. This
+authorized only the backup-passphrase use and read-only package inspection
+above; it did not authorize a container, database, or pass 1.
+
+The exact sparse bundle was mounted once at
+`/private/tmp/conduit-p12-pass1-recipe-mount-7f96916` through the approved
+Keychain-to-standard-input path. Fresh inspection proved
+`image-encrypted: TRUE` and `writeable: false`. All eight `SHA256SUMS`
+entries passed. Each checksum-bound file was a regular, non-symlink,
+single-link file owned by `cloud`, mode `0600`; the dump remained exactly
+352,642 bytes with SHA-256
+`9d306a478b8ada65d0a32ab31bca19587c55efa3ae979ae4dd8ad5871d575932`.
+No raw SQL, row, UUID, password, or dump content was displayed, copied, or
+persisted.
+
+The seven checksum-bound non-dump records independently reconfirmed the
+historical readiness result: exact image `17.6.1.063`, network-none isolation
+with no host port, ordered `pre-data`/`data`/`post-data`, 20 UUID-only Auth
+dependency stubs with zero sensitive payload, unchanged source-before and
+source-after business metrics, restored comparable metrics matching the source,
+only aggregate physical byte size differing, zero recorded integrity
+anomalies, and container removal. They prove that the historical restore
+passed; they do not contain the commands needed to reproduce it.
+
+The inspection found no exact, repeatable recipe for any of these required
+pass-1 inputs:
+
+- initialize `conduit_p12_rehearsal` while preserving the frozen image's
+  Supabase roles/Auth schema and establishing password-authenticated
+  `session_user=current_user=postgres`;
+- provide loopback-only runner access while retaining an isolated target;
+- run the exact phased full restore with frozen flags/TOC handling and derive
+  and insert the 20 UUID-only Auth stubs;
+- establish or reconstruct the required object-ownership and ACL posture,
+  including exact hotfix `016`; the inspected checksum-bound records do not
+  establish whether or how ownership and privileges were included, omitted,
+  or remapped;
+- create only the exact `supabase_migrations` ledger prefix `009`-`016` and
+  the guarded disposable sentinel with its deny ACL; or
+- bind target preparation, the same-checkout transition to source HEAD
+  `7fbfe1bb8f71df03a78762b00e93aded7bdd6e42`, evidence, and cleanup into one
+  reviewed, reproducible contract.
+
+A native PostgreSQL 17 `pg_restore` was not present in the approved host
+locations, so the metadata-only TOC subcheck stopped without using Docker,
+the running Local container, or the unapproved pre-existing
+`production-app.dump.list`. Consequently no TOC, ACL/owner, or foreign-key
+claim is added here. Starting a tool container or reading that unbound list
+would have exceeded this authority.
+
+After the inspection, no handle remained except the disk-image process needed
+for the active mount. The bundle was detached without force, that process
+closed, the exact mountpoint was removed, and the bundle is unmounted with no
+remaining handle. No Docker container/network/port action, database
+connection/write, Git checkout change, Local Supabase access, Production
+credential/access, runner invocation, or pass-1 stage occurred.
+
+Result: `CONSUMED ONCE — HISTORICAL RESTORE VERIFIED — REPRODUCIBLE BASELINE
+RECIPE NOT RECOVERED — PASS 1 HOLD`. `automaticNextStep=false`. A new,
+separately reviewed and Owner-authorized baseline-provisioning contract is
+required before any target creation or `calibrate-schema` invocation. Do not
+infer commands from the result-only metadata or use unbound restore logs as
+authority.
+
 **Authority:** Production `2568.0.0` remains authoritative for item names,
 units, and prices. The local workbook remains reconciliation/reference evidence
 only.
@@ -1799,7 +1872,10 @@ weaken the verifier, or continue that disposable sequence.
   run `calibrate-schema` one stage per manual invocation on a fresh disposable
   isolated PostgreSQL 17 target; preserve the recursively hash-bound
   `UNREVIEWED` pass-1 manifest chain in exact `016`, `017`, `017a`,
-  `018`-`026` stage order.
+  `018`-`026` stage order. The bounded baseline-recipe inspection was consumed
+  once and did not recover a reproducible provisioning contract; pass 1
+  remains `UNAUTHORIZED — HOLD` until that separate prerequisite is reviewed
+  and approved.
 - [ ] Have the named independent verifier compare the first-pass captures and
   freeze owner-only `0600`
   `conduit-boq/master-catalog-p12-schema-shape-contract/v3`. Replace free-form
