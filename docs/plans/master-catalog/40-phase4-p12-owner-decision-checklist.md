@@ -2949,6 +2949,53 @@ deviations; commit once as
 existing branch, create no PR, and set `automaticNextStep=false`. Pass 2,
 independent contract review, Production, and P-12 remain separate decisions.
 
+**Credential-corrected one-lifecycle result recorded:** 2026-08-01 ICT — the
+Checklist-only authority was committed/pushed and upstream-equal at
+`ced78c3ae1bbcb90d7a9aeffd521607548e0ab9c`. All reviewers were complete and
+the exact external proof/provisioner/review hashes above were reproved before
+the checkout detached to frozen source/tooling HEAD
+`7fbfe1bb8f71df03a78762b00e93aded7bdd6e42`.
+
+The reviewed proof created one application-empty target from the exact frozen
+image on a dedicated `bridge` with `Internal=false`, one attached container,
+and the sole binding `127.0.0.1:55437:5432/tcp`. Image, network, HostConfig,
+runtime, loopback, and single-container checks passed. The idempotent
+container-loopback credential rebind to role `postgres` completed without the
+secret appearing in argv or retained output. The owner-only, regular,
+single-link, one-line `0600` passfile was then used with every alternate
+password environment unset.
+
+The sole frozen Supabase CLI identity query exited `1` and normalized again to
+`connection_or_auth`. It did not time out; stdout was 0 bytes, stderr was 370
+bytes, no password literal was present, and raw stdout/stderr were deleted.
+This is the first authorized mismatch. It proves only that the private
+PGPASSFILE proof did not pass; it does not prove a narrower historical root
+cause.
+
+The exact safe proof summary is
+`/Users/cloud/Backups/ConduitBOQ/evidence/phase4/pre-p12/p12-pgpass-lifecycle-12b7d31/pgpass-proof-summary.txt`,
+2,256 bytes, mode `0600`, SHA-256
+`f38153ce7a87fe92054bb84991ad90f332ae7196355e905e4de50b78edc77a3d`.
+The lifecycle result is
+`/Users/cloud/Backups/ConduitBOQ/evidence/phase4/pre-p12/p12-pgpass-lifecycle-12b7d31/credential-corrected-lifecycle-result.txt`,
+2,197 bytes, mode `0600`, SHA-256
+`24361db3fa36f165ca114f0d34a35ab5e4430afa066bd1772837c020ca21caa9`.
+
+The hard-stop prevented Keychain access, bundle/dump access, read-only mount,
+restore/schema/Auth/ledger work, dev4, formal, stage `016`, any pass-1 stage,
+pass 2, Local, Production, and P-12. No fallback, retry, alternate credential,
+or alternate transport was attempted. Label-guarded cleanup proved the proof
+container, network, listener, passfile, password files, and raw output absent;
+ports `55437`-`55439` were free, no bundle was mounted, the exact temp root was
+removed, and the checkout returned to the pushed/upstream-equal authority
+branch. Protected untracked paths were untouched and execution deviations were
+zero.
+
+Result: `PRIVATE PGPASSFILE PROOF FAILED — CONNECTION_OR_AUTH — DEV4,
+FORMAL, AND PASS 1 NOT STARTED — HARD STOP`. `automaticNextStep=false`. Any
+new diagnosis, credential/client correction, retry, dev target, formal pass,
+Local, Production, pass 2, or P-12 requires a new Owner decision.
+
 **Authority:** Production `2568.0.0` remains authoritative for item names,
 units, and prices. The local workbook remains reconciliation/reference evidence
 only.
@@ -3393,8 +3440,11 @@ weaken the verifier, or continue that disposable sequence.
   unstarted. The credential-corrected one-lifecycle authority above now permits
   exactly one private-PGPASSFILE proof, conditional dev4, and conditional fresh
   formal pass 1 under first-mismatch hard-stop semantics.
-  Status: `CREDENTIAL-CORRECTED LIFECYCLE AUTHORIZED — PRIVATE PGPASSFILE
-  PROOF PENDING`.
+  The authorized proof then completed one PGPASSFILE-only query and hard-stopped
+  at normalized `connection_or_auth`; dev4, formal, and every pass-1 stage were
+  not started.
+  Status: `PRIVATE PGPASSFILE PROOF FAILED — CONNECTION_OR_AUTH — DEV4,
+  FORMAL, AND PASS 1 NOT STARTED — HARD STOP`.
 - [ ] Have the named independent verifier compare the first-pass captures and
   freeze owner-only `0600`
   `conduit-boq/master-catalog-p12-schema-shape-contract/v3`. Replace free-form
