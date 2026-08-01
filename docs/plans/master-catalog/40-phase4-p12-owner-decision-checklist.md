@@ -78,9 +78,9 @@ The fresh formal Pass 2 lifecycle below stopped before migration `017` at its
 host-CLI connection proof and completed exact cleanup. The bounded diagnostic
 then reproduced and identified the standalone provisioner's missing explicit
 `PGSSLMODE=disable`; its result and cleanup are recorded below. Pass 2 remains
-unstarted. Any corrected fresh Pass-2 lifecycle requires a new Owner decision.
-Production approval, Production access, and P-12 remain unstarted and
-unauthorized.
+unstarted. The corrected fresh Pass-2 lifecycle is authorized only by the
+bounded decision below. Production approval, Production access, and P-12
+remain unstarted and unauthorized.
 
 **Exact application candidate:**
 `5068f944af2aa3fe8446c77c8ae8d48673cb260b`
@@ -3376,6 +3376,84 @@ listener, and temporary root; independent checks found all absent. Local and
 Production were untouched. Result:
 `ROOT CAUSE IDENTIFIED — STANDALONE PROVISIONER TLS ENVIRONMENT MISSING —
 CLEANUP COMPLETE — PASS 2 NOT STARTED`. `automaticNextStep=false`.
+
+**Corrected fresh formal Pass 2 rehearsal authority recorded:** 2026-08-01
+ICT — immediately after the exact TLS root cause, one-line external-runtime
+correction, and required fresh lifecycle were presented, the Owner instructed
+`ทำต่อ`. The named human verifier `lukkxh` remains confirmed available in this
+same execution window. This authorizes exactly the single corrected lifecycle
+below without another Owner approval between mechanical steps; it does not
+waive any post-migration human review.
+
+First create exactly one Checklist-only authority checkpoint from base
+`c2e95c6401761da76470944358b78c82aca155e7` on branch
+`codex/master-catalog-phase4`: change only this Checklist, commit once as
+`docs: authorize corrected p12 pass2 rehearsal`, push once to the existing
+branch, and create no PR. Do not stage, modify, or delete `files/`, `tmp/`,
+`output/`, or any other untracked repository path.
+
+Only after that checkpoint is tracked-clean, pushed, and upstream-equal:
+
+1. derive one new owner-only external runtime from preserved Pass-2 runtime
+   SHA-256
+   `1d359459dde3e981246a26545c3001eebeadd24e11507ba8bd474ca242043849`.
+   Change only the fresh resource/evidence/temp names below and explicitly set
+   `PGSSLMODE=disable` for every standalone rehearsal CLI call: the
+   provisioner's host-CLI proof and each advisor capture. The frozen runner
+   already sets this environment internally. Preserve
+   every frozen image, dump, source, CLI, kit, contract, credential-rebind,
+   restore/Auth/ledger/ACL/hotfix/sentinel/fingerprint, custody, and cleanup
+   check. Make no tracked runner, test, migration, source, kit, or contract
+   change. Statically and independently verify the derived runtime before any
+   Keychain, mount, Docker, database, or network action;
+2. use exact temporary root
+   `/private/tmp/conduit-p12-formal-pass2c-a7a8a81`, evidence root
+   `/Users/cloud/Backups/ConduitBOQ/evidence/phase4/pre-p12/p12-formal-pass2c-a7a8a81`,
+   clean detached execution worktree at source/tooling HEAD
+   `a7a8a81248b19ea9e3ca2f262bdc03365c79c849`, the existing frozen kit and
+   contract at their already recorded paths/hashes, and only already-installed
+   dependencies;
+3. retrieve only the existing sparsebundle passphrase from the already
+   recorded Keychain service/account, mount the exact encrypted bundle
+   read-only and `nobrowse`, verify encryption plus all eight checksum members
+   and the exact 352,642-byte dump SHA-256
+   `9d306a478b8ada65d0a32ab31bca19587c55efa3ae979ae4dd8ad5871d575932`,
+   copy only that dump to the owner-only temporary root, and detach without
+   force;
+4. provision exactly one fresh target using the already-present frozen image
+   ID, container `conduit-p12-pass2c-a7a8a81-formal`, dedicated non-internal
+   single-container bridge `conduit-p12-pass2c-a7a8a81-net-formal`, sole
+   loopback publish `127.0.0.1:55449`, database
+   `conduit_p12_rehearsal`, and sentinel
+   `ConduitP12Pass2C_a7a8a81_20260801`. Require the corrected host-CLI proof,
+   complete accepted `016` restore baseline, operational catalog fingerprint,
+   and every unchanged provisioning gate to pass;
+5. capture one fresh secret-free baseline advisor artifact with explicit
+   rehearsal `PGSSLMODE=disable`, then invoke the frozen runner in normal
+   rehearsal mode in exact order `017`, `017a`,
+   `018`, `019`, `020`, `021`, `022`, `023`, `024`, `025`, `026`. After each
+   successful migration, capture a new advisor artifact with the same explicit
+   rehearsal TLS environment. Before every next migration, require actual
+   `lukkxh` review of the complete newly created
+   evidence and exact owner-only `0600` prior-step signoff. After `026`, require
+   the same human's exact final signoff, then run read-only closeout. Do not
+   predate, reuse, manufacture, or self-approve any signoff;
+6. hard-stop at the first mismatch, uncertain outcome, timeout, missing human
+   review, or cleanup failure. Perform no retry, alternate credential,
+   alternate verifier, migration edit, or stage advance. Preserve truthful
+   owner-only secret-free evidence and remove only the exact label/custody-
+   matched target, network, credential/runtime files, mount, worktree, dump
+   copy, and temporary root; and
+7. after success or hard-stop and complete cleanup, change only this Checklist
+   to record the exact result and evidence hashes, commit once as
+   `docs: record corrected p12 pass2 result`, push once to the existing branch,
+   create no PR, and reverify tracked-clean/upstream-equal state.
+
+This correction is an external execution-environment repair only. It starts no
+Local or Production connection, Production approval, P-12, P-13, GO marker,
+application/UI/export, feature flag, PR merge, image pull/upgrade, or tracked
+change. Final closeout retains `p13Authorized=false` and
+`automaticNextStep=false`; every later gate requires a new Owner decision.
 
 **Authority:** Production `2568.0.0` remains authoritative for item names,
 units, and prices. The local workbook remains reconciliation/reference evidence
