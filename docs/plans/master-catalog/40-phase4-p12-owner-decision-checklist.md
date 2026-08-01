@@ -74,10 +74,11 @@ correction is pushed/upstream-equal at
 `a7a8a81248b19ea9e3ca2f262bdc03365c79c849`; the re-frozen kit and fresh
 formal Pass 1 are complete through `026`; the independent authenticated GitHub
 review and external schema-shape contract freeze are complete and bound below.
-The fresh formal Pass 2 rehearsal is authorized only by the bounded lifecycle
-recorded below and remains unstarted pending live availability of the named
-human verifier. Production approval, Production access, and P-12 remain
-unstarted and unauthorized.
+The fresh formal Pass 2 lifecycle below stopped before migration `017` at its
+host-CLI connection proof and completed exact cleanup. Pass 2 therefore
+remains unstarted. The single bounded host-CLI diagnostic recorded below is
+the only authorized next action. Production approval, Production access, and
+P-12 remain unstarted and unauthorized.
 
 **Exact application candidate:**
 `5068f944af2aa3fe8446c77c8ae8d48673cb260b`
@@ -3267,6 +3268,69 @@ P-12, P-13, GO marker, application/UI/export, feature flag, PR merge, image
 pull/upgrade, or tracked source/tooling/runner/test/migration/kit/contract
 change. Final Pass-2 closeout keeps `p13Authorized=false` and
 `automaticNextStep=false`; every later gate requires a new Owner decision.
+
+**Fresh formal Pass 2 pre-migration result and host-CLI diagnostic authority
+recorded:** 2026-08-01 ICT — authority checkpoint
+`b79b639f4f1e38e0410066d91a17256f24abaf89` changed only this Checklist,
+was pushed/upstream-equal, and the named verifier's live availability was
+confirmed before target creation. The clean detached execution worktree was
+exactly `a7a8a81248b19ea9e3ca2f262bdc03365c79c849`. The encrypted bundle was
+mounted read-only/`nobrowse`; all eight checksum members and the exact
+352,642-byte dump SHA-256
+`9d306a478b8ada65d0a32ab31bca19587c55efa3ae979ae4dd8ad5871d575932`
+passed; the bundle detached without force.
+
+The one fresh target passed exact image/resource isolation, loopback-only
+publish, credential rebind to `postgres`, and database identity. It then
+returned exit code `1` at `host-cli-proof` before schema preparation, restore,
+advisor capture, verifier signoff, or migration `017`. The inherited
+provisioner's safe diagnostic retained zero bytes because the emitted CLI text
+did not match its narrow known-error prefixes; the cause is therefore
+truthfully `undetermined`, not assumed transient. No retry or alternate
+credential occurred. Container, network, listener, credentials, mount,
+worktree, dump copy, and exact temporary root are absent. Local and Production
+were untouched.
+
+The owner-only result file is
+`/Users/cloud/Backups/ConduitBOQ/evidence/phase4/pre-p12/p12-formal-pass2-a7a8a81/formal-pass2-result.txt`,
+1,362 bytes, mode `0600`, SHA-256
+`3672889b94fe1df42500ab28295523b15845d33d06b3c22f8089eaedf495a1a5`.
+The provisioning summary SHA-256 is
+`ad22ab65a197992f5b55feb7ae835363e47ecf43b56fbe95d3fa06418314867e`;
+the zero-byte diagnostic SHA-256 is
+`e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855`.
+Result: `PASS2_NOT_STARTED — HOST-CLI PROOF FAILED — CLEANUP COMPLETE`.
+`automaticNextStep=false`.
+
+After seeing that exact result, the Owner instructed
+`เร็ว รีบหาสาเหตุ host-cli-proof ให้เห็น error จริง`. This decision
+authorizes the same Checklist-only result checkpoint to serve as the authority
+checkpoint for exactly one bounded diagnostic. Commit this Checklist alone as
+`docs: record p12 pass2 result`, push once to the existing branch, create no
+PR, and require tracked-clean/upstream-equal state before the diagnostic.
+
+The diagnostic may create exactly one new disposable PostgreSQL 17 target
+using the already-present frozen image ID above, container
+`conduit-p12-host-cli-diagnostic-a7a8a81`, dedicated non-internal single-
+container bridge `conduit-p12-host-cli-diagnostic-a7a8a81-net`, sole loopback
+publish `127.0.0.1:55448`, and database `conduit_p12_rehearsal`. Generate one
+new private random password, start the image at its frozen default
+`supabase_admin`, rebind only role `postgres` through container-loopback
+`psql`/`\getenv`, prove exact `postgres` identity and PostgreSQL major 17,
+then invoke once the exact failed host CLI query using the frozen CLI binary,
+passwordless loopback URL, and `PGPASSWORD` environment transport.
+
+Capture the command's actual stdout/stderr, exit code, byte count, and SHA-256
+in a new owner-only external evidence directory. Before preservation, reject
+and destroy raw output if it contains the generated password; otherwise retain
+the exact output mode `0600`. Do not run CLI help/version, mount/Keychain/dump,
+schema preparation, restore, Auth stubs, ledger repair, advisor, migration,
+Local, Production, or P-12 action. Whether the query succeeds or fails, remove
+only the exact label-matched container/network/password/runtime files, prove
+port `55448` and the exact temp root absent, and perform no retry. Then this
+decision preauthorizes one Checklist-only truthful diagnostic-result commit as
+`docs: record p12 host cli diagnosis` and one push/no PR after complete
+cleanup. That result authorizes no automatic Pass-2 continuation.
 
 **Authority:** Production `2568.0.0` remains authoritative for item names,
 units, and prices. The local workbook remains reconciliation/reference evidence
