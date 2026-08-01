@@ -2702,6 +2702,92 @@ discovery completed before its checkpoint and no concurrent CLI reviewer; it
 is not current authority. Any diagnostic, correction, development/formal
 target, stage `016`, or pass 1 requires a new Owner decision.
 
+**Clean host-CLI-only diagnostic re-authorization recorded:** 2026-08-01 ICT —
+the Owner explicitly approved:
+
+> อนุมัติ clean host-CLI-only diagnostic หนึ่งครั้งตามขอบเขตเดิม โดยเริ่มนับ
+> เฉพาะ connecting db query และห้าม CLI/help/version หรือ concurrent reviewer
+> อื่นหลัง checkpoint
+
+This decision supersedes only the immediately preceding pre-execution
+procedural hard stop. It treats prior non-connecting discovery as closed
+preparation and authorizes exactly one new connecting `db query` diagnostic.
+It does not authorize a fix, retry, second query, development/formal target,
+runner, migration, pass 1, Local/Production action, or P-12.
+
+All command discovery, script construction, and independent static review were
+completed before this authority checkpoint. The exact external script is
+`/Users/cloud/Backups/ConduitBOQ/evidence/phase4/pre-p12/p12-host-cli-clean-diagnostic-c3b3cf8/run-host-cli-diagnostic.sh`,
+14,460 bytes, mode `0700`, SHA-256
+`d454bbb012d5f99a5596b59a30c441a71445c342ffde8d0deb734266c98aa1fb`.
+Its owner-only review record is SHA-256
+`79fb4046a64450688c1f4f436de021845ea28d191f7d064d81eb083a4ea6fd14`.
+The review proved Bash 3.2 syntax, exactly one connecting CLI invocation, no
+help/version invocation, a 65,536-byte per-file raw-output bound, secret-safe
+classification, and label-guarded cleanup without invoking Supabase CLI,
+Docker, a database, Keychain, bundle, or dump.
+
+First, authorize exactly one Checklist-only authority checkpoint from base
+`c3b3cf828b5f9a10c5fe4aa782a5937c56855ba5` on branch
+`codex/master-catalog-phase4`: change only this Checklist, commit once as
+`docs: authorize clean pre-p12 host-cli diagnostic`, push once to the existing
+branch, and create no PR. Do not stage, modify, or delete `files/`, `tmp/`,
+`output/`, or any other untracked repository path.
+
+Only after that checkpoint is tracked-clean, pushed, and upstream-equal:
+
+1. run single-agent only. No reviewer, subagent, concurrent task, Supabase CLI
+   help/version, direct backend invocation, alternate client, command discovery,
+   script edit, or second connecting query is permitted;
+2. preserve all earlier evidence as immutable history. Use only the owner-mode
+   roots
+   `/Users/cloud/Backups/ConduitBOQ/evidence/phase4/pre-p12/p12-host-cli-clean-diagnostic-c3b3cf8`
+   and
+   `/private/tmp/conduit-p12-host-cli-clean-diagnostic-c3b3cf8`.
+   Reprove the exact script/review bytes, detach the same checkout to frozen
+   source/tooling HEAD
+   `7fbfe1bb8f71df03a78762b00e93aded7bdd6e42`, and preserve exact CLI shim
+   SHA-256
+   `ce144c21c06e5ad5b9bdb6566fabcdadb15f32d72c8fbe8ba77eae994753a601`,
+   backend SHA-256
+   `5e9be99fc013121b46b5f6bb848348ecc54bf1fb9f1d1791e715c6fb08397491`,
+   and frozen step-`017` config SHA-256
+   `dc7a8d55d45a0fd0b5c25867d0f35b91d2724e30a8b8a283df04a8c5b5d59dcf`;
+3. create exactly one application-empty disposable target from frozen image ID
+   `sha256:178f0976b54a39237096bfa310c1a352dbc82fb1b08dda45cdb8acb5d40c1426`
+   with `--pull=never`, tmpfs data, one fresh non-displayed environment-only
+   password, database `conduit_p12_rehearsal`, one labeled dedicated
+   `bridge` with `Internal=false`, one attached container, and exactly one
+   publication `127.0.0.1:55436:5432/tcp`. Use only `pg_isready` before the
+   query and prove the exact single network/binding posture;
+4. execute the frozen script once. Its sole connecting invocation must be the
+   frozen Supabase CLI `2.107.0` `db query` with telemetry disabled,
+   password-free loopback URL, password supplied only by `PGPASSWORD`, JSON
+   output, frozen `steps/017` workdir, and the sole read-only SQL
+   `select current_user::text, session_user::text, current_database()::text;`.
+   Access no Keychain item, bundle, dump, Local Supabase, Production endpoint,
+   or Production credential; perform no restore, schema/Auth/ledger work, DDL,
+   DML, migration, or runner invocation;
+5. retain stdout/stderr only in owner-only temporary files, each hard-bounded to
+   65,536 bytes, scan for the ephemeral password, persist no raw excerpt/path/
+   URL/row/token/hash, delete raw output, and record exactly one safe category:
+   `success_identity_match`, `success_identity_mismatch`,
+   `cli_capability_or_usage`, `cli_local_state_or_permission`,
+   `connection_or_auth`, `timeout`, `other_failure`, or
+   `unsafe_or_inconclusive`; and
+6. every category ends the diagnostic. No result authorizes correction or
+   continuation. Perform exact label-guarded cleanup, prove zero scoped
+   containers, networks, listeners, password files, and raw output, remove the
+   temporary root, and return to the pushed authority HEAD.
+
+This decision preauthorizes exactly one Checklist-only result checkpoint after
+complete cleanup: record the authority/script/review hashes, one-query count,
+safe category and counters, network proof, cleanup, and deviations; commit once
+as `docs: record clean pre-p12 host-cli diagnostic result`, push once to the
+existing branch, and create no PR. `automaticNextStep=false`. Any correction,
+development/formal target, stage `016`, pass 1, pass 2, Production access, or
+P-12 requires a new Owner decision.
+
 **Authority:** Production `2568.0.0` remains authoritative for item names,
 units, and prices. The local workbook remains reconciliation/reference evidence
 only.
