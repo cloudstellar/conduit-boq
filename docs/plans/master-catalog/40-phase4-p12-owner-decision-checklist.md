@@ -2548,6 +2548,55 @@ branch, and create no PR. `automaticNextStep=false` after that result.
 Independent GitHub schema-contract review, pass 2, fresh Production
 evidence/backup, Production access, and P-12 GO remain separate decisions.
 
+**Network-corrected final-dev3 and fresh formal pass-1 result recorded:**
+2026-08-01 ICT — the network-corrected authority checkpoint was
+committed/pushed at
+`719eab5b97727302f98fe8b59fcd2d4687d4a3c5`, the same checkout was detached to
+exact frozen source/tooling HEAD
+`7fbfe1bb8f71df03a78762b00e93aded7bdd6e42`, and the prior 25,579-byte
+provisioner SHA-256
+`82ed4f56449e2c51f5a6d6a93433ddad12b277055ea10dfe295cf915c1d70fdd`
+was preserved as immutable input. The corrected external provisioner is
+`/Users/cloud/Backups/ConduitBOQ/evidence/phase4/pre-p12/p12-network-corrected-pass1-1d6d4b3/provision-p12-baseline.sh`,
+27,420 bytes, SHA-256
+`f7a50cae5b2758eaa46288a61dc99acda51a7e4f52829efba76b113c6c76a038`.
+Its independent review record is SHA-256
+`2fb0c967ae2b5bca08c33e2c8be2fe61a0f7ecc4a436e0b4c1d8d6b8a0717020`.
+
+The encrypted bundle was mounted read-only/nobrowse after encryption,
+read-only state, all package checksums, and the exact 352,642-byte dump SHA-256
+were reproved. Final development attempt `dev3` then proved the identified
+network correction: dedicated driver `bridge`, `Internal=false`, exactly one
+container on one network, exact HostConfig and runtime binding
+`127.0.0.1:55433` to `5432/tcp`, no wildcard/IPv6/additional binding, successful
+host loopback reachability, exact frozen image, and matching PostgreSQL 17
+`postgres` identity. It subsequently failed at `host-cli-proof`, before target
+preparation or any dump restore. Its safe summary is
+`/Users/cloud/Backups/ConduitBOQ/evidence/phase4/pre-p12/p12-network-corrected-pass1-1d6d4b3/provision-dev3/provision-summary.txt`,
+SHA-256
+`59e834b4eb2dd8ac0607fe3f38795c72df6a93abe04cb955b9ebf4d32d654a5a`.
+
+The final-development failure hard-stop prohibited correction, retry, a fresh
+formal target, stage `016`, and every pass-1 invocation. No target-owner/schema
+preparation, dump restore, Auth-stub insert, ledger repair, Phase 4 migration,
+formal target, or pass-1 manifest occurred. Label-guarded cleanup left zero
+containers, networks, listeners, and runtime credential files. The encrypted
+bundle was detached without force and the exact temporary root was removed.
+The lifecycle result is
+`/Users/cloud/Backups/ConduitBOQ/evidence/phase4/pre-p12/p12-network-corrected-pass1-1d6d4b3/network-corrected-result.txt`,
+SHA-256
+`9c669847460e3642a5fe5204028f7da2d7701012c163dc3233c0bf2322079f41`.
+No Local or Production credential, connection, target, or data was touched.
+
+Result: `NETWORK CORRECTION PASSED — FINAL DEV3 FAILED AT HOST-CLI-PROOF —
+FORMAL AND PASS 1 NOT STARTED — HOLD`. `automaticNextStep=false`. Any new
+diagnostic, development target, host-CLI correction, formal target, or pass-1
+execution requires a new Owner decision. The smallest next proposal is one
+host-CLI-only diagnostic on an empty disposable target with the now-proven
+network posture, no bundle/dump/restore/migration, and a normalized redacted
+error classification before any new development authority; it is not current
+authority.
+
 **Authority:** Production `2568.0.0` remains authoritative for item names,
 units, and prices. The local workbook remains reconciliation/reference evidence
 only.
@@ -2982,10 +3031,11 @@ weaken the verifier, or continue that disposable sequence.
   `UNREVIEWED` pass-1 manifest chain in exact `016`, `017`, `017a`,
   `018`-`026` stage order. The earlier lifecycle stopped after `dev2`; the
   bounded continuation then hard-stopped at diagnostic class `4`. The
-  network-corrected authority above now permits final `dev3` and, only after it
-  succeeds, one fresh formal target and the manual pass-1 chain.
-  Status: `OWNER APPROVED — EXECUTION ONLY AFTER PUSHED NETWORK-CORRECTED
-  CHECKPOINT — RESULT HOLD`.
+  network-corrected lifecycle proved the bridge/binding correction but its
+  final `dev3` then failed at `host-cli-proof`; formal, stage `016`, and pass 1
+  were not started.
+  Status: `NETWORK CORRECTION PASSED — FINAL DEV3 FAILED AT HOST-CLI-PROOF —
+  FORMAL AND PASS 1 NOT STARTED — HOLD`.
 - [ ] Have the named independent verifier compare the first-pass captures and
   freeze owner-only `0600`
   `conduit-boq/master-catalog-p12-schema-shape-contract/v3`. Replace free-form
