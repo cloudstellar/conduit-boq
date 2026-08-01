@@ -74,8 +74,10 @@ correction is pushed/upstream-equal at
 `a7a8a81248b19ea9e3ca2f262bdc03365c79c849`; the re-frozen kit and fresh
 formal Pass 1 are complete through `026`; the independent authenticated GitHub
 review and external schema-shape contract freeze are complete and bound below.
-The next gate is separately authorized Pass 2. Pass 2, Production approval,
-Production access, and P-12 remain unstarted and unauthorized.
+The fresh formal Pass 2 rehearsal is authorized only by the bounded lifecycle
+recorded below and remains unstarted pending live availability of the named
+human verifier. Production approval, Production access, and P-12 remain
+unstarted and unauthorized.
 
 **Exact application candidate:**
 `5068f944af2aa3fe8446c77c8ae8d48673cb260b`
@@ -3177,6 +3179,94 @@ file are absent. No database, container, network, mount, Local, Production,
 pass 2, P-12, source/tooling, kit, migration, or PR-merge action occurred.
 Result: `SCHEMA-SHAPE CONTRACT V3 FROZEN — OFFLINE VALIDATION PASSED — HOLD FOR
 SEPARATELY AUTHORIZED PASS 2`. `automaticNextStep=false`.
+
+**Fresh formal Pass 2 rehearsal authority recorded:** 2026-08-01 ICT — after
+the schema-contract freeze result was pushed and upstream-equal, the Owner
+instructed `ทำต่อยาวๆให้เสร็จครับ`. This authorizes the single bounded
+rehearsal lifecycle below without another Owner approval between its steps.
+It does not waive any independent-human verifier gate.
+
+First create exactly one Checklist-only authority checkpoint from base
+`692ab76b0fa051e219a1f893770032efd8ff1d5a` on branch
+`codex/master-catalog-phase4`: change only this Checklist, commit once as
+`docs: authorize p12 pass2 rehearsal`, push once to the existing branch, and
+create no PR. Do not stage, modify, or delete `files/`, `tmp/`, `output/`, or
+any other untracked repository path. The commit is documentation authority
+only and does not change the frozen source/tooling identity.
+
+Only after that checkpoint is tracked-clean, pushed, and upstream-equal:
+
+1. create one owner-only external Pass-2 runtime derived mechanically from the
+   proven Pass-1 provisioner at SHA-256
+   `f04dc89a7070966a18b225eb192c64e1e54ef8a4db9dbaf73f9e97013d2d9d79`.
+   Preserve its frozen image, restore, Auth-stub, credential-rebind, ledger,
+   ownership/ACL, hotfix, sentinel, custody, and label-guarded cleanup gates;
+   remove the Pass-1 calibration path and make no source, runner, migration,
+   kit, or contract change. Statically verify the derived runtime before any
+   Keychain, mount, Docker, database, or network action;
+2. require explicit live availability of the named human verifier `lukkxh`
+   before provisioning. A contract review or blanket advance statement is not
+   a substitute for reviewing evidence created after each migration, and the
+   executor must not manufacture, predate, or self-approve a verifier signoff;
+3. create one clean detached execution worktree at exact frozen source/tooling
+   HEAD `a7a8a81248b19ea9e3ca2f262bdc03365c79c849` under
+   `/private/tmp/conduit-p12-formal-pass2-a7a8a81`, reuse only the already
+   frozen local dependencies, kit
+   `/Users/cloud/Backups/ConduitBOQ/production/phase4/pre-p12/p12-cli-kit-v2-a7a8a81248b19ea9`
+   at manifest SHA-256
+   `1d10f9f4bb72e845f3dd8a496ce6969b1e8bbc422e0d68af82014dd672ae206b`,
+   and contract
+   `/Users/cloud/Backups/ConduitBOQ/production/phase4/pre-p12/p12-schema-shape-contract-v3-a7a8a81248b19ea9.json`
+   at SHA-256
+   `4535ec62acad937fcf539ae752faa64436e861dadb53f626b3dccebaab930d66`;
+4. retrieve only the existing encrypted rehearsal-bundle passphrase from macOS
+   Keychain service `Conduit BOQ Phase4 Backup`, account
+   `otlssvssvgkohqwuuiir-pre-p12`, deliver it through standard input without
+   display or persistence, mount
+   `/Users/cloud/Backups/ConduitBOQ/production/phase4/pre-p12/pre-p12-rehearsal.sparsebundle`
+   read-only and `nobrowse`, reverify its complete checksums and the exact
+   352,642-byte dump SHA-256
+   `9d306a478b8ada65d0a32ab31bca19587c55efa3ae979ae4dd8ad5871d575932`,
+   copy only that verified dump into the owner-only temporary root, and detach
+   without force;
+5. provision exactly one fresh disposable PostgreSQL 17 target using the
+   already-present image
+   `public.ecr.aws/supabase/postgres:17.6.1.063` at image ID
+   `sha256:178f0976b54a39237096bfa310c1a352dbc82fb1b08dda45cdb8acb5d40c1426`,
+   container `conduit-p12-pass2-a7a8a81-formal`, dedicated non-internal bridge
+   `conduit-p12-pass2-a7a8a81-net-formal`, sole loopback publish on port
+   `55447`, database `conduit_p12_rehearsal`, and sentinel
+   `ConduitP12Pass2_a7a8a81_20260801`. Restore and prove the accepted `016`
+   baseline before execution, including exact operational catalog fingerprint
+   `0fbaf215018200bacbc728af330e990b98c7e6128165982289ed429c93ad13f2`;
+6. capture a fresh baseline advisor artifact, then run normal rehearsal mode in
+   exact order `017`, `017a`, `018`, `019`, `020`, `021`, `022`, `023`,
+   `024`, `025`, `026`. After each successful migration capture a fresh
+   advisor artifact. Before every next migration, require `lukkxh` to review
+   the complete new evidence and publish the exact owner-only `0600`
+   prior-step verifier signoff. After `026`, require the same actual human to
+   review the final evidence and publish the exact `0600` final closeout
+   signoff. No artifact or signoff may be reused for a later stage;
+7. if and only if the final signoff validates, run the runner's read-only
+   rehearsal `closeout`, recursively verify the complete Pass-2 chain, and
+   preserve all secret-free evidence under the owner-only directory
+   `/Users/cloud/Backups/ConduitBOQ/evidence/phase4/pre-p12/p12-formal-pass2-a7a8a81`;
+8. hard-stop at the first mismatch, uncertain outcome, timeout, failed proof,
+   missing human review, or unavailable verifier. Do not retry, substitute a
+   verifier, use an alternate credential, edit a migration, or advance a
+   stage. Preserve truthful owner-only evidence, then remove only the exact
+   labeled disposable container, network, password/runtime files, mount, and
+   worktree; prove the listener and exact temporary root absent; and
+9. after success or hard-stop and complete cleanup, change only this Checklist
+   to record the exact truthful result and canonical evidence hashes, commit
+   once as `docs: record p12 pass2 result`, push once to the existing branch,
+   create no PR, and reverify tracked-clean/upstream-equal state.
+
+This authority starts no Local or Production connection, Production approval,
+P-12, P-13, GO marker, application/UI/export, feature flag, PR merge, image
+pull/upgrade, or tracked source/tooling/runner/test/migration/kit/contract
+change. Final Pass-2 closeout keeps `p13Authorized=false` and
+`automaticNextStep=false`; every later gate requires a new Owner decision.
 
 **Authority:** Production `2568.0.0` remains authoritative for item names,
 units, and prices. The local workbook remains reconciliation/reference evidence
