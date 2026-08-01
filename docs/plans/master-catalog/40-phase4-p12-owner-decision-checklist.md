@@ -2425,6 +2425,49 @@ the existing branch, and create no PR. `automaticNextStep=false` after that
 result. Independent GitHub schema-contract review, pass 2, fresh Production
 evidence/backup, Production access, and P-12 GO remain separate decisions.
 
+**One-lifecycle isolation diagnostic, conditional dev3, and fresh formal
+pass-1 result recorded:** 2026-08-01 ICT — the continuation authority
+checkpoint was committed/pushed at
+`0bccdf4d4411d50c3ebfad9655b920875be594d5`, the same checkout was detached to
+exact frozen source/tooling HEAD
+`7fbfe1bb8f71df03a78762b00e93aded7bdd6e42`, and the one-use isolation-only
+diagnostic was independently reviewed and frozen at 15,161 bytes, SHA-256
+`e27d2e61f43edfbe753937b06b3de370557e45140d79e42a56a0ca498fdab3a9`.
+Its review record is SHA-256
+`e03f2021786e41f00c3ff21abaff0b2f9217dced70017b371b2a32a42b91e95e`.
+
+The diagnostic used only the exact local image ID, Docker context
+`desktop-linux`, server `29.5.3`, one dedicated internal bridge, and fixed
+loopback request `127.0.0.1:55435`. Docker `HostConfig` retained exactly one
+requested binding both before and after start, and PostgreSQL became ready on
+the container's internal TCP endpoint. Runtime port state nevertheless had one
+nonmatching binding; the specific `docker port` query exited `1`, and the host
+loopback endpoint was not reachable. The reviewed classifier therefore emitted
+class `4`, `unsafe_or_inconclusive`, with `correction_authorized=false`. Safe
+diagnostic evidence is
+`/Users/cloud/Backups/ConduitBOQ/evidence/phase4/pre-p12/p12-one-lifecycle-pass1-3b80486/isolation-diagnostic/diagnostic-summary.txt`,
+SHA-256
+`f8c06259b772fd0adce6468e8b234ae4e2bd710a727861321be9e46298e2a12a`.
+
+The hard-stop condition prohibited modifying the provisioner or starting
+`dev3`; consequently no Keychain access, bundle mount, dump access, restore,
+Auth-stub insert, Supabase CLI/runner invocation, formal target, stage `016`,
+or pass-1 stage occurred. Label-guarded cleanup left zero diagnostic containers,
+networks, listeners, and credential files. The exact temporary root was
+removed, while owner-only evidence was retained. The lifecycle result is
+`/Users/cloud/Backups/ConduitBOQ/evidence/phase4/pre-p12/p12-one-lifecycle-pass1-3b80486/one-lifecycle-result.txt`,
+SHA-256
+`914e52ea13ef7790b892a2f50dde0cf5bf14e6c39e6daecc156493a2cee3f044`.
+No Local or Production credential, connection, target, or data was touched.
+
+Result: `ISOLATION DIAGNOSTIC CLASS 4 HARD STOP — DEV3, FORMAL, AND PASS 1 NOT
+STARTED — HOLD`. `automaticNextStep=false`. Any networking correction, `dev3`,
+formal target, or pass-1 execution requires a new Owner decision. The smallest
+next proposal is a dedicated single-container bridge that is not marked
+`--internal`, while retaining loopback-only publication, exact one-binding and
+one-network proofs, frozen image/tooling, and every other prior safety gate;
+this proposal is not current authority.
+
 **Authority:** Production `2568.0.0` remains authoritative for item names,
 units, and prices. The local workbook remains reconciliation/reference evidence
 only.
@@ -2858,10 +2901,10 @@ weaken the verifier, or continue that disposable sequence.
   isolated PostgreSQL 17 target; preserve the recursively hash-bound
   `UNREVIEWED` pass-1 manifest chain in exact `016`, `017`, `017a`,
   `018`-`026` stage order. The earlier lifecycle stopped after `dev2`; the
-  bounded continuation authority above permits one isolation-only diagnostic,
-  conditional `dev3`, and then one fresh formal target.
-  Status: `OWNER APPROVED — EXECUTION ONLY AFTER PUSHED CONTINUATION
-  CHECKPOINT — RESULT HOLD`.
+  bounded continuation then hard-stopped at diagnostic class `4`; `dev3`, the
+  formal target, stage `016`, and pass 1 were not started.
+  Status: `ISOLATION DIAGNOSTIC CLASS 4 HARD STOP — DEV3, FORMAL, AND PASS 1
+  NOT STARTED — HOLD`.
 - [ ] Have the named independent verifier compare the first-pass captures and
   freeze owner-only `0600`
   `conduit-boq/master-catalog-p12-schema-shape-contract/v3`. Replace free-form
