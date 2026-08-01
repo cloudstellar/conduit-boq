@@ -2301,6 +2301,56 @@ Independent GitHub schema-contract review, pass 2 on a second fresh target,
 fresh Production evidence/backup, Production access, and P-12 GO remain
 separate decisions.
 
+**Disposable baseline provisioning and pass-1 lifecycle result recorded:**
+2026-08-01 ICT — the authority checkpoint was committed/pushed at
+`8cd9d37f1ad15395711eeb355972eeb994660cbb`, the same checkout was detached to
+exact frozen source/tooling HEAD
+`7fbfe1bb8f71df03a78762b00e93aded7bdd6e42`, and the encrypted readiness bundle
+was mounted read-only after its package checksums and exact 352,642-byte dump
+SHA-256 were reproved. No Local or Production credential, connection, target,
+or data was used.
+
+Development consumed two fresh disposable targets. Attempt `dev1` used script
+SHA-256
+`1f4c66ed962e170b5c53b230f0648e7cf321a9409359bcb87c1b5a6f41d6feaf`
+and stopped at `isolation-proof`. Before attempt `dev2`, the script was
+independently rereviewed, deterministic role/readiness/ACL/cleanup blockers
+were corrected, and the final external script was frozen at 25,579 bytes,
+SHA-256
+`82ed4f56449e2c51f5a6d6a93433ddad12b277055ea10dfe295cf915c1d70fdd`,
+path
+`/Users/cloud/Backups/ConduitBOQ/evidence/phase4/pre-p12/p12-baseline-pass1-lifecycle-7f15556/provision-p12-baseline.sh`,
+with review record SHA-256
+`9b83d7ae479384fdc591844d9bc149ec31152943a027bcb0dc715607434dff9c`.
+Static frozen-runner/kit verification passed for stages `016`, `017`, `017a`,
+and `018`-`026`. Attempt `dev2` nevertheless stopped at the same
+`isolation-proof` blocker: Docker reported no published `5432/tcp` mapping.
+The safe summaries are SHA-256
+`df0b308ddc4f4f8ca04301fbaca5f9edf59dd223f78c55783d61fb1e12f107d4`
+for `dev1` and
+`6fb4002912d9b19262bace57bb23773bffd7cb034e2325d7f64350cd3ec9b384`
+for `dev2`.
+
+The mandatory repeated-blocker stop rule therefore prohibited `dev3`, the
+fresh formal target, baseline stage `016`, and every pass-1 runner invocation.
+No restore, Auth-stub insert, migration, formal target, pass-1 manifest, schema
+contract review, pass 2, Production action, or P-12 action occurred. Label-
+guarded cleanup left zero authority-scoped containers and networks and zero
+runtime password/port custody files; the encrypted bundle was detached without
+force and the exact temporary root was removed. Durable owner-only evidence is
+retained at
+`/Users/cloud/Backups/ConduitBOQ/evidence/phase4/pre-p12/p12-baseline-pass1-lifecycle-7f15556`.
+Its lifecycle result is SHA-256
+`035ca50fdd4ba49a2b0e32147c94f3e0be646ea1cf1e47aab72460c426319a7a`.
+
+Result: `TWO DEVELOPMENT ATTEMPTS — SAME ISOLATION-PROOF BLOCKER — FORMAL AND
+PASS 1 NOT STARTED — HOLD`. `automaticNextStep=false`. Any isolation-only
+diagnostic, assertion change, `dev3`, formal target, or pass-1 execution now
+requires a new, separate Owner decision. The smallest next proposal is one
+isolation-only disposable diagnostic with no dump restore or migration, solely
+to distinguish a Docker port-publication failure from an incorrect assertion;
+it is a recommendation, not current authority.
+
 **Authority:** Production `2568.0.0` remains authoritative for item names,
 units, and prices. The local workbook remains reconciliation/reference evidence
 only.
@@ -2733,10 +2783,11 @@ weaken the verifier, or continue that disposable sequence.
   run `calibrate-schema` one stage per manual invocation on a fresh disposable
   isolated PostgreSQL 17 target; preserve the recursively hash-bound
   `UNREVIEWED` pass-1 manifest chain in exact `016`, `017`, `017a`,
-  `018`-`026` stage order. The Owner-authorized lifecycle above first develops
-  and freezes one external provisioner, then uses stage `016` as the clean
-  baseline proof on a fresh formal target. Status: `AUTHORIZED AFTER PUSHED
-  LIFECYCLE CHECKPOINT — EXECUTION/RESULT HOLD`.
+  `018`-`026` stage order. The Owner-authorized lifecycle above hard-stopped
+  after development attempt `dev2` reached the same `isolation-proof` blocker
+  as `dev1`; `dev3`, the formal target, stage `016`, and pass 1 were not run.
+  Status: `TWO DEVELOPMENT ATTEMPTS — SAME ISOLATION-PROOF BLOCKER — FORMAL
+  AND PASS 1 NOT STARTED — HOLD`.
 - [ ] Have the named independent verifier compare the first-pass captures and
   freeze owner-only `0600`
   `conduit-boq/master-catalog-p12-schema-shape-contract/v3`. Replace free-form
