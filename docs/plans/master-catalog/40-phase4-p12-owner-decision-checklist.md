@@ -58,9 +58,10 @@ gate then stopped on a synthetic-fixture defect, and its separately authorized
 corrected continuation was also consumed once. That corrected harness exited
 `1` without stdout/stderr or a test record before any Keychain, mount, dump, or
 Docker action, so the retained evidence cannot identify the failed stage. The
-Owner now authorizes exactly one observable synthetic gate; only a complete
-pass permits one read-only TOC-only invocation against the exact frozen dump
-under the unchanged isolation recorded below.
+subsequent observable synthetic gate was consumed once and stopped at its
+first parser case, `lower-counts`, with exit `1`. No test record was created,
+the conditional read-only TOC was not invoked, complete cleanup passed, and no
+fix or retry is authorized.
 Disposable database execution, pass 1, Production, application/UI/export
 changes, flags, publication, Factor F, hotfix `016`, and P-12 remain
 unauthorized.
@@ -2151,6 +2152,53 @@ decision authorizes exactly one minimal observable continuation:
    cleanup. It authorizes no fix, retry, contract publication, target, pass 1,
    Production access, or P-12. `automaticNextStep=false`.
 
+**Observable aggregate synthetic-gate result recorded:** 2026-08-01 ICT — the
+observable authority checkpoint completed at exact tracked-clean,
+pushed/upstream-equal
+`7f6a2e2da0a0831741287e64dcec9e4879c98ebd`. The reviewed temporary sources
+were recovered with exact preceding bindings. The parser remained 14,061
+bytes at SHA-256
+`bff949c00ad02ce010cd7e1a98b3b09057eb8b1470827807e62eeede8db2f2f8`
+and 14,060 canonical bytes at SHA-256
+`23fecdca51d9fc01b4100daa38fc49e9b10c485477cb1a13c5d7f1f5ed2906bb`.
+The wrapper remained 38,536 bytes at SHA-256
+`d20e8f6f9c2f682a6579004f3f35d4dac7856a02e0b690e994703049101e9980`
+and 38,535 canonical bytes at SHA-256
+`31b0abe4b5ece00cd863854087bfe60b79c4b217666bee4a4e8e331cb40d9e0f`.
+
+Only the temporary corrected harness received the reviewed fixed terminal
+observer. The observable harness was 25,068 bytes at SHA-256
+`c83633c2693e4eb276e759bc3ae2d0386a529237cabf2f61d639c3d8c8e21e39`
+and 25,067 canonical bytes at SHA-256
+`afc870a2e09f294cebf3ddb118439b704087a463564f9e319ef4f91293b182c1`.
+All three files were regular, non-symlink, single-link, owner `cloud`, mode
+`0600`; syntax, binding, fixed-enum output, ordinary-output suppression,
+secret exclusion, no-persistence, and independent static reviews passed
+before invocation.
+
+At 2026-08-01 08:29 ICT, the observable harness was invoked exactly once under
+the approved clean environment. It exited `1` and emitted exactly this one
+117-byte newline-terminated safe record:
+`{"schema":"conduit-boq/master-catalog-p12-observable-gate/v1","stage":"parser","caseId":"lower-counts","exitCode":1}`.
+Its SHA-256 including the trailing LF was
+`ef39316ea4ca50c72e66ccc82a98eeb47ba5a73e033169909ced8164cfbbffc9`.
+No test record was created. The safe result identifies the first parser-case
+boundary but does not establish a deeper cause and authorizes no inferred
+correction.
+
+No Keychain, bundle, mount, dump, Docker, container, database, Local,
+Production, schema, contract, or pass-1 action occurred. The real Docker and
+TOC invocation counts remained zero. Mandatory cleanup deleted the three exact
+temporary sources, created no fourth or fifth temporary file, and removed both
+empty exact temporary directories. No raw or safe temporary output remains.
+Git remained tracked-clean at the pushed/upstream-equal authority HEAD, with
+protected untracked paths untouched.
+
+Result: `CONSUMED ONCE — PARSER lower-counts EXIT 1 — TOC NOT INVOKED —
+HOLD`. This result authorizes no fix, retry, alternate gate, metadata attempt,
+contract publication, target, pass 1, Production access, or P-12.
+`automaticNextStep=false`.
+
 **Authority:** Production `2568.0.0` remains authoritative for item names,
 units, and prices. The local workbook remains reconciliation/reference evidence
 only.
@@ -2579,8 +2627,8 @@ weaken the verifier, or continue that disposable sequence.
   bounded metadata-assisted design authority above: `INITIAL ATTEMPT CONSUMED
   — E74 HARD STOP — CORRECTED TOC-ONLY CONSUMED — E72 HARD STOP — AGGREGATE
   E72-CORRECTED SYNTHETIC GATE HARD STOP — CORRECTED AGGREGATE SYNTHETIC GATE
-  CONSUMED — OPAQUE EXIT 1 — OBSERVABLE AGGREGATE SYNTHETIC GATE AUTHORIZED
-  ONCE — NOT YET EXECUTED`.
+  CONSUMED — OPAQUE EXIT 1 — OBSERVABLE AGGREGATE SYNTHETIC GATE CONSUMED —
+  PARSER `lower-counts` EXIT 1 — TOC NOT INVOKED — HOLD`.
   This does not authorize schema metadata inspection, target creation,
   execution proof, or pass 1.
 - [ ] After the P-47 replacement candidate is separately Git-published and
