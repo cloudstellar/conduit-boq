@@ -46,6 +46,7 @@ import {
   HOTFIX_016_FUNCTION_SIGNATURE,
   HOTFIX_016_PROSRC_LENGTH,
   HOTFIX_016_PROSRC_SHA256,
+  HOTFIX_016_SQL,
   INITIAL_WINDOW_BUDGET_MS,
   POSTFLIGHT_BUDGET_MS,
   PRE_MIGRATION_WINDOW_BUDGET_MS,
@@ -933,6 +934,12 @@ describe.sequential('Master Catalog P-12 CLI kit', () => {
   });
 
   it('proves the exact hotfix 016 function body and guarded execution posture', () => {
+    expect(HOTFIX_016_SQL).toContain(
+      'pg_catalog.oidvectortypes(p.proargtypes)',
+    );
+    expect(HOTFIX_016_SQL).not.toContain(
+      'pg_get_function_identity_arguments',
+    );
     const exact = hotfix016Snapshot();
     expect(validateHotfix016([exact])).toEqual(exact);
     expect(() => validateHotfix016([
