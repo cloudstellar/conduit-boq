@@ -2570,13 +2570,17 @@ select
   ) as boq_factor_bindings_fingerprint_sha256;
 `
 
-const HOTFIX_016_SQL = `
+export const HOTFIX_016_SQL = `
 select
   format(
     '%I.%I(%s)',
     n.nspname,
     p.proname,
-    pg_get_function_identity_arguments(p.oid)
+    replace(
+      pg_catalog.oidvectortypes(p.proargtypes),
+      ', ',
+      ','
+    )
   )::text as signature,
   pg_get_userbyid(p.proowner)::text as owner,
   length(p.prosrc)::integer as prosrc_length,

@@ -2996,6 +2996,33 @@ FORMAL, AND PASS 1 NOT STARTED — HARD STOP`. `automaticNextStep=false`. Any
 new diagnosis, credential/client correction, retry, dev target, formal pass,
 Local, Production, pass 2, or P-12 requires a new Owner decision.
 
+**Targeted runner correction and fresh pass-1 authority recorded:** 2026-08-01
+ICT — after the credential/TLS correction had already proved a disposable
+development target and fresh formal baseline, formal calibration `016` stopped
+before any migration because the runner formatted the PostgreSQL identity with
+argument names while its frozen contract correctly expected type-only function
+identity. The live body length/SHA-256, owner, ACL, security-definer posture,
+and empty search path all matched; this is a runner metadata-selector defect,
+not database or migration drift.
+
+The Owner authorized one minimal correction: keep the type-only contract and
+replace only that metadata projection with PostgreSQL's type-only
+`oidvectortypes(proargtypes)` representation, add a focused regression check,
+commit/push the exact runner/test/Checklist change, and generate one new
+tracked-clean external kit revision. The generator, migrations, application
+candidate, database function, and every other gate remain unchanged.
+
+After static verification of the new kit, continue in one lifecycle on a new
+fresh disposable formal PostgreSQL 17 target using the already proved dedicated
+non-internal bridge, loopback-only publish, default `supabase_admin` bootstrap,
+credential rebind, `PGSSLMODE=disable`, encrypted bundle read-only mount, and
+the unchanged restore/Auth/ledger/sentinel gates. Run separate manual stages
+`016`, `017`, `017a`, `018`-`026` in order, verifying each recursively bound
+manifest before the next. Hard-stop at the first real mismatch. No Local,
+Production, pass 2, P-12, alternate credential, retry, migration edit, or
+scope expansion is authorized. Preserve owner-only evidence, perform exact
+cleanup, then record and push one truthful result checkpoint.
+
 **Authority:** Production `2568.0.0` remains authoritative for item names,
 units, and prices. The local workbook remains reconciliation/reference evidence
 only.
