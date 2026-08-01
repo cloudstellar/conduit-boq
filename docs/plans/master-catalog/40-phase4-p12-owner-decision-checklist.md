@@ -75,10 +75,12 @@ correction is pushed/upstream-equal at
 formal Pass 1 are complete through `026`; the independent authenticated GitHub
 review and external schema-shape contract freeze are complete and bound below.
 The fresh formal Pass 2 lifecycle below stopped before migration `017` at its
-host-CLI connection proof and completed exact cleanup. Pass 2 therefore
-remains unstarted. The single bounded host-CLI diagnostic recorded below is
-the only authorized next action. Production approval, Production access, and
-P-12 remain unstarted and unauthorized.
+host-CLI connection proof and completed exact cleanup. The bounded diagnostic
+then reproduced and identified the standalone provisioner's missing explicit
+`PGSSLMODE=disable`; its result and cleanup are recorded below. Pass 2 remains
+unstarted. Any corrected fresh Pass-2 lifecycle requires a new Owner decision.
+Production approval, Production access, and P-12 remain unstarted and
+unauthorized.
 
 **Exact application candidate:**
 `5068f944af2aa3fe8446c77c8ae8d48673cb260b`
@@ -3331,6 +3333,49 @@ port `55448` and the exact temp root absent, and perform no retry. Then this
 decision preauthorizes one Checklist-only truthful diagnostic-result commit as
 `docs: record p12 host cli diagnosis` and one push/no PR after complete
 cleanup. That result authorizes no automatic Pass-2 continuation.
+
+**Host-CLI diagnostic result recorded:** 2026-08-01 ICT — checkpoint
+`97531f879312a826a11920683a244f6e4208fa06` changed only this Checklist,
+was pushed/upstream-equal, and the diagnostic ran exactly once. The fresh
+target passed the frozen image, dedicated bridge, sole loopback binding,
+credential rebind, and exact
+`postgres|postgres|conduit_p12_rehearsal|17` identity gates. No mount,
+Keychain, dump, restore, Auth stub, ledger repair, advisor, or migration action
+ran.
+
+The exact frozen CLI query used passwordless URL
+`postgresql://postgres@127.0.0.1:55448/conduit_p12_rehearsal?sslmode=disable`
+and process-memory-only `PGPASSWORD`, then returned exit code `1` with the
+actual error `tls error (server refused TLS connection)`. The diagnostic
+process had no `PGSSLMODE`; therefore the CLI attempted TLS despite the URL
+query parameter. The successful Pass-1 provisioner used the same CLI hash,
+image, and standalone command but does not export `PGSSLMODE`; together with
+its recorded authority requiring `PGSSLMODE=disable`, that makes an inherited
+outer environment the evidence-supported explanation for its earlier success.
+
+The correction is limited to explicitly setting `PGSSLMODE=disable` for the
+standalone external provisioner's host-CLI proof. The frozen runner already
+sets rehearsal `PGSSLMODE=disable` inside `buildCliEnvironment`, so no tracked
+runner, source, test, migration, kit, contract, database, or Production change
+is needed.
+
+The owner-only diagnostic directory is
+`/Users/cloud/Backups/ConduitBOQ/evidence/phase4/pre-p12/p12-host-cli-diagnostic-a7a8a81`.
+Its exact 370-byte CLI output SHA-256 is
+`ef44a3f0f5547c6a73039dc7d5ca5a0b3161136ef697cd9ce1e44d9a25a7f5bc`;
+diagnostic-summary SHA-256 is
+`042ed899ec3b36d417ae3dc3e2667ae051fe124c451c0ee8c85a3fc3f9f12900`;
+diagnostic-script SHA-256 is
+`b23b0c673727e442583b2380ece9b281f0e141bdfa40abc634ada71cde33f93a`;
+and the 1,629-byte mode-`0600` diagnostic-result SHA-256 is
+`6be68a7740033d42e1442ade4422af5a1a72a66a6698f1386fe5d746e1d82a97`.
+No generated password appears in preserved output.
+
+Label-guarded cleanup removed the exact container, network, credential file,
+listener, and temporary root; independent checks found all absent. Local and
+Production were untouched. Result:
+`ROOT CAUSE IDENTIFIED — STANDALONE PROVISIONER TLS ENVIRONMENT MISSING —
+CLEANUP COMPLETE — PASS 2 NOT STARTED`. `automaticNextStep=false`.
 
 **Authority:** Production `2568.0.0` remains authoritative for item names,
 units, and prices. The local workbook remains reconciliation/reference evidence
