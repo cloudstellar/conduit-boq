@@ -2351,6 +2351,80 @@ isolation-only disposable diagnostic with no dump restore or migration, solely
 to distinguish a Docker port-publication failure from an incorrect assertion;
 it is a recommendation, not current authority.
 
+**One-lifecycle isolation diagnostic, conditional dev3, and fresh formal
+pass-1 authority recorded:** 2026-08-01 ICT — after the prior lifecycle
+hard-stopped and the remaining scope was explained, the Owner explicitly
+approved:
+
+> อนุมัติ one-lifecycle diagnostic → dev3 → fresh formal Pass 1
+> ตามขอบเขตที่แนะนำ โดยไม่ต้องขออนุมัติระหว่างขั้น
+
+This is one new bounded authority after the correctly consumed repeated-blocker
+stop. It does not reinterpret either prior attempt as a pass or alter any prior
+result. It supersedes only the prohibition against continuing with an
+isolation-only diagnostic, `dev3`, and the fresh formal pass-1 lifecycle.
+
+First, authorize exactly one Checklist-only authority checkpoint from base
+`3b80486824c850bcb0c9daccaa9c276c837c24dc` on branch
+`codex/master-catalog-phase4`: change only this Checklist, commit once as
+`docs: authorize one-lifecycle pre-p12 pass1 continuation`, push once to the
+existing branch, and create no PR. Do not stage, modify, or delete `files/`,
+`tmp/`, `output/`, or any other untracked repository path.
+
+Only after that checkpoint is tracked-clean, pushed, and upstream-equal:
+
+1. preserve every frozen source, kit, runner, image, dump, Keychain, role,
+   sentinel, executor, checkout, isolation, evidence, secret-handling, and
+   cleanup binding from the disposable lifecycle authority above. Never access
+   Local Supabase or Production, pull an image, regenerate a kit, edit a
+   migration/runner/generator, or change tracked source/tooling;
+2. preserve the prior evidence root and its recorded script/hash as immutable
+   history. Use only new owner-mode regular non-symlink roots
+   `/Users/cloud/Backups/ConduitBOQ/evidence/phase4/pre-p12/p12-one-lifecycle-pass1-3b80486`
+   and `/private/tmp/conduit-p12-one-lifecycle-pass1-3b80486` for this
+   continuation;
+3. run exactly one fresh isolation-only disposable diagnostic with the exact
+   frozen image, `--pull=never`, a dedicated internal network, loopback-only
+   PostgreSQL publication, tmpfs data, a fresh non-displayed rehearsal secret,
+   and authority/attempt labels. It may start the empty server and prove
+   readiness, Docker port-binding state, and loopback reachability, but must not
+   access the backup Keychain item or bundle, restore a dump, create application
+   schema/data/Auth stubs, apply SQL migrations, or invoke the frozen runner.
+   Record only a safe secret-free summary and destroy the target immediately;
+4. continue only if that diagnostic identifies one deterministic correction
+   limited to loopback publication, Docker binding inspection, or the
+   `isolation-proof` assertion. Independently review and hash the corrected new
+   provisioner before use. If the diagnostic is inconclusive, unsafe, or shows
+   an unresolved publication failure, hard-stop without `dev3`;
+5. if and only if clause 4 passes, run exactly one fresh `dev3` target under all
+   prior full provisioning checks. This is the third and final development
+   attempt: no `dev4`, correction, retry, alternate target, or inferred pass is
+   authorized if it fails. If it succeeds, destroy it and freeze the reviewed
+   provisioner path, byte size, SHA-256, and non-secret bindings;
+6. after successful `dev3` cleanup, create exactly one fresh formal target from
+   that byte-identical provisioner. Invoke the frozen runner separately and
+   manually in exact order `016`, `017`, `017a`, `018` through `026`. Start each
+   stage only after the preceding stage exits successfully and its complete
+   recursively chained evidence manifest is verified. No intermediate Owner
+   approval or Checklist commit is required, and no stage may be skipped,
+   reordered, or automatically chained; and
+7. any diagnostic, isolation, secret, mount, checksum, role, restore, Auth-stub,
+   count/hash, integrity, ledger, ownership/ACL, sentinel, clean-rebuild,
+   stage-`016`, later runner, manifest, or cleanup mismatch is a hard stop.
+   A `dev3` or formal failure authorizes no correction or retry. After success
+   or hard stop, perform label-guarded exact cleanup, non-force detach if
+   mounted, return to the pushed authority HEAD, and preserve only owner-only
+   secret-free evidence.
+
+This decision preauthorizes exactly one Checklist-only result checkpoint after
+cleanup: record the diagnostic outcome and evidence hash, corrected provisioner
+path/hash if created, `dev3` result, formal stage reached, final manifest
+path/hash if complete, cleanup, and deviations; commit once as
+`docs: record one-lifecycle pre-p12 pass1 continuation result`, push once to
+the existing branch, and create no PR. `automaticNextStep=false` after that
+result. Independent GitHub schema-contract review, pass 2, fresh Production
+evidence/backup, Production access, and P-12 GO remain separate decisions.
+
 **Authority:** Production `2568.0.0` remains authoritative for item names,
 units, and prices. The local workbook remains reconciliation/reference evidence
 only.
@@ -2783,11 +2857,11 @@ weaken the verifier, or continue that disposable sequence.
   run `calibrate-schema` one stage per manual invocation on a fresh disposable
   isolated PostgreSQL 17 target; preserve the recursively hash-bound
   `UNREVIEWED` pass-1 manifest chain in exact `016`, `017`, `017a`,
-  `018`-`026` stage order. The Owner-authorized lifecycle above hard-stopped
-  after development attempt `dev2` reached the same `isolation-proof` blocker
-  as `dev1`; `dev3`, the formal target, stage `016`, and pass 1 were not run.
-  Status: `TWO DEVELOPMENT ATTEMPTS — SAME ISOLATION-PROOF BLOCKER — FORMAL
-  AND PASS 1 NOT STARTED — HOLD`.
+  `018`-`026` stage order. The earlier lifecycle stopped after `dev2`; the
+  bounded continuation authority above permits one isolation-only diagnostic,
+  conditional `dev3`, and then one fresh formal target.
+  Status: `OWNER APPROVED — EXECUTION ONLY AFTER PUSHED CONTINUATION
+  CHECKPOINT — RESULT HOLD`.
 - [ ] Have the named independent verifier compare the first-pass captures and
   freeze owner-only `0600`
   `conduit-boq/master-catalog-p12-schema-shape-contract/v3`. Replace free-form
