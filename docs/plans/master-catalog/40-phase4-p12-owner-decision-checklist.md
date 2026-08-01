@@ -74,13 +74,17 @@ correction is pushed/upstream-equal at
 `a7a8a81248b19ea9e3ca2f262bdc03365c79c849`; the re-frozen kit and fresh
 formal Pass 1 are complete through `026`; the independent authenticated GitHub
 review and external schema-shape contract freeze are complete and bound below.
-The fresh formal Pass 2 lifecycle below stopped before migration `017` at its
-host-CLI connection proof and completed exact cleanup. The bounded diagnostic
-then reproduced and identified the standalone provisioner's missing explicit
-`PGSSLMODE=disable`; its result and cleanup are recorded below. Pass 2 remains
-unstarted. The corrected fresh Pass-2 lifecycle is authorized only by the
-bounded decision below. Production approval, Production access, and P-12
-remain unstarted and unauthorized.
+The original fresh formal Pass 2 lifecycle stopped before migration `017` at
+its host-CLI connection proof and completed exact cleanup. The bounded
+diagnostic identified the standalone provisioner's missing explicit
+`PGSSLMODE=disable`. The separately authorized corrected fresh Pass-2 lifecycle
+then completed exact `017`, `017a`, `018`-`026` order, authenticated `lukkxh`
+review hand-offs, final read-only closeout, and exact cleanup. Its canonical
+final closeout evidence-manifest SHA-256 is
+`5fa07457740c1e016b17406a7a048741dadc17c97038fadeb7332fcdb53dfbf8`.
+This closes rehearsal only. External Production approval, the fresh Production
+advisor baseline, Production access, and P-12 remain unstarted, unbound, and
+unauthorized; `p13Authorized=false` and `automaticNextStep=false`.
 
 **Exact application candidate:**
 `5068f944af2aa3fe8446c77c8ae8d48673cb260b`
@@ -3455,6 +3459,72 @@ application/UI/export, feature flag, PR merge, image pull/upgrade, or tracked
 change. Final closeout retains `p13Authorized=false` and
 `automaticNextStep=false`; every later gate requires a new Owner decision.
 
+**Corrected fresh formal Pass 2 result recorded:** 2026-08-01 ICT — authority
+checkpoint `f7d1933bfe1974b7634e2546633222d65230a9a1` changed only this
+Checklist and was pushed/upstream-equal before execution. The clean detached
+execution worktree was exact source/tooling HEAD
+`a7a8a81248b19ea9e3ca2f262bdc03365c79c849`; frozen kit-manifest SHA-256
+`1d10f9f4bb72e845f3dd8a496ce6969b1e8bbc422e0d68af82014dd672ae206b`
+and schema-shape-contract SHA-256
+`4535ec62acad937fcf539ae752faa64436e861dadb53f626b3dccebaab930d66`
+remained exact. Provisioning passed the frozen image, read-only bundle/dump,
+loopback-only target, corrected host-CLI proof, accepted `016` baseline,
+sentinel, identity, ledger, hotfix, and catalog fingerprint gates. The
+provisioning summary SHA-256 is
+`2d08b3859a9e92a2f20bf5eb8aabfd722538d086fe3c7c624e0dccef87a9f4b6`.
+
+The runner completed all migration stages with exit code `0`, mechanical and
+postflight verification true, no uncertainty, and all three Phase 4 flags
+false. The exact stage evidence-manifest SHA-256 chain is: `017`
+`2e16f494da7d86c4004726046acf69a9c178e8f2eac3c718d2680fb73b2820a2`;
+`017a` `7f68d20f031546b76cb061aaf49a50802fbee0ccf65e481c1f4976e0ab5cf50c`;
+`018` `4f3a58f63c1e9f65c90d5db0b35034fd372202bfc3327637221c09362da1b38d`;
+`019` `adc5f606fd97a2ef1f48fe7c3f10356cd3e89e3302d2d6c8e7aa5e4db071ee56`;
+`020` `79572f4e0176d814c77658577ca2de4ceb545ce0a853bbcd9c191ac572187c72`;
+`021` `7639302304a5df755f01524e1cc2cf0d37410de20e8a1a2cdd8008a27a94449e`;
+`022` `9791aeb5ec4768f4fd26a79ed9b3eab9550056099efd17c57ec79accf8b1ad7d`;
+`023` `f628d274790180c6a60b27144765d015c1294c1cd17f1d416a8f094f31189ad2`;
+`024` `8688b3bdc65d3849c7ef410ebd93ac072956fae6dc4f616259e7ac313deb628d`;
+`025` `d394849ae085cd04742d5c0c6f29b30147ded98d55b8f5bfdfd616ee03409aca`;
+and `026` `25d7ea25fed2b49bc94b61428d351b675156fbf4c888eacdcc19b9695b57a869`.
+Fresh advisor capture and actual authenticated `lukkxh` review preceded every
+next stage. The final `026` advisor SHA-256 is
+`7d32333fd9f918f8f8c818890e872e57e943b57b8fb093d503a747c05bccd563`;
+it contains only the unchanged frozen `pg_temp.catalog_placement_input`
+analyzer limitation and no new finding.
+
+The final authenticated collaborator marker is GitHub PR `#7` comment
+`5151736907`, authored by `lukkxh` at `2026-08-01T13:57:30Z`, and binds exact
+source, kit, contract, `026` manifest, advisor, final schema fingerprint, and
+`p13=false`. The resulting owner-only final signoff SHA-256 is
+`401c082d65fbb19cad3fc7e7b022cf50ef24a3bbabc402ce0b28cbc6aa209952`.
+Before the single live closeout boundary, one host launcher stopped during
+module import because the detached worktree did not expose the already-
+installed frozen CLI package. It created no evidence directory, CLI process,
+or database query. The same native CLI binary was reverified at exact SHA-256
+`ce144c21c06e5ad5b9bdb6566fabcdadb15f32d72c8fbe8ba77eae994753a601`
+and referenced without mutation through the dependency search path; no package
+was installed or changed. The one live runner closeout then passed read-only.
+
+The canonical closeout directory is
+`/Users/cloud/Backups/ConduitBOQ/evidence/phase4/pre-p12/p12-formal-pass2c-a7a8a81/pass2/final-closeout`.
+Its context, live snapshot, and outcome SHA-256 values are respectively
+`7fd615934481736a77db975e705d82b68056689da8b457f91f21164995077d99`,
+`49b057808ff3c89c32596dc2a9dd051cca904c35f54ce669166e008dd0bb6daf`,
+and `05da938e70be82fd76441a739bd0d636a606029255729038cddf63d56e6652a1`;
+the final manifest SHA-256 is
+`5fa07457740c1e016b17406a7a048741dadc17c97038fadeb7332fcdb53dfbf8`.
+The normalized live snapshot exactly matched final `026` postflight at
+SHA-256 `b57f73b8cc63dc5f0043a6ed01b24ed9a40994537bcb29e23be5706a2cfba32c`,
+including final schema-shape fingerprint
+`11151413fec6f194e1948ed1d7e841c99cd62bf670da75def07900700ac0adf8`.
+Independent verification found no blocker. Label/custody-guarded cleanup then
+removed the exact container, network, loopback listener, credential/runtime
+files, detached worktree, dump copy, and temporary root; the encrypted bundle
+was already detached and Local and Production were untouched. Result:
+`PASS 2 COMPLETE — FINAL CLOSEOUT VERIFIED — CLEANUP COMPLETE`.
+`p13Authorized=false`; `automaticNextStep=false`.
+
 **Authority:** Production `2568.0.0` remains authoritative for item names,
 units, and prices. The local workbook remains reconciliation/reference evidence
 only.
@@ -3905,18 +3975,22 @@ weaken the verifier, or continue that disposable sequence.
   offline runner checks structure/hash/chronology only and does not authenticate
   GitHub. `COMPLETE`; authenticated pre-publication and final preserved rechecks
   matched exactly, and PR `#7` remains open/unmerged.
-- [ ] Run a second fresh full isolated rehearsal that matches every frozen
+- [x] Run a second fresh full isolated rehearsal that matches every frozen
   pre/post schema fingerprint using the same source/tooling HEAD, kit, and
   contract. It must use fresh advisor hand-offs after each step and finish the
-  transitive read-only final closeout. Do not invent, reorder, or skip a stage.
+  transitive read-only final closeout. Do not invent, reorder, or skip a stage:
+  `COMPLETE — FINAL CLOSEOUT VERIFIED — CLEANUP COMPLETE`; canonical manifest
+  SHA-256 `5fa07457740c1e016b17406a7a048741dadc17c97038fadeb7332fcdb53dfbf8`.
 - [ ] Record and bind `schemaShapeContractSha256` in the external Production
   approval: contract SHA-256
   `4535ec62acad937fcf539ae752faa64436e861dadb53f626b3dccebaab930d66`
   is `REVIEWED — FROZEN`; external Production approval remains
   `UNBOUND — HOLD`.
-- [ ] Record and bind the pass-2 final closeout evidence-manifest canonical
-  path/SHA-256 in the external Production approval and later committed Owner
-  marker: `UNCREATED — UNBOUND — HOLD`.
+- [x] Record the pass-2 final closeout evidence-manifest canonical path/SHA-256
+  in this committed Owner marker: path and SHA-256 are recorded in the result
+  block above.
+- [ ] Bind that same pass-2 final closeout path/SHA-256 in the external
+  Production approval: `UNBOUND — HOLD`.
 - [ ] After pass 2 and before Owner approval, capture the fresh Production
   advisor baseline and bind its canonical path/SHA-256/timestamp in the
   external approval for step `017` only:
@@ -3928,9 +4002,10 @@ weaken the verifier, or continue that disposable sequence.
   creation, Keychain access, or Production connection if the review is
   unavailable, mismatched, dismissed, superseded, or no longer targets the
   exact source HEAD.
-- [ ] For each later step, require a fresh post-previous-step advisor artifact
+- [x] For each later step, require a fresh post-previous-step advisor artifact
   bound by its verifier sign-off; after `026`, require a fresh artifact bound
-  by final closeout. Do not reuse the approval baseline for the whole sequence.
+  by final closeout. Do not reuse the approval baseline for the whole sequence:
+  `PASS-2 REHEARSAL COMPLETE`; Production execution must repeat this contract.
 
 The fingerprint derivation completed through its separately authorized
 read-only query, and its exact value and source are recorded above. Until the
@@ -3938,15 +4013,16 @@ same value is bound in the external Production approval, a mechanically
 `productionEligible=true` source kit must not be used in Production and P-12
 must not be requested.
 
-- [ ] Select and rehearse the exact execution path/account and client timeout;
+- [x] Select and rehearse the exact execution path/account and client timeout;
   prove it handles the 394,076-byte `020`, records one remote ledger row per
   file, uses the same frozen `current_user` for `017`, `017a`, and
   `018`-`026`, and supports safe stop/cancel behavior. Default privileges are
   scoped to that executing role. Any identity or owner drift stops execution;
   do not improvise `ALTER OWNER` or ACL changes. SQL Editor/direct `psql` is
   not accepted merely because it can execute SQL. Do not use `db push`,
-  `db pull`, or linked diff from this worktree.
-- [ ] Record the after-each-file checks and final verification handoff:
+  `db pull`, or linked diff from this worktree. `REHEARSED — VERIFIED` by the
+  corrected fresh Pass-2 chain and final closeout above.
+- [x] Record the after-each-file checks and final verification handoff:
   one ledger row, unchanged session identity, and the object ownership/ACL
   delta for objects created or replaced by that file. Also record the exact
   flag stage: before `017`, `catalog_admin_enabled`,
@@ -3959,8 +4035,9 @@ must not be requested.
   `public`/`private` schema defaults after `017a`, and no Phase 4 routine
   EXECUTE for `PUBLIC`, `anon`, or `service_role` from `017a` onward. After
   `026`, record the full owner/ACL/RLS inventory and prove all positive grants
-  exactly match the reviewed migration postconditions.
-- [ ] Record and rehearse one new canonical external evidence directory per
+  exactly match the reviewed migration postconditions: `COMPLETE` in the
+  hash-bound Pass-2 stage manifests above.
+- [x] Record and rehearse one new canonical external evidence directory per
   invocation, owner-only permissions, and the free-space/media-health check.
   While the approved window has the full frozen postflight budget, the runner
   must attempt the bounded read-only after-state before any post-CLI
@@ -3971,7 +4048,8 @@ must not be requested.
   reconciliation handoff. If the budget is already gone, no new Production
   query starts without separately authorized bounded read-only forensic
   reconciliation. This ordering reduces but cannot eliminate sudden
-  evidence-medium failure.
+  evidence-medium failure. `REHEARSED — COMPLETE`; all stage manifests and the
+  final closeout manifest published successfully under owner-only custody.
 - [x] Propose the maintenance window: Saturday 2026-08-01,
   `18:00`-`23:00` ICT (`+07:00`), readiness cutoff `17:00` ICT. This is a
   proposal only; P-12 approval and every prerequisite remain separate.
@@ -4055,12 +4133,14 @@ Request P-12 only when every HOLD row in Package #39 is Ready:
   necessary quarantine parent accepted, and the exact 35-directory/166-file
   manifest payload independently reverified with the narrow optional root
   Finder-sidecar policy above.
-- [ ] Complete pass 1, structured authenticated GitHub contract review, pass
+- [x] Complete pass 1, structured authenticated GitHub contract review, pass
   2, and the transitive final closeout at that same source/tooling HEAD and
-  with that same frozen kit.
-- [ ] Record the schema contract SHA-256, final pass-1 manifest path/SHA-256,
-  pass-2 final closeout manifest path/SHA-256, and fresh post-pass-2 step-`017`
-  advisor baseline path/SHA-256/timestamp.
+  with that same frozen kit: `COMPLETE — CLEANUP COMPLETE`.
+- [x] Record the schema contract SHA-256, final pass-1 manifest path/SHA-256,
+  and pass-2 final closeout manifest path/SHA-256 in this Checklist.
+- [ ] Capture and bind the fresh post-pass-2 Production step-`017` advisor
+  baseline path/SHA-256/timestamp in the external approval:
+  `UNRECORDED — UNBOUND — HOLD`.
 - [ ] Repeat the authenticated GitHub review check immediately before GO and
   bind its `githubReviewCheckedAt`, immutable review URL/ID/login, reviewed
   commit, and contract SHA-256 in the external approval. The offline runner
