@@ -61,8 +61,11 @@ Docker action, so the retained evidence cannot identify the failed stage. The
 subsequent observable synthetic gate was consumed once and stopped at its
 first parser case, `lower-counts`, with exit `1`. No test record was created,
 the conditional read-only TOC was not invoked, complete cleanup passed, and no
-fix or retry is authorized.
-Disposable database execution, pass 1, Production, application/UI/export
+fix or retry is authorized. The metadata/TOC parser route is superseded for
+future execution by the bounded real-database lifecycle below; all of its
+results remain immutable historical audit evidence. Disposable provisioning
+and pass 1 are authorized only after the new Checklist-only authority
+checkpoint is pushed and upstream-equal. Production, application/UI/export
 changes, flags, publication, Factor F, hotfix `016`, and P-12 remain
 unauthorized.
 
@@ -2199,6 +2202,105 @@ HOLD`. This result authorizes no fix, retry, alternate gate, metadata attempt,
 contract publication, target, pass 1, Production access, or P-12.
 `automaticNextStep=false`.
 
+**Disposable baseline provisioning and pass-1 lifecycle authority recorded:**
+2026-08-01 ICT — after the failed parser route and its retained value were
+explained, the Owner instructed `ทำตามแนะนำครับ`. This decision supersedes
+only the temporary metadata/TOC parser, wrapper, and synthetic-harness route.
+Do not reconstruct or retry it. Preserve every prior commit and result as audit
+history; they are no longer a prerequisite for real disposable execution.
+
+This decision first authorizes exactly one Checklist-only authority checkpoint
+from base `7f15556cff61c8bdaf5baa914dbe099f2f0de58c` on branch
+`codex/master-catalog-phase4`: change only this Checklist, commit once as
+`docs: authorize disposable pre-p12 pass1 lifecycle`, push once to the
+existing branch, and create no PR. Do not stage, modify, or delete `files/`,
+`tmp/`, `output/`, or any other untracked repository path. This checkpoint
+contains no P-12 GO marker and changes no source/tooling, application, kit,
+runner, generator, migration, Package #39, or Runbook #41 content.
+
+Only after that checkpoint is tracked-clean, pushed, and upstream-equal, this
+decision authorizes one bounded disposable provisioning-development, clean
+baseline-proof, and formal pass-1 lifecycle with these limits:
+
+1. use only replacement source/tooling HEAD
+   `7fbfe1bb8f71df03a78762b00e93aded7bdd6e42`, application candidate
+   `5068f944af2aa3fe8446c77c8ae8d48673cb260b`, the existing frozen kit and
+   manifest SHA-256
+   `0e4235ffe91853d8066e99f41f297ab5b62f39e14ad6bfa8c9ee432c04733987`,
+   exact already-present image
+   `public.ecr.aws/supabase/postgres:17.6.1.063` at image ID
+   `sha256:178f0976b54a39237096bfa310c1a352dbc82fb1b08dda45cdb8acb5d40c1426`,
+   encrypted readiness bundle, and 352,642-byte application dump SHA-256
+   `9d306a478b8ada65d0a32ab31bca19587c55efa3ae979ae4dd8ad5871d575932`.
+   Do not pull an image, regenerate a kit, or edit a frozen input;
+2. use the existing checkout in place as the dedicated lifecycle checkout.
+   After proving the authority HEAD clean/upstream-equal, detach only to the
+   exact source/tooling HEAD above and return to this branch only after database
+   and bundle cleanup. Never create a fresh worktree, overwrite Local config,
+   or touch protected untracked paths;
+3. create only owner-mode external evidence root
+   `/Users/cloud/Backups/ConduitBOQ/evidence/phase4/pre-p12/p12-baseline-pass1-lifecycle-7f15556`
+   and owner-mode temporary root
+   `/private/tmp/conduit-p12-baseline-pass1-7f15556`. Maintain one reviewed
+   external provisioning shell script, its per-revision SHA-256 review record,
+   safe summaries, and runner evidence. Add no tracked executable, parser,
+   framework, migration, or runner change. Files must be regular,
+   non-symlink, owner-only, and secret-free;
+4. access only the backup passphrase in macOS login Keychain service
+   `Conduit BOQ Phase4 Backup`, account
+   `otlssvssvgkohqwuuiir-pre-p12`, without displaying or persisting it, and
+   mount the exact sparse bundle read-only/nobrowse through standard input.
+   Reprove encryption, read-only state, package checksums, dump size, and dump
+   hash before use. Never access the Production database credential or connect
+   to Local Supabase or Production;
+5. development may create and destroy at most three fresh disposable targets,
+   one at a time, solely to correct a provisioning script from a specific safe
+   observed error. Review and hash the script before every attempt; do not make
+   an identical blind retry, and stop if the same blocker recurs twice or the
+   third target fails. Use `--pull=never`, the exact frozen image, a dedicated
+   isolated Docker network, loopback-only published PostgreSQL port, no host
+   data volume, and a fresh rehearsal-only password that never appears in an
+   argument, terminal output, evidence, or Git;
+6. the script may use PostgreSQL tools only for disposable target
+   initialization and baseline preparation, never to apply Phase 4 migrations.
+   It must establish exact database `conduit_p12_rehearsal`, PostgreSQL 17,
+   password-authenticated `session_user=current_user=postgres`; restore the
+   frozen dump in `pre-data` then `data`, derive inside the target and insert
+   exactly 20 UUID-only Auth dependency stubs without emitting their values,
+   then restore `post-data`; prove application counts/hashes and
+   integrity; establish exact `009`-`016` ledger, hotfix `016`, ownership/ACL
+   posture, and the Runbook #41 postgres-owned deny-ACL sentinel. Any
+   uncertainty remains a failed development attempt, never an inferred pass;
+7. after one development target succeeds, destroy it and freeze the final
+   script path, byte size, SHA-256, review, and non-secret input bindings. Then
+   create one fresh target from that byte-identical script. The existing frozen
+   runner's `calibrate-schema --stage 016` is the clean baseline proof; add no
+   duplicate custom baseline gate;
+8. only after stage `016` exits successfully with a complete evidence manifest,
+   continue under this same Owner authority with separate manual runner
+   invocations in exact order `017`, `017a`, `018` through `026`, executor
+   label `Suthorn Kaewkorn`, the same sentinel, frozen kit, and recursively
+   chained prior manifests. No intermediate Owner approval or Checklist commit
+   is required, but there is no automatic next-stage execution;
+9. any isolation, secret, mount, checksum, role, restore, Auth-stub, count/hash,
+   integrity, ledger, ownership/ACL, sentinel, clean-rebuild, stage-`016`, later
+   runner, evidence, or cleanup mismatch is a hard stop. A formal clean-target
+   or runner failure authorizes no script correction, retry, alternate target,
+   runner/migration fix, Local/Production action, GitHub contract review, pass
+   2, or P-12. Preserve only owner-only secret-free evidence and remove only
+   the exact disposable containers, network, temporary files, and mount without
+   force; and
+10. after success or hard stop and complete cleanup, return to the exact branch
+    authority HEAD. This decision preauthorizes exactly one Checklist-only
+    result checkpoint: record final script path/hash, development-attempt count,
+    stage reached, final manifest path/hash if complete, cleanup, and deviations;
+    commit once as `docs: record disposable pre-p12 pass1 result`, push once to
+    the existing branch, and create no PR. It authorizes no automatic next step.
+
+Independent GitHub schema-contract review, pass 2 on a second fresh target,
+fresh Production evidence/backup, Production access, and P-12 GO remain
+separate decisions.
+
 **Authority:** Production `2568.0.0` remains authoritative for item names,
 units, and prices. The local workbook remains reconciliation/reference evidence
 only.
@@ -2622,24 +2724,19 @@ weaken the verifier, or continue that disposable sequence.
   Production approval before the source kit may be used in Production:
   `UNBOUND — HOLD`. `productionEligible=true` by itself records only a clean
   source/tooling worktree and is not authorization.
-- [ ] Produce and independently review the exact external
-  `conduit-boq/master-catalog-p12-baseline-provisioning-contract/v1` under the
-  bounded metadata-assisted design authority above: `INITIAL ATTEMPT CONSUMED
-  — E74 HARD STOP — CORRECTED TOC-ONLY CONSUMED — E72 HARD STOP — AGGREGATE
-  E72-CORRECTED SYNTHETIC GATE HARD STOP — CORRECTED AGGREGATE SYNTHETIC GATE
-  CONSUMED — OPAQUE EXIT 1 — OBSERVABLE AGGREGATE SYNTHETIC GATE CONSUMED —
-  PARSER `lower-counts` EXIT 1 — TOC NOT INVOKED — HOLD`.
-  This does not authorize schema metadata inspection, target creation,
-  execution proof, or pass 1.
+- [x] Supersede the temporary metadata/TOC parser path as a future execution
+  prerequisite. Retain its `E74`, `E72`, synthetic-fixture, opaque-exit, and
+  observable `lower-counts` outcomes as immutable audit history only; do not
+  reconstruct or retry that path.
 - [ ] After the P-47 replacement candidate is separately Git-published and
   frozen,
   run `calibrate-schema` one stage per manual invocation on a fresh disposable
   isolated PostgreSQL 17 target; preserve the recursively hash-bound
   `UNREVIEWED` pass-1 manifest chain in exact `016`, `017`, `017a`,
-  `018`-`026` stage order. The bounded baseline-recipe inspection was consumed
-  once and did not recover a reproducible provisioning contract; pass 1
-  remains `UNAUTHORIZED — HOLD` until that separate prerequisite is reviewed
-  and approved.
+  `018`-`026` stage order. The Owner-authorized lifecycle above first develops
+  and freezes one external provisioner, then uses stage `016` as the clean
+  baseline proof on a fresh formal target. Status: `AUTHORIZED AFTER PUSHED
+  LIFECYCLE CHECKPOINT — EXECUTION/RESULT HOLD`.
 - [ ] Have the named independent verifier compare the first-pass captures and
   freeze owner-only `0600`
   `conduit-boq/master-catalog-p12-schema-shape-contract/v3`. Replace free-form
