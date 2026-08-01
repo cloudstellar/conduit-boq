@@ -2837,6 +2837,118 @@ authority; it is not current authority. Any correction, connecting query,
 development/formal target, stage `016`, or pass 1 requires a new Owner
 decision.
 
+**Credential-corrected one-lifecycle pass-1 authority recorded:** 2026-08-01
+ICT — the Owner explicitly approved:
+
+> อนุมัติ one-lifecycle credential correction → private PGPASSFILE empty-target
+> proof → credential-corrected dev4 → fresh formal Pass 1 ตาม frozen stage order
+> โดยไม่ต้องขออนุมัติระหว่างขั้น; hard-stop ที่ mismatch แรก; ไม่มี
+> retry/alternate credential, Local, Production, pass 2 หรือ P-12 และอนุมัติ
+> authority/result Checklist commits, read-only bundle mount, evidence
+> preservation และ exact cleanup ตามขอบเขตเดิมทั้งหมด
+
+The normalized prior `connection_or_auth` result did not prove a root cause.
+This authority therefore makes no historical root-cause claim. Its sole
+credential correction is an idempotent, secret-safe rebind of the already
+generated disposable-target secret to role `postgres` after readiness and
+network isolation: container-loopback `supabase_admin` runs `psql`, imports
+the existing container `POSTGRES_PASSWORD` with `\getenv`, executes
+`ALTER ROLE postgres PASSWORD :'p12_password'`, and immediately `\unset`s the
+variable. The secret must not appear in argv, retained output, evidence, or
+Git.
+
+All construction and concurrent static review finished before this checkpoint.
+The frozen owner-only external artifacts are:
+
+- `run-pgpass-proof.sh`, 17,313 bytes, mode `0700`, SHA-256
+  `69bebc2165bc316ce3c7bb0d117f838eb7d89e03095bd6b4a3e0ea8aa3efdfc1`;
+- `provision-p12-pgpass.sh`, 28,618 bytes, mode `0700`, derived only from
+  provisioner SHA-256
+  `f7a50cae5b2758eaa46288a61dc99acda51a7e4f52829efba76b113c6c76a038`,
+  final SHA-256
+  `a8ebe7d841523f944a3d3d0e094a1620dbfe9c235f74e12bf59d650b9dccdc64`;
+- `artifact-review.txt`, mode `0600`, SHA-256
+  `51d648257706249bfda4e019b21d111086da5f6bc43bfc753a5c6b1188c88ec1`.
+
+They are under
+`/Users/cloud/Backups/ConduitBOQ/evidence/phase4/pre-p12/p12-pgpass-lifecycle-12b7d31`.
+The review passed Bash 3.2 syntax, exact one-query/no-fallback proof behavior,
+private passfile custody and cleanup, dev4/formal-only selection, unchanged
+`PGPASSWORD` dev4/formal paths, and the exact manual manifest chain. Preserve
+runner SHA-256
+`be2f1aa3ee74137e4b7c3d9a193cb39b59fdfe30ae8ae1a17f8535580920fa89`,
+generator SHA-256
+`9bf6ad36bbfc98a9e5ce767de412e737d23226af8bb4afd0f0d7bf07e06b1d69`,
+kit-manifest SHA-256
+`0e4235ffe91853d8066e99f41f297ab5b62f39e14ad6bfa8c9ee432c04733987`,
+CLI shim SHA-256
+`ce144c21c06e5ad5b9bdb6566fabcdadb15f32d72c8fbe8ba77eae994753a601`,
+CLI backend SHA-256
+`5e9be99fc013121b46b5f6bb848348ecc54bf1fb9f1d1791e715c6fb08397491`,
+frozen image ID
+`sha256:178f0976b54a39237096bfa310c1a352dbc82fb1b08dda45cdb8acb5d40c1426`,
+and dump SHA-256
+`9d306a478b8ada65d0a32ab31bca19587c55efa3ae979ae4dd8ad5871d575932`.
+No runner, generator, kit, migration, Local, or Production byte/state change is
+authorized.
+
+First authorize one Checklist-only checkpoint from base
+`12b7d31f093dffb087418ecfbb549e22f66acb14` on branch
+`codex/master-catalog-phase4`: change only this Checklist, commit once as
+`docs: authorize credential-corrected pre-p12 pass1 lifecycle`, push once to
+the existing branch, and create no PR. Leave every protected untracked path
+untouched.
+
+Only after that checkpoint is tracked-clean, pushed, and upstream-equal:
+
+1. run single-agent only from exact frozen source/tooling HEAD
+   `7fbfe1bb8f71df03a78762b00e93aded7bdd6e42`. Do not edit an artifact or run
+   ad-hoc CLI help/version/discovery; only version checks internally emitted by
+   the exact frozen runner are permitted;
+2. execute the reviewed proof once using temp root
+   `/private/tmp/conduit-p12-pgpass-lifecycle-12b7d31`, frozen image
+   `--pull=never`, tmpfs, database `conduit_p12_rehearsal`, one dedicated
+   `bridge` with `Internal=false`, one container, and only
+   `127.0.0.1:55437:5432/tcp`. After isolation and the rebind, create one
+   owner-only `0700` directory and exact regular, single-link, one-line `0600`
+   passfile entry for role `postgres`; unset every alternate password
+   environment, set only `PGPASSFILE`, and invoke the frozen CLI exactly once
+   for the existing read-only identity query. A mismatch hard-stops after
+   label-guarded cleanup; no `PGPASSWORD` fallback is permitted;
+3. only after proof success, mount encrypted sparse bundle
+   `/Users/cloud/Backups/ConduitBOQ/production/phase4/pre-p12/pre-p12-rehearsal.sparsebundle`
+   at the exact temp-root `mount` subdirectory, read-only and `nobrowse`, using
+   the existing Keychain service `Conduit BOQ Phase4 Backup`, account
+   `otlssvssvgkohqwuuiir-pre-p12`, through standard input without displaying
+   or persisting the passphrase. Reprove encryption, non-writeability, exact
+   eight-entry `SHA256SUMS`, package membership, and dump size/hash;
+4. invoke the reviewed provisioner once as `provision dev4` on port `55438`.
+   It performs the same rebind, then preserves the original `PGPASSWORD`-only
+   host-CLI and ledger-repair paths and every frozen restore/Auth/count/hash/
+   ledger/ACL/sentinel gate. This is the required exact formal-transport proof,
+   not a fallback from the distinct PGPASSFILE proof. Clean dev4 completely;
+5. only after dev4 success and cleanup, invoke `provision formal` once on port
+   `55439`. Then invoke the exact frozen runner separately and manually in
+   order `016`, `017`, `017a`, `018`, `019`, `020`, `021`, `022`, `023`,
+   `024`, `025`, `026`. Verify each complete manifest and its immediate-prior
+   recursive binding before the next invocation. Do not loop, skip, reorder,
+   retry, or infer a later pass; and
+6. the first proof, mount, dev4, formal, stage, manifest, or cleanup mismatch is
+   the terminal result. Do not try another credential or transport and do not
+   start Local, Production, pass 2, or P-12. Perform exact label/custody-guarded
+   cleanup, prove zero scoped containers/networks/listeners/passfiles/password
+   files/raw files, detach the bundle without force, remove only the exact temp
+   root, return to the pushed authority HEAD, and retain only owner-only,
+   secret-free evidence.
+
+This decision preauthorizes one Checklist-only result checkpoint after cleanup:
+record exactly what reached or passed, artifact/manifest hashes, the separate
+PGPASSFILE and PGPASSWORD outcomes, first mismatch if any, cleanup and
+deviations; commit once as
+`docs: record credential-corrected pre-p12 pass1 result`, push once to the
+existing branch, create no PR, and set `automaticNextStep=false`. Pass 2,
+independent contract review, Production, and P-12 remain separate decisions.
+
 **Authority:** Production `2568.0.0` remains authoritative for item names,
 units, and prices. The local workbook remains reconciliation/reference evidence
 only.
@@ -3278,9 +3390,11 @@ weaken the verifier, or continue that disposable sequence.
   connecting CLI query was started. The clean re-authorization then completed
   exactly one query on the proven network posture and classified the remaining
   blocker as `connection_or_auth`; formal, stage `016`, and pass 1 remain
-  unstarted.
-  Status: `CLEAN HOST-CLI DIAGNOSTIC COMPLETED — CONNECTION_OR_AUTH — FORMAL
-  AND PASS 1 NOT STARTED — HOLD`.
+  unstarted. The credential-corrected one-lifecycle authority above now permits
+  exactly one private-PGPASSFILE proof, conditional dev4, and conditional fresh
+  formal pass 1 under first-mismatch hard-stop semantics.
+  Status: `CREDENTIAL-CORRECTED LIFECYCLE AUTHORIZED — PRIVATE PGPASSFILE
+  PROOF PENDING`.
 - [ ] Have the named independent verifier compare the first-pass captures and
   freeze owner-only `0600`
   `conduit-boq/master-catalog-p12-schema-shape-contract/v3`. Replace free-form
