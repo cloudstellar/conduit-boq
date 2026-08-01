@@ -2788,6 +2788,55 @@ existing branch, and create no PR. `automaticNextStep=false`. Any correction,
 development/formal target, stage `016`, pass 1, pass 2, Production access, or
 P-12 requires a new Owner decision.
 
+**Clean host-CLI-only diagnostic result recorded:** 2026-08-01 ICT — the clean
+authority checkpoint was committed/pushed at
+`39380f21b22411b8ad820c5dcc2795146408c5fb`, all reviewers were completed
+before that checkpoint, and the same checkout was detached to exact frozen
+source/tooling HEAD
+`7fbfe1bb8f71df03a78762b00e93aded7bdd6e42`. The byte-identical reviewed
+14,460-byte diagnostic script SHA-256
+`d454bbb012d5f99a5596b59a30c441a71445c342ffde8d0deb734266c98aa1fb`
+and review SHA-256
+`79fb4046a64450688c1f4f436de021845ea28d191f7d064d81eb083a4ea6fd14`
+were reproved before use.
+
+The script created exactly one application-empty target from the frozen image
+on one dedicated `bridge` with `Internal=false`, one attached container, and
+the sole exact binding `127.0.0.1:55436:5432/tcp`. HostConfig and runtime
+bindings matched, loopback reachability passed, and there was no wildcard,
+IPv6, second binding, additional network, or application data. It then invoked
+the frozen Supabase CLI `db query` exactly once with the password-free URL and
+environment-only `PGPASSWORD`. The invocation exited `1` and the normalized
+safe category was `connection_or_auth`; stdout was 0 bytes and stderr was 370
+bytes. It did not time out, no password literal was present, no raw excerpt or
+raw-output hash was retained, and both raw files were deleted. Because the
+network posture passed first, this narrows the blocker to the CLI
+connection/authentication boundary; the retained category intentionally does
+not claim a more specific credential mechanism.
+
+The owner-only safe summary is
+`/Users/cloud/Backups/ConduitBOQ/evidence/phase4/pre-p12/p12-host-cli-clean-diagnostic-c3b3cf8/diagnostic-summary.txt`,
+SHA-256
+`a164a9af168e7bdb8d616adffa8b90cbd8d4af94eb8fb83227de6b0cc4153818`.
+The lifecycle result is
+`/Users/cloud/Backups/ConduitBOQ/evidence/phase4/pre-p12/p12-host-cli-clean-diagnostic-c3b3cf8/clean-diagnostic-result.txt`,
+SHA-256
+`36744842c060b9690e17eb244cbf88fcf343f0ae65ade9b0c34ced72f5ff4652`.
+Exact label-guarded cleanup left zero scoped containers, networks, listeners,
+password files, raw output, and temporary-root content; the checkout returned
+to the pushed authority branch. No Keychain item, bundle, dump, restore,
+schema/Auth/ledger work, runner, migration, Local credential/connection/data,
+or Production credential/connection/data was touched. There were no execution
+deviations.
+
+Result: `CLEAN DIAGNOSTIC COMPLETED — CONNECTION_OR_AUTH — ONE QUERY — HOLD`.
+`automaticNextStep=false`. The smallest next proposal is one
+credential-transport-specific correction proof on the same empty target
+posture, without bundle/dump/restore/migration, before any new development
+authority; it is not current authority. Any correction, connecting query,
+development/formal target, stage `016`, or pass 1 requires a new Owner
+decision.
+
 **Authority:** Production `2568.0.0` remains authoritative for item names,
 units, and prices. The local workbook remains reconciliation/reference evidence
 only.
@@ -3226,8 +3275,11 @@ weaken the verifier, or continue that disposable sequence.
   final `dev3` then failed at `host-cli-proof`; formal, stage `016`, and pass 1
   were not started. The subsequently authorized host-CLI-only diagnostic then
   stopped at its pre-execution invocation audit; no diagnostic target or
-  connecting CLI query was started.
-  Status: `PRE-EXECUTION PROCEDURAL HARD STOP — HOST-CLI DIAGNOSTIC, FORMAL,
+  connecting CLI query was started. The clean re-authorization then completed
+  exactly one query on the proven network posture and classified the remaining
+  blocker as `connection_or_auth`; formal, stage `016`, and pass 1 remain
+  unstarted.
+  Status: `CLEAN HOST-CLI DIAGNOSTIC COMPLETED — CONNECTION_OR_AUTH — FORMAL
   AND PASS 1 NOT STARTED — HOLD`.
 - [ ] Have the named independent verifier compare the first-pass captures and
   freeze owner-only `0600`
