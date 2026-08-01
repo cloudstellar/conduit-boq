@@ -4,7 +4,7 @@
 
 **Last updated:** 2026-08-01
 
-**Status:** PRE-P-12 HOLD - immutable replacement source/tooling HEAD
+**Status:** PRE-P-12 HOLD — historical pre-correction context: immutable replacement source/tooling HEAD
 `7fbfe1bb8f71df03a78762b00e93aded7bdd6e42` and its truthful
 `Vercel=success` record are frozen. The post-P-48 Checklist-only status
 checkpoint completed at pushed/upstream-equal
@@ -69,6 +69,13 @@ checkpoint is pushed and upstream-equal. Production, application/UI/export
 changes, flags, publication, Factor F, hotfix `016`, and P-12 remain
 unauthorized.
 
+**Current status:** PRE-P-12 HOLD — the minimal hotfix-signature selector
+correction is pushed/upstream-equal at
+`a7a8a81248b19ea9e3ca2f262bdc03365c79c849`; the re-frozen kit and fresh
+formal Pass 1 are complete through `026`. The next gate is independent human
+comparison/review and schema-contract freeze. Pass 2, Production approval,
+Production access, and P-12 remain unstarted and unauthorized.
+
 **Exact application candidate:**
 `5068f944af2aa3fe8446c77c8ae8d48673cb260b`
 
@@ -84,6 +91,9 @@ source by the P-46 finding
 
 **Replacement source/tooling HEAD:**
 `7fbfe1bb8f71df03a78762b00e93aded7bdd6e42`
+
+**Current runner-corrected re-frozen source/tooling HEAD:**
+`a7a8a81248b19ea9e3ca2f262bdc03365c79c849`
 
 **Completed post-P-48 Checklist-only status-checkpoint HEAD:**
 `28673b39962a092472c2334843e95aaafdfce97b`
@@ -3023,6 +3033,55 @@ Production, pass 2, P-12, alternate credential, retry, migration edit, or
 scope expansion is authorized. Preserve owner-only evidence, perform exact
 cleanup, then record and push one truthful result checkpoint.
 
+**Targeted correction and fresh formal Pass 1 result recorded:** 2026-08-01
+ICT — the exact three-file correction commit above was pushed and
+upstream-equal. Focused runner tests passed 40/40, TypeScript and targeted lint
+passed, and independent SQL review approved the canonical type-only projection.
+The full suite's only failures were the three already documented frozen
+authority-consistency expectations at this post-freeze Checklist descendant;
+no runner, migration, schema, or application test failed.
+
+The new external kit is
+`/Users/cloud/Backups/ConduitBOQ/production/phase4/pre-p12/p12-cli-kit-v2-a7a8a81248b19ea9`.
+Its manifest SHA-256 is
+`1d10f9f4bb72e845f3dd8a496ce6969b1e8bbc422e0d68af82014dd672ae206b`,
+with `productionEligible=true`, source HEAD
+`a7a8a81248b19ea9e3ca2f262bdc03365c79c849`, unchanged generator SHA-256
+`9bf6ad36bbfc98a9e5ce767de412e737d23226af8bb4afd0f0d7bf07e06b1d69`,
+and corrected runner SHA-256
+`3ee8181cd9ff1231e1f999e4589dbdb3f3f7753b2079ea50e3e5a4c2e64b7e5f`.
+Static verification passed all eleven kit steps.
+
+Fresh formal baseline provisioning then passed the exact frozen image,
+non-internal dedicated bridge, sole loopback binding, credential rebind,
+host-CLI transport, phased restore, 20 UUID-only Auth stubs with zero sensitive
+payload, ledger, ownership/ACL, BOQ/Factor F/catalog hashes, hotfix `016`, and
+sentinel gates. The provisioning summary SHA-256 is
+`086740c423f9255762427663f31c930fe6bef59473492c322ab624d3f7fb3b0e`.
+
+Separate manual calibration invocations passed in exact order `016`, `017`,
+`017a`, `018`-`026`. Before every next invocation, the runner's exported
+verifier reloaded all current evidence files and the complete recursive prior
+chain. The final `026` manifest SHA-256 is
+`ea45c06c3bb9c5d39c52f69fc59e271aa8413cec76d960bf9c91d76ca06b0e18`;
+it recursively verifies the full `016`-`026` chain and remains explicitly
+non-authorizing for Production.
+
+The complete owner-only evidence directory is
+`/Users/cloud/Backups/ConduitBOQ/evidence/phase4/pre-p12/p12-formal-pass1-a7a8a81`.
+Its secret-free result record is `formal-pass1-result.txt`, 2,639 bytes, mode
+`0600`, SHA-256
+`ab51b2c65dbf9bc3fcdf7a4c105c9f7cb9fc465f023bb5c2f4cda305969f8087`.
+Custody verification found 87 regular single-link files, zero symlinks, zero
+multi-link files, and no group/other access.
+
+Label-guarded cleanup removed the exact formal container, network, private
+runtime files, and listener; the encrypted bundle detached without force and
+the exact temp root is absent. Local and Production were untouched. No pass 2,
+Production approval/access, or P-12 action started. Result:
+`FRESH FORMAL PASS 1 COMPLETE — 016 THROUGH 026 — CLEANUP COMPLETE — HOLD FOR
+INDEPENDENT REVIEW`. `automaticNextStep=false`.
+
 **Authority:** Production `2568.0.0` remains authoritative for item names,
 units, and prices. The local workbook remains reconciliation/reference evidence
 only.
@@ -3402,11 +3461,10 @@ weaken the verifier, or continue that disposable sequence.
   that source/tooling HEAD under later separate authorization and record its
   canonical manifest path/SHA-256, generator source SHA-256, runner source
   SHA-256, and `productionEligible=true`: `CONSUMED ONCE — BUILT — BOUND`.
-  Exact path and manifest SHA-256
-  `0e4235ffe91853d8066e99f41f297ab5b62f39e14ad6bfa8c9ee432c04733987`
-  are recorded above.
-  Reuse this exact kit for pass 1, pass 2, and Production; do not regenerate it
-  at the later GO HEAD.
+  The original `7fbfe1b` kit remains immutable historical evidence. The
+  targeted runner correction explicitly superseded it with the current kit
+  path and manifest SHA-256 `1d10f9f4...` recorded above; do not reuse the old
+  runner kit for a later gate.
 - [x] Name the migration executor: `Suthorn Kaewkorn`.
 - [x] Name an independent verifier: GitHub login `Lukkxh`; repository access,
   authenticated identity, availability, and the actual review remain pending.
@@ -3450,28 +3508,12 @@ weaken the verifier, or continue that disposable sequence.
   prerequisite. Retain its `E74`, `E72`, synthetic-fixture, opaque-exit, and
   observable `lower-counts` outcomes as immutable audit history only; do not
   reconstruct or retry that path.
-- [ ] After the P-47 replacement candidate is separately Git-published and
-  frozen,
-  run `calibrate-schema` one stage per manual invocation on a fresh disposable
-  isolated PostgreSQL 17 target; preserve the recursively hash-bound
-  `UNREVIEWED` pass-1 manifest chain in exact `016`, `017`, `017a`,
-  `018`-`026` stage order. The earlier lifecycle stopped after `dev2`; the
-  bounded continuation then hard-stopped at diagnostic class `4`. The
-  network-corrected lifecycle proved the bridge/binding correction but its
-  final `dev3` then failed at `host-cli-proof`; formal, stage `016`, and pass 1
-  were not started. The subsequently authorized host-CLI-only diagnostic then
-  stopped at its pre-execution invocation audit; no diagnostic target or
-  connecting CLI query was started. The clean re-authorization then completed
-  exactly one query on the proven network posture and classified the remaining
-  blocker as `connection_or_auth`; formal, stage `016`, and pass 1 remain
-  unstarted. The credential-corrected one-lifecycle authority above now permits
-  exactly one private-PGPASSFILE proof, conditional dev4, and conditional fresh
-  formal pass 1 under first-mismatch hard-stop semantics.
-  The authorized proof then completed one PGPASSFILE-only query and hard-stopped
-  at normalized `connection_or_auth`; dev4, formal, and every pass-1 stage were
-  not started.
-  Status: `PRIVATE PGPASSFILE PROOF FAILED — CONNECTION_OR_AUTH — DEV4,
-  FORMAL, AND PASS 1 NOT STARTED — HARD STOP`.
+- [x] Run `calibrate-schema` one stage per manual invocation on a fresh
+  disposable isolated PostgreSQL 17 target and preserve the recursively
+  hash-bound `UNREVIEWED` Pass-1 chain in exact `016`, `017`, `017a`,
+  `018`-`026` order: `COMPLETE`. Final manifest SHA-256 `ea45c06c...` verifies
+  the complete chain; exact cleanup passed. Historical failed attempts remain
+  immutable audit evidence and are superseded as current execution status.
 - [ ] Have the named independent verifier compare the first-pass captures and
   freeze owner-only `0600`
   `conduit-boq/master-catalog-p12-schema-shape-contract/v3`. Replace free-form
