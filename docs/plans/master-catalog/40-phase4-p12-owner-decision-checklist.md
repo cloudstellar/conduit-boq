@@ -2468,6 +2468,86 @@ next proposal is a dedicated single-container bridge that is not marked
 one-network proofs, frozen image/tooling, and every other prior safety gate;
 this proposal is not current authority.
 
+**Network-corrected final-dev3 and fresh formal pass-1 authority recorded:**
+2026-08-01 ICT — after the class-4 diagnostic result and its single identified
+network correction were explained, the Owner explicitly approved:
+
+> อนุมัติ network-corrected continuation: dedicated non-internal
+> single-container bridge + loopback-only publish → dev3 → fresh formal Pass 1
+> โดยไม่ต้องขออนุมัติระหว่างขั้น และคงขอบเขตเดิมทั้งหมด
+
+This new bounded decision supersedes only the preceding prohibition against the
+identified network correction, `dev3`, and a fresh formal pass-1 lifecycle. It
+does not reinterpret either prior failure as a pass or authorize another
+diagnostic, development attempt, networking alternative, Local/Production
+action, pass 2, or P-12.
+
+First, authorize exactly one Checklist-only authority checkpoint from base
+`1d6d4b3e74fb058603f1f19f2929385a46b23895` on branch
+`codex/master-catalog-phase4`: change only this Checklist, commit once as
+`docs: authorize network-corrected pre-p12 pass1 continuation`, push once to
+the existing branch, and create no PR. Do not stage, modify, or delete
+`files/`, `tmp/`, `output/`, or any other untracked repository path.
+
+Only after that checkpoint is tracked-clean, pushed, and upstream-equal:
+
+1. preserve every frozen source, application, kit, runner, generator, image,
+   dump, Keychain, role, sentinel, executor, checkout, secret-handling,
+   evidence, cleanup, ordering, and hard-stop binding from the two preceding
+   lifecycle authorities. Preserve their evidence roots as immutable history.
+   Use only new owner-mode regular non-symlink roots
+   `/Users/cloud/Backups/ConduitBOQ/evidence/phase4/pre-p12/p12-network-corrected-pass1-1d6d4b3`
+   and
+   `/private/tmp/conduit-p12-network-corrected-pass1-1d6d4b3`;
+2. derive the corrected provisioner only from the recorded 25,579-byte script
+   at
+   `/Users/cloud/Backups/ConduitBOQ/evidence/phase4/pre-p12/p12-baseline-pass1-lifecycle-7f15556/provision-p12-baseline.sh`,
+   SHA-256
+   `82ed4f56449e2c51f5a6d6a93433ddad12b277055ea10dfe295cf915c1d70fdd`.
+   Its only semantic change may be in network creation and the directly
+   corresponding isolation proof/summary: omit `--internal`, require the
+   dedicated bridge to report `Internal=false`, and prove exactly one labeled
+   target container attached to exactly that one network. Retain explicit
+   `127.0.0.1:<attempt-port>:5432/tcp` publication and prove exactly one runtime
+   binding with host IP `127.0.0.1`, the expected host/container ports, and no
+   wildcard, IPv6, second binding, or additional published port. Do not change
+   restore, Auth-stub, role, ledger, migration, runner, evidence-chain, or
+   cleanup behavior. Independently review, syntax-check, byte-count, and hash
+   the corrected provisioner before use;
+3. run exactly one fresh `dev3` with that reviewed provisioner, exact frozen
+   image and `--pull=never`, dedicated non-internal single-container bridge,
+   loopback-only port `55433`, tmpfs data, and all prior full provisioning and
+   cleanup checks. This is the third and final development attempt; no separate
+   diagnostic, `dev4`, correction, retry, alternate network/target, or inferred
+   pass is authorized if it fails;
+4. only after `dev3` succeeds and is completely destroyed, freeze the reviewed
+   provisioner path, byte size, SHA-256, review hash, and non-secret bindings.
+   Create exactly one fresh formal target from those byte-identical bytes, using
+   its dedicated non-internal single-container bridge and loopback-only port
+   `55434`;
+5. invoke the frozen runner separately and manually in exact order `016`,
+   `017`, `017a`, `018` through `026`. Start each stage only after the preceding
+   stage exits successfully and its complete recursively chained evidence
+   manifest is verified. No intermediate Owner approval or Checklist commit is
+   required, but no stage may be skipped, reordered, retried, or automatically
+   chained; and
+6. any isolation, binding, network-count, secret, mount, checksum, role,
+   restore, Auth-stub, count/hash, integrity, ledger, ownership/ACL, sentinel,
+   clean-rebuild, stage-`016`, later-runner, manifest, or cleanup mismatch is a
+   hard stop. A `dev3` or formal failure authorizes no correction or retry.
+   After success or hard stop, perform label-guarded exact cleanup, non-force
+   detach if mounted, return to the pushed authority HEAD, and preserve only
+   owner-only secret-free evidence.
+
+This decision preauthorizes exactly one Checklist-only result checkpoint after
+complete cleanup: record the corrected provisioner path/size/hash and review
+hash, `dev3` result, formal stage reached, final manifest path/hash if complete,
+network/binding proofs, cleanup, and deviations; commit once as
+`docs: record network-corrected pre-p12 pass1 result`, push once to the existing
+branch, and create no PR. `automaticNextStep=false` after that result.
+Independent GitHub schema-contract review, pass 2, fresh Production
+evidence/backup, Production access, and P-12 GO remain separate decisions.
+
 **Authority:** Production `2568.0.0` remains authoritative for item names,
 units, and prices. The local workbook remains reconciliation/reference evidence
 only.
@@ -2901,10 +2981,11 @@ weaken the verifier, or continue that disposable sequence.
   isolated PostgreSQL 17 target; preserve the recursively hash-bound
   `UNREVIEWED` pass-1 manifest chain in exact `016`, `017`, `017a`,
   `018`-`026` stage order. The earlier lifecycle stopped after `dev2`; the
-  bounded continuation then hard-stopped at diagnostic class `4`; `dev3`, the
-  formal target, stage `016`, and pass 1 were not started.
-  Status: `ISOLATION DIAGNOSTIC CLASS 4 HARD STOP — DEV3, FORMAL, AND PASS 1
-  NOT STARTED — HOLD`.
+  bounded continuation then hard-stopped at diagnostic class `4`. The
+  network-corrected authority above now permits final `dev3` and, only after it
+  succeeds, one fresh formal target and the manual pass-1 chain.
+  Status: `OWNER APPROVED — EXECUTION ONLY AFTER PUSHED NETWORK-CORRECTED
+  CHECKPOINT — RESULT HOLD`.
 - [ ] Have the named independent verifier compare the first-pass captures and
   freeze owner-only `0600`
   `conduit-boq/master-catalog-p12-schema-shape-contract/v3`. Replace free-form
