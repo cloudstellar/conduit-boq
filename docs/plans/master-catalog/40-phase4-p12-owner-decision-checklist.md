@@ -72,8 +72,9 @@ unauthorized.
 **Current status:** PRE-P-12 HOLD — the minimal hotfix-signature selector
 correction is pushed/upstream-equal at
 `a7a8a81248b19ea9e3ca2f262bdc03365c79c849`; the re-frozen kit and fresh
-formal Pass 1 are complete through `026`. The next gate is independent human
-comparison/review and schema-contract freeze. Pass 2, Production approval,
+formal Pass 1 are complete through `026`; the independent authenticated GitHub
+review and external schema-shape contract freeze are complete and bound below.
+The next gate is separately authorized Pass 2. Pass 2, Production approval,
 Production access, and P-12 remain unstarted and unauthorized.
 
 **Exact application candidate:**
@@ -3138,6 +3139,45 @@ connection, Production approval, P-12, migration, application/UI/export,
 feature flag, source/tooling, generator, runner, or kit change. It authorizes
 no PR merge and no action after the result checkpoint.
 
+**Schema-contract freeze result recorded:** 2026-08-01 ICT — authority
+checkpoint `54d38edf9ce432aba3eef9e105d4a398e44e90fd` changed only this
+Checklist and was tracked-clean, pushed, and upstream-equal before the freeze.
+Authenticated GitHub API rechecks found PR `#7` open and unmerged with unchanged
+head `a7a8a81248b19ea9e3ca2f262bdc03365c79c849` and exactly one review:
+`4834121985`, canonical URL
+`https://github.com/cloudstellar/conduit-boq/pull/7#pullrequestreview-4834121985`,
+`lukkxh`/`User`, `APPROVED`, exact commit and marker, with no later dismissal or
+changes-requested review. The preserved final recheck timestamp is
+`2026-08-01T08:08:26.979Z`.
+
+The external reviewed contract is the 4,338-byte regular, non-symlink,
+single-link owner-`cloud` mode-`0600` file
+`/Users/cloud/Backups/ConduitBOQ/production/phase4/pre-p12/p12-schema-shape-contract-v3-a7a8a81248b19ea9.json`,
+SHA-256
+`4535ec62acad937fcf539ae752faa64436e861dadb53f626b3dccebaab930d66`.
+The reviewed payload SHA-256 remains
+`e5310b29028e5c52c3a3071fdf6af48c801442af414ecff3293e0c07e0694f9f`.
+The frozen runner reverified the exact production-eligible kit, all migration
+hashes, the complete recursive Pass-1 chain through `026`, all 12 stage
+fingerprints, review structure/identity/chronology, final manifest SHA-256
+`ea45c06c3bb9c5d39c52f69fc59e271aa8413cec76d960bf9c91d76ca06b0e18`,
+and final contract byte hash.
+
+The owner-`cloud` mode-`0700` evidence directory is
+`/Users/cloud/Backups/ConduitBOQ/evidence/phase4/pre-p12/p12-schema-contract-freeze-a7a8a81`.
+Its three regular, non-symlink, single-link mode-`0600` files are
+`contract-validation.json` at SHA-256
+`d3502127513d79f9077ae55cb4640752d7d58c71907dd6bd7bcf94e4b54dbbd9`,
+`github-review-verification.json` at SHA-256
+`6f307c41ca17ee32301303748aac4ea74fba649c7131a3b9f6cd333a856fc6ae`,
+and `SHA256SUMS` at SHA-256
+`058adc9781d6552d1718e3bd57eabf080a31e85553a7104b9535375ed270d943`.
+All checksum entries passed. The exact temporary root and publication staging
+file are absent. No database, container, network, mount, Local, Production,
+pass 2, P-12, source/tooling, kit, migration, or PR-merge action occurred.
+Result: `SCHEMA-SHAPE CONTRACT V3 FROZEN — OFFLINE VALIDATION PASSED — HOLD FOR
+SEPARATELY AUTHORIZED PASS 2`. `automaticNextStep=false`.
+
 **Authority:** Production `2568.0.0` remains authoritative for item names,
 units, and prices. The local workbook remains reconciliation/reference evidence
 only.
@@ -3523,10 +3563,11 @@ weaken the verifier, or continue that disposable sequence.
   runner kit for a later gate.
 - [x] Name the migration executor: `Suthorn Kaewkorn`.
 - [x] Name an independent verifier: GitHub login `Lukkxh`; repository access,
-  authenticated identity, availability, and the actual review remain pending.
+  authenticated identity, and the exact `APPROVED` review are verified and
+  bound in the frozen contract above.
 - [x] Confirm that the verifier is a named human distinct from the executor;
-  self-verification is not accepted for P-12. This names the roles only and
-  does not claim that verification has occurred.
+  self-verification is not accepted for P-12. The completed contract review is
+  by `lukkxh`, distinct from capture/migration executor `Suthorn Kaewkorn`.
 - [x] Record the required Production `session_user`, `current_user`, and
   object-owner role: `postgres` / `postgres` / `postgres`. Fresh in-window
   readback and unchanged after-each-file identity remain mandatory.
@@ -3570,7 +3611,7 @@ weaken the verifier, or continue that disposable sequence.
   `018`-`026` order: `COMPLETE`. Final manifest SHA-256 `ea45c06c...` verifies
   the complete chain; exact cleanup passed. Historical failed attempts remain
   immutable audit evidence and are superseded as current execution status.
-- [ ] Have the named independent verifier compare the first-pass captures and
+- [x] Have the named independent verifier compare the first-pass captures and
   freeze owner-only `0600`
   `conduit-boq/master-catalog-p12-schema-shape-contract/v3`. Replace free-form
   reviewer claims with the structured `githubReview` envelope bound to
@@ -3579,19 +3620,23 @@ weaken the verifier, or continue that disposable sequence.
   reviewed-payload SHA-256, and exact
   `P12_SCHEMA_REVIEW_V1 source=<40hex> kit=<64hex> pass1=<64hex> payload=<64hex>`
   marker. The reviewer must differ from pass-1 capture executor and migration
-  executor.
-- [ ] Before contract freeze, open the exact review in an authenticated GitHub
+  executor. `COMPLETE — FROZEN` at the exact path/SHA-256 recorded above.
+- [x] Before contract freeze, open the exact review in an authenticated GitHub
   session/API and confirm repository, review ID, named-human login,
   `APPROVED` state, exact source commit, unchanged PR head, exact marker, latest
   review for that HEAD, and no later dismissal/changes-requested review. The
   offline runner checks structure/hash/chronology only and does not authenticate
-  GitHub.
+  GitHub. `COMPLETE`; authenticated pre-publication and final preserved rechecks
+  matched exactly, and PR `#7` remains open/unmerged.
 - [ ] Run a second fresh full isolated rehearsal that matches every frozen
   pre/post schema fingerprint using the same source/tooling HEAD, kit, and
   contract. It must use fresh advisor hand-offs after each step and finish the
   transitive read-only final closeout. Do not invent, reorder, or skip a stage.
 - [ ] Record and bind `schemaShapeContractSha256` in the external Production
-  approval: `UNCREATED — UNREVIEWED — UNBOUND — HOLD`.
+  approval: contract SHA-256
+  `4535ec62acad937fcf539ae752faa64436e861dadb53f626b3dccebaab930d66`
+  is `REVIEWED — FROZEN`; external Production approval remains
+  `UNBOUND — HOLD`.
 - [ ] Record and bind the pass-2 final closeout evidence-manifest canonical
   path/SHA-256 in the external Production approval and later committed Owner
   marker: `UNCREATED — UNBOUND — HOLD`.
