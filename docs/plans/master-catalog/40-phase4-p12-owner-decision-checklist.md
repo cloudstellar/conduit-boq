@@ -2597,6 +2597,77 @@ network posture, no bundle/dump/restore/migration, and a normalized redacted
 error classification before any new development authority; it is not current
 authority.
 
+**Host-CLI-only empty-target diagnostic authority recorded:** 2026-08-01 ICT —
+after the network-corrected lifecycle proved its Docker posture but stopped at
+`host-cli-proof`, the Owner accepted the immediately preceding smallest-next
+proposal by replying `ได้`. This accepts exactly one classification diagnostic;
+it does not authorize a fix, retry, development target, formal target, runner,
+migration, pass 1, Local/Production action, or P-12.
+
+First, authorize exactly one Checklist-only authority checkpoint from base
+`d8c7cccd28f85208ce2ca389d34e092cec2574c8` on branch
+`codex/master-catalog-phase4`: change only this Checklist, commit once as
+`docs: authorize pre-p12 host-cli-only diagnostic`, push once to the existing
+branch, and create no PR. Do not stage, modify, or delete `files/`, `tmp/`,
+`output/`, or any other untracked repository path.
+
+Only after that checkpoint is tracked-clean, pushed, and upstream-equal:
+
+1. preserve every frozen image, CLI, kit, checkout, secret-handling, network,
+   label, evidence, and cleanup binding above. Preserve all earlier evidence as
+   immutable history. Use only owner-mode regular non-symlink roots
+   `/Users/cloud/Backups/ConduitBOQ/evidence/phase4/pre-p12/p12-host-cli-diagnostic-d8c7ccc`
+   and `/private/tmp/conduit-p12-host-cli-diagnostic-d8c7ccc`;
+2. use one independently reviewed and hashed external diagnostic script to
+   create exactly one application-empty disposable target from image ID
+   `sha256:178f0976b54a39237096bfa310c1a352dbc82fb1b08dda45cdb8acb5d40c1426`
+   with `--pull=never`, tmpfs data, a fresh non-displayed environment-only
+   rehearsal password, database `conduit_p12_rehearsal`, one labeled dedicated
+   `bridge` with `Internal=false`, exactly one attached container, and exactly
+   one publication `127.0.0.1:55436:5432/tcp`. Prove no wildcard, IPv6, second
+   binding, additional port, container, or network. Use only container-native
+   readiness checks before the diagnostic;
+3. access no Keychain item, bundle, dump, Local Supabase, Production endpoint,
+   or Production credential. Perform no schema preparation, Auth-stub work,
+   ledger repair, restore, DDL, DML, migration, runner invocation, or SQL
+   through `psql`; the sole SQL allowed is the diagnostic read-only identity
+   `select` sent by the frozen CLI;
+4. invoke exactly once, with telemetry disabled and the password supplied only
+   through the process environment, the frozen Supabase CLI `2.107.0` at
+   `/Users/cloud/Cloudstellar/conduit-boq/node_modules/@supabase/cli-darwin-arm64/bin/supabase`,
+   SHA-256
+   `ce144c21c06e5ad5b9bdb6566fabcdadb15f32d72c8fbe8ba77eae994753a601`,
+   using the same `db query`, password-free loopback DB URL, JSON output,
+   frozen `steps/017` workdir, and
+   `select current_user::text, session_user::text, current_database()::text;`
+   invocation that failed at `dev3`. Do not run a second CLI command, help,
+   version, retry, alternate client, corrected environment, or alternate URL;
+5. retain raw stdout/stderr only in owner-only temporary files during
+   classification, bounded to 65,536 bytes each, then delete them. Durable
+   evidence may contain only provenance hashes, exit code, stdout/stderr byte
+   counts and presence booleans, identity-match boolean when successful, and
+   exactly one normalized redacted category:
+   `success_identity_match`, `success_identity_mismatch`,
+   `cli_capability_or_usage`, `cli_local_state_or_permission`,
+   `connection_or_auth`, `timeout`, `other_failure`, or
+   `unsafe_or_inconclusive`. Persist no raw excerpt, stack trace, path-bearing
+   error, URL, password, row, UUID, token, or raw-output hash; and
+6. any preflight/hash, readiness, network/binding, secret, output-bound,
+   classification, target-state, or cleanup mismatch is a hard stop. After the
+   one invocation or earlier hard stop, perform label-guarded exact cleanup,
+   prove zero scoped containers, networks, listeners, password files, and raw
+   output, remove the exact temporary root, and return to the pushed authority
+   HEAD. No result category authorizes automatic continuation.
+
+This decision preauthorizes exactly one Checklist-only result checkpoint after
+complete cleanup: record the diagnostic script path/size/hash and review hash,
+safe normalized category, bounded counters, target/network proofs, cleanup,
+and deviations; commit once as
+`docs: record pre-p12 host-cli-only diagnostic result`, push once to the
+existing branch, and create no PR. `automaticNextStep=false`. Any correction,
+new development/formal target, stage `016`, pass 1, pass 2, Production access,
+or P-12 requires a new Owner decision.
+
 **Authority:** Production `2568.0.0` remains authoritative for item names,
 units, and prices. The local workbook remains reconciliation/reference evidence
 only.
