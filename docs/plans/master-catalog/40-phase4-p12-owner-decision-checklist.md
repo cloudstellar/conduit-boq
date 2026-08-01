@@ -52,12 +52,15 @@ results passed, but no reproducible baseline-provisioning recipe was recovered.
 The bounded metadata-assisted authority recorded on 2026-08-01 was consumed
 once and stopped at the TOC parser's fixed safe error `E74`; no schema stream,
 database, contract publication, or result Git action occurred, and mandatory
-cleanup passed. The subsequent corrected TOC-only attempt was also consumed
-once and stopped at fixed safe error `E72`; static review then found that the
-bound Docker argv omitted Docker `--interactive`, so the dump stream was not
-attached to container standard input. The Owner now authorizes exactly one
-aggregate E72-corrected TOC-only, non-database metadata attempt under the
-narrower contract recorded below.
+cleanup passed. The subsequent corrected TOC-only attempt was consumed once
+and stopped at fixed safe error `E72`. The aggregate E72-corrected synthetic
+gate then stopped on a synthetic-fixture defect, and its separately authorized
+corrected continuation was also consumed once. That corrected harness exited
+`1` without stdout/stderr or a test record before any Keychain, mount, dump, or
+Docker action, so the retained evidence cannot identify the failed stage. The
+Owner now authorizes exactly one observable synthetic gate; only a complete
+pass permits one read-only TOC-only invocation against the exact frozen dump
+under the unchanged isolation recorded below.
 Disposable database execution, pass 1, Production, application/UI/export
 changes, flags, publication, Factor F, hotfix `016`, and P-12 remain
 unauthorized.
@@ -2069,6 +2072,85 @@ continuation:
    complete cleanup retains the existing Checklist-only metadata/diagnostic
    result-checkpoint authority. `automaticNextStep=false`.
 
+**Corrected aggregate synthetic-gate opaque result and observable continuation
+authority recorded:** 2026-08-01 ICT — the corrected continuation authority
+checkpoint completed at pushed/upstream-equal
+`b3eb7bf5dc4d1cb1dfb7b68055d6160148af2ef1`. The corrected harness was 23,651
+bytes at SHA-256
+`7eacf58bfb4c28dd2a9f343ea0f1d735e2a490fe9b216bfb4443759534ef37e2`;
+its trailing-LF-canonical source was 23,650 bytes at SHA-256
+`24e71db33d79f3095bcbd7e3db7cd2bb06ace69a57519bd9089aa8081da5e781`.
+
+That harness was invoked exactly once under the approved clean environment.
+It exited `1` in approximately 0.2 seconds, emitted no stdout/stderr, and
+created no test record. The retained evidence therefore cannot truthfully
+distinguish a binding, parser-case, wrapper-suite, or safe-record-writer
+failure. No Keychain, bundle, mount, dump, Docker, container, database, Local,
+Production, schema, contract, or pass-1 action occurred; the real Docker
+invocation count remained zero; mandatory cleanup passed; and Git remained
+tracked-clean/upstream-equal. The corrected continuation authority is fully
+consumed. Repeating the same opaque command is not authorized.
+
+After the narrow observable design was explained, the Owner required
+`ไม่ over engineer นะ` and then instructed `ทำตามที่แนะนำครับ`. This decision
+first authorizes exactly one Checklist-only authority checkpoint from base
+`b3eb7bf5dc4d1cb1dfb7b68055d6160148af2ef1` on branch
+`codex/master-catalog-phase4`: change only this Checklist, commit once as
+`docs: authorize observable pre-p12 aggregate gate`, push once to the existing
+branch, and create no PR. Do not stage, modify, or delete `files/`, `tmp/`,
+`output/`, or any other untracked repository path. The checkpoint contains no
+P-12 GO marker and changes no source/tooling, kit, generator, runner,
+migration, application, flag, Package #39, or Runbook #41 content.
+
+Only after that checkpoint is tracked-clean, pushed, and upstream-equal, this
+decision authorizes exactly one minimal observable continuation:
+
+1. recover only the same reviewed parser, wrapper, and corrected harness into
+   the same exact owner-mode temporary paths from the same read-only Codex
+   session record. Before any observability change, require the parser,
+   wrapper, and corrected-harness file/canonical sizes and SHA-256 values to
+   match the bindings above and in the preceding authority exactly. Do not add
+   repository source, a framework, a retry system, or a sixth temporary file;
+   the existing five-file allowlist remains unchanged;
+2. preserve every parser and wrapper byte. Change only the temporary corrected
+   harness by the minimum required to emit exactly one newline-terminated safe
+   terminal JSON record on success or failure. It may contain only schema
+   `conduit-boq/master-catalog-p12-observable-gate/v1`, fixed-enum `stage`
+   (`binding`, `parser`, `wrapper`, `writer`, or `complete`), a fixed
+   harness-owned case ID, and integer `exitCode`. It must never emit a raw
+   command, path, fixture, parser/wrapper output, stderr payload, dump content,
+   identifier, credential, or secret. Bind the observable harness's
+   file/canonical sizes and hashes before execution;
+3. after syntax, binding, fixed-enum-output, secret-exclusion, and cleanup
+   review passes, invoke that observable synthetic harness exactly once under
+   the same clean environment. It may not access Keychain, the bundle,
+   mountpoint, dump, Docker, a database, Local, Production, or schema work;
+4. only a terminal `complete` record with the all-cases case ID and exit code
+   `0`, together with the newly created validated test record proving all 20
+   parser fixtures, 20 wrapper cases, binding, argv, safe-output, permission, and
+   cleanup checks, permits the still-unused inspection/mount and exactly one
+   read-only TOC invocation under unchanged aggregate-authority items 6-9.
+   Keep the exact frozen dump and image, Docker `--network none`, read-only
+   filesystem, no port or volume, and `pg_restore --format=custom --list`
+   without `--dbname`, `--jobs`, or any Production database credential;
+5. any observable synthetic failure stops after mandatory cleanup without an
+   automatic fix, retry, alternate harness/parser/wrapper/image/dump, TOC
+   invocation, schema/database/contract work, pass 1, or P-12. Any later
+   preflight or TOC failure likewise stops without retry; and
+6. after complete cleanup, either the one safe synthetic terminal result or a
+   conditionally reached safe TOC result authorizes exactly one Checklist-only
+   result checkpoint from the pushed observable-authority HEAD. Change only
+   this Checklist; record the source/observable hashes, safe terminal record,
+   test-record hash if created, exact Docker invocation count, any safe TOC
+   outcome, cleanup, and deviations; commit once as
+   `docs: record observable pre-p12 aggregate result`; push once to the
+   existing branch; and create no PR. For this continuation only, this
+   supersedes the earlier aggregate-authority preflight/static/synthetic/mount/
+   pre-invocation no-result rule and corrected-continuation item 5's no-result
+   rule, solely so the consumed outcome can be recorded after complete
+   cleanup. It authorizes no fix, retry, contract publication, target, pass 1,
+   Production access, or P-12. `automaticNextStep=false`.
+
 **Authority:** Production `2568.0.0` remains authoritative for item names,
 units, and prices. The local workbook remains reconciliation/reference evidence
 only.
@@ -2497,7 +2579,8 @@ weaken the verifier, or continue that disposable sequence.
   bounded metadata-assisted design authority above: `INITIAL ATTEMPT CONSUMED
   — E74 HARD STOP — CORRECTED TOC-ONLY CONSUMED — E72 HARD STOP — AGGREGATE
   E72-CORRECTED SYNTHETIC GATE HARD STOP — CORRECTED AGGREGATE SYNTHETIC GATE
-  AUTHORIZED ONCE — NOT YET EXECUTED`.
+  CONSUMED — OPAQUE EXIT 1 — OBSERVABLE AGGREGATE SYNTHETIC GATE AUTHORIZED
+  ONCE — NOT YET EXECUTED`.
   This does not authorize schema metadata inspection, target creation,
   execution proof, or pass 1.
 - [ ] After the P-47 replacement candidate is separately Git-published and
