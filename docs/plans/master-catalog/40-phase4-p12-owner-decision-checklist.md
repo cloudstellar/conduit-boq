@@ -3082,6 +3082,62 @@ Production approval/access, or P-12 action started. Result:
 `FRESH FORMAL PASS 1 COMPLETE — 016 THROUGH 026 — CLEANUP COMPLETE — HOLD FOR
 INDEPENDENT REVIEW`. `automaticNextStep=false`.
 
+**Schema-contract freeze authority recorded:** 2026-08-01 ICT — after the
+independent human submitted the required GitHub review, the authenticated
+read-only check found review `4834121985` by canonical login `lukkxh`, type
+`User`, state `APPROVED`, exact marker, and exact reviewed commit
+`a7a8a81248b19ea9e3ca2f262bdc03365c79c849`; PR `#7` remained open and
+unmerged at that check. The exact bounded next package was presented as one
+Checklist-only authority commit/push, authenticated review recheck, owner-only
+`0600` contract freeze/validation, and one Checklist-only result commit/push,
+with a hard stop before pass 2 and no PR merge, Local, Production, P-12,
+source, or kit change. The Owner then instructed `ทำยาวๆจนพร้อมเลยได้ไหม`.
+In that direct context, this decision authorizes the complete package below
+without another approval between its steps.
+
+First create exactly one Checklist-only authority checkpoint from base
+`85876dd38e717c63297169053d588e266cf88673` on branch
+`codex/master-catalog-phase4`: change only this Checklist, commit once as
+`docs: authorize p12 schema contract freeze`, push once to the existing
+branch, and create no PR. Do not stage, modify, or delete `files/`, `tmp/`,
+`output/`, or any other untracked repository path. The commit is not a new
+source/tooling HEAD, Production approval, or P-12 GO marker.
+
+Only after that checkpoint is tracked-clean, pushed, and upstream-equal:
+
+1. recheck PR `#7` through authenticated GitHub API and require repository
+   `cloudstellar/conduit-boq`, review ID `4834121985`, canonical immutable URL,
+   login/type `lukkxh`/`User`, state `APPROVED`, exact source/tooling commit and
+   unchanged PR head `a7a8a81248b19ea9e3ca2f262bdc03365c79c849`, exact
+   `P12_SCHEMA_REVIEW_V1` marker, latest review for that head, and no later
+   dismissal or changes-requested review. Do not merge the PR;
+2. independently reverify the complete owner-only Pass-1 evidence chain and
+   exact reviewed payload, then exclusively publish the external contract at
+   `/Users/cloud/Backups/ConduitBOQ/production/phase4/pre-p12/p12-schema-shape-contract-v3-a7a8a81248b19ea9.json`
+   as a regular, non-symlink, single-link file owned by `cloud`, mode `0600`,
+   schema `conduit-boq/master-catalog-p12-schema-shape-contract/v3`, with the
+   exact structured `githubReview` envelope above. Use an owner-only `0700`
+   temporary root and no-overwrite atomic publication; no secret-bearing field
+   or raw credential may be present;
+3. validate the frozen file offline with the reviewed runner's
+   `loadSchemaShapeContract` against the canonical kit, complete Pass-1 chain,
+   exact payload SHA-256, review chronology, and final file-byte SHA-256.
+   Preserve only secret-free owner-only validation/review/checksum evidence
+   under
+   `/Users/cloud/Backups/ConduitBOQ/evidence/phase4/pre-p12/p12-schema-contract-freeze-a7a8a81`,
+   then remove the exact temporary root; and
+4. hard-stop at the first mismatch with `automaticNextStep=false`. If and only
+   if the freeze and offline validation pass, change only this Checklist to
+   record the exact result and contract SHA-256, commit once as
+   `docs: record p12 schema contract freeze`, push once to the existing branch,
+   create no PR, reverify tracked-clean/upstream-equal state, and stop with
+   `automaticNextStep=false`.
+
+This authority starts no pass 2, disposable database, Local or Production
+connection, Production approval, P-12, migration, application/UI/export,
+feature flag, source/tooling, generator, runner, or kit change. It authorizes
+no PR merge and no action after the result checkpoint.
+
 **Authority:** Production `2568.0.0` remains authoritative for item names,
 units, and prices. The local workbook remains reconciliation/reference evidence
 only.
