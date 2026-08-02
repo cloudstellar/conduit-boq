@@ -2,7 +2,7 @@
 
 **Prepared:** 2026-07-26
 
-**Last updated:** 2026-08-01
+**Last updated:** 2026-08-02
 
 **Status:** PRE-P-12 HOLD — historical pre-correction context: immutable replacement source/tooling HEAD
 `7fbfe1bb8f71df03a78762b00e93aded7bdd6e42` and its truthful
@@ -69,22 +69,17 @@ checkpoint is pushed and upstream-equal. Production, application/UI/export
 changes, flags, publication, Factor F, hotfix `016`, and P-12 remain
 unauthorized.
 
-**Current status:** PRE-P-12 HOLD — the minimal hotfix-signature selector
-correction is pushed/upstream-equal at
-`a7a8a81248b19ea9e3ca2f262bdc03365c79c849`; the re-frozen kit and fresh
-formal Pass 1 are complete through `026`; the independent authenticated GitHub
-review and external schema-shape contract freeze are complete and bound below.
-The original fresh formal Pass 2 lifecycle stopped before migration `017` at
-its host-CLI connection proof and completed exact cleanup. The bounded
-diagnostic identified the standalone provisioner's missing explicit
-`PGSSLMODE=disable`. The separately authorized corrected fresh Pass-2 lifecycle
-then completed exact `017`, `017a`, `018`-`026` order, authenticated `lukkxh`
-review hand-offs, final read-only closeout, and exact cleanup. Its canonical
-final closeout evidence-manifest SHA-256 is
-`5fa07457740c1e016b17406a7a048741dadc17c97038fadeb7332fcdb53dfbf8`.
-This closes rehearsal only. External Production approval, the fresh Production
-advisor baseline, Production access, and P-12 remain unstarted, unbound, and
-unauthorized; `p13Authorized=false` and `automaticNextStep=false`.
+**Current status:** PRE-P-12 HOLD — both 2026-08-02 Production GO decisions
+are consumed and superseded. The connected step-`017` attempt stopped during
+its complete read-only preflight before the migration transaction because the
+frozen structural fingerprint incorrectly included volatile
+`pg_index.indcheckxmin`. Migration `017` was not applied, all Phase 4 flags
+remain absent, and Production data/schema are unchanged. The Owner authorized
+the minimal semantic correction and fresh qualification preparation below,
+but no new Production connection, retry, migration, or P-13 action. The old
+kit, contract, Pass 1, Pass 2, approval records, and failed preflight remain
+immutable audit evidence and are not represented as qualification for the new
+runner scope.
 
 **Exact application candidate:**
 `5068f944af2aa3fe8446c77c8ae8d48673cb260b`
@@ -102,8 +97,13 @@ source by the P-46 finding
 **Replacement source/tooling HEAD:**
 `7fbfe1bb8f71df03a78762b00e93aded7bdd6e42`
 
-**Current runner-corrected re-frozen source/tooling HEAD:**
+**Superseded pre-incident runner/source-tooling HEAD:**
 `a7a8a81248b19ea9e3ca2f262bdc03365c79c849`
+
+**Pending structural-fingerprint-v2 source/tooling HEAD:**
+the tracked-clean commit containing the minimal correction below; its exact
+Git identity is recorded externally by Git and must be bound by the new kit
+and reviewed contract before any future GO.
 
 **Completed post-P-48 Checklist-only status-checkpoint HEAD:**
 `28673b39962a092472c2334843e95aaafdfce97b`
@@ -3585,7 +3585,39 @@ bounded correction and corrected GO at `11:29:22` ICT. The same
 never-true flags, no-retry posture, post-migration encrypted backup, and
 no-P-13 boundary remain unchanged.
 
-<!-- P12_RUNNER_AUTHORITY_V1 {"decision":"GO","applicationCandidate":"5068f944af2aa3fe8446c77c8ae8d48673cb260b","ownerApprovalReference":"Codex Owner approved corrected P-12 GO after append-only Pass-2 normalization on 2026-08-02","approvedAt":"2026-08-02T11:29:22+07:00","executor":"Suthorn Kaewkorn","independentVerifier":"lukkxh","schemaShapeContractSha256":"4535ec62acad937fcf539ae752faa64436e861dadb53f626b3dccebaab930d66","pass2VerificationEvidenceManifestSha256":"ddcfdb8e1383ec5515974812205ca1cbc68d06fe068d1c5065b1a9d001a7daf3","maintenanceWindow":{"startsAt":"2026-08-02T11:00:00+07:00","endsAt":"2026-08-02T14:00:00+07:00"}} -->
+**Connected pre-`017` hard-stop and structural-fingerprint-v2 correction
+recorded:** 2026-08-02 ICT — the corrected invocation passed every offline
+binding, read the approved Keychain credential, connected to Production, and
+captured the complete preflight read-only snapshot. It then stopped before
+the final write boundary with expected stage-`016` schema fingerprint
+`297ef462fd7ebba40815742edb48f6ee15cc392e8ce65767e8a6a2e5e01cf3a8`
+versus live
+`9ad7a1613a091ed734eb304c15655ceffce3d913d24991baa0c554da0b21cfdb`.
+There was no migration CLI invocation or migration transaction.
+
+Columns `198/198`, constraints `91/91`, indexes `56/56`, every index
+definition, and every valid/ready/live state matched exactly. The only deltas
+were `check_xmin=false` in the restored rehearsal versus `true` in Production
+for `public.price_list.uq_version_item_code` and
+`public.user_profiles.idx_user_profiles_onboarding`. Retained-evidence offline
+parity removed only `indexes[].check_xmin` and proved strict semantic-payload
+equality across Production preflight, Pass-1 stage `016`, and Pass-2
+pre-`017`. This is a parity proof, not a replacement contract fingerprint.
+
+The Owner directed the path that prevents Production failure. The minimal
+source correction changes schema-shape scope from v1 to v2, excludes only
+`pg_index.indcheckxmin` from the structural payload/hash and final closeout
+equality, retains it separately as non-gating runtime diagnostic metadata,
+initializes successful final-closeout `closeoutError` as explicit `null`
+instead of repeating the earlier omitted-key defect, and adds focused
+regression tests. Exact index definitions and
+`indisvalid`/`indisready`/`indislive` remain hard gates. Migration SQL,
+application candidate, catalog authority, and Production remain unchanged.
+Do not alter `pg_catalog`, run `VACUUM`/`REINDEX`, or retry Production to make
+the old gate pass. The prior machine-readable GO marker is removed by this
+source correction; no active P-12 GO exists until a new kit, Pass 1, semantic
+human contract review, Pass 2, read-only parity, fresh approval, and separate
+Owner GO complete.
 
 **Authority:** Production `2568.0.0` remains authoritative for item names,
 units, and prices. The local workbook remains reconciliation/reference evidence

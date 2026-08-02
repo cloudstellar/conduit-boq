@@ -90,6 +90,7 @@ import {
   redactSensitiveText,
   runCapturedProcess,
   schemaShapeContractReviewPayloadSha256,
+  schemaShapeContractSurface,
   snapshotQueryDefinitions,
   validateApprovalRecord,
   validateCatalogActionErrorAcl,
@@ -216,6 +217,12 @@ function schemaShapeSnapshot(
       is_valid: true,
       is_ready: true,
       is_live: true,
+    }],
+    index_runtime_diagnostics: [{
+      schema_name: 'public',
+      relation_name: 'price_list',
+      index_name: 'price_list_pkey',
+      check_xmin: false,
     }],
     ...overrides,
   };
@@ -1035,6 +1042,54 @@ describe.sequential('Master Catalog P-12 CLI kit', () => {
       })],
       fingerprint,
     )).toThrow('invalid, unready, or non-live index');
+  });
+
+  it('keeps indcheckxmin diagnostic-only while preserving structural index gates', () => {
+    expect(SCHEMA_SHAPE_SCOPE).toBe(
+      'public-private-table-columns-constraints-indexes/v2',
+    );
+    const schemaShapeSql = snapshotQueryDefinitions({
+      relations: [],
+      routines: [],
+    }).find(({ name }) => name === 'schemaShape')?.sql ?? '';
+    expect(schemaShapeSql).toContain(
+      "to_jsonb(index_row) - 'check_xmin'",
+    );
+    expect(schemaShapeSql).toContain(
+      'index_row.indcheckxmin as check_xmin',
+    );
+    expect(schemaShapeSql).toContain('as index_runtime_diagnostics');
+    expect(schemaShapeSql).toContain('index_row.indisvalid as is_valid');
+    expect(schemaShapeSql).toContain('index_row.indisready as is_ready');
+    expect(schemaShapeSql).toContain('index_row.indislive as is_live');
+
+    const before = schemaShapeSnapshot();
+    const after = schemaShapeSnapshot(undefined, {
+      index_runtime_diagnostics: [{
+        schema_name: 'public',
+        relation_name: 'price_list',
+        index_name: 'price_list_pkey',
+        check_xmin: true,
+      }],
+    });
+    expect(schemaShapeContractSurface(after)).toEqual(
+      schemaShapeContractSurface(before),
+    );
+    expect(validateSchemaShape([after], '8'.repeat(64))).toEqual(after);
+  });
+
+  it('serializes a null error for successful final closeout evidence', async () => {
+    const runnerSource = await readFile(
+      join(REPOSITORY_ROOT, P12_RUNNER_SOURCE),
+      'utf8',
+    );
+    expect(runnerSource).toContain('let closeoutError = null');
+    expect(runnerSource).toContain(
+      'liveSnapshot && closeoutError === null',
+    );
+    expect(runnerSource).toContain(
+      'canonicalJson(schemaShapeContractSurface(liveSnapshot.schemaShape))',
+    );
   });
 
   it('captures all fifteen read-only snapshot surfaces for failure evidence', () => {
