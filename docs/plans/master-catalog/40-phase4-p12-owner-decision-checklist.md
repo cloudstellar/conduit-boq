@@ -3550,7 +3550,42 @@ changes-requested review. The migration executor is `Suthorn Kaewkorn`; the
 distinct independent verifier is `lukkxh` and is recorded present during the
 window. This GO authorizes no automatic next step.
 
-<!-- P12_RUNNER_AUTHORITY_V1 {"decision":"GO","applicationCandidate":"5068f944af2aa3fe8446c77c8ae8d48673cb260b","ownerApprovalReference":"Codex Owner GO P-12 Production effective 2026-08-02 11:00 ICT","approvedAt":"2026-08-02T11:03:47+07:00","executor":"Suthorn Kaewkorn","independentVerifier":"lukkxh","schemaShapeContractSha256":"4535ec62acad937fcf539ae752faa64436e861dadb53f626b3dccebaab930d66","pass2VerificationEvidenceManifestSha256":"5fa07457740c1e016b17406a7a048741dadc17c97038fadeb7332fcdb53dfbf8","maintenanceWindow":{"startsAt":"2026-08-02T11:00:00+07:00","endsAt":"2026-08-02T14:00:00+07:00"}} -->
+**Pre-`017` offline hard-stop and corrected GO binding recorded:**
+2026-08-02 ICT — the first frozen-runner invocation exited before Keychain
+access, Production connection, evidence-directory creation, or migration
+because the successful Pass-2 closeout writer omitted its undefined
+`closeoutError` property while the frozen loader required that exact key
+with value `null`. No Production state changed.
+
+The original owner-only Pass-2 bundle and manifest SHA-256
+`5fa07457740c1e016b17406a7a048741dadc17c97038fadeb7332fcdb53dfbf8`
+remain immutable. An append-only sibling at
+`/Users/cloud/Backups/ConduitBOQ/evidence/phase4/pre-p12/p12-formal-pass2c-a7a8a81/pass2/final-closeout-normalized-v1`
+keeps the context and live snapshot byte-for-byte and adds only
+`"closeoutError": null` to the successful outcome. Its manifest SHA-256 is
+`ddcfdb8e1383ec5515974812205ca1cbc68d06fe068d1c5065b1a9d001a7daf3`;
+the technical validation record SHA-256 is
+`1f21e91789b65b9ed13e1f5e5ef57d9a0f78a8b607c4af003bb6ea76524ed076`.
+The complete frozen transitive loader then rehashed and accepted the contract,
+Pass 1, every Pass-2 stage, final `026` signoff/advisor, schema fingerprint,
+ACL/RLS, ledger, flags, BOQ/Factor-F, hotfix posture, and live closeout with no
+other offline mismatch.
+
+Independent verifier `lukkxh` confirmed the exact normalization in GitHub PR
+`#7` comment `5155299689` at `2026-08-02T04:28:23Z`. A new read-only
+Production advisor baseline captured at `2026-08-02T04:24:28.443Z` returned
+exit `0`, no schema errors, and artifact SHA-256
+`ca96317a1fa622b9a8719d44b7492a4c4ebeea016e6881dc77810afe775f3cc1`.
+The authenticated final review recheck completed at
+`2026-08-02T04:29:09.109Z`: PR `#7` remained open/unmerged at exact source
+HEAD, the original contract review remained `APPROVED`, and the new
+normalization marker matched exactly. The Owner approved this recommended
+bounded correction and corrected GO at `11:29:22` ICT. The same
+`11:00`-`14:00` ICT window, sequence, executor/verifier, hard-stop,
+never-true flags, no-retry posture, post-migration encrypted backup, and
+no-P-13 boundary remain unchanged.
+
+<!-- P12_RUNNER_AUTHORITY_V1 {"decision":"GO","applicationCandidate":"5068f944af2aa3fe8446c77c8ae8d48673cb260b","ownerApprovalReference":"Codex Owner approved corrected P-12 GO after append-only Pass-2 normalization on 2026-08-02","approvedAt":"2026-08-02T11:29:22+07:00","executor":"Suthorn Kaewkorn","independentVerifier":"lukkxh","schemaShapeContractSha256":"4535ec62acad937fcf539ae752faa64436e861dadb53f626b3dccebaab930d66","pass2VerificationEvidenceManifestSha256":"ddcfdb8e1383ec5515974812205ca1cbc68d06fe068d1c5065b1a9d001a7daf3","maintenanceWindow":{"startsAt":"2026-08-02T11:00:00+07:00","endsAt":"2026-08-02T14:00:00+07:00"}} -->
 
 **Authority:** Production `2568.0.0` remains authoritative for item names,
 units, and prices. The local workbook remains reconciliation/reference evidence
