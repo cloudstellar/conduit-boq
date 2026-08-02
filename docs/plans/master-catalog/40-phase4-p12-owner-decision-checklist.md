@@ -3525,6 +3525,33 @@ was already detached and Local and Production were untouched. Result:
 `PASS 2 COMPLETE — FINAL CLOSEOUT VERIFIED — CLEANUP COMPLETE`.
 `p13Authorized=false`; `automaticNextStep=false`.
 
+**P-12 Production GO recorded:** 2026-08-02 `11:03:47` ICT — the Owner
+explicitly authorizes Production execution in the exact `11:00`-`14:00` ICT
+window, using the frozen source/tooling HEAD, kit, reviewed schema contract,
+and application candidate already recorded above. Execute only `017` ->
+`017a` -> `018`-`026`, one manually verified stage at a time, with immediate
+postflight/advisor review and a post-migration encrypted backup while all
+three Phase 4 flags remain `false`. Hard-stop at the first mismatch or
+uncertain outcome; do not retry, substitute an alternate path, reset or
+restore over Production, open P-13, deploy the application, publish a catalog,
+or enable a feature flag.
+
+The GO binds the fresh verified pre-migration backup package
+`p12-pre-migration-20260802T034459Z` (dump SHA-256
+`276a3ee1caf3baaa221be90b410b2511b450c877315ba358b46397c81cd9514d`),
+the fresh step-`017` Production advisor baseline captured at
+`2026-08-02T03:13:38.778Z` (artifact SHA-256
+`3f9f90718dd6a2d0c3bbd8b6e5b37941bc1ca08adbab1263e26768717dea39e8`;
+no schema findings), and the authenticated GitHub review recheck completed at
+`2026-08-02T04:02:09.902Z`. PR `#7` remained open and unmerged at exact head
+`a7a8a81248b19ea9e3ca2f262bdc03365c79c849`; review `4834121985` remained
+`APPROVED` by `lukkxh` with the exact frozen marker and no later dismissal or
+changes-requested review. The migration executor is `Suthorn Kaewkorn`; the
+distinct independent verifier is `lukkxh` and is recorded present during the
+window. This GO authorizes no automatic next step.
+
+<!-- P12_RUNNER_AUTHORITY_V1 {"decision":"GO","applicationCandidate":"5068f944af2aa3fe8446c77c8ae8d48673cb260b","ownerApprovalReference":"Codex Owner GO P-12 Production effective 2026-08-02 11:00 ICT","approvedAt":"2026-08-02T11:03:47+07:00","executor":"Suthorn Kaewkorn","independentVerifier":"lukkxh","schemaShapeContractSha256":"4535ec62acad937fcf539ae752faa64436e861dadb53f626b3dccebaab930d66","pass2VerificationEvidenceManifestSha256":"5fa07457740c1e016b17406a7a048741dadc17c97038fadeb7332fcdb53dfbf8","maintenanceWindow":{"startsAt":"2026-08-02T11:00:00+07:00","endsAt":"2026-08-02T14:00:00+07:00"}} -->
+
 **Authority:** Production `2568.0.0` remains authoritative for item names,
 units, and prices. The local workbook remains reconciliation/reference evidence
 only.
