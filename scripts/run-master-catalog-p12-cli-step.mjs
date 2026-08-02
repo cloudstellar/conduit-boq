@@ -75,7 +75,7 @@ export const FINAL_CLOSEOUT_CONTEXT_SCHEMA =
 export const SCHEMA_SHAPE_CONTRACT_SCHEMA =
   'conduit-boq/master-catalog-p12-schema-shape-contract/v3'
 export const SCHEMA_SHAPE_SCOPE =
-  'public-private-table-columns-constraints-indexes/v1'
+  'public-private-table-columns-constraints-indexes/v2'
 export const SCHEMA_SHAPE_GITHUB_REVIEW_PROVIDER =
   'github-pull-request-review'
 export const SCHEMA_SHAPE_GITHUB_REPOSITORY =
@@ -2726,7 +2726,7 @@ shape as (
     coalesce(
       (
         select jsonb_agg(
-          to_jsonb(index_row)
+          to_jsonb(index_row) - 'check_xmin'
           order by
             index_row.schema_name collate "C",
             index_row.relation_name collate "C",
@@ -2745,7 +2745,25 @@ select
   )::text as schema_shape_fingerprint_sha256,
   payload->'columns' as columns,
   payload->'constraints' as constraints,
-  payload->'indexes' as indexes
+  payload->'indexes' as indexes,
+  coalesce(
+    (
+      select jsonb_agg(
+        jsonb_build_object(
+          'schema_name', index_row.schema_name,
+          'relation_name', index_row.relation_name,
+          'index_name', index_row.index_name,
+          'check_xmin', index_row.check_xmin
+        )
+        order by
+          index_row.schema_name collate "C",
+          index_row.relation_name collate "C",
+          index_row.index_name collate "C"
+      )
+      from index_rows index_row
+    ),
+    '[]'::jsonb
+  ) as index_runtime_diagnostics
 from shape;
 `
 
@@ -3278,6 +3296,16 @@ export function validateCapturedSchemaShape(
     )
   }
   return row
+}
+
+export function schemaShapeContractSurface(schemaShape) {
+  return {
+    schema_shape_fingerprint_sha256:
+      schemaShape.schema_shape_fingerprint_sha256,
+    columns: schemaShape.columns,
+    constraints: schemaShape.constraints,
+    indexes: schemaShape.indexes,
+  }
 }
 
 function validateOwnedInventory(rows, targets, label) {
@@ -5891,8 +5919,10 @@ function assertFinalCloseoutSnapshotMatches(
     liveSnapshot.hotfix016,
   )
   assert(
-    canonicalJson(liveSnapshot.schemaShape)
-      === canonicalJson(finalMigrationPostflight.schemaShape),
+    canonicalJson(schemaShapeContractSurface(liveSnapshot.schemaShape))
+      === canonicalJson(
+        schemaShapeContractSurface(finalMigrationPostflight.schemaShape),
+      ),
     'Live final-closeout schema shape differs from final-migration postflight',
   )
   assert(
@@ -6112,7 +6142,7 @@ export async function executeP12FinalCloseout(options) {
   )
 
   let liveSnapshot
-  let closeoutError
+  let closeoutError = null
   try {
     const immediateKit = await verifyKit(
       options.kit,
@@ -6320,7 +6350,7 @@ export async function executeP12FinalCloseout(options) {
   }
 
   const finalCloseoutVerified = Boolean(
-    liveSnapshot && !closeoutError,
+    liveSnapshot && closeoutError === null,
   )
   const outcome = {
     finishedAt: new Date().toISOString(),

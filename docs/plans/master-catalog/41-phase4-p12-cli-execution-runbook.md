@@ -274,6 +274,13 @@ fingerprint canonicalizes every
 identity/generated state, and collation), constraint definition/validation
 state, and index definition/valid/ready/live state. Preflight must equal the
 preceding stage; postflight and final closeout must equal the new stage.
+`pg_index.indcheckxmin` is an MVCC/HOT runtime-horizon marker rather than
+structural schema. Scope
+`public-private-table-columns-constraints-indexes/v2` therefore excludes it
+from the fingerprint and closeout-equality surface while preserving its live
+value as non-gating `index_runtime_diagnostics` evidence. Never mutate
+`pg_catalog`, `VACUUM`, or `REINDEX` merely to make this diagnostic value match
+a rehearsal.
 
 The contract cannot be self-generated during Production execution. Its safe
 derivation is a two-pass rehearsal:
