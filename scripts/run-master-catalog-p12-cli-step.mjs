@@ -1443,6 +1443,7 @@ async function loadFocusedIsolated017HistoricalKit(ownerChatConfirmation) {
     record.kitManifestPath,
     record.kitManifestSha256,
     'Focused isolated 017 historical kit manifest',
+    512 * 1024,
   )
   const manifest = loaded.record
   assert(
