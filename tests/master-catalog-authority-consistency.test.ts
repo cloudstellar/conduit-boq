@@ -19,6 +19,41 @@ function expectInOrder(source: string, tokens: string[]) {
   }
 }
 
+function expectP12ProductionAuthorityConsumed(source: string) {
+  const markers = [
+    ...source.matchAll(
+      /<!-- P12_RUNNER_AUTHORITY_CONSUMED_V1 (\{[^\n]+\}) -->/g,
+    ),
+  ]
+
+  expect(markers).toHaveLength(1)
+  expect(JSON.parse(markers[0][1])).toEqual({
+    executionGitHead: 'b8a80d24ccd4e205f349216d22dac0cfef714ebe',
+    approvalRecordSha256:
+      '30bd194cae9f885d2cb71d9f3497153ff6731ea2b1ccaa752f31a07dc4dd887f',
+    attemptedStep: '017',
+    evidenceManifestSha256:
+      '87533c8a8795d00ad1934a80c71540eab21df40cb424b538cc6758a3581acb1c',
+    outcomeSha256:
+      '8ace5309120c4cb257fa4fe1ad49262dd4bb6b6cee448e111280e34c9e68ad45',
+    afterStateSha256:
+      'da7ec851e800a4579dc56c80809cebdba352437ba1d06eec25312a5933ced342',
+    verifiedStageAfter: '016',
+    disposition: 'hard-stop-consumed-no-retry-authority',
+    productionMutationObserved: false,
+    retryAuthorized: false,
+    freshGoRequired: true,
+  })
+  expect(source).toContain(
+    'The native CLI stopped before applying that migration\nbecause the frozen workdir omitted seven older versions already present in the\nProduction migration ledger.',
+  )
+  expect(source).toContain('no Production mutation was observed.')
+  expect(source).toContain(
+    'until a fresh\nOwner GO and new `P12_RUNNER_AUTHORITY_V2` checkpoint.',
+  )
+  expect(source).not.toMatch(/<!-- P12_RUNNER_AUTHORITY_V[12] /)
+}
+
 function expectRelativeMarkdownLinksToExist(path: string) {
   const source = read(path)
   const sourceDirectory = dirname(resolve(root, path))
@@ -586,17 +621,18 @@ describe('Master Catalog authority consistency', () => {
       '- [x] Accept the unused `v_row_count` assignment as low-risk managed',
     )
     expect(ownerChecklist).toContain(
-      '- [ ] Name the migration executor: `________________`.',
+      '- [x] Name the migration executor: `Suthorn Kaewkorn`.',
     )
     expect(ownerChecklist).toContain(
-      '- [ ] Name an independent verifier: `________________`.',
+      '- [x] Name an independent verifier: GitHub login `Lukkxh`;',
     )
     expect(ownerChecklist).toContain(
-      '- [ ] Record the approved Production `session_user`, `current_user`, and',
+      '- [x] Record the required Production `session_user`, `current_user`, and',
     )
     expect(ownerChecklist).toContain(
-      '- [ ] Propose the maintenance window: `________________`.',
+      '- [x] Propose the maintenance window: Saturday 2026-08-01,',
     )
+    expectP12ProductionAuthorityConsumed(ownerChecklist)
     expect(ownerChecklist).toContain(
       '- [x] P-47 authorizes repository-only migration `026` plus required bootstrap',
     )
@@ -676,7 +712,7 @@ describe('Master Catalog authority consistency', () => {
       '- [x] P-48 authorizes exactly one commit/push from base `d92d8ce`',
     )
     expect(ownerChecklist).toContain(
-      '- [ ] After P-48 execution, record the replacement clean pushed',
+      '- [x] P-48 executed exactly once at replacement clean pushed/upstream-equal',
     )
     expect(decisions).toContain(
       '`ed94c0304be2741217c7ea2c36322b426de1dfe5`',
@@ -708,18 +744,23 @@ describe('Master Catalog authority consistency', () => {
     expect(readinessPackage).toContain('two operational binding HEADs')
     expect(readinessPackage).not.toContain('uses two Git commits')
     expect(ownerChecklist).toContain(
-      '`UNAUTHORIZED — HOLD`',
+      'This consumed authority permits no retry or\nalternate path.',
     )
     expect(ownerChecklist).toContain(
       '`supabase db reset --local --no-seed`',
     )
-    for (const authority of [decisions, readinessPackage, ownerChecklist]) {
+    for (const authority of [decisions, readinessPackage]) {
       expect(authority).toContain('PRE-GO authority checkpoint')
       expect(authority).toMatch(
         /clean\s+dedicated\s+(?:execution\s+)?checkout/,
       )
       expect(authority).toMatch(/net\s+changed\s+path/)
     }
+    expect(ownerChecklist).toMatch(/PRE-GO\s+authority checkpoint/)
+    expect(ownerChecklist).toMatch(
+      /clean\s+dedicated\s+(?:execution\s+)?checkout/,
+    )
+    expect(ownerChecklist).toMatch(/net\s+changed\s+path/)
     expect(readinessPackage).toContain(
       'The same `current_user` must execute `017`,\n  `017a`, and `018`-`026` because `ALTER DEFAULT PRIVILEGES`',
     )
@@ -1398,7 +1439,6 @@ describe('Master Catalog authority consistency', () => {
       'docs/plans/master-catalog/19-phase4-decision-register.md',
       'docs/plans/master-catalog/25-phase4-execution-progress-tracker.md',
       'docs/plans/master-catalog/39-phase4-p12-production-readiness-package.md',
-      'docs/plans/master-catalog/40-phase4-p12-owner-decision-checklist.md',
     ]
     const historicalAuthorityHash =
       'sha256:ecd457c625c6eeb445607f30d374734c3e7ebd2a6d5489912f4c7ec42b3019a5'
@@ -1433,11 +1473,32 @@ describe('Master Catalog authority consistency', () => {
       'docs/plans/master-catalog/40-phase4-p12-owner-decision-checklist.md',
     )
 
-    for (const authority of [readinessPackage, ownerChecklist]) {
-      expect(authority).toContain('UNCOMPUTED — HOLD')
-      expect(authority).toContain('UNRECORDED — HOLD')
-      expect(authority).toContain('UNBOUND — HOLD')
-    }
+    expect(ownerChecklist).toContain('`catalogAuthorityFingerprintSha256`')
+    expect(ownerChecklist).toMatch(/new\s+operational\s+fingerprint/i)
+    expect(ownerChecklist).toContain(historicalAuthorityHash)
+    expect(ownerChecklist).toMatch(
+      /historical canonical SQL was not committed/i,
+    )
+    expect(ownerChecklist).toMatch(
+      /separately\s+authorized\s+read-only (?:query|derivation)/i,
+    )
+    expect(ownerChecklist).toMatch(
+      /encrypted\s+Production\s+readiness\s+snapshot's\s+isolated\s+restore/i,
+    )
+    expect(ownerChecklist).toMatch(
+      /fresh encrypted Production\s+application backup passed isolated PostgreSQL 17 restore\/checksum/i,
+    )
+    expect(ownerChecklist).toMatch(/external\s+Production approval/i)
+    expect(ownerChecklist).toContain('`productionEligible=true`')
+    expect(ownerChecklist).toContain('P-12')
+
+    expect(readinessPackage).toContain('UNCOMPUTED — HOLD')
+    expect(readinessPackage).toContain('UNRECORDED — HOLD')
+    expect(readinessPackage).toContain('UNBOUND — HOLD')
+    expect(ownerChecklist).toContain(
+      '`0fbaf215018200bacbc728af330e990b98c7e6128165982289ed429c93ad13f2`',
+    )
+    expectP12ProductionAuthorityConsumed(ownerChecklist)
 
     expect(readinessPackage).toContain(
       'These placeholders are deliberately invalid approval values.',
@@ -1478,9 +1539,13 @@ describe('Master Catalog authority consistency', () => {
     }
 
     expect(ownerChecklist).toContain(
-      'UNCREATED — UNREVIEWED — UNBOUND — HOLD',
+      'reviewed schema contract SHA-256 is\n`06f46916609afa80fde75cf8d0f4cbf0a63a1b65fc2f69abffda398c6dea3912`',
     )
-    expect(ownerChecklist).toContain('UNRECORDED — UNBOUND — HOLD')
+    expect(ownerChecklist).toContain(
+      'fresh Pass-2 final closeout manifest SHA-256 is\n`f4f0fdcdee44562afab3c7f6e96b7a8e0fbad9b1c37ea0fb28adee0898a8f603`',
+    )
+    expect(ownerChecklist).toMatch(/fresh Production advisor\s+returned no findings/)
+    expectP12ProductionAuthorityConsumed(ownerChecklist)
     expect(cliRunbook).toContain(
       'conduit-boq/master-catalog-p12-schema-shape-contract/v3',
     )
@@ -1592,17 +1657,25 @@ describe('Master Catalog authority consistency', () => {
       ownerChecklist.indexOf(
         '- [ ] Owner receives a separate exact P-12 go/no-go request.',
       ),
-    )
+    ).replace(/\s+/g, ' ')
     expectInOrder(requestGate, [
       'review',
       'commit/push',
-      'Remote CI/status',
+      'Remote status',
       'corrected Local',
       'Build and hash-bind',
       'pass 1',
       'GitHub contract review',
       'pass 2',
     ])
+    expectInOrder(ownerChecklist, [
+      '## 3. P-12 request gate',
+      '## 4. Explicit exclusions',
+      '## 5. Final P-12 Production GO overlay — 2026-08-09',
+      '## 6. P-12 Production attempt hard-stop — 2026-08-09',
+      'P12_RUNNER_AUTHORITY_CONSUMED_V1',
+    ])
+    expectP12ProductionAuthorityConsumed(ownerChecklist)
 
     for (const authority of [
       decisionRegister,
@@ -1628,10 +1701,13 @@ describe('Master Catalog authority consistency', () => {
     expect(ownerChecklist).toContain('githubReviewCheckedAt')
     expect(cliRunbook).toContain('githubReviewCheckedAt')
     expect(runner).toContain(
+      'conduit-boq/master-catalog-p12-schema-shape-contract/v4',
+    )
+    expect(runner).toContain(
       'conduit-boq/master-catalog-p12-schema-shape-contract/v3',
     )
     expect(runner).toContain(
-      'conduit-boq/master-catalog-p12-production-approval/v3',
+      'conduit-boq/master-catalog-p12-production-approval/v4',
     )
     expect(runner).not.toContain('api.github.com')
     expect(runner).not.toMatch(/\bgh\s+api\b/)

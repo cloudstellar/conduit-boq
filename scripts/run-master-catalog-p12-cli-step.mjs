@@ -25,10 +25,13 @@ import { pathToFileURL } from 'node:url'
 import {
   APPLICATION_CANDIDATE,
   CLIENT_TIMEOUT_SECONDS,
+  FULL_PRE_017_LEDGER_SEQUENCE,
   HISTORICAL_MIGRATIONS,
   KIT_SCHEMA,
+  LEGACY_LEDGER_COMPATIBILITY_GUARDS,
   LOCAL_SUPABASE_CLI,
   P12_KIT_GENERATOR_SOURCE,
+  P12_LEGACY_LEDGER_GUARD_SOURCE_ROOT,
   P12_RUNNER_SOURCE,
   PHASE4_MIGRATIONS,
   REPOSITORY_ROOT,
@@ -42,7 +45,7 @@ import {
 } from './prepare-master-catalog-p12-cli-kit.mjs'
 
 export const APPROVAL_SCHEMA =
-  'conduit-boq/master-catalog-p12-production-approval/v3'
+  'conduit-boq/master-catalog-p12-production-approval/v4'
 export const APPROVAL_SCOPE =
   'P-12-migrations-017-017a-018-through-026-only'
 export const PRODUCTION_PROJECT_REF = 'otlssvssvgkohqwuuiir'
@@ -73,7 +76,41 @@ export const FINAL_CLOSEOUT_EVIDENCE_MANIFEST_SCHEMA =
 export const FINAL_CLOSEOUT_CONTEXT_SCHEMA =
   'conduit-boq/master-catalog-p12-final-closeout-evidence/v2'
 export const SCHEMA_SHAPE_CONTRACT_SCHEMA =
+  'conduit-boq/master-catalog-p12-schema-shape-contract/v4'
+export const LEGACY_SCHEMA_SHAPE_CONTRACT_SCHEMA =
   'conduit-boq/master-catalog-p12-schema-shape-contract/v3'
+export const SCHEMA_SHAPE_CONTINUITY_SCHEMA =
+  'conduit-boq/master-catalog-p12-schema-shape-continuity/v1'
+export const LEGACY_SCHEMA_SHAPE_CONTRACT_SHA256 =
+  '06f46916609afa80fde75cf8d0f4cbf0a63a1b65fc2f69abffda398c6dea3912'
+export const LEGACY_PASS2_VERIFICATION_EVIDENCE_MANIFEST_SHA256 =
+  'f4f0fdcdee44562afab3c7f6e96b7a8e0fbad9b1c37ea0fb28adee0898a8f603'
+export const FAILED_PRODUCTION_017_EVIDENCE_MANIFEST_SHA256 =
+  '87533c8a8795d00ad1934a80c71540eab21df40cb424b538cc6758a3581acb1c'
+export const FAILED_PRODUCTION_017_GIT_HEAD =
+  'b8a80d24ccd4e205f349216d22dac0cfef714ebe'
+export const FOCUSED_ISOLATED_017_PRODUCTION_DUMP_SHA256 =
+  'b74fef5667225434bf10a737813a5090b45bb9a83eac08fd02db7797e14b4cb4'
+export const FOCUSED_ISOLATED_017_POSTGRES_IMAGE_ID =
+  'sha256:178f0976b54a39237096bfa310c1a352dbc82fb1b08dda45cdb8acb5d40c1426'
+export const FAILED_PRODUCTION_017_APPROVAL_RECORD_SHA256 =
+  '30bd194cae9f885d2cb71d9f3497153ff6731ea2b1ccaa752f31a07dc4dd887f'
+export const FAILED_PRODUCTION_017_FILE_SHA256 = Object.freeze({
+  '00-context.json':
+    'a6bc6ab190302ef019a426122e35147f76ac776b6bdb6c22e5971b2b2999f943',
+  '01-preflight-write-boundary.json':
+    '6393644d3f87046b85a0bb7f8bc839a80410abee86f6b66860a74329a089981e',
+  '01-preflight.json':
+    'c8f58e61e9aab04eb01bfef03c71c005af1a0398237508692e7b2f1b9fa7f1a2',
+  '02-cli-output.json':
+    'cb0d0a6a28593211ca9debec77a1e11815f2911d4ecd8530b5a7d1ef746b57c5',
+  '02-migration-outcome.json':
+    '8ace5309120c4cb257fa4fe1ad49262dd4bb6b6cee448e111280e34c9e68ad45',
+  '03-failure-after-state.json':
+    'da7ec851e800a4579dc56c80809cebdba352437ba1d06eec25312a5933ced342',
+  '03-postflight-unavailable.json':
+    '3e8e46e17aaa63de10356e6f823c264f03aa28df37b2f26117b37f2879224a62',
+})
 export const SCHEMA_SHAPE_SCOPE =
   'public-private-table-columns-constraints-indexes/v2'
 export const SCHEMA_SHAPE_GITHUB_REVIEW_PROVIDER =
@@ -134,7 +171,20 @@ export const P12_AUTHORITY_FILES = Object.freeze([
 ])
 export const P12_RUNNER_AUTHORITY_FILE =
   'docs/plans/master-catalog/40-phase4-p12-owner-decision-checklist.md'
-export const P12_RUNNER_AUTHORITY_MARKER = 'P12_RUNNER_AUTHORITY_V1'
+export const P12_RUNNER_AUTHORITY_MARKER = 'P12_RUNNER_AUTHORITY_V2'
+export const P12_CONSUMED_AUTHORITY_MARKER =
+  'P12_RUNNER_AUTHORITY_CONSUMED_V1'
+export const CORRECTION_SOURCE_ALLOWED_PATHS = Object.freeze([
+  P12_RUNNER_AUTHORITY_FILE,
+  P12_KIT_GENERATOR_SOURCE,
+  P12_RUNNER_SOURCE,
+  'tests/master-catalog-p12-cli-kit.test.ts',
+  'tests/master-catalog-authority-consistency.test.ts',
+  ...LEGACY_LEDGER_COMPATIBILITY_GUARDS.map(
+    (migration) =>
+      `${P12_LEGACY_LEDGER_GUARD_SOURCE_ROOT}/${migration.sourceFile}`,
+  ),
+])
 export const CLI_USAGE = `Usage:
   node scripts/run-master-catalog-p12-cli-step.mjs --mode <rehearsal|production> --kit <absolute-path> --step <017|017a|018-026> --db-url <passwordless-url> --evidence <absolute-new-path> --executor-label <label> --schema-shape-contract <absolute-0600-json> --advisor-artifact <absolute-path> --advisor-artifact-sha256 <sha256> [mode-specific options]
   node scripts/run-master-catalog-p12-cli-step.mjs closeout --mode <rehearsal|production> --kit <absolute-path> --db-url <passwordless-url> --evidence <absolute-new-path> --final-migration-evidence-manifest <absolute-path> --final-signoff <absolute-0600-json> --verifier-label <label> --schema-shape-contract <absolute-0600-json> --advisor-artifact <absolute-path> --advisor-artifact-sha256 <sha256> [mode-specific options]
@@ -163,7 +213,7 @@ export const SCHEMA_SHAPE_STAGES = Object.freeze([
   '016',
   ...PHASE4_MIGRATIONS.map((migration) => migration.ordinal),
 ])
-export const SCHEMA_SHAPE_CONTRACT_PAYLOAD_KEYS = Object.freeze([
+export const LEGACY_SCHEMA_SHAPE_CONTRACT_PAYLOAD_KEYS = Object.freeze([
   'schema',
   'scope',
   'applicationCandidate',
@@ -179,6 +229,30 @@ export const SCHEMA_SHAPE_CONTRACT_PAYLOAD_KEYS = Object.freeze([
   'captureExecutor',
   'pass1EvidenceManifestPath',
   'pass1EvidenceManifestSha256',
+])
+export const SCHEMA_SHAPE_CONTRACT_PAYLOAD_KEYS = Object.freeze([
+  ...LEGACY_SCHEMA_SHAPE_CONTRACT_PAYLOAD_KEYS,
+  'continuity',
+])
+export const SCHEMA_SHAPE_CONTINUITY_KEYS = Object.freeze([
+  'schema',
+  'priorSchemaShapeContractPath',
+  'priorSchemaShapeContractSha256',
+  'priorPass2VerificationEvidenceManifestPath',
+  'priorPass2VerificationEvidenceManifestSha256',
+  'failedProductionAttempt',
+  'focusedIsolated017Proof',
+])
+export const FAILED_PRODUCTION_ATTEMPT_KEYS = Object.freeze([
+  'evidenceManifestPath',
+  'evidenceManifestSha256',
+  'files',
+])
+export const FOCUSED_ISOLATED_017_PROOF_KEYS = Object.freeze([
+  'evidenceManifestPath',
+  'evidenceManifestSha256',
+  'proofResultPath',
+  'proofResultSha256',
 ])
 export const SCHEMA_SHAPE_GITHUB_REVIEW_KEYS = Object.freeze([
   'provider',
@@ -216,8 +290,11 @@ function canonicalJson(value) {
 
 export function schemaShapeContractReviewPayload(record) {
   assertPlainObject(record, 'Schema-shape contract review payload source')
+  const payloadKeys = record.schema === LEGACY_SCHEMA_SHAPE_CONTRACT_SCHEMA
+    ? LEGACY_SCHEMA_SHAPE_CONTRACT_PAYLOAD_KEYS
+    : SCHEMA_SHAPE_CONTRACT_PAYLOAD_KEYS
   return Object.fromEntries(
-    SCHEMA_SHAPE_CONTRACT_PAYLOAD_KEYS.map((key) => [key, record[key]]),
+    payloadKeys.map((key) => [key, record[key]]),
   )
 }
 
@@ -233,11 +310,23 @@ export function expectedSchemaShapeGithubReviewMarker(
   reviewedPayloadSha256 =
     schemaShapeContractReviewPayloadSha256(record),
 ) {
+  if (record.schema === LEGACY_SCHEMA_SHAPE_CONTRACT_SCHEMA) {
+    return [
+      'P12_SCHEMA_REVIEW_V1',
+      `source=${record.sourceToolingGitHead}`,
+      `kit=${record.kitManifestSha256}`,
+      `pass1=${record.pass1EvidenceManifestSha256}`,
+      `payload=${reviewedPayloadSha256}`,
+    ].join(' ')
+  }
   return [
-    'P12_SCHEMA_REVIEW_V1',
+    'P12_SCHEMA_REVIEW_V2',
     `source=${record.sourceToolingGitHead}`,
     `kit=${record.kitManifestSha256}`,
-    `pass1=${record.pass1EvidenceManifestSha256}`,
+    `legacy=${record.continuity?.priorSchemaShapeContractSha256}`,
+    `pass2=${record.continuity?.priorPass2VerificationEvidenceManifestSha256}`,
+    `failed=${record.continuity?.failedProductionAttempt?.evidenceManifestSha256}`,
+    `proof=${record.continuity?.focusedIsolated017Proof?.evidenceManifestSha256}`,
     `payload=${reviewedPayloadSha256}`,
   ].join(' ')
 }
@@ -469,7 +558,7 @@ export function validateApprovalRecord(
     ],
     'Approval record',
   )
-  assert(record.schema === APPROVAL_SCHEMA, 'Approval record schema is not frozen P-12 v3')
+  assert(record.schema === APPROVAL_SCHEMA, 'Approval record schema is not frozen P-12 v4')
   assert(record.decision === 'GO', 'Approval record must contain an explicit GO decision')
   assert(
     record.scope === APPROVAL_SCOPE,
@@ -980,7 +1069,7 @@ export function expectedSchemaShapeFingerprint(contract, stage) {
  *   now?: Date,
  * }} options
  */
-export async function loadSchemaShapeContract(
+export async function loadSchemaShapeContractV3(
   path,
   {
     kit,
@@ -1021,13 +1110,13 @@ export async function loadSchemaShapeContract(
   assertExactKeys(
     record,
     [
-      ...SCHEMA_SHAPE_CONTRACT_PAYLOAD_KEYS,
+      ...LEGACY_SCHEMA_SHAPE_CONTRACT_PAYLOAD_KEYS,
       'githubReview',
     ],
     'Schema-shape contract',
   )
   assert(
-    record.schema === SCHEMA_SHAPE_CONTRACT_SCHEMA,
+    record.schema === LEGACY_SCHEMA_SHAPE_CONTRACT_SCHEMA,
     'Schema-shape contract schema is not frozen v3',
   )
   assert(
@@ -1146,6 +1235,874 @@ export async function loadSchemaShapeContract(
   }
 }
 
+async function loadOwnerOnlyJsonArtifact(
+  path,
+  expectedSha256,
+  label,
+  maximumBytes = 128 * 1024,
+) {
+  assert(
+    typeof path === 'string' && isAbsolute(path),
+    `${label} path must be absolute`,
+  )
+  if (expectedSha256 !== undefined) {
+    assert(
+      /^[0-9a-f]{64}$/.test(expectedSha256),
+      `${label} SHA-256 is invalid`,
+    )
+  }
+  const { resolvedPath, stats } = await resolveExistingExternalPath(
+    path,
+    label,
+    'file',
+  )
+  if (typeof process.getuid === 'function') {
+    assert(
+      stats.uid === process.getuid(),
+      `${label} must be owned by the executing OS user`,
+    )
+  }
+  assert(
+    (stats.mode & 0o077) === 0,
+    `${label} must deny group and other access`,
+  )
+  assert(
+    stats.size > 0 && stats.size <= maximumBytes,
+    `${label} size is outside the bounded limit`,
+  )
+  const raw = await readFile(resolvedPath, 'utf8')
+  const sha256 = sha256Bytes(Buffer.from(raw, 'utf8'))
+  if (expectedSha256 !== undefined) {
+    assert(sha256 === expectedSha256, `${label} SHA-256 differs`)
+  }
+  const record = JSON.parse(raw)
+  assertPlainObject(record, label)
+  assertNoSecretFields(record, label)
+  return {
+    path: resolvedPath,
+    sha256,
+    record,
+    stats,
+  }
+}
+
+async function loadLegacySchemaShapeContractForContinuity(
+  path,
+  expectedSha256,
+  now,
+) {
+  assert(
+    expectedSha256 === LEGACY_SCHEMA_SHAPE_CONTRACT_SHA256,
+    'Continuity does not bind the exact accepted v3 schema-shape contract',
+  )
+  const loaded = await loadOwnerOnlyJsonArtifact(
+    path,
+    expectedSha256,
+    'Legacy v3 schema-shape contract',
+  )
+  assert(
+    (loaded.stats.mode & 0o777) === 0o600,
+    'Legacy v3 schema-shape contract permissions must be exactly 0600',
+  )
+  const record = loaded.record
+  assertExactKeys(
+    record,
+    [
+      ...LEGACY_SCHEMA_SHAPE_CONTRACT_PAYLOAD_KEYS,
+      'githubReview',
+    ],
+    'Legacy v3 schema-shape contract',
+  )
+  assert(
+    record.schema === LEGACY_SCHEMA_SHAPE_CONTRACT_SCHEMA,
+    'Legacy schema-shape contract schema is not frozen v3',
+  )
+  assert(
+    record.scope === SCHEMA_SHAPE_SCOPE
+      && record.applicationCandidate === APPLICATION_CANDIDATE,
+    'Legacy schema-shape contract scope or application candidate differs',
+  )
+  assert(
+    /^[0-9a-f]{40}$/.test(record.sourceToolingGitHead ?? '')
+      && typeof record.kitManifestPath === 'string'
+      && isAbsolute(record.kitManifestPath)
+      && /^[0-9a-f]{64}$/.test(record.kitManifestSha256 ?? '')
+      && /^[0-9a-f]{64}$/.test(record.generatorSourceSha256 ?? '')
+      && /^[0-9a-f]{64}$/.test(record.runnerSourceSha256 ?? ''),
+    'Legacy schema-shape contract source or kit bindings are invalid',
+  )
+  assert(
+    record.supabaseCliVersion === REQUIRED_SUPABASE_CLI_VERSION
+      && record.postgresMajor === REQUIRED_POSTGRES_MAJOR,
+    'Legacy schema-shape contract tool versions differ',
+  )
+  assertExactKeys(
+    record.migrationHashes,
+    PHASE4_MIGRATIONS.map((migration) => migration.sourceFile),
+    'Legacy schema-shape contract migration hashes',
+  )
+  assertFrozenMap(
+    record.migrationHashes,
+    exactFrozenMap('sha256'),
+    'Legacy schema-shape contract migration hashes',
+  )
+  assertExactKeys(
+    record.fingerprints,
+    SCHEMA_SHAPE_STAGES,
+    'Legacy schema-shape contract fingerprints',
+  )
+  for (const stage of SCHEMA_SHAPE_STAGES) {
+    assert(
+      /^[0-9a-f]{64}$/.test(record.fingerprints[stage] ?? ''),
+      `Legacy schema-shape contract fingerprint is invalid for ${stage}`,
+    )
+  }
+  assert(
+    typeof record.captureExecutor === 'string'
+      && record.captureExecutor.trim(),
+    'Legacy schema-shape contract capture executor is missing',
+  )
+  const pass1Evidence = await loadOwnerOnlyJsonArtifact(
+    record.pass1EvidenceManifestPath,
+    record.pass1EvidenceManifestSha256,
+    'Legacy pass-1 evidence manifest',
+  )
+  assert(
+    pass1Evidence.record.schema
+      === SCHEMA_CALIBRATION_EVIDENCE_MANIFEST_SCHEMA
+      && pass1Evidence.record.stage === FINAL_MIGRATION_ORDINAL
+      && pass1Evidence.record.captureExecutor === record.captureExecutor
+      && canonicalJson(pass1Evidence.record.fingerprints)
+        === canonicalJson(record.fingerprints),
+    'Legacy pass-1 evidence does not preserve the reviewed fingerprints',
+  )
+  assertTimestampWithZone(
+    pass1Evidence.record.createdAt,
+    'Legacy pass-1 evidence manifest createdAt',
+  )
+  const githubReview = validateSchemaShapeGithubReview(record, { now })
+  assert(
+    Date.parse(githubReview.submittedAt)
+      > Date.parse(pass1Evidence.record.createdAt),
+    'Legacy schema-shape review predates its pass-1 evidence',
+  )
+  return {
+    ...loaded,
+    pass1Evidence: {
+      path: pass1Evidence.path,
+      sha256: pass1Evidence.sha256,
+      manifest: pass1Evidence.record,
+    },
+  }
+}
+
+export async function loadFailedProduction017ForContinuity(failedAttempt) {
+  assertExactKeys(
+    failedAttempt,
+    FAILED_PRODUCTION_ATTEMPT_KEYS,
+    'Failed Production 017 continuity binding',
+  )
+  assert(
+    failedAttempt.evidenceManifestSha256
+      === FAILED_PRODUCTION_017_EVIDENCE_MANIFEST_SHA256,
+    'Continuity does not consume the exact failed Production 017 manifest',
+  )
+  assertExactKeys(
+    failedAttempt.files,
+    Object.keys(FAILED_PRODUCTION_017_FILE_SHA256),
+    'Failed Production 017 member hashes',
+  )
+  for (const [name, expectedSha256] of Object.entries(
+    FAILED_PRODUCTION_017_FILE_SHA256,
+  )) {
+    assert(
+      failedAttempt.files[name] === expectedSha256,
+      `Failed Production 017 continuity hash differs for ${name}`,
+    )
+  }
+  const manifestArtifact = await loadOwnerOnlyJsonArtifact(
+    failedAttempt.evidenceManifestPath,
+    failedAttempt.evidenceManifestSha256,
+    'Failed Production 017 evidence manifest',
+    64 * 1024,
+  )
+  const manifest = manifestArtifact.record
+  assertExactKeys(
+    manifest,
+    [
+      'schema',
+      'createdAt',
+      'step',
+      'mode',
+      'gitHead',
+      'kitManifestSha256',
+      'files',
+    ],
+    'Failed Production 017 evidence manifest',
+  )
+  assert(
+    manifest.schema === EVIDENCE_MANIFEST_SCHEMA
+      && manifest.step === '017'
+      && manifest.mode === 'production'
+      && manifest.gitHead === FAILED_PRODUCTION_017_GIT_HEAD
+      && canonicalJson(manifest.files)
+        === canonicalJson(FAILED_PRODUCTION_017_FILE_SHA256),
+    'Failed Production 017 evidence identity differs',
+  )
+  assertTimestampWithZone(
+    manifest.createdAt,
+    'Failed Production 017 evidence manifest createdAt',
+  )
+  const members = {}
+  const evidenceRoot = dirname(manifestArtifact.path)
+  for (const [name, expectedSha256] of Object.entries(
+    FAILED_PRODUCTION_017_FILE_SHA256,
+  )) {
+    members[name] = await loadOwnerOnlyJsonArtifact(
+      join(evidenceRoot, name),
+      expectedSha256,
+      `Failed Production 017 evidence member ${name}`,
+      MAX_CAPTURE_BYTES,
+    )
+  }
+  const context = members['00-context.json'].record
+  const outcome = members['02-migration-outcome.json'].record
+  const failureAfterState = members['03-failure-after-state.json'].record
+  const postflightUnavailable =
+    members['03-postflight-unavailable.json'].record
+  assertExactKeys(
+    failureAfterState,
+    [
+      'capturedAt',
+      'complete',
+      'outcomeMustBeTreatedAsUncertain',
+      'results',
+    ],
+    'Failed Production 017 after-state',
+  )
+  assertExactKeys(
+    postflightUnavailable,
+    [
+      'capturedAt',
+      'completeReadOnlySnapshot',
+      'error',
+      'outcomeMustBeTreatedAsUncertain',
+    ],
+    'Failed Production 017 postflight-unavailable record',
+  )
+  assert(
+    context.mode === 'production'
+      && context.step === '017'
+      && context.gitHead === FAILED_PRODUCTION_017_GIT_HEAD
+      && context.schemaShapeContractSha256
+        === LEGACY_SCHEMA_SHAPE_CONTRACT_SHA256
+      && context.pass2VerificationEvidenceManifestSha256
+        === LEGACY_PASS2_VERIFICATION_EVIDENCE_MANIFEST_SHA256
+      && context.automaticNextStep === false,
+    'Failed Production 017 context differs from the consumed attempt',
+  )
+  assert(
+    outcome.cliExitCode === 1
+      && outcome.postflightVerified === false
+      && outcome.mechanicalSuccess === false
+      && outcome.verifiedSuccess === false
+      && outcome.uncertainOutcome === true
+      && outcome.automaticNextStep === false,
+    'Failed Production 017 outcome is not the exact hard-stop result',
+  )
+  assertTimestampWithZone(
+    outcome.finishedAt,
+    'Failed Production 017 outcome finishedAt',
+  )
+  assert(
+    failureAfterState.complete === true
+      && failureAfterState.outcomeMustBeTreatedAsUncertain === true
+      && postflightUnavailable.outcomeMustBeTreatedAsUncertain === true
+      && postflightUnavailable.completeReadOnlySnapshot?.complete === true
+      && canonicalJson(postflightUnavailable.completeReadOnlySnapshot)
+        === canonicalJson({
+          capturedAt: failureAfterState.capturedAt,
+          complete: failureAfterState.complete,
+          results: failureAfterState.results,
+        }),
+    'Failed Production 017 does not contain the complete matching after-state',
+  )
+  assertTimestampWithZone(
+    failureAfterState.capturedAt,
+    'Failed Production 017 after-state capturedAt',
+  )
+  const afterResults = failureAfterState.results
+  assertPlainObject(afterResults, 'Failed Production 017 after-state results')
+  validateIdentity(afterResults.identity?.rows, 'production')
+  validateLedgerRows(
+    afterResults.ledger?.rows,
+    HISTORICAL_MIGRATIONS,
+    'Failed Production 017 bounded legacy ledger',
+  )
+  validateFlags(afterResults.flags?.rows, HISTORICAL_MIGRATIONS)
+  validateCatalog(afterResults.catalog?.rows, afterResults.catalogPointer?.rows)
+  validateFactorAndBoq(afterResults.factorAndBoq?.rows)
+  validateHotfix016(afterResults.hotfix016?.rows)
+  validateSchemaShape(
+    afterResults.schemaShape?.rows,
+    '76ab651e06d854e61f51ea16e4434c3abed13d07c9dbd0aad21c38693983bd19',
+    'Failed Production 017 after-state schema shape',
+  )
+  assert(
+    Date.parse(outcome.finishedAt)
+      <= Date.parse(failureAfterState.capturedAt)
+      && Date.parse(failureAfterState.capturedAt)
+        <= Date.parse(manifest.createdAt),
+    'Failed Production 017 evidence chronology is invalid',
+  )
+  return {
+    path: manifestArtifact.path,
+    sha256: manifestArtifact.sha256,
+    manifest,
+    context,
+    outcome,
+    failureAfterState,
+    postflightUnavailable,
+  }
+}
+
+async function loadFocusedIsolated017Proof(binding, {
+  kit,
+  expectedExecutor,
+}) {
+  assertExactKeys(
+    binding,
+    FOCUSED_ISOLATED_017_PROOF_KEYS,
+    'Focused isolated 017 proof binding',
+  )
+  for (const [pathKey, shaKey] of [
+    ['evidenceManifestPath', 'evidenceManifestSha256'],
+    ['proofResultPath', 'proofResultSha256'],
+  ]) {
+    assert(
+      typeof binding[pathKey] === 'string'
+        && isAbsolute(binding[pathKey])
+        && /^[0-9a-f]{64}$/.test(binding[shaKey] ?? ''),
+      `Focused isolated 017 proof ${pathKey} or ${shaKey} is invalid`,
+    )
+  }
+
+  const proofResultArtifact = await loadOwnerOnlyJsonArtifact(
+    binding.proofResultPath,
+    binding.proofResultSha256,
+    'Focused isolated 017 proof result',
+    64 * 1024,
+  )
+  const proofResult = proofResultArtifact.record
+  assertExactKeys(
+    proofResult,
+    [
+      'schema',
+      'createdAt',
+      'result',
+      'correctionSourceHead',
+      'kitManifestSha256',
+      'proofRuntimeSha256',
+      'productionDerivedDumpSha256',
+      'postgresImageId',
+      'stage016FingerprintSha256',
+      'stage017FingerprintSha256',
+      'stage016CalibrationManifestSha256',
+      'stage017CalibrationManifestSha256',
+      'ledgerRowsBefore',
+      'ledgerRowsAfter',
+      'migrationApplied',
+      'migrationApplyCount',
+      'compatibilityGuardAppliedCount',
+      'catalogRows',
+      'boqRows',
+      'boqItemRows',
+      'factorFUnchanged',
+      'hotfix016Unchanged',
+      'rehearsalSentinelVerified',
+      'phase4FlagsRemainFalse',
+      'backupKeychainReadCount',
+      'productionDbKeychainReadCount',
+      'productionAccessed',
+      'productionAuthorized',
+      'automaticRetry',
+      'automaticNextStep',
+      'cleanupVerified',
+      'encryptedBundleDetached',
+    ],
+    'Focused isolated 017 proof result',
+  )
+  assertTimestampWithZone(
+    proofResult.createdAt,
+    'Focused isolated 017 proof result createdAt',
+  )
+  assert(
+    proofResult.schema
+      === 'conduit-boq/master-catalog-p12-isolated-corrected-017-result/v1'
+      && proofResult.result === 'verified'
+      && proofResult.correctionSourceHead === kit.manifest.sourceGitHead
+      && proofResult.kitManifestSha256
+        === await sha256File(kit.manifestPath)
+      && /^[0-9a-f]{64}$/.test(proofResult.proofRuntimeSha256 ?? '')
+      && proofResult.productionDerivedDumpSha256
+        === FOCUSED_ISOLATED_017_PRODUCTION_DUMP_SHA256
+      && proofResult.postgresImageId
+        === FOCUSED_ISOLATED_017_POSTGRES_IMAGE_ID,
+    'Focused isolated 017 proof source, kit, runtime, backup, or image binding differs',
+  )
+  assert(
+    proofResult.stage016FingerprintSha256
+      === '76ab651e06d854e61f51ea16e4434c3abed13d07c9dbd0aad21c38693983bd19'
+      && proofResult.stage017FingerprintSha256
+        === 'bd561b8b6d70d02a8912efe0e36b02cf0841f0342a1dccc46f1c9c65f75c2191'
+      && proofResult.stage017CalibrationManifestSha256
+        === binding.evidenceManifestSha256,
+    'Focused isolated 017 proof fingerprint or calibration binding differs',
+  )
+  assert(
+    proofResult.ledgerRowsBefore === 15
+      && proofResult.ledgerRowsAfter === 16
+      && proofResult.migrationApplied
+        === '20260728001700_master_catalog_phase4_foundation.sql'
+      && proofResult.migrationApplyCount === 1
+      && proofResult.compatibilityGuardAppliedCount === 0
+      && proofResult.catalogRows === 710
+      && proofResult.boqRows === 240
+      && proofResult.boqItemRows === 2464
+      && proofResult.factorFUnchanged === true
+      && proofResult.hotfix016Unchanged === true
+      && proofResult.rehearsalSentinelVerified === true
+      && proofResult.phase4FlagsRemainFalse === true,
+    'Focused isolated 017 proof migration, ledger, or preserved-data result differs',
+  )
+  assert(
+    proofResult.backupKeychainReadCount === 1
+      && proofResult.productionDbKeychainReadCount === 0
+      && proofResult.productionAccessed === false
+      && proofResult.productionAuthorized === false
+      && proofResult.automaticRetry === false
+      && proofResult.automaticNextStep === false
+      && proofResult.cleanupVerified === true
+      && proofResult.encryptedBundleDetached === true,
+    'Focused isolated 017 proof custody or non-Production result differs',
+  )
+  assert(
+    proofResultArtifact.path
+      === join(
+        dirname(dirname(binding.evidenceManifestPath)),
+        '99-proof-result.json',
+      ),
+    'Focused isolated 017 proof result is not beside the bound calibration chain',
+  )
+  const proofRuntimePath = join(
+    dirname(proofResultArtifact.path),
+    'isolated-corrected-017-proof.sh',
+  )
+  const {
+    resolvedPath: resolvedProofRuntimePath,
+    stats: proofRuntimeStats,
+  } = await resolveExistingExternalPath(
+    proofRuntimePath,
+    'Focused isolated 017 proof runtime',
+    'file',
+  )
+  if (typeof process.getuid === 'function') {
+    assert(
+      proofRuntimeStats.uid === process.getuid(),
+      'Focused isolated 017 proof runtime must be owned by the executing OS user',
+    )
+  }
+  assert(
+    (proofRuntimeStats.mode & 0o077) === 0
+      && proofRuntimeStats.size > 0
+      && proofRuntimeStats.size <= 128 * 1024
+      && await sha256File(resolvedProofRuntimePath)
+        === proofResult.proofRuntimeSha256,
+    'Focused isolated 017 proof runtime custody or SHA-256 differs',
+  )
+
+  const calibration = await loadSchemaCalibrationManifest(
+    binding.evidenceManifestPath,
+    {
+      expectedSha256: binding.evidenceManifestSha256,
+      kit,
+      expectedFinalStage: '017',
+      expectedExecutor,
+    },
+  )
+  assert(
+    calibration.prior?.sha256
+      === proofResult.stage016CalibrationManifestSha256
+      && calibration.sha256
+        === proofResult.stage017CalibrationManifestSha256,
+    'Focused isolated 017 proof result differs from its transitive calibration manifests',
+  )
+  assert(
+    calibration.prior?.path
+      === join(
+        dirname(proofResultArtifact.path),
+        '016',
+        '05-schema-calibration-evidence-manifest.json',
+      ),
+    'Focused isolated 016 prior manifest is not in the same proof root',
+  )
+  const validateFocusedSnapshot = (snapshot, expectedMigrations, label) => {
+    assertExactKeys(
+      snapshot,
+      [
+        'capturedAt',
+        'identity',
+        'ledger',
+        'flags',
+        'catalog',
+        'factorAndBoq',
+        'hotfix016',
+        'schemaShape',
+        'disposableTarget',
+      ],
+      label,
+    )
+    assertTimestampWithZone(snapshot.capturedAt, `${label} capturedAt`)
+    validateIdentity([snapshot.identity], 'rehearsal')
+    validateLedgerRows(
+      snapshot.ledger,
+      expectedMigrations,
+      `${label} ledger`,
+    )
+    validateFlags(
+      Object.entries(snapshot.flags).map(([key, value]) => ({
+        key,
+        value,
+      })),
+      expectedMigrations,
+    )
+    validateCatalogSnapshot(snapshot.catalog)
+    validateFactorAndBoq([snapshot.factorAndBoq])
+    validateHotfix016([snapshot.hotfix016])
+    assertExactKeys(
+      snapshot.disposableTarget,
+      ['databaseName', 'tableOwner', 'purpose', 'nonceSha256'],
+      `${label} disposable target`,
+    )
+    assert(
+      snapshot.disposableTarget.databaseName === REHEARSAL_DATABASE_NAME
+        && snapshot.disposableTarget.tableOwner === REQUIRED_CURRENT_USER
+        && snapshot.disposableTarget.purpose
+          === REHEARSAL_SENTINEL_PURPOSE
+        && /^[0-9a-f]{64}$/.test(
+          snapshot.disposableTarget.nonceSha256 ?? '',
+        ),
+      `${label} disposable target differs`,
+    )
+  }
+  const focusedSnapshot = calibration.capture.snapshot
+  const priorSnapshot = calibration.prior?.capture.snapshot
+  assertPlainObject(
+    priorSnapshot,
+    'Focused isolated 016 prior snapshot',
+  )
+  validateFocusedSnapshot(
+    priorSnapshot,
+    FULL_PRE_017_LEDGER_SEQUENCE,
+    'Focused isolated 016 prior snapshot',
+  )
+  const focused017ExpectedLedger = [
+    ...FULL_PRE_017_LEDGER_SEQUENCE,
+    PHASE4_MIGRATIONS[0],
+  ]
+  validateFocusedSnapshot(
+    focusedSnapshot,
+    focused017ExpectedLedger,
+    'Focused isolated 017 snapshot',
+  )
+  assertCatalogUnchanged(priorSnapshot.catalog, focusedSnapshot.catalog)
+  assertFactorAndBoqUnchanged(
+    priorSnapshot.factorAndBoq,
+    focusedSnapshot.factorAndBoq,
+  )
+  assertHotfix016Unchanged(
+    priorSnapshot.hotfix016,
+    focusedSnapshot.hotfix016,
+  )
+  assert(
+    canonicalJson(focusedSnapshot.disposableTarget)
+      === canonicalJson(priorSnapshot.disposableTarget)
+      && canonicalJson(focusedSnapshot.disposableTarget)
+        === canonicalJson(calibration.writeBoundary.disposableTarget),
+    'Focused isolated 017 proof sentinel changed across the restored calibration boundary',
+  )
+  assert(
+    Number(focusedSnapshot.catalog.price_rows)
+      === proofResult.catalogRows
+      && Number(focusedSnapshot.factorAndBoq.boq_count)
+        === proofResult.boqRows
+      && Number(focusedSnapshot.factorAndBoq.boq_item_count)
+        === proofResult.boqItemRows,
+    'Focused isolated 017 proof result counts differ from the captured snapshot',
+  )
+  assert(
+    Date.parse(proofResult.createdAt)
+      >= Date.parse(calibration.manifest.createdAt),
+    'Focused isolated 017 proof result predates its calibration evidence',
+  )
+  return {
+    ...calibration,
+    proofResult: {
+      path: proofResultArtifact.path,
+      sha256: proofResultArtifact.sha256,
+      record: proofResult,
+    },
+  }
+}
+
+async function loadSchemaShapeContractV4(
+  path,
+  {
+    kit,
+    expectedSha256,
+    now = new Date(),
+  },
+) {
+  const loaded = await loadOwnerOnlyJsonArtifact(
+    path,
+    expectedSha256,
+    'Schema-shape contract',
+  )
+  assert(
+    (loaded.stats.mode & 0o777) === 0o600,
+    'Schema-shape contract permissions must be exactly 0600',
+  )
+  const record = loaded.record
+  assertExactKeys(
+    record,
+    [
+      ...SCHEMA_SHAPE_CONTRACT_PAYLOAD_KEYS,
+      'githubReview',
+    ],
+    'Schema-shape contract',
+  )
+  assert(
+    record.schema === SCHEMA_SHAPE_CONTRACT_SCHEMA,
+    'Schema-shape contract schema is not frozen v4',
+  )
+  assert(
+    record.scope === SCHEMA_SHAPE_SCOPE
+      && record.applicationCandidate === APPLICATION_CANDIDATE,
+    'Schema-shape contract scope or application candidate differs',
+  )
+  assert(
+    record.sourceToolingGitHead === kit.manifest.sourceGitHead,
+    'Schema-shape contract is bound to a different correction source/tooling Git HEAD',
+  )
+  assert(
+    record.kitManifestPath === kit.manifestPath
+      && /^[0-9a-f]{64}$/.test(record.kitManifestSha256 ?? '')
+      && record.kitManifestSha256 === await sha256File(kit.manifestPath),
+    'Schema-shape contract is bound to a different corrected kit',
+  )
+  assert(
+    record.generatorSourceSha256
+      === kit.manifest.generatorSourceSha256
+      && record.runnerSourceSha256
+        === kit.manifest.runnerSourceSha256,
+    'Schema-shape contract tooling hashes differ from the corrected kit',
+  )
+  assert(
+    record.supabaseCliVersion === REQUIRED_SUPABASE_CLI_VERSION
+      && record.postgresMajor === REQUIRED_POSTGRES_MAJOR,
+    'Schema-shape contract tool versions differ',
+  )
+  assertExactKeys(
+    record.migrationHashes,
+    PHASE4_MIGRATIONS.map((migration) => migration.sourceFile),
+    'Schema-shape contract migration hashes',
+  )
+  assertFrozenMap(
+    record.migrationHashes,
+    exactFrozenMap('sha256'),
+    'Schema-shape contract migration hashes',
+  )
+  assertExactKeys(
+    record.fingerprints,
+    SCHEMA_SHAPE_STAGES,
+    'Schema-shape contract fingerprints',
+  )
+  for (const stage of SCHEMA_SHAPE_STAGES) {
+    assert(
+      /^[0-9a-f]{64}$/.test(record.fingerprints[stage] ?? ''),
+      `Schema-shape contract fingerprint is invalid for ${stage}`,
+    )
+  }
+  assert(
+    typeof record.captureExecutor === 'string'
+      && record.captureExecutor.trim()
+      && typeof record.pass1EvidenceManifestPath === 'string'
+      && isAbsolute(record.pass1EvidenceManifestPath)
+      && /^[0-9a-f]{64}$/.test(
+        record.pass1EvidenceManifestSha256 ?? '',
+      ),
+    'Schema-shape contract legacy pass-1 reference is invalid',
+  )
+
+  const continuity = record.continuity
+  assertExactKeys(
+    continuity,
+    SCHEMA_SHAPE_CONTINUITY_KEYS,
+    'Schema-shape continuity',
+  )
+  assert(
+    continuity.schema === SCHEMA_SHAPE_CONTINUITY_SCHEMA,
+    'Schema-shape continuity schema is invalid',
+  )
+  assert(
+    continuity.priorSchemaShapeContractSha256
+      === LEGACY_SCHEMA_SHAPE_CONTRACT_SHA256,
+    'Schema-shape continuity does not bind the accepted old contract',
+  )
+  assert(
+    continuity.priorPass2VerificationEvidenceManifestSha256
+      === LEGACY_PASS2_VERIFICATION_EVIDENCE_MANIFEST_SHA256,
+    'Schema-shape continuity does not bind the accepted old Pass 2',
+  )
+  assertExactKeys(
+    continuity.focusedIsolated017Proof,
+    FOCUSED_ISOLATED_017_PROOF_KEYS,
+    'Focused isolated 017 proof binding',
+  )
+
+  const legacyContract =
+    await loadLegacySchemaShapeContractForContinuity(
+      continuity.priorSchemaShapeContractPath,
+      continuity.priorSchemaShapeContractSha256,
+      now,
+    )
+  assert(
+    canonicalJson(record.migrationHashes)
+      === canonicalJson(legacyContract.record.migrationHashes),
+    'Corrected contract changed a reviewed Phase 4 migration hash',
+  )
+  assert(
+    canonicalJson(record.fingerprints)
+      === canonicalJson(legacyContract.record.fingerprints),
+    'Corrected contract changed a reviewed schema-shape fingerprint',
+  )
+  assert(
+    record.captureExecutor === legacyContract.record.captureExecutor
+      && record.pass1EvidenceManifestPath
+        === legacyContract.record.pass1EvidenceManifestPath
+      && record.pass1EvidenceManifestSha256
+        === legacyContract.record.pass1EvidenceManifestSha256,
+    'Corrected contract changed the accepted legacy pass-1 binding',
+  )
+
+  const failedProductionAttempt =
+    await loadFailedProduction017ForContinuity(
+      continuity.failedProductionAttempt,
+    )
+  const focused017Proof = await loadFocusedIsolated017Proof(
+    continuity.focusedIsolated017Proof,
+    {
+      kit,
+      expectedExecutor: record.captureExecutor,
+    },
+  )
+  assert(
+    focused017Proof.manifest.fingerprints['016']
+      === record.fingerprints['016']
+      && focused017Proof.manifest.fingerprints['017']
+        === record.fingerprints['017'],
+    'Focused isolated 017 proof changed a reviewed fingerprint',
+  )
+  const focused017ExpectedLedger = [
+    ...FULL_PRE_017_LEDGER_SEQUENCE,
+    PHASE4_MIGRATIONS[0],
+  ]
+  validateIdentity(
+    [focused017Proof.capture.snapshot.identity],
+    'rehearsal',
+  )
+  validateLedgerRows(
+    focused017Proof.capture.snapshot.ledger,
+    focused017ExpectedLedger,
+    'Focused isolated 017 proof ledger',
+  )
+  validateFlags(
+    Object.entries(focused017Proof.capture.snapshot.flags).map(
+      ([key, value]) => ({ key, value }),
+    ),
+    focused017ExpectedLedger,
+  )
+
+  const githubReview = validateSchemaShapeGithubReview(record, { now })
+  assert(
+    githubReview.reviewerLogin === 'lukkxh',
+    'Corrected schema-shape contract requires a fresh lukkxh review',
+  )
+  assert(
+    githubReview.reviewerLogin.toLocaleLowerCase()
+      !== record.captureExecutor.trim().toLocaleLowerCase(),
+    'Schema-shape contract reviewer must be distinct from the evidence executor',
+  )
+  assert(
+    Date.parse(failedProductionAttempt.manifest.createdAt)
+      < Date.parse(focused017Proof.manifest.createdAt)
+      && Date.parse(focused017Proof.proofResult.record.createdAt)
+        < Date.parse(githubReview.submittedAt),
+    'Corrected contract review must follow the failed attempt and completed focused isolated 017 proof',
+  )
+  return {
+    path: loaded.path,
+    sha256: loaded.sha256,
+    record,
+    pass1Evidence: legacyContract.pass1Evidence,
+    continuity: {
+      legacyContract,
+      failedProductionAttempt,
+      focused017Proof,
+    },
+  }
+}
+
+export async function loadSchemaShapeContract(
+  path,
+  {
+    kit,
+    expectedSha256,
+    now = new Date(),
+    requireV4 = false,
+  },
+) {
+  const { resolvedPath } = await resolveExistingExternalPath(
+    path,
+    'Schema-shape contract',
+    'file',
+  )
+  const record = JSON.parse(await readFile(resolvedPath, 'utf8'))
+  assertPlainObject(record, 'Schema-shape contract')
+  if (requireV4) {
+    assert(
+      record.schema === SCHEMA_SHAPE_CONTRACT_SCHEMA,
+      'Production with the corrected kit requires a fresh v4 continuity schema-shape contract',
+    )
+  }
+  if (record.schema === LEGACY_SCHEMA_SHAPE_CONTRACT_SCHEMA) {
+    return loadSchemaShapeContractV3(path, {
+      kit,
+      expectedSha256,
+      now,
+    })
+  }
+  assert(
+    record.schema === SCHEMA_SHAPE_CONTRACT_SCHEMA,
+    'Schema-shape contract schema is neither supported v3 nor corrected v4',
+  )
+  return loadSchemaShapeContractV4(path, {
+    kit,
+    expectedSha256,
+    now,
+  })
+}
+
 /**
  * @param {string} path
  * @param {string} expectedSha256
@@ -1190,6 +2147,182 @@ export async function loadBoundAdvisorArtifact(
   }
 }
 
+async function loadLegacyPass2ContinuityEvidence(
+  path,
+  expectedSha256,
+  {
+    schemaShapeContract,
+    approval,
+  },
+) {
+  const continuity = schemaShapeContract.record.continuity
+  assert(
+    path === continuity.priorPass2VerificationEvidenceManifestPath
+      && expectedSha256
+        === continuity.priorPass2VerificationEvidenceManifestSha256
+      && expectedSha256
+        === LEGACY_PASS2_VERIFICATION_EVIDENCE_MANIFEST_SHA256,
+    'Production does not consume the exact accepted legacy Pass 2 manifest',
+  )
+  assert(
+    path === approval.pass2VerificationEvidenceManifestPath
+      && expectedSha256
+        === approval.pass2VerificationEvidenceManifestSha256,
+    'Production approval legacy Pass 2 binding differs from continuity',
+  )
+  const manifestArtifact = await loadOwnerOnlyJsonArtifact(
+    path,
+    expectedSha256,
+    'Legacy Pass 2 evidence manifest',
+    64 * 1024,
+  )
+  const manifest = manifestArtifact.record
+  assertExactKeys(
+    manifest,
+    [
+      'schema',
+      'createdAt',
+      'mode',
+      'gitHead',
+      'kitManifestSha256',
+      'finalMigrationEvidenceManifestSha256',
+      'finalCloseoutSignoffSha256',
+      'p13Authorized',
+      'files',
+    ],
+    'Legacy Pass 2 evidence manifest',
+  )
+  const legacyContract = schemaShapeContract.continuity.legacyContract
+  assert(
+    manifest.schema === FINAL_CLOSEOUT_EVIDENCE_MANIFEST_SCHEMA
+      && manifest.mode === 'rehearsal'
+      && manifest.gitHead
+        === legacyContract.record.sourceToolingGitHead
+      && manifest.kitManifestSha256
+        === legacyContract.record.kitManifestSha256
+      && manifest.p13Authorized === false,
+    'Legacy Pass 2 manifest identity differs from the accepted v3 contract',
+  )
+  assertTimestampWithZone(
+    manifest.createdAt,
+    'Legacy Pass 2 evidence manifest createdAt',
+  )
+  assertExactKeys(
+    manifest.files,
+    [
+      '00-closeout-context.json',
+      '01-live-closeout-snapshot.json',
+      '02-closeout-outcome.json',
+    ],
+    'Legacy Pass 2 evidence members',
+  )
+  const evidenceRoot = dirname(manifestArtifact.path)
+  const members = {}
+  for (const [name, memberSha256] of Object.entries(manifest.files)) {
+    members[name] = await loadOwnerOnlyJsonArtifact(
+      join(evidenceRoot, name),
+      memberSha256,
+      `Legacy Pass 2 evidence member ${name}`,
+      MAX_CAPTURE_BYTES,
+    )
+  }
+  const context = members['00-closeout-context.json'].record
+  const liveSnapshot = members['01-live-closeout-snapshot.json'].record
+  const outcome = members['02-closeout-outcome.json'].record
+  assert(
+    context.schema === FINAL_CLOSEOUT_CONTEXT_SCHEMA
+      && context.mode === 'rehearsal'
+      && context.gitHead === legacyContract.record.sourceToolingGitHead
+      && context.sourceToolingGitHead
+        === legacyContract.record.sourceToolingGitHead
+      && context.applicationCandidate === APPLICATION_CANDIDATE
+      && context.kitManifestSha256
+        === legacyContract.record.kitManifestSha256
+      && context.schemaShapeContractSha256
+        === LEGACY_SCHEMA_SHAPE_CONTRACT_SHA256
+      && context.pass1EvidenceManifestSha256
+        === legacyContract.record.pass1EvidenceManifestSha256
+      && context.expectedSchemaShapeSha256
+        === legacyContract.record.fingerprints[FINAL_MIGRATION_ORDINAL]
+      && context.independentVerifier === 'lukkxh'
+      && context.readOnly === true
+      && context.migrationPerformed === false
+      && context.p13Authorized === false
+      && context.automaticNextStep === false,
+    'Legacy Pass 2 context differs from the accepted continuity evidence',
+  )
+  assertTimestampWithZone(
+    liveSnapshot.capturedAt,
+    'Legacy Pass 2 live snapshot capturedAt',
+  )
+  validateIdentity([liveSnapshot.identity], 'rehearsal')
+  validateLedgerRows(
+    liveSnapshot.ledger,
+    [
+      ...HISTORICAL_MIGRATIONS,
+      ...PHASE4_MIGRATIONS,
+    ],
+    'Legacy Pass 2 bounded ledger',
+  )
+  validateFlags(
+    Object.entries(liveSnapshot.flags).map(([key, value]) => ({
+      key,
+      value,
+    })),
+    [
+      ...HISTORICAL_MIGRATIONS,
+      ...PHASE4_MIGRATIONS,
+    ],
+  )
+  assert(
+    liveSnapshot.schemaShape?.schema_shape_fingerprint_sha256
+      === legacyContract.record.fingerprints[FINAL_MIGRATION_ORDINAL],
+    'Legacy Pass 2 live schema fingerprint differs',
+  )
+  assert(
+    outcome.finalCloseoutVerified === true
+      && outcome.independentVerifier === 'lukkxh'
+      && outcome.independentVerificationCompleted === true
+      && outcome.securityContractReviewed === true
+      && outcome.advisorDeltaTriaged === true
+      && outcome.liveBoundaryRechecked === true
+      && outcome.finalMigrationEvidenceConsumed === true
+      && outcome.finalSignoffConsumed === true
+      && outcome.readOnly === true
+      && outcome.migrationPerformed === false
+      && outcome.phase4FlagsRemainFalse === true
+      && outcome.p13Authorized === false
+      && outcome.automaticNextStep === false
+      && outcome.closeoutError === null,
+    'Legacy Pass 2 outcome is not the accepted complete hard-stop-safe result',
+  )
+  assertTimestampWithZone(
+    outcome.finishedAt,
+    'Legacy Pass 2 outcome finishedAt',
+  )
+  assert(
+    Date.parse(liveSnapshot.capturedAt)
+      <= Date.parse(outcome.finishedAt)
+      && Date.parse(outcome.finishedAt)
+        <= Date.parse(manifest.createdAt)
+      && Date.parse(manifest.createdAt)
+        < Date.parse(
+          schemaShapeContract.continuity.failedProductionAttempt
+            .manifest.createdAt,
+        ),
+    'Legacy Pass 2 continuity chronology is invalid',
+  )
+  return {
+    path: manifestArtifact.path,
+    sha256: manifestArtifact.sha256,
+    manifest,
+    context,
+    liveSnapshot,
+    outcome,
+    legacyContinuity: true,
+  }
+}
+
 export async function loadPass2VerificationEvidenceManifest(
   path,
   expectedSha256,
@@ -1199,6 +2332,16 @@ export async function loadPass2VerificationEvidenceManifest(
     approval,
   },
 ) {
+  if (schemaShapeContract.record.schema === SCHEMA_SHAPE_CONTRACT_SCHEMA) {
+    return loadLegacyPass2ContinuityEvidence(
+      path,
+      expectedSha256,
+      {
+        schemaShapeContract,
+        approval,
+      },
+    )
+  }
   const pass2Kit = await verifyKit(
     kit.kitRoot,
     FINAL_MIGRATION_ORDINAL,
@@ -1607,6 +2750,10 @@ function assertReviewedExecutionBindings({
 }) {
   if (approval) {
     assert(
+      schemaShapeContract.record.schema === SCHEMA_SHAPE_CONTRACT_SCHEMA,
+      'Production requires the corrected v4 continuity schema-shape contract',
+    )
+    assert(
       schemaShapeContract.sha256
         === approval.schemaShapeContractSha256,
       'Schema-shape contract differs from the approved binding',
@@ -1622,6 +2769,15 @@ function assertReviewedExecutionBindings({
           schemaShapeContract.record.githubReview.submittedAt,
         ),
       'Authenticated GitHub review recheck predates the contract review',
+    )
+    assert(
+      approval.pass2VerificationEvidenceManifestPath
+        === schemaShapeContract.record.continuity
+          .priorPass2VerificationEvidenceManifestPath
+        && approval.pass2VerificationEvidenceManifestSha256
+          === schemaShapeContract.record.continuity
+            .priorPass2VerificationEvidenceManifestSha256,
+      'Production approval legacy Pass 2 binding differs from continuity',
     )
   }
   if (executorLabel) {
@@ -1646,7 +2802,7 @@ function assertApprovalBaselineAdvisor(approval, advisorArtifact) {
 }
 
 function migrationRecordMatches(actual, expected) {
-  return (
+  const baseMatches = (
     actual?.ordinal === expected.ordinal
     && actual?.sourceFile === expected.sourceFile
     && actual?.version === expected.version
@@ -1657,6 +2813,17 @@ function migrationRecordMatches(actual, expected) {
         ? actual?.sha256 === expected.sha256
         : /^[0-9a-f]{64}$/.test(actual?.sha256 ?? '')
     )
+  )
+  if (!baseMatches) return false
+  if (expected.compatibilityGuard === true) {
+    return (
+      actual?.compatibilityGuard === true
+      && actual?.executionPolicy === expected.executionPolicy
+    )
+  }
+  return (
+    actual?.compatibilityGuard === undefined
+    && actual?.executionPolicy === undefined
   )
 }
 
@@ -1711,7 +2878,7 @@ export async function verifyKit(kitPath, ordinal, mode) {
   }
   const manifest = JSON.parse(await readFile(manifestPath, 'utf8'))
 
-  assert(manifest.schema === KIT_SCHEMA, 'Kit manifest schema is not frozen v2')
+  assert(manifest.schema === KIT_SCHEMA, 'Kit manifest schema is not frozen v3')
   assert(
     typeof manifest.sourceGitHead === 'string'
       && /^[0-9a-f]{40}$/.test(manifest.sourceGitHead),
@@ -1740,11 +2907,36 @@ export async function verifyKit(kitPath, ordinal, mode) {
   assert(manifest.postgresMajor === REQUIRED_POSTGRES_MAJOR, 'Kit PostgreSQL major is not frozen')
   assert(manifest.clientTimeoutSeconds === CLIENT_TIMEOUT_SECONDS, 'Kit client timeout is not frozen')
   assert(manifest.automaticNextStep === false, 'Kit must prohibit automatic next-step execution')
+  assert(
+    typeof manifest.trackedWorktreeClean === 'boolean',
+    'Kit tracked-worktree status is invalid',
+  )
+  assert(
+    typeof manifest.compatibilityGuardsTrackedAtHead === 'boolean',
+    'Kit compatibility-guard Git custody is invalid',
+  )
+  assert(
+    manifest.productionEligible
+      === (
+        manifest.trackedWorktreeClean
+        && manifest.compatibilityGuardsTrackedAtHead
+      ),
+    'Kit Production eligibility differs from its source custody',
+  )
   if (mode === 'production') {
-    assert(manifest.productionEligible === true, 'Kit was prepared from a tracked-dirty worktree')
+    assert(manifest.productionEligible === true, 'Kit was not prepared from a fully committed clean source')
     assert(manifest.trackedWorktreeClean === true, 'Kit does not record a clean tracked worktree')
+    assert(
+      manifest.compatibilityGuardsTrackedAtHead === true,
+      'Kit compatibility guards are not bound to the source Git HEAD',
+    )
   }
 
+  assertMigrationArray(
+    manifest.compatibilityGuardMigrations,
+    LEGACY_LEDGER_COMPATIBILITY_GUARDS,
+    'Legacy ledger compatibility-guard manifest',
+  )
   assertMigrationArray(
     manifest.historicalMigrations,
     HISTORICAL_MIGRATIONS,
@@ -1763,14 +2955,17 @@ export async function verifyKit(kitPath, ordinal, mode) {
   const step = manifest.steps?.find((candidate) => candidate.ordinal === ordinal)
   assert(step, `Kit does not contain step ${ordinal}`)
   const expectedAfter = [
+    ...LEGACY_LEDGER_COMPATIBILITY_GUARDS,
     ...HISTORICAL_MIGRATIONS,
     ...PHASE4_MIGRATIONS.slice(0, phaseIndex + 1),
   ]
   const manifestBefore = [
+    ...manifest.compatibilityGuardMigrations,
     ...manifest.historicalMigrations,
     ...manifest.phase4Migrations.slice(0, phaseIndex),
   ]
   const manifestAfter = [
+    ...manifest.compatibilityGuardMigrations,
     ...manifest.historicalMigrations,
     ...manifest.phase4Migrations.slice(0, phaseIndex + 1),
   ]
@@ -1828,10 +3023,14 @@ export async function verifyKit(kitPath, ordinal, mode) {
       )
     }
     const actualSha = await sha256File(migrationPath)
+    const sourceRoot = migration.compatibilityGuard === true
+      ? P12_LEGACY_LEDGER_GUARD_SOURCE_ROOT
+      : 'migrations'
     const repositorySha = await sha256File(
-      join(REPOSITORY_ROOT, 'migrations', migration.sourceFile),
+      join(REPOSITORY_ROOT, sourceRoot, migration.sourceFile),
     )
     const manifestMigration = [
+      ...manifest.compatibilityGuardMigrations,
       ...manifest.historicalMigrations,
       ...manifest.phase4Migrations,
     ].find((candidate) => candidate.ordinal === migration.ordinal)
@@ -1840,6 +3039,15 @@ export async function verifyKit(kitPath, ordinal, mode) {
       actualSha === repositorySha,
       `${migration.sourceFile} kit copy differs from the approved Git worktree`,
     )
+
+    if (migration.compatibilityGuard === true) {
+      const guardSql = await readFile(migrationPath, 'utf8')
+      assert(
+        guardSql.includes('RAISE EXCEPTION')
+          && guardSql.includes('must never execute'),
+        `${migration.sourceFile} is not a fail-closed compatibility guard`,
+      )
+    }
 
     if (migration.sha256) {
       assert(actualSha === migration.sha256, `${migration.sourceFile} no longer matches the accepted hash`)
@@ -1888,6 +3096,16 @@ function readCommittedGitFile(head, path) {
   })
   assert(result.status === 0, `Unable to read committed authority file ${path}`)
   return result.stdout
+}
+
+export function containsActiveAuthorityMarker(source, marker) {
+  assert(typeof source === 'string', 'Authority marker source must be text')
+  assert(
+    typeof marker === 'string' && marker.length > 0,
+    'Authority marker name must be non-empty',
+  )
+  const escapedMarker = marker.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+  return new RegExp(`<!--\\s*${escapedMarker}\\s+\\{`).test(source)
 }
 
 function parseCommittedAuthorityMarker(bytes) {
@@ -1967,11 +3185,125 @@ export function validateProductionHeadDelta(changedPaths) {
   return changedPaths
 }
 
+function assertConsumedFailedAuthority(checklistBytes) {
+  const source = checklistBytes.toString('utf8')
+  for (const activeMarker of [
+    'P12_RUNNER_AUTHORITY_V1',
+    P12_RUNNER_AUTHORITY_MARKER,
+  ]) {
+    assert(
+      !containsActiveAuthorityMarker(source, activeMarker),
+      `Correction source must not retain active ${activeMarker}`,
+    )
+  }
+  const escapedConsumed = P12_CONSUMED_AUTHORITY_MARKER.replace(
+    /[.*+?^${}()|[\]\\]/g,
+    '\\$&',
+  )
+  const matches = [
+    ...source.matchAll(
+      new RegExp(
+        `<!--\\s*${escapedConsumed}\\s+(\\{[^\\n]+\\})\\s*-->`,
+        'g',
+      ),
+    ),
+  ]
+  assert(
+    matches.length === 1,
+    `Correction source must contain exactly one ${P12_CONSUMED_AUTHORITY_MARKER}`,
+  )
+  let marker
+  try {
+    marker = JSON.parse(matches[0][1])
+  } catch {
+    throw new Error(`${P12_CONSUMED_AUTHORITY_MARKER} is not valid JSON`)
+  }
+  const expected = {
+    executionGitHead: FAILED_PRODUCTION_017_GIT_HEAD,
+    approvalRecordSha256:
+      FAILED_PRODUCTION_017_APPROVAL_RECORD_SHA256,
+    attemptedStep: '017',
+    evidenceManifestSha256:
+      FAILED_PRODUCTION_017_EVIDENCE_MANIFEST_SHA256,
+    outcomeSha256:
+      FAILED_PRODUCTION_017_FILE_SHA256['02-migration-outcome.json'],
+    afterStateSha256:
+      FAILED_PRODUCTION_017_FILE_SHA256['03-failure-after-state.json'],
+    verifiedStageAfter: '016',
+    disposition: 'hard-stop-consumed-no-retry-authority',
+    productionMutationObserved: false,
+    retryAuthorized: false,
+    freshGoRequired: true,
+  }
+  assertExactKeys(
+    marker,
+    Object.keys(expected),
+    P12_CONSUMED_AUTHORITY_MARKER,
+  )
+  assert(
+    canonicalJson(marker) === canonicalJson(expected),
+    `${P12_CONSUMED_AUTHORITY_MARKER} differs from the failed attempt`,
+  )
+}
+
+function assertCorrectionSourceDelta(sourceToolingHead) {
+  const ancestor = spawnSync(
+    'git',
+    [
+      'merge-base',
+      '--is-ancestor',
+      FAILED_PRODUCTION_017_GIT_HEAD,
+      sourceToolingHead,
+    ],
+    {
+      cwd: REPOSITORY_ROOT,
+      encoding: 'utf8',
+      shell: false,
+    },
+  )
+  assert(
+    ancestor.status === 0
+      && sourceToolingHead !== FAILED_PRODUCTION_017_GIT_HEAD,
+    'Corrected source/tooling HEAD must descend from the consumed failed attempt',
+  )
+  const changedPaths = runGit([
+    'diff',
+    '--name-only',
+    '--diff-filter=ACDMRTUXB',
+    FAILED_PRODUCTION_017_GIT_HEAD,
+    sourceToolingHead,
+  ]).split('\n').filter(Boolean)
+  const allowed = new Set(CORRECTION_SOURCE_ALLOWED_PATHS)
+  assert(
+    changedPaths.every((path) => allowed.has(path)),
+    'Corrected source/tooling HEAD contains a path outside the reviewed ledger-correction scope',
+  )
+  for (const requiredPath of [
+    P12_RUNNER_AUTHORITY_FILE,
+    P12_KIT_GENERATOR_SOURCE,
+    P12_RUNNER_SOURCE,
+    'tests/master-catalog-p12-cli-kit.test.ts',
+    ...LEGACY_LEDGER_COMPATIBILITY_GUARDS.map(
+      (migration) =>
+        `${P12_LEGACY_LEDGER_GUARD_SOURCE_ROOT}/${migration.sourceFile}`,
+    ),
+  ]) {
+    assert(
+      changedPaths.includes(requiredPath),
+      `Corrected source/tooling HEAD is missing required path ${requiredPath}`,
+    )
+  }
+  assertConsumedFailedAuthority(
+    readCommittedGitFile(sourceToolingHead, P12_RUNNER_AUTHORITY_FILE),
+  )
+}
+
 function assertCommittedSourceBindings(
   sourceToolingHead,
   currentHead,
   schemaShapeContract,
 ) {
+  assertCorrectionSourceDelta(sourceToolingHead)
   const ancestor = spawnSync(
     'git',
     ['merge-base', '--is-ancestor', sourceToolingHead, currentHead],
@@ -1999,7 +3331,10 @@ function assertCommittedSourceBindings(
     P12_RUNNER_AUTHORITY_FILE,
   ).toString('utf8')
   assert(
-    !sourceChecklist.includes(P12_RUNNER_AUTHORITY_MARKER),
+    !containsActiveAuthorityMarker(
+      sourceChecklist,
+      P12_RUNNER_AUTHORITY_MARKER,
+    ),
     'Source/tooling HEAD must predate the committed P-12 GO marker',
   )
 
@@ -2012,6 +3347,10 @@ function assertCommittedSourceBindings(
       P12_RUNNER_SOURCE,
       schemaShapeContract.record.runnerSourceSha256,
     ],
+    ...LEGACY_LEDGER_COMPATIBILITY_GUARDS.map((migration) => [
+      `${P12_LEGACY_LEDGER_GUARD_SOURCE_ROOT}/${migration.sourceFile}`,
+      migration.sha256,
+    ]),
     ...PHASE4_MIGRATIONS.map((migration) => [
       `migrations/${migration.sourceFile}`,
       schemaShapeContract.record.migrationHashes[migration.sourceFile],
@@ -2347,7 +3686,6 @@ select
 const LEDGER_SQL = `
 select version::text as version, name::text as name
 from supabase_migrations.schema_migrations
-where version >= '20260621045208'
 order by version;
 `
 
@@ -4075,7 +5413,7 @@ export async function loadSchemaCalibrationManifest(
     validateLedgerRows(
       writeBoundary.snapshot.ledger,
       [
-        ...HISTORICAL_MIGRATIONS,
+        ...FULL_PRE_017_LEDGER_SEQUENCE,
         ...PHASE4_MIGRATIONS.slice(0, stageIndex - 1),
       ],
       `Calibration stage ${manifest.stage} write-boundary ledger`,
@@ -4569,7 +5907,7 @@ export async function loadPriorStepSignoff(
   validateLedgerRows(
     postflight.ledger,
     [
-      ...HISTORICAL_MIGRATIONS,
+      ...FULL_PRE_017_LEDGER_SEQUENCE,
       ...PHASE4_MIGRATIONS.slice(0, priorIndex + 1),
     ],
     'Prior postflight ledger',
@@ -4748,7 +6086,7 @@ async function loadSuccessfulStepEvidenceManifest(
   assertTimestampWithZone(postflight.capturedAt, `${step} postflight capturedAt`)
 
   const expectedStepMigrations = [
-    ...HISTORICAL_MIGRATIONS,
+    ...FULL_PRE_017_LEDGER_SEQUENCE,
     ...PHASE4_MIGRATIONS.slice(
       0,
       PHASE4_MIGRATIONS.findIndex(
@@ -5497,10 +6835,10 @@ export async function executeSchemaCalibration(options) {
   const workdir = kit.stepRoot
   const expectedBefore = migrationPerformed
     ? kit.step.expectedRemoteBefore
-    : HISTORICAL_MIGRATIONS
+    : FULL_PRE_017_LEDGER_SEQUENCE
   const expectedAfter = migrationPerformed
     ? kit.step.expectedRemoteAfter
-    : HISTORICAL_MIGRATIONS
+    : FULL_PRE_017_LEDGER_SEQUENCE
   const disposableTarget = await verifyDisposableRehearsalTarget({
     dbUrl: options.db_url,
     password,
@@ -6009,6 +7347,7 @@ export async function executeP12FinalCloseout(options) {
     {
       kit,
       expectedSha256: approval?.schemaShapeContractSha256,
+      requireV4: options.mode === 'production',
     },
   )
   let pass2VerificationEvidence
@@ -6182,6 +7521,7 @@ export async function executeP12FinalCloseout(options) {
       {
         kit: immediateKit,
         expectedSha256: schemaShapeContract.sha256,
+        requireV4: options.mode === 'production',
       },
     )
     const immediateAdvisorArtifact = await loadBoundAdvisorArtifact(
@@ -6242,7 +7582,7 @@ export async function executeP12FinalCloseout(options) {
       step: FINAL_MIGRATION_ORDINAL,
       workdir: immediateKit.stepRoot,
       expectedMigrations: [
-        ...HISTORICAL_MIGRATIONS,
+        ...FULL_PRE_017_LEDGER_SEQUENCE,
         ...PHASE4_MIGRATIONS,
       ],
       expectedSchemaShapeFingerprint:
@@ -6275,6 +7615,7 @@ export async function executeP12FinalCloseout(options) {
       {
         kit: immediateKit,
         expectedSha256: schemaShapeContract.sha256,
+        requireV4: options.mode === 'production',
       },
     )
     const completedAdvisorArtifact = await loadBoundAdvisorArtifact(
@@ -6448,6 +7789,7 @@ export async function executeP12Step(options) {
     {
       kit,
       expectedSha256: approval?.schemaShapeContractSha256,
+      requireV4: options.mode === 'production',
     },
   )
   let pass2VerificationEvidence
@@ -6651,6 +7993,7 @@ export async function executeP12Step(options) {
     {
       kit: finalWriteKit,
       expectedSha256: schemaShapeContract.sha256,
+      requireV4: options.mode === 'production',
     },
   )
   const finalAdvisorArtifact = await loadBoundAdvisorArtifact(

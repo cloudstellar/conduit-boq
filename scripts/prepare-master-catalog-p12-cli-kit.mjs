@@ -29,7 +29,7 @@ import { fileURLToPath, pathToFileURL } from 'node:url'
 import { createHash } from 'node:crypto'
 import { createRequire } from 'node:module'
 
-export const KIT_SCHEMA = 'conduit-boq/master-catalog-p12-cli-kit/v2'
+export const KIT_SCHEMA = 'conduit-boq/master-catalog-p12-cli-kit/v3'
 export const REQUIRED_SUPABASE_CLI_VERSION = '2.107.0'
 export const REQUIRED_POSTGRES_MAJOR = 17
 export const CLIENT_TIMEOUT_SECONDS = 180
@@ -39,6 +39,76 @@ export const P12_KIT_GENERATOR_SOURCE =
   'scripts/prepare-master-catalog-p12-cli-kit.mjs'
 export const P12_RUNNER_SOURCE =
   'scripts/run-master-catalog-p12-cli-step.mjs'
+export const P12_LEGACY_LEDGER_GUARD_SOURCE_ROOT =
+  'scripts/p12-legacy-ledger-guards'
+export const LEGACY_LEDGER_COMPATIBILITY_GUARD_POLICY =
+  'must-already-exist-never-apply'
+
+export const LEGACY_LEDGER_COMPATIBILITY_GUARDS = Object.freeze([
+  {
+    ordinal: 'pre-009-001',
+    sourceFile: '20260302034458_add_fk_indexes.sql',
+    version: '20260302034458',
+    ledgerName: 'add_fk_indexes',
+    sha256: '333046c6e79fcbdc67b998c7a3d62119ec12f381f86a82c932160484818bcb5d',
+    compatibilityGuard: true,
+    executionPolicy: LEGACY_LEDGER_COMPATIBILITY_GUARD_POLICY,
+  },
+  {
+    ordinal: 'pre-009-002',
+    sourceFile: '20260302034725_enable_rls_factor_reference.sql',
+    version: '20260302034725',
+    ledgerName: 'enable_rls_factor_reference',
+    sha256: '34cb618c4b1fadad5267249048883bd0681cf8f34f7c829d767a46f3b53fae46',
+    compatibilityGuard: true,
+    executionPolicy: LEGACY_LEDGER_COMPATIBILITY_GUARD_POLICY,
+  },
+  {
+    ordinal: 'pre-009-003',
+    sourceFile: '20260304105854_fix_function_search_path.sql',
+    version: '20260304105854',
+    ledgerName: 'fix_function_search_path',
+    sha256: '23830717e05f1fb3e52cb05aa14128951a33341ee05f21107c17e5efaa9596b5',
+    compatibilityGuard: true,
+    executionPolicy: LEGACY_LEDGER_COMPATIBILITY_GUARD_POLICY,
+  },
+  {
+    ordinal: 'pre-009-004',
+    sourceFile: '20260304110029_fix_unqualified_table_references.sql',
+    version: '20260304110029',
+    ledgerName: 'fix_unqualified_table_references',
+    sha256: 'ddad2ee15a76a30c4890ce20ab1e00afe4e44783ec306d8b1b7d5376b96ee846',
+    compatibilityGuard: true,
+    executionPolicy: LEGACY_LEDGER_COMPATIBILITY_GUARD_POLICY,
+  },
+  {
+    ordinal: 'pre-009-005',
+    sourceFile: '20260306092423_fix_search_path_to_public.sql',
+    version: '20260306092423',
+    ledgerName: 'fix_search_path_to_public',
+    sha256: '01bae7ad3e3c3a3d9ddc239c8e456ee9c9dea48179c621043d53e5defb513668',
+    compatibilityGuard: true,
+    executionPolicy: LEGACY_LEDGER_COMPATIBILITY_GUARD_POLICY,
+  },
+  {
+    ordinal: 'pre-009-006',
+    sourceFile: '20260316154955_add_factor_f_snapshot_columns.sql',
+    version: '20260316154955',
+    ledgerName: 'add_factor_f_snapshot_columns',
+    sha256: 'fd0a134b51d3c1ffb36448e463f08416321adf92813c91cc4fc6d30a640655e9',
+    compatibilityGuard: true,
+    executionPolicy: LEGACY_LEDGER_COMPATIBILITY_GUARD_POLICY,
+  },
+  {
+    ordinal: 'pre-009-007',
+    sourceFile: '20260316160554_update_save_boq_rpc_with_factor_f_snapshot.sql',
+    version: '20260316160554',
+    ledgerName: 'update_save_boq_rpc_with_factor_f_snapshot',
+    sha256: 'f5bef3f3a6e9a311832ffe061043aa9f1fc49fca8d85b27ca6a6ba42a7991cab',
+    compatibilityGuard: true,
+    executionPolicy: LEGACY_LEDGER_COMPATIBILITY_GUARD_POLICY,
+  },
+])
 
 export const HISTORICAL_MIGRATIONS = Object.freeze([
   {
@@ -89,6 +159,11 @@ export const HISTORICAL_MIGRATIONS = Object.freeze([
     version: '20260706090832',
     ledgerName: 'hotfix_preserve_boq_item_suffix',
   },
+])
+
+export const FULL_PRE_017_LEDGER_SEQUENCE = Object.freeze([
+  ...LEGACY_LEDGER_COMPATIBILITY_GUARDS,
+  ...HISTORICAL_MIGRATIONS,
 ])
 
 export const PHASE4_MIGRATIONS = Object.freeze([
@@ -174,10 +249,51 @@ export const PHASE4_MIGRATIONS = Object.freeze([
   },
 ])
 
+export function assertStrictFullLedgerSequence(migrations = [
+  ...FULL_PRE_017_LEDGER_SEQUENCE,
+  ...PHASE4_MIGRATIONS,
+]) {
+  const seenVersions = new Set()
+  const seenFilenames = new Set()
+  let previousVersion = ''
+  for (const migration of migrations) {
+    assert(
+      /^\d{14}$/.test(migration.version ?? ''),
+      `Migration ${migration.ordinal ?? 'unknown'} has an invalid ledger version`,
+    )
+    assert(
+      typeof migration.ledgerName === 'string'
+        && /^[a-z0-9_]+$/.test(migration.ledgerName),
+      `Migration ${migration.ordinal ?? 'unknown'} has an invalid ledger name`,
+    )
+    assert(
+      migration.version > previousVersion,
+      'Full migration ledger is not strictly ordered by version',
+    )
+    assert(
+      !seenVersions.has(migration.version),
+      `Full migration ledger duplicates version ${migration.version}`,
+    )
+    const filename = ledgerFilename(migration)
+    assert(
+      !seenFilenames.has(filename),
+      `Full migration ledger duplicates filename ${filename}`,
+    )
+    previousVersion = migration.version
+    seenVersions.add(migration.version)
+    seenFilenames.add(filename)
+  }
+  return migrations
+}
+
 export const REPOSITORY_ROOT = resolve(
   fileURLToPath(new URL('..', import.meta.url)),
 )
 export const MIGRATIONS_ROOT = join(REPOSITORY_ROOT, 'migrations')
+export const LEGACY_LEDGER_GUARDS_ROOT = join(
+  REPOSITORY_ROOT,
+  P12_LEGACY_LEDGER_GUARD_SOURCE_ROOT,
+)
 const requireFromThisModule = createRequire(import.meta.url)
 
 const SUPABASE_NATIVE_PACKAGE_CANDIDATES = Object.freeze({
@@ -363,6 +479,32 @@ function runGit(args) {
   return result.stdout.trim()
 }
 
+export function compatibilityGuardSourcesMatchHead(head) {
+  if (typeof head !== 'string' || !/^[0-9a-f]{40}$/.test(head)) {
+    return false
+  }
+
+  return LEGACY_LEDGER_COMPATIBILITY_GUARDS.every((guard) => {
+    const repositoryPath = [
+      P12_LEGACY_LEDGER_GUARD_SOURCE_ROOT,
+      guard.sourceFile,
+    ].join('/')
+    const result = spawnSync(
+      'git',
+      ['show', `${head}:${repositoryPath}`],
+      {
+        cwd: REPOSITORY_ROOT,
+        encoding: null,
+        maxBuffer: 1024 * 1024,
+        shell: false,
+      },
+    )
+    return result.status === 0
+      && Buffer.isBuffer(result.stdout)
+      && sha256Bytes(result.stdout) === guard.sha256
+  })
+}
+
 export function readRepositoryState() {
   const head = runGit(['rev-parse', 'HEAD'])
   const trackedStatus = runGit([
@@ -373,6 +515,8 @@ export function readRepositoryState() {
   return {
     gitHead: head,
     trackedWorktreeClean: trackedStatus === '',
+    compatibilityGuardsTrackedAtHead:
+      compatibilityGuardSourcesMatchHead(head),
   }
 }
 
@@ -407,18 +551,41 @@ export function assertSupabaseCliVersion(cliPath = LOCAL_SUPABASE_CLI) {
 }
 
 async function loadMigrationSources() {
+  assertStrictFullLedgerSequence()
   const sourceRows = []
 
-  for (const migration of [
-    ...HISTORICAL_MIGRATIONS,
-    ...PHASE4_MIGRATIONS,
-  ]) {
-    const isPhase4 = typeof migration.sha256 === 'string'
-    const sourcePath = join(MIGRATIONS_ROOT, migration.sourceFile)
+  const sourceDescriptors = [
+    ...LEGACY_LEDGER_COMPATIBILITY_GUARDS.map((migration) => ({
+      migration,
+      sourceRoot: LEGACY_LEDGER_GUARDS_ROOT,
+      isCompatibilityGuard: true,
+      isPhase4: false,
+    })),
+    ...HISTORICAL_MIGRATIONS.map((migration) => ({
+      migration,
+      sourceRoot: MIGRATIONS_ROOT,
+      isCompatibilityGuard: false,
+      isPhase4: false,
+    })),
+    ...PHASE4_MIGRATIONS.map((migration) => ({
+      migration,
+      sourceRoot: MIGRATIONS_ROOT,
+      isCompatibilityGuard: false,
+      isPhase4: true,
+    })),
+  ]
+
+  for (const {
+    migration,
+    sourceRoot,
+    isCompatibilityGuard,
+    isPhase4,
+  } of sourceDescriptors) {
+    const sourcePath = join(sourceRoot, migration.sourceFile)
     const bytes = await readFile(sourcePath)
     const sha256 = sha256Bytes(bytes)
 
-    if (isPhase4) {
+    if (isCompatibilityGuard || isPhase4) {
       assert(
         sha256 === migration.sha256,
         `${migration.sourceFile} does not match its accepted SHA-256`,
@@ -430,6 +597,8 @@ async function loadMigrationSources() {
       ledgerFilename: ledgerFilename(migration),
       bytes,
       sha256,
+      sourcePath,
+      isCompatibilityGuard,
       isPhase4,
       objectTargets: isPhase4
         ? extractOwnedObjectTargets(bytes.toString('utf8'))
@@ -458,10 +627,7 @@ async function makeStepDirectory(
 
   for (const migration of includedMigrations) {
     const destination = join(migrationRoot, migration.ledgerFilename)
-    await copyFile(
-      join(MIGRATIONS_ROOT, migration.sourceFile),
-      destination,
-    )
+    await copyFile(migration.sourcePath, destination)
     await chmod(destination, 0o400)
     assert(
       (await sha256File(destination)) === migration.sha256,
@@ -473,7 +639,7 @@ async function makeStepDirectory(
 }
 
 function publicMigrationRecord(migration) {
-  return {
+  const record = {
     ordinal: migration.ordinal,
     sourceFile: migration.sourceFile,
     version: migration.version,
@@ -481,6 +647,16 @@ function publicMigrationRecord(migration) {
     ledgerFilename: migration.ledgerFilename,
     sha256: migration.sha256,
   }
+
+  if (migration.isCompatibilityGuard) {
+    return {
+      ...record,
+      compatibilityGuard: true,
+      executionPolicy: LEGACY_LEDGER_COMPATIBILITY_GUARD_POLICY,
+    }
+  }
+
+  return record
 }
 
 /**
@@ -490,6 +666,7 @@ function publicMigrationRecord(migration) {
  *   repositoryState?: {
  *     gitHead: string,
  *     trackedWorktreeClean: boolean,
+ *     compatibilityGuardsTrackedAtHead?: boolean,
  *   },
  * }} options
  */
@@ -504,6 +681,11 @@ export async function prepareP12CliKit({
 
   const resolvedOutput = await resolveNewExternalDirectory(outputPath)
   const state = repositoryState ?? readRepositoryState()
+  // Resolve custody from the claimed Git object even when repositoryState is
+  // injected by tests. Uncommitted guard bytes can never make a kit eligible
+  // for Production.
+  const compatibilityGuardsTrackedAtHead =
+    compatibilityGuardSourcesMatchHead(state.gitHead)
   const sources = await loadMigrationSources()
   const generatorSourceSha256 = await sha256File(
     join(REPOSITORY_ROOT, P12_KIT_GENERATOR_SOURCE),
@@ -511,7 +693,12 @@ export async function prepareP12CliKit({
   const runnerSourceSha256 = await sha256File(
     join(REPOSITORY_ROOT, P12_RUNNER_SOURCE),
   )
-  const historical = sources.filter((migration) => !migration.isPhase4)
+  const compatibilityGuards = sources.filter(
+    (migration) => migration.isCompatibilityGuard,
+  )
+  const historical = sources.filter(
+    (migration) => !migration.isCompatibilityGuard && !migration.isPhase4,
+  )
   const phase4 = sources.filter((migration) => migration.isPhase4)
 
   let created = false
@@ -524,7 +711,11 @@ export async function prepareP12CliKit({
     for (let index = 0; index < phase4.length; index += 1) {
       const currentMigration = phase4[index]
       const phase4ThroughCurrent = phase4.slice(0, index + 1)
-      const included = [...historical, ...phase4ThroughCurrent]
+      const included = [
+        ...compatibilityGuards,
+        ...historical,
+        ...phase4ThroughCurrent,
+      ]
       const workdir = await makeStepDirectory(
         resolvedOutput,
         currentMigration,
@@ -536,6 +727,7 @@ export async function prepareP12CliKit({
         workdir,
         pendingMigration: publicMigrationRecord(currentMigration),
         expectedRemoteBefore: [
+          ...compatibilityGuards,
           ...historical,
           ...phase4.slice(0, index),
         ].map(publicMigrationRecord),
@@ -556,12 +748,18 @@ export async function prepareP12CliKit({
       generatorSourceSha256,
       runnerSourceSha256,
       trackedWorktreeClean: state.trackedWorktreeClean,
-      productionEligible: state.trackedWorktreeClean,
+      compatibilityGuardsTrackedAtHead,
+      productionEligible:
+        state.trackedWorktreeClean
+        && compatibilityGuardsTrackedAtHead,
       applicationCandidate: APPLICATION_CANDIDATE,
       supabaseCliVersion: REQUIRED_SUPABASE_CLI_VERSION,
       postgresMajor: REQUIRED_POSTGRES_MAJOR,
       clientTimeoutSeconds: CLIENT_TIMEOUT_SECONDS,
       automaticNextStep: false,
+      compatibilityGuardMigrations: compatibilityGuards.map(
+        publicMigrationRecord,
+      ),
       historicalMigrations: historical.map(publicMigrationRecord),
       phase4Migrations: phase4.map(publicMigrationRecord),
       steps,

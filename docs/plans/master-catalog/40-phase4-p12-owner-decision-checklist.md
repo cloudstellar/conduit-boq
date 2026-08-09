@@ -2,7 +2,7 @@
 
 **Prepared:** 2026-07-26
 
-**Last updated:** 2026-08-02
+**Last updated:** 2026-08-09
 
 **Status:** PRE-P-12 HOLD — historical pre-correction context: immutable replacement source/tooling HEAD
 `7fbfe1bb8f71df03a78762b00e93aded7bdd6e42` and its truthful
@@ -69,17 +69,14 @@ checkpoint is pushed and upstream-equal. Production, application/UI/export
 changes, flags, publication, Factor F, hotfix `016`, and P-12 remain
 unauthorized.
 
-**Current status:** PRE-P-12 HOLD — both 2026-08-02 Production GO decisions
-are consumed and superseded. The connected step-`017` attempt stopped during
-its complete read-only preflight before the migration transaction because the
-frozen structural fingerprint incorrectly included volatile
-`pg_index.indcheckxmin`. Migration `017` was not applied, all Phase 4 flags
-remain absent, and Production data/schema are unchanged. The Owner authorized
-the minimal semantic correction and fresh qualification preparation below,
-but no new Production connection, retry, migration, or P-13 action. The old
-kit, contract, Pass 1, Pass 2, approval records, and failed preflight remain
-immutable audit evidence and are not represented as qualification for the new
-runner scope.
+**Current status:** P-12 HOLD — the 2026-08-09 GO was consumed by the first
+attempted stage, `017`. The native CLI stopped before applying that migration
+because the frozen workdir omitted seven older versions already present in the
+Production migration ledger. The complete immediate after-state remained
+stage `016`, and no Production mutation was observed. The minimal full-ledger
+correction and focused isolated proof are authorized; Production retry,
+migration, P-13, and any automatic next step remain prohibited until a fresh
+Owner GO and new `P12_RUNNER_AUTHORITY_V2` checkpoint.
 
 **Exact application candidate:**
 `5068f944af2aa3fe8446c77c8ae8d48673cb260b`
@@ -4324,4 +4321,14 @@ use an alternate path or credential, restore over Production automatically,
 deploy, merge the review-only PR, enable flags, publish a catalog, or open
 P-13. The executor is `Suthorn Kaewkorn`; the distinct verifier is `lukkxh`.
 
-<!-- P12_RUNNER_AUTHORITY_V1 {"decision":"GO","applicationCandidate":"5068f944af2aa3fe8446c77c8ae8d48673cb260b","ownerApprovalReference":"Owner chat: GO P-12 ตอนนี้ on 2026-08-09","approvedAt":"2026-08-09T17:49:57+07:00","executor":"Suthorn Kaewkorn","independentVerifier":"lukkxh","schemaShapeContractSha256":"06f46916609afa80fde75cf8d0f4cbf0a63a1b65fc2f69abffda398c6dea3912","pass2VerificationEvidenceManifestSha256":"f4f0fdcdee44562afab3c7f6e96b7a8e0fbad9b1c37ea0fb28adee0898a8f603","maintenanceWindow":{"startsAt":"2026-08-09T17:32:00+07:00","endsAt":"2026-08-09T21:32:00+07:00"}} -->
+## 6. P-12 Production attempt hard-stop — 2026-08-09
+
+The GO above was consumed by the first attempted stage, `017`. The native CLI
+stopped on the missing full-history compatibility set before recording `017`.
+The immediate complete after-state verified the database at stage `016`; no
+Production mutation was observed. The failed-attempt evidence remains
+append-only and hash-bound below. This consumed authority permits no retry or
+alternate path. A corrected source checkpoint, focused isolated proof, and a
+fresh Owner GO are required before any later Production attempt.
+
+<!-- P12_RUNNER_AUTHORITY_CONSUMED_V1 {"executionGitHead":"b8a80d24ccd4e205f349216d22dac0cfef714ebe","approvalRecordSha256":"30bd194cae9f885d2cb71d9f3497153ff6731ea2b1ccaa752f31a07dc4dd887f","attemptedStep":"017","evidenceManifestSha256":"87533c8a8795d00ad1934a80c71540eab21df40cb424b538cc6758a3581acb1c","outcomeSha256":"8ace5309120c4cb257fa4fe1ad49262dd4bb6b6cee448e111280e34c9e68ad45","afterStateSha256":"da7ec851e800a4579dc56c80809cebdba352437ba1d06eec25312a5933ced342","verifiedStageAfter":"016","disposition":"hard-stop-consumed-no-retry-authority","productionMutationObserved":false,"retryAuthorized":false,"freshGoRequired":true} -->

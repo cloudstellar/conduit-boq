@@ -17,15 +17,20 @@ import { afterEach, describe, expect, it } from 'vitest';
 import {
   APPLICATION_CANDIDATE,
   CLIENT_TIMEOUT_SECONDS,
+  FULL_PRE_017_LEDGER_SEQUENCE,
   HISTORICAL_MIGRATIONS,
   KIT_SCHEMA,
+  LEGACY_LEDGER_COMPATIBILITY_GUARDS,
   LOCAL_SUPABASE_CLI,
   P12_KIT_GENERATOR_SOURCE,
+  P12_LEGACY_LEDGER_GUARD_SOURCE_ROOT,
   P12_RUNNER_SOURCE,
   PHASE4_MIGRATIONS,
   REPOSITORY_ROOT,
   REQUIRED_POSTGRES_MAJOR,
   REQUIRED_SUPABASE_CLI_VERSION,
+  assertStrictFullLedgerSequence,
+  compatibilityGuardSourcesMatchHead,
   extractOwnedObjectTargets,
   ledgerFilename,
   prepareP12CliKit,
@@ -48,6 +53,7 @@ import {
   HOTFIX_016_PROSRC_SHA256,
   HOTFIX_016_SQL,
   INITIAL_WINDOW_BUDGET_MS,
+  LEGACY_SCHEMA_SHAPE_CONTRACT_SCHEMA,
   POSTFLIGHT_BUDGET_MS,
   PRE_MIGRATION_WINDOW_BUDGET_MS,
   P12_AUTHORITY_FILES,
@@ -61,6 +67,7 @@ import {
   REHEARSAL_SENTINEL_PURPOSE,
   REQUIRED_CURRENT_USER,
   SCHEMA_SHAPE_CONTRACT_SCHEMA,
+  SCHEMA_SHAPE_CONTINUITY_SCHEMA,
   SCHEMA_SHAPE_GITHUB_REPOSITORY,
   SCHEMA_SHAPE_GITHUB_REVIEW_PROVIDER,
   SCHEMA_CALIBRATION_EVIDENCE_MANIFEST_SCHEMA,
@@ -74,6 +81,7 @@ import {
   buildCliEnvironment,
   buildSupabaseMigrationArgs,
   buildSupabaseQueryArgs,
+  containsActiveAuthorityMarker,
   expectedFeatureFlags,
   expectedSchemaShapeGithubReviewMarker,
   expectedSchemaShapeFingerprint,
@@ -112,6 +120,29 @@ import {
 } from '../scripts/run-master-catalog-p12-cli-step.mjs';
 
 const createdTemporaryRoots: string[] = [];
+
+// Independent literal regression fixture. Do not derive this from the
+// generator constants: the original defect passed because tests repeated the
+// same incomplete post-009 assumption as the kit.
+const KNOWN_PRODUCTION_PRE_009_LEDGER = Object.freeze([
+  ['20260302034458', 'add_fk_indexes'],
+  ['20260302034725', 'enable_rls_factor_reference'],
+  ['20260304105854', 'fix_function_search_path'],
+  ['20260304110029', 'fix_unqualified_table_references'],
+  ['20260306092423', 'fix_search_path_to_public'],
+  ['20260316154955', 'add_factor_f_snapshot_columns'],
+  ['20260316160554', 'update_save_boq_rpc_with_factor_f_snapshot'],
+]);
+
+const KNOWN_PRODUCTION_PRE_009_GUARD_HASHES = Object.freeze([
+  '333046c6e79fcbdc67b998c7a3d62119ec12f381f86a82c932160484818bcb5d',
+  '34cb618c4b1fadad5267249048883bd0681cf8f34f7c829d767a46f3b53fae46',
+  '23830717e05f1fb3e52cb05aa14128951a33341ee05f21107c17e5efaa9596b5',
+  'ddad2ee15a76a30c4890ce20ab1e00afe4e44783ec306d8b1b7d5376b96ee846',
+  '01bae7ad3e3c3a3d9ddc239c8e456ee9c9dea48179c621043d53e5defb513668',
+  'fd0a134b51d3c1ffb36448e463f08416321adf92813c91cc4fc6d30a640655e9',
+  'f5bef3f3a6e9a311832ffe061043aa9f1fc49fca8d85b27ca6a6ba42a7991cab',
+]);
 
 async function temporaryRoot() {
   const root = await mkdtemp(join(tmpdir(), 'conduit-p12-cli-kit-test-'));
@@ -236,6 +267,7 @@ const distinctSchemaFingerprints = Object.fromEntries(
 );
 
 function schemaShapeContractRecord({
+  schema = LEGACY_SCHEMA_SHAPE_CONTRACT_SCHEMA,
   gitHead = 'a'.repeat(40),
   kitManifestPath = '/external/kit/manifest.json',
   kitManifestSha256 = 'c'.repeat(64),
@@ -250,6 +282,7 @@ function schemaShapeContractRecord({
   pullNumber = 42,
   reviewId = '987654321',
 }: {
+  schema?: string;
   gitHead?: string;
   kitManifestPath?: string;
   kitManifestSha256?: string;
@@ -264,7 +297,7 @@ function schemaShapeContractRecord({
   reviewId?: string;
 } = {}) {
   const payload = {
-    schema: SCHEMA_SHAPE_CONTRACT_SCHEMA,
+    schema,
     scope: SCHEMA_SHAPE_SCOPE,
     applicationCandidate: APPLICATION_CANDIDATE,
     sourceToolingGitHead: gitHead,
@@ -539,7 +572,7 @@ async function writeCalibrationChain(
               server_version_num: '170006',
             },
             ledger: [
-              ...HISTORICAL_MIGRATIONS,
+              ...FULL_PRE_017_LEDGER_SEQUENCE,
               ...PHASE4_MIGRATIONS.slice(0, index - 1),
             ].map((migration) => ({
               version: migration.version,
@@ -616,6 +649,28 @@ describe.sequential('Master Catalog P-12 CLI kit', () => {
   });
 
   it('freezes exact historical and Phase 4 ledger mappings', () => {
+    expect(LEGACY_LEDGER_COMPATIBILITY_GUARDS.map((migration) => [
+      migration.version,
+      migration.ledgerName,
+    ])).toEqual(KNOWN_PRODUCTION_PRE_009_LEDGER);
+    expect(FULL_PRE_017_LEDGER_SEQUENCE.map((migration) => [
+      migration.version,
+      migration.ledgerName,
+    ])).toEqual([
+      ...KNOWN_PRODUCTION_PRE_009_LEDGER,
+      ...HISTORICAL_MIGRATIONS.map((migration) => [
+        migration.version,
+        migration.ledgerName,
+      ]),
+    ]);
+    expect(assertStrictFullLedgerSequence()).toHaveLength(
+      FULL_PRE_017_LEDGER_SEQUENCE.length + PHASE4_MIGRATIONS.length,
+    );
+    expect(() => assertStrictFullLedgerSequence([
+      FULL_PRE_017_LEDGER_SEQUENCE[0],
+      FULL_PRE_017_LEDGER_SEQUENCE[0],
+    ])).toThrow('strictly ordered');
+
     expect(HISTORICAL_MIGRATIONS.map((migration) => [
       migration.ordinal,
       migration.version,
@@ -657,6 +712,27 @@ describe.sequential('Master Catalog P-12 CLI kit', () => {
     );
   });
 
+  it('keeps every pre-009 compatibility guard hash-bound and fail-closed', async () => {
+    expect(LEGACY_LEDGER_COMPATIBILITY_GUARDS.map(
+      (guard) => guard.sha256,
+    )).toEqual(KNOWN_PRODUCTION_PRE_009_GUARD_HASHES);
+    expect(compatibilityGuardSourcesMatchHead('0'.repeat(40))).toBe(false);
+    for (const guard of LEGACY_LEDGER_COMPATIBILITY_GUARDS) {
+      expect(guard.compatibilityGuard).toBe(true);
+      expect(guard.executionPolicy).toBe('must-already-exist-never-apply');
+      const sourcePath = join(
+        REPOSITORY_ROOT,
+        P12_LEGACY_LEDGER_GUARD_SOURCE_ROOT,
+        guard.sourceFile,
+      );
+      const sql = await readFile(sourcePath, 'utf8');
+      expect(await sha256File(sourcePath)).toBe(guard.sha256);
+      expect(sql).toContain('this is not reconstructed migration SQL');
+      expect(sql).toContain('RAISE EXCEPTION');
+      expect(sql).toContain(`${guard.version}_${guard.ledgerName} must never execute`);
+    }
+  });
+
   it('resolves the exact native Supabase binary instead of the JavaScript shim', async () => {
     expect(resolveNativeSupabaseCliBinary()).toBe(LOCAL_SUPABASE_CLI);
     expect(LOCAL_SUPABASE_CLI).toMatch(
@@ -680,7 +756,8 @@ describe.sequential('Master Catalog P-12 CLI kit', () => {
 
     expect(result.outputPath).toBe(await realpath(outputPath));
     expect(result.manifest.schema).toBe(KIT_SCHEMA);
-    expect(result.manifest.productionEligible).toBe(true);
+    expect(result.manifest.compatibilityGuardsTrackedAtHead).toBe(false);
+    expect(result.manifest.productionEligible).toBe(false);
     expect(result.manifest.steps).toHaveLength(11);
     expect(result.manifest.applicationCandidate).toBe(APPLICATION_CANDIDATE);
     expect(result.manifest.generatorSourceSha256).toBe(
@@ -698,7 +775,7 @@ describe.sequential('Master Catalog P-12 CLI kit', () => {
       const step = result.manifest.steps[phaseIndex];
       const migrationRoot = join(outputPath, step.workdir, 'supabase', 'migrations');
       const expected = [
-        ...HISTORICAL_MIGRATIONS,
+        ...FULL_PRE_017_LEDGER_SEQUENCE,
         ...PHASE4_MIGRATIONS.slice(0, phaseIndex + 1),
       ];
       const files = (await readdir(migrationRoot)).sort();
@@ -706,13 +783,17 @@ describe.sequential('Master Catalog P-12 CLI kit', () => {
       expect(step.ordinal).toBe(phaseMigration.ordinal);
       expect(step.pendingMigration.sourceFile).toBe(phaseMigration.sourceFile);
       expect(step.expectedRemoteBefore).toHaveLength(
-        HISTORICAL_MIGRATIONS.length + phaseIndex,
+        FULL_PRE_017_LEDGER_SEQUENCE.length + phaseIndex,
       );
       expect(step.expectedRemoteAfter).toHaveLength(expected.length);
       expect(files).toEqual(expected.map(ledgerFilename).sort());
 
       for (const migration of expected) {
-        const sourcePath = join(REPOSITORY_ROOT, 'migrations', migration.sourceFile);
+        const sourceRoot = 'compatibilityGuard' in migration
+          && migration.compatibilityGuard === true
+          ? P12_LEGACY_LEDGER_GUARD_SOURCE_ROOT
+          : 'migrations';
+        const sourcePath = join(REPOSITORY_ROOT, sourceRoot, migration.sourceFile);
         const copyPath = join(migrationRoot, ledgerFilename(migration));
         expect(await readFile(copyPath)).toEqual(await readFile(sourcePath));
         expect(await sha256File(copyPath)).toBe(
@@ -910,11 +991,11 @@ describe.sequential('Master Catalog P-12 CLI kit', () => {
   });
 
   it('binds feature-flag rows to the immutable migration stage', () => {
-    expect(expectedFeatureFlags(HISTORICAL_MIGRATIONS)).toEqual([]);
-    expect(validateFlags([], HISTORICAL_MIGRATIONS)).toEqual({});
+    expect(expectedFeatureFlags(FULL_PRE_017_LEDGER_SEQUENCE)).toEqual([]);
+    expect(validateFlags([], FULL_PRE_017_LEDGER_SEQUENCE)).toEqual({});
 
     const through017 = [
-      ...HISTORICAL_MIGRATIONS,
+      ...FULL_PRE_017_LEDGER_SEQUENCE,
       PHASE4_MIGRATIONS[0],
     ];
     expect(expectedFeatureFlags(through017)).toEqual([
@@ -930,7 +1011,7 @@ describe.sequential('Master Catalog P-12 CLI kit', () => {
     ], through017)).toThrow('is not false');
 
     const through020 = [
-      ...HISTORICAL_MIGRATIONS,
+      ...FULL_PRE_017_LEDGER_SEQUENCE,
       ...PHASE4_MIGRATIONS.slice(0, 5),
     ];
     expect(expectedFeatureFlags(through020)).toEqual([
@@ -1048,10 +1129,18 @@ describe.sequential('Master Catalog P-12 CLI kit', () => {
     expect(SCHEMA_SHAPE_SCOPE).toBe(
       'public-private-table-columns-constraints-indexes/v2',
     );
-    const schemaShapeSql = snapshotQueryDefinitions({
+    const queryDefinitions = snapshotQueryDefinitions({
       relations: [],
       routines: [],
-    }).find(({ name }) => name === 'schemaShape')?.sql ?? '';
+    });
+    const ledgerSql = queryDefinitions.find(
+      ({ name }) => name === 'ledger',
+    )?.sql ?? '';
+    expect(ledgerSql).toContain('from supabase_migrations.schema_migrations');
+    expect(ledgerSql).not.toContain('where version');
+    const schemaShapeSql = queryDefinitions.find(
+      ({ name }) => name === 'schemaShape',
+    )?.sql ?? '';
     expect(schemaShapeSql).toContain(
       "to_jsonb(index_row) - 'check_xmin'",
     );
@@ -1118,6 +1207,9 @@ describe.sequential('Master Catalog P-12 CLI kit', () => {
   it('binds schema review to an exact approved GitHub PR review envelope', () => {
     const record = schemaShapeContractRecord();
     expect(SCHEMA_SHAPE_CONTRACT_SCHEMA).toBe(
+      'conduit-boq/master-catalog-p12-schema-shape-contract/v4',
+    );
+    expect(LEGACY_SCHEMA_SHAPE_CONTRACT_SCHEMA).toBe(
       'conduit-boq/master-catalog-p12-schema-shape-contract/v3',
     );
     expect(validateSchemaShapeGithubReview(record, {
@@ -1132,6 +1224,47 @@ describe.sequential('Master Catalog P-12 CLI kit', () => {
         `payload=${record.githubReview.reviewedPayloadSha256}`,
       ].join(' '),
     );
+
+    const continuity = {
+      schema: SCHEMA_SHAPE_CONTINUITY_SCHEMA,
+      priorSchemaShapeContractPath: '/external/legacy-contract.json',
+      priorSchemaShapeContractSha256: '1'.repeat(64),
+      priorPass2VerificationEvidenceManifestPath:
+        '/external/legacy-pass2/05-closeout-evidence-manifest.json',
+      priorPass2VerificationEvidenceManifestSha256: '2'.repeat(64),
+      failedProductionAttempt: {
+        evidenceManifestPath: '/external/failed-017/05-evidence-manifest.json',
+        evidenceManifestSha256: '3'.repeat(64),
+        files: {},
+      },
+      focusedIsolated017Proof: {
+        evidenceManifestPath:
+          '/external/focused-017/05-schema-calibration-evidence-manifest.json',
+        evidenceManifestSha256: '4'.repeat(64),
+        proofResultPath: '/external/focused-017/99-proof-result.json',
+        proofResultSha256: '5'.repeat(64),
+      },
+    };
+    const v4Payload = {
+      ...record,
+      schema: SCHEMA_SHAPE_CONTRACT_SCHEMA,
+      continuity,
+    };
+    delete (v4Payload as { githubReview?: unknown }).githubReview;
+    const v4PayloadSha256 = schemaShapeContractReviewPayloadSha256(v4Payload);
+    expect(expectedSchemaShapeGithubReviewMarker(
+      v4Payload,
+      v4PayloadSha256,
+    )).toBe([
+      'P12_SCHEMA_REVIEW_V2',
+      `source=${v4Payload.sourceToolingGitHead}`,
+      `kit=${v4Payload.kitManifestSha256}`,
+      `legacy=${continuity.priorSchemaShapeContractSha256}`,
+      `pass2=${continuity.priorPass2VerificationEvidenceManifestSha256}`,
+      `failed=${continuity.failedProductionAttempt.evidenceManifestSha256}`,
+      `proof=${continuity.focusedIsolated017Proof.evidenceManifestSha256}`,
+      `payload=${v4PayloadSha256}`,
+    ].join(' '));
 
     const payloadTampered = structuredClone(record);
     payloadTampered.scope = `${SCHEMA_SHAPE_SCOPE}-tampered`;
@@ -1228,6 +1361,13 @@ describe.sequential('Master Catalog P-12 CLI kit', () => {
     ).toBe(distinctSchemaFingerprints[FINAL_MIGRATION_ORDINAL]);
     expect(contract.pass1Evidence.manifest.stage).toBe(
       FINAL_MIGRATION_ORDINAL,
+    );
+    await expect(loadSchemaShapeContract(contractPath, {
+      kit,
+      expectedSha256: contractSha256,
+      requireV4: true,
+    })).rejects.toThrow(
+      'requires a fresh v4 continuity schema-shape contract',
     );
 
     await chmod(contractPath, 0o400);
@@ -1356,7 +1496,7 @@ describe.sequential('Master Catalog P-12 CLI kit', () => {
     ])).toThrow('not owner-only');
 
     const through017 = [
-      ...HISTORICAL_MIGRATIONS,
+      ...FULL_PRE_017_LEDGER_SEQUENCE,
       PHASE4_MIGRATIONS[0],
     ];
     const preBridgePublicDefault = {
@@ -1374,7 +1514,7 @@ describe.sequential('Master Catalog P-12 CLI kit', () => {
     )).toThrow('appeared before the reviewed 017a bridge');
 
     const through017a = [
-      ...HISTORICAL_MIGRATIONS,
+      ...FULL_PRE_017_LEDGER_SEQUENCE,
       ...PHASE4_MIGRATIONS.slice(0, 2),
     ];
     expect(() => validateFunctionDefaultAclForMigrations(
@@ -1389,7 +1529,7 @@ describe.sequential('Master Catalog P-12 CLI kit', () => {
 
   it('binds authenticated private-schema USAGE to the exact reviewed migration stage', () => {
     const through017 = [
-      ...HISTORICAL_MIGRATIONS,
+      ...FULL_PRE_017_LEDGER_SEQUENCE,
       PHASE4_MIGRATIONS[0],
     ];
     expect(() => validatePrivateSchemaAcl(
@@ -1402,7 +1542,7 @@ describe.sequential('Master Catalog P-12 CLI kit', () => {
     )).toThrow('before migration 018');
 
     const through017a = [
-      ...HISTORICAL_MIGRATIONS,
+      ...FULL_PRE_017_LEDGER_SEQUENCE,
       ...PHASE4_MIGRATIONS.slice(0, 2),
     ];
     expect(() => validatePrivateSchemaAcl(
@@ -1416,7 +1556,7 @@ describe.sequential('Master Catalog P-12 CLI kit', () => {
 
     for (let phaseIndex = 2; phaseIndex < PHASE4_MIGRATIONS.length; phaseIndex += 1) {
       const expectedMigrations = [
-        ...HISTORICAL_MIGRATIONS,
+        ...FULL_PRE_017_LEDGER_SEQUENCE,
         ...PHASE4_MIGRATIONS.slice(0, phaseIndex + 1),
       ];
       expect(() => validatePrivateSchemaAcl(
@@ -1433,35 +1573,35 @@ describe.sequential('Master Catalog P-12 CLI kit', () => {
       ...privateSchemaAcl(true),
       public_usage: true,
     }], [
-      ...HISTORICAL_MIGRATIONS,
+      ...FULL_PRE_017_LEDGER_SEQUENCE,
       ...PHASE4_MIGRATIONS.slice(0, 3),
     ])).toThrow('PUBLIC');
     expect(() => validatePrivateSchemaAcl([{
       ...privateSchemaAcl(true),
       anon_usage: true,
     }], [
-      ...HISTORICAL_MIGRATIONS,
+      ...FULL_PRE_017_LEDGER_SEQUENCE,
       ...PHASE4_MIGRATIONS.slice(0, 3),
     ])).toThrow('anon');
     expect(() => validatePrivateSchemaAcl([{
       ...privateSchemaAcl(true),
       authenticated_create: true,
     }], [
-      ...HISTORICAL_MIGRATIONS,
+      ...FULL_PRE_017_LEDGER_SEQUENCE,
       ...PHASE4_MIGRATIONS.slice(0, 3),
     ])).toThrow('CREATE to authenticated');
     expect(() => validatePrivateSchemaAcl([{
       ...privateSchemaAcl(true),
       service_role_usage: false,
     }], [
-      ...HISTORICAL_MIGRATIONS,
+      ...FULL_PRE_017_LEDGER_SEQUENCE,
       ...PHASE4_MIGRATIONS.slice(0, 3),
     ])).toThrow('service_role');
   });
 
   it('requires the exact least-privilege catalog_action_error posture after migration 026', () => {
     const through025 = [
-      ...HISTORICAL_MIGRATIONS,
+      ...FULL_PRE_017_LEDGER_SEQUENCE,
       ...PHASE4_MIGRATIONS.slice(0, -1),
     ];
     expect(() => validateCatalogActionErrorAcl(
@@ -1470,7 +1610,7 @@ describe.sequential('Master Catalog P-12 CLI kit', () => {
     )).not.toThrow();
 
     const through026 = [
-      ...HISTORICAL_MIGRATIONS,
+      ...FULL_PRE_017_LEDGER_SEQUENCE,
       ...PHASE4_MIGRATIONS,
     ];
     expect(() => validateCatalogActionErrorAcl(
@@ -1749,7 +1889,7 @@ describe.sequential('Master Catalog P-12 CLI kit', () => {
         database_name: REHEARSAL_DATABASE_NAME,
         server_version_num: '170006',
       },
-      ledger: HISTORICAL_MIGRATIONS.map((migration) => ({
+      ledger: FULL_PRE_017_LEDGER_SEQUENCE.map((migration) => ({
         version: migration.version,
         name: migration.ledgerName,
       })),
@@ -1769,7 +1909,7 @@ describe.sequential('Master Catalog P-12 CLI kit', () => {
       validateWriteBoundaryRow({
         boundary: candidate,
         mode: 'rehearsal',
-        expectedMigrations: HISTORICAL_MIGRATIONS,
+        expectedMigrations: FULL_PRE_017_LEDGER_SEQUENCE,
         expectedCatalog: catalog,
         expectedFactorAndBoq: factorAndBoq,
         expectedHotfix016: hotfix016,
@@ -1806,6 +1946,17 @@ describe.sequential('Master Catalog P-12 CLI kit', () => {
       P12_RUNNER_AUTHORITY_FILE,
       P12_RUNNER_SOURCE,
     ])).toThrow('may differ from the source/tooling HEAD only');
+  });
+
+  it('distinguishes an active P-12 authority marker from explanatory prose', () => {
+    expect(containsActiveAuthorityMarker(
+      'A fresh `P12_RUNNER_AUTHORITY_V2` checkpoint is required.',
+      'P12_RUNNER_AUTHORITY_V2',
+    )).toBe(false);
+    expect(containsActiveAuthorityMarker(
+      '<!-- P12_RUNNER_AUTHORITY_V2 {"decision":"GO"} -->',
+      'P12_RUNNER_AUTHORITY_V2',
+    )).toBe(true);
   });
 
   it('keeps every external guard before the single last-await database boundary and immediate spawn', async () => {
@@ -1987,7 +2138,7 @@ describe.sequential('Master Catalog P-12 CLI kit', () => {
       '03-postflight.json': {
         capturedAt: '2026-07-28T09:02:30+07:00',
         ledger: [
-          ...HISTORICAL_MIGRATIONS,
+          ...FULL_PRE_017_LEDGER_SEQUENCE,
           PHASE4_MIGRATIONS[0],
         ].map((migration) => ({
           version: migration.version,
@@ -2202,7 +2353,7 @@ describe.sequential('Master Catalog P-12 CLI kit', () => {
           server_version_num: '170006',
         },
         ledger: [
-          ...HISTORICAL_MIGRATIONS,
+          ...FULL_PRE_017_LEDGER_SEQUENCE,
           ...PHASE4_MIGRATIONS,
         ].map((migration) => ({
           version: migration.version,
@@ -2596,12 +2747,12 @@ describe.sequential('Master Catalog P-12 CLI kit', () => {
     })).not.toThrow();
     expect(() => validateApprovalRecord(approvalRecord({
       schema:
-        'conduit-boq/master-catalog-p12-production-approval/v2',
+        'conduit-boq/master-catalog-p12-production-approval/v3',
       scope: 'P-12-migrations-017-017a-018-through-025-only',
     }), {
       now,
       currentHead: 'a'.repeat(40),
-    })).toThrow('not frozen P-12 v3');
+    })).toThrow('not frozen P-12 v4');
     expect(() => validateApprovalRecord(approvalRecord({
       independentVerifier: 'Executor A',
     }), {
@@ -2656,7 +2807,7 @@ describe.sequential('Master Catalog P-12 CLI kit', () => {
 
   it('blocks missing, extra, renamed, or out-of-order ledger entries', () => {
     const expected = [
-      ...HISTORICAL_MIGRATIONS,
+      ...FULL_PRE_017_LEDGER_SEQUENCE,
       PHASE4_MIGRATIONS[0],
     ];
     const exactRows = expected.map((migration) => ({
@@ -2670,6 +2821,10 @@ describe.sequential('Master Catalog P-12 CLI kit', () => {
     expect(() => validateLedgerRows([
       ...exactRows,
       { version: '20260728999999', name: 'unexpected' },
+    ], expected)).toThrow('does not match');
+    expect(() => validateLedgerRows([
+      { ...exactRows[0], name: `${exactRows[0].name}_renamed` },
+      ...exactRows.slice(1),
     ], expected)).toThrow('does not match');
     expect(() => validateLedgerRows([
       exactRows[1],
