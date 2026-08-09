@@ -4304,3 +4304,24 @@ Acceptance of this checklist does **not** authorize any further Production
 access or write, including DDL/DML, reset, deployment, feature enablement,
 catalog publication, Add/Supplement release, Factor F mutation, or hotfix `016`
 changes. P-12, P-13, P-14, and P-15 remain separate sequential decisions.
+
+## 5. Final P-12 Production GO overlay — 2026-08-09
+
+The Owner instructed `GO P‑12 ตอนนี้` after the fresh encrypted Production
+application backup passed isolated PostgreSQL 17 restore/checksum, exact
+read-only stage-`016` Production parity passed, the fresh Production advisor
+returned no findings, and the corrected PR `#8` remained open/unmerged at
+source/tooling HEAD `07548af07e1d56b290a3af34b9365c40072f2505` with the
+authenticated `APPROVED` review from `lukkxh` and recorded Remote status.
+
+This GO authorizes only the frozen sequence `017` -> `017a` -> `018`-`026`
+inside the exact `2026-08-09T17:32:00+07:00` through
+`2026-08-09T21:32:00+07:00` maintenance window, one transaction and verified
+postflight/advisor handoff per file, followed by final read-only closeout and
+the encrypted post-migration application backup while all Phase 4 flags remain
+`false`. Hard-stop at the first mismatch or uncertain result. Do not retry,
+use an alternate path or credential, restore over Production automatically,
+deploy, merge the review-only PR, enable flags, publish a catalog, or open
+P-13. The executor is `Suthorn Kaewkorn`; the distinct verifier is `lukkxh`.
+
+<!-- P12_RUNNER_AUTHORITY_V1 {"decision":"GO","applicationCandidate":"5068f944af2aa3fe8446c77c8ae8d48673cb260b","ownerApprovalReference":"Owner chat: GO P-12 ตอนนี้ on 2026-08-09","approvedAt":"2026-08-09T17:49:57+07:00","executor":"Suthorn Kaewkorn","independentVerifier":"lukkxh","schemaShapeContractSha256":"06f46916609afa80fde75cf8d0f4cbf0a63a1b65fc2f69abffda398c6dea3912","pass2VerificationEvidenceManifestSha256":"f4f0fdcdee44562afab3c7f6e96b7a8e0fbad9b1c37ea0fb28adee0898a8f603","maintenanceWindow":{"startsAt":"2026-08-09T17:32:00+07:00","endsAt":"2026-08-09T21:32:00+07:00"}} -->
