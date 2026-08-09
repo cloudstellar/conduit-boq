@@ -81,6 +81,8 @@ export const LEGACY_SCHEMA_SHAPE_CONTRACT_SCHEMA =
   'conduit-boq/master-catalog-p12-schema-shape-contract/v3'
 export const SCHEMA_SHAPE_CONTINUITY_SCHEMA =
   'conduit-boq/master-catalog-p12-schema-shape-continuity/v1'
+export const OWNER_CHAT_CONFIRMATION_SCHEMA =
+  'conduit-boq/master-catalog-p12-owner-chat-confirmation/v1'
 export const LEGACY_SCHEMA_SHAPE_CONTRACT_SHA256 =
   '06f46916609afa80fde75cf8d0f4cbf0a63a1b65fc2f69abffda398c6dea3912'
 export const LEGACY_PASS2_VERIFICATION_EVIDENCE_MANIFEST_SHA256 =
@@ -93,6 +95,18 @@ export const FOCUSED_ISOLATED_017_PRODUCTION_DUMP_SHA256 =
   'b74fef5667225434bf10a737813a5090b45bb9a83eac08fd02db7797e14b4cb4'
 export const FOCUSED_ISOLATED_017_POSTGRES_IMAGE_ID =
   'sha256:178f0976b54a39237096bfa310c1a352dbc82fb1b08dda45cdb8acb5d40c1426'
+export const FOCUSED_ISOLATED_017_SOURCE_GIT_HEAD =
+  'db86af558aec2af7358b9adcfa20da985283f633'
+export const FOCUSED_ISOLATED_017_KIT_MANIFEST_SHA256 =
+  '2ef1c2e886cb8f3fe3e8c0cac72a5d01006cc24f4d5f3f82f9e75d6537058829'
+export const FOCUSED_ISOLATED_017_GENERATOR_SOURCE_SHA256 =
+  '60ef1cc43b549f99b12d12b712aa14358efbcb3852557f2275ebcce1eb449fbb'
+export const FOCUSED_ISOLATED_017_RUNNER_SOURCE_SHA256 =
+  '9ad5b2c7069023ae863f47a74fe91fbb538de558f4c00a504ac60f3094205027'
+export const OWNER_CHAT_CONFIRMATION_SHA256 =
+  '84ac869ca50895a4c6d26e2924e0f255f16650aad474e0c8d7bfb457819362cd'
+export const OWNER_CHAT_CONFIRMATION_REVIEWED_PAYLOAD_SHA256 =
+  '125180668b54a1a3bade5d7bb3feb523315265a0702ae10b0bb07645f39d4822'
 export const FAILED_PRODUCTION_017_APPROVAL_RECORD_SHA256 =
   '30bd194cae9f885d2cb71d9f3497153ff6731ea2b1ccaa752f31a07dc4dd887f'
 export const FAILED_PRODUCTION_017_FILE_SHA256 = Object.freeze({
@@ -242,6 +256,7 @@ export const SCHEMA_SHAPE_CONTINUITY_KEYS = Object.freeze([
   'priorPass2VerificationEvidenceManifestSha256',
   'failedProductionAttempt',
   'focusedIsolated017Proof',
+  'ownerChatConfirmation',
 ])
 export const FAILED_PRODUCTION_ATTEMPT_KEYS = Object.freeze([
   'evidenceManifestPath',
@@ -253,6 +268,34 @@ export const FOCUSED_ISOLATED_017_PROOF_KEYS = Object.freeze([
   'evidenceManifestSha256',
   'proofResultPath',
   'proofResultSha256',
+])
+export const OWNER_CHAT_CONFIRMATION_BINDING_KEYS = Object.freeze([
+  'path',
+  'sha256',
+])
+export const OWNER_CHAT_CONFIRMATION_RECORD_KEYS = Object.freeze([
+  'schema',
+  'decision',
+  'recordedAt',
+  'ownerConfirmationText',
+  'reviewTransportDecisionText',
+  'sourceToolingGitHead',
+  'kitManifestPath',
+  'kitManifestSha256',
+  'continuityPayloadPath',
+  'continuityPayloadFileSha256',
+  'continuityReviewedPayloadSha256',
+  'focusedIsolated017EvidenceManifestPath',
+  'focusedIsolated017EvidenceManifestSha256',
+  'focusedIsolated017ProofResultPath',
+  'focusedIsolated017ProofResultSha256',
+  'technicalConclusion',
+  'keychainAccessAuthorizedBeforeFreshGo',
+  'productionConnectionAuthorized',
+  'productionMigrationAuthorized',
+  'p12GoAuthorized',
+  'automaticNextStep',
+  'freshGoRequired',
 ])
 export const SCHEMA_SHAPE_GITHUB_REVIEW_KEYS = Object.freeze([
   'provider',
@@ -720,7 +763,7 @@ export function validateApprovalRecord(
   )
   assert(
     githubReviewCheckedAtMs <= approvedAtMs,
-    'Authenticated GitHub review recheck occurred after Owner approval',
+    'Authenticated legacy GitHub review recheck occurred after Owner approval',
   )
   assert(startsAtMs < endsAtMs, 'Maintenance window end must be after its start')
   assert(
@@ -1286,6 +1329,165 @@ async function loadOwnerOnlyJsonArtifact(
   }
 }
 
+export function validateReviewTransportBridgePaths(changedPaths) {
+  const expected = [
+    P12_RUNNER_SOURCE,
+    'tests/master-catalog-p12-cli-kit.test.ts',
+  ].sort()
+  assert(
+    Array.isArray(changedPaths)
+      && canonicalJson([...changedPaths].sort()) === canonicalJson(expected),
+    'Post-R2 source delta must contain only the chat-confirmation bridge runner and focused regression test',
+  )
+  return changedPaths
+}
+
+function assertReviewTransportBridgeDelta(sourceToolingHead) {
+  const ancestor = spawnSync(
+    'git',
+    [
+      'merge-base',
+      '--is-ancestor',
+      FOCUSED_ISOLATED_017_SOURCE_GIT_HEAD,
+      sourceToolingHead,
+    ],
+    {
+      cwd: REPOSITORY_ROOT,
+      encoding: 'utf8',
+      shell: false,
+    },
+  )
+  assert(
+    ancestor.status === 0
+      && sourceToolingHead !== FOCUSED_ISOLATED_017_SOURCE_GIT_HEAD,
+    'Chat-confirmation bridge source must descend from the exact R2 source HEAD',
+  )
+  const changedPaths = runGit([
+    'diff',
+    '--name-only',
+    '--diff-filter=ACDMRTUXB',
+    FOCUSED_ISOLATED_017_SOURCE_GIT_HEAD,
+    sourceToolingHead,
+  ]).split('\n').filter(Boolean)
+  validateReviewTransportBridgePaths(changedPaths)
+}
+
+async function loadOwnerChatConfirmation(binding) {
+  assertExactKeys(
+    binding,
+    OWNER_CHAT_CONFIRMATION_BINDING_KEYS,
+    'Owner chat confirmation binding',
+  )
+  assert(
+    binding.sha256 === OWNER_CHAT_CONFIRMATION_SHA256,
+    'Continuity does not bind the exact recorded Owner chat confirmation',
+  )
+  const loaded = await loadOwnerOnlyJsonArtifact(
+    binding.path,
+    binding.sha256,
+    'Owner chat confirmation',
+    32 * 1024,
+  )
+  assertExactKeys(
+    loaded.record,
+    OWNER_CHAT_CONFIRMATION_RECORD_KEYS,
+    'Owner chat confirmation',
+  )
+  const record = loaded.record
+  assertTimestampWithZone(record.recordedAt, 'Owner chat confirmation recordedAt')
+  assert(
+    record.schema === OWNER_CHAT_CONFIRMATION_SCHEMA
+      && record.decision === 'CONFIRMED_FOR_PREPARATION_ONLY'
+      && record.ownerConfirmationText
+        === 'พร้อมเตรียมเข้าสู่ P‑12 Production'
+      && record.reviewTransportDecisionText
+        === 'ไม่ต้องทำขั้นตอนวุ่นวายแล้ว ให้ยืนยันในนี้ได้เลยครับ เสียเวลา'
+      && record.sourceToolingGitHead
+        === FOCUSED_ISOLATED_017_SOURCE_GIT_HEAD
+      && record.kitManifestSha256
+        === FOCUSED_ISOLATED_017_KIT_MANIFEST_SHA256
+      && record.continuityPayloadFileSha256
+        === '39b410851bf9eb8f6ec692858019ea31c4e5eaf9d8dc7bb5ddae5c085d489cfd'
+      && record.continuityReviewedPayloadSha256
+        === OWNER_CHAT_CONFIRMATION_REVIEWED_PAYLOAD_SHA256,
+    'Owner chat confirmation identity or reviewed continuity binding differs',
+  )
+  assert(
+    typeof record.kitManifestPath === 'string'
+      && isAbsolute(record.kitManifestPath)
+      && typeof record.continuityPayloadPath === 'string'
+      && isAbsolute(record.continuityPayloadPath)
+      && typeof record.focusedIsolated017EvidenceManifestPath === 'string'
+      && isAbsolute(record.focusedIsolated017EvidenceManifestPath)
+      && typeof record.focusedIsolated017ProofResultPath === 'string'
+      && isAbsolute(record.focusedIsolated017ProofResultPath),
+    'Owner chat confirmation artifact paths must be absolute',
+  )
+  assert(
+    record.technicalConclusion
+      === 'corrected full-ledger kit and focused isolated 016-to-017 proof verified; no Production access or mutation occurred'
+      && record.keychainAccessAuthorizedBeforeFreshGo === false
+      && record.productionConnectionAuthorized === false
+      && record.productionMigrationAuthorized === false
+      && record.p12GoAuthorized === false
+      && record.automaticNextStep === false
+      && record.freshGoRequired === true,
+    'Owner chat confirmation exceeds preparation-only authority',
+  )
+  return loaded
+}
+
+async function loadFocusedIsolated017HistoricalKit(ownerChatConfirmation) {
+  const record = ownerChatConfirmation.record
+  const loaded = await loadOwnerOnlyJsonArtifact(
+    record.kitManifestPath,
+    record.kitManifestSha256,
+    'Focused isolated 017 historical kit manifest',
+  )
+  const manifest = loaded.record
+  assert(
+    manifest.schema === KIT_SCHEMA
+      && manifest.sourceGitHead
+        === FOCUSED_ISOLATED_017_SOURCE_GIT_HEAD
+      && manifest.generatorSourceSha256
+        === FOCUSED_ISOLATED_017_GENERATOR_SOURCE_SHA256
+      && manifest.runnerSourceSha256
+        === FOCUSED_ISOLATED_017_RUNNER_SOURCE_SHA256
+      && manifest.applicationCandidate === APPLICATION_CANDIDATE
+      && manifest.supabaseCliVersion === REQUIRED_SUPABASE_CLI_VERSION
+      && manifest.postgresMajor === REQUIRED_POSTGRES_MAJOR
+      && manifest.productionEligible === true,
+    'Focused isolated 017 historical kit identity differs from R2',
+  )
+  return {
+    manifestPath: loaded.path,
+    manifest,
+  }
+}
+
+export function validateFocusedKitMigrationContinuity(
+  historicalKit,
+  executionKit,
+) {
+  assert(
+    executionKit.manifest.generatorSourceSha256
+      === historicalKit.manifest.generatorSourceSha256,
+    'Chat-confirmation bridge changed the kit generator after R2',
+  )
+  for (const field of [
+    'compatibilityGuardMigrations',
+    'historicalMigrations',
+    'phase4Migrations',
+    'steps',
+  ]) {
+    assert(
+      canonicalJson(executionKit.manifest[field])
+        === canonicalJson(historicalKit.manifest[field]),
+      `Chat-confirmation bridge changed the R2 kit ${field}`,
+    )
+  }
+}
+
 async function loadLegacySchemaShapeContractForContinuity(
   path,
   expectedSha256,
@@ -1567,7 +1769,8 @@ export async function loadFailedProduction017ForContinuity(failedAttempt) {
 }
 
 async function loadFocusedIsolated017Proof(binding, {
-  kit,
+  executionKit,
+  historicalKit,
   expectedExecutor,
 }) {
   assertExactKeys(
@@ -1640,9 +1843,10 @@ async function loadFocusedIsolated017Proof(binding, {
     proofResult.schema
       === 'conduit-boq/master-catalog-p12-isolated-corrected-017-result/v1'
       && proofResult.result === 'verified'
-      && proofResult.correctionSourceHead === kit.manifest.sourceGitHead
+      && proofResult.correctionSourceHead
+        === historicalKit.manifest.sourceGitHead
       && proofResult.kitManifestSha256
-        === await sha256File(kit.manifestPath)
+        === await sha256File(historicalKit.manifestPath)
       && /^[0-9a-f]{64}$/.test(proofResult.proofRuntimeSha256 ?? '')
       && proofResult.productionDerivedDumpSha256
         === FOCUSED_ISOLATED_017_PRODUCTION_DUMP_SHA256
@@ -1725,11 +1929,12 @@ async function loadFocusedIsolated017Proof(binding, {
     binding.evidenceManifestPath,
     {
       expectedSha256: binding.evidenceManifestSha256,
-      kit,
+      kit: historicalKit,
       expectedFinalStage: '017',
       expectedExecutor,
     },
   )
+  validateFocusedKitMigrationContinuity(historicalKit, executionKit)
   assert(
     calibration.prior?.sha256
       === proofResult.stage016CalibrationManifestSha256
@@ -1875,10 +2080,7 @@ async function loadSchemaShapeContractV4(
   const record = loaded.record
   assertExactKeys(
     record,
-    [
-      ...SCHEMA_SHAPE_CONTRACT_PAYLOAD_KEYS,
-      'githubReview',
-    ],
+    SCHEMA_SHAPE_CONTRACT_PAYLOAD_KEYS,
     'Schema-shape contract',
   )
   assert(
@@ -1999,10 +2201,17 @@ async function loadSchemaShapeContractV4(
     await loadFailedProduction017ForContinuity(
       continuity.failedProductionAttempt,
     )
+  const ownerChatConfirmation = await loadOwnerChatConfirmation(
+    continuity.ownerChatConfirmation,
+  )
+  assertReviewTransportBridgeDelta(record.sourceToolingGitHead)
+  const historicalKit =
+    await loadFocusedIsolated017HistoricalKit(ownerChatConfirmation)
   const focused017Proof = await loadFocusedIsolated017Proof(
     continuity.focusedIsolated017Proof,
     {
-      kit,
+      executionKit: kit,
+      historicalKit,
       expectedExecutor: record.captureExecutor,
     },
   )
@@ -2033,22 +2242,37 @@ async function loadSchemaShapeContractV4(
     focused017ExpectedLedger,
   )
 
-  const githubReview = validateSchemaShapeGithubReview(record, { now })
   assert(
-    githubReview.reviewerLogin === 'lukkxh',
-    'Corrected schema-shape contract requires a fresh lukkxh review',
+    ownerChatConfirmation.record
+      .focusedIsolated017EvidenceManifestPath
+        === continuity.focusedIsolated017Proof.evidenceManifestPath
+      && ownerChatConfirmation.record
+        .focusedIsolated017EvidenceManifestSha256
+          === continuity.focusedIsolated017Proof.evidenceManifestSha256
+      && ownerChatConfirmation.record.focusedIsolated017ProofResultPath
+        === continuity.focusedIsolated017Proof.proofResultPath
+      && ownerChatConfirmation.record.focusedIsolated017ProofResultSha256
+        === continuity.focusedIsolated017Proof.proofResultSha256,
+    'Owner chat confirmation does not bind the exact focused R2 proof',
   )
   assert(
-    githubReview.reviewerLogin.toLocaleLowerCase()
-      !== record.captureExecutor.trim().toLocaleLowerCase(),
-    'Schema-shape contract reviewer must be distinct from the evidence executor',
+    Date.parse(focused017Proof.proofResult.record.createdAt)
+      < Date.parse(ownerChatConfirmation.record.recordedAt),
+    'Owner chat confirmation must follow the completed focused isolated 017 proof',
   )
   assert(
     Date.parse(failedProductionAttempt.manifest.createdAt)
       < Date.parse(focused017Proof.manifest.createdAt)
-      && Date.parse(focused017Proof.proofResult.record.createdAt)
-        < Date.parse(githubReview.submittedAt),
-    'Corrected contract review must follow the failed attempt and completed focused isolated 017 proof',
+      && Date.parse(ownerChatConfirmation.record.recordedAt)
+        <= now.getTime(),
+    'Corrected continuity chronology or Owner chat record time is invalid',
+  )
+  assert(
+    legacyContract.record.githubReview.reviewerLogin === 'lukkxh'
+      && legacyContract.record.githubReview.reviewerLogin
+        .toLocaleLowerCase()
+        !== record.captureExecutor.trim().toLocaleLowerCase(),
+    'Corrected continuity must retain the accepted independent lukkxh verifier',
   )
   return {
     path: loaded.path,
@@ -2059,8 +2283,31 @@ async function loadSchemaShapeContractV4(
       legacyContract,
       failedProductionAttempt,
       focused017Proof,
+      ownerChatConfirmation,
     },
   }
+}
+
+export function schemaShapeContractVerifierIdentity(schemaShapeContract) {
+  if (
+    schemaShapeContract.record.schema === SCHEMA_SHAPE_CONTRACT_SCHEMA
+  ) {
+    return schemaShapeContract.continuity.legacyContract.record
+      .githubReview.reviewerLogin
+  }
+  return schemaShapeContract.record.githubReview.reviewerLogin
+}
+
+export function schemaShapeContractConfirmationRecordedAt(
+  schemaShapeContract,
+) {
+  if (
+    schemaShapeContract.record.schema === SCHEMA_SHAPE_CONTRACT_SCHEMA
+  ) {
+    return schemaShapeContract.continuity.ownerChatConfirmation.record
+      .recordedAt
+  }
+  return schemaShapeContract.record.githubReview.submittedAt
 }
 
 export async function loadSchemaShapeContract(
@@ -2584,7 +2831,7 @@ export async function loadPass2VerificationEvidenceManifest(
   )
   assert(
     context.independentVerifier
-      === schemaShapeContract.record.githubReview.reviewerLogin,
+      === schemaShapeContractVerifierIdentity(schemaShapeContract),
     'Pass-2 verifier differs from the schema-shape contract reviewer',
   )
   assert(
@@ -2712,7 +2959,7 @@ export async function loadPass2VerificationEvidenceManifest(
   assert(
     Date.parse(manifest.createdAt)
       > Date.parse(
-        schemaShapeContract.record.githubReview.submittedAt,
+        schemaShapeContractConfirmationRecordedAt(schemaShapeContract),
       ),
     'Pass-2 verifying rehearsal must complete after contract review',
   )
@@ -2723,7 +2970,7 @@ export async function loadPass2VerificationEvidenceManifest(
   assert(
     Date.parse(manifest.createdAt)
       <= Date.parse(approval.githubReviewCheckedAt),
-    'Authenticated GitHub review recheck must occur after pass-2 verification',
+    'Authenticated legacy GitHub review recheck must occur after pass-2 verification',
   )
   assert(
     Date.parse(approval.advisorArtifactCapturedAt)
@@ -2759,16 +3006,16 @@ function assertReviewedExecutionBindings({
       'Schema-shape contract differs from the approved binding',
     )
     assert(
-      schemaShapeContract.record.githubReview.reviewerLogin
+      schemaShapeContractVerifierIdentity(schemaShapeContract)
         === approval.independentVerifier,
       'Schema-shape contract reviewer differs from the approved independent verifier',
     )
     assert(
       Date.parse(approval.githubReviewCheckedAt)
         >= Date.parse(
-          schemaShapeContract.record.githubReview.submittedAt,
+          schemaShapeContractConfirmationRecordedAt(schemaShapeContract),
         ),
-      'Authenticated GitHub review recheck predates the contract review',
+      'Authenticated legacy GitHub review recheck predates the Owner chat confirmation',
     )
     assert(
       approval.pass2VerificationEvidenceManifestPath
@@ -2782,7 +3029,7 @@ function assertReviewedExecutionBindings({
   }
   if (executorLabel) {
     assert(
-      schemaShapeContract.record.githubReview.reviewerLogin
+      schemaShapeContractVerifierIdentity(schemaShapeContract)
         .toLocaleLowerCase()
         !== executorLabel.trim().toLocaleLowerCase(),
       'Schema-shape contract must be independently reviewed by someone other than the migration executor',
@@ -5698,7 +5945,7 @@ export async function loadPriorStepSignoff(
   )
   assert(
     signoff.verifier
-      === schemaShapeContract.record.githubReview.reviewerLogin,
+      === schemaShapeContractVerifierIdentity(schemaShapeContract),
     'Prior-step verifier differs from the schema-shape contract reviewer',
   )
   assert(
@@ -6315,7 +6562,7 @@ export async function loadFinalCloseoutSignoff(
   )
   assert(
     signoff.independentVerifier
-      === schemaShapeContract.record.githubReview.reviewerLogin,
+      === schemaShapeContractVerifierIdentity(schemaShapeContract),
     'Final closeout verifier differs from the schema-shape contract reviewer',
   )
   for (const field of [

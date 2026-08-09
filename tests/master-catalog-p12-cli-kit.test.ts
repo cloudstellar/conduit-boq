@@ -98,6 +98,8 @@ import {
   redactSensitiveText,
   runCapturedProcess,
   schemaShapeContractReviewPayloadSha256,
+  schemaShapeContractConfirmationRecordedAt,
+  schemaShapeContractVerifierIdentity,
   schemaShapeContractSurface,
   snapshotQueryDefinitions,
   validateApprovalRecord,
@@ -105,12 +107,14 @@ import {
   validateCatalogSnapshot,
   validateFactorAndBoq,
   validateFlags,
+  validateFocusedKitMigrationContinuity,
   validateFunctionDefaultAclForMigrations,
   validateHotfix016,
   validateLedgerRows,
   validatePasswordlessDbUrl,
   validatePrivateSchemaAcl,
   validateProductionHeadDelta,
+  validateReviewTransportBridgePaths,
   validateRequiredFunctionDefaultAcl,
   validateSchemaShape,
   validateSchemaShapeGithubReview,
@@ -1316,6 +1320,78 @@ describe.sequential('Master Catalog P-12 CLI kit', () => {
     expect(() => validateSchemaShapeGithubReview(
       extraReviewField,
     )).toThrow('keys do not match the frozen manifest');
+  });
+
+  it('bridges the exact R2 proof through Owner chat without changing migration or workdir manifests', () => {
+    expect(validateReviewTransportBridgePaths([
+      P12_RUNNER_SOURCE,
+      'tests/master-catalog-p12-cli-kit.test.ts',
+    ])).toHaveLength(2);
+    expect(() => validateReviewTransportBridgePaths([
+      P12_RUNNER_SOURCE,
+      'tests/master-catalog-p12-cli-kit.test.ts',
+      'migrations/017_master_catalog_phase4_foundation.sql',
+    ])).toThrow('only the chat-confirmation bridge');
+    expect(() => validateReviewTransportBridgePaths([
+      P12_RUNNER_SOURCE,
+    ])).toThrow('only the chat-confirmation bridge');
+
+    const historicalKit = {
+      manifest: {
+        generatorSourceSha256: 'a'.repeat(64),
+        runnerSourceSha256: 'b'.repeat(64),
+        compatibilityGuardMigrations:
+          structuredClone(LEGACY_LEDGER_COMPATIBILITY_GUARDS),
+        historicalMigrations: structuredClone(HISTORICAL_MIGRATIONS),
+        phase4Migrations: structuredClone(PHASE4_MIGRATIONS),
+        steps: [{
+          ordinal: '017',
+          workdir: '017',
+          expectedRemoteBefore: ['legacy'],
+          expectedRemoteAfter: ['legacy', '017'],
+        }],
+      },
+    };
+    const executionKit = structuredClone(historicalKit);
+    executionKit.manifest.runnerSourceSha256 = 'c'.repeat(64);
+    expect(() => validateFocusedKitMigrationContinuity(
+      historicalKit,
+      executionKit,
+    )).not.toThrow();
+
+    const migrationDrift = structuredClone(executionKit);
+    migrationDrift.manifest.phase4Migrations[0].sha256 = '0'.repeat(64);
+    expect(() => validateFocusedKitMigrationContinuity(
+      historicalKit,
+      migrationDrift,
+    )).toThrow('phase4Migrations');
+
+    const workdirDrift = structuredClone(executionKit);
+    workdirDrift.manifest.steps[0].workdir = '017-drifted';
+    expect(() => validateFocusedKitMigrationContinuity(
+      historicalKit,
+      workdirDrift,
+    )).toThrow('steps');
+
+    const legacyContract = {
+      record: schemaShapeContractRecord({
+        reviewerLogin: 'lukkxh',
+        reviewSubmittedAt: '2026-08-01T10:00:00+07:00',
+      }),
+    };
+    const v4Contract = {
+      record: { schema: SCHEMA_SHAPE_CONTRACT_SCHEMA },
+      continuity: {
+        legacyContract,
+        ownerChatConfirmation: {
+          record: { recordedAt: '2026-08-09T22:54:31+07:00' },
+        },
+      },
+    };
+    expect(schemaShapeContractVerifierIdentity(v4Contract)).toBe('lukkxh');
+    expect(
+      schemaShapeContractConfirmationRecordedAt(v4Contract),
+    ).toBe('2026-08-09T22:54:31+07:00');
   });
 
   it('loads only a frozen reviewed schema contract and exact advisor artifact', async () => {
