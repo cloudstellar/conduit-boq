@@ -3619,6 +3619,49 @@ source correction; no active P-12 GO exists until a new kit, Pass 1, semantic
 human contract review, Pass 2, read-only parity, fresh approval, and separate
 Owner GO complete.
 
+**Structural-fingerprint-v2 qualification result and one-run PRE-GO authority
+recorded:** 2026-08-09 ICT — exact pushed source/tooling HEAD
+`07548af07e1d56b290a3af34b9365c40072f2505` retains application candidate
+`5068f944af2aa3fe8446c77c8ae8d48673cb260b`. The corrected kit-manifest
+SHA-256 is `08e74e0d890dbb5cbf3ffdee17f50cff5cbac75bbc080bb9c5f077af7c23ae0a`;
+corrected Pass-1 final manifest SHA-256 is
+`6be8df448d912aaa454cea1adae5986ae82d3f23262ddf7fbeca7079c68c7e44`;
+reviewed schema contract SHA-256 is
+`06f46916609afa80fde75cf8d0f4cbf0a63a1b65fc2f69abffda398c6dea3912`;
+and fresh Pass-2 final closeout manifest SHA-256 is
+`f4f0fdcdee44562afab3c7f6e96b7a8e0fbad9b1c37ea0fb28adee0898a8f603`.
+The v2 stage-`016` structural fingerprint is
+`76ab651e06d854e61f51ea16e4434c3abed13d07c9dbd0aad21c38693983bd19`;
+`indcheckxmin` remains diagnostic-only.
+
+Authenticated GitHub recheck at `2026-08-09T06:09:19Z` found review-only PR
+`#8` open/unmerged at that exact head. Review `4837496253` remained
+`APPROVED` by `lukkxh` with the exact `P12_SCHEMA_REVIEW_V1` marker. Remote
+status is recorded truthfully: `Vercel=success`; GitHub Actions Quality run
+`30736009482` is `failure`, with four stale frozen-Checklist string assertions
+(executor placeholder, operational-fingerprint placeholder, schema/advisor
+placeholder, and brittle P-43 raw-text ordering), not a runtime, migration,
+RLS, or database failure. The full suite is not represented as green and the
+frozen source/tests are not changed before P-12.
+
+The owner-only PRE-GO runtime bundle is preserved at
+`/Users/cloud/Backups/ConduitBOQ/evidence/phase4/pre-p12/prego-runtime-07548af-20260809`;
+its manifest SHA-256 is
+`fb6e5ffed7dac9534f2ad275de04edcfee85dc6816e70743df7cf40176499775`.
+The offline exact-image retained-owner/ACL fixture proof SHA-256 is
+`7f9a49395344d5573b882066dad700f011d78f2116cdc4cde06d13948de45b10`.
+
+The Owner's `ทำเลย` instruction authorizes one uninterrupted read-only PRE-GO
+window from `2026-08-09T13:45:00+07:00` through
+`2026-08-09T17:45:00+07:00`: fresh encrypted backup plus isolated restore and
+checksum, exact stage-`016` Production parity, then a fresh Production advisor
+baseline. Hard-stop at the first mismatch; no retry or alternate path. This
+does not authorize migration, feature flags, P-12 GO, P-13, deployment,
+publication, PR merge, or an automatic next step. A successful PRE-GO result
+must return to the Owner for one separate final GO.
+
+P12_PREGO_AUTHORITY_V1 {"schema":"conduit-boq/master-catalog-p12-prego-authority/v1","ownerApproved":true,"ownerApprovalReference":"Owner said ทำเลย after the simplified one-run PRE-GO plan on 2026-08-09","sourceToolingGitHead":"07548af07e1d56b290a3af34b9365c40072f2505","applicationCandidate":"5068f944af2aa3fe8446c77c8ae8d48673cb260b","kitManifestSha256":"08e74e0d890dbb5cbf3ffdee17f50cff5cbac75bbc080bb9c5f077af7c23ae0a","schemaShapeContractSha256":"06f46916609afa80fde75cf8d0f4cbf0a63a1b65fc2f69abffda398c6dea3912","pass2CloseoutManifestSha256":"f4f0fdcdee44562afab3c7f6e96b7a8e0fbad9b1c37ea0fb28adee0898a8f603","backupRuntimeSha256":"c63f054d904538b454fc0b546ce8f3d134be2cae01e544f2f1cd654f50edc240","criticalMetricsSqlSha256":"ad953fc11c00eff4c0f028d1174b78640a708e2b9311b6554dc07749606db53d","restoredIntegritySqlSha256":"ae90e4f472a490d22faac2ff1e0977a646c754d5d17c38eca242e19bfc43631b","productionParityHelperSha256":"144bca899b36df4fc6e2afb3a9e042cdc7ec7489a78757a4b49fb058b63bbe56","productionAdvisorHelperSha256":"61203e1565c69284f4546afc8b3ce4fabba9e7a9757532c8ac0c9d77ae234e00","windowStartsAt":"2026-08-09T13:45:00+07:00","windowEndsAt":"2026-08-09T17:45:00+07:00","windowStartEpoch":1786257900,"windowEndEpoch":1786272300,"windowId":"073270bb2b03156c","executor":"Suthorn Kaewkorn","independentVerifier":"lukkxh","productionReadOnly":true,"productionMutationAuthorized":false,"migrationAuthorized":false,"p12GoAuthorized":false,"automaticNextStep":false,"oneUse":true}
+
 **Authority:** Production `2568.0.0` remains authoritative for item names,
 units, and prices. The local workbook remains reconciliation/reference evidence
 only.
