@@ -2,6 +2,10 @@
 > **DEPRECATED:** This file has been migrated to the canonical documentation system.
 > See [docs/canonical/DATA_INTEGRITY.md](../canonical/DATA_INTEGRITY.md) for the authoritative version.
 > This file is preserved for historical reference.
+>
+> P-49 (2026-08-17) supersedes the pending-own-BOQ business target below with
+> profile/onboarding-only. Do not use this legacy file for implementation; see
+> [P-49 Plan](../plans/master-catalog/45-phase4-p49-pending-authorization-hardening-plan.md).
 
 # Database Schema
 ## Conduit BOQ System
@@ -368,4 +372,3 @@ idx_boq_items_route_id   ON boq_items(route_id)
 ### NEW: system_event_log
 - Trigger rejection logging
 - Columns: `action`, `table_name`, `record_id`, `reason`, `created_at`
-

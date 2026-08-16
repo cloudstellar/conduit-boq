@@ -1,8 +1,8 @@
 # Database Schema
 ## Conduit BOQ System
 
-**Last Updated:** 2026-06-28
-**Status:** Canonical  
+**Last Updated:** 2026-08-17
+**Status:** Schema canonical; P-49 authorization target not yet implemented
 **Database:** PostgreSQL 17 (Supabase)
 
 ---
@@ -315,7 +315,11 @@ singleton pointer สำหรับ Factor F default หลัง migration 012
 
 ## 🔒 Row Level Security (RLS)
 
-### Enabled Tables
+### Historical/core enabled-table excerpt
+
+This seven-table list is not the current complete RLS inventory. Settings,
+catalog/price, Factor F, and Phase 4 surfaces are also in current scope; P-49
+requires exact grants/policies/functions inventory before P-13.
 - `user_profiles`
 - `boq`
 - `boq_routes`
@@ -327,16 +331,34 @@ singleton pointer สำหรับ Factor F default หลัง migration 012
 ### Key Policies
 
 **user_profiles:**
-- Users can read their own profile
+- Frozen baseline currently includes permissive authenticated policy
+  `Users can view all profiles`; P-49 treats pending/inactive/suspended
+  other-profile visibility as a release blocker pending exact live verification
 - Admin can read/update all
 - Managers can read profiles in their department
+- Current own-row INSERT may exploit the profile `active` default; broad UPDATE,
+  role-only admin UPDATE, and the trigger do not protect the full `role`/`status`
+  state machine. P-49 records these as P-13 blockers.
 
 **boq:**
 - Legacy BOQ (created_by IS NULL): **Admin-only** (v1.2.0)
 - Owner/Assignee: always see own BOQ
 - Sector access: staff/sector_manager (active only)
 - Department access: dept_manager/procurement (active only)
-- Pending users: own BOQ only (no sector/dept access)
+- Current applied behavior: `009` BOQ owner visibility lacks a current active
+  profile requirement, and `016` still permits pending saves.
+- P-49 target: pending is profile/onboarding-only and has no business access.
+  The target is not yet enforced and requires a separately approved append-only
+  correction; applied migrations remain immutable.
+- Current `app_settings`, `can_approve_boq`, `get_user_role`/`is_admin`, and
+  legacy/versioned Factor F surfaces also lack the complete P-49 status/scope
+  boundary and belong in the same correction inventory.
+- Organization/department/sector policies expose all selector rows to every
+  authenticated status; the target permits pending only active onboarding rows
+  and denies selectors to inactive/suspended/missing/unknown profiles.
+
+See [P-49 Pending-Account Authorization Hardening Plan](../plans/master-catalog/45-phase4-p49-pending-authorization-hardening-plan.md)
+for the current-vs-target matrix and acceptance gates.
 
 ---
 
@@ -394,6 +416,14 @@ idx_boq_items_route_id   ON boq_items(route_id)
 
 ## 📁 Migration Files
 
+> [!IMPORTANT]
+> Current Production supersession (2026-08-17): Factor F `012`-`015` and the
+> exact Phase 4 sequence `017` -> `017a` -> `018`-`026` were later applied and
+> verified. The former draft/planned labels below are retained only where
+> explicitly marked historical. [MIGRATIONS.md](./MIGRATIONS.md) owns current
+> ledger status and [Verification Report #13](../plans/master-catalog/13-phase4-verification-report.md)
+> owns the P-12 evidence.
+
 | File | Description | Status |
 |------|-------------|--------|
 | `001_backup_before_migration.sql` | Backup queries | ✅ Applied |
@@ -411,11 +441,11 @@ idx_boq_items_route_id   ON boq_items(route_id)
 | `010_master_catalog_phase1a_versioning.sql` | Nullable catalog versioning + historical backfill | ✅ Production 2026-06-21 |
 | `010a_master_catalog_phase1a_indexes.sql` | Concurrent index runbook | ✅ 4 indexes valid/ready 2026-06-21 |
 | `011_master_catalog_phase1b_hardening.sql` | BOQ version contract hardening | ✅ Production 2026-06-21 |
-| `012_factor_f_version_foundation.sql` | Factor F version tables + BOQ factor version FK | Draft local-verified 2026-06-28; not Production |
-| `013_factor_f_seed_current_baseline.sql` | Seed audited current Factor F baseline `2566.0.0` | Draft local-verified 2026-06-28; not Production |
-| `014_factor_f_publish_2569_0_0.sql` | Publish Factor F `2569.0.0` from confirmed ว 481 source | Draft local-verified 2026-06-28; not Production |
-| `015_factor_f_repair_legacy_snapshot_metadata.sql` | Repair legacy Factor F snapshot metadata without repricing or binding old BOQs | Draft created 2026-06-29; not Production |
-| `017+_master_catalog_phase4_*.sql` | Master Catalog Phase 4 database migrations | Planned after Factor F migrations |
+| `012_factor_f_version_foundation.sql` | Factor F version tables + BOQ factor version FK | ✅ Production; former Local-only status superseded |
+| `013_factor_f_seed_current_baseline.sql` | Seed audited current Factor F baseline `2566.0.0` | ✅ Production; former Local-only status superseded |
+| `014_factor_f_publish_2569_0_0.sql` | Publish Factor F `2569.0.0` from confirmed ว 481 source | ✅ Production; former Local-only status superseded |
+| `015_factor_f_repair_legacy_snapshot_metadata.sql` | Repair legacy Factor F snapshot metadata without repricing or binding old BOQs | ✅ Production; former draft status superseded |
+| `017+_master_catalog_phase4_*.sql` | Master Catalog Phase 4 database migrations | ✅ Production exact `017` -> `017a` -> `018`-`026`; P-12 complete |
 
 ---
 
@@ -427,14 +457,15 @@ idx_boq_items_route_id   ON boq_items(route_id)
 
 ---
 
-## Master Catalog v26 Implemented Baseline
+## Historical Master Catalog v26 baseline and current P-12 supersession
 
-The Phase 1A/1B baseline below is implemented in Production. Phase 4 identity,
-code registry, versioned categories, imports/change sets, and publication
-metadata remain proposed under
-[ADR-004](../02_architecture/ADR/ADR-004-phase4-catalog-governance-and-official-publication.md)
-and must not be described as deployed until its migration is executed and
-verified. See [MIGRATIONS.md](./MIGRATIONS.md) for the migration ledger.
+The Phase 1A/1B baseline below remains implemented history. P-12 later applied
+and verified Phase 4 identity, code registry, versioned categories, imports/
+change sets, publication metadata, and the exact sequence through `026`, with
+all Phase 4 flags still false. This section is not a complete current-schema
+inventory; see [MIGRATIONS.md](./MIGRATIONS.md),
+[ADR-004](../02_architecture/ADR/ADR-004-phase4-catalog-governance-and-official-publication.md),
+and [Verification Report #13](../plans/master-catalog/13-phase4-verification-report.md).
 
 ### NEW: price_list_versions
 | Column | Type | Description |

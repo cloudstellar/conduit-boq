@@ -1,7 +1,7 @@
 # Lessons Learned & AI Constitution
 ## Conduit BOQ System
 
-**Last Updated:** 2026-01-22  
+**Last Updated:** 2026-08-17
 **Status:** Living Document (Update constantly)
 
 > [!IMPORTANT]
@@ -46,6 +46,26 @@ supabase.auth.onAuthStateChange((event, session) => {
   3. `migrations/008_rls_and_trigger.sql` — DB-level enforcement
 - **Rule:** ถ้า 3 ไฟล์ขัดกัน → ยึดตาม `SECURITY.md` + RLS (เข้มกว่า) แล้ว flag ให้แก้ `permissions.ts`
 
+### 1.5 P-49 correction — authorization is cross-layer, not three-file
+
+- **Historical note:** the 2026-05 lesson correctly records the old
+  pending-own-BOQ contract and why the earlier RPC was written that way. P-49
+  supersedes that business intent on 2026-08-17; do not rewrite the historical
+  event as if pending was always profile-only.
+- **New rule:** compare the complete chain: product decision -> UI permission ->
+  middleware/route classifier -> server/API actions -> table grants -> RLS ->
+  trigger/protected columns -> RPC body/ACL -> service-role boundary -> real
+  authenticated tests. Choosing the strictest of only three files can still
+  leave a bypass in another layer.
+- **New rule:** UI redirects and hidden buttons are not authorization. Supabase
+  clients can call Data API/RPC directly; PostgreSQL and every privileged server
+  path must enforce the same status x resource x action matrix.
+- **New rule:** a pending profile's stored `role` grants no authority. Check
+  current `status='active'` together with role before every privileged action,
+  and never permit self-service mutation of role/status or approval/audit fields.
+- **Gate:** P-13 remains hard-stopped until the P-49 matrix passes. See
+  [P-49 Plan](../plans/master-catalog/45-phase4-p49-pending-authorization-hardening-plan.md).
+
 ---
 
 ## 2. Documentation Patterns
@@ -74,4 +94,3 @@ supabase.auth.onAuthStateChange((event, session) => {
 - Run `VERIFICATION_REPORT.md` if unsure about discrepancies.
 - **Rule (2026-05):** ก่อนบอกว่า "เอกสารตรงกันแล้ว" **ต้อง diff จริง ไม่ใช่แค่จำ** — ถ้า edit ถูก cancel/fail ต้องตรวจว่าไฟล์ถูกแก้จริงหรือไม่
 - **Rule (2026-05):** ก่อน commit เอกสารลง repo ต้องตรวจว่าเป็น version ล่าสุดที่ผ่าน review แล้ว
-

@@ -2,6 +2,13 @@
 -- RLS Security Regression Tests for v1.2.0
 -- Run these tests after applying 008_rls_and_trigger.sql
 -- =============================================================================
+-- HISTORICAL ONLY (P-49, 2026-08-17): pending-own-BOQ expectations below
+-- describe the former v1.2.0 contract and must not be used as current release
+-- acceptance. The approved target is pending = profile/onboarding-only, but it
+-- is not implemented yet. See docs/plans/master-catalog/
+-- 45-phase4-p49-pending-authorization-hardening-plan.md.
+-- Do not run this script as P-49 evidence; the replacement matrix requires
+-- implementation and database authority.
 
 -- Setup: Create test users (run as admin/service role)
 -- Assumes you have test users with these characteristics

@@ -406,3 +406,17 @@ BOQ remained 198/1,547 with zero unversioned BOQs, Factor F remained
 These Local attempt numbers are historical P-38 evidence. Migration `022` will
 retain their target values and assign draft references while releasing their
 unissued official tuples.
+
+## 9. P-49 pending-account authorization supersession — 2026-08-17
+
+The P39R active-only catalog rule remains correct: pending, inactive, and
+suspended profiles see no Master Catalog state. P-49 explicitly rejects the
+later idea of restoring pending issued-catalog reads and preserves applied
+`022`/`023` unchanged.
+
+P-49 also records that catalog RLS alone does not create the approved
+profile/onboarding-only pending experience. Older BOQ policies/RPC, Factor F
+reads, profile grants/protected fields, and application/API guards still require
+a separately authorized forward-only correction. See
+[P-49 Plan #45](./45-phase4-p49-pending-authorization-hardening-plan.md). This
+supersession authorizes no implementation or database/deploy action.

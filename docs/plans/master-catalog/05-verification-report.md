@@ -1,11 +1,21 @@
 # Verification Report: Master Catalog v26
 
+> **Historical point-in-time verification — P-12/P-49 supersession
+> (2026-08-17):** this whole v26 report predates the completed P-12 sequence.
+> Production later applied and verified exact `017` -> `017a` -> `018`-`026`
+> plus the v7 backup; [Verification Report #13](./13-phase4-verification-report.md)
+> is current evidence authority. Pending-own-BOQ results below verify the former
+> contract only. The approved target is now profile/onboarding-only and is not
+> yet implemented; current gates are in
+> [P-49 Plan #45](./45-phase4-p49-pending-authorization-hardening-plan.md).
+
 **Status:** Production P0 → Phase 1A → Phase 2 → Phase 1B completed and verified
 **Production project:** `otlssvssvgkohqwuuiir`
 **Related change request:** [04-change-request.md](./04-change-request.md)
 
-**Current position:** Phase 4 administration/publication has not started and is
-governed by [09-phase4-change-request.md](./09-phase4-change-request.md).
+**Historical position at this report's date:** Phase 4 administration/
+publication had not started. **Current position:** P-12 database migration and
+backup are complete, flags remain false, and P-13 is hard-stopped by P-49.
 
 ## Execution Record
 
@@ -21,7 +31,7 @@ governed by [09-phase4-change-request.md](./09-phase4-change-request.md).
 | Local Phase 2 | Version-aware application implementation and smoke tests | Codex | 2026-06-20 | 2026-06-21 | Passed; Local only |
 | Phase 2 | PR #2, CI, and Vercel Production deploy | Codex + Owner | 2026-06-21 | 2026-06-21 | Merged/deployed and browser/API verified |
 | Phase 1B | `011_master_catalog_phase1b_hardening.sql` | Codex via Supabase MCP | 2026-06-21 | 2026-06-21 | Applied and verified (`20260621104056`) |
-| Phase 4 | Admin/import/manual/publish/export/history |  |  |  | Not started; separate approval required |
+| Phase 4 | Admin/import/manual/publish/export/history |  |  |  | Historical row: not started at this report's date; P-12 migrations later completed, while feature enablement/publication remain separately gated |
 
 ## Baseline
 

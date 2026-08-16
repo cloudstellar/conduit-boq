@@ -161,3 +161,21 @@ All authorization is enforced through PostgreSQL RLS policies. Client applicatio
 - [Supabase RLS Documentation](https://supabase.com/docs/guides/auth/row-level-security)
 - [PostgreSQL RLS](https://www.postgresql.org/docs/current/ddl-rowsecurity.html)
 
+---
+
+## P-49 addendum — 2026-08-17
+
+P-49 applies this ADR's database-first rule to account status. The approved
+target treats `pending` as profile/onboarding-only and denies all business data
+and operations until current database status is `active`. Master Catalog RLS
+from `022`/`023` already matches that target and must not be widened.
+
+The current BOQ policies/RPC, Factor F reads, profile grants, and one privileged
+API do not yet match. Editing UI permissions or middleware alone would violate
+this ADR because a caller can use the Supabase Data API/RPC or direct API route.
+P-13 is therefore hard-stopped pending a separately authorized forward-only
+database and application correction plus the real-session status x resource x
+action matrix in [P-49 Plan](../../plans/master-catalog/45-phase4-p49-pending-authorization-hardening-plan.md).
+
+This addendum records target architecture and the blocker only. It authorizes no
+implementation, database action, merge, or deploy.

@@ -5,6 +5,12 @@
 **Scope:** อ่านจาก source code, docs, migrations, scripts, tests, และ production Supabase  
 **Database source:** ตรวจสอบ production Supabase ผ่าน OAuth MCP project `Conduit Price List` (`otlssvssvgkohqwuuiir`) ณ 2026-06-11
 
+> **P-49 supersession note (2026-08-17):** counts and runtime observations in
+> this map remain a historical 2026-06-11 snapshot. The former pending-own-BOQ/
+> price-list business rule is superseded by the approved profile/onboarding-only
+> target, but that target is not yet implemented across DB and app layers. See
+> [P-49 Plan](./plans/master-catalog/45-phase4-p49-pending-authorization-hardening-plan.md).
+
 ---
 
 ## 1. Executive Summary
@@ -218,9 +224,11 @@ Important files:
 - `lib/hooks/useUser.ts` listens to `onAuthStateChange` and fetches profile relations
 - `lib/context/AuthContext.tsx` exposes `user`, `isLoading`, `signOut`, `refreshProfile`
 
-User statuses:
+Historical/current-source user status behavior (not the P-49 target):
 
-- `pending`: can access profile, BOQ list/create/edit/print, price list; admin page blocked
+- `pending`: client and BOQ DB paths still offer profile plus own BOQ; catalog
+  RLS `022`/`023` now blocks Price List/Master Catalog, producing a partial and
+  inconsistent experience after P-12
 - `inactive` / `suspended`: redirected to profile only
 - `active`: normal access based on role/RLS
 
@@ -245,11 +253,11 @@ Database side:
 - Production policy snapshot shows 28 policies across these tables
 - Production policy roles are mixed: several write policies still use role `public`, while core read policies for `boq`, `boq_items`, `price_list`, `factor_reference`, org tables, and profiles are scoped to `authenticated`
 
-Access summary from canonical docs:
+P-49 target access summary (implementation HOLD):
 
 | Role/status | BOQ visibility |
 |---|---|
-| pending | own BOQ only |
+| pending | no BOQ/business access; own safe profile/onboarding only |
 | staff active | own + same sector |
 | sector_manager active | sector scope |
 | dept_manager active | department scope |
@@ -262,6 +270,19 @@ Known UI mismatch:
 - `components/boq/BOQAccessBanner.tsx` says legacy BOQ is "ทุกคนแก้ไขได้"
 - `docs/04_data/SECURITY_MODEL.md` says legacy is admin-only and notes UI hint mismatch
 - RLS should be treated as authoritative
+
+P-49 adds higher-priority cross-layer blockers: BOQ owner policies lack a
+current active-profile gate and the save RPC still permits pending owners;
+legacy and versioned Factor F surfaces are readable to
+authenticated tokens; frozen baseline policy `Users can view all profiles`
+permits cross-profile reads; own-profile UPDATE may allow protected
+`role`/`status` mutation; `app_settings` and authenticated role/approval helpers
+either expose data or trust role without active status; and the user-deletion
+API checks admin role without active status before using service role. UI-only
+alignment is bypassable. P-13
+is hard-stopped until a separately authorized forward-only database/application
+correction and real-session persona matrix pass. Exact current Production
+posture has not been re-queried by the P-49 docs-only review.
 
 ---
 

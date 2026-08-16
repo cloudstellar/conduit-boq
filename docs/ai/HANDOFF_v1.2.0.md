@@ -1,5 +1,10 @@
 # AI Session Handoff: v1.2.0-admin-security
 
+> **Historical only — P-49 supersession (2026-08-17):** the pending-own-BOQ
+> instructions below describe v1.2.0 history and must not be used for new work.
+> Current target is pending profile/onboarding-only; implementation is on HOLD
+> under [P-49 Plan](../plans/master-catalog/45-phase4-p49-pending-authorization-hardening-plan.md).
+
 ## Context
 Sprint v1.2.0 adds admin permission security with hybrid onboarding flow.
 

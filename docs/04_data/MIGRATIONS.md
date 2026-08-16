@@ -1,8 +1,27 @@
 # Migrations
 ## Conduit BOQ System
 
-**Last Updated:** 2026-07-29
+**Last Updated:** 2026-08-17
 **Status:** Canonical
+
+> **Current Production overlay (supersedes stale pre-execution status and
+> authority text below):**
+> P-12 completed exact Production sequence `017` -> `017a` -> `018`-`026`
+> during 2026-08-16/17 and passed final closeout plus the post-`026` v7
+> encrypted backup/isolated restore/read-only checksum. All older “Local
+> only”, “not Production-applied”, “P-12 HOLD”, future-gate, and
+> no-approved-window/path prose in this document—including narrative outside
+> the inventory rows—is preserved only as point-in-time pre-execution history,
+> not current status or runnable authority. Current execution and closeout
+> authority is [Owner Checklist #40](../plans/master-catalog/40-phase4-p12-owner-decision-checklist.md)
+> together with [Verification Report #13](../plans/master-catalog/13-phase4-verification-report.md).
+> Applied migration bytes remain immutable.
+>
+> P-49 preserves active-only catalog RLS in `022`/`023` and rejects any
+> migration that widens pending catalog reads. It records that a separate
+> forward-only BOQ/profile/Factor-F/API authorization correction is required
+> before P-13, but authorizes no migration and reserves no filename/number. See
+> [P-49 Plan](../plans/master-catalog/45-phase4-p49-pending-authorization-hardening-plan.md).
 
 ---
 
@@ -428,6 +447,7 @@ exact incident/window. Never edit an applied migration file.
 | **Rollback Utility** | Reversal script, run only if rollback is needed |
 | **Draft** | Review and test before applying to production |
 | **Planned** | Reserved future work; not implemented or applied |
+| **Historical pre-execution status** | Row text preserved from before a later overlay/completion; read the dated overlay before treating it as current |
 
 ---
 

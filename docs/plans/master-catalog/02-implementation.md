@@ -1,5 +1,11 @@
 # แผนการพัฒนาการจัดการระบบแคตล็อกหลัก (Master Catalog Implementation Plan - Revised v26)
 
+> **Historical implementation plan — P-49 supersession (2026-08-17):** the
+> pending-own-BOQ behavior below records why current BOQ policies/RPC were
+> created. Do not reuse it as the current target. Pending is profile/onboarding-
+> only; exact correction work is not authorized. See
+> [P-49 Plan #45](./45-phase4-p49-pending-authorization-hardening-plan.md).
+
 แผนพัฒนานี้จัดทำขึ้นจากข้อกำหนดการทบทวนของระบบและปรับโครงสร้างการเปลี่ยนผ่านทั้งหมดให้มี **ความปลอดภัยเป็นอันดับหนึ่ง (SRE-First Rollout)** เพื่อให้มั่นใจได้ 100% ว่าการจัดทำและเปลี่ยนผ่านระบบจะไม่ทำให้ผู้ใช้เดิมสร้าง คัดลอก หรือคำนวณราคาใบงานสะดุดล้มระหว่างช่วงเดปลอยการทำงาน
 
 ## สถานะการดำเนินงานปัจจุบัน (2026-06-21)

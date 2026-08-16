@@ -1,5 +1,11 @@
 # ข้อกำหนดทางเทคนิคและการจัดทำระบบจัดการแคตตาล็อกหลัก (Master Catalog Technical Spec & Blueprint - Revised v26)
 
+> **Historical proposal — P-49 supersession (2026-08-17):** references below
+> to pending-own-BOQ are preserved as the contract that produced applied
+> `009`/`016`; they are not the current business target. Pending is now approved
+> as profile/onboarding-only, with implementation HOLD under
+> [P-49 Plan #45](./45-phase4-p49-pending-authorization-hardening-plan.md).
+
 เอกสารฉบับนี้คือ **Technical Specification (ข้อกำหนดคุณสมบัติทางเทคนิคฉบับผ่านการตรวจสอบระดับความปลอดภัยสูงสุด)** และพิมพ์เขียวในการดำเนินการจริงสำหรับระบบจัดการ **Master Catalog (บัญชีราคามาตรฐาน)** ของโครงการ Conduit BOQ โดยแก้ไขและปิดจุดบกพร่องเชิงโครงสร้างและความปลอดภัยฐานข้อมูล 4 ประเด็นสำคัญตามคำแนะนำอย่างละเอียดถี่ถ้วน เพื่อให้มั่นใจในเสถียรภาพและความปลอดภัยระดับสูงสุดบนระบบโปรดักชัน (Production-Grade Security & High Availability via Lock Timeouts and Atomic Rollbacks)
 
 ## สถานะการดำเนินงานปัจจุบัน (2026-06-02)

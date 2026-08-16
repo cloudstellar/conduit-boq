@@ -1,8 +1,14 @@
 # Permission Patterns
 ## Conduit BOQ System
 
-**Last Updated:** 2026-01-22  
-**Status:** Canonical
+**Last Updated:** 2026-08-17
+**Status:** P-49 target canonical; implementation HOLD; P-13 hard-stop
+
+> [!IMPORTANT]
+> P-49 changes the pending business rule to profile/onboarding-only. Current
+> `lib/permissions.ts`, middleware, BOQ RLS/RPC, Factor F reads, profile grants,
+> and privileged APIs are not yet aligned. UI permission helpers are never the
+> authorization boundary. See [P-49 Plan](../plans/master-catalog/45-phase4-p49-pending-authorization-hardening-plan.md).
 
 ---
 
@@ -86,9 +92,12 @@ interface BOQContext {
 - Read-only on approved BOQs in department
 
 ### Pending
-- Own BOQ only (create, read, update)
-- Cannot delete own BOQ
-- Cannot approve
+- Authentication self-service, truthful waiting state, and own safe
+  profile/onboarding fields only
+- No Dashboard, BOQ, Price List/Master Catalog, Factor F, export/print, admin,
+  business RPC, or privileged API
+- A stored role has no authority until the current profile status is `active`
+- Existing pending-owned BOQs are retained but hidden and inoperable
 
 ---
 
@@ -112,6 +121,11 @@ const isLegacy = context?.created_by === null
 > [!WARNING]
 > RLS is the source of truth. The `can()` function is for UI display only.
 
+P-49 therefore cannot be implemented by editing `can()` alone. The database
+grants/policies/RPCs, server/API checks, middleware allowlist, loaders/actions,
+and UI must pass the same matrix. Current source still implements the former
+pending-own-BOQ rule and is a recorded blocker rather than an accepted pattern.
+
 ---
 
 ## 6. Status-Based Rules
@@ -119,9 +133,26 @@ const isLegacy = context?.created_by === null
 | User Status | Effect |
 |-------------|--------|
 | `active` | Full role permissions |
-| `pending` | Own BOQ only |
-| `inactive` | No access |
-| `suspended` | No access |
+| `pending` | Profile/onboarding only (P-49 target; current runtime not yet aligned) |
+| `inactive` | No business access; own blocked status and auth self-service only; no profile edits |
+| `suspended` | No business access; own blocked status and auth self-service only; no profile edits |
+
+Protected profile fields (`role`, `status`, actual organization, identity/email,
+approval/rejection, and audit fields) are never normal self-service. Every
+privileged server/API operation must require both current `role='admin'` and
+`status='active'` before any service-role call.
+
+The frozen baseline `Users can view all profiles` policy is not an acceptable
+substitute for role-scoped profile reads. Pending/inactive/suspended must receive
+zero other-profile rows through direct Data API/RPC access and may not edit
+their own onboarding/profile fields after becoming inactive/suspended. Active
+role-scoped behavior remains a separate preserved contract rather than being
+silently broadened or narrowed by P-49.
+
+The same rule applies beyond tables: `app_settings`, `can_approve_boq`,
+`get_user_role`, and `is_admin` need exact audience/status/scope checks. A
+stored admin role on a non-active profile is never sufficient authorization,
+and ordinary callers must not use an arbitrary user ID as a role-disclosure API.
 
 ---
 

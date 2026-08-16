@@ -1,53 +1,79 @@
-# Security Model: Admin Permission & Onboarding v1.2.0
+# Security Model: Current Runtime and P-49 Target
 
-## Overview
+**Current status (2026-08-17):** P-49 business intent approved; technical
+implementation on HOLD; P-13 hard-stopped. See
+[P-49 Pending-Account Authorization Hardening Plan](../plans/master-catalog/45-phase4-p49-pending-authorization-hardening-plan.md).
 
-```
-┌─────────────┐     ┌─────────────┐     ┌─────────────┐
-│   Client    │────▶│     RLS     │────▶│   Trigger   │
-│ permissions │     │ (who sees)  │     │(what edits) │
-└─────────────┘     └─────────────┘     └─────────────┘
-                           │                   │
-                           ▼                   ▼
-                    ┌─────────────┐     ┌─────────────┐
-                    │     BOQ     │     │   Profile   │
-                    │    Data     │     │    Lock     │
-                    └─────────────┘     └─────────────┘
-                                              │
-                                              ▼
-                                       ┌─────────────┐
-                                       │  RPC (ADMIN)│
-                                       │approve/reject│
-                                       └─────────────┘
-```
+**P-49 target:** `pending = profile/onboarding-only`; implementation is not
+authorized and the current runtime is not yet fully aligned.
 
-## Access Matrix
+## Authorization boundary
 
-| Role | Own BOQ | Sector BOQ | Dept BOQ | Legacy BOQ |
-|------|---------|------------|----------|------------|
-| pending | ✅ | ❌ | ❌ | ❌ |
-| staff (active) | ✅ | ✅ | ❌ | ❌ |
-| sector_manager | ✅ | ✅ | ❌ | ❌ |
-| dept_manager | ✅ | ✅ | ✅ | ❌ |
-| procurement | ✅ own | ✅ sector (approved) | ✅ dept (approved) | ❌ |
-| admin | ✅ | ✅ | ✅ | ✅ |
+PostgreSQL grants, RLS, triggers, and guarded RPCs are the security boundary.
+Client permissions, middleware, navigation, and copy must mirror that boundary
+but cannot replace it. Unknown status, a missing profile, or an unclassified
+resource/action fails closed.
 
-## Key Security Rules
+## P-49 target access matrix
 
-1. **Pending = Own-only**: No sector/dept access until admin approves
-2. **Legacy = Admin-only**: BOQ with `created_by IS NULL` (RLS enforced)
-   > ⚠️ Note: `lib/permissions.ts` currently shows legacy as readable by staff (UI hint), but RLS blocks this. Code fix deferred.
-3. **Org Lock**: After onboarding, user cannot change dept/sector (Trigger enforced)
-4. **RPC Approve**: Admin uses `admin_approve_user()` for atomic approval
+This matrix is the approved target, not a claim that the current runtime is
+already aligned.
 
-## Files
+| Profile state | Profile/onboarding | Business data and routes | Admin/privileged operations |
+|---|---|---|---|
+| `pending` | Own safe fields, onboarding request/status, password, logout | None: no Dashboard, BOQ, Price List/Master Catalog, Factor F, print/export | None, regardless of stored role |
+| `active` non-admin | Existing own/hierarchical access | Existing role-scoped BOQ, issued catalog, and Factor F reads | None |
+| `active` admin | Existing profile/user workflow | Existing admin and business access subject to SoD/flags | Allowed only after current role **and** active-status checks |
+| `inactive` / `suspended` | Existing blocked-profile/status surface only | None | None |
+| Anonymous / missing profile / unknown status | Authentication entry points only | None | None |
 
-| File | Purpose |
-|------|---------|
-| `lib/permissions.ts` | Client-side UI checks |
-| `migrations/008_rls_and_trigger.sql` | DB-level enforcement |
-| `app/admin/page.tsx` | Admin UI calls RPC |
+Pending-owned BOQs are retained unchanged while hidden and become accessible
+again only after a valid transition to `active`, under the normal active-role
+rules. No data is deleted or reassigned to implement the waiting state.
 
-## Verification
+## Current runtime gaps
 
-Run `scripts/test-rls-security.sql` for 10 test cases.
+- Master Catalog migrations `022`/`023` already enforce active-only catalog
+  reads and remain unchanged.
+- BOQ policies in `009` and `save_boq_with_routes` in `016` still authorize
+  non-active owners; legacy and versioned Factor F reads are available to any
+  authenticated token.
+- Raw `app_settings` is anonymous/authenticated-readable and its writes check
+  stored admin role without current active status. Authenticated
+  `can_approve_boq` also lacks active status, while `get_user_role`/`is_admin`
+  expose arbitrary-user role metadata instead of a self-scoped result.
+- The frozen baseline policy `Users can view all profiles` allows every
+  authenticated identity to select every profile row. Its own-row INSERT can
+  exploit the `active` default, broad UPDATE does not protect `role`/`status`,
+  and role-only admin UPDATE plus the current trigger do not close these paths.
+  Exact live posture needs read-only verification, but source-derived profile/
+  PII exposure, missing-profile self-creation, and self-escalation are blockers.
+- Organization/department/sector policies expose all selector rows to every
+  authenticated status without an `is_active` predicate. Pending should receive
+  only active onboarding selectors; inactive/suspended should receive none.
+- `/api/admin/users/[id]` checks admin role without active status before using a
+  service-role operation, while pending middleware does not cover `/api/admin`.
+- `lib/permissions.ts`, pending navigation/copy, and catalog export still encode
+  the former pending-own-BOQ/catalog contract.
+
+Therefore UI-only changes are insufficient. A separately approved append-only
+database authorization correction plus matching application/server changes and
+the full status x resource x action matrix are required before P-13. P-49
+authorizes no implementation, database action, merge, or deploy.
+
+## Safe profile boundary
+
+Pending self-service is limited to `first_name`, `last_name`, `title`,
+`position`, `employee_id`, `phone`, requested department/sector, and the bounded
+onboarding-submission transition. `role`, `status`, actual organization,
+identity/email, approval/rejection, and audit fields are never self-service.
+Inactive and suspended profiles may read their own status but may not edit the
+onboarding/profile fields. Other-profile reads follow only the separately
+approved active role scope; pending/inactive/suspended receive none.
+
+## Canonical references
+
+- [ADR-001: Supabase RLS Authorization](../02_architecture/ADR/ADR-001-supabase-rls-authorization.md)
+- [Access Model](../03_domain/ACCESS_MODEL.md)
+- [Permission Patterns](../06_engineering/PERMISSION_PATTERNS.md)
+- [P-49 Plan](../plans/master-catalog/45-phase4-p49-pending-authorization-hardening-plan.md)

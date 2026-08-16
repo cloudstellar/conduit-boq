@@ -5,10 +5,10 @@ the exact `017` -> `017a` -> `018`-`026` sequence at execution HEAD
 `7c5ac6bd88677c0144bf8b8933b39293a2dee866`; final read-only closeout and the
 one-use v7 encrypted application-only backup/isolated restore/read-only
 checksum passed. All three Phase 4 flags remain boolean `false`.
-**P-13 pre-deploy preparation is in progress and is not authorized.** The
-exact deployment commit, remote CI, and deployment fingerprint remain open. No
-`main` merge, application deployment, feature enablement, or publication is
-implied.
+**P-49 business intent is approved; technical implementation is on HOLD. P-13
+is hard-stopped on pending cross-layer authorization alignment and is not
+authorized.** The pre-P-49 CI/Preview result is historical only. No `main`
+merge, application deployment, feature enablement, or publication is implied.
 
 **Current P-37 disposition (2026-07-25):** **Accepted by the Owner under an
 explicit guided-UAT variance** against exact implementation checkpoint
@@ -1508,7 +1508,66 @@ post-publication custody remain pending.
 | Encryption/checksum | Encrypted bundle; writeable capture followed by read-only reopen; all 10 package entries passed; read-only checksum-result SHA-256 `95265fca040c084d70f76b3d8ed3f00beb39a6aa4e98c573dd4a7d49b70c7d0a`; final detach passed |
 | Scope | Application schemas only; Auth/Storage payload excluded; no migration rerun; no Production mutation; no P-13 or automatic next step |
 
-P-12 is **Complete**. The P-12 handoff is **P-13 PRE-DEPLOY PREPARATION IN
-PROGRESS — NOT AUTHORIZED**. The exact deployment commit, matching pre-deploy
-CI/fingerprint, and separate Owner P-13 decision remain mandatory before
-merging to `main` or deploying.
+P-12 is **Complete**. P-49 does not reopen or invalidate its migration/backup
+evidence.
+
+## 19. P-49 pending-account authorization overlay — 2026-08-17
+
+This section supersedes only the former pending-user business-access target and
+the P-13 readiness statement above. It does not rewrite P-12 evidence or claim
+that the P-49 target has been implemented.
+
+### 19.1 Decision and current evidence
+
+| Item | Result |
+|---|---|
+| Business target | `pending = profile/onboarding-only`: authenticated but unapproved, with auth self-service, own safe profile/onboarding, required org selectors, waiting status, and logout only |
+| Business denial | No Dashboard, BOQ (including retained own BOQ), Price List/Master Catalog, Factor F, print/export, admin, business RPC, or privileged API |
+| Catalog RLS | Applied `022`/`023` active-only policies remain correct and immutable; pending catalog-read widening withdrawn |
+| Current BOQ/RPC mismatch | `009` BOQ owner access lacks a current active-profile requirement and `016` still authorizes pending saves; non-active/missing/unknown-status paths must fail closed |
+| Current Factor F mismatch | Legacy `factor_reference` plus versioned `012` tables are authenticated-readable without the P-49 active-status boundary; views/RPCs still require inventory |
+| Current profile risk | Frozen baseline `Users can view all profiles` exposes all rows to authenticated; own-row INSERT can exploit the `active` default; broad own-row UPDATE, role-only admin UPDATE, and the current trigger do not protect `role`/`status`; exact live posture requires read-only verification, but source-derived privacy/self-creation/escalation paths are blockers |
+| Current selector risk | Org/department/sector policies expose all rows to every authenticated status without `is_active`; pending should receive only active onboarding selectors and inactive/suspended none |
+| Current settings/helper risk | Frozen baseline raw `app_settings` is anonymous/authenticated-readable and role-only writable; authenticated `can_approve_boq` lacks active status and `get_user_role`/`is_admin` expose arbitrary-user role state |
+| Current privileged API risk | `/api/admin/users/[id]` requires admin role but not active status before service-role deletion; pending middleware does not cover `/api/admin/**` |
+| Current application mismatch | permissions, middleware/navigation/copy, and export still encode the former pending business contract |
+| Data integrity disposition | No row corruption inferred; existing pending-owned BOQs must remain byte/row unchanged while hidden |
+| Authority | P-49 permits only canonical docs, a comment-only supersession on the historical RLS test, the executable authority-consistency test, and one local handoff commit; application/runtime/migration implementation, DB access, external Git publication/push, PR, merge, and deploy authority are false |
+
+### 19.2 Required verification before P-13
+
+- A separately approved append-only correction must align grants, RLS,
+  protected profile columns, BOQ policies/RPC, Factor F, privileged API/server
+  actions, middleware, permissions, loaders/export, waiting-state UI, and copy.
+- Real sessions must prove the complete anonymous/pending/active/inactive/
+  suspended/missing-profile/unknown-status x resource x action matrix through
+  Data API, RPC, page deep links, and API routes.
+- Pending safe-profile fields must remain usable while self-`role`, self-
+  `status`, actual-org, identity/email, approval/rejection, and audit changes
+  fail. Active-admin transitions must be atomic/audited; inactive admins and
+  non-admins must fail.
+- Pending/inactive/suspended must receive zero other-user profile rows, and
+  inactive/suspended must not update their own onboarding/profile fields.
+- Pending/inactive/suspended cannot read internal `app_settings`, pass BOQ
+  approval helpers, or access legacy/versioned Factor F tables/views/RPCs;
+  arbitrary-user role/admin lookup is unavailable to ordinary callers.
+- Generic status edits must not bypass pending approval, turn active back into
+  pending, or skip the audited rejection/resubmission/revocation state machine.
+- Pending BOQ/catalog/Factor-F reads and writes must return zero/denied with no
+  partial effect; active users, existing BOQ/Factor F bindings, pointer, flags,
+  and hashes must remain unchanged.
+- The exact correction commit must pass clean bootstrap, advisors, full tests,
+  TypeScript, lint, build, remote CI, and Preview. A fresh deployment fingerprint
+  and separate Owner P-13 decision remain mandatory.
+
+Detailed evidence inventory, target matrix, historical-record rules, and
+non-authority boundaries are in
+[P-49 Plan #45](./45-phase4-p49-pending-authorization-hardening-plan.md).
+
+### 19.3 P-13 disposition
+
+**P-13 HARD-STOP — PENDING CROSS-LAYER AUTHORIZATION ALIGNMENT; NOT
+AUTHORIZED.** Branch HEAD
+`6f0953b19c25f6f96b1d2d11ee99ff43c33c5443` and its Quality/Preview evidence
+predate P-49 implementation and are not an approved deployment candidate. No
+`main` merge or Vercel Production deploy may proceed from that evidence.

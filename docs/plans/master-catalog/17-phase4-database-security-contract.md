@@ -1186,3 +1186,29 @@ covering indexes.
 - [Phase 4 verification report](./13-phase4-verification-report.md)
 - [Post-Factor-F adjustment plan](./22-phase4-post-factor-f-adjustment-plan.md)
 - [P-46 catalog-action-error callability finding](./44-phase4-p46-catalog-action-error-callability-finding.md)
+
+## 17. P-49 pending-account authorization amendment — 2026-08-17
+
+The P-49 target is `pending = profile/onboarding-only` and interprets every
+“authenticated staff” catalog/business rule as
+**active authenticated staff** unless the resource is explicitly part of the
+safe onboarding/profile allowlist. `pending` is not a business role.
+
+Applied Master Catalog RLS from `022`/`023` already requires active status and
+remains unchanged. That control does not repair older BOQ policies/RPC, legacy
+and versioned Factor F reads, broad profile SELECT/UPDATE, or application/API
+authorization. In particular, `009` BOQ owner access lacks an active-profile
+gate and `016` permits pending saves; legacy `factor_reference` and `012`
+expose authenticated Factor F;
+the frozen baseline `Users can view all profiles` policy exposes other-user
+rows; and the current profile trigger does not protect `role`/`status`. A
+role-only privileged API also lacks the active-status half of the boundary.
+`007` exposes `app_settings` to authenticated and uses role-only write checks;
+authenticated `can_approve_boq` lacks active status, while `get_user_role` and
+`is_admin` disclose arbitrary-user role/admin state.
+
+P-13 is hard-stopped until a separately approved forward-only correction and
+real-session status x resource x action matrix prove the exact target in
+[P-49 Plan #45](./45-phase4-p49-pending-authorization-hardening-plan.md). This
+amendment authorizes no SQL, Local/Production action, implementation, merge, or
+deploy and does not alter the applied migration bytes or P-12 evidence.

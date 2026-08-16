@@ -3,6 +3,19 @@
 **Prepared:** 2026-06-22
 **Purpose:** ให้เจ้าของระบบ review ชุดเอกสารตามลำดับโดยไม่สับสนกับ Phase เดิม
 
+> **Current supersession (2026-08-17):** P-12 is complete through `026` and the
+> v7 post-`026` backup. The long readiness chronology below is retained as
+> history. P-49 now places P-13 on **HARD-STOP — PENDING CROSS-LAYER
+> AUTHORIZATION ALIGNMENT**: pending is approved as profile/onboarding-only,
+> catalog RLS `022`/`023` stays active-only, and the remaining BOQ/RPC/Factor-F/
+> profile/API gaps require separately authorized forward-only correction and a
+> full real-session matrix. No implementation, Production action, merge, or
+> deploy is authorized by this review-guide update. See [Plan #45](./45-phase4-p49-pending-authorization-hardening-plan.md).
+>
+> Historical PRE-P-12 `source/tooling HEAD`, `calibrate-schema`, second fresh
+> full isolated rehearsal, `pass-2`, `GO HEAD`, and `HOLD` records below remain
+> immutable chronology rather than current gate status.
+
 ## สถานะสั้นที่สุด
 
 - Production Phase 0 → 1A → 2 → 1B: **เสร็จและใช้งานอยู่**
@@ -123,17 +136,18 @@
 17. [P-12 CLI Execution Runbook](./41-phase4-p12-cli-execution-runbook.md) — exact one-file ledger, secret, timeout, owner/ACL และ rehearsal contract
 18. [P-12 Private-Function Default-Privilege Finding](./43-phase4-p12-private-function-default-privilege-finding.md) — blocker จาก disposable `017` rehearsal; Owner เลือก exact Option B `017a` bridge หลัง `017`/ก่อน `018`; correction หลัง `025` ใช้แทน bridge ไม่ได้
 19. [P-46 Catalog Action Error Callability Finding](./44-phase4-p46-catalog-action-error-callability-finding.md) — ผล fail-closed หลัง clean chain, root cause, exact `026` least-privilege contract และ P-47 scope
-20. [Post-Phase-4 DR Backlog](./42-phase4-post-phase4-disaster-recovery-backlog.md) — งาน RPO/RTO/Auth/Storage/off-device restore ภายหลัง; ไม่ใช่ P-12 blocker
-20. [Reconciliation Report](./11-phase4-reconciliation-report.md) — ตรวจว่าข้อมูล 710/708 ถูกจัดการอย่างไร
-21. [Code Dictionary](./10-phase4-structured-code-dictionary.md) — ตรวจความหมาย AAA/TTT และจุดผิด 16 Crossing
-22. [Database/Security Contract](./17-phase4-database-security-contract.md) — ตรวจ schema, RLS/grants, function และ migration order
-23. [Lean Threat Model](./18-phase4-threat-model.md) — ตรวจความเสี่ยง/control/หลักฐานทดสอบ
-24. [Parser/Hash Specification](./14-phase4-parser-and-canonical-hash-spec.md) — สัญญาเชิงเทคนิคที่ทำให้ import/export ทำซ้ำได้
-25. [Official Export Specification](./20-phase4-official-export-spec.md) — อนุมัติรูปแบบ Excel/PDF, stamp และ hash
-25. [Production Runbook](./12-phase4-production-runbook.md) — ขั้นตอนจริง จุดหยุด และ rollback
-26. [Verification Report](./13-phase4-verification-report.md) — หลักฐานที่ต้องกรอกเมื่อ implement/rollout
-27. [Admin Operating Procedure](./15-phase4-admin-operating-procedure.md) — วิธีใช้งานของผู้ดูแลระบบ
-28. [Release Note Template](./16-phase4-release-note-template.md) — เอกสารต่อหนึ่งเวอร์ชันที่ publish
+20. [P-49 Pending-Account Authorization Hardening Plan](./45-phase4-p49-pending-authorization-hardening-plan.md) — target pending profile/onboarding-only, cross-layer gaps, exact deny-by-default matrix และ P-13 hard-stop; ยังไม่อนุญาต implementation
+21. [Post-Phase-4 DR Backlog](./42-phase4-post-phase4-disaster-recovery-backlog.md) — งาน RPO/RTO/Auth/Storage/off-device restore ภายหลัง; ไม่ใช่ P-12 blocker
+22. [Reconciliation Report](./11-phase4-reconciliation-report.md) — ตรวจว่าข้อมูล 710/708 ถูกจัดการอย่างไร
+23. [Code Dictionary](./10-phase4-structured-code-dictionary.md) — ตรวจความหมาย AAA/TTT และจุดผิด 16 Crossing
+24. [Database/Security Contract](./17-phase4-database-security-contract.md) — ตรวจ schema, RLS/grants, function และ migration order
+25. [Lean Threat Model](./18-phase4-threat-model.md) — ตรวจความเสี่ยง/control/หลักฐานทดสอบ
+26. [Parser/Hash Specification](./14-phase4-parser-and-canonical-hash-spec.md) — สัญญาเชิงเทคนิคที่ทำให้ import/export ทำซ้ำได้
+27. [Official Export Specification](./20-phase4-official-export-spec.md) — อนุมัติรูปแบบ Excel/PDF, stamp และ hash
+28. [Production Runbook](./12-phase4-production-runbook.md) — ขั้นตอนจริง จุดหยุด และ rollback
+29. [Verification Report](./13-phase4-verification-report.md) — หลักฐานที่ต้องกรอกเมื่อ implement/rollout
+30. [Admin Operating Procedure](./15-phase4-admin-operating-procedure.md) — วิธีใช้งานของผู้ดูแลระบบ
+31. [Release Note Template](./16-phase4-release-note-template.md) — เอกสารต่อหนึ่งเวอร์ชันที่ publish
 
 ระหว่าง implementation ให้ใช้
 [Execution Progress Tracker](./25-phase4-execution-progress-tracker.md)
@@ -161,6 +175,7 @@
 | P-12 source/migration manifest, readiness matrix, managed residual และหลักฐาน Production/backup | [P-12 Readiness Package #39](./39-phase4-p12-production-readiness-package.md) |
 | P-12 Owner decisions, human roles, exact owner/window และ authority-sync gate | [Owner Checklist #40](./40-phase4-p12-owner-decision-checklist.md) |
 | P-12 exact CLI kit/ledger/secret/timeout/ownership execution contract | [CLI Execution Runbook #41](./41-phase4-p12-cli-execution-runbook.md) |
+| P-49 pending-account business target, current cross-layer gaps, target matrix และ P-13 hard-stop | [P-49 Pending-Account Authorization Hardening Plan #45](./45-phase4-p49-pending-authorization-hardening-plan.md) |
 | Post-Phase-4 whole-service DR backlog | [DR Backlog #42](./42-phase4-post-phase4-disaster-recovery-backlog.md) |
 | End-to-end capability completeness and release visibility | [Completeness Audit #29](./29-phase4-owner-dev-completeness-audit.md) |
 | One-working-draft, abandon และ final snapshot review | [P-22 Correction Plan #31](./31-phase4-wp66-operator-workflow-correction-plan.md) |
@@ -214,7 +229,8 @@ checkpoint.
 | P-18 placement governance สำหรับ add/supplement | P-30 รับรองกติกา V1, amended WP-7.5 ผ่าน P-32 Local DB/browser/export evidence และ P-33 รับรองขอบเขตเทคนิคแล้วตาม [Review Note #28](./28-phase4-p18-placement-governance-review-note.md). P-36 integrated Local technical rehearsal และ corrected P-37 recovery/owner keyboard/focus/presentation UAT ผ่าน; Owner accepted P-37 เมื่อ 2026-07-25 ภายใต้ guided-UAT variance ที่บันทึกตามจริง. Add/Supplement ยังซ่อน/ปิดจนถึง P-14 และต้อง re-evaluate residual ก่อน enablement |
 | P-19 PDF policy สำหรับรายการยกเลิกใช้ | ถ้า version ใดมี inactive/retired rows ต้องตัดสินใจว่าจะ exclude/mark/appendix ก่อน filed PDF |
 | P-20 canonical hash portability | Owner approved deterministic baseline identity จาก Production-derived `price_list.id`; independent two-rebuild proof ของ data-bearing chain ผ่านแล้ว. `017a` และ `026` เป็น data-free ACL-only changes จึงไม่ทำให้ต้อง repeat portability reset สองรอบ; แต่ต้องมี corrected integration bootstrap ใหม่หนึ่งครั้งหลัง P-47 และต้องขอ Owner reset approval ใหม่. P-15 final hash acceptance ยังแยก |
-| P-12 Production readiness | Production read-only/Data API/readiness backup/restore/checksum evidence เดิมยังใช้ได้ตาม freshness gate. P-45 เสร็จที่ `d92d8ce`; P-46 ถูกใช้หนึ่งครั้งและหยุด fail-closed หลัง chain ถึง `025`. P-47 repository/static closure ของ candidate `026`/tooling/tests/docs ผ่านแล้ว และ P-48 อนุมัติเฉพาะ exact 25-file Git publication แบบหนึ่ง commit/push โดยไม่มี PR. Package #39 ยัง HOLD ที่ replacement clean pushed source/tooling HEAD/Remote result, corrected Local rehearsal ที่อนุมัติใหม่, kit/pass 1/authenticated review/pass 2, named-human executor/verifier, exact path/identity/window และ P-12 approval; fresh in-window backup, post-migration backup ก่อน P-13 และ external-copy closeout ยังบังคับ. Evidence window นี้ไม่ใช่การอนุมัติ migration |
+| P-12 Production readiness | **Complete 2026-08-17.** Exact `017` -> `017a` -> `018`-`026`, objective closeout, and checksum-verified v7 post-`026` backup/isolated restore passed; all Phase 4 flags remain false. P-49 does not reopen this evidence. |
+| P-49 pending-account authorization | Business target approved: pending is profile/onboarding-only and catalog `022`/`023` remains active-only. Current BOQ/RPC/Factor-F/profile/API paths are not aligned; implementation is not authorized. P-13 is hard-stopped pending separate correction authority, real-session matrix, new exact CI/Preview/fingerprint, and separate deploy decision. |
 | WP-6.6 capability completeness | G1R/G2 ผ่าน DB/concurrency/P-20/advisor/repository บน exact candidate `721c2c2`; P-25/G3/P-26 technical paths ผ่าน และ owner accepted G3 บน exact `78e96ab` แล้ว. G4 ยังแยก ส่วน independent UAT/performance/formal accessibility อยู่ WP-8 |
 | P-21/P-22/P-23/P-23.1/P-24/P-25/P-26/P-27 WP-6.6 Local-only | `020` SHA-256 `e07e0c4161077efba7bc4f6ebf95518d0cc1bc7e4628a43a128dd899bd1aef93` ผ่าน G1R/G2, P-28 เพิ่มเข้า bootstrap และ P-29/G4E ผ่าน clean chain; G3/P-26 accepted บน exact application checkpoint `78e96ab`. ไม่รวม `021` bootstrap, Factor F/hotfix expansion หรือ Production |
 | Version lifecycle ตาม ADR-003 | Admin ต้องเลือก annual/revision/patch; annual year มาจาก owner; ระบบใช้ทะเบียนทุกสถานะและไม่ reuse เลข; DB บังคับเลขถัดไป. Live G1R/G2/G3 และ owner closeout ผ่านแล้ว; WP-8/P-14 ยังรอ |

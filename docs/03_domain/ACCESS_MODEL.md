@@ -1,8 +1,13 @@
 # Access Model
 ## Conduit BOQ System
 
-**Last Updated:** 2026-01-22  
-**Status:** Canonical
+**Last Updated:** 2026-08-17
+**Status:** P-49 target canonical; implementation HOLD; P-13 hard-stop
+
+> [!IMPORTANT]
+> P-49 supersedes the former `pending = own BOQ` business rule. The target is
+> profile/onboarding-only, but current BOQ RLS/RPC and profile grants are not yet
+> aligned. See [P-49 Plan](../plans/master-catalog/45-phase4-p49-pending-authorization-hardening-plan.md).
 
 ---
 
@@ -46,9 +51,9 @@
 | Status | Meaning | Access Level |
 |--------|---------|--------------|
 | `active` | Full access per role | Normal |
-| `pending` | New user, waiting admin approval | Own BOQ only |
-| `inactive` | Disabled but not deleted | No access |
-| `suspended` | Temporarily blocked | No access |
+| `pending` | Authenticated user waiting admin approval | Profile/onboarding only; no business access (P-49 target, not yet fully enforced) |
+| `inactive` | Disabled but not deleted | No business access; own blocked status and auth self-service only; no profile edits |
+| `suspended` | Temporarily blocked | No business access; own blocked status and auth self-service only; no profile edits |
 
 ---
 
@@ -56,7 +61,7 @@
 
 | Role | Own BOQ | Sector BOQ | Dept BOQ | Legacy BOQ |
 |------|---------|------------|----------|------------|
-| pending | ✅ | ❌ | ❌ | ❌ |
+| pending | ❌ | ❌ | ❌ | ❌ |
 | staff (active) | ✅ | ✅ | ❌ | ❌ |
 | sector_manager | ✅ | ✅ | ❌ | ❌ |
 | dept_manager | ✅ | ✅ | ✅ | ❌ |
@@ -67,8 +72,23 @@
 
 ## 5. Key Security Rules
 
-### 5.1 Pending = Own-only
-No sector/dept access until admin approves.
+### 5.1 Pending = Profile/onboarding-only
+
+Pending may authenticate, change password, sign out, read its own status, edit
+only safe onboarding/profile fields, and read the active department/sector
+selectors needed for onboarding. It may not use Dashboard, BOQ (including its
+own retained BOQs), Price List/Master Catalog, Factor F, print/export, admin,
+or privileged RPC/API paths until `status='active'`.
+
+This is the approved P-49 target. It is not yet the complete runtime contract:
+`007`, `009`, `012`, and `016` still expose non-active settings/business paths;
+authenticated role helpers disclose or trust stored role without active status;
+raw settings and all selector rows are too broad; broad profile SELECT/INSERT/
+UPDATE may expose every row, permit missing-profile active self-creation, and
+allow protected-column mutation; and one privileged API checks admin role
+without active status.
+UI/middleware changes alone are insufficient. Inactive/suspended self-profile
+edits and generic status transitions must also fail in the target state machine.
 
 ### 5.2 Legacy = Admin-only
 BOQ with `created_by IS NULL` is only visible to admins.
@@ -80,6 +100,9 @@ BOQ with `created_by IS NULL` is only visible to admins.
 After onboarding, user cannot change `department_id` or `sector_id`.
 - Enforced by: `trg_lock_org_fields_after_onboarding` trigger
 - Admin bypass: Admins can still modify these fields
+
+The current trigger does not lock `role` or `status`; P-49 requires a separate
+forward-only protected-field boundary before P-13.
 
 ### 5.4 Separation of Duties
 - Creator cannot approve their own BOQ
@@ -98,15 +121,19 @@ Admin uses `admin_approve_user()` for atomic approval:
 
 | File | Purpose |
 |------|---------|
-| `lib/permissions.ts` | Client-side UI checks |
-| `migrations/008_rls_and_trigger.sql` | DB-level enforcement |
+| `lib/permissions.ts` | Client-side UI checks; current pending rule is superseded and awaiting implementation |
+| `migrations/008_rls_and_trigger.sql` | Historical DB enforcement; applied bytes remain immutable |
 | `app/admin/page.tsx` | Admin UI calls RPC |
+| `docs/plans/master-catalog/45-phase4-p49-pending-authorization-hardening-plan.md` | Current target, gap inventory, and acceptance gates |
 
 ---
 
 ## 7. Verification
 
-Run `scripts/test-rls-security.sql` for 10 test cases.
+The legacy `scripts/test-rls-security.sql` pending-own-BOQ expectation is no
+longer canonical. Before P-13, run the P-49 real-session status x resource x
+action matrix across DB policies/grants/RPC, page and API deep links, protected
+profile columns, transition E2E, and unchanged active-user behavior.
 
 ---
 

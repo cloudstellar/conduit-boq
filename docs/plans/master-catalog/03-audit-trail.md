@@ -1,5 +1,10 @@
 # 🔬 Architecture Analysis v26 — Audit Trail (Proposal v26 / Plan v26)
 
+> **Historical audit trail — P-49 supersession (2026-08-17):** pending-own-BOQ
+> findings and passes below remain truthful evidence of the former contract.
+> They do not authorize or describe the new profile/onboarding-only target. See
+> [P-49 Plan #45](./45-phase4-p49-pending-authorization-hardening-plan.md).
+
 > เอกสารนี้เป็น **audit trail** ของทุกรอบ review พร้อมสถานะปัจจุบัน
 
 ---

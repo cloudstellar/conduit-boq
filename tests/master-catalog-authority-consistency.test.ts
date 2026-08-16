@@ -634,7 +634,7 @@ describe('Master Catalog authority consistency', () => {
       /P-33 accepted that\s+exact bounded WP-7\.5 technical checkpoint at 2026-07-15 13:54 \+07/,
     )
     expect(tracker).toContain(
-      '| Current work package | P-12 closeout reconciliation and P-13 pre-deploy preparation only:',
+      '| Current work package | P-49 decision/status recording only:',
     )
     expect(tracker).toContain('P42-UAT-C03')
     expect(tracker).toContain('P42-UAT-G01')
@@ -648,13 +648,13 @@ describe('Master Catalog authority consistency', () => {
       '16e88c6487307c4bb0606a048dc53e05e9dcee18',
     )
     expect(tracker).toContain(
-      '| Current environment | Production is verified at stage `026`:',
+      '| Current environment | P-12 checkpoint evidence (not a live count invariant):',
     )
     expect(tracker).toContain(
-      'The one-use v7 post-migration application-only encrypted backup',
+      'the v7 post-`026` encrypted application-only backup are',
     )
     expect(tracker).toContain(
-      'Owner decisions needed: after exact-commit validation evidence exists, approve or reject a bounded P-13',
+      'Owner decisions needed: separately approve or reject the exact P-49 database/application correction proposal',
     )
     expect(tracker).toContain(
       '`0fbaf215018200bacbc728af330e990b98c7e6128165982289ed429c93ad13f2`',
@@ -993,7 +993,7 @@ describe('Master Catalog authority consistency', () => {
       /pre-amendment operator\/browser preflight passed on\s+`c8f6dca`/,
     )
     expect(tracker).toContain(
-      'Status: P-12 COMPLETE; exact Production sequence 017 -> 017a -> 018-026, objective closeout, and v7 encrypted application-only backup/isolated restore/read-only checksum passed; all Phase 4 flags remain false; P-13 PRE-DEPLOY PREPARATION IN PROGRESS — NOT AUTHORIZED',
+      'Status: P-12 COMPLETE; exact Production sequence 017 -> 017a -> 018-026 and v7 backup remain valid; all Phase 4 flags false. P-49 BUSINESS INTENT APPROVED / TECHNICAL HOLD. P-13 HARD-STOP — PENDING CROSS-LAYER AUTHORIZATION ALIGNMENT; NOT AUTHORIZED',
     )
     expect(decisions).toContain(
       'accepts combined Owner-operated guided UI plus developer-operated fault-injection/cleanup evidence',
@@ -1336,16 +1336,186 @@ describe('Master Catalog authority consistency', () => {
         'd44286409cad41fff8f977acdafbf6eaecdecb5692381a37fdb8f8f95b9ba538',
       )
       expect(authority).toMatch(
-        /P-13[\s\S]{0,500}(?:PRE-DEPLOY PREPARATION|pre-deploy preparation)/i,
+        /P-13[\s\S]{0,500}(?:PRE-DEPLOY PREPARATION|pre-deploy preparation|HARD-STOP|hard-stopped)/i,
       )
       expect(authority).toMatch(
-        /P-13[\s\S]{0,500}(?:NOT AUTHORIZED|not authorized)/i,
+        /P-13[\s\S]{0,500}(?:NOT\s+AUTHORIZED|not\s+authorized)/i,
       )
     }
 
     expectP12ProductionAuthorityConsumed(
       read('docs/plans/master-catalog/40-phase4-p12-owner-decision-checklist.md'),
     )
+  })
+
+  it('records P-49 pending profile-only intent without claiming implementation or P-13 authority', () => {
+    const p49Path =
+      'docs/plans/master-catalog/45-phase4-p49-pending-authorization-hardening-plan.md'
+    const p49 = read(p49Path)
+    const markerMatch = p49.match(
+      /<!-- P49_PENDING_AUTHORIZATION_DECISION_V1 (\{[^\n]+\}) -->/,
+    )
+
+    expect(markerMatch).not.toBeNull()
+    expect(JSON.parse(markerMatch![1])).toEqual({
+      schema: 'conduit-boq/p49-pending-authorization-decision/v1',
+      recordedAt: '2026-08-17T02:58:08+07:00',
+      businessIntent: 'pending-profile-onboarding-only',
+      masterCatalogRls: 'preserve-022-023-active-only',
+      catalogReadWideningAuthorized: false,
+      decisionRecordLocalCommitAuthorized: true,
+      historicalTestCommentAuthorized: true,
+      externalGitPublicationAuthorized: false,
+      implementationAuthorized: false,
+      databaseHardeningRequired: true,
+      p13Authorized: false,
+      automaticNextStep: false,
+    })
+
+    const hardStopPaths = [
+      p49Path,
+      'docs/SECURITY.md',
+      'docs/04_data/SECURITY_MODEL.md',
+      'docs/plans/master-catalog/13-phase4-verification-report.md',
+      'docs/plans/master-catalog/19-phase4-decision-register.md',
+      'docs/plans/master-catalog/25-phase4-execution-progress-tracker.md',
+    ]
+
+    for (const path of hardStopPaths) {
+      const authority = read(path)
+      expect(authority).toContain('P-49')
+      expect(authority).toMatch(/profile\/onboarding-only/i)
+      expect(authority).toMatch(/P-13[\s\S]{0,220}(?:HARD-STOP|hard-stopped)/i)
+      expect(authority).toMatch(
+        /(?:IMPLEMENTATION NOT AUTHORIZED|implementation on HOLD|implementation is on HOLD|implementation is not authorized|technical implementation is on HOLD)/i,
+      )
+    }
+
+    for (const path of [
+      'docs/03_domain/ACCESS_MODEL.md',
+      'docs/04_data/DATA_INTEGRITY.md',
+      'docs/04_data/DATABASE_SCHEMA.md',
+      'docs/06_engineering/PERMISSION_PATTERNS.md',
+      'docs/02_architecture/ADR/ADR-001-supabase-rls-authorization.md',
+      'docs/ai/DECISIONS/ADR-001-supabase-rls-authorization.md',
+      'docs/plans/master-catalog/17-phase4-database-security-contract.md',
+      'docs/plans/master-catalog/18-phase4-threat-model.md',
+      'docs/plans/master-catalog/37-phase4-p39-draft-identity-release-number-correction-plan.md',
+    ]) {
+      const authority = read(path)
+      expect(authority).toContain('P-49')
+      expect(authority).toMatch(/profile\/onboarding-only/i)
+    }
+
+    expect(p49).toMatch(/`009`[\s\S]{0,180}`016`/)
+    expect(p49).toContain('Factor F')
+    expect(p49).toContain('Users can view all profiles')
+    expect(p49).toContain('app_settings_select USING (true)')
+    expect(p49).toContain('can_approve_boq(uuid)')
+    expect(p49).toContain('get_user_role(uuid)')
+    expect(p49).toContain('is_admin(uuid)')
+    expect(p49).toContain('status` defaults to `active')
+    expect(p49).toContain('missing-profile')
+    expect(p49).toContain('unknown-status')
+    expect(p49).toContain('inactive/suspended')
+    expect(p49).toContain('active -> pending')
+    expect(p49).toContain('self-`role=\'admin\'`')
+    expect(p49).toContain('self-`status=\'active\'`')
+    expect(p49).toContain('`/api/admin/users/[id]`')
+    expect(p49).toMatch(/existing rows are retained/i)
+    expect(p49).toContain(
+      'only this canonical documentation, a comment-only P-49\nsupersession on the historical RLS test',
+    )
+    expect(p49).toContain('external Git\npublication/push')
+    expect(p49).toContain(
+      'externalGitPublicationAuthorized":false',
+    )
+
+    const historicalRlsTest = read('scripts/test-rls-security.sql')
+    expect(historicalRlsTest).toContain('HISTORICAL ONLY (P-49, 2026-08-17)')
+    expect(historicalRlsTest).toContain('pending = profile/onboarding-only')
+    expect(historicalRlsTest).toContain('Do not run this script as P-49 evidence')
+
+    expect(
+      existsSync(
+        resolve(
+          root,
+          'migrations/027_master_catalog_pending_issued_read_compatibility.sql',
+        ),
+      ),
+    ).toBe(false)
+
+    const frozenP49Evidence = new Map<string, string>([
+      [
+        'migrations/005_phase1a_seed_and_rls.sql',
+        '767009873242d7c74d652343290af34ed906e4fc6b92339244a75b9c22aeeded',
+      ],
+      [
+        'migrations/007_app_settings.sql',
+        '2f1c6200248c3bfa86fd93ae08ea9867fd45a76d1d3970cd2b6c831b9a06069d',
+      ],
+      [
+        'migrations/008_rls_and_trigger.sql',
+        '63ec56740e9b7940bf7e312d2f33154acbbb3794bbb8646a6fddb5115f66d811',
+      ],
+      [
+        'migrations/009_master_catalog_p0_containment.sql',
+        '6d18fd4365b0f4ca8cb69582a276cd1b3e48c01b01bc7046c5306746719b57d2',
+      ],
+      [
+        'migrations/012_factor_f_version_foundation.sql',
+        'dd574de138bcfa3bfb3495ed5c216a66ab1d3c844a0cdd12af7bd35f21fa5bd1',
+      ],
+      [
+        'migrations/016_hotfix_preserve_boq_item_suffix.sql',
+        '23067432081325a423355cd5dddc3166e2b7312e2a13c74c36458a818b5a505d',
+      ],
+      [
+        'migrations/022_master_catalog_phase4_draft_identity_and_release_number.sql',
+        '9fc8f951fa5b3f3d7de928cce877a265d9333fda46850dd7564b22cd424c41f3',
+      ],
+      [
+        'migrations/023_master_catalog_phase4_published_code_rls_scope.sql',
+        'cbe01f63c6dd822edb29e1f7a31bfd27d5cb063e4d7d7e3878567875434d0a88',
+      ],
+      [
+        'supabase/local/production-baseline.sql',
+        '4aad05cdd2b790b4b7d7459aa874422d53871caee3be243b30307a59048a443d',
+      ],
+      [
+        'lib/permissions.ts',
+        '0084726044dbff81026b9f0925d6399b2f302cc8c1bbfe15292dc8bf08f34baa',
+      ],
+      [
+        'lib/supabase/middleware.ts',
+        '2b42d35c2596c10df4d2b86c14e46fd9151dd56b8193d34c5ccbfe29741aa0ce',
+      ],
+      [
+        'app/api/admin/users/[id]/route.ts',
+        'bfa515ec3b073341897f8a313d2c47411e556c306d63043d0af091f58a7418be',
+      ],
+      [
+        'app/profile/page.tsx',
+        'e242da508a1f0ec01795d0f3a832502d732c1f13653c6dde0d973e30f546ee58',
+      ],
+      [
+        'lib/master-catalog/export/data.ts',
+        '08758042cd0112e4f30554ddc2ff18f60cf0bec3248d1954e262b3f6d89bb5f3',
+      ],
+    ])
+
+    for (const [path, expectedSha256] of frozenP49Evidence) {
+      expect(createHash('sha256').update(read(path)).digest('hex')).toBe(
+        expectedSha256,
+      )
+      expect(p49).toContain(`| \`${path}\` | \`${expectedSha256}\` |`)
+    }
+
+    const threatModel = read(
+      'docs/plans/master-catalog/18-phase4-threat-model.md',
+    )
+    expect(threatModel).toContain('| T-65 |')
+    expect(threatModel).toContain('**Open / High before P-13.**')
   })
 
   it('keeps PRE-P-12 backup, custody, restore, and verifier gates synchronized', () => {
@@ -1733,7 +1903,7 @@ describe('Master Catalog authority consistency', () => {
     expect(completedTracker).toMatch(/source\/tooling HEAD/)
     expect(completedTracker).toContain('| P-12 exact CLI evidence chain | **COMPLETE.**')
     expect(completedTracker).toContain(
-      'P-13 PRE-DEPLOY PREPARATION IN PROGRESS — NOT AUTHORIZED',
+      'P-13 HARD-STOP — PENDING CROSS-LAYER AUTHORIZATION ALIGNMENT; NOT AUTHORIZED',
     )
   })
 
