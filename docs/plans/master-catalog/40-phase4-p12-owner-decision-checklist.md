@@ -2,9 +2,16 @@
 
 **Prepared:** 2026-07-26
 
-**Last updated:** 2026-08-09
+**Last updated:** 2026-08-17
 
-**Status:** PRE-P-12 HOLD — historical pre-correction context: immutable replacement source/tooling HEAD
+**Status:** P-12 COMPLETE — Production migrations `017` -> `017a` ->
+`018`-`026`, final read-only closeout, and the checksum-verified post-`026`
+application-only backup are complete. All three Phase 4 flags remain boolean
+`false`. P-13 pre-deploy preparation is in progress and is not authorized; the
+exact deployment commit/remote CI/fingerprint remain open, and no PR, `main`
+merge, application deploy, feature enablement, or publication is implied.
+
+**Historical pre-correction context:** immutable replacement source/tooling HEAD
 `7fbfe1bb8f71df03a78762b00e93aded7bdd6e42` and its truthful
 `Vercel=success` record are frozen. The post-P-48 Checklist-only status
 checkpoint completed at pushed/upstream-equal
@@ -69,7 +76,7 @@ checkpoint is pushed and upstream-equal. Production, application/UI/export
 changes, flags, publication, Factor F, hotfix `016`, and P-12 remain
 unauthorized.
 
-**Current status:** P-12 HOLD — the 2026-08-09 GO was consumed by the first
+**Historical 2026-08-09 attempt status:** the earlier GO was consumed by the first
 attempted stage, `017`. The native CLI stopped before applying that migration
 because the frozen workdir omitted seven older versions already present in the
 Production migration ledger. The complete immediate after-state remained
@@ -4345,4 +4352,64 @@ All three same-window fresh gates passed under PRE-GO checkpoint `e53c76498f0f20
 
 Fresh backup status SHA-256: `09eb88621946ed9349001bc93039ef6bffbb6238946b19d0a8d9fa6d09a05152`; parity manifest SHA-256: `8f6d4cba673944f084941dc253e316cb3f2f03277202a87f90d485511c071913`; advisor manifest SHA-256: `e8ab90fce86388f0d8a5b9454adf6064e468463cf22bc9c1e327233cbe7e3d96`.
 
-<!-- P12_RUNNER_AUTHORITY_V2 {"decision":"GO","applicationCandidate":"5068f944af2aa3fe8446c77c8ae8d48673cb260b","ownerApprovalReference":"P-12 one-GO fresh GO e118f674aa6c8776afe1822317c5aa85af9554d575b73295b35d63ef3a8dccee; control approval 705f298067ee758319b92e4193e4d6338b8a9dd9f07374db0f9bf4314f4f4f09; fresh gates e8ab90fce86388f0d8a5b9454adf6064e468463cf22bc9c1e327233cbe7e3d96","approvedAt":"2026-08-16T05:01:57.416Z","executor":"Suthorn Kaewkorn","independentVerifier":"lukkxh","schemaShapeContractSha256":"61a78af664d3aef1759b6220e776fa9a33cc657673a8d0780870a1755e33a813","pass2VerificationEvidenceManifestSha256":"f4f0fdcdee44562afab3c7f6e96b7a8e0fbad9b1c37ea0fb28adee0898a8f603","maintenanceWindow":{"startsAt":"2026-08-16T12:00:00+07:00","endsAt":"2026-08-16T16:00:00+07:00"}} -->
+<!-- P12_RUNNER_AUTHORITY_CONSUMED_V2 {"decision":"GO_CONSUMED_COMPLETE","applicationCandidate":"5068f944af2aa3fe8446c77c8ae8d48673cb260b","executionGitHead":"7c5ac6bd88677c0144bf8b8933b39293a2dee866","ownerApprovalReference":"P-12 one-GO fresh GO e118f674aa6c8776afe1822317c5aa85af9554d575b73295b35d63ef3a8dccee; control approval 705f298067ee758319b92e4193e4d6338b8a9dd9f07374db0f9bf4314f4f4f09; fresh gates e8ab90fce86388f0d8a5b9454adf6064e468463cf22bc9c1e327233cbe7e3d96","approvedAt":"2026-08-16T05:01:57.416Z","executor":"Suthorn Kaewkorn","historicalApprovalVerifier":"lukkxh","schemaShapeContractSha256":"61a78af664d3aef1759b6220e776fa9a33cc657673a8d0780870a1755e33a813","pass2VerificationEvidenceManifestSha256":"f4f0fdcdee44562afab3c7f6e96b7a8e0fbad9b1c37ea0fb28adee0898a8f603","stage026EvidenceManifestSha256":"5a029dd507471ab5d74375bd3f2afba931096e9f2c208ff836b68d1dd5881e47","finalCloseoutEvidenceManifestSha256":"2fb1259249282315750ce20d41732fd9f6c5e65998aa772fc4e387c5368d64a5","completedAt":"2026-08-16T06:45:22.249Z","maintenanceWindow":{"startsAt":"2026-08-16T12:00:00+07:00","endsAt":"2026-08-16T16:00:00+07:00"},"phase4FlagsRemainFalse":true,"p12Complete":true,"p13Authorized":false,"automaticNextStep":false} -->
+
+## 9. P-12 Production execution and post-026 backup closeout
+
+The corrected one-GO execution completed at execution HEAD
+`7c5ac6bd88677c0144bf8b8933b39293a2dee866`. Every migration in the exact
+sequence `017` -> `017a` -> `018`-`026` completed one stage at a time. The
+stage-`026` evidence manifest is owner-only at
+`/Users/cloud/Backups/ConduitBOQ/evidence/phase4/p12-production/p12-execution-3f2b526ea36912f6/stages/026/05-evidence-manifest.json`,
+SHA-256 `5a029dd507471ab5d74375bd3f2afba931096e9f2c208ff836b68d1dd5881e47`.
+Its CLI exit code is `0`, postflight is verified, outcome is mechanically
+successful and not uncertain, and it authorizes no automatic next step.
+
+The final owner-authorized objective-machine-gate closeout is owner-only at
+`/Users/cloud/Backups/ConduitBOQ/evidence/phase4/p12-production/p12-execution-3f2b526ea36912f6/final-closeout-v2/05-closeout-evidence-manifest.json`,
+SHA-256 `2fb1259249282315750ce20d41732fd9f6c5e65998aa772fc4e387c5368d64a5`.
+It binds final machine gate SHA-256
+`33fdccc0c6b1e58e2b919c5bf246b62a5b2558461c70b2a329b11a10e9ad3085`,
+records `finalCloseoutVerified=true`, `phase4FlagsRemainFalse=true`,
+`p13Authorized=false`, `automaticNextStep=false`, and no new independent-human
+verification claim. The exact known `pg_temp.catalog_placement_input` static
+advisor finding was accepted only by the Owner's hash-bound objective policy;
+its findings fingerprint is
+`468af0cb31e757f8316f0ef22249cf04dc58219eaea50b01787bd54fd572f846`.
+
+The final one-use v7 post-`026` application-only encrypted backup completed at
+`2026-08-17T00:42:03+07:00`. Its owner-only evidence root is
+`/Users/cloud/Backups/ConduitBOQ/evidence/phase4/p12-production/post026-backup-e826f73-v7/p12-post026-backup-v7-fddaaef72c5ff80c`.
+Runtime status SHA-256 is
+`72d2f10358c99565aa2853b02a6bbcf61cc8812f24f2d665498bfd13d7c98d19`
+with result `objectively-verified-post026-backup-complete`. The encrypted
+package is `p12-post026-migration-20260816T173952Z`; dump SHA-256 is
+`d44286409cad41fff8f977acdafbf6eaecdecb5692381a37fdb8f8f95b9ba538`
+and size is `776850` bytes. Source-before equals source-after at SHA-256
+`e10c528af9a3453dcd855752f7b63714b80cdf9b1d54d2dfaf7c6df5236ff833`;
+source and restored normalized metrics equal SHA-256
+`eb5118bedd3d4064b2df98af4e681626c12a9a3f73373588fefb958a2e83e4db`;
+source and restored structural schema equal SHA-256
+`e3d56e868ed7048ad19649a48954aeb63e617baa8f8f25b474ec2e18094a7ba2`.
+
+The v7 restored-integrity result SHA-256 is
+`1c6af1a06a335ac29d43321d3241e63872d56858827647f18864c03fb1f74629`.
+It retains the legacy raw `price_rows_without_code_group=710` as
+informational and verifies `invalid_code_group_state_count=0`; every other
+bounded integrity invariant passed. The writeable and read-only checksum files
+are byte-identical at SHA-256
+`95265fca040c084d70f76b3d8ed3f00beb39a6aa4e98c573dd4a7d49b70c7d0a`,
+with all ten package entries `OK`, including the dump, recovery manifest,
+status files, source metrics, restored metrics/integrity, and structural
+shapes. Both image attachments detached cleanly; no P-12 Docker container,
+network, volume, or mount remained. The backup helper performed no migration,
+authorized no Production mutation, left P-13 false, and authorized no
+automatic next step.
+
+This closes P-12 and satisfies the post-migration backup prerequisite for a
+separate P-13 request. It does not itself authorize a PR, merge to `main`,
+Vercel Production deployment, feature enablement, or catalog publication.
+
+<!-- P12_PRODUCTION_CLOSEOUT_V1 {"schema":"conduit-boq/master-catalog-p12-production-closeout/v1","status":"COMPLETE","executionGitHead":"7c5ac6bd88677c0144bf8b8933b39293a2dee866","sourceToolingGitHead":"e826f739e1181b30a7b76941dab1032baaa8be1a","applicationCandidate":"5068f944af2aa3fe8446c77c8ae8d48673cb260b","stage026EvidenceManifestSha256":"5a029dd507471ab5d74375bd3f2afba931096e9f2c208ff836b68d1dd5881e47","stage026OutcomeSha256":"1e407941d20cd4811638d3196cfa3b7f6253b87a841e9333286e9c634ea252b9","stage026PostflightSha256":"89cfba517f9157c7f4e0bb1448c05fb5c86a09135b5b5418df828fff6fe28a75","advisorFindingsFingerprintSha256":"468af0cb31e757f8316f0ef22249cf04dc58219eaea50b01787bd54fd572f846","advisorDisposition":"accepted-exact-known-temp-table-false-positive","finalMachineGateSha256":"33fdccc0c6b1e58e2b919c5bf246b62a5b2558461c70b2a329b11a10e9ad3085","finalCloseoutOutcomeSha256":"6c37bbe99c1babccbdc17667b2b468763643befbb52f3c4f73b7edd59033f144","finalCloseoutEvidenceManifestSha256":"2fb1259249282315750ce20d41732fd9f6c5e65998aa772fc4e387c5368d64a5","completedAt":"2026-08-16T06:45:22.249Z","verificationMode":"owner-authorized-objective-machine-gates","newIndependentVerifierClaim":false,"phase4FlagsRemainFalse":true,"p12Complete":true,"p13Authorized":false,"automaticNextStep":false} -->
+
+<!-- P12_POST026_BACKUP_CLOSEOUT_V1 {"schema":"conduit-boq/master-catalog-p12-post026-backup-closeout/v1","status":"COMPLETE","attemptId":"p12-post026-backup-v7-fddaaef72c5ff80c","executionGitHead":"7c5ac6bd88677c0144bf8b8933b39293a2dee866","ownerApprovalTextSha256":"43f1dc03b83def025bbd14e1627a6acb4a7a2b24c28e1e6779a86f8c24319645","retryAuthoritySha256":"c1b9b26bc8fdfba792bd18f7a7f1ecabce045d7b6f9cf9603d147cfffa8bf940","runtimeSha256":"d8e7fe310ed3033b26cafb37ce6c404e0a4bcdcd4a465636fc5c197390f15d66","runtimeStatusSha256":"72d2f10358c99565aa2853b02a6bbcf61cc8812f24f2d665498bfd13d7c98d19","integritySqlSha256":"bd91c880167414d407356dcb813a5a34ef622efa4c10fe08b300aaea23b75296","dumpSha256":"d44286409cad41fff8f977acdafbf6eaecdecb5692381a37fdb8f8f95b9ba538","dumpBytes":776850,"sourceBeforeAfterCanonicalSha256":"e10c528af9a3453dcd855752f7b63714b80cdf9b1d54d2dfaf7c6df5236ff833","sourceRestoredNormalizedSha256":"eb5118bedd3d4064b2df98af4e681626c12a9a3f73373588fefb958a2e83e4db","sourceRestoredSchemaStructuralSha256":"e3d56e868ed7048ad19649a48954aeb63e617baa8f8f25b474ec2e18094a7ba2","restoredIntegrityResultSha256":"1c6af1a06a335ac29d43321d3241e63872d56858827647f18864c03fb1f74629","checksumReadonlySha256":"95265fca040c084d70f76b3d8ed3f00beb39a6aa4e98c573dd4a7d49b70c7d0a","checksumEntriesPassed":10,"completedAt":"2026-08-16T17:42:03Z","previousAttemptReused":false,"productionMutationAuthorized":false,"migrationPerformed":false,"encrypted":true,"readonlyReopenVerified":true,"detached":true,"p12SidePrerequisitesComplete":true,"p13Authorized":false,"automaticNextStep":false} -->

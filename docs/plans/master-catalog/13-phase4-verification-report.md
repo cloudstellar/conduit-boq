@@ -1,5 +1,15 @@
 # Master Catalog Phase 4 Verification Report
 
+**Current P-12 disposition (2026-08-17):** **Complete.** Production executed
+the exact `017` -> `017a` -> `018`-`026` sequence at execution HEAD
+`7c5ac6bd88677c0144bf8b8933b39293a2dee866`; final read-only closeout and the
+one-use v7 encrypted application-only backup/isolated restore/read-only
+checksum passed. All three Phase 4 flags remain boolean `false`.
+**P-13 pre-deploy preparation is in progress and is not authorized.** The
+exact deployment commit, remote CI, and deployment fingerprint remain open. No
+`main` merge, application deployment, feature enablement, or publication is
+implied.
+
 **Current P-37 disposition (2026-07-25):** **Accepted by the Owner under an
 explicit guided-UAT variance** against exact implementation checkpoint
 `df44b827b290933463da5e14fa9125314660022a`. The Owner requested and
@@ -9,7 +19,7 @@ cleanup evidence. The evidence is not relabelled independent/no-assistance.
 WP-8 is complete; Add/Supplement remains hidden until P-14, and P-12 plus every
 Production action remain separate.
 
-**Current P-12 readiness disposition (2026-07-28):** desk review, Local
+**Historical P-12 readiness disposition (2026-07-28):** desk review, Local
 read-only verification, and the Owner-authorized Production read-only
 database/ledger/advisor window are complete on exact implementation checkpoint
 `6827ebc1a729b7675fe91db58e129c9381b33ddb`.
@@ -1463,3 +1473,42 @@ authority for the completed placement and import-feedback UX checks.
 | Price authority |  | Pending |  |  |
 
 Final decision: `Pending / Accepted / Accepted with exceptions / Rejected`
+
+## 18. P-12 Production verification overlay — 2026-08-17
+
+This section supersedes only the P-12-related `Pending` cells and historical
+readiness status above. The overall Phase 4 final decision, P-13 deployment,
+P-14/P-15 state, official Production exports, release note, and
+post-publication custody remain pending.
+
+### 18.1 Migration and closeout
+
+| Evidence | Result |
+|---|---|
+| Execution/application | Execution HEAD `7c5ac6bd88677c0144bf8b8933b39293a2dee866`; application candidate `5068f944af2aa3fe8446c77c8ae8d48673cb260b` |
+| Final stage | `026`; ordered ledger, schema shape, ownership/ACL/RLS, function posture, hotfix `016`, BOQ/Factor F invariants, and all-disabled flags passed |
+| Stage-`026` manifest | `5a029dd507471ab5d74375bd3f2afba931096e9f2c208ff836b68d1dd5881e47` |
+| Stage-`026` outcome/postflight | `1e407941d20cd4811638d3196cfa3b7f6253b87a841e9333286e9c634ea252b9` / `89cfba517f9157c7f4e0bb1448c05fb5c86a09135b5b5418df828fff6fe28a75` |
+| Final machine gate | `33fdccc0c6b1e58e2b919c5bf246b62a5b2558461c70b2a329b11a10e9ad3085` |
+| Final closeout outcome/manifest | `6c37bbe99c1babccbdc17667b2b468763643befbb52f3c4f73b7edd59033f144` / `2fb1259249282315750ce20d41732fd9f6c5e65998aa772fc4e387c5368d64a5` |
+| Advisor disposition | Exact known temporary-table false positive only; findings fingerprint `468af0cb31e757f8316f0ef22249cf04dc58219eaea50b01787bd54fd572f846`; no other finding accepted |
+| Closeout boundary | Read-only; no migration in closeout; all Phase 4 flags `false`; `p13Authorized=false`; no automatic next step |
+
+### 18.2 Post-`026` application-only backup
+
+| Evidence | Result |
+|---|---|
+| Attempt | `p12-post026-backup-v7-fddaaef72c5ff80c`; completed `2026-08-16T17:42:03Z` |
+| Runtime/status | Runtime `d8e7fe310ed3033b26cafb37ce6c404e0a4bcdcd4a465636fc5c197390f15d66`; status `72d2f10358c99565aa2853b02a6bbcf61cc8812f24f2d665498bfd13d7c98d19` |
+| Dump | `d44286409cad41fff8f977acdafbf6eaecdecb5692381a37fdb8f8f95b9ba538`; 776850 bytes; empty `pg_dump` stderr |
+| Source before/after | Identical canonical SHA-256 `e10c528af9a3453dcd855752f7b63714b80cdf9b1d54d2dfaf7c6df5236ff833` |
+| Source/restored normalized data | Identical SHA-256 `eb5118bedd3d4064b2df98af4e681626c12a9a3f73373588fefb958a2e83e4db` |
+| Source/restored structural schema | Identical SHA-256 `e3d56e868ed7048ad19649a48954aeb63e617baa8f8f25b474ec2e18094a7ba2` |
+| Restored integrity | Result SHA-256 `1c6af1a06a335ac29d43321d3241e63872d56858827647f18864c03fb1f74629`; `invalid_code_group_state_count=0`; empty verifier stderr |
+| Encryption/checksum | Encrypted bundle; writeable capture followed by read-only reopen; all 10 package entries passed; read-only checksum-result SHA-256 `95265fca040c084d70f76b3d8ed3f00beb39a6aa4e98c573dd4a7d49b70c7d0a`; final detach passed |
+| Scope | Application schemas only; Auth/Storage payload excluded; no migration rerun; no Production mutation; no P-13 or automatic next step |
+
+P-12 is **Complete**. The P-12 handoff is **P-13 PRE-DEPLOY PREPARATION IN
+PROGRESS — NOT AUTHORIZED**. The exact deployment commit, matching pre-deploy
+CI/fingerprint, and separate Owner P-13 decision remain mandatory before
+merging to `main` or deploying.

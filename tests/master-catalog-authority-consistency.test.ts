@@ -51,6 +51,77 @@ function expectP12ProductionAuthorityConsumed(source: string) {
   expect(source).toContain(
     'until a fresh\nOwner GO and new `P12_RUNNER_AUTHORITY_V2` checkpoint.',
   )
+  const completedAuthorityMarkers = [
+    ...source.matchAll(
+      /<!-- P12_RUNNER_AUTHORITY_CONSUMED_V2 (\{[^\n]+\}) -->/g,
+    ),
+  ]
+  const productionCloseoutMarkers = [
+    ...source.matchAll(
+      /<!-- P12_PRODUCTION_CLOSEOUT_V1 (\{[^\n]+\}) -->/g,
+    ),
+  ]
+  const backupCloseoutMarkers = [
+    ...source.matchAll(
+      /<!-- P12_POST026_BACKUP_CLOSEOUT_V1 (\{[^\n]+\}) -->/g,
+    ),
+  ]
+
+  expect(completedAuthorityMarkers).toHaveLength(1)
+  expect(productionCloseoutMarkers).toHaveLength(1)
+  expect(backupCloseoutMarkers).toHaveLength(1)
+  expect(JSON.parse(completedAuthorityMarkers[0][1])).toMatchObject({
+    decision: 'GO_CONSUMED_COMPLETE',
+    executionGitHead: '7c5ac6bd88677c0144bf8b8933b39293a2dee866',
+    stage026EvidenceManifestSha256:
+      '5a029dd507471ab5d74375bd3f2afba931096e9f2c208ff836b68d1dd5881e47',
+    finalCloseoutEvidenceManifestSha256:
+      '2fb1259249282315750ce20d41732fd9f6c5e65998aa772fc4e387c5368d64a5',
+    phase4FlagsRemainFalse: true,
+    p12Complete: true,
+    p13Authorized: false,
+    automaticNextStep: false,
+  })
+  expect(JSON.parse(productionCloseoutMarkers[0][1])).toMatchObject({
+    schema: 'conduit-boq/master-catalog-p12-production-closeout/v1',
+    status: 'COMPLETE',
+    finalMachineGateSha256:
+      '33fdccc0c6b1e58e2b919c5bf246b62a5b2558461c70b2a329b11a10e9ad3085',
+    finalCloseoutEvidenceManifestSha256:
+      '2fb1259249282315750ce20d41732fd9f6c5e65998aa772fc4e387c5368d64a5',
+    verificationMode: 'owner-authorized-objective-machine-gates',
+    newIndependentVerifierClaim: false,
+    phase4FlagsRemainFalse: true,
+    p12Complete: true,
+    p13Authorized: false,
+    automaticNextStep: false,
+  })
+  expect(JSON.parse(backupCloseoutMarkers[0][1])).toMatchObject({
+    schema: 'conduit-boq/master-catalog-p12-post026-backup-closeout/v1',
+    status: 'COMPLETE',
+    attemptId: 'p12-post026-backup-v7-fddaaef72c5ff80c',
+    runtimeStatusSha256:
+      '72d2f10358c99565aa2853b02a6bbcf61cc8812f24f2d665498bfd13d7c98d19',
+    dumpSha256:
+      'd44286409cad41fff8f977acdafbf6eaecdecb5692381a37fdb8f8f95b9ba538',
+    dumpBytes: 776850,
+    checksumEntriesPassed: 10,
+    previousAttemptReused: false,
+    productionMutationAuthorized: false,
+    migrationPerformed: false,
+    encrypted: true,
+    readonlyReopenVerified: true,
+    detached: true,
+    p12SidePrerequisitesComplete: true,
+    p13Authorized: false,
+    automaticNextStep: false,
+  })
+  expectInOrder(source, [
+    'P12_RUNNER_AUTHORITY_CONSUMED_V1',
+    'P12_RUNNER_AUTHORITY_CONSUMED_V2',
+    'P12_PRODUCTION_CLOSEOUT_V1',
+    'P12_POST026_BACKUP_CLOSEOUT_V1',
+  ])
   expect(source).not.toMatch(/<!-- P12_RUNNER_AUTHORITY_V[12] /)
 }
 
@@ -563,7 +634,7 @@ describe('Master Catalog authority consistency', () => {
       /P-33 accepted that\s+exact bounded WP-7\.5 technical checkpoint at 2026-07-15 13:54 \+07/,
     )
     expect(tracker).toContain(
-      '| Current work package | PRE-P-12 P-48 exact replacement source/tooling Git publication.',
+      '| Current work package | P-12 closeout reconciliation and P-13 pre-deploy preparation only:',
     )
     expect(tracker).toContain('P42-UAT-C03')
     expect(tracker).toContain('P42-UAT-G01')
@@ -577,16 +648,16 @@ describe('Master Catalog authority consistency', () => {
       '16e88c6487307c4bb0606a048dc53e05e9dcee18',
     )
     expect(tracker).toContain(
-      '| Current environment | Production read-only evidence remains historical/freshness-gated and Production writes remain zero.',
+      '| Current environment | Production is verified at stage `026`:',
     )
     expect(tracker).toContain(
-      'one retained evidence draft `2568.2.0`, all three flags false',
+      'The one-use v7 post-migration application-only encrypted backup',
     )
     expect(tracker).toContain(
-      'Owner decisions needed: P-48 Git-only publication is authorized.',
+      'Owner decisions needed: after exact-commit validation evidence exists, approve or reject a bounded P-13',
     )
     expect(tracker).toContain(
-      'sha256:ecd457c625c6eeb445607f30d374734c3e7ebd2a6d5489912f4c7ec42b3019a5',
+      '`0fbaf215018200bacbc728af330e990b98c7e6128165982289ed429c93ad13f2`',
     )
     expect(verificationReport).toContain(
       '20260706090832 hotfix_preserve_boq_item_suffix',
@@ -922,7 +993,7 @@ describe('Master Catalog authority consistency', () => {
       /pre-amendment operator\/browser preflight passed on\s+`c8f6dca`/,
     )
     expect(tracker).toContain(
-      'Status: WP-8/P-37 remains Owner-accepted under the guided-UAT variance; readiness baseline 6827ebc and exact application candidate 5068f94 remain unchanged; Package #39 is HOLD for replacement source/tooling HEAD/Remote, fresh separately authorized Local rehearsal, two-pass evidence, named humans/window, and separate P-12',
+      'Status: P-12 COMPLETE; exact Production sequence 017 -> 017a -> 018-026, objective closeout, and v7 encrypted application-only backup/isolated restore/read-only checksum passed; all Phase 4 flags remain false; P-13 PRE-DEPLOY PREPARATION IN PROGRESS — NOT AUTHORIZED',
     )
     expect(decisions).toContain(
       'accepts combined Owner-operated guided UI plus developer-operated fault-injection/cleanup evidence',
@@ -1239,13 +1310,50 @@ describe('Master Catalog authority consistency', () => {
     expect(correctionPlan).toContain('`reviewLock={expected_lock_version}`')
   })
 
+  it('records P-12 completion without authorizing P-13', () => {
+    const authorityPaths = [
+      'docs/plans/master-catalog/13-phase4-verification-report.md',
+      'docs/plans/master-catalog/19-phase4-decision-register.md',
+      'docs/plans/master-catalog/25-phase4-execution-progress-tracker.md',
+      'docs/plans/master-catalog/40-phase4-p12-owner-decision-checklist.md',
+    ]
+
+    for (const path of authorityPaths) {
+      const authority = read(path)
+      expect(authority).toContain(
+        '7c5ac6bd88677c0144bf8b8933b39293a2dee866',
+      )
+      expect(authority).toContain(
+        '5a029dd507471ab5d74375bd3f2afba931096e9f2c208ff836b68d1dd5881e47',
+      )
+      expect(authority).toContain(
+        '2fb1259249282315750ce20d41732fd9f6c5e65998aa772fc4e387c5368d64a5',
+      )
+      expect(authority).toContain(
+        '72d2f10358c99565aa2853b02a6bbcf61cc8812f24f2d665498bfd13d7c98d19',
+      )
+      expect(authority).toContain(
+        'd44286409cad41fff8f977acdafbf6eaecdecb5692381a37fdb8f8f95b9ba538',
+      )
+      expect(authority).toMatch(
+        /P-13[\s\S]{0,500}(?:PRE-DEPLOY PREPARATION|pre-deploy preparation)/i,
+      )
+      expect(authority).toMatch(
+        /P-13[\s\S]{0,500}(?:NOT AUTHORIZED|not authorized)/i,
+      )
+    }
+
+    expectP12ProductionAuthorityConsumed(
+      read('docs/plans/master-catalog/40-phase4-p12-owner-decision-checklist.md'),
+    )
+  })
+
   it('keeps PRE-P-12 backup, custody, restore, and verifier gates synchronized', () => {
     const backupAuthorityPaths = [
       'docs/plans/master-catalog/00-phase4-review-guide.md',
       'docs/plans/master-catalog/12-phase4-production-runbook.md',
       'docs/plans/master-catalog/13-phase4-verification-report.md',
       'docs/plans/master-catalog/19-phase4-decision-register.md',
-      'docs/plans/master-catalog/25-phase4-execution-progress-tracker.md',
       'docs/plans/master-catalog/39-phase4-p12-production-readiness-package.md',
       'docs/plans/master-catalog/40-phase4-p12-owner-decision-checklist.md',
       'docs/plans/master-catalog/42-phase4-post-phase4-disaster-recovery-backlog.md',
@@ -1331,7 +1439,7 @@ describe('Master Catalog authority consistency', () => {
       'distinct named-human independent verifier',
     )
     expect(readinessPackage).toContain('**Status:** HOLD')
-    expect(ownerChecklist).toContain('**Status:** PRE-P-12 HOLD')
+    expect(ownerChecklist).toContain('**Status:** P-12 COMPLETE')
 
     const decisions = read(
       'docs/plans/master-catalog/19-phase4-decision-register.md',
@@ -1437,7 +1545,6 @@ describe('Master Catalog authority consistency', () => {
       'docs/plans/master-catalog/12-phase4-production-runbook.md',
       'docs/plans/master-catalog/13-phase4-verification-report.md',
       'docs/plans/master-catalog/19-phase4-decision-register.md',
-      'docs/plans/master-catalog/25-phase4-execution-progress-tracker.md',
       'docs/plans/master-catalog/39-phase4-p12-production-readiness-package.md',
     ]
     const historicalAuthorityHash =
@@ -1465,6 +1572,17 @@ describe('Master Catalog authority consistency', () => {
       expect(authority).toContain('`productionEligible=true`')
       expect(authority).toContain('P-12')
     }
+
+    const currentTracker = read(
+      'docs/plans/master-catalog/25-phase4-execution-progress-tracker.md',
+    )
+    expect(currentTracker).toContain(
+      '| Operational catalog-authority fingerprint | Complete and immutable for the P-12 execution:',
+    )
+    expect(currentTracker).toContain(
+      '`0fbaf215018200bacbc728af330e990b98c7e6128165982289ed429c93ad13f2`',
+    )
+    expect(currentTracker).toContain('| P-12 exact CLI evidence chain | **COMPLETE.**')
 
     const readinessPackage = read(
       'docs/plans/master-catalog/39-phase4-p12-production-readiness-package.md',
@@ -1596,7 +1714,6 @@ describe('Master Catalog authority consistency', () => {
       'docs/plans/master-catalog/12-phase4-production-runbook.md',
       'docs/plans/master-catalog/13-phase4-verification-report.md',
       'docs/plans/master-catalog/19-phase4-decision-register.md',
-      'docs/plans/master-catalog/25-phase4-execution-progress-tracker.md',
       'docs/plans/master-catalog/39-phase4-p12-production-readiness-package.md',
       'docs/plans/master-catalog/40-phase4-p12-owner-decision-checklist.md',
       'docs/plans/master-catalog/41-phase4-p12-cli-execution-runbook.md',
@@ -1609,6 +1726,15 @@ describe('Master Catalog authority consistency', () => {
       expect(authority).toMatch(/GO\s+HEAD/)
       expect(authority).toMatch(/HOLD/)
     }
+
+    const completedTracker = read(
+      'docs/plans/master-catalog/25-phase4-execution-progress-tracker.md',
+    )
+    expect(completedTracker).toMatch(/source\/tooling HEAD/)
+    expect(completedTracker).toContain('| P-12 exact CLI evidence chain | **COMPLETE.**')
+    expect(completedTracker).toContain(
+      'P-13 PRE-DEPLOY PREPARATION IN PROGRESS — NOT AUTHORIZED',
+    )
   })
 
   it('keeps the P-43 authority order, one-reset rule, and review trust boundary explicit', () => {

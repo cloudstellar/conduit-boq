@@ -1471,9 +1471,12 @@ describe.sequential('Master Catalog P-12 CLI kit', () => {
       }),
       0o600,
     );
+    const selfReviewedContractSha256 = await sha256File(
+      selfReviewedContractPath,
+    );
     await expect(loadSchemaShapeContract(
       selfReviewedContractPath,
-      { kit },
+      { kit, expectedSha256: selfReviewedContractSha256 },
     )).rejects.toThrow('distinct from the pass-1 capture executor');
 
     const earlyReviewContractPath = join(
@@ -1494,9 +1497,12 @@ describe.sequential('Master Catalog P-12 CLI kit', () => {
       }),
       0o600,
     );
+    const earlyReviewContractSha256 = await sha256File(
+      earlyReviewContractPath,
+    );
     await expect(loadSchemaShapeContract(
       earlyReviewContractPath,
-      { kit },
+      { kit, expectedSha256: earlyReviewContractSha256 },
     )).rejects.toThrow(
       'review must occur after pass-1 evidence completion',
     );
@@ -1521,9 +1527,10 @@ describe.sequential('Master Catalog P-12 CLI kit', () => {
       'legacy-schema-contract.json',
     );
     await writeSecureJson(legacyContractPath, legacyContract, 0o600);
+    const legacyContractSha256 = await sha256File(legacyContractPath);
     await expect(loadSchemaShapeContract(
       legacyContractPath,
-      { kit },
+      { kit, expectedSha256: legacyContractSha256 },
     )).rejects.toThrow('keys do not match the frozen manifest');
 
     const advisorPath = join(root, 'advisors.json');
