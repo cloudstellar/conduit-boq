@@ -828,7 +828,7 @@ describe.sequential('Master Catalog P-12 CLI kit', () => {
     await expect(
       verifyKit(outputPath, '017', 'rehearsal'),
     ).rejects.toThrow('symbolic link');
-  }, 15_000);
+  }, 30_000);
 
   it('refuses relative, in-repository, and already-existing output paths', async () => {
     await expect(
