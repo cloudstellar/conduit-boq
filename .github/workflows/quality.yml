@@ -5,6 +5,7 @@ on:
   push:
     branches:
       - main
+      - codex/p12-production-authority-r2
 
 jobs:
   quality:
