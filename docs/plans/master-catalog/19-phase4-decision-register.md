@@ -5,6 +5,51 @@ pending decisions still require owner resolution at the stated gate
 
 **Prepared:** 2026-06-22
 
+**Current authority overlay (2026-08-24):** P-12 is **COMPLETE**: exact
+`017` -> `017a` -> `018`-`026`, objective closeout, and checksum-verified v7
+post-`026` backup/isolated restore passed. P-13/P-14/P-14C/P-15 remain
+unauthorized. The exact P-50D V3 Owner confirmation (ratification) is recorded
+under [Review Remediation #54](./54-phase4-p50c-review-remediation-and-p50d-v3-ratification-request.md):
+P-50D V3 is complete only within `decision-record-only` scope, and the bounded
+local P-50C data candidate is accepted only as local review evidence. Published
+`2568.0.0` remains unchanged; provisional `2568.1.0` still requires the fresh
+registry check. The Owner later approved exact request
+`P50G-REQ-20260824-V1`, bound to Proposal #55 SHA-256
+`5f2cbdb4d255613c41b2e5c46e4a8a3ba01856c2d17819752e9aeb787ee82cfc`.
+That one-time authority was consumed once and the offline/read-only gate passed;
+see [Result #56](./56-phase4-p50g-small-repository-gate-result.md). P-50G cannot
+be replayed. [P-50H Proposal #57](./57-phase4-p50h-exact-local-git-ci-preview-authorization-proposal.md)
+and its manifest are now prepared for separate review; P-50H execution and
+all operational actions remain unauthorized. Nothing continues automatically.
+Historical
+P-01/WP-8/PRE-P-12/HOLD/request entries below preserve chronology and do not
+override this current overlay.
+
+> **Canonical term:** **exact Owner confirmation (ratification)** has the single
+> meaning defined in [Review Remediation #54](./54-phase4-p50c-review-remediation-and-p50d-v3-ratification-request.md):
+> confirm the post-build UUID and named SHA-256 values and accept P-50C only as
+> local review evidence. It authorizes no candidate application, Git/CI,
+> database/Production/network, P-13/P-14/P-14C/P-15, deploy, or publication.
+
+> **P-50D V3 ratification stop boundary — reached (2026-08-24):**
+> [Review Remediation #54](./54-phase4-p50c-review-remediation-and-p50d-v3-ratification-request.md)
+> records the exact Owner ratification and then stops. No small repository
+> gate, Git/CI request, candidate application, database/Production/network
+> action, P-13 through P-15, deploy, or publication is authorized. This
+> supersedes live wording below that names any next step; every later action
+> requires a new explicit Owner instruction.
+
+> **P-50G result overlay (2026-08-24):** exact request
+> `P50G-REQ-20260824-V1` was approved using Proposal #55 full SHA-256 and
+> consumed once. [Result #56](./56-phase4-p50g-small-repository-gate-result.md)
+> records PASS for `3` focused files / `30` tests, focused lint, deterministic
+> P-50C check, parser syntax, and scoped diff-check. The approval cannot be
+> replayed. PASS permits only preparation of P-50H Proposal #57 plus its exact
+> manifest for separate Owner review. It does not authorize P-50H execution,
+> protected-path access, Git stage/commit/push, CI/Preview, candidate
+> application, database/Production/network, P-13 through P-15, deployment,
+> publication, waiver extension, or automatic continuation.
+
 **Reliability plan alignment recorded:** 2026-07-11 — owner instructed the
 Phase 4 plan/authority documents to be aligned before further implementation to
 reduce drift after production hotfix `016`. This authorizes this docs-only plan
@@ -518,11 +563,11 @@ and P-44 froze its exact reviewed executable migration/application/bootstrap/
 generator/runner content at clean pushed commit
 `ed94c0304be2741217c7ea2c36322b426de1dfe5` with no GO marker, PR, or
 protected-untracked-path change. Exact-head Remote evidence records
-`Vercel=success` and no PR-triggered GitHub Actions run. P-45 now authorizes a
+`Vercel=success` and no PR-triggered GitHub Actions run. P-45 then authorized a
 bounded authority/status-only descendant commit/push from `ed94c03`; P-46
 conditionally authorizes exactly one destructive Local bootstrap only after
 that descendant is clean, pushed, HEAD-equal-to-upstream, and Remote-ready.
-P-12 remains **HOLD** for the resulting P-45 HEAD/Remote evidence, the P-46
+At that PRE-P-12 checkpoint, P-12 remained **HOLD** for the resulting P-45 HEAD/Remote evidence, the P-46
 Local result, a
 named human executor and a distinct named human independent verifier, approved
 `session_user`/`current_user` and object-owner role, exact execution
@@ -866,12 +911,37 @@ this register. In particular:
    embedded NT runtime fonts. The owner accepted the exact replacement
    database-generated Excel/PDF pair from `777df75` on 2026-07-11 22:20 +07;
    WP-6/P-11 is complete while Production filing remains a separate P-15 gate.
-- P-12 through P-15 remain normal sequential Production gates after WP-8. Do
-  not combine Production gates by default; pause for owner/verifier readiness
-  review after local rehearsal, then request each Production decision only when
-  its evidence is complete and green.
-- P-12 additionally requires `catalogAuthorityFingerprintSha256` as a **new
-  operational fingerprint**. It is **UNCOMPUTED — HOLD**, not a recomputation
+- P-12 is complete through exact `017` -> `017a` -> `018`-`026` and the
+  checksum-verified v7 post-`026` backup/isolated restore. For the bounded first
+  closeout under P-51, P-50R SOLO is complete; exact P-50D V3 Owner ratification
+  is complete in decision-record-only scope; and the existing verified P-50C
+  package is accepted only as local review evidence. P-50G later passed and its
+  one-time authority was consumed. The remaining route is separate P-50H
+  review/approval for local release commit/push plus CI/Preview -> one bounded
+  P-13/P-14/P-14C deploy/UAT/draft window -> separate P-15 -> ordered
+  closeout/custody -> P-49. P-50R completed
+  `PASS_FOR_P50D_REQUEST`. Historical [P-50D Proposal #50](./50-phase4-p50d-exact-price-and-version-disposition-decision-proposal.md)
+  was superseded without approval on 2026-08-23. Exact current
+  [one-row Proposal #52](./52-phase4-p50d-one-row-selected-delta-approval-proposal.md),
+  request `P50D-REQ-20260823-V3`, is frozen and ratified only as a decision
+  record under [Receipt #54](./54-phase4-p50c-review-remediation-and-p50d-v3-ratification-request.md).
+  Historical
+  [baseline-first Proposal #51](./51-phase4-p50d-2568-baseline-first-delta-review-proposal.md)
+  records the Owner's V2 selection intent but supplies no hash approval or
+  mutation authority. The separately bounded offline P-50C technical build
+  nevertheless occurred under the superseded same-day interpretation and is
+  recorded as
+  [Result #53](./53-phase4-p50c-one-row-offline-candidate-result-record.md),
+  candidate `P50C-CANDIDATE-20260823-V1`. P-50C is accepted only as local
+  review evidence; it performed no candidate application, database, Production,
+  or network action and has no further execution authority.
+  P-14/P-14C may share the same bounded window only after P-13 PASS and an
+  explicit zero-draft/unchanged-pointer checkpoint; P-14C stops with one
+  unpublished locked draft. P-15 remains a separate publication confirmation.
+- **Historical PRE-P-12 fingerprint requirement (later satisfied):** P-12
+  additionally required `catalogAuthorityFingerprintSha256` as a **new
+  operational fingerprint**. At that checkpoint it was **UNCOMPUTED — HOLD**,
+  not a recomputation
   or reuse of historical
   `sha256:ecd457c625c6eeb445607f30d374734c3e7ebd2a6d5489912f4c7ec42b3019a5`,
   because the historical canonical SQL was not committed. Use only the formula
@@ -880,9 +950,11 @@ this register. In particular:
   snapshot's isolated restore or fresh in-window Production/restore evidence.
   Record the exact value and query/evidence source in #39/#40, then bind the
   same bare lowercase 64-hex value in the external Production approval before
-  any mechanically `productionEligible=true` source kit is used in Production
-  or P-12 is requested.
-- P-12 CLI authority records that P-47 independent source/security review and
+  any mechanically `productionEligible=true` source kit was used in Production
+  or P-12 was requested. The completed P-12 record later bound
+  `0fbaf215018200bacbc728af330e990b98c7e6128165982289ed429c93ad13f2`.
+- **Historical PRE-P-12 CLI authority path (later completed):** the P-12 CLI
+  authority record stated that P-47 independent source/security review and
   static checks passed. Historical P-45 completed at pushed/upstream-equal
   `d92d8ce`; P-46 was consumed and failed closed after applying through `025`.
   P-47 authorizes repository-only append-only `026` implementation and
@@ -902,7 +974,7 @@ this register. In particular:
   order. P-47 itself authorizes no Git action; P-48 separately authorizes only
   the exact recorded 25-file publication. Local/disposable execution, kit,
   Production access/write, P-12, deployment, flag, publication, Factor F,
-  hotfix, and `v_row_count` action remain unauthorized.
+  hotfix, and `v_row_count` action remained unauthorized at that checkpoint.
 - P-18 records an owner-identified governance gap discovered during WP-6
   artifact review: new/supplement items must not become official merely by
   being appended to the end of the catalog. The current Phase 4 Core contract
@@ -923,6 +995,139 @@ this register. In particular:
   WP-8/P-14 UX, performance, and intended-admin release gates remain pending in
   [Review Note #28](./28-phase4-p18-placement-governance-review-note.md).
 
+**Historical P-51 bounded closeout sequencing and absolute waiver checkpoint
+recorded:**
+2026-08-18 — the Owner accepts the known P-49 security risk temporarily and
+directs the team to finish the first Master Catalog closeout before implementing
+P-49. This waives P-49 only as the blocker for the exact first-closeout route;
+it does not close the finding, declare the runtime secure, or authorize any
+Production/Git/data action. The then-planned route was P-51D -> P-50R -> P-50D -> P-50C ->
+identifier binding -> Git/CI/Preview -> P-13 -> P-14 -> P-14C -> P-15 ->
+official artifacts/canaries/final flags/invariants/backup custody -> P-49.
+Every operational step remains a separate approval gate. If the first P-15
+closeout has not finished by **2026-08-25 23:59:59 +07**, the waiver requires
+fresh explicit Owner reapproval before continuing; there is no automatic
+extension. It ends earlier at the first P-15 closeout, a security-trigger
+event, or the next unrelated Production deployment. P-49 re-entry is due
+before the next Production deployment, with a target no later than seven
+calendar days after P-15 closeout. See
+[P-51 Closeout Plan #48](./48-phase4-p51-risk-accepted-master-catalog-closeout-plan.md).
+
+**Historical P-50R staged-gate refinement — 2026-08-18 (superseded):** the parent P-50R gate
+now expands to P-50R-I -> P-50R-O -> P-50R-X. The only next Owner decision is
+approve or hold P-50R-I, which is implementation/test/freeze against synthetic
+fixtures only and remains unauthorized. P-50R-O is a later separately approved
+PDF-oracle capture gate; P-50R-X is a later separately approved six-input
+reconciliation gate. P-50R-O and P-50R-X are not ready, not requested, and not
+authorized. Completion of one stage never authorizes the next. This refinement
+does not rewrite the historical P-51 parent-route record above and authorizes no
+protected-source read, evidence execution, database/network/Git action, price
+decision, or later gate. See
+[P-50R Request #49](./49-phase4-p50r-exact-price-reconciliation-evidence-scope-request.md).
+
+**Historical P-50R SOLO result and then-current P-50D stop — 2026-08-22:** the Owner confirmed that one
+person operates and reviews this closeout and asked to remove unnecessary
+ceremony. The unexecuted I/O/X model above is preserved as dated planning
+history but is no longer current authority. Request #49 was approved and
+consumed offline with 100% coverage, two byte-identical passes, and authorized
+operator review of all 28 PDF pages plus every delta/exception. It completed
+`PASS_FOR_P50D_REQUEST`; Owner personal result confirmation is not claimed.
+The next stop is unapproved [P-50D Proposal #50](./50-phase4-p50d-exact-price-and-version-disposition-decision-proposal.md). The
+then-current route was P-50R SOLO -> P-50D -> P-50C -> release commit/push and
+CI/Preview -> bounded P-13/P-14/P-14C window -> separate P-15 -> closeout ->
+P-49. No operational action is authorized by this simplification. The
+2026-08-23 baseline-first direction immediately below supersedes only that
+then-current Proposal #50 decision point; it preserves the completed P-50R
+evidence and chronology.
+
+**Historical Owner `2568.0.0` baseline-first direction — 2026-08-23:**
+published/current `2568.0.0` is the authority for all 710 existing identities,
+names, units, material costs, labor costs, and unit costs. The immutable P-50R
+package remains comparison evidence; its frozen `proposed_confirmed_correction`
+label does not approve a correction. Proposal #50 / `P50D-REQ-20260822-V1` is
+superseded without approval and not approvable. Then-current
+[Proposal #51](./51-phase4-p50d-2568-baseline-first-delta-review-proposal.md) /
+`P50D-REQ-20260823-V2` starts with zero approved name/unit/price changes and
+offers only `BASELINE-ONLY` or a newly frozen exact `SELECTED-DELTA` subset.
+The zero-name/unit/price gate remains binding. P-50C, Git, database/Production,
+P-13, P-14, P-14C, P-15, and every automatic next step remain false.
+
+**Historical Owner one-row `SELECTED-DELTA` intent — 2026-08-23:** the Owner
+selected only stable UUID `f2662c71-a6e5-407e-8456-8608e304b43b` /
+`ITEM-0429` / `COR-PB0-002`, retaining its exact baseline name
+`งานเจาะผนังบ่อพักย่อย (PB)` and unit `จุด`, with price
+`0/1763/1763 -> 0/1764/1764`. This records selection intent under V2; it does
+not approve a hash that did not yet exist. Then-current
+[Proposal #52](./52-phase4-p50d-one-row-selected-delta-approval-proposal.md) /
+`P50D-REQ-20260823-V3` freezes exactly one record: manifest SHA-256
+`1ac28a74def993214f73659f1930acdb5caa57390504e494b21d72bbf3778429`,
+selected-record SHA-256
+`f63127e589e7f5302f481f55b1df54a6b741efdc1aaa3b74e94d94f84abf15df`.
+The other 709 baseline rows remain unchanged. The other 48 external-source
+candidates, SHA-256
+`2194d0b5f5e9c5a2deb5590aefddd53592f031ef0e9359657b707ed3c46690be`,
+remain unselected/deferred, including `ITEM-0427`, `ITEM-0430`, and
+`ITEM-0431`; they are distinct from the 17 authority exclusions. Historical
+BOQ reprice/backfill remained false. At that checkpoint P-50D V3, P-50C, Git,
+database/Production/network, mutation, P-13, P-14, P-14C, P-15, and every
+automatic next step remained false pending exact Owner confirmation
+(ratification).
+
+**Historical pre-receipt P-50D V3 working record and P-50C offline result —
+2026-08-23:** at this checkpoint, exact `P50D-REQ-20260823-V3` froze the one
+selected UUID but remained unauthorized pending exact Owner confirmation
+(ratification). The bounded offline deterministic P-50C
+technical build occurred as
+candidate `P50C-CANDIDATE-20260823-V1`; see
+[Result #53](./53-phase4-p50c-one-row-offline-candidate-result-record.md).
+Candidate SHA-256 is
+`d7a19a9dbaecff4abb18086d1f9e236ae4b5ea311477ccdb609a52c54f200611`,
+diff SHA-256 is
+`72e950d96bfdf81abeb3317ee280cc01e630a13447d1f38edd9ee7149f3ddf18`,
+and P-50C manifest SHA-256 is
+`d88d3daa63db6a59f9ba973d653647224584aa9d98c3efde4cbaad78f6bfefe5`.
+Published/current `2568.0.0` remains unchanged at `0/1763/1763`; only the
+offline provisional `2568.1.0` candidate uses `0/1764/1764` for exact
+`ITEM-0429`. All 709 other baseline values remain unchanged, with zero
+name/unit/material changes; `ITEM-0427`, `ITEM-0430`, and `ITEM-0431` remain
+unchanged and no historical BOQ is repriced. The fresh issued/claimed target
+registry check remained pending. **At this historical checkpoint:**
+technical/document remediation and focused validation were complete; exact
+Owner confirmation (ratification) was still next. Commit/push was not the next
+authorized action; only after confirmation and
+a fresh passing small repository gate may a separate exact local commit/push
+plus CI/Preview request be prepared.
+Git, database/Production/network, candidate application, deploy, P-13, P-14,
+P-14C, P-15, publication, and every automatic next step remain false.
+
+<!-- P50D_V3_P50C_ONE_ROW_DECISION_RESULT_V1 {"schema":"conduit-boq/p50d-v3-p50c-one-row-decision-result/v1","recordedAt":"2026-08-23","p50dRequestId":"P50D-REQ-20260823-V3","p50dAuthorized":true,"selectedDeltaManifestSha256":"1ac28a74def993214f73659f1930acdb5caa57390504e494b21d72bbf3778429","selectedRecordsSha256":"f63127e589e7f5302f481f55b1df54a6b741efdc1aaa3b74e94d94f84abf15df","p50cAuthorizationScope":"offline-deterministic-package-build-only","p50cOfflineBuildAuthorized":true,"p50cOfflineBuildAuthorizationConsumed":true,"p50cOfflineBuildComplete":true,"p50cCandidateId":"P50C-CANDIDATE-20260823-V1","candidateSha256":"d7a19a9dbaecff4abb18086d1f9e236ae4b5ea311477ccdb609a52c54f200611","diffSha256":"72e950d96bfdf81abeb3317ee280cc01e630a13447d1f38edd9ee7149f3ddf18","p50cManifestSha256":"d88d3daa63db6a59f9ba973d653647224584aa9d98c3efde4cbaad78f6bfefe5","publishedVersion":"2568.0.0","publishedPrice":[0,1763,1763],"provisionalTargetVersion":"2568.1.0","candidatePrice":[0,1764,1764],"candidateRowCount":710,"unchangedBaselineRowCount":709,"nameChangeCount":0,"unitChangeCount":0,"materialChangeCount":0,"adjacentFindingsUnchanged":true,"historicalBoqRepriceAuthorized":false,"targetRegistryCheckStatus":"pending","p50cCandidateApplicationAuthorized":false,"databaseAccessAuthorized":false,"productionReadAuthorized":false,"productionWriteAuthorized":false,"networkAuthorized":false,"localCommitAuthorized":false,"externalGitPublicationAuthorized":false,"ciPreviewAuthorized":false,"p13Authorized":false,"p14Authorized":false,"p14cAuthorized":false,"p15Authorized":false,"automaticNextStep":false,"nextOwnerDecision":"authorize-local-commit-push-and-ci-preview"} -->
+
+The `P50D_V3_P50C_ONE_ROW_DECISION_RESULT_V1` marker above is retained as the
+same-day interpretation that triggered the independent review. The correction
+below supersedes its current authority and next-decision fields; it does not
+erase the completed technical build.
+
+<!-- P50D_V3_P50C_DECISION_REVIEW_CORRECTION_V1 {"schema":"conduit-boq/p50d-v3-p50c-decision-review-correction/v1","recordedAt":"2026-08-23","supersedesCurrentAuthorityOf":"P50D_V3_P50C_ONE_ROW_DECISION_RESULT_V1","p50dRequestId":"P50D-REQ-20260823-V3","exactOwnerRatificationPending":true,"p50dAuthorized":false,"p50cTechnicalBuildOccurred":true,"p50cCandidateAccepted":false,"p50cCandidateId":"P50C-CANDIDATE-20260823-V1","candidateSha256":"d7a19a9dbaecff4abb18086d1f9e236ae4b5ea311477ccdb609a52c54f200611","diffSha256":"72e950d96bfdf81abeb3317ee280cc01e630a13447d1f38edd9ee7149f3ddf18","p50cManifestSha256":"d88d3daa63db6a59f9ba973d653647224584aa9d98c3efde4cbaad78f6bfefe5","nextOwnerDecision":"ratify-or-hold-exact-p50d-v3","localCommitAuthorized":false,"externalGitPublicationAuthorized":false,"ciPreviewAuthorized":false,"databaseAccessAuthorized":false,"productionReadAuthorized":false,"productionWriteAuthorized":false,"networkAuthorized":false,"p13Authorized":false,"p14Authorized":false,"p14cAuthorized":false,"p15Authorized":false,"automaticNextStep":false} -->
+
+**Historical exact Owner ratification receipt checkpoint — 2026-08-24:** the Owner's exact
+confirmation is recorded by canonical marker
+`P50D_V3_EXACT_OWNER_RATIFICATION_RECEIPT_V1` in [Review Remediation
+#54](./54-phase4-p50c-review-remediation-and-p50d-v3-ratification-request.md).
+P-50D V3 is complete only in `decision-record-only` scope. P-50C is accepted
+only as local review evidence and has no application/import or further execution
+authority. Published `2568.0.0` is unchanged; provisional `2568.1.0` remains
+registry-pending. At this checkpoint the next safe step was only a separately
+authorized small repository gate. That later P-50G gate passed and is recorded
+in Result #56; this receipt itself still grants no later authority.
+
+<!-- P50D_V3_EXACT_OWNER_RATIFICATION_DECISION_REGISTER_RECEIPT_V1 {"schema":"conduit-boq/p50d-v3-exact-owner-ratification-decision-register-receipt/v1","recordedAt":"2026-08-24T00:44:15+07:00","canonicalReceiptMarker":"P50D_V3_EXACT_OWNER_RATIFICATION_RECEIPT_V1","canonicalReceiptDocument":"./54-phase4-p50c-review-remediation-and-p50d-v3-ratification-request.md","resolvesRequestId":"P50D-V3-RATIFY-REQ-20260823-V1","p50dRequestId":"P50D-REQ-20260823-V3","confirmationReceived":true,"exactOwnerConfirmationPending":false,"exactOwnerRatificationPending":false,"p50dV3Ratified":true,"p50dAuthorized":true,"p50dAuthorityScope":"decision-record-only","p50dFurtherActionAuthorized":false,"p50cCandidateId":"P50C-CANDIDATE-20260823-V1","p50cCandidateAccepted":true,"acceptsCandidateAs":"local-review-evidence-only","p50cFurtherExecutionAuthorized":false,"candidateSha256":"d7a19a9dbaecff4abb18086d1f9e236ae4b5ea311477ccdb609a52c54f200611","diffSha256":"72e950d96bfdf81abeb3317ee280cc01e630a13447d1f38edd9ee7149f3ddf18","candidateManifestSha256":"d88d3daa63db6a59f9ba973d653647224584aa9d98c3efde4cbaad78f6bfefe5","currentPublishedVersion":"2568.0.0","currentPublishedCatalogChanged":false,"provisionalTargetVersion":"2568.1.0","targetRegistryCheckPending":true,"historicalBoqRepriceAuthorized":false,"nextSafeStep":"none-stop-after-recording-ratification","smallRepositoryGateRequired":false,"separateGitCiAuthorizationRequired":true,"gitCiAuthorizationGranted":false,"candidateApplicationAuthorized":false,"localCommitAuthorized":false,"externalGitPublicationAuthorized":false,"ciPreviewAuthorized":false,"databaseAccessAuthorized":false,"productionReadAuthorized":false,"productionWriteAuthorized":false,"networkAuthorized":false,"p13Authorized":false,"p14Authorized":false,"p14cAuthorized":false,"p15Authorized":false,"deployAuthorized":false,"publicationAuthorized":false,"automaticNextStep":false} -->
+
+**Current P-50G result — 2026-08-24:** [Result #56](./56-phase4-p50g-small-repository-gate-result.md)
+records exact request `P50G-REQ-20260824-V1` PASS and one-time authorization
+consumption. The approval cannot be replayed. P-50H Proposal #57 plus its
+exact manifest are prepared for separate Owner review; P-50H execution,
+Git/CI, and every operational action remain unauthorized.
+
 | ID | Decision required | Current evidence/default recommendation | Owner | Due before | Status |
 |---|---|---|---|---|---|
 | P-01 | Approve ADR-004, Change Request, architecture Revision 8, DB/security contract, threat model, parser/hash spec, export spec, Post-Factor-F adjustment plan, and Implementation Execution Pack for implementation/local rehearsal | Approved together after owner review; this does not authorize Production migration, deploy, enablement, publication, or P-02 through P-15 data/records/visual decisions | Owner | Phase 4A implementation | Approved 2026-07-04 |
@@ -937,9 +1142,10 @@ this register. In particular:
 | P-10 | Approve which NT fonts/logo derivatives may be committed and deployed | Approved limited runtime CI asset scope for Master Catalog Phase 4. Owner confirms the project has rights to use all supplied NT CI assets under `/CI/` for NT business operations, including fonts, logos, guidelines, and supporting graphics. Repository/deployment approval is limited to `app/fonts/nt/NT-Regular.woff2` from `CI/NT Regular.ttf`, `app/fonts/nt/NT-Bold.woff2` from `CI/NT Bold.ttf`, `public/brand/nt/nt-logo-primary.png` from `CI/NT_1_v3.png`, and `public/brand/nt/nt-logo-company-lockup.png` from `CI/NT_4_v3.png`. Original `/CI/` source files remain local-only; existing `public/nt_logo.svg` and `public/nt_logo.png` must be replaced by approved derivatives or explicitly retained with source/provenance evidence. Implementation must follow [Doc #24](./24-phase4-nt-ci-runtime-asset-analysis.md). P-11 replacement artifact acceptance was recorded on 2026-07-11; remaining app-wide asset cleanup stays under P-10. | Owner/brand custodian | Phase 4B UI implementation | Approved 2026-07-04 |
 | P-11 | Approve the official Excel/PDF visual sample and field order | Direction approved for implementation: official human-facing PDF uses A4 portrait price-list layout and title `รายการบัญชีราคามาตรฐานงานก่อสร้างท่อร้อยสายสื่อสารใต้ดิน`; the main PDF table shows sequence, item description, counting unit, material cost, labor cost, and total unit price; PDF item-unit column label is `หน่วยนับ`; `(หน่วยเงิน: บาท)` appears as a repeated right-aligned note above the PDF price columns; field-facing PDF price pages, including the published Production PDF, must use the price-disclaimer watermark wording/style from `files/รายการบัญชีราคามาตรฐานงานก่อสร้างท่อร้อยสาย 2568.pdf` and the exact three-line owner-provided wording recorded in the export spec; this watermark is not a Draft/Preview status mark; `item_code` is not a dedicated PDF table column; Excel remains the full 13-column canonical/business export with visible `ข้อมูลตรวจสอบ`; footer shows department, page `x/y`, and right-side version/status or version/effective-date text using the examples recorded in the export spec; no truncated SHA-256 in the field-facing PDF footer; no technical verification page in the final field-facing PDF; QR code is deferred unless a stable owner-approved verification URL exists. Owner refinement 2026-07-10: the PDF summary shows only organization, catalog version, Thai status, effective date, item count, and full dataset hash. It excludes technical `Current Default`, approval reference/date, approved-by/publisher, exported-at/by, generated-by, and export-spec fields. A non-current published version instead carries a plain Thai retrospective-reference warning. The excluded values remain in Excel metadata and the release/filing manifest. Owner refinement 2026-07-11 21:49 +07: the editable Excel export uses `TH Sarabun New` on every populated cell with a 16-point body baseline and larger title hierarchy; the PDF retains embedded NT runtime fonts. The exact replacement pair from `777df75` passed semantic, typography, five-sheet workbook, 19-page PDF, and unchanged Local readback checks. At 22:20 +07 the owner confirmed `รูปแบบ pdf excel ok เลยครับ`, accepting those exact Local binaries as final P-11/WP-6 artifact evidence. This does not approve Production filing, migration, deploy, enablement, publication, P-18/P-19, or Factor F changes. | Owner | Export implementation acceptance | Accepted 2026-07-11 22:20 +07; WP-6 complete; Production filing remains separate |
 | P-12 | Approve the named Production migration window | Request only after WP-8 evidence review is complete: Local evidence green, remote migration ledger includes hotfix `016`, clean Local bootstrap has applied `009`-`015`, `016`, and the exact approved Phase 4 sequence, fresh read-only Production baseline and schema drift check match, backup/restore evidence complete, P-20 portability and reviewed migration fingerprints match, live DB/RPC/RLS/concurrency and permanent BOQ/Factor F regressions pass, advisors have no unresolved blocker, and owner gives go/no-go for the actual window. Package #39 contains the row-by-row readiness disposition. | Owner | Production migration | **COMPLETE 2026-08-17.** Production executed exact `017` -> `017a` -> `018`-`026` at execution HEAD `7c5ac6bd88677c0144bf8b8933b39293a2dee866`. Stage-`026` manifest SHA-256 is `5a029dd507471ab5d74375bd3f2afba931096e9f2c208ff836b68d1dd5881e47`; final closeout manifest SHA-256 is `2fb1259249282315750ce20d41732fd9f6c5e65998aa772fc4e387c5368d64a5`; all three Phase 4 flags remain false. The one-use post-`026` v7 encrypted application-only backup completed with runtime-status SHA-256 `72d2f10358c99565aa2853b02a6bbcf61cc8812f24f2d665498bfd13d7c98d19`, dump SHA-256 `d44286409cad41fff8f977acdafbf6eaecdecb5692381a37fdb8f8f95b9ba538`, byte-identical writeable/read-only checksum SHA-256 `95265fca040c084d70f76b3d8ed3f00beb39a6aa4e98c573dd4a7d49b70c7d0a`, matched source-before/source-after and isolated restore, and complete cleanup. No application deploy, feature enablement, publication, P-13 authorization, or automatic next step occurred. |
-| P-13 | Approve application deploy and admin-only smoke window | Request only after P-12 migration verification passes, the post-migration application-only backup/manifest is checksum-verified while all Phase 4 flags remain disabled, CI/deployment fingerprint matches, current user flows and Factor F/BOQ invariants remain unchanged, and the Phase 4 feature flag stays disabled by default. | Owner | Production deploy | **HARD-STOP — PENDING CROSS-LAYER AUTHORIZATION ALIGNMENT; NOT AUTHORIZED.** P-12 verification and backup remain complete, but P-49 found pending BOQ/RPC/Factor-F access, an apparent own-profile role/status escalation path, and a privileged API active-status gap. The pre-P-49 CI/Preview commit is historical only. A separately authorized forward-only correction, full real-session matrix, new exact commit, fresh remote CI/Preview/fingerprint, and separate Owner P-13 window are mandatory. No `main` merge or Vercel Production deploy is authorized. |
-| P-14 | Approve feature enablement | Request only after P-13 deploy and admin-only smoke pass, authorization/UI/accessibility/error-recovery checks, intended-admin UAT, reusable ADR-003 version evidence, structured logs, performance baseline, and non-admin denial tests pass. Enable admin scope only; do not publish a catalog version under P-14. | Owner | User visibility | Not requested; request after deploy/admin smoke verification |
-| P-15 | Approve publication of the exact named catalog version and its final diff/count/hash | Migration/deploy/enablement approval does not imply publish approval. Requires WP-6.6 capability evidence, exact final version metadata, effective date, approval reference/date, version-level physical archive reference, authenticated publisher snapshot, final diff totals, item count, P-20-compliant dataset hash, tracked-verifier official Excel/PDF evidence, stable request-ID/concurrency evidence, WP-6.5 P-18 add/supplement guard evidence when relevant, WP-6.5 structured-code exception guard evidence, P-19 inactive-row export policy when relevant, and owner go/no-go. | Owner | Production publication | Not requested |
+| P-13 | Deploy the exact application tree with flags off and pass minimum smoke | Exact P-50D V3 Owner confirmation and P-50G PASS are recorded. Only after a separately approved P-50H release commit/push passes CI/Preview may one separately authorized bounded Owner window begin at P-13. Reverify the P-12 backup checksum/custody and deployment fingerprint; deploy with all three Phase 4 flags false; smoke active-admin login, existing BOQ read/save/duplicate/export, Factor F, disabled-catalog behavior, and absence of client `service_role`/secret exposure. RLS/grants/Auth config remain unchanged. | Owner/operator | First checkpoint in the bounded deploy/UAT window | **NOT AUTHORIZED / NOT REQUESTED.** P-50G PASS does not authorize P-13. Any smoke, fingerprint, traffic, backup, auth, or invariant failure stops the window with all flags false. |
+| P-14 | Run minimum-admin UAT inside the same bounded window | Advance only after P-13 PASS. Enable only `catalog_admin_enabled=true`; keep new-identity and retirement flags false. Complete one intended-admin UAT, then abandon the UAT draft and prove zero working drafts, unchanged pointer/BOQ/Factor F, and all failure-path flags false before the P-14C checkpoint. | Owner/operator | Second checkpoint in the bounded deploy/UAT window | **NOT AUTHORIZED / NOT REQUESTED.** The bounded window may pre-authorize this checkpoint, but P-13 failure or missing cleanup prevents advancement. P-14 never publishes. |
+| P-14C | Create exactly one real unpublished Production draft inside the bounded window | After the explicit P-14 cleanup checkpoint, create one real draft from the approved base, apply only an exact ratified P-50D V3 selected manifest, and freeze draft reference, target, request ID, review lock, dataset hash, final diff, and review-only DRAFT artifact hashes. Keep the published pointer/versions and existing BOQs unchanged; stop unpublished with exactly one draft. | Owner/operator + price authority | Final checkpoint in the bounded deploy/UAT window; before separate P-15 | **NOT AUTHORIZED / NOT REQUESTED.** The same bounded decision may cover this checkpoint only conditionally; it does not authorize P-15. |
+| P-15 | Approve atomic publication of the exact reviewed Production draft | Migration/deploy/enablement/candidate-preparation approval does not imply publish approval. The request must name the exact P-14C Production draft reference and review lock, reviewed target, pointer base/target, exact ratified P-50D V3 selected manifest, price authority, ADR-003 decision, candidate dataset hash, final diff/count, rollback target, and canary identities. It also requires the existing WP-6.5/WP-6.6/P-18/P-19/P-20 publication guards and exact metadata. Official Excel/PDF are generated and filed only after successful atomic publication from the published database version, followed in order by BOQ canaries, final flag restoration, final invariants, and post-publication encrypted backup/restore/custody. | Owner | Production publication | **NOT AUTHORIZED / NOT REQUESTED.** Any draft-reference/review-lock drift, pointer drift, or identifier mismatch is a hard stop. |
 | P-16 | Schedule Supabase legacy API-key migration | Separate maintenance change; complete before provider retirement and after inventory/rehearsal | Owner + developer | Separate security window | Pending |
 | P-17 | Record completed Factor F F0-F4 gates before Master Catalog Phase 4 | Completed before Master Catalog Phase 4. ADR-005 and the separate Factor F CR governed the rollout; current baseline from `FACTOR F 2566_7.PDF` is active as `2566.0.0`, the 26 June 2026 source-table annex is current default `2569.0.0`, legacy BOQs were not backfilled, and `015` repaired only missing legacy snapshot metadata without repricing or binding old BOQs. Production hotfix `016` followed as a BOQ save regression fix, not a Factor F publication. | Owner + factor data custodian | Before Master Catalog Phase 4 Production migration | Completed 2026-06-29; hotfix follow-up 2026-07-06; see Factor F closeout and migration ledger |
 | P-18 | Decide display-order placement governance for newly added or supplement catalog items | Keep the proven DB hold until a supported workflow passes. Accepted V1: place only identities absent from the base; choose category plus same-category before/after anchor; confirm all pending rows in one audited batch; one active admin/data custodian may confirm under the existing publisher model; preserve inherited base relative order; arbitrary reorder remains a separate CR. Implement through append-only migration `021`, DB placement revision/review, exact RPC/RLS/audit/concurrency controls, Thai UI, and WP-8 UAT. See [Review Note #28](./28-phase4-p18-placement-governance-review-note.md). | Owner + data custodian | Before WP-7.5 implementation, before P-14 full Add/Supplement enablement, and before P-15 for any version with new identities | Accepted via P-30; P-32/P-33 technical scope and P-36 integrated technical rehearsal passed; independent intended-admin WP-8/P-14 release evidence and Production remain separate |
@@ -975,7 +1181,20 @@ this register. In particular:
 | P-46 | Authorize exactly one corrected destructive Local bootstrap under fail-closed conditions | Only after the P-45 descendant is pushed, tracked-clean, equal to upstream, and has truthful exact-head Remote-ready evidence, run `npm run db:local:bootstrap` exactly once at that same HEAD. The Owner was explicitly warned that this invokes `supabase db reset --local --no-seed` and destroys/rebuilds all Local Supabase data. Apply canonical order `009`-`015`, hotfix `016`, `017`, `017a`, `018`-`025`, then run consolidated security/business invariants with all Phase 4 flags false and Production untouched. Store only secret-free immutable external evidence bound to the exact HEAD. If any precondition, migration, invariant, or evidence step fails or drifts, preserve evidence and stop; do not retry, patch Local, or reset a second time without fresh Owner approval. | Owner + developer | After successful P-45 push/Remote-ready evidence; before kit generation | Consumed exactly once 2026-07-29 at `d92d8ce`. Bootstrap completed through `025`; WP-6.5 then failed closed on private formatter callability. External evidence was preserved. No retry, cleanup, patch, reset, kit, or Production action is authorized. |
 | P-47 | Authorize repository-only append-only `026` correction and static closure | Add `026_master_catalog_phase4_catalog_action_error_acl.sql` after immutable `025`, ledger `20260729002600_master_catalog_phase4_catalog_action_error_acl`, SHA-256 `472fa04b81bc8e96e9b507e20fc20cfee3114c80fda45f2ffba3893480920d8a`; align bootstrap, canonical hash, kit/runner, WP-6.5 cleanup, tests, architecture/security, and authority. Preserve helper body/owner/signature/empty search path and `017a` defaults; use invoker context; grant only authenticated in addition to owner; deny PUBLIC/anon/service. | Owner + developer | After P-46 fail-closed evidence; before any new Git or database action | Approved 2026-07-29 for repository design/implementation/static review only. No Local cleanup/apply/reset/retry, disposable DB, Git stage/commit/push/PR, kit/pass, Production, accepted app/UI/export change, flags, publication, Factor F, hotfix, or `v_row_count` change. |
 | P-48 | Authorize exact P-47 replacement source/tooling commit and push | From exact base `d92d8ced42fc882481ebc2c4579adcf1edbebea7` on `codex/master-catalog-phase4`, stage only the exact 25-file allowlist below, commit once as `Close P-47 helper ACL correction`, and push the same branch. Exclude protected/unrelated untracked content and do not create a PR. Verify exact local/upstream equality and truthful Remote status after push; record the resulting SHA outside its own commit. | Owner + developer | After P-47 repository/static closure; before any replacement-HEAD Local request | Approved 2026-07-29 for this exact Git-only publication. No Local/disposable/kit/Production action, PR, deploy, flag, publication, Factor F, hotfix, `v_row_count`, or Checklist-only GO commit is authorized. |
-| P-49 | Decide the pending-account business-access contract and record the P-13 authorization blocker | Approved target: `pending` is an authenticated onboarding state with only auth self-service, own safe profile/onboarding fields, active org selectors, truthful waiting status, and logout. It has no Dashboard, BOQ (including retained own BOQs), Price List/Master Catalog, Factor F, raw settings, other profiles, print/export, admin, business RPC, or privileged API access. Preserve active-only catalog RLS in applied `022`/`023`; do not create the proposed pending catalog-read compatibility migration. Cross-layer review found gaps across `007`/`009`/`012`/`016`, BOQ/Factor-F/settings/selectors, profile SELECT/INSERT/UPDATE and transition controls, role helpers, client/server code, and one service-role API. See [P-49 Plan #45](./45-phase4-p49-pending-authorization-hardening-plan.md). | Owner + database/security/application reviewers | Before any P-13 request; exact live-posture verification and remediation planning are urgent | **BUSINESS INTENT APPROVED 2026-08-17; TECHNICAL HOLD; IMPLEMENTATION NOT AUTHORIZED.** UI-only enforcement is rejected as insufficient. A forward-only database/application correction and complete real-session matrix require separate Owner authority. P-13 is hard-stopped; no Local/Production DB action, external Git publication, implementation, merge, deploy, flag, P-14, P-15, or automatic next step is authorized. One local decision-record commit is permitted by Plan #45. |
+| P-49 | Decide the pending-account business-access contract and record the open authorization risk | Approved target: `pending` is an authenticated onboarding state with only auth self-service, own safe profile/onboarding fields, active org selectors, truthful waiting status, and logout. It has no Dashboard, BOQ (including retained own BOQs), Price List/Master Catalog, Factor F, raw settings, other profiles, print/export, admin, business RPC, or privileged API access. Preserve active-only catalog RLS in applied `022`/`023`; do not create a pending catalog-read compatibility migration. Cross-layer gaps remain across BOQ/Factor-F/settings/selectors, profile controls, role helpers, client/server code, and a service-role API. See [P-49 Plan #45](./45-phase4-p49-pending-authorization-hardening-plan.md). | Owner + database/security/application reviewers | Re-enter immediately after P-15 and before the next unrelated Production deploy; target within seven calendar days after closeout | **BUSINESS INTENT APPROVED; OPEN/HIGH; IMPLEMENTATION DEFERRED AND NOT AUTHORIZED.** P-51 accepts the known exposure temporarily and waives P-49 only as a blocker for the exact first Master Catalog closeout. UI-only enforcement remains insufficient; the technical target is unchanged. |
+| P-49S | Authorize an exact P-49 forward-only repository/source correction package | Proposal [#47](./47-phase4-p49-forward-only-db-application-correction-proposal.md) is retained as a design record only. It must be rewritten from fresh post-P-15 live-posture evidence and a complete executable authorization/compatibility contract. No migration number or ledger value is reserved. | Owner + database/security/application reviewers | After P-15; before any P-49 implementation or later Production deployment | **DEFERRED / NOT APPROVED.** Do not implement or execute Proposal #47 as currently written. |
+| P-50 | Reconcile the known `ITEM-0429` / `COR-PB0-002` external-source difference and the complete comparison set before the first publication | Preserve published/current `2568.0.0` as the 710-row before-value authority. P-50R completed the comparison; V2 recorded one-row intent; V3 freezes the exact manifest/hash and is now ratified only as a decision record; bounded offline P-50C produced the complete provisional candidate/diff/manifest evidence and is accepted only as local review evidence without applying it. PDF/workbook/candidate evidence is not Production mutation authority. See [P-50 Plan #46](./46-phase4-p50-known-price-erratum-pre-p15-reconciliation-and-release-decision-plan.md), [Result #53](./53-phase4-p50c-one-row-offline-candidate-result-record.md), [Receipt #54](./54-phase4-p50c-review-remediation-and-p50d-v3-ratification-request.md), and [P-50G Result #56](./56-phase4-p50g-small-repository-gate-result.md). | Owner/operator + data authority | P-50G passed; review the separately prepared P-50H Git/CI proposal | **P-50R COMPLETE; P-50D V3 RATIFIED `decision-record-only`; P-50C ACCEPTED `local-review-evidence-only`; P-50G PASS; OPERATING/GIT HOLD.** Published `2568.0.0` remains unchanged; provisional candidate changes only `ITEM-0429` and remains registry-pending. Local commit/push, CI/Preview, application, database/Production/network, deployment, P-13-P-15, and publication are not authorized; nothing continues automatically. |
+| P-50R | Authorize one offline/read-only SOLO reconciliation | Exact [Request #49](./49-phase4-p50r-exact-price-reconciliation-evidence-scope-request.md) bound five inputs, three implementation files, a five-file evidence package, no DB/network, 100% coverage, two byte-identical passes, and all-page/all-record operator review. | Owner-authorized local operator/self-reviewer | Before P-50D | **APPROVAL CONSUMED; COMPLETE / `PASS_FOR_P50D_REQUEST`.** Review binding `55c90931144b8a7a2cb4aebeb917d2dc0062b576dcbd5a7678e2f208421149cc`; 28 pages, 67 deltas, 245 exceptions, blockers 0. Evidence only; no P-50D, mutation, Git, or later gate is implied. |
+| P-50R-I | Historical staged implementation-freeze proposal | Preserved only as 2026-08-18 planning history. It was never authorized or executed and is superseded by P-50R SOLO. | Historical | Never current | **SUPERSEDED 2026-08-21 / NEVER EXECUTED.** |
+| P-50R-O | Historical staged PDF-oracle proposal | Preserved only as 2026-08-18 planning history. It was never authorized or executed and is superseded by P-50R SOLO. | Historical | Never current | **SUPERSEDED 2026-08-21 / NEVER EXECUTED.** |
+| P-50R-X | Historical staged reconciliation proposal | Preserved only as 2026-08-18 planning history. It was never authorized or executed and is superseded by P-50R SOLO. | Historical | Never current | **SUPERSEDED 2026-08-21 / NEVER EXECUTED.** |
+| P-50D-V1 | Historical exact price/version disposition proposal | Preserve [Proposal #50](./50-phase4-p50d-exact-price-and-version-disposition-decision-proposal.md) and its hashes as the unapproved 2026-08-22 proposal. Its Path A recommendation and approval sentence are disabled and may not be consumed. | Historical | Never current | **SUPERSEDED WITHOUT APPROVAL / NOT APPROVABLE.** Request `P50D-REQ-20260822-V1` generated no authority. |
+| P-50D-V2 | Historical baseline-first selection proposal | Preserve [Proposal #51](./51-phase4-p50d-2568-baseline-first-delta-review-proposal.md) as the baseline-first review that began with an empty selected set. The Owner used it to record `SELECTED-DELTA` intent for exactly `ITEM-0429`; it did not and could not approve the later manifest/hash. | Historical selection basis | Before V3 | **SELECTION INTENT RECORDED / NO HASH OR MUTATION AUTHORITY.** Request `P50D-REQ-20260823-V2` is consumed only as V3's selection basis. |
+| P-50D | Record exact Owner ratification of the one-row manifest and local review package | [Proposal #52](./52-phase4-p50d-one-row-selected-delta-approval-proposal.md) binds one UUID-keyed price delta: manifest SHA-256 `1ac28a74def993214f73659f1930acdb5caa57390504e494b21d72bbf3778429`; selected-record SHA-256 `f63127e589e7f5302f481f55b1df54a6b741efdc1aaa3b74e94d94f84abf15df`. [Receipt #54](./54-phase4-p50c-review-remediation-and-p50d-v3-ratification-request.md) confirms those plus the three P-50C hashes. | Owner + data authority | Complete before any Git gate | **RATIFIED / DECISION-RECORD-ONLY; NO FURTHER ACTION AUTHORIZED.** Request `P50D-REQ-20260823-V3` is limited to exact `ITEM-0429`; 709 other baseline rows remain unchanged, 48 other candidates remain unselected, 17 authority exclusions remain distinct/outside scope, and historical BOQ reprice is false. `p50dAuthorized=true` means only the decision record; it does not authorize Git, application, database/Production/network, P-13-P-15, deployment, or publication. |
+| P-50C | Preserve and review the non-Production candidate build | Build a deterministic offline 710-row candidate from exact P-50D V3, applying one old-value-checked UUID and proving exactly one labor/unit-cost delta, zero name/unit/material changes, 709 unchanged baseline rows, no historical BOQ reprice, and unchanged adjacent rows/exclusions. See [Result #53](./53-phase4-p50c-one-row-offline-candidate-result-record.md). | Owner + data/technical reviewers | Accepted as local review evidence by the exact Owner confirmation; P-50G then passed before a separate local release Git/CI/Preview decision | **TECHNICAL BUILD COMPLETE / DATA REVIEW PASSED / ACCEPTED AS LOCAL REVIEW EVIDENCE ONLY; NOT COMMIT-READY.** Candidate `P50C-CANDIDATE-20260823-V1`; candidate `d7a19a9...`, diff `72e950d...`, manifest `d88d3daa...`. Candidate application, DB/Production/network, commit/push, CI/Preview, official artifact, deploy, P-13/P-14/P-14C/P-15, and publication remain unauthorized. Registry check is pending. P-50G passed but does not itself grant Git/CI; no automatic step. |
+| P-50G | Consume one post-ratification offline/read-only small repository gate | [Proposal #55](./55-phase4-p50g-post-ratification-small-repository-gate-authorization-proposal.md), request `P50G-REQ-20260824-V1`, bound branch/HEAD/upstream, five frozen hashes, exact focused commands, protected exclusions, result paths, and fail-closed rules. The Owner approved full proposal SHA-256 `5f2cbdb4d255613c41b2e5c46e4a8a3ba01856c2d17819752e9aeb787ee82cfc`; [Result #56](./56-phase4-p50g-small-repository-gate-result.md) records execution. | Owner + local operator | Complete before preparing P-50H | **PASS / AUTHORIZATION CONSUMED ONCE / NO REPLAY.** `3` focused files / `30` tests, lint, deterministic P-50C check, parser syntax, and scoped diff-check passed offline. No protected input, Git stage/commit/push, CI/Preview, DB/Production/network, candidate application, P-13-P-15, deploy, publication, waiver extension, or automatic continuation occurred or was authorized. |
+| P-50H | Review an exact local Git/CI Preview envelope | [Proposal #57](./57-phase4-p50h-exact-local-git-ci-preview-authorization-proposal.md) and its exact manifest bind the prospective non-protected payload, required authority-test alignment, fail-closed validation, branch/HEAD/upstream, and publication boundary. | Owner + local operator | After P-50G PASS; before any stage/commit/push or CI/Preview | **PROPOSAL PREPARED / EXECUTION NOT AUTHORIZED.** No stage, commit, push, CI/Preview, network, protected-path access, candidate application, database/Production action, P-13-P-15, deploy, or publication is implied. |
+| P-51 | Accept bounded P-49 security risk and finish the first Master Catalog closeout before implementing P-49 | Follow [P-51 Closeout Plan #48](./48-phase4-p51-risk-accepted-master-catalog-closeout-plan.md): P-51D -> P-50R SOLO -> exact P-50D V3 Owner ratification complete/P-50C accepted only as local review evidence -> P-50G PASS -> separately approved P-50H local release Git/CI decision -> bounded P-13/P-14/P-14C window -> separate P-15 -> closeout -> P-49. If P-15 closeout is incomplete at 2026-08-25 23:59:59 +07, fresh Owner reapproval is mandatory; never rush Production for the date. | Owner/operator | Review P-50H Proposal #57; waiver checkpoint remains binding | **P-50R COMPLETE; P-50D V3 RATIFIED `decision-record-only`; P-50C ACCEPTED `local-review-evidence-only`; P-50G PASS; P-50H PENDING.** No Git or operational authority; every later gate remains unauthorized and nothing advances automatically. |
 
 The exact P-48 repository-relative allowlist is:
 
@@ -1114,23 +1333,26 @@ Every record must include:
 Chat acknowledgement alone should not be interpreted as approval for a later
 Production gate unless it identifies the exact gate and version.
 
-## 6. P-01 component review tracker
+## 6. Historical P-01 component review tracker
 
-P-01 is approved only after all required implementation/local-rehearsal
+This table preserves the 2026-07-04 implementation-start chronology. P-01,
+WP-8, and P-12 were later completed; it is not current gate status.
+
+At that checkpoint, P-01 was approved only after all required implementation/local-rehearsal
 authority documents below are accepted. A component approval does not authorize
 Production migration, deploy, feature enablement, or publication.
 
 | Component | Status | Owner decision / condition | Evidence |
 |---|---|---|---|
 | Post-Factor-F adjustment plan | Approved for implementation/local rehearsal | Factor F pointer/rows/bindings stay unchanged; before/after assertions and `save_boq_with_routes` immutability regressions are mandatory Production gates | Owner chat approval, 2026-07-04 |
-| Implementation Execution Pack | Approved for WP-0 through WP-8 implementation/local rehearsal | WP-9 requires P-12 through P-15 as normal sequential gates after WP-8 evidence review. Feature flag disabled, BOQ regression, Factor F assertions, live preflight, and Decision Register authority are mandatory gates | Owner chat approval, 2026-07-04 |
+| Implementation Execution Pack | Approved for WP-0 through WP-8 implementation/local rehearsal | Historical condition: WP-9 required sequential P-12 through P-15 gates after WP-8. Current status is P-12 complete; P-13/P-14/P-14C/P-15 remain unauthorized. | Owner chat approval, 2026-07-04 |
 | Architecture Revision 8 | Approved as Phase 4 Core architecture authority for implementation/local rehearsal | Production gates require rollback/fix-forward evidence plus RLS/grants, advisory lock, status-transition, export formula-safety, BOQ, and Factor F regression proof | Owner chat approval, 2026-07-04 |
 | Architecture Review Disposition | Approved as supporting disposition record | Revision 8 and the contract suite remain authority; external review is input only and must not become shadow authority | Owner chat approval, 2026-07-04 |
 | ADR-004 | Approved as Phase 4 governance/architecture decision for implementation/local rehearsal | Published database catalog is system of record; system-generated Excel/PDF are official only when stamp/count/hash match; Production and publish gates remain separate | Owner chat approval, 2026-07-04 |
 | Phase 4 Change Request | Approved for implementation/local rehearsal | Missing decision at its due gate is a stop condition; Production migration, deploy, enablement, publication, Factor F work, and unauthorized Production name/unit/price changes remain unauthorized | Owner chat approval, 2026-07-04 |
 | Database/security contract | Approved for implementation/local rehearsal | Additive `017+`, explicit grants/RLS, private definer boundary, direct-write revocation, lock order, Factor F/BOQ immutability, local DB/security/advisor verification, and forward-fix-only recovery are accepted | Owner chat approval, 2026-07-04 |
 | Threat model | Approved as threat/control baseline for implementation/local rehearsal | Required security tests, advisors, malicious fixtures, BOQ/Factor F regression, residual-risk acceptance, and re-review triggers are mandatory before Production | Owner chat approval, 2026-07-04 |
-| Decision Register | Approved as Phase 4 decision source of truth | Current locked/pending/deferred model, recording procedure, and "chat acknowledgement is not approval" control are accepted; P-02 through P-08 are approved, P-09 reserves only the `2568.1.0` draft/rehearsal version string, P-10 approves limited runtime CI assets per Doc #24, P-11 visual direction is approved for implementation, and P-09 effective/approval/filing metadata plus final P-11 artifacts and P-12 through P-15 remain unresolved unless separately approved | Owner chat approval, 2026-07-04 |
+| Decision Register | Approved as Phase 4 decision source of truth | Historical 2026-07-04 condition: P-02 through P-08 were approved, P-09 reserved only the `2568.1.0` draft/rehearsal version string, P-10 approved limited runtime CI assets, P-11 visual direction was approved, and P-12 through P-15 were then unresolved. Current status is P-12 complete; P-13/P-14/P-14C/P-15 remain unauthorized. | Owner chat approval, 2026-07-04 |
 | Parser/hash spec | Approved for implementation/local rehearsal | Deterministic single parser profile, server revalidation, file/row/payload limits, stable error contract, K-exclusion, decimal-string money, canonical hash contract, golden/cross-runtime tests, and independent filed-source rehash before publication are accepted | Owner chat approval, 2026-07-04 |
 | Official export spec | Approved for implementation/local rehearsal | Dataset-hash versus binary-hash model, selected-version server export, fail-closed count/hash checks, five-sheet Excel architecture, visible canonical verification, PDF server-verified stamp, draft markings, Factor F exclusion, accessibility, filing evidence, and failure behavior are accepted; P-11 visual direction amendment is now recorded, while final artifacts and reviewer sign-offs remain separate | Owner chat approval, 2026-07-04 |
 
@@ -1180,9 +1402,19 @@ Production migration, deploy, feature enablement, or publication.
 | P-48 PRE-P-12 replacement source publication | Exact one-commit/one-push 25-file allowlist from base `d92d8ce`; no PR | Owner + developer | 2026-07-29 | Git-only authorization for commit message `Close P-47 helper ACL correction`; exclude `files/`, `tmp/`, `output/`, every unrelated untracked path, Local/disposable/kit/Production, and all adjacent scopes. Resulting SHA/upstream/Remote truth must be recorded outside its own commit before any later request. |
 | Production migration | P-12 COMPLETE | Owner + objective machine gates | 2026-08-16 through 2026-08-17 | Exact `017` -> `017a` -> `018`-`026`, final closeout, checksum-verified encrypted post-migration backup, isolated restore, and cleanup passed. All Phase 4 flags remain false; P-13 and every later gate remain separate. |
 | Private-function default privilege | OPTION B IMMUTABLE; P-12 COMPLETE | Owner + architecture/security reviewers | 2026-07-28 through 2026-08-17 | [Finding #43](./43-phase4-p12-private-function-default-privilege-finding.md) records exact `017a` after `017` and before `018`; it was applied in that exact position. Do not edit applied `017`, `017a`, or `018`; [Finding #44](./44-phase4-p46-catalog-action-error-callability-finding.md) owns append-only `026`. |
-| Pending-account authorization (P-49) | Business intent approved; technical implementation HOLD | Owner | 2026-08-17 | Pending is profile/onboarding-only. Preserve Master Catalog `022`/`023`; reject pending catalog-read widening. Current BOQ/Factor-F/settings/selector/profile/RPC/API gaps require separately authorized forward-only correction and a complete real-session matrix. P-13 hard-stopped; one local decision-record commit only, with no external publication, implementation, or Production action authorized. |
-| Deploy / feature enable | P-13 HARD-STOP — PENDING CROSS-LAYER AUTHORIZATION ALIGNMENT; P-14 not requested | Owner | After P-49 correction evidence and P-12 closeout | Pre-P-49 CI/Preview evidence is historical only. P-13 requires separately authorized correction, new exact commit, full status/resource/action matrix, fresh CI/Preview/fingerprint, and a separate deploy window. P-14 remains blocked until P-13 smoke passes and its separate Auth/feature decision is recorded. |
-| Publish named version | Not requested |  |  | P-15 |
+| Pending-account authorization (P-49) | Business target approved; open/high implementation deferred under P-51 | Owner | 2026-08-18 | Pending remains profile/onboarding-only. Current cross-layer gaps remain real. P-49 is waived only as blocker for the exact first closeout. If that closeout is incomplete at 2026-08-25 23:59:59 +07, fresh explicit Owner reapproval is mandatory; otherwise there is no continuation. P-49 then re-enters before another Production deploy with a seven-day post-P-15 target. |
+| Historical P-50R SOLO execution and P-50D stop | Exact `P50R-SOLO-REQ-20260821-V1` approval consumed; offline reconciliation complete `PASS_FOR_P50D_REQUEST`; [P-50D Proposal #50](./50-phase4-p50d-exact-price-and-version-disposition-decision-proposal.md) ready but not approved | Owner-authorized local operator; Owner P-50D pending | 2026-08-21 through 2026-08-22 | Frozen review binding `55c90931144b8a7a2cb4aebeb917d2dc0062b576dcbd5a7678e2f208421149cc`; 28/28 PDF pages, 67/67 deltas, 245/245 exceptions, zero blockers, 49 proposed corrections and 18 source-version rows pending P-50D. No DB/Production/network/source/catalog/BOQ/pointer/Factor F mutation, commit, or push occurred. At this historical checkpoint the zero-price `2568.1.0` gate remained binding and P-50D/later gates were false. |
+| Historical P-50D baseline-first Owner direction | Published/current `2568.0.0`/710 is the name/unit/price authority; historical V1 superseded without approval; [Proposal #51](./51-phase4-p50d-2568-baseline-first-delta-review-proposal.md) / `P50D-REQ-20260823-V2` became the then-current choice request | Owner; technical/data comparison prepared locally | 2026-08-23 | P-50R frozen files/hashes remain immutable comparison evidence. The proposal began with an empty selected set and 49 pending external-source candidates; the later same-day row records the Owner's one-row selection intent and the V3 request. No DB/Production/network/catalog/BOQ/pointer/Factor F mutation, commit, push, or later gate. |
+| Historical P-50D one-row `SELECTED-DELTA` intent and V3 freeze checkpoint | Owner selected only UUID `f2662c71-a6e5-407e-8456-8608e304b43b` / `ITEM-0429` / `COR-PB0-002`, `0/1763/1763 -> 0/1764/1764`, under V2; [Proposal #52](./52-phase4-p50d-one-row-selected-delta-approval-proposal.md) / `P50D-REQ-20260823-V3` froze the later exact manifest for separate approval | Owner selection intent; technical/data manifest prepared locally | 2026-08-23 | At this checkpoint, manifest SHA-256 was `1ac28a74def993214f73659f1930acdb5caa57390504e494b21d72bbf3778429`; one selected record SHA-256 `f63127e589e7f5302f481f55b1df54a6b741efdc1aaa3b74e94d94f84abf15df`; other 48 candidate hash `2194d0b5f5e9c5a2deb5590aefddd53592f031ef0e9359657b707ed3c46690be`. Other 709 baseline rows remained unchanged; `ITEM-0427`/`ITEM-0430`/`ITEM-0431` remained unselected; 48 unselected candidates were distinct from 17 authority exclusions; historical BOQ reprice was false. **V3/P-50C WERE FALSE AT THIS HISTORICAL CHECKPOINT; THE NEXT ROW RECORDS THEIR LATER APPROVAL/COMPLETION.** |
+| P-50D V3 confirmation hold and P-50C offline technical build | V3 remains unauthorized pending exact Owner confirmation (ratification). [Result #53](./53-phase4-p50c-one-row-offline-candidate-result-record.md) records technical build `P50C-CANDIDATE-20260823-V1`; acceptance only as local review evidence is pending in the same decision | Owner + local technical/data execution | 2026-08-23 | Candidate SHA-256 `d7a19a9dbaecff4abb18086d1f9e236ae4b5ea311477ccdb609a52c54f200611`; diff `72e950d96bfdf81abeb3317ee280cc01e630a13447d1f38edd9ee7149f3ddf18`; manifest `d88d3daa63db6a59f9ba973d653647224584aa9d98c3efde4cbaad78f6bfefe5`. Published `2568.0.0` remains `0/1763/1763`; offline provisional `2568.1.0` changes only `ITEM-0429` to `0/1764/1764`; 709 rows, all names/units/materials, adjacent findings, and historical BOQs remain unchanged. Registry check pending. **REVIEW HOLD FOR EXACT OWNER CONFIRMATION (RATIFICATION); candidate application, commit/push, CI/Preview, DB/Production/network, P-13-P-15, and publication remain false.** |
+| P-50D V3 exact Owner ratification receipt / P-50C local-evidence acceptance | [Receipt #54](./54-phase4-p50c-review-remediation-and-p50d-v3-ratification-request.md) records exact `P50D-REQ-20260823-V3` ratification and accepts `P50C-CANDIDATE-20260823-V1` only as local review evidence | Owner | 2026-08-24 00:44:15 +07 | **P-50D V3 DECISION COMPLETE / `decision-record-only`; P-50C ACCEPTED / `local-review-evidence-only`.** Published `2568.0.0` remains unchanged; provisional `2568.1.0` registry check remains pending. No application, Git/CI, database/Production/network, P-13/P-14/P-14C/P-15, deploy, or publication authority. Next safe step is only the small repository gate; after PASS, a separate Git/CI authorization request may be prepared. No automatic step. |
+| P-50G exact small repository gate | [Proposal #55](./55-phase4-p50g-post-ratification-small-repository-gate-authorization-proposal.md) full SHA-256 approved; [Result #56](./56-phase4-p50g-small-repository-gate-result.md) records the one offline/read-only execution | Owner + local operator | 2026-08-24 02:07:26.798 +07 | **PASS / AUTHORIZATION CONSUMED ONCE / NO REPLAY.** `3` focused files / `30` tests and every named focused check passed. No protected path, stage/commit/push, CI/Preview, database/Production/network, candidate application, P-13-P-15, deploy, or publication authority. Only P-50H proposal/manifest preparation follows for separate review. |
+| Historical known price erratum and candidate-gate proposal (P-50/P-50R/P-50C) | Pre-P-15 full reconciliation direction recorded; exact P-50R request prepared; execution/P-50D/P-50C were pending at this checkpoint | Owner + price authority | 2026-08-18 | Preserve frozen `ITEM-0429`/`COR-PB0-002` evidence `0/1763/1763`; proposed `0/1764/1764` and adjacent findings required 100% reconciliation, exact price authority, ADR-003 classification, then a separately approved P-50C non-Production build/refreeze. [Request #49](./49-phase4-p50r-exact-price-reconciliation-evidence-scope-request.md) defined the exact offline evidence envelope but authorized no protected-source read or execution. |
+| Historical P-50R staged-gate refinement | Parent P-50R split into P-50R-I -> P-50R-O -> P-50R-X; next Owner decision was P-50R-I only | Owner + price authority + implementation/data reviewers | 2026-08-18 | P-50R-I/P-50R-O/P-50R-X were never executed and were superseded by P-50R SOLO. This row is chronology only. |
+| Historical bounded closeout sequence (P-51) | Owner accepted temporary P-49 risk for exact first closeout; docs alignment only | Owner | 2026-08-18 | P-51D -> P-50R -> P-50D -> P-50C -> identifier binding -> Git/CI/Preview -> P-13 -> P-14 -> P-14C -> P-15 -> official artifacts/canaries/final flags/invariants/backup custody -> P-49. No operational action was authorized by this sequence record. |
+| Historical P-50R SOLO simplification | Unexecuted I/O/X ceremony superseded by one offline/read-only self-reviewed gate | Owner as sole operator | 2026-08-21 | Request `P50R-SOLO-REQ-20260821-V1` retained exact five input hashes/counts, 100% coverage, two identical passes, 28-page/all-delta review, no DB/network/mutation, and separate P-50D. This row is the pre-execution authorization chronology; the SOLO run later completed. |
+| Deploy / feature enable / Production candidate | One bounded P-13/P-14/P-14C window may be requested; P-15 stays separate | Owner/operator | P-50G has passed; only after a separately approved P-50H release commit/push and passing CI/Preview evidence | P-50D V3 ratification and P-50G PASS grant no operating authority. P-13 deploys exact bytes with all flags false and smoke. On PASS, P-14 runs minimum-admin UAT; the UAT draft is abandoned and zero drafts/unchanged pointer are re-proven before the P-14C checkpoint creates exactly one locked unpublished draft. Failure restores flags false and stops. P-50H and all operating gates remain unauthorized; no publication is authorized. |
+| Publish named version | P-15 not requested | Owner | After exact P-14C draft preparation and review | P-15 must name the exact Production draft reference and review lock plus the reviewed target, pointer base/target, ratified manifest, dataset hash, rollback target, and canaries. The provisional local one-row candidate does not change published `2568.0.0`; ratification alone does not let it proceed to Git or Production. Official artifacts, canaries, final flags/invariants, and backup custody follow successful publication in that order; no publication is authorized. |
 
 ## References
 
@@ -1193,6 +1425,11 @@ Production migration, deploy, feature enablement, or publication.
 - [Lean Threat Model](./18-phase4-threat-model.md)
 - [Official Export Specification](./20-phase4-official-export-spec.md)
 - [Execution Progress Tracker and authority/evidence index](./25-phase4-execution-progress-tracker.md)
+- [P-50R SOLO Offline Price-Reconciliation Request](./49-phase4-p50r-exact-price-reconciliation-evidence-scope-request.md)
+- [Historical P-50D Exact Price and Version Disposition Proposal](./50-phase4-p50d-exact-price-and-version-disposition-decision-proposal.md)
+- [Historical P-50D Baseline-First Delta Review Proposal](./51-phase4-p50d-2568-baseline-first-delta-review-proposal.md)
+- [Pending-confirmation P-50D One-Row Selected-Delta Proposal](./52-phase4-p50d-one-row-selected-delta-approval-proposal.md)
+- [P-50C One-Row Offline Candidate Result](./53-phase4-p50c-one-row-offline-candidate-result-record.md)
 - [NT CI Runtime Asset Analysis](./24-phase4-nt-ci-runtime-asset-analysis.md)
 - [P-37 Intended-Admin UAT and Placement UX Correction Note](./33-phase4-wp8-p37-uat-ux-correction-note.md)
 - [P-37 Closure Matrix](./34-phase4-wp8-p37-closure-matrix.md)

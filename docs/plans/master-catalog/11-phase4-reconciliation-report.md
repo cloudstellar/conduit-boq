@@ -1,7 +1,28 @@
 # Master Catalog Phase 4 Reconciliation Report
 
-**Status:** Owner-approved as draft evidence and decision framework; not
-approved for candidate freeze, import, or publication
+**Status:** Owner-approved as evidence framework; exact P-50D V3 Owner
+confirmation (ratification) is recorded under
+[Review Remediation #54](./54-phase4-p50c-review-remediation-and-p50d-v3-ratification-request.md);
+the data-correct P-50C candidate is accepted only as local review evidence.
+Candidate application, Production import, database/network action, Git/CI,
+P-13 through P-15, deployment, and catalog publication remain unauthorized.
+The next safe step is the required small repository gate, not an automatic Git
+or operating action.
+
+> **Canonical term:** **exact Owner confirmation (ratification)** has the single
+> meaning defined in [Review Remediation #54](./54-phase4-p50c-review-remediation-and-p50d-v3-ratification-request.md):
+> confirm the post-build UUID and named SHA-256 values and accept P-50C only as
+> local review evidence. It authorizes no candidate application, Git/CI,
+> database/Production/network, P-13/P-14/P-14C/P-15, deploy, or publication.
+
+> **P-50D V3 ratification stop boundary — reached (2026-08-24):**
+> [Review Remediation #54](./54-phase4-p50c-review-remediation-and-p50d-v3-ratification-request.md)
+> records the exact Owner ratification and then stops. No small repository
+> gate, Git/CI request, candidate application, database/Production/network
+> action, P-13 through P-15, deploy, or publication is authorized. This
+> supersedes live wording below that names any next step; every later action
+> requires a new explicit Owner instruction.
+
 **Prepared:** 2026-06-22
 **Production project:** `otlssvssvgkohqwuuiir`
 **Target use:** First structured-code candidate `2568.1.0`
@@ -85,6 +106,110 @@ For the first structured-code release:
   labor costs, and unit costs exactly;
 - any price delta after clone is a blocking error unless a separate approved
   price change request is linked.
+
+### 5.1 P-50 pre-P-15 erratum/reconciliation overlay — 2026-08-18
+
+The point-in-time CSV and every first-rollout `price_outcome` above remain
+immutable historical evidence. Do not rewrite row 430 or reinterpret
+`preserve_production`: identity `f2662c71-a6e5-407e-8456-8608e304b43b`
+(`ITEM-0429` -> `COR-PB0-002`) stays at material/labor/unit
+`0/1763/1763` in the frozen reconciliation and in the zero-price-change
+`2568.1.0` candidate.
+
+The Owner-reported `0/1764/1764` value is recorded separately in
+[P-50 Plan #46](./46-phase4-p50-known-price-erratum-pre-p15-reconciliation-and-release-decision-plan.md).
+The same source page exposes other apparent baseline differences, so no exact
+correction manifest is frozen yet. Complete 100% source-price reconciliation
+before P-15 under the bounded offline/read-only envelope in
+[P-50R Request #49](./49-phase4-p50r-exact-price-reconciliation-evidence-scope-request.md),
+which replaces the unexecuted staged model with one P-50R SOLO operation. The
+SOLO run must bind all five exact input hashes, reconcile 100% of source/current/
+candidate rows by stable identity, produce byte-identical results from two
+passes, and record the Owner/operator's review of all 28 PDF pages and every
+delta/exception. The request is ready for review but implementation, source
+reads, execution, and evidence writes are not authorized. Then require durable
+source authority, an exact Owner/price-authority manifest, and ADR-003 release
+decision under separate P-50D before any rebaseline. The zero-price gate above
+remains binding until explicitly superseded. Every
+adjacent difference remains unresolved and unauthorized until then; P-51
+security-risk acceptance does not waive this data-quality gate.
+
+### 5.2 P-50R SOLO completion overlay — 2026-08-22
+
+Section 5.1 remains the immutable pre-execution record. Exact request
+`P50R-SOLO-REQ-20260821-V1` was later consumed and completed offline with
+`PASS_FOR_P50D_REQUEST`. The frozen evidence package accounts for 28/28 PDF
+pages, 67 deltas, 245 exceptions, and zero blockers. It classifies 49 records
+as proposed corrections and 18 as source-version differences; every one remains
+pending P-50D and none is mutation authority.
+
+[P-50D Proposal #50](./50-phase4-p50d-exact-price-and-version-disposition-decision-proposal.md)
+was superseded without approval on 2026-08-23. Published/current `2568.0.0`
+is the controlling 710-row authority for names, units, and prices; P-50R is
+comparison evidence only. Current [Proposal #51](./51-phase4-p50d-2568-baseline-first-delta-review-proposal.md),
+request `P50D-REQ-20260823-V2`, starts with zero approved deltas and remains
+unapproved. Until that exact decision, the zero-name/unit/price `2568.1.0` gate remains binding and P-50C, Git, database/
+Production/network access, catalog/BOQ/pointer/Factor F mutation, P-13, P-14,
+P-14C, P-15, deploy, flags, and publication remain unauthorized.
+
+### 5.3 P-50D exact one-row selection overlay — 2026-08-23
+
+Section 5.2 remains the V2 baseline-first preparation record. The Owner later
+selected only stable identity `f2662c71-a6e5-407e-8456-8608e304b43b` /
+`ITEM-0429` / `COR-PB0-002` as `SELECTED-DELTA`, with unchanged name, unit,
+and material price and exact price triple
+`0/1763/1763 -> 0/1764/1764`. The other 709 baseline rows remain unchanged;
+the other 48 P-50R candidates remain unselected.
+
+[Proposal #52](./52-phase4-p50d-one-row-selected-delta-approval-proposal.md),
+request `P50D-REQ-20260823-V3`, freezes the one-row manifest under file
+SHA-256
+`1ac28a74def993214f73659f1930acdb5caa57390504e494b21d72bbf3778429`,
+selected-record SHA-256
+`f63127e589e7f5302f481f55b1df54a6b741efdc1aaa3b74e94d94f84abf15df`,
+and unselected-48 SHA-256
+`2194d0b5f5e9c5a2deb5590aefddd53592f031ef0e9359657b707ed3c46690be`.
+The latest Owner message selected the row before this manifest/hash existed,
+so exact Owner confirmation (ratification) is still pending. Until that
+confirmation, the zero-price
+gate remains binding and P-50D/P-50C, database/Production/network, catalog/
+BOQ/pointer/Factor F mutation, Git, P-13, P-14, P-14C, and P-15 remain false.
+
+### 5.4 P-50C technical result and current review correction overlay — 2026-08-23
+
+Section 5.3 is preserved as the exact pre-confirmation checkpoint. A same-day
+interpretation treated the Owner's one-row business intent as if it approved
+`P50D-REQ-20260823-V3` and allowed the bounded local offline P-50C build. The
+technical build occurred and completed, but independent review later found
+that the interpretation did not satisfy Proposal #52's exact UUID/hash
+contract. [Review Remediation #54](./54-phase4-p50c-review-remediation-and-p50d-v3-ratification-request.md)
+therefore supersedes that interpretation for current authority. [P-50C Result
+#53](./53-phase4-p50c-one-row-offline-candidate-result-record.md) freezes
+provisional candidate `P50C-CANDIDATE-20260823-V1` with:
+
+| Binding | Exact result |
+|---|---|
+| Candidate SHA-256 | `d7a19a9dbaecff4abb18086d1f9e236ae4b5ea311477ccdb609a52c54f200611` |
+| Complete diff SHA-256 | `72e950d96bfdf81abeb3317ee280cc01e630a13447d1f38edd9ee7149f3ddf18` |
+| Candidate-manifest SHA-256 | `d88d3daa63db6a59f9ba973d653647224584aa9d98c3efde4cbaad78f6bfefe5` |
+| Selected row | UUID `f2662c71-a6e5-407e-8456-8608e304b43b`; `ITEM-0429` -> `COR-PB0-002`; `0/1763/1763 -> 0/1764/1764` |
+| Unchanged scope | 709 other baseline authority rows; zero name/unit/material delta; all other 48 external-source candidates; adjacent `ITEM-0427`, `ITEM-0430`, `ITEM-0431`; 17 authority exclusions remain distinct |
+
+Published/current `2568.0.0` is unchanged and continues to supply
+`0/1763/1763`; only the local provisional review candidate contains the
+proposed one-row delta. No existing or historical BOQ is repriced or
+backfilled. The historical zero-price gate has not been superseded as current
+authority; the candidate demonstrates the selected-row proposal only. Proposed
+target `2568.1.0` remains provisional until a fresh issued/claimed registry
+check passes.
+
+P-50C technical work is complete with no residual execution authority, but the
+candidate is not accepted even as local review evidence until the exact Owner
+confirmation (ratification). That confirmation itself grants no Git or
+operating authority. The current next decision is confirm/ratify or hold
+[Review Remediation #54](./54-phase4-p50c-review-remediation-and-p50d-v3-ratification-request.md),
+not commit/push. No database, Production, network, application mutation,
+commit, push, CI, P-13, P-14, P-14C, or P-15 authority was granted or consumed.
 
 ## 6. Required owner decisions
 
@@ -304,3 +429,33 @@ The final approved artifact must satisfy:
 
 Until all sign-offs are complete, this report blocks Phase 4A backfill and any
 publication of structured codes.
+
+## 10. Current P-50 authority correction — 2026-08-24
+
+This append-only correction preserves the dated technical result above while
+making the current authority unambiguous. Exact Owner confirmation
+(ratification) is pending; the candidate is technical review evidence that has
+not yet been accepted; Git and every operating gate remain separately held.
+
+<!-- P50C_RECONCILIATION_REVIEW_CORRECTION_V1 {"schema":"conduit-boq/p50c-reconciliation-review-correction/v1","recordedAt":"2026-08-24","supersedesCurrentAuthorityOf":"section-5.4-same-day-approval-interpretation","p50dRequestId":"P50D-REQ-20260823-V3","exactOwnerConfirmationPending":true,"exactOwnerRatificationPending":true,"p50dApproved":false,"p50cTechnicalBuildOccurred":true,"p50cDataReviewPassed":true,"p50cCandidateAccepted":false,"p50cCandidateRole":"unaccepted-local-review-evidence","p50cCandidateId":"P50C-CANDIDATE-20260823-V1","candidateSha256":"d7a19a9dbaecff4abb18086d1f9e236ae4b5ea311477ccdb609a52c54f200611","diffSha256":"72e950d96bfdf81abeb3317ee280cc01e630a13447d1f38edd9ee7149f3ddf18","candidateManifestSha256":"d88d3daa63db6a59f9ba973d653647224584aa9d98c3efde4cbaad78f6bfefe5","nextOwnerDecision":"confirm-ratify-or-hold-exact-p50d-v3","candidateApplicationAuthorized":false,"localCommitAuthorized":false,"externalGitPublicationAuthorized":false,"ciPreviewAuthorized":false,"databaseAccessAuthorized":false,"productionReadAuthorized":false,"productionWriteAuthorized":false,"networkAuthorized":false,"p13Authorized":false,"p14Authorized":false,"p14cAuthorized":false,"p15Authorized":false,"automaticNextStep":false} -->
+
+## 11. P-50D V3 exact Owner ratification receipt mirror — 2026-08-24
+
+This append-only successor supersedes only the live pending interpretation
+above. The canonical authority remains the exact receipt and marker in
+[Review Remediation #54](./54-phase4-p50c-review-remediation-and-p50d-v3-ratification-request.md).
+Exact P-50D V3 ratification is recorded, and
+`P50C-CANDIDATE-20260823-V1` is accepted only as local review evidence.
+Published/current `2568.0.0` remains unchanged, including `ITEM-0429` at
+`0/1763/1763`; provisional local `2568.1.0` review evidence contains the
+selected row at `0/1764/1764` and still requires a fresh issued/claimed
+registry check.
+
+This receipt authorizes no candidate application, source/catalog/BOQ/pointer/
+Factor F mutation, commit, push, CI/Preview, database, Production, network,
+P-13, P-14, P-14C, P-15, deployment, or publication. The next safe step is
+the required small repository gate. Only after it passes may a separate exact
+local commit/push and CI/Preview authorization request be prepared; nothing
+continues automatically.
+
+<!-- P50D_V3_RECONCILIATION_RATIFICATION_RECEIPT_V1 {"schema":"conduit-boq/p50d-v3-reconciliation-ratification-receipt/v1","recordedAt":"2026-08-24T00:44:15+07:00","canonicalReceiptMarker":"P50D_V3_EXACT_OWNER_RATIFICATION_RECEIPT_V1","canonicalReceiptDocument":"./54-phase4-p50c-review-remediation-and-p50d-v3-ratification-request.md","resolvesRequestId":"P50D-V3-RATIFY-REQ-20260823-V1","p50dRequestId":"P50D-REQ-20260823-V3","confirmationReceived":true,"exactOwnerConfirmationPending":false,"exactOwnerRatificationPending":false,"p50dDecisionApproved":true,"p50dV3Confirmed":true,"p50dV3Ratified":true,"p50dAuthorized":true,"p50dAuthorityScope":"decision-record-only","p50dFurtherActionAuthorized":false,"selectedIdentityId":"f2662c71-a6e5-407e-8456-8608e304b43b","selectedLegacyItemCode":"ITEM-0429","selectedTargetItemCode":"COR-PB0-002","baselinePrice":[0,1763,1763],"candidatePrice":[0,1764,1764],"p50dManifestSha256":"1ac28a74def993214f73659f1930acdb5caa57390504e494b21d72bbf3778429","selectedRecordsSha256":"f63127e589e7f5302f481f55b1df54a6b741efdc1aaa3b74e94d94f84abf15df","p50cCandidateId":"P50C-CANDIDATE-20260823-V1","p50cTechnicalBuildOccurred":true,"p50cDataReviewPassed":true,"p50cCandidateAccepted":true,"acceptsCandidateAs":"local-review-evidence-only","p50cFurtherExecutionAuthorized":false,"candidateSha256":"d7a19a9dbaecff4abb18086d1f9e236ae4b5ea311477ccdb609a52c54f200611","diffSha256":"72e950d96bfdf81abeb3317ee280cc01e630a13447d1f38edd9ee7149f3ddf18","candidateManifestSha256":"d88d3daa63db6a59f9ba973d653647224584aa9d98c3efde4cbaad78f6bfefe5","unchangedBaselineRowCount":709,"unselectedExternalCandidateCount":48,"retainBaselineEvidenceCount":18,"authorityExclusionCount":17,"explicitlyUnselectedAdjacentItems":["ITEM-0427","ITEM-0430","ITEM-0431"],"rowClassification":"same-basis-correction","overallReleaseClassification":"structured-code-revision-with-one-selected-price-delta","currentPublishedVersion":"2568.0.0","currentPublishedCatalogChanged":false,"provisionalTargetVersion":"2568.1.0","targetRegistryCheckPending":true,"historicalZeroPriceGateSupersededForSelectedLocalCandidateUuidOnly":true,"historicalBoqRepriceAuthorized":false,"changesPriorBusinessIntent":false,"nextSafeStep":"none-stop-after-recording-ratification","smallRepositoryGateRequired":false,"separateGitCiAuthorizationRequired":true,"gitCiAuthorizationGranted":false,"candidateApplicationAuthorized":false,"localCommitAuthorized":false,"externalGitPublicationAuthorized":false,"ciPreviewAuthorized":false,"databaseAccessAuthorized":false,"productionReadAuthorized":false,"productionWriteAuthorized":false,"networkAuthorized":false,"sourceMutationAuthorized":false,"catalogMutationAuthorized":false,"boqMutationAuthorized":false,"pointerMutationAuthorized":false,"factorFMutationAuthorized":false,"p13Authorized":false,"p14Authorized":false,"p14cAuthorized":false,"p15Authorized":false,"deployAuthorized":false,"publicationAuthorized":false,"automaticNextStep":false,"supersedesCurrentAuthorityOf":"P50C_RECONCILIATION_REVIEW_CORRECTION_V1"} -->

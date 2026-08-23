@@ -179,3 +179,14 @@ action matrix in [P-49 Plan](../../plans/master-catalog/45-phase4-p49-pending-au
 
 This addendum records target architecture and the blocker only. It authorizes no
 implementation, database action, merge, or deploy.
+
+## P-51 sequencing addendum — 2026-08-18
+
+P-51 supersedes only the current release ordering in the dated P-49 addendum.
+The Owner accepts the known P-49 exposure temporarily for the exact first
+Master Catalog P-13/P-14/P-15 closeout, so P-49 is no longer the sole blocker
+for that sequence. The database-first architecture and P-49 target are
+unchanged; the risk remains open/high and remediation is deferred until after
+P-15. P-51 authorizes no database/application change, Git action, deployment,
+flag, or publication. See
+[P-51 Closeout Plan](../../plans/master-catalog/48-phase4-p51-risk-accepted-master-catalog-closeout-plan.md).

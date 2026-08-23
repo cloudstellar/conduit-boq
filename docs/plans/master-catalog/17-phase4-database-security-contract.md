@@ -1212,3 +1212,19 @@ real-session status x resource x action matrix prove the exact target in
 [P-49 Plan #45](./45-phase4-p49-pending-authorization-hardening-plan.md). This
 amendment authorizes no SQL, Local/Production action, implementation, merge, or
 deploy and does not alter the applied migration bytes or P-12 evidence.
+
+## 18. P-51 bounded deferral amendment — 2026-08-18
+
+P-51 changes sequencing, not this database target. The Owner accepts the known
+P-49 exposure temporarily for the exact first Master Catalog closeout, so P-49
+is not the sole blocker for that P-13/P-14/P-15 sequence. The gaps above remain
+open/high and no SQL, migration number, Local/Production database access,
+application change, Git action, deploy, flag, or publication is authorized.
+
+After P-15, begin with separately authorized read-only live-posture discovery,
+then rewrite/re-review Proposal #47 before any correction. Re-entry is required
+before another Production deploy, targeting its decision within seven calendar
+days after closeout. If that first closeout is not finished by
+2026-08-25 23:59:59 +07, continued reliance on the P-51 waiver requires fresh
+Owner reapproval; no calendar extension is automatic. See
+[P-51 Closeout Plan #48](./48-phase4-p51-risk-accepted-master-catalog-closeout-plan.md).

@@ -1,0 +1,485 @@
+{
+  "schema": "conduit-boq/p50h-git-payload-manifest/v1",
+  "manifestId": "P50H-GIT-PAYLOAD-MANIFEST-20260824-V1",
+  "requestId": "P50H-REQ-20260824-V1",
+  "recordedAt": "2026-08-24",
+  "status": "prepared-not-authorized",
+  "branch": "codex/p12-production-authority-r2",
+  "localHead": "a12b022247d75d7e006fac890fc123e9c0a8e168",
+  "upstream": "origin/codex/p12-production-authority-r2",
+  "upstreamHead": "6f0953b19c25f6f96b1d2d11ee99ff43c33c5443",
+  "branchAheadBy": 1,
+  "indexMustBeEmpty": true,
+  "commitMessage": "master-catalog: record P-50 reconciliation package",
+  "commitPathCount": 52,
+  "payloadEntryCount": 51,
+  "manifestSelfExcluded": true,
+  "manifestSha256BindingMode": "external-owner-approval",
+  "proposalPath": "docs/plans/master-catalog/57-phase4-p50h-exact-local-git-ci-preview-authorization-proposal.md",
+  "manifestPath": "docs/plans/master-catalog/evidence/p50h-v1/git-payload-manifest.json",
+  "commitPathListSha256": "2434a7b6d336fb649332b736d9e6539550c56ae2dd12a92a98fff7e94c4cd001",
+  "targetPayloadContentManifestSha256": "35e92ff55631144ac19a9e6a2e74f8e1a962ca94344388774832c03bf0b4c063",
+  "currentPayloadContentManifestSha256": "20c360e49169a314e78873078ef6f1e0b77c546ee73c35b35e6e09c84a7154cd",
+  "authorityTestPath": "tests/master-catalog-authority-consistency.test.ts",
+  "authorityTestPreimageSha256": "0af6c62224b7db661f10822c70ee63a34f24f904e9645896105646e1a03abf88",
+  "authorityTestTargetSha256": "012cf89cc9521618571b8640e599c568ff4cbb326682b5ed6a3752030df1950a",
+  "workspaceMatchesTarget": false,
+  "pendingTargetPaths": [
+    "tests/master-catalog-authority-consistency.test.ts"
+  ],
+  "commitReady": false,
+  "commitPaths": [
+    "docs/02_architecture/ADR/ADR-001-supabase-rls-authorization.md",
+    "docs/03_domain/ACCESS_MODEL.md",
+    "docs/04_data/DATABASE_SCHEMA.md",
+    "docs/04_data/DATA_INTEGRITY.md",
+    "docs/04_data/MIGRATIONS.md",
+    "docs/04_data/SECURITY_MODEL.md",
+    "docs/06_engineering/PERMISSION_PATTERNS.md",
+    "docs/08_ai/LESSONS_LEARNED.md",
+    "docs/CODEBASE_DATABASE_MAP.md",
+    "docs/SECURITY.md",
+    "docs/ai/DECISIONS/ADR-001-supabase-rls-authorization.md",
+    "docs/plans/master-catalog/00-phase4-review-guide.md",
+    "docs/plans/master-catalog/05-verification-report.md",
+    "docs/plans/master-catalog/09-phase4-change-request.md",
+    "docs/plans/master-catalog/11-phase4-reconciliation-report.md",
+    "docs/plans/master-catalog/12-phase4-production-runbook.md",
+    "docs/plans/master-catalog/13-phase4-verification-report.md",
+    "docs/plans/master-catalog/15-phase4-admin-operating-procedure.md",
+    "docs/plans/master-catalog/17-phase4-database-security-contract.md",
+    "docs/plans/master-catalog/18-phase4-threat-model.md",
+    "docs/plans/master-catalog/19-phase4-decision-register.md",
+    "docs/plans/master-catalog/23-phase4-implementation-execution-pack.md",
+    "docs/plans/master-catalog/25-phase4-execution-progress-tracker.md",
+    "docs/plans/master-catalog/45-phase4-p49-pending-authorization-hardening-plan.md",
+    "docs/plans/master-catalog/46-phase4-p50-known-price-erratum-pre-p15-reconciliation-and-release-decision-plan.md",
+    "docs/plans/master-catalog/47-phase4-p49-forward-only-db-application-correction-proposal.md",
+    "docs/plans/master-catalog/48-phase4-p51-risk-accepted-master-catalog-closeout-plan.md",
+    "docs/plans/master-catalog/49-phase4-p50r-exact-price-reconciliation-evidence-scope-request.md",
+    "docs/plans/master-catalog/50-phase4-p50d-exact-price-and-version-disposition-decision-proposal.md",
+    "docs/plans/master-catalog/51-phase4-p50d-2568-baseline-first-delta-review-proposal.md",
+    "docs/plans/master-catalog/52-phase4-p50d-one-row-selected-delta-approval-proposal.md",
+    "docs/plans/master-catalog/53-phase4-p50c-one-row-offline-candidate-result-record.md",
+    "docs/plans/master-catalog/54-phase4-p50c-review-remediation-and-p50d-v3-ratification-request.md",
+    "docs/plans/master-catalog/55-phase4-p50g-post-ratification-small-repository-gate-authorization-proposal.md",
+    "docs/plans/master-catalog/56-phase4-p50g-small-repository-gate-result.md",
+    "docs/plans/master-catalog/57-phase4-p50h-exact-local-git-ci-preview-authorization-proposal.md",
+    "docs/plans/master-catalog/evidence/p50c-v1/candidate.json",
+    "docs/plans/master-catalog/evidence/p50c-v1/diff.json",
+    "docs/plans/master-catalog/evidence/p50c-v1/manifest.json",
+    "docs/plans/master-catalog/evidence/p50d-v3/p50d-selected-delta-manifest.json",
+    "docs/plans/master-catalog/evidence/p50h-v1/git-payload-manifest.json",
+    "docs/plans/master-catalog/evidence/p50r-solo/SHA256SUMS",
+    "docs/plans/master-catalog/evidence/p50r-solo/exceptions.json",
+    "docs/plans/master-catalog/evidence/p50r-solo/proposed-delta-manifest.json",
+    "docs/plans/master-catalog/evidence/p50r-solo/reconciliation.csv",
+    "docs/plans/master-catalog/evidence/p50r-solo/summary.json",
+    "scripts/build-master-catalog-p50c.mjs",
+    "scripts/reconcile-master-catalog-p50r-pdf.py",
+    "scripts/reconcile-master-catalog-p50r.mjs",
+    "tests/master-catalog-authority-consistency.test.ts",
+    "tests/master-catalog-p50c-candidate.test.ts",
+    "tests/master-catalog-p50r-reconciliation.test.ts"
+  ],
+  "entries": [
+    {
+      "path": "docs/02_architecture/ADR/ADR-001-supabase-rls-authorization.md",
+      "gitMode": "100644",
+      "byteLength": 5736,
+      "sha256": "0283190ee7687b648a70aad105730c20f24091bff7d539da8b0f6e27801b2e3e",
+      "state": "current-target"
+    },
+    {
+      "path": "docs/03_domain/ACCESS_MODEL.md",
+      "gitMode": "100644",
+      "byteLength": 6508,
+      "sha256": "8f51a209d7226ca5cc12dd94618c5eff4325b8b63f3dcb5181a1c723b615afea",
+      "state": "current-target"
+    },
+    {
+      "path": "docs/04_data/DATABASE_SCHEMA.md",
+      "gitMode": "100644",
+      "byteLength": 25712,
+      "sha256": "01d32fd2806839e68174fc5a2f5e5664b7f1de293b40c1b3aa6eabbd4d5d0cc3",
+      "state": "current-target"
+    },
+    {
+      "path": "docs/04_data/DATA_INTEGRITY.md",
+      "gitMode": "100644",
+      "byteLength": 6118,
+      "sha256": "e4ff1957323a97193179030d52d5b695b0c743aa9d431b93d589d3d4c312364c",
+      "state": "current-target"
+    },
+    {
+      "path": "docs/04_data/MIGRATIONS.md",
+      "gitMode": "100644",
+      "byteLength": 39618,
+      "sha256": "85f784de3965ceedd4f1397b7ab7aeb4a664fc89f1c4445354e8c5e53ad16c8f",
+      "state": "current-target"
+    },
+    {
+      "path": "docs/04_data/SECURITY_MODEL.md",
+      "gitMode": "100644",
+      "byteLength": 4974,
+      "sha256": "8393a85f26edbdb2c0285330d860d00d438354e4438ffa53b4d90780dfefc0ab",
+      "state": "current-target"
+    },
+    {
+      "path": "docs/06_engineering/PERMISSION_PATTERNS.md",
+      "gitMode": "100644",
+      "byteLength": 4935,
+      "sha256": "1b52657a757ca9e3134d88607a352d38d9d663c002d30b72206f809220f8dd7e",
+      "state": "current-target"
+    },
+    {
+      "path": "docs/08_ai/LESSONS_LEARNED.md",
+      "gitMode": "100644",
+      "byteLength": 5673,
+      "sha256": "0dc8c930641220803f91d99cb98155c817c392ab4b0846355d9154280f8b8332",
+      "state": "current-target"
+    },
+    {
+      "path": "docs/CODEBASE_DATABASE_MAP.md",
+      "gitMode": "100644",
+      "byteLength": 38136,
+      "sha256": "5273d565df2687a2c0fe272413e11fce8d9701a0a021e3c82308cc36a53d5798",
+      "state": "current-target"
+    },
+    {
+      "path": "docs/SECURITY.md",
+      "gitMode": "100644",
+      "byteLength": 4968,
+      "sha256": "00c7df9ae6e1da95bf4e22df866acb743efd81c0720db16ac19068285f55869d",
+      "state": "current-target"
+    },
+    {
+      "path": "docs/ai/DECISIONS/ADR-001-supabase-rls-authorization.md",
+      "gitMode": "100644",
+      "byteLength": 5736,
+      "sha256": "0283190ee7687b648a70aad105730c20f24091bff7d539da8b0f6e27801b2e3e",
+      "state": "current-target"
+    },
+    {
+      "path": "docs/plans/master-catalog/00-phase4-review-guide.md",
+      "gitMode": "100644",
+      "byteLength": 45552,
+      "sha256": "3f805a73e6b705a899853dc208de9a66397f6d58bf2665ce3b167c55ee5483b2",
+      "state": "current-target"
+    },
+    {
+      "path": "docs/plans/master-catalog/05-verification-report.md",
+      "gitMode": "100644",
+      "byteLength": 33223,
+      "sha256": "5ca79849f7c99e368465af33c9ba226c51d0dbfef1573b8c64b043df533ac061",
+      "state": "current-target"
+    },
+    {
+      "path": "docs/plans/master-catalog/09-phase4-change-request.md",
+      "gitMode": "100644",
+      "byteLength": 64607,
+      "sha256": "75f5946a9e13ee242d86f29e298981b954f53fecfcdbe87c211ef71595ad62a2",
+      "state": "current-target"
+    },
+    {
+      "path": "docs/plans/master-catalog/11-phase4-reconciliation-report.md",
+      "gitMode": "100644",
+      "byteLength": 29369,
+      "sha256": "9ca9f27ca0a40ecd00fb4c0b8c17dc5ebc93fc31aa29712f3fff7f012bf8e8c5",
+      "state": "current-target"
+    },
+    {
+      "path": "docs/plans/master-catalog/12-phase4-production-runbook.md",
+      "gitMode": "100644",
+      "byteLength": 71384,
+      "sha256": "102ff8520112c2bf8ca8c402d60ae733e58e4d355d1b599c482a827d2b6d93f8",
+      "state": "current-target"
+    },
+    {
+      "path": "docs/plans/master-catalog/13-phase4-verification-report.md",
+      "gitMode": "100644",
+      "byteLength": 214603,
+      "sha256": "b08504c98a5e4c07e3d6af71b52a95d4d1823f9d120b6a29ef6a66433cf2430a",
+      "state": "current-target"
+    },
+    {
+      "path": "docs/plans/master-catalog/15-phase4-admin-operating-procedure.md",
+      "gitMode": "100644",
+      "byteLength": 57189,
+      "sha256": "369b00a427859af2fd6fef599b59f1827ba9041bc33b243bda0c47aa35235540",
+      "state": "current-target"
+    },
+    {
+      "path": "docs/plans/master-catalog/17-phase4-database-security-contract.md",
+      "gitMode": "100644",
+      "byteLength": 70849,
+      "sha256": "89b5ab65cf424f581a5217c6ebc10cb887d3c620886ca5b0ed7f1edd0c2ca311",
+      "state": "current-target"
+    },
+    {
+      "path": "docs/plans/master-catalog/18-phase4-threat-model.md",
+      "gitMode": "100644",
+      "byteLength": 61594,
+      "sha256": "e13d9fe927a630e94a44b1a7d0dea870cb5c6dc65058c9ff0538678a041c542b",
+      "state": "current-target"
+    },
+    {
+      "path": "docs/plans/master-catalog/19-phase4-decision-register.md",
+      "gitMode": "100644",
+      "byteLength": 190330,
+      "sha256": "e8caf9d281002fe2f0ae9bd00c489821297ead1db009c597d57a40bf92dc11fb",
+      "state": "current-target"
+    },
+    {
+      "path": "docs/plans/master-catalog/23-phase4-implementation-execution-pack.md",
+      "gitMode": "100644",
+      "byteLength": 90872,
+      "sha256": "27cd0cacb1796fdf9ef273df52f07edb18fcdd70d45685413a203f390262704e",
+      "state": "current-target"
+    },
+    {
+      "path": "docs/plans/master-catalog/25-phase4-execution-progress-tracker.md",
+      "gitMode": "100644",
+      "byteLength": 261412,
+      "sha256": "307737d77bd824c2282a761b6632af9a390351c5cee97a956c2e085133f35f9c",
+      "state": "current-target"
+    },
+    {
+      "path": "docs/plans/master-catalog/45-phase4-p49-pending-authorization-hardening-plan.md",
+      "gitMode": "100644",
+      "byteLength": 21599,
+      "sha256": "3a528921c2a3eaea17f6b6070a1509ff960789e59542ebf0f5bd596b2e0c445c",
+      "state": "current-target"
+    },
+    {
+      "path": "docs/plans/master-catalog/46-phase4-p50-known-price-erratum-pre-p15-reconciliation-and-release-decision-plan.md",
+      "gitMode": "100644",
+      "byteLength": 38932,
+      "sha256": "bad95b90ac078d03e30906e500d8c723bd23b6e6e973d282af5645646dc80e38",
+      "state": "current-target"
+    },
+    {
+      "path": "docs/plans/master-catalog/47-phase4-p49-forward-only-db-application-correction-proposal.md",
+      "gitMode": "100644",
+      "byteLength": 14820,
+      "sha256": "a376258559e3c80e05f93adddb8b40d9ffb628e2e97dc5fe4ff797323a79a2a1",
+      "state": "current-target"
+    },
+    {
+      "path": "docs/plans/master-catalog/48-phase4-p51-risk-accepted-master-catalog-closeout-plan.md",
+      "gitMode": "100644",
+      "byteLength": 44853,
+      "sha256": "a46341f4f7b884133f16fb7bcd8e58c7d543c4475a836c84addd1d19cf6e5df7",
+      "state": "current-target"
+    },
+    {
+      "path": "docs/plans/master-catalog/49-phase4-p50r-exact-price-reconciliation-evidence-scope-request.md",
+      "gitMode": "100644",
+      "byteLength": 29022,
+      "sha256": "afbcb1e14f2587ba7fdbf6563b6baa58f7164c2b95af3794d99247a9dd14582c",
+      "state": "current-target"
+    },
+    {
+      "path": "docs/plans/master-catalog/50-phase4-p50d-exact-price-and-version-disposition-decision-proposal.md",
+      "gitMode": "100644",
+      "byteLength": 21916,
+      "sha256": "437fbfc7bca60a51928d402cbedc11de8564e3bc2b3b0ec009742ebf1b5ae9ba",
+      "state": "current-target"
+    },
+    {
+      "path": "docs/plans/master-catalog/51-phase4-p50d-2568-baseline-first-delta-review-proposal.md",
+      "gitMode": "100644",
+      "byteLength": 26463,
+      "sha256": "a3f58ee50426d9f3b57d53e52ef15b917d3945724e191059ca695f857cc09456",
+      "state": "current-target"
+    },
+    {
+      "path": "docs/plans/master-catalog/52-phase4-p50d-one-row-selected-delta-approval-proposal.md",
+      "gitMode": "100644",
+      "byteLength": 19302,
+      "sha256": "bc889c0b7699eb250ba584822df156fdc1690228217350bb8358b1f33c96a5a7",
+      "state": "current-target"
+    },
+    {
+      "path": "docs/plans/master-catalog/53-phase4-p50c-one-row-offline-candidate-result-record.md",
+      "gitMode": "100644",
+      "byteLength": 13397,
+      "sha256": "a40295620c4b39e7483726d630abe2f11799a67959e193bdadbef28c573d12ed",
+      "state": "current-target"
+    },
+    {
+      "path": "docs/plans/master-catalog/54-phase4-p50c-review-remediation-and-p50d-v3-ratification-request.md",
+      "gitMode": "100644",
+      "byteLength": 20519,
+      "sha256": "f4dc574b5885ad349d1eaca21dcfbe981cdbf5445b971b7781f7d08f7bed62fa",
+      "state": "current-target"
+    },
+    {
+      "path": "docs/plans/master-catalog/55-phase4-p50g-post-ratification-small-repository-gate-authorization-proposal.md",
+      "gitMode": "100644",
+      "byteLength": 21396,
+      "sha256": "5f2cbdb4d255613c41b2e5c46e4a8a3ba01856c2d17819752e9aeb787ee82cfc",
+      "state": "current-target"
+    },
+    {
+      "path": "docs/plans/master-catalog/56-phase4-p50g-small-repository-gate-result.md",
+      "gitMode": "100644",
+      "byteLength": 6365,
+      "sha256": "1223a6fc1072dc42b6e3e2b78eb99843d63e90c2f047f424e7dc20d84ec99d91",
+      "state": "current-target"
+    },
+    {
+      "path": "docs/plans/master-catalog/57-phase4-p50h-exact-local-git-ci-preview-authorization-proposal.md",
+      "gitMode": "100644",
+      "byteLength": 15336,
+      "sha256": "7d63dbf2ef3314a2bd8a8bb73965bd7ff00298a94567388657a857a68a89c503",
+      "state": "current-target"
+    },
+    {
+      "path": "docs/plans/master-catalog/evidence/p50c-v1/candidate.json",
+      "gitMode": "100644",
+      "byteLength": 415964,
+      "sha256": "d7a19a9dbaecff4abb18086d1f9e236ae4b5ea311477ccdb609a52c54f200611",
+      "state": "current-target"
+    },
+    {
+      "path": "docs/plans/master-catalog/evidence/p50c-v1/diff.json",
+      "gitMode": "100644",
+      "byteLength": 890,
+      "sha256": "72e950d96bfdf81abeb3317ee280cc01e630a13447d1f38edd9ee7149f3ddf18",
+      "state": "current-target"
+    },
+    {
+      "path": "docs/plans/master-catalog/evidence/p50c-v1/manifest.json",
+      "gitMode": "100644",
+      "byteLength": 5665,
+      "sha256": "d88d3daa63db6a59f9ba973d653647224584aa9d98c3efde4cbaad78f6bfefe5",
+      "state": "current-target"
+    },
+    {
+      "path": "docs/plans/master-catalog/evidence/p50d-v3/p50d-selected-delta-manifest.json",
+      "gitMode": "100644",
+      "byteLength": 4822,
+      "sha256": "1ac28a74def993214f73659f1930acdb5caa57390504e494b21d72bbf3778429",
+      "state": "current-target"
+    },
+    {
+      "path": "docs/plans/master-catalog/evidence/p50r-solo/SHA256SUMS",
+      "gitMode": "100644",
+      "byteLength": 1563,
+      "sha256": "35485e1a862e9894a6e51def37b4a2df5300b23578e157e9dbd79ced54efc3ff",
+      "state": "current-target"
+    },
+    {
+      "path": "docs/plans/master-catalog/evidence/p50r-solo/exceptions.json",
+      "gitMode": "100644",
+      "byteLength": 107059,
+      "sha256": "93e179ef906849bcd5c383986aaf560f84e6242a815c2d2649e3d8b78142600b",
+      "state": "current-target"
+    },
+    {
+      "path": "docs/plans/master-catalog/evidence/p50r-solo/proposed-delta-manifest.json",
+      "gitMode": "100644",
+      "byteLength": 68059,
+      "sha256": "c2fa9de6a9b2f7c3206852779675b4e4457c3ddfef77b64f8655170030391c47",
+      "state": "current-target"
+    },
+    {
+      "path": "docs/plans/master-catalog/evidence/p50r-solo/reconciliation.csv",
+      "gitMode": "100644",
+      "byteLength": 967382,
+      "sha256": "4bd5c30fa60b323164eb0303d211ae31f211bbdb337f2236ed15970b63912bee",
+      "state": "current-target"
+    },
+    {
+      "path": "docs/plans/master-catalog/evidence/p50r-solo/summary.json",
+      "gitMode": "100644",
+      "byteLength": 28107,
+      "sha256": "7cc7cf4bbe1fea8783e5cc6fa736e018591d461325a43ed7570c26e015fe8d3d",
+      "state": "current-target"
+    },
+    {
+      "path": "scripts/build-master-catalog-p50c.mjs",
+      "gitMode": "100644",
+      "byteLength": 26126,
+      "sha256": "d4ffac6f0f377dbb7586324c76b9d078c4679059167d5f48edd4de7535556957",
+      "state": "current-target"
+    },
+    {
+      "path": "scripts/reconcile-master-catalog-p50r-pdf.py",
+      "gitMode": "100644",
+      "byteLength": 10672,
+      "sha256": "a036a96b27c99be8b8480a87eba0e712bcacc325c86ac96a1b813e0ed81cd555",
+      "state": "current-target"
+    },
+    {
+      "path": "scripts/reconcile-master-catalog-p50r.mjs",
+      "gitMode": "100644",
+      "byteLength": 61435,
+      "sha256": "dca98a5ca9d767fbdcb7ba90beea7a0f45f759097ae3b1b65994e0fdbbd647c6",
+      "state": "current-target"
+    },
+    {
+      "path": "tests/master-catalog-authority-consistency.test.ts",
+      "gitMode": "100644",
+      "byteLength": 200931,
+      "sha256": "012cf89cc9521618571b8640e599c568ff4cbb326682b5ed6a3752030df1950a",
+      "state": "planned-p50h-alignment",
+      "preimageByteLength": 198366,
+      "preimageSha256": "0af6c62224b7db661f10822c70ee63a34f24f904e9645896105646e1a03abf88",
+      "targetByteLength": 200931,
+      "targetSha256": "012cf89cc9521618571b8640e599c568ff4cbb326682b5ed6a3752030df1950a"
+    },
+    {
+      "path": "tests/master-catalog-p50c-candidate.test.ts",
+      "gitMode": "100644",
+      "byteLength": 8989,
+      "sha256": "351ac25144b5bcf267764c16d3e448dacc856c632319963a7325a95a7e109e1f",
+      "state": "current-target"
+    },
+    {
+      "path": "tests/master-catalog-p50r-reconciliation.test.ts",
+      "gitMode": "100644",
+      "byteLength": 6250,
+      "sha256": "c8fd2fcc2fb82890725efba7640aaaf606cd8cf6f5f01c99ff41183d8eeb0899",
+      "state": "current-target"
+    }
+  ],
+  "protectedRootsExcluded": [
+    "files/",
+    "output/",
+    "outputs/",
+    "tmp/"
+  ],
+  "p50gPassed": true,
+  "p50gAuthorizationConsumed": true,
+  "p50gReplayAllowed": false,
+  "ownerApprovalPending": true,
+  "authorityTestAlignmentAuthorized": false,
+  "p50hExecutionAuthorized": false,
+  "gitStageAuthorized": false,
+  "localCommitAuthorized": false,
+  "externalGitPublicationAuthorized": false,
+  "networkAuthorized": false,
+  "ciPreviewAuthorized": false,
+  "protectedPathAccessAuthorized": false,
+  "candidateApplicationAuthorized": false,
+  "databaseAccessAuthorized": false,
+  "productionReadAuthorized": false,
+  "productionWriteAuthorized": false,
+  "applicationMutationAuthorized": false,
+  "catalogMutationAuthorized": false,
+  "boqMutationAuthorized": false,
+  "pointerMutationAuthorized": false,
+  "factorFMutationAuthorized": false,
+  "mainMutationAuthorized": false,
+  "pullRequestAuthorized": false,
+  "p13Authorized": false,
+  "p14Authorized": false,
+  "p14cAuthorized": false,
+  "p15Authorized": false,
+  "deployAuthorized": false,
+  "publicationAuthorized": false,
+  "automaticNextStep": false,
+  "nextOwnerDecision": "approve-or-hold-p50h"
+}

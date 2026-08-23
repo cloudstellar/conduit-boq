@@ -1,13 +1,16 @@
 # Access Model
 ## Conduit BOQ System
 
-**Last Updated:** 2026-08-17
-**Status:** P-49 target canonical; implementation HOLD; P-13 hard-stop
+**Last Updated:** 2026-08-18
+**Status:** P-49 target canonical; risk open/high; remediation deferred under
+P-51; P-13 separately unauthorized
 
 > [!IMPORTANT]
 > P-49 supersedes the former `pending = own BOQ` business rule. The target is
 > profile/onboarding-only, but current BOQ RLS/RPC and profile grants are not yet
-> aligned. See [P-49 Plan](../plans/master-catalog/45-phase4-p49-pending-authorization-hardening-plan.md).
+> aligned. P-51 accepts that exposure temporarily only for the exact first
+> closeout; it does not change this target or authorize a gate. See
+> [P-51 Plan](../plans/master-catalog/48-phase4-p51-risk-accepted-master-catalog-closeout-plan.md).
 
 ---
 
@@ -101,8 +104,9 @@ After onboarding, user cannot change `department_id` or `sector_id`.
 - Enforced by: `trg_lock_org_fields_after_onboarding` trigger
 - Admin bypass: Admins can still modify these fields
 
-The current trigger does not lock `role` or `status`; P-49 requires a separate
-forward-only protected-field boundary before P-13.
+The current trigger does not lock `role` or `status`; P-49 still requires a
+separately authorized forward-only protected-field boundary after the first
+P-15 closeout.
 
 ### 5.4 Separation of Duties
 - Creator cannot approve their own BOQ
@@ -131,9 +135,10 @@ Admin uses `admin_approve_user()` for atomic approval:
 ## 7. Verification
 
 The legacy `scripts/test-rls-security.sql` pending-own-BOQ expectation is no
-longer canonical. Before P-13, run the P-49 real-session status x resource x
-action matrix across DB policies/grants/RPC, page and API deep links, protected
-profile columns, transition E2E, and unchanged active-user behavior.
+longer canonical. During post-P-15 P-49 remediation, run the real-session
+status x resource x action matrix across DB policies/grants/RPC, page and API
+deep links, protected profile columns, transition E2E, and unchanged
+active-user behavior.
 
 ---
 

@@ -1,0 +1,118 @@
+{
+  "schema": "conduit-boq/p50d-selected-delta-manifest/v1",
+  "prepared_at": "2026-08-23",
+  "request_id": "P50D-REQ-20260823-V3",
+  "decision": "SELECTED-DELTA",
+  "selection_basis_request_id": "P50D-REQ-20260823-V2",
+  "status": "owner-selection-recorded-exact-manifest-approval-pending",
+  "owner_selection_intent_recorded": true,
+  "owner_selection_reason": "select-only-the-original-p50-item-at-1764-and-retain-all-other-baseline-values",
+  "owner_exact_manifest_approval_pending": true,
+  "baseline": {
+    "version": "2568.0.0",
+    "row_count": 710,
+    "snapshot_sha256": "a8761632ba4ddbb22934c0e10dca0e4299798d572dc1db56222629a2d86c4570",
+    "value_binding_sha256": "6266fcf6f51089cc9902c61c2b66acbbf27906679ce0e1e9148172a8f47b0b1a",
+    "authority_fields": [
+      "item_name",
+      "unit",
+      "material_cost",
+      "labor_cost",
+      "unit_cost"
+    ]
+  },
+  "comparison_evidence": {
+    "p50r_request_id": "P50R-SOLO-REQ-20260821-V1",
+    "p50r_result": "PASS_FOR_P50D_REQUEST",
+    "p50r_review_binding_sha256": "55c90931144b8a7a2cb4aebeb917d2dc0062b576dcbd5a7678e2f208421149cc",
+    "p50r_manifest_sha256": "c2fa9de6a9b2f7c3206852779675b4e4457c3ddfef77b64f8655170030391c47",
+    "source_pdf_sha256": "5f095c43a34a4541779d9c45a0558ac108048aab6fa96454b7e81e9f25cc619b",
+    "selected_p50r_record_set_sha256": "2137ca768a8067bdae08279f11779b51ad988437884ee484030dc3b0dd67efe1",
+    "role": "comparison-evidence-only"
+  },
+  "selected_record_count": 1,
+  "selected_records_sha256": "f63127e589e7f5302f481f55b1df54a6b741efdc1aaa3b74e94d94f84abf15df",
+  "selected_records_hash_contract": "SHA-256 over UTF-8 JSON.stringify(records) plus LF, preserving manifest field order",
+  "records": [
+    {
+      "stable_identity_id": "f2662c71-a6e5-407e-8456-8608e304b43b",
+      "legacy_item_code": "ITEM-0429",
+      "source_item_code": "COR-PB0-002",
+      "target_item_code": "COR-PB0-002",
+      "change_fields": [
+        "labor_cost",
+        "unit_cost"
+      ],
+      "baseline": {
+        "item_name": "งานเจาะผนังบ่อพักย่อย (PB)",
+        "unit": "จุด",
+        "material_cost": 0,
+        "labor_cost": 1763,
+        "unit_cost": 1763
+      },
+      "selected": {
+        "item_name": "งานเจาะผนังบ่อพักย่อย (PB)",
+        "unit": "จุด",
+        "material_cost": 0,
+        "labor_cost": 1764,
+        "unit_cost": 1764
+      },
+      "delta": {
+        "material_cost": 0,
+        "labor_cost": 1,
+        "unit_cost": 1
+      },
+      "evidence": {
+        "baseline_version": "2568.0.0",
+        "p50r_request_id": "P50R-SOLO-REQ-20260821-V1",
+        "p50r_manifest_sha256": "c2fa9de6a9b2f7c3206852779675b4e4457c3ddfef77b64f8655170030391c47",
+        "pdf_locator": "p24:t1:r9:display-2",
+        "pdf_row_digest": "1651a7a1e42744bf6f2bc458fa62c8c20a26e56af9860b7338e543534cfd6b91"
+      },
+      "selection_basis": "OWNER_SELECTED_EXACT_ONE_ROW_DELTA"
+    }
+  ],
+  "retained_scope": {
+    "unchanged_baseline_row_count": 709,
+    "unselected_external_source_candidate_count": 48,
+    "unselected_external_source_candidate_set_sha256": "2194d0b5f5e9c5a2deb5590aefddd53592f031ef0e9359657b707ed3c46690be",
+    "unselected_external_source_candidate_hash_contract": "SHA-256 over UTF-8 JSON.stringify(unselected raw P-50R records) plus LF, preserving P-50R order",
+    "retain_baseline_evidence_count": 18,
+    "retain_baseline_evidence_set_sha256": "489a8a82ee570c62640b9028ef5e8b612bc1b1858dd4d3251c068750c7fb64a2",
+    "authority_exclusion_count": 17,
+    "adjacent_unselected_legacy_item_codes": [
+      "ITEM-0427",
+      "ITEM-0430",
+      "ITEM-0431"
+    ],
+    "all_unselected_names_units_prices_remain_baseline": true
+  },
+  "release_intent": {
+    "row_classification": "same-basis-correction",
+    "overall_release_classification": "structured-code-revision-with-one-selected-price-delta",
+    "proposed_target": "2568.1.0",
+    "target_requires_fresh_issued_claimed_registry_check": true,
+    "historical_zero_price_gate_supersession_requested": true
+  },
+  "authority": {
+    "exact_selected_delta_manifest_approved": false,
+    "p50d_authorized": false,
+    "p50c_authorized": false,
+    "database_access_authorized": false,
+    "production_read_authorized": false,
+    "production_write_authorized": false,
+    "network_authorized": false,
+    "catalog_mutation_authorized": false,
+    "candidate_mutation_authorized": false,
+    "boq_reprice_authorized": false,
+    "pointer_mutation_authorized": false,
+    "factor_f_mutation_authorized": false,
+    "local_commit_authorized": false,
+    "external_git_publication_authorized": false,
+    "p13_authorized": false,
+    "p14_authorized": false,
+    "p14c_authorized": false,
+    "p15_authorized": false,
+    "automatic_next_step": false
+  }
+}

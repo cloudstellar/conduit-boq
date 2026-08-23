@@ -1,5 +1,30 @@
 # Master Catalog Phase 4 Admin Operating Procedure
 
+> **Current P-50 ratification receipt (2026-08-24):** the P-50C JSON package is
+> a technically verified review oracle, not an import payload. Exact P-50D V3
+> Owner confirmation (ratification) is recorded under [Review Remediation
+> #54](./54-phase4-p50c-review-remediation-and-p50d-v3-ratification-request.md),
+> and the package is accepted only as local review evidence.
+> Generate review-only Excel/PDF only from the later separately authorized exact
+> P-14C draft. The required small repository gate is the next safe step;
+> commit/push, CI/Preview, database, Production, candidate application, P-13
+> through P-15, publication, and automatic continuation remain unauthorized;
+> any contrary same-day wording below is superseded history.
+
+> **Canonical term:** **exact Owner confirmation (ratification)** has the single
+> meaning defined in [Review Remediation #54](./54-phase4-p50c-review-remediation-and-p50d-v3-ratification-request.md):
+> confirm the post-build UUID and named SHA-256 values and accept P-50C only as
+> local review evidence. It authorizes no candidate application, Git/CI,
+> database/Production/network, P-13/P-14/P-14C/P-15, deploy, or publication.
+
+> **P-50D V3 ratification stop boundary — reached (2026-08-24):**
+> [Review Remediation #54](./54-phase4-p50c-review-remediation-and-p50d-v3-ratification-request.md)
+> records the exact Owner ratification and then stops. No small repository
+> gate, Git/CI request, candidate application, database/Production/network
+> action, P-13 through P-15, deploy, or publication is authorized. This
+> supersedes live wording below that names any next step; every later action
+> requires a new explicit Owner instruction.
+
 **Status:** Procedure amended under P-22/P-23; source/static implementation of the
 one-working-draft, audited-abandon, item-first, and final snapshot-review flow
 passed on `ac31feb`, and G1 Local DB/concurrency evidence passed on `e463270`.
@@ -48,6 +73,77 @@ guidance remains disclosed; this procedure must not describe that evidence as
 independent/no-assistance. WP-8 is complete. Add/Supplement remains hidden
 until P-14, and this procedure still grants no Production authority.
 
+**Historical P-51 Production sequencing overlay (2026-08-18; superseded for
+current execution on 2026-08-21):**
+`P51_CANONICAL_PRODUCTION_SEQUENCE_V2`. This operating procedure does not grant
+any gate. For the bounded first closeout, the order is separately approved
+P-50R-I implementation freeze, P-50R-O PDF oracle, P-50R-X reconciliation,
+then P-50D; P-50C non-Production rebuild or zero-price refreeze with review-only
+artifacts marked `DRAFT – ห้ามใช้อ้างอิง`; identifier freeze and Git/CI/Preview;
+P-13 fresh read-only Production manifest plus reverification of the existing
+P-12 backup (not a new backup); P-14 using exact temporary
+`catalog_admin_enabled=true`, `catalog_new_identity_enabled=false`,
+`catalog_retirement_enabled=false` and final all-false matrices; audited-abandon
+the P-14 UAT draft and prove zero working drafts; separate P-14C real Production
+candidate preparation; and P-15 naming the exact Production draft reference and
+final `reviewLock`. Closeout order is publish, official exports, named BOQ
+canaries, final all-false flags, final invariants, then backup/isolated restore/
+checksum/custody. Completion of one step never authorizes the next. If the
+first P-15 closeout remains unfinished at 2026-08-25 23:59:59 +07, stop and
+obtain fresh explicit Owner reapproval of the P-51 waiver; no extension is
+automatic.
+
+**Current sequencing correction (2026-08-24):**
+`P51_CANONICAL_PRODUCTION_SEQUENCE_V3`. The unexecuted P-50R-I/O/X model above
+is historical. The current route is `P-51D -> P-50R SOLO complete -> one exact
+P-50D V3 Owner confirmation (ratification), also accepting existing verified
+P-50C only as local review evidence -> separately authorized local release
+commit/push + CI/Preview -> P-13/P-14/P-14C bounded window -> P-15 -> closeout
+-> P-49`. P-50R SOLO keeps exact hashes, offline/read-only access, 100% row
+coverage, two byte-identical passes, and Owner review of all 28 PDF pages and
+every delta/exception. It does not authorize the pending confirmation or a
+mutation.
+
+One bounded-window decision may enumerate sequential P-13 flags-off deploy/
+smoke, P-14 minimum-admin UAT, and P-14C creation/review of exactly one real
+unpublished draft. Before advancing from P-14 to P-14C, audited-abandon the UAT
+draft and prove zero working drafts, unchanged pointer/version/count/hash,
+unchanged BOQ/Factor F invariants, and the expected temporary flag matrix. Stop
+at the reviewed unpublished draft. P-15 remains a separate exact confirmation
+bound to that draft reference and final `reviewLock`; no earlier PASS implies
+publication. If the first closeout remains unfinished at 2026-08-25 23:59:59
++07, stop for fresh Owner reapproval rather than rushing Production.
+
+**Superseded same-day P-50D/P-50C interpretation (2026-08-23):** a same-day
+reading of the Owner's business intent treated `SELECTED-DELTA` as approved for
+only UUID
+`f2662c71-a6e5-407e-8456-8608e304b43b` / `ITEM-0429` /
+`COR-PB0-002`, `0/1763/1763 -> 0/1764/1764`. The other 709 baseline rows and
+all other 48 P-50R candidates remain unchanged at `2568.0.0`. Exact
+[Proposal #52](./52-phase4-p50d-one-row-selected-delta-approval-proposal.md),
+request `P50D-REQ-20260823-V3`, binds manifest SHA-256
+`1ac28a74def993214f73659f1930acdb5caa57390504e494b21d72bbf3778429`
+and selected-record SHA-256
+`f63127e589e7f5302f481f55b1df54a6b741efdc1aaa3b74e94d94f84abf15df`;
+the 48 unselected candidates bind to
+`2194d0b5f5e9c5a2deb5590aefddd53592f031ef0e9359657b707ed3c46690be`.
+The offline P-50C technical build occurred and is complete in [Result
+#53](./53-phase4-p50c-one-row-offline-candidate-result-record.md), but exact
+P-50D V3 Owner confirmation (ratification) and acceptance only as local review
+evidence remain pending under [Review Remediation
+#54](./54-phase4-p50c-review-remediation-and-p50d-v3-ratification-request.md).
+Candidate `P50C-CANDIDATE-20260823-V1` has 710 rows and exact one-row diff;
+candidate/manifest SHA-256 values are respectively
+`d7a19a9dbaecff4abb18086d1f9e236ae4b5ea311477ccdb609a52c54f200611`
+and `d88d3daa63db6a59f9ba973d653647224584aa9d98c3efde4cbaad78f6bfefe5`.
+Published/current `2568.0.0` still contains `0/1763/1763`; only the local,
+provisional `2568.1.0` candidate contains `0/1764/1764`. Database/Production/
+network, candidate application, commit/push, CI/Preview, P-13, P-14, P-14C,
+and P-15 authorities remain false. The marker below preserves the superseded
+same-day interpretation and is not current authority.
+
+<!-- P50C_ADMIN_PROCEDURE_CURRENT_OVERLAY_V1 {"schema":"conduit-boq/p50c-admin-procedure-current-overlay/v1","currentAsOf":"2026-08-23","p50dRequestId":"P50D-REQ-20260823-V3","p50dApproved":true,"p50cCandidateId":"P50C-CANDIDATE-20260823-V1","p50cOfflineBuildComplete":true,"candidateSha256":"d7a19a9dbaecff4abb18086d1f9e236ae4b5ea311477ccdb609a52c54f200611","diffSha256":"72e950d96bfdf81abeb3317ee280cc01e630a13447d1f38edd9ee7149f3ddf18","candidateManifestSha256":"d88d3daa63db6a59f9ba973d653647224584aa9d98c3efde4cbaad78f6bfefe5","publishedVersion":"2568.0.0","publishedCatalogChanged":false,"provisionalTarget":"2568.1.0","targetRegistryCheckPending":true,"changedValueRowCount":1,"unchangedValueRowCount":709,"databaseAccessAuthorized":false,"productionReadAuthorized":false,"productionWriteAuthorized":false,"networkAuthorized":false,"candidateApplicationAuthorized":false,"localCommitAuthorized":false,"externalGitPublicationAuthorized":false,"p13Authorized":false,"p14Authorized":false,"p14cAuthorized":false,"p15Authorized":false,"automaticNextStep":false} -->
+
 **Audience:** Active Master Catalog administrators
 **Rule:** A draft is not official; published versions are immutable
 
@@ -89,6 +185,12 @@ Published/Active and readable/exportable; archival is a later separately
 approved maintenance capability.
 
 ## 3. Create a draft
+
+In Production, create a draft only within an exact gate: a disposable UAT draft
+under P-14 or the one real candidate under P-14C. The P-14 UAT draft must be
+audited-abandoned with its immutable reference/reason/audit evidence, and the
+system must show zero working drafts plus an unchanged pointer before P-14C.
+P-14 does not authorize creation or mutation of the real candidate.
 
 1. Open **บัญชีราคามาตรฐาน → บัญชีปัจจุบัน**.
 2. Confirm the version marked current.
@@ -149,6 +251,35 @@ For first structured-code rollout, choose **ปรับปรุง/เพิ�
 `2568.0.0`; `2568.1.0` is the expected candidate only when that number has not
 already been issued or claimed. Confirm all 710 names, units, and prices are unchanged
 before applying mappings.
+
+P-50R pre-P-15 full source-price reconciliation is complete under exact request
+`P50R-SOLO-REQ-20260821-V1` with `PASS_FOR_P50D_REQUEST`. Its immutable
+evidence covers 28/28 PDF pages, 67 deltas, 245 exceptions, and zero blockers.
+Published/current `2568.0.0` is the authority for all 710 names, units, and
+prices. The 49 technical candidates are comparison evidence, not permission to
+edit a draft.
+
+Keep the published/current stable identity
+`f2662c71-a6e5-407e-8456-8608e304b43b` at material/labor/unit
+`0/1763/1763`; never edit `2568.0.0` or an existing BOQ in place. P-50D V3 has
+approved `0/1764/1764` only for this UUID in the later candidate. Historical
+[Proposal #50](./50-phase4-p50d-exact-price-and-version-disposition-decision-proposal.md)
+is superseded without approval and [Proposal #51](./51-phase4-p50d-2568-baseline-first-delta-review-proposal.md)
+is the consumed selection basis. [Proposal #52](./52-phase4-p50d-one-row-selected-delta-approval-proposal.md)
+is frozen but unauthorized. Use candidate `P50C-CANDIDATE-20260823-V1` only as
+the unaccepted local review package; do not import it or any of the other 48
+P-50R price findings.
+
+After any later exact approval, complete every approved import first, apply only
+approved identity-keyed money edits last through **แก้ไขข้อมูล**, and regenerate
+the entire review/hash/export evidence. Any later import invalidates the review
+lock/manifest equality and requires a fresh reconciliation/diff. If those gates
+do not pass, P-15 remains held unless a separate price-risk decision is
+recorded. See [P-50 Plan #46](./46-phase4-p50-known-price-erratum-pre-p15-reconciliation-and-release-decision-plan.md)
+and [consumed P-50R Request/Result #49](./49-phase4-p50r-exact-price-reconciliation-evidence-scope-request.md).
+The offline P-50C build is complete. Git, database/Production/network access,
+candidate application, P-13, P-14, P-14C, P-15, deploy, flags, and publication
+remain unauthorized.
 
 ## 4. Manual add
 
@@ -380,6 +511,14 @@ complete final database snapshots against the exact base by stable identity,
 not only list import events. The URL and page must show the same reviewed
 `reviewLock`; record it with the review evidence.
 
+For P-14C, also freeze the exact Production draft reference, target, base/
+pointer, mutation request IDs, final `reviewLock`, candidate dataset hash,
+complete diff/counts, and approval/source identifiers. Generate only
+review-only Excel/PDF artifacts labelled `DRAFT – ห้ามใช้อ้างอิง` and record
+their binary hashes against that dataset hash. Any later manual change or import
+invalidates the lock and this evidence package. P-14C ends with the draft
+unpublished and does not authorize official exports.
+
 For a high-volume review, use the page as a controlled review queue:
 
 1. Start from **รายการที่ได้รับผล**, then select each summary count to filter
@@ -433,6 +572,14 @@ through codes and versions.
 
 Publication is high impact.
 
+In Production, do not begin publication without a separate P-15 decision naming
+the exact draft reference, final `reviewLock`, target, current base/pointer,
+exact approved P-50D V3 one-row selected manifest or another exact later
+approved manifest,
+rollback target, named canaries, temporary/final flag matrices, and one operation request ID. P-14 and
+P-14C do not authorize publication. Re-read these values immediately before
+submit and stop on the first mismatch.
+
 1. Open **Review changes before publication** from the draft workspace.
 2. Resolve all blocking errors.
 3. Enter/confirm approval reference, approval document date, effective date,
@@ -448,9 +595,10 @@ Publication is high impact.
    except the approved `ITEM-0139` exception. An unchanged legacy-only clone does
    not activate this rollout guard.
 7. If any inactive/retired rows are present, confirm P-19 official PDF policy.
-8. Confirm the draft reference, target version, and current base/pointer.
-9. Obtain explicit owner approval to issue this exact target as the official
-   version.
+8. Confirm the draft reference, final reviewed `reviewLock`, target version, and
+   current base/pointer exactly match the P-15 decision.
+9. Confirm explicit Owner P-15 approval to issue this exact reviewed draft and
+   target as the official version.
 10. Select **ตรวจและยืนยันการเผยแพร่**. In the confirmation dialog, recheck the
     current version, target version, reviewed draft revision, item count,
     immutability, and BOQ effect.
@@ -467,7 +615,10 @@ the pointer moves atomically. Do not attempt to edit it.
 
 ## 11. Generate official exports
 
-1. Open the published version, not merely “current.”
+Official exports are a post-P-15 closeout action. No pre-publication Excel/PDF
+may be renamed, filed, or distributed as official.
+
+1. Open the exact published version, not merely “current.”
 2. Choose **ส่งออกเอกสาร → Excel สำหรับตรวจสอบ** or
    **เปิดหน้าพิมพ์/บันทึก PDF**. The PDF choice opens the browser print view;
    print or save the file from that view. On a draft the equivalent menu is
@@ -493,6 +644,32 @@ confirmation.
 
 Draft exports must show `DRAFT – ห้ามใช้อ้างอิง` and cannot be treated as
 official references.
+
+### 11.1 P-51 ordered closeout
+
+After the exact P-15 publish succeeds, complete these steps in order:
+
+1. Verify the atomic publish result, singleton pointer, published version,
+   item count, dataset hash, and publish audit/change-set ID.
+2. Generate, verify, hash, visually inspect, and file official Excel/PDF from
+   that published database version.
+3. Run the named new/old/duplicate/open-tab BOQ canaries. Confirm a new BOQ uses
+   the approved current catalog, existing and duplicated BOQs retain their
+   source catalog/Factor F bindings and snapshots, an already open create tab
+   revalidates before save, and edit/print/export remain usable.
+4. Restore and verify the exact final matrix:
+   `catalog_admin_enabled=false`, `catalog_new_identity_enabled=false`, and
+   `catalog_retirement_enabled=false`.
+5. Record final invariants: singleton pointer plus published version/count/hash,
+   zero working drafts, publish audit, unchanged historical BOQ bindings/
+   snapshots, unchanged Factor F pointer/rows/hash, unchanged grants/RLS, and no
+   monitored auth/profile/RPC drift.
+6. Only then create the post-publication encrypted backup, complete the isolated
+   restore and checksum verification, and record independent custody.
+
+Stop on the first failure. Do not claim closeout or use a backup taken before
+the official exports, canaries, final flags, and invariant snapshot as final
+closeout evidence.
 
 ## 12. Restore the current pointer
 
@@ -641,3 +818,33 @@ or a keyboard-incomplete required control blocks P-14 unless corrected and
 rerun or explicitly accepted with an owner, rationale, remediation owner, and
 due date. Drag and drop is not required and may never replace the visible
 category/insertion-gap/up-down path.
+
+## Current P-50 authority correction — 2026-08-24
+
+The earlier P-50C admin marker is preserved as superseded chronology. Current
+authority is exact Owner confirmation (ratification) pending, with P-50C not
+yet accepted even as local review evidence. Git and every operating gate remain
+separate and held.
+
+<!-- P50C_ADMIN_PROCEDURE_REVIEW_CORRECTION_V1 {"schema":"conduit-boq/p50c-admin-procedure-review-correction/v1","recordedAt":"2026-08-24","supersedesCurrentAuthorityOf":"P50C_ADMIN_PROCEDURE_CURRENT_OVERLAY_V1","p50dRequestId":"P50D-REQ-20260823-V3","exactOwnerConfirmationPending":true,"exactOwnerRatificationPending":true,"p50dApproved":false,"p50cTechnicalBuildOccurred":true,"p50cDataReviewPassed":true,"p50cCandidateAccepted":false,"p50cCandidateRole":"unaccepted-local-review-evidence","p50cCandidateId":"P50C-CANDIDATE-20260823-V1","candidateSha256":"d7a19a9dbaecff4abb18086d1f9e236ae4b5ea311477ccdb609a52c54f200611","diffSha256":"72e950d96bfdf81abeb3317ee280cc01e630a13447d1f38edd9ee7149f3ddf18","candidateManifestSha256":"d88d3daa63db6a59f9ba973d653647224584aa9d98c3efde4cbaad78f6bfefe5","nextOwnerDecision":"confirm-ratify-or-hold-exact-p50d-v3","candidateApplicationAuthorized":false,"localCommitAuthorized":false,"externalGitPublicationAuthorized":false,"ciPreviewAuthorized":false,"databaseAccessAuthorized":false,"productionReadAuthorized":false,"productionWriteAuthorized":false,"networkAuthorized":false,"p13Authorized":false,"p14Authorized":false,"p14cAuthorized":false,"p15Authorized":false,"automaticNextStep":false} -->
+
+## Current P-50D V3 ratification receipt mirror — 2026-08-24
+
+This append-only successor supersedes only the live pending interpretation
+above. The canonical authority remains the exact receipt and marker in
+[Review Remediation #54](./54-phase4-p50c-review-remediation-and-p50d-v3-ratification-request.md).
+Exact P-50D V3 ratification is recorded, and
+`P50C-CANDIDATE-20260823-V1` is accepted only as local review evidence.
+Published/current `2568.0.0` remains unchanged, including `ITEM-0429` at
+`0/1763/1763`; provisional local `2568.1.0` review evidence contains the
+selected row at `0/1764/1764` and still requires a fresh issued/claimed
+registry check.
+
+This receipt authorizes no candidate application, source/catalog/BOQ/pointer/
+Factor F mutation, commit, push, CI/Preview, database, Production, network,
+P-13, P-14, P-14C, P-15, deployment, or publication. The next safe step is
+the required small repository gate. Only after it passes may a separate exact
+local commit/push and CI/Preview authorization request be prepared; nothing
+continues automatically.
+
+<!-- P50D_V3_ADMIN_PROCEDURE_RATIFICATION_RECEIPT_V1 {"schema":"conduit-boq/p50d-v3-admin-procedure-ratification-receipt/v1","recordedAt":"2026-08-24T00:44:15+07:00","canonicalReceiptMarker":"P50D_V3_EXACT_OWNER_RATIFICATION_RECEIPT_V1","canonicalReceiptDocument":"./54-phase4-p50c-review-remediation-and-p50d-v3-ratification-request.md","resolvesRequestId":"P50D-V3-RATIFY-REQ-20260823-V1","p50dRequestId":"P50D-REQ-20260823-V3","confirmationReceived":true,"exactOwnerConfirmationPending":false,"exactOwnerRatificationPending":false,"p50dDecisionApproved":true,"p50dV3Confirmed":true,"p50dV3Ratified":true,"p50dAuthorized":true,"p50dAuthorityScope":"decision-record-only","p50dFurtherActionAuthorized":false,"selectedIdentityId":"f2662c71-a6e5-407e-8456-8608e304b43b","selectedLegacyItemCode":"ITEM-0429","selectedTargetItemCode":"COR-PB0-002","baselinePrice":[0,1763,1763],"candidatePrice":[0,1764,1764],"p50dManifestSha256":"1ac28a74def993214f73659f1930acdb5caa57390504e494b21d72bbf3778429","selectedRecordsSha256":"f63127e589e7f5302f481f55b1df54a6b741efdc1aaa3b74e94d94f84abf15df","p50cCandidateId":"P50C-CANDIDATE-20260823-V1","p50cTechnicalBuildOccurred":true,"p50cDataReviewPassed":true,"p50cCandidateAccepted":true,"acceptsCandidateAs":"local-review-evidence-only","p50cFurtherExecutionAuthorized":false,"candidateSha256":"d7a19a9dbaecff4abb18086d1f9e236ae4b5ea311477ccdb609a52c54f200611","diffSha256":"72e950d96bfdf81abeb3317ee280cc01e630a13447d1f38edd9ee7149f3ddf18","candidateManifestSha256":"d88d3daa63db6a59f9ba973d653647224584aa9d98c3efde4cbaad78f6bfefe5","unchangedBaselineRowCount":709,"unselectedExternalCandidateCount":48,"retainBaselineEvidenceCount":18,"authorityExclusionCount":17,"explicitlyUnselectedAdjacentItems":["ITEM-0427","ITEM-0430","ITEM-0431"],"rowClassification":"same-basis-correction","overallReleaseClassification":"structured-code-revision-with-one-selected-price-delta","currentPublishedVersion":"2568.0.0","currentPublishedCatalogChanged":false,"provisionalTargetVersion":"2568.1.0","targetRegistryCheckPending":true,"historicalZeroPriceGateSupersededForSelectedLocalCandidateUuidOnly":true,"historicalBoqRepriceAuthorized":false,"changesPriorBusinessIntent":false,"nextSafeStep":"none-stop-after-recording-ratification","smallRepositoryGateRequired":false,"separateGitCiAuthorizationRequired":true,"gitCiAuthorizationGranted":false,"candidateApplicationAuthorized":false,"localCommitAuthorized":false,"externalGitPublicationAuthorized":false,"ciPreviewAuthorized":false,"databaseAccessAuthorized":false,"productionReadAuthorized":false,"productionWriteAuthorized":false,"networkAuthorized":false,"sourceMutationAuthorized":false,"catalogMutationAuthorized":false,"boqMutationAuthorized":false,"pointerMutationAuthorized":false,"factorFMutationAuthorized":false,"p13Authorized":false,"p14Authorized":false,"p14cAuthorized":false,"p15Authorized":false,"deployAuthorized":false,"publicationAuthorized":false,"automaticNextStep":false,"supersedesCurrentAuthorityOf":"P50C_ADMIN_PROCEDURE_REVIEW_CORRECTION_V1"} -->

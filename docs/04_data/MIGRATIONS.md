@@ -18,10 +18,11 @@
 > Applied migration bytes remain immutable.
 >
 > P-49 preserves active-only catalog RLS in `022`/`023` and rejects any
-> migration that widens pending catalog reads. It records that a separate
-> forward-only BOQ/profile/Factor-F/API authorization correction is required
-> before P-13, but authorizes no migration and reserves no filename/number. See
-> [P-49 Plan](../plans/master-catalog/45-phase4-p49-pending-authorization-hardening-plan.md).
+> migration that widens pending catalog reads. Its separate forward-only BOQ/
+> profile/Factor-F/API correction remains required but is deferred until after
+> P-15 under P-51. Proposal #47 is unapproved and reserves no filename/number.
+> P-51 authorizes no migration or database action. See
+> [P-51 Plan](../plans/master-catalog/48-phase4-p51-risk-accepted-master-catalog-closeout-plan.md).
 
 ---
 

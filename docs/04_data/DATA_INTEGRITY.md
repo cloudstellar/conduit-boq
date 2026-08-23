@@ -1,14 +1,16 @@
 # Data Integrity
 ## Conduit BOQ System
 
-**Last Updated:** 2026-08-17
-**Status:** P-49 target recorded; current authorization gap blocks P-13
+**Last Updated:** 2026-08-18
+**Status:** P-49 target recorded; risk open/high; remediation deferred under
+P-51 for the exact first closeout
 
 > [!IMPORTANT]
 > The former pending-own-BOQ rule is superseded as business intent by P-49.
 > The approved target is `pending = profile/onboarding-only`.
 > Current database paths are not yet aligned, so this document distinguishes
-> current behavior from the approved target. See [P-49 Plan](../plans/master-catalog/45-phase4-p49-pending-authorization-hardening-plan.md).
+> current behavior from the approved target. P-51 accepts but does not fix that
+> risk. See [P-51 Plan](../plans/master-catalog/48-phase4-p51-risk-accepted-master-catalog-closeout-plan.md).
 
 ---
 
@@ -55,8 +57,9 @@ Phase 4 surfaces; P-49 requires an exact grants/policies/functions inventory.
   insert/update checks stored admin role without active status.
 - Current authenticated `can_approve_boq` lacks an active-status check, and
   `get_user_role`/`is_admin` can disclose arbitrary-user role metadata.
-- Legacy and versioned Factor F reads are authenticated-wide. P-49 requires
-  complete table/view/RPC inventory and non-active denial before P-13.
+- Legacy and versioned Factor F reads are authenticated-wide. Post-P-15 P-49
+  remediation requires a complete table/view/RPC inventory and non-active
+  denial.
 - Organization/department/sector policies expose all selector rows to every
   authenticated status; P-49 permits pending only active onboarding selectors
   and denies them to inactive/suspended/missing/unknown profiles.
@@ -117,8 +120,9 @@ idx_boq_items_route_id   ON boq_items(route_id)
 | `admin_reject_user(p_target_id, p_note)` | Reject user with note |
 
 Every privileged profile operation must ultimately require current
-`role='admin' AND status='active'`. The exact forward-only correction and its
-real-session matrix require separate Owner authority before P-13.
+`role='admin' AND status='active'`. The post-P-15 forward-only correction and
+its real-session matrix require separate Owner authority; P-51 is not that
+authority.
 
 ---
 

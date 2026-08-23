@@ -1,0 +1,151 @@
+{
+  "schema": "conduit-boq/p50c-candidate-manifest/v1",
+  "candidate_id": "P50C-CANDIDATE-20260823-V1",
+  "prepared_at": "2026-08-23",
+  "mode": "offline-deterministic-evidence-only",
+  "status": "candidate-built-not-authorized-for-application",
+  "inputs": {
+    "production_baseline": {
+      "path": "docs/plans/master-catalog/evidence/phase4-reconciliation-draft.csv",
+      "sha256": "4627e413bea3c6a72b544f71cf0b91f4bff5c8d4199a799373140f4c969a338a",
+      "csv_decode": "xlsx-codepage-65001",
+      "row_count": 710,
+      "value_binding_sha256": "6266fcf6f51089cc9902c61c2b66acbbf27906679ce0e1e9148172a8f47b0b1a",
+      "value_binding_contract": "SHA-256 over UTF-8 JSON.stringify(records) plus LF; records sorted by legacy_item_code and projected as identity_id, legacy_item_code, item_name, unit, material_cost, labor_cost, unit_cost"
+    },
+    "structured_code_authority": {
+      "path": "lib/master-catalog/import/data/phase4-first-rollout-authority.json",
+      "sha256": "62d1e40a368c103aef76c70055057bdf906a50f2c1d7141bf8a97e1f8836a0b8",
+      "mapping_count": 710,
+      "recode_count": 709,
+      "retain_count": 1,
+      "source_exclusion_count": 17
+    },
+    "selected_delta": {
+      "path": "docs/plans/master-catalog/evidence/p50d-v3/p50d-selected-delta-manifest.json",
+      "sha256": "1ac28a74def993214f73659f1930acdb5caa57390504e494b21d72bbf3778429",
+      "request_id": "P50D-REQ-20260823-V3",
+      "selected_record_count": 1
+    }
+  },
+  "outputs": {
+    "candidate": {
+      "path": "docs/plans/master-catalog/evidence/p50c-v1/candidate.json",
+      "sha256": "d7a19a9dbaecff4abb18086d1f9e236ae4b5ea311477ccdb609a52c54f200611",
+      "byte_count": 415964,
+      "row_count": 710
+    },
+    "diff": {
+      "path": "docs/plans/master-catalog/evidence/p50c-v1/diff.json",
+      "sha256": "72e950d96bfdf81abeb3317ee280cc01e630a13447d1f38edd9ee7149f3ddf18",
+      "byte_count": 890,
+      "record_count": 1
+    }
+  },
+  "counts": {
+    "candidate_row_count": 710,
+    "identity_recode_count": 709,
+    "identity_retain_count": 1,
+    "baseline_authority_value_changed_row_count": 1,
+    "baseline_authority_value_unchanged_row_count": 709,
+    "item_name_changed_row_count": 0,
+    "unit_changed_row_count": 0,
+    "material_cost_changed_row_count": 0,
+    "labor_cost_changed_row_count": 1,
+    "unit_cost_changed_row_count": 1,
+    "historical_boq_repriced_row_count": 0
+  },
+  "selected_delta": {
+    "stable_identity_id": "f2662c71-a6e5-407e-8456-8608e304b43b",
+    "legacy_item_code": "ITEM-0429",
+    "target_item_code": "COR-PB0-002",
+    "item_name": "งานเจาะผนังบ่อพักย่อย (PB)",
+    "unit": "จุด",
+    "before": {
+      "material_cost": 0,
+      "labor_cost": 1763,
+      "unit_cost": 1763
+    },
+    "after": {
+      "material_cost": 0,
+      "labor_cost": 1764,
+      "unit_cost": 1764
+    }
+  },
+  "adjacent_rows_unchanged": [
+    {
+      "stable_identity_id": "77dae4c9-b6f0-4ad5-987c-661e344c2871",
+      "legacy_item_code": "ITEM-0427",
+      "target_item_code": "RPR-REM-001",
+      "item_name": "งานรื้อท่อเดิม 12-Ø4\" GIP ข้ามคลอง พร้อมเหล็กรัดท่อ",
+      "unit": "ชุด",
+      "material_cost": 5070,
+      "labor_cost": 1801,
+      "unit_cost": 6871,
+      "baseline_values_retained": true
+    },
+    {
+      "stable_identity_id": "ceb49dea-167c-481d-a28c-6a8c9ce46633",
+      "legacy_item_code": "ITEM-0430",
+      "target_item_code": "COR-MH0-001",
+      "item_name": "งานเจาะหน้าต่างบ่อพัก (MH)",
+      "unit": "จุด",
+      "material_cost": 0,
+      "labor_cost": 1763,
+      "unit_cost": 1763,
+      "baseline_values_retained": true
+    },
+    {
+      "stable_identity_id": "1e60425d-d3d0-4510-b7f1-9075fb3ff352",
+      "legacy_item_code": "ITEM-0431",
+      "target_item_code": "COR-MH0-002",
+      "item_name": "งานเจาะผนังบ่อพัก (MH)",
+      "unit": "จุด",
+      "material_cost": 0,
+      "labor_cost": 3526,
+      "unit_cost": 3526,
+      "baseline_values_retained": true
+    }
+  ],
+  "invariants": {
+    "exact_uuid_and_legacy_code_join": true,
+    "selected_old_value_name_unit_check_passed": true,
+    "candidate_identity_count_preserved": true,
+    "candidate_target_codes_unique": true,
+    "display_order_zero_based_contiguous": true,
+    "item_names_unchanged": true,
+    "units_unchanged": true,
+    "material_costs_unchanged": true,
+    "price_arithmetic_valid": true,
+    "adjacent_findings_unchanged": true,
+    "source_exclusions_unchanged": true,
+    "historical_boq_reprice": false
+  },
+  "release": {
+    "baseline_version": "2568.0.0",
+    "provisional_target_version": "2568.1.0",
+    "target_version_is_official": false,
+    "fresh_issued_claimed_registry_check_required": true,
+    "fresh_issued_claimed_registry_check_status": "pending"
+  },
+  "authority": {
+    "p50c_candidate_package_built": true,
+    "p50c_candidate_application_authorized": false,
+    "database_access_authorized": false,
+    "production_read_authorized": false,
+    "production_write_authorized": false,
+    "network_authorized": false,
+    "catalog_mutation_authorized": false,
+    "published_catalog_mutation_authorized": false,
+    "pointer_mutation_authorized": false,
+    "historical_boq_reprice_authorized": false,
+    "local_commit_authorized": false,
+    "external_git_publication_authorized": false,
+    "publish_authorized": false,
+    "p13_authorized": false,
+    "p14_authorized": false,
+    "p14c_authorized": false,
+    "p15_authorized": false,
+    "automatic_next_step": false
+  }
+}

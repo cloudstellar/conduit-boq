@@ -1,8 +1,10 @@
 # Security Model: Current Runtime and P-49 Target
 
-**Current status (2026-08-17):** P-49 business intent approved; technical
-implementation on HOLD; P-13 hard-stopped. See
-[P-49 Pending-Account Authorization Hardening Plan](../plans/master-catalog/45-phase4-p49-pending-authorization-hardening-plan.md).
+**Current status (2026-08-18):** P-49 business target retained; security risk
+open/high; remediation deferred until after the first P-15 closeout under the
+bounded P-51 waiver. P-13 is not authorized but is no longer blocked solely by
+P-49 for that exact closeout. See
+[P-51 Closeout Plan](../plans/master-catalog/48-phase4-p51-risk-accepted-master-catalog-closeout-plan.md).
 
 **P-49 target:** `pending = profile/onboarding-only`; implementation is not
 authorized and the current runtime is not yet fully aligned.
@@ -56,10 +58,12 @@ rules. No data is deleted or reassigned to implement the waiting state.
 - `lib/permissions.ts`, pending navigation/copy, and catalog export still encode
   the former pending-own-BOQ/catalog contract.
 
-Therefore UI-only changes are insufficient. A separately approved append-only
-database authorization correction plus matching application/server changes and
-the full status x resource x action matrix are required before P-13. P-49
-authorizes no implementation, database action, merge, or deploy.
+Therefore UI-only changes are insufficient. A future separately approved
+append-only database authorization correction plus matching application/server
+changes and the full status x resource x action matrix remain required to close
+P-49. P-51 accepts but does not remediate this risk for the exact first
+closeout. P-49/P-51 authorize no implementation, database action, merge, or
+deploy.
 
 ## Safe profile boundary
 
@@ -77,3 +81,4 @@ approved active role scope; pending/inactive/suspended receive none.
 - [Access Model](../03_domain/ACCESS_MODEL.md)
 - [Permission Patterns](../06_engineering/PERMISSION_PATTERNS.md)
 - [P-49 Plan](../plans/master-catalog/45-phase4-p49-pending-authorization-hardening-plan.md)
+- [P-51 Closeout Plan](../plans/master-catalog/48-phase4-p51-risk-accepted-master-catalog-closeout-plan.md)

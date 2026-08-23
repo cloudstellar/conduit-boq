@@ -1,8 +1,9 @@
 # Database Schema
 ## Conduit BOQ System
 
-**Last Updated:** 2026-08-17
-**Status:** Schema canonical; P-49 authorization target not yet implemented
+**Last Updated:** 2026-08-18
+**Status:** Schema canonical; P-49 authorization target not yet implemented;
+risk accepted temporarily and remediation deferred under P-51
 **Database:** PostgreSQL 17 (Supabase)
 
 ---
@@ -318,8 +319,8 @@ singleton pointer สำหรับ Factor F default หลัง migration 012
 ### Historical/core enabled-table excerpt
 
 This seven-table list is not the current complete RLS inventory. Settings,
-catalog/price, Factor F, and Phase 4 surfaces are also in current scope; P-49
-requires exact grants/policies/functions inventory before P-13.
+catalog/price, Factor F, and Phase 4 surfaces are also in current scope. The
+post-P-15 P-49 correction requires an exact grants/policies/functions inventory.
 - `user_profiles`
 - `boq`
 - `boq_routes`
@@ -338,7 +339,8 @@ requires exact grants/policies/functions inventory before P-13.
 - Managers can read profiles in their department
 - Current own-row INSERT may exploit the profile `active` default; broad UPDATE,
   role-only admin UPDATE, and the trigger do not protect the full `role`/`status`
-  state machine. P-49 records these as P-13 blockers.
+  state machine. P-49 records these as open/high risks; P-51 defers remediation
+  without resolving them.
 
 **boq:**
 - Legacy BOQ (created_by IS NULL): **Admin-only** (v1.2.0)
@@ -358,7 +360,9 @@ requires exact grants/policies/functions inventory before P-13.
   and denies selectors to inactive/suspended/missing/unknown profiles.
 
 See [P-49 Pending-Account Authorization Hardening Plan](../plans/master-catalog/45-phase4-p49-pending-authorization-hardening-plan.md)
-for the current-vs-target matrix and acceptance gates.
+for the current-vs-target matrix and acceptance gates, and
+[P-51 Closeout Plan](../plans/master-catalog/48-phase4-p51-risk-accepted-master-catalog-closeout-plan.md)
+for the bounded sequencing waiver.
 
 ---
 

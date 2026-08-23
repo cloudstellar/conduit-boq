@@ -1,14 +1,17 @@
 # Permission Patterns
 ## Conduit BOQ System
 
-**Last Updated:** 2026-08-17
-**Status:** P-49 target canonical; implementation HOLD; P-13 hard-stop
+**Last Updated:** 2026-08-18
+**Status:** P-49 target canonical; risk open/high; remediation deferred under
+P-51; P-13 separately unauthorized
 
 > [!IMPORTANT]
 > P-49 changes the pending business rule to profile/onboarding-only. Current
 > `lib/permissions.ts`, middleware, BOQ RLS/RPC, Factor F reads, profile grants,
 > and privileged APIs are not yet aligned. UI permission helpers are never the
-> authorization boundary. See [P-49 Plan](../plans/master-catalog/45-phase4-p49-pending-authorization-hardening-plan.md).
+> authorization boundary. P-51 accepts this risk temporarily but does not
+> change the permission target. See
+> [P-51 Plan](../plans/master-catalog/48-phase4-p51-risk-accepted-master-catalog-closeout-plan.md).
 
 ---
 
@@ -121,10 +124,10 @@ const isLegacy = context?.created_by === null
 > [!WARNING]
 > RLS is the source of truth. The `can()` function is for UI display only.
 
-P-49 therefore cannot be implemented by editing `can()` alone. The database
+P-49 therefore cannot be implemented by editing `can()` alone. The future database
 grants/policies/RPCs, server/API checks, middleware allowlist, loaders/actions,
 and UI must pass the same matrix. Current source still implements the former
-pending-own-BOQ rule and is a recorded blocker rather than an accepted pattern.
+pending-own-BOQ rule and remains an open risk rather than an accepted pattern.
 
 ---
 

@@ -488,7 +488,7 @@ describe('Master Catalog authority consistency', () => {
       '## 13. WP-6.6 admin workflow completeness and authority hardening',
       '## 14. WP-7 permanent BOQ/hotfix `016` and Factor F regression preservation',
       '## 15. WP-7.5 P-18 new-identity placement governance',
-      '## 16. WP-8 clean local rehearsal',
+      '## 16. Historical WP-8 clean local rehearsal',
     ])
     for (const contract of [
       'Placement UX hard gates for the full Add/Supplement release',
@@ -617,6 +617,7 @@ describe('Master Catalog authority consistency', () => {
     const tracker = read(
       'docs/plans/master-catalog/25-phase4-execution-progress-tracker.md',
     )
+    const normalizedTracker = tracker.replace(/\s+/g, ' ')
     const verificationReport = read(
       'docs/plans/master-catalog/13-phase4-verification-report.md',
     )
@@ -633,8 +634,11 @@ describe('Master Catalog authority consistency', () => {
     expect(tracker).toMatch(
       /P-33 accepted that\s+exact bounded WP-7\.5 technical checkpoint at 2026-07-15 13:54 \+07/,
     )
-    expect(tracker).toContain(
-      '| Current work package | P-49 decision/status recording only:',
+    expect(normalizedTracker).toMatch(
+      /P-50D V3[^.]{0,180}(?:received|complete)[^.]{0,180}decision-record-only/i,
+    )
+    expect(normalizedTracker).toMatch(
+      /P-50C[^.]{0,180}accepted only as local review evidence/i,
     )
     expect(tracker).toContain('P42-UAT-C03')
     expect(tracker).toContain('P42-UAT-G01')
@@ -653,9 +657,13 @@ describe('Master Catalog authority consistency', () => {
     expect(tracker).toContain(
       'the v7 post-`026` encrypted application-only backup are',
     )
-    expect(tracker).toContain(
-      'Owner decisions needed: separately approve or reject the exact P-49 database/application correction proposal',
+    expect(normalizedTracker).toMatch(
+      /P-50D V3 ratification stop boundary — reached/i,
     )
+    expect(normalizedTracker).toMatch(
+      /no small repository\s*>?\s*gate(?:,| and no)\s*>?\s*Git\/CI (?:authorization )?request[^.]{0,240}(?:is|are) authorized/i,
+    )
+    expect(tracker).toContain('P50C-CANDIDATE-20260823-V1')
     expect(tracker).toContain(
       '`0fbaf215018200bacbc728af330e990b98c7e6128165982289ed429c93ad13f2`',
     )
@@ -993,7 +1001,7 @@ describe('Master Catalog authority consistency', () => {
       /pre-amendment operator\/browser preflight passed on\s+`c8f6dca`/,
     )
     expect(tracker).toContain(
-      'Status: P-12 COMPLETE; exact Production sequence 017 -> 017a -> 018-026 and v7 backup remain valid; all Phase 4 flags false. P-49 BUSINESS INTENT APPROVED / TECHNICAL HOLD. P-13 HARD-STOP — PENDING CROSS-LAYER AUTHORIZATION ALIGNMENT; NOT AUTHORIZED',
+      'Status: P-12 COMPLETE; exact Production sequence 017 -> 017a -> 018-026 and v7 backup remain valid; all Phase 4 flags false. P-49 OPEN/HIGH AND DEFERRED UNTIL AFTER P-15 UNDER P-51. P-13 NOT AUTHORIZED; P-49 IS NOT THE SOLE BLOCKER FOR THE EXACT FIRST CLOSEOUT',
     )
     expect(decisions).toContain(
       'accepts combined Owner-operated guided UI plus developer-operated fault-injection/cleanup evidence',
@@ -1336,9 +1344,6 @@ describe('Master Catalog authority consistency', () => {
         'd44286409cad41fff8f977acdafbf6eaecdecb5692381a37fdb8f8f95b9ba538',
       )
       expect(authority).toMatch(
-        /P-13[\s\S]{0,500}(?:PRE-DEPLOY PREPARATION|pre-deploy preparation|HARD-STOP|hard-stopped)/i,
-      )
-      expect(authority).toMatch(
         /P-13[\s\S]{0,500}(?:NOT\s+AUTHORIZED|not\s+authorized)/i,
       )
     }
@@ -1372,7 +1377,30 @@ describe('Master Catalog authority consistency', () => {
       automaticNextStep: false,
     })
 
-    const hardStopPaths = [
+    const waiverMarkerMatch = p49.match(
+      /<!-- P49_P51_WAIVER_DISPOSITION_V1 (\{[^\n]+\}) -->/,
+    )
+    expect(waiverMarkerMatch).not.toBeNull()
+    expect(JSON.parse(waiverMarkerMatch![1])).toEqual({
+      schema: 'conduit-boq/p49-p51-waiver-disposition/v1',
+      recordedAt: '2026-08-18',
+      p49RiskOpen: true,
+      businessTargetRetained: true,
+      remediationDeferred: true,
+      deferredUntil: 'after-first-p15-closeout',
+      waiver: 'P-51',
+      waiverScope: 'first-p13-through-p15-closeout-only',
+      waiverExpires: 'immediately-on-first-p15-closeout',
+      calendarReapprovalRequiredAt: '2026-08-25T23:59:59+07:00',
+      p49ReentryDeadline:
+        'before-next-production-deploy-and-target-within-7-calendar-days-after-p15',
+      p49ImplementationAuthorized: false,
+      migrationReserved: false,
+      proposal47Approved: false,
+      automaticNextStep: false,
+    })
+
+    const currentAuthorityPaths = [
       p49Path,
       'docs/SECURITY.md',
       'docs/04_data/SECURITY_MODEL.md',
@@ -1381,14 +1409,15 @@ describe('Master Catalog authority consistency', () => {
       'docs/plans/master-catalog/25-phase4-execution-progress-tracker.md',
     ]
 
-    for (const path of hardStopPaths) {
+    for (const path of currentAuthorityPaths) {
       const authority = read(path)
       expect(authority).toContain('P-49')
       expect(authority).toMatch(/profile\/onboarding-only/i)
-      expect(authority).toMatch(/P-13[\s\S]{0,220}(?:HARD-STOP|hard-stopped)/i)
-      expect(authority).toMatch(
-        /(?:IMPLEMENTATION NOT AUTHORIZED|implementation on HOLD|implementation is on HOLD|implementation is not authorized|technical implementation is on HOLD)/i,
-      )
+      expect(authority).toContain('P-51')
+      expect(authority).toMatch(/(?:open\/high|OPEN SECURITY RISK|open high)/i)
+      expect(authority).toMatch(/deferred/i)
+      expect(authority).toContain('P-13')
+      expect(authority).toMatch(/not authorized/i)
     }
 
     for (const path of [
@@ -1423,10 +1452,9 @@ describe('Master Catalog authority consistency', () => {
     expect(p49).toContain('self-`status=\'active\'`')
     expect(p49).toContain('`/api/admin/users/[id]`')
     expect(p49).toMatch(/existing rows are retained/i)
-    expect(p49).toContain(
-      'only this canonical documentation, a comment-only P-49\nsupersession on the historical RLS test',
-    )
-    expect(p49).toContain('external Git\npublication/push')
+    expect(p49).toContain('P-51 supersedes only the former timing/hard-stop')
+    expect(p49).toContain('It authorizes no P-49')
+    expect(p49).toContain('external Git publication/push')
     expect(p49).toContain(
       'externalGitPublicationAuthorized":false',
     )
@@ -1515,7 +1543,2439 @@ describe('Master Catalog authority consistency', () => {
       'docs/plans/master-catalog/18-phase4-threat-model.md',
     )
     expect(threatModel).toContain('| T-65 |')
-    expect(threatModel).toContain('**Open / High before P-13.**')
+    expect(threatModel).toContain(
+      '**Open / High; temporarily accepted and deferred under P-51 for the exact first closeout.**',
+    )
+  })
+
+  it('keeps Proposal #47 deferred, unreserved, and non-executable under P-51', () => {
+    const proposal = read(
+      'docs/plans/master-catalog/47-phase4-p49-forward-only-db-application-correction-proposal.md',
+    )
+    const markerMatch = proposal.match(
+      /<!-- P49_FORWARD_ONLY_CORRECTION_PROPOSAL_V1 (\{[^\n]+\}) -->/,
+    )
+
+    expect(markerMatch).not.toBeNull()
+    expect(JSON.parse(markerMatch![1])).toEqual({
+      schema: 'conduit-boq/p49-forward-only-correction-proposal/v1',
+      preparedAt: '2026-08-18',
+      baseCommit: 'a12b022247d75d7e006fac890fc123e9c0a8e168',
+      businessIntent: 'pending-profile-onboarding-only',
+      status: 'deferred-not-approved',
+      deferredUnder: 'P-51',
+      deferredUntil: 'after-first-p15-closeout',
+      p49ReentryDeadline:
+        'before-next-production-deploy-and-target-within-7-calendar-days-after-p15',
+      currentExecutionPlan: false,
+      proposedMigrationNumber: null,
+      proposedLedgerVersion: null,
+      migrationReserved: false,
+      proposalDecisionPending: false,
+      implementationAuthorized: false,
+      localDatabaseAuthorized: false,
+      productionReadAuthorized: false,
+      productionWriteAuthorized: false,
+      localCommitAuthorized: false,
+      externalGitPublicationAuthorized: false,
+      p13Authorized: false,
+      p14Authorized: false,
+      p15Authorized: false,
+      mustReReviewLivePosture: true,
+      mustRewriteProposal: true,
+      automaticNextStep: false,
+    })
+    expect(proposal).toContain('NOT A CURRENT EXECUTION PLAN')
+    expect(proposal).toContain('withdrawn and unreserved')
+    expect(proposal).toContain('read-only live-posture capture')
+    expect(proposal).toContain('Do not approve P-49S from this document')
+  })
+
+  it('records one bounded P-51 SOLO closeout route without authorizing operational work', () => {
+    const p51 = read(
+      'docs/plans/master-catalog/48-phase4-p51-risk-accepted-master-catalog-closeout-plan.md',
+    )
+    const markerMatch = p51.match(
+      /<!-- P51_RISK_ACCEPTED_MASTER_CATALOG_CLOSEOUT_V2 (\{[^\n]+\}) -->/,
+    )
+
+    expect(markerMatch).not.toBeNull()
+    const marker = JSON.parse(markerMatch![1])
+    expect(marker).toMatchObject({
+      schema: 'conduit-boq/p51-risk-accepted-master-catalog-closeout/v2',
+      recordedAt: '2026-08-18',
+      soloSimplifiedAt: '2026-08-21',
+      scope: 'exact-first-master-catalog-closeout-only',
+      ownerSoloOperator: true,
+      operatingGateModel:
+        'data->bounded-deploy-uat->separate-publish-closeout',
+      formerP50rStageModel: 'P-50R-I->P-50R-O->P-50R-X',
+      formerP50rStagesExecuted: false,
+      currentDecisionId: 'P50R-SOLO-REQ-20260821-V1',
+      currentDecision: 'approve-or-hold-p50r-solo-only',
+      p50rSoloRequestReady: true,
+      p50rSoloOfflineOnly: true,
+      p50rSoloCoverageRequirement: '100-percent-bidirectional',
+      p50rSoloDeterministicRunCount: 2,
+      ownerAcceptsTemporaryP49SecurityRisk: true,
+      p49ImplementationDeferredUntilAfterP15: true,
+      p49CurrentReleaseBlockerWaived: true,
+      waiverCalendarReapprovalAt: '2026-08-25T23:59:59+07:00',
+      supabaseRlsGrantsAuthMustRemainUnchanged: true,
+      clientServiceRoleForbidden: true,
+      zeroPriceRequirementAutomaticallySuperseded: false,
+    })
+    for (const field of [
+      'p50rSoloAuthorized',
+      'p50rSoloDatabaseAccessAuthorized',
+      'p50rSoloNetworkAccessAuthorized',
+      'p50rSoloSourceMutationAuthorized',
+      'p50PriceMutationAuthorized',
+      'p50dAuthorized',
+      'p50cAuthorized',
+      'gitCiAuthorized',
+      'p13Authorized',
+      'p14Authorized',
+      'p14cAuthorized',
+      'p15Authorized',
+      'databaseAccessAuthorized',
+      'productionWriteAuthorized',
+      'localCommitAuthorized',
+      'externalGitPublicationAuthorized',
+      'automaticNextStep',
+    ]) {
+      expect(marker[field]).toBe(false)
+    }
+
+    const historicalCurrentMarkerMatch = p51.match(
+      /<!-- P51_CURRENT_GATE_OVERLAY_V1 (\{[^\n]+\}) -->/,
+    )
+    expect(historicalCurrentMarkerMatch).not.toBeNull()
+    const historicalCurrentMarker = JSON.parse(
+      historicalCurrentMarkerMatch![1],
+    )
+    expect(historicalCurrentMarker).toMatchObject({
+      schema: 'conduit-boq/p51-current-gate-overlay/v1',
+      currentAsOf: '2026-08-22',
+      p50rRequestId: 'P50R-SOLO-REQ-20260821-V1',
+      p50rCompleted: true,
+      p50rResult: 'PASS_FOR_P50D_REQUEST',
+      currentDecisionId: 'P50D-REQ-20260822-V1',
+      currentDecision: 'approve-or-hold-p50d-only',
+      p50dProposalReady: true,
+      historicalZeroPriceGateStillBinding: true,
+    })
+    expect(p51).toContain(
+      'The overlay above is retained as the 2026-08-22 point-in-time state',
+    )
+    expect(p51).toContain('superseded without approval')
+    for (const field of [
+      'p50dAuthorized',
+      'p50cAuthorized',
+      'gitCiAuthorized',
+      'databaseAccessAuthorized',
+      'productionWriteAuthorized',
+      'p13Authorized',
+      'p14Authorized',
+      'p14cAuthorized',
+      'p15Authorized',
+      'localCommitAuthorized',
+      'externalGitPublicationAuthorized',
+      'automaticNextStep',
+    ]) {
+      expect(historicalCurrentMarker[field]).toBe(false)
+    }
+
+    const currentMarkerMatch = p51.match(
+      /<!-- P51_CURRENT_GATE_OVERLAY_V2 (\{[^\n]+\}) -->/,
+    )
+    expect(currentMarkerMatch).not.toBeNull()
+    const currentMarker = JSON.parse(currentMarkerMatch![1])
+    expect(currentMarker).toMatchObject({
+      schema: 'conduit-boq/p51-current-gate-overlay/v2',
+      currentAsOf: '2026-08-23',
+      p50rRequestId: 'P50R-SOLO-REQ-20260821-V1',
+      p50rCompleted: true,
+      p50rResult: 'PASS_FOR_P50D_REQUEST',
+      p50rEvidenceComparisonOnly: true,
+      supersededDecisionId: 'P50D-REQ-20260822-V1',
+      supersededDecisionApproved: false,
+      currentDecisionId: 'P50D-REQ-20260823-V2',
+      currentDecision: 'select-baseline-only-or-selected-delta-or-hold',
+      baselineVersion: '2568.0.0',
+      baselineRowCount: 710,
+      baselineAuthorityFields: [
+        'item_name',
+        'unit',
+        'material_cost',
+        'labor_cost',
+        'unit_cost',
+      ],
+      initialApprovedChangeCount: 0,
+      p50dProposalReady: true,
+      historicalZeroPriceGateStillBinding: true,
+    })
+    for (const field of [
+      'p50dAuthorized',
+      'p50cAuthorized',
+      'gitCiAuthorized',
+      'databaseAccessAuthorized',
+      'productionWriteAuthorized',
+      'p13Authorized',
+      'p14Authorized',
+      'p14cAuthorized',
+      'p15Authorized',
+      'localCommitAuthorized',
+      'externalGitPublicationAuthorized',
+      'automaticNextStep',
+    ]) {
+      expect(currentMarker[field]).toBe(false)
+    }
+
+    const currentReviewMarkerMatch = p51.match(
+      /<!-- P51_CURRENT_GATE_OVERLAY_V5 (\{[^\n]+\}) -->/,
+    )
+    expect(currentReviewMarkerMatch).not.toBeNull()
+    const currentReviewMarker = JSON.parse(currentReviewMarkerMatch![1])
+    expect(currentReviewMarker).toMatchObject({
+      schema: 'conduit-boq/p51-current-gate-overlay/v5',
+      currentAsOf: '2026-08-23',
+      supersedesLiveAcceptanceAndNextActionOf:
+        'P51_CURRENT_GATE_OVERLAY_V4',
+      preservesPriorMarkersAsHistory: true,
+      p50dV3RequestId: 'P50D-REQ-20260823-V3',
+      p50dV3ManifestSha256:
+        '1ac28a74def993214f73659f1930acdb5caa57390504e494b21d72bbf3778429',
+      selectedIdentityId: 'f2662c71-a6e5-407e-8456-8608e304b43b',
+      selectedLegacyItemCode: 'ITEM-0429',
+      selectedTargetItemCode: 'COR-PB0-002',
+      baselinePrice: [0, 1763, 1763],
+      candidatePrice: [0, 1764, 1764],
+      p50cCandidateId: 'P50C-CANDIDATE-20260823-V1',
+      candidateSha256:
+        'd7a19a9dbaecff4abb18086d1f9e236ae4b5ea311477ccdb609a52c54f200611',
+      diffSha256:
+        '72e950d96bfdf81abeb3317ee280cc01e630a13447d1f38edd9ee7149f3ddf18',
+      candidateManifestSha256:
+        'd88d3daa63db6a59f9ba973d653647224584aa9d98c3efde4cbaad78f6bfefe5',
+      candidateDataQualityReviewPassed: true,
+      candidateRole: 'review-oracle-not-direct-import-payload',
+      soloPreGitPackage: [
+        'candidate.json',
+        'diff.json',
+        'manifest.json',
+        'focused-deterministic-test',
+      ],
+      preGitExcelPdfRequired: false,
+      draftExcelPdfDeferredTo: 'exact-p14c-production-draft',
+      exactOwnerRatificationPending: true,
+      candidateAccepted: false,
+      gitScopeRequiresSeparateExplicitStatement: true,
+    })
+    for (const field of [
+      'localCommitAuthorized',
+      'externalGitPublicationAuthorized',
+      'ciAuthorized',
+      'previewAuthorized',
+      'databaseAccessAuthorized',
+      'productionReadAuthorized',
+      'productionWriteAuthorized',
+      'networkAuthorized',
+      'applicationMutationAuthorized',
+      'sourceMutationAuthorized',
+      'catalogMutationAuthorized',
+      'boqMutationAuthorized',
+      'pointerMutationAuthorized',
+      'factorFMutationAuthorized',
+      'p13Authorized',
+      'p14Authorized',
+      'p14cAuthorized',
+      'p15Authorized',
+      'automaticNextStep',
+    ]) {
+      expect(currentReviewMarker[field]).toBe(false)
+    }
+
+    const canonicalRoute = p51
+      .split('\n')
+      .find((line) => line.startsWith('`P-51D -> Gate 1'))
+    expect(canonicalRoute).toContain(
+      'P-50R-SOLO complete -> one exact P-50D V3 Owner confirmation (ratification), also accepting existing verified P-50C only as local review evidence -> separately authorized Git/CI/Preview',
+    )
+    expect(canonicalRoute).not.toContain('P-50D -> P-50C')
+    expect(canonicalRoute).toContain(
+      'Gate 2 [P-13 -> P-14 checkpoint -> P-14C STOP UNPUBLISHED]',
+    )
+    expect(canonicalRoute).toContain(
+      'Gate 3 [P-15 -> ordered closeout/custody]',
+    )
+    expectInOrder(p51, [
+      '### 2.1 Gate 1',
+      '#### P-50R-SOLO',
+      '#### P-50D checkpoint',
+      '#### P-50C and Git/CI checkpoint',
+      '### 2.2 Gate 2 — bounded P-13/P-14/P-14C window',
+      '### 2.3 Gate 3 — separate P-15 publication and closeout',
+    ])
+    const boundedWindowSection = p51.slice(
+      p51.indexOf('### 2.2 Gate 2'),
+      p51.indexOf('### 2.3 Gate 3'),
+    )
+    expect(boundedWindowSection).toContain('P-14 checkpoint')
+    expect(boundedWindowSection).toContain('Gate 2 must end')
+    expect(boundedWindowSection).toContain(
+      'one P-14C draft **unpublished**',
+    )
+    const publicationSection = p51.slice(
+      p51.indexOf('### 2.3 Gate 3'),
+      p51.indexOf('## 3. Minimal identifier bindings'),
+    )
+    expect(publicationSection).toContain(
+      'P-15 requires a new explicit decision',
+    )
+    expect(p51).toMatch(/100% of both source and\s+catalog\/candidate rows/)
+    expect(p51).toContain(
+      'two fresh deterministic runs whose canonical result hashes are identical',
+    )
+    expect(p51).toContain(
+      'Owner self-review of every delta and exception',
+    )
+    expect(p51).toMatch(
+      /Security-risk acceptance under P-51 does\s+not\s+accept\s+price, accounting,\s+(?:source-authority|evidence-precedence), or data-quality risk\./,
+    )
+    expect(p51).toContain(
+      'P-50R-SOLO and P-50C use no Supabase client',
+    )
+    expect(p51).toContain('2026-08-25 23:59:59 +07')
+    expect(p51).toMatch(
+      /P-50D, P-50C, Git\/CI\/Preview, P-13, P-14, P-14C, and P-15 remain false/,
+    )
+
+    for (const path of [
+      'docs/plans/master-catalog/12-phase4-production-runbook.md',
+      'docs/plans/master-catalog/13-phase4-verification-report.md',
+      'docs/plans/master-catalog/15-phase4-admin-operating-procedure.md',
+      'docs/plans/master-catalog/23-phase4-implementation-execution-pack.md',
+    ]) {
+      const operationalContract = read(path)
+      expect(operationalContract).toContain('P-50R SOLO')
+      expect(operationalContract).toContain(
+        'P-13/P-14/P-14C bounded window',
+      )
+      expect(operationalContract).toMatch(/P-15[\s\S]{0,180}separate/i)
+      expect(operationalContract).toContain('DRAFT – ห้ามใช้อ้างอิง')
+      expect(operationalContract).toMatch(/official Excel\/PDF/i)
+      expect(operationalContract).toMatch(
+        /post-publication[^\n]{0,120}backup/i,
+      )
+    }
+  })
+
+  it('records P-50 as a pre-P-15 one-row candidate without authorizing Production or publication', () => {
+    const p50Path =
+      'docs/plans/master-catalog/46-phase4-p50-known-price-erratum-pre-p15-reconciliation-and-release-decision-plan.md'
+    const p50 = read(p50Path)
+    const markerMatch = p50.match(
+      /<!-- P50_CATALOG_PRICE_ERRATUM_PRE_P15_DECISION_V2 (\{[^\n]+\}) -->/,
+    )
+
+    expect(markerMatch).not.toBeNull()
+    expect(JSON.parse(markerMatch![1])).toEqual({
+      schema: 'conduit-boq/p50-catalog-price-erratum-pre-p15-decision/v2',
+      recordedAt: '2026-08-17T23:44:12+07:00',
+      reframedAt: '2026-08-18',
+      disposition:
+        'pre-p15-full-source-price-reconciliation-required-release-path-owner-decision-pending',
+      ownerReleasePathDecisionPending: true,
+      currentPublishedVersion: '2568.0.0',
+      firstStructuredCandidate: '2568.1.0',
+      historicalCandidatePriceGate: 'zero-price-change',
+      historicalCandidatePriceGateStillBinding: true,
+      historicalCandidatePriceGateSupersessionAuthorized: false,
+      fullSourcePriceReconciliationBeforeP15Required: true,
+      reconciliationExecutionAuthorized: false,
+      sourceFileAccessAuthorized: false,
+      databaseAccessAuthorized: false,
+      productionReadAuthorized: false,
+      exactCorrectionManifestApproved: false,
+      durablePriceAuthorityApproved: false,
+      adr003VersionDecisionApproved: false,
+      correctionAuthorized: false,
+      rebaselineAuthorized: false,
+      securityRiskAcceptanceCoversPriceOrDataQuality: false,
+      p15Hold: true,
+      separatePriceRiskDecisionMayReleaseP15Hold: true,
+      identityId: 'f2662c71-a6e5-407e-8456-8608e304b43b',
+      legacyItemCode: 'ITEM-0429',
+      candidateStructuredCode: 'COR-PB0-002',
+      materialBefore: '0.00',
+      materialAfter: '0.00',
+      laborBefore: '1763.00',
+      laborProposed: '1764.00',
+      unitBefore: '1763.00',
+      unitProposed: '1764.00',
+      sourcePdfSha256:
+        '5f095c43a34a4541779d9c45a0558ac108048aab6fa96454b7e81e9f25cc619b',
+      sourcePdfPage: 24,
+      rawReconciliationSha256:
+        '4627e413bea3c6a72b544f71cf0b91f4bff5c8d4199a799373140f4c969a338a',
+      firstRolloutAuthoritySha256:
+        '62d1e40a368c103aef76c70055057bdf906a50f2c1d7141bf8a97e1f8836a0b8',
+      rawReconciliationPreserved: true,
+      adjacentFindingsAuthorized: false,
+      existingBoqRepriceAuthorized: false,
+      currentCatalogMutationAuthorized: false,
+      p13Authorized: false,
+      p14Authorized: false,
+      p15Authorized: false,
+      localCommitAuthorized: false,
+      externalGitPublicationAuthorized: false,
+      automaticNextStep: false,
+    })
+
+    const historicalResultMarkerMatch = p50.match(
+      /<!-- P50_P50R_RESULT_OVERLAY_V1 (\{[^\n]+\}) -->/,
+    )
+    expect(historicalResultMarkerMatch).not.toBeNull()
+    const historicalResultMarker = JSON.parse(historicalResultMarkerMatch![1])
+    expect(historicalResultMarker).toMatchObject({
+      schema: 'conduit-boq/p50-p50r-result-overlay/v1',
+      currentAsOf: '2026-08-22',
+      p50rRequestId: 'P50R-SOLO-REQ-20260821-V1',
+      p50rCompleted: true,
+      p50rResult: 'PASS_FOR_P50D_REQUEST',
+      reviewBindingSha256:
+        '55c90931144b8a7a2cb4aebeb917d2dc0062b576dcbd5a7678e2f208421149cc',
+      p50dProposalId: 'P50D-REQ-20260822-V1',
+      p50dProposalReady: true,
+      historicalZeroPriceGateStillBinding: true,
+    })
+    for (const field of [
+      'p50dAuthorized',
+      'p50cAuthorized',
+      'databaseAccessAuthorized',
+      'productionWriteAuthorized',
+      'catalogMutationAuthorized',
+      'gitPublicationAuthorized',
+      'p13Authorized',
+      'p14Authorized',
+      'p14cAuthorized',
+      'p15Authorized',
+      'automaticNextStep',
+    ]) {
+      expect(historicalResultMarker[field]).toBe(false)
+    }
+
+    const currentMarkerMatch = p50.match(
+      /<!-- P50_BASELINE_FIRST_AUTHORITY_OVERLAY_V1 (\{[^\n]+\}) -->/,
+    )
+    expect(currentMarkerMatch).not.toBeNull()
+    const currentMarker = JSON.parse(currentMarkerMatch![1])
+    expect(currentMarker).toMatchObject({
+      schema: 'conduit-boq/p50-baseline-first-authority-overlay/v1',
+      currentAsOf: '2026-08-23',
+      currentPublishedVersion: '2568.0.0',
+      currentPublishedRowCount: 710,
+      baselineAuthorityFields: [
+        'item_name',
+        'unit',
+        'material_cost',
+        'labor_cost',
+        'unit_cost',
+      ],
+      p50rRequestId: 'P50R-SOLO-REQ-20260821-V1',
+      p50rResult: 'PASS_FOR_P50D_REQUEST',
+      p50rReviewBindingSha256:
+        '55c90931144b8a7a2cb4aebeb917d2dc0062b576dcbd5a7678e2f208421149cc',
+      p50rOutputsRole: 'immutable-comparison-evidence-only',
+      historicalTechnicalCandidateCount: 49,
+      historicalRetainEvidenceCount: 18,
+      historicalCandidateLabelsApproveCorrections: false,
+      p50dV1RequestId: 'P50D-REQ-20260822-V1',
+      p50dV1Superseded: true,
+      currentP50dRequestId: 'P50D-REQ-20260823-V2',
+      currentP50dProposalNumber: 51,
+      currentOutcomes: ['BASELINE-ONLY', 'SELECTED-DELTA'],
+      defaultOutcome: 'BASELINE-ONLY',
+      defaultNameDeltaCount: 0,
+      defaultUnitDeltaCount: 0,
+      defaultPriceDeltaCount: 0,
+      selectedDeltaRequiresExactOwnerSelection: true,
+      selectedDeltaNameUnitMutationAuthorized: false,
+    })
+    for (const field of [
+      'p50dV2Authorized',
+      'p50cAuthorized',
+      'databaseAccessAuthorized',
+      'productionReadAuthorized',
+      'productionWriteAuthorized',
+      'networkAuthorized',
+      'catalogMutationAuthorized',
+      'candidateMutationAuthorized',
+      'gitPublicationAuthorized',
+      'p13Authorized',
+      'p14Authorized',
+      'p14cAuthorized',
+      'p15Authorized',
+      'automaticNextStep',
+    ]) {
+      expect(currentMarker[field]).toBe(false)
+    }
+
+    const p50AuthorityPaths = [
+      'docs/plans/master-catalog/00-phase4-review-guide.md',
+      'docs/plans/master-catalog/09-phase4-change-request.md',
+      'docs/plans/master-catalog/11-phase4-reconciliation-report.md',
+      'docs/plans/master-catalog/12-phase4-production-runbook.md',
+      'docs/plans/master-catalog/13-phase4-verification-report.md',
+      'docs/plans/master-catalog/15-phase4-admin-operating-procedure.md',
+      'docs/plans/master-catalog/19-phase4-decision-register.md',
+      'docs/plans/master-catalog/23-phase4-implementation-execution-pack.md',
+      'docs/plans/master-catalog/25-phase4-execution-progress-tracker.md',
+    ]
+
+    for (const path of p50AuthorityPaths) {
+      const authority = read(path)
+      expect(authority).toContain('P-50')
+      expect(authority).toContain(
+        './46-phase4-p50-known-price-erratum-pre-p15-reconciliation-and-release-decision-plan.md',
+      )
+      expect(authority).toContain('2568.0.0')
+      expect(authority).toMatch(
+        /(?:before[^\n]{0,60}P-15|pre-P-15)/i,
+      )
+      expect(authority).toContain(
+        './53-phase4-p50c-one-row-offline-candidate-result-record.md',
+      )
+      expect(authority).toContain('P50C-CANDIDATE-20260823-V1')
+    }
+
+    expect(p50).toContain('ITEM-0427')
+    expect(p50).toContain('ITEM-0430')
+    expect(p50).toContain('ITEM-0431')
+    expect(p50).toMatch(/ITEM-0427[\s\S]{0,240}1801[\s\S]{0,80}6871[\s\S]{0,160}1802[\s\S]{0,80}6872/)
+    expect(p50).toMatch(/ITEM-0430[\s\S]{0,240}1763[\s\S]{0,160}1764/)
+    expect(p50).toMatch(/ITEM-0431[\s\S]{0,240}3526[\s\S]{0,160}3528/)
+    expect([
+      ...p50.matchAll(
+        /historical technical candidate; not selected\/authorized/g,
+      ),
+    ]).toHaveLength(3)
+    expect(p50).toMatch(
+      /100% of both source and catalog(?:\/candidate)?\s+rows/i,
+    )
+    expect(p50).toContain(
+      'ae72ac34caf37aeb024e15b0b7462f21ca34987aac448a07bde4d69f7e92ec3b',
+    )
+    expect(p50).toContain('workbook row 620/source row 782')
+    expect(p50).not.toContain('2568.0.1')
+    expect(p50).toContain('`BASELINE-ONLY` — current default')
+    expect(p50).toContain('`SELECTED-DELTA` — optional exact Owner selection')
+    expect(p50).toContain(
+      'Proposal #50 Path A and Path B are superseded',
+    )
+    expect(p50).toContain(
+      'security-risk acceptance cannot authorize,\nwaive, or absorb a price/data-quality discrepancy',
+    )
+    expect(p50).toContain(
+      'Any import after a final selected money edit invalidates',
+    )
+
+    const runbook = read(
+      'docs/plans/master-catalog/12-phase4-production-runbook.md',
+    )
+    expect(runbook).toContain(
+      'Require the price-change set to equal the exact ratified P-50D V3 manifest',
+    )
+
+    const reconciliationPath =
+      'docs/plans/master-catalog/evidence/phase4-reconciliation-draft.csv'
+    const reconciliation = read(reconciliationPath)
+    expect(createHash('sha256').update(reconciliation).digest('hex')).toBe(
+      '4627e413bea3c6a72b544f71cf0b91f4bff5c8d4199a799373140f4c969a338a',
+    )
+    expect(reconciliation).toContain(
+      '"f2662c71-a6e5-407e-8456-8608e304b43b","ITEM-0429","COR-PB0-002"',
+    )
+    expect(reconciliation).toContain(
+      '"0","0","1763","1763","1763","1763","recode","preserve_production"',
+    )
+
+    const firstRolloutAuthority = read(
+      'lib/master-catalog/import/data/phase4-first-rollout-authority.json',
+    )
+    expect(
+      createHash('sha256').update(firstRolloutAuthority).digest('hex'),
+    ).toBe(
+      '62d1e40a368c103aef76c70055057bdf906a50f2c1d7141bf8a97e1f8836a0b8',
+    )
+
+    const decisionRegister = read(
+      'docs/plans/master-catalog/19-phase4-decision-register.md',
+    )
+    expect(decisionRegister).toMatch(
+      /\| Publish named version \| P-15 not requested \|/,
+    )
+    expect(decisionRegister).toMatch(/\| P-51 \|/)
+    expect(decisionRegister).toContain(
+      'waives P-49 only as a blocker for the exact first Master Catalog closeout',
+    )
+    expect(
+      existsSync(
+        resolve(
+          root,
+          'docs/plans/master-catalog/46-phase4-p50-known-price-erratum-post-p15-correction-plan.md',
+        ),
+      ),
+    ).toBe(false)
+  })
+
+  it('preserves the exact consumed P-50R SOLO request contract as historical authority', () => {
+    const requestPath =
+      'docs/plans/master-catalog/49-phase4-p50r-exact-price-reconciliation-evidence-scope-request.md'
+    const request = read(requestPath)
+    const markerMatch = request.match(
+      /<!-- P50R_SOLO_RECONCILIATION_REQUEST_V1 (\{[^\n]+\}) -->/,
+    )
+
+    expect(markerMatch).not.toBeNull()
+    const marker = JSON.parse(markerMatch![1])
+    expect(marker).toMatchObject({
+      schema: 'conduit-boq/p50r-solo-reconciliation-request/v1',
+      preparedAt: '2026-08-21',
+      requestId: 'P50R-SOLO-REQ-20260821-V1',
+      baseCommit: 'a12b022247d75d7e006fac890fc123e9c0a8e168',
+      status: 'ready-for-owner-review-execution-not-authorized',
+      mode: 'solo-operator',
+      supersedesStageModel: 'P-50R-I->P-50R-O->P-50R-X',
+      stagedModelExecuted: false,
+      stagedModelSuperseded: true,
+      ownerReviewReady: true,
+      ownerDecisionPending: true,
+      soloOperatorSelfReviewAccepted: true,
+      requestedScope: 'one-offline-read-only-full-reconciliation',
+      sourceReadRequested: true,
+      boundedEvidenceWriteRequested: true,
+      inputCount: 5,
+      implementationFileCount: 3,
+      evidenceFileCount: 5,
+      coverageRequirement: '100-percent-bidirectional',
+      deterministicPassCount: 2,
+      pdfPageCount: 28,
+      manualAllPageReviewRequired: true,
+      exactDeltaReviewRequired: true,
+      identityKey: 'stable-identity-id',
+      currentPublishedVersion: '2568.0.0',
+      firstStructuredCandidate: '2568.1.0',
+      historicalZeroPriceGateStillBinding: true,
+      identityId: 'f2662c71-a6e5-407e-8456-8608e304b43b',
+      legacyItemCode: 'ITEM-0429',
+      candidateStructuredCode: 'COR-PB0-002',
+      frozenPriceTriple: '0/1763/1763',
+      proposedPriceTriple: '0/1764/1764',
+      productionSnapshotSha256:
+        'a8761632ba4ddbb22934c0e10dca0e4299798d572dc1db56222629a2d86c4570',
+      taxonomyWorkbookSha256:
+        'ae72ac34caf37aeb024e15b0b7462f21ca34987aac448a07bde4d69f7e92ec3b',
+      sourcePdfSha256:
+        '5f095c43a34a4541779d9c45a0558ac108048aab6fa96454b7e81e9f25cc619b',
+      rawReconciliationSha256:
+        '4627e413bea3c6a72b544f71cf0b91f4bff5c8d4199a799373140f4c969a338a',
+      firstRolloutAuthoritySha256:
+        '62d1e40a368c103aef76c70055057bdf906a50f2c1d7141bf8a97e1f8836a0b8',
+      reconciliationCompleted: false,
+      reconciliationResultSha256: null,
+    })
+
+    for (const field of [
+      'executionBaselineFrozen',
+      'priceSourceAuthorityFiled',
+      'protectedSourceReadAuthorized',
+      'sourceDirectoryEnumerationAuthorized',
+      'runnerImplementationAuthorized',
+      'reconciliationExecutionAuthorized',
+      'evidenceWriteAuthorized',
+      'localDatabaseAuthorized',
+      'productionReadAuthorized',
+      'productionWriteAuthorized',
+      'networkAuthorized',
+      'dependencyInstallAuthorized',
+      'sourceMutationAuthorized',
+      'historicalEvidenceMutationAuthorized',
+      'protectedUntrackedMutationAuthorized',
+      'catalogMutationAuthorized',
+      'candidateMutationAuthorized',
+      'boqMutationAuthorized',
+      'pointerMutationAuthorized',
+      'factorFMutationAuthorized',
+      'exactCorrectionManifestApproved',
+      'durablePriceAuthorityApproved',
+      'adr003VersionDecisionApproved',
+      'adjacentFindingsAuthorized',
+      'p50dAuthorized',
+      'p50cAuthorized',
+      'gitPublicationAuthorized',
+      'p13Authorized',
+      'p14Authorized',
+      'p14cAuthorized',
+      'p15Authorized',
+      'localCommitAuthorized',
+      'externalGitPublicationAuthorized',
+      'automaticNextStep',
+    ]) {
+      expect(marker[field]).toBe(false)
+    }
+
+    const consumedOverlayMatch = request.match(
+      /<!-- P50R_CONSUMED_BASELINE_FIRST_OVERLAY_V1 (\{[^\n]+\}) -->/,
+    )
+    expect(consumedOverlayMatch).not.toBeNull()
+    const consumedOverlay = JSON.parse(consumedOverlayMatch![1])
+    expect(consumedOverlay).toMatchObject({
+      schema: 'conduit-boq/p50r-consumed-baseline-first-overlay/v1',
+      currentAsOf: '2026-08-23',
+      p50rRequestId: 'P50R-SOLO-REQ-20260821-V1',
+      p50rConsumed: true,
+      p50rCompleted: true,
+      p50rResult: 'PASS_FOR_P50D_REQUEST',
+      p50rResidualAuthority: false,
+      reviewBindingSha256:
+        '55c90931144b8a7a2cb4aebeb917d2dc0062b576dcbd5a7678e2f208421149cc',
+      reconciliationSha256:
+        '4bd5c30fa60b323164eb0303d211ae31f211bbdb337f2236ed15970b63912bee',
+      deltaManifestSha256:
+        'c2fa9de6a9b2f7c3206852779675b4e4457c3ddfef77b64f8655170030391c47',
+      exceptionsSha256:
+        '93e179ef906849bcd5c383986aaf560f84e6242a815c2d2649e3d8b78142600b',
+      summarySha256:
+        '7cc7cf4bbe1fea8783e5cc6fa736e018591d461325a43ed7570c26e015fe8d3d',
+      sha256sumsSha256:
+        '35485e1a862e9894a6e51def37b4a2df5300b23578e157e9dbd79ced54efc3ff',
+      publishedCurrentBaseline: '2568.0.0',
+      publishedCurrentRowCount: 710,
+      baselineAuthorityFields: [
+        'item_name',
+        'unit',
+        'material_cost',
+        'labor_cost',
+        'unit_cost',
+      ],
+      p50rOutputsRole: 'immutable-comparison-evidence-only',
+      historicalTechnicalCandidateCount: 49,
+      historicalTechnicalCandidatesApproved: false,
+      historicalSourceVersionDifferenceCount: 18,
+      p50dV1RequestId: 'P50D-REQ-20260822-V1',
+      p50dV1Superseded: true,
+      currentP50dRequestId: 'P50D-REQ-20260823-V2',
+      currentP50dProposalNumber: 51,
+      defaultOutcome: 'BASELINE-ONLY',
+      defaultNameDeltaCount: 0,
+      defaultUnitDeltaCount: 0,
+      defaultPriceDeltaCount: 0,
+      selectedDeltaRequiresExactStableIdentitiesAndTriples: true,
+    })
+    for (const field of [
+      'p50dV2Authorized',
+      'p50cAuthorized',
+      'databaseAccessAuthorized',
+      'productionReadAuthorized',
+      'productionWriteAuthorized',
+      'networkAuthorized',
+      'catalogMutationAuthorized',
+      'candidateMutationAuthorized',
+      'boqMutationAuthorized',
+      'pointerMutationAuthorized',
+      'factorFMutationAuthorized',
+      'gitPublicationAuthorized',
+      'p13Authorized',
+      'p14Authorized',
+      'p14cAuthorized',
+      'p15Authorized',
+      'automaticNextStep',
+    ]) {
+      expect(consumedOverlay[field]).toBe(false)
+    }
+
+    const exactInputs = [
+      [
+        'supabase/.snapshots/public-data-20260621-post009.sql',
+        'a8761632ba4ddbb22934c0e10dca0e4299798d572dc1db56222629a2d86c4570',
+      ],
+      [
+        'files/รายการบัญชีราคามาตรฐานงานก่อสร้างท่อร้อยสาย 2568.pdf',
+        '5f095c43a34a4541779d9c45a0558ac108048aab6fa96454b7e81e9f25cc619b',
+      ],
+      [
+        'files/NT_Item_Code_Master_K_Mapping_2568.xlsx',
+        'ae72ac34caf37aeb024e15b0b7462f21ca34987aac448a07bde4d69f7e92ec3b',
+      ],
+      [
+        'docs/plans/master-catalog/evidence/phase4-reconciliation-draft.csv',
+        '4627e413bea3c6a72b544f71cf0b91f4bff5c8d4199a799373140f4c969a338a',
+      ],
+      [
+        'lib/master-catalog/import/data/phase4-first-rollout-authority.json',
+        '62d1e40a368c103aef76c70055057bdf906a50f2c1d7141bf8a97e1f8836a0b8',
+      ],
+    ]
+    const inputSection = request.slice(
+      request.indexOf('## 2. Exact five-input read contract'),
+      request.indexOf('## 3. One runner, one focused test, one evidence package'),
+    )
+    expect(
+      [
+        ...inputSection.matchAll(
+          /^\| `([^`]+)` \| SHA-256 `([a-f0-9]{64})`;/gm,
+        ),
+      ].map((match) => [match[1], match[2]]),
+    ).toEqual(exactInputs)
+    expect(exactInputs.every(([path]) => !/[?*\[\]{}]/.test(path))).toBe(true)
+    expect(inputSection).toContain('12 frozen columns and 710 active rows')
+    expect(inputSection).toContain('all 28 pages')
+    expect(inputSection).toContain(
+      'range `A1:AE709`, 31 headers, 708 data rows',
+    )
+    expect(inputSection).toContain(
+      '27 columns and 728 records: 710 `production`, 18 `workbook_candidate`',
+    )
+    expect(inputSection).toContain(
+      '710 mappings, 17 exclusions, 65 groups',
+    )
+    expect(inputSection).toContain(
+      'No directory listing, glob, recursive scan, sibling-file read',
+    )
+    expect(inputSection).toContain('Recompute all five hashes after the run')
+
+    const implementationPaths = [
+      'scripts/reconcile-master-catalog-p50r.mjs',
+      'scripts/reconcile-master-catalog-p50r-pdf.py',
+      'tests/master-catalog-p50r-reconciliation.test.ts',
+    ]
+    const implementationSection = request.slice(
+      request.indexOf('### 3.1 Implementation allowlist'),
+      request.indexOf('### 3.2 Evidence write allowlist'),
+    )
+    expect(
+      [...implementationSection.matchAll(/^\d+\. `([^`]+)`/gm)].map(
+        (match) => match[1],
+      ),
+    ).toEqual(implementationPaths)
+
+    const evidencePaths = [
+      'docs/plans/master-catalog/evidence/p50r-solo/reconciliation.csv',
+      'docs/plans/master-catalog/evidence/p50r-solo/proposed-delta-manifest.json',
+      'docs/plans/master-catalog/evidence/p50r-solo/exceptions.json',
+      'docs/plans/master-catalog/evidence/p50r-solo/summary.json',
+      'docs/plans/master-catalog/evidence/p50r-solo/SHA256SUMS',
+    ]
+    const evidenceSection = request.slice(
+      request.indexOf('### 3.2 Evidence write allowlist'),
+      request.indexOf('## 4. Minimum reconciliation and self-review contract'),
+    )
+    expect(
+      [...evidenceSection.matchAll(/^\d+\. `([^`]+)`/gm)].map(
+        (match) => match[1],
+      ),
+    ).toEqual(evidencePaths)
+    expect(evidenceSection).toContain('All targets must be absent')
+    expect(evidenceSection).toContain('No existing evidence')
+    expect(evidenceSection).toContain(
+      'synthetic in-memory inputs only',
+    )
+
+    expect(request).toContain('Coverage must be 100% bidirectional')
+    expect(request).toContain('Stable UUID identity is primary')
+    expect(request).toContain('Never use price as an identity key')
+    expect(request).toContain('material + labor = unit cost')
+    expect(request).toContain(
+      'SQL 710 rows must equal CSV 710 Production rows',
+    )
+    expect(request).toContain(
+      'Workbook 708 rows must reconcile exactly',
+    )
+    expect(request).toContain(
+      'JSON 710 mappings/17 exclusions/65 groups must reconcile',
+    )
+    expect(request).toContain(
+      'Every PDF row on every page must appear exactly once',
+    )
+    for (const itemCode of ['ITEM-0429', 'ITEM-0427', 'ITEM-0430', 'ITEM-0431']) {
+      expect(request).toContain(itemCode)
+    }
+
+    const deterministicSection = request.slice(
+      request.indexOf('### 4.2 Two-pass determinism'),
+      request.indexOf('### 4.3 Solo manual review'),
+    )
+    expect(deterministicSection).toContain(
+      'execute two independent\nin-memory passes',
+    )
+    expect(deterministicSection).toContain(
+      'compare exact canonical\nbytes',
+    )
+    expect(deterministicSection).toContain(
+      'Any difference is `HOLD` before the first evidence write',
+    )
+    for (const output of evidencePaths.slice(0, 3)) {
+      expect(deterministicSection).toContain(
+        '`' + output.split('/').at(-1) + '`',
+      )
+    }
+
+    const manualReviewSection = request.slice(
+      request.indexOf('### 4.3 Solo manual review'),
+      request.indexOf('## 5. Hard stops and explicit non-authority'),
+    )
+    expect(manualReviewSection).toContain('all 28 PDF pages')
+    expect(manualReviewSection).toContain(
+      'every proposed price delta, including adjacent findings',
+    )
+    expect(manualReviewSection).toContain(
+      'every unmatched, duplicate, ambiguous, arithmetic, and source-precedence',
+    )
+    expect(manualReviewSection).toContain('`pending_p50d`')
+    expect(manualReviewSection).toContain('`PASS_FOR_P50D_REQUEST` or `HOLD`')
+
+    expect(request).toContain(
+      'offline/read-only source access with no database or network connection',
+    )
+    expect(request).toContain(
+      'Local or Production DB access/write',
+    )
+    expect(request).toContain(
+      'editing the source inputs, published catalog, candidate, pointer, BOQ',
+    )
+    expect(request).toContain(
+      'P-50D/P-50C/Git/P-13/P-14/P-14C/P-15=false',
+    )
+    const normalizedRequest = request.replace(/\s+/g, ' ')
+    expect(normalizedRequest).toContain(
+      'P-51D -> P-50R SOLO complete -> one exact P-50D V3 Owner confirmation (ratification) that also accepts the verified offline P-50C package only as local review evidence -> separately authorized local release commit/push + CI/Preview -> P-13/P-14/P-14C bounded window -> separate P-15 -> closeout -> P-49',
+    )
+    expect(normalizedRequest).not.toContain(
+      'The canonical solo route is: `P-51D -> P-50R SOLO -> P-50D -> P-50C',
+    )
+    expect(request).toContain(
+      'P-15 remains a separate confirmation',
+    )
+    expect(request).toContain('HISTORICAL REQUEST CONSUMED; P-50R COMPLETE')
+    expect(request).toContain(
+      '## 10. Superseded same-day downstream interpretation — 2026-08-23',
+    )
+    expect(request).toContain(
+      '## 11. Current downstream authority correction — 2026-08-24',
+    )
+
+    const trackedReconciliation = read(
+      'docs/plans/master-catalog/evidence/phase4-reconciliation-draft.csv',
+    )
+    expect(
+      createHash('sha256').update(trackedReconciliation).digest('hex'),
+    ).toBe(exactInputs[3][1])
+    const trackedAuthority = read(
+      'lib/master-catalog/import/data/phase4-first-rollout-authority.json',
+    )
+    expect(createHash('sha256').update(trackedAuthority).digest('hex')).toBe(
+      exactInputs[4][1],
+    )
+
+    for (const path of [
+      'docs/plans/master-catalog/00-phase4-review-guide.md',
+      'docs/plans/master-catalog/09-phase4-change-request.md',
+      'docs/plans/master-catalog/11-phase4-reconciliation-report.md',
+      'docs/plans/master-catalog/12-phase4-production-runbook.md',
+      'docs/plans/master-catalog/13-phase4-verification-report.md',
+      'docs/plans/master-catalog/15-phase4-admin-operating-procedure.md',
+      'docs/plans/master-catalog/19-phase4-decision-register.md',
+      'docs/plans/master-catalog/23-phase4-implementation-execution-pack.md',
+      'docs/plans/master-catalog/25-phase4-execution-progress-tracker.md',
+      'docs/plans/master-catalog/46-phase4-p50-known-price-erratum-pre-p15-reconciliation-and-release-decision-plan.md',
+      'docs/plans/master-catalog/48-phase4-p51-risk-accepted-master-catalog-closeout-plan.md',
+    ]) {
+      expect(read(path)).toContain(
+        './49-phase4-p50r-exact-price-reconciliation-evidence-scope-request.md',
+      )
+    }
+
+    const decisionRegister = read(
+      'docs/plans/master-catalog/19-phase4-decision-register.md',
+    )
+    const p50rRow = decisionRegister
+      .split('\n')
+      .find((line) => line.startsWith('| P-50R |'))
+    expect(p50rRow).toMatch(/offline\/read-only SOLO reconciliation/i)
+    expect(p50rRow).toMatch(/APPROVAL CONSUMED/i)
+    expect(p50rRow).toContain('PASS_FOR_P50D_REQUEST')
+    expect(p50rRow).toMatch(/no P-50D, mutation, Git, or later gate/i)
+
+    const tracker = read(
+      'docs/plans/master-catalog/25-phase4-execution-progress-tracker.md',
+    )
+    const normalizedTracker = tracker.replace(/\s+/g, ' ')
+    expect(tracker).toContain('P50R-SOLO-REQ-20260821-V1')
+    expect(normalizedTracker).toMatch(
+      /P-50D V3[^.]{0,180}(?:received|complete)[^.]{0,180}decision-record-only/i,
+    )
+    expect(normalizedTracker).toMatch(
+      /P-50C[^.]{0,180}accepted only as local review evidence/i,
+    )
+    expect(normalizedTracker).toMatch(
+      /P-50D V3 ratification stop boundary — reached/i,
+    )
+    expect(normalizedTracker).toMatch(
+      /no small repository\s*>?\s*gate(?:,| and no)\s*>?\s*Git\/CI (?:authorization )?request[^.]{0,240}(?:is|are) authorized/i,
+    )
+    expect(tracker).toContain('P50D-REQ-20260823-V2')
+    expect(tracker).toMatch(
+      /P50D-REQ-20260822-V1[^\n]{0,160}superseded without approval/i,
+    )
+    const canonicalRoute = tracker
+      .split('\n')
+      .find((line) => line.startsWith('| Canonical first-closeout route |'))
+    expect(canonicalRoute).toContain(
+      'P-51D -> P-50R SOLO complete -> V2 one-row selection intent -> P-50D V3 exact Owner ratification complete/P-50C accepted only as local review evidence -> P-50G PASS/authorization consumed -> review separately prepared P-50H proposal',
+    )
+    expect(canonicalRoute).toContain(
+      'P-50G PASS/authorization consumed',
+    )
+    expect(canonicalRoute).toContain(
+      'P-50H execution, P-13/P-14/P-14C, P-15',
+    )
+    expect(tracker).toMatch(/P-15[^\n]*separate/i)
+  })
+
+  it('preserves superseded P-50D V1 and binds current baseline-first V2 without authority', () => {
+    const historicalProposalPath =
+      'docs/plans/master-catalog/50-phase4-p50d-exact-price-and-version-disposition-decision-proposal.md'
+    const currentProposalPath =
+      'docs/plans/master-catalog/51-phase4-p50d-2568-baseline-first-delta-review-proposal.md'
+    const evidenceRoot = 'docs/plans/master-catalog/evidence/p50r-solo'
+    const historicalProposal = read(historicalProposalPath)
+    const currentProposal = read(currentProposalPath)
+    const supersessionMatch = historicalProposal.match(
+      /<!-- P50D_V1_SUPERSESSION_OVERLAY_V1 (\{[^\n]+\}) -->/,
+    )
+
+    expect(supersessionMatch).not.toBeNull()
+    const supersession = JSON.parse(supersessionMatch![1])
+    expect(supersession).toMatchObject({
+      schema: 'conduit-boq/p50d-v1-supersession-overlay/v1',
+      recordedAt: '2026-08-23',
+      supersededRequestId: 'P50D-REQ-20260822-V1',
+      supersededWithoutApproval: true,
+      approvable: false,
+      replacementRequestId: 'P50D-REQ-20260823-V2',
+      replacementProposal:
+        './51-phase4-p50d-2568-baseline-first-delta-review-proposal.md',
+      ownerBaselineVersion: '2568.0.0',
+      ownerBaselineFieldAuthority: [
+        'item_name',
+        'unit',
+        'material_cost',
+        'labor_cost',
+        'unit_cost',
+      ],
+      p50rEvidencePreserved: true,
+      p50rEvidenceComparisonOnly: true,
+      historicalV1MarkerPreserved: true,
+      historicalZeroPriceGateStillBinding: true,
+    })
+    for (const field of [
+      'p50dAuthorized',
+      'p50cAuthorized',
+      'databaseAccessAuthorized',
+      'productionReadAuthorized',
+      'productionWriteAuthorized',
+      'catalogMutationAuthorized',
+      'candidateMutationAuthorized',
+      'boqMutationAuthorized',
+      'pointerMutationAuthorized',
+      'factorFMutationAuthorized',
+      'gitPublicationAuthorized',
+      'p13Authorized',
+      'p14Authorized',
+      'p14cAuthorized',
+      'p15Authorized',
+      'automaticNextStep',
+    ]) {
+      expect(supersession[field]).toBe(false)
+    }
+    expect(historicalProposal).toContain(
+      'SUPERSEDED WITHOUT APPROVAL / NOT APPROVABLE',
+    )
+    expect(historicalProposal).toContain(
+      'Everything below this notice is retained as the historical, unapproved V1',
+    )
+
+    const markerMatch = historicalProposal.match(
+      /<!-- P50D_OWNER_DECISION_PROPOSAL_V1 (\{[^\n]+\}) -->/,
+    )
+
+    expect(markerMatch).not.toBeNull()
+    const marker = JSON.parse(markerMatch![1])
+    expect(marker).toMatchObject({
+      schema: 'conduit-boq/p50d-owner-decision-proposal/v1',
+      preparedAt: '2026-08-22',
+      requestId: 'P50D-REQ-20260822-V1',
+      consumesP50rRequestId: 'P50R-SOLO-REQ-20260821-V1',
+      p50rResult: 'PASS_FOR_P50D_REQUEST',
+      p50rReviewBindingSha256:
+        '55c90931144b8a7a2cb4aebeb917d2dc0062b576dcbd5a7678e2f208421149cc',
+      deltaManifestSha256:
+        'c2fa9de6a9b2f7c3206852779675b4e4457c3ddfef77b64f8655170030391c47',
+      deltaRecordCount: 67,
+      recommendedPath: 'A',
+      recommendedRowBasis: 'same-filed-2568-basis-source-restoration',
+      recommendedReleaseIntent: 'revision',
+      recommendedTarget: '2568.1.0',
+      recommendedCorrectionCount: 49,
+      recommendedCorrectionSetSha256:
+        '42e02ca9df6180a073237398811666c1de92ec9d52ac9ed6f183a18eadad0cc0',
+      cohortACount: 25,
+      cohortASetSha256:
+        '95ca7c3c77b5697c64d099a186f17e9116b7eff54409f6fea2a7a3dd8d5a7ec5',
+      cohortBCount: 24,
+      cohortBSetSha256:
+        '5b7be022a56c8b361671a0c6ba5e1c22234d1e0e41b6e7ed5d0f5a00976b3dd0',
+      retainSourceVersionCount: 18,
+      retainSourceVersionSetSha256:
+        '489a8a82ee570c62640b9028ef5e8b612bc1b1858dd4d3251c068750c7fb64a2',
+      authorityExclusionCount: 17,
+      p51WaiverReapprovalAt: '2026-08-25T23:59:59+07:00',
+      ownerPersonalResultConfirmationClaimed: false,
+      historicalZeroPriceGateStillBinding: true,
+    })
+
+    for (const field of [
+      'historicalZeroPriceGateSupersessionAuthorized',
+      'exactCorrectionManifestApproved',
+      'p50dAuthorized',
+      'p50cAuthorized',
+      'databaseAccessAuthorized',
+      'productionReadAuthorized',
+      'productionWriteAuthorized',
+      'catalogMutationAuthorized',
+      'candidateMutationAuthorized',
+      'boqMutationAuthorized',
+      'pointerMutationAuthorized',
+      'factorFMutationAuthorized',
+      'gitPublicationAuthorized',
+      'p13Authorized',
+      'p14Authorized',
+      'p14cAuthorized',
+      'p15Authorized',
+      'automaticNextStep',
+    ]) {
+      expect(marker[field]).toBe(false)
+    }
+
+    const currentMarkerMatch = currentProposal.match(
+      /<!-- P50D_BASELINE_FIRST_OWNER_REVIEW_PROPOSAL_V2 (\{[^\n]+\}) -->/,
+    )
+    expect(currentMarkerMatch).not.toBeNull()
+    const currentMarker = JSON.parse(currentMarkerMatch![1])
+    expect(currentMarker).toMatchObject({
+      schema: 'conduit-boq/p50d-baseline-first-owner-review-proposal/v2',
+      preparedAt: '2026-08-23',
+      requestId: 'P50D-REQ-20260823-V2',
+      supersedesRequestId: 'P50D-REQ-20260822-V1',
+      supersededRequestApproved: false,
+      baselineVersion: '2568.0.0',
+      baselineRowCount: 710,
+      baselineSnapshotSha256:
+        'a8761632ba4ddbb22934c0e10dca0e4299798d572dc1db56222629a2d86c4570',
+      baselineValueBindingSha256:
+        '6266fcf6f51089cc9902c61c2b66acbbf27906679ce0e1e9148172a8f47b0b1a',
+      baselineAuthorityFields: [
+        'item_name',
+        'unit',
+        'material_cost',
+        'labor_cost',
+        'unit_cost',
+      ],
+      consumesP50rRequestId: 'P50R-SOLO-REQ-20260821-V1',
+      p50rResult: 'PASS_FOR_P50D_REQUEST',
+      p50rReviewBindingSha256:
+        '55c90931144b8a7a2cb4aebeb917d2dc0062b576dcbd5a7678e2f208421149cc',
+      p50rDeltaManifestSha256:
+        'c2fa9de6a9b2f7c3206852779675b4e4457c3ddfef77b64f8655170030391c47',
+      p50rEvidenceComparisonOnly: true,
+      externalSourcePriceCandidateCount: 49,
+      externalSourcePriceCandidateSetSha256:
+        '42e02ca9df6180a073237398811666c1de92ec9d52ac9ed6f183a18eadad0cc0',
+      retainBaselineCount: 18,
+      retainBaselineSetSha256:
+        '489a8a82ee570c62640b9028ef5e8b612bc1b1858dd4d3251c068750c7fb64a2',
+      authorityExclusionCount: 17,
+      proposedNameChangeCount: 0,
+      proposedUnitChangeCount: 0,
+      proposedMaterialChangeCount: 0,
+      initialApprovedChangeCount: 0,
+      initialApprovedSetSha256:
+        '37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570',
+      ownerChoices: ['BASELINE-ONLY', 'SELECTED-DELTA'],
+      historicalZeroPriceGateStillBinding: true,
+      historicalZeroPriceGateSupersessionAuthorized: false,
+      exactSelectedDeltaManifestApproved: false,
+    })
+    for (const field of [
+      'p50dAuthorized',
+      'p50cAuthorized',
+      'databaseAccessAuthorized',
+      'productionReadAuthorized',
+      'productionWriteAuthorized',
+      'catalogMutationAuthorized',
+      'candidateMutationAuthorized',
+      'boqMutationAuthorized',
+      'pointerMutationAuthorized',
+      'factorFMutationAuthorized',
+      'gitPublicationAuthorized',
+      'p13Authorized',
+      'p14Authorized',
+      'p14cAuthorized',
+      'p15Authorized',
+      'automaticNextStep',
+    ]) {
+      expect(currentMarker[field]).toBe(false)
+    }
+
+    const baselineSnapshot = read(
+      'supabase/.snapshots/public-data-20260621-post009.sql',
+    )
+    expect(createHash('sha256').update(baselineSnapshot).digest('hex')).toBe(
+      currentMarker.baselineSnapshotSha256,
+    )
+    const priceListMatches = [
+      ...baselineSnapshot.matchAll(
+        /^INSERT INTO public\.price_list\r?\nSELECT \* FROM jsonb_populate_recordset\(NULL::public\.price_list,\r?\n\$snapshot_20260621\$(\[[^\r\n]*\])\$snapshot_20260621\$::jsonb\);$/gm,
+      ),
+    ]
+    expect(priceListMatches).toHaveLength(1)
+    const baselineRows = JSON.parse(priceListMatches[0]![1]) as Array<{
+      id: string
+      item_code: string
+      item_name: string
+      unit: string
+      material_cost: number
+      labor_cost: number
+      unit_cost: number
+    }>
+    const baselineValueRecords = [...baselineRows]
+      .sort((left, right) => left.item_code.localeCompare(right.item_code, 'en'))
+      .map((row) => ({
+        identity_id: row.id,
+        legacy_item_code: row.item_code,
+        item_name: row.item_name,
+        unit: row.unit,
+        material_cost: row.material_cost,
+        labor_cost: row.labor_cost,
+        unit_cost: row.unit_cost,
+      }))
+    expect(baselineValueRecords).toHaveLength(710)
+    expect(baselineValueRecords[0]?.legacy_item_code).toBe('ITEM-0001')
+    expect(baselineValueRecords.at(-1)?.legacy_item_code).toBe('ITEM-0710')
+    expect(
+      createHash('sha256')
+        .update(JSON.stringify(baselineValueRecords) + '\n')
+        .digest('hex'),
+    ).toBe(currentMarker.baselineValueBindingSha256)
+    expect(
+      createHash('sha256').update(JSON.stringify([]) + '\n').digest('hex'),
+    ).toBe(currentMarker.initialApprovedSetSha256)
+
+    const evidenceHashes = {
+      'reconciliation.csv':
+        '4bd5c30fa60b323164eb0303d211ae31f211bbdb337f2236ed15970b63912bee',
+      'proposed-delta-manifest.json':
+        'c2fa9de6a9b2f7c3206852779675b4e4457c3ddfef77b64f8655170030391c47',
+      'exceptions.json':
+        '93e179ef906849bcd5c383986aaf560f84e6242a815c2d2649e3d8b78142600b',
+      'summary.json':
+        '7cc7cf4bbe1fea8783e5cc6fa736e018591d461325a43ed7570c26e015fe8d3d',
+      SHA256SUMS:
+        '35485e1a862e9894a6e51def37b4a2df5300b23578e157e9dbd79ced54efc3ff',
+    }
+    for (const [name, sha256] of Object.entries(evidenceHashes)) {
+      expect(
+        createHash('sha256')
+          .update(read(`${evidenceRoot}/${name}`))
+          .digest('hex'),
+      ).toBe(sha256)
+    }
+
+    const summary = JSON.parse(read(`${evidenceRoot}/summary.json`))
+    expect(summary).toMatchObject({
+      request_id: 'P50R-SOLO-REQ-20260821-V1',
+      result: 'PASS_FOR_P50D_REQUEST',
+      next_step: 'STOP_AT_P50D_OWNER_DECISION_REQUEST',
+      review_binding: {
+        digest:
+          '55c90931144b8a7a2cb4aebeb917d2dc0062b576dcbd5a7678e2f208421149cc',
+      },
+      delta_review: {
+        record_count: 67,
+        every_record_pending_p50d: true,
+        mutation_authorized: false,
+      },
+      exception_review: {
+        record_count: 245,
+        blocking_count: 0,
+      },
+      authority: {
+        p50d_authorized: false,
+        p50c_authorized: false,
+        automatic_next_step: false,
+      },
+    })
+    expect(summary.page_review.status).toBe('reviewed_all_28_pages')
+
+    const manifest = JSON.parse(
+      read(`${evidenceRoot}/proposed-delta-manifest.json`),
+    )
+    const cohortA = manifest.records.filter(
+      (record: Record<string, unknown>) =>
+        record.classification === 'proposed_confirmed_correction' &&
+        record.sql_vs_xlsx === 'equal' &&
+        record.xlsx_vs_pdf === 'different',
+    )
+    const cohortB = manifest.records.filter(
+      (record: Record<string, unknown>) =>
+        record.classification === 'proposed_confirmed_correction' &&
+        record.sql_vs_xlsx === 'different' &&
+        record.xlsx_vs_pdf === 'equal',
+    )
+    const retain = manifest.records.filter(
+      (record: Record<string, unknown>) =>
+        record.classification === 'source_version_difference',
+    )
+    const digest = (records: Array<Record<string, unknown>>) =>
+      createHash('sha256')
+        .update(JSON.stringify(records) + '\n')
+        .digest('hex')
+
+    expect(manifest).toMatchObject({
+      record_count: 67,
+      status: 'evidence_only_pending_p50d',
+      price_mutation_authorized: false,
+    })
+    expect(
+      new Set(
+        manifest.records.map(
+          (record: { identity_key: string }) => record.identity_key,
+        ),
+      ).size,
+    ).toBe(67)
+    expect(
+      manifest.records.every(
+        (record: { decision_status: string }) =>
+          record.decision_status === 'pending_p50d',
+      ),
+    ).toBe(true)
+    expect(
+      manifest.records.every(
+        (record: { proposed_action: string }) =>
+          record.proposed_action === 'none',
+      ),
+    ).toBe(true)
+    expect(cohortA).toHaveLength(25)
+    expect(cohortB).toHaveLength(24)
+    expect(retain).toHaveLength(18)
+    expect(digest([...cohortA, ...cohortB])).toBe(
+      marker.recommendedCorrectionSetSha256,
+    )
+    expect(digest(cohortA)).toBe(marker.cohortASetSha256)
+    expect(digest(cohortB)).toBe(marker.cohortBSetSha256)
+    expect(digest(retain)).toBe(marker.retainSourceVersionSetSha256)
+    expect(digest([...cohortA, ...cohortB])).toBe(
+      currentMarker.externalSourcePriceCandidateSetSha256,
+    )
+    expect(digest(retain)).toBe(currentMarker.retainBaselineSetSha256)
+
+    const firstRolloutAuthority = JSON.parse(
+      read(
+        'lib/master-catalog/import/data/phase4-first-rollout-authority.json',
+      ),
+    )
+    expect(firstRolloutAuthority.mappings).toHaveLength(710)
+    expect(firstRolloutAuthority.source_exclusions).toHaveLength(17)
+    expect(currentMarker.authorityExclusionCount).toBe(
+      firstRolloutAuthority.source_exclusions.length,
+    )
+
+    expect(historicalProposal).toContain('ITEM-0623 +855')
+    expect(historicalProposal).toContain('ITEM-0637 -460')
+    expect(historicalProposal).toContain(
+      'if it is\n   absent, `HOLD` and return to P-50D instead of using target `2568.1.0`',
+    )
+    expect(historicalProposal).toContain(
+      'Until the Owner records the complete\nSection 7 decision',
+    )
+    expect(currentProposal).toContain('HISTORICAL V2 SELECTION BASIS CONSUMED')
+    expect(currentProposal).toContain('P50D-REQ-20260823-V2')
+    expect(currentProposal).toContain(
+      'P-50R remains immutable comparison evidence',
+    )
+    expect(currentProposal).toContain('| Approved name changes | `0` |')
+    expect(currentProposal).toContain('| Approved unit changes | `0` |')
+    expect(currentProposal).toContain(
+      '| Approved material-price changes | `0` |',
+    )
+    expect(currentProposal).toContain(
+      '| Approved labor-price changes | `0` |',
+    )
+    expect(currentProposal).toContain(
+      '| Approved unit-cost changes | `0` |',
+    )
+    expect(currentProposal).toContain(
+      'P-50C/DB/Production/network/mutation/Git/P-13/P-14/P-14C/P-15 remain false',
+    )
+
+    for (const path of [
+      'docs/plans/master-catalog/00-phase4-review-guide.md',
+      'docs/plans/master-catalog/09-phase4-change-request.md',
+      'docs/plans/master-catalog/11-phase4-reconciliation-report.md',
+      'docs/plans/master-catalog/12-phase4-production-runbook.md',
+      'docs/plans/master-catalog/13-phase4-verification-report.md',
+      'docs/plans/master-catalog/15-phase4-admin-operating-procedure.md',
+      'docs/plans/master-catalog/19-phase4-decision-register.md',
+      'docs/plans/master-catalog/23-phase4-implementation-execution-pack.md',
+      'docs/plans/master-catalog/25-phase4-execution-progress-tracker.md',
+      'docs/plans/master-catalog/48-phase4-p51-risk-accepted-master-catalog-closeout-plan.md',
+      historicalProposalPath,
+    ]) {
+      const authority = read(path)
+      expect(authority).toContain(
+        './51-phase4-p50d-2568-baseline-first-delta-review-proposal.md',
+      )
+      expect(authority).toContain('2568.0.0')
+    }
+
+    const tracker = read(
+      'docs/plans/master-catalog/25-phase4-execution-progress-tracker.md',
+    )
+    expect(tracker).toContain('P50D-REQ-20260823-V2')
+    expect(tracker).toMatch(
+      /P50D-REQ-20260822-V1[^\n]{0,160}superseded without approval/i,
+    )
+  })
+
+  it('preserves the original P-50C interpretation and binds the reviewed candidate evidence', () => {
+    const resultPath =
+      'docs/plans/master-catalog/53-phase4-p50c-one-row-offline-candidate-result-record.md'
+    const result = read(resultPath)
+    const resultMarkerMatch = result.match(
+      /<!-- P50C_ONE_ROW_OFFLINE_CANDIDATE_RESULT_V1 (\{[^\n]+\}) -->/,
+    )
+
+    expect(resultMarkerMatch).not.toBeNull()
+    const marker = JSON.parse(resultMarkerMatch![1])
+    expect(marker).toMatchObject({
+      schema: 'conduit-boq/p50c-one-row-offline-candidate-result/v1',
+      recordedAt: '2026-08-23',
+      p50dRequestId: 'P50D-REQ-20260823-V3',
+      p50dDecision: 'SELECTED-DELTA',
+      p50dApproved: true,
+      p50dManifestSha256:
+        '1ac28a74def993214f73659f1930acdb5caa57390504e494b21d72bbf3778429',
+      selectedRecordCount: 1,
+      selectedRecordsSha256:
+        'f63127e589e7f5302f481f55b1df54a6b741efdc1aaa3b74e94d94f84abf15df',
+      selectedIdentityId: 'f2662c71-a6e5-407e-8456-8608e304b43b',
+      selectedLegacyItemCode: 'ITEM-0429',
+      selectedTargetItemCode: 'COR-PB0-002',
+      baselinePrice: [0, 1763, 1763],
+      candidatePrice: [0, 1764, 1764],
+      p50cCandidateId: 'P50C-CANDIDATE-20260823-V1',
+      p50cOfflineBuildAuthorized: true,
+      p50cOfflineBuildAuthorityConsumed: true,
+      p50cOfflineBuildComplete: true,
+      candidateSha256:
+        'd7a19a9dbaecff4abb18086d1f9e236ae4b5ea311477ccdb609a52c54f200611',
+      diffSha256:
+        '72e950d96bfdf81abeb3317ee280cc01e630a13447d1f38edd9ee7149f3ddf18',
+      candidateManifestSha256:
+        'd88d3daa63db6a59f9ba973d653647224584aa9d98c3efde4cbaad78f6bfefe5',
+      candidateRowCount: 710,
+      identityRecodeCount: 709,
+      identityRetainCount: 1,
+      changedAuthorityValueRowCount: 1,
+      unchangedAuthorityValueRowCount: 709,
+      nameChangeCount: 0,
+      unitChangeCount: 0,
+      materialChangeCount: 0,
+      laborChangeCount: 1,
+      unitCostChangeCount: 1,
+      unselectedExternalCandidateCount: 48,
+      authorityExclusionCount: 17,
+      historicalBoqRepriceAuthorized: false,
+      currentPublishedVersion: '2568.0.0',
+      currentPublishedCatalogChanged: false,
+      provisionalTargetVersion: '2568.1.0',
+      targetRegistryCheckPending: true,
+      historicalZeroPriceGateSupersededOnlyForSelectedUuidInLocalCandidate: true,
+    })
+    expect(result).toContain('Independent-review correction')
+    const reviewCorrectionMatch = result.match(
+      /<!-- P50C_RESULT_REVIEW_CORRECTION_V1 (\{[^\n]+\}) -->/,
+    )
+    expect(reviewCorrectionMatch).not.toBeNull()
+    const reviewCorrection = JSON.parse(reviewCorrectionMatch![1])
+    expect(reviewCorrection).toMatchObject({
+      schema: 'conduit-boq/p50c-result-review-correction/v1',
+      supersedesCurrentAuthorityOf: 'P50C_ONE_ROW_OFFLINE_CANDIDATE_RESULT_V1',
+      p50dRequestId: 'P50D-REQ-20260823-V3',
+      exactOwnerRatificationPending: true,
+      p50dAuthorized: false,
+      p50cTechnicalBuildOccurred: true,
+      p50cDataReviewPassed: true,
+      p50cCandidateAccepted: false,
+      nextOwnerDecision: 'ratify-or-hold-exact-p50d-v3',
+    })
+    for (const field of [
+      'p50cCandidateApplicationAuthorized',
+      'databaseAccessAuthorized',
+      'productionReadAuthorized',
+      'productionWriteAuthorized',
+      'networkAuthorized',
+      'publishedCatalogMutationAuthorized',
+      'pointerMutationAuthorized',
+      'factorFMutationAuthorized',
+      'localCommitAuthorized',
+      'externalGitPublicationAuthorized',
+      'ciPreviewAuthorized',
+      'p13Authorized',
+      'p14Authorized',
+      'p14cAuthorized',
+      'p15Authorized',
+      'automaticNextStep',
+    ]) {
+      expect(marker[field]).toBe(false)
+    }
+
+    const artifactHashes = {
+      'docs/plans/master-catalog/evidence/p50d-v3/p50d-selected-delta-manifest.json':
+        marker.p50dManifestSha256,
+      'docs/plans/master-catalog/evidence/p50c-v1/candidate.json':
+        marker.candidateSha256,
+      'docs/plans/master-catalog/evidence/p50c-v1/diff.json':
+        marker.diffSha256,
+      'docs/plans/master-catalog/evidence/p50c-v1/manifest.json':
+        marker.candidateManifestSha256,
+      'scripts/build-master-catalog-p50c.mjs':
+        'd4ffac6f0f377dbb7586324c76b9d078c4679059167d5f48edd4de7535556957',
+      'tests/master-catalog-p50c-candidate.test.ts':
+        '351ac25144b5bcf267764c16d3e448dacc856c632319963a7325a95a7e109e1f',
+    }
+    for (const [path, sha256] of Object.entries(artifactHashes)) {
+      expect(createHash('sha256').update(read(path)).digest('hex')).toBe(
+        sha256,
+      )
+    }
+
+    const candidate = JSON.parse(
+      read('docs/plans/master-catalog/evidence/p50c-v1/candidate.json'),
+    )
+    const diff = JSON.parse(
+      read('docs/plans/master-catalog/evidence/p50c-v1/diff.json'),
+    )
+    const candidateManifest = JSON.parse(
+      read('docs/plans/master-catalog/evidence/p50c-v1/manifest.json'),
+    )
+    expect(candidate).toMatchObject({
+      candidate_id: 'P50C-CANDIDATE-20260823-V1',
+      baseline_version: '2568.0.0',
+      provisional_target_version: '2568.1.0',
+      target_version_registry_check_status: 'pending',
+      row_count: 710,
+    })
+    expect(candidate.rows).toHaveLength(710)
+    expect(candidate.rows.map((row: { display_order: number }) => row.display_order))
+      .toEqual(Array.from({ length: 710 }, (_, index) => index))
+    expect(diff).toMatchObject({
+      candidate_id: 'P50C-CANDIDATE-20260823-V1',
+      record_count: 1,
+      records: [
+        {
+          stable_identity_id: 'f2662c71-a6e5-407e-8456-8608e304b43b',
+          legacy_item_code: 'ITEM-0429',
+          target_item_code: 'COR-PB0-002',
+          change_fields: ['labor_cost', 'unit_cost'],
+          before: { material_cost: 0, labor_cost: 1763, unit_cost: 1763 },
+          after: { material_cost: 0, labor_cost: 1764, unit_cost: 1764 },
+          delta: { material_cost: 0, labor_cost: 1, unit_cost: 1 },
+        },
+      ],
+    })
+    expect(candidateManifest).toMatchObject({
+      status: 'candidate-built-not-authorized-for-application',
+      counts: {
+        candidate_row_count: 710,
+        baseline_authority_value_changed_row_count: 1,
+        baseline_authority_value_unchanged_row_count: 709,
+        item_name_changed_row_count: 0,
+        unit_changed_row_count: 0,
+        material_cost_changed_row_count: 0,
+        historical_boq_repriced_row_count: 0,
+      },
+      release: {
+        target_version_is_official: false,
+        fresh_issued_claimed_registry_check_status: 'pending',
+      },
+    })
+
+    const currentAuthorityPaths = [
+      'docs/plans/master-catalog/00-phase4-review-guide.md',
+      'docs/plans/master-catalog/09-phase4-change-request.md',
+      'docs/plans/master-catalog/11-phase4-reconciliation-report.md',
+      'docs/plans/master-catalog/12-phase4-production-runbook.md',
+      'docs/plans/master-catalog/13-phase4-verification-report.md',
+      'docs/plans/master-catalog/15-phase4-admin-operating-procedure.md',
+      'docs/plans/master-catalog/19-phase4-decision-register.md',
+      'docs/plans/master-catalog/23-phase4-implementation-execution-pack.md',
+      'docs/plans/master-catalog/25-phase4-execution-progress-tracker.md',
+      'docs/plans/master-catalog/46-phase4-p50-known-price-erratum-pre-p15-reconciliation-and-release-decision-plan.md',
+      'docs/plans/master-catalog/48-phase4-p51-risk-accepted-master-catalog-closeout-plan.md',
+      'docs/plans/master-catalog/49-phase4-p50r-exact-price-reconciliation-evidence-scope-request.md',
+      'docs/plans/master-catalog/51-phase4-p50d-2568-baseline-first-delta-review-proposal.md',
+      'docs/plans/master-catalog/52-phase4-p50d-one-row-selected-delta-approval-proposal.md',
+    ]
+    for (const path of currentAuthorityPaths) {
+      const authority = read(path)
+      expect(authority).toContain(
+        './53-phase4-p50c-one-row-offline-candidate-result-record.md',
+      )
+      expect(authority).toContain('P50C-CANDIDATE-20260823-V1')
+      expect(authority).toContain(marker.candidateSha256)
+      expect(authority).toContain(marker.candidateManifestSha256)
+    }
+  })
+
+  it('records exact P-50D V3 Owner ratification while holding every execution gate', () => {
+    const remediationPath =
+      'docs/plans/master-catalog/54-phase4-p50c-review-remediation-and-p50d-v3-ratification-request.md'
+    const remediation = read(remediationPath)
+
+    // Preserve the pre-receipt request, term, and validation markers as dated
+    // history. The append-only receipt below is the current authority state.
+    const confirmationTermMatch = remediation.match(
+      /<!-- P50D_V3_EXACT_OWNER_CONFIRMATION_TERM_V1 (\{[^\n]+\}) -->/,
+    )
+
+    expect(confirmationTermMatch).not.toBeNull()
+    const confirmationTerm = JSON.parse(confirmationTermMatch![1])
+    expect(confirmationTerm).toMatchObject({
+      schema: 'conduit-boq/p50d-v3-exact-owner-confirmation-term/v1',
+      recordedAt: '2026-08-24',
+      canonicalTerm: 'exact Owner confirmation (ratification)',
+      thaiMeaning:
+        'การยืนยันรายละเอียดแบบเจาะจงโดย Owner หลังสร้างหลักฐานแล้ว',
+      legacyCommandLabel: 'RATIFY',
+      requestId: 'P50D-V3-RATIFY-REQ-20260823-V1',
+      p50dRequestId: 'P50D-REQ-20260823-V3',
+      selectedIdentityId: 'f2662c71-a6e5-407e-8456-8608e304b43b',
+      selectedLegacyItemCode: 'ITEM-0429',
+      selectedTargetItemCode: 'COR-PB0-002',
+      baselinePrice: [0, 1763, 1763],
+      candidatePrice: [0, 1764, 1764],
+      p50dManifestSha256:
+        '1ac28a74def993214f73659f1930acdb5caa57390504e494b21d72bbf3778429',
+      selectedRecordsSha256:
+        'f63127e589e7f5302f481f55b1df54a6b741efdc1aaa3b74e94d94f84abf15df',
+      p50cCandidateId: 'P50C-CANDIDATE-20260823-V1',
+      candidateSha256:
+        'd7a19a9dbaecff4abb18086d1f9e236ae4b5ea311477ccdb609a52c54f200611',
+      diffSha256:
+        '72e950d96bfdf81abeb3317ee280cc01e630a13447d1f38edd9ee7149f3ddf18',
+      candidateManifestSha256:
+        'd88d3daa63db6a59f9ba973d653647224584aa9d98c3efde4cbaad78f6bfefe5',
+      confirmsBindings: [
+        'selected-uuid',
+        'p50d-manifest-sha256',
+        'selected-records-sha256',
+        'p50c-candidate-sha256',
+        'p50c-diff-sha256',
+        'p50c-manifest-sha256',
+      ],
+      unchangedBaselineRowCount: 709,
+      unselectedExternalCandidateCount: 48,
+      retainBaselineEvidenceCount: 18,
+      authorityExclusionCount: 17,
+      explicitlyUnselectedAdjacentItems: [
+        'ITEM-0427',
+        'ITEM-0430',
+        'ITEM-0431',
+      ],
+      rowClassification: 'same-basis-correction',
+      overallReleaseClassification:
+        'structured-code-revision-with-one-selected-price-delta',
+      candidateRole: 'local-review-evidence-only',
+      acceptsCandidateAs: 'local-review-evidence-only',
+      currentPublishedVersion: '2568.0.0',
+      currentPublishedCatalogChanged: false,
+      provisionalTargetVersion: '2568.1.0',
+      targetRegistryCheckPending: true,
+      historicalBoqRepriceAuthorized: false,
+      changesPriorBusinessIntent: false,
+      confirmationReceived: false,
+      exactOwnerConfirmationPending: true,
+      exactOwnerRatificationPending: true,
+    })
+    for (const field of [
+      'candidateApplicationAuthorized',
+      'localCommitAuthorized',
+      'externalGitPublicationAuthorized',
+      'ciPreviewAuthorized',
+      'databaseAccessAuthorized',
+      'productionReadAuthorized',
+      'productionWriteAuthorized',
+      'networkAuthorized',
+      'p13Authorized',
+      'p14Authorized',
+      'p14cAuthorized',
+      'p15Authorized',
+      'deployAuthorized',
+      'publicationAuthorized',
+      'automaticNextStep',
+    ]) {
+      expect(confirmationTerm[field], field).toBe(false)
+    }
+
+    const markerMatch = remediation.match(
+      /<!-- P50C_REVIEW_REMEDIATION_RATIFICATION_REQUEST_V1 (\{[^\n]+\}) -->/,
+    )
+
+    expect(markerMatch).not.toBeNull()
+    const marker = JSON.parse(markerMatch![1])
+    expect(marker).toMatchObject({
+      schema: 'conduit-boq/p50c-review-remediation-ratification-request/v1',
+      recordedAt: '2026-08-23',
+      requestId: 'P50D-V3-RATIFY-REQ-20260823-V1',
+      p50dRequestId: 'P50D-REQ-20260823-V3',
+      reviewResult: 'data-pass-governance-remediation-required',
+      ownerBusinessIntentRecorded: true,
+      exactOwnerRatificationPending: true,
+      p50dAuthorized: false,
+      p50cTechnicalBuildOccurred: true,
+      p50cCandidateAccepted: false,
+      p50cCandidateId: 'P50C-CANDIDATE-20260823-V1',
+      p50dManifestSha256:
+        '1ac28a74def993214f73659f1930acdb5caa57390504e494b21d72bbf3778429',
+      selectedRecordsSha256:
+        'f63127e589e7f5302f481f55b1df54a6b741efdc1aaa3b74e94d94f84abf15df',
+      candidateSha256:
+        'd7a19a9dbaecff4abb18086d1f9e236ae4b5ea311477ccdb609a52c54f200611',
+      diffSha256:
+        '72e950d96bfdf81abeb3317ee280cc01e630a13447d1f38edd9ee7149f3ddf18',
+      candidateManifestSha256:
+        'd88d3daa63db6a59f9ba973d653647224584aa9d98c3efde4cbaad78f6bfefe5',
+      selectedIdentityId: 'f2662c71-a6e5-407e-8456-8608e304b43b',
+      selectedLegacyItemCode: 'ITEM-0429',
+      selectedTargetItemCode: 'COR-PB0-002',
+      baselinePrice: [0, 1763, 1763],
+      candidatePrice: [0, 1764, 1764],
+      unchangedBaselineRowCount: 709,
+      currentPublishedVersion: '2568.0.0',
+      currentPublishedCatalogChanged: false,
+      provisionalTargetVersion: '2568.1.0',
+      targetRegistryCheckPending: true,
+      nextOwnerDecision: 'ratify-or-hold-exact-p50d-v3',
+    })
+    for (const field of [
+      'localCommitAuthorized',
+      'externalGitPublicationAuthorized',
+      'ciPreviewAuthorized',
+      'databaseAccessAuthorized',
+      'productionReadAuthorized',
+      'productionWriteAuthorized',
+      'networkAuthorized',
+      'candidateApplicationAuthorized',
+      'p13Authorized',
+      'p14Authorized',
+      'p14cAuthorized',
+      'p15Authorized',
+      'automaticNextStep',
+    ]) {
+      expect(marker[field]).toBe(false)
+    }
+
+    expect(remediation).toContain(
+      'EXACT P-50D V3 OWNER CONFIRMATION (RATIFICATION) RECORDED',
+    )
+    expect(remediation).toContain(
+      'P-50C ACCEPTED AS LOCAL REVIEW EVIDENCE ONLY',
+    )
+    const validationMatch = remediation.match(
+      /<!-- P50C_REVIEW_REMEDIATION_VALIDATION_RESULT_V1 (\{[^\n]+\}) -->/,
+    )
+    expect(validationMatch).not.toBeNull()
+    const validation = JSON.parse(validationMatch![1])
+    expect(validation).toMatchObject({
+      schema: 'conduit-boq/p50c-review-remediation-validation-result/v1',
+      requestId: 'P50D-V3-RATIFY-REQ-20260823-V1',
+      remediationComplete: true,
+      typescriptPassed: true,
+      eslintPassed: true,
+      candidateCheckPassed: true,
+      focusedTestFileCount: 3,
+      focusedTestCount: 30,
+      fullTestFileCount: 40,
+      fullTestCount: 310,
+      diffCheckPassed: true,
+      focusedTestFileSha256:
+        '351ac25144b5bcf267764c16d3e448dacc856c632319963a7325a95a7e109e1f',
+      exactOwnerRatificationPending: true,
+      p50dAuthorized: false,
+      p50cCandidateAccepted: false,
+    })
+    for (const field of [
+      'localCommitAuthorized',
+      'externalGitPublicationAuthorized',
+      'ciPreviewAuthorized',
+      'databaseAccessAuthorized',
+      'productionReadAuthorized',
+      'productionWriteAuthorized',
+      'networkAuthorized',
+      'p13Authorized',
+      'p14Authorized',
+      'p14cAuthorized',
+      'p15Authorized',
+      'automaticNextStep',
+    ]) {
+      expect(validation[field]).toBe(false)
+    }
+
+    const receiptMatches = [
+      ...remediation.matchAll(
+        /<!-- P50D_V3_EXACT_OWNER_RATIFICATION_RECEIPT_V1 (\{[^\n]+\}) -->/g,
+      ),
+    ]
+    expect(receiptMatches).toHaveLength(1)
+    const receiptMatch = receiptMatches[0]
+
+    const receipt = JSON.parse(receiptMatch[1])
+    expect(receipt).toMatchObject({
+      schema: 'conduit-boq/p50d-v3-exact-owner-ratification-receipt/v1',
+      recordedAt: '2026-08-24T00:44:15+07:00',
+      decision: 'ratified',
+      resolvesRequestId: confirmationTerm.requestId,
+      p50dRequestId: confirmationTerm.p50dRequestId,
+      confirmationReceived: true,
+      exactOwnerConfirmationPending: false,
+      exactOwnerRatificationPending: false,
+      p50dDecisionApproved: true,
+      p50dV3Confirmed: true,
+      p50dV3Ratified: true,
+      p50dAuthorized: true,
+      p50dAuthorityScope: 'decision-record-only',
+      p50dFurtherActionAuthorized: false,
+      selectedIdentityId: confirmationTerm.selectedIdentityId,
+      selectedLegacyItemCode: confirmationTerm.selectedLegacyItemCode,
+      selectedTargetItemCode: confirmationTerm.selectedTargetItemCode,
+      baselinePrice: confirmationTerm.baselinePrice,
+      candidatePrice: confirmationTerm.candidatePrice,
+      p50dManifestSha256: confirmationTerm.p50dManifestSha256,
+      selectedRecordsSha256: confirmationTerm.selectedRecordsSha256,
+      confirmedBindings: confirmationTerm.confirmsBindings,
+      p50cCandidateId: confirmationTerm.p50cCandidateId,
+      p50cTechnicalBuildOccurred: true,
+      p50cDataReviewPassed: true,
+      p50cCandidateAccepted: true,
+      acceptsCandidateAs: 'local-review-evidence-only',
+      p50cFurtherExecutionAuthorized: false,
+      candidateSha256: confirmationTerm.candidateSha256,
+      diffSha256: confirmationTerm.diffSha256,
+      candidateManifestSha256: confirmationTerm.candidateManifestSha256,
+      unchangedBaselineRowCount: confirmationTerm.unchangedBaselineRowCount,
+      unselectedExternalCandidateCount:
+        confirmationTerm.unselectedExternalCandidateCount,
+      retainBaselineEvidenceCount:
+        confirmationTerm.retainBaselineEvidenceCount,
+      authorityExclusionCount: confirmationTerm.authorityExclusionCount,
+      explicitlyUnselectedAdjacentItems:
+        confirmationTerm.explicitlyUnselectedAdjacentItems,
+      rowClassification: confirmationTerm.rowClassification,
+      overallReleaseClassification:
+        confirmationTerm.overallReleaseClassification,
+      currentPublishedVersion: confirmationTerm.currentPublishedVersion,
+      currentPublishedCatalogChanged: false,
+      provisionalTargetVersion: confirmationTerm.provisionalTargetVersion,
+      targetRegistryCheckPending: true,
+      historicalZeroPriceGateSupersededForSelectedLocalCandidateUuidOnly: true,
+      historicalBoqRepriceAuthorized: false,
+      changesPriorBusinessIntent: false,
+      nextSafeStep: 'none-stop-after-recording-ratification',
+      smallRepositoryGateRequired: false,
+      separateGitCiAuthorizationRequired: true,
+      gitCiAuthorizationGranted: false,
+      stopBoundaryReached: true,
+    })
+    for (const field of [
+      'p50dFurtherActionAuthorized',
+      'p50cFurtherExecutionAuthorized',
+      'gitCiAuthorizationGranted',
+      'candidateApplicationAuthorized',
+      'localCommitAuthorized',
+      'externalGitPublicationAuthorized',
+      'ciPreviewAuthorized',
+      'databaseAccessAuthorized',
+      'productionReadAuthorized',
+      'productionWriteAuthorized',
+      'networkAuthorized',
+      'sourceMutationAuthorized',
+      'catalogMutationAuthorized',
+      'boqMutationAuthorized',
+      'pointerMutationAuthorized',
+      'factorFMutationAuthorized',
+      'p13Authorized',
+      'p14Authorized',
+      'p14cAuthorized',
+      'p15Authorized',
+      'deployAuthorized',
+      'publicationAuthorized',
+      'automaticNextStep',
+    ]) {
+      expect(receipt[field], field).toBe(false)
+    }
+
+    expect(remediation).not.toContain(
+      'P50D_V3_POST_RATIFICATION_SMALL_REPOSITORY_GATE_V1',
+    )
+    expect(remediation.trimEnd().endsWith(receiptMatch[0])).toBe(true)
+
+    for (const hash of [
+      marker.p50dManifestSha256,
+      marker.selectedRecordsSha256,
+      marker.candidateSha256,
+      marker.diffSha256,
+      marker.candidateManifestSha256,
+    ]) {
+      expect(remediation).toContain(hash)
+    }
+    expect(remediation).toContain(
+      'candidate.json` is not a direct application/import payload',
+    )
+    expect(remediation).toContain(
+      'RATIFY P-50D V3 — P50D-REQ-20260823-V3',
+    )
+
+    const correctedAuthorityPaths = [
+      'docs/plans/master-catalog/00-phase4-review-guide.md',
+      'docs/plans/master-catalog/09-phase4-change-request.md',
+      'docs/plans/master-catalog/11-phase4-reconciliation-report.md',
+      'docs/plans/master-catalog/12-phase4-production-runbook.md',
+      'docs/plans/master-catalog/13-phase4-verification-report.md',
+      'docs/plans/master-catalog/15-phase4-admin-operating-procedure.md',
+      'docs/plans/master-catalog/19-phase4-decision-register.md',
+      'docs/plans/master-catalog/23-phase4-implementation-execution-pack.md',
+      'docs/plans/master-catalog/25-phase4-execution-progress-tracker.md',
+      'docs/plans/master-catalog/46-phase4-p50-known-price-erratum-pre-p15-reconciliation-and-release-decision-plan.md',
+      'docs/plans/master-catalog/48-phase4-p51-risk-accepted-master-catalog-closeout-plan.md',
+      'docs/plans/master-catalog/49-phase4-p50r-exact-price-reconciliation-evidence-scope-request.md',
+      'docs/plans/master-catalog/50-phase4-p50d-exact-price-and-version-disposition-decision-proposal.md',
+      'docs/plans/master-catalog/51-phase4-p50d-2568-baseline-first-delta-review-proposal.md',
+      'docs/plans/master-catalog/52-phase4-p50d-one-row-selected-delta-approval-proposal.md',
+      'docs/plans/master-catalog/53-phase4-p50c-one-row-offline-candidate-result-record.md',
+      remediationPath,
+    ]
+    expect(correctedAuthorityPaths).toHaveLength(17)
+    const historicalV1ProposalPath =
+      'docs/plans/master-catalog/50-phase4-p50d-exact-price-and-version-disposition-decision-proposal.md'
+    for (const path of correctedAuthorityPaths) {
+      const authority = read(path)
+      const normalizedAuthority = authority.replace(/\s+/g, ' ')
+      expect(authority).toContain('exact Owner confirmation (ratification)')
+      expect(normalizedAuthority).toMatch(
+        /(?:exact(?:ly)? )?(?:P-50D V3 )?(?:Owner(?:'s)? )?(?:confirmation \(ratification\)|ratification|confirmed\/ratified)[^.]{0,160}(?:received|recorded|complete)|exactly confirmed\/ratified/i,
+      )
+      expect(normalizedAuthority).toMatch(
+        /P-?50C(?:-CANDIDATE-[^ ]+)?[^.]{0,240}(?:is )?accepted (?:only )?as local review evidence(?: only)?/i,
+      )
+      if (path === historicalV1ProposalPath) {
+        expect(normalizedAuthority).toContain(
+          'That receipt grants no candidate application, Git/CI, database/Production/network, P-13 through P-15, deploy, or publication.',
+        )
+      } else {
+        expect(normalizedAuthority).toContain('decision-record-only')
+        expect(normalizedAuthority).toMatch(
+          /(?:P-50D V3 ratification|Owner) stop boundary[^.]{0,80}reached/i,
+        )
+        expect(normalizedAuthority).toMatch(
+          /no small repository\s*>?\s*gate(?:,| and no)\s*>?\s*Git\/CI (?:authorization )?request[^.]{0,240}(?:is|are) authorized/i,
+        )
+      }
+      expect(normalizedAuthority).toMatch(
+        /nothing continues automatically|no automatic next (?:step|action)|"automaticNextStep":false/i,
+      )
+      if (path !== remediationPath) {
+        expect(authority).toContain(
+          './54-phase4-p50c-review-remediation-and-p50d-v3-ratification-request.md',
+        )
+      }
+    }
+
+    for (const [path, markerName, approvalField] of [
+      [
+        'docs/plans/master-catalog/12-phase4-production-runbook.md',
+        'P50C_RUNBOOK_REVIEW_CORRECTION_V1',
+        'p50dApproved',
+      ],
+      [
+        'docs/plans/master-catalog/19-phase4-decision-register.md',
+        'P50D_V3_P50C_DECISION_REVIEW_CORRECTION_V1',
+        'p50dAuthorized',
+      ],
+      [
+        'docs/plans/master-catalog/23-phase4-implementation-execution-pack.md',
+        'P50C_EXECUTION_PACK_REVIEW_CORRECTION_V1',
+        'p50dApproved',
+      ],
+    ] as const) {
+      const authority = read(path)
+      const correctionMatch = authority.match(
+        new RegExp(`<!-- ${markerName} (\\{[^\\n]+\\}) -->`),
+      )
+      expect(correctionMatch).not.toBeNull()
+      const correction = JSON.parse(correctionMatch![1])
+      expect(correction.exactOwnerRatificationPending).toBe(true)
+      expect(correction[approvalField]).toBe(false)
+      expect(correction.p50cTechnicalBuildOccurred).toBe(true)
+      expect(correction.p50cCandidateAccepted).toBe(false)
+      expect(correction.nextOwnerDecision).toBe('ratify-or-hold-exact-p50d-v3')
+      expect(correction.localCommitAuthorized).toBe(false)
+      expect(correction.p13Authorized).toBe(false)
+      expect(correction.p15Authorized).toBe(false)
+    }
+
+    for (const [
+      path,
+      markerName,
+      schema,
+      supersedesCurrentAuthorityOf,
+      approvalField,
+      receiptMarkerName,
+    ] of [
+      [
+        'docs/plans/master-catalog/11-phase4-reconciliation-report.md',
+        'P50C_RECONCILIATION_REVIEW_CORRECTION_V1',
+        'conduit-boq/p50c-reconciliation-review-correction/v1',
+        'section-5.4-same-day-approval-interpretation',
+        'p50dApproved',
+        'P50D_V3_RECONCILIATION_RATIFICATION_RECEIPT_V1',
+      ],
+      [
+        'docs/plans/master-catalog/15-phase4-admin-operating-procedure.md',
+        'P50C_ADMIN_PROCEDURE_REVIEW_CORRECTION_V1',
+        'conduit-boq/p50c-admin-procedure-review-correction/v1',
+        'P50C_ADMIN_PROCEDURE_CURRENT_OVERLAY_V1',
+        'p50dApproved',
+        'P50D_V3_ADMIN_PROCEDURE_RATIFICATION_RECEIPT_V1',
+      ],
+      [
+        'docs/plans/master-catalog/25-phase4-execution-progress-tracker.md',
+        'P50C_TRACKER_CURRENT_AUTHORITY_CORRECTION_V1',
+        'conduit-boq/p50c-tracker-current-authority-correction/v1',
+        'P50D_V3_P50C_ONE_ROW_TRACKER_RESULT_V1',
+        'p50dAuthorized',
+        'P50D_V3_EXACT_OWNER_RATIFICATION_TRACKER_RECEIPT_V1',
+      ],
+      [
+        'docs/plans/master-catalog/46-phase4-p50-known-price-erratum-pre-p15-reconciliation-and-release-decision-plan.md',
+        'P50_P50D_P50C_REVIEW_CORRECTION_V1',
+        'conduit-boq/p50-p50d-p50c-review-correction/v1',
+        'P50_P50D_P50C_RESULT_OVERLAY_V1',
+        'p50dAuthorized',
+        'P50_P50D_P50C_RATIFICATION_RECEIPT_V1',
+      ],
+      [
+        'docs/plans/master-catalog/49-phase4-p50r-exact-price-reconciliation-evidence-scope-request.md',
+        'P50R_DOWNSTREAM_REVIEW_CORRECTION_V1',
+        'conduit-boq/p50r-downstream-review-correction/v1',
+        'P50R_DOWNSTREAM_DISPOSITION_OVERLAY_V1',
+        'p50dAuthorized',
+        'P50R_DOWNSTREAM_RATIFICATION_RECEIPT_V1',
+      ],
+      [
+        'docs/plans/master-catalog/51-phase4-p50d-2568-baseline-first-delta-review-proposal.md',
+        'P50D_V2_SUCCESSOR_REVIEW_CORRECTION_V1',
+        'conduit-boq/p50d-v2-successor-review-correction/v1',
+        'P50D_V2_SUCCESSOR_COMPLETION_OVERLAY_V1',
+        'p50dAuthorized',
+        'P50D_V2_SUCCESSOR_RATIFICATION_RECEIPT_V1',
+      ],
+    ] as const) {
+      const authority = read(path)
+      const correctionMatch = authority.match(
+        new RegExp(`<!-- ${markerName} (\\{[^\\n]+\\}) -->`),
+      )
+      expect(correctionMatch, markerName).not.toBeNull()
+      expect(
+        authority.indexOf(correctionMatch![0]),
+        `${markerName} remains before the current ratification receipt`,
+      ).toBeLessThan(
+        authority.indexOf(`<!-- ${receiptMarkerName} `),
+      )
+
+      const correction = JSON.parse(correctionMatch![1])
+      expect(correction).toMatchObject({
+        schema,
+        recordedAt: '2026-08-24',
+        supersedesCurrentAuthorityOf,
+        p50dRequestId: 'P50D-REQ-20260823-V3',
+        exactOwnerConfirmationPending: true,
+        exactOwnerRatificationPending: true,
+        p50cTechnicalBuildOccurred: true,
+        p50cDataReviewPassed: true,
+        p50cCandidateAccepted: false,
+        p50cCandidateRole: 'unaccepted-local-review-evidence',
+        p50cCandidateId: 'P50C-CANDIDATE-20260823-V1',
+        candidateSha256: confirmationTerm.candidateSha256,
+        diffSha256: confirmationTerm.diffSha256,
+        candidateManifestSha256: confirmationTerm.candidateManifestSha256,
+        nextOwnerDecision: 'confirm-ratify-or-hold-exact-p50d-v3',
+      })
+      expect(correction[approvalField], `${markerName}.${approvalField}`).toBe(
+        false,
+      )
+      for (const field of [
+        'candidateApplicationAuthorized',
+        'localCommitAuthorized',
+        'externalGitPublicationAuthorized',
+        'ciPreviewAuthorized',
+        'databaseAccessAuthorized',
+        'productionReadAuthorized',
+        'productionWriteAuthorized',
+        'networkAuthorized',
+        'p13Authorized',
+        'p14Authorized',
+        'p14cAuthorized',
+        'p15Authorized',
+        'automaticNextStep',
+      ]) {
+        expect(correction[field], `${markerName}.${field}`).toBe(false)
+      }
+    }
+
+    const p50gProposalPath =
+      'docs/plans/master-catalog/55-phase4-p50g-post-ratification-small-repository-gate-authorization-proposal.md'
+    const p50gProposal = read(p50gProposalPath)
+    const p50gPreparationMatch = p50gProposal.match(
+      /<!-- P50G_PROPOSAL_PREPARATION_RECORD_V1 (\{[^\n]+\}) -->/,
+    )
+    expect(
+      p50gProposal.match(/<!-- P50G_PROPOSAL_PREPARATION_RECORD_V1 /g),
+    ).toHaveLength(1)
+    expect(p50gPreparationMatch).not.toBeNull()
+    const p50gPreparation = JSON.parse(p50gPreparationMatch![1])
+    expect(p50gPreparation).toMatchObject({
+      schema: 'conduit-boq/p50g-proposal-preparation-record/v1',
+      recordedAt: '2026-08-24',
+      requestId: 'P50G-REQ-20260824-V1',
+      ownerContinuationInstructionReceived: true,
+      instructionText: 'ทำต่อครับ',
+      interpretation: 'prepare-p50g-proposal-only',
+      proposalPreparationAuthorized: true,
+      p50gGateAuthorized: false,
+    })
+
+    const p50gProposalMatch = p50gProposal.match(
+      /<!-- P50G_SMALL_REPOSITORY_GATE_AUTHORIZATION_PROPOSAL_V1 (\{[^\n]+\}) -->/,
+    )
+    expect(
+      p50gProposal.match(
+        /<!-- P50G_SMALL_REPOSITORY_GATE_AUTHORIZATION_PROPOSAL_V1 /g,
+      ),
+    ).toHaveLength(1)
+    expect(p50gProposalMatch).not.toBeNull()
+    const p50g = JSON.parse(p50gProposalMatch![1])
+    expect(p50g).toMatchObject({
+      schema:
+        'conduit-boq/p50g-small-repository-gate-authorization-proposal/v1',
+      recordedAt: '2026-08-24',
+      requestId: 'P50G-REQ-20260824-V1',
+      status: 'ready-for-owner-review',
+      ownerApprovalPending: true,
+      p50gGateAuthorized: false,
+      canonicalReceiptMarker: 'P50D_V3_EXACT_OWNER_RATIFICATION_RECEIPT_V1',
+      p50dRequestId: confirmationTerm.p50dRequestId,
+      p50cCandidateId: confirmationTerm.p50cCandidateId,
+      p50dManifestSha256: confirmationTerm.p50dManifestSha256,
+      selectedRecordsSha256: confirmationTerm.selectedRecordsSha256,
+      candidateSha256: confirmationTerm.candidateSha256,
+      diffSha256: confirmationTerm.diffSha256,
+      candidateManifestSha256: confirmationTerm.candidateManifestSha256,
+      branch: 'codex/p12-production-authority-r2',
+      localHead: 'a12b022247d75d7e006fac890fc123e9c0a8e168',
+      upstreamHead: '6f0953b19c25f6f96b1d2d11ee99ff43c33c5443',
+      branchAheadBy: 1,
+      shellFailFastRequired: true,
+      proposalSha256BindingMode: 'external-owner-approval',
+      ownerApprovalForm: 'short-hash-bound-v1',
+      shortApprovalTemplate:
+        'APPROVE P-50G — P50G-REQ-20260824-V1 — SHA-256 PROPOSAL_SHA256_FROM_REVIEW_HANDOFF',
+      approvalRequiresExactRequestId: true,
+      approvalRequiresFullProposalSha256: true,
+      shortApprovalExpandsToSections2Through6: true,
+      longApprovalRequired: false,
+      gitStatePreflightRequired: true,
+      indexMustBeEmpty: true,
+      preGateTrackedPathAllowlistRequired: true,
+      preGateRelevantUntrackedPathAllowlistRequired: true,
+      trackedPathListSha256:
+        '38342e79f7a1138b689ac81141cc3a53fe848618f2819ad2b1af21890441f30a',
+      preGateSafeUntrackedPathCount: 24,
+      safeUntrackedPathListSha256:
+        'e9ab9f0eb33e2aa65e27c906771e0e618cbd69cc033264822c9327fd9357cf5a',
+      fullPayloadByteHashInventoryDeferredToP50h: true,
+      unexpectedPathInventoryDeferredToP50h: false,
+      prospectiveSafePathCount: 48,
+      trackedModifiedPathCount: 25,
+      untrackedSafePathCount: 23,
+      focusedTestFileCount: 3,
+      expectedFocusedTestCount: 30,
+      offlineOnly: true,
+      readOnlyGate: true,
+      dependencyInstallAuthorized: false,
+      protectedPathAccessAuthorized: false,
+      realP50rReplayAuthorized: false,
+      broadTypeScriptScanIncluded: false,
+      broadTypeScriptScanAuthorized: false,
+      testMutationAfterGateAuthorized: false,
+      resultRecordPath:
+        'docs/plans/master-catalog/56-phase4-p50g-small-repository-gate-result.md',
+      onPassPreparationOnly: [
+        'docs/plans/master-catalog/57-phase4-p50h-exact-local-git-ci-preview-authorization-proposal.md',
+        'docs/plans/master-catalog/evidence/p50h-v1/git-payload-manifest.json',
+      ],
+      windowBegins: 'exact-owner-approval-message-timestamp',
+      windowEnds: '2026-08-25T23:00:00+07:00',
+      p51WaiverExtended: false,
+      nextOwnerDecision: 'approve-or-hold-p50g',
+    })
+    for (const field of [
+      'p50gGateAuthorized',
+      'dependencyInstallAuthorized',
+      'protectedPathAccessAuthorized',
+      'realP50rReplayAuthorized',
+      'broadTypeScriptScanIncluded',
+      'broadTypeScriptScanAuthorized',
+      'longApprovalRequired',
+      'testMutationAfterGateAuthorized',
+      'unexpectedPathInventoryDeferredToP50h',
+      'p51WaiverExtended',
+      'localCommitAuthorized',
+      'externalGitPublicationAuthorized',
+      'gitStageAuthorized',
+      'ciPreviewAuthorized',
+      'databaseAccessAuthorized',
+      'productionReadAuthorized',
+      'productionWriteAuthorized',
+      'networkAuthorized',
+      'candidateApplicationAuthorized',
+      'applicationMutationAuthorized',
+      'catalogMutationAuthorized',
+      'boqMutationAuthorized',
+      'pointerMutationAuthorized',
+      'factorFMutationAuthorized',
+      'p13Authorized',
+      'p14Authorized',
+      'p14cAuthorized',
+      'p15Authorized',
+      'deployAuthorized',
+      'publicationAuthorized',
+      'p50hExecutionAuthorized',
+      'automaticNextStep',
+    ]) {
+      expect(p50g[field], `P50G.${field}`).toBe(false)
+    }
+    expect(p50gProposal.trimEnd().endsWith(p50gProposalMatch![0])).toBe(true)
+    expect(p50gProposal).toContain(
+      'APPROVE P-50G — P50G-REQ-20260824-V1',
+    )
+    expect(p50gProposal).toContain(
+      'APPROVE P-50G — P50G-REQ-20260824-V1 — SHA-256 PROPOSAL_SHA256_FROM_REVIEW_HANDOFF',
+    )
+    expect(p50gProposal).toContain('No long approval paragraph is required')
+    expect(p50gProposal).toContain('approve Sections 2-6 exactly')
+    expect(p50gProposal).not.toContain(
+      'P50G-REQ-20260824-V1; approve reviewed Proposal #55',
+    )
+    expect(p50gProposal).toContain('without executing P-50H')
+    expect(p50gProposal).toMatch(/including no[^\n]{0,80}\binstall\b/)
+    expect(p50gProposal).toContain('Git stage/commit/push')
+    expect(p50gProposal).toContain('set -euo pipefail')
+    expect(p50gProposal).toContain('test "$(git branch --show-current)"')
+    expect(p50gProposal).toContain(
+      'test -z "$(git diff --cached --name-only)"',
+    )
+    expect(p50gProposal).toContain('git diff --cached --check')
+    expect(p50gProposal).toMatch(/compare\s+the staged paths to its allowlist/)
+    expect(p50gProposal).toContain('exact-manifest staging')
+    expect(p50gProposal).toContain(
+      'PROPOSAL_SHA256_FROM_EXACT_OWNER_APPROVAL',
+    )
+    expect(p50gProposal).toContain(
+      'PROPOSAL_SHA256_FROM_REVIEW_HANDOFF',
+    )
+    expect(p50gProposal).not.toContain('./node_modules/.bin/tsc')
+    expect(p50g.prospectivePackageContentManifestSha256).toMatch(
+      /^[a-f0-9]{64}$/,
+    )
+    expect(p50gProposal).not.toContain(
+      '- update `tests/master-catalog-authority-consistency.test.ts`.',
+    )
+    expect(p50gProposal).not.toContain('documentation/test outputs')
+
+    const p50gResultPath =
+      'docs/plans/master-catalog/56-phase4-p50g-small-repository-gate-result.md'
+    const p50gResult = read(p50gResultPath)
+    const p50gResultMatch = p50gResult.match(
+      /<!-- P50G_SMALL_REPOSITORY_GATE_RESULT_V1 (\{[^\n]+\}) -->/,
+    )
+    expect(
+      p50gResult.match(/<!-- P50G_SMALL_REPOSITORY_GATE_RESULT_V1 /g),
+    ).toHaveLength(1)
+    expect(p50gResultMatch).not.toBeNull()
+    const p50gResultRecord = JSON.parse(p50gResultMatch![1])
+    expect(p50gResultRecord).toMatchObject({
+      schema: 'conduit-boq/p50g-small-repository-gate-result/v1',
+      requestId: 'P50G-REQ-20260824-V1',
+      approvedProposalSha256:
+        '5f2cbdb4d255613c41b2e5c46e4a8a3ba01856c2d17819752e9aeb787ee82cfc',
+      approvalValid: true,
+      authorizationConsumed: true,
+      authorizationReplayAllowed: false,
+      gateExecuted: true,
+      gatePassed: true,
+      focusedTestFileCount: 3,
+      focusedTestCount: 30,
+      postResultAuthorityTestAlignmentRequired: true,
+      commitReady: false,
+      p50hProposalPreparationAuthorized: true,
+      p50hProposalPrepared: true,
+      p50hExecutionAuthorized: false,
+      nextOwnerDecision: 'review-p50h-proposal',
+    })
+    for (const field of [
+      'authorizationReplayAllowed',
+      'protectedPathAccessed',
+      'candidateApplied',
+      'commitReady',
+      'p50hExecutionAuthorized',
+      'gitStageAuthorized',
+      'localCommitAuthorized',
+      'externalGitPublicationAuthorized',
+      'ciPreviewAuthorized',
+      'databaseAccessAuthorized',
+      'productionReadAuthorized',
+      'productionWriteAuthorized',
+      'networkAuthorized',
+      'applicationMutationAuthorized',
+      'catalogMutationAuthorized',
+      'boqMutationAuthorized',
+      'pointerMutationAuthorized',
+      'factorFMutationAuthorized',
+      'p13Authorized',
+      'p14Authorized',
+      'p14cAuthorized',
+      'p15Authorized',
+      'deployAuthorized',
+      'publicationAuthorized',
+      'automaticNextStep',
+    ]) {
+      expect(p50gResultRecord[field], `P50G result.${field}`).toBe(false)
+    }
+    expect(p50gResult.trimEnd().endsWith(p50gResultMatch![0])).toBe(true)
+    expect(p50gResult).toContain('not commit-ready')
+
+    const p50gProspectivePaths = [
+      'docs/02_architecture/ADR/ADR-001-supabase-rls-authorization.md',
+      'docs/03_domain/ACCESS_MODEL.md',
+      'docs/04_data/DATABASE_SCHEMA.md',
+      'docs/04_data/DATA_INTEGRITY.md',
+      'docs/04_data/MIGRATIONS.md',
+      'docs/04_data/SECURITY_MODEL.md',
+      'docs/06_engineering/PERMISSION_PATTERNS.md',
+      'docs/08_ai/LESSONS_LEARNED.md',
+      'docs/CODEBASE_DATABASE_MAP.md',
+      'docs/SECURITY.md',
+      'docs/ai/DECISIONS/ADR-001-supabase-rls-authorization.md',
+      'docs/plans/master-catalog/05-verification-report.md',
+      'docs/plans/master-catalog/17-phase4-database-security-contract.md',
+      'docs/plans/master-catalog/18-phase4-threat-model.md',
+      'docs/plans/master-catalog/45-phase4-p49-pending-authorization-hardening-plan.md',
+      'docs/plans/master-catalog/00-phase4-review-guide.md',
+      'docs/plans/master-catalog/09-phase4-change-request.md',
+      'docs/plans/master-catalog/11-phase4-reconciliation-report.md',
+      'docs/plans/master-catalog/12-phase4-production-runbook.md',
+      'docs/plans/master-catalog/13-phase4-verification-report.md',
+      'docs/plans/master-catalog/15-phase4-admin-operating-procedure.md',
+      'docs/plans/master-catalog/19-phase4-decision-register.md',
+      'docs/plans/master-catalog/23-phase4-implementation-execution-pack.md',
+      'docs/plans/master-catalog/25-phase4-execution-progress-tracker.md',
+      'docs/plans/master-catalog/46-phase4-p50-known-price-erratum-pre-p15-reconciliation-and-release-decision-plan.md',
+      'docs/plans/master-catalog/47-phase4-p49-forward-only-db-application-correction-proposal.md',
+      'docs/plans/master-catalog/48-phase4-p51-risk-accepted-master-catalog-closeout-plan.md',
+      'docs/plans/master-catalog/49-phase4-p50r-exact-price-reconciliation-evidence-scope-request.md',
+      'docs/plans/master-catalog/50-phase4-p50d-exact-price-and-version-disposition-decision-proposal.md',
+      'docs/plans/master-catalog/51-phase4-p50d-2568-baseline-first-delta-review-proposal.md',
+      'docs/plans/master-catalog/52-phase4-p50d-one-row-selected-delta-approval-proposal.md',
+      'docs/plans/master-catalog/53-phase4-p50c-one-row-offline-candidate-result-record.md',
+      'docs/plans/master-catalog/54-phase4-p50c-review-remediation-and-p50d-v3-ratification-request.md',
+      'docs/plans/master-catalog/evidence/p50r-solo/SHA256SUMS',
+      'docs/plans/master-catalog/evidence/p50r-solo/exceptions.json',
+      'docs/plans/master-catalog/evidence/p50r-solo/proposed-delta-manifest.json',
+      'docs/plans/master-catalog/evidence/p50r-solo/reconciliation.csv',
+      'docs/plans/master-catalog/evidence/p50r-solo/summary.json',
+      'docs/plans/master-catalog/evidence/p50d-v3/p50d-selected-delta-manifest.json',
+      'docs/plans/master-catalog/evidence/p50c-v1/candidate.json',
+      'docs/plans/master-catalog/evidence/p50c-v1/diff.json',
+      'docs/plans/master-catalog/evidence/p50c-v1/manifest.json',
+      'scripts/build-master-catalog-p50c.mjs',
+      'scripts/reconcile-master-catalog-p50r.mjs',
+      'scripts/reconcile-master-catalog-p50r-pdf.py',
+      'tests/master-catalog-authority-consistency.test.ts',
+      'tests/master-catalog-p50r-reconciliation.test.ts',
+      'tests/master-catalog-p50c-candidate.test.ts',
+    ]
+    expect(p50gProspectivePaths).toHaveLength(48)
+    expect(new Set(p50gProspectivePaths).size).toBe(48)
+    for (const path of p50gProspectivePaths) {
+      expect(existsSync(resolve(root, path)), path).toBe(true)
+      expect(p50gProposal, path).toContain(`\`${path}\``)
+    }
+
+    const trackerAfterP50gPreparation = read(
+      'docs/plans/master-catalog/25-phase4-execution-progress-tracker.md',
+    )
+    const decisionRegisterAfterP50gPreparation = read(
+      'docs/plans/master-catalog/19-phase4-decision-register.md',
+    )
+    for (const authority of [
+      read('docs/plans/master-catalog/00-phase4-review-guide.md'),
+      trackerAfterP50gPreparation,
+      decisionRegisterAfterP50gPreparation,
+    ]) {
+      expect(authority).toContain('P50G-REQ-20260824-V1')
+      expect(authority).toContain(
+        './55-phase4-p50g-post-ratification-small-repository-gate-authorization-proposal.md',
+      )
+      expect(authority).toContain(
+        './56-phase4-p50g-small-repository-gate-result.md',
+      )
+      expect(authority).toMatch(/P-50G[\s\S]{0,240}(?:PASS|passed)/i)
+      expect(authority).toMatch(
+        /P-50G[\s\S]{0,300}(?:consumed once|authorization consumed)/i,
+      )
+    }
+    expect(trackerAfterP50gPreparation).toMatch(
+      /P-50G[^\n]{0,240}PASS\/authorization consumed/i,
+    )
+    expect(trackerAfterP50gPreparation).not.toMatch(
+      /documentation\/test(?: result)? outputs/i,
+    )
+    expect(decisionRegisterAfterP50gPreparation).toContain(
+      '**PASS / AUTHORIZATION CONSUMED ONCE / NO REPLAY.**',
+    )
   })
 
   it('keeps PRE-P-12 backup, custody, restore, and verifier gates synchronized', () => {
@@ -1902,8 +4362,9 @@ describe('Master Catalog authority consistency', () => {
     )
     expect(completedTracker).toMatch(/source\/tooling HEAD/)
     expect(completedTracker).toContain('| P-12 exact CLI evidence chain | **COMPLETE.**')
+    expect(completedTracker).toContain('P-13 NOT AUTHORIZED')
     expect(completedTracker).toContain(
-      'P-13 HARD-STOP — PENDING CROSS-LAYER AUTHORIZATION ALIGNMENT; NOT AUTHORIZED',
+      'P-49 IS NOT THE SOLE BLOCKER FOR THE EXACT FIRST CLOSEOUT',
     )
   })
 
@@ -2173,7 +4634,7 @@ describe('Master Catalog authority consistency', () => {
     expect(changeRequest).toContain(
       'One mutable draft globally plus audited current/stale abandon history',
     )
-    expect(changeRequest).toContain('Current P-37 disposition (2026-07-25)')
+    expect(changeRequest).toContain('Historical P-37 disposition (2026-07-25;')
     expect(changeRequest).toContain(
       'Owner-accepted under the explicit guided-UAT variance',
     )
@@ -2263,6 +4724,17 @@ describe('Master Catalog authority consistency', () => {
     }
 
     for (const path of [
+      'docs/SECURITY.md',
+      'docs/CODEBASE_DATABASE_MAP.md',
+      'docs/02_architecture/ADR/ADR-001-supabase-rls-authorization.md',
+      'docs/03_domain/ACCESS_MODEL.md',
+      'docs/04_data/DATABASE_SCHEMA.md',
+      'docs/04_data/DATA_INTEGRITY.md',
+      'docs/04_data/MIGRATIONS.md',
+      'docs/04_data/SECURITY_MODEL.md',
+      'docs/06_engineering/PERMISSION_PATTERNS.md',
+      'docs/08_ai/LESSONS_LEARNED.md',
+      'docs/ai/DECISIONS/ADR-001-supabase-rls-authorization.md',
       'docs/01_overview/IMPLEMENTATION_PLAN.md',
       'docs/01_overview/ROADMAP.md',
       'docs/04_data/MIGRATIONS.md',
@@ -2298,6 +4770,20 @@ describe('Master Catalog authority consistency', () => {
       'docs/plans/master-catalog/41-phase4-p12-cli-execution-runbook.md',
       'docs/plans/master-catalog/42-phase4-post-phase4-disaster-recovery-backlog.md',
       'docs/plans/master-catalog/43-phase4-p12-private-function-default-privilege-finding.md',
+      'docs/plans/master-catalog/44-phase4-p46-catalog-action-error-callability-finding.md',
+      'docs/plans/master-catalog/45-phase4-p49-pending-authorization-hardening-plan.md',
+      'docs/plans/master-catalog/46-phase4-p50-known-price-erratum-pre-p15-reconciliation-and-release-decision-plan.md',
+      'docs/plans/master-catalog/47-phase4-p49-forward-only-db-application-correction-proposal.md',
+      'docs/plans/master-catalog/48-phase4-p51-risk-accepted-master-catalog-closeout-plan.md',
+      'docs/plans/master-catalog/49-phase4-p50r-exact-price-reconciliation-evidence-scope-request.md',
+      'docs/plans/master-catalog/50-phase4-p50d-exact-price-and-version-disposition-decision-proposal.md',
+      'docs/plans/master-catalog/51-phase4-p50d-2568-baseline-first-delta-review-proposal.md',
+      'docs/plans/master-catalog/52-phase4-p50d-one-row-selected-delta-approval-proposal.md',
+      'docs/plans/master-catalog/53-phase4-p50c-one-row-offline-candidate-result-record.md',
+      'docs/plans/master-catalog/54-phase4-p50c-review-remediation-and-p50d-v3-ratification-request.md',
+      'docs/plans/master-catalog/55-phase4-p50g-post-ratification-small-repository-gate-authorization-proposal.md',
+      'docs/plans/master-catalog/56-phase4-p50g-small-repository-gate-result.md',
+      'docs/plans/master-catalog/57-phase4-p50h-exact-local-git-ci-preview-authorization-proposal.md',
     ]) {
       expectRelativeMarkdownLinksToExist(path)
       expectMarkdownTablesToBeWellShaped(path)

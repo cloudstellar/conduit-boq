@@ -10,6 +10,8 @@
 > price-list business rule is superseded by the approved profile/onboarding-only
 > target, but that target is not yet implemented across DB and app layers. See
 > [P-49 Plan](./plans/master-catalog/45-phase4-p49-pending-authorization-hardening-plan.md).
+> P-51 later accepted this risk temporarily for the exact first closeout and
+> deferred remediation until after P-15; it did not change these observations.
 
 ---
 
@@ -279,10 +281,11 @@ permits cross-profile reads; own-profile UPDATE may allow protected
 `role`/`status` mutation; `app_settings` and authenticated role/approval helpers
 either expose data or trust role without active status; and the user-deletion
 API checks admin role without active status before using service role. UI-only
-alignment is bypassable. P-13
-is hard-stopped until a separately authorized forward-only database/application
-correction and real-session persona matrix pass. Exact current Production
-posture has not been re-queried by the P-49 docs-only review.
+alignment is bypassable. P-13 is still separately unauthorized, but P-49 is no
+longer its sole blocker for the exact P-51 first-closeout sequence. A future
+separately authorized forward-only database/application correction and
+real-session persona matrix remain required to close P-49. Exact current
+Production posture has not been re-queried by the P-49/P-51 docs-only review.
 
 ---
 

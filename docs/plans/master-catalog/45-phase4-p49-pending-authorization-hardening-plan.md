@@ -1,6 +1,7 @@
 # Phase 4 P-49 Pending-Account Authorization Hardening Plan
 
-**Status:** BUSINESS INTENT APPROVED; TECHNICAL HOLD; P-13 HARD-STOP;
+**Status:** OPEN SECURITY RISK; BUSINESS TARGET RETAINED; REMEDIATION DEFERRED
+UNTIL AFTER THE FIRST P-15 CLOSEOUT UNDER THE TIME-BOUND P-51 WAIVER;
 IMPLEMENTATION NOT AUTHORIZED
 **Recorded:** 2026-08-17 02:58 +07
 **Repository evidence HEAD:**
@@ -8,6 +9,31 @@ IMPLEMENTATION NOT AUTHORIZED
 **Production access for this decision review:** None
 
 <!-- P49_PENDING_AUTHORIZATION_DECISION_V1 {"schema":"conduit-boq/p49-pending-authorization-decision/v1","recordedAt":"2026-08-17T02:58:08+07:00","businessIntent":"pending-profile-onboarding-only","masterCatalogRls":"preserve-022-023-active-only","catalogReadWideningAuthorized":false,"decisionRecordLocalCommitAuthorized":true,"historicalTestCommentAuthorized":true,"externalGitPublicationAuthorized":false,"implementationAuthorized":false,"databaseHardeningRequired":true,"p13Authorized":false,"automaticNextStep":false} -->
+
+<!-- P49_P51_WAIVER_DISPOSITION_V1 {"schema":"conduit-boq/p49-p51-waiver-disposition/v1","recordedAt":"2026-08-18","p49RiskOpen":true,"businessTargetRetained":true,"remediationDeferred":true,"deferredUntil":"after-first-p15-closeout","waiver":"P-51","waiverScope":"first-p13-through-p15-closeout-only","waiverExpires":"immediately-on-first-p15-closeout","calendarReapprovalRequiredAt":"2026-08-25T23:59:59+07:00","p49ReentryDeadline":"before-next-production-deploy-and-target-within-7-calendar-days-after-p15","p49ImplementationAuthorized":false,"migrationReserved":false,"proposal47Approved":false,"automaticNextStep":false} -->
+
+## Current P-51 supersession
+
+P-51 accepts the documented P-49 residual risk only for the bounded first
+Phase 4 closeout sequence through P-15. It changes the timing of remediation;
+it does not close, downgrade, disprove, or remediate any finding in this plan.
+P-49 therefore no longer independently hard-stops consideration of the first
+P-13, P-14, and P-15 decisions, but none of those decisions is authorized by
+P-51 or by this document. Every existing gate still requires its own exact
+Owner decision and evidence.
+
+The waiver requires fresh Owner reapproval if the first P-15 closeout has not
+finished by 2026-08-25 23:59:59 +07; it has no automatic calendar extension.
+It expires immediately when the first P-15 backup/closeout is recorded. After
+that point, P-49 returns to the active remediation queue and requires a fresh
+authorized read-only live-posture review followed by a rewritten exact
+proposal. Re-entry must occur before the next Production deployment, with a
+target of completing the re-entry decision no later than seven calendar days
+after P-15 closeout. The waiver does not cover a second release/publication,
+scope expansion, a new privileged surface, or continued deferral after that
+closeout. Evidence of exploitation, unauthorized disclosure/escalation, or
+failure of an existing active-only catalog control ends reliance on the waiver
+and is an immediate stop/escalation condition.
 
 ## 1. Owner decision and authority boundary
 
@@ -28,15 +54,15 @@ The subsequent cross-layer review found that an application-only correction
 cannot enforce it. P-49 therefore records the intended outcome and the newly
 discovered blocker; it does **not** authorize implementation.
 
-P-49 authorizes only this canonical documentation, a comment-only P-49
-supersession on the historical RLS test, and its executable authority-consistency
-test as a decision-recording change, plus one local commit for handoff
-continuity. It authorizes no application/runtime/migration
-implementation, Local or Production database query/write, external Git
-publication/push, PR, `main` merge, deploy, feature flag, P-13, P-14, P-15, or
-automatic next step. Any forward-only database correction, matching
-application work, or external publication requires a separate exact Owner
-decision.
+The original P-49 decision authorized only its bounded decision-recording
+package. P-51 supersedes only the former timing/hard-stop disposition for the
+first P-13-through-P-15 closeout sequence. It authorizes no P-49
+application/runtime/migration implementation, Local or Production database
+query/write, external Git publication/push, PR, `main` merge, deploy, feature
+flag, or automatic next step. Any P-49 posture read, forward-only database
+correction, matching application work, or external publication requires a
+separate exact Owner decision after the first P-15 closeout unless P-51 is
+itself explicitly superseded.
 
 ## 2. Why UI-only enforcement is unsafe
 
@@ -75,8 +101,9 @@ cross-layer paths:
    guard `role` or `status`. A missing-profile caller may therefore self-create
    an active/admin profile, and an existing caller may self-promote.
    Exact current Production grants/policies must be verified read-only before
-   claiming either live exploit as confirmed, but the source-derived conditions
-   are release blockers now.
+   claiming either live exploit as confirmed. These remain open security risks;
+   P-51 accepts them only for its bounded first-closeout window and does not
+   convert them into a safe baseline.
 8. Organization/department/sector policies expose all selector rows to every
    authenticated status without an `is_active` predicate. P-49 permits pending
    only the active selector subset and permits inactive/suspended users none.
@@ -156,10 +183,13 @@ not substitute for approval. An `active` account is revoked with `inactive` or
 `suspended`, never downgraded to `pending`. Direct or invalid transitions fail
 atomically.
 
-## 4. Required forward-only correction before P-13
+## 4. Deferred forward-only correction after the first P-15 closeout
 
-The exact implementation remains unapproved. A later proposal must preserve
-applied migrations and use the next approved append-only ledger entry to:
+The exact implementation remains unapproved and is deliberately deferred under
+P-51. After the first P-15 closeout, a fresh authorized read-only live-posture
+inventory must precede a rewritten proposal. That later proposal must preserve
+applied migrations and use whatever append-only ledger entry is next and
+unreserved at that future review point to:
 
 1. require a current active profile for BOQ header/child visibility and every
    BOQ mutation path, including `save_boq_with_routes`; missing, unknown,
@@ -188,12 +218,13 @@ applied migrations and use the next approved append-only ledger entry to:
 9. preserve all approved active-user, BOQ, catalog, and Factor F data and
    behavior; any unrelated active-profile minimization requires its own decision.
 
-This plan deliberately does not reserve a migration filename. “No pending
-catalog compatibility migration” does not mean “no database hardening
-migration.” The exact number, bytes, rollback/fix-forward contract, and
-execution authority belong to a later reviewed change.
+This plan deliberately does not reserve a migration filename or ledger value.
+“No pending catalog compatibility migration” does not mean “no database
+hardening migration.” The exact number, bytes, rollback/fix-forward contract,
+and execution authority must be derived from the post-P-15 live posture and
+then approved as a later reviewed change.
 
-## 5. Acceptance gates
+## 5. Post-waiver remediation acceptance gates
 
 ### 5.1 Database and real-session authorization
 
@@ -268,18 +299,30 @@ execution authority belong to a later reviewed change.
 - Separate Owner authority is recorded for Local/live correction evidence and
   for any later Production database action.
 
-## 6. P-13 disposition
+## 6. First-closeout waiver and post-P-15 disposition
 
 P-12 and its post-`026` backup remain complete and immutable. This finding does
 not rerun or roll back migrations `017`-`026` and is not evidence of catalog,
 BOQ, or Factor F row corruption.
 
-P-13 is now **HARD-STOP — PENDING CROSS-LAYER AUTHORIZATION ALIGNMENT**. The
-Quality/Preview evidence on `6f0953b19c25f6f96b1d2d11ee99ff43c33c5443`
-is historical pre-P-49 evidence, not an approved deployment candidate. After a
-separately authorized correction, a new exact commit and fresh matching remote
-CI/Preview/deployment fingerprint are required before a separate Owner P-13
-decision.
+P-49 remains an **OPEN SECURITY RISK**. Under P-51 it is not, by itself, a
+hard-stop on the separately gated first P-13-through-P-15 closeout sequence.
+The Quality/Preview evidence on
+`6f0953b19c25f6f96b1d2d11ee99ff43c33c5443` remains historical pre-P-49
+evidence and is not automatically an approved deployment candidate. P-51 does
+not waive exact-source, CI/Preview, deployment-fingerprint, smoke, backup, or
+Owner-decision requirements at P-13, P-14, or P-15.
+
+The deferral requires fresh Owner reapproval at 2026-08-25 23:59:59 +07 if the
+first P-15 closeout has not finished, and ends immediately at that closeout.
+The next P-49 action after that milestone is not implementation: it is a
+separately authorized read-only live-posture capture, including policies,
+grants, functions, overloads, views, service-role surfaces, current application
+dependencies, and affected account/data-state counts. Proposal #47 is deferred
+and must be rewritten from that evidence before any source, Local, Git, or
+Production correction request. Re-entry is required before the next Production
+deployment, with a target of completing its decision within seven calendar days
+after the P-15 closeout.
 
 ## 7. Historical-record rule
 

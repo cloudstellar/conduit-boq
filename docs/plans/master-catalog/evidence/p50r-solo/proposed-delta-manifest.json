@@ -1,0 +1,2649 @@
+{
+  "schema": "conduit-boq/p50r-proposed-delta-manifest/v1",
+  "request_id": "P50R-SOLO-REQ-20260821-V1",
+  "status": "evidence_only_pending_p50d",
+  "price_mutation_authorized": false,
+  "record_count": 67,
+  "records": [
+    {
+      "identity_key": "prod:e037b936-d887-4eb0-beed-5b65c7202a4c",
+      "stable_identity_id": "e037b936-d887-4eb0-beed-5b65c7202a4c",
+      "legacy_item_code": "ITEM-0010",
+      "source_item_code": "CIC-PVC-010",
+      "target_item_code": "CIC-PVC-010",
+      "classification": "source_version_difference",
+      "decision_status": "pending_p50d",
+      "proposed_action": "none",
+      "current_price": [
+        1029,
+        409,
+        1438
+      ],
+      "workbook_price": [
+        1819,
+        717,
+        2536
+      ],
+      "filed_pdf_price": [
+        1029,
+        409,
+        1438
+      ],
+      "pdf_locator": "p02:t1:r14:display-10",
+      "sql_vs_xlsx": "different",
+      "xlsx_vs_pdf": "different",
+      "sql_vs_pdf": "equal",
+      "filed_minus_current": {
+        "material": 0,
+        "labor": 0,
+        "total": 0
+      },
+      "workbook_minus_current": {
+        "material": 790,
+        "labor": 308,
+        "total": 1098
+      },
+      "p50d_decision_required": true
+    },
+    {
+      "identity_key": "prod:07bf6091-9bc9-4ded-befa-a01837043da6",
+      "stable_identity_id": "07bf6091-9bc9-4ded-befa-a01837043da6",
+      "legacy_item_code": "ITEM-0082",
+      "source_item_code": "CIS-H10-003",
+      "target_item_code": "CIS-H10-003",
+      "classification": "source_version_difference",
+      "decision_status": "pending_p50d",
+      "proposed_action": "none",
+      "current_price": [
+        1319,
+        321,
+        1640
+      ],
+      "workbook_price": [
+        1319,
+        647,
+        1966
+      ],
+      "filed_pdf_price": [
+        1319,
+        321,
+        1640
+      ],
+      "pdf_locator": "p05:t1:r6:display-3",
+      "sql_vs_xlsx": "different",
+      "xlsx_vs_pdf": "different",
+      "sql_vs_pdf": "equal",
+      "filed_minus_current": {
+        "material": 0,
+        "labor": 0,
+        "total": 0
+      },
+      "workbook_minus_current": {
+        "material": 0,
+        "labor": 326,
+        "total": 326
+      },
+      "p50d_decision_required": true
+    },
+    {
+      "identity_key": "prod:b54d9539-aae9-4036-840f-45f5dfe14097",
+      "stable_identity_id": "b54d9539-aae9-4036-840f-45f5dfe14097",
+      "legacy_item_code": "ITEM-0086",
+      "source_item_code": "CIS-H10-007",
+      "target_item_code": "CIS-H10-007",
+      "classification": "source_version_difference",
+      "decision_status": "pending_p50d",
+      "proposed_action": "none",
+      "current_price": [
+        2375,
+        357,
+        2732
+      ],
+      "workbook_price": [
+        2375,
+        683,
+        3058
+      ],
+      "filed_pdf_price": [
+        2375,
+        357,
+        2732
+      ],
+      "pdf_locator": "p05:t1:r10:display-7",
+      "sql_vs_xlsx": "different",
+      "xlsx_vs_pdf": "different",
+      "sql_vs_pdf": "equal",
+      "filed_minus_current": {
+        "material": 0,
+        "labor": 0,
+        "total": 0
+      },
+      "workbook_minus_current": {
+        "material": 0,
+        "labor": 326,
+        "total": 326
+      },
+      "p50d_decision_required": true
+    },
+    {
+      "identity_key": "prod:0096556f-1935-4fbc-ac3d-487fb2fc99d4",
+      "stable_identity_id": "0096556f-1935-4fbc-ac3d-487fb2fc99d4",
+      "legacy_item_code": "ITEM-0124",
+      "source_item_code": "CRS-GIP-018",
+      "target_item_code": "CRS-H06-001",
+      "classification": "source_version_difference",
+      "decision_status": "pending_p50d",
+      "proposed_action": "none",
+      "current_price": [
+        293,
+        41,
+        334
+      ],
+      "workbook_price": [
+        224,
+        41,
+        265
+      ],
+      "filed_pdf_price": [
+        293,
+        41,
+        334
+      ],
+      "pdf_locator": "p06:t1:r24:display-18",
+      "sql_vs_xlsx": "different",
+      "xlsx_vs_pdf": "different",
+      "sql_vs_pdf": "equal",
+      "filed_minus_current": {
+        "material": 0,
+        "labor": 0,
+        "total": 0
+      },
+      "workbook_minus_current": {
+        "material": -69,
+        "labor": 0,
+        "total": -69
+      },
+      "p50d_decision_required": true
+    },
+    {
+      "identity_key": "prod:e59461a4-91ef-44f9-8f5a-c013aed68093",
+      "stable_identity_id": "e59461a4-91ef-44f9-8f5a-c013aed68093",
+      "legacy_item_code": "ITEM-0125",
+      "source_item_code": "CRS-GIP-019",
+      "target_item_code": "CRS-H06-002",
+      "classification": "source_version_difference",
+      "decision_status": "pending_p50d",
+      "proposed_action": "none",
+      "current_price": [
+        585,
+        82,
+        667
+      ],
+      "workbook_price": [
+        447,
+        82,
+        529
+      ],
+      "filed_pdf_price": [
+        585,
+        82,
+        667
+      ],
+      "pdf_locator": "p06:t1:r25:display-19",
+      "sql_vs_xlsx": "different",
+      "xlsx_vs_pdf": "different",
+      "sql_vs_pdf": "equal",
+      "filed_minus_current": {
+        "material": 0,
+        "labor": 0,
+        "total": 0
+      },
+      "workbook_minus_current": {
+        "material": -138,
+        "labor": 0,
+        "total": -138
+      },
+      "p50d_decision_required": true
+    },
+    {
+      "identity_key": "prod:d88bfe0e-9364-4de1-babc-ee6d628b32be",
+      "stable_identity_id": "d88bfe0e-9364-4de1-babc-ee6d628b32be",
+      "legacy_item_code": "ITEM-0126",
+      "source_item_code": "CRS-GIP-020",
+      "target_item_code": "CRS-H06-003",
+      "classification": "source_version_difference",
+      "decision_status": "pending_p50d",
+      "proposed_action": "none",
+      "current_price": [
+        878,
+        123,
+        1001
+      ],
+      "workbook_price": [
+        671,
+        123,
+        794
+      ],
+      "filed_pdf_price": [
+        878,
+        123,
+        1001
+      ],
+      "pdf_locator": "p06:t1:r26:display-20",
+      "sql_vs_xlsx": "different",
+      "xlsx_vs_pdf": "different",
+      "sql_vs_pdf": "equal",
+      "filed_minus_current": {
+        "material": 0,
+        "labor": 0,
+        "total": 0
+      },
+      "workbook_minus_current": {
+        "material": -207,
+        "labor": 0,
+        "total": -207
+      },
+      "p50d_decision_required": true
+    },
+    {
+      "identity_key": "prod:a3ade330-4ce4-4b74-b80d-4362468817cd",
+      "stable_identity_id": "a3ade330-4ce4-4b74-b80d-4362468817cd",
+      "legacy_item_code": "ITEM-0127",
+      "source_item_code": "CRS-GIP-021",
+      "target_item_code": "CRS-H06-004",
+      "classification": "source_version_difference",
+      "decision_status": "pending_p50d",
+      "proposed_action": "none",
+      "current_price": [
+        1171,
+        163,
+        1334
+      ],
+      "workbook_price": [
+        895,
+        163,
+        1058
+      ],
+      "filed_pdf_price": [
+        1171,
+        163,
+        1334
+      ],
+      "pdf_locator": "p06:t1:r27:display-21",
+      "sql_vs_xlsx": "different",
+      "xlsx_vs_pdf": "different",
+      "sql_vs_pdf": "equal",
+      "filed_minus_current": {
+        "material": 0,
+        "labor": 0,
+        "total": 0
+      },
+      "workbook_minus_current": {
+        "material": -276,
+        "labor": 0,
+        "total": -276
+      },
+      "p50d_decision_required": true
+    },
+    {
+      "identity_key": "prod:111eb158-1396-4fa0-8c4e-dfb8dd968975",
+      "stable_identity_id": "111eb158-1396-4fa0-8c4e-dfb8dd968975",
+      "legacy_item_code": "ITEM-0230",
+      "source_item_code": "RSR-PL0-024",
+      "target_item_code": "RSR-PL0-024",
+      "classification": "source_version_difference",
+      "decision_status": "pending_p50d",
+      "proposed_action": "none",
+      "current_price": [
+        11373,
+        2214,
+        13587
+      ],
+      "workbook_price": [
+        11613,
+        2274,
+        13887
+      ],
+      "filed_pdf_price": [
+        11373,
+        2214,
+        13587
+      ],
+      "pdf_locator": "p10:t1:r24:display-13",
+      "sql_vs_xlsx": "different",
+      "xlsx_vs_pdf": "different",
+      "sql_vs_pdf": "equal",
+      "filed_minus_current": {
+        "material": 0,
+        "labor": 0,
+        "total": 0
+      },
+      "workbook_minus_current": {
+        "material": 240,
+        "labor": 60,
+        "total": 300
+      },
+      "p50d_decision_required": true
+    },
+    {
+      "identity_key": "prod:7c218133-65ba-4f70-8bfa-d2c5318fb9ed",
+      "stable_identity_id": "7c218133-65ba-4f70-8bfa-d2c5318fb9ed",
+      "legacy_item_code": "ITEM-0286",
+      "source_item_code": "CHB-PB0-011",
+      "target_item_code": "CHB-PB0-011",
+      "classification": "proposed_confirmed_correction",
+      "decision_status": "pending_p50d",
+      "proposed_action": "none",
+      "current_price": [
+        23671,
+        8410,
+        32081
+      ],
+      "workbook_price": [
+        23671,
+        8410,
+        32081
+      ],
+      "filed_pdf_price": [
+        23671,
+        8415,
+        32086
+      ],
+      "pdf_locator": "p12:t1:r33:display-11",
+      "sql_vs_xlsx": "equal",
+      "xlsx_vs_pdf": "different",
+      "sql_vs_pdf": "different",
+      "filed_minus_current": {
+        "material": 0,
+        "labor": 5,
+        "total": 5
+      },
+      "workbook_minus_current": {
+        "material": 0,
+        "labor": 0,
+        "total": 0
+      },
+      "p50d_decision_required": true
+    },
+    {
+      "identity_key": "prod:cdf01707-2ec3-4211-b83f-5104139e429d",
+      "stable_identity_id": "cdf01707-2ec3-4211-b83f-5104139e429d",
+      "legacy_item_code": "ITEM-0287",
+      "source_item_code": "CHB-PB0-012",
+      "target_item_code": "CHB-PB0-012",
+      "classification": "proposed_confirmed_correction",
+      "decision_status": "pending_p50d",
+      "proposed_action": "none",
+      "current_price": [
+        32596,
+        11580,
+        44176
+      ],
+      "workbook_price": [
+        32596,
+        11580,
+        44176
+      ],
+      "filed_pdf_price": [
+        32596,
+        11586,
+        44182
+      ],
+      "pdf_locator": "p13:t1:r3:display-12",
+      "sql_vs_xlsx": "equal",
+      "xlsx_vs_pdf": "different",
+      "sql_vs_pdf": "different",
+      "filed_minus_current": {
+        "material": 0,
+        "labor": 6,
+        "total": 6
+      },
+      "workbook_minus_current": {
+        "material": 0,
+        "labor": 0,
+        "total": 0
+      },
+      "p50d_decision_required": true
+    },
+    {
+      "identity_key": "prod:520a4226-4c87-4ec5-b629-f69487c8f67e",
+      "stable_identity_id": "520a4226-4c87-4ec5-b629-f69487c8f67e",
+      "legacy_item_code": "ITEM-0332",
+      "source_item_code": "MOD-MH0-006",
+      "target_item_code": "MOD-MH0-006",
+      "classification": "proposed_confirmed_correction",
+      "decision_status": "pending_p50d",
+      "proposed_action": "none",
+      "current_price": [
+        27164,
+        8807,
+        35971
+      ],
+      "workbook_price": [
+        27164,
+        8807,
+        35971
+      ],
+      "filed_pdf_price": [
+        27164,
+        8811,
+        35975
+      ],
+      "pdf_locator": "p14:t1:r24:display-6",
+      "sql_vs_xlsx": "equal",
+      "xlsx_vs_pdf": "different",
+      "sql_vs_pdf": "different",
+      "filed_minus_current": {
+        "material": 0,
+        "labor": 4,
+        "total": 4
+      },
+      "workbook_minus_current": {
+        "material": 0,
+        "labor": 0,
+        "total": 0
+      },
+      "p50d_decision_required": true
+    },
+    {
+      "identity_key": "prod:bfaee5bc-6fad-4b15-8da4-2f1c60d5c0f5",
+      "stable_identity_id": "bfaee5bc-6fad-4b15-8da4-2f1c60d5c0f5",
+      "legacy_item_code": "ITEM-0333",
+      "source_item_code": "MOD-MH0-007",
+      "target_item_code": "MOD-MH0-007",
+      "classification": "proposed_confirmed_correction",
+      "decision_status": "pending_p50d",
+      "proposed_action": "none",
+      "current_price": [
+        45014,
+        14593,
+        59607
+      ],
+      "workbook_price": [
+        45014,
+        14593,
+        59607
+      ],
+      "filed_pdf_price": [
+        45014,
+        14600,
+        59614
+      ],
+      "pdf_locator": "p14:t1:r25:display-7",
+      "sql_vs_xlsx": "equal",
+      "xlsx_vs_pdf": "different",
+      "sql_vs_pdf": "different",
+      "filed_minus_current": {
+        "material": 0,
+        "labor": 7,
+        "total": 7
+      },
+      "workbook_minus_current": {
+        "material": 0,
+        "labor": 0,
+        "total": 0
+      },
+      "p50d_decision_required": true
+    },
+    {
+      "identity_key": "prod:956b2d1a-cac2-4ee7-98ed-3f7b8604af06",
+      "stable_identity_id": "956b2d1a-cac2-4ee7-98ed-3f7b8604af06",
+      "legacy_item_code": "ITEM-0334",
+      "source_item_code": "MOD-MH0-008",
+      "target_item_code": "MOD-MH0-008",
+      "classification": "proposed_confirmed_correction",
+      "decision_status": "pending_p50d",
+      "proposed_action": "none",
+      "current_price": [
+        33740,
+        10939,
+        44679
+      ],
+      "workbook_price": [
+        33740,
+        10939,
+        44679
+      ],
+      "filed_pdf_price": [
+        33740,
+        10945,
+        44685
+      ],
+      "pdf_locator": "p14:t1:r26:display-8",
+      "sql_vs_xlsx": "equal",
+      "xlsx_vs_pdf": "different",
+      "sql_vs_pdf": "different",
+      "filed_minus_current": {
+        "material": 0,
+        "labor": 6,
+        "total": 6
+      },
+      "workbook_minus_current": {
+        "material": 0,
+        "labor": 0,
+        "total": 0
+      },
+      "p50d_decision_required": true
+    },
+    {
+      "identity_key": "prod:d260a391-59bb-4ced-9b18-cc08b7e57d0e",
+      "stable_identity_id": "d260a391-59bb-4ced-9b18-cc08b7e57d0e",
+      "legacy_item_code": "ITEM-0335",
+      "source_item_code": "MOD-MH0-009",
+      "target_item_code": "MOD-MH0-009",
+      "classification": "proposed_confirmed_correction",
+      "decision_status": "pending_p50d",
+      "proposed_action": "none",
+      "current_price": [
+        35037,
+        11359,
+        46396
+      ],
+      "workbook_price": [
+        35037,
+        11359,
+        46396
+      ],
+      "filed_pdf_price": [
+        35037,
+        11364,
+        46401
+      ],
+      "pdf_locator": "p14:t1:r27:display-9",
+      "sql_vs_xlsx": "equal",
+      "xlsx_vs_pdf": "different",
+      "sql_vs_pdf": "different",
+      "filed_minus_current": {
+        "material": 0,
+        "labor": 5,
+        "total": 5
+      },
+      "workbook_minus_current": {
+        "material": 0,
+        "labor": 0,
+        "total": 0
+      },
+      "p50d_decision_required": true
+    },
+    {
+      "identity_key": "prod:ece950a8-f7d5-4a3d-a6ca-51461bef9b91",
+      "stable_identity_id": "ece950a8-f7d5-4a3d-a6ca-51461bef9b91",
+      "legacy_item_code": "ITEM-0426",
+      "source_item_code": "RPR-BRK-002",
+      "target_item_code": "RPR-BRK-002",
+      "classification": "proposed_confirmed_correction",
+      "decision_status": "pending_p50d",
+      "proposed_action": "none",
+      "current_price": [
+        0,
+        2520,
+        2520
+      ],
+      "workbook_price": [
+        0,
+        2520,
+        2520
+      ],
+      "filed_pdf_price": [
+        0,
+        2521,
+        2521
+      ],
+      "pdf_locator": "p23:t1:r32:display-2",
+      "sql_vs_xlsx": "equal",
+      "xlsx_vs_pdf": "different",
+      "sql_vs_pdf": "different",
+      "filed_minus_current": {
+        "material": 0,
+        "labor": 1,
+        "total": 1
+      },
+      "workbook_minus_current": {
+        "material": 0,
+        "labor": 0,
+        "total": 0
+      },
+      "p50d_decision_required": true
+    },
+    {
+      "identity_key": "prod:77dae4c9-b6f0-4ad5-987c-661e344c2871",
+      "stable_identity_id": "77dae4c9-b6f0-4ad5-987c-661e344c2871",
+      "legacy_item_code": "ITEM-0427",
+      "source_item_code": "RPR-REM-001",
+      "target_item_code": "RPR-REM-001",
+      "classification": "proposed_confirmed_correction",
+      "decision_status": "pending_p50d",
+      "proposed_action": "none",
+      "current_price": [
+        5070,
+        1801,
+        6871
+      ],
+      "workbook_price": [
+        5070,
+        1801,
+        6871
+      ],
+      "filed_pdf_price": [
+        5070,
+        1802,
+        6872
+      ],
+      "pdf_locator": "p24:t1:r4:display-1",
+      "sql_vs_xlsx": "equal",
+      "xlsx_vs_pdf": "different",
+      "sql_vs_pdf": "different",
+      "filed_minus_current": {
+        "material": 0,
+        "labor": 1,
+        "total": 1
+      },
+      "workbook_minus_current": {
+        "material": 0,
+        "labor": 0,
+        "total": 0
+      },
+      "p50d_decision_required": true
+    },
+    {
+      "identity_key": "prod:f2662c71-a6e5-407e-8456-8608e304b43b",
+      "stable_identity_id": "f2662c71-a6e5-407e-8456-8608e304b43b",
+      "legacy_item_code": "ITEM-0429",
+      "source_item_code": "COR-PB0-002",
+      "target_item_code": "COR-PB0-002",
+      "classification": "proposed_confirmed_correction",
+      "decision_status": "pending_p50d",
+      "proposed_action": "none",
+      "current_price": [
+        0,
+        1763,
+        1763
+      ],
+      "workbook_price": [
+        0,
+        1763,
+        1763
+      ],
+      "filed_pdf_price": [
+        0,
+        1764,
+        1764
+      ],
+      "pdf_locator": "p24:t1:r9:display-2",
+      "sql_vs_xlsx": "equal",
+      "xlsx_vs_pdf": "different",
+      "sql_vs_pdf": "different",
+      "filed_minus_current": {
+        "material": 0,
+        "labor": 1,
+        "total": 1
+      },
+      "workbook_minus_current": {
+        "material": 0,
+        "labor": 0,
+        "total": 0
+      },
+      "p50d_decision_required": true
+    },
+    {
+      "identity_key": "prod:ceb49dea-167c-481d-a28c-6a8c9ce46633",
+      "stable_identity_id": "ceb49dea-167c-481d-a28c-6a8c9ce46633",
+      "legacy_item_code": "ITEM-0430",
+      "source_item_code": "COR-MH0-001",
+      "target_item_code": "COR-MH0-001",
+      "classification": "proposed_confirmed_correction",
+      "decision_status": "pending_p50d",
+      "proposed_action": "none",
+      "current_price": [
+        0,
+        1763,
+        1763
+      ],
+      "workbook_price": [
+        0,
+        1763,
+        1763
+      ],
+      "filed_pdf_price": [
+        0,
+        1764,
+        1764
+      ],
+      "pdf_locator": "p24:t1:r12:display-1",
+      "sql_vs_xlsx": "equal",
+      "xlsx_vs_pdf": "different",
+      "sql_vs_pdf": "different",
+      "filed_minus_current": {
+        "material": 0,
+        "labor": 1,
+        "total": 1
+      },
+      "workbook_minus_current": {
+        "material": 0,
+        "labor": 0,
+        "total": 0
+      },
+      "p50d_decision_required": true
+    },
+    {
+      "identity_key": "prod:1e60425d-d3d0-4510-b7f1-9075fb3ff352",
+      "stable_identity_id": "1e60425d-d3d0-4510-b7f1-9075fb3ff352",
+      "legacy_item_code": "ITEM-0431",
+      "source_item_code": "COR-MH0-002",
+      "target_item_code": "COR-MH0-002",
+      "classification": "proposed_confirmed_correction",
+      "decision_status": "pending_p50d",
+      "proposed_action": "none",
+      "current_price": [
+        0,
+        3526,
+        3526
+      ],
+      "workbook_price": [
+        0,
+        3526,
+        3526
+      ],
+      "filed_pdf_price": [
+        0,
+        3528,
+        3528
+      ],
+      "pdf_locator": "p24:t1:r13:display-2",
+      "sql_vs_xlsx": "equal",
+      "xlsx_vs_pdf": "different",
+      "sql_vs_pdf": "different",
+      "filed_minus_current": {
+        "material": 0,
+        "labor": 2,
+        "total": 2
+      },
+      "workbook_minus_current": {
+        "material": 0,
+        "labor": 0,
+        "total": 0
+      },
+      "p50d_decision_required": true
+    },
+    {
+      "identity_key": "prod:d5bdd67d-3b33-434d-8429-c3d536967ced",
+      "stable_identity_id": "d5bdd67d-3b33-434d-8429-c3d536967ced",
+      "legacy_item_code": "ITEM-0450",
+      "source_item_code": "PIL-STD-002",
+      "target_item_code": "PIL-STD-002",
+      "classification": "proposed_confirmed_correction",
+      "decision_status": "pending_p50d",
+      "proposed_action": "none",
+      "current_price": [
+        1704,
+        632,
+        2336
+      ],
+      "workbook_price": [
+        1704,
+        632,
+        2336
+      ],
+      "filed_pdf_price": [
+        1704,
+        633,
+        2337
+      ],
+      "pdf_locator": "p25:t1:r12:display-2",
+      "sql_vs_xlsx": "equal",
+      "xlsx_vs_pdf": "different",
+      "sql_vs_pdf": "different",
+      "filed_minus_current": {
+        "material": 0,
+        "labor": 1,
+        "total": 1
+      },
+      "workbook_minus_current": {
+        "material": 0,
+        "labor": 0,
+        "total": 0
+      },
+      "p50d_decision_required": true
+    },
+    {
+      "identity_key": "prod:41a43f65-ab81-48d1-b58f-35866e441bf6",
+      "stable_identity_id": "41a43f65-ab81-48d1-b58f-35866e441bf6",
+      "legacy_item_code": "ITEM-0453",
+      "source_item_code": "PIL-STD-005",
+      "target_item_code": "PIL-STD-005",
+      "classification": "proposed_confirmed_correction",
+      "decision_status": "pending_p50d",
+      "proposed_action": "none",
+      "current_price": [
+        3294,
+        1147,
+        4441
+      ],
+      "workbook_price": [
+        3294,
+        1147,
+        4441
+      ],
+      "filed_pdf_price": [
+        3294,
+        1148,
+        4442
+      ],
+      "pdf_locator": "p25:t1:r15:display-5",
+      "sql_vs_xlsx": "equal",
+      "xlsx_vs_pdf": "different",
+      "sql_vs_pdf": "different",
+      "filed_minus_current": {
+        "material": 0,
+        "labor": 1,
+        "total": 1
+      },
+      "workbook_minus_current": {
+        "material": 0,
+        "labor": 0,
+        "total": 0
+      },
+      "p50d_decision_required": true
+    },
+    {
+      "identity_key": "prod:07fdccd5-1384-4825-8031-0fa70991c568",
+      "stable_identity_id": "07fdccd5-1384-4825-8031-0fa70991c568",
+      "legacy_item_code": "ITEM-0454",
+      "source_item_code": "PIL-STD-006",
+      "target_item_code": "PIL-STD-006",
+      "classification": "proposed_confirmed_correction",
+      "decision_status": "pending_p50d",
+      "proposed_action": "none",
+      "current_price": [
+        3893,
+        1341,
+        5234
+      ],
+      "workbook_price": [
+        3893,
+        1341,
+        5234
+      ],
+      "filed_pdf_price": [
+        3893,
+        1342,
+        5235
+      ],
+      "pdf_locator": "p25:t1:r16:display-6",
+      "sql_vs_xlsx": "equal",
+      "xlsx_vs_pdf": "different",
+      "sql_vs_pdf": "different",
+      "filed_minus_current": {
+        "material": 0,
+        "labor": 1,
+        "total": 1
+      },
+      "workbook_minus_current": {
+        "material": 0,
+        "labor": 0,
+        "total": 0
+      },
+      "p50d_decision_required": true
+    },
+    {
+      "identity_key": "prod:5272c4fe-20d1-43ce-9488-6beaf9873c6c",
+      "stable_identity_id": "5272c4fe-20d1-43ce-9488-6beaf9873c6c",
+      "legacy_item_code": "ITEM-0456",
+      "source_item_code": "PIL-STD-008",
+      "target_item_code": "PIL-STD-008",
+      "classification": "proposed_confirmed_correction",
+      "decision_status": "pending_p50d",
+      "proposed_action": "none",
+      "current_price": [
+        4166,
+        1445,
+        5611
+      ],
+      "workbook_price": [
+        4166,
+        1445,
+        5611
+      ],
+      "filed_pdf_price": [
+        4166,
+        1446,
+        5612
+      ],
+      "pdf_locator": "p25:t1:r18:display-8",
+      "sql_vs_xlsx": "equal",
+      "xlsx_vs_pdf": "different",
+      "sql_vs_pdf": "different",
+      "filed_minus_current": {
+        "material": 0,
+        "labor": 1,
+        "total": 1
+      },
+      "workbook_minus_current": {
+        "material": 0,
+        "labor": 0,
+        "total": 0
+      },
+      "p50d_decision_required": true
+    },
+    {
+      "identity_key": "prod:382cdb09-5def-403d-87ee-215f497e527b",
+      "stable_identity_id": "382cdb09-5def-403d-87ee-215f497e527b",
+      "legacy_item_code": "ITEM-0457",
+      "source_item_code": "PIL-STD-009",
+      "target_item_code": "PIL-STD-009",
+      "classification": "proposed_confirmed_correction",
+      "decision_status": "pending_p50d",
+      "proposed_action": "none",
+      "current_price": [
+        4932,
+        1686,
+        6618
+      ],
+      "workbook_price": [
+        4932,
+        1686,
+        6618
+      ],
+      "filed_pdf_price": [
+        4932,
+        1687,
+        6619
+      ],
+      "pdf_locator": "p25:t1:r19:display-9",
+      "sql_vs_xlsx": "equal",
+      "xlsx_vs_pdf": "different",
+      "sql_vs_pdf": "different",
+      "filed_minus_current": {
+        "material": 0,
+        "labor": 1,
+        "total": 1
+      },
+      "workbook_minus_current": {
+        "material": 0,
+        "labor": 0,
+        "total": 0
+      },
+      "p50d_decision_required": true
+    },
+    {
+      "identity_key": "prod:f94e153a-7afb-4e92-b32b-64340e2ab42d",
+      "stable_identity_id": "f94e153a-7afb-4e92-b32b-64340e2ab42d",
+      "legacy_item_code": "ITEM-0458",
+      "source_item_code": "PIL-STD-010",
+      "target_item_code": "PIL-STD-010",
+      "classification": "proposed_confirmed_correction",
+      "decision_status": "pending_p50d",
+      "proposed_action": "none",
+      "current_price": [
+        3965,
+        1371,
+        5336
+      ],
+      "workbook_price": [
+        3965,
+        1371,
+        5336
+      ],
+      "filed_pdf_price": [
+        3965,
+        1372,
+        5337
+      ],
+      "pdf_locator": "p25:t1:r20:display-10",
+      "sql_vs_xlsx": "equal",
+      "xlsx_vs_pdf": "different",
+      "sql_vs_pdf": "different",
+      "filed_minus_current": {
+        "material": 0,
+        "labor": 1,
+        "total": 1
+      },
+      "workbook_minus_current": {
+        "material": 0,
+        "labor": 0,
+        "total": 0
+      },
+      "p50d_decision_required": true
+    },
+    {
+      "identity_key": "prod:c8986fed-9ff9-451b-8c2b-3b7de462a1e3",
+      "stable_identity_id": "c8986fed-9ff9-451b-8c2b-3b7de462a1e3",
+      "legacy_item_code": "ITEM-0459",
+      "source_item_code": "PIL-STD-011",
+      "target_item_code": "PIL-STD-011",
+      "classification": "proposed_confirmed_correction",
+      "decision_status": "pending_p50d",
+      "proposed_action": "none",
+      "current_price": [
+        4809,
+        1686,
+        6495
+      ],
+      "workbook_price": [
+        4809,
+        1686,
+        6495
+      ],
+      "filed_pdf_price": [
+        4809,
+        1687,
+        6496
+      ],
+      "pdf_locator": "p25:t1:r21:display-11",
+      "sql_vs_xlsx": "equal",
+      "xlsx_vs_pdf": "different",
+      "sql_vs_pdf": "different",
+      "filed_minus_current": {
+        "material": 0,
+        "labor": 1,
+        "total": 1
+      },
+      "workbook_minus_current": {
+        "material": 0,
+        "labor": 0,
+        "total": 0
+      },
+      "p50d_decision_required": true
+    },
+    {
+      "identity_key": "prod:c6c4131e-bf7c-4067-bdf9-fea2bf2c875c",
+      "stable_identity_id": "c6c4131e-bf7c-4067-bdf9-fea2bf2c875c",
+      "legacy_item_code": "ITEM-0460",
+      "source_item_code": "PIL-STD-012",
+      "target_item_code": "PIL-STD-012",
+      "classification": "proposed_confirmed_correction",
+      "decision_status": "pending_p50d",
+      "proposed_action": "none",
+      "current_price": [
+        5694,
+        1985,
+        7679
+      ],
+      "workbook_price": [
+        5694,
+        1985,
+        7679
+      ],
+      "filed_pdf_price": [
+        5694,
+        1986,
+        7680
+      ],
+      "pdf_locator": "p25:t1:r22:display-12",
+      "sql_vs_xlsx": "equal",
+      "xlsx_vs_pdf": "different",
+      "sql_vs_pdf": "different",
+      "filed_minus_current": {
+        "material": 0,
+        "labor": 1,
+        "total": 1
+      },
+      "workbook_minus_current": {
+        "material": 0,
+        "labor": 0,
+        "total": 0
+      },
+      "p50d_decision_required": true
+    },
+    {
+      "identity_key": "prod:2ccb5619-4065-45b2-9bd0-86c17c031b7f",
+      "stable_identity_id": "2ccb5619-4065-45b2-9bd0-86c17c031b7f",
+      "legacy_item_code": "ITEM-0461",
+      "source_item_code": "PIL-STD-013",
+      "target_item_code": "PIL-STD-013",
+      "classification": "proposed_confirmed_correction",
+      "decision_status": "pending_p50d",
+      "proposed_action": "none",
+      "current_price": [
+        5204,
+        1780,
+        6984
+      ],
+      "workbook_price": [
+        5204,
+        1780,
+        6984
+      ],
+      "filed_pdf_price": [
+        5204,
+        1781,
+        6985
+      ],
+      "pdf_locator": "p25:t1:r23:display-13",
+      "sql_vs_xlsx": "equal",
+      "xlsx_vs_pdf": "different",
+      "sql_vs_pdf": "different",
+      "filed_minus_current": {
+        "material": 0,
+        "labor": 1,
+        "total": 1
+      },
+      "workbook_minus_current": {
+        "material": 0,
+        "labor": 0,
+        "total": 0
+      },
+      "p50d_decision_required": true
+    },
+    {
+      "identity_key": "prod:25db6bc2-631b-45e8-880d-dbafd5b62d27",
+      "stable_identity_id": "25db6bc2-631b-45e8-880d-dbafd5b62d27",
+      "legacy_item_code": "ITEM-0462",
+      "source_item_code": "PIL-STD-014",
+      "target_item_code": "PIL-STD-014",
+      "classification": "proposed_confirmed_correction",
+      "decision_status": "pending_p50d",
+      "proposed_action": "none",
+      "current_price": [
+        6088,
+        2067,
+        8155
+      ],
+      "workbook_price": [
+        6088,
+        2067,
+        8155
+      ],
+      "filed_pdf_price": [
+        6088,
+        2068,
+        8156
+      ],
+      "pdf_locator": "p25:t1:r24:display-14",
+      "sql_vs_xlsx": "equal",
+      "xlsx_vs_pdf": "different",
+      "sql_vs_pdf": "different",
+      "filed_minus_current": {
+        "material": 0,
+        "labor": 1,
+        "total": 1
+      },
+      "workbook_minus_current": {
+        "material": 0,
+        "labor": 0,
+        "total": 0
+      },
+      "p50d_decision_required": true
+    },
+    {
+      "identity_key": "prod:2370bb46-f38f-4cce-938d-4a11f0169329",
+      "stable_identity_id": "2370bb46-f38f-4cce-938d-4a11f0169329",
+      "legacy_item_code": "ITEM-0463",
+      "source_item_code": "PIL-STD-015",
+      "target_item_code": "PIL-STD-015",
+      "classification": "proposed_confirmed_correction",
+      "decision_status": "pending_p50d",
+      "proposed_action": "none",
+      "current_price": [
+        7018,
+        2353,
+        9371
+      ],
+      "workbook_price": [
+        7018,
+        2353,
+        9371
+      ],
+      "filed_pdf_price": [
+        7018,
+        2354,
+        9372
+      ],
+      "pdf_locator": "p25:t1:r25:display-15",
+      "sql_vs_xlsx": "equal",
+      "xlsx_vs_pdf": "different",
+      "sql_vs_pdf": "different",
+      "filed_minus_current": {
+        "material": 0,
+        "labor": 1,
+        "total": 1
+      },
+      "workbook_minus_current": {
+        "material": 0,
+        "labor": 0,
+        "total": 0
+      },
+      "p50d_decision_required": true
+    },
+    {
+      "identity_key": "prod:a38a5a15-33ed-4ba4-9c83-d9103b05dcb3",
+      "stable_identity_id": "a38a5a15-33ed-4ba4-9c83-d9103b05dcb3",
+      "legacy_item_code": "ITEM-0478",
+      "source_item_code": "DRN-STD-001",
+      "target_item_code": "DRN-STD-001",
+      "classification": "proposed_confirmed_correction",
+      "decision_status": "pending_p50d",
+      "proposed_action": "none",
+      "current_price": [
+        2608,
+        925,
+        3533
+      ],
+      "workbook_price": [
+        2608,
+        925,
+        3533
+      ],
+      "filed_pdf_price": [
+        2608,
+        926,
+        3534
+      ],
+      "pdf_locator": "p26:t1:r21:display-1",
+      "sql_vs_xlsx": "equal",
+      "xlsx_vs_pdf": "different",
+      "sql_vs_pdf": "different",
+      "filed_minus_current": {
+        "material": 0,
+        "labor": 1,
+        "total": 1
+      },
+      "workbook_minus_current": {
+        "material": 0,
+        "labor": 0,
+        "total": 0
+      },
+      "p50d_decision_required": true
+    },
+    {
+      "identity_key": "prod:ec79f469-ed24-4b3c-89ec-9edc9ccba549",
+      "stable_identity_id": "ec79f469-ed24-4b3c-89ec-9edc9ccba549",
+      "legacy_item_code": "ITEM-0479",
+      "source_item_code": "DRN-STD-002",
+      "target_item_code": "DRN-STD-002",
+      "classification": "proposed_confirmed_correction",
+      "decision_status": "pending_p50d",
+      "proposed_action": "none",
+      "current_price": [
+        3120,
+        1108,
+        4228
+      ],
+      "workbook_price": [
+        3120,
+        1108,
+        4228
+      ],
+      "filed_pdf_price": [
+        3120,
+        1109,
+        4229
+      ],
+      "pdf_locator": "p26:t1:r22:display-2",
+      "sql_vs_xlsx": "equal",
+      "xlsx_vs_pdf": "different",
+      "sql_vs_pdf": "different",
+      "filed_minus_current": {
+        "material": 0,
+        "labor": 1,
+        "total": 1
+      },
+      "workbook_minus_current": {
+        "material": 0,
+        "labor": 0,
+        "total": 0
+      },
+      "p50d_decision_required": true
+    },
+    {
+      "identity_key": "prod:aa6eb882-153f-4d71-a635-cb0c27dfccb7",
+      "stable_identity_id": "aa6eb882-153f-4d71-a635-cb0c27dfccb7",
+      "legacy_item_code": "ITEM-0480",
+      "source_item_code": "DRN-STD-003",
+      "target_item_code": "DRN-STD-003",
+      "classification": "proposed_confirmed_correction",
+      "decision_status": "pending_p50d",
+      "proposed_action": "none",
+      "current_price": [
+        6519,
+        2316,
+        8835
+      ],
+      "workbook_price": [
+        6519,
+        2316,
+        8835
+      ],
+      "filed_pdf_price": [
+        6519,
+        2317,
+        8836
+      ],
+      "pdf_locator": "p26:t1:r23:display-3",
+      "sql_vs_xlsx": "equal",
+      "xlsx_vs_pdf": "different",
+      "sql_vs_pdf": "different",
+      "filed_minus_current": {
+        "material": 0,
+        "labor": 1,
+        "total": 1
+      },
+      "workbook_minus_current": {
+        "material": 0,
+        "labor": 0,
+        "total": 0
+      },
+      "p50d_decision_required": true
+    },
+    {
+      "identity_key": "prod:40779d45-c955-458e-8744-35f698d1a872",
+      "stable_identity_id": "40779d45-c955-458e-8744-35f698d1a872",
+      "legacy_item_code": "ITEM-0615",
+      "source_item_code": "LVU-MH0-002",
+      "target_item_code": "LVU-MH0-002",
+      "classification": "proposed_confirmed_correction",
+      "decision_status": "pending_p50d",
+      "proposed_action": "none",
+      "current_price": [
+        2869,
+        7091,
+        9960
+      ],
+      "workbook_price": [
+        2869,
+        7427,
+        10296
+      ],
+      "filed_pdf_price": [
+        2869,
+        7427,
+        10296
+      ],
+      "pdf_locator": "p21:t1:r11:display-2",
+      "sql_vs_xlsx": "different",
+      "xlsx_vs_pdf": "equal",
+      "sql_vs_pdf": "different",
+      "filed_minus_current": {
+        "material": 0,
+        "labor": 336,
+        "total": 336
+      },
+      "workbook_minus_current": {
+        "material": 0,
+        "labor": 336,
+        "total": 336
+      },
+      "p50d_decision_required": true
+    },
+    {
+      "identity_key": "prod:2205221d-b1c6-4c25-a17b-be19a01fb6e8",
+      "stable_identity_id": "2205221d-b1c6-4c25-a17b-be19a01fb6e8",
+      "legacy_item_code": "ITEM-0616",
+      "source_item_code": "LVU-MH0-003",
+      "target_item_code": "LVU-MH0-003",
+      "classification": "proposed_confirmed_correction",
+      "decision_status": "pending_p50d",
+      "proposed_action": "none",
+      "current_price": [
+        3438,
+        7417,
+        10855
+      ],
+      "workbook_price": [
+        3438,
+        7724,
+        11162
+      ],
+      "filed_pdf_price": [
+        3438,
+        7724,
+        11162
+      ],
+      "pdf_locator": "p21:t1:r12:display-3",
+      "sql_vs_xlsx": "different",
+      "xlsx_vs_pdf": "equal",
+      "sql_vs_pdf": "different",
+      "filed_minus_current": {
+        "material": 0,
+        "labor": 307,
+        "total": 307
+      },
+      "workbook_minus_current": {
+        "material": 0,
+        "labor": 307,
+        "total": 307
+      },
+      "p50d_decision_required": true
+    },
+    {
+      "identity_key": "prod:59dd5bbc-9f14-4948-9922-04637a26535c",
+      "stable_identity_id": "59dd5bbc-9f14-4948-9922-04637a26535c",
+      "legacy_item_code": "ITEM-0617",
+      "source_item_code": "LVU-MH0-004",
+      "target_item_code": "LVU-MH0-004",
+      "classification": "proposed_confirmed_correction",
+      "decision_status": "pending_p50d",
+      "proposed_action": "none",
+      "current_price": [
+        4027,
+        7782,
+        11809
+      ],
+      "workbook_price": [
+        4027,
+        8042,
+        12069
+      ],
+      "filed_pdf_price": [
+        4027,
+        8042,
+        12069
+      ],
+      "pdf_locator": "p21:t1:r13:display-4",
+      "sql_vs_xlsx": "different",
+      "xlsx_vs_pdf": "equal",
+      "sql_vs_pdf": "different",
+      "filed_minus_current": {
+        "material": 0,
+        "labor": 260,
+        "total": 260
+      },
+      "workbook_minus_current": {
+        "material": 0,
+        "labor": 260,
+        "total": 260
+      },
+      "p50d_decision_required": true
+    },
+    {
+      "identity_key": "prod:dfff30ec-a715-4cb1-aa2f-3b5c4e86d386",
+      "stable_identity_id": "dfff30ec-a715-4cb1-aa2f-3b5c4e86d386",
+      "legacy_item_code": "ITEM-0618",
+      "source_item_code": "LVU-MH0-005",
+      "target_item_code": "LVU-MH0-005",
+      "classification": "proposed_confirmed_correction",
+      "decision_status": "pending_p50d",
+      "proposed_action": "none",
+      "current_price": [
+        5167,
+        8433,
+        13600
+      ],
+      "workbook_price": [
+        5167,
+        8637,
+        13804
+      ],
+      "filed_pdf_price": [
+        5167,
+        8637,
+        13804
+      ],
+      "pdf_locator": "p21:t1:r14:display-5",
+      "sql_vs_xlsx": "different",
+      "xlsx_vs_pdf": "equal",
+      "sql_vs_pdf": "different",
+      "filed_minus_current": {
+        "material": 0,
+        "labor": 204,
+        "total": 204
+      },
+      "workbook_minus_current": {
+        "material": 0,
+        "labor": 204,
+        "total": 204
+      },
+      "p50d_decision_required": true
+    },
+    {
+      "identity_key": "prod:f0aff709-2054-4b59-8650-8a4ebfdc7429",
+      "stable_identity_id": "f0aff709-2054-4b59-8650-8a4ebfdc7429",
+      "legacy_item_code": "ITEM-0619",
+      "source_item_code": "LVU-MH0-006",
+      "target_item_code": "LVU-MH0-006",
+      "classification": "proposed_confirmed_correction",
+      "decision_status": "pending_p50d",
+      "proposed_action": "none",
+      "current_price": [
+        6325,
+        9124,
+        15449
+      ],
+      "workbook_price": [
+        6325,
+        9253,
+        15578
+      ],
+      "filed_pdf_price": [
+        6325,
+        9253,
+        15578
+      ],
+      "pdf_locator": "p21:t1:r15:display-6",
+      "sql_vs_xlsx": "different",
+      "xlsx_vs_pdf": "equal",
+      "sql_vs_pdf": "different",
+      "filed_minus_current": {
+        "material": 0,
+        "labor": 129,
+        "total": 129
+      },
+      "workbook_minus_current": {
+        "material": 0,
+        "labor": 129,
+        "total": 129
+      },
+      "p50d_decision_required": true
+    },
+    {
+      "identity_key": "prod:c102adf3-5bbf-4d16-a8fe-54d44bb32c8b",
+      "stable_identity_id": "c102adf3-5bbf-4d16-a8fe-54d44bb32c8b",
+      "legacy_item_code": "ITEM-0620",
+      "source_item_code": "LVU-MH0-007",
+      "target_item_code": "LVU-MH0-007",
+      "classification": "proposed_confirmed_correction",
+      "decision_status": "pending_p50d",
+      "proposed_action": "none",
+      "current_price": [
+        7465,
+        9775,
+        17240
+      ],
+      "workbook_price": [
+        7465,
+        9848,
+        17313
+      ],
+      "filed_pdf_price": [
+        7465,
+        9848,
+        17313
+      ],
+      "pdf_locator": "p21:t1:r16:display-7",
+      "sql_vs_xlsx": "different",
+      "xlsx_vs_pdf": "equal",
+      "sql_vs_pdf": "different",
+      "filed_minus_current": {
+        "material": 0,
+        "labor": 73,
+        "total": 73
+      },
+      "workbook_minus_current": {
+        "material": 0,
+        "labor": 73,
+        "total": 73
+      },
+      "p50d_decision_required": true
+    },
+    {
+      "identity_key": "prod:62843343-f9ff-453c-8d7f-92677f416921",
+      "stable_identity_id": "62843343-f9ff-453c-8d7f-92677f416921",
+      "legacy_item_code": "ITEM-0621",
+      "source_item_code": "LVU-MH0-009",
+      "target_item_code": "LVU-MH0-009",
+      "classification": "proposed_confirmed_correction",
+      "decision_status": "pending_p50d",
+      "proposed_action": "none",
+      "current_price": [
+        24369,
+        7091,
+        31460
+      ],
+      "workbook_price": [
+        24369,
+        7427,
+        31796
+      ],
+      "filed_pdf_price": [
+        24369,
+        7427,
+        31796
+      ],
+      "pdf_locator": "p21:t1:r18:display-9",
+      "sql_vs_xlsx": "different",
+      "xlsx_vs_pdf": "equal",
+      "sql_vs_pdf": "different",
+      "filed_minus_current": {
+        "material": 0,
+        "labor": 336,
+        "total": 336
+      },
+      "workbook_minus_current": {
+        "material": 0,
+        "labor": 336,
+        "total": 336
+      },
+      "p50d_decision_required": true
+    },
+    {
+      "identity_key": "prod:5cf43d1e-e593-4d77-b3e9-3292f16ea178",
+      "stable_identity_id": "5cf43d1e-e593-4d77-b3e9-3292f16ea178",
+      "legacy_item_code": "ITEM-0622",
+      "source_item_code": "LVU-MH0-010",
+      "target_item_code": "LVU-MH0-010",
+      "classification": "proposed_confirmed_correction",
+      "decision_status": "pending_p50d",
+      "proposed_action": "none",
+      "current_price": [
+        24938,
+        7417,
+        32355
+      ],
+      "workbook_price": [
+        24938,
+        7724,
+        32662
+      ],
+      "filed_pdf_price": [
+        24938,
+        7724,
+        32662
+      ],
+      "pdf_locator": "p21:t1:r19:display-10",
+      "sql_vs_xlsx": "different",
+      "xlsx_vs_pdf": "equal",
+      "sql_vs_pdf": "different",
+      "filed_minus_current": {
+        "material": 0,
+        "labor": 307,
+        "total": 307
+      },
+      "workbook_minus_current": {
+        "material": 0,
+        "labor": 307,
+        "total": 307
+      },
+      "p50d_decision_required": true
+    },
+    {
+      "identity_key": "prod:57801cb6-2b72-4bf9-a05f-cf06e5594e55",
+      "stable_identity_id": "57801cb6-2b72-4bf9-a05f-cf06e5594e55",
+      "legacy_item_code": "ITEM-0623",
+      "source_item_code": "LVU-MH0-011",
+      "target_item_code": "LVU-MH0-011",
+      "classification": "proposed_confirmed_correction",
+      "decision_status": "pending_p50d",
+      "proposed_action": "none",
+      "current_price": [
+        26667,
+        7782,
+        34449
+      ],
+      "workbook_price": [
+        26667,
+        8637,
+        35304
+      ],
+      "filed_pdf_price": [
+        26667,
+        8637,
+        35304
+      ],
+      "pdf_locator": "p21:t1:r20:display-11",
+      "sql_vs_xlsx": "different",
+      "xlsx_vs_pdf": "equal",
+      "sql_vs_pdf": "different",
+      "filed_minus_current": {
+        "material": 0,
+        "labor": 855,
+        "total": 855
+      },
+      "workbook_minus_current": {
+        "material": 0,
+        "labor": 855,
+        "total": 855
+      },
+      "p50d_decision_required": true
+    },
+    {
+      "identity_key": "prod:ced3def1-9a2f-43a4-a4c4-5d62b8711ed2",
+      "stable_identity_id": "ced3def1-9a2f-43a4-a4c4-5d62b8711ed2",
+      "legacy_item_code": "ITEM-0624",
+      "source_item_code": "LVU-MH0-012",
+      "target_item_code": "LVU-MH0-012",
+      "classification": "proposed_confirmed_correction",
+      "decision_status": "pending_p50d",
+      "proposed_action": "none",
+      "current_price": [
+        26667,
+        8433,
+        35100
+      ],
+      "workbook_price": [
+        26667,
+        8637,
+        35304
+      ],
+      "filed_pdf_price": [
+        26667,
+        8637,
+        35304
+      ],
+      "pdf_locator": "p21:t1:r21:display-12",
+      "sql_vs_xlsx": "different",
+      "xlsx_vs_pdf": "equal",
+      "sql_vs_pdf": "different",
+      "filed_minus_current": {
+        "material": 0,
+        "labor": 204,
+        "total": 204
+      },
+      "workbook_minus_current": {
+        "material": 0,
+        "labor": 204,
+        "total": 204
+      },
+      "p50d_decision_required": true
+    },
+    {
+      "identity_key": "prod:e8d7456b-e39b-417b-8faa-e5463836c177",
+      "stable_identity_id": "e8d7456b-e39b-417b-8faa-e5463836c177",
+      "legacy_item_code": "ITEM-0625",
+      "source_item_code": "LVU-MH0-013",
+      "target_item_code": "LVU-MH0-013",
+      "classification": "proposed_confirmed_correction",
+      "decision_status": "pending_p50d",
+      "proposed_action": "none",
+      "current_price": [
+        27825,
+        9124,
+        36949
+      ],
+      "workbook_price": [
+        27825,
+        9253,
+        37078
+      ],
+      "filed_pdf_price": [
+        27825,
+        9253,
+        37078
+      ],
+      "pdf_locator": "p21:t1:r22:display-13",
+      "sql_vs_xlsx": "different",
+      "xlsx_vs_pdf": "equal",
+      "sql_vs_pdf": "different",
+      "filed_minus_current": {
+        "material": 0,
+        "labor": 129,
+        "total": 129
+      },
+      "workbook_minus_current": {
+        "material": 0,
+        "labor": 129,
+        "total": 129
+      },
+      "p50d_decision_required": true
+    },
+    {
+      "identity_key": "prod:51bb9762-1089-4c66-aca9-4e774531f081",
+      "stable_identity_id": "51bb9762-1089-4c66-aca9-4e774531f081",
+      "legacy_item_code": "ITEM-0626",
+      "source_item_code": "LVU-MH0-014",
+      "target_item_code": "LVU-MH0-014",
+      "classification": "proposed_confirmed_correction",
+      "decision_status": "pending_p50d",
+      "proposed_action": "none",
+      "current_price": [
+        28965,
+        9775,
+        38740
+      ],
+      "workbook_price": [
+        28965,
+        9848,
+        38813
+      ],
+      "filed_pdf_price": [
+        28965,
+        9848,
+        38813
+      ],
+      "pdf_locator": "p21:t1:r23:display-14",
+      "sql_vs_xlsx": "different",
+      "xlsx_vs_pdf": "equal",
+      "sql_vs_pdf": "different",
+      "filed_minus_current": {
+        "material": 0,
+        "labor": 73,
+        "total": 73
+      },
+      "workbook_minus_current": {
+        "material": 0,
+        "labor": 73,
+        "total": 73
+      },
+      "p50d_decision_required": true
+    },
+    {
+      "identity_key": "prod:57162766-1e8f-4768-8c2e-19f76c940927",
+      "stable_identity_id": "57162766-1e8f-4768-8c2e-19f76c940927",
+      "legacy_item_code": "ITEM-0627",
+      "source_item_code": "LVU-MH0-016",
+      "target_item_code": "LVU-MH0-016",
+      "classification": "proposed_confirmed_correction",
+      "decision_status": "pending_p50d",
+      "proposed_action": "none",
+      "current_price": [
+        17569,
+        7091,
+        24660
+      ],
+      "workbook_price": [
+        17569,
+        7427,
+        24996
+      ],
+      "filed_pdf_price": [
+        17569,
+        7427,
+        24996
+      ],
+      "pdf_locator": "p21:t1:r25:display-16",
+      "sql_vs_xlsx": "different",
+      "xlsx_vs_pdf": "equal",
+      "sql_vs_pdf": "different",
+      "filed_minus_current": {
+        "material": 0,
+        "labor": 336,
+        "total": 336
+      },
+      "workbook_minus_current": {
+        "material": 0,
+        "labor": 336,
+        "total": 336
+      },
+      "p50d_decision_required": true
+    },
+    {
+      "identity_key": "prod:d404cdec-792a-4394-89fd-b5c2c51837f8",
+      "stable_identity_id": "d404cdec-792a-4394-89fd-b5c2c51837f8",
+      "legacy_item_code": "ITEM-0628",
+      "source_item_code": "LVU-MH0-017",
+      "target_item_code": "LVU-MH0-017",
+      "classification": "proposed_confirmed_correction",
+      "decision_status": "pending_p50d",
+      "proposed_action": "none",
+      "current_price": [
+        18138,
+        7417,
+        25555
+      ],
+      "workbook_price": [
+        18138,
+        7724,
+        25862
+      ],
+      "filed_pdf_price": [
+        18138,
+        7724,
+        25862
+      ],
+      "pdf_locator": "p21:t1:r26:display-17",
+      "sql_vs_xlsx": "different",
+      "xlsx_vs_pdf": "equal",
+      "sql_vs_pdf": "different",
+      "filed_minus_current": {
+        "material": 0,
+        "labor": 307,
+        "total": 307
+      },
+      "workbook_minus_current": {
+        "material": 0,
+        "labor": 307,
+        "total": 307
+      },
+      "p50d_decision_required": true
+    },
+    {
+      "identity_key": "prod:25328e10-8b31-4197-a180-cd99b2969267",
+      "stable_identity_id": "25328e10-8b31-4197-a180-cd99b2969267",
+      "legacy_item_code": "ITEM-0629",
+      "source_item_code": "LVU-MH0-018",
+      "target_item_code": "LVU-MH0-018",
+      "classification": "proposed_confirmed_correction",
+      "decision_status": "pending_p50d",
+      "proposed_action": "none",
+      "current_price": [
+        18727,
+        7782,
+        26509
+      ],
+      "workbook_price": [
+        18727,
+        8042,
+        26769
+      ],
+      "filed_pdf_price": [
+        18727,
+        8042,
+        26769
+      ],
+      "pdf_locator": "p21:t1:r27:display-18",
+      "sql_vs_xlsx": "different",
+      "xlsx_vs_pdf": "equal",
+      "sql_vs_pdf": "different",
+      "filed_minus_current": {
+        "material": 0,
+        "labor": 260,
+        "total": 260
+      },
+      "workbook_minus_current": {
+        "material": 0,
+        "labor": 260,
+        "total": 260
+      },
+      "p50d_decision_required": true
+    },
+    {
+      "identity_key": "prod:4df41b83-e81b-433d-aefd-28f6616896a9",
+      "stable_identity_id": "4df41b83-e81b-433d-aefd-28f6616896a9",
+      "legacy_item_code": "ITEM-0630",
+      "source_item_code": "LVU-MH0-019",
+      "target_item_code": "LVU-MH0-019",
+      "classification": "proposed_confirmed_correction",
+      "decision_status": "pending_p50d",
+      "proposed_action": "none",
+      "current_price": [
+        19867,
+        8433,
+        28300
+      ],
+      "workbook_price": [
+        19867,
+        8637,
+        28504
+      ],
+      "filed_pdf_price": [
+        19867,
+        8637,
+        28504
+      ],
+      "pdf_locator": "p21:t1:r28:display-19",
+      "sql_vs_xlsx": "different",
+      "xlsx_vs_pdf": "equal",
+      "sql_vs_pdf": "different",
+      "filed_minus_current": {
+        "material": 0,
+        "labor": 204,
+        "total": 204
+      },
+      "workbook_minus_current": {
+        "material": 0,
+        "labor": 204,
+        "total": 204
+      },
+      "p50d_decision_required": true
+    },
+    {
+      "identity_key": "prod:14327b99-850d-43c2-b973-e47a7fa68267",
+      "stable_identity_id": "14327b99-850d-43c2-b973-e47a7fa68267",
+      "legacy_item_code": "ITEM-0631",
+      "source_item_code": "LVU-MH0-020",
+      "target_item_code": "LVU-MH0-020",
+      "classification": "proposed_confirmed_correction",
+      "decision_status": "pending_p50d",
+      "proposed_action": "none",
+      "current_price": [
+        21025,
+        9124,
+        30149
+      ],
+      "workbook_price": [
+        21025,
+        9253,
+        30278
+      ],
+      "filed_pdf_price": [
+        21025,
+        9253,
+        30278
+      ],
+      "pdf_locator": "p21:t1:r29:display-20",
+      "sql_vs_xlsx": "different",
+      "xlsx_vs_pdf": "equal",
+      "sql_vs_pdf": "different",
+      "filed_minus_current": {
+        "material": 0,
+        "labor": 129,
+        "total": 129
+      },
+      "workbook_minus_current": {
+        "material": 0,
+        "labor": 129,
+        "total": 129
+      },
+      "p50d_decision_required": true
+    },
+    {
+      "identity_key": "prod:31b4051d-cecd-4ea3-a2dd-5fcb2c1b7527",
+      "stable_identity_id": "31b4051d-cecd-4ea3-a2dd-5fcb2c1b7527",
+      "legacy_item_code": "ITEM-0632",
+      "source_item_code": "LVU-MH0-021",
+      "target_item_code": "LVU-MH0-021",
+      "classification": "proposed_confirmed_correction",
+      "decision_status": "pending_p50d",
+      "proposed_action": "none",
+      "current_price": [
+        22165,
+        9775,
+        31940
+      ],
+      "workbook_price": [
+        22165,
+        9848,
+        32013
+      ],
+      "filed_pdf_price": [
+        22165,
+        9848,
+        32013
+      ],
+      "pdf_locator": "p21:t1:r30:display-21",
+      "sql_vs_xlsx": "different",
+      "xlsx_vs_pdf": "equal",
+      "sql_vs_pdf": "different",
+      "filed_minus_current": {
+        "material": 0,
+        "labor": 73,
+        "total": 73
+      },
+      "workbook_minus_current": {
+        "material": 0,
+        "labor": 73,
+        "total": 73
+      },
+      "p50d_decision_required": true
+    },
+    {
+      "identity_key": "prod:bea66bd4-4092-425a-9de3-d6452cb16f61",
+      "stable_identity_id": "bea66bd4-4092-425a-9de3-d6452cb16f61",
+      "legacy_item_code": "ITEM-0633",
+      "source_item_code": "LVU-MH0-023",
+      "target_item_code": "LVU-MH0-023",
+      "classification": "proposed_confirmed_correction",
+      "decision_status": "pending_p50d",
+      "proposed_action": "none",
+      "current_price": [
+        9669,
+        7091,
+        16760
+      ],
+      "workbook_price": [
+        9669,
+        7427,
+        17096
+      ],
+      "filed_pdf_price": [
+        9669,
+        7427,
+        17096
+      ],
+      "pdf_locator": "p22:t1:r4:display-23",
+      "sql_vs_xlsx": "different",
+      "xlsx_vs_pdf": "equal",
+      "sql_vs_pdf": "different",
+      "filed_minus_current": {
+        "material": 0,
+        "labor": 336,
+        "total": 336
+      },
+      "workbook_minus_current": {
+        "material": 0,
+        "labor": 336,
+        "total": 336
+      },
+      "p50d_decision_required": true
+    },
+    {
+      "identity_key": "prod:d75d9306-c167-493e-b879-7c897640c203",
+      "stable_identity_id": "d75d9306-c167-493e-b879-7c897640c203",
+      "legacy_item_code": "ITEM-0634",
+      "source_item_code": "LVU-MH0-024",
+      "target_item_code": "LVU-MH0-024",
+      "classification": "proposed_confirmed_correction",
+      "decision_status": "pending_p50d",
+      "proposed_action": "none",
+      "current_price": [
+        10238,
+        7417,
+        17655
+      ],
+      "workbook_price": [
+        10238,
+        7724,
+        17962
+      ],
+      "filed_pdf_price": [
+        10238,
+        7724,
+        17962
+      ],
+      "pdf_locator": "p22:t1:r5:display-24",
+      "sql_vs_xlsx": "different",
+      "xlsx_vs_pdf": "equal",
+      "sql_vs_pdf": "different",
+      "filed_minus_current": {
+        "material": 0,
+        "labor": 307,
+        "total": 307
+      },
+      "workbook_minus_current": {
+        "material": 0,
+        "labor": 307,
+        "total": 307
+      },
+      "p50d_decision_required": true
+    },
+    {
+      "identity_key": "prod:01dac95c-620c-4e39-b4ad-0228e33b6ed9",
+      "stable_identity_id": "01dac95c-620c-4e39-b4ad-0228e33b6ed9",
+      "legacy_item_code": "ITEM-0635",
+      "source_item_code": "LVU-MH0-025",
+      "target_item_code": "LVU-MH0-025",
+      "classification": "proposed_confirmed_correction",
+      "decision_status": "pending_p50d",
+      "proposed_action": "none",
+      "current_price": [
+        10827,
+        7782,
+        18609
+      ],
+      "workbook_price": [
+        10827,
+        8042,
+        18869
+      ],
+      "filed_pdf_price": [
+        10827,
+        8042,
+        18869
+      ],
+      "pdf_locator": "p22:t1:r6:display-25",
+      "sql_vs_xlsx": "different",
+      "xlsx_vs_pdf": "equal",
+      "sql_vs_pdf": "different",
+      "filed_minus_current": {
+        "material": 0,
+        "labor": 260,
+        "total": 260
+      },
+      "workbook_minus_current": {
+        "material": 0,
+        "labor": 260,
+        "total": 260
+      },
+      "p50d_decision_required": true
+    },
+    {
+      "identity_key": "prod:a89a5cc9-8432-4816-8600-a0d5a145d19c",
+      "stable_identity_id": "a89a5cc9-8432-4816-8600-a0d5a145d19c",
+      "legacy_item_code": "ITEM-0636",
+      "source_item_code": "LVU-MH0-026",
+      "target_item_code": "LVU-MH0-026",
+      "classification": "proposed_confirmed_correction",
+      "decision_status": "pending_p50d",
+      "proposed_action": "none",
+      "current_price": [
+        11967,
+        8433,
+        20400
+      ],
+      "workbook_price": [
+        11967,
+        8637,
+        20604
+      ],
+      "filed_pdf_price": [
+        11967,
+        8637,
+        20604
+      ],
+      "pdf_locator": "p22:t1:r7:display-26",
+      "sql_vs_xlsx": "different",
+      "xlsx_vs_pdf": "equal",
+      "sql_vs_pdf": "different",
+      "filed_minus_current": {
+        "material": 0,
+        "labor": 204,
+        "total": 204
+      },
+      "workbook_minus_current": {
+        "material": 0,
+        "labor": 204,
+        "total": 204
+      },
+      "p50d_decision_required": true
+    },
+    {
+      "identity_key": "prod:4bd498d4-75ee-45e8-a2fb-d47931be5a75",
+      "stable_identity_id": "4bd498d4-75ee-45e8-a2fb-d47931be5a75",
+      "legacy_item_code": "ITEM-0637",
+      "source_item_code": "LVU-MH0-027",
+      "target_item_code": "LVU-MH0-027",
+      "classification": "proposed_confirmed_correction",
+      "decision_status": "pending_p50d",
+      "proposed_action": "none",
+      "current_price": [
+        11998,
+        9124,
+        21122
+      ],
+      "workbook_price": [
+        11998,
+        8664,
+        20662
+      ],
+      "filed_pdf_price": [
+        11998,
+        8664,
+        20662
+      ],
+      "pdf_locator": "p22:t1:r8:display-27",
+      "sql_vs_xlsx": "different",
+      "xlsx_vs_pdf": "equal",
+      "sql_vs_pdf": "different",
+      "filed_minus_current": {
+        "material": 0,
+        "labor": -460,
+        "total": -460
+      },
+      "workbook_minus_current": {
+        "material": 0,
+        "labor": -460,
+        "total": -460
+      },
+      "p50d_decision_required": true
+    },
+    {
+      "identity_key": "prod:95d045a0-0e56-47df-897c-7bdddc0353a2",
+      "stable_identity_id": "95d045a0-0e56-47df-897c-7bdddc0353a2",
+      "legacy_item_code": "ITEM-0638",
+      "source_item_code": "LVU-MH0-028",
+      "target_item_code": "LVU-MH0-028",
+      "classification": "proposed_confirmed_correction",
+      "decision_status": "pending_p50d",
+      "proposed_action": "none",
+      "current_price": [
+        14265,
+        9775,
+        24040
+      ],
+      "workbook_price": [
+        14265,
+        9848,
+        24113
+      ],
+      "filed_pdf_price": [
+        14265,
+        9848,
+        24113
+      ],
+      "pdf_locator": "p22:t1:r9:display-28",
+      "sql_vs_xlsx": "different",
+      "xlsx_vs_pdf": "equal",
+      "sql_vs_pdf": "different",
+      "filed_minus_current": {
+        "material": 0,
+        "labor": 73,
+        "total": 73
+      },
+      "workbook_minus_current": {
+        "material": 0,
+        "labor": 73,
+        "total": 73
+      },
+      "p50d_decision_required": true
+    },
+    {
+      "identity_key": "prod:98b98893-59b8-42c4-b030-c6c9f3cb2854",
+      "stable_identity_id": "98b98893-59b8-42c4-b030-c6c9f3cb2854",
+      "legacy_item_code": "ITEM-0693",
+      "source_item_code": "CIS-H06-007",
+      "target_item_code": "CIS-H06-007",
+      "classification": "source_version_difference",
+      "decision_status": "pending_p50d",
+      "proposed_action": "none",
+      "current_price": [
+        547,
+        221,
+        768
+      ],
+      "workbook_price": [
+        478,
+        221,
+        699
+      ],
+      "filed_pdf_price": null,
+      "pdf_locator": null,
+      "sql_vs_xlsx": "different",
+      "xlsx_vs_pdf": "not_comparable",
+      "sql_vs_pdf": "not_comparable",
+      "filed_minus_current": {
+        "material": null,
+        "labor": null,
+        "total": null
+      },
+      "workbook_minus_current": {
+        "material": -69,
+        "labor": 0,
+        "total": -69
+      },
+      "p50d_decision_required": true
+    },
+    {
+      "identity_key": "prod:007f668e-c727-41b7-a1a4-a99a2f7e17c4",
+      "stable_identity_id": "007f668e-c727-41b7-a1a4-a99a2f7e17c4",
+      "legacy_item_code": "ITEM-0694",
+      "source_item_code": "CIS-H06-008",
+      "target_item_code": "CIS-H06-008",
+      "classification": "source_version_difference",
+      "decision_status": "pending_p50d",
+      "proposed_action": "none",
+      "current_price": [
+        827,
+        258,
+        1085
+      ],
+      "workbook_price": [
+        689,
+        258,
+        947
+      ],
+      "filed_pdf_price": null,
+      "pdf_locator": null,
+      "sql_vs_xlsx": "different",
+      "xlsx_vs_pdf": "not_comparable",
+      "sql_vs_pdf": "not_comparable",
+      "filed_minus_current": {
+        "material": null,
+        "labor": null,
+        "total": null
+      },
+      "workbook_minus_current": {
+        "material": -138,
+        "labor": 0,
+        "total": -138
+      },
+      "p50d_decision_required": true
+    },
+    {
+      "identity_key": "prod:26ad397d-46d0-4a1c-b5a9-ddb77159e3af",
+      "stable_identity_id": "26ad397d-46d0-4a1c-b5a9-ddb77159e3af",
+      "legacy_item_code": "ITEM-0695",
+      "source_item_code": "CIS-H06-009",
+      "target_item_code": "CIS-H06-009",
+      "classification": "source_version_difference",
+      "decision_status": "pending_p50d",
+      "proposed_action": "none",
+      "current_price": [
+        1106,
+        297,
+        1403
+      ],
+      "workbook_price": [
+        899,
+        297,
+        1196
+      ],
+      "filed_pdf_price": null,
+      "pdf_locator": null,
+      "sql_vs_xlsx": "different",
+      "xlsx_vs_pdf": "not_comparable",
+      "sql_vs_pdf": "not_comparable",
+      "filed_minus_current": {
+        "material": null,
+        "labor": null,
+        "total": null
+      },
+      "workbook_minus_current": {
+        "material": -207,
+        "labor": 0,
+        "total": -207
+      },
+      "p50d_decision_required": true
+    },
+    {
+      "identity_key": "prod:88ce6cd7-b2a1-431a-881a-3fd186b39425",
+      "stable_identity_id": "88ce6cd7-b2a1-431a-881a-3fd186b39425",
+      "legacy_item_code": "ITEM-0696",
+      "source_item_code": "CIS-H06-010",
+      "target_item_code": "CIS-H06-010",
+      "classification": "source_version_difference",
+      "decision_status": "pending_p50d",
+      "proposed_action": "none",
+      "current_price": [
+        1867,
+        683,
+        2550
+      ],
+      "workbook_price": [
+        1591,
+        683,
+        2274
+      ],
+      "filed_pdf_price": null,
+      "pdf_locator": null,
+      "sql_vs_xlsx": "different",
+      "xlsx_vs_pdf": "not_comparable",
+      "sql_vs_pdf": "not_comparable",
+      "filed_minus_current": {
+        "material": null,
+        "labor": null,
+        "total": null
+      },
+      "workbook_minus_current": {
+        "material": -276,
+        "labor": 0,
+        "total": -276
+      },
+      "p50d_decision_required": true
+    },
+    {
+      "identity_key": "prod:b30844bc-7d46-44d0-87fb-e2a1ea69e73a",
+      "stable_identity_id": "b30844bc-7d46-44d0-87fb-e2a1ea69e73a",
+      "legacy_item_code": "ITEM-0697",
+      "source_item_code": "CIS-H06-011",
+      "target_item_code": "CIS-H06-011",
+      "classification": "source_version_difference",
+      "decision_status": "pending_p50d",
+      "proposed_action": "none",
+      "current_price": [
+        2416,
+        756,
+        3172
+      ],
+      "workbook_price": [
+        2002,
+        756,
+        2758
+      ],
+      "filed_pdf_price": null,
+      "pdf_locator": null,
+      "sql_vs_xlsx": "different",
+      "xlsx_vs_pdf": "not_comparable",
+      "sql_vs_pdf": "not_comparable",
+      "filed_minus_current": {
+        "material": null,
+        "labor": null,
+        "total": null
+      },
+      "workbook_minus_current": {
+        "material": -414,
+        "labor": 0,
+        "total": -414
+      },
+      "p50d_decision_required": true
+    },
+    {
+      "identity_key": "prod:b5cf66a8-39b6-4c61-bdf7-6dc15b6dad8d",
+      "stable_identity_id": "b5cf66a8-39b6-4c61-bdf7-6dc15b6dad8d",
+      "legacy_item_code": "ITEM-0698",
+      "source_item_code": "CIS-H06-012",
+      "target_item_code": "CIS-H06-012",
+      "classification": "source_version_difference",
+      "decision_status": "pending_p50d",
+      "proposed_action": "none",
+      "current_price": [
+        4082,
+        976,
+        5058
+      ],
+      "workbook_price": [
+        3254,
+        976,
+        4230
+      ],
+      "filed_pdf_price": null,
+      "pdf_locator": null,
+      "sql_vs_xlsx": "different",
+      "xlsx_vs_pdf": "not_comparable",
+      "sql_vs_pdf": "not_comparable",
+      "filed_minus_current": {
+        "material": null,
+        "labor": null,
+        "total": null
+      },
+      "workbook_minus_current": {
+        "material": -828,
+        "labor": 0,
+        "total": -828
+      },
+      "p50d_decision_required": true
+    },
+    {
+      "identity_key": "prod:69264c50-0aa3-41e4-8efa-57f514fbc0f8",
+      "stable_identity_id": "69264c50-0aa3-41e4-8efa-57f514fbc0f8",
+      "legacy_item_code": "ITEM-0703",
+      "source_item_code": "RSR-PL0-014",
+      "target_item_code": "RSR-PL0-014",
+      "classification": "source_version_difference",
+      "decision_status": "pending_p50d",
+      "proposed_action": "none",
+      "current_price": [
+        2892,
+        749,
+        3641
+      ],
+      "workbook_price": [
+        2747,
+        749,
+        3496
+      ],
+      "filed_pdf_price": null,
+      "pdf_locator": null,
+      "sql_vs_xlsx": "different",
+      "xlsx_vs_pdf": "not_comparable",
+      "sql_vs_pdf": "not_comparable",
+      "filed_minus_current": {
+        "material": null,
+        "labor": null,
+        "total": null
+      },
+      "workbook_minus_current": {
+        "material": -145,
+        "labor": 0,
+        "total": -145
+      },
+      "p50d_decision_required": true
+    },
+    {
+      "identity_key": "prod:92d0bd54-3ecc-4d6e-8ad1-ba3eac30da52",
+      "stable_identity_id": "92d0bd54-3ecc-4d6e-8ad1-ba3eac30da52",
+      "legacy_item_code": "ITEM-0704",
+      "source_item_code": "RSR-PL0-015",
+      "target_item_code": "RSR-PL0-015",
+      "classification": "source_version_difference",
+      "decision_status": "pending_p50d",
+      "proposed_action": "none",
+      "current_price": [
+        5048,
+        1093,
+        6141
+      ],
+      "workbook_price": [
+        4758,
+        1093,
+        5851
+      ],
+      "filed_pdf_price": null,
+      "pdf_locator": null,
+      "sql_vs_xlsx": "different",
+      "xlsx_vs_pdf": "not_comparable",
+      "sql_vs_pdf": "not_comparable",
+      "filed_minus_current": {
+        "material": null,
+        "labor": null,
+        "total": null
+      },
+      "workbook_minus_current": {
+        "material": -290,
+        "labor": 0,
+        "total": -290
+      },
+      "p50d_decision_required": true
+    },
+    {
+      "identity_key": "prod:283d1a1f-2bc4-4600-bb85-c109ac02448b",
+      "stable_identity_id": "283d1a1f-2bc4-4600-bb85-c109ac02448b",
+      "legacy_item_code": "ITEM-0705",
+      "source_item_code": "RSR-PL0-016",
+      "target_item_code": "RSR-PL0-016",
+      "classification": "source_version_difference",
+      "decision_status": "pending_p50d",
+      "proposed_action": "none",
+      "current_price": [
+        9119,
+        1738,
+        10857
+      ],
+      "workbook_price": [
+        8539,
+        1738,
+        10277
+      ],
+      "filed_pdf_price": null,
+      "pdf_locator": null,
+      "sql_vs_xlsx": "different",
+      "xlsx_vs_pdf": "not_comparable",
+      "sql_vs_pdf": "not_comparable",
+      "filed_minus_current": {
+        "material": null,
+        "labor": null,
+        "total": null
+      },
+      "workbook_minus_current": {
+        "material": -580,
+        "labor": 0,
+        "total": -580
+      },
+      "p50d_decision_required": true
+    },
+    {
+      "identity_key": "prod:c6e19e31-073f-482a-8189-f56e262fdc5e",
+      "stable_identity_id": "c6e19e31-073f-482a-8189-f56e262fdc5e",
+      "legacy_item_code": "ITEM-0706",
+      "source_item_code": "RSR-PL0-017",
+      "target_item_code": "RSR-PL0-017",
+      "classification": "source_version_difference",
+      "decision_status": "pending_p50d",
+      "proposed_action": "none",
+      "current_price": [
+        11253,
+        2274,
+        13527
+      ],
+      "workbook_price": [
+        10769,
+        2274,
+        13043
+      ],
+      "filed_pdf_price": null,
+      "pdf_locator": null,
+      "sql_vs_xlsx": "different",
+      "xlsx_vs_pdf": "not_comparable",
+      "sql_vs_pdf": "not_comparable",
+      "filed_minus_current": {
+        "material": null,
+        "labor": null,
+        "total": null
+      },
+      "workbook_minus_current": {
+        "material": -484,
+        "labor": 0,
+        "total": -484
+      },
+      "p50d_decision_required": true
+    }
+  ]
+}

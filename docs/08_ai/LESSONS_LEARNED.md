@@ -63,8 +63,11 @@ supabase.auth.onAuthStateChange((event, session) => {
 - **New rule:** a pending profile's stored `role` grants no authority. Check
   current `status='active'` together with role before every privileged action,
   and never permit self-service mutation of role/status or approval/audit fields.
-- **Gate:** P-13 remains hard-stopped until the P-49 matrix passes. See
-  [P-49 Plan](../plans/master-catalog/45-phase4-p49-pending-authorization-hardening-plan.md).
+- **Current gate:** P-49 remains open/high, but P-51 accepts the risk
+  temporarily and defers remediation until after the exact first P-15 closeout.
+  P-13 remains separately unauthorized; the P-49 matrix is still mandatory for
+  the later remediation rather than silently waived. See
+  [P-51 Plan](../plans/master-catalog/48-phase4-p51-risk-accepted-master-catalog-closeout-plan.md).
 
 ---
 

@@ -6,8 +6,8 @@
 > plus the v7 backup; [Verification Report #13](./13-phase4-verification-report.md)
 > is current evidence authority. Pending-own-BOQ results below verify the former
 > contract only. The approved target is now profile/onboarding-only and is not
-> yet implemented; current gates are in
-> [P-49 Plan #45](./45-phase4-p49-pending-authorization-hardening-plan.md).
+> yet implemented; current sequencing is in
+> [P-51 Plan #48](./48-phase4-p51-risk-accepted-master-catalog-closeout-plan.md).
 
 **Status:** Production P0 → Phase 1A → Phase 2 → Phase 1B completed and verified
 **Production project:** `otlssvssvgkohqwuuiir`
@@ -15,7 +15,8 @@
 
 **Historical position at this report's date:** Phase 4 administration/
 publication had not started. **Current position:** P-12 database migration and
-backup are complete, flags remain false, and P-13 is hard-stopped by P-49.
+backup are complete, flags remain false, P-49 is open/high but deferred under
+P-51, and P-13 remains separately unauthorized.
 
 ## Execution Record
 

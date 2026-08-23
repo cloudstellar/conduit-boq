@@ -1,0 +1,681 @@
+{
+  "schema": "conduit-boq/p50r-solo-summary/v1",
+  "request_id": "P50R-SOLO-REQ-20260821-V1",
+  "generated_at": "2026-08-21T10:02:06.190Z",
+  "result": "PASS_FOR_P50D_REQUEST",
+  "authority_window": {
+    "start": "2026-08-21T16:27:24+07:00",
+    "end": "2026-08-25T23:00:00+07:00",
+    "timezone": "Asia/Bangkok"
+  },
+  "execution_mode": "offline_solo_operator_self_review",
+  "baseline": {
+    "base_commit": "a12b022247d75d7e006fac890fc123e9c0a8e168",
+    "tracked_diff_sha256_before": "a6f0a449e35036e88a1286ce6fdb9dd67cb1d1643e53c700d432076908decbaa",
+    "tracked_diff_sha256_after": "a6f0a449e35036e88a1286ce6fdb9dd67cb1d1643e53c700d432076908decbaa",
+    "tracked_diff_unchanged": true,
+    "authority_path_hash_manifest": {
+      "docs/plans/master-catalog/46-phase4-p50-known-price-erratum-pre-p15-reconciliation-and-release-decision-plan.md": "0717afa8de8178d3ddee8c9baa0ea290a69248a7b2d803cc7f71958c0e7746cc",
+      "docs/plans/master-catalog/48-phase4-p51-risk-accepted-master-catalog-closeout-plan.md": "6786a4d6b26dec41e04cbb33618dccd15283d80ccd913d3d31f25e42ce569a20",
+      "docs/plans/master-catalog/49-phase4-p50r-exact-price-reconciliation-evidence-scope-request.md": "2219d057cdcdcc3f4545a5032b5091e7b15b659e6d7137deb2ae61c37aa575e8",
+      "docs/plans/master-catalog/19-phase4-decision-register.md": "fe0889a09e4f3f22b3b72270938b4917b7c64e00aba539ebd604e2398e652846",
+      "docs/plans/master-catalog/25-phase4-execution-progress-tracker.md": "bf18a9a9122871919c3d5089056babf9d7dd05ff5313ec9e37044468920e0a0b",
+      "tests/master-catalog-authority-consistency.test.ts": "7215efdf09d40a34fdc0b2ebf10586758eea3dea34bb616f6ecf98039eb3d3b7"
+    }
+  },
+  "price_source": {
+    "issuer": "ส่วนวิศวกรรมท่อร้อยสาย (วทฐฐ.)",
+    "approval_reference": "Owner acceptance of complete filed source under P50R-SOLO-REQ-20260821-V1",
+    "approval_date": "2026-08-21",
+    "effective_basis": "รายการบัญชีราคามาตรฐานงานก่อสร้างท่อร้อยสายสื่อสารใต้ดิน ประจำปี 2568",
+    "durable_archive_reference": "files/รายการบัญชีราคามาตรฐานงานก่อสร้างท่อร้อยสาย 2568.pdf#sha256=5f095c43a34a4541779d9c45a0558ac108048aab6fa96454b7e81e9f25cc619b",
+    "precedence": "filed PDF is price evidence; workbook is taxonomy/locator bridge; P-50D remains required",
+    "completeness": "Owner approved all 28 pages as the complete filed price source for this reconciliation"
+  },
+  "runtimes": {
+    "node": "v24.2.0",
+    "python_path": "/Users/cloud/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/bin/python3",
+    "python": "3.12.13",
+    "pdfplumber": "0.11.9",
+    "xlsx": "0.18.5"
+  },
+  "implementation_files": [
+    {
+      "path": "scripts/reconcile-master-catalog-p50r.mjs",
+      "type": "regular_file",
+      "bytes": 61435,
+      "sha256": "dca98a5ca9d767fbdcb7ba90beea7a0f45f759097ae3b1b65994e0fdbbd647c6"
+    },
+    {
+      "path": "scripts/reconcile-master-catalog-p50r-pdf.py",
+      "type": "regular_file",
+      "bytes": 10672,
+      "sha256": "a036a96b27c99be8b8480a87eba0e712bcacc325c86ac96a1b813e0ed81cd555"
+    },
+    {
+      "path": "tests/master-catalog-p50r-reconciliation.test.ts",
+      "type": "regular_file",
+      "bytes": 6250,
+      "sha256": "c8fd2fcc2fb82890725efba7640aaaf606cd8cf6f5f01c99ff41183d8eeb0899"
+    }
+  ],
+  "evidence_write_contract": {
+    "targets_absent_before_write": true,
+    "new_directory_only": "docs/plans/master-catalog/evidence/p50r-solo",
+    "overwrite_allowed": false,
+    "expected_file_count": 5,
+    "deterministic_outputs": {
+      "reconciliation": {
+        "pass1_sha256": "4bd5c30fa60b323164eb0303d211ae31f211bbdb337f2236ed15970b63912bee",
+        "pass2_sha256": "4bd5c30fa60b323164eb0303d211ae31f211bbdb337f2236ed15970b63912bee",
+        "byte_identical": true,
+        "bytes": 967382
+      },
+      "deltaManifest": {
+        "pass1_sha256": "c2fa9de6a9b2f7c3206852779675b4e4457c3ddfef77b64f8655170030391c47",
+        "pass2_sha256": "c2fa9de6a9b2f7c3206852779675b4e4457c3ddfef77b64f8655170030391c47",
+        "byte_identical": true,
+        "bytes": 68059
+      },
+      "exceptions": {
+        "pass1_sha256": "93e179ef906849bcd5c383986aaf560f84e6242a815c2d2649e3d8b78142600b",
+        "pass2_sha256": "93e179ef906849bcd5c383986aaf560f84e6242a815c2d2649e3d8b78142600b",
+        "byte_identical": true,
+        "bytes": 107059
+      }
+    },
+    "sha256sums_covers_implementation_inputs_and_outputs_1_through_4": true
+  },
+  "inputs": {
+    "sql": {
+      "path": "supabase/.snapshots/public-data-20260621-post009.sql",
+      "sha256": "a8761632ba4ddbb22934c0e10dca0e4299798d572dc1db56222629a2d86c4570",
+      "bytes": 1725635
+    },
+    "pdf": {
+      "path": "files/รายการบัญชีราคามาตรฐานงานก่อสร้างท่อร้อยสาย 2568.pdf",
+      "sha256": "5f095c43a34a4541779d9c45a0558ac108048aab6fa96454b7e81e9f25cc619b",
+      "bytes": 844583
+    },
+    "workbook": {
+      "path": "files/NT_Item_Code_Master_K_Mapping_2568.xlsx",
+      "sha256": "ae72ac34caf37aeb024e15b0b7462f21ca34987aac448a07bde4d69f7e92ec3b",
+      "bytes": 305435
+    },
+    "csv": {
+      "path": "docs/plans/master-catalog/evidence/phase4-reconciliation-draft.csv",
+      "sha256": "4627e413bea3c6a72b544f71cf0b91f4bff5c8d4199a799373140f4c969a338a",
+      "bytes": 457862
+    },
+    "authority": {
+      "path": "lib/master-catalog/import/data/phase4-first-rollout-authority.json",
+      "sha256": "62d1e40a368c103aef76c70055057bdf906a50f2c1d7141bf8a97e1f8836a0b8",
+      "bytes": 235590
+    }
+  },
+  "input_hashes_reverified_in_both_passes": true,
+  "counts": {
+    "sql_rows": 710,
+    "csv_rows": 728,
+    "csv_production_rows": 710,
+    "csv_workbook_candidate_rows": 18,
+    "workbook_rows": 708,
+    "authority_mappings": 710,
+    "authority_exclusions": 17,
+    "authority_groups": 65,
+    "pdf_pages": 28,
+    "pdf_rows": 662,
+    "canonical_identity_rows": 727,
+    "aligned_pdf_workbook_rows": 662,
+    "workbook_rows_absent_from_pdf": 46,
+    "pdf_rows_without_workbook_identity": 0,
+    "alternate_optimal_alignment": false,
+    "proposed_delta_records": 67,
+    "exceptions": 245,
+    "blocking_exceptions": 0,
+    "identity_confidence": {
+      "high": 697,
+      "medium": 13,
+      "low": 0,
+      "authority_rejected": 17
+    }
+  },
+  "coverage": {
+    "sql": "710/710",
+    "csv": "728/728",
+    "workbook": "708/708",
+    "authority_mappings": "710/710",
+    "authority_exclusions": "17/17",
+    "authority_groups": "65/65",
+    "pdf_pages": "28/28",
+    "pdf_rows": "662/662",
+    "accounted_and_classified_union_percent": 100
+  },
+  "identity_review": {
+    "non_high_stable_match_count": 13,
+    "non_high_stable_matches": [
+      {
+        "stable_identity_id": "62922196-02a6-41a6-9a3c-390dad3db690",
+        "legacy_item_code": "ITEM-0026",
+        "source_item_code": "CIC-H10-001",
+        "workbook_physical_row": 27,
+        "pdf_locator": "p03:t1:r3:display-11",
+        "identity_confidence": "medium",
+        "workbook_name": "งานวางท่อ 1-Ø110 มม. HDPE PE80 PN10 หุ้ม ค.ส.ล.",
+        "pdf_name": "งานวางท่อ 1-Ø110 มม. HD1P. Eง าPนEว8า0ง ทPN่อร1้อ0ย หสุ้มา ยคส.สื่อ.สลา.รใต้ดิน หุ้มคอนกรีตเสริมเหล็ก (ค.ส.ล.)",
+        "notes": "repeated_page_header_description_overlay"
+      },
+      {
+        "stable_identity_id": "ac93a14a-84d3-4db6-9aa1-f45f78fdd430",
+        "legacy_item_code": "ITEM-0052",
+        "source_item_code": "CIS-PVC-011",
+        "workbook_physical_row": 53,
+        "pdf_locator": "p04:t1:r3:display-11",
+        "identity_confidence": "medium",
+        "workbook_name": "งานวางท่อ 6-Ø3\" PVC กลบทราย",
+        "pdf_name": "งานวางท่อ 6-Ø3\" PVC กลบ1ท. งราายนวางท่อร้อยสายสื่อสารใต้ดิน หุ้มคอนกรีตเสริมเหล็ก (ค.ส.ล.)",
+        "notes": "repeated_page_header_description_overlay"
+      },
+      {
+        "stable_identity_id": "7fac622a-c672-4b14-a731-3ec1283b38fc",
+        "legacy_item_code": "ITEM-0106",
+        "source_item_code": "CIS-GIP-009",
+        "workbook_physical_row": 139,
+        "pdf_locator": "p06:t1:r3:display-9",
+        "identity_confidence": "medium",
+        "workbook_name": "งานวางท่อ 12-Ø4\" GIP กลบทราย",
+        "pdf_name": "งานวางท่อ 12-Ø4\" GIP ก1ล.บ งทารนาวยางท่อร้อยสายสื่อสารใต้ดิน หุ้มคอนกรีตเสริมเหล็ก (ค.ส.ล.)",
+        "notes": "repeated_page_header_description_overlay"
+      },
+      {
+        "stable_identity_id": "aa3df7b3-0d24-4f3f-b695-7ae99dada017",
+        "legacy_item_code": "ITEM-0134",
+        "source_item_code": "CRS-GIP-028",
+        "workbook_physical_row": 167,
+        "pdf_locator": "p07:t1:r3:display-28",
+        "identity_confidence": "medium",
+        "workbook_name": "งานวางท่อ 3-Ø110 มม. HDPE PE80 PN8 CROSSING",
+        "pdf_name": "งานวางท่อ 3-Ø110 มม. HD1P. Eง าPนEว8า0ง ทPN่อร8้อ CยRสOายSสSIื่อNสGารใต้ดิน หุ้มคอนกรีตเสริมเหล็ก (ค.ส.ล.)",
+        "notes": "repeated_page_header_description_overlay"
+      },
+      {
+        "stable_identity_id": "04dff8e7-0581-40f0-8541-b3ca093f168c",
+        "legacy_item_code": "ITEM-0156",
+        "source_item_code": "HDD-H08-004",
+        "workbook_physical_row": 189,
+        "pdf_locator": "p08:t1:r3:display-4",
+        "identity_confidence": "medium",
+        "workbook_name": "งานดันท่อลอด 6-Ø110 มม. HDPE PE80 PN8 (HDD)",
+        "pdf_name": "งานดันท่อลอด 6-Ø110 มม1.. HงาDนPวEา PงทE8่อ0ร ้อPยNส8า ย(HสDื่อDส)า ร ใต้ดิน หุ้มคอนกรีตเสริมเหล็ก (ค.ส.ล.)",
+        "notes": "repeated_page_header_description_overlay"
+      },
+      {
+        "stable_identity_id": "262c7bcb-1938-4e75-a4ce-663e8c55c93c",
+        "legacy_item_code": "ITEM-0185",
+        "source_item_code": "HDD-H10-009",
+        "workbook_physical_row": 218,
+        "pdf_locator": "p09:t1:r3:display-9",
+        "identity_confidence": "medium",
+        "workbook_name": "งานดันท่อลอด 12-Ø110 มม. HDPE PE80 PN10 (HDD)",
+        "pdf_name": "งานดันท่อลอด 12-Ø110 ม1ม. .ง HานDวPาEง PทE่อ8ร0้อ ยPสNา1ย0ส (ื่อHสDาDร)ใต้ดิน หุ้มคอนกรีตเสริมเหล็ก (ค.ส.ล.)",
+        "notes": "repeated_page_header_description_overlay"
+      },
+      {
+        "stable_identity_id": "179314fa-006e-4745-ad22-502878a17367",
+        "legacy_item_code": "ITEM-0212",
+        "source_item_code": "JNT-PVC-007",
+        "workbook_physical_row": 245,
+        "pdf_locator": "p10:t1:r3:display-7",
+        "identity_confidence": "medium",
+        "workbook_name": "งานสร้างจุดเชื่อมท่อ 6-Ø4\" PVC หุ้ม ค.ส.ล. (0.50x0.675x1.00 ม.)",
+        "pdf_name": "งานสรา้ งจุดเชื่อมท่อ 6-Ø4\"1 P. VงCา นหวุ้มา งคท.ส่อ.รล้อ. ย(0ส.า5ย0สx0ื่อ.ส6า7ร5ใxต1้ด.0ิน0 หมุ้ม.)คอนกรีตเสริมเหล็ก (ค.ส.ล.)",
+        "notes": "repeated_page_header_description_overlay"
+      },
+      {
+        "stable_identity_id": "018f0498-a8e1-41b1-93fb-f50ffb87f95f",
+        "legacy_item_code": "ITEM-0240",
+        "source_item_code": "RSR-PL0-037",
+        "workbook_physical_row": 287,
+        "pdf_locator": "p11:t1:r3:display-23",
+        "identity_confidence": "medium",
+        "workbook_name": "งานสร้างท่อโค้ง 2-Ø125 มม. HDPE PE80 PN10 ขึ้นเสา ตามแบบมาตรฐานเลขที่ 152",
+        "pdf_name": "งานสรา้ งท่อโค้ง 2-Ø125 ม1ม.. งHาDนPวEา งPทE8่อ0ร ้อPยNส1า0ย สขื่อึ้นสเสาาร ใตตา้ดมินแ บหบุ้มมคาอตนรกฐราีตนเเสลขริมทเี่ ห15ล2็ก (ค.ส.ล.)",
+        "notes": "repeated_page_header_description_overlay"
+      },
+      {
+        "stable_identity_id": "cdf01707-2ec3-4211-b83f-5104139e429d",
+        "legacy_item_code": "ITEM-0287",
+        "source_item_code": "CHB-PB0-012",
+        "workbook_physical_row": 334,
+        "pdf_locator": "p13:t1:r3:display-12",
+        "identity_confidence": "medium",
+        "workbook_name": "งานสร้างบ่อพักย่อย (PB) JUF-16 ฝาเหล็ก",
+        "pdf_name": "งานสรา้ งบ่อพักย่อย (PB) J1U.F ง-า1น6 วฝาางเทห่อลร็ก้อยสายสื่อสารใต้ดิน หุ้มคอนกรีตเสริมเหล็ก (ค.ส.ล.)",
+        "notes": "repeated_page_header_description_overlay"
+      },
+      {
+        "stable_identity_id": "c66a46bc-5b46-43be-96eb-1d8d602121c3",
+        "legacy_item_code": "ITEM-0316",
+        "source_item_code": "CHB-MH0-029",
+        "workbook_physical_row": 363,
+        "pdf_locator": "p14:t1:r3:display-29",
+        "identity_confidence": "medium",
+        "workbook_name": "งานสร้างบ่อพัก (MH) TYPE T3-3 ฝาค.ส.ล. ตามแบบมาตรฐานเลขที่ 133",
+        "pdf_name": "งานสรา้ งบ่อพัก (MH) TYP1E. Tง3า-น3ว ฝาางคท.่อสร.ล้อ.ย ตสาามยแสบื่อบสมาารตใตร้ดฐาินน หเลุ้มขคทอี่ 1น3ก3รีตเสริมเหล็ก (ค.ส.ล.)",
+        "notes": "repeated_page_header_description_overlay"
+      },
+      {
+        "stable_identity_id": "af6be34e-96f7-4305-b609-df3de9f270f5",
+        "legacy_item_code": "ITEM-0340",
+        "source_item_code": "MOD-FPB-005",
+        "workbook_physical_row": 387,
+        "pdf_locator": "p15:t1:r3:display-5",
+        "identity_confidence": "medium",
+        "workbook_name": "งานเปลี่ยนเฟรมบ่อพักย่อย (PB) JUF-11",
+        "pdf_name": "งานเปลี่ยนเฟรมบ่อพักย่อย 1(P. Bง)า นJUวFา-ง1ท1่อร้อยสายสื่อสารใต้ดิน หุ้มคอนกรีตเสริมเหล็ก (ค.ส.ล.)",
+        "notes": "repeated_page_header_description_overlay"
+      },
+      {
+        "stable_identity_id": "7400a344-ea0f-41dc-bc93-5fdd47d1e8f3",
+        "legacy_item_code": "ITEM-0366",
+        "source_item_code": "WLL-PB0-021",
+        "workbook_physical_row": 413,
+        "pdf_locator": "p16:t1:r3:display-21",
+        "identity_confidence": "medium",
+        "workbook_name": "งานเสริมผนังบ่อพัก (PB) JUF-13 ฝาคสล. (เพิ่มหน้าต่างเป็น 2-Ø4\") (เปลี่ยนเฟรม - เปลี่ยนฝาค.ส.ล.)",
+        "pdf_name": "งานเสรมิ ผนังบ่อพัก (PB) JU1F. -ง1า3น ฝวาาคงสทล่อ.ร ้อ ย(เสพาิ่มยหสนื่อ้าสตา่ารงใเตป้ด็นิน 2 -หØุ้ม4ค\")อ น(เกปรลีตี่ยเนสรเฟิมรเหม ล-็ก เ ป(คลี่ย.สน.ลฝ.า)ค.ส.ล.)",
+        "notes": "repeated_page_header_description_overlay"
+      },
+      {
+        "stable_identity_id": "389a67f7-3943-43d5-a315-a7c9a3f8bfae",
+        "legacy_item_code": "ITEM-0509",
+        "source_item_code": "RDW-AC0-001",
+        "workbook_physical_row": 700,
+        "pdf_locator": "p28:t1:r3:display-13",
+        "identity_confidence": "medium",
+        "workbook_name": "งานซ่อมถนนแอสฟัลต์ชั่วคราว",
+        "pdf_name": "งานซ่อมถนนแอสฟัลต์ชั่วคร1า.ว งานวางท่อร้อยสายสื่อสารใต้ดิน หุ้มคอนกรีตเสริมเหล็ก (ค.ส.ล.)",
+        "notes": "repeated_page_header_description_overlay"
+      }
+    ]
+  },
+  "deterministic_two_pass": {
+    "pass_count": 2,
+    "byte_identical": true,
+    "artifacts": {
+      "reconciliation": {
+        "pass1_sha256": "4bd5c30fa60b323164eb0303d211ae31f211bbdb337f2236ed15970b63912bee",
+        "pass2_sha256": "4bd5c30fa60b323164eb0303d211ae31f211bbdb337f2236ed15970b63912bee",
+        "byte_identical": true,
+        "bytes": 967382
+      },
+      "deltaManifest": {
+        "pass1_sha256": "c2fa9de6a9b2f7c3206852779675b4e4457c3ddfef77b64f8655170030391c47",
+        "pass2_sha256": "c2fa9de6a9b2f7c3206852779675b4e4457c3ddfef77b64f8655170030391c47",
+        "byte_identical": true,
+        "bytes": 68059
+      },
+      "exceptions": {
+        "pass1_sha256": "93e179ef906849bcd5c383986aaf560f84e6242a815c2d2649e3d8b78142600b",
+        "pass2_sha256": "93e179ef906849bcd5c383986aaf560f84e6242a815c2d2649e3d8b78142600b",
+        "byte_identical": true,
+        "bytes": 107059
+      }
+    }
+  },
+  "review_binding": {
+    "schema": "conduit-boq/p50r-solo-review-binding/v1",
+    "digest": "55c90931144b8a7a2cb4aebeb917d2dc0062b576dcbd5a7678e2f208421149cc",
+    "binds_exact_deterministic_artifacts": true
+  },
+  "page_review": {
+    "status": "reviewed_all_28_pages",
+    "row_count_oracle": [
+      0,
+      25,
+      26,
+      28,
+      26,
+      28,
+      22,
+      29,
+      27,
+      28,
+      24,
+      23,
+      29,
+      24,
+      26,
+      14,
+      25,
+      30,
+      30,
+      30,
+      26,
+      28,
+      22,
+      17,
+      22,
+      15,
+      28,
+      10
+    ],
+    "pages": [
+      {
+        "description_overlay_scope": null,
+        "extracted_row_count": 0,
+        "first_locator": null,
+        "kind": "cover",
+        "last_locator": null,
+        "page": 1,
+        "table_count": 0
+      },
+      {
+        "description_overlay_scope": null,
+        "extracted_row_count": 25,
+        "first_locator": "p02:t1:r5:display-1",
+        "kind": "price_table",
+        "last_locator": "p02:t1:r33:display-10",
+        "page": 2,
+        "table_count": 1
+      },
+      {
+        "description_overlay_scope": null,
+        "extracted_row_count": 26,
+        "first_locator": "p03:t1:r3:display-11",
+        "kind": "price_table",
+        "last_locator": "p03:t1:r33:display-10",
+        "page": 3,
+        "table_count": 1
+      },
+      {
+        "description_overlay_scope": null,
+        "extracted_row_count": 28,
+        "first_locator": "p04:t1:r3:display-11",
+        "kind": "price_table",
+        "last_locator": "p04:t1:r32:display-7",
+        "page": 4,
+        "table_count": 1
+      },
+      {
+        "description_overlay_scope": "heading_only",
+        "extracted_row_count": 26,
+        "first_locator": "p05:t1:r4:display-1",
+        "kind": "price_table",
+        "last_locator": "p05:t1:r33:display-8",
+        "page": 5,
+        "table_count": 1
+      },
+      {
+        "description_overlay_scope": null,
+        "extracted_row_count": 28,
+        "first_locator": "p06:t1:r3:display-9",
+        "kind": "price_table",
+        "last_locator": "p06:t1:r33:display-27",
+        "page": 6,
+        "table_count": 1
+      },
+      {
+        "description_overlay_scope": null,
+        "extracted_row_count": 22,
+        "first_locator": "p07:t1:r3:display-28",
+        "kind": "price_table",
+        "last_locator": "p07:t1:r33:display-3",
+        "page": 7,
+        "table_count": 1
+      },
+      {
+        "description_overlay_scope": null,
+        "extracted_row_count": 29,
+        "first_locator": "p08:t1:r3:display-4",
+        "kind": "price_table",
+        "last_locator": "p08:t1:r33:display-8",
+        "page": 8,
+        "table_count": 1
+      },
+      {
+        "description_overlay_scope": null,
+        "extracted_row_count": 27,
+        "first_locator": "p09:t1:r3:display-9",
+        "kind": "price_table",
+        "last_locator": "p09:t1:r33:display-6",
+        "page": 9,
+        "table_count": 1
+      },
+      {
+        "description_overlay_scope": null,
+        "extracted_row_count": 28,
+        "first_locator": "p10:t1:r3:display-7",
+        "kind": "price_table",
+        "last_locator": "p10:t1:r33:display-22",
+        "page": 10,
+        "table_count": 1
+      },
+      {
+        "description_overlay_scope": null,
+        "extracted_row_count": 24,
+        "first_locator": "p11:t1:r3:display-23",
+        "kind": "price_table",
+        "last_locator": "p11:t1:r32:display-6",
+        "page": 11,
+        "table_count": 1
+      },
+      {
+        "description_overlay_scope": "heading_only",
+        "extracted_row_count": 23,
+        "first_locator": "p12:t1:r4:display-1",
+        "kind": "price_table",
+        "last_locator": "p12:t1:r33:display-11",
+        "page": 12,
+        "table_count": 1
+      },
+      {
+        "description_overlay_scope": null,
+        "extracted_row_count": 29,
+        "first_locator": "p13:t1:r3:display-12",
+        "kind": "price_table",
+        "last_locator": "p13:t1:r33:display-28",
+        "page": 13,
+        "table_count": 1
+      },
+      {
+        "description_overlay_scope": null,
+        "extracted_row_count": 24,
+        "first_locator": "p14:t1:r3:display-29",
+        "kind": "price_table",
+        "last_locator": "p14:t1:r33:display-4",
+        "page": 14,
+        "table_count": 1
+      },
+      {
+        "description_overlay_scope": null,
+        "extracted_row_count": 26,
+        "first_locator": "p15:t1:r3:display-5",
+        "kind": "price_table",
+        "last_locator": "p15:t1:r33:display-20",
+        "page": 15,
+        "table_count": 1
+      },
+      {
+        "description_overlay_scope": null,
+        "extracted_row_count": 14,
+        "first_locator": "p16:t1:r3:display-21",
+        "kind": "price_table",
+        "last_locator": "p16:t1:r18:display-9",
+        "page": 16,
+        "table_count": 1
+      },
+      {
+        "description_overlay_scope": "heading_only",
+        "extracted_row_count": 25,
+        "first_locator": "p17:t1:r5:display-1",
+        "kind": "price_table",
+        "last_locator": "p17:t1:r29:display-25",
+        "page": 17,
+        "table_count": 1
+      },
+      {
+        "description_overlay_scope": null,
+        "extracted_row_count": 30,
+        "first_locator": "p18:t1:r3:display-26",
+        "kind": "price_table",
+        "last_locator": "p18:t1:r32:display-55",
+        "page": 18,
+        "table_count": 1
+      },
+      {
+        "description_overlay_scope": null,
+        "extracted_row_count": 30,
+        "first_locator": "p19:t1:r3:display-56",
+        "kind": "price_table",
+        "last_locator": "p19:t1:r32:display-85",
+        "page": 19,
+        "table_count": 1
+      },
+      {
+        "description_overlay_scope": null,
+        "extracted_row_count": 30,
+        "first_locator": "p20:t1:r3:display-86",
+        "kind": "price_table",
+        "last_locator": "p20:t1:r32:display-115",
+        "page": 20,
+        "table_count": 1
+      },
+      {
+        "description_overlay_scope": null,
+        "extracted_row_count": 26,
+        "first_locator": "p21:t1:r3:display-116",
+        "kind": "price_table",
+        "last_locator": "p21:t1:r30:display-21",
+        "page": 21,
+        "table_count": 1
+      },
+      {
+        "description_overlay_scope": null,
+        "extracted_row_count": 28,
+        "first_locator": "p22:t1:r3:display-22",
+        "kind": "price_table",
+        "last_locator": "p22:t1:r30:display-49",
+        "page": 22,
+        "table_count": 1
+      },
+      {
+        "description_overlay_scope": null,
+        "extracted_row_count": 22,
+        "first_locator": "p23:t1:r3:display-50",
+        "kind": "price_table",
+        "last_locator": "p23:t1:r32:display-2",
+        "page": 23,
+        "table_count": 1
+      },
+      {
+        "description_overlay_scope": "heading_only",
+        "extracted_row_count": 17,
+        "first_locator": "p24:t1:r4:display-1",
+        "kind": "price_table",
+        "last_locator": "p24:t1:r33:display-3",
+        "page": 24,
+        "table_count": 1
+      },
+      {
+        "description_overlay_scope": "heading_only",
+        "extracted_row_count": 22,
+        "first_locator": "p25:t1:r4:display-1",
+        "kind": "price_table",
+        "last_locator": "p25:t1:r31:display-1",
+        "page": 25,
+        "table_count": 1
+      },
+      {
+        "description_overlay_scope": "heading_only",
+        "extracted_row_count": 15,
+        "first_locator": "p26:t1:r5:display-1",
+        "kind": "price_table",
+        "last_locator": "p26:t1:r23:display-3",
+        "page": 26,
+        "table_count": 1
+      },
+      {
+        "description_overlay_scope": "heading_only",
+        "extracted_row_count": 28,
+        "first_locator": "p27:t1:r4:display-1",
+        "kind": "price_table",
+        "last_locator": "p27:t1:r33:display-12",
+        "page": 27,
+        "table_count": 1
+      },
+      {
+        "description_overlay_scope": null,
+        "extracted_row_count": 10,
+        "first_locator": "p28:t1:r3:display-13",
+        "kind": "price_table",
+        "last_locator": "p28:t1:r12:display-22",
+        "page": 28,
+        "table_count": 1
+      }
+    ],
+    "known_description_overlay_rows": 19,
+    "price_arithmetic_failures": 0
+  },
+  "delta_review": {
+    "status": "reviewed_all_delta_records",
+    "record_count": 67,
+    "classifications": {
+      "proposed_confirmed_correction": 49,
+      "source_version_difference": 18
+    },
+    "every_record_pending_p50d": true,
+    "mutation_authorized": false
+  },
+  "exception_review": {
+    "status": "reviewed_all_exception_records",
+    "record_count": 245,
+    "blocking_count": 0,
+    "classifications": {
+      "extraction_structure": 180,
+      "source_version_difference": 65
+    }
+  },
+  "p50_target": {
+    "stable_identity_id": "f2662c71-a6e5-407e-8456-8608e304b43b",
+    "legacy_item_code": "ITEM-0429",
+    "target_item_code": "COR-PB0-002",
+    "frozen_price": "0/1763/1763",
+    "filed_pdf_price": "0/1764/1764",
+    "pdf_locator": "p24:t1:r9:display-2",
+    "status": "pending_p50d"
+  },
+  "manual_attestation": {
+    "mode": "authorized solo operator review for Owner",
+    "review_actor": "Codex local operator under exact Owner approval",
+    "owner_personal_result_confirmation_claimed": false,
+    "all_28_pages_reviewed": true,
+    "every_delta_reviewed": true,
+    "every_exception_reviewed": true,
+    "source_inputs_unchanged": true,
+    "unexpected_tracked_changes": false
+  },
+  "boundaries": {
+    "local_database_used": false,
+    "production_used": false,
+    "network_used": false,
+    "dependency_install_used": false,
+    "source_mutation": false,
+    "catalog_mutation": false,
+    "boq_mutation": false,
+    "pointer_mutation": false,
+    "factor_f_mutation": false,
+    "commit_or_push": false
+  },
+  "authority": {
+    "p50d_authorized": false,
+    "p50c_authorized": false,
+    "git_publication_authorized": false,
+    "p13_authorized": false,
+    "p14_authorized": false,
+    "p14c_authorized": false,
+    "p15_authorized": false,
+    "automatic_next_step": false
+  },
+  "next_step": "STOP_AT_P50D_OWNER_DECISION_REQUEST"
+}

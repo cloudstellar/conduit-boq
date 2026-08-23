@@ -1,0 +1,35 @@
+{
+  "schema": "conduit-boq/p50c-one-row-diff/v1",
+  "candidate_id": "P50C-CANDIDATE-20260823-V1",
+  "baseline_version": "2568.0.0",
+  "provisional_target_version": "2568.1.0",
+  "record_count": 1,
+  "records": [
+    {
+      "stable_identity_id": "f2662c71-a6e5-407e-8456-8608e304b43b",
+      "legacy_item_code": "ITEM-0429",
+      "target_item_code": "COR-PB0-002",
+      "item_name": "งานเจาะผนังบ่อพักย่อย (PB)",
+      "unit": "จุด",
+      "change_fields": [
+        "labor_cost",
+        "unit_cost"
+      ],
+      "before": {
+        "material_cost": 0,
+        "labor_cost": 1763,
+        "unit_cost": 1763
+      },
+      "after": {
+        "material_cost": 0,
+        "labor_cost": 1764,
+        "unit_cost": 1764
+      },
+      "delta": {
+        "material_cost": 0,
+        "labor_cost": 1,
+        "unit_cost": 1
+      }
+    }
+  ]
+}
