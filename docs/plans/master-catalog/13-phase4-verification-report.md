@@ -1,13 +1,30 @@
 # Master Catalog Phase 4 Verification Report
 
-> **Current P-50 ratification receipt (2026-08-24):** exact P-50D V3 Owner
-> confirmation (ratification) is recorded under [Review Remediation
+> **Current P-50I verification result (2026-08-24):** the exact P-50I approval
+> was consumed; preflight, patch application, and target hash passed. Local
+> validation then failed closed at `21/22` authority tests and `30/31` exact
+> P-50 tests because a raw marker-name count included two examples embedded in
+> Proposal #59's frozen diff plus the actual EOF marker. The anchored count is
+> one; focused ESLint and deterministic P-50C checks passed. [Result
+> #60](./60-phase4-p50i-local-validation-failure-result-record.md) is canonical.
+> No stage/commit/push/new CI/Preview occurred; HEAD/upstream/remote remain
+> `2b45f9b...`, the index is empty, and Production is untouched. P-13 remains
+> hard-held. [P-50J Proposal
+> #61](./61-phase4-p50j-marker-count-correction-and-ci-authorization-proposal.md)
+> freezes only the line-anchor correction and is not execution authority.
+> Earlier P-50H/P-50I-pending status text is chronology.
+> Historical bindings remain [P-50H Result #58](./58-phase4-p50h-local-git-ci-preview-result-record.md),
+> [P-50I Proposal #59](./59-phase4-p50i-quality-fixture-remediation-and-ci-rerun-authorization-proposal.md),
+> and failed Quality run `32661774094`; none grants current authority.
+
+> **Historical pre-P-50G/P-50H ratification checkpoint (2026-08-24;
+> superseded by the current result above):** exact P-50D V3 Owner
+> confirmation (ratification) was recorded under [Review Remediation
 > #54](./54-phase4-p50c-review-remediation-and-p50d-v3-ratification-request.md),
 > and the 710-row P-50C package is accepted only as local review evidence.
-> Any contrary pending or “commit/push is next” wording below is superseded
-> history. The next safe step is the required small repository gate; Git,
-> CI/Preview, database, Production, candidate application, P-13 through P-15,
-> deployment, publication, and automatic continuation remain unauthorized.
+> At that checkpoint the small repository gate was next. P-50G and P-50H
+> chronology is recorded by Result #58. P-50I was later approved and stopped
+> locally as recorded by Result #60; P-50J Proposal #61 is now current.
 
 > **Canonical term:** **exact Owner confirmation (ratification)** has the single
 > meaning defined in [Review Remediation #54](./54-phase4-p50c-review-remediation-and-p50d-v3-ratification-request.md):
@@ -39,12 +56,14 @@ Proposal #51 / `P50D-REQ-20260823-V2` records the Owner's one-row
 The local offline P-50C technical build occurred and its data result is recorded
 in [Result #53](./53-phase4-p50c-one-row-offline-candidate-result-record.md),
 and the candidate is accepted only as local review evidence. That acceptance
-does not authorize Git or an operating gate; each remains a later, separate
-decision after the required small repository gate.
+alone did not authorize Git or an operating gate; P-50G and P-50H were later
+separately authorized and are recorded in Results #56/#58.
 Published `2568.0.0` remains unchanged; provisional target `2568.1.0` still
 requires a fresh registry check. The pre-P-49 CI/Preview result is historical
-only. No `main` merge, application/database/Production mutation, network use,
-commit/push, deployment, feature enablement, or publication is implied.
+only. P-50H later created and pushed exactly one feature-branch evidence
+commit, but Quality failed. No `main` merge, candidate application,
+database/Production mutation, deployment, feature enablement, or publication
+is implied.
 
 **Current P-37 disposition (2026-07-25):** **Accepted by the Owner under an
 explicit guided-UAT variance** against exact implementation checkpoint
@@ -1855,7 +1874,7 @@ BOQs. The next decision is confirm/ratify or hold Review Remediation #54. That
 confirmation accepts the package only as local review evidence and does not
 authorize commit/push, CI, or any operating gate.
 
-## 27. P-50D V3 exact Owner ratification receipt mirror — 2026-08-24
+## 27. Historical P-50D V3 ratification mirror before P-50G/P-50H — 2026-08-24
 
 This append-only successor supersedes only the live pending interpretation
 above. The canonical authority remains the exact receipt and marker in

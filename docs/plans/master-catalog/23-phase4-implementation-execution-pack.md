@@ -1,5 +1,23 @@
 # Phase 4 Implementation Execution Pack
 
+**Current execution handoff (2026-08-24):** P-50I one-time authority is
+consumed. Preflight, exact patch application, and target hash passed, then the
+required local gate stopped at `21/22` authority tests and `30/31` exact P-50
+tests because the raw P-50I marker-name regex counted two frozen-diff examples
+plus the one real EOF marker. Anchored count `1`, focused ESLint PASS, and
+deterministic P-50C PASS bound the failure to the assertion. See [Result
+#60](./60-phase4-p50i-local-validation-failure-result-record.md). No stage,
+commit, push, new CI/Preview, database, or Production action occurred;
+HEAD/upstream/remote remain `2b45f9b...` and the index is empty. Gate 1 is not
+passed and this pack must stop before P-13. The next review is [P-50J Proposal
+#61](./61-phase4-p50j-marker-count-correction-and-ci-authorization-proposal.md),
+which authorizes nothing until exact approval. Earlier P-50G/P-50H/P-50I-next
+wording below is chronology.
+
+Historical bindings remain [P-50H Result #58](./58-phase4-p50h-local-git-ci-preview-result-record.md),
+[P-50I Proposal #59](./59-phase4-p50i-quality-fixture-remediation-and-ci-rerun-authorization-proposal.md),
+and failed Quality run `32661774094`; none grants current authority.
+
 **Historical P-39R amendment (2026-07-18):** P-38 Card A was stopped and safely
 cleaned after permanent abandoned-number reservation was found to create
 unexplained official-release gaps. [Correction Plan #37](./37-phase4-p39-draft-identity-release-number-correction-plan.md)
@@ -21,18 +39,20 @@ P39R-C then passed the clean `009`-`024` technical chain on exact pushed
 before P39R-U passes.
 At that checkpoint, Production remained unauthorized.
 
-**Status:** WP-0 through WP-8 and P-12 are complete. P-12 executed exact
+**Historical pre-P-50G status checkpoint (superseded by the current handoff
+above):** WP-0 through WP-8 and P-12 are complete. P-12 executed exact
 `017` -> `017a` -> `018`-`026`; objective closeout and the checksum-verified v7
 post-`026` backup/isolated restore passed. P-13/P-14/P-14C/P-15 remain separate
 and unauthorized. The bounded local P-50C data candidate exists and its
 TypeScript/document remediation plus focused validation are complete. Exact
 P-50D V3 Owner confirmation (ratification) is recorded under
 [Review Remediation #54](./54-phase4-p50c-review-remediation-and-p50d-v3-ratification-request.md).
-The candidate is accepted only as local review evidence. The next safe step is
-the required small repository gate; after it passes, a separate exact local
-commit/push and CI/Preview authorization request may be prepared. No database/
-Production/network/application mutation, Git/CI, P-13 through P-15, deploy,
-flags, publication, or automatic continuation is authorized.
+The candidate is accepted only as local review evidence. At this historical
+checkpoint the next safe step was the required small repository gate. P-50G,
+P-50H, and P-50I later ran under separate approvals; the current result and
+P-50J boundary are stated at the top. No database/Production/application
+mutation, P-13 through P-15, deploy, flags, publication, or automatic
+continuation is authorized.
 
 > **Canonical term:** **exact Owner confirmation (ratification)** has the single
 > meaning defined in [Review Remediation #54](./54-phase4-p50c-review-remediation-and-p50d-v3-ratification-request.md):
@@ -1118,21 +1138,29 @@ failed, ambiguous, or different from the reviewed plan.
 
 ## 17. WP-9 Production execution
 
-This package cannot start from this document alone. P-12 and P-50R are complete,
-and the offline P-50C technical build exists. Exact P-50D V3 remains
-unauthorized pending Owner confirmation (ratification), including acceptance
-of P-50C only as local review evidence. Every remaining
-Git/CI/data/Production scope still requires exact authority,
-the Production Runbook, and matching Verification evidence. One
-bounded decision may enumerate P-13/P-14/P-14C sequentially, but P-15 remains a
-separate confirmation.
+This package cannot start from this document alone. P-12/P-50R are complete;
+P-50D V3 is ratified only as a decision record; and P-50C is accepted only as
+local review evidence. P-50G passed. P-50H later published exact feature-branch
+commit `2b45f9b1679d12caac933568e89e1065d74dbd74`, but required Quality run
+`32661774094` failed, so the release gate is incomplete and P-13 remains a hard
+hold. P-50I then passed exact preflight/patch/hash but failed its local marker
+assertion before Git; Result #60 is canonical and P-50I is consumed/no-replay.
+Only repository-only P-50J Proposal #61 is ready for Owner review; it is not
+execution authority. Every remaining Git/CI/data/Production scope still
+requires exact authority, the Production Runbook, and matching Verification
+evidence. One later bounded decision may enumerate P-13/P-14/P-14C
+sequentially, but P-15 remains a separate confirmation.
 
-Current P-51 order (`P51_CANONICAL_PRODUCTION_SEQUENCE_V3`):
+The later `P-13/P-14/P-14C bounded window` remains only a planning boundary;
+it has not been requested or authorized by P-50J preparation.
 
-`P-51D -> P-50R SOLO complete -> one exact P-50D V3 Owner confirmation
-(ratification), also accepting existing verified P-50C only as local review
-evidence -> separately authorized local release commit/push + CI/Preview ->
-P-13/P-14/P-14C bounded window -> P-15 -> closeout -> P-49`
+Current P-51 order after the P-50I fail-closed result:
+
+`P-51D -> P-50R SOLO complete -> P-50D V3 ratified/P-50C accepted only as
+local review evidence -> P-50G PASS -> P-50H Git publication complete but
+Quality FAIL -> P-50I local assertion FAIL before Git -> separately approved
+P-50J + green exact-head Quality/Preview evidence -> P-13/P-14/P-14C bounded
+window -> P-15 -> closeout -> P-49`
 
 If the first P-15 closeout remains unfinished at 2026-08-25 23:59:59 +07,
 stop and obtain fresh explicit Owner reapproval of the P-51 waiver before any
@@ -1146,23 +1174,21 @@ step continues; there is no automatic extension.
    mutation authority.
 2. Preserve historical [P-50D Proposal #50](./50-phase4-p50d-exact-price-and-version-disposition-decision-proposal.md)
    as superseded without approval and [Proposal #51](./51-phase4-p50d-2568-baseline-first-delta-review-proposal.md)
-   as the consumed selection basis. The working record preserves the Owner's
-   one-row business intent for UUID
-   `f2662c71-a6e5-407e-8456-8608e304b43b`,
-   `0/1763/1763 -> 0/1764/1764`. Exact [Proposal
-   #52](./52-phase4-p50d-one-row-selected-delta-approval-proposal.md) remains
-   unauthorized until exact Owner confirmation (ratification), which also
-   accepts P-50C only as local review evidence. Git remains a later, separate
-   decision.
+   as the consumed selection basis. Exact [Proposal
+   #52](./52-phase4-p50d-one-row-selected-delta-approval-proposal.md) is now
+   ratified through [Receipt #54](./54-phase4-p50c-review-remediation-and-p50d-v3-ratification-request.md)
+   only in `decision-record-only` scope, preserving the one selected UUID at
+   `0/1763/1763 -> 0/1764/1764` and accepting P-50C only as local review
+   evidence. P-50J remains a later, separate repository decision.
 3. Consume [P-50C Result #53](./53-phase4-p50c-one-row-offline-candidate-result-record.md):
    candidate `P50C-CANDIDATE-20260823-V1` has 710 rows, one value delta, 709
    unchanged baseline authority rows, and zero name/unit/material changes.
    Its candidate/diff/manifest hashes and TypeScript/document remediation have
-   passed; complete exact V3 Owner confirmation (ratification) under
-   [Review Remediation #54](./54-phase4-p50c-review-remediation-and-p50d-v3-ratification-request.md)
-   before any Git/CI request. Review-only
-   Excel/PDF remains a later exact-draft gate; no artifact is official before
-   publication.
+   passed and exact V3 Owner confirmation is complete under [Receipt
+   #54](./54-phase4-p50c-review-remediation-and-p50d-v3-ratification-request.md).
+   P-50H later published the evidence but Quality failed; P-50I then stopped
+   locally before Git. Review-only Excel/PDF remains a later exact-draft gate;
+   no artifact is official before publication.
 4. Freeze the identifier-binding manifest across the application/source commit,
    comparison-evidence set, delta manifest or exact empty baseline set, ADR-003 decision,
    non-Production JSON candidate/diff/manifest hashes, later exact-draft artifact
@@ -1204,15 +1230,14 @@ step continues; there is no automatic extension.
     within seven calendar days after P-15 closeout.
 
 Under P-51, WP-9 has consumed the frozen P-50R SOLO result and produced the
-offline P-50C technical package. P-50D V3 remains unauthorized pending exact
-Owner confirmation (ratification), including acceptance only as local review
-evidence. P-50C proves the other
-709 baseline authority-value rows remain equal to `2568.0.0` and that the only
-selected money delta is the exact UUID-keyed manifest. **Current review HOLD:**
-TypeScript/document remediation and focused validation passed; exact Owner
-confirmation (ratification) under Review Remediation #54 is next. Commit/push
-is not the next authorized action; only after confirmation and a fresh passing small repository
-gate may a separate local commit/push plus CI/Preview request be prepared.
+offline P-50C technical package. P-50D V3 is ratified only in
+`decision-record-only` scope, including acceptance of P-50C only as local
+review evidence. P-50C proves the other 709 baseline authority-value rows
+remain equal to `2568.0.0` and that the only selected money delta is the exact
+UUID-keyed manifest. **Current review HOLD:** P-50I is consumed after local
+assertion failure before Git; only the separately frozen P-50J proposal may be
+reviewed. Commit/push is not authorized without that exact approval and a
+passing focused gate.
 P-49 remains
 open/high but is deferred until after the exact first closeout and is not the
 sole P-13 blocker for that sequence. P-13, P-14, and P-14C remain explicit

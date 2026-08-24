@@ -8,15 +8,32 @@ P-13/P-14/P-14C/P-15 remain unauthorized.
 **Production project:** `otlssvssvgkohqwuuiir`
 **Default posture:** Feature flag disabled; stop on any failed gate
 
-**Current ratification receipt (2026-08-24):** exact P-50D V3 Owner confirmation
-(ratification) is recorded under [Review Remediation
+> **Current pre-Production stop (2026-08-24):** P-50I preflight and exact patch
+> target passed, then fail-fast local validation stopped at `21/22` authority
+> tests and `30/31` exact P-50 tests because the raw P-50I marker-name regex
+> counted two frozen-diff examples plus the one actual EOF marker. The anchored
+> count is one; lint and deterministic P-50C checks passed. [Result
+> #60](./60-phase4-p50i-local-validation-failure-result-record.md) is the
+> canonical receipt. No stage, commit, push, new CI/Preview, database, or
+> Production action occurred; HEAD/upstream/remote remain `2b45f9b...` and the
+> exact P-50I target is retained uncommitted. This runbook remains stopped
+> before P-13. Only [P-50J Proposal
+> #61](./61-phase4-p50j-marker-count-correction-and-ci-authorization-proposal.md)
+> is current, and it is review-only until separately approved. Earlier P-50H
+> and P-50I-pending wording below is historical.
+> Historical bindings remain [P-50H Result #58](./58-phase4-p50h-local-git-ci-preview-result-record.md),
+> [P-50I Proposal #59](./59-phase4-p50i-quality-fixture-remediation-and-ci-rerun-authorization-proposal.md),
+> and failed Quality run `32661774094`; none grants current authority.
+
+**Historical pre-P-50G/P-50H ratification checkpoint (2026-08-24; superseded
+by the current stop above):** exact P-50D V3 Owner confirmation
+(ratification) was recorded under [Review Remediation
 #54](./54-phase4-p50c-review-remediation-and-p50d-v3-ratification-request.md),
 and the bounded local P-50C candidate is accepted only as local review evidence.
-The next safe step is the required small repository gate; after it passes, a
-separate exact local commit/push and CI/Preview authorization request may be
-prepared. Database/Production/network/application mutation, Git/CI,
-P-13/P-14/P-14C/P-15, deploy, flags, publication, and automatic continuation
-remain unauthorized.
+At that checkpoint the next safe step was the small repository gate. P-50G and
+P-50H chronology is recorded by Result #58. P-50I was later approved and
+stopped locally as recorded by Result #60; P-50J Proposal #61 is now the only
+current review.
 
 > **Canonical term:** **exact Owner confirmation (ratification)** has the single
 > meaning defined in [Review Remediation #54](./54-phase4-p50c-review-remediation-and-p50d-v3-ratification-request.md):
@@ -780,11 +797,11 @@ custody. Do not request P-13 until this checkpoint passes.
 This handoff is not a prerequisite to begin an approved P-12 migration and does
 not authorize P-13. It is a hard precondition for the separate P-13 request.
 
-### Current P-50D V3 confirmation and P-50C evidence gate before Git/P-13
+### Historical P-50D V3/P-50C gate before P-50G and P-50H
 
 **Canonical sequence marker:** `P51_CANONICAL_PRODUCTION_SEQUENCE_V3`
 
-Current route: `P-51D -> P-50R SOLO complete -> one exact P-50D V3 Owner
+Route recorded at this historical checkpoint: `P-51D -> P-50R SOLO complete -> one exact P-50D V3 Owner
 confirmation (ratification), also accepting existing verified P-50C only as
 local review evidence -> separately authorized local release commit/push +
 CI/Preview -> P-13/P-14/P-14C bounded window -> P-15 -> closeout -> P-49`.
@@ -793,8 +810,8 @@ If the first P-15 closeout has not finished by 2026-08-25 23:59:59 +07,
 stop before continuing this sequence and obtain fresh explicit Owner reapproval
 of the P-51 waiver. No calendar extension is automatic.
 
-P-50R SOLO and the bounded P-50C technical/data review are complete. The one
-pending decision is exact Owner confirmation (ratification) of the frozen V3
+P-50R SOLO and the bounded P-50C technical/data review were complete. The one
+pending decision at this checkpoint was exact Owner confirmation (ratification) of the frozen V3
 UUID/hashes, which also accepts the existing P-50C package only as local review
 evidence. There is no separate future P-50C build gate in the current route.
 The confirmation does not authorize candidate application, a rebuild, Git/CI,
@@ -818,8 +835,8 @@ authorized local release commit/push and CI/Preview gate. Technical completion
 or later local-evidence acceptance does not authorize that Git publication or
 the bounded P-13/P-14/P-14C window.
 
-Current working result: exact P-50D request `P50D-REQ-20260823-V3` freezes only
-UUID `f2662c71-a6e5-407e-8456-8608e304b43b` and remains unauthorized pending
+Historical working result: exact P-50D request `P50D-REQ-20260823-V3` freezes only
+UUID `f2662c71-a6e5-407e-8456-8608e304b43b` and at this checkpoint remained unauthorized pending
 exact Owner confirmation (ratification). Offline candidate
 `P50C-CANDIDATE-20260823-V1` was technically built, but acceptance only as local
 review evidence is pending. Its 710-row candidate SHA-256 is

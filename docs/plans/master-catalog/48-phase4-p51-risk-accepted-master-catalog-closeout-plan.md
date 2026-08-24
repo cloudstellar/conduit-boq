@@ -1,13 +1,36 @@
 # Phase 4 P-51 Risk-Accepted Solo Master Catalog Closeout Plan
 
-**Status:** P-50R-SOLO COMPLETE / `PASS_FOR_P50D_REQUEST`; EXACT P-50D V3
-OWNER CONFIRMATION (RATIFICATION) RECORDED UNDER [REVIEW REMEDIATION
-#54](./54-phase4-p50c-review-remediation-and-p50d-v3-ratification-request.md);
-OFFLINE P-50C JSON PACKAGE IS ACCEPTED AS LOCAL REVIEW EVIDENCE ONLY; ALL GIT
-AND OPERATIONAL SCOPE REMAINS HELD;
-PUBLISHED/CURRENT `2568.0.0` REMAINS UNCHANGED; LOCAL
-`2568.1.0` TARGET IS PROVISIONAL; DATABASE, PRODUCTION, GIT, DEPLOYMENT,
+**Status:** GATE 1 DATA/DECISION/P-50G COMPLETE; P-50H CONSUMED WITH QUALITY
+FAIL; P-50I CONSUMED WITH LOCAL ASSERTION FAIL BEFORE GIT; GATE 1 NOT PASSED;
+GATE 2 / P-13 HARD HOLD. OFFLINE P-50C IS ACCEPTED ONLY AS LOCAL REVIEW
+EVIDENCE. PUBLISHED/CURRENT `2568.0.0` REMAINS UNCHANGED; LOCAL `2568.1.0`
+TARGET IS PROVISIONAL; DATABASE, PRODUCTION, CANDIDATE APPLICATION, DEPLOYMENT,
 FLAGS, AND PUBLICATION ARE NOT AUTHORIZED
+
+> **P-50I current gate overlay (2026-08-24):** exact P-50I approval was
+> consumed. Preflight and exact patch target passed, but local validation
+> stopped at `21/22` authority tests and `30/31` exact P-50 tests because the
+> raw marker-name regex counted two frozen-diff examples plus the actual EOF
+> marker. Anchored count `1`, lint PASS, and deterministic P-50C PASS bound the
+> defect to that assertion. [Result
+> #60](./60-phase4-p50i-local-validation-failure-result-record.md) is canonical.
+> No stage/commit/push/new CI/Preview or Production action occurred; HEAD,
+> upstream, and live remote remain `2b45f9b...`. Gate 1 remains red and Gate 2
+> must not start. Only [P-50J Proposal
+> #61](./61-phase4-p50j-marker-count-correction-and-ci-authorization-proposal.md)
+> is current, review-only. The P-51 deadline remains
+> `2026-08-25T23:59:59+07:00`; no extension is implied.
+> Historical bindings remain [P-50H Result #58](./58-phase4-p50h-local-git-ci-preview-result-record.md),
+> [P-50I Proposal #59](./59-phase4-p50i-quality-fixture-remediation-and-ci-rerun-authorization-proposal.md),
+> and failed Quality run `32661774094`; none grants current authority.
+
+<!-- P51_CURRENT_GATE_OVERLAY_V7 {"schema":"conduit-boq/p51-current-gate-overlay/v7","currentAsOf":"2026-08-24","supersedesLiveStatusOf":"P51_CURRENT_GATE_OVERLAY_V6","preservesPriorMarkersAsHistory":true,"p50hCommitSha":"2b45f9b1679d12caac933568e89e1065d74dbd74","qualityRunId":32661774094,"qualityConclusion":"failure","p50iRequestId":"P50I-REQ-20260824-V1","p50iAuthorizationConsumed":true,"p50iReplayAllowed":false,"p50iPreflightPassed":true,"p50iExactPatchApplied":true,"p50iLocalGatePassed":false,"authorityTestPassCount":21,"authorityTestFailCount":1,"focusedTestPassCount":30,"focusedTestFailCount":1,"gitStageOccurred":false,"localCommitOccurred":false,"externalGitPublicationOccurred":false,"newQualityRunOccurred":false,"newPreviewOccurred":false,"currentDecisionId":"P50J-REQ-20260824-V1","currentDecision":"approve-or-hold-p50j-one-line-marker-count-correction","p50jProposalReady":true,"p50jAuthorized":false,"gate1Passed":false,"gate2Authorized":false,"publishedVersion":"2568.0.0","publishedVersionMutated":false,"provisionalTargetVersion":"2568.1.0","targetRegistryCheckPending":true,"p51WaiverReapprovalAt":"2026-08-25T23:59:59+07:00","candidateApplicationAuthorized":false,"databaseAccessAuthorized":false,"productionReadAuthorized":false,"productionWriteAuthorized":false,"localCommitAuthorized":false,"externalGitPublicationAuthorized":false,"ciPreviewAuthorized":false,"p13Authorized":false,"p14Authorized":false,"p14cAuthorized":false,"p15Authorized":false,"deployAuthorized":false,"publicationAuthorized":false,"automaticNextStep":false} -->
+
+**Historical P-50H/P-50I-pending overlay:** the V6 marker immediately below
+preserves the pre-P-50I checkpoint only and no longer describes current
+authority.
+
+<!-- P51_CURRENT_GATE_OVERLAY_V6 {"schema":"conduit-boq/p51-current-gate-overlay/v6","currentAsOf":"2026-08-24","supersedesLiveStatusOf":"P51_P50D_V3_RATIFICATION_RECEIPT_V1","preservesPriorMarkersAsHistory":true,"p50hRequestId":"P50H-REQ-20260824-V1","p50hAuthorizationConsumed":true,"p50hReplayAllowed":false,"p50hCommitSha":"2b45f9b1679d12caac933568e89e1065d74dbd74","remoteBranchEqual":true,"qualityRunId":32661774094,"qualityConclusion":"failure","previewEnvironment":"Preview","previewStatus":"success","previewOverridesQuality":false,"gate1Passed":false,"gate2Authorized":false,"currentDecisionId":"P50I-REQ-20260824-V1","currentDecision":"approve-or-hold-p50i-repository-only-correction","p50iProposalReady":true,"p50iAuthorized":false,"publishedVersion":"2568.0.0","publishedVersionMutated":false,"provisionalTargetVersion":"2568.1.0","targetRegistryCheckPending":true,"p51WaiverReapprovalAt":"2026-08-25T23:59:59+07:00","candidateApplicationAuthorized":false,"databaseAccessAuthorized":false,"productionReadAuthorized":false,"productionWriteAuthorized":false,"localCommitAuthorized":false,"externalGitPublicationAuthorized":false,"ciPreviewAuthorized":false,"p13Authorized":false,"p14Authorized":false,"p14cAuthorized":false,"p15Authorized":false,"deployAuthorized":false,"publicationAuthorized":false,"automaticNextStep":false} -->
 
 > **Canonical term:** **exact Owner confirmation (ratification)** has the single
 > meaning defined in [Review Remediation #54](./54-phase4-p50c-review-remediation-and-p50d-v3-ratification-request.md):
@@ -30,9 +53,10 @@ FLAGS, AND PUBLICATION ARE NOT AUTHORIZED
 **P-51D working-tree docs/test alignment:** COMPLETE 2026-08-21; uncommitted;
 no Git or operational authority
 
-**Decision-record base:**
-`a12b022247d75d7e006fac890fc123e9c0a8e168` (local-only P-49 decision record;
-upstream remains `6f0953b19c25f6f96b1d2d11ee99ff43c33c5443`)
+**Historical decision-record base before P-50H:**
+`a12b022247d75d7e006fac890fc123e9c0a8e168` (the then-local P-49 decision
+record; current local/upstream HEAD is `2b45f9b1679d12caac933568e89e1065d74dbd74`
+as recorded by Result #58)
 
 **Production access for this alignment:** None
 
@@ -603,14 +627,15 @@ all remain false.
 
 <!-- P51_CURRENT_GATE_OVERLAY_V5 {"schema":"conduit-boq/p51-current-gate-overlay/v5","currentAsOf":"2026-08-23","supersedesLiveAcceptanceAndNextActionOf":"P51_CURRENT_GATE_OVERLAY_V4","preservesPriorMarkersAsHistory":true,"p50dV3RequestId":"P50D-REQ-20260823-V3","p50dV3ManifestSha256":"1ac28a74def993214f73659f1930acdb5caa57390504e494b21d72bbf3778429","selectedIdentityId":"f2662c71-a6e5-407e-8456-8608e304b43b","selectedLegacyItemCode":"ITEM-0429","selectedTargetItemCode":"COR-PB0-002","baselinePrice":[0,1763,1763],"candidatePrice":[0,1764,1764],"p50cCandidateId":"P50C-CANDIDATE-20260823-V1","candidateSha256":"d7a19a9dbaecff4abb18086d1f9e236ae4b5ea311477ccdb609a52c54f200611","diffSha256":"72e950d96bfdf81abeb3317ee280cc01e630a13447d1f38edd9ee7149f3ddf18","candidateManifestSha256":"d88d3daa63db6a59f9ba973d653647224584aa9d98c3efde4cbaad78f6bfefe5","candidateDataQualityReviewPassed":true,"candidateRole":"review-oracle-not-direct-import-payload","soloPreGitPackage":["candidate.json","diff.json","manifest.json","focused-deterministic-test"],"preGitExcelPdfRequired":false,"draftExcelPdfDeferredTo":"exact-p14c-production-draft","exactOwnerRatificationPending":true,"candidateAccepted":false,"gitScopeRequiresSeparateExplicitStatement":true,"localCommitAuthorized":false,"externalGitPublicationAuthorized":false,"ciAuthorized":false,"previewAuthorized":false,"databaseAccessAuthorized":false,"productionReadAuthorized":false,"productionWriteAuthorized":false,"networkAuthorized":false,"applicationMutationAuthorized":false,"sourceMutationAuthorized":false,"catalogMutationAuthorized":false,"boqMutationAuthorized":false,"pointerMutationAuthorized":false,"factorFMutationAuthorized":false,"p13Authorized":false,"p14Authorized":false,"p14cAuthorized":false,"p15Authorized":false,"automaticNextStep":false} -->
 
-## 13. Current P-50D V3 ratification receipt — 2026-08-24
+## 13. Historical P-50D V3 receipt before P-50G/P-50H — 2026-08-24
 
 Section 12 and `P51_CURRENT_GATE_OVERLAY_V5` remain the pre-receipt review
 hold. The Owner has now exactly ratified P-50D V3 under [Review Remediation
 #54](./54-phase4-p50c-review-remediation-and-p50d-v3-ratification-request.md)
 and accepted the verified P-50C package only as local review evidence. This
-completes Gate 1's decision substep, not its repository/Git substep. Run the
-small repository gate and stop; any local commit/push and CI/Preview scope must
-be requested and approved separately.
+completed Gate 1's decision substep, not its repository/Git substep. At this
+checkpoint the small repository gate was next. Later P-50G/P-50H chronology
+and the later P-50I stop/P-50J review boundary are recorded in the V7 overlay
+at the top.
 
 <!-- P51_P50D_V3_RATIFICATION_RECEIPT_V1 {"schema":"conduit-boq/p51-p50d-v3-ratification-receipt/v1","recordedAt":"2026-08-24","supersedesLivePendingStateOf":"P51_CURRENT_GATE_OVERLAY_V5","canonicalReceiptMarker":"P50D_V3_EXACT_OWNER_RATIFICATION_RECEIPT_V1","p50dRequestId":"P50D-REQ-20260823-V3","p50dV3Ratified":true,"p50dAuthorized":true,"p50dAuthorityScope":"decision-record-only","p50dFurtherActionAuthorized":false,"p50cCandidateAccepted":true,"acceptsCandidateAs":"local-review-evidence-only","p50cFurtherExecutionAuthorized":false,"currentPublishedCatalogChanged":false,"targetRegistryCheckPending":true,"nextSafeStep":"none-stop-after-recording-ratification","separateGitCiAuthorizationRequired":true,"candidateApplicationAuthorized":false,"localCommitAuthorized":false,"externalGitPublicationAuthorized":false,"ciPreviewAuthorized":false,"databaseAccessAuthorized":false,"productionReadAuthorized":false,"productionWriteAuthorized":false,"networkAuthorized":false,"p13Authorized":false,"p14Authorized":false,"p14cAuthorized":false,"p15Authorized":false,"deployAuthorized":false,"publicationAuthorized":false,"automaticNextStep":false} -->

@@ -3,6 +3,23 @@
 **Prepared:** 2026-06-22
 **Purpose:** ให้เจ้าของระบบ review ชุดเอกสารตามลำดับโดยไม่สับสนกับ Phase เดิม
 
+> **P-50I result overlay — current (2026-08-24):** the exact one-time P-50I
+> approval was consumed. Preflight and the exact test target hash passed, but
+> the required local gate stopped at `21/22` authority tests and `30/31` in the
+> exact P-50 set. The new raw marker-name count included two examples inside
+> Proposal #59's frozen diff plus the one real EOF marker; the line-anchored
+> count is exactly one. Focused ESLint and deterministic P-50C checks passed.
+> See [P-50I Result #60](./60-phase4-p50i-local-validation-failure-result-record.md).
+> Fail-fast stopped before stage/commit/push, so local/upstream/remote remain
+> `2b45f9b1679d12caac933568e89e1065d74dbd74`, the index is empty, and no new
+> CI/Preview or Production action occurred. The exact P-50I test target remains
+> uncommitted. Earlier P-50H/P-50I-pending wording below is chronology only.
+> The preceding P-50H Quality run remains `32661774094` as recorded by Result
+> #58; P-50I created no new run.
+> The sole current review is the one-line repository correction in [P-50J
+> Proposal #61](./61-phase4-p50j-marker-count-correction-and-ci-authorization-proposal.md);
+> preparation grants no mutation, Git, CI, Production, or later-gate authority.
+
 > **Canonical term:** **exact Owner confirmation (ratification)** has the single
 > meaning defined in [Review Remediation #54](./54-phase4-p50c-review-remediation-and-p50d-v3-ratification-request.md):
 > confirm the post-build UUID and named SHA-256 values and accept P-50C only as
@@ -226,18 +243,22 @@
 28. [P-50C Review Remediation and P-50D V3 Ratification Receipt](./54-phase4-p50c-review-remediation-and-p50d-v3-ratification-request.md) — canonical exact receipt `P50D_V3_EXACT_OWNER_RATIFICATION_RECEIPT_V1`; no execution/Git/Production/later-gate authority
 29. [P-50G Post-Ratification Small Repository Gate Proposal](./55-phase4-p50g-post-ratification-small-repository-gate-authorization-proposal.md) — exact proposal ที่ Owner อนุมัติด้วย request ID + full SHA-256; เก็บเป็น authorization snapshot ที่ใช้สิทธิ์ครบหนึ่งครั้งแล้ว
 30. [P-50G Small Repository Gate Result](./56-phase4-p50g-small-repository-gate-result.md) — ผล PASS ของ gate แบบ offline/read-only; บันทึกว่า authorization ถูก consume และไม่อนุญาต Git/CI/operation
-31. [P-50H Exact Local Git/CI Preview Proposal](./57-phase4-p50h-exact-local-git-ci-preview-authorization-proposal.md) — proposal และ manifest สำหรับ Owner review แยก; ยังไม่อนุญาตให้ execute, stage, commit, push หรือ CI/Preview
-32. [Post-Phase-4 DR Backlog](./42-phase4-post-phase4-disaster-recovery-backlog.md) — งาน RPO/RTO/Auth/Storage/off-device restore ภายหลัง; ไม่ใช่ P-12 blocker
-33. [Reconciliation Report](./11-phase4-reconciliation-report.md) — ตรวจว่าข้อมูล 710/708 ถูกจัดการอย่างไร
-34. [Code Dictionary](./10-phase4-structured-code-dictionary.md) — ตรวจความหมาย AAA/TTT และจุดผิด 16 Crossing
-35. [Database/Security Contract](./17-phase4-database-security-contract.md) — ตรวจ schema, RLS/grants, function และ migration order
-36. [Lean Threat Model](./18-phase4-threat-model.md) — ตรวจความเสี่ยง/control/หลักฐานทดสอบ
-37. [Parser/Hash Specification](./14-phase4-parser-and-canonical-hash-spec.md) — สัญญาเชิงเทคนิคที่ทำให้ import/export ทำซ้ำได้
-38. [Official Export Specification](./20-phase4-official-export-spec.md) — อนุมัติรูปแบบ Excel/PDF, stamp และ hash
-39. [Production Runbook](./12-phase4-production-runbook.md) — ขั้นตอนจริง จุดหยุด และ rollback
-40. [Verification Report](./13-phase4-verification-report.md) — หลักฐานที่ต้องกรอกเมื่อ implement/rollout
-41. [Admin Operating Procedure](./15-phase4-admin-operating-procedure.md) — วิธีใช้งานของผู้ดูแลระบบ
-42. [Release Note Template](./16-phase4-release-note-template.md) — เอกสารต่อหนึ่งเวอร์ชันที่ publish
+31. [P-50H Exact Local Git/CI Preview Proposal](./57-phase4-p50h-exact-local-git-ci-preview-authorization-proposal.md) — authorization snapshot ที่ Owner อนุมัติและถูกใช้ครบหนึ่งครั้งแล้ว; ห้าม replay
+32. [P-50H Local Git/CI/Preview Result](./58-phase4-p50h-local-git-ci-preview-result-record.md) — exact Git publication สำเร็จ แต่ Quality FAIL จาก hidden local snapshot dependency; authorization consumed และ P-13 hard hold
+33. [P-50I Quality Fixture Remediation Proposal](./59-phase4-p50i-quality-fixture-remediation-and-ci-rerun-authorization-proposal.md) — authorization snapshot ที่ Owner อนุมัติและถูกใช้ครั้งเดียว; exact patch ลง working tree แล้วแต่ local gate หยุดก่อน Git
+34. [P-50I Local Validation Failure Result](./60-phase4-p50i-local-validation-failure-result-record.md) — preflight/target PASS, test `21/22` และ P-50 set `30/31`; fail-fast ก่อน stage/commit/push และ Production ไม่ถูกแตะ
+35. [P-50J Marker-Count Correction and CI Proposal](./61-phase4-p50j-marker-count-correction-and-ci-authorization-proposal.md) — ข้อเสนอแก้ regex หนึ่งจุดให้ยึดต้นบรรทัด แล้วค่อยรัน focused gate และ remote Quality/Preview; ยังไม่อนุญาต execute
+36. [Post-Phase-4 DR Backlog](./42-phase4-post-phase4-disaster-recovery-backlog.md) — งาน RPO/RTO/Auth/Storage/off-device restore ภายหลัง; ไม่ใช่ P-12 blocker
+37. [Reconciliation Report](./11-phase4-reconciliation-report.md) — ตรวจว่าข้อมูล 710/708 ถูกจัดการอย่างไร
+38. [Code Dictionary](./10-phase4-structured-code-dictionary.md) — ตรวจความหมาย AAA/TTT และจุดผิด 16 Crossing
+39. [Database/Security Contract](./17-phase4-database-security-contract.md) — ตรวจ schema, RLS/grants, function และ migration order
+40. [Lean Threat Model](./18-phase4-threat-model.md) — ตรวจความเสี่ยง/control/หลักฐานทดสอบ
+41. [Parser/Hash Specification](./14-phase4-parser-and-canonical-hash-spec.md) — สัญญาเชิงเทคนิคที่ทำให้ import/export ทำซ้ำได้
+42. [Official Export Specification](./20-phase4-official-export-spec.md) — อนุมัติรูปแบบ Excel/PDF, stamp และ hash
+43. [Production Runbook](./12-phase4-production-runbook.md) — ขั้นตอนจริง จุดหยุด และ rollback
+44. [Verification Report](./13-phase4-verification-report.md) — หลักฐานที่ต้องกรอกเมื่อ implement/rollout
+45. [Admin Operating Procedure](./15-phase4-admin-operating-procedure.md) — วิธีใช้งานของผู้ดูแลระบบ
+46. [Release Note Template](./16-phase4-release-note-template.md) — เอกสารต่อหนึ่งเวอร์ชันที่ publish
 
 ระหว่าง implementation ให้ใช้
 [Execution Progress Tracker](./25-phase4-execution-progress-tracker.md)
@@ -326,11 +347,11 @@ checkpoint.
 | P-20 canonical hash portability | Owner approved deterministic baseline identity จาก Production-derived `price_list.id`; independent two-rebuild proof ของ data-bearing chain ผ่านแล้ว. `017a` และ `026` เป็น data-free ACL-only changes จึงไม่ทำให้ต้อง repeat portability reset สองรอบ; แต่ต้องมี corrected integration bootstrap ใหม่หนึ่งครั้งหลัง P-47 และต้องขอ Owner reset approval ใหม่. P-15 final hash acceptance ยังแยก |
 | P-12 Production readiness | **Complete 2026-08-17.** Exact `017` -> `017a` -> `018`-`026`, objective closeout, and checksum-verified v7 post-`026` backup/isolated restore passed; all Phase 4 flags remain false. P-49 does not reopen this evidence. |
 | P-49 pending-account authorization | Business target approved: pending is profile/onboarding-only and catalog `022`/`023` remains active-only. Current BOQ/RPC/Factor-F/profile/API paths are not aligned; risk remains open/high and implementation is deferred/unapproved. P-51 waives it only as blocker for the exact first closeout, then requires re-entry. |
-| P-50 known price erratum | P-50R completed `PASS_FOR_P50D_REQUEST`; the frozen P-50D V3 manifest selects only `ITEM-0429` at `0/1764/1764`, and the local offline P-50C technical build proves that one-row candidate scope. Exact Owner confirmation (ratification) is recorded; P-50D V3 is complete only in decision-record-only scope and P-50C is accepted only as local review evidence. Published `2568.0.0` remains `0/1763/1763`; historical BOQs are unchanged. No Production, Git, deployment, or publication authority follows. |
+| P-50 known price erratum | P-50R completed `PASS_FOR_P50D_REQUEST`; the frozen P-50D V3 manifest selects only `ITEM-0429` at `0/1764/1764`, and the local offline P-50C technical build proves that one-row candidate scope. Exact Owner confirmation (ratification) is recorded; P-50D V3 is complete only in decision-record-only scope and P-50C is accepted only as local review evidence. P-50H later committed/pushed the evidence package on the feature branch, but required Quality failed and the package is not release-qualified. Published `2568.0.0` remains `0/1763/1763`; historical BOQs are unchanged. No candidate application, Production, deployment, or publication authority follows. |
 | P-50R evidence scope | [Request/Result #49](./49-phase4-p50r-exact-price-reconciliation-evidence-scope-request.md) is consumed and complete. The immutable package covers 28/28 pages, 67 deltas, 245 exceptions, and zero blockers. Its 49 technical candidates are comparison evidence only; published/current `2568.0.0` remains authority. No P-50D/P-50C/Git/database/Production/network/mutation or later gate is implied. |
 | P-50D decision | Historical [Proposal #50](./50-phase4-p50d-exact-price-and-version-disposition-decision-proposal.md) is superseded without approval. [Proposal #51](./51-phase4-p50d-2568-baseline-first-delta-review-proposal.md) records the V2 baseline-first choice. Exact [Proposal #52](./52-phase4-p50d-one-row-selected-delta-approval-proposal.md), request `P50D-REQ-20260823-V3`, freezes only `ITEM-0429` at `0/1764/1764`; [Receipt #54](./54-phase4-p50c-review-remediation-and-p50d-v3-ratification-request.md) records exact Owner ratification and completes P-50D V3 only in decision-record-only scope. The other 709 baseline authority rows and 48 candidates remain unchanged. |
-| P-50C result | [Result #53](./53-phase4-p50c-one-row-offline-candidate-result-record.md) records **TECHNICAL BUILD COMPLETE / DATA REVIEW PASSED / ACCEPTED AS LOCAL REVIEW EVIDENCE ONLY** for local offline candidate `P50C-CANDIDATE-20260823-V1`; candidate `d7a19a9...`, diff `72e950d9...`, manifest `d88d3daa...`. All other 48 candidates—including `ITEM-0427`, `ITEM-0430`, and `ITEM-0431`—remain unchanged, while the 17 exclusions remain distinct. Target `2568.1.0` remains provisional pending a fresh issued/claimed registry check. P-50G later passed, but there is still no candidate application, DB/Production/network/application/BOQ/Git/P-50H-execution authority. |
-| P-51 closeout sequencing | P-51D, P-50R SOLO, exact P-50D V3 ratification, acceptance of the verified P-50C candidate only as local review evidence, and P-50G PASS/authorization consumption are recorded complete. P-50H Proposal #57 is preparation-only for separate review. Git/CI, P-13/P-14/P-14C, and separate P-15 remain unauthorized. The waiver needs fresh Owner reapproval if closeout is unfinished at 2026-08-25 23:59:59 +07. Nothing continues automatically. |
+| P-50C result | [Result #53](./53-phase4-p50c-one-row-offline-candidate-result-record.md) records **TECHNICAL BUILD COMPLETE / DATA REVIEW PASSED / ACCEPTED AS LOCAL REVIEW EVIDENCE ONLY** for local offline candidate `P50C-CANDIDATE-20260823-V1`; candidate `d7a19a9...`, diff `72e950d9...`, manifest `d88d3daa...`. All other 48 candidates—including `ITEM-0427`, `ITEM-0430`, and `ITEM-0431`—remain unchanged, while the 17 exclusions remain distinct. Target `2568.1.0` remains provisional pending a fresh issued/claimed registry check. P-50H published only the review evidence on the feature branch; it did not apply the candidate, and Quality failed. DB/Production/network/application/BOQ remain untouched. |
+| P-51 closeout sequencing | P-51D through P-50H are complete/consumed. P-50I was also consumed: its exact patch target passed, but [Result #60](./60-phase4-p50i-local-validation-failure-result-record.md) records local `21/22` and `30/31` failure before Git. Gate 1 remains incomplete and P-13 is hard-held. The sole current Owner review is [P-50J Proposal #61](./61-phase4-p50j-marker-count-correction-and-ci-authorization-proposal.md); it is not execution authority. The waiver needs fresh Owner reapproval if closeout is unfinished at 2026-08-25 23:59:59 +07. Nothing continues automatically. |
 | WP-6.6 capability completeness | G1R/G2 ผ่าน DB/concurrency/P-20/advisor/repository บน exact candidate `721c2c2`; P-25/G3/P-26 technical paths ผ่าน และ owner accepted G3 บน exact `78e96ab` แล้ว. G4 ยังแยก ส่วน independent UAT/performance/formal accessibility อยู่ WP-8 |
 | P-21/P-22/P-23/P-23.1/P-24/P-25/P-26/P-27 WP-6.6 Local-only | `020` SHA-256 `e07e0c4161077efba7bc4f6ebf95518d0cc1bc7e4628a43a128dd899bd1aef93` ผ่าน G1R/G2, P-28 เพิ่มเข้า bootstrap และ P-29/G4E ผ่าน clean chain; G3/P-26 accepted บน exact application checkpoint `78e96ab`. ไม่รวม `021` bootstrap, Factor F/hotfix expansion หรือ Production |
 | Version lifecycle ตาม ADR-003 | Admin ต้องเลือก annual/revision/patch; annual year มาจาก owner; ระบบใช้ทะเบียนทุกสถานะและไม่ reuse เลข; DB บังคับเลขถัดไป. Live G1R/G2/G3 และ owner closeout ผ่านแล้ว; WP-8/P-14 ยังรอ |

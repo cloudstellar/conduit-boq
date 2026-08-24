@@ -1,15 +1,32 @@
 # Master Catalog Phase 4 Admin Operating Procedure
 
-> **Current P-50 ratification receipt (2026-08-24):** the P-50C JSON package is
+> **Current operator boundary (2026-08-24):** the exact one-time P-50I run
+> stopped locally after its exact patch matched but the new marker assertion
+> returned `21/22` authority tests and `30/31` exact P-50 tests. It counted two
+> frozen-diff examples and the one real EOF marker; the anchored count is one.
+> Lint and deterministic P-50C checks passed. See [Result
+> #60](./60-phase4-p50i-local-validation-failure-result-record.md). No stage,
+> commit, push, new CI/Preview, database, or Production action occurred;
+> HEAD/upstream/remote remain `2b45f9b...` and the index is empty. Do not start
+> P-13, create a Production draft, apply P-50C, change flags, or generate
+> official artifacts. [P-50J Proposal
+> #61](./61-phase4-p50j-marker-count-correction-and-ci-authorization-proposal.md)
+> is the only current review and is not execution authority. Earlier P-50H and
+> P-50I-pending text is retained history.
+> Historical bindings remain [P-50H Result #58](./58-phase4-p50h-local-git-ci-preview-result-record.md),
+> [P-50I Proposal #59](./59-phase4-p50i-quality-fixture-remediation-and-ci-rerun-authorization-proposal.md),
+> and failed Quality run `32661774094`; none grants current authority.
+
+> **Historical pre-P-50G/P-50H ratification checkpoint (2026-08-24;
+> superseded by the current operator boundary above):** the P-50C JSON package is
 > a technically verified review oracle, not an import payload. Exact P-50D V3
 > Owner confirmation (ratification) is recorded under [Review Remediation
 > #54](./54-phase4-p50c-review-remediation-and-p50d-v3-ratification-request.md),
 > and the package is accepted only as local review evidence.
 > Generate review-only Excel/PDF only from the later separately authorized exact
-> P-14C draft. The required small repository gate is the next safe step;
-> commit/push, CI/Preview, database, Production, candidate application, P-13
-> through P-15, publication, and automatic continuation remain unauthorized;
-> any contrary same-day wording below is superseded history.
+> P-14C draft. At this checkpoint the small repository gate was next. P-50G
+> and P-50H chronology is recorded by Result #58. P-50I was later approved and
+> stopped locally as recorded by Result #60; P-50J Proposal #61 is now current.
 
 > **Canonical term:** **exact Owner confirmation (ratification)** has the single
 > meaning defined in [Review Remediation #54](./54-phase4-p50c-review-remediation-and-p50d-v3-ratification-request.md):
@@ -819,16 +836,16 @@ rerun or explicitly accepted with an owner, rationale, remediation owner, and
 due date. Drag and drop is not required and may never replace the visible
 category/insertion-gap/up-down path.
 
-## Current P-50 authority correction — 2026-08-24
+## Historical pre-ratification P-50 authority correction — 2026-08-24
 
-The earlier P-50C admin marker is preserved as superseded chronology. Current
-authority is exact Owner confirmation (ratification) pending, with P-50C not
-yet accepted even as local review evidence. Git and every operating gate remain
-separate and held.
+The earlier P-50C admin marker is preserved as superseded chronology. At this
+checkpoint exact Owner confirmation (ratification) was pending, with P-50C not
+yet accepted even as local review evidence. The later receipt and current
+P-50H stop at the top supersede this interpretation.
 
 <!-- P50C_ADMIN_PROCEDURE_REVIEW_CORRECTION_V1 {"schema":"conduit-boq/p50c-admin-procedure-review-correction/v1","recordedAt":"2026-08-24","supersedesCurrentAuthorityOf":"P50C_ADMIN_PROCEDURE_CURRENT_OVERLAY_V1","p50dRequestId":"P50D-REQ-20260823-V3","exactOwnerConfirmationPending":true,"exactOwnerRatificationPending":true,"p50dApproved":false,"p50cTechnicalBuildOccurred":true,"p50cDataReviewPassed":true,"p50cCandidateAccepted":false,"p50cCandidateRole":"unaccepted-local-review-evidence","p50cCandidateId":"P50C-CANDIDATE-20260823-V1","candidateSha256":"d7a19a9dbaecff4abb18086d1f9e236ae4b5ea311477ccdb609a52c54f200611","diffSha256":"72e950d96bfdf81abeb3317ee280cc01e630a13447d1f38edd9ee7149f3ddf18","candidateManifestSha256":"d88d3daa63db6a59f9ba973d653647224584aa9d98c3efde4cbaad78f6bfefe5","nextOwnerDecision":"confirm-ratify-or-hold-exact-p50d-v3","candidateApplicationAuthorized":false,"localCommitAuthorized":false,"externalGitPublicationAuthorized":false,"ciPreviewAuthorized":false,"databaseAccessAuthorized":false,"productionReadAuthorized":false,"productionWriteAuthorized":false,"networkAuthorized":false,"p13Authorized":false,"p14Authorized":false,"p14cAuthorized":false,"p15Authorized":false,"automaticNextStep":false} -->
 
-## Current P-50D V3 ratification receipt mirror — 2026-08-24
+## Historical P-50D V3 ratification mirror before P-50G/P-50H — 2026-08-24
 
 This append-only successor supersedes only the live pending interpretation
 above. The canonical authority remains the exact receipt and marker in

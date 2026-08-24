@@ -2,6 +2,7 @@ import { createHash } from 'node:crypto'
 import { existsSync, readFileSync } from 'node:fs'
 import { dirname, resolve } from 'node:path'
 import { describe, expect, it } from 'vitest'
+import * as XLSX from 'xlsx'
 
 const root = process.cwd()
 
@@ -2739,38 +2740,37 @@ describe('Master Catalog authority consistency', () => {
       expect(currentMarker[field]).toBe(false)
     }
 
-    const baselineSnapshot = read(
-      'supabase/.snapshots/public-data-20260621-post009.sql',
+    const baselineInputPath =
+      'docs/plans/master-catalog/evidence/phase4-reconciliation-draft.csv'
+    const baselineInputBytes = readFileSync(resolve(root, baselineInputPath))
+    expect(createHash('sha256').update(baselineInputBytes).digest('hex')).toBe(
+      '4627e413bea3c6a72b544f71cf0b91f4bff5c8d4199a799373140f4c969a338a',
     )
-    expect(createHash('sha256').update(baselineSnapshot).digest('hex')).toBe(
-      currentMarker.baselineSnapshotSha256,
-    )
-    const priceListMatches = [
-      ...baselineSnapshot.matchAll(
-        /^INSERT INTO public\.price_list\r?\nSELECT \* FROM jsonb_populate_recordset\(NULL::public\.price_list,\r?\n\$snapshot_20260621\$(\[[^\r\n]*\])\$snapshot_20260621\$::jsonb\);$/gm,
-      ),
-    ]
-    expect(priceListMatches).toHaveLength(1)
-    const baselineRows = JSON.parse(priceListMatches[0]![1]) as Array<{
-      id: string
-      item_code: string
-      item_name: string
-      unit: string
-      material_cost: number
-      labor_cost: number
-      unit_cost: number
-    }>
-    const baselineValueRecords = [...baselineRows]
-      .sort((left, right) => left.item_code.localeCompare(right.item_code, 'en'))
+    const baselineWorkbook = XLSX.read(baselineInputBytes, {
+      type: 'buffer',
+      codepage: 65001,
+      raw: false,
+    })
+    const baselineWorksheet =
+      baselineWorkbook.Sheets[baselineWorkbook.SheetNames[0]]
+    const baselineValueRecords = XLSX.utils
+      .sheet_to_json<Record<string, unknown>>(baselineWorksheet, {
+        defval: '',
+        raw: true,
+      })
+      .filter((row) => String(row.record_scope) === 'production')
       .map((row) => ({
-        identity_id: row.id,
-        legacy_item_code: row.item_code,
-        item_name: row.item_name,
-        unit: row.unit,
-        material_cost: row.material_cost,
-        labor_cost: row.labor_cost,
-        unit_cost: row.unit_cost,
+        identity_id: String(row.production_uuid),
+        legacy_item_code: String(row.legacy_item_code),
+        item_name: String(row.production_name),
+        unit: String(row.production_unit),
+        material_cost: Number(row.production_material_cost),
+        labor_cost: Number(row.production_labor_cost),
+        unit_cost: Number(row.production_unit_cost),
       }))
+      .sort((left, right) =>
+        left.legacy_item_code.localeCompare(right.legacy_item_code, 'en'),
+      )
     expect(baselineValueRecords).toHaveLength(710)
     expect(baselineValueRecords[0]?.legacy_item_code).toBe('ITEM-0001')
     expect(baselineValueRecords.at(-1)?.legacy_item_code).toBe('ITEM-0710')
@@ -2779,6 +2779,10 @@ describe('Master Catalog authority consistency', () => {
         .update(JSON.stringify(baselineValueRecords) + '\n')
         .digest('hex'),
     ).toBe(currentMarker.baselineValueBindingSha256)
+    const p50rChecksums = read(`${evidenceRoot}/SHA256SUMS`)
+    expect(p50rChecksums).toContain(
+      `${currentMarker.baselineSnapshotSha256}  supabase/.snapshots/public-data-20260621-post009.sql`,
+    )
     expect(
       createHash('sha256').update(JSON.stringify([]) + '\n').digest('hex'),
     ).toBe(currentMarker.initialApprovedSetSha256)
@@ -4695,6 +4699,159 @@ describe('Master Catalog authority consistency', () => {
     expect(itemEditor).toContain('ประวัติและ BOQ เดิมไม่ถูกเขียนทับ')
   })
 
+  it('records P-50H fail-closed and keeps P-50I non-operational', () => {
+    const resultPath =
+      'docs/plans/master-catalog/58-phase4-p50h-local-git-ci-preview-result-record.md'
+    const proposalPath =
+      'docs/plans/master-catalog/59-phase4-p50i-quality-fixture-remediation-and-ci-rerun-authorization-proposal.md'
+    const result = read(resultPath)
+    const proposal = read(proposalPath)
+    const resultMatch = result.match(
+      /<!-- P50H_LOCAL_GIT_CI_PREVIEW_RESULT_V1 (\{[^\n]+\}) -->/,
+    )
+    const proposalMatch = proposal.match(
+      /<!-- P50I_QUALITY_FIXTURE_REMEDIATION_AUTHORIZATION_PROPOSAL_V1 (\{[^\n]+\}) -->/,
+    )
+    expect(
+      result.match(/<!-- P50H_LOCAL_GIT_CI_PREVIEW_RESULT_V1 /g),
+    ).toHaveLength(1)
+    expect(
+      proposal.match(
+        /^<!-- P50I_QUALITY_FIXTURE_REMEDIATION_AUTHORIZATION_PROPOSAL_V1 /gm,
+      ),
+    ).toHaveLength(1)
+    expect(resultMatch).not.toBeNull()
+    expect(proposalMatch).not.toBeNull()
+
+    const receipt = JSON.parse(resultMatch![1])
+    expect(receipt).toMatchObject({
+      schema: 'conduit-boq/p50h-local-git-ci-preview-result/v1',
+      requestId: 'P50H-REQ-20260824-V1',
+      authorizationConsumed: true,
+      authorizationReplayAllowed: false,
+      commitSha: '2b45f9b1679d12caac933568e89e1065d74dbd74',
+      parentSha: 'a12b022247d75d7e006fac890fc123e9c0a8e168',
+      commitPathCount: 52,
+      pushSucceeded: true,
+      remoteBranchEqual: true,
+      qualityRunId: 32661774094,
+      qualityConclusion: 'failure',
+      qualityTestPassed: false,
+      qualityBuildSkipped: true,
+      qualityFailureCode: 'ENOENT',
+      qualityFailureClassification:
+        'non-hermetic-local-only-snapshot-dependency',
+      previewEnvironment: 'Preview',
+      previewStatus: 'success',
+      previewDoesNotOverrideQualityFailure: true,
+      gatePassed: false,
+      releaseQualified: false,
+      publishedVersion: '2568.0.0',
+      publishedVersionMutated: false,
+      provisionalTargetVersion: '2568.1.0',
+      targetRegistryCheckStatus: 'pending',
+      p50iProposalPrepared: true,
+      p50iExecutionAuthorized: false,
+      nextOwnerDecision: 'review-p50i-proposal',
+    })
+    expect(result.trimEnd().endsWith(resultMatch![0])).toBe(true)
+    expect(result).toContain('QUALITY FAIL')
+    expect(result).toContain('P-13 HARD HOLD')
+
+    const p50i = JSON.parse(proposalMatch![1])
+    expect(p50i).toMatchObject({
+      schema:
+        'conduit-boq/p50i-quality-fixture-remediation-authorization-proposal/v1',
+      requestId: 'P50I-REQ-20260824-V1',
+      status: 'ready-for-owner-review',
+      ownerApprovalPending: true,
+      branch: 'codex/p12-production-authority-r2',
+      localHead: '2b45f9b1679d12caac933568e89e1065d74dbd74',
+      upstreamHead: '2b45f9b1679d12caac933568e89e1065d74dbd74',
+      failedQualityRunId: 32661774094,
+      failedQualityConclusion: 'failure',
+      rootCause: 'non-hermetic-local-only-snapshot-dependency',
+      trackedBaselineSha256:
+        '4627e413bea3c6a72b544f71cf0b91f4bff5c8d4199a799373140f4c969a338a',
+      baselineRowCount: 710,
+      baselineValueBindingSha256:
+        '6266fcf6f51089cc9902c61c2b66acbbf27906679ce0e1e9148172a8f47b0b1a',
+      authorityTestPreimageSha256:
+        '012cf89cc9521618571b8640e599c568ff4cbb326682b5ed6a3752030df1950a',
+      prospectiveCommitPathCount: 11,
+      proposalStagedMode: '100644',
+      commitPathListSerialization: 'utf8-sorted-path-lf-v1',
+      targetContentManifestSerialization:
+        'utf8-sorted-sha256-two-spaces-path-lf-v1',
+      expectedAuthorityTestCount: 22,
+      expectedFocusedTestFileCount: 3,
+      expectedFocusedTestCount: 31,
+      p50hAuthorizationConsumed: true,
+      p50hReplayAllowed: false,
+      p50iExecutionAuthorized: false,
+      localDependencyInstallAuthorized: false,
+      remoteQualityNpmCiExpected: true,
+      nextOwnerDecision: 'approve-or-hold-p50i',
+    })
+    expect(p50i.authorityTestTargetSha256).toMatch(/^[a-f0-9]{64}$/)
+    expect(p50i.commitPathListSha256).toMatch(/^[a-f0-9]{64}$/)
+    expect(p50i.targetContentManifestSha256).toMatch(/^[a-f0-9]{64}$/)
+    for (const field of [
+      'p50hReplayAllowed',
+      'p50iExecutionAuthorized',
+      'testMutationAuthorized',
+      'docsAlignmentCommitAuthorized',
+      'gitStageAuthorized',
+      'localCommitAuthorized',
+      'externalGitPublicationAuthorized',
+      'networkAuthorized',
+      'ciPreviewAuthorized',
+      'localDependencyInstallAuthorized',
+      'protectedPathAccessAuthorized',
+      'candidateApplicationAuthorized',
+      'databaseAccessAuthorized',
+      'productionReadAuthorized',
+      'productionWriteAuthorized',
+      'applicationMutationAuthorized',
+      'catalogMutationAuthorized',
+      'boqMutationAuthorized',
+      'pointerMutationAuthorized',
+      'factorFMutationAuthorized',
+      'mainMutationAuthorized',
+      'pullRequestAuthorized',
+      'p13Authorized',
+      'p14Authorized',
+      'p14cAuthorized',
+      'p15Authorized',
+      'deployAuthorized',
+      'publicationAuthorized',
+      'automaticNextStep',
+    ]) {
+      expect(p50i[field], `P50I.${field}`).toBe(false)
+    }
+    expect(proposal.trimEnd().endsWith(proposalMatch![0])).toBe(true)
+
+    for (const path of [
+      'docs/plans/master-catalog/00-phase4-review-guide.md',
+      'docs/plans/master-catalog/12-phase4-production-runbook.md',
+      'docs/plans/master-catalog/13-phase4-verification-report.md',
+      'docs/plans/master-catalog/15-phase4-admin-operating-procedure.md',
+      'docs/plans/master-catalog/19-phase4-decision-register.md',
+      'docs/plans/master-catalog/23-phase4-implementation-execution-pack.md',
+      'docs/plans/master-catalog/25-phase4-execution-progress-tracker.md',
+      'docs/plans/master-catalog/48-phase4-p51-risk-accepted-master-catalog-closeout-plan.md',
+    ]) {
+      const authority = read(path)
+      expect(authority).toContain(
+        './58-phase4-p50h-local-git-ci-preview-result-record.md',
+      )
+      expect(authority).toContain(
+        './59-phase4-p50i-quality-fixture-remediation-and-ci-rerun-authorization-proposal.md',
+      )
+      expect(authority).toContain('32661774094')
+    }
+  })
+
   it('keeps core authority links resolvable', () => {
     const threatModel = read(
       'docs/plans/master-catalog/18-phase4-threat-model.md',
@@ -4784,6 +4941,8 @@ describe('Master Catalog authority consistency', () => {
       'docs/plans/master-catalog/55-phase4-p50g-post-ratification-small-repository-gate-authorization-proposal.md',
       'docs/plans/master-catalog/56-phase4-p50g-small-repository-gate-result.md',
       'docs/plans/master-catalog/57-phase4-p50h-exact-local-git-ci-preview-authorization-proposal.md',
+      'docs/plans/master-catalog/58-phase4-p50h-local-git-ci-preview-result-record.md',
+      'docs/plans/master-catalog/59-phase4-p50i-quality-fixture-remediation-and-ci-rerun-authorization-proposal.md',
     ]) {
       expectRelativeMarkdownLinksToExist(path)
       expectMarkdownTablesToBeWellShaped(path)
