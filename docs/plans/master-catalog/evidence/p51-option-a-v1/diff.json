@@ -1,0 +1,3058 @@
+{
+  "schema": "conduit-boq/p51-option-a-diff/v1",
+  "candidate_id": "P51-OPTION-A-CANDIDATE-20260826-V1",
+  "artifact_role": "local-review-oracle-not-direct-import-payload",
+  "published_baseline_comparison": {
+    "reference_version": "2568.0.0",
+    "changed_row_count": 49,
+    "unchanged_row_count": 661,
+    "change_field_counts": {
+      "item_name_changed_row_count": 0,
+      "unit_changed_row_count": 0,
+      "material_cost_changed_row_count": 0,
+      "labor_cost_changed_row_count": 49,
+      "unit_cost_changed_row_count": 49
+    },
+    "price_delta_statistics": {
+      "positive_count": 48,
+      "negative_count": 1,
+      "zero_count": 0,
+      "minimum": -460,
+      "maximum": 855,
+      "net": 5295
+    },
+    "records": [
+      {
+        "stable_identity_id": "7c218133-65ba-4f70-8bfa-d2c5318fb9ed",
+        "legacy_item_code": "ITEM-0286",
+        "source_item_code": "CHB-PB0-011",
+        "target_item_code": "CHB-PB0-011",
+        "item_name": "งานสร้างบ่อพักย่อย  (PB) JUF-16 ฝาค.ส.ล.",
+        "unit": "บ่อ",
+        "change_fields": [
+          "labor_cost",
+          "unit_cost"
+        ],
+        "before": {
+          "material_cost": 23671,
+          "labor_cost": 8410,
+          "unit_cost": 32081
+        },
+        "after": {
+          "material_cost": 23671,
+          "labor_cost": 8415,
+          "unit_cost": 32086
+        },
+        "delta": {
+          "material_cost": 0,
+          "labor_cost": 5,
+          "unit_cost": 5
+        },
+        "source_evidence": {
+          "classification": "proposed_confirmed_correction",
+          "pdf_locator": "p12:t1:r33:display-11"
+        }
+      },
+      {
+        "stable_identity_id": "cdf01707-2ec3-4211-b83f-5104139e429d",
+        "legacy_item_code": "ITEM-0287",
+        "source_item_code": "CHB-PB0-012",
+        "target_item_code": "CHB-PB0-012",
+        "item_name": "งานสร้างบ่อพักย่อย  (PB) JUF-16 ฝาเหล็ก",
+        "unit": "บ่อ",
+        "change_fields": [
+          "labor_cost",
+          "unit_cost"
+        ],
+        "before": {
+          "material_cost": 32596,
+          "labor_cost": 11580,
+          "unit_cost": 44176
+        },
+        "after": {
+          "material_cost": 32596,
+          "labor_cost": 11586,
+          "unit_cost": 44182
+        },
+        "delta": {
+          "material_cost": 0,
+          "labor_cost": 6,
+          "unit_cost": 6
+        },
+        "source_evidence": {
+          "classification": "proposed_confirmed_correction",
+          "pdf_locator": "p13:t1:r3:display-12"
+        }
+      },
+      {
+        "stable_identity_id": "520a4226-4c87-4ec5-b629-f69487c8f67e",
+        "legacy_item_code": "ITEM-0332",
+        "source_item_code": "MOD-MH0-006",
+        "target_item_code": "MOD-MH0-006",
+        "item_name": "งาน M. บ่อพัก (MH) TYPE L2-2 ฝาเหล็ก เป็น T3-2",
+        "unit": "บ่อ",
+        "change_fields": [
+          "labor_cost",
+          "unit_cost"
+        ],
+        "before": {
+          "material_cost": 27164,
+          "labor_cost": 8807,
+          "unit_cost": 35971
+        },
+        "after": {
+          "material_cost": 27164,
+          "labor_cost": 8811,
+          "unit_cost": 35975
+        },
+        "delta": {
+          "material_cost": 0,
+          "labor_cost": 4,
+          "unit_cost": 4
+        },
+        "source_evidence": {
+          "classification": "proposed_confirmed_correction",
+          "pdf_locator": "p14:t1:r24:display-6"
+        }
+      },
+      {
+        "stable_identity_id": "bfaee5bc-6fad-4b15-8da4-2f1c60d5c0f5",
+        "legacy_item_code": "ITEM-0333",
+        "source_item_code": "MOD-MH0-007",
+        "target_item_code": "MOD-MH0-007",
+        "item_name": "งาน M. บ่อพัก (MH) TYPE A-1 ฝาเหล็ก เป็น A-2",
+        "unit": "บ่อ",
+        "change_fields": [
+          "labor_cost",
+          "unit_cost"
+        ],
+        "before": {
+          "material_cost": 45014,
+          "labor_cost": 14593,
+          "unit_cost": 59607
+        },
+        "after": {
+          "material_cost": 45014,
+          "labor_cost": 14600,
+          "unit_cost": 59614
+        },
+        "delta": {
+          "material_cost": 0,
+          "labor_cost": 7,
+          "unit_cost": 7
+        },
+        "source_evidence": {
+          "classification": "proposed_confirmed_correction",
+          "pdf_locator": "p14:t1:r25:display-7"
+        }
+      },
+      {
+        "stable_identity_id": "956b2d1a-cac2-4ee7-98ed-3f7b8604af06",
+        "legacy_item_code": "ITEM-0334",
+        "source_item_code": "MOD-MH0-008",
+        "target_item_code": "MOD-MH0-008",
+        "item_name": "งาน M. บ่อพัก (MH) TYPE A-2 ฝาเหล็ก เป็น L2-1 (2.45x3.85)",
+        "unit": "บ่อ",
+        "change_fields": [
+          "labor_cost",
+          "unit_cost"
+        ],
+        "before": {
+          "material_cost": 33740,
+          "labor_cost": 10939,
+          "unit_cost": 44679
+        },
+        "after": {
+          "material_cost": 33740,
+          "labor_cost": 10945,
+          "unit_cost": 44685
+        },
+        "delta": {
+          "material_cost": 0,
+          "labor_cost": 6,
+          "unit_cost": 6
+        },
+        "source_evidence": {
+          "classification": "proposed_confirmed_correction",
+          "pdf_locator": "p14:t1:r26:display-8"
+        }
+      },
+      {
+        "stable_identity_id": "d260a391-59bb-4ced-9b18-cc08b7e57d0e",
+        "legacy_item_code": "ITEM-0335",
+        "source_item_code": "MOD-MH0-009",
+        "target_item_code": "MOD-MH0-009",
+        "item_name": "งาน M. บ่อพัก (MH) TYPE A-2 ฝาเหล็ก เป็น L3-2 (2.55x5.15)",
+        "unit": "บ่อ",
+        "change_fields": [
+          "labor_cost",
+          "unit_cost"
+        ],
+        "before": {
+          "material_cost": 35037,
+          "labor_cost": 11359,
+          "unit_cost": 46396
+        },
+        "after": {
+          "material_cost": 35037,
+          "labor_cost": 11364,
+          "unit_cost": 46401
+        },
+        "delta": {
+          "material_cost": 0,
+          "labor_cost": 5,
+          "unit_cost": 5
+        },
+        "source_evidence": {
+          "classification": "proposed_confirmed_correction",
+          "pdf_locator": "p14:t1:r27:display-9"
+        }
+      },
+      {
+        "stable_identity_id": "ece950a8-f7d5-4a3d-a6ca-51461bef9b91",
+        "legacy_item_code": "ITEM-0426",
+        "source_item_code": "RPR-BRK-002",
+        "target_item_code": "RPR-BRK-002",
+        "item_name": "งานทุบค.ส.ล.หุ้มท่อ  24-Ø4\" PVC (พร้อมขนเศษวัสดุทิ้ง)",
+        "unit": "ม.",
+        "change_fields": [
+          "labor_cost",
+          "unit_cost"
+        ],
+        "before": {
+          "material_cost": 0,
+          "labor_cost": 2520,
+          "unit_cost": 2520
+        },
+        "after": {
+          "material_cost": 0,
+          "labor_cost": 2521,
+          "unit_cost": 2521
+        },
+        "delta": {
+          "material_cost": 0,
+          "labor_cost": 1,
+          "unit_cost": 1
+        },
+        "source_evidence": {
+          "classification": "proposed_confirmed_correction",
+          "pdf_locator": "p23:t1:r32:display-2"
+        }
+      },
+      {
+        "stable_identity_id": "77dae4c9-b6f0-4ad5-987c-661e344c2871",
+        "legacy_item_code": "ITEM-0427",
+        "source_item_code": "RPR-REM-001",
+        "target_item_code": "RPR-REM-001",
+        "item_name": "งานรื้อท่อเดิม 12-Ø4\" GIP ข้ามคลอง พร้อมเหล็กรัดท่อ",
+        "unit": "ชุด",
+        "change_fields": [
+          "labor_cost",
+          "unit_cost"
+        ],
+        "before": {
+          "material_cost": 5070,
+          "labor_cost": 1801,
+          "unit_cost": 6871
+        },
+        "after": {
+          "material_cost": 5070,
+          "labor_cost": 1802,
+          "unit_cost": 6872
+        },
+        "delta": {
+          "material_cost": 0,
+          "labor_cost": 1,
+          "unit_cost": 1
+        },
+        "source_evidence": {
+          "classification": "proposed_confirmed_correction",
+          "pdf_locator": "p24:t1:r4:display-1"
+        }
+      },
+      {
+        "stable_identity_id": "f2662c71-a6e5-407e-8456-8608e304b43b",
+        "legacy_item_code": "ITEM-0429",
+        "source_item_code": "COR-PB0-002",
+        "target_item_code": "COR-PB0-002",
+        "item_name": "งานเจาะผนังบ่อพักย่อย (PB)",
+        "unit": "จุด",
+        "change_fields": [
+          "labor_cost",
+          "unit_cost"
+        ],
+        "before": {
+          "material_cost": 0,
+          "labor_cost": 1763,
+          "unit_cost": 1763
+        },
+        "after": {
+          "material_cost": 0,
+          "labor_cost": 1764,
+          "unit_cost": 1764
+        },
+        "delta": {
+          "material_cost": 0,
+          "labor_cost": 1,
+          "unit_cost": 1
+        },
+        "source_evidence": {
+          "classification": "proposed_confirmed_correction",
+          "pdf_locator": "p24:t1:r9:display-2"
+        }
+      },
+      {
+        "stable_identity_id": "ceb49dea-167c-481d-a28c-6a8c9ce46633",
+        "legacy_item_code": "ITEM-0430",
+        "source_item_code": "COR-MH0-001",
+        "target_item_code": "COR-MH0-001",
+        "item_name": "งานเจาะหน้าต่างบ่อพัก (MH)",
+        "unit": "จุด",
+        "change_fields": [
+          "labor_cost",
+          "unit_cost"
+        ],
+        "before": {
+          "material_cost": 0,
+          "labor_cost": 1763,
+          "unit_cost": 1763
+        },
+        "after": {
+          "material_cost": 0,
+          "labor_cost": 1764,
+          "unit_cost": 1764
+        },
+        "delta": {
+          "material_cost": 0,
+          "labor_cost": 1,
+          "unit_cost": 1
+        },
+        "source_evidence": {
+          "classification": "proposed_confirmed_correction",
+          "pdf_locator": "p24:t1:r12:display-1"
+        }
+      },
+      {
+        "stable_identity_id": "1e60425d-d3d0-4510-b7f1-9075fb3ff352",
+        "legacy_item_code": "ITEM-0431",
+        "source_item_code": "COR-MH0-002",
+        "target_item_code": "COR-MH0-002",
+        "item_name": "งานเจาะผนังบ่อพัก (MH)",
+        "unit": "จุด",
+        "change_fields": [
+          "labor_cost",
+          "unit_cost"
+        ],
+        "before": {
+          "material_cost": 0,
+          "labor_cost": 3526,
+          "unit_cost": 3526
+        },
+        "after": {
+          "material_cost": 0,
+          "labor_cost": 3528,
+          "unit_cost": 3528
+        },
+        "delta": {
+          "material_cost": 0,
+          "labor_cost": 2,
+          "unit_cost": 2
+        },
+        "source_evidence": {
+          "classification": "proposed_confirmed_correction",
+          "pdf_locator": "p24:t1:r13:display-2"
+        }
+      },
+      {
+        "stable_identity_id": "d5bdd67d-3b33-434d-8429-c3d536967ced",
+        "legacy_item_code": "ITEM-0450",
+        "source_item_code": "PIL-STD-002",
+        "target_item_code": "PIL-STD-002",
+        "item_name": "เสา คอร.ขนาด 0.25x0.25x4.50 ม.",
+        "unit": "ต้น",
+        "change_fields": [
+          "labor_cost",
+          "unit_cost"
+        ],
+        "before": {
+          "material_cost": 1704,
+          "labor_cost": 632,
+          "unit_cost": 2336
+        },
+        "after": {
+          "material_cost": 1704,
+          "labor_cost": 633,
+          "unit_cost": 2337
+        },
+        "delta": {
+          "material_cost": 0,
+          "labor_cost": 1,
+          "unit_cost": 1
+        },
+        "source_evidence": {
+          "classification": "proposed_confirmed_correction",
+          "pdf_locator": "p25:t1:r12:display-2"
+        }
+      },
+      {
+        "stable_identity_id": "41a43f65-ab81-48d1-b58f-35866e441bf6",
+        "legacy_item_code": "ITEM-0453",
+        "source_item_code": "PIL-STD-005",
+        "target_item_code": "PIL-STD-005",
+        "item_name": "เสา คอร.ขนาด 0.30x0.30x5.50 ม.",
+        "unit": "ต้น",
+        "change_fields": [
+          "labor_cost",
+          "unit_cost"
+        ],
+        "before": {
+          "material_cost": 3294,
+          "labor_cost": 1147,
+          "unit_cost": 4441
+        },
+        "after": {
+          "material_cost": 3294,
+          "labor_cost": 1148,
+          "unit_cost": 4442
+        },
+        "delta": {
+          "material_cost": 0,
+          "labor_cost": 1,
+          "unit_cost": 1
+        },
+        "source_evidence": {
+          "classification": "proposed_confirmed_correction",
+          "pdf_locator": "p25:t1:r15:display-5"
+        }
+      },
+      {
+        "stable_identity_id": "07fdccd5-1384-4825-8031-0fa70991c568",
+        "legacy_item_code": "ITEM-0454",
+        "source_item_code": "PIL-STD-006",
+        "target_item_code": "PIL-STD-006",
+        "item_name": "เสา คอร.ขนาด 0.30x0.30x6.50 ม.",
+        "unit": "ต้น",
+        "change_fields": [
+          "labor_cost",
+          "unit_cost"
+        ],
+        "before": {
+          "material_cost": 3893,
+          "labor_cost": 1341,
+          "unit_cost": 5234
+        },
+        "after": {
+          "material_cost": 3893,
+          "labor_cost": 1342,
+          "unit_cost": 5235
+        },
+        "delta": {
+          "material_cost": 0,
+          "labor_cost": 1,
+          "unit_cost": 1
+        },
+        "source_evidence": {
+          "classification": "proposed_confirmed_correction",
+          "pdf_locator": "p25:t1:r16:display-6"
+        }
+      },
+      {
+        "stable_identity_id": "5272c4fe-20d1-43ce-9488-6beaf9873c6c",
+        "legacy_item_code": "ITEM-0456",
+        "source_item_code": "PIL-STD-008",
+        "target_item_code": "PIL-STD-008",
+        "item_name": "เสา คอร.ขนาด 0.35x0.35x5.50 ม.",
+        "unit": "ต้น",
+        "change_fields": [
+          "labor_cost",
+          "unit_cost"
+        ],
+        "before": {
+          "material_cost": 4166,
+          "labor_cost": 1445,
+          "unit_cost": 5611
+        },
+        "after": {
+          "material_cost": 4166,
+          "labor_cost": 1446,
+          "unit_cost": 5612
+        },
+        "delta": {
+          "material_cost": 0,
+          "labor_cost": 1,
+          "unit_cost": 1
+        },
+        "source_evidence": {
+          "classification": "proposed_confirmed_correction",
+          "pdf_locator": "p25:t1:r18:display-8"
+        }
+      },
+      {
+        "stable_identity_id": "382cdb09-5def-403d-87ee-215f497e527b",
+        "legacy_item_code": "ITEM-0457",
+        "source_item_code": "PIL-STD-009",
+        "target_item_code": "PIL-STD-009",
+        "item_name": "เสา คอร.ขนาด 0.35x0.35x6.50 ม.",
+        "unit": "ต้น",
+        "change_fields": [
+          "labor_cost",
+          "unit_cost"
+        ],
+        "before": {
+          "material_cost": 4932,
+          "labor_cost": 1686,
+          "unit_cost": 6618
+        },
+        "after": {
+          "material_cost": 4932,
+          "labor_cost": 1687,
+          "unit_cost": 6619
+        },
+        "delta": {
+          "material_cost": 0,
+          "labor_cost": 1,
+          "unit_cost": 1
+        },
+        "source_evidence": {
+          "classification": "proposed_confirmed_correction",
+          "pdf_locator": "p25:t1:r19:display-9"
+        }
+      },
+      {
+        "stable_identity_id": "f94e153a-7afb-4e92-b32b-64340e2ab42d",
+        "legacy_item_code": "ITEM-0458",
+        "source_item_code": "PIL-STD-010",
+        "target_item_code": "PIL-STD-010",
+        "item_name": "เสา คอร.ขนาด 0.36x0.36x4.50 ม.",
+        "unit": "ต้น",
+        "change_fields": [
+          "labor_cost",
+          "unit_cost"
+        ],
+        "before": {
+          "material_cost": 3965,
+          "labor_cost": 1371,
+          "unit_cost": 5336
+        },
+        "after": {
+          "material_cost": 3965,
+          "labor_cost": 1372,
+          "unit_cost": 5337
+        },
+        "delta": {
+          "material_cost": 0,
+          "labor_cost": 1,
+          "unit_cost": 1
+        },
+        "source_evidence": {
+          "classification": "proposed_confirmed_correction",
+          "pdf_locator": "p25:t1:r20:display-10"
+        }
+      },
+      {
+        "stable_identity_id": "c8986fed-9ff9-451b-8c2b-3b7de462a1e3",
+        "legacy_item_code": "ITEM-0459",
+        "source_item_code": "PIL-STD-011",
+        "target_item_code": "PIL-STD-011",
+        "item_name": "เสา คอร.ขนาด 0.36x0.36x5.50 ม.",
+        "unit": "ต้น",
+        "change_fields": [
+          "labor_cost",
+          "unit_cost"
+        ],
+        "before": {
+          "material_cost": 4809,
+          "labor_cost": 1686,
+          "unit_cost": 6495
+        },
+        "after": {
+          "material_cost": 4809,
+          "labor_cost": 1687,
+          "unit_cost": 6496
+        },
+        "delta": {
+          "material_cost": 0,
+          "labor_cost": 1,
+          "unit_cost": 1
+        },
+        "source_evidence": {
+          "classification": "proposed_confirmed_correction",
+          "pdf_locator": "p25:t1:r21:display-11"
+        }
+      },
+      {
+        "stable_identity_id": "c6c4131e-bf7c-4067-bdf9-fea2bf2c875c",
+        "legacy_item_code": "ITEM-0460",
+        "source_item_code": "PIL-STD-012",
+        "target_item_code": "PIL-STD-012",
+        "item_name": "เสา คอร.ขนาด 0.36x0.36x6.50 ม.",
+        "unit": "ต้น",
+        "change_fields": [
+          "labor_cost",
+          "unit_cost"
+        ],
+        "before": {
+          "material_cost": 5694,
+          "labor_cost": 1985,
+          "unit_cost": 7679
+        },
+        "after": {
+          "material_cost": 5694,
+          "labor_cost": 1986,
+          "unit_cost": 7680
+        },
+        "delta": {
+          "material_cost": 0,
+          "labor_cost": 1,
+          "unit_cost": 1
+        },
+        "source_evidence": {
+          "classification": "proposed_confirmed_correction",
+          "pdf_locator": "p25:t1:r22:display-12"
+        }
+      },
+      {
+        "stable_identity_id": "2ccb5619-4065-45b2-9bd0-86c17c031b7f",
+        "legacy_item_code": "ITEM-0461",
+        "source_item_code": "PIL-STD-013",
+        "target_item_code": "PIL-STD-013",
+        "item_name": "เสา คอร.ขนาด 0.40x0.40x5.50 ม.",
+        "unit": "ต้น",
+        "change_fields": [
+          "labor_cost",
+          "unit_cost"
+        ],
+        "before": {
+          "material_cost": 5204,
+          "labor_cost": 1780,
+          "unit_cost": 6984
+        },
+        "after": {
+          "material_cost": 5204,
+          "labor_cost": 1781,
+          "unit_cost": 6985
+        },
+        "delta": {
+          "material_cost": 0,
+          "labor_cost": 1,
+          "unit_cost": 1
+        },
+        "source_evidence": {
+          "classification": "proposed_confirmed_correction",
+          "pdf_locator": "p25:t1:r23:display-13"
+        }
+      },
+      {
+        "stable_identity_id": "25db6bc2-631b-45e8-880d-dbafd5b62d27",
+        "legacy_item_code": "ITEM-0462",
+        "source_item_code": "PIL-STD-014",
+        "target_item_code": "PIL-STD-014",
+        "item_name": "เสา คอร.ขนาด 0.40x0.40x6.50 ม.",
+        "unit": "ต้น",
+        "change_fields": [
+          "labor_cost",
+          "unit_cost"
+        ],
+        "before": {
+          "material_cost": 6088,
+          "labor_cost": 2067,
+          "unit_cost": 8155
+        },
+        "after": {
+          "material_cost": 6088,
+          "labor_cost": 2068,
+          "unit_cost": 8156
+        },
+        "delta": {
+          "material_cost": 0,
+          "labor_cost": 1,
+          "unit_cost": 1
+        },
+        "source_evidence": {
+          "classification": "proposed_confirmed_correction",
+          "pdf_locator": "p25:t1:r24:display-14"
+        }
+      },
+      {
+        "stable_identity_id": "2370bb46-f38f-4cce-938d-4a11f0169329",
+        "legacy_item_code": "ITEM-0463",
+        "source_item_code": "PIL-STD-015",
+        "target_item_code": "PIL-STD-015",
+        "item_name": "เสา คอร.ขนาด 0.40x0.40x7.50 ม.",
+        "unit": "ต้น",
+        "change_fields": [
+          "labor_cost",
+          "unit_cost"
+        ],
+        "before": {
+          "material_cost": 7018,
+          "labor_cost": 2353,
+          "unit_cost": 9371
+        },
+        "after": {
+          "material_cost": 7018,
+          "labor_cost": 2354,
+          "unit_cost": 9372
+        },
+        "delta": {
+          "material_cost": 0,
+          "labor_cost": 1,
+          "unit_cost": 1
+        },
+        "source_evidence": {
+          "classification": "proposed_confirmed_correction",
+          "pdf_locator": "p25:t1:r25:display-15"
+        }
+      },
+      {
+        "stable_identity_id": "a38a5a15-33ed-4ba4-9c83-d9103b05dcb3",
+        "legacy_item_code": "ITEM-0478",
+        "source_item_code": "DRN-STD-001",
+        "target_item_code": "DRN-STD-001",
+        "item_name": "งานรื้อย้ายท่อระบายน้ำขนาด Ø0.30 ม.x1.00 ม.",
+        "unit": "ม.",
+        "change_fields": [
+          "labor_cost",
+          "unit_cost"
+        ],
+        "before": {
+          "material_cost": 2608,
+          "labor_cost": 925,
+          "unit_cost": 3533
+        },
+        "after": {
+          "material_cost": 2608,
+          "labor_cost": 926,
+          "unit_cost": 3534
+        },
+        "delta": {
+          "material_cost": 0,
+          "labor_cost": 1,
+          "unit_cost": 1
+        },
+        "source_evidence": {
+          "classification": "proposed_confirmed_correction",
+          "pdf_locator": "p26:t1:r21:display-1"
+        }
+      },
+      {
+        "stable_identity_id": "ec79f469-ed24-4b3c-89ec-9edc9ccba549",
+        "legacy_item_code": "ITEM-0479",
+        "source_item_code": "DRN-STD-002",
+        "target_item_code": "DRN-STD-002",
+        "item_name": "งานรื้อย้ายท่อระบายน้ำขนาด Ø0.60 ม.x1.00 ม.",
+        "unit": "ม.",
+        "change_fields": [
+          "labor_cost",
+          "unit_cost"
+        ],
+        "before": {
+          "material_cost": 3120,
+          "labor_cost": 1108,
+          "unit_cost": 4228
+        },
+        "after": {
+          "material_cost": 3120,
+          "labor_cost": 1109,
+          "unit_cost": 4229
+        },
+        "delta": {
+          "material_cost": 0,
+          "labor_cost": 1,
+          "unit_cost": 1
+        },
+        "source_evidence": {
+          "classification": "proposed_confirmed_correction",
+          "pdf_locator": "p26:t1:r22:display-2"
+        }
+      },
+      {
+        "stable_identity_id": "aa6eb882-153f-4d71-a635-cb0c27dfccb7",
+        "legacy_item_code": "ITEM-0480",
+        "source_item_code": "DRN-STD-003",
+        "target_item_code": "DRN-STD-003",
+        "item_name": "งานรื้อย้ายท่อระบายน้ำขนาด Ø0.80 ม.x1.00 ม.",
+        "unit": "ม.",
+        "change_fields": [
+          "labor_cost",
+          "unit_cost"
+        ],
+        "before": {
+          "material_cost": 6519,
+          "labor_cost": 2316,
+          "unit_cost": 8835
+        },
+        "after": {
+          "material_cost": 6519,
+          "labor_cost": 2317,
+          "unit_cost": 8836
+        },
+        "delta": {
+          "material_cost": 0,
+          "labor_cost": 1,
+          "unit_cost": 1
+        },
+        "source_evidence": {
+          "classification": "proposed_confirmed_correction",
+          "pdf_locator": "p26:t1:r23:display-3"
+        }
+      },
+      {
+        "stable_identity_id": "40779d45-c955-458e-8744-35f698d1a872",
+        "legacy_item_code": "ITEM-0615",
+        "source_item_code": "LVU-MH0-002",
+        "target_item_code": "LVU-MH0-002",
+        "item_name": "งานยกระดับคอบ่อพัก (MH) A-1 (ไม่เปลี่ยนฝา - ไม่เปลี่ยนเฟรม) 1 ฝา ระดับ +0.10 ม.",
+        "unit": "บ่อ",
+        "change_fields": [
+          "labor_cost",
+          "unit_cost"
+        ],
+        "before": {
+          "material_cost": 2869,
+          "labor_cost": 7091,
+          "unit_cost": 9960
+        },
+        "after": {
+          "material_cost": 2869,
+          "labor_cost": 7427,
+          "unit_cost": 10296
+        },
+        "delta": {
+          "material_cost": 0,
+          "labor_cost": 336,
+          "unit_cost": 336
+        },
+        "source_evidence": {
+          "classification": "proposed_confirmed_correction",
+          "pdf_locator": "p21:t1:r11:display-2"
+        }
+      },
+      {
+        "stable_identity_id": "2205221d-b1c6-4c25-a17b-be19a01fb6e8",
+        "legacy_item_code": "ITEM-0616",
+        "source_item_code": "LVU-MH0-003",
+        "target_item_code": "LVU-MH0-003",
+        "item_name": "งานยกระดับคอบ่อพัก (MH) A-1 (ไม่เปลี่ยนฝา - ไม่เปลี่ยนเฟรม) 1 ฝา ระดับ +0.15 ม.",
+        "unit": "บ่อ",
+        "change_fields": [
+          "labor_cost",
+          "unit_cost"
+        ],
+        "before": {
+          "material_cost": 3438,
+          "labor_cost": 7417,
+          "unit_cost": 10855
+        },
+        "after": {
+          "material_cost": 3438,
+          "labor_cost": 7724,
+          "unit_cost": 11162
+        },
+        "delta": {
+          "material_cost": 0,
+          "labor_cost": 307,
+          "unit_cost": 307
+        },
+        "source_evidence": {
+          "classification": "proposed_confirmed_correction",
+          "pdf_locator": "p21:t1:r12:display-3"
+        }
+      },
+      {
+        "stable_identity_id": "59dd5bbc-9f14-4948-9922-04637a26535c",
+        "legacy_item_code": "ITEM-0617",
+        "source_item_code": "LVU-MH0-004",
+        "target_item_code": "LVU-MH0-004",
+        "item_name": "งานยกระดับคอบ่อพัก (MH) A-1 (ไม่เปลี่ยนฝา - ไม่เปลี่ยนเฟรม) 1 ฝา ระดับ +0.20 ม.",
+        "unit": "บ่อ",
+        "change_fields": [
+          "labor_cost",
+          "unit_cost"
+        ],
+        "before": {
+          "material_cost": 4027,
+          "labor_cost": 7782,
+          "unit_cost": 11809
+        },
+        "after": {
+          "material_cost": 4027,
+          "labor_cost": 8042,
+          "unit_cost": 12069
+        },
+        "delta": {
+          "material_cost": 0,
+          "labor_cost": 260,
+          "unit_cost": 260
+        },
+        "source_evidence": {
+          "classification": "proposed_confirmed_correction",
+          "pdf_locator": "p21:t1:r13:display-4"
+        }
+      },
+      {
+        "stable_identity_id": "dfff30ec-a715-4cb1-aa2f-3b5c4e86d386",
+        "legacy_item_code": "ITEM-0618",
+        "source_item_code": "LVU-MH0-005",
+        "target_item_code": "LVU-MH0-005",
+        "item_name": "งานยกระดับคอบ่อพัก (MH) A-1 (ไม่เปลี่ยนฝา - ไม่เปลี่ยนเฟรม) 1 ฝา ระดับ +0.30 ม.",
+        "unit": "บ่อ",
+        "change_fields": [
+          "labor_cost",
+          "unit_cost"
+        ],
+        "before": {
+          "material_cost": 5167,
+          "labor_cost": 8433,
+          "unit_cost": 13600
+        },
+        "after": {
+          "material_cost": 5167,
+          "labor_cost": 8637,
+          "unit_cost": 13804
+        },
+        "delta": {
+          "material_cost": 0,
+          "labor_cost": 204,
+          "unit_cost": 204
+        },
+        "source_evidence": {
+          "classification": "proposed_confirmed_correction",
+          "pdf_locator": "p21:t1:r14:display-5"
+        }
+      },
+      {
+        "stable_identity_id": "f0aff709-2054-4b59-8650-8a4ebfdc7429",
+        "legacy_item_code": "ITEM-0619",
+        "source_item_code": "LVU-MH0-006",
+        "target_item_code": "LVU-MH0-006",
+        "item_name": "งานยกระดับคอบ่อพัก (MH) A-1 (ไม่เปลี่ยนฝา - ไม่เปลี่ยนเฟรม) 1 ฝา ระดับ +0.40 ม.",
+        "unit": "บ่อ",
+        "change_fields": [
+          "labor_cost",
+          "unit_cost"
+        ],
+        "before": {
+          "material_cost": 6325,
+          "labor_cost": 9124,
+          "unit_cost": 15449
+        },
+        "after": {
+          "material_cost": 6325,
+          "labor_cost": 9253,
+          "unit_cost": 15578
+        },
+        "delta": {
+          "material_cost": 0,
+          "labor_cost": 129,
+          "unit_cost": 129
+        },
+        "source_evidence": {
+          "classification": "proposed_confirmed_correction",
+          "pdf_locator": "p21:t1:r15:display-6"
+        }
+      },
+      {
+        "stable_identity_id": "c102adf3-5bbf-4d16-a8fe-54d44bb32c8b",
+        "legacy_item_code": "ITEM-0620",
+        "source_item_code": "LVU-MH0-007",
+        "target_item_code": "LVU-MH0-007",
+        "item_name": "งานยกระดับคอบ่อพัก (MH) A-1 (ไม่เปลี่ยนฝา - ไม่เปลี่ยนเฟรม) 1 ฝา ระดับ +0.50 ม.",
+        "unit": "บ่อ",
+        "change_fields": [
+          "labor_cost",
+          "unit_cost"
+        ],
+        "before": {
+          "material_cost": 7465,
+          "labor_cost": 9775,
+          "unit_cost": 17240
+        },
+        "after": {
+          "material_cost": 7465,
+          "labor_cost": 9848,
+          "unit_cost": 17313
+        },
+        "delta": {
+          "material_cost": 0,
+          "labor_cost": 73,
+          "unit_cost": 73
+        },
+        "source_evidence": {
+          "classification": "proposed_confirmed_correction",
+          "pdf_locator": "p21:t1:r16:display-7"
+        }
+      },
+      {
+        "stable_identity_id": "62843343-f9ff-453c-8d7f-92677f416921",
+        "legacy_item_code": "ITEM-0621",
+        "source_item_code": "LVU-MH0-009",
+        "target_item_code": "LVU-MH0-009",
+        "item_name": "งานยกระดับคอบ่อพัก (MH) A-1 (เปลี่ยนฝา - เปลี่ยนเฟรม) 1 ฝา ระดับ +0.10 ม.",
+        "unit": "บ่อ",
+        "change_fields": [
+          "labor_cost",
+          "unit_cost"
+        ],
+        "before": {
+          "material_cost": 24369,
+          "labor_cost": 7091,
+          "unit_cost": 31460
+        },
+        "after": {
+          "material_cost": 24369,
+          "labor_cost": 7427,
+          "unit_cost": 31796
+        },
+        "delta": {
+          "material_cost": 0,
+          "labor_cost": 336,
+          "unit_cost": 336
+        },
+        "source_evidence": {
+          "classification": "proposed_confirmed_correction",
+          "pdf_locator": "p21:t1:r18:display-9"
+        }
+      },
+      {
+        "stable_identity_id": "5cf43d1e-e593-4d77-b3e9-3292f16ea178",
+        "legacy_item_code": "ITEM-0622",
+        "source_item_code": "LVU-MH0-010",
+        "target_item_code": "LVU-MH0-010",
+        "item_name": "งานยกระดับคอบ่อพัก (MH) A-1 (เปลี่ยนฝา - เปลี่ยนเฟรม) 1 ฝา ระดับ +0.15 ม.",
+        "unit": "บ่อ",
+        "change_fields": [
+          "labor_cost",
+          "unit_cost"
+        ],
+        "before": {
+          "material_cost": 24938,
+          "labor_cost": 7417,
+          "unit_cost": 32355
+        },
+        "after": {
+          "material_cost": 24938,
+          "labor_cost": 7724,
+          "unit_cost": 32662
+        },
+        "delta": {
+          "material_cost": 0,
+          "labor_cost": 307,
+          "unit_cost": 307
+        },
+        "source_evidence": {
+          "classification": "proposed_confirmed_correction",
+          "pdf_locator": "p21:t1:r19:display-10"
+        }
+      },
+      {
+        "stable_identity_id": "57801cb6-2b72-4bf9-a05f-cf06e5594e55",
+        "legacy_item_code": "ITEM-0623",
+        "source_item_code": "LVU-MH0-011",
+        "target_item_code": "LVU-MH0-011",
+        "item_name": "งานยกระดับคอบ่อพัก (MH) A-1 (เปลี่ยนฝา - เปลี่ยนเฟรม) 1 ฝา ระดับ +0.20 ม.",
+        "unit": "บ่อ",
+        "change_fields": [
+          "labor_cost",
+          "unit_cost"
+        ],
+        "before": {
+          "material_cost": 26667,
+          "labor_cost": 7782,
+          "unit_cost": 34449
+        },
+        "after": {
+          "material_cost": 26667,
+          "labor_cost": 8637,
+          "unit_cost": 35304
+        },
+        "delta": {
+          "material_cost": 0,
+          "labor_cost": 855,
+          "unit_cost": 855
+        },
+        "source_evidence": {
+          "classification": "proposed_confirmed_correction",
+          "pdf_locator": "p21:t1:r20:display-11"
+        }
+      },
+      {
+        "stable_identity_id": "ced3def1-9a2f-43a4-a4c4-5d62b8711ed2",
+        "legacy_item_code": "ITEM-0624",
+        "source_item_code": "LVU-MH0-012",
+        "target_item_code": "LVU-MH0-012",
+        "item_name": "งานยกระดับคอบ่อพัก (MH) A-1 (เปลี่ยนฝา - เปลี่ยนเฟรม) 1 ฝา ระดับ +0.30 ม.",
+        "unit": "บ่อ",
+        "change_fields": [
+          "labor_cost",
+          "unit_cost"
+        ],
+        "before": {
+          "material_cost": 26667,
+          "labor_cost": 8433,
+          "unit_cost": 35100
+        },
+        "after": {
+          "material_cost": 26667,
+          "labor_cost": 8637,
+          "unit_cost": 35304
+        },
+        "delta": {
+          "material_cost": 0,
+          "labor_cost": 204,
+          "unit_cost": 204
+        },
+        "source_evidence": {
+          "classification": "proposed_confirmed_correction",
+          "pdf_locator": "p21:t1:r21:display-12"
+        }
+      },
+      {
+        "stable_identity_id": "e8d7456b-e39b-417b-8faa-e5463836c177",
+        "legacy_item_code": "ITEM-0625",
+        "source_item_code": "LVU-MH0-013",
+        "target_item_code": "LVU-MH0-013",
+        "item_name": "งานยกระดับคอบ่อพัก (MH) A-1 (เปลี่ยนฝา - เปลี่ยนเฟรม) 1 ฝา ระดับ +0.40 ม.",
+        "unit": "บ่อ",
+        "change_fields": [
+          "labor_cost",
+          "unit_cost"
+        ],
+        "before": {
+          "material_cost": 27825,
+          "labor_cost": 9124,
+          "unit_cost": 36949
+        },
+        "after": {
+          "material_cost": 27825,
+          "labor_cost": 9253,
+          "unit_cost": 37078
+        },
+        "delta": {
+          "material_cost": 0,
+          "labor_cost": 129,
+          "unit_cost": 129
+        },
+        "source_evidence": {
+          "classification": "proposed_confirmed_correction",
+          "pdf_locator": "p21:t1:r22:display-13"
+        }
+      },
+      {
+        "stable_identity_id": "51bb9762-1089-4c66-aca9-4e774531f081",
+        "legacy_item_code": "ITEM-0626",
+        "source_item_code": "LVU-MH0-014",
+        "target_item_code": "LVU-MH0-014",
+        "item_name": "งานยกระดับคอบ่อพัก (MH) A-1 (เปลี่ยนฝา - เปลี่ยนเฟรม) 1 ฝา ระดับ +0.50 ม.",
+        "unit": "บ่อ",
+        "change_fields": [
+          "labor_cost",
+          "unit_cost"
+        ],
+        "before": {
+          "material_cost": 28965,
+          "labor_cost": 9775,
+          "unit_cost": 38740
+        },
+        "after": {
+          "material_cost": 28965,
+          "labor_cost": 9848,
+          "unit_cost": 38813
+        },
+        "delta": {
+          "material_cost": 0,
+          "labor_cost": 73,
+          "unit_cost": 73
+        },
+        "source_evidence": {
+          "classification": "proposed_confirmed_correction",
+          "pdf_locator": "p21:t1:r23:display-14"
+        }
+      },
+      {
+        "stable_identity_id": "57162766-1e8f-4768-8c2e-19f76c940927",
+        "legacy_item_code": "ITEM-0627",
+        "source_item_code": "LVU-MH0-016",
+        "target_item_code": "LVU-MH0-016",
+        "item_name": "งานยกระดับคอบ่อพัก (MH) A-1 (ไม่เปลี่ยนฝา - เปลี่ยนเฟรม) 1 ฝา ระดับ +0.10 ม.",
+        "unit": "บ่อ",
+        "change_fields": [
+          "labor_cost",
+          "unit_cost"
+        ],
+        "before": {
+          "material_cost": 17569,
+          "labor_cost": 7091,
+          "unit_cost": 24660
+        },
+        "after": {
+          "material_cost": 17569,
+          "labor_cost": 7427,
+          "unit_cost": 24996
+        },
+        "delta": {
+          "material_cost": 0,
+          "labor_cost": 336,
+          "unit_cost": 336
+        },
+        "source_evidence": {
+          "classification": "proposed_confirmed_correction",
+          "pdf_locator": "p21:t1:r25:display-16"
+        }
+      },
+      {
+        "stable_identity_id": "d404cdec-792a-4394-89fd-b5c2c51837f8",
+        "legacy_item_code": "ITEM-0628",
+        "source_item_code": "LVU-MH0-017",
+        "target_item_code": "LVU-MH0-017",
+        "item_name": "งานยกระดับคอบ่อพัก (MH) A-1 (ไม่เปลี่ยนฝา - เปลี่ยนเฟรม) 1 ฝา ระดับ +0.15 ม.",
+        "unit": "บ่อ",
+        "change_fields": [
+          "labor_cost",
+          "unit_cost"
+        ],
+        "before": {
+          "material_cost": 18138,
+          "labor_cost": 7417,
+          "unit_cost": 25555
+        },
+        "after": {
+          "material_cost": 18138,
+          "labor_cost": 7724,
+          "unit_cost": 25862
+        },
+        "delta": {
+          "material_cost": 0,
+          "labor_cost": 307,
+          "unit_cost": 307
+        },
+        "source_evidence": {
+          "classification": "proposed_confirmed_correction",
+          "pdf_locator": "p21:t1:r26:display-17"
+        }
+      },
+      {
+        "stable_identity_id": "25328e10-8b31-4197-a180-cd99b2969267",
+        "legacy_item_code": "ITEM-0629",
+        "source_item_code": "LVU-MH0-018",
+        "target_item_code": "LVU-MH0-018",
+        "item_name": "งานยกระดับคอบ่อพัก (MH) A-1 (ไม่เปลี่ยนฝา - เปลี่ยนเฟรม) 1 ฝา ระดับ +0.20 ม.",
+        "unit": "บ่อ",
+        "change_fields": [
+          "labor_cost",
+          "unit_cost"
+        ],
+        "before": {
+          "material_cost": 18727,
+          "labor_cost": 7782,
+          "unit_cost": 26509
+        },
+        "after": {
+          "material_cost": 18727,
+          "labor_cost": 8042,
+          "unit_cost": 26769
+        },
+        "delta": {
+          "material_cost": 0,
+          "labor_cost": 260,
+          "unit_cost": 260
+        },
+        "source_evidence": {
+          "classification": "proposed_confirmed_correction",
+          "pdf_locator": "p21:t1:r27:display-18"
+        }
+      },
+      {
+        "stable_identity_id": "4df41b83-e81b-433d-aefd-28f6616896a9",
+        "legacy_item_code": "ITEM-0630",
+        "source_item_code": "LVU-MH0-019",
+        "target_item_code": "LVU-MH0-019",
+        "item_name": "งานยกระดับคอบ่อพัก (MH) A-1 (ไม่เปลี่ยนฝา - เปลี่ยนเฟรม) 1 ฝา ระดับ +0.30 ม.",
+        "unit": "บ่อ",
+        "change_fields": [
+          "labor_cost",
+          "unit_cost"
+        ],
+        "before": {
+          "material_cost": 19867,
+          "labor_cost": 8433,
+          "unit_cost": 28300
+        },
+        "after": {
+          "material_cost": 19867,
+          "labor_cost": 8637,
+          "unit_cost": 28504
+        },
+        "delta": {
+          "material_cost": 0,
+          "labor_cost": 204,
+          "unit_cost": 204
+        },
+        "source_evidence": {
+          "classification": "proposed_confirmed_correction",
+          "pdf_locator": "p21:t1:r28:display-19"
+        }
+      },
+      {
+        "stable_identity_id": "14327b99-850d-43c2-b973-e47a7fa68267",
+        "legacy_item_code": "ITEM-0631",
+        "source_item_code": "LVU-MH0-020",
+        "target_item_code": "LVU-MH0-020",
+        "item_name": "งานยกระดับคอบ่อพัก (MH) A-1 (ไม่เปลี่ยนฝา - เปลี่ยนเฟรม) 1 ฝา ระดับ +0.40 ม.",
+        "unit": "บ่อ",
+        "change_fields": [
+          "labor_cost",
+          "unit_cost"
+        ],
+        "before": {
+          "material_cost": 21025,
+          "labor_cost": 9124,
+          "unit_cost": 30149
+        },
+        "after": {
+          "material_cost": 21025,
+          "labor_cost": 9253,
+          "unit_cost": 30278
+        },
+        "delta": {
+          "material_cost": 0,
+          "labor_cost": 129,
+          "unit_cost": 129
+        },
+        "source_evidence": {
+          "classification": "proposed_confirmed_correction",
+          "pdf_locator": "p21:t1:r29:display-20"
+        }
+      },
+      {
+        "stable_identity_id": "31b4051d-cecd-4ea3-a2dd-5fcb2c1b7527",
+        "legacy_item_code": "ITEM-0632",
+        "source_item_code": "LVU-MH0-021",
+        "target_item_code": "LVU-MH0-021",
+        "item_name": "งานยกระดับคอบ่อพัก (MH) A-1 (ไม่เปลี่ยนฝา - เปลี่ยนเฟรม) 1 ฝา ระดับ +0.50 ม.",
+        "unit": "บ่อ",
+        "change_fields": [
+          "labor_cost",
+          "unit_cost"
+        ],
+        "before": {
+          "material_cost": 22165,
+          "labor_cost": 9775,
+          "unit_cost": 31940
+        },
+        "after": {
+          "material_cost": 22165,
+          "labor_cost": 9848,
+          "unit_cost": 32013
+        },
+        "delta": {
+          "material_cost": 0,
+          "labor_cost": 73,
+          "unit_cost": 73
+        },
+        "source_evidence": {
+          "classification": "proposed_confirmed_correction",
+          "pdf_locator": "p21:t1:r30:display-21"
+        }
+      },
+      {
+        "stable_identity_id": "bea66bd4-4092-425a-9de3-d6452cb16f61",
+        "legacy_item_code": "ITEM-0633",
+        "source_item_code": "LVU-MH0-023",
+        "target_item_code": "LVU-MH0-023",
+        "item_name": "งานยกระดับคอบ่อพัก (MH) A-1 (เปลี่ยนฝา - ไม่เปลี่ยนเฟรม) 1 ฝา ระดับ +0.10 ม.",
+        "unit": "บ่อ",
+        "change_fields": [
+          "labor_cost",
+          "unit_cost"
+        ],
+        "before": {
+          "material_cost": 9669,
+          "labor_cost": 7091,
+          "unit_cost": 16760
+        },
+        "after": {
+          "material_cost": 9669,
+          "labor_cost": 7427,
+          "unit_cost": 17096
+        },
+        "delta": {
+          "material_cost": 0,
+          "labor_cost": 336,
+          "unit_cost": 336
+        },
+        "source_evidence": {
+          "classification": "proposed_confirmed_correction",
+          "pdf_locator": "p22:t1:r4:display-23"
+        }
+      },
+      {
+        "stable_identity_id": "d75d9306-c167-493e-b879-7c897640c203",
+        "legacy_item_code": "ITEM-0634",
+        "source_item_code": "LVU-MH0-024",
+        "target_item_code": "LVU-MH0-024",
+        "item_name": "งานยกระดับคอบ่อพัก (MH) A-1 (เปลี่ยนฝา - ไม่เปลี่ยนเฟรม) 1 ฝา ระดับ +0.15 ม.",
+        "unit": "บ่อ",
+        "change_fields": [
+          "labor_cost",
+          "unit_cost"
+        ],
+        "before": {
+          "material_cost": 10238,
+          "labor_cost": 7417,
+          "unit_cost": 17655
+        },
+        "after": {
+          "material_cost": 10238,
+          "labor_cost": 7724,
+          "unit_cost": 17962
+        },
+        "delta": {
+          "material_cost": 0,
+          "labor_cost": 307,
+          "unit_cost": 307
+        },
+        "source_evidence": {
+          "classification": "proposed_confirmed_correction",
+          "pdf_locator": "p22:t1:r5:display-24"
+        }
+      },
+      {
+        "stable_identity_id": "01dac95c-620c-4e39-b4ad-0228e33b6ed9",
+        "legacy_item_code": "ITEM-0635",
+        "source_item_code": "LVU-MH0-025",
+        "target_item_code": "LVU-MH0-025",
+        "item_name": "งานยกระดับคอบ่อพัก (MH) A-1 (เปลี่ยนฝา - ไม่เปลี่ยนเฟรม) 1 ฝา ระดับ +0.20 ม.",
+        "unit": "บ่อ",
+        "change_fields": [
+          "labor_cost",
+          "unit_cost"
+        ],
+        "before": {
+          "material_cost": 10827,
+          "labor_cost": 7782,
+          "unit_cost": 18609
+        },
+        "after": {
+          "material_cost": 10827,
+          "labor_cost": 8042,
+          "unit_cost": 18869
+        },
+        "delta": {
+          "material_cost": 0,
+          "labor_cost": 260,
+          "unit_cost": 260
+        },
+        "source_evidence": {
+          "classification": "proposed_confirmed_correction",
+          "pdf_locator": "p22:t1:r6:display-25"
+        }
+      },
+      {
+        "stable_identity_id": "a89a5cc9-8432-4816-8600-a0d5a145d19c",
+        "legacy_item_code": "ITEM-0636",
+        "source_item_code": "LVU-MH0-026",
+        "target_item_code": "LVU-MH0-026",
+        "item_name": "งานยกระดับคอบ่อพัก (MH) A-1 (เปลี่ยนฝา - ไม่เปลี่ยนเฟรม) 1 ฝา ระดับ +0.30 ม.",
+        "unit": "บ่อ",
+        "change_fields": [
+          "labor_cost",
+          "unit_cost"
+        ],
+        "before": {
+          "material_cost": 11967,
+          "labor_cost": 8433,
+          "unit_cost": 20400
+        },
+        "after": {
+          "material_cost": 11967,
+          "labor_cost": 8637,
+          "unit_cost": 20604
+        },
+        "delta": {
+          "material_cost": 0,
+          "labor_cost": 204,
+          "unit_cost": 204
+        },
+        "source_evidence": {
+          "classification": "proposed_confirmed_correction",
+          "pdf_locator": "p22:t1:r7:display-26"
+        }
+      },
+      {
+        "stable_identity_id": "4bd498d4-75ee-45e8-a2fb-d47931be5a75",
+        "legacy_item_code": "ITEM-0637",
+        "source_item_code": "LVU-MH0-027",
+        "target_item_code": "LVU-MH0-027",
+        "item_name": "งานยกระดับคอบ่อพัก (MH) A-1 (เปลี่ยนฝา - ไม่เปลี่ยนเฟรม) 1 ฝา ระดับ +0.40 ม.",
+        "unit": "บ่อ",
+        "change_fields": [
+          "labor_cost",
+          "unit_cost"
+        ],
+        "before": {
+          "material_cost": 11998,
+          "labor_cost": 9124,
+          "unit_cost": 21122
+        },
+        "after": {
+          "material_cost": 11998,
+          "labor_cost": 8664,
+          "unit_cost": 20662
+        },
+        "delta": {
+          "material_cost": 0,
+          "labor_cost": -460,
+          "unit_cost": -460
+        },
+        "source_evidence": {
+          "classification": "proposed_confirmed_correction",
+          "pdf_locator": "p22:t1:r8:display-27"
+        }
+      },
+      {
+        "stable_identity_id": "95d045a0-0e56-47df-897c-7bdddc0353a2",
+        "legacy_item_code": "ITEM-0638",
+        "source_item_code": "LVU-MH0-028",
+        "target_item_code": "LVU-MH0-028",
+        "item_name": "งานยกระดับคอบ่อพัก (MH) A-1 (เปลี่ยนฝา - ไม่เปลี่ยนเฟรม) 1 ฝา ระดับ +0.50 ม.",
+        "unit": "บ่อ",
+        "change_fields": [
+          "labor_cost",
+          "unit_cost"
+        ],
+        "before": {
+          "material_cost": 14265,
+          "labor_cost": 9775,
+          "unit_cost": 24040
+        },
+        "after": {
+          "material_cost": 14265,
+          "labor_cost": 9848,
+          "unit_cost": 24113
+        },
+        "delta": {
+          "material_cost": 0,
+          "labor_cost": 73,
+          "unit_cost": 73
+        },
+        "source_evidence": {
+          "classification": "proposed_confirmed_correction",
+          "pdf_locator": "p22:t1:r9:display-28"
+        }
+      }
+    ]
+  },
+  "d002_incremental_comparison": {
+    "reference_candidate_id": "P50C-CANDIDATE-20260823-V1",
+    "reference_candidate_sha256": "d7a19a9dbaecff4abb18086d1f9e236ae4b5ea311477ccdb609a52c54f200611",
+    "reference_draft": "2568.1.0-D002",
+    "changed_row_count": 48,
+    "unchanged_row_count": 662,
+    "change_field_counts": {
+      "item_name_changed_row_count": 0,
+      "unit_changed_row_count": 0,
+      "material_cost_changed_row_count": 0,
+      "labor_cost_changed_row_count": 48,
+      "unit_cost_changed_row_count": 48
+    },
+    "price_delta_statistics": {
+      "positive_count": 47,
+      "negative_count": 1,
+      "zero_count": 0,
+      "minimum": -460,
+      "maximum": 855,
+      "net": 5294
+    },
+    "records": [
+      {
+        "stable_identity_id": "7c218133-65ba-4f70-8bfa-d2c5318fb9ed",
+        "legacy_item_code": "ITEM-0286",
+        "source_item_code": "CHB-PB0-011",
+        "target_item_code": "CHB-PB0-011",
+        "item_name": "งานสร้างบ่อพักย่อย  (PB) JUF-16 ฝาค.ส.ล.",
+        "unit": "บ่อ",
+        "change_fields": [
+          "labor_cost",
+          "unit_cost"
+        ],
+        "before": {
+          "material_cost": 23671,
+          "labor_cost": 8410,
+          "unit_cost": 32081
+        },
+        "after": {
+          "material_cost": 23671,
+          "labor_cost": 8415,
+          "unit_cost": 32086
+        },
+        "delta": {
+          "material_cost": 0,
+          "labor_cost": 5,
+          "unit_cost": 5
+        },
+        "source_evidence": {
+          "classification": "proposed_confirmed_correction",
+          "pdf_locator": "p12:t1:r33:display-11"
+        }
+      },
+      {
+        "stable_identity_id": "cdf01707-2ec3-4211-b83f-5104139e429d",
+        "legacy_item_code": "ITEM-0287",
+        "source_item_code": "CHB-PB0-012",
+        "target_item_code": "CHB-PB0-012",
+        "item_name": "งานสร้างบ่อพักย่อย  (PB) JUF-16 ฝาเหล็ก",
+        "unit": "บ่อ",
+        "change_fields": [
+          "labor_cost",
+          "unit_cost"
+        ],
+        "before": {
+          "material_cost": 32596,
+          "labor_cost": 11580,
+          "unit_cost": 44176
+        },
+        "after": {
+          "material_cost": 32596,
+          "labor_cost": 11586,
+          "unit_cost": 44182
+        },
+        "delta": {
+          "material_cost": 0,
+          "labor_cost": 6,
+          "unit_cost": 6
+        },
+        "source_evidence": {
+          "classification": "proposed_confirmed_correction",
+          "pdf_locator": "p13:t1:r3:display-12"
+        }
+      },
+      {
+        "stable_identity_id": "520a4226-4c87-4ec5-b629-f69487c8f67e",
+        "legacy_item_code": "ITEM-0332",
+        "source_item_code": "MOD-MH0-006",
+        "target_item_code": "MOD-MH0-006",
+        "item_name": "งาน M. บ่อพัก (MH) TYPE L2-2 ฝาเหล็ก เป็น T3-2",
+        "unit": "บ่อ",
+        "change_fields": [
+          "labor_cost",
+          "unit_cost"
+        ],
+        "before": {
+          "material_cost": 27164,
+          "labor_cost": 8807,
+          "unit_cost": 35971
+        },
+        "after": {
+          "material_cost": 27164,
+          "labor_cost": 8811,
+          "unit_cost": 35975
+        },
+        "delta": {
+          "material_cost": 0,
+          "labor_cost": 4,
+          "unit_cost": 4
+        },
+        "source_evidence": {
+          "classification": "proposed_confirmed_correction",
+          "pdf_locator": "p14:t1:r24:display-6"
+        }
+      },
+      {
+        "stable_identity_id": "bfaee5bc-6fad-4b15-8da4-2f1c60d5c0f5",
+        "legacy_item_code": "ITEM-0333",
+        "source_item_code": "MOD-MH0-007",
+        "target_item_code": "MOD-MH0-007",
+        "item_name": "งาน M. บ่อพัก (MH) TYPE A-1 ฝาเหล็ก เป็น A-2",
+        "unit": "บ่อ",
+        "change_fields": [
+          "labor_cost",
+          "unit_cost"
+        ],
+        "before": {
+          "material_cost": 45014,
+          "labor_cost": 14593,
+          "unit_cost": 59607
+        },
+        "after": {
+          "material_cost": 45014,
+          "labor_cost": 14600,
+          "unit_cost": 59614
+        },
+        "delta": {
+          "material_cost": 0,
+          "labor_cost": 7,
+          "unit_cost": 7
+        },
+        "source_evidence": {
+          "classification": "proposed_confirmed_correction",
+          "pdf_locator": "p14:t1:r25:display-7"
+        }
+      },
+      {
+        "stable_identity_id": "956b2d1a-cac2-4ee7-98ed-3f7b8604af06",
+        "legacy_item_code": "ITEM-0334",
+        "source_item_code": "MOD-MH0-008",
+        "target_item_code": "MOD-MH0-008",
+        "item_name": "งาน M. บ่อพัก (MH) TYPE A-2 ฝาเหล็ก เป็น L2-1 (2.45x3.85)",
+        "unit": "บ่อ",
+        "change_fields": [
+          "labor_cost",
+          "unit_cost"
+        ],
+        "before": {
+          "material_cost": 33740,
+          "labor_cost": 10939,
+          "unit_cost": 44679
+        },
+        "after": {
+          "material_cost": 33740,
+          "labor_cost": 10945,
+          "unit_cost": 44685
+        },
+        "delta": {
+          "material_cost": 0,
+          "labor_cost": 6,
+          "unit_cost": 6
+        },
+        "source_evidence": {
+          "classification": "proposed_confirmed_correction",
+          "pdf_locator": "p14:t1:r26:display-8"
+        }
+      },
+      {
+        "stable_identity_id": "d260a391-59bb-4ced-9b18-cc08b7e57d0e",
+        "legacy_item_code": "ITEM-0335",
+        "source_item_code": "MOD-MH0-009",
+        "target_item_code": "MOD-MH0-009",
+        "item_name": "งาน M. บ่อพัก (MH) TYPE A-2 ฝาเหล็ก เป็น L3-2 (2.55x5.15)",
+        "unit": "บ่อ",
+        "change_fields": [
+          "labor_cost",
+          "unit_cost"
+        ],
+        "before": {
+          "material_cost": 35037,
+          "labor_cost": 11359,
+          "unit_cost": 46396
+        },
+        "after": {
+          "material_cost": 35037,
+          "labor_cost": 11364,
+          "unit_cost": 46401
+        },
+        "delta": {
+          "material_cost": 0,
+          "labor_cost": 5,
+          "unit_cost": 5
+        },
+        "source_evidence": {
+          "classification": "proposed_confirmed_correction",
+          "pdf_locator": "p14:t1:r27:display-9"
+        }
+      },
+      {
+        "stable_identity_id": "ece950a8-f7d5-4a3d-a6ca-51461bef9b91",
+        "legacy_item_code": "ITEM-0426",
+        "source_item_code": "RPR-BRK-002",
+        "target_item_code": "RPR-BRK-002",
+        "item_name": "งานทุบค.ส.ล.หุ้มท่อ  24-Ø4\" PVC (พร้อมขนเศษวัสดุทิ้ง)",
+        "unit": "ม.",
+        "change_fields": [
+          "labor_cost",
+          "unit_cost"
+        ],
+        "before": {
+          "material_cost": 0,
+          "labor_cost": 2520,
+          "unit_cost": 2520
+        },
+        "after": {
+          "material_cost": 0,
+          "labor_cost": 2521,
+          "unit_cost": 2521
+        },
+        "delta": {
+          "material_cost": 0,
+          "labor_cost": 1,
+          "unit_cost": 1
+        },
+        "source_evidence": {
+          "classification": "proposed_confirmed_correction",
+          "pdf_locator": "p23:t1:r32:display-2"
+        }
+      },
+      {
+        "stable_identity_id": "77dae4c9-b6f0-4ad5-987c-661e344c2871",
+        "legacy_item_code": "ITEM-0427",
+        "source_item_code": "RPR-REM-001",
+        "target_item_code": "RPR-REM-001",
+        "item_name": "งานรื้อท่อเดิม 12-Ø4\" GIP ข้ามคลอง พร้อมเหล็กรัดท่อ",
+        "unit": "ชุด",
+        "change_fields": [
+          "labor_cost",
+          "unit_cost"
+        ],
+        "before": {
+          "material_cost": 5070,
+          "labor_cost": 1801,
+          "unit_cost": 6871
+        },
+        "after": {
+          "material_cost": 5070,
+          "labor_cost": 1802,
+          "unit_cost": 6872
+        },
+        "delta": {
+          "material_cost": 0,
+          "labor_cost": 1,
+          "unit_cost": 1
+        },
+        "source_evidence": {
+          "classification": "proposed_confirmed_correction",
+          "pdf_locator": "p24:t1:r4:display-1"
+        }
+      },
+      {
+        "stable_identity_id": "ceb49dea-167c-481d-a28c-6a8c9ce46633",
+        "legacy_item_code": "ITEM-0430",
+        "source_item_code": "COR-MH0-001",
+        "target_item_code": "COR-MH0-001",
+        "item_name": "งานเจาะหน้าต่างบ่อพัก (MH)",
+        "unit": "จุด",
+        "change_fields": [
+          "labor_cost",
+          "unit_cost"
+        ],
+        "before": {
+          "material_cost": 0,
+          "labor_cost": 1763,
+          "unit_cost": 1763
+        },
+        "after": {
+          "material_cost": 0,
+          "labor_cost": 1764,
+          "unit_cost": 1764
+        },
+        "delta": {
+          "material_cost": 0,
+          "labor_cost": 1,
+          "unit_cost": 1
+        },
+        "source_evidence": {
+          "classification": "proposed_confirmed_correction",
+          "pdf_locator": "p24:t1:r12:display-1"
+        }
+      },
+      {
+        "stable_identity_id": "1e60425d-d3d0-4510-b7f1-9075fb3ff352",
+        "legacy_item_code": "ITEM-0431",
+        "source_item_code": "COR-MH0-002",
+        "target_item_code": "COR-MH0-002",
+        "item_name": "งานเจาะผนังบ่อพัก (MH)",
+        "unit": "จุด",
+        "change_fields": [
+          "labor_cost",
+          "unit_cost"
+        ],
+        "before": {
+          "material_cost": 0,
+          "labor_cost": 3526,
+          "unit_cost": 3526
+        },
+        "after": {
+          "material_cost": 0,
+          "labor_cost": 3528,
+          "unit_cost": 3528
+        },
+        "delta": {
+          "material_cost": 0,
+          "labor_cost": 2,
+          "unit_cost": 2
+        },
+        "source_evidence": {
+          "classification": "proposed_confirmed_correction",
+          "pdf_locator": "p24:t1:r13:display-2"
+        }
+      },
+      {
+        "stable_identity_id": "d5bdd67d-3b33-434d-8429-c3d536967ced",
+        "legacy_item_code": "ITEM-0450",
+        "source_item_code": "PIL-STD-002",
+        "target_item_code": "PIL-STD-002",
+        "item_name": "เสา คอร.ขนาด 0.25x0.25x4.50 ม.",
+        "unit": "ต้น",
+        "change_fields": [
+          "labor_cost",
+          "unit_cost"
+        ],
+        "before": {
+          "material_cost": 1704,
+          "labor_cost": 632,
+          "unit_cost": 2336
+        },
+        "after": {
+          "material_cost": 1704,
+          "labor_cost": 633,
+          "unit_cost": 2337
+        },
+        "delta": {
+          "material_cost": 0,
+          "labor_cost": 1,
+          "unit_cost": 1
+        },
+        "source_evidence": {
+          "classification": "proposed_confirmed_correction",
+          "pdf_locator": "p25:t1:r12:display-2"
+        }
+      },
+      {
+        "stable_identity_id": "41a43f65-ab81-48d1-b58f-35866e441bf6",
+        "legacy_item_code": "ITEM-0453",
+        "source_item_code": "PIL-STD-005",
+        "target_item_code": "PIL-STD-005",
+        "item_name": "เสา คอร.ขนาด 0.30x0.30x5.50 ม.",
+        "unit": "ต้น",
+        "change_fields": [
+          "labor_cost",
+          "unit_cost"
+        ],
+        "before": {
+          "material_cost": 3294,
+          "labor_cost": 1147,
+          "unit_cost": 4441
+        },
+        "after": {
+          "material_cost": 3294,
+          "labor_cost": 1148,
+          "unit_cost": 4442
+        },
+        "delta": {
+          "material_cost": 0,
+          "labor_cost": 1,
+          "unit_cost": 1
+        },
+        "source_evidence": {
+          "classification": "proposed_confirmed_correction",
+          "pdf_locator": "p25:t1:r15:display-5"
+        }
+      },
+      {
+        "stable_identity_id": "07fdccd5-1384-4825-8031-0fa70991c568",
+        "legacy_item_code": "ITEM-0454",
+        "source_item_code": "PIL-STD-006",
+        "target_item_code": "PIL-STD-006",
+        "item_name": "เสา คอร.ขนาด 0.30x0.30x6.50 ม.",
+        "unit": "ต้น",
+        "change_fields": [
+          "labor_cost",
+          "unit_cost"
+        ],
+        "before": {
+          "material_cost": 3893,
+          "labor_cost": 1341,
+          "unit_cost": 5234
+        },
+        "after": {
+          "material_cost": 3893,
+          "labor_cost": 1342,
+          "unit_cost": 5235
+        },
+        "delta": {
+          "material_cost": 0,
+          "labor_cost": 1,
+          "unit_cost": 1
+        },
+        "source_evidence": {
+          "classification": "proposed_confirmed_correction",
+          "pdf_locator": "p25:t1:r16:display-6"
+        }
+      },
+      {
+        "stable_identity_id": "5272c4fe-20d1-43ce-9488-6beaf9873c6c",
+        "legacy_item_code": "ITEM-0456",
+        "source_item_code": "PIL-STD-008",
+        "target_item_code": "PIL-STD-008",
+        "item_name": "เสา คอร.ขนาด 0.35x0.35x5.50 ม.",
+        "unit": "ต้น",
+        "change_fields": [
+          "labor_cost",
+          "unit_cost"
+        ],
+        "before": {
+          "material_cost": 4166,
+          "labor_cost": 1445,
+          "unit_cost": 5611
+        },
+        "after": {
+          "material_cost": 4166,
+          "labor_cost": 1446,
+          "unit_cost": 5612
+        },
+        "delta": {
+          "material_cost": 0,
+          "labor_cost": 1,
+          "unit_cost": 1
+        },
+        "source_evidence": {
+          "classification": "proposed_confirmed_correction",
+          "pdf_locator": "p25:t1:r18:display-8"
+        }
+      },
+      {
+        "stable_identity_id": "382cdb09-5def-403d-87ee-215f497e527b",
+        "legacy_item_code": "ITEM-0457",
+        "source_item_code": "PIL-STD-009",
+        "target_item_code": "PIL-STD-009",
+        "item_name": "เสา คอร.ขนาด 0.35x0.35x6.50 ม.",
+        "unit": "ต้น",
+        "change_fields": [
+          "labor_cost",
+          "unit_cost"
+        ],
+        "before": {
+          "material_cost": 4932,
+          "labor_cost": 1686,
+          "unit_cost": 6618
+        },
+        "after": {
+          "material_cost": 4932,
+          "labor_cost": 1687,
+          "unit_cost": 6619
+        },
+        "delta": {
+          "material_cost": 0,
+          "labor_cost": 1,
+          "unit_cost": 1
+        },
+        "source_evidence": {
+          "classification": "proposed_confirmed_correction",
+          "pdf_locator": "p25:t1:r19:display-9"
+        }
+      },
+      {
+        "stable_identity_id": "f94e153a-7afb-4e92-b32b-64340e2ab42d",
+        "legacy_item_code": "ITEM-0458",
+        "source_item_code": "PIL-STD-010",
+        "target_item_code": "PIL-STD-010",
+        "item_name": "เสา คอร.ขนาด 0.36x0.36x4.50 ม.",
+        "unit": "ต้น",
+        "change_fields": [
+          "labor_cost",
+          "unit_cost"
+        ],
+        "before": {
+          "material_cost": 3965,
+          "labor_cost": 1371,
+          "unit_cost": 5336
+        },
+        "after": {
+          "material_cost": 3965,
+          "labor_cost": 1372,
+          "unit_cost": 5337
+        },
+        "delta": {
+          "material_cost": 0,
+          "labor_cost": 1,
+          "unit_cost": 1
+        },
+        "source_evidence": {
+          "classification": "proposed_confirmed_correction",
+          "pdf_locator": "p25:t1:r20:display-10"
+        }
+      },
+      {
+        "stable_identity_id": "c8986fed-9ff9-451b-8c2b-3b7de462a1e3",
+        "legacy_item_code": "ITEM-0459",
+        "source_item_code": "PIL-STD-011",
+        "target_item_code": "PIL-STD-011",
+        "item_name": "เสา คอร.ขนาด 0.36x0.36x5.50 ม.",
+        "unit": "ต้น",
+        "change_fields": [
+          "labor_cost",
+          "unit_cost"
+        ],
+        "before": {
+          "material_cost": 4809,
+          "labor_cost": 1686,
+          "unit_cost": 6495
+        },
+        "after": {
+          "material_cost": 4809,
+          "labor_cost": 1687,
+          "unit_cost": 6496
+        },
+        "delta": {
+          "material_cost": 0,
+          "labor_cost": 1,
+          "unit_cost": 1
+        },
+        "source_evidence": {
+          "classification": "proposed_confirmed_correction",
+          "pdf_locator": "p25:t1:r21:display-11"
+        }
+      },
+      {
+        "stable_identity_id": "c6c4131e-bf7c-4067-bdf9-fea2bf2c875c",
+        "legacy_item_code": "ITEM-0460",
+        "source_item_code": "PIL-STD-012",
+        "target_item_code": "PIL-STD-012",
+        "item_name": "เสา คอร.ขนาด 0.36x0.36x6.50 ม.",
+        "unit": "ต้น",
+        "change_fields": [
+          "labor_cost",
+          "unit_cost"
+        ],
+        "before": {
+          "material_cost": 5694,
+          "labor_cost": 1985,
+          "unit_cost": 7679
+        },
+        "after": {
+          "material_cost": 5694,
+          "labor_cost": 1986,
+          "unit_cost": 7680
+        },
+        "delta": {
+          "material_cost": 0,
+          "labor_cost": 1,
+          "unit_cost": 1
+        },
+        "source_evidence": {
+          "classification": "proposed_confirmed_correction",
+          "pdf_locator": "p25:t1:r22:display-12"
+        }
+      },
+      {
+        "stable_identity_id": "2ccb5619-4065-45b2-9bd0-86c17c031b7f",
+        "legacy_item_code": "ITEM-0461",
+        "source_item_code": "PIL-STD-013",
+        "target_item_code": "PIL-STD-013",
+        "item_name": "เสา คอร.ขนาด 0.40x0.40x5.50 ม.",
+        "unit": "ต้น",
+        "change_fields": [
+          "labor_cost",
+          "unit_cost"
+        ],
+        "before": {
+          "material_cost": 5204,
+          "labor_cost": 1780,
+          "unit_cost": 6984
+        },
+        "after": {
+          "material_cost": 5204,
+          "labor_cost": 1781,
+          "unit_cost": 6985
+        },
+        "delta": {
+          "material_cost": 0,
+          "labor_cost": 1,
+          "unit_cost": 1
+        },
+        "source_evidence": {
+          "classification": "proposed_confirmed_correction",
+          "pdf_locator": "p25:t1:r23:display-13"
+        }
+      },
+      {
+        "stable_identity_id": "25db6bc2-631b-45e8-880d-dbafd5b62d27",
+        "legacy_item_code": "ITEM-0462",
+        "source_item_code": "PIL-STD-014",
+        "target_item_code": "PIL-STD-014",
+        "item_name": "เสา คอร.ขนาด 0.40x0.40x6.50 ม.",
+        "unit": "ต้น",
+        "change_fields": [
+          "labor_cost",
+          "unit_cost"
+        ],
+        "before": {
+          "material_cost": 6088,
+          "labor_cost": 2067,
+          "unit_cost": 8155
+        },
+        "after": {
+          "material_cost": 6088,
+          "labor_cost": 2068,
+          "unit_cost": 8156
+        },
+        "delta": {
+          "material_cost": 0,
+          "labor_cost": 1,
+          "unit_cost": 1
+        },
+        "source_evidence": {
+          "classification": "proposed_confirmed_correction",
+          "pdf_locator": "p25:t1:r24:display-14"
+        }
+      },
+      {
+        "stable_identity_id": "2370bb46-f38f-4cce-938d-4a11f0169329",
+        "legacy_item_code": "ITEM-0463",
+        "source_item_code": "PIL-STD-015",
+        "target_item_code": "PIL-STD-015",
+        "item_name": "เสา คอร.ขนาด 0.40x0.40x7.50 ม.",
+        "unit": "ต้น",
+        "change_fields": [
+          "labor_cost",
+          "unit_cost"
+        ],
+        "before": {
+          "material_cost": 7018,
+          "labor_cost": 2353,
+          "unit_cost": 9371
+        },
+        "after": {
+          "material_cost": 7018,
+          "labor_cost": 2354,
+          "unit_cost": 9372
+        },
+        "delta": {
+          "material_cost": 0,
+          "labor_cost": 1,
+          "unit_cost": 1
+        },
+        "source_evidence": {
+          "classification": "proposed_confirmed_correction",
+          "pdf_locator": "p25:t1:r25:display-15"
+        }
+      },
+      {
+        "stable_identity_id": "a38a5a15-33ed-4ba4-9c83-d9103b05dcb3",
+        "legacy_item_code": "ITEM-0478",
+        "source_item_code": "DRN-STD-001",
+        "target_item_code": "DRN-STD-001",
+        "item_name": "งานรื้อย้ายท่อระบายน้ำขนาด Ø0.30 ม.x1.00 ม.",
+        "unit": "ม.",
+        "change_fields": [
+          "labor_cost",
+          "unit_cost"
+        ],
+        "before": {
+          "material_cost": 2608,
+          "labor_cost": 925,
+          "unit_cost": 3533
+        },
+        "after": {
+          "material_cost": 2608,
+          "labor_cost": 926,
+          "unit_cost": 3534
+        },
+        "delta": {
+          "material_cost": 0,
+          "labor_cost": 1,
+          "unit_cost": 1
+        },
+        "source_evidence": {
+          "classification": "proposed_confirmed_correction",
+          "pdf_locator": "p26:t1:r21:display-1"
+        }
+      },
+      {
+        "stable_identity_id": "ec79f469-ed24-4b3c-89ec-9edc9ccba549",
+        "legacy_item_code": "ITEM-0479",
+        "source_item_code": "DRN-STD-002",
+        "target_item_code": "DRN-STD-002",
+        "item_name": "งานรื้อย้ายท่อระบายน้ำขนาด Ø0.60 ม.x1.00 ม.",
+        "unit": "ม.",
+        "change_fields": [
+          "labor_cost",
+          "unit_cost"
+        ],
+        "before": {
+          "material_cost": 3120,
+          "labor_cost": 1108,
+          "unit_cost": 4228
+        },
+        "after": {
+          "material_cost": 3120,
+          "labor_cost": 1109,
+          "unit_cost": 4229
+        },
+        "delta": {
+          "material_cost": 0,
+          "labor_cost": 1,
+          "unit_cost": 1
+        },
+        "source_evidence": {
+          "classification": "proposed_confirmed_correction",
+          "pdf_locator": "p26:t1:r22:display-2"
+        }
+      },
+      {
+        "stable_identity_id": "aa6eb882-153f-4d71-a635-cb0c27dfccb7",
+        "legacy_item_code": "ITEM-0480",
+        "source_item_code": "DRN-STD-003",
+        "target_item_code": "DRN-STD-003",
+        "item_name": "งานรื้อย้ายท่อระบายน้ำขนาด Ø0.80 ม.x1.00 ม.",
+        "unit": "ม.",
+        "change_fields": [
+          "labor_cost",
+          "unit_cost"
+        ],
+        "before": {
+          "material_cost": 6519,
+          "labor_cost": 2316,
+          "unit_cost": 8835
+        },
+        "after": {
+          "material_cost": 6519,
+          "labor_cost": 2317,
+          "unit_cost": 8836
+        },
+        "delta": {
+          "material_cost": 0,
+          "labor_cost": 1,
+          "unit_cost": 1
+        },
+        "source_evidence": {
+          "classification": "proposed_confirmed_correction",
+          "pdf_locator": "p26:t1:r23:display-3"
+        }
+      },
+      {
+        "stable_identity_id": "40779d45-c955-458e-8744-35f698d1a872",
+        "legacy_item_code": "ITEM-0615",
+        "source_item_code": "LVU-MH0-002",
+        "target_item_code": "LVU-MH0-002",
+        "item_name": "งานยกระดับคอบ่อพัก (MH) A-1 (ไม่เปลี่ยนฝา - ไม่เปลี่ยนเฟรม) 1 ฝา ระดับ +0.10 ม.",
+        "unit": "บ่อ",
+        "change_fields": [
+          "labor_cost",
+          "unit_cost"
+        ],
+        "before": {
+          "material_cost": 2869,
+          "labor_cost": 7091,
+          "unit_cost": 9960
+        },
+        "after": {
+          "material_cost": 2869,
+          "labor_cost": 7427,
+          "unit_cost": 10296
+        },
+        "delta": {
+          "material_cost": 0,
+          "labor_cost": 336,
+          "unit_cost": 336
+        },
+        "source_evidence": {
+          "classification": "proposed_confirmed_correction",
+          "pdf_locator": "p21:t1:r11:display-2"
+        }
+      },
+      {
+        "stable_identity_id": "2205221d-b1c6-4c25-a17b-be19a01fb6e8",
+        "legacy_item_code": "ITEM-0616",
+        "source_item_code": "LVU-MH0-003",
+        "target_item_code": "LVU-MH0-003",
+        "item_name": "งานยกระดับคอบ่อพัก (MH) A-1 (ไม่เปลี่ยนฝา - ไม่เปลี่ยนเฟรม) 1 ฝา ระดับ +0.15 ม.",
+        "unit": "บ่อ",
+        "change_fields": [
+          "labor_cost",
+          "unit_cost"
+        ],
+        "before": {
+          "material_cost": 3438,
+          "labor_cost": 7417,
+          "unit_cost": 10855
+        },
+        "after": {
+          "material_cost": 3438,
+          "labor_cost": 7724,
+          "unit_cost": 11162
+        },
+        "delta": {
+          "material_cost": 0,
+          "labor_cost": 307,
+          "unit_cost": 307
+        },
+        "source_evidence": {
+          "classification": "proposed_confirmed_correction",
+          "pdf_locator": "p21:t1:r12:display-3"
+        }
+      },
+      {
+        "stable_identity_id": "59dd5bbc-9f14-4948-9922-04637a26535c",
+        "legacy_item_code": "ITEM-0617",
+        "source_item_code": "LVU-MH0-004",
+        "target_item_code": "LVU-MH0-004",
+        "item_name": "งานยกระดับคอบ่อพัก (MH) A-1 (ไม่เปลี่ยนฝา - ไม่เปลี่ยนเฟรม) 1 ฝา ระดับ +0.20 ม.",
+        "unit": "บ่อ",
+        "change_fields": [
+          "labor_cost",
+          "unit_cost"
+        ],
+        "before": {
+          "material_cost": 4027,
+          "labor_cost": 7782,
+          "unit_cost": 11809
+        },
+        "after": {
+          "material_cost": 4027,
+          "labor_cost": 8042,
+          "unit_cost": 12069
+        },
+        "delta": {
+          "material_cost": 0,
+          "labor_cost": 260,
+          "unit_cost": 260
+        },
+        "source_evidence": {
+          "classification": "proposed_confirmed_correction",
+          "pdf_locator": "p21:t1:r13:display-4"
+        }
+      },
+      {
+        "stable_identity_id": "dfff30ec-a715-4cb1-aa2f-3b5c4e86d386",
+        "legacy_item_code": "ITEM-0618",
+        "source_item_code": "LVU-MH0-005",
+        "target_item_code": "LVU-MH0-005",
+        "item_name": "งานยกระดับคอบ่อพัก (MH) A-1 (ไม่เปลี่ยนฝา - ไม่เปลี่ยนเฟรม) 1 ฝา ระดับ +0.30 ม.",
+        "unit": "บ่อ",
+        "change_fields": [
+          "labor_cost",
+          "unit_cost"
+        ],
+        "before": {
+          "material_cost": 5167,
+          "labor_cost": 8433,
+          "unit_cost": 13600
+        },
+        "after": {
+          "material_cost": 5167,
+          "labor_cost": 8637,
+          "unit_cost": 13804
+        },
+        "delta": {
+          "material_cost": 0,
+          "labor_cost": 204,
+          "unit_cost": 204
+        },
+        "source_evidence": {
+          "classification": "proposed_confirmed_correction",
+          "pdf_locator": "p21:t1:r14:display-5"
+        }
+      },
+      {
+        "stable_identity_id": "f0aff709-2054-4b59-8650-8a4ebfdc7429",
+        "legacy_item_code": "ITEM-0619",
+        "source_item_code": "LVU-MH0-006",
+        "target_item_code": "LVU-MH0-006",
+        "item_name": "งานยกระดับคอบ่อพัก (MH) A-1 (ไม่เปลี่ยนฝา - ไม่เปลี่ยนเฟรม) 1 ฝา ระดับ +0.40 ม.",
+        "unit": "บ่อ",
+        "change_fields": [
+          "labor_cost",
+          "unit_cost"
+        ],
+        "before": {
+          "material_cost": 6325,
+          "labor_cost": 9124,
+          "unit_cost": 15449
+        },
+        "after": {
+          "material_cost": 6325,
+          "labor_cost": 9253,
+          "unit_cost": 15578
+        },
+        "delta": {
+          "material_cost": 0,
+          "labor_cost": 129,
+          "unit_cost": 129
+        },
+        "source_evidence": {
+          "classification": "proposed_confirmed_correction",
+          "pdf_locator": "p21:t1:r15:display-6"
+        }
+      },
+      {
+        "stable_identity_id": "c102adf3-5bbf-4d16-a8fe-54d44bb32c8b",
+        "legacy_item_code": "ITEM-0620",
+        "source_item_code": "LVU-MH0-007",
+        "target_item_code": "LVU-MH0-007",
+        "item_name": "งานยกระดับคอบ่อพัก (MH) A-1 (ไม่เปลี่ยนฝา - ไม่เปลี่ยนเฟรม) 1 ฝา ระดับ +0.50 ม.",
+        "unit": "บ่อ",
+        "change_fields": [
+          "labor_cost",
+          "unit_cost"
+        ],
+        "before": {
+          "material_cost": 7465,
+          "labor_cost": 9775,
+          "unit_cost": 17240
+        },
+        "after": {
+          "material_cost": 7465,
+          "labor_cost": 9848,
+          "unit_cost": 17313
+        },
+        "delta": {
+          "material_cost": 0,
+          "labor_cost": 73,
+          "unit_cost": 73
+        },
+        "source_evidence": {
+          "classification": "proposed_confirmed_correction",
+          "pdf_locator": "p21:t1:r16:display-7"
+        }
+      },
+      {
+        "stable_identity_id": "62843343-f9ff-453c-8d7f-92677f416921",
+        "legacy_item_code": "ITEM-0621",
+        "source_item_code": "LVU-MH0-009",
+        "target_item_code": "LVU-MH0-009",
+        "item_name": "งานยกระดับคอบ่อพัก (MH) A-1 (เปลี่ยนฝา - เปลี่ยนเฟรม) 1 ฝา ระดับ +0.10 ม.",
+        "unit": "บ่อ",
+        "change_fields": [
+          "labor_cost",
+          "unit_cost"
+        ],
+        "before": {
+          "material_cost": 24369,
+          "labor_cost": 7091,
+          "unit_cost": 31460
+        },
+        "after": {
+          "material_cost": 24369,
+          "labor_cost": 7427,
+          "unit_cost": 31796
+        },
+        "delta": {
+          "material_cost": 0,
+          "labor_cost": 336,
+          "unit_cost": 336
+        },
+        "source_evidence": {
+          "classification": "proposed_confirmed_correction",
+          "pdf_locator": "p21:t1:r18:display-9"
+        }
+      },
+      {
+        "stable_identity_id": "5cf43d1e-e593-4d77-b3e9-3292f16ea178",
+        "legacy_item_code": "ITEM-0622",
+        "source_item_code": "LVU-MH0-010",
+        "target_item_code": "LVU-MH0-010",
+        "item_name": "งานยกระดับคอบ่อพัก (MH) A-1 (เปลี่ยนฝา - เปลี่ยนเฟรม) 1 ฝา ระดับ +0.15 ม.",
+        "unit": "บ่อ",
+        "change_fields": [
+          "labor_cost",
+          "unit_cost"
+        ],
+        "before": {
+          "material_cost": 24938,
+          "labor_cost": 7417,
+          "unit_cost": 32355
+        },
+        "after": {
+          "material_cost": 24938,
+          "labor_cost": 7724,
+          "unit_cost": 32662
+        },
+        "delta": {
+          "material_cost": 0,
+          "labor_cost": 307,
+          "unit_cost": 307
+        },
+        "source_evidence": {
+          "classification": "proposed_confirmed_correction",
+          "pdf_locator": "p21:t1:r19:display-10"
+        }
+      },
+      {
+        "stable_identity_id": "57801cb6-2b72-4bf9-a05f-cf06e5594e55",
+        "legacy_item_code": "ITEM-0623",
+        "source_item_code": "LVU-MH0-011",
+        "target_item_code": "LVU-MH0-011",
+        "item_name": "งานยกระดับคอบ่อพัก (MH) A-1 (เปลี่ยนฝา - เปลี่ยนเฟรม) 1 ฝา ระดับ +0.20 ม.",
+        "unit": "บ่อ",
+        "change_fields": [
+          "labor_cost",
+          "unit_cost"
+        ],
+        "before": {
+          "material_cost": 26667,
+          "labor_cost": 7782,
+          "unit_cost": 34449
+        },
+        "after": {
+          "material_cost": 26667,
+          "labor_cost": 8637,
+          "unit_cost": 35304
+        },
+        "delta": {
+          "material_cost": 0,
+          "labor_cost": 855,
+          "unit_cost": 855
+        },
+        "source_evidence": {
+          "classification": "proposed_confirmed_correction",
+          "pdf_locator": "p21:t1:r20:display-11"
+        }
+      },
+      {
+        "stable_identity_id": "ced3def1-9a2f-43a4-a4c4-5d62b8711ed2",
+        "legacy_item_code": "ITEM-0624",
+        "source_item_code": "LVU-MH0-012",
+        "target_item_code": "LVU-MH0-012",
+        "item_name": "งานยกระดับคอบ่อพัก (MH) A-1 (เปลี่ยนฝา - เปลี่ยนเฟรม) 1 ฝา ระดับ +0.30 ม.",
+        "unit": "บ่อ",
+        "change_fields": [
+          "labor_cost",
+          "unit_cost"
+        ],
+        "before": {
+          "material_cost": 26667,
+          "labor_cost": 8433,
+          "unit_cost": 35100
+        },
+        "after": {
+          "material_cost": 26667,
+          "labor_cost": 8637,
+          "unit_cost": 35304
+        },
+        "delta": {
+          "material_cost": 0,
+          "labor_cost": 204,
+          "unit_cost": 204
+        },
+        "source_evidence": {
+          "classification": "proposed_confirmed_correction",
+          "pdf_locator": "p21:t1:r21:display-12"
+        }
+      },
+      {
+        "stable_identity_id": "e8d7456b-e39b-417b-8faa-e5463836c177",
+        "legacy_item_code": "ITEM-0625",
+        "source_item_code": "LVU-MH0-013",
+        "target_item_code": "LVU-MH0-013",
+        "item_name": "งานยกระดับคอบ่อพัก (MH) A-1 (เปลี่ยนฝา - เปลี่ยนเฟรม) 1 ฝา ระดับ +0.40 ม.",
+        "unit": "บ่อ",
+        "change_fields": [
+          "labor_cost",
+          "unit_cost"
+        ],
+        "before": {
+          "material_cost": 27825,
+          "labor_cost": 9124,
+          "unit_cost": 36949
+        },
+        "after": {
+          "material_cost": 27825,
+          "labor_cost": 9253,
+          "unit_cost": 37078
+        },
+        "delta": {
+          "material_cost": 0,
+          "labor_cost": 129,
+          "unit_cost": 129
+        },
+        "source_evidence": {
+          "classification": "proposed_confirmed_correction",
+          "pdf_locator": "p21:t1:r22:display-13"
+        }
+      },
+      {
+        "stable_identity_id": "51bb9762-1089-4c66-aca9-4e774531f081",
+        "legacy_item_code": "ITEM-0626",
+        "source_item_code": "LVU-MH0-014",
+        "target_item_code": "LVU-MH0-014",
+        "item_name": "งานยกระดับคอบ่อพัก (MH) A-1 (เปลี่ยนฝา - เปลี่ยนเฟรม) 1 ฝา ระดับ +0.50 ม.",
+        "unit": "บ่อ",
+        "change_fields": [
+          "labor_cost",
+          "unit_cost"
+        ],
+        "before": {
+          "material_cost": 28965,
+          "labor_cost": 9775,
+          "unit_cost": 38740
+        },
+        "after": {
+          "material_cost": 28965,
+          "labor_cost": 9848,
+          "unit_cost": 38813
+        },
+        "delta": {
+          "material_cost": 0,
+          "labor_cost": 73,
+          "unit_cost": 73
+        },
+        "source_evidence": {
+          "classification": "proposed_confirmed_correction",
+          "pdf_locator": "p21:t1:r23:display-14"
+        }
+      },
+      {
+        "stable_identity_id": "57162766-1e8f-4768-8c2e-19f76c940927",
+        "legacy_item_code": "ITEM-0627",
+        "source_item_code": "LVU-MH0-016",
+        "target_item_code": "LVU-MH0-016",
+        "item_name": "งานยกระดับคอบ่อพัก (MH) A-1 (ไม่เปลี่ยนฝา - เปลี่ยนเฟรม) 1 ฝา ระดับ +0.10 ม.",
+        "unit": "บ่อ",
+        "change_fields": [
+          "labor_cost",
+          "unit_cost"
+        ],
+        "before": {
+          "material_cost": 17569,
+          "labor_cost": 7091,
+          "unit_cost": 24660
+        },
+        "after": {
+          "material_cost": 17569,
+          "labor_cost": 7427,
+          "unit_cost": 24996
+        },
+        "delta": {
+          "material_cost": 0,
+          "labor_cost": 336,
+          "unit_cost": 336
+        },
+        "source_evidence": {
+          "classification": "proposed_confirmed_correction",
+          "pdf_locator": "p21:t1:r25:display-16"
+        }
+      },
+      {
+        "stable_identity_id": "d404cdec-792a-4394-89fd-b5c2c51837f8",
+        "legacy_item_code": "ITEM-0628",
+        "source_item_code": "LVU-MH0-017",
+        "target_item_code": "LVU-MH0-017",
+        "item_name": "งานยกระดับคอบ่อพัก (MH) A-1 (ไม่เปลี่ยนฝา - เปลี่ยนเฟรม) 1 ฝา ระดับ +0.15 ม.",
+        "unit": "บ่อ",
+        "change_fields": [
+          "labor_cost",
+          "unit_cost"
+        ],
+        "before": {
+          "material_cost": 18138,
+          "labor_cost": 7417,
+          "unit_cost": 25555
+        },
+        "after": {
+          "material_cost": 18138,
+          "labor_cost": 7724,
+          "unit_cost": 25862
+        },
+        "delta": {
+          "material_cost": 0,
+          "labor_cost": 307,
+          "unit_cost": 307
+        },
+        "source_evidence": {
+          "classification": "proposed_confirmed_correction",
+          "pdf_locator": "p21:t1:r26:display-17"
+        }
+      },
+      {
+        "stable_identity_id": "25328e10-8b31-4197-a180-cd99b2969267",
+        "legacy_item_code": "ITEM-0629",
+        "source_item_code": "LVU-MH0-018",
+        "target_item_code": "LVU-MH0-018",
+        "item_name": "งานยกระดับคอบ่อพัก (MH) A-1 (ไม่เปลี่ยนฝา - เปลี่ยนเฟรม) 1 ฝา ระดับ +0.20 ม.",
+        "unit": "บ่อ",
+        "change_fields": [
+          "labor_cost",
+          "unit_cost"
+        ],
+        "before": {
+          "material_cost": 18727,
+          "labor_cost": 7782,
+          "unit_cost": 26509
+        },
+        "after": {
+          "material_cost": 18727,
+          "labor_cost": 8042,
+          "unit_cost": 26769
+        },
+        "delta": {
+          "material_cost": 0,
+          "labor_cost": 260,
+          "unit_cost": 260
+        },
+        "source_evidence": {
+          "classification": "proposed_confirmed_correction",
+          "pdf_locator": "p21:t1:r27:display-18"
+        }
+      },
+      {
+        "stable_identity_id": "4df41b83-e81b-433d-aefd-28f6616896a9",
+        "legacy_item_code": "ITEM-0630",
+        "source_item_code": "LVU-MH0-019",
+        "target_item_code": "LVU-MH0-019",
+        "item_name": "งานยกระดับคอบ่อพัก (MH) A-1 (ไม่เปลี่ยนฝา - เปลี่ยนเฟรม) 1 ฝา ระดับ +0.30 ม.",
+        "unit": "บ่อ",
+        "change_fields": [
+          "labor_cost",
+          "unit_cost"
+        ],
+        "before": {
+          "material_cost": 19867,
+          "labor_cost": 8433,
+          "unit_cost": 28300
+        },
+        "after": {
+          "material_cost": 19867,
+          "labor_cost": 8637,
+          "unit_cost": 28504
+        },
+        "delta": {
+          "material_cost": 0,
+          "labor_cost": 204,
+          "unit_cost": 204
+        },
+        "source_evidence": {
+          "classification": "proposed_confirmed_correction",
+          "pdf_locator": "p21:t1:r28:display-19"
+        }
+      },
+      {
+        "stable_identity_id": "14327b99-850d-43c2-b973-e47a7fa68267",
+        "legacy_item_code": "ITEM-0631",
+        "source_item_code": "LVU-MH0-020",
+        "target_item_code": "LVU-MH0-020",
+        "item_name": "งานยกระดับคอบ่อพัก (MH) A-1 (ไม่เปลี่ยนฝา - เปลี่ยนเฟรม) 1 ฝา ระดับ +0.40 ม.",
+        "unit": "บ่อ",
+        "change_fields": [
+          "labor_cost",
+          "unit_cost"
+        ],
+        "before": {
+          "material_cost": 21025,
+          "labor_cost": 9124,
+          "unit_cost": 30149
+        },
+        "after": {
+          "material_cost": 21025,
+          "labor_cost": 9253,
+          "unit_cost": 30278
+        },
+        "delta": {
+          "material_cost": 0,
+          "labor_cost": 129,
+          "unit_cost": 129
+        },
+        "source_evidence": {
+          "classification": "proposed_confirmed_correction",
+          "pdf_locator": "p21:t1:r29:display-20"
+        }
+      },
+      {
+        "stable_identity_id": "31b4051d-cecd-4ea3-a2dd-5fcb2c1b7527",
+        "legacy_item_code": "ITEM-0632",
+        "source_item_code": "LVU-MH0-021",
+        "target_item_code": "LVU-MH0-021",
+        "item_name": "งานยกระดับคอบ่อพัก (MH) A-1 (ไม่เปลี่ยนฝา - เปลี่ยนเฟรม) 1 ฝา ระดับ +0.50 ม.",
+        "unit": "บ่อ",
+        "change_fields": [
+          "labor_cost",
+          "unit_cost"
+        ],
+        "before": {
+          "material_cost": 22165,
+          "labor_cost": 9775,
+          "unit_cost": 31940
+        },
+        "after": {
+          "material_cost": 22165,
+          "labor_cost": 9848,
+          "unit_cost": 32013
+        },
+        "delta": {
+          "material_cost": 0,
+          "labor_cost": 73,
+          "unit_cost": 73
+        },
+        "source_evidence": {
+          "classification": "proposed_confirmed_correction",
+          "pdf_locator": "p21:t1:r30:display-21"
+        }
+      },
+      {
+        "stable_identity_id": "bea66bd4-4092-425a-9de3-d6452cb16f61",
+        "legacy_item_code": "ITEM-0633",
+        "source_item_code": "LVU-MH0-023",
+        "target_item_code": "LVU-MH0-023",
+        "item_name": "งานยกระดับคอบ่อพัก (MH) A-1 (เปลี่ยนฝา - ไม่เปลี่ยนเฟรม) 1 ฝา ระดับ +0.10 ม.",
+        "unit": "บ่อ",
+        "change_fields": [
+          "labor_cost",
+          "unit_cost"
+        ],
+        "before": {
+          "material_cost": 9669,
+          "labor_cost": 7091,
+          "unit_cost": 16760
+        },
+        "after": {
+          "material_cost": 9669,
+          "labor_cost": 7427,
+          "unit_cost": 17096
+        },
+        "delta": {
+          "material_cost": 0,
+          "labor_cost": 336,
+          "unit_cost": 336
+        },
+        "source_evidence": {
+          "classification": "proposed_confirmed_correction",
+          "pdf_locator": "p22:t1:r4:display-23"
+        }
+      },
+      {
+        "stable_identity_id": "d75d9306-c167-493e-b879-7c897640c203",
+        "legacy_item_code": "ITEM-0634",
+        "source_item_code": "LVU-MH0-024",
+        "target_item_code": "LVU-MH0-024",
+        "item_name": "งานยกระดับคอบ่อพัก (MH) A-1 (เปลี่ยนฝา - ไม่เปลี่ยนเฟรม) 1 ฝา ระดับ +0.15 ม.",
+        "unit": "บ่อ",
+        "change_fields": [
+          "labor_cost",
+          "unit_cost"
+        ],
+        "before": {
+          "material_cost": 10238,
+          "labor_cost": 7417,
+          "unit_cost": 17655
+        },
+        "after": {
+          "material_cost": 10238,
+          "labor_cost": 7724,
+          "unit_cost": 17962
+        },
+        "delta": {
+          "material_cost": 0,
+          "labor_cost": 307,
+          "unit_cost": 307
+        },
+        "source_evidence": {
+          "classification": "proposed_confirmed_correction",
+          "pdf_locator": "p22:t1:r5:display-24"
+        }
+      },
+      {
+        "stable_identity_id": "01dac95c-620c-4e39-b4ad-0228e33b6ed9",
+        "legacy_item_code": "ITEM-0635",
+        "source_item_code": "LVU-MH0-025",
+        "target_item_code": "LVU-MH0-025",
+        "item_name": "งานยกระดับคอบ่อพัก (MH) A-1 (เปลี่ยนฝา - ไม่เปลี่ยนเฟรม) 1 ฝา ระดับ +0.20 ม.",
+        "unit": "บ่อ",
+        "change_fields": [
+          "labor_cost",
+          "unit_cost"
+        ],
+        "before": {
+          "material_cost": 10827,
+          "labor_cost": 7782,
+          "unit_cost": 18609
+        },
+        "after": {
+          "material_cost": 10827,
+          "labor_cost": 8042,
+          "unit_cost": 18869
+        },
+        "delta": {
+          "material_cost": 0,
+          "labor_cost": 260,
+          "unit_cost": 260
+        },
+        "source_evidence": {
+          "classification": "proposed_confirmed_correction",
+          "pdf_locator": "p22:t1:r6:display-25"
+        }
+      },
+      {
+        "stable_identity_id": "a89a5cc9-8432-4816-8600-a0d5a145d19c",
+        "legacy_item_code": "ITEM-0636",
+        "source_item_code": "LVU-MH0-026",
+        "target_item_code": "LVU-MH0-026",
+        "item_name": "งานยกระดับคอบ่อพัก (MH) A-1 (เปลี่ยนฝา - ไม่เปลี่ยนเฟรม) 1 ฝา ระดับ +0.30 ม.",
+        "unit": "บ่อ",
+        "change_fields": [
+          "labor_cost",
+          "unit_cost"
+        ],
+        "before": {
+          "material_cost": 11967,
+          "labor_cost": 8433,
+          "unit_cost": 20400
+        },
+        "after": {
+          "material_cost": 11967,
+          "labor_cost": 8637,
+          "unit_cost": 20604
+        },
+        "delta": {
+          "material_cost": 0,
+          "labor_cost": 204,
+          "unit_cost": 204
+        },
+        "source_evidence": {
+          "classification": "proposed_confirmed_correction",
+          "pdf_locator": "p22:t1:r7:display-26"
+        }
+      },
+      {
+        "stable_identity_id": "4bd498d4-75ee-45e8-a2fb-d47931be5a75",
+        "legacy_item_code": "ITEM-0637",
+        "source_item_code": "LVU-MH0-027",
+        "target_item_code": "LVU-MH0-027",
+        "item_name": "งานยกระดับคอบ่อพัก (MH) A-1 (เปลี่ยนฝา - ไม่เปลี่ยนเฟรม) 1 ฝา ระดับ +0.40 ม.",
+        "unit": "บ่อ",
+        "change_fields": [
+          "labor_cost",
+          "unit_cost"
+        ],
+        "before": {
+          "material_cost": 11998,
+          "labor_cost": 9124,
+          "unit_cost": 21122
+        },
+        "after": {
+          "material_cost": 11998,
+          "labor_cost": 8664,
+          "unit_cost": 20662
+        },
+        "delta": {
+          "material_cost": 0,
+          "labor_cost": -460,
+          "unit_cost": -460
+        },
+        "source_evidence": {
+          "classification": "proposed_confirmed_correction",
+          "pdf_locator": "p22:t1:r8:display-27"
+        }
+      },
+      {
+        "stable_identity_id": "95d045a0-0e56-47df-897c-7bdddc0353a2",
+        "legacy_item_code": "ITEM-0638",
+        "source_item_code": "LVU-MH0-028",
+        "target_item_code": "LVU-MH0-028",
+        "item_name": "งานยกระดับคอบ่อพัก (MH) A-1 (เปลี่ยนฝา - ไม่เปลี่ยนเฟรม) 1 ฝา ระดับ +0.50 ม.",
+        "unit": "บ่อ",
+        "change_fields": [
+          "labor_cost",
+          "unit_cost"
+        ],
+        "before": {
+          "material_cost": 14265,
+          "labor_cost": 9775,
+          "unit_cost": 24040
+        },
+        "after": {
+          "material_cost": 14265,
+          "labor_cost": 9848,
+          "unit_cost": 24113
+        },
+        "delta": {
+          "material_cost": 0,
+          "labor_cost": 73,
+          "unit_cost": 73
+        },
+        "source_evidence": {
+          "classification": "proposed_confirmed_correction",
+          "pdf_locator": "p22:t1:r9:display-28"
+        }
+      }
+    ]
+  }
+}

@@ -1,5 +1,25 @@
 # Phase 4 Decision Register
 
+> **Owner Option A / PDF presentation decision — current (2026-08-25):** The
+> Owner selected **Option A** for the successor `2568.1.0` review candidate:
+> use all `49` frozen P-50R external-source price corrections. D002 currently
+> contains only the already reviewed ITEM-0429 correction, so this choice adds
+> `48` corrections to the business scope; ITEM-0615 is specifically
+> `2869/7091/9960 -> 2869/7427/10296`. This decision does not itself authorize
+> applying those `48` rows to D002 or any other Production/catalog object.
+>
+> For PDF presentation only, rows of one display category must be contiguous;
+> category order follows first occurrence in canonical global order, rows
+> within a category retain canonical `display_order`, and the visible sequence
+> restarts at `1` per category. A multi-page category repeats its heading with
+> `(ต่อ)` while continuing the same category-local sequence. Global
+> `display_order`, DB row order, canonical hashing, Excel ordering/numbering,
+> identities, BOQs, and Factor F remain unchanged. Local/offline docs, code,
+> tests, and review artifacts are approved; D002/Production mutation,
+> candidate application, P-15, and publication are not approved here.
+
+<!-- P50_OPTION_A_PDF_PRESENTATION_DECISION_V1 {"schema":"conduit-boq/p50-option-a-pdf-presentation-decision/v1","recordedAt":"2026-08-25","priceScope":"OPTION_A_ALL_49_FROZEN_P50R_EXTERNAL_SOURCE_CORRECTIONS","approvedPriceCorrectionCount":49,"existingD002AppliedCorrectionCount":1,"additionalApprovedBusinessScopeCount":48,"item0615CurrentPrice":[2869,7091,9960],"item0615ApprovedPrice":[2869,7427,10296],"businessScopeSelected":true,"candidateApplicationAuthorized":false,"existingD002ReviewLock":2,"result80PreservedAsImmutableHistory":true,"pdfPresentationRefinementApproved":true,"pdfGroupSameCategoryContiguously":true,"pdfCategoryOrder":"first-occurrence-in-canonical-global-order","pdfWithinCategoryOrder":"canonical-global-display-order","pdfVisibleSequence":"restart-at-1-per-category-and-continue-across-pages","pdfContinuationHeadingRequired":true,"pdfCoverageRowCount":710,"globalDisplayOrderMutated":false,"databaseOrderMutated":false,"canonicalHashContractChanged":false,"excelChanged":false,"historicalBoqRepriceAuthorized":false,"localOfflineDocsCodeTestsReviewArtifactsAuthorized":true,"databaseAccessAuthorized":false,"productionReadAuthorized":false,"productionWriteAuthorized":false,"catalogMutationAuthorized":false,"boqMutationAuthorized":false,"pointerMutationAuthorized":false,"factorFMutationAuthorized":false,"localCommitAuthorized":false,"externalGitPublicationAuthorized":false,"deployAuthorized":false,"p15Authorized":false,"publicationAuthorized":false,"automaticNextStep":false} -->
+
 **Status:** Owner-approved decision source of truth for Phase 4 governance;
 pending decisions still require owner resolution at the stated gate
 

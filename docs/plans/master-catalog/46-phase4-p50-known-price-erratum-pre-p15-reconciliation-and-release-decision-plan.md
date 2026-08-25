@@ -1,6 +1,35 @@
 # Phase 4 P-50 Known Price Erratum Pre-P-15 Reconciliation and Release-Decision Plan
 
-**Status:** P-50R SOLO COMPLETE / `PASS_FOR_P50D_REQUEST`; EXACT P-50D V3
+> **Current Option A successor overlay — 2026-08-26:** The Owner's later Option
+> A decision supersedes every lower one-row, baseline-only, “next small
+> repository gate,” and direct P-13/P-14C-to-P-15 instruction for current scope
+> and next action. [Result #81](./81-phase4-p51-option-a-local-successor-candidate-result.md)
+> records local package `P51-OPTION-A-CANDIDATE-20260826-V1`: candidate
+> SHA-256 `ef232f772b63d74901179304ee92553120fa497e1794016bf381b7b1447026fb`
+> / `416229` bytes / `710` rows; diff SHA-256
+> `f522e722a76ef78a7442c8d071abfe311be94c8b3c5d74779da499efceb5c370`
+> / `96778` bytes / `49` baseline changes and `48` additional changes from
+> Result #80 D002; manifest SHA-256
+> `f30bea1ec2646b67d2025165bf9f5e5678c9b303a66f56d2484750dbb64b52a8`
+> / `7371` bytes. Missing/blank prices fail closed; the D002 comparison proves
+> `710`-row structural equality; and inherited nullable source/target/context/
+> type counts are `19/0/1/1`. The package is a local review oracle, not a direct import
+> payload, and claims no live D002 binding. This offline build performed no
+> historical-BOQ reprice operation; that is not a live DB readback claim.
+> P-50C remains the exact ITEM-0429/
+> Result-#80-D002 semantic oracle. Target `2568.1.0` remains provisional.
+>
+> Current route: local Option A package plus separate synthetic PDF
+> presentation evidence -> separately approved one-use Git code/docs/tests push
+> with automatic deployment and no DB/flag action -> separately approved D002
+> old-value-checked `48`-row application/refreeze -> authenticated real-data
+> DRAFT/review-only proof -> separate fresh P-51/P-15 waiver -> publication ->
+> official artifacts only after publication -> closeout -> P-49. Result #80
+> must not advance directly to P-15. This overlay grants no operation, Git,
+> network, deployment, database/Production, mutation, P-15, or publication
+> authority.
+
+**Historical pre-Option-A status:** P-50R SOLO COMPLETE / `PASS_FOR_P50D_REQUEST`; EXACT P-50D V3
 OWNER CONFIRMATION (RATIFICATION) RECORDED UNDER [REVIEW REMEDIATION
 #54](./54-phase4-p50c-review-remediation-and-p50d-v3-ratification-request.md);
 P-50C TECHNICAL DATA REVIEW PASSED AND IS ACCEPTED AS LOCAL REVIEW EVIDENCE ONLY;
@@ -9,7 +38,7 @@ LOCAL `2568.1.0` REVIEW EVIDENCE CONTAINS ONLY THE SELECTED PRICE DELTA;
 COMMIT/PUSH, CI, DATABASE, PRODUCTION, NETWORK, APPLICATION MUTATION, AND P-13
 THROUGH P-15 REMAIN UNAUTHORIZED
 
-> **Current ratification receipt:** P-50D V3 is now confirmed/ratified and P-50C
+> **Historical pre-Option-A ratification receipt:** P-50D V3 is now confirmed/ratified and P-50C
 > is accepted only as local review evidence under Review Remediation #54. Any
 > pending-confirmation wording below is pre-receipt chronology. Candidate
 > application, commit/push, CI/Preview, database/Production/network, and P-13
@@ -82,6 +111,13 @@ network, mutation, Git, P-13, P-14, P-14C, and P-15 all remain false.
 <!-- P50_BASELINE_FIRST_AUTHORITY_OVERLAY_V1 {"schema":"conduit-boq/p50-baseline-first-authority-overlay/v1","currentAsOf":"2026-08-23","currentPublishedVersion":"2568.0.0","currentPublishedRowCount":710,"baselineAuthorityFields":["item_name","unit","material_cost","labor_cost","unit_cost"],"p50rRequestId":"P50R-SOLO-REQ-20260821-V1","p50rResult":"PASS_FOR_P50D_REQUEST","p50rReviewBindingSha256":"55c90931144b8a7a2cb4aebeb917d2dc0062b576dcbd5a7678e2f208421149cc","p50rOutputsRole":"immutable-comparison-evidence-only","historicalTechnicalCandidateCount":49,"historicalRetainEvidenceCount":18,"historicalCandidateLabelsApproveCorrections":false,"p50dV1RequestId":"P50D-REQ-20260822-V1","p50dV1Superseded":true,"currentP50dRequestId":"P50D-REQ-20260823-V2","currentP50dProposalNumber":51,"currentOutcomes":["BASELINE-ONLY","SELECTED-DELTA"],"defaultOutcome":"BASELINE-ONLY","defaultNameDeltaCount":0,"defaultUnitDeltaCount":0,"defaultPriceDeltaCount":0,"selectedDeltaRequiresExactOwnerSelection":true,"selectedDeltaNameUnitMutationAuthorized":false,"p50dV2Authorized":false,"p50cAuthorized":false,"databaseAccessAuthorized":false,"productionReadAuthorized":false,"productionWriteAuthorized":false,"networkAuthorized":false,"catalogMutationAuthorized":false,"candidateMutationAuthorized":false,"gitPublicationAuthorized":false,"p13Authorized":false,"p14Authorized":false,"p14cAuthorized":false,"p15Authorized":false,"automaticNextStep":false} -->
 
 ## 1. Required pre-P-15 decision and authority boundary
+
+> **Historical section notice:** Sections 1-11 preserve the baseline-first and
+> one-row P-50D/P-50C chronology. Where they say `current`, `next`, or direct
+> P-13/P-14C/P-15, the current Option A overlay above supersedes that wording.
+> Do not use these historical instructions to bypass Result #81, either
+> separate one-use successor gate, the fresh P-51/P-15 waiver, or the rule that
+> official artifacts exist only after publication.
 
 For the current 2026-08-23 decision route, source precedence is baseline-first:
 published/current `2568.0.0` is authoritative for current names, units, and all
@@ -258,7 +294,7 @@ considered before the Owner's baseline-first direction.
 
 ## 5. Required pre-P-15 sequence
 
-Canonical route: P-51D -> P-50R SOLO complete -> one exact P-50D V3 Owner
+Historical canonical route (superseded; do not execute): P-51D -> P-50R SOLO complete -> one exact P-50D V3 Owner
 confirmation (ratification), also accepting existing verified P-50C only as
 local review evidence -> separately authorized local release commit/push +
 CI/Preview -> P-13/P-14/P-14C bounded window -> P-15 -> ordered

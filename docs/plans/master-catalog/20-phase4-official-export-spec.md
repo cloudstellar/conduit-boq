@@ -1,5 +1,33 @@
 # Phase 4 Official Excel and PDF Export Specification
 
+> **PDF category-grouping amendment recorded 2026-08-25:** The Owner approved
+> a presentation-only rule for draft and published field-facing PDF/print
+> output. Starting from the complete canonical rowset, export groups all rows
+> with the same normalized display-category identity into one contiguous
+> block. Category blocks follow the first occurrence of each category in the
+> canonical global `display_order`; rows inside each block retain their
+> canonical global `display_order`. The visible PDF sequence restarts at `1`
+> for each category and continues across page breaks. Continued pages repeat
+> the category heading with `(ต่อ)`. For every coded category, the visible
+> heading includes the normalized category code, one ASCII period (`U+002E`),
+> one ASCII space (`U+0020`), and the category name: `1.1. <name>`; its
+> continuation is exactly `1.1. <name> (ต่อ)`. Uncategorized rows form one
+> explicit `ไม่ระบุหมวดหมู่` block. The export must prove that every canonical row
+> appears exactly once and no row is duplicated.
+> Display-category identity is the trimmed/NFC-normalized `category_code` when
+> present, otherwise the trimmed/NFC-normalized `category_name`, otherwise the
+> single uncategorized identity. The first row encountered supplies the visible
+> label for that identity.
+>
+> This amendment supersedes only prior wording that could be read as requiring
+> the PDF's visible sequence to equal `display_order + 1` across the whole
+> catalog. It does not mutate or redefine database `display_order`, canonical
+> row order, category identity, the dataset-hash contract, or placement/reorder
+> behavior. Excel remains unchanged: `รายการราคา` continues to use the global
+> `display_order + 1` sequence and `ข้อมูลตรวจสอบ` remains in canonical hash
+> order. A PDF presentation change may alter pagination and PDF binary SHA-256,
+> but cannot by itself alter the canonical dataset SHA-256.
+
 **Status:** Owner-approved export specification for implementation/local
 rehearsal; records, UI/CI, application verification, and Production publication
 remain separately gated
@@ -145,11 +173,19 @@ paths, user UUIDs, SQL errors, or request headers.
 
 Draft exports:
 
-- show `DRAFT – ห้ามใช้อ้างอิง` prominently on the first sheet/page and in
-  every repeated header/footer;
+- show the exact marker `DRAFT - ห้ามใช้อ้างอิง`, using the ASCII
+  hyphen-minus (`U+002D`) rather than an en dash or em dash, prominently on the
+  first sheet/page and on every price page. In the browser print route, place
+  the repeated marker in a dedicated row inside each pre-paginated price
+  section's logical `<thead>`. The component renders that complete header in
+  every logical price section; print CSS uses
+  `@media print { thead { display: table-row-group; } }` so Chrome does not
+  fragment or repeat the header independently of the section. Also include the
+  exact marker in the route-rendered draft price-page footer. Do not depend on
+  Chrome's optional browser-generated header/footer setting for this control;
 - show version status as Draft, never Published;
 - use a draft dataset hash calculated for review but clearly label it
-  `Draft dataset hash — not an official publication hash`;
+  `Draft dataset hash - not an official publication hash`;
 - are active-admin only;
 - use a filename beginning `DRAFT-`;
 - cannot be presented as approval evidence or a current standard price list.
@@ -422,8 +458,9 @@ custody is required.
 - Table headers repeat on every data page.
 - Footer repeats department name, page number as `x/y`, and version/status or
   version/effective-date. The left footer department text is
-  `ส่วนวิศวกรรมท่อร้อยสาย (วทฐฐ.)`. Draft right footer example:
-  `v2568.1.0 | Draft`. Published right footer example:
+  `ส่วนวิศวกรรมท่อร้อยสาย (วทฐฐ.)`. A draft price-page right footer includes
+  the exact draft marker plus its draft reference, for example
+  `DRAFT - ห้ามใช้อ้างอิง | 2568.1.0-D002`. Published right footer example:
   `v2568.1.0 | 1 ม.ค. 2570`.
 - The field-facing PDF footer must not show a truncated dataset hash. Full
   hash verification remains on the cover/summary, Excel verification sheet,
@@ -435,6 +472,36 @@ custody is required.
 - Long descriptions wrap without clipping.
 - No interactive-only control appears in printed output.
 
+**Chrome pre-pagination regression rule (recorded 2026-08-26):** The print
+component constructs one complete `.price-section` for each logical price
+page. Using `thead { display: table-header-group; }` inside those already
+pre-paginated sections allowed Chrome to fragment the section and emit an
+extra physical page whose repeated header was detached from the intended
+page. The accepted local fix is to render the logical `<thead>` as
+`table-row-group` under `@media print` and keep each `.price-section` together
+with `break-inside: avoid` / `page-break-inside: avoid`. A saved-PDF regression
+test must prove that physical page count is exactly one cover plus the number
+of logical price sections, every price page contains its own full header and
+footer, and no clipped, split, or blank overflow page exists. This rule is
+specific to the pre-paginated print component; it does not remove the logical
+table-header semantics from the HTML.
+
+**Corrected category-code heading local QA checkpoint (2026-08-26):** A fresh
+local Chromium render of the exact presentation component passed the heading
+contract above: `52` initial coded headings plus `18` continuations, `52`
+nonblank unique codes, zero exact-heading mismatch, zero category re-entry, and
+zero category-local sequence error across `710` rows / `710` unique
+`display_order` values (`0` through `709`). The first heading is
+`1.1. งานวางท่อ PVC หุ้มคอนกรีตเสริมเหล็ก (ค.ส.ล.)`; the final heading is
+`22. งานซ่อมถนน (ต่อ)`. Its saved PDF is `20` tagged A4 portrait pages,
+`1,957,518` bytes / SHA-256
+`34ffc82354f1558d61dce036c94252d23c569975f02b3b30b4ad8f9de6b55f54`,
+with all-page/contact-sheet visual review passed and no encryption, form,
+JavaScript, or out-of-MediaBox character. This is local fixture/synthetic
+presentation evidence only. It does not satisfy the authenticated selected-
+version route, real database binding, canonical stored count/hash, or official
+publication requirements in Sections 3, 5.1, and 8.3.
+
 If reliable page numbering cannot be achieved with the supported browser print
 engine, it is a blocking visual-acceptance issue—not a reason to print a false
 page number.
@@ -443,6 +510,23 @@ page number.
 
 1. Official document summary/stamp
 2. Price catalog grouped by approved display category
+
+For item `r`, define its PDF-visible sequence as its one-based position among
+all rows with the same normalized display-category identity after those rows
+are ordered by canonical global `display_order`. The number resets only when
+the category changes, not when the physical page changes. Grouping is a pure
+presentation projection over the complete verified rowset; it must not write
+the grouped order or local sequence back to the database.
+
+For a category with `category_code`, its visible heading is
+`{normalized category_code}. {category name}`. The separator is exactly one
+ASCII period followed by one ASCII space; do not substitute Thai punctuation,
+omit the code, or emit a double period. If a stored code already has trailing
+period punctuation, normalize that punctuation so the rendered separator is
+still exactly `. `. A continuation appends exactly ` (ต่อ)` after the complete
+code-and-name heading, for example `1.1. งานวางท่อ (ต่อ)`. The existing
+name-only fallback remains only for an identity with no category code, and the
+single uncategorized block remains `ไม่ระบุหมวดหมู่`.
 
 Do not append technical verification, dictionary, or change-summary pages to
 the final field-facing PDF price list. Those controls belong in the Excel
@@ -527,19 +611,33 @@ On the export screen:
 - P-20 identity/hash portability passes before a clean-environment hash is used
   as cross-environment equivalence evidence.
 - After P-18 acceptance, placement tests prove the workbook/PDF sequence equals
-  the unique contiguous final `display_order`; shifted inherited rows remain in
-  base-relative order and the canonical hash changes to the exact final values.
+  the unique contiguous final `display_order` at the data-binding layer;
+  shifted inherited rows remain in base-relative order and the canonical hash
+  changes to the exact final values. The PDF rendering assertion then proves
+  its presentation projection separately: category blocks are contiguous,
+  category-local numbering is gap-free and starts at `1`, numbering continues
+  across page breaks, and the union of PDF rows equals the complete canonical
+  rowset exactly once.
 
 ### 8.2 Visual/manual
 
 - NT CI/logo/font usage approved;
-- metadata, hash, and draft marks are readable;
+- metadata, hash, and draft marks are readable; the exact
+  `DRAFT - ห้ามใช้อ้างอิง` marker is prominent on the cover and visibly
+  repeats in the price-page table header and route-rendered footer after saving
+  through the supported Chrome print path;
 - all columns fit/read at normal print scale;
 - headers/footers/page numbering repeat correctly;
 - Thai wrapping has no clipping or orphaned marks;
 - long descriptions, zero costs, maximum costs, null optional English labels,
   inactive rows under the approved P-19 policy, and category page breaks render
   correctly;
+- categories split in the source global order render as one contiguous PDF
+  block; a continued block repeats the category heading with `(ต่อ)` and does
+  not restart its category-local row number;
+- every coded category heading visibly follows `1.1. <name>` formatting with
+  exactly one ASCII period and one ASCII space, and every continuation follows
+  `1.1. <name> (ต่อ)` without losing or duplicating the code;
 - saved PDF text is searchable and official stamp matches the selected version;
 - field-facing PDF footer uses department name, `x/y` page numbering, and
   version/status or version/effective-date, without a truncated hash;
