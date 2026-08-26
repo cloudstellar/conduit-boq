@@ -43,6 +43,11 @@ import {
   parseCatalogVersionString,
   type CatalogVersionTransition,
 } from '@/lib/master-catalog/versioning';
+import {
+  P51D002BatchPreparationError,
+  executeP51D002OptionABatchRpc,
+  resolveP51D002RuntimeTarget,
+} from '@/lib/master-catalog/admin/p51D002OptionABatch.server';
 
 const UUID_PATTERN =
   /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
@@ -323,6 +328,92 @@ export async function applyCatalogManualChangeAction(
         ));
       }
     }
+  }
+
+  return result;
+}
+
+export async function applyP51D002OptionABatchAction(
+  _previousState: CatalogMutationState,
+  formData: FormData,
+): Promise<CatalogMutationState> {
+  const supabase = await createClient();
+  const gate = await loadCatalogAdminGate(supabase);
+
+  if (gate.state !== 'enabled') {
+    return createCatalogMutationError(
+      'ระบบบัญชีราคาสำหรับผู้ดูแลยังไม่เปิดใช้งาน',
+      'FORBIDDEN',
+    );
+  }
+
+  const startedAt = Date.now();
+  let execution: Awaited<ReturnType<typeof executeP51D002OptionABatchRpc>>;
+  try {
+    const target = await resolveP51D002RuntimeTarget(
+      formData.get('versionId'),
+      (versionId) => supabase
+        .from('price_list_versions')
+        .select('id,target_version_string,draft_reference,status,lock_version')
+        .eq('id', versionId)
+        .maybeSingle(),
+    );
+    execution = await executeP51D002OptionABatchRpc(
+      {
+        confirmation: formData.get('confirmation'),
+        target,
+      },
+      (args) => supabase.rpc('apply_catalog_changes', args),
+    );
+  } catch (error) {
+    if (error instanceof P51D002BatchPreparationError) {
+      return createCatalogMutationError(error.message, error.code);
+    }
+    throw error;
+  }
+
+  const {
+    args,
+    data,
+    error,
+    responseClassification,
+  } = execution;
+  if (error) {
+    return mapRpcTransportError(
+      'applyP51D002OptionABatch',
+      error,
+      args.p_request_id,
+      { startedAt, versionId: args.p_version_id },
+    );
+  }
+
+  if (responseClassification === 'uncertain') {
+    return mapRpcTransportError(
+      'applyP51D002OptionABatch',
+      { code: 'P51_D002_RESPONSE_MISMATCH' },
+      args.p_request_id,
+      { startedAt, versionId: args.p_version_id },
+    );
+  }
+
+  const result = mapCatalogRpcActionResponse(
+    data as CatalogRpcActionResponse,
+    'บันทึกชุดแก้ไข Option A จำนวน 48 รายการลงฉบับร่าง D002 แล้ว',
+  );
+  if (result.status === 'success' && result.duplicateRequest === true) {
+    result.message = 'ตรวจพบว่าคำขอเดิมบันทึกชุดแก้ไข Option A จำนวน 48 รายการแล้ว โดยไม่มีการบันทึกซ้ำ';
+  }
+  logMasterCatalogOperation({
+    operation: 'applyP51D002OptionABatch',
+    outcome: result.status === 'success' ? 'success' : 'rejected',
+    startedAt,
+    requestId: result.requestId ?? args.p_request_id,
+    versionId: result.versionId ?? args.p_version_id,
+    code: result.code,
+  });
+
+  if (result.status === 'success') {
+    revalidateMasterCatalogPaths(result.versionId ?? args.p_version_id);
   }
 
   return result;

@@ -74,9 +74,14 @@ import type {
   CatalogIdentityHistoryPage,
   CatalogItemDetail,
 } from '@/lib/master-catalog/admin/catalogWorkspace';
+import {
+  P51_D002_BATCH_CONFIRMATION,
+  shouldShowP51D002OptionAPanel,
+} from '@/lib/master-catalog/admin/p51D002OptionABatch.server';
 import { MasterCatalogItemEditor } from './MasterCatalogItemEditor';
 import { MasterCatalogHeaderUtilities } from './MasterCatalogHeaderUtilities';
 import { MasterCatalogPlacementWorkspaceView } from './MasterCatalogPlacementWorkspace';
+import { MasterCatalogP51D002OptionAPanel } from './MasterCatalogP51D002OptionAPanel';
 import type { CatalogReviewBinding } from '@/lib/master-catalog/admin/reviewBinding';
 
 const sectionLinks: Array<{
@@ -262,6 +267,14 @@ export function MasterCatalogVersionDetailView({
 }) {
   const version = detail.version;
   const isEditableDraft = version.status === 'draft' && !detail.isStaleDraft;
+  const showP51D002OptionAPanel = shouldShowP51D002OptionAPanel({
+    gateState: gate.state,
+    isStaleDraft: detail.isStaleDraft,
+    status: version.status,
+    draftReference: version.draftReference,
+    targetVersionString: version.targetVersionString,
+    lockVersion: version.lockVersion,
+  });
   const isCurrentVersion = detail.currentVersionId === version.id;
   const latestAppliedImport = notice === 'import-applied'
     ? detail.imports.find((item) => item.status === 'applied') ?? null
@@ -416,6 +429,15 @@ export function MasterCatalogVersionDetailView({
           <Badge variant="outline">รุ่นแก้ไข {formatThaiNumber(version.lockVersion)}</Badge>
         </div>
       </section>
+
+      {showP51D002OptionAPanel ? (
+        <MasterCatalogP51D002OptionAPanel
+          key={version.id}
+          versionId={version.id}
+          lockVersion={version.lockVersion}
+          confirmationPhrase={P51_D002_BATCH_CONFIRMATION}
+        />
+      ) : null}
 
       <MasterCatalogVersionWorkspace
         version={{

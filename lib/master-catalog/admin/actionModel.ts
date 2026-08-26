@@ -229,6 +229,7 @@ const RPC_TRANSPORT_ERROR_MESSAGES = {
   abandonCatalogDraft: 'ยกเลิกฉบับร่างไม่สำเร็จจากระบบฐานข้อมูล',
   applyCatalogImport: 'บันทึกการนำเข้าไม่สำเร็จจากระบบฐานข้อมูล',
   applyCatalogManualChange: 'บันทึกการเปลี่ยนแปลงในฉบับร่างไม่สำเร็จจากระบบฐานข้อมูล',
+  applyP51D002OptionABatch: 'บันทึกชุดแก้ไข Option A ลงฉบับร่างไม่สำเร็จจากระบบฐานข้อมูล',
   createCatalogDraft: 'สร้างฉบับร่างไม่สำเร็จจากระบบฐานข้อมูล',
   previewCatalogImport: 'บันทึกผลตรวจการนำเข้าไม่สำเร็จจากระบบฐานข้อมูล',
   placeCatalogItems: 'ยืนยันตำแหน่งรายการใหม่ไม่สำเร็จจากระบบฐานข้อมูล',
