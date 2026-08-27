@@ -41,7 +41,10 @@ import {
   catalogItemMutationNotice,
   safeCatalogItemReturnHref,
 } from '@/lib/master-catalog/admin/navigation';
-import { formatCatalogDictionaryLabel } from '@/lib/master-catalog/admin/presentation';
+import {
+  formatCatalogDictionaryLabel,
+  formatCatalogVersionBackLabel,
+} from '@/lib/master-catalog/admin/presentation';
 import { applyCatalogManualChangeAction } from '../actions';
 import { CatalogMoneyInput } from './CatalogMoneyInput';
 import { CatalogUnitInput } from './CatalogUnitInput';
@@ -113,6 +116,11 @@ export function MasterCatalogItemEditor({
     searchParams.get('outcome'),
     searchParams.get('requestId'),
   );
+  const versionBackLabel = formatCatalogVersionBackLabel({
+    versionStatus: item.versionStatus,
+    draftReference: item.draftReference,
+    targetVersionString: item.targetVersionString,
+  });
 
   function handleSubmitCapture(event: FormEvent<HTMLFormElement>) {
     if (action === 'update' && (!normalizedMaterialCost || !normalizedLaborCost)) {
@@ -157,7 +165,7 @@ export function MasterCatalogItemEditor({
       <div className="flex flex-wrap items-center justify-between gap-3">
         <Button variant="ghost" size="sm" asChild>
           <Link href={returnHref}>
-            <ArrowLeft />กลับไปยัง {item.draftReference ?? `เป้าหมาย ${item.targetVersionString}`}
+            <ArrowLeft />กลับไปยัง {versionBackLabel}
           </Link>
         </Button>
         <div className="flex gap-2">
