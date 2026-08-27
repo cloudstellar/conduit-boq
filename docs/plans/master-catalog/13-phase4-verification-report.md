@@ -1,5 +1,24 @@
 # Master Catalog Phase 4 Verification Report
 
+> **Current Master Catalog admin-edit completion overlay (2026-08-28):** The
+> data/publication milestone is complete (`2568.1.0`, `710` rows, reviewed
+> ITEM-0429/ITEM-0615 values, XLSX/PDF passed, no historical BOQ reprice, no
+> Factor F change), and P-13/P-14/P-14C/P-15 are complete and must not be
+> replayed. Migration 027 was applied once and is immutable. The deployed Admin
+> UI is intentionally read-only, so end-to-end completion remains pending.
+> [Plan #105](./105-phase4-master-catalog-admin-edit-completion-plan.md) restores
+> the original active-Admin draft workflow through a new forward-only 028 gate
+> projection while keeping published rows immutable and new-identity/
+> retirement capabilities disabled. Current authority covers local docs, code,
+> tests, and the reviewed package commit/push only to
+> `codex/master-catalog-admin-edit`; no merge/push to `main`, Production
+> write, flag change, Production deploy, or automatic next step is authorized.
+> This overlay supersedes all prior live Status/Current/next-action wording;
+> all dated text below is retained as historical evidence only.
+
+<!-- MASTER_CATALOG_ADMIN_EDIT_STATUS_V1 {"schema":"conduit-boq/master-catalog-admin-edit-status/v1","recordedAt":"2026-08-28","catalogDataPublicationComplete":true,"publishedVersion":"2568.1.0","publishedRowCount":710,"p13P14P14cP15CompleteNoReplay":true,"migration027AppliedOnceNoReplay":true,"readOnlyAdminUiLive":true,"endToEndComplete":false,"plan":"105-phase4-master-catalog-admin-edit-completion-plan.md","target":"active-admin-draft-workflow","migration028Required":true,"catalogNewIdentityEnabledTarget":false,"catalogRetirementEnabledTarget":false,"localDocsCodeTestsAuthorized":true,"featureBranchGitPublicationAuthorized":true,"featureBranch":"codex/master-catalog-admin-edit","commitAuthorized":true,"pushAuthorized":true,"mainMergeAuthorized":false,"productionWriteAuthorized":false,"deployAuthorized":false,"automaticNextStep":false} -->
+
+
 > **Current P-50I verification result (2026-08-24):** the exact P-50I approval
 > was consumed; preflight, patch application, and target hash passed. Local
 > validation then failed closed at `21/22` authority tests and `30/31` exact

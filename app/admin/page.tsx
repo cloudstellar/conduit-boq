@@ -11,7 +11,7 @@ import { createClient } from '@/lib/supabase/client'
 import { useAuth } from '@/lib/context/AuthContext'
 import { UserRole } from '@/lib/types/auth'
 import { getRoleLabel } from '@/lib/permissions'
-import { isCatalogAdminEnabled } from '@/lib/master-catalog/admin/flags'
+import { loadCatalogAdminGateProjection } from '@/lib/master-catalog/admin/adminGate'
 import {
   canAdminTransitionUserStatus,
   isExactMissingRpcError,
@@ -149,30 +149,24 @@ function AdminContent() {
       setAdminMutationsEnabled(false)
       try {
         const authorization = await requireActiveAdmin(supabase)
-        const loadedUsers = await loadAuthorizedUsers(authorization.source)
+        const [loadedUsers, catalogGate] = await Promise.all([
+          loadAuthorizedUsers(authorization.source),
+          authorization.source === 'v2'
+            ? loadCatalogAdminGateProjection(supabase)
+            : Promise.resolve({ enabled: false, issue: null }),
+        ])
 
         if (cancelled) return
         setUsers(loadedUsers)
         setAdminMutationsEnabled(authorization.source === 'v2')
-
-        if (authorization.source === 'legacy-read-only') {
-          const settingResult = await supabase
-            .from('app_settings')
-            .select('value')
-            .eq('key', 'catalog_admin_enabled')
-            .maybeSingle()
-          if (settingResult.error || !settingResult.data) {
-            setCatalogAdminEntryState('unavailable')
-            setCatalogSettingsIssue('อ่านสถานะ Master Catalog ไม่สำเร็จ เครื่องมือแก้ไขจึงถูกปิดแบบปลอดภัย')
-          } else {
-            setCatalogAdminEntryState(
-              isCatalogAdminEnabled(settingResult.data.value) ? 'enabled' : 'read-only'
-            )
-          }
-        } else {
-          setCatalogAdminEntryState('read-only')
-          setCatalogSettingsIssue(null)
-        }
+        setCatalogAdminEntryState(
+          catalogGate.enabled
+            ? 'enabled'
+            : catalogGate.issue
+              ? 'unavailable'
+              : 'read-only'
+        )
+        setCatalogSettingsIssue(catalogGate.issue)
       } catch (err) {
         console.error('Load error:', err)
         if (!cancelled) {

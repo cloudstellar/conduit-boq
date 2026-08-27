@@ -5,8 +5,10 @@
 > workflow only. For the canonical migration ledger and Master Catalog v26
 > rollout artifacts, use
 > [`docs/04_data/MIGRATIONS.md`](../docs/04_data/MIGRATIONS.md). The current
-> Local authority path is `009`-`015`, Production hotfix `016`, then Phase 4
-> `017`-`025`, exactly as implemented by `scripts/bootstrap-local-db.sh`.
+> generic Local bootstrap replays `009`-`015`, Production hotfix `016`,
+> then Phase 4 `017`-`026`. Applied migration 027 and Local-only candidate
+> 028 are exact-ledger-bound and require an isolated post-027 rehearsal; they
+> must not be appended blindly to `scripts/bootstrap-local-db.sh`.
 
 ## 📋 Overview
 This migration adds multi-route support to the BOQ system while preserving all existing data.

@@ -6,7 +6,7 @@ import {
   hashCanonicalCatalogDatasetRows,
   type CanonicalCatalogDatasetRow,
 } from '../hash/canonicalDataset';
-import { isCatalogAdminEnabled } from '../admin/flags';
+import { loadCatalogAdminGateProjection } from '../admin/adminGate';
 import {
   loadCurrentAuthorization,
   type AuthorizationSource,
@@ -416,23 +416,16 @@ async function assertExportAccess(
       );
     }
 
-    if (profile.authorizationSource !== 'legacy-read-only') {
+    if (profile.authorizationSource !== 'v2') {
       throw new CatalogExportError(
         'CATALOG_EXPORT_FORBIDDEN',
-        'Draft catalog exports remain disabled without a bounded feature-flag contract',
+        'Draft catalog exports require the bounded active-admin gate',
         403,
       );
     }
 
-    // Exact pre-migration read-only compatibility. This raw setting query is
-    // unreachable once get_my_profile_v2 is available.
-    const { data, error } = await supabase
-      .from('app_settings')
-      .select('value')
-      .eq('key', 'catalog_admin_enabled')
-      .maybeSingle();
-
-    if (error || !isCatalogAdminEnabled(data?.value)) {
+    const gate = await loadCatalogAdminGateProjection(supabase);
+    if (!gate.enabled) {
       throw new CatalogExportError(
         'CATALOG_EXPORT_FORBIDDEN',
         'Draft catalog exports require the admin feature gate',

@@ -105,6 +105,7 @@ describe('Master Catalog export data loader', () => {
 
   it('keeps draft export behind the active-admin feature gate', async () => {
     const datasetHash = await hashCanonicalCatalogDatasetRows([CANONICAL_ROW]);
+    const calls: string[] = [];
     const client = createExportClient({
       datasetHash,
       featureFlag: false,
@@ -115,17 +116,20 @@ describe('Master Catalog export data loader', () => {
         item_count: 1,
         effective_date: null,
       },
-    });
+    }, calls);
 
     await expect(loadCatalogExportDataset(client, VERSION_ID))
       .rejects.toMatchObject({
         code: 'CATALOG_EXPORT_FORBIDDEN',
         status: 403,
       });
+    expect(calls).toContain('rpc:get_my_catalog_admin_gate');
+    expect(calls).not.toContain('from:app_settings');
   });
 
   it('loads an active-admin draft as a marked non-official export', async () => {
     const datasetHash = await hashCanonicalCatalogDatasetRows([CANONICAL_ROW]);
+    const calls: string[] = [];
     const client = createExportClient({
       datasetHash,
       featureFlag: true,
@@ -140,7 +144,7 @@ describe('Master Catalog export data loader', () => {
         published_at: null,
         published_by_display_name: null,
       },
-    });
+    }, calls);
 
     const dataset = await loadCatalogExportDataset(client, VERSION_ID);
 
@@ -151,6 +155,8 @@ describe('Master Catalog export data loader', () => {
     expect(dataset.canonicalDatasetHash).toBe(datasetHash);
     expect(makeCatalogExportFilename(dataset, 'pdf'))
       .toMatch(/^DRAFT-2568\.1\.0-D001-NT-Master-Catalog-v2568\.1\.0-\d{8}\.pdf$/);
+    expect(calls).toContain('rpc:get_my_catalog_admin_gate');
+    expect(calls).not.toContain('from:app_settings');
   });
 
   it('fails closed when a draft has no immutable draft reference', async () => {
@@ -240,16 +246,31 @@ function createExportClient(
     },
     rpc: async (name: string) => {
       calls.push(`rpc:${name}`);
-      if (name !== 'get_my_profile_v2') {
-        throw new CatalogExportError('TEST_UNEXPECTED_RPC', `Unexpected RPC: ${name}`);
+      if (name === 'get_my_profile_v2') {
+        return {
+          data: [{
+            id: 'user-admin',
+            email: 'admin@ntplc.co.th',
+            first_name: 'Admin',
+            last_name: 'User',
+            role: 'admin',
+            status: 'active',
+            created_at: '2026-08-27T00:00:00.000Z',
+            updated_at: '2026-08-27T00:00:00.000Z',
+          }],
+          error: null,
+        };
       }
-      return {
-        data: null,
-        error: {
-          code: 'PGRST202',
-          message: 'Could not find public.get_my_profile_v2 in the schema cache',
-        },
-      };
+      if (name === 'get_my_catalog_admin_gate') {
+        return {
+          data: [{
+            admin_enabled: options.featureFlag ?? true,
+            configuration_valid: true,
+          }],
+          error: null,
+        };
+      }
+      throw new CatalogExportError('TEST_UNEXPECTED_RPC', `Unexpected RPC: ${name}`);
     },
     from: (table: string) => {
       calls.push(`from:${table}`);
@@ -291,22 +312,6 @@ function maybeSingle(
   baseVersionRow: Record<string, unknown>,
   options: ExportClientOptions,
 ) {
-  if (table === 'user_profiles') {
-    return {
-      data: {
-        id: 'user-admin',
-        email: 'admin@ntplc.co.th',
-        first_name: 'Admin',
-        last_name: 'User',
-        role: 'admin',
-        status: 'active',
-        created_at: '2026-08-27T00:00:00.000Z',
-        updated_at: '2026-08-27T00:00:00.000Z',
-      },
-      error: null,
-    };
-  }
-
   if (table === 'price_list_versions') {
     const id = filters.get('id');
     return {
@@ -320,10 +325,6 @@ function maybeSingle(
       data: { version_id: options.currentDefaultVersionId ?? VERSION_ID },
       error: null,
     };
-  }
-
-  if (table === 'app_settings') {
-    return { data: { value: options.featureFlag ?? true }, error: null };
   }
 
   throw new CatalogExportError('TEST_UNEXPECTED_TABLE', `Unexpected table: ${table}`);

@@ -29,10 +29,13 @@ describe('Master Catalog P-22 operator workflow', () => {
     ];
 
     expect(adminPage).toContain("type CatalogAdminEntryState = 'loading' | 'enabled' | 'read-only' | 'unavailable'");
-    expect(adminPage).toContain("if (authorization.source === 'legacy-read-only')");
-    expect(adminPage).toContain('if (settingResult.error || !settingResult.data)');
+    expect(adminPage).toContain('loadCatalogAdminGateProjection');
+    expect(adminPage).toContain("authorization.source === 'v2'");
+    expect(adminPage).toContain('Promise.all([');
+    expect(adminPage).not.toContain(".from('app_settings')");
     expect(adminPage).toContain("setCatalogAdminEntryState('unavailable')");
-    expect(adminPage).toContain("setCatalogAdminEntryState('read-only')");
+    expect(adminPage).toContain("? 'unavailable'");
+    expect(adminPage).toContain(": 'read-only'");
     expect(adminPage).toContain('<Link href="/admin/master-catalog">เปิด Master Catalog</Link>');
     expect(adminPage).not.toContain('{catalogAdminEnabled ?');
     for (const route of readableRoutes) {

@@ -54,6 +54,7 @@ function client(options: {
   profileRpc?: { data: unknown; error: unknown }
   legacyProfile?: { data: unknown; error: unknown }
   signupRpc?: { data: unknown; error: unknown }
+  catalogGateRpc?: { data: unknown; error: unknown }
   settings?: { data: unknown; error: unknown }
   onFrom?: (table: string) => void
 } = {}): SupabaseClient {
@@ -78,9 +79,18 @@ function client(options: {
         error: null,
       }),
     },
-    rpc: async (name: string) => name === 'is_signup_email_allowed'
-      ? options.signupRpc ?? { data: true, error: null }
-      : options.profileRpc ?? { data: [profile()], error: null },
+    rpc: async (name: string) => {
+      if (name === 'is_signup_email_allowed') {
+        return options.signupRpc ?? { data: true, error: null }
+      }
+      if (name === 'get_my_catalog_admin_gate') {
+        return options.catalogGateRpc ?? {
+          data: [{ admin_enabled: false, configuration_valid: true }],
+          error: null,
+        }
+      }
+      return options.profileRpc ?? { data: [profile()], error: null }
+    },
     from: (table: string) => {
       options.onFrom?.(table)
       return queryFor(table)
@@ -342,14 +352,18 @@ describe('P-49 application authorization contract', () => {
     )).resolves.toBe(false)
   })
 
-  it('keeps the catalog mutation gate disabled once bounded P-49 auth is live', async () => {
+  it('uses the bounded catalog gate without reading raw settings', async () => {
     const rawTables: string[] = []
     const gate = await loadCatalogAdminGate(client({
       profileRpc: { data: [profile('active', 'admin')], error: null },
+      catalogGateRpc: {
+        data: [{ admin_enabled: true, configuration_valid: true }],
+        error: null,
+      },
       onFrom: (table) => rawTables.push(table),
     }))
 
-    expect(gate.state).toBe('disabled')
+    expect(gate.state).toBe('enabled')
     expect(rawTables).not.toContain('app_settings')
   })
 

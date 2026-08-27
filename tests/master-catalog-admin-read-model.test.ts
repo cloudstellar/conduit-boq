@@ -25,8 +25,8 @@ type GateClientOptions = {
     status: string;
   } | null;
   profileError?: Error | null;
-  setting?: { value: unknown } | null;
-  settingError?: Error | null;
+  gateResult?: { data: unknown; error: unknown };
+  onFrom?: (table: string) => void;
 };
 
 function createGateClient(options: GateClientOptions): Parameters<typeof loadCatalogAdminGate>[0] {
@@ -35,6 +35,12 @@ function createGateClient(options: GateClientOptions): Parameters<typeof loadCat
       getUser: async () => ({ data: { user: options.user } }),
     },
     rpc: async (name: string) => {
+      if (name === 'get_my_catalog_admin_gate') {
+        return options.gateResult ?? {
+          data: [{ admin_enabled: false, configuration_valid: true }],
+          error: null,
+        };
+      }
       if (name !== 'get_my_profile_v2') {
         throw new Error(`Unexpected RPC: ${name}`);
       }
@@ -59,6 +65,7 @@ function createGateClient(options: GateClientOptions): Parameters<typeof loadCat
       };
     },
     from: (table: string) => {
+      options.onFrom?.(table);
       const query = {
         select: () => query,
         eq: () => query,
@@ -75,14 +82,6 @@ function createGateClient(options: GateClientOptions): Parameters<typeof loadCat
               error: options.profileError ?? null,
             };
           }
-
-          if (table === 'app_settings') {
-            return {
-              data: options.setting ?? null,
-              error: options.settingError ?? null,
-            };
-          }
-
           throw new Error(`Unexpected table: ${table}`);
         },
       };
@@ -497,11 +496,12 @@ describe('Master Catalog admin gate', () => {
     });
   });
 
-  it('keeps active admins behind the disabled catalog flag by default', async () => {
+  it('keeps the legacy authorization source read-only without raw settings access', async () => {
+    const fromTables: string[] = [];
     const gate = await loadCatalogAdminGate(createGateClient({
       user: { id: 'user-admin' },
       profile: activeAdminProfile,
-      setting: { value: false },
+      onFrom: (table) => fromTables.push(table),
     }));
 
     expect(gate).toMatchObject({
@@ -513,18 +513,23 @@ describe('Master Catalog admin gate', () => {
         status: 'active',
       },
     });
+    expect(fromTables).not.toContain('app_settings');
   });
 
-  it('fails closed with an explicit issue when app_settings cannot be read', async () => {
+  it('keeps a valid false v2 projection read-only without an operator issue', async () => {
     const gate = await loadCatalogAdminGate(createGateClient({
       user: { id: 'user-admin' },
       profile: activeAdminProfile,
-      settingError: new Error('settings unavailable'),
+      profileSource: 'v2',
+      gateResult: {
+        data: [{ admin_enabled: false, configuration_valid: true }],
+        error: null,
+      },
     }));
 
     expect(gate).toMatchObject({
       state: 'disabled',
-      flagIssue: 'อ่านค่า feature flag ไม่สำเร็จ',
+      flagIssue: null,
     });
     expect(canReadCatalogAdmin(gate)).toBe(true);
   });
@@ -533,7 +538,11 @@ describe('Master Catalog admin gate', () => {
     const gate = await loadCatalogAdminGate(createGateClient({
       user: { id: 'user-admin' },
       profile: activeAdminProfile,
-      setting: { value: true },
+      profileSource: 'v2',
+      gateResult: {
+        data: [{ admin_enabled: true, configuration_valid: true }],
+        error: null,
+      },
     }));
 
     expect(gate).toMatchObject({
@@ -574,16 +583,17 @@ describe('Master Catalog admin gate', () => {
     expect(canReadCatalogAdmin({ state: 'unauthenticated' })).toBe(false);
   });
 
-  it('treats the P-49 v2 profile as expected read-only state without a flag error', async () => {
+  it('fails the v2 path closed with an operator issue on malformed gate data', async () => {
     const gate = await loadCatalogAdminGate(createGateClient({
       user: { id: 'user-admin' },
       profile: activeAdminProfile,
       profileSource: 'v2',
+      gateResult: { data: [], error: null },
     }));
 
     expect(gate).toMatchObject({
       state: 'disabled',
-      flagIssue: null,
+      flagIssue: expect.any(String),
       profile: {
         id: 'user-admin',
         role: 'admin',

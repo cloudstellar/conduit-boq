@@ -1402,7 +1402,6 @@ describe('Master Catalog authority consistency', () => {
     })
 
     const currentAuthorityPaths = [
-      p49Path,
       'docs/SECURITY.md',
       'docs/04_data/SECURITY_MODEL.md',
       'docs/plans/master-catalog/13-phase4-verification-report.md',
@@ -1414,12 +1413,15 @@ describe('Master Catalog authority consistency', () => {
       const authority = read(path)
       expect(authority).toContain('P-49')
       expect(authority).toMatch(/profile\/onboarding-only/i)
-      expect(authority).toContain('P-51')
-      expect(authority).toMatch(/(?:open\/high|OPEN SECURITY RISK|open high)/i)
-      expect(authority).toMatch(/deferred/i)
+      expect(authority).toContain('Plan #105')
+      expect(authority).toContain('2026-08-28')
       expect(authority).toContain('P-13')
-      expect(authority).toMatch(/not authorized/i)
+      expect(authority).toMatch(/must not be(?:\s*>\s*|\s+)replayed/i)
     }
+
+    expect(p49).toMatch(/(?:open\/high|OPEN SECURITY RISK|open high)/i)
+    expect(p49).toMatch(/deferred/i)
+    expect(p49).toMatch(/not authorized/i)
 
     for (const path of [
       'docs/03_domain/ACCESS_MODEL.md',

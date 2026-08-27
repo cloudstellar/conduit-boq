@@ -12,7 +12,7 @@ import {
   buildCatalogFinalReviewSnapshot,
   type CatalogFinalReviewSnapshot,
 } from './catalogDiff';
-import { isCatalogAdminEnabled } from './flags';
+import { loadCatalogAdminGateProjection } from './adminGate';
 import {
   loadCatalogCapabilityFlags,
   type CatalogCapabilityFlags,
@@ -377,7 +377,7 @@ export async function loadCatalogAdminGate(
     return { state: 'forbidden', profile: mappedProfile };
   }
 
-  if (authorization.source === 'v2') {
+  if (authorization.source !== 'v2') {
     return {
       state: 'disabled',
       profile: mappedProfile,
@@ -385,27 +385,12 @@ export async function loadCatalogAdminGate(
     };
   }
 
-  // Pre-migration compatibility only. Once get_my_profile_v2 exists, raw
-  // setting access above is unreachable and the catalog remains read-only.
-  const { data: setting, error: settingError } = await supabase
-    .from('app_settings')
-    .select('value')
-    .eq('key', 'catalog_admin_enabled')
-    .maybeSingle();
-
-  if (settingError) {
+  const projection = await loadCatalogAdminGateProjection(supabase);
+  if (!projection.enabled) {
     return {
       state: 'disabled',
       profile: mappedProfile,
-      flagIssue: 'อ่านค่า feature flag ไม่สำเร็จ',
-    };
-  }
-
-  if (!isCatalogAdminEnabled(setting?.value)) {
-    return {
-      state: 'disabled',
-      profile: mappedProfile,
-      flagIssue: setting ? null : 'ยังไม่พบ feature flag catalog_admin_enabled',
+      flagIssue: projection.issue,
     };
   }
 

@@ -1,10 +1,19 @@
 # Database Schema
 ## Conduit BOQ System
 
-**Last Updated:** 2026-08-18
-**Status:** Schema canonical; P-49 authorization target not yet implemented;
-risk accepted temporarily and remediation deferred under P-51
+**Last Updated:** 2026-08-28
+**Status:** Migration 027/P-49 authorization is applied in Production; migration
+028 bounded Admin gate projection is a Local-only candidate under Plan #105
 **Database:** PostgreSQL 17 (Supabase)
+
+> **Current-state supersession:** Migration 027 is applied exactly once and raw
+> `app_settings` is not an anonymous/authenticated client API. The deployed
+> Master Catalog Admin UI is intentionally read-only while all three catalog
+> flags remain false. Local migration 028 adds only
+> `private.catalog_admin_gate_projection()` plus the
+> `public.get_my_catalog_admin_gate()` invoker wrapper; it does not enable a
+> flag or mutate catalog, BOQ, or Factor F data. See
+> [Plan #105](../plans/master-catalog/105-phase4-master-catalog-admin-edit-completion-plan.md).
 
 ---
 

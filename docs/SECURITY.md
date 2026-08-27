@@ -1,13 +1,21 @@
 # Security Model: Current Runtime and P-49 Target
 
-**Current status (2026-08-18):** P-49 business target retained; security risk
-open/high; remediation deferred until after the first P-15 closeout under the
-bounded P-51 waiver. P-13 is not authorized but is no longer blocked solely by
-P-49 for that exact closeout. See
-[P-51 Closeout Plan](./plans/master-catalog/48-phase4-p51-risk-accepted-master-catalog-closeout-plan.md).
+**Current status (2026-08-28):** Migration 027 and the matching application
+hardening are live; `pending = profile/onboarding-only` is enforced. P-13,
+P-14, P-14C, and P-15 are complete and must not be replayed. The Master Catalog
+Admin surface remains read-only because all three catalog flags are false.
+Plan #105 prepares a bounded post-closeout active-Admin edit gate without
+reopening raw settings or weakening database enforcement. See
+[Plan #105](./plans/master-catalog/105-phase4-master-catalog-admin-edit-completion-plan.md).
 
-**P-49 target:** `pending = profile/onboarding-only`; implementation is not
-authorized and the current runtime is not yet fully aligned.
+Migration 028 is fail-fast against the exact post-027 active-Admin predicate,
+catalog function/policy fingerprints, catalog RLS/direct-DML posture, raw
+settings ACL, and private-schema owner/usage boundary. It creates only a
+bounded read projection and leaves every catalog feature flag false.
+
+> The “target” and “current runtime gaps” sections below are preserved as the
+> pre-027 threat analysis. They are not a statement of the current Production
+> posture. Unexecuted expanded P-49 tests remain accepted residuals, not PASS.
 
 ## Authorization boundary
 

@@ -1,8 +1,18 @@
 # Migrations
 ## Conduit BOQ System
 
-**Last Updated:** 2026-08-17
+**Last Updated:** 2026-08-28
 **Status:** Canonical
+
+> **Current-state supersession (2026-08-28):** P-13/P-14/P-14C/P-15 are
+> complete and must not be replayed. Migration 027 was applied exactly once as
+> ledger `20260827174634/p49_active_profile_authorization_hardening` and remains
+> immutable. Migration 028 is now a Local-only, function/ACL-only candidate;
+> it leaves all catalog flags false and changes no Master Catalog, pointer, BOQ,
+> or Factor F data. Its reviewed feature-branch commit/push is authorized;
+> merge/push to `main`, Production application, matching Production deployment,
+> and later flag change remain separate gates under
+> [Plan #105](../plans/master-catalog/105-phase4-master-catalog-admin-edit-completion-plan.md).
 
 > **Current Production overlay (supersedes stale pre-execution status and
 > authority text below):**
@@ -64,6 +74,8 @@
 | `024_master_catalog_phase4_set_based_placement_invalidation.sql` | P-39R forward-only execution-shape correction: replace migration `021` row-level placement invalidation with three transition-table statement triggers and transaction-local positive/negative version caches | **Local-only SHA-256 `d3aa11282fa4b2d4bac058bde3851287c551556ba5eac307277f086ba3d86b25`; committed/pushed/applied incrementally on exact `b6d58ce6cfedafa5812821edb49b897c2856f049`; WP-6.6/WP-7.5, canonical `017`-`024`, trigger inventory 3/0, and adjacent-data invariants passed in P39R-L and clean-chain P39R-C on exact `10531610eac53a97c6ef8f9d06418766b58bee36`; not Production-applied** |
 | `025_master_catalog_phase4_withdraw_order_compaction.sql` | P-41 forward-only correction: compact a draft's `display_order` atomically after never-published-row withdrawal while preserving relative order and one placement-revision advance per transaction | **Local-only SHA-256 `00d79d7750aa52ba7f003f6bb82fedb1d31ab111be417d74329c1cd3d899f76f`; incrementally applied without reset on 2026-07-19; exact pushed source `bb27b0d28e116e97ce1e7ee3e582f39bcc4edf22` passed 34 files/220 tests and incremental smoke; owner-approved exact execution source `adcca3939f3080cdf64bc6ad807051e9e85fed94` clean-applied `009`-`015`, hotfix `016`, and `017`-`025`; later P-42 recovery, proportional D005 execution, exact D007 stale-choice replay, and D009 Full-import correction passed against the unchanged chain and restored `2568.0.0`/710, zero drafts, and flags false; P-37 was Owner-accepted on 2026-07-25 under the recorded guided-UAT variance; not Production-applied** |
 | `026_master_catalog_phase4_catalog_action_error_acl.sql` | P-47 forward-only per-object callability correction: retain the pure `private.catalog_action_error` body/owner/signature/empty search path, change it to `SECURITY INVOKER`, and grant `EXECUTE` only to `authenticated` while denying `PUBLIC`, `anon`, and `service_role` | **Repository/static review passed; P-48 exact Git-only publication authorized; ledger `20260729002600 master_catalog_phase4_catalog_action_error_acl`; SHA-256 `472fa04b81bc8e96e9b507e20fc20cfee3114c80fda45f2ffba3893480920d8a`; required after immutable `025`; no table/data/default-privilege change; not applied to Local or Production; replacement Git/Remote result, separately authorized clean Local rehearsal, two-pass evidence, and P-12 remain HOLD** |
+| `027_p49_active_profile_authorization_hardening.sql` | P-49 current-active authorization, profile protection, bounded settings projections, and least-privilege API/RLS hardening | **Applied to Production exactly once as `20260827174634 p49_active_profile_authorization_hardening`; SHA-256 `7b96ac17aefc96ee7a788327ddee7508e15eaec73c54f609b44adccf8159eabe`; immutable/no replay** |
+| `028_master_catalog_admin_gate_projection.sql` | Add a private active-Admin gate projection and public security-invoker wrapper without changing flags or business data | **Local-only SHA-256 `6c03dff28d6f71bc4468ba799c70f8a1a7222017353d23f6446bb4be4fb006e3` under Plan #105; reviewed feature-branch commit/push authorized; apply only after exact 027 while all three catalog flags are false; not merged to `main` or Production-applied** |
 | `017+_master_catalog_phase4_*.sql` | Umbrella reference for the Local-only Phase 4 range; canonical bootstrap source applies `017`, `017a`, then `018`-`026` after hotfix `016` | **Current candidate range — prior clean runs through `025` are historical evidence. P-46 completed the exact chain but WP-6.5 then exposed the formatter callability defect and stopped fail-closed. `017a` remains the required pre-`018` global-default bridge; `026` is a distinct, narrowly scoped post-`025` object exception and does not rewrite any reviewed migration. Repository/static review passed and P-48 authorizes exact Git-only publication; replacement Git/Remote result, separately authorized clean Local rehearsal, isolated pass 1, independent contract review, pass 2, and closeout remain mandatory. Every Production approval remains absent.** |
 
 The 2026-07-28 disposable rehearsal does not supersede the prior Local
