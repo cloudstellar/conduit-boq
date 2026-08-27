@@ -3,49 +3,37 @@
 import { useEffect, useState, useCallback, useMemo } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { UserProfileWithOrg } from '@/lib/types/auth'
-
-type SupabaseProfileError = {
-  code?: string
-  message?: string
-}
-
-function shouldLogProfileError(error: SupabaseProfileError) {
-  return error.code !== 'PGRST116'
-}
+import { loadCurrentAuthorization } from '@/lib/auth/authorization'
 
 export function useUser() {
   const [user, setUser] = useState<UserProfileWithOrg | null>(null)
   const [isLoading, setIsLoading] = useState(true)
   const supabase = useMemo(() => createClient(), [])
 
-  const fetchProfile = useCallback(async (userId: string): Promise<UserProfileWithOrg | null> => {
+  const fetchProfile = useCallback(async (): Promise<UserProfileWithOrg | null> => {
     try {
-      const { data, error } = await supabase
-        .from('user_profiles')
-        .select(`
-          *,
-          organization:organizations!user_profiles_org_id_fkey(id, name, code),
-          department:departments!user_profiles_department_id_fkey(id, code, name, full_name),
-          sector:sectors!user_profiles_sector_id_fkey(id, code, name, full_name)
-        `)
-        .eq('id', userId)
-        .maybeSingle()
+      const authorization = await loadCurrentAuthorization(supabase)
+      if (authorization.state !== 'active' && authorization.state !== 'pending') return null
 
-      if (error) {
-        if (shouldLogProfileError(error)) {
-          console.warn('useUser: Profile unavailable; treating session as signed out:', {
-            code: error.code,
-            message: error.message,
-          })
-        }
-        return null
-      }
+      const profile = authorization.profile
+      const [organizationResult, departmentResult, sectorResult] = await Promise.all([
+        profile.org_id
+          ? supabase.from('organizations').select('id,name,code').eq('id', profile.org_id).maybeSingle()
+          : Promise.resolve({ data: null, error: null }),
+        profile.department_id
+          ? supabase.from('departments').select('id,code,name,full_name').eq('id', profile.department_id).maybeSingle()
+          : Promise.resolve({ data: null, error: null }),
+        profile.sector_id
+          ? supabase.from('sectors').select('id,code,name,full_name').eq('id', profile.sector_id).maybeSingle()
+          : Promise.resolve({ data: null, error: null }),
+      ])
 
-      if (!data) {
-        return null
-      }
-
-      return data as UserProfileWithOrg
+      return {
+        ...profile,
+        organization: organizationResult.error ? null : organizationResult.data,
+        department: departmentResult.error ? null : departmentResult.data,
+        sector: sectorResult.error ? null : sectorResult.data,
+      } as UserProfileWithOrg
     } catch {
       console.warn('useUser: Profile request failed; treating session as signed out')
       return null
@@ -54,15 +42,12 @@ export function useUser() {
 
   const refreshProfile = useCallback(async () => {
     try {
-      const { data: { session } } = await supabase.auth.getSession()
-      if (session?.user) {
-        const profile = await fetchProfile(session.user.id)
-        setUser(profile)
-      }
+      const profile = await fetchProfile()
+      setUser(profile)
     } catch (err) {
       console.warn('useUser: Error refreshing profile:', err instanceof Error ? err.message : err)
     }
-  }, [supabase, fetchProfile])
+  }, [fetchProfile])
 
   const signOut = useCallback(async () => {
     await supabase.auth.signOut()
@@ -78,7 +63,7 @@ export function useUser() {
       if (!isMounted) return
 
       if (session?.user) {
-        const profile = await fetchProfile(session.user.id)
+        const profile = await fetchProfile()
         if (isMounted) {
           setUser(profile)
           setIsLoading(false)

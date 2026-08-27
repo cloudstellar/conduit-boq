@@ -5,6 +5,7 @@
 import { useState, useEffect, useMemo } from 'react';
 import { useParams } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
+import { requireActiveProfile } from '@/lib/auth/authorization';
 import { roundMoney, calculateVAT, allocateToRoutes, multiplyFactor } from '@/lib/calculation';
 import {
   calculateInterpolatedFactorFromRefs,
@@ -508,6 +509,7 @@ export default function PrintBOQPage() {
   useEffect(() => {
     const fetchData = async () => {
       try {
+        await requireActiveProfile(supabase);
         const { data: boqData, error: boqError } = await supabase
           .from('boq')
           .select('*')
@@ -598,7 +600,14 @@ export default function PrintBOQPage() {
   const formatNumber = (num: number) =>
     num.toLocaleString('th-TH', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
-  const handlePrint = () => window.print();
+  const handlePrint = async () => {
+    try {
+      await requireActiveProfile(supabase);
+      window.print();
+    } catch {
+      setLoadError('ไม่สามารถยืนยันสิทธิ์ปัจจุบันสำหรับการพิมพ์ได้');
+    }
+  };
 
   // ──── Loading State ────
   if (isLoading) {
@@ -626,6 +635,7 @@ export default function PrintBOQPage() {
   // ── handleExportExcel must be after the null check for boq ──
   const handleExportExcel = async () => {
     try {
+      await requireActiveProfile(supabase);
       const { exportBoqToExcel } = await import('@/lib/exportBoqExcel');
       const routeCosts = routes.map(r => r.total_cost);
       const alloc = allocateToRoutes(routeCosts, factor);

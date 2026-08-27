@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
 import { useAuth } from '@/lib/context/AuthContext'
+import { loadCurrentAuthorization } from '@/lib/auth/authorization'
 import { Department, Sector } from '@/lib/types/auth'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -18,7 +19,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
-import { Loader2, ArrowLeft, LogOut, Clock, Ban, Home } from 'lucide-react'
+import { Loader2, ArrowLeft, LogOut, Clock, Ban } from 'lucide-react'
 
 export default function ProfilePage() {
   const router = useRouter()
@@ -36,50 +37,65 @@ export default function ProfilePage() {
   // v1.2.0: Requested org for onboarding
   const [requestedDepartmentId, setRequestedDepartmentId] = useState('')
   const [requestedSectorId, setRequestedSectorId] = useState('')
-  const [onboardingCompleted, setOnboardingCompleted] = useState(false)
 
   const [departments, setDepartments] = useState<Department[]>([])
   const [sectors, setSectors] = useState<Sector[]>([])
   const [isSaving, setIsSaving] = useState(false)
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null)
+  const [selectorError, setSelectorError] = useState<string | null>(null)
 
-  // v1.2.0: Can user edit org fields?
-  const canEditOrg = !onboardingCompleted
+  // Pending users may complete or resubmit requested organization fields.
+  // Active users keep their approved organization immutable here.
+  const canEditOrg = user?.status === 'pending'
 
   // Load departments and sectors
   useEffect(() => {
     const loadOrgData = async () => {
-      const { data: depts } = await supabase
+      if (!user || (user.status !== 'active' && user.status !== 'pending')) return
+      const { data: depts, error } = await supabase
         .from('departments')
         .select('*')
         .eq('is_active', true)
         .order('name')
 
-      if (depts) setDepartments(depts)
+      if (error) {
+        setDepartments([])
+        setSelectorError('ไม่สามารถโหลดรายการสังกัดได้ กรุณาลองใหม่ภายหลัง')
+      } else if (depts) {
+        setDepartments(depts)
+        setSelectorError(null)
+      }
     }
     loadOrgData()
-  }, [supabase])
+  }, [supabase, user])
 
   // Load sectors when department changes
   // v1.2.0: Use requestedDepartmentId for pending users, departmentId for approved
   useEffect(() => {
     const loadSectors = async () => {
+      if (!user || (user.status !== 'active' && user.status !== 'pending')) return
       const deptToLoad = canEditOrg ? requestedDepartmentId : departmentId
       if (!deptToLoad) {
         setSectors([])
         return
       }
-      const { data: sects } = await supabase
+      const { data: sects, error } = await supabase
         .from('sectors')
         .select('*')
         .eq('department_id', deptToLoad)
         .eq('is_active', true)
         .order('name')
 
-      if (sects) setSectors(sects)
+      if (error) {
+        setSectors([])
+        setSelectorError('ไม่สามารถโหลดรายการส่วนงานได้ กรุณาลองใหม่ภายหลัง')
+      } else if (sects) {
+        setSectors(sects)
+        setSelectorError(null)
+      }
     }
     loadSectors()
-  }, [canEditOrg, requestedDepartmentId, departmentId, supabase])
+  }, [canEditOrg, requestedDepartmentId, departmentId, supabase, user])
 
   // Populate form with current user data
   /* eslint-disable react-hooks/set-state-in-effect -- Loaded profile data initializes an editable form draft. */
@@ -94,7 +110,6 @@ export default function ProfilePage() {
       setDepartmentId(user.department_id || '')
       setSectorId(user.sector_id || '')
       // v1.2.0: Load onboarding state
-      setOnboardingCompleted(user.onboarding_completed ?? false)
       setRequestedDepartmentId(user.requested_department_id || '')
       setRequestedSectorId(user.requested_sector_id || '')
     }
@@ -108,51 +123,39 @@ export default function ProfilePage() {
     setIsSaving(true)
     setMessage(null)
 
-    // v1.2.0: Build update payload based on onboarding status
-    const updatePayload: Record<string, string | boolean | null> = {
-      first_name: firstName,
-      last_name: lastName,
-      title,
-      position,
-      employee_id: employeeId || null,
-      phone: phone || null,
-      updated_at: new Date().toISOString(),
-    }
-
-    // v1.2.0: If not yet onboarded, save to requested_* and mark complete
-    if (!onboardingCompleted) {
-      updatePayload.requested_department_id = requestedDepartmentId || null
-      updatePayload.requested_sector_id = requestedSectorId || null
-      updatePayload.onboarding_completed = true
-    }
-    // Note: actual department_id/sector_id are set by admin via RPC
-
-    const { error } = await supabase
-      .from('user_profiles')
-      .update(updatePayload)
-      .eq('id', user.id)
+    const { error } = await supabase.rpc('update_my_profile', {
+      p_first_name: firstName,
+      p_last_name: lastName,
+      p_title: title,
+      p_position: position,
+      p_employee_id: employeeId || null,
+      p_phone: phone || null,
+      p_requested_department_id: requestedDepartmentId || null,
+      p_requested_sector_id: requestedSectorId || null,
+      p_submit_onboarding: user.status === 'pending',
+      p_request_id: crypto.randomUUID(),
+    })
 
     setIsSaving(false)
 
     if (error) {
-      // v1.2.0: Handle trigger error for locked fields
-      if (error.message.includes('locked after onboarding')) {
-        setMessage({ type: 'error', text: 'ไม่สามารถแก้ไขสังกัดได้ กรุณาติดต่อผู้ดูแลระบบ' })
-      } else {
-        setMessage({ type: 'error', text: 'เกิดข้อผิดพลาด: ' + error.message })
-      }
+      setMessage({
+        type: 'error',
+        text: error.code === 'PGRST202'
+          ? 'การบันทึกโปรไฟล์ถูกปิดชั่วคราวระหว่างปรับปรุงสิทธิ์ กรุณาลองใหม่ภายหลัง'
+          : 'ไม่สามารถบันทึกโปรไฟล์ได้ กรุณาตรวจสอบข้อมูลหรือติดต่อผู้ดูแลระบบ',
+      })
     } else {
       // Show different message for first-time onboarding vs regular save
-      if (!onboardingCompleted) {
+      if (user.status === 'pending') {
         setMessage({
           type: 'success',
-          text: '✅ ลงทะเบียนสำเร็จ! ข้อมูลของคุณถูกส่งไปยังผู้ดูแลระบบแล้ว ระหว่างรอการอนุมัติ คุณสามารถสร้าง BOQ ได้เลย'
+          text: '✅ ลงทะเบียนสำเร็จ! ข้อมูลของคุณถูกส่งไปยังผู้ดูแลระบบแล้ว กรุณารอการอนุมัติก่อนใช้งานส่วนธุรกิจ'
         })
       } else {
         setMessage({ type: 'success', text: 'บันทึกข้อมูลเรียบร้อยแล้ว' })
       }
       await refreshProfile()
-      setOnboardingCompleted(true) // Update local state
     }
   }
 
@@ -180,7 +183,7 @@ export default function ProfilePage() {
           </div>
           <div className="flex items-center gap-4">
             {(user?.status === 'active' || user?.status === 'pending') && (
-              <Link href="/" className="text-blue-600 hover:text-blue-800 flex items-center gap-1">
+              <Link href={user.status === 'pending' ? '/pending' : '/'} className="text-blue-600 hover:text-blue-800 flex items-center gap-1">
                 <ArrowLeft className="h-4 w-4" />
                 กลับหน้าหลัก
               </Link>
@@ -201,12 +204,18 @@ export default function ProfilePage() {
             <AlertDescription className="ml-2">
               <p className="font-medium text-amber-800">บัญชีของคุณอยู่ระหว่างรอการยืนยันสังกัดจากผู้ดูแลระบบ</p>
               <p className="text-sm text-amber-700 mt-1">
-                ขณะนี้คุณสามารถสร้างและแก้ไข BOQ ของตนเองได้ แต่ยังไม่สามารถลบ/อนุมัติ BOQ ได้
+                ขณะนี้คุณยังไม่สามารถเปิด Dashboard, BOQ, บัญชีราคา, Factor F, งานพิมพ์ หรืองานส่งออกได้
               </p>
               <p className="text-sm text-amber-700 mt-1">
                 กรุณากรอกข้อมูลโปรไฟล์ให้ครบถ้วน โดยเฉพาะข้อมูลสังกัด เพื่อให้ผู้ดูแลระบบพิจารณาอนุมัติ
               </p>
             </AlertDescription>
+          </Alert>
+        )}
+
+        {selectorError && (
+          <Alert variant="destructive" className="mb-6">
+            <AlertDescription>{selectorError}</AlertDescription>
           </Alert>
         )}
 
@@ -247,10 +256,10 @@ export default function ProfilePage() {
                   </AlertDescription>
                   {message.type === 'success' && user?.status === 'pending' && (
                     <div className="mt-4">
-                      <Link href="/">
+                      <Link href="/pending">
                         <Button className="bg-green-600 hover:bg-green-700">
-                          <Home className="h-4 w-4 mr-2" />
-                          ไปหน้าหลักเพื่อสร้าง BOQ
+                          <Clock className="h-4 w-4 mr-2" />
+                          กลับหน้ารอการอนุมัติ
                         </Button>
                       </Link>
                     </div>
@@ -412,7 +421,7 @@ export default function ProfilePage() {
         )}
 
         {/* Change Password Section */}
-        {user?.status !== 'inactive' && <ChangePasswordSection />}
+        {(user?.status === 'active' || user?.status === 'pending') && <ChangePasswordSection />}
       </main>
     </div>
   )
@@ -451,6 +460,13 @@ function ChangePasswordSection() {
     }
 
     setIsChanging(true)
+
+    const authorization = await loadCurrentAuthorization(supabase)
+    if (authorization.state !== 'active' && authorization.state !== 'pending') {
+      setIsChanging(false)
+      setMessage({ type: 'error', text: 'ไม่สามารถยืนยันสิทธิ์บัญชีปัจจุบันได้' })
+      return
+    }
 
     const { error } = await supabase.auth.updateUser({
       password: newPassword

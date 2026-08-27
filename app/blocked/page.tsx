@@ -1,10 +1,35 @@
 'use client'
 
-import { useMemo } from 'react'
+import { Suspense, useMemo } from 'react'
+import { useSearchParams } from 'next/navigation'
+import {
+  resolveBlockedPageReason,
+  type BlockedPageReason,
+} from '@/lib/auth/authorization'
 import { createClient } from '@/lib/supabase/client'
 
-export default function BlockedPage() {
+const BLOCKED_COPY: Record<BlockedPageReason, {
+  message: string
+  guidanceTitle: string
+  guidance: string
+}> = {
+  domain: {
+    message: 'อีเมลนี้ไม่อยู่ในโดเมนองค์กรที่ระบบอนุญาต',
+    guidanceTitle: 'หากคุณเป็นพนักงาน NT',
+    guidance: 'กรุณาออกจากระบบแล้วเข้าสู่ระบบใหม่ด้วยอีเมล @ntplc.co.th',
+  },
+  authorization: {
+    message: 'ระบบไม่สามารถยืนยันสิทธิ์การใช้งานของบัญชีนี้ได้',
+    guidanceTitle: 'ต้องการตรวจสอบสิทธิ์',
+    guidance: 'กรุณาติดต่อผู้ดูแลระบบเพื่อตรวจสอบสถานะบัญชี',
+  },
+}
+
+function BlockedContent() {
+  const searchParams = useSearchParams()
   const supabase = useMemo(() => createClient(), [])
+  const reason = resolveBlockedPageReason(searchParams.get('reason'))
+  const copy = BLOCKED_COPY[reason]
 
   const handleSignOut = async () => {
     await supabase.auth.signOut()
@@ -25,8 +50,7 @@ export default function BlockedPage() {
         </h1>
         
         <p className="text-gray-600 mb-6">
-          อีเมลของคุณไม่ได้รับอนุญาตให้เข้าใช้งานระบบนี้<br />
-          ระบบอนุญาตเฉพาะอีเมลองค์กร @ntplc.co.th เท่านั้น
+          {copy.message}
         </p>
 
         <div className="p-4 bg-amber-50 border border-amber-200 rounded-lg mb-6 text-left">
@@ -35,8 +59,8 @@ export default function BlockedPage() {
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
             <div className="text-sm text-amber-800">
-              <p className="font-medium">หากคุณเป็นพนักงาน NT</p>
-              <p className="mt-1">กรุณาออกจากระบบแล้วเข้าสู่ระบบใหม่ด้วยอีเมล @ntplc.co.th</p>
+              <p className="font-medium">{copy.guidanceTitle}</p>
+              <p className="mt-1">{copy.guidance}</p>
             </div>
           </div>
         </div>
@@ -53,3 +77,16 @@ export default function BlockedPage() {
   )
 }
 
+export default function BlockedPage() {
+  return (
+    <Suspense
+      fallback={(
+        <div className="flex min-h-screen items-center justify-center bg-gray-50">
+          <div className="size-9 animate-spin rounded-full border-4 border-blue-600 border-t-transparent" />
+        </div>
+      )}
+    >
+      <BlockedContent />
+    </Suspense>
+  )
+}

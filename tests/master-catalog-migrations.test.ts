@@ -1,5 +1,5 @@
 import { createHash } from 'node:crypto'
-import { readFileSync } from 'node:fs'
+import { readFileSync, readdirSync } from 'node:fs'
 import { resolve } from 'node:path'
 import { describe, expect, it } from 'vitest'
 
@@ -819,6 +819,64 @@ describe('Master Catalog migration contracts', () => {
     const bootstrap = readFileSync(resolve(process.cwd(), 'scripts/bootstrap-local-db.sh'), 'utf8')
     expect(bootstrap.indexOf('-f /tmp/025.sql'))
       .toBeLessThan(bootstrap.indexOf('-f /tmp/026.sql'))
+  })
+
+  it('keeps P-12 immutable through 026 and adds the separate P-49 migration 027', () => {
+    const candidatePath = resolve(
+      process.cwd(),
+      'docs/plans/master-catalog/evidence/p49-local-prep-v2/candidate.sql',
+    )
+    const candidate = readFileSync(candidatePath, 'utf8')
+    const canonicalPhase4Migrations = readdirSync(
+      resolve(process.cwd(), 'migrations'),
+    )
+      .filter((name) => /^(?:017|017a|018|019|020|021|022|023|024|025|026)_/.test(name))
+      .sort()
+
+    expect(canonicalPhase4Migrations).toEqual([
+      '017_master_catalog_phase4_foundation.sql',
+      '017a_master_catalog_phase4_global_function_default_privileges.sql',
+      '018_master_catalog_phase4_draft_mutation.sql',
+      '019_master_catalog_phase4_publish_pointer.sql',
+      '020_master_catalog_phase4_admin_workflow_hardening.sql',
+      '021_master_catalog_phase4_placement_governance.sql',
+      '022_master_catalog_phase4_draft_identity_and_release_number.sql',
+      '023_master_catalog_phase4_published_code_rls_scope.sql',
+      '024_master_catalog_phase4_set_based_placement_invalidation.sql',
+      '025_master_catalog_phase4_withdraw_order_compaction.sql',
+      '026_master_catalog_phase4_catalog_action_error_acl.sql',
+    ])
+    expect(
+      readdirSync(resolve(process.cwd(), 'migrations')).filter((name) =>
+        /^027.*\.sql$/.test(name),
+      ),
+    ).toEqual(['027_p49_active_profile_authorization_hardening.sql'])
+    expect(candidate).toContain('P49 CONTRACT: master-catalog-preserved')
+    expect(candidate).toMatch(/FROM\s+supabase_migrations\.schema_migrations/i)
+    expect(candidate).not.toMatch(
+      /(?:INSERT\s+INTO|UPDATE|DELETE\s+FROM)\s+supabase_migrations\.schema_migrations/i,
+    )
+    expect(candidate).not.toContain(
+      '027_pending_account_authorization_hardening.sql',
+    )
+
+    const p49 = readMigration(
+      '027_p49_active_profile_authorization_hardening.sql',
+    )
+    const p49TopLevel = p49.replace(/\$(\w*)\$[\s\S]*?\$\1\$/g, '$body$')
+    expect(p49).toContain('P49 CONTRACT: master-catalog-preserved')
+    expect(p49).toContain('P49 CONTRACT: predecessor-policies-preserved')
+    expect(p49).toContain("v_latest_version IS DISTINCT FROM '20260729002600'")
+    expect(p49).not.toContain('fresh-bind-required')
+    expect(p49).not.toContain(
+      '027_pending_account_authorization_hardening.sql',
+    )
+    expect(p49TopLevel).not.toMatch(
+      /(?:INSERT\s+INTO|UPDATE|DELETE\s+FROM)\s+supabase_migrations\.schema_migrations/i,
+    )
+    expect(p49TopLevel).not.toMatch(
+      /\b(?:INSERT\s+INTO|UPDATE|DELETE\s+FROM)\s+public\.(?:price_list|price_list_versions|price_list_default_version|catalog_[a-z0-9_]+|boq|boq_items|boq_routes|factor_reference(?:_[a-z0-9_]+)?)/i,
+    )
   })
 
   it('audits best-effort WP-6.5 fixture cleanup and surfaces cleanup failures', () => {

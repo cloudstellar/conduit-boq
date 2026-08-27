@@ -6,6 +6,7 @@ import { createClient } from '@/lib/supabase/client';
 import { BOQ } from '@/lib/supabase';
 import { useAuth } from '@/lib/context/AuthContext';
 import { can } from '@/lib/permissions';
+import { requireActiveProfile } from '@/lib/auth/authorization';
 import BOQPageHeader from '@/components/boq/BOQPageHeader';
 import BOQAccessBanner from '@/components/boq/BOQAccessBanner';
 import { RouteBadge } from '@/components/boq/RouteBadge';
@@ -41,6 +42,7 @@ export default function BOQListPage() {
   useEffect(() => {
     const fetchBOQList = async () => {
       try {
+        await requireActiveProfile(supabase);
         const { data, error } = await supabase
           .from('boq')
           .select('*')
@@ -96,153 +98,15 @@ export default function BOQListPage() {
     );
   };
 
-  const handleDuplicate = async (id: string) => {
-    if (!confirm('ต้องการคัดลอกใบประมาณราคานี้หรือไม่?')) return;
-
-    try {
-      // Fetch original BOQ
-      const { data: originalBOQ, error: boqError } = await supabase
-        .from('boq')
-        .select('*')
-        .eq('id', id)
-        .single();
-
-      if (boqError) throw boqError;
-
-      // Get current user's info for ownership
-      const { data: { user: authUser } } = await supabase.auth.getUser();
-
-      // Build estimator name from user's profile
-      const estimatorName = user
-        ? `${user.title || ''}${user.first_name} ${user.last_name}`.trim() || user.email?.split('@')[0] || 'ไม่ระบุ'
-        : originalBOQ.estimator_name;
-
-      // Create new BOQ with copied data - owned by current user
-      const { data: newBOQ, error: insertError } = await supabase
-        .from('boq')
-        .insert({
-          // Use current user's name as estimator
-          estimator_name: estimatorName,
-          document_date: new Date().toISOString().split('T')[0],
-          project_name: `${originalBOQ.project_name} (สำเนา)`,
-          route: originalBOQ.route,
-          construction_area: originalBOQ.construction_area,
-          department: originalBOQ.department,
-          total_material_cost: originalBOQ.total_material_cost,
-          total_labor_cost: originalBOQ.total_labor_cost,
-          total_cost: originalBOQ.total_cost,
-          factor_f: originalBOQ.factor_f,
-          factor_f_raw: originalBOQ.factor_f_raw,
-          factor_f_lower_cost: originalBOQ.factor_f_lower_cost,
-          factor_f_upper_cost: originalBOQ.factor_f_upper_cost,
-          factor_f_lower_value: originalBOQ.factor_f_lower_value,
-          factor_f_upper_value: originalBOQ.factor_f_upper_value,
-          total_with_factor_f: originalBOQ.total_with_factor_f,
-          total_with_vat: originalBOQ.total_with_vat,
-          price_list_version_id: originalBOQ.price_list_version_id,
-          factor_reference_version_id: originalBOQ.factor_reference_version_id,
-          status: 'draft',
-          // Ownership: assign to current user
-          created_by: authUser?.id || null,
-          org_id: user?.org_id || null,
-          department_id: user?.department_id || null,
-          sector_id: user?.sector_id || null,
-        })
-        .select()
-        .single();
-
-      if (insertError) throw insertError;
-
-      // Fetch and copy routes
-      const { data: routes, error: routesError } = await supabase
-        .from('boq_routes')
-        .select('*')
-        .eq('boq_id', id)
-        .order('route_order');
-
-      if (routesError) throw routesError;
-
-      if (routes && routes.length > 0) {
-        // Create route mapping (old route id -> new route id)
-        const routeMapping: Record<string, string> = {};
-
-        for (const route of routes) {
-          const { data: newRoute, error: routeInsertError } = await supabase
-            .from('boq_routes')
-            .insert({
-              boq_id: newBOQ.id,
-              route_order: route.route_order,
-              route_name: route.route_name,
-              route_description: route.route_description,
-              construction_area: route.construction_area,
-              total_material_cost: route.total_material_cost,
-              total_labor_cost: route.total_labor_cost,
-              total_cost: route.total_cost,
-              cost_with_factor_f: route.cost_with_factor_f,
-            })
-            .select()
-            .single();
-
-          if (routeInsertError) throw routeInsertError;
-          routeMapping[route.id] = newRoute.id;
-        }
-
-        // Fetch and copy items
-        const { data: items, error: itemsError } = await supabase
-          .from('boq_items')
-          .select('*')
-          .eq('boq_id', id)
-          .order('item_order');
-
-        if (itemsError) throw itemsError;
-
-        if (items && items.length > 0) {
-          const newItems = items.map(item => ({
-            boq_id: newBOQ.id,
-            route_id: item.route_id ? routeMapping[item.route_id] : null,
-            item_order: item.item_order,
-            price_list_id: item.price_list_id,
-            item_name: item.item_name,
-            quantity: item.quantity,
-            unit: item.unit,
-            material_cost_per_unit: item.material_cost_per_unit,
-            labor_cost_per_unit: item.labor_cost_per_unit,
-            unit_cost: item.unit_cost,
-            total_material_cost: item.total_material_cost,
-            total_labor_cost: item.total_labor_cost,
-            total_cost: item.total_cost,
-            remarks: item.remarks,
-            category: item.category,
-          }));
-
-          const { error: itemsInsertError } = await supabase
-            .from('boq_items')
-            .insert(newItems);
-
-          if (itemsInsertError) throw itemsInsertError;
-        }
-      }
-
-      // Refresh list
-      const { data: updatedList } = await supabase
-        .from('boq')
-        .select('*')
-        .order('created_at', { ascending: false });
-
-      setBOQList(updatedList || []);
-      alert('คัดลอกใบประมาณราคาเรียบร้อยแล้ว');
-    } catch (err) {
-      console.error('Error duplicating BOQ:', err);
-      alert('เกิดข้อผิดพลาดในการคัดลอก');
-    }
-  };
+  const copyDisabledReason = 'ปิดการคัดลอกชั่วคราวจนกว่าระบบคัดลอกแบบ atomic จะพร้อมใช้งาน';
 
   const handleDelete = async (id: string) => {
     if (!confirm('ต้องการลบใบประมาณราคานี้หรือไม่?')) return;
 
     try {
-      await supabase.from('boq_items').delete().eq('boq_id', id);
-      await supabase.from('boq').delete().eq('id', id);
+      await requireActiveProfile(supabase);
+      const { error } = await supabase.from('boq').delete().eq('id', id);
+      if (error) throw error;
       setBOQList((prev) => prev.filter((b) => b.id !== id));
     } catch (err) {
       console.error('Error deleting BOQ:', err);
@@ -329,7 +193,7 @@ export default function BOQListPage() {
                         พิมพ์
                       </Button>
                     </Link>
-                    <Button variant="outline" size="sm" onClick={() => handleDuplicate(boq.id)}>
+                    <Button variant="outline" size="sm" disabled title={copyDisabledReason}>
                       <Copy className="h-4 w-4 mr-1" />
                       คัดลอก
                     </Button>
@@ -432,12 +296,12 @@ export default function BOQListPage() {
                           </Tooltip>
                           <Tooltip>
                             <TooltipTrigger asChild>
-                              <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-green-600" onClick={() => handleDuplicate(boq.id)}>
+                              <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground" disabled title={copyDisabledReason}>
                                 <Copy className="h-4 w-4" />
                               </Button>
                             </TooltipTrigger>
                             <TooltipContent>
-                              <p>คัดลอก</p>
+                              <p>{copyDisabledReason}</p>
                             </TooltipContent>
                           </Tooltip>
                           <Tooltip>

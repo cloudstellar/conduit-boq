@@ -24,14 +24,14 @@ export function can(
 ): boolean {
   if (!user) return false
 
-  // Inactive/Suspended users cannot do anything except view/update own profile
+  // Inactive/Suspended users are confined to the dedicated blocked/logout flow.
   if (user.status === 'inactive' || user.status === 'suspended') {
-    return resource === 'profile' && (action === 'read' || action === 'update')
+    return false
   }
 
   // Pending users have limited permissions
   if (user.status === 'pending') {
-    return canPending(user, action, resource, context)
+    return canPending(action, resource)
   }
 
   // Admin can do everything (except approve own BOQ - SoD)
@@ -72,52 +72,15 @@ export function can(
 
 /**
  * Permissions for pending users (awaiting admin approval)
- * Limited to own BOQ only, no delete/approve
+ * Pending users can only read/update their own safe profile/onboarding data.
  */
 function canPending(
-  user: UserProfileWithOrg,
   action: Action,
   resource: Resource,
-  ctx?: BOQContext
 ): boolean {
   // Profile - can read/update own
   if (resource === 'profile') {
     return action === 'read' || action === 'update'
-  }
-
-  // Price list - can read
-  if (resource === 'price_list') {
-    return action === 'read'
-  }
-
-  // BOQ - limited to own only (v1.2.0: only created_by, no assigned_to)
-  if (resource === 'boq') {
-    const isOwner = ctx?.created_by === user.id // No assigned_to for pending
-
-    switch (action) {
-      case 'create':
-        return true // Can create new BOQ
-      case 'read':
-        return isOwner // Can only read own BOQ (no legacy, no assigned)
-      case 'update':
-        return isOwner // Can only update own BOQ
-      case 'delete':
-        return false // Cannot delete
-      case 'approve':
-        return false // Cannot approve
-      default:
-        return false
-    }
-  }
-
-  // User management - no
-  if (resource === 'user') {
-    return false
-  }
-
-  // Committee - no
-  if (resource === 'committee') {
-    return false
   }
 
   return false

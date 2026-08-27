@@ -1,5 +1,6 @@
 import type { SupabaseClient } from '@supabase/supabase-js';
 import type { UserRole } from '@/lib/types/auth';
+import { loadCurrentAuthorization } from '../../auth/authorization';
 import {
   loadCatalogVersionWorkspace,
   loadCatalogVersionItemsSnapshot,
@@ -333,23 +334,15 @@ export function formatThaiNumber(value: number | null | undefined): string {
 export async function loadCatalogAdminGate(
   supabase: SupabaseClient,
 ): Promise<CatalogAdminGate> {
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  if (!user) {
+  const authorization = await loadCurrentAuthorization(supabase);
+  if (authorization.state === 'unauthenticated') {
     return { state: 'unauthenticated' };
   }
-
-  const { data: profile, error: profileError } = await supabase
-    .from('user_profiles')
-    .select('id,email,first_name,last_name,role,status')
-    .eq('id', user.id)
-    .maybeSingle();
-
-  if (profileError || !profile) {
+  if (authorization.state === 'unavailable') {
     return { state: 'forbidden', profile: null };
   }
+
+  const profile = authorization.profile;
 
   const mappedProfile: CatalogAdminProfile = {
     id: String(profile.id),
@@ -360,10 +353,20 @@ export async function loadCatalogAdminGate(
     status: profile.status as CatalogAdminProfile['status'],
   };
 
-  if (!isActiveAdminProfile(profile)) {
+  if (authorization.state !== 'active' || !isActiveAdminProfile(profile)) {
     return { state: 'forbidden', profile: mappedProfile };
   }
 
+  if (authorization.source === 'v2') {
+    return {
+      state: 'disabled',
+      profile: mappedProfile,
+      flagIssue: 'P-49 ไม่เปิดเผย feature flag ดิบ เครื่องมือแก้ไขจึงปิดแบบปลอดภัย',
+    };
+  }
+
+  // Pre-migration compatibility only. Once get_my_profile_v2 exists, raw
+  // setting access below is unreachable and the catalog remains read-only.
   const { data: setting, error: settingError } = await supabase
     .from('app_settings')
     .select('value')

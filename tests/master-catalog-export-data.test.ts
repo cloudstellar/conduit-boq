@@ -238,6 +238,19 @@ function createExportClient(
     auth: {
       getUser: async () => ({ data: { user: { id: 'user-admin' } }, error: null }),
     },
+    rpc: async (name: string) => {
+      calls.push(`rpc:${name}`);
+      if (name !== 'get_my_profile_v2') {
+        throw new CatalogExportError('TEST_UNEXPECTED_RPC', `Unexpected RPC: ${name}`);
+      }
+      return {
+        data: null,
+        error: {
+          code: 'PGRST202',
+          message: 'Could not find public.get_my_profile_v2 in the schema cache',
+        },
+      };
+    },
     from: (table: string) => {
       calls.push(`from:${table}`);
       const filters = new Map<string, unknown>();
@@ -287,6 +300,8 @@ function maybeSingle(
         last_name: 'User',
         role: 'admin',
         status: 'active',
+        created_at: '2026-08-27T00:00:00.000Z',
+        updated_at: '2026-08-27T00:00:00.000Z',
       },
       error: null,
     };

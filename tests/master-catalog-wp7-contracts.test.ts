@@ -75,14 +75,15 @@ describe('Master Catalog WP-7 regression contracts', () => {
 
     expect(createPage).toContain('price_list_version_id: latestCatalogVersion.id')
     expect(createPage).toContain('factor_reference_version_id: factorReferenceVersion.id')
-    expect(listPage).toContain('price_list_version_id: originalBOQ.price_list_version_id')
-    expect(listPage).toContain('factor_reference_version_id: originalBOQ.factor_reference_version_id')
-    expect(listPage).toContain('factor_f_raw: originalBOQ.factor_f_raw')
-    expect(listPage).toContain('category: item.category')
+    expect(listPage).toContain('copyDisabledReason')
+    expect(listPage).toMatch(/disabled title=\{copyDisabledReason\}/)
+    expect(listPage).not.toContain('handleDuplicate')
+    expect(listPage).not.toContain('originalBOQ')
 
-    expect(editPage).toContain('factor_reference_version_id: currentFactorVersion.id')
-    expect(editPage).toContain('factor_f_raw: null')
-    expect(editPage).toContain('price_list_version_id: originalBOQ.price_list_version_id')
+    expect(editPage).toContain('FACTOR_COPY_DISABLED_REASON')
+    expect(editPage).toMatch(/disabled\s+title=\{FACTOR_COPY_DISABLED_REASON\}/)
+    expect(editPage).not.toContain('handleCreateFactorCopy')
+    expect(editPage).not.toContain('originalBOQ')
 
     expect(printPage).toContain(
       'getActiveFactorReferenceVersion(supabase, boqData.factor_reference_version_id)',

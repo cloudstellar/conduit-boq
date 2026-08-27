@@ -6,6 +6,7 @@ import { BOQ } from '@/lib/supabase';
 import { UserProfileWithOrg } from '@/lib/types/auth';
 import { PostgrestError } from '@supabase/supabase-js';
 import { getActiveDefaultPriceListVersion } from '@/lib/catalog/defaultVersion';
+import { requireActiveProfile } from '@/lib/auth/authorization';
 
 export interface DashboardStats {
   myBoqsCount: number;
@@ -38,7 +39,9 @@ export function useDashboardData(user: UserProfileWithOrg | null) {
   const supabase = useMemo(() => createClient(), []);
 
   const refreshData = useCallback(async () => {
-    if (!user) {
+    if (!user || user.status !== 'active') {
+      setStats(null);
+      setRecentBoqs([]);
       setIsLoading(false);
       return;
     }
@@ -46,6 +49,7 @@ export function useDashboardData(user: UserProfileWithOrg | null) {
     setError(null);
 
     try {
+      await requireActiveProfile(supabase);
       const defaultVersionPromise = getActiveDefaultPriceListVersion(supabase);
 
       // 3. Fetch BOQs created by this user

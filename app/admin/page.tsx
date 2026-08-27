@@ -3,7 +3,7 @@
 // Force dynamic rendering to prevent prerender error on Vercel
 export const dynamic = 'force-dynamic'
 
-import { useState, useEffect, useMemo } from 'react'
+import { useState, useEffect, useMemo, useCallback } from 'react'
 import nextDynamic from 'next/dynamic'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
@@ -11,9 +11,13 @@ import { createClient } from '@/lib/supabase/client'
 import { useAuth } from '@/lib/context/AuthContext'
 import { UserRole } from '@/lib/types/auth'
 import { getRoleLabel } from '@/lib/permissions'
-import { isCatalogAdminEnabled } from '@/lib/master-catalog/admin/flags'
+import {
+  canAdminTransitionUserStatus,
+  isExactMissingRpcError,
+  requireActiveAdmin,
+} from '@/lib/auth/authorization'
 import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Card } from '@/components/ui/card'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Badge } from '@/components/ui/badge'
 import {
@@ -31,9 +35,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
-import { Switch } from '@/components/ui/switch'
-import { Label } from '@/components/ui/label'
-import { Loader2, ArrowLeft, Check, X, Trash2, Database } from 'lucide-react'
+import { Loader2, ArrowLeft, Check, X } from 'lucide-react'
 
 interface UserProfile {
   id: string
@@ -60,61 +62,97 @@ function AdminContent() {
   const [error, setError] = useState<string | null>(null)
   const [editingUser, setEditingUser] = useState<string | null>(null)
   const [savingUser, setSavingUser] = useState<string | null>(null)
-  const [deletingUser, setDeletingUser] = useState<string | null>(null)
   const [approvingUser, setApprovingUser] = useState<string | null>(null)
-  const [restrictEmailDomain, setRestrictEmailDomain] = useState(false)
-  const [catalogAdminEnabled, setCatalogAdminEnabled] = useState(false)
-  const [savingSettings, setSavingSettings] = useState(false)
+  const [adminMutationsEnabled, setAdminMutationsEnabled] = useState(false)
 
   const supabase = useMemo(() => createClient(), [])
 
   // Redirect to login if not authenticated
   useEffect(() => {
     if (!authLoading && !user) {
-      router.push('/login?redirect=/admin')
+      router.push('/login?redirectTo=/admin')
     }
   }, [authLoading, user, router])
 
-  // Load users and settings in parallel
+  const loadAuthorizedUsers = useCallback(async (source: 'v2' | 'legacy-read-only') => {
+    const pageResult = await supabase.rpc('get_admin_profiles_page', {
+      p_limit: 100,
+      p_cursor_created_at: null,
+      p_cursor_id: null,
+    })
+
+    if (pageResult.error) {
+      if (
+        source !== 'legacy-read-only'
+        || !isExactMissingRpcError(pageResult.error, 'get_admin_profiles_page')
+      ) {
+        throw new Error('ไม่สามารถอ่านทะเบียนผู้ใช้งานที่ได้รับอนุญาตได้')
+      }
+
+      const fallback = await supabase.from('user_profiles').select(`
+        id, email, first_name, last_name, title, position, role, status, created_at, onboarding_completed,
+        department:departments!user_profiles_department_id_fkey(id, name),
+        sector:sectors!user_profiles_sector_id_fkey(id, name),
+        requested_department:departments!user_profiles_requested_department_id_fkey(id, name),
+        requested_sector:sectors!user_profiles_requested_sector_id_fkey(id, name)
+      `).order('created_at', { ascending: false })
+
+      if (fallback.error) throw new Error('ไม่สามารถอ่านทะเบียนผู้ใช้งานได้')
+      return (fallback.data || []) as unknown as UserProfile[]
+    }
+
+    const rows = (Array.isArray(pageResult.data) ? pageResult.data : []) as Record<string, unknown>[]
+    const [departmentsResult, sectorsResult] = await Promise.all([
+      supabase.from('departments').select('id,name'),
+      supabase.from('sectors').select('id,name'),
+    ])
+    const departments = new Map(
+      (departmentsResult.data || []).map((row) => [String(row.id), { id: String(row.id), name: String(row.name) }]),
+    )
+    const sectors = new Map(
+      (sectorsResult.data || []).map((row) => [String(row.id), { id: String(row.id), name: String(row.name) }]),
+    )
+
+    return rows.map((row) => ({
+      id: String(row.id),
+      email: typeof row.email === 'string' ? row.email : null,
+      first_name: String(row.first_name ?? ''),
+      last_name: String(row.last_name ?? ''),
+      title: typeof row.title === 'string' ? row.title : null,
+      position: typeof row.position === 'string' ? row.position : null,
+      role: row.role as UserRole,
+      status: row.status as UserProfile['status'],
+      department: departments.get(String(row.department_id)) ?? null,
+      sector: sectors.get(String(row.sector_id)) ?? null,
+      requested_department: departments.get(String(row.requested_department_id)) ?? null,
+      requested_sector: sectors.get(String(row.requested_sector_id)) ?? null,
+      onboarding_completed: row.onboarding_completed === true,
+      created_at: String(row.created_at ?? ''),
+    }))
+  }, [supabase])
+
+  // Load the bounded admin directory. The legacy table fallback is read-only
+  // and is reachable only when both new profile RPCs are exactly missing.
   useEffect(() => {
     if (!user || user.role !== 'admin') return
 
     let cancelled = false
 
     const loadData = async () => {
+      setAdminMutationsEnabled(false)
       try {
-        const [usersRes, settingsRes] = await Promise.all([
-          supabase.from('user_profiles').select(`
-            id, email, first_name, last_name, title, position, role, status, created_at, onboarding_completed,
-            department:departments!user_profiles_department_id_fkey(id, name),
-            sector:sectors!user_profiles_sector_id_fkey(id, name),
-            requested_department:departments!user_profiles_requested_department_id_fkey(id, name),
-            requested_sector:sectors!user_profiles_requested_sector_id_fkey(id, name)
-          `).order('created_at', { ascending: false }),
-          supabase
-            .from('app_settings')
-            .select('key, value')
-            .in('key', ['restrict_email_domain', 'catalog_admin_enabled'])
-        ])
+        const authorization = await requireActiveAdmin(supabase)
+        const loadedUsers = await loadAuthorizedUsers(authorization.source)
 
         if (cancelled) return
-
-        if (usersRes.error) {
-          setError(usersRes.error.message)
-        } else {
-          setUsers((usersRes.data || []) as unknown as UserProfile[])
-        }
-        if (settingsRes.data) {
-          const settings = new Map(
-            settingsRes.data.map((setting) => [setting.key, setting.value])
-          )
-          const restrictValue = settings.get('restrict_email_domain')
-          const catalogAdminValue = settings.get('catalog_admin_enabled')
-          setRestrictEmailDomain(restrictValue === true || restrictValue === 'true')
-          setCatalogAdminEnabled(isCatalogAdminEnabled(catalogAdminValue))
-        }
+        setUsers(loadedUsers)
+        setAdminMutationsEnabled(authorization.source === 'v2')
       } catch (err) {
         console.error('Load error:', err)
+        if (!cancelled) {
+          setAdminMutationsEnabled(false)
+          setError(err instanceof Error ? err.message : 'โหลดข้อมูลผู้ดูแลระบบไม่สำเร็จ')
+        }
       }
       if (!cancelled) {
         setIsLoading(false)
@@ -123,82 +161,108 @@ function AdminContent() {
     loadData()
 
     return () => { cancelled = true }
-  }, [user, supabase])
+  }, [user, supabase, loadAuthorizedUsers])
 
   const refreshUsers = async () => {
     setIsLoading(true)
-    const { data, error } = await supabase
-      .from('user_profiles')
-      .select(`
-        id, email, first_name, last_name, title, position, role, status, created_at, onboarding_completed,
-        department:departments!user_profiles_department_id_fkey(id, name),
-        sector:sectors!user_profiles_sector_id_fkey(id, name),
-        requested_department:departments!user_profiles_requested_department_id_fkey(id, name),
-        requested_sector:sectors!user_profiles_requested_sector_id_fkey(id, name)
-      `)
-      .order('created_at', { ascending: false })
-
-    if (error) {
-      setError(error.message)
-    } else {
-      setUsers((data || []) as unknown as UserProfile[])
+    try {
+      const authorization = await requireActiveAdmin(supabase)
+      setUsers(await loadAuthorizedUsers(authorization.source))
+      setAdminMutationsEnabled(authorization.source === 'v2')
+    } catch {
+      setAdminMutationsEnabled(false)
+      setError('ไม่สามารถโหลดทะเบียนผู้ใช้งานล่าสุดได้')
+    } finally {
+      setIsLoading(false)
     }
-    setIsLoading(false)
   }
 
-  const handleToggleEmailRestriction = async () => {
-    setSavingSettings(true)
-    const newValue = !restrictEmailDomain
-
-    const { error } = await supabase
-      .from('app_settings')
-      .upsert({
-        key: 'restrict_email_domain',
-        value: newValue,
-        updated_at: new Date().toISOString()
-      })
-
-    if (error) {
-      alert('เกิดข้อผิดพลาด: ' + error.message)
-    } else {
-      setRestrictEmailDomain(newValue)
+  const requireV2AdminMutationAuthority = async () => {
+    const authorization = await requireActiveAdmin(supabase)
+    if (authorization.source !== 'v2') {
+      throw new Error('P-49 mutation RPCs are not available yet')
     }
-    setSavingSettings(false)
+    return authorization
   }
 
   const handleRoleChange = async (userId: string, newRole: UserRole) => {
-    setSavingUser(userId)
-    const { error } = await supabase
-      .from('user_profiles')
-      .update({ role: newRole })
-      .eq('id', userId)
-
-    if (error) {
-      alert('เกิดข้อผิดพลาด: ' + error.message)
-    } else {
-      setUsers(users.map(u => u.id === userId ? { ...u, role: newRole } : u))
-      setEditingUser(null)
+    if (!adminMutationsEnabled) {
+      alert('การจัดการบัญชีถูกปิดชั่วคราวระหว่างปรับปรุงสิทธิ์')
+      return
     }
-    setSavingUser(null)
+    const target = users.find((candidate) => candidate.id === userId)
+    if (!target || target.status !== 'active') {
+      alert('เปลี่ยนบทบาทได้เฉพาะบัญชีที่กำลังใช้งาน')
+      setEditingUser(null)
+      return
+    }
+    const reason = prompt('ระบุเหตุผลที่เปลี่ยนบทบาท:')?.trim()
+    if (!reason) return
+    setSavingUser(userId)
+    try {
+      await requireV2AdminMutationAuthority()
+      const { error } = await supabase.rpc('admin_set_user_role', {
+        p_target_id: userId,
+        p_new_role: newRole,
+        p_reason: reason,
+        p_request_id: crypto.randomUUID(),
+      })
+
+      if (error) throw error
+      setUsers((currentUsers) => currentUsers.map(
+        (candidate) => candidate.id === userId ? { ...candidate, role: newRole } : candidate,
+      ))
+      setEditingUser(null)
+    } catch {
+      alert('ไม่สามารถเปลี่ยนบทบาทได้ กรุณาตรวจสอบสิทธิ์และลองใหม่')
+    } finally {
+      setSavingUser(null)
+    }
   }
 
   const handleStatusChange = async (userId: string, newStatus: 'active' | 'inactive' | 'suspended' | 'pending') => {
-    setSavingUser(userId)
-    const { error } = await supabase
-      .from('user_profiles')
-      .update({ status: newStatus })
-      .eq('id', userId)
-
-    if (error) {
-      alert('เกิดข้อผิดพลาด: ' + error.message)
-    } else {
-      setUsers(users.map(u => u.id === userId ? { ...u, status: newStatus } : u))
+    if (!adminMutationsEnabled) {
+      alert('การจัดการบัญชีถูกปิดชั่วคราวระหว่างปรับปรุงสิทธิ์')
+      return
     }
-    setSavingUser(null)
+    const target = users.find((candidate) => candidate.id === userId)
+    if (!target || target.status === newStatus) return
+    if (!canAdminTransitionUserStatus(target.status, newStatus)) {
+      alert('ไม่อนุญาตให้เปลี่ยนสถานะตามเส้นทางนี้')
+      return
+    }
+    const rpcName = newStatus === 'active'
+      ? 'admin_reactivate_user'
+      : newStatus === 'inactive'
+        ? 'admin_deactivate_user'
+        : 'admin_suspend_user'
+    const reason = prompt('ระบุเหตุผลที่เปลี่ยนสถานะบัญชี:')?.trim()
+    if (!reason) return
+    setSavingUser(userId)
+    try {
+      await requireV2AdminMutationAuthority()
+      const { error } = await supabase.rpc(rpcName, {
+        p_target_id: userId,
+        p_reason: reason,
+        p_request_id: crypto.randomUUID(),
+      })
+      if (error) throw error
+      setUsers((currentUsers) => currentUsers.map(
+        (candidate) => candidate.id === userId ? { ...candidate, status: newStatus } : candidate,
+      ))
+    } catch {
+      alert('ไม่สามารถเปลี่ยนสถานะบัญชีได้ กรุณาตรวจสอบสิทธิ์และลองใหม่')
+    } finally {
+      setSavingUser(null)
+    }
   }
 
   // v1.2.0: Approve pending user via RPC
   const handleApproveUser = async (userId: string) => {
+    if (!adminMutationsEnabled) {
+      alert('การจัดการบัญชีถูกปิดชั่วคราวระหว่างปรับปรุงสิทธิ์')
+      return
+    }
     const targetUser = users.find(u => u.id === userId)
     if (!targetUser?.requested_department || !targetUser?.requested_sector) {
       alert('ผู้ใช้ยังไม่ได้เลือกฝ่าย/ส่วน กรุณาให้ผู้ใช้ลงทะเบียนสังกัดก่อน')
@@ -210,66 +274,53 @@ function AdminContent() {
     }
 
     setApprovingUser(userId)
-    const { error } = await supabase.rpc('admin_approve_user', { p_target_id: userId })
-
-    if (error) {
-      alert('เกิดข้อผิดพลาด: ' + error.message)
-    } else {
+    try {
+      await requireV2AdminMutationAuthority()
+      const { error } = await supabase.rpc('admin_approve_user', {
+        p_target_id: userId,
+        p_request_id: crypto.randomUUID(),
+        p_reason: 'อนุมัติข้อมูลและสังกัดตามคำขอ',
+      })
+      if (error) throw error
       // Update local state
-      setUsers(users.map(u => u.id === userId ? {
-        ...u,
+      setUsers((currentUsers) => currentUsers.map((candidate) => candidate.id === userId ? {
+        ...candidate,
         status: 'active' as const,
         department: targetUser.requested_department,
         sector: targetUser.requested_sector,
         onboarding_completed: true
-      } : u))
+      } : candidate))
+    } catch {
+      alert('ไม่สามารถอนุมัติบัญชีได้ กรุณาตรวจสอบสิทธิ์และข้อมูลล่าสุด')
+    } finally {
+      setApprovingUser(null)
     }
-    setApprovingUser(null)
   }
 
   // v1.2.0: Reject pending user via RPC  
   const handleRejectUser = async (userId: string) => {
-    const note = prompt('หมายเหตุ (ไม่บังคับ):')
-    if (note === null) return // User cancelled
+    if (!adminMutationsEnabled) {
+      alert('การจัดการบัญชีถูกปิดชั่วคราวระหว่างปรับปรุงสิทธิ์')
+      return
+    }
+    const note = prompt('ระบุเหตุผลที่ปฏิเสธ:')?.trim()
+    if (!note) return
 
     setApprovingUser(userId)
-    const { error } = await supabase.rpc('admin_reject_user', {
-      p_target_id: userId,
-      p_note: note || null
-    })
-
-    if (error) {
-      alert('เกิดข้อผิดพลาด: ' + error.message)
-    } else {
+    try {
+      await requireV2AdminMutationAuthority()
+      const { error } = await supabase.rpc('admin_reject_user', {
+        p_target_id: userId,
+        p_reason: note,
+        p_request_id: crypto.randomUUID(),
+      })
+      if (error) throw error
       alert('ปฏิเสธเรียบร้อย ผู้ใช้สามารถแก้ไขสังกัดและส่งใหม่ได้')
       await refreshUsers()
-    }
-    setApprovingUser(null)
-  }
-
-  const handleDeleteUser = async (userId: string, email: string | null) => {
-    const confirmMessage = `ต้องการลบผู้ใช้ ${email || 'ไม่ทราบอีเมล'} หรือไม่?\n\nการดำเนินการนี้ไม่สามารถย้อนกลับได้`
-    if (!confirm(confirmMessage)) return
-
-    setDeletingUser(userId)
-    try {
-      const response = await fetch(`/api/admin/users/${userId}`, {
-        method: 'DELETE',
-      })
-
-      const data = await response.json()
-
-      if (!response.ok) {
-        throw new Error(data.error || 'Failed to delete user')
-      }
-
-      // Remove user from list
-      setUsers(users.filter(u => u.id !== userId))
-      alert('ลบผู้ใช้เรียบร้อยแล้ว')
-    } catch (err) {
-      alert('เกิดข้อผิดพลาด: ' + (err instanceof Error ? err.message : 'Unknown error'))
+    } catch {
+      alert('ไม่สามารถปฏิเสธบัญชีได้ กรุณาตรวจสอบสิทธิ์และข้อมูลล่าสุด')
     } finally {
-      setDeletingUser(null)
+      setApprovingUser(null)
     }
   }
 
@@ -332,57 +383,17 @@ function AdminContent() {
       </header>
 
       <main className="max-w-7xl mx-auto px-4 py-6 sm:px-6 lg:px-8">
-        {catalogAdminEnabled ? (
-          <Card className="mb-6">
-            <CardHeader>
-              <CardTitle>Master Catalog</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                <div className="flex items-start gap-3">
-                  <div className="flex size-10 items-center justify-center rounded-md border bg-background text-muted-foreground">
-                    <Database className="size-4" />
-                  </div>
-                  <div>
-                    <div className="font-medium">จัดการบัญชีราคามาตรฐาน</div>
-                    <div className="text-sm text-muted-foreground">
-                      Master Catalog Phase 4 admin shell
-                    </div>
-                  </div>
-                </div>
-                <Button asChild>
-                  <Link href="/admin/master-catalog">เปิด Master Catalog</Link>
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-        ) : null}
-
-        {/* Settings Section */}
-        <Card className="mb-6">
-          <CardHeader>
-            <CardTitle>ตั้งค่าระบบ</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="flex items-center justify-between">
-              <div className="space-y-0.5">
-                <Label>จำกัดการสมัครเฉพาะอีเมล @ntplc.co.th</Label>
-                <p className="text-sm text-muted-foreground">
-                  เมื่อเปิดใช้งาน ผู้ใช้สามารถสมัครได้เฉพาะอีเมลของ NT เท่านั้น
-                </p>
-              </div>
-              <Switch
-                checked={restrictEmailDomain}
-                onCheckedChange={handleToggleEmailRestriction}
-                disabled={savingSettings}
-              />
-            </div>
-          </CardContent>
-        </Card>
-
         {error && (
           <Alert variant="destructive" className="mb-4">
             <AlertDescription>{error}</AlertDescription>
+          </Alert>
+        )}
+
+        {!isLoading && !adminMutationsEnabled && (
+          <Alert className="mb-4 border-amber-200 bg-amber-50 text-amber-900">
+            <AlertDescription>
+              ขณะนี้ดูทะเบียนผู้ใช้ได้ตามปกติ แต่การอนุมัติ เปลี่ยนบทบาท และเปลี่ยนสถานะถูกปิดชั่วคราวจนกว่าฐานข้อมูลสิทธิ์รุ่นใหม่จะพร้อม
+            </AlertDescription>
           </Alert>
         )}
 
@@ -436,7 +447,7 @@ function AdminContent() {
                         <Select
                           value={u.role}
                           onValueChange={(v) => handleRoleChange(u.id, v as UserRole)}
-                          disabled={savingUser === u.id}
+                          disabled={!adminMutationsEnabled || savingUser === u.id || u.status !== 'active'}
                         >
                           <SelectTrigger className="w-[140px]">
                             <SelectValue />
@@ -454,7 +465,8 @@ function AdminContent() {
                           variant="link"
                           className="p-0 h-auto"
                           onClick={() => setEditingUser(u.id)}
-                          disabled={u.id === user?.id}
+                          disabled={!adminMutationsEnabled || u.id === user?.id || u.status !== 'active'}
+                          title={u.status === 'active' ? 'เปลี่ยนบทบาท' : 'เปลี่ยนบทบาทได้เฉพาะบัญชีที่กำลังใช้งาน'}
                         >
                           {getRoleLabel(u.role)}
                         </Button>
@@ -464,16 +476,28 @@ function AdminContent() {
                       <Select
                         value={u.status}
                         onValueChange={(v) => handleStatusChange(u.id, v as 'active' | 'inactive' | 'suspended' | 'pending')}
-                        disabled={savingUser === u.id || u.id === user?.id}
+                        disabled={!adminMutationsEnabled || savingUser === u.id || u.id === user?.id || u.status === 'pending'}
                       >
                         <SelectTrigger className={`w-[130px] ${u.status === 'pending' ? 'border-yellow-400 bg-yellow-50' : ''}`}>
                           <SelectValue />
                         </SelectTrigger>
                         <SelectContent>
                           <SelectItem value="active">ใช้งาน</SelectItem>
-                          <SelectItem value="pending">รอการอนุมัติ</SelectItem>
-                          <SelectItem value="inactive">ไม่ใช้งาน</SelectItem>
-                          <SelectItem value="suspended">ระงับ</SelectItem>
+                          {u.status === 'pending' && (
+                            <SelectItem value="pending" disabled>รอการอนุมัติ</SelectItem>
+                          )}
+                          {u.status === 'active' && (
+                            <>
+                              <SelectItem value="inactive">ไม่ใช้งาน</SelectItem>
+                              <SelectItem value="suspended">ระงับ</SelectItem>
+                            </>
+                          )}
+                          {u.status === 'inactive' && (
+                            <SelectItem value="inactive" disabled>ไม่ใช้งาน</SelectItem>
+                          )}
+                          {u.status === 'suspended' && (
+                            <SelectItem value="suspended" disabled>ระงับ</SelectItem>
+                          )}
                         </SelectContent>
                       </Select>
                     </TableCell>
@@ -486,7 +510,7 @@ function AdminContent() {
                               size="sm"
                               variant="outline"
                               onClick={() => handleApproveUser(u.id)}
-                              disabled={approvingUser === u.id}
+                              disabled={!adminMutationsEnabled || approvingUser === u.id}
                               className="h-7 bg-green-50 text-green-700 hover:bg-green-100"
                             >
                               {approvingUser === u.id ? <Loader2 className="h-3 w-3 animate-spin" /> : <Check className="h-3 w-3" />}
@@ -495,24 +519,13 @@ function AdminContent() {
                               size="sm"
                               variant="outline"
                               onClick={() => handleRejectUser(u.id)}
-                              disabled={approvingUser === u.id}
+                              disabled={!adminMutationsEnabled || approvingUser === u.id}
                               className="h-7 bg-red-50 text-red-700 hover:bg-red-100"
                             >
                               <X className="h-3 w-3" />
                             </Button>
                           </>
                         ) : null}
-                        {u.id !== user?.id && (
-                          <Button
-                            size="sm"
-                            variant="ghost"
-                            onClick={() => handleDeleteUser(u.id, u.email)}
-                            disabled={deletingUser === u.id}
-                            className="h-7 text-red-600 hover:text-red-800 hover:bg-red-50"
-                          >
-                            {deletingUser === u.id ? <Loader2 className="h-3 w-3 animate-spin" /> : <Trash2 className="h-3 w-3" />}
-                          </Button>
-                        )}
                       </div>
                     </TableCell>
                   </TableRow>

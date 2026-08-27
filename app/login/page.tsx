@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useMemo, Suspense } from 'react'
+import { useState, useMemo, Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import Image from 'next/image'
 import Link from 'next/link'
@@ -13,14 +13,14 @@ import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Separator } from '@/components/ui/separator'
 import { Loader2 } from 'lucide-react'
 import {
-  getOrganizationEmailDomainError,
   normalizeOrganizationEmail,
 } from '@/lib/auth/email'
+import { isSignupEmailAllowed, safeInternalPath } from '@/lib/auth/authorization'
 
 function LoginForm() {
   const router = useRouter()
   const searchParams = useSearchParams()
-  const redirectTo = searchParams.get('redirectTo') || '/'
+  const redirectTo = safeInternalPath(searchParams.get('redirectTo'))
   const supabase = useMemo(() => createClient(), [])
 
   const [email, setEmail] = useState('')
@@ -29,28 +29,15 @@ function LoginForm() {
   const [error, setError] = useState<string | null>(null)
   const [success, setSuccess] = useState<string | null>(null)
   const [mode, setMode] = useState<'login' | 'signup' | 'forgot'>('login')
-  const [isEmailRestricted, setIsEmailRestricted] = useState(true)
   const [emailDomainError, setEmailDomainError] = useState<string | null>(null)
 
-  // Fetch email domain restriction setting
-  useEffect(() => {
-    const fetchSetting = async () => {
-      const { data, error } = await supabase
-        .from('app_settings')
-        .select('value')
-        .eq('key', 'restrict_email_domain')
-        .single()
-      if (error || !data) {
-        return
-      }
-      setIsEmailRestricted(data?.value === true || data?.value === 'true')
-    }
-    fetchSetting()
-  }, [supabase])
-
-  // Validate email domain
+  // Local syntax is only a display hint. The bounded database routine is the
+  // authoritative domain decision at submit time.
   const validateEmailDomain = (emailValue: string) => {
-    const domainError = getOrganizationEmailDomainError(emailValue, isEmailRestricted)
+    const normalized = normalizeOrganizationEmail(emailValue, true)
+    const domainError = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(normalized)
+      ? null
+      : 'กรุณากรอกอีเมลให้ถูกต้อง'
     setEmailDomainError(domainError)
     return !domainError
   }
@@ -63,7 +50,7 @@ function LoginForm() {
 
   // Auto-append @ntplc.co.th when domain restriction is enabled
   const handleEmailBlur = () => {
-    const newEmail = normalizeOrganizationEmail(email, isEmailRestricted)
+    const newEmail = normalizeOrganizationEmail(email, true)
     if (newEmail !== email) {
       setEmail(newEmail)
       validateEmailDomain(newEmail)
@@ -79,7 +66,7 @@ function LoginForm() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
 
-    const emailForAuth = normalizeOrganizationEmail(email, isEmailRestricted)
+    const emailForAuth = normalizeOrganizationEmail(email, true)
     if (emailForAuth !== email) {
       setEmail(emailForAuth)
     }
@@ -94,6 +81,10 @@ function LoginForm() {
     setSuccess(null)
 
     try {
+      if (!await isSignupEmailAllowed(supabase, emailForAuth)) {
+        throw new Error('ไม่สามารถยืนยันสิทธิ์อีเมลนี้ได้ กรุณาตรวจสอบอีเมลหรือติดต่อผู้ดูแลระบบ')
+      }
+
       if (mode === 'login') {
         const { error } = await supabase.auth.signInWithPassword({
           email: emailForAuth,
@@ -103,14 +94,6 @@ function LoginForm() {
         router.push(redirectTo)
         router.refresh()
       } else if (mode === 'signup') {
-        // Check email domain restriction (double check)
-        if (isEmailRestricted) {
-          const emailDomain = emailForAuth.split('@')[1]?.toLowerCase()
-          if (emailDomain !== 'ntplc.co.th') {
-            throw new Error('ระบบจำกัดการสมัครเฉพาะอีเมล @ntplc.co.th เท่านั้น')
-          }
-        }
-
         const { error } = await supabase.auth.signUp({
           email: emailForAuth,
           password,
@@ -174,20 +157,20 @@ function LoginForm() {
                 <Input
                   id="email"
                   name="email"
-                  type={isEmailRestricted ? 'text' : 'email'}
-                  autoComplete={isEmailRestricted ? 'username' : 'email'}
+                  type="text"
+                  autoComplete="username"
                   inputMode="email"
                   required
                   value={email}
                   onChange={handleEmailChange}
                   onBlur={handleEmailBlur}
                   className={emailDomainError ? 'border-red-300 bg-red-50' : ''}
-                  placeholder={isEmailRestricted ? 'ชื่อผู้ใช้ (ไม่ต้องพิมพ์ @ntplc.co.th)' : 'name@ntplc.co.th'}
+                  placeholder="ชื่อผู้ใช้ (ไม่ต้องพิมพ์ @ntplc.co.th)"
                 />
                 {emailDomainError && (
                   <p className="text-sm text-red-600">{emailDomainError}</p>
                 )}
-                {isEmailRestricted && !emailDomainError && (
+                {!emailDomainError && (
                   <p className="text-xs text-muted-foreground">
                     พิมพ์แค่ชื่อผู้ใช้ ระบบจะเติม @ntplc.co.th ให้อัตโนมัติ
                   </p>

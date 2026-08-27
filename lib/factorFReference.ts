@@ -1,5 +1,6 @@
 import type { SupabaseClient } from '@supabase/supabase-js';
 import type { FactorReferenceCondition, FactorReferenceRow } from './factorF';
+import { requireActiveProfile } from './auth/authorization';
 
 export const FACTOR_REFERENCE_VERSION_REQUIRED_MESSAGE =
   'ใบประมาณราคานี้ยังไม่ได้ผูกกับเวอร์ชัน Factor F และไม่สามารถคำนวณจากตารางล่าสุดโดยอัตโนมัติได้';
@@ -18,6 +19,7 @@ export async function getActiveFactorReferenceVersion(
   supabase: SupabaseClient,
   versionId: string,
 ): Promise<FactorReferenceVersionData> {
+  await requireActiveProfile(supabase);
   const { data, error } = await supabase
     .from('factor_reference_versions')
     .select(`
@@ -48,6 +50,7 @@ export async function getActiveFactorReferenceVersion(
 export async function getActiveDefaultFactorReferenceVersion(
   supabase: SupabaseClient,
 ): Promise<FactorReferenceVersionData> {
+  await requireActiveProfile(supabase);
   const { data: pointer, error: pointerError } = await supabase
     .from('factor_reference_default_version')
     .select('version_id')
@@ -68,6 +71,7 @@ export async function getActiveDefaultFactorReferenceVersion(
 export async function listActiveFactorReferenceVersions(
   supabase: SupabaseClient,
 ): Promise<FactorReferenceVersionData[]> {
+  await requireActiveProfile(supabase);
   const { data, error } = await supabase
     .from('factor_reference_versions')
     .select(`
@@ -94,6 +98,7 @@ export async function getFactorReferenceRowsForVersion(
   supabase: SupabaseClient,
   versionId: string | null,
 ): Promise<FactorReferenceRow[]> {
+  await requireActiveProfile(supabase);
   if (!versionId) {
     throw new Error(FACTOR_REFERENCE_VERSION_REQUIRED_MESSAGE);
   }

@@ -12,6 +12,7 @@ import {
 import { getActiveDefaultFactorReferenceVersion } from '@/lib/factorFReference';
 import { useAuth } from '@/lib/context/AuthContext';
 import { can } from '@/lib/permissions';
+import { requireActiveProfile } from '@/lib/auth/authorization';
 import CatalogVersionNotice from '@/components/catalog/CatalogVersionNotice';
 import ProjectInfoForm from '@/components/boq/ProjectInfoForm';
 import BOQPageHeader from '@/components/boq/BOQPageHeader';
@@ -48,6 +49,7 @@ export default function CreateBOQPage() {
     setCatalogError(null);
 
     try {
+      await requireActiveProfile(supabase);
       setCatalogVersion(await getActiveDefaultPriceListVersion(supabase));
     } catch (err) {
       setCatalogVersion(null);
@@ -103,16 +105,11 @@ export default function CreateBOQPage() {
         throw new Error(DEFAULT_CATALOG_UNAVAILABLE_MESSAGE);
       }
 
-      const [authResult, latestCatalogVersion, factorReferenceVersion] = await Promise.all([
-        supabase.auth.getUser(),
+      const [authorization, latestCatalogVersion, factorReferenceVersion] = await Promise.all([
+        requireActiveProfile(supabase),
         getActiveDefaultPriceListVersion(supabase),
         getActiveDefaultFactorReferenceVersion(supabase),
       ]);
-      const authUser = authResult.data.user;
-
-      if (!authUser) {
-        throw new Error('ไม่พบผู้ใช้ที่เข้าสู่ระบบ');
-      }
 
       if (latestCatalogVersion.id !== catalogVersion.id) {
         setCatalogVersion(latestCatalogVersion);
@@ -132,10 +129,10 @@ export default function CreateBOQPage() {
           price_list_version_id: latestCatalogVersion.id,
           factor_reference_version_id: factorReferenceVersion.id,
           // Ownership fields (injected from authenticated user)
-          created_by: authUser.id,
-          org_id: user?.org_id || null,
-          department_id: user?.department_id || null,
-          sector_id: user?.sector_id || null,
+          created_by: authorization.user.id,
+          org_id: authorization.profile.org_id,
+          department_id: authorization.profile.department_id,
+          sector_id: authorization.profile.sector_id,
         })
         .select()
         .single();

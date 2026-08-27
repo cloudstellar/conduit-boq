@@ -1,5 +1,6 @@
 // User role types
 export type UserRole = 'admin' | 'dept_manager' | 'sector_manager' | 'staff' | 'procurement'
+export type UserStatus = 'active' | 'inactive' | 'suspended' | 'pending'
 
 // User profile from database
 export interface UserProfile {
@@ -19,9 +20,15 @@ export interface UserProfile {
   requested_department_id: string | null
   requested_sector_id: string | null
   onboarding_completed: boolean
-  status: 'active' | 'inactive' | 'suspended' | 'pending'
+  status: UserStatus
   created_at: string
   updated_at: string
+  approved_at?: string | null
+  approved_by?: string | null
+  rejected_at?: string | null
+  rejected_by?: string | null
+  admin_note?: string | null
+  authorization_source?: 'v2' | 'legacy-read-only'
 }
 
 // Extended user profile with relations

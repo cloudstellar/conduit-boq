@@ -7,6 +7,10 @@ import {
   type CanonicalCatalogDatasetRow,
 } from '../hash/canonicalDataset';
 import { isCatalogAdminEnabled } from '../admin/flags';
+import {
+  loadCurrentAuthorization,
+  type AuthorizationSource,
+} from '../../auth/authorization';
 
 export const CATALOG_EXPORT_SPEC_REVISION = 'phase4-official-export-spec-2026-06-22';
 export const CATALOG_CANONICALIZATION_REVISION = 'phase4-canonical-dataset-v1';
@@ -37,6 +41,7 @@ export interface CatalogExportProfile {
   displayName: string;
   isActiveAdmin: boolean;
   canReadPublishedCatalog: boolean;
+  authorizationSource?: AuthorizationSource;
 }
 
 export interface CatalogExportVersion {
@@ -411,6 +416,16 @@ async function assertExportAccess(
       );
     }
 
+    if (profile.authorizationSource !== 'legacy-read-only') {
+      throw new CatalogExportError(
+        'CATALOG_EXPORT_FORBIDDEN',
+        'Draft catalog exports remain disabled without a bounded feature-flag contract',
+        403,
+      );
+    }
+
+    // Exact pre-migration read-only compatibility. This raw setting query is
+    // unreachable once get_my_profile_v2 is available.
     const { data, error } = await supabase
       .from('app_settings')
       .select('value')
@@ -439,7 +454,7 @@ async function assertExportAccess(
   if (!profile.canReadPublishedCatalog) {
     throw new CatalogExportError(
       'CATALOG_EXPORT_FORBIDDEN',
-      'Catalog export requires an active or pending authenticated profile',
+      'Catalog export requires an active authenticated profile',
       403,
     );
   }
@@ -448,30 +463,24 @@ async function assertExportAccess(
 async function loadExporterProfile(
   supabase: SupabaseClient,
 ): Promise<{ user: User; profile: CatalogExportProfile }> {
-  const { data: authData, error: authError } = await supabase.auth.getUser();
-  const user = authData.user;
-
-  if (authError || !user) {
+  const authorization = await loadCurrentAuthorization(supabase);
+  if (authorization.state === 'unauthenticated') {
     throw new CatalogExportError(
       'CATALOG_EXPORT_UNAUTHENTICATED',
       'Authentication is required for catalog export',
       401,
     );
   }
-
-  const { data, error } = await supabase
-    .from('user_profiles')
-    .select('id,email,first_name,last_name,role,status')
-    .eq('id', user.id)
-    .maybeSingle();
-
-  if (error || !data) {
+  if (authorization.state !== 'active') {
     throw new CatalogExportError(
       'CATALOG_EXPORT_FORBIDDEN',
       'A readable user profile is required for catalog export',
       403,
     );
   }
+
+  const user = authorization.user;
+  const data = authorization.profile;
 
   const firstName = String(data.first_name ?? '');
   const lastName = String(data.last_name ?? '');
@@ -494,7 +503,8 @@ async function loadExporterProfile(
       status,
       displayName,
       isActiveAdmin: role === 'admin' && status === 'active',
-      canReadPublishedCatalog: status === 'active' || status === 'pending',
+      canReadPublishedCatalog: status === 'active',
+      authorizationSource: authorization.source,
     },
   };
 }

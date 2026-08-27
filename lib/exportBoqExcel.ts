@@ -7,6 +7,8 @@ import {
   isFactorSnapshotUsable,
   type FactorReferenceCondition,
 } from './factorF';
+import { createClient } from './supabase/client';
+import { requireActiveProfile } from './auth/authorization';
 
 // ──────────────────────────────────
 // Types (mirror from print/page.tsx)
@@ -821,6 +823,13 @@ export async function exportBoqToExcel(
   upperFactorRef?: ExportFactorRef | null,
   factorCondition?: FactorReferenceCondition | null,
 ) {
+  // This module is client-only in production. Keep workbook construction pure
+  // in non-browser test/build contexts while requiring a fresh profile before
+  // the browser may materialize a downloadable file.
+  if (typeof window !== 'undefined') {
+    await requireActiveProfile(createClient());
+  }
+
   // Dynamic import to avoid bundle bloat
   const ExcelJS = (await import('exceljs')).default;
   const { saveAs } = await import('file-saver');

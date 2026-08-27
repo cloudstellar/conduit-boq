@@ -1,10 +1,18 @@
 import { createServerClient } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
+import {
+  buildSameOriginRedirectUrl,
+  isSignupEmailAllowed,
+  loadCurrentAuthorization,
+  safeInternalPath,
+  type CurrentAuthorization,
+} from '@/lib/auth/authorization'
+
+const PUBLIC_AUTH_PATHS = ['/auth/callback']
+const PENDING_PATHS = ['/pending', '/profile', '/blocked']
 
 export async function updateSession(request: NextRequest) {
-  let supabaseResponse = NextResponse.next({
-    request,
-  })
+  let supabaseResponse = NextResponse.next({ request })
 
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -16,112 +24,169 @@ export async function updateSession(request: NextRequest) {
         },
         setAll(cookiesToSet) {
           cookiesToSet.forEach(({ name, value }) => request.cookies.set(name, value))
-          supabaseResponse = NextResponse.next({
-            request,
-          })
+          supabaseResponse = NextResponse.next({ request })
           cookiesToSet.forEach(({ name, value, options }) =>
             supabaseResponse.cookies.set(name, value, options)
           )
         },
       },
-    }
+    },
   )
 
-  // IMPORTANT: Do not remove auth.getUser()
-  // This refreshes the session if expired
-  let user = null
-  try {
-    const { data, error } = await supabase.auth.getUser()
-    if (error) {
-      console.error('Middleware: Error getting user:', error.message)
-      // On auth error, treat as no user - will redirect to login
-    } else {
-      user = data.user
-    }
-  } catch (err) {
-    console.error('Middleware: Exception getting user:', err)
-    // On exception, treat as no user - will redirect to login
+  const pathname = request.nextUrl.pathname
+  const isApi = pathname === '/api' || pathname.startsWith('/api/')
+
+  if (PUBLIC_AUTH_PATHS.some((path) => isPathWithin(pathname, path))) {
+    return supabaseResponse
   }
 
-  // Public routes
-  const publicPaths = ['/login', '/auth/callback', '/blocked']
-  const isPublicPath = publicPaths.some(path =>
-    request.nextUrl.pathname === path || request.nextUrl.pathname.startsWith(path)
+  const authorization = await loadCurrentAuthorization(supabase)
+
+  if (pathname === '/login') {
+    if (authorization.state === 'unauthenticated') return supabaseResponse
+    if (authorization.state === 'pending') return redirectTo(request, supabaseResponse, '/pending')
+    if (authorization.state === 'active') {
+      const requestedPath = safeInternalPath(request.nextUrl.searchParams.get('redirectTo'))
+      return redirectTo(request, supabaseResponse, requestedPath)
+    }
+    return redirectTo(request, supabaseResponse, '/blocked', 'authorization')
+  }
+
+  if (pathname === '/blocked') {
+    if (
+      authorization.state === 'unauthenticated'
+      || authorization.state === 'unavailable'
+      || authorization.state === 'blocked'
+    ) {
+      return supabaseResponse
+    }
+
+    const emailAllowed = await isSignupEmailAllowed(
+      supabase,
+      authorization.user.email ?? '',
+    )
+    if (!emailAllowed) return supabaseResponse
+    return redirectTo(
+      request,
+      supabaseResponse,
+      authorization.state === 'pending' ? '/pending' : '/',
+    )
+  }
+
+  const denial = authorizationDenial(authorization)
+  if (denial) {
+    if (isApi) return apiDenial(supabaseResponse, denial.code, denial.message, denial.status)
+    if (denial.status === 401) return redirectTo(request, supabaseResponse, '/login', undefined, pathname)
+    return redirectTo(request, supabaseResponse, '/blocked', 'authorization')
+  }
+
+  // The denial branch above is exhaustive; this explicit guard keeps the
+  // security invariant and TypeScript narrowing local to the request path.
+  if (authorization.state !== 'active' && authorization.state !== 'pending') {
+    if (isApi) {
+      return apiDenial(supabaseResponse, 'AUTHORIZATION_UNAVAILABLE', 'Current authorization could not be verified', 403)
+    }
+    return redirectTo(request, supabaseResponse, '/blocked', 'authorization')
+  }
+
+  const emailAllowed = await isSignupEmailAllowed(
+    supabase,
+    authorization.user.email ?? '',
   )
-
-  // If not logged in and trying to access protected route, redirect to login
-  if (!isPublicPath && !user) {
-    const url = request.nextUrl.clone()
-    url.pathname = '/login'
-    // Set redirectTo for all protected paths including root
-    if (request.nextUrl.pathname !== '/login') {
-      url.searchParams.set('redirectTo', request.nextUrl.pathname === '/' ? '/' : request.nextUrl.pathname)
+  if (!emailAllowed) {
+    if (isApi) {
+      return apiDenial(supabaseResponse, 'EMAIL_NOT_ALLOWED', 'The account email is not allowed', 403)
     }
-    return NextResponse.redirect(url)
+    return redirectTo(request, supabaseResponse, '/blocked', 'domain')
   }
 
-  // Redirect logged-in users away from login page
-  if (request.nextUrl.pathname === '/login' && user) {
-    const redirectTo = request.nextUrl.searchParams.get('redirectTo') || '/'
-    const url = request.nextUrl.clone()
-    url.pathname = redirectTo
-    url.searchParams.delete('redirectTo')
-    return NextResponse.redirect(url)
+  if (authorization.state === 'pending') {
+    const allowed = PENDING_PATHS.some((path) => isPathWithin(pathname, path))
+    if (!allowed) {
+      if (isApi) {
+        return apiDenial(supabaseResponse, 'ACCOUNT_PENDING', 'The account is pending approval', 403)
+      }
+      return redirectTo(request, supabaseResponse, '/pending')
+    }
+    return supabaseResponse
   }
 
-  // Check user status and domain restrictions
-  if (user) {
-    const { data: profile } = await supabase
-      .from('user_profiles')
-      .select('status')
-      .eq('id', user.id)
-      .single()
-
-    // Check domain restriction from app_settings
-    const { data: domainSetting } = await supabase
-      .from('app_settings')
-      .select('value')
-      .eq('key', 'allowed_email_domain')
-      .single()
-
-    // If domain restriction is enabled and user email doesn't match, redirect to blocked page
-    if (domainSetting?.value) {
-      const allowedDomain = domainSetting.value.toLowerCase()
-      const userDomain = user.email?.split('@')[1]?.toLowerCase()
-
-      if (userDomain !== allowedDomain) {
-        // User's email domain doesn't match - redirect to a blocked page
-        if (request.nextUrl.pathname !== '/blocked') {
-          const url = request.nextUrl.clone()
-          url.pathname = '/blocked'
-          url.searchParams.set('reason', 'domain')
-          return NextResponse.redirect(url)
-        }
-        return supabaseResponse
-      }
-    }
-
-    // Inactive/Suspended users can only access profile (which shows blocked message)
-    if (profile && (profile.status === 'inactive' || profile.status === 'suspended')) {
-      if (request.nextUrl.pathname !== '/profile') {
-        const url = request.nextUrl.clone()
-        url.pathname = '/profile'
-        url.searchParams.set('inactive', 'true')
-        return NextResponse.redirect(url)
-      }
-    }
-
-    // Pending users - allow BOQ pages but redirect from admin
-    if (profile && profile.status === 'pending') {
-      // Block admin page for pending users
-      if (request.nextUrl.pathname === '/admin' || request.nextUrl.pathname.startsWith('/admin/')) {
-        const url = request.nextUrl.clone()
-        url.pathname = '/profile'
-        url.searchParams.set('pending', 'true')
-        return NextResponse.redirect(url)
-      }
-    }
+  if (isAdminPath(pathname) && authorization.profile.role !== 'admin') {
+    if (isApi) return apiDenial(supabaseResponse, 'ADMIN_REQUIRED', 'Administrator access is required', 403)
+    return redirectTo(request, supabaseResponse, '/')
   }
 
   return supabaseResponse
+}
+
+function authorizationDenial(
+  authorization: CurrentAuthorization,
+): { code: string; message: string; status: 401 | 403 } | null {
+  if (authorization.state === 'unauthenticated') {
+    return {
+      code: 'UNAUTHENTICATED',
+      message: 'Authentication is required',
+      status: 401,
+    }
+  }
+  if (authorization.state === 'unavailable') {
+    return {
+      code: 'AUTHORIZATION_UNAVAILABLE',
+      message: 'Current authorization could not be verified',
+      status: 403,
+    }
+  }
+  if (authorization.state === 'blocked') {
+    return {
+      code: 'ACCOUNT_NOT_ACTIVE',
+      message: 'The account is not active',
+      status: 403,
+    }
+  }
+  return null
+}
+
+function apiDenial(
+  cookieSource: NextResponse,
+  code: string,
+  message: string,
+  status: 401 | 403,
+) {
+  const response = NextResponse.json(
+    { error: { code, message } },
+    {
+      status,
+      headers: {
+        'Cache-Control': 'private, no-store',
+        'X-Content-Type-Options': 'nosniff',
+      },
+    },
+  )
+  cookieSource.cookies.getAll().forEach((cookie) => {
+    response.cookies.set(cookie)
+  })
+  return response
+}
+
+function redirectTo(
+  request: NextRequest,
+  cookieSource: NextResponse,
+  destination: string,
+  reason?: string,
+  returnPath?: string,
+) {
+  const url = buildSameOriginRedirectUrl(request.url, destination, reason, returnPath)
+  const response = NextResponse.redirect(url)
+  cookieSource.cookies.getAll().forEach((cookie) => {
+    response.cookies.set(cookie)
+  })
+  return response
+}
+
+function isPathWithin(pathname: string, basePath: string): boolean {
+  return pathname === basePath || pathname.startsWith(`${basePath}/`)
+}
+
+function isAdminPath(pathname: string): boolean {
+  return isPathWithin(pathname, '/admin') || isPathWithin(pathname, '/api/admin')
 }

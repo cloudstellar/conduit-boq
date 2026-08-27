@@ -7,13 +7,16 @@ function readSource(path: string): string {
 }
 
 describe('Master Catalog Phase 2 application contracts', () => {
-  it('binds new and duplicated BOQs to the correct catalog version', () => {
+  it('binds new BOQs and keeps duplicate BOQ copy disabled pending an atomic contract', () => {
     const createPage = readSource('app/boq/create/page.tsx')
     const listPage = readSource('app/boq/page.tsx')
 
     expect(createPage).toContain('price_list_version_id: latestCatalogVersion.id')
-    expect(listPage).toContain('price_list_version_id: originalBOQ.price_list_version_id')
-    expect(listPage).toContain('category: item.category')
+    expect(listPage).toContain('copyDisabledReason')
+    expect(listPage).toMatch(/disabled title=\{copyDisabledReason\}/)
+    expect(listPage).not.toContain('handleDuplicate')
+    expect(listPage).not.toContain('originalBOQ')
+    expect(listPage).not.toContain("from('boq_items').insert")
   })
 
   it('filters both item-search queries by the BOQ catalog version', () => {
