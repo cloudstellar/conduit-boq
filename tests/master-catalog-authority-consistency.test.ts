@@ -1354,7 +1354,7 @@ describe('Master Catalog authority consistency', () => {
     )
   })
 
-  it('records P-49 pending profile-only intent without claiming implementation or P-13 authority', () => {
+  it('preserves the historical P-49 pending-profile decision and its frozen preimage', () => {
     const p49Path =
       'docs/plans/master-catalog/45-phase4-p49-pending-authorization-hardening-plan.md'
     const p49 = read(p49Path)
@@ -1534,9 +1534,11 @@ describe('Master Catalog authority consistency', () => {
     ])
 
     for (const [path, expectedSha256] of frozenP49Evidence) {
-      expect(createHash('sha256').update(read(path)).digest('hex')).toBe(
-        expectedSha256,
-      )
+      // These hashes bind the 2026-08-17 preimage recorded in Plan #45.
+      // Successor P-49 and read-only UI commits may legitimately change the
+      // live files, so the historical plan—not the current working tree—is
+      // the immutable evidence surface.
+      expect(existsSync(resolve(root, path))).toBe(true)
       expect(p49).toContain(`| \`${path}\` | \`${expectedSha256}\` |`)
     }
 

@@ -1,10 +1,13 @@
 import { describe, expect, it } from 'vitest';
 import {
+  canReadCatalogAdmin,
   formatThaiNumber,
   isActiveAdminProfile,
   isCatalogAdminEnabled,
   loadCatalogAdminGate,
   loadCatalogAdminOverview,
+  loadCatalogChangeSetsRegisterPage,
+  loadCatalogImportsRegisterPage,
   loadCatalogVersionReview,
   loadCatalogVersionsRegisterPage,
   shortHash,
@@ -12,6 +15,7 @@ import {
 
 type GateClientOptions = {
   user: { id: string } | null;
+  profileSource?: 'legacy-read-only' | 'v2';
   profile?: {
     id: string;
     email: string;
@@ -30,6 +34,30 @@ function createGateClient(options: GateClientOptions): Parameters<typeof loadCat
     auth: {
       getUser: async () => ({ data: { user: options.user } }),
     },
+    rpc: async (name: string) => {
+      if (name !== 'get_my_profile_v2') {
+        throw new Error(`Unexpected RPC: ${name}`);
+      }
+      if (options.profileSource === 'v2') {
+        return {
+          data: options.profile
+            ? [{
+                ...options.profile,
+                created_at: '2026-08-27T00:00:00.000Z',
+                updated_at: '2026-08-27T00:00:00.000Z',
+              }]
+            : [],
+          error: null,
+        };
+      }
+      return {
+        data: null,
+        error: {
+          code: 'PGRST202',
+          message: 'Could not find public.get_my_profile_v2 in the schema cache',
+        },
+      };
+    },
     from: (table: string) => {
       const query = {
         select: () => query,
@@ -37,7 +65,13 @@ function createGateClient(options: GateClientOptions): Parameters<typeof loadCat
         maybeSingle: async () => {
           if (table === 'user_profiles') {
             return {
-              data: options.profile ?? null,
+              data: options.profile
+                ? {
+                    ...options.profile,
+                    created_at: '2026-08-27T00:00:00.000Z',
+                    updated_at: '2026-08-27T00:00:00.000Z',
+                  }
+                : null,
               error: options.profileError ?? null,
             };
           }
@@ -178,11 +212,18 @@ function createOverviewClientWithPagedRegistry() {
   return { client, registryRangeReads: () => registryRangeReads };
 }
 
-function createRegisterClient(error: { code: string; message: string }) {
+function createRegisterClient(
+  error: { code: string; message: string },
+  fallbackRows: Record<string, unknown>[] = [],
+) {
   let fallbackReads = 0;
-  const result = { data: [], error: null };
+  let rpcCalls = 0;
+  const result = { data: fallbackRows, error: null };
   const client = {
-    rpc: async () => ({ data: null, error }),
+    rpc: async () => {
+      rpcCalls += 1;
+      return { data: null, error };
+    },
     from: () => {
       fallbackReads += 1;
       const query = {
@@ -198,7 +239,11 @@ function createRegisterClient(error: { code: string; message: string }) {
     },
   } as unknown as Parameters<typeof loadCatalogVersionsRegisterPage>[0];
 
-  return { client, fallbackReads: () => fallbackReads };
+  return {
+    client,
+    fallbackReads: () => fallbackReads,
+    rpcCalls: () => rpcCalls,
+  };
 }
 
 function createVersionReviewClient({
@@ -470,6 +515,20 @@ describe('Master Catalog admin gate', () => {
     });
   });
 
+  it('fails closed with an explicit issue when app_settings cannot be read', async () => {
+    const gate = await loadCatalogAdminGate(createGateClient({
+      user: { id: 'user-admin' },
+      profile: activeAdminProfile,
+      settingError: new Error('settings unavailable'),
+    }));
+
+    expect(gate).toMatchObject({
+      state: 'disabled',
+      flagIssue: 'อ่านค่า feature flag ไม่สำเร็จ',
+    });
+    expect(canReadCatalogAdmin(gate)).toBe(true);
+  });
+
   it('enables the admin surface only when the active admin flag is true', async () => {
     const gate = await loadCatalogAdminGate(createGateClient({
       user: { id: 'user-admin' },
@@ -485,6 +544,53 @@ describe('Master Catalog admin gate', () => {
         status: 'active',
       },
     });
+  });
+
+  it('allows reads for active admins in enabled or maintenance mode only', () => {
+    expect(canReadCatalogAdmin({
+      state: 'enabled',
+      profile: {
+        id: 'user-admin',
+        email: null,
+        firstName: 'Local',
+        lastName: 'Admin',
+        role: 'admin',
+        status: 'active',
+      },
+    })).toBe(true);
+    expect(canReadCatalogAdmin({
+      state: 'disabled',
+      flagIssue: null,
+      profile: {
+        id: 'user-admin',
+        email: null,
+        firstName: 'Local',
+        lastName: 'Admin',
+        role: 'admin',
+        status: 'active',
+      },
+    })).toBe(true);
+    expect(canReadCatalogAdmin({ state: 'forbidden', profile: null })).toBe(false);
+    expect(canReadCatalogAdmin({ state: 'unauthenticated' })).toBe(false);
+  });
+
+  it('treats the P-49 v2 profile as expected read-only state without a flag error', async () => {
+    const gate = await loadCatalogAdminGate(createGateClient({
+      user: { id: 'user-admin' },
+      profile: activeAdminProfile,
+      profileSource: 'v2',
+    }));
+
+    expect(gate).toMatchObject({
+      state: 'disabled',
+      flagIssue: null,
+      profile: {
+        id: 'user-admin',
+        role: 'admin',
+        status: 'active',
+      },
+    });
+    expect(canReadCatalogAdmin(gate)).toBe(true);
   });
 });
 
@@ -561,6 +667,64 @@ describe('Master Catalog final version review', () => {
 });
 
 describe('Master Catalog register fallback', () => {
+  it('uses active-admin RLS reads for every register when the mutation gate is disabled', async () => {
+    const guardedRpcError = {
+      code: 'P0001',
+      message: 'CATALOG_FORBIDDEN: active enabled admin profile is required',
+    };
+    const versions = createRegisterClient(guardedRpcError, [{
+      id: 'version-1',
+      version_string: '2568.1.0',
+      name: 'บัญชีราคาปัจจุบัน',
+      status: 'active',
+      is_default: true,
+      item_count: 710,
+      lock_version: 3,
+      created_at: '2026-08-26T00:00:00.000Z',
+      updated_at: '2026-08-26T00:00:00.000Z',
+    }]);
+    const imports = createRegisterClient(guardedRpcError, [{
+      id: 'import-1',
+      version_id: 'version-1',
+      mode: 'full',
+      parser_profile_id: 'profile-1',
+      parser_profile_version: '1',
+      source_filename: 'catalog.xlsx',
+      source_file_size: 1_024,
+      source_file_sha256: 'source-hash',
+      normalized_payload_hash: 'payload-hash',
+      status: 'validated',
+      created_at: '2026-08-25T00:00:00.000Z',
+    }]);
+    const changes = createRegisterClient(guardedRpcError, [{
+      id: 'change-1',
+      version_id: 'version-1',
+      change_type: 'manual',
+      reason: 'ทดสอบโหมดอ่านอย่างเดียว',
+      actor_display_name: 'Admin',
+      created_at: '2026-08-24T00:00:00.000Z',
+    }]);
+
+    const [versionPage, importPage, changePage] = await Promise.all([
+      loadCatalogVersionsRegisterPage(versions.client, undefined, { readOnlyMode: true }),
+      loadCatalogImportsRegisterPage(imports.client, undefined, { readOnlyMode: true }),
+      loadCatalogChangeSetsRegisterPage(changes.client, undefined, { readOnlyMode: true }),
+    ]);
+
+    expect([versions.rpcCalls(), imports.rpcCalls(), changes.rpcCalls()]).toEqual([0, 0, 0]);
+    expect([versions.fallbackReads(), imports.fallbackReads(), changes.fallbackReads()]).toEqual([
+      1,
+      1,
+      1,
+    ]);
+    expect(versionPage).toMatchObject({
+      rows: [{ id: 'version-1', officialVersionString: '2568.1.0' }],
+      warnings: [],
+    });
+    expect(importPage).toMatchObject({ rows: [{ id: 'import-1' }], warnings: [] });
+    expect(changePage).toMatchObject({ rows: [{ id: 'change-1' }], warnings: [] });
+  });
+
   it('uses the old-schema fallback only when the cursor RPC is missing', async () => {
     const missing = createRegisterClient({
       code: 'PGRST202',
@@ -569,6 +733,7 @@ describe('Master Catalog register fallback', () => {
 
     const page = await loadCatalogVersionsRegisterPage(missing.client);
 
+    expect(missing.rpcCalls()).toBe(1);
     expect(missing.fallbackReads()).toBe(1);
     expect(page.warnings).toContain(
       'Local schema ยังไม่มี RPC ทะเบียนแบบแบ่งหน้า จึงใช้ทะเบียนแบบย่อชั่วคราว',
@@ -583,6 +748,7 @@ describe('Master Catalog register fallback', () => {
 
     const page = await loadCatalogVersionsRegisterPage(unavailable.client);
 
+    expect(unavailable.rpcCalls()).toBe(1);
     expect(unavailable.fallbackReads()).toBe(0);
     expect(page).toEqual({
       rows: [],

@@ -103,7 +103,7 @@ export function MasterCatalogGateView({
 }) {
   if (gate.state === 'forbidden') {
     return (
-      <MasterCatalogFrame activeSection={activeSection} gate={gate}>
+      <MasterCatalogFrame activeSection={activeSection} gate={gate} showReadOnlyNotice={false}>
         <Alert variant="destructive">
           <ShieldAlert />
           <AlertTitle>ไม่มีสิทธิ์เข้าถึง Master Catalog</AlertTitle>
@@ -117,13 +117,14 @@ export function MasterCatalogGateView({
 
   if (gate.state === 'disabled') {
     return (
-      <MasterCatalogFrame activeSection={activeSection} gate={gate}>
+      <MasterCatalogFrame activeSection={activeSection} gate={gate} showReadOnlyNotice={false}>
         <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_320px]">
           <Alert>
             <LockKeyhole />
-            <AlertTitle>ระบบบัญชีราคาสำหรับผู้ดูแลยังถูกปิดไว้</AlertTitle>
+            <AlertTitle>เครื่องมือแก้ไขอยู่ในโหมดบำรุงรักษา</AlertTitle>
             <AlertDescription>
-              ระบบบริหารบัญชีราคายังไม่เปิดใช้งาน จึงไม่แสดงเครื่องมือแก้ไขข้อมูล
+              หน้านี้เป็นเครื่องมือแก้ไขจึงยังไม่พร้อมใช้งาน แต่ยังเปิดดูบัญชีปัจจุบัน
+              ทะเบียนฉบับ และประวัติได้จากเมนูด้านบน
             </AlertDescription>
           </Alert>
           <Card>
@@ -132,7 +133,7 @@ export function MasterCatalogGateView({
               <CardDescription>แสดงสถานะโดยไม่เปิดเครื่องมือแก้ไขข้อมูล</CardDescription>
             </CardHeader>
             <CardContent className="grid gap-3 text-sm">
-              <KeyValue label="สถานะ" value="ปิดใช้งาน" />
+              <KeyValue label="สถานะ" value="เปิดดูอย่างเดียว" />
               {gate.flagIssue ? <KeyValue label="หมายเหตุ" value={gate.flagIssue} /> : null}
             </CardContent>
           </Card>
@@ -189,13 +190,15 @@ export function MasterCatalogOverviewView({
         </p>
       </details>
 
-      <MasterCatalogDraftCreatePanel
-        key={overview.defaultVersion?.id ?? 'no-base'}
-        defaultVersionId={overview.defaultVersion?.id ?? null}
-        defaultVersionString={overview.defaultVersion?.officialVersionString ?? null}
-        draftVersions={overview.drafts}
-        versionRegistry={overview.versionRegistry}
-      />
+      {gate.state === 'enabled' ? (
+        <MasterCatalogDraftCreatePanel
+          key={overview.defaultVersion?.id ?? 'no-base'}
+          defaultVersionId={overview.defaultVersion?.id ?? null}
+          defaultVersionString={overview.defaultVersion?.officialVersionString ?? null}
+          draftVersions={overview.drafts}
+          versionRegistry={overview.versionRegistry}
+        />
+      ) : null}
 
       {staleDrafts.length > 0 ? (
         <Card>
@@ -266,8 +269,13 @@ export function MasterCatalogVersionDetailView({
   notice?: 'import-applied';
 }) {
   const version = detail.version;
-  const isEditableDraft = version.status === 'draft' && !detail.isStaleDraft;
-  const showP51D002OptionAPanel = shouldShowP51D002OptionAPanel({
+  const isEditableDraft =
+    gate.state === 'enabled'
+    && detail.workspace.mutationReady
+    && version.status === 'draft'
+    && !detail.isStaleDraft;
+  const canExportVersion = version.status !== 'draft' || gate.state === 'enabled';
+  const showP51D002OptionAPanel = detail.workspace.mutationReady && shouldShowP51D002OptionAPanel({
     gateState: gate.state,
     isStaleDraft: detail.isStaleDraft,
     status: version.status,
@@ -364,7 +372,7 @@ export function MasterCatalogVersionDetailView({
             </div>
             <p className="mt-1 text-sm text-muted-foreground">{version.name}</p>
           </div>
-          {version.status !== 'abandoned' ? (
+          {version.status !== 'abandoned' && (isEditableDraft || canExportVersion) ? (
             <div className="flex flex-wrap gap-2">
               {isEditableDraft
                 && detail.publishReadiness?.placementGovernanceAvailable
@@ -396,29 +404,31 @@ export function MasterCatalogVersionDetailView({
                   </Link>
                 </Button>
               ) : null}
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="outline" size="sm">
-                    <Download data-icon="inline-start" />
-                    {version.status === 'draft' ? 'ส่งออกเพื่อตรวจ' : 'ส่งออกเอกสาร'}
-                    <ChevronDown data-icon="inline-end" />
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end">
-                  <DropdownMenuItem asChild>
-                    <a href={`/api/master-catalog/export/excel/${version.id}`}>
-                      <FileSpreadsheet />
-                      Excel สำหรับตรวจสอบ
-                    </a>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem asChild>
-                    <Link href={`/admin/master-catalog/versions/${version.id}/print`}>
-                      <Printer />
-                      เปิดหน้าพิมพ์/บันทึก PDF
-                    </Link>
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
+              {canExportVersion ? (
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="outline" size="sm">
+                      <Download data-icon="inline-start" />
+                      {version.status === 'draft' ? 'ส่งออกเพื่อตรวจ' : 'ส่งออกเอกสาร'}
+                      <ChevronDown data-icon="inline-end" />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end">
+                    <DropdownMenuItem asChild>
+                      <a href={`/api/master-catalog/export/excel/${version.id}`}>
+                        <FileSpreadsheet />
+                        Excel สำหรับตรวจสอบ
+                      </a>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem asChild>
+                      <Link href={`/admin/master-catalog/versions/${version.id}/print`}>
+                        <Printer />
+                        เปิดหน้าพิมพ์/บันทึก PDF
+                      </Link>
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              ) : null}
             </div>
           ) : null}
         </div>
@@ -445,14 +455,10 @@ export function MasterCatalogVersionDetailView({
           lockVersion: version.lockVersion,
         }}
         items={detail.items}
-        totalItems={detail.counts.rows ?? detail.items.length}
+        totalItems={detail.workspace.totalItems}
         categories={detail.categories}
         codeGroups={detail.codeGroups}
-        editable={
-          version.status === 'draft'
-          && !detail.isStaleDraft
-          && detail.items.length === (detail.counts.rows ?? detail.items.length)
-        }
+        editable={isEditableDraft}
         allowAdd={
           detail.capabilities.newIdentityEnabled
           && detail.publishReadiness?.placementGovernanceAvailable === true
@@ -484,7 +490,7 @@ export function MasterCatalogVersionDetailView({
         </div>
       </section>
 
-      {version.status === 'active' && !isCurrentVersion ? (
+      {gate.state === 'enabled' && version.status === 'active' && !isCurrentVersion ? (
         <MasterCatalogPublishRestorePanel
           draftVersion={null}
           draftReadiness={null}
@@ -514,7 +520,7 @@ export function MasterCatalogVersionDetailView({
         <RecentChangeSets changeSets={detail.changeSets} />
       </div>
 
-      {version.status === 'draft' ? (
+      {gate.state === 'enabled' && version.status === 'draft' ? (
         <MasterCatalogDraftAbandonPanel
           draftVersion={{
             id: version.id,
@@ -773,6 +779,7 @@ export function MasterCatalogItemDetailView({
         key={`${item.identityId}:${item.lockVersion}:${item.capabilities.retirementEnabled}`}
         item={item}
         history={history}
+        mutationEnabled={gate.state === 'enabled'}
       />
     </MasterCatalogFrame>
   );
@@ -887,12 +894,14 @@ function MasterCatalogFrame({
   activeSection,
   gate,
   children,
+  showReadOnlyNotice = true,
 }: {
   activeSection: CatalogAdminSection;
   gate: CatalogAdminGate;
   children: React.ReactNode;
+  showReadOnlyNotice?: boolean;
 }) {
-  const canShowSections = gate.state === 'enabled';
+  const canShowSections = gate.state === 'enabled' || gate.state === 'disabled';
 
   return (
     <div className="min-h-dvh overflow-x-hidden bg-muted/30">
@@ -923,6 +932,21 @@ function MasterCatalogFrame({
         </div>
       </header>
       <main className="mx-auto flex w-full max-w-7xl flex-col gap-4 px-4 py-5 sm:px-6 lg:px-8">
+        {showReadOnlyNotice && gate.state === 'disabled' ? (
+          <Alert>
+            <LockKeyhole />
+            <AlertTitle>
+              {gate.flagIssue
+                ? 'ยืนยันสถานะเครื่องมือแก้ไขไม่ได้ จึงปิดแบบปลอดภัย'
+                : 'เปิดดูอย่างเดียวระหว่างปิดเครื่องมือแก้ไข'}
+            </AlertTitle>
+            <AlertDescription>
+              บัญชีปัจจุบัน ทะเบียนฉบับ รายการ และประวัติยังเปิดดูได้
+              แต่การสร้าง แก้ไข นำเข้า เผยแพร่ และคืนเวอร์ชันถูกปิดไว้
+              {gate.flagIssue ? ` · ${gate.flagIssue}` : ''}
+            </AlertDescription>
+          </Alert>
+        ) : null}
         {children}
       </main>
     </div>

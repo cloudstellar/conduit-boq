@@ -7,6 +7,71 @@ function source(path: string) {
 }
 
 describe('Master Catalog P-22 operator workflow', () => {
+  it('keeps published catalog reads discoverable while the mutation gate is off', () => {
+    const adminPage = source('app/admin/page.tsx');
+    const views = source(
+      'app/admin/master-catalog/_components/MasterCatalogAdminViews.tsx',
+    );
+    const headerUtilities = source(
+      'app/admin/master-catalog/_components/MasterCatalogHeaderUtilities.tsx',
+    );
+    const itemEditor = source(
+      'app/admin/master-catalog/_components/MasterCatalogItemEditor.tsx',
+    );
+    const importContext = source('lib/master-catalog/admin/importContext.ts');
+    const importValidation = source('lib/master-catalog/admin/importValidation.ts');
+    const readableRoutes = [
+      'app/admin/master-catalog/page.tsx',
+      'app/admin/master-catalog/versions/page.tsx',
+      'app/admin/master-catalog/history/page.tsx',
+      'app/admin/master-catalog/versions/[versionId]/page.tsx',
+      'app/admin/master-catalog/versions/[versionId]/items/[identityId]/page.tsx',
+    ];
+
+    expect(adminPage).toContain("type CatalogAdminEntryState = 'loading' | 'enabled' | 'read-only' | 'unavailable'");
+    expect(adminPage).toContain("if (authorization.source === 'legacy-read-only')");
+    expect(adminPage).toContain('if (settingResult.error || !settingResult.data)');
+    expect(adminPage).toContain("setCatalogAdminEntryState('unavailable')");
+    expect(adminPage).toContain("setCatalogAdminEntryState('read-only')");
+    expect(adminPage).toContain('<Link href="/admin/master-catalog">เปิด Master Catalog</Link>');
+    expect(adminPage).not.toContain('{catalogAdminEnabled ?');
+    for (const route of readableRoutes) {
+      expect(source(route)).toContain('if (!canReadCatalogAdmin(gate))');
+    }
+    expect(source('app/admin/master-catalog/versions/page.tsx')).toContain(
+      "readOnlyMode: gate.state === 'disabled'",
+    );
+    expect(
+      source('app/admin/master-catalog/history/page.tsx')
+        .match(/readOnlyMode: gate\.state === 'disabled'/g),
+    ).toHaveLength(2);
+    expect(
+      source('app/admin/master-catalog/versions/[versionId]/items/[identityId]/page.tsx'),
+    ).toContain("readOnlyMode: gate.state === 'disabled'");
+    expect(views).toContain("gate.state === 'enabled' || gate.state === 'disabled'");
+    expect(views).toContain("gate.state === 'enabled' ? (");
+    expect(views).toContain('detail.workspace.mutationReady');
+    expect(views).toContain('totalItems={detail.workspace.totalItems}');
+    expect(views).toContain("mutationEnabled={gate.state === 'enabled'}");
+    expect(itemEditor).toMatch(/mutationEnabled\s+&& item\.mutationReady/);
+    expect(headerUtilities).toContain("disabled: 'เปิดดูอย่างเดียว'");
+    expect(importContext).toContain('&& workspace.mutationReady');
+    expect(importContext).not.toContain('&& workspace.items.length === workspace.totalItems');
+    expect(importValidation).toContain('|| !workspace.mutationReady');
+    expect(importValidation).not.toContain('|| workspace.items.length !== workspace.totalItems');
+
+    const mutationOnlyRoutes = [
+      'app/admin/master-catalog/import/page.tsx',
+      'app/admin/master-catalog/versions/[versionId]/import/page.tsx',
+      'app/admin/master-catalog/versions/[versionId]/placement/page.tsx',
+      'app/admin/master-catalog/versions/[versionId]/review/page.tsx',
+    ];
+    for (const route of mutationOnlyRoutes) {
+      expect(source(route)).toContain("if (gate.state !== 'enabled')");
+      expect(source(route)).not.toContain('canReadCatalogAdmin');
+    }
+  });
+
   it('keeps draft actions in context and the item workspace before history', () => {
     const views = source(
       'app/admin/master-catalog/_components/MasterCatalogAdminViews.tsx',

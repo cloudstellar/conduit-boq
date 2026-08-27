@@ -1,6 +1,7 @@
 import { redirect } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
 import {
+  canReadCatalogAdmin,
   loadCatalogAdminGate,
   loadCatalogChangeSetsRegisterPage,
   loadCatalogImportsRegisterPage,
@@ -35,13 +36,17 @@ export default async function MasterCatalogHistoryPage({
     redirect('/login?redirectTo=/admin/master-catalog/history');
   }
 
-  if (gate.state !== 'enabled') {
+  if (!canReadCatalogAdmin(gate)) {
     return <MasterCatalogGateView gate={gate} activeSection="history" />;
   }
 
   const [importsPage, changeSetsPage] = await Promise.all([
-    loadCatalogImportsRegisterPage(supabase, importsCursor),
-    loadCatalogChangeSetsRegisterPage(supabase, changesCursor),
+    loadCatalogImportsRegisterPage(supabase, importsCursor, {
+      readOnlyMode: gate.state === 'disabled',
+    }),
+    loadCatalogChangeSetsRegisterPage(supabase, changesCursor, {
+      readOnlyMode: gate.state === 'disabled',
+    }),
   ]);
   return (
     <MasterCatalogHistoryView

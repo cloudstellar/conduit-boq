@@ -4,7 +4,7 @@ import type { CatalogAdminGate } from '@/lib/master-catalog/admin/readModel';
 
 const GATE_LABELS: Record<CatalogAdminGate['state'], string> = {
   enabled: 'ระบบเปิดใช้งาน',
-  disabled: 'ระบบปิดใช้งาน',
+  disabled: 'เปิดดูอย่างเดียว',
   forbidden: 'ไม่มีสิทธิ์',
   unauthenticated: 'ยังไม่เข้าสู่ระบบ',
 };

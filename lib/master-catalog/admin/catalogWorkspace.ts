@@ -5,6 +5,8 @@ import {
 } from './capabilities';
 
 const ITEM_PAGE_SIZE = 500;
+const HISTORY_PAGE_SIZE = 25;
+const HISTORY_CHANGE_SET_BATCH_SIZE = 100;
 export const CATALOG_CLIENT_FILTER_ROW_LIMIT = 2_000;
 
 export interface CatalogCategoryOption {
@@ -44,6 +46,8 @@ export interface CatalogVersionWorkspace {
   categories: CatalogCategoryOption[];
   codeGroups: CatalogCodeGroupOption[];
   totalItems: number;
+  complete: boolean;
+  mutationReady: boolean;
   warnings: string[];
 }
 
@@ -97,6 +101,10 @@ export interface CatalogIdentityHistoryPage {
   warnings: string[];
 }
 
+export interface CatalogIdentityHistoryReadOptions {
+  readOnlyMode?: boolean;
+}
+
 const ITEM_COLUMNS = [
   'id',
   'identity_id',
@@ -135,14 +143,24 @@ export async function loadCatalogVersionWorkspace(
   ]);
 
   const warnings = [...snapshot.warnings];
-  if (categoriesResult.error) warnings.push('โหลดหมวดงานที่อนุมัติไว้ไม่สำเร็จ');
-  if (groupsResult.error) warnings.push('โหลดกลุ่มรหัสที่อนุมัติไว้ไม่สำเร็จ');
+  const categoriesReady =
+    !categoriesResult.error
+    && Array.isArray(categoriesResult.data)
+    && categoriesResult.data.length > 0;
+  const groupsReady =
+    !groupsResult.error
+    && Array.isArray(groupsResult.data)
+    && groupsResult.data.length > 0;
+  if (!categoriesReady) warnings.push('โหลดหมวดงานที่อนุมัติไว้ไม่สำเร็จ');
+  if (!groupsReady) warnings.push('โหลดกลุ่มรหัสที่อนุมัติไว้ไม่สำเร็จ');
 
   return {
     items: snapshot.items,
     categories: mapCategories(categoriesResult.data),
     codeGroups: mapCodeGroups(groupsResult.data),
     totalItems: snapshot.totalItems,
+    complete: snapshot.complete,
+    mutationReady: snapshot.complete && categoriesReady && groupsReady,
     warnings,
   };
 }
@@ -385,71 +403,144 @@ export async function loadCatalogIdentityHistoryPage(
   supabase: SupabaseClient,
   identityId: string,
   cursor?: { createdAt: string; id: string },
+  options: CatalogIdentityHistoryReadOptions = {},
 ): Promise<CatalogIdentityHistoryPage> {
   const warnings: string[] = [];
-  const { data, error } = await supabase.rpc('get_catalog_identity_history_page', {
-    p_identity_id: identityId,
-    p_limit: 25,
-    p_before_created_at: cursor?.createdAt ?? null,
-    p_before_id: cursor?.id ?? null,
-  });
+  if (!options.readOnlyMode) {
+    const { data, error } = await supabase.rpc('get_catalog_identity_history_page', {
+      p_identity_id: identityId,
+      p_limit: 25,
+      p_before_created_at: cursor?.createdAt ?? null,
+      p_before_id: cursor?.id ?? null,
+    });
 
-  if (!error) {
-    const result = object(data);
-    const nextCursor = object(result?.nextCursor);
-    return {
-      rows: rows(result?.rows).map(mapIdentityHistory),
-      nextCursor: nextCursor
-        ? {
-            createdAt: String(nextCursor.createdAt ?? ''),
-            id: String(nextCursor.id ?? ''),
-          }
-        : null,
-      warnings,
-    };
+    if (!error) {
+      const result = object(data);
+      const nextCursor = object(result?.nextCursor);
+      return {
+        rows: rows(result?.rows).map(mapIdentityHistory),
+        nextCursor: nextCursor
+          ? {
+              createdAt: String(nextCursor.createdAt ?? ''),
+              id: String(nextCursor.id ?? ''),
+            }
+          : null,
+        warnings,
+      };
+    }
+
+    if (!isMissingCatalogRpc(error)) {
+      return {
+        rows: [],
+        nextCursor: null,
+        warnings: ['โหลดประวัติรายการแบบแบ่งหน้าไม่สำเร็จ'],
+      };
+    }
+
+    warnings.push('Local schema ยังไม่มี RPC ประวัติแบบแบ่งหน้า จึงแสดงประวัติแบบอ่านอย่างย่อ');
   }
 
-  if (!isMissingCatalogRpc(error)) {
-    return {
-      rows: [],
-      nextCursor: null,
-      warnings: ['โหลดประวัติรายการแบบแบ่งหน้าไม่สำเร็จ'],
-    };
+  const changeItems: Record<string, unknown>[] = [];
+  let historyTruncated = false;
+  for (
+    let offset = 0;
+    offset < CATALOG_CLIENT_FILTER_ROW_LIMIT;
+    offset += ITEM_PAGE_SIZE
+  ) {
+    const { data: itemRows, error: itemError } = await supabase
+      .from('catalog_change_items')
+      .select('id,change_set_id,identity_id,action,old_values,new_values,price_authority_reference')
+      .eq('identity_id', identityId)
+      .order('id', { ascending: true })
+      .range(offset, offset + ITEM_PAGE_SIZE - 1);
+
+    if (itemError) {
+      return {
+        rows: [],
+        nextCursor: null,
+        warnings: [...warnings, 'โหลดประวัติรายการไม่สำเร็จ'],
+      };
+    }
+
+    const page = rows(itemRows);
+    changeItems.push(...page);
+    if (page.length < ITEM_PAGE_SIZE) break;
   }
 
-  warnings.push('Local schema ยังไม่มี RPC ประวัติแบบแบ่งหน้า จึงแสดงประวัติแบบอ่านอย่างย่อ');
-  const { data: itemRows, error: itemError } = await supabase
-    .from('catalog_change_items')
-    .select('id,change_set_id,identity_id,action,old_values,new_values')
-    .eq('identity_id', identityId)
-    .limit(100);
-
-  if (itemError) {
-    return { rows: [], nextCursor: null, warnings: [...warnings, 'โหลดประวัติรายการไม่สำเร็จ'] };
+  if (changeItems.length === CATALOG_CLIENT_FILTER_ROW_LIMIT) {
+    const { data: extraRows, error: extraError } = await supabase
+      .from('catalog_change_items')
+      .select('id')
+      .eq('identity_id', identityId)
+      .order('id', { ascending: true })
+      .range(CATALOG_CLIENT_FILTER_ROW_LIMIT, CATALOG_CLIENT_FILTER_ROW_LIMIT);
+    if (extraError) {
+      return {
+        rows: [],
+        nextCursor: null,
+        warnings: [...warnings, 'ยืนยันความครบถ้วนของประวัติรายการไม่สำเร็จ'],
+      };
+    }
+    historyTruncated = rows(extraRows).length > 0;
   }
 
-  const changeItems = rows(itemRows);
-  const changeSetIds = changeItems.map((row) => String(row.change_set_id ?? '')).filter(Boolean);
+  if (historyTruncated) {
+    warnings.push(
+      `ประวัติรายการเกินเพดาน ${CATALOG_CLIENT_FILTER_ROW_LIMIT.toLocaleString('th-TH')} เหตุการณ์ จึงแสดงเฉพาะข้อมูลที่โหลดได้`,
+    );
+  }
+
+  const changeSetIds = [
+    ...new Set(changeItems.map((row) => String(row.change_set_id ?? '')).filter(Boolean)),
+  ];
 
   if (changeSetIds.length === 0) return { rows: [], nextCursor: null, warnings };
 
-  const { data: setRows, error: setError } = await supabase
-    .from('catalog_change_sets')
-    .select('id,version_id,change_type,reason,actor_display_name,created_at')
-    .in('id', changeSetIds);
+  const changeSets: Record<string, unknown>[] = [];
+  for (let offset = 0; offset < changeSetIds.length; offset += HISTORY_CHANGE_SET_BATCH_SIZE) {
+    const { data: setRows, error: setError } = await supabase
+      .from('catalog_change_sets')
+      .select('id,version_id,change_type,reason,actor_display_name,created_at')
+      .in('id', changeSetIds.slice(offset, offset + HISTORY_CHANGE_SET_BATCH_SIZE));
 
-  if (setError) {
-    return { rows: [], nextCursor: null, warnings: [...warnings, 'โหลดชุดการเปลี่ยนแปลงไม่สำเร็จ'] };
+    if (setError) {
+      return {
+        rows: [],
+        nextCursor: null,
+        warnings: [...warnings, 'โหลดชุดการเปลี่ยนแปลงไม่สำเร็จ'],
+      };
+    }
+    changeSets.push(...rows(setRows));
   }
 
-  const setById = new Map(rows(setRows).map((row) => [String(row.id ?? ''), row]));
+  const setById = new Map(changeSets.map((row) => [String(row.id ?? ''), row]));
   const history = changeItems.flatMap((item) => {
     const set = setById.get(String(item.change_set_id ?? ''));
     if (!set) return [];
     return [mapIdentityHistory({ ...set, ...item, id: set.id })];
-  }).sort((left, right) => right.createdAt.localeCompare(left.createdAt));
+  }).sort(
+    (left, right) =>
+      right.createdAt.localeCompare(left.createdAt)
+      || right.id.localeCompare(left.id),
+  );
 
-  return { rows: history.slice(0, 25), nextCursor: null, warnings };
+  const cursorRows = cursor
+    ? history.filter(
+        (entry) =>
+          entry.createdAt < cursor.createdAt
+          || (entry.createdAt === cursor.createdAt && entry.id < cursor.id),
+      )
+    : history;
+  const page = cursorRows.slice(0, HISTORY_PAGE_SIZE);
+  const last = page.at(-1);
+
+  return {
+    rows: page,
+    nextCursor: cursorRows.length > HISTORY_PAGE_SIZE && last
+      ? { createdAt: last.createdAt, id: last.id }
+      : null,
+    warnings,
+  };
 }
 
 function mapWorkspaceItem(row: Record<string, unknown>): CatalogWorkspaceItem {

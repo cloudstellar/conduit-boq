@@ -11,13 +11,14 @@ import { createClient } from '@/lib/supabase/client'
 import { useAuth } from '@/lib/context/AuthContext'
 import { UserRole } from '@/lib/types/auth'
 import { getRoleLabel } from '@/lib/permissions'
+import { isCatalogAdminEnabled } from '@/lib/master-catalog/admin/flags'
 import {
   canAdminTransitionUserStatus,
   isExactMissingRpcError,
   requireActiveAdmin,
 } from '@/lib/auth/authorization'
 import { Button } from '@/components/ui/button'
-import { Card } from '@/components/ui/card'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Badge } from '@/components/ui/badge'
 import {
@@ -35,7 +36,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
-import { Loader2, ArrowLeft, Check, X } from 'lucide-react'
+import { Loader2, ArrowLeft, Check, X, Database } from 'lucide-react'
 
 interface UserProfile {
   id: string
@@ -54,6 +55,8 @@ interface UserProfile {
   created_at: string
 }
 
+type CatalogAdminEntryState = 'loading' | 'enabled' | 'read-only' | 'unavailable'
+
 function AdminContent() {
   const { user, isLoading: authLoading } = useAuth()
   const router = useRouter()
@@ -64,6 +67,8 @@ function AdminContent() {
   const [savingUser, setSavingUser] = useState<string | null>(null)
   const [approvingUser, setApprovingUser] = useState<string | null>(null)
   const [adminMutationsEnabled, setAdminMutationsEnabled] = useState(false)
+  const [catalogAdminEntryState, setCatalogAdminEntryState] = useState<CatalogAdminEntryState>('loading')
+  const [catalogSettingsIssue, setCatalogSettingsIssue] = useState<string | null>(null)
 
   const supabase = useMemo(() => createClient(), [])
 
@@ -139,6 +144,8 @@ function AdminContent() {
     let cancelled = false
 
     const loadData = async () => {
+      setCatalogAdminEntryState('loading')
+      setCatalogSettingsIssue(null)
       setAdminMutationsEnabled(false)
       try {
         const authorization = await requireActiveAdmin(supabase)
@@ -147,10 +154,31 @@ function AdminContent() {
         if (cancelled) return
         setUsers(loadedUsers)
         setAdminMutationsEnabled(authorization.source === 'v2')
+
+        if (authorization.source === 'legacy-read-only') {
+          const settingResult = await supabase
+            .from('app_settings')
+            .select('value')
+            .eq('key', 'catalog_admin_enabled')
+            .maybeSingle()
+          if (settingResult.error || !settingResult.data) {
+            setCatalogAdminEntryState('unavailable')
+            setCatalogSettingsIssue('อ่านสถานะ Master Catalog ไม่สำเร็จ เครื่องมือแก้ไขจึงถูกปิดแบบปลอดภัย')
+          } else {
+            setCatalogAdminEntryState(
+              isCatalogAdminEnabled(settingResult.data.value) ? 'enabled' : 'read-only'
+            )
+          }
+        } else {
+          setCatalogAdminEntryState('read-only')
+          setCatalogSettingsIssue(null)
+        }
       } catch (err) {
         console.error('Load error:', err)
         if (!cancelled) {
           setAdminMutationsEnabled(false)
+          setCatalogAdminEntryState('unavailable')
+          setCatalogSettingsIssue('โหลดการตั้งค่าระบบไม่สำเร็จ เครื่องมือแก้ไขบัญชีราคาจึงถูกปิดแบบปลอดภัย')
           setError(err instanceof Error ? err.message : 'โหลดข้อมูลผู้ดูแลระบบไม่สำเร็จ')
         }
       }
@@ -356,6 +384,28 @@ function AdminContent() {
   }
 
   const pendingCount = users.filter(u => u.status === 'pending').length
+  const catalogEntryStatus = {
+    loading: {
+      label: 'กำลังตรวจสถานะ',
+      description: 'กำลังตรวจว่าเครื่องมือแก้ไขพร้อมใช้งานหรืออยู่ในโหมดอ่านอย่างเดียว',
+      variant: 'outline' as const,
+    },
+    enabled: {
+      label: 'พร้อมแก้ไข',
+      description: 'เปิดดูบัญชีราคาและใช้เครื่องมือแก้ไขตามสิทธิ์ผู้ดูแลระบบได้',
+      variant: 'default' as const,
+    },
+    'read-only': {
+      label: 'เปิดดูอย่างเดียว',
+      description: 'บัญชีปัจจุบัน ทะเบียนฉบับ และประวัติยังเปิดดูได้ โดยเครื่องมือแก้ไขถูกปิดไว้',
+      variant: 'outline' as const,
+    },
+    unavailable: {
+      label: 'ตรวจสถานะไม่ได้',
+      description: 'ยังเปิดดู Master Catalog ได้ แต่เครื่องมือแก้ไขจะปิดแบบปลอดภัยจนกว่าจะอ่านการตั้งค่าได้',
+      variant: 'destructive' as const,
+    },
+  }[catalogAdminEntryState]
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -383,6 +433,36 @@ function AdminContent() {
       </header>
 
       <main className="max-w-7xl mx-auto px-4 py-6 sm:px-6 lg:px-8">
+        <Card className="mb-6">
+          <CardHeader className="flex-row items-center justify-between gap-3">
+            <CardTitle>Master Catalog</CardTitle>
+            <Badge variant={catalogEntryStatus.variant}>{catalogEntryStatus.label}</Badge>
+          </CardHeader>
+          <CardContent>
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+              <div className="flex items-start gap-3">
+                <div className="flex size-10 items-center justify-center rounded-md border bg-background text-muted-foreground">
+                  <Database className="size-4" />
+                </div>
+                <div>
+                  <div className="font-medium">บัญชีราคามาตรฐาน</div>
+                  <div className="text-sm text-muted-foreground">
+                    {catalogEntryStatus.description}
+                  </div>
+                  {catalogSettingsIssue ? (
+                    <div className="mt-1 text-sm text-destructive" role="status">
+                      {catalogSettingsIssue}
+                    </div>
+                  ) : null}
+                </div>
+              </div>
+              <Button asChild>
+                <Link href="/admin/master-catalog">เปิด Master Catalog</Link>
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+
         {error && (
           <Alert variant="destructive" className="mb-4">
             <AlertDescription>{error}</AlertDescription>

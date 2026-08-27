@@ -62,9 +62,11 @@ const initialState: CatalogMutationState = { status: 'idle', message: '' };
 export function MasterCatalogItemEditor({
   item,
   history,
+  mutationEnabled,
 }: {
   item: CatalogItemDetail;
   history: CatalogIdentityHistoryPage;
+  mutationEnabled: boolean;
 }) {
   const searchParams = useSearchParams();
   const returnHref = safeCatalogItemReturnHref(
@@ -72,9 +74,9 @@ export function MasterCatalogItemEditor({
     item.versionId,
   );
   const editable =
-    item.mutationReady
-    &&
-    item.versionStatus === 'draft'
+    mutationEnabled
+    && item.mutationReady
+    && item.versionStatus === 'draft'
     && item.basedOnVersionId !== null
     && item.basedOnVersionId === item.currentVersionId;
   const recodeGroups = item.codeGroups.filter((group) => group.id !== item.codeGroupId);
@@ -179,7 +181,9 @@ export function MasterCatalogItemEditor({
           <ShieldAlert />
           <AlertTitle>เปิดดูอย่างเดียว</AlertTitle>
           <AlertDescription>
-            แก้ไขได้เฉพาะฉบับร่างที่อ้างอิงเวอร์ชันใช้งานปัจจุบัน รายการและประวัติเดิมยังเปิดดูได้ครบ
+            {mutationEnabled
+              ? 'แก้ไขได้เฉพาะฉบับร่างที่อ้างอิงเวอร์ชันใช้งานปัจจุบัน รายการและประวัติเดิมยังเปิดดูได้'
+              : 'เครื่องมือแก้ไขอยู่ในโหมดบำรุงรักษา รายการและประวัติเดิมยังเปิดดูได้'}
           </AlertDescription>
         </Alert>
       ) : null}

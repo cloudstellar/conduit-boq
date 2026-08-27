@@ -4,7 +4,10 @@ import {
   loadCatalogIdentityHistoryPage,
   loadCatalogItemDetail,
 } from '@/lib/master-catalog/admin/catalogWorkspace';
-import { loadCatalogAdminGate } from '@/lib/master-catalog/admin/readModel';
+import {
+  canReadCatalogAdmin,
+  loadCatalogAdminGate,
+} from '@/lib/master-catalog/admin/readModel';
 import {
   MasterCatalogGateView,
   MasterCatalogItemDetailView,
@@ -40,13 +43,15 @@ export default async function MasterCatalogItemPage({
     redirect(`/login?redirectTo=/admin/master-catalog/versions/${versionId}/items/${identityId}`);
   }
 
-  if (gate.state !== 'enabled') {
+  if (!canReadCatalogAdmin(gate)) {
     return <MasterCatalogGateView gate={gate} activeSection="versions" />;
   }
 
   const [item, history] = await Promise.all([
     loadCatalogItemDetail(supabase, versionId, identityId),
-    loadCatalogIdentityHistoryPage(supabase, identityId, cursor),
+    loadCatalogIdentityHistoryPage(supabase, identityId, cursor, {
+      readOnlyMode: gate.state === 'disabled',
+    }),
   ]);
 
   if (!item) notFound();

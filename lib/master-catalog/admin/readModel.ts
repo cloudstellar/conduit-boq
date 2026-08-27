@@ -51,6 +51,11 @@ export type CatalogAdminGate =
   | { state: 'disabled'; profile: CatalogAdminProfile; flagIssue: string | null }
   | { state: 'enabled'; profile: CatalogAdminProfile };
 
+export type ReadableCatalogAdminGate = Extract<
+  CatalogAdminGate,
+  { state: 'disabled' | 'enabled' }
+>;
+
 export interface CatalogVersionSummary {
   id: string;
   officialVersionString: string | null;
@@ -203,6 +208,11 @@ export interface CatalogVersionDetail {
   items: CatalogWorkspaceItem[];
   categories: CatalogCategoryOption[];
   codeGroups: CatalogCodeGroupOption[];
+  workspace: {
+    totalItems: number;
+    complete: boolean;
+    mutationReady: boolean;
+  };
   currentVersionId: string | null;
   isStaleDraft: boolean;
   publishReadiness: CatalogPublishReadiness | null;
@@ -226,6 +236,10 @@ export interface CatalogVersionReview {
 export interface CatalogPageCursor {
   createdAt: string;
   id: string;
+}
+
+export interface CatalogRegisterReadOptions {
+  readOnlyMode?: boolean;
 }
 
 export interface CatalogRegisterPage<T> {
@@ -298,6 +312,12 @@ export function isActiveAdminProfile(profile: {
   return profile?.role === 'admin' && profile.status === 'active';
 }
 
+export function canReadCatalogAdmin(
+  gate: CatalogAdminGate,
+): gate is ReadableCatalogAdminGate {
+  return gate.state === 'enabled' || gate.state === 'disabled';
+}
+
 export function shortHash(hash: string | null | undefined): string {
   if (!hash) return 'ยังไม่มี hash';
   const prefix = hash.startsWith('sha256:') ? 'sha256:' : '';
@@ -361,12 +381,12 @@ export async function loadCatalogAdminGate(
     return {
       state: 'disabled',
       profile: mappedProfile,
-      flagIssue: 'P-49 ไม่เปิดเผย feature flag ดิบ เครื่องมือแก้ไขจึงปิดแบบปลอดภัย',
+      flagIssue: null,
     };
   }
 
   // Pre-migration compatibility only. Once get_my_profile_v2 exists, raw
-  // setting access below is unreachable and the catalog remains read-only.
+  // setting access above is unreachable and the catalog remains read-only.
   const { data: setting, error: settingError } = await supabase
     .from('app_settings')
     .select('value')
@@ -664,7 +684,7 @@ export async function loadCatalogPlacementWorkspace(
   const inheritedItems = workspace.items.filter((item) => baseIdentityIds.has(item.identityId));
   const currentVersionId = toNullableString(pointerResult.data?.version_id);
   const status = (versionRow.status ?? 'draft') as CatalogVersionStatus;
-  const complete = workspace.items.length === workspace.totalItems && baseSnapshot.complete;
+  const complete = workspace.mutationReady && baseSnapshot.complete;
   const placementGovernanceAvailable = readiness?.placementGovernanceAvailable === true;
 
   return {
@@ -779,6 +799,18 @@ export async function loadCatalogVersionDetail(
   const openDraftRow = rowFromResult(openDraftResult.data);
   const openDraft = openDraftRow ? mapVersionSummary(openDraftRow) : null;
   const currentVersionId = toNullableString(pointerResult.data?.version_id);
+  const workspaceComplete =
+    workspace.complete
+    && rows !== null
+    && rows === workspace.totalItems
+    && categories !== null
+    && categories === workspace.categories.length
+    && codeGroups !== null
+    && codeGroups === workspace.codeGroups.length;
+  const workspaceMutationReady = workspaceComplete && workspace.mutationReady;
+  if (!workspaceMutationReady) {
+    warnings.push('โหลดรายการ หมวดงาน หรือกลุ่มรหัสได้ไม่ครบ จึงปิดเครื่องมือแก้ไขไว้ก่อน');
+  }
   let currentVersion: CatalogVersionSummary | null = null;
   if (currentVersionId === version.id) {
     currentVersion = version;
@@ -805,6 +837,11 @@ export async function loadCatalogVersionDetail(
     items: workspace.items,
     categories: workspace.categories,
     codeGroups: workspace.codeGroups,
+    workspace: {
+      totalItems: workspace.totalItems,
+      complete: workspaceComplete,
+      mutationReady: workspaceMutationReady,
+    },
     currentVersionId,
     isStaleDraft:
       version.status === 'draft'
@@ -997,32 +1034,36 @@ export async function loadCatalogVersionImportHistory(
 export async function loadCatalogVersionsRegisterPage(
   supabase: SupabaseClient,
   cursor?: CatalogPageCursor,
+  options: CatalogRegisterReadOptions = {},
 ): Promise<CatalogRegisterPage<CatalogVersionSummary>> {
   const warnings: string[] = [];
-  const { data, error } = await supabase.rpc('get_catalog_versions_page', {
-    p_limit: 25,
-    p_before_created_at: cursor?.createdAt ?? null,
-    p_before_id: cursor?.id ?? null,
-  });
+  if (!options.readOnlyMode) {
+    const { data, error } = await supabase.rpc('get_catalog_versions_page', {
+      p_limit: 25,
+      p_before_created_at: cursor?.createdAt ?? null,
+      p_before_id: cursor?.id ?? null,
+    });
 
-  if (!error) {
-    const page = parseRegisterPage(data);
-    return {
-      rows: page.rows.map(mapVersionSummary),
-      nextCursor: page.nextCursor,
-      warnings,
-    };
+    if (!error) {
+      const page = parseRegisterPage(data);
+      return {
+        rows: page.rows.map(mapVersionSummary),
+        nextCursor: page.nextCursor,
+        warnings,
+      };
+    }
+
+    if (!isMissingCatalogRpc(error)) {
+      return {
+        rows: [],
+        nextCursor: null,
+        warnings: ['โหลดทะเบียนเวอร์ชันแบบแบ่งหน้าไม่สำเร็จ'],
+      };
+    }
+
+    warnings.push('Local schema ยังไม่มี RPC ทะเบียนแบบแบ่งหน้า จึงใช้ทะเบียนแบบย่อชั่วคราว');
   }
 
-  if (!isMissingCatalogRpc(error)) {
-    return {
-      rows: [],
-      nextCursor: null,
-      warnings: ['โหลดทะเบียนเวอร์ชันแบบแบ่งหน้าไม่สำเร็จ'],
-    };
-  }
-
-  warnings.push('Local schema ยังไม่มี RPC ทะเบียนแบบแบ่งหน้า จึงใช้ทะเบียนแบบย่อชั่วคราว');
   let query = supabase
     .from('price_list_versions')
     .select(VERSION_COLUMNS)
@@ -1042,28 +1083,32 @@ export async function loadCatalogVersionsRegisterPage(
 export async function loadCatalogImportsRegisterPage(
   supabase: SupabaseClient,
   cursor?: CatalogPageCursor,
+  options: CatalogRegisterReadOptions = {},
 ): Promise<CatalogRegisterPage<CatalogImportSummary>> {
   const warnings: string[] = [];
-  const { data, error } = await supabase.rpc('get_catalog_imports_page', {
-    p_version_id: null,
-    p_limit: 25,
-    p_before_created_at: cursor?.createdAt ?? null,
-    p_before_id: cursor?.id ?? null,
-  });
-  if (!error) {
-    const page = parseRegisterPage(data);
-    return { rows: page.rows.map(mapImportSummary), nextCursor: page.nextCursor, warnings };
+  if (!options.readOnlyMode) {
+    const { data, error } = await supabase.rpc('get_catalog_imports_page', {
+      p_version_id: null,
+      p_limit: 25,
+      p_before_created_at: cursor?.createdAt ?? null,
+      p_before_id: cursor?.id ?? null,
+    });
+    if (!error) {
+      const page = parseRegisterPage(data);
+      return { rows: page.rows.map(mapImportSummary), nextCursor: page.nextCursor, warnings };
+    }
+
+    if (!isMissingCatalogRpc(error)) {
+      return {
+        rows: [],
+        nextCursor: null,
+        warnings: ['โหลดทะเบียนนำเข้าแบบแบ่งหน้าไม่สำเร็จ'],
+      };
+    }
+
+    warnings.push('Local schema ยังไม่มี RPC ทะเบียนนำเข้าแบบแบ่งหน้า');
   }
 
-  if (!isMissingCatalogRpc(error)) {
-    return {
-      rows: [],
-      nextCursor: null,
-      warnings: ['โหลดทะเบียนนำเข้าแบบแบ่งหน้าไม่สำเร็จ'],
-    };
-  }
-
-  warnings.push('Local schema ยังไม่มี RPC ทะเบียนนำเข้าแบบแบ่งหน้า');
   let query = supabase
     .from('catalog_imports')
     .select(IMPORT_COLUMNS)
@@ -1083,28 +1128,32 @@ export async function loadCatalogImportsRegisterPage(
 export async function loadCatalogChangeSetsRegisterPage(
   supabase: SupabaseClient,
   cursor?: CatalogPageCursor,
+  options: CatalogRegisterReadOptions = {},
 ): Promise<CatalogRegisterPage<CatalogChangeSetSummary>> {
   const warnings: string[] = [];
-  const { data, error } = await supabase.rpc('get_catalog_change_sets_page', {
-    p_version_id: null,
-    p_limit: 25,
-    p_before_created_at: cursor?.createdAt ?? null,
-    p_before_id: cursor?.id ?? null,
-  });
-  if (!error) {
-    const page = parseRegisterPage(data);
-    return { rows: page.rows.map(mapChangeSetSummary), nextCursor: page.nextCursor, warnings };
+  if (!options.readOnlyMode) {
+    const { data, error } = await supabase.rpc('get_catalog_change_sets_page', {
+      p_version_id: null,
+      p_limit: 25,
+      p_before_created_at: cursor?.createdAt ?? null,
+      p_before_id: cursor?.id ?? null,
+    });
+    if (!error) {
+      const page = parseRegisterPage(data);
+      return { rows: page.rows.map(mapChangeSetSummary), nextCursor: page.nextCursor, warnings };
+    }
+
+    if (!isMissingCatalogRpc(error)) {
+      return {
+        rows: [],
+        nextCursor: null,
+        warnings: ['โหลดทะเบียนการเปลี่ยนแปลงแบบแบ่งหน้าไม่สำเร็จ'],
+      };
+    }
+
+    warnings.push('Local schema ยังไม่มี RPC ทะเบียนการเปลี่ยนแปลงแบบแบ่งหน้า');
   }
 
-  if (!isMissingCatalogRpc(error)) {
-    return {
-      rows: [],
-      nextCursor: null,
-      warnings: ['โหลดทะเบียนการเปลี่ยนแปลงแบบแบ่งหน้าไม่สำเร็จ'],
-    };
-  }
-
-  warnings.push('Local schema ยังไม่มี RPC ทะเบียนการเปลี่ยนแปลงแบบแบ่งหน้า');
   let query = supabase
     .from('catalog_change_sets')
     .select(CHANGE_SET_COLUMNS)

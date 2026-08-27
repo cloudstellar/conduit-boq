@@ -1,6 +1,7 @@
 import { redirect } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
 import {
+  canReadCatalogAdmin,
   loadCatalogAdminGate,
   loadCatalogAdminOverview,
 } from '@/lib/master-catalog/admin/readModel';
@@ -19,7 +20,7 @@ export default async function MasterCatalogAdminPage() {
     redirect('/login?redirectTo=/admin/master-catalog');
   }
 
-  if (gate.state !== 'enabled') {
+  if (!canReadCatalogAdmin(gate)) {
     return <MasterCatalogGateView gate={gate} activeSection="overview" />;
   }
 

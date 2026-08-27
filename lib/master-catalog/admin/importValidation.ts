@@ -219,7 +219,7 @@ async function loadCatalogImportDraftSnapshot(
   if (
     pointerResult.error
     || workspace.warnings.length > 0
-    || workspace.items.length !== workspace.totalItems
+    || !workspace.mutationReady
     || codeReservationsResult.error
   ) {
     throw new CatalogImportServerValidationError(

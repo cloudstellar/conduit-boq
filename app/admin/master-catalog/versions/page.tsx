@@ -1,6 +1,7 @@
 import { redirect } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
 import {
+  canReadCatalogAdmin,
   loadCatalogAdminGate,
   loadCatalogVersionsRegisterPage,
 } from '@/lib/master-catalog/admin/readModel';
@@ -34,10 +35,12 @@ export default async function MasterCatalogVersionsPage({
     redirect('/login?redirectTo=/admin/master-catalog/versions');
   }
 
-  if (gate.state !== 'enabled') {
+  if (!canReadCatalogAdmin(gate)) {
     return <MasterCatalogGateView gate={gate} activeSection="versions" />;
   }
 
-  const page = await loadCatalogVersionsRegisterPage(supabase, cursor);
+  const page = await loadCatalogVersionsRegisterPage(supabase, cursor, {
+    readOnlyMode: gate.state === 'disabled',
+  });
   return <MasterCatalogVersionsView gate={gate} page={page} />;
 }

@@ -295,7 +295,7 @@ export async function loadCatalogImportContext(
     mappings.length === 710
     && exclusions.length === 17
     && workspace.codeGroups.length === 65
-    && workspace.items.length === workspace.totalItems
+    && workspace.mutationReady
     && unresolvedMappings === 0;
 
   if (!authorityReady) {
