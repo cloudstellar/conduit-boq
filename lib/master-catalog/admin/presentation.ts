@@ -26,3 +26,11 @@ export function formatCatalogVersionBackLabel({
 
   return normalizedTargetVersion || 'เวอร์ชันนี้';
 }
+
+export function formatCatalogThaiDateTime(value: string): string {
+  return new Intl.DateTimeFormat('th-TH', {
+    dateStyle: 'medium',
+    timeStyle: 'short',
+    timeZone: 'Asia/Bangkok',
+  }).format(new Date(value));
+}

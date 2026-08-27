@@ -43,6 +43,7 @@ import {
 } from '@/lib/master-catalog/admin/navigation';
 import {
   formatCatalogDictionaryLabel,
+  formatCatalogThaiDateTime,
   formatCatalogVersionBackLabel,
 } from '@/lib/master-catalog/admin/presentation';
 import { applyCatalogManualChangeAction } from '../actions';
@@ -547,7 +548,7 @@ function IdentityTimeline({ item, history }: { item: CatalogItemDetail; history:
                 <Badge variant="outline">{historyActionLabel(entry.action)}</Badge>
                 <span className="text-sm font-medium">{entry.reason}</span>
               </div>
-              <time className="text-xs text-muted-foreground">{formatThaiDateTime(entry.createdAt)}</time>
+              <time className="text-xs text-muted-foreground">{formatCatalogThaiDateTime(entry.createdAt)}</time>
             </div>
             <p className="mt-1 text-xs text-muted-foreground">{entry.actorDisplayName}</p>
             <FieldDiff
@@ -624,8 +625,4 @@ function displayValue(value: unknown): string {
 
 function money(value: number): string {
   return value.toFixed(2);
-}
-
-function formatThaiDateTime(value: string): string {
-  return new Intl.DateTimeFormat('th-TH', { dateStyle: 'medium', timeStyle: 'short' }).format(new Date(value));
 }

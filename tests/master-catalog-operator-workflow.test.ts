@@ -55,6 +55,7 @@ describe('Master Catalog P-22 operator workflow', () => {
     expect(views).toContain("mutationEnabled={gate.state === 'enabled'}");
     expect(itemEditor).toMatch(/mutationEnabled\s+&& item\.mutationReady/);
     expect(itemEditor).toContain('formatCatalogVersionBackLabel({');
+    expect(itemEditor).toContain('formatCatalogThaiDateTime(entry.createdAt)');
     expect(headerUtilities).toContain("disabled: 'เปิดดูอย่างเดียว'");
     expect(importContext).toContain('&& workspace.mutationReady');
     expect(importContext).not.toContain('&& workspace.items.length === workspace.totalItems');

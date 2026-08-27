@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import {
   formatCatalogDictionaryLabel,
+  formatCatalogThaiDateTime,
   formatCatalogVersionBackLabel,
 } from '../lib/master-catalog/admin/presentation';
 
@@ -50,5 +51,10 @@ describe('Master Catalog admin presentation', () => {
       draftReference: null,
       targetVersionString: '2568.1.0',
     })).toBe('เป้าหมาย 2568.1.0');
+  });
+
+  it('renders timeline timestamps deterministically in the business timezone', () => {
+    expect(formatCatalogThaiDateTime('2026-08-25T09:56:00.000Z'))
+      .toBe('25 ส.ค. 2569 16:56');
   });
 });
