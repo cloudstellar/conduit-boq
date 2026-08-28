@@ -390,6 +390,20 @@ describe('Master Catalog post-closeout admin edit completion', () => {
       );
     }
 
+    const agentEntry = source('AGENTS.md');
+    const aiHandoff = source('docs/08_ai/AI_HANDOFF.md');
+    for (const content of [agentEntry, aiHandoff]) {
+      expect(content).toContain('LOCAL_WORKSPACE_HANDOFF_20260829');
+      expect(content).toContain('/Users/cloud/Cloudstellar/conduit-boq');
+      expect(content).toContain(
+        '/Users/cloud/Cloudstellar/conduit-boq-archive-p51-20260829',
+      );
+    }
+    expect(aiHandoff).toContain('no required Master Catalog execution work');
+    expect(aiHandoff).not.toContain(
+      'shared legacy checkout and its protected local evidence remain untouched',
+    );
+
     for (const path of liveDocuments) {
       const content = source(path);
       const currentState = content.slice(0, 2200);

@@ -80,10 +80,52 @@ dated plans/results as audit chronology; a historical `HOLD`, `pending`, or
 commit, push, deploy, database, or publication authority from a historical
 approval receipt.
 
-## Repository-only residual
+## Host-local workspace handoff — 2026-08-29
 
-Master Catalog completion does not authorize branch/worktree cleanup. The
-shared legacy checkout and its protected local evidence remain untouched;
-inventory, archive custody, and any branch deletion require a separate explicit
-approval. This repository housekeeping is not an open R-01 through R-05 item
-and does not reopen the completed Master Catalog release.
+`LOCAL_WORKSPACE_HANDOFF_20260829`
+
+- The canonical checkout on this host is
+  `/Users/cloud/Cloudstellar/conduit-boq`. It was observed clean on `main` at
+  `f89511767d8d5e9207a61f851c9e6f3f97b42cf7`, equal to `origin/main`, before
+  this local handoff-document alignment. Verify `git status`, branch, HEAD, and
+  upstream at the start of every new session.
+- The complete former checkout was archived, not deleted, at
+  `/Users/cloud/Cloudstellar/conduit-boq-archive-p51-20260829`. Its recorded
+  branch/HEAD are `codex/p51-option-a-closeout` and
+  `1dd98ee16af02f89ab413c614e04df7960b42563`.
+- The archive is intentionally dirty and contains protected evidence, ignored
+  secrets, and local session material. It must remain local and must not be
+  cleaned, staged, committed, uploaded, or shared. Do not use it as the normal
+  workspace for new changes.
+- The archived repository's linked worktree at
+  `/Users/cloud/.codex/worktrees/1ede/conduit-boq` was repaired after the move;
+  it remains archive lineage, not canonical `main`.
+- No branch was deleted. The local `codex/main-convergence` branch remains at
+  the same pushed convergence commit. Branch deletion was deliberately left
+  outside this operation.
+
+This section records host-local custody, not portable Production truth. On a
+different host, verify paths independently. Its preparation grants no commit,
+push, deploy, database, publication, or deletion authority.
+
+## What remains
+
+There is **no required Master Catalog execution work** and no open R-01 through
+R-05 item. Do not replay the completed release, migrations, disposable QA, or
+closeout.
+
+Only these independent optional maintenance decisions remain:
+
+1. Keep the local archive as-is unless the Owner later approves a specific
+   encrypted backup, retention, or removal operation.
+2. Classify or prune old branches/worktrees only under a new, explicit cleanup
+   approval. Keeping them is safe and does not block normal work on `main`.
+3. Run the expanded Production persona rehearsal only as a newly authorized
+   security-review task. Until then its status remains `accepted residual — not
+   PASS`.
+4. Normalize application-version labels only as a separate product/versioning
+   decision; it is unrelated to Master Catalog `2568.1.0`.
+
+For a new AI session: work from the canonical checkout, read this file plus
+`AGENTS.md`, `AI_CONTEXT.md`, #106, and #107, then inspect Git status before any
+change. Do not enter or inventory the archive unless the Owner explicitly asks.

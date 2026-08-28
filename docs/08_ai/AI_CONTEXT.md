@@ -50,6 +50,7 @@ remain authoritative for direct Data API/RPC access.
 | Topic | Canonical location |
 |---|---|
 | Current repository handoff | [`08_ai/AI_HANDOFF.md`](./AI_HANDOFF.md) |
+| Host-local canonical checkout and archive custody | [AI Handoff — Host-local workspace handoff](./AI_HANDOFF.md#host-local-workspace-handoff--2026-08-29) |
 | Master Catalog final state | [Handoff #106](../plans/master-catalog/106-phase4-master-catalog-exact-remaining-work-handoff.md) and [Result #107](../plans/master-catalog/107-phase4-p49-master-catalog-final-closeout-result.md) |
 | Database schema | [`04_data/DATABASE_SCHEMA.md`](../04_data/DATABASE_SCHEMA.md) |
 | Production migration ledger | [`04_data/MIGRATIONS.md`](../04_data/MIGRATIONS.md) |
@@ -62,6 +63,11 @@ remain authoritative for direct Data API/RPC access.
 When documentation and mutable Production state might differ, do not guess.
 Use the latest durable result for historical truth and obtain separately
 authorized fresh read-only evidence for a live claim.
+
+The canonical checkout/archive paths in AI Handoff are observations about this
+host, not portable application or Production state. Start normal work only in
+the canonical checkout. Do not inspect, copy, clean, upload, or delete the
+archive or its protected contents without fresh explicit approval.
 
 For this repository convergence, Production was reconfirmed read-only at
 `2026-08-29 01:38:54 +07` against the closeout state summarized in
