@@ -9,6 +9,20 @@ const PRINT_DOCUMENT = readFileSync(
   ),
   'utf8',
 );
+const MUTATION_PANEL = readFileSync(
+  resolve(
+    process.cwd(),
+    'app/admin/master-catalog/_components/MasterCatalogMutationPanel.tsx',
+  ),
+  'utf8',
+);
+const IMPORT_PANEL = readFileSync(
+  resolve(
+    process.cwd(),
+    'app/admin/master-catalog/_components/MasterCatalogImportPanel.tsx',
+  ),
+  'utf8',
+);
 
 describe('Master Catalog draft print contract', () => {
   it('uses one exact draft mark on the cover, every price-page header, and footer', () => {
@@ -31,7 +45,7 @@ describe('Master Catalog draft print contract', () => {
 
   it('labels a draft hash as non-official while retaining draft reference and target fields', () => {
     expect(PRINT_DOCUMENT).toContain(
-      "'Draft dataset hash - not an official publication hash';",
+      "'Draft dataset SHA-256 (ข้อมูลครบทั้งฉบับ รวมรายการยกเลิกใช้) - ไม่ใช่ค่าแฮชการเผยแพร่ทางการ';",
     );
     expect(PRINT_DOCUMENT).toContain(
       '? { ...row, label: DRAFT_DATASET_HASH_LABEL }',
@@ -64,12 +78,17 @@ describe('Master Catalog draft print contract', () => {
     const printCss = PRINT_DOCUMENT.split('@media print {')[1]
       ?.split('      `}</style>')[0];
 
-    expect(printCss).toContain('thead { display: table-row-group; }');
-    expect(printCss).toMatch(
-      /\.price-section \{[\s\S]*?break-inside: avoid;[\s\S]*?page-break-inside: avoid;/,
+    expect(printCss).toContain('height: 290mm;');
+    expect(printCss).toContain('margin: 0 0 7mm;');
+    expect(printCss).toContain('.print-fixed-price-heading');
+    expect(printCss).toContain('position: fixed;');
+    expect(PRINT_DOCUMENT).toContain('className="screen-price-page-heading"');
+    expect(PRINT_DOCUMENT).toContain('className="print-fixed-logo"');
+    expect(PRINT_DOCUMENT).toContain('className="print-fixed-title repeat-title"');
+    expect(PRINT_DOCUMENT).toContain(
+      'className="print-fixed-draft repeat-draft-mark"',
     );
-    expect(PRINT_DOCUMENT).toContain('<thead>');
-    expect(PRINT_DOCUMENT).toContain('</thead>');
+    expect(PRINT_DOCUMENT).not.toContain('<thead>');
     expect(PRINT_DOCUMENT).toContain(
       '<div className="repeat-draft-mark">{draftMark}</div>',
     );
@@ -80,5 +99,47 @@ describe('Master Catalog draft print contract', () => {
       "data-category-code={categoryCode ?? ''}",
     );
     expect(PRINT_DOCUMENT).toContain('data-category-label={category}');
+  });
+
+  it('uses presentation-filtered rows and visibly marks inactive draft rows', () => {
+    expect(PRINT_DOCUMENT).toContain('pdfPresentation.rows');
+    expect(PRINT_DOCUMENT).toContain(
+      "data-pdf-policy={dataset.isDraftExport ? 'draft-all-mark-inactive' : 'official-active-only'}",
+    );
+    expect(PRINT_DOCUMENT).toContain('data-pdf-total-rows');
+    expect(PRINT_DOCUMENT).toContain('data-pdf-displayed-rows');
+    expect(PRINT_DOCUMENT).toContain('data-pdf-excluded-inactive-rows');
+    expect(PRINT_DOCUMENT).toContain(
+      'data-pdf-hash-scope="complete-version-including-inactive"',
+    );
+    expect(PRINT_DOCUMENT).toContain(
+      "data-row-active={row.isActive ? 'true' : 'false'}",
+    );
+    for (const attribute of [
+      'data-identity-id',
+      'data-item-code',
+      'data-item-name',
+      'data-unit',
+      'data-material-cost',
+      'data-labor-cost',
+      'data-unit-cost',
+      'data-category-local-sequence',
+    ]) {
+      expect(PRINT_DOCUMENT).toContain(attribute);
+    }
+    expect(PRINT_DOCUMENT).toContain(
+      '<span className="inactive-mark">ยกเลิกใช้</span>',
+    );
+    expect(PRINT_DOCUMENT).toContain('.inactive-row td');
+  });
+
+  it('shows the approved active-only PDF policy instead of pending-policy copy', () => {
+    for (const panel of [MUTATION_PANEL, IMPORT_PANEL]) {
+      expect(panel).toContain('PDF ฉบับร่าง');
+      expect(panel).toContain('จะแสดงเฉพาะรายการใช้งาน');
+      expect(panel).toContain('Dataset SHA-256');
+      expect(panel).not.toContain('จนกว่านโยบายการแสดงรายการยกเลิกใช้จะได้รับอนุมัติ');
+      expect(panel).not.toContain('ต้องยืนยันนโยบายเอกสารสำหรับรายการยกเลิกใช้');
+    }
   });
 });

@@ -1,22 +1,32 @@
 # Phase 4 Implementation Execution Pack
 
-> **Current Master Catalog admin-edit completion overlay (2026-08-28):** The
-> data/publication milestone is complete (`2568.1.0`, `710` rows, reviewed
-> ITEM-0429/ITEM-0615 values, XLSX/PDF passed, no historical BOQ reprice, no
-> Factor F change), and P-13/P-14/P-14C/P-15 are complete and must not be
-> replayed. Migration 027 was applied once and is immutable. The deployed Admin
-> UI is intentionally read-only, so end-to-end completion remains pending.
-> [Plan #105](./105-phase4-master-catalog-admin-edit-completion-plan.md) restores
-> the original active-Admin draft workflow through a new forward-only 028 gate
-> projection while keeping published rows immutable and new-identity/
-> retirement capabilities disabled. Current authority covers local docs, code,
-> tests, and the reviewed package commit/push only to
-> `codex/master-catalog-admin-edit`; no merge/push to `main`, Production
-> write, flag change, Production deploy, or automatic next step is authorized.
+> **Current Master Catalog full-Admin completion amendment (2026-08-28):**
+> The data/publication milestone is complete (`2568.1.0`, `710` rows,
+> reviewed ITEM-0429/ITEM-0615 values, XLSX/PDF passed, no historical BOQ
+> reprice, no Factor F change), and P-13/P-14/P-14C/P-15 are complete and must not be
+> replayed. Migration 027 was applied once and is immutable. The
+> deployed Admin UI remains intentionally read-only and all three capability
+> settings remain exact boolean `false`.
+> [Plan #105 V2](./105-phase4-master-catalog-admin-edit-completion-plan.md)
+> retains immutable published rows and sets the final staged target: Admin
+> enables Edit/Recode plus eligible Withdraw/Reactivate recovery; New identity
+> adds Add/Supplement and placement; Retirement adds Retire. All three settings
+> are ultimately `true`. Published identities are never
+> hard-deleted. P-19 direction is now active-only field-facing official PDF,
+> while draft PDF visibly marks inactive rows and Excel/database/history retain
+> the complete dataset. P-49 formal closeout remains pending; its unrun expanded
+> Production persona rehearsal remains an accepted residual, never a
+> retrospective PASS. The baseline Admin-gate commit `705eeca...` is pushed
+> only to `codex/master-catalog-admin-edit`; the bounded P-19 application, tests,
+> render QA, and exact PDF-to-Excel parity are complete locally at `48` files /
+> `444` tests. The Owner then issued `APPROVE MASTER CATALOG FINAL`,
+> authorizing R-02 through R-05 in exact staged order with no retry. It does not
+> authorize catalog publication, pointer restore, BOQ mutation, Factor F mutation,
+> or migration replay.
 > This overlay supersedes all prior live Status/Current/next-action wording;
 > all dated text below is retained as historical evidence only.
 
-<!-- MASTER_CATALOG_ADMIN_EDIT_STATUS_V1 {"schema":"conduit-boq/master-catalog-admin-edit-status/v1","recordedAt":"2026-08-28","catalogDataPublicationComplete":true,"publishedVersion":"2568.1.0","publishedRowCount":710,"p13P14P14cP15CompleteNoReplay":true,"migration027AppliedOnceNoReplay":true,"readOnlyAdminUiLive":true,"endToEndComplete":false,"plan":"105-phase4-master-catalog-admin-edit-completion-plan.md","target":"active-admin-draft-workflow","migration028Required":true,"catalogNewIdentityEnabledTarget":false,"catalogRetirementEnabledTarget":false,"localDocsCodeTestsAuthorized":true,"featureBranchGitPublicationAuthorized":true,"featureBranch":"codex/master-catalog-admin-edit","commitAuthorized":true,"pushAuthorized":true,"mainMergeAuthorized":false,"productionWriteAuthorized":false,"deployAuthorized":false,"automaticNextStep":false} -->
+<!-- MASTER_CATALOG_ADMIN_EDIT_STATUS_V2 {"schema":"conduit-boq/master-catalog-admin-edit-status/v2","recordedAt":"2026-08-28","catalogDataPublicationComplete":true,"publishedVersion":"2568.1.0","publishedRowCount":710,"p13P14P14cP15CompleteNoReplay":true,"migration027AppliedOnceNoReplay":true,"readOnlyAdminUiLive":true,"endToEndComplete":false,"p49FormalCloseoutComplete":false,"expandedProductionPersonaTestAcceptedResidual":true,"plan":"105-phase4-master-catalog-admin-edit-completion-plan.md","target":"full-active-admin-draft-workflow","publishedHardDeleteAllowed":false,"p19Policy":"official-pdf-active-only-draft-pdf-mark-inactive","p19ImplementationComplete":true,"p19RenderedFixturesVerified":true,"p19LocalTestResult":"48-files-444-tests-pass","migration028Required":true,"migration029Required":false,"catalogAdminEnabledCurrent":false,"catalogNewIdentityEnabledCurrent":false,"catalogRetirementEnabledCurrent":false,"catalogAdminEnabledTarget":true,"catalogNewIdentityEnabledTarget":true,"catalogRetirementEnabledTarget":true,"baselineFeatureCommit":"705eeca0c86df5eda06cd4ea9efeda5b9bfeeebe","planDocsAmendmentAuthorized":true,"planDocsAmendmentComplete":true,"finalReleaseAuthorization":"APPROVE MASTER CATALOG FINAL","applicationCodeAuthorized":true,"commitAuthorized":true,"pushAuthorized":true,"mainMergeAuthorized":true,"productionReadAuthorized":true,"productionWriteAuthorized":true,"deployAuthorized":true,"flagChangeAuthorized":true,"automaticNextStep":true} -->
 
 
 **Current execution handoff (2026-08-24):** P-50I one-time authority is
@@ -1291,8 +1301,8 @@ Hard stop:
 - export count/hash mismatch;
 - add/supplement/new-identity publish attempted before P-18 placement
   governance or guard evidence is accepted;
-- inactive/retired-row official PDF filing attempted before P-19 policy is
-  approved;
+- inactive/retired-row official PDF filing or Retirement enablement attempted
+  before approved P-19 presentation code/tests/render QA pass;
 - post-publication backup/restore started before official exports, named BOQ
   canaries, final all-false flags, and final invariants have passed;
 - backup restore not proven.
@@ -1382,7 +1392,7 @@ Before asking for code review:
 | P-10 missing or superseded | Current Decision Register records P-10 approved limited runtime CI assets; if superseded or missing, use placeholder-safe local styling only and do not deploy CI assets |
 | P-11 missing | Build export mechanics; do not accept official export visual |
 | WP-8/P-14 placement release acceptance missing | Keep draft add/supplement review capability-gated, and block publication of versions with new identities until the placement UX, performance, intended-admin, and release evidence are accepted |
-| P-19 unresolved | Do not file a field-facing official PDF for versions with inactive/retired rows; publish only if owner explicitly approves the rendering/exclusion policy |
+| P-19 implementation pending | Direction is approved: official published/archived PDF is active-only, draft PDF marks inactive rows, and Excel/history/hash stay complete. Keep Retirement disabled and do not file a mixed-status official PDF until exact code/tests/render QA pass |
 | P-20 unresolved | Continue non-hash-changing reliability work, but do not accept WP-8 clean-reset hash evidence, freeze the migration fingerprint, or request P-15 |
 | Any Audit #29 C-01 through C-17 gap unresolved | Do not start WP-7 or claim full operator readiness. Implement WP-6.6 or remove the affected control from release visibility according to the audit |
 | Reusable path still hardcodes `2568.1.0` | Treat as implementation nonconformance with ADR-003; fix and test another valid annual/revision/patch version before P-14 |

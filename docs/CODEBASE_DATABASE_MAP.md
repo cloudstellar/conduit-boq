@@ -4,11 +4,15 @@
 > historical 2026-06-11 map. Production now includes the immutable Phase 4
 > chain through migration 027, Master Catalog `2568.1.0` with `710` active
 > rows, and the P-49 hardened application. The deployed Admin UI is read-only.
-> Plan #105 adds a Local-only migration 028 gate projection plus a shared
-> fail-closed app loader before any future enablement of active-Admin draft
-> editing. The reviewed package may be committed/pushed only to
-> `codex/master-catalog-admin-edit`; no merge/push to `main`, Production write,
-> flag change, or Production deploy is authorized. See
+> Plan #105 V2 retains migration 028 plus the shared fail-closed app loader and
+> defines staged Admin -> New identity -> Retirement enablement. The baseline
+> package is pushed only to `codex/master-catalog-admin-edit` at `705eeca...`;
+> bounded P-19 application/tests/render and exact PDF-to-Excel parity are
+> complete locally at `48` files / `444` tests. The Owner issued `APPROVE
+> MASTER CATALOG FINAL`, authorizing exact staged R-02 through R-05 execution
+> with no retry. Published rows remain immutable; the approval excludes catalog
+> publication, pointer restore, BOQ mutation, Factor F mutation, and migration
+> replay. See
 > [Plan #105](./plans/master-catalog/105-phase4-master-catalog-admin-edit-completion-plan.md).
 
 **Project:** Conduit BOQ  

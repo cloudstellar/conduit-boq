@@ -4,14 +4,18 @@
 hardening are live; `pending = profile/onboarding-only` is enforced. P-13,
 P-14, P-14C, and P-15 are complete and must not be replayed. The Master Catalog
 Admin surface remains read-only because all three catalog flags are false.
-Plan #105 prepares a bounded post-closeout active-Admin edit gate without
-reopening raw settings or weakening database enforcement. See
+Plan #105 V2 prepares a bounded staged path to Admin, New identity, and
+Retirement capabilities without reopening raw settings or weakening database
+enforcement. Published rows remain immutable; published identities are never
+hard-deleted. Retirement stays false until P-19 PDF behavior is implemented
+and verified. See
 [Plan #105](../plans/master-catalog/105-phase4-master-catalog-admin-edit-completion-plan.md).
 
 Migration 028 is fail-fast against the exact post-027 active-Admin predicate,
 catalog function/policy fingerprints, catalog RLS/direct-DML posture, raw
 settings ACL, and private-schema owner/usage boundary. It creates only a
-bounded read projection and leaves every catalog feature flag false.
+bounded read projection and leaves every catalog feature flag false. Later
+flag transitions are runtime configuration changes, not schema migrations.
 
 > The “target” and “current runtime gaps” sections below are preserved as the
 > pre-027 threat analysis. They are not a statement of the current Production

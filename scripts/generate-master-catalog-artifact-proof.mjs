@@ -8,6 +8,8 @@ import { createServerClient } from '@supabase/ssr'
 import { readLocalEnvFile } from './local-env.mjs'
 import {
   ARTIFACT_MANIFEST_SCHEMA_VERSION,
+  ARTIFACT_PDF_HASH_SCOPE,
+  ARTIFACT_PDF_PRESENTATION_POLICY,
   countPdfPages,
   sha256,
   verifyMasterCatalogArtifacts,
@@ -120,8 +122,19 @@ try {
       status: version.status,
       isCurrentDefault: version.is_default,
       itemCount: version.item_count,
+      activeItemCount: domProof.activeItemCount,
+      inactiveItemCount: domProof.inactiveItemCount,
       datasetHash: version.dataset_hash,
       effectiveDate: version.effective_date,
+    },
+    pdfPresentation: {
+      policy: ARTIFACT_PDF_PRESENTATION_POLICY,
+      mode: domProof.pdfPolicy,
+      hashScope: domProof.pdfHashScope,
+      totalItemCount: domProof.totalItemCount,
+      displayedItemCount: domProof.displayedItemCount,
+      inactiveItemCount: domProof.inactiveItemCount,
+      excludedInactiveItemCount: domProof.excludedInactiveItemCount,
     },
     domProof,
     artifacts: {
@@ -309,17 +322,74 @@ async function waitForDomProof(cdp, version) {
             image.addEventListener('error', resolveImage, { once: true });
           });
         }));
-        const rows = [...document.querySelectorAll('tbody tr:not(.category-row)')];
-        const seqs = rows
-          .map((row) => row.querySelector('.seq')?.textContent?.trim())
-          .filter(Boolean)
-          .map((value) => Number(value.replace(/[๐-๙]/g, (digit) => '๐๑๒๓๔๕๖๗๘๙'.indexOf(digit))));
-        const sequenceBreaks = [];
-        for (let index = 0; index < seqs.length; index += 1) {
-          if (seqs[index] !== index + 1) {
-            sequenceBreaks.push({ index, expected: index + 1, actual: seqs[index] });
+        const root = document.querySelector('.print-root');
+        const rows = [...document.querySelectorAll('tr[data-row-active]')];
+        const parseInteger = (value, minimum = 0) => {
+          if (typeof value !== 'string' || !/^-?[0-9]+$/.test(value)) return null;
+          const parsed = Number(value);
+          return Number.isSafeInteger(parsed) && parsed >= minimum ? parsed : null;
+        };
+        const parseLocalizedInteger = (value) => {
+          const normalized = String(value ?? '')
+            .trim()
+            .replaceAll(',', '')
+            .replace(/[๐-๙]/g, (digit) => String('๐๑๒๓๔๕๖๗๘๙'.indexOf(digit)));
+          return /^[0-9]+$/.test(normalized) ? Number(normalized) : null;
+        };
+        const rowProofs = rows.map((row) => ({
+          identityId: row.dataset.identityId ?? null,
+          itemCode: row.dataset.itemCode ?? null,
+          itemName: row.dataset.itemName ?? null,
+          unit: row.dataset.unit ?? null,
+          materialCost: row.dataset.materialCost ?? null,
+          laborCost: row.dataset.laborCost ?? null,
+          unitCost: row.dataset.unitCost ?? null,
+          categoryCode: row.dataset.categoryCode ?? null,
+          categoryName: row.dataset.categoryName ?? null,
+          displayOrder: parseInteger(row.dataset.displayOrder, 0),
+          categoryKey: row.dataset.categoryKey ?? '',
+          categoryLocalSequence: parseInteger(row.dataset.categoryLocalSequence, 1),
+          visibleSequence: parseLocalizedInteger(row.querySelector('.seq')?.textContent),
+          activeState: row.dataset.rowActive ?? '',
+          inactiveMarked: row.querySelector('.inactive-mark')?.textContent?.trim() === 'ยกเลิกใช้',
+        }));
+        const categorySequenceBreaks = [];
+        const categoryReentries = [];
+        const lastSequenceByCategory = new Map();
+        const closedCategories = new Set();
+        let previousCategoryKey = null;
+        for (let index = 0; index < rowProofs.length; index += 1) {
+          const row = rowProofs[index];
+          if (!row.categoryKey || row.categoryLocalSequence === null) continue;
+          if (previousCategoryKey !== null && previousCategoryKey !== row.categoryKey) {
+            closedCategories.add(previousCategoryKey);
+            if (closedCategories.has(row.categoryKey)) {
+              categoryReentries.push({ index, categoryKey: row.categoryKey });
+            }
           }
+          const previousSequence = lastSequenceByCategory.get(row.categoryKey) ?? 0;
+          const expectedSequence = previousSequence + 1;
+          if (row.categoryLocalSequence !== expectedSequence) {
+            categorySequenceBreaks.push({
+              index,
+              categoryKey: row.categoryKey,
+              expected: expectedSequence,
+              actual: row.categoryLocalSequence,
+            });
+          }
+          lastSequenceByCategory.set(row.categoryKey, row.categoryLocalSequence);
+          previousCategoryKey = row.categoryKey;
         }
+        const totalItemCount = parseInteger(root?.dataset.pdfTotalRows, 0);
+        const displayedItemCount = parseInteger(root?.dataset.pdfDisplayedRows, 0);
+        const inactiveItemCount = parseInteger(root?.dataset.pdfInactiveRows, 0);
+        const excludedInactiveItemCount = parseInteger(
+          root?.dataset.pdfExcludedInactiveRows,
+          0,
+        );
+        const activeItemCount = totalItemCount !== null && inactiveItemCount !== null
+          ? totalItemCount - inactiveItemCount
+          : null;
         const priceSectionCount = document.querySelectorAll('.price-section').length;
         const expectedPageCount = document.querySelectorAll('.sheet').length;
         return {
@@ -327,15 +397,75 @@ async function waitForDomProof(cdp, version) {
           fontsReady: document.fonts.status === 'loaded',
           imagesReady: [...document.images].every((image) => image.complete && image.naturalWidth > 0),
           rowCount: rows.length,
-          firstSeqInDom: seqs[0] ?? null,
-          lastSeqInDom: seqs[seqs.length - 1] ?? null,
-          uniqueSeqCount: new Set(seqs).size,
-          sequenceBreakCount: sequenceBreaks.length,
-          sequenceBreaks: sequenceBreaks.slice(0, 5),
+          pdfPolicy: root?.dataset.pdfPolicy ?? null,
+          pdfHashScope: root?.dataset.pdfHashScope ?? null,
+          totalItemCount,
+          displayedItemCount,
+          activeItemCount,
+          inactiveItemCount,
+          excludedInactiveItemCount,
+          activeRowCount: rowProofs.filter((row) => row.activeState === 'true').length,
+          inactiveRowCount: rowProofs.filter((row) => row.activeState === 'false').length,
+          invalidRowActiveCount: rowProofs.filter(
+            (row) => row.activeState !== 'true' && row.activeState !== 'false',
+          ).length,
+          inactiveMarkedRowCount: rowProofs.filter((row) => row.inactiveMarked).length,
+          uniqueDisplayOrderCount: new Set(
+            rowProofs.map((row) => row.displayOrder).filter((value) => value !== null),
+          ).size,
+          invalidDisplayOrderCount: rowProofs.filter((row) => row.displayOrder === null).length,
+          invalidCategoryMetadataCount: rowProofs.filter(
+            (row) => !row.categoryKey || row.categoryLocalSequence === null,
+          ).length,
+          visibleSequenceMismatchCount: rowProofs.filter(
+            (row) => row.visibleSequence !== row.categoryLocalSequence,
+          ).length,
+          invalidParityMetadataCount: rowProofs.filter((row) => {
+            const stringFields = [
+              row.identityId,
+              row.itemCode,
+              row.itemName,
+              row.unit,
+              row.materialCost,
+              row.laborCost,
+              row.unitCost,
+              row.categoryCode,
+              row.categoryName,
+            ];
+            return stringFields.some((value) => typeof value !== 'string')
+              || !/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(row.identityId ?? '')
+              || !/^(0|[1-9][0-9]*)[.][0-9]{2}$/.test(row.materialCost ?? '')
+              || !/^(0|[1-9][0-9]*)[.][0-9]{2}$/.test(row.laborCost ?? '')
+              || !/^(0|[1-9][0-9]*)[.][0-9]{2}$/.test(row.unitCost ?? '')
+              || row.displayOrder === null
+              || row.categoryLocalSequence === null;
+          }).length,
+          displayedRows: rowProofs.map((row) => ({
+            identityId: row.identityId,
+            itemCode: row.itemCode,
+            itemName: row.itemName,
+            unit: row.unit,
+            materialCost: row.materialCost,
+            laborCost: row.laborCost,
+            unitCost: row.unitCost,
+            categoryCode: row.categoryCode,
+            categoryName: row.categoryName,
+            displayOrder: row.displayOrder,
+            categoryLocalSequence: row.categoryLocalSequence,
+            isActive: row.activeState === 'true',
+          })),
+          categorySequenceBreakCount: categorySequenceBreaks.length,
+          categorySequenceBreaks: categorySequenceBreaks.slice(0, 5),
+          categoryReentryCount: categoryReentries.length,
+          categoryReentries: categoryReentries.slice(0, 5),
+          categoryCount: new Set(rowProofs.map((row) => row.categoryKey).filter(Boolean)).size,
           priceSectionCount,
           expectedPageCount,
           title: document.querySelector('h1')?.textContent?.trim() ?? null,
           hashPresent: document.body.textContent.includes(${expectedHash}),
+          hashScopeLabelPresent: document.body.textContent.includes(
+            'ข้อมูลครบทั้งฉบับ รวมรายการยกเลิกใช้',
+          ),
           watermarkPresent: document.body.textContent.includes('รายการบัญชีราคานี้ไม่ใช่ราคาก่อสร้าง'),
         };
       })()`,
@@ -346,14 +476,31 @@ async function waitForDomProof(cdp, version) {
       last?.readyState === 'complete'
       && last.fontsReady
       && last.imagesReady
-      && last.rowCount === version.item_count
-      && last.firstSeqInDom === 1
-      && last.lastSeqInDom === version.item_count
-      && last.uniqueSeqCount === version.item_count
-      && last.sequenceBreakCount === 0
-      && last.priceSectionCount > 0
+      && last.pdfPolicy === 'official-active-only'
+      && last.pdfHashScope === ARTIFACT_PDF_HASH_SCOPE
+      && last.totalItemCount === version.item_count
+      && last.displayedItemCount === last.activeItemCount
+      && last.inactiveItemCount === last.excludedInactiveItemCount
+      && last.displayedItemCount + last.excludedInactiveItemCount === last.totalItemCount
+      && last.rowCount === last.displayedItemCount
+      && last.activeRowCount === last.rowCount
+      && last.inactiveRowCount === 0
+      && last.invalidRowActiveCount === 0
+      && last.inactiveMarkedRowCount === 0
+      && last.uniqueDisplayOrderCount === last.rowCount
+      && last.invalidDisplayOrderCount === 0
+      && last.invalidCategoryMetadataCount === 0
+      && last.visibleSequenceMismatchCount === 0
+      && last.invalidParityMetadataCount === 0
+      && Array.isArray(last.displayedRows)
+      && last.displayedRows.length === last.rowCount
+      && last.categorySequenceBreakCount === 0
+      && last.categoryReentryCount === 0
+      && last.categoryCount >= (last.rowCount === 0 ? 0 : 1)
+      && last.priceSectionCount >= (last.displayedItemCount === 0 ? 0 : 1)
       && last.expectedPageCount === last.priceSectionCount + 1
       && last.hashPresent
+      && last.hashScopeLabelPresent
       && last.watermarkPresent
     ) {
       return last

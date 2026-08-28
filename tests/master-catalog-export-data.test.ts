@@ -75,6 +75,36 @@ describe('Master Catalog export data loader', () => {
       .toBe('NT-Master-Catalog-v2568.0.0-20260622.xlsx');
   });
 
+  it('keeps complete active and inactive rows in an archived dataset before PDF presentation', async () => {
+    const canonicalRows = [
+      CANONICAL_ROW,
+      {
+        ...CANONICAL_ROW,
+        identity_id: '00000000-0000-4000-8000-000000000002',
+        item_code: 'AAA-BBB-002',
+        is_active: false,
+        display_order: 2,
+      },
+    ];
+    const datasetHash = await hashCanonicalCatalogDatasetRows(canonicalRows);
+    const client = createExportClient({
+      canonicalRows,
+      datasetHash,
+      versionOverrides: { status: 'archived', is_default: false },
+    });
+
+    const dataset = await loadCatalogExportDataset(client, VERSION_ID);
+
+    expect(dataset.version.status).toBe('archived');
+    expect(dataset.rows.map((row) => row.isActive)).toEqual([true, false]);
+    expect(dataset.counts).toMatchObject({
+      rowCount: 2,
+      activeRows: 1,
+      inactiveRows: 1,
+    });
+    expect(dataset.canonicalDatasetHash).toBe(datasetHash);
+  });
+
   it('fails closed when published item_count does not match selected rows', async () => {
     const datasetHash = await hashCanonicalCatalogDatasetRows([CANONICAL_ROW]);
     const client = createExportClient({

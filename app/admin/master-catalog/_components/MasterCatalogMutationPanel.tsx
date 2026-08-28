@@ -609,11 +609,13 @@ export function MasterCatalogPublishRestorePanel({
             {draftReadiness?.retiredPdfPolicyRequired ? (
               <Alert>
                 <ShieldCheck />
-                <AlertTitle>ต้องพิจารณานโยบาย PDF สำหรับรายการยกเลิกใช้</AlertTitle>
+                <AlertTitle>PDF รองรับรายการยกเลิกใช้แล้ว</AlertTitle>
                 <AlertDescription>
                   ฉบับร่างมีรายการยกเลิกใช้{' '}
                   {draftReadiness.inactiveRowCount.toLocaleString('th-TH')} รายการ
-                  จึงยังห้ามรับรองหรือจัดเก็บ PDF เป็นฉบับทางการจนกว่านโยบายการแสดงรายการยกเลิกใช้จะได้รับอนุมัติ
+                  โดย PDF ฉบับร่างจะแสดงและทำเครื่องหมายรายการเหล่านี้ ส่วน PDF
+                  ที่เผยแพร่หรือจัดเก็บถาวรจะแสดงเฉพาะรายการใช้งาน
+                  ขณะที่จำนวนรวมและ Dataset SHA-256 ยังคงครอบคลุมข้อมูลครบทั้งฉบับ
                 </AlertDescription>
               </Alert>
             ) : null}

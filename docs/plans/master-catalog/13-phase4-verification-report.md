@@ -1,22 +1,32 @@
 # Master Catalog Phase 4 Verification Report
 
-> **Current Master Catalog admin-edit completion overlay (2026-08-28):** The
-> data/publication milestone is complete (`2568.1.0`, `710` rows, reviewed
-> ITEM-0429/ITEM-0615 values, XLSX/PDF passed, no historical BOQ reprice, no
-> Factor F change), and P-13/P-14/P-14C/P-15 are complete and must not be
-> replayed. Migration 027 was applied once and is immutable. The deployed Admin
-> UI is intentionally read-only, so end-to-end completion remains pending.
-> [Plan #105](./105-phase4-master-catalog-admin-edit-completion-plan.md) restores
-> the original active-Admin draft workflow through a new forward-only 028 gate
-> projection while keeping published rows immutable and new-identity/
-> retirement capabilities disabled. Current authority covers local docs, code,
-> tests, and the reviewed package commit/push only to
-> `codex/master-catalog-admin-edit`; no merge/push to `main`, Production
-> write, flag change, Production deploy, or automatic next step is authorized.
+> **Current Master Catalog full-Admin completion amendment (2026-08-28):**
+> The data/publication milestone is complete (`2568.1.0`, `710` rows,
+> reviewed ITEM-0429/ITEM-0615 values, XLSX/PDF passed, no historical BOQ
+> reprice, no Factor F change), and P-13/P-14/P-14C/P-15 are complete and must not be
+> replayed. Migration 027 was applied once and is immutable. The
+> deployed Admin UI remains intentionally read-only and all three capability
+> settings remain exact boolean `false`.
+> [Plan #105 V2](./105-phase4-master-catalog-admin-edit-completion-plan.md)
+> retains immutable published rows and sets the final staged target: Admin
+> enables Edit/Recode plus eligible Withdraw/Reactivate recovery; New identity
+> adds Add/Supplement and placement; Retirement adds Retire. All three settings
+> are ultimately `true`. Published identities are never
+> hard-deleted. P-19 direction is now active-only field-facing official PDF,
+> while draft PDF visibly marks inactive rows and Excel/database/history retain
+> the complete dataset. P-49 formal closeout remains pending; its unrun expanded
+> Production persona rehearsal remains an accepted residual, never a
+> retrospective PASS. The baseline Admin-gate commit `705eeca...` is pushed
+> only to `codex/master-catalog-admin-edit`; the bounded P-19 application, tests,
+> render QA, and exact PDF-to-Excel parity are complete locally at `48` files /
+> `444` tests. The Owner then issued `APPROVE MASTER CATALOG FINAL`,
+> authorizing R-02 through R-05 in exact staged order with no retry. It does not
+> authorize catalog publication, pointer restore, BOQ mutation, Factor F mutation,
+> or migration replay.
 > This overlay supersedes all prior live Status/Current/next-action wording;
 > all dated text below is retained as historical evidence only.
 
-<!-- MASTER_CATALOG_ADMIN_EDIT_STATUS_V1 {"schema":"conduit-boq/master-catalog-admin-edit-status/v1","recordedAt":"2026-08-28","catalogDataPublicationComplete":true,"publishedVersion":"2568.1.0","publishedRowCount":710,"p13P14P14cP15CompleteNoReplay":true,"migration027AppliedOnceNoReplay":true,"readOnlyAdminUiLive":true,"endToEndComplete":false,"plan":"105-phase4-master-catalog-admin-edit-completion-plan.md","target":"active-admin-draft-workflow","migration028Required":true,"catalogNewIdentityEnabledTarget":false,"catalogRetirementEnabledTarget":false,"localDocsCodeTestsAuthorized":true,"featureBranchGitPublicationAuthorized":true,"featureBranch":"codex/master-catalog-admin-edit","commitAuthorized":true,"pushAuthorized":true,"mainMergeAuthorized":false,"productionWriteAuthorized":false,"deployAuthorized":false,"automaticNextStep":false} -->
+<!-- MASTER_CATALOG_ADMIN_EDIT_STATUS_V2 {"schema":"conduit-boq/master-catalog-admin-edit-status/v2","recordedAt":"2026-08-28","catalogDataPublicationComplete":true,"publishedVersion":"2568.1.0","publishedRowCount":710,"p13P14P14cP15CompleteNoReplay":true,"migration027AppliedOnceNoReplay":true,"readOnlyAdminUiLive":true,"endToEndComplete":false,"p49FormalCloseoutComplete":false,"expandedProductionPersonaTestAcceptedResidual":true,"plan":"105-phase4-master-catalog-admin-edit-completion-plan.md","target":"full-active-admin-draft-workflow","publishedHardDeleteAllowed":false,"p19Policy":"official-pdf-active-only-draft-pdf-mark-inactive","p19ImplementationComplete":true,"p19RenderedFixturesVerified":true,"p19LocalTestResult":"48-files-444-tests-pass","migration028Required":true,"migration029Required":false,"catalogAdminEnabledCurrent":false,"catalogNewIdentityEnabledCurrent":false,"catalogRetirementEnabledCurrent":false,"catalogAdminEnabledTarget":true,"catalogNewIdentityEnabledTarget":true,"catalogRetirementEnabledTarget":true,"baselineFeatureCommit":"705eeca0c86df5eda06cd4ea9efeda5b9bfeeebe","planDocsAmendmentAuthorized":true,"planDocsAmendmentComplete":true,"finalReleaseAuthorization":"APPROVE MASTER CATALOG FINAL","applicationCodeAuthorized":true,"commitAuthorized":true,"pushAuthorized":true,"mainMergeAuthorized":true,"productionReadAuthorized":true,"productionWriteAuthorized":true,"deployAuthorized":true,"flagChangeAuthorized":true,"automaticNextStep":true} -->
 
 
 > **Current P-50I verification result (2026-08-24):** the exact P-50I approval

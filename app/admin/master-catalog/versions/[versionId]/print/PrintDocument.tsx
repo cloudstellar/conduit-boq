@@ -9,6 +9,7 @@ import {
   type CatalogExportRow,
 } from '@/lib/master-catalog/export/data';
 import {
+  buildFieldFacingPdfPresentation,
   buildFieldFacingPdfStamp,
   getFieldFacingPdfStatus,
   getNonCurrentPdfNotice,
@@ -46,10 +47,10 @@ const WATERMARK_NOTICE_LINES = [
 const WATERMARK_NOTICE_TEXT = WATERMARK_NOTICE_LINES.join('\n');
 const DRAFT_PDF_MARK = 'DRAFT - ห้ามใช้อ้างอิง';
 const DRAFT_DATASET_HASH_LABEL =
-  'Draft dataset hash - not an official publication hash';
+  'Draft dataset SHA-256 (ข้อมูลครบทั้งฉบับ รวมรายการยกเลิกใช้) - ไม่ใช่ค่าแฮชการเผยแพร่ทางการ';
 // Keep print pages below the measured Chrome PDF overflow threshold because long
 // Thai item names wrap and can otherwise spill into sparse overflow pages.
-const PRICE_PAGE_ROW_LIMIT = 45;
+const PRICE_PAGE_ROW_LIMIT = 40;
 // The repeated draft line adds roughly 6.7 mm (line plus flex gap), so reserve
 // two normal row units rather than risking a sparse overflow page.
 const DRAFT_PRICE_PAGE_ROW_LIMIT = PRICE_PAGE_ROW_LIMIT - 2;
@@ -62,8 +63,12 @@ export function MasterCatalogPrintDocument({
   const documentVersionString = dataset.isDraftExport
     ? dataset.version.targetVersionString
     : dataset.version.officialVersionString ?? dataset.version.targetVersionString;
-  const pricePages = paginateCatalogPdfRows(
+  const pdfPresentation = buildFieldFacingPdfPresentation(
     dataset.rows,
+    dataset.version.status,
+  );
+  const pricePages = paginateCatalogPdfRows(
+    pdfPresentation.rows,
     dataset.isDraftExport ? DRAFT_PRICE_PAGE_ROW_LIMIT : PRICE_PAGE_ROW_LIMIT,
   );
   const filename = makeCatalogExportFilename(dataset, 'pdf');
@@ -78,7 +83,9 @@ export function MasterCatalogPrintDocument({
     isDraft: dataset.isDraftExport,
     statusText,
     effectiveDate: displayDateWithIso(dataset.version.effectiveDate),
-    itemCount: dataset.counts.rowCount,
+    displayedItemCount: pdfPresentation.displayedItemCount,
+    totalItemCount: pdfPresentation.totalItemCount,
+    excludedInactiveItemCount: pdfPresentation.excludedInactiveItemCount,
     canonicalDatasetHash: dataset.canonicalDatasetHash,
   }).map((row) => dataset.isDraftExport && row.hash
     ? { ...row, label: DRAFT_DATASET_HASH_LABEL }
@@ -88,28 +95,22 @@ export function MasterCatalogPrintDocument({
     : `v${documentVersionString} | ${formatThaiDate(dataset.version.effectiveDate)}`;
   const priceListTitle = makeCatalogExportDocumentTitle(documentVersionString);
   const coverYearLabel = makeFieldFacingPdfYearLabel(documentVersionString);
+  const totalPageCount = pricePages.length + 1;
 
   return (
-    <main className={`${ntDocumentFont.className} print-root`}>
+    <main
+      className={`${ntDocumentFont.className} print-root`}
+      data-pdf-policy={dataset.isDraftExport ? 'draft-all-mark-inactive' : 'official-active-only'}
+      data-pdf-total-rows={pdfPresentation.totalItemCount}
+      data-pdf-displayed-rows={pdfPresentation.displayedItemCount}
+      data-pdf-inactive-rows={pdfPresentation.inactiveItemCount}
+      data-pdf-excluded-inactive-rows={pdfPresentation.excludedInactiveItemCount}
+      data-pdf-hash-scope="complete-version-including-inactive"
+    >
       <style>{`
 	        @page {
 	          size: A4 portrait;
-	          margin: 12mm 5mm 16mm;
-	          @bottom-left {
-	            content: "${cssString(CATALOG_EXPORT_DEPARTMENT_FOOTER)}";
-	            font-family: ${DOCUMENT_FONT_FAMILY};
-	            font-size: 10pt;
-	          }
-	          @bottom-center {
-	            content: "หน้า " counter(page) "/" counter(pages);
-	            font-family: ${DOCUMENT_FONT_FAMILY};
-	            font-size: 10pt;
-	          }
-	          @bottom-right {
-	            content: "${cssString(footerRight)}";
-	            font-family: ${DOCUMENT_FONT_FAMILY};
-	            font-size: 10pt;
-	          }
+              margin: 0;
         }
         * { box-sizing: border-box; }
         @font-face {
@@ -286,8 +287,6 @@ export function MasterCatalogPrintDocument({
           font-size: 10.2pt;
           line-height: 1;
         }
-        thead { display: table-header-group; }
-        tfoot { display: table-footer-group; }
 	        th, td {
 	          border: 0.75pt solid #111827;
 	          padding: 0.55mm 0.65mm;
@@ -304,52 +303,72 @@ export function MasterCatalogPrintDocument({
 	        .col-unit { width: 12.5mm; }
 	        .col-money { width: 17mm; }
 	        .col-total { width: 20mm; }
-        .repeat-doc-cell {
-          border: 0;
-          padding: 0 0 4mm;
-          background: white;
-        }
         .repeat-doc-header {
-          display: flex;
-          flex-direction: column;
-          align-items: center;
-          gap: 3mm;
+          display: block;
+          width: 198mm;
+          max-width: 100%;
+          margin: 0 auto 2mm;
           color: #111827;
         }
+        .price-page-heading {
+          position: absolute;
+          top: 12mm;
+          right: 5mm;
+          left: 5mm;
+          z-index: 3;
+        }
+        .print-fixed-price-heading { display: none; }
+        .print-fixed-logo, .print-fixed-title, .print-fixed-draft { display: none; }
+        .price-page-rows { padding-top: 33.5mm; }
+        .price-page-rows.with-draft-heading { padding-top: 40.2mm; }
         .repeat-logo {
           display: block;
           width: 56mm;
           height: auto;
+          margin: 0 auto;
         }
         .repeat-title {
+          margin-top: 3mm;
           font-size: 15.5pt;
           font-weight: 700;
           line-height: 1.15;
           text-align: center;
         }
         .repeat-draft-mark {
+          margin-top: 3mm;
           color: #991b1b;
           font-size: 10.5pt;
           font-weight: 700;
           line-height: 1;
           text-align: center;
         }
-        .currency-row th {
-          border: 0;
-          padding: 0 0 2mm;
-          background: white;
+        .currency-line {
+          margin-bottom: 2mm;
           font-size: 10pt;
           font-weight: 400;
           text-align: right;
         }
-	        .column-header-row th {
+	        .column-header-grid {
+	          display: grid;
+	          grid-template-columns: 7.5mm minmax(0, 1fr) 12.5mm 17mm 17mm 20mm;
+	          width: 198mm;
+	          max-width: 100%;
+	          margin: 0 auto;
+	        }
+	        .column-header-cell {
 	          background: #fff1a8;
+	          border: 0.75pt solid #111827;
 	          border-top-width: 1.1pt;
 	          border-bottom-width: 1.1pt;
+	          padding: 0.55mm 0.65mm;
 	          font-size: 10.4pt;
+          font-weight: 700;
           line-height: 1.1;
+          text-align: center;
           white-space: nowrap;
         }
+        .column-header-cell + .column-header-cell { border-left: 0; }
+        .price-data-table { margin-top: -0.75pt; }
         tr { break-inside: avoid; page-break-inside: avoid; }
         .category-row td {
           background: #f3f4f6;
@@ -370,42 +389,120 @@ export function MasterCatalogPrintDocument({
 	          overflow-wrap: normal;
 	          word-break: normal;
 	        }
-        .footer-fallback {
-          display: none;
-          margin-top: 8mm;
+        .inactive-row td {
+          background: #fff7ed;
+          color: #7c2d12;
+        }
+        .inactive-mark {
+          display: inline-block;
+          margin-left: 1.5mm;
+          border: 0.75pt solid #c2410c;
+          border-radius: 2mm;
+          padding: 0.2mm 1.2mm;
+          color: #9a3412;
+          font-size: 8.8pt;
+          font-weight: 700;
+          line-height: 1;
+          white-space: nowrap;
+        }
+        .page-footer {
+          position: absolute;
+          right: 5mm;
+          bottom: 5mm;
+          left: 5mm;
+          display: grid;
+          grid-template-columns: 1fr auto 1fr;
+          align-items: end;
+          gap: 4mm;
           border-top: 1px solid #d4d4d8;
           padding-top: 2mm;
           font-size: 10pt;
           color: #52525b;
         }
+        .page-footer-center { text-align: center; }
+        .page-footer-right { text-align: right; }
         @media print {
           body { background: white; }
           .toolbar { display: none; }
-          /*
-           * Rows are already pre-paginated into explicit logical tables.
-           * Chromium 151 can clip the last table-header-group above the media
-           * box, so print each logical thead once instead of repeating it.
-           */
-          thead { display: table-row-group; }
+          .print-fixed-price-heading {
+            display: block;
+            position: fixed;
+            top: 12mm;
+            right: 5mm;
+            left: 5mm;
+            z-index: 9999;
+          }
+          .print-fixed-logo {
+            display: block;
+            position: fixed;
+            top: 12mm;
+            right: 5mm;
+            left: 5mm;
+            z-index: 9999;
+          }
+          .print-fixed-title {
+            display: block;
+            position: fixed;
+            top: 25.75mm;
+            right: 5mm;
+            left: 5mm;
+            z-index: 9999;
+            margin-top: 0;
+          }
+          .print-fixed-draft {
+            display: block;
+            position: fixed;
+            top: 35.05mm;
+            right: 5mm;
+            left: 5mm;
+            z-index: 9999;
+            margin-top: 0;
+          }
           .sheet {
-            width: auto;
-            min-height: auto;
-            margin: 0;
-            padding: 0;
+            width: 210mm;
+            /* 290 mm content + 7 mm trailing spacer = one exact 297 mm A4 slot. */
+            height: 290mm;
+            min-height: 290mm;
+            margin: 0 0 7mm;
+            overflow: hidden;
+            padding: 12mm 5mm 16mm;
             box-shadow: none;
+            break-after: auto;
+            page-break-after: auto;
           }
           .price-section {
             margin-top: 0;
-            min-height: calc(297mm - 28mm);
-            break-before: page;
-            break-inside: avoid;
-            page-break-inside: avoid;
+            min-height: 290mm;
+            background: transparent;
           }
-          .footer-fallback { display: none; }
+          .cover-sheet {
+            z-index: 10000;
+            background: white;
+          }
         }
       `}</style>
       <MasterCatalogPrintToolbar filename={filename} versionId={dataset.version.id} />
-      <article className="sheet">
+      <div className="print-fixed-logo">
+        <img
+          src="/brand/nt/nt-logo-company-lockup.png"
+          alt=""
+          className="repeat-logo"
+        />
+      </div>
+      <div className="print-fixed-title repeat-title" aria-hidden="true">
+        {priceListTitle}
+      </div>
+      {dataset.isDraftExport ? (
+        <div className="print-fixed-draft repeat-draft-mark" aria-hidden="true">
+          {DRAFT_PDF_MARK}
+        </div>
+      ) : null}
+      <PricePageHeader
+        className="print-fixed-price-heading"
+        priceListTitle={priceListTitle}
+        draftMark={dataset.isDraftExport ? DRAFT_PDF_MARK : null}
+      />
+      <article className="sheet cover-sheet">
         <div className="content cover-content">
           <header className="doc-header">
             <img
@@ -430,25 +527,55 @@ export function MasterCatalogPrintDocument({
             ))}
           </section>
         </div>
+        <PageFooter
+          footerRight={footerRight}
+          pageNumber={1}
+          totalPageCount={totalPageCount}
+        />
       </article>
       {pricePages.map((page, index) => (
         <article className="sheet price-section" key={`price-page-${index}`}>
+          <PricePageHeader
+            className="screen-price-page-heading"
+            priceListTitle={priceListTitle}
+            draftMark={dataset.isDraftExport ? DRAFT_PDF_MARK : null}
+          />
           <div className="price-watermark" aria-hidden="true">
             {WATERMARK_NOTICE_TEXT}
           </div>
-          <div className="content">
+          <div
+            className={`content price-page-rows${dataset.isDraftExport ? ' with-draft-heading' : ''}`}
+          >
             <PricePageTable
               entries={page.entries}
-              priceListTitle={priceListTitle}
-              draftMark={dataset.isDraftExport ? DRAFT_PDF_MARK : null}
             />
-            <div className="footer-fallback">
-              {CATALOG_EXPORT_DEPARTMENT_FOOTER} | {footerRight}
-            </div>
           </div>
+          <PageFooter
+            footerRight={footerRight}
+            pageNumber={index + 2}
+            totalPageCount={totalPageCount}
+          />
         </article>
       ))}
     </main>
+  );
+}
+
+function PageFooter({
+  footerRight,
+  pageNumber,
+  totalPageCount,
+}: {
+  footerRight: string;
+  pageNumber: number;
+  totalPageCount: number;
+}) {
+  return (
+    <footer className="page-footer">
+      <span>{CATALOG_EXPORT_DEPARTMENT_FOOTER}</span>
+      <span className="page-footer-center">หน้า {pageNumber}/{totalPageCount}</span>
+      <span className="page-footer-right">{footerRight}</span>
+    </footer>
   );
 }
 
@@ -469,74 +596,79 @@ function StampRow({
   );
 }
 
-function PricePageTable({
-  entries,
+function PricePageHeader({
+  className,
   priceListTitle,
   draftMark,
 }: {
-  entries: CatalogPdfPageEntry<CatalogExportRow>[];
+  className: string;
   priceListTitle: string;
   draftMark: string | null;
 }) {
   return (
-    <table>
-      <colgroup>
-        <col className="col-seq" />
-        <col className="col-item" />
-        <col className="col-unit" />
-        <col className="col-money" />
-        <col className="col-money" />
-        <col className="col-total" />
-      </colgroup>
-      <thead>
-        <tr className="repeat-doc-row">
-          <th colSpan={6} className="repeat-doc-cell">
-            <div className="repeat-doc-header">
-              <img
-                src="/brand/nt/nt-logo-company-lockup.png"
-                alt="NT"
-                className="repeat-logo"
+    <div className={`price-page-heading ${className}`}>
+      <header className="repeat-doc-header">
+        <img
+          src="/brand/nt/nt-logo-company-lockup.png"
+          alt="NT"
+          className="repeat-logo"
+        />
+        <div className="repeat-title">{priceListTitle}</div>
+        {draftMark ? (
+          <div className="repeat-draft-mark">{draftMark}</div>
+        ) : null}
+      </header>
+      <div className="currency-line">(หน่วยเงิน: บาท)</div>
+      <div className="column-header-grid" role="row" aria-label="หัวตารางรายการราคา">
+        <div className="column-header-cell seq" role="columnheader">ที่</div>
+        <div className="column-header-cell item-name" role="columnheader">รายการวัสดุ</div>
+        <div className="column-header-cell unit" role="columnheader">หน่วยนับ</div>
+        <div className="column-header-cell money" role="columnheader">ค่าวัสดุ</div>
+        <div className="column-header-cell money" role="columnheader">ค่าแรง</div>
+        <div className="column-header-cell money" role="columnheader">ราคาต่อหน่วย</div>
+      </div>
+    </div>
+  );
+}
+
+function PricePageTable({
+  entries,
+}: {
+  entries: CatalogPdfPageEntry<CatalogExportRow>[];
+}) {
+  return (
+    <>
+      <table className="price-data-table">
+        <colgroup>
+          <col className="col-seq" />
+          <col className="col-item" />
+          <col className="col-unit" />
+          <col className="col-money" />
+          <col className="col-money" />
+          <col className="col-total" />
+        </colgroup>
+        <tbody className="print-page-body">
+          {entries.map((entry) =>
+            entry.kind === 'category' ? (
+              <CategoryRow
+                key={entry.key}
+                category={entry.category}
+                categoryCode={entry.categoryCode}
+                categoryKey={entry.categoryKey}
+                isContinuation={entry.isContinuation}
               />
-              <div className="repeat-title">{priceListTitle}</div>
-              {draftMark ? (
-                <div className="repeat-draft-mark">{draftMark}</div>
-              ) : null}
-            </div>
-          </th>
-        </tr>
-        <tr className="currency-row">
-          <th colSpan={6}>(หน่วยเงิน: บาท)</th>
-        </tr>
-        <tr className="column-header-row">
-          <th className="seq">ที่</th>
-          <th className="item-name">รายการวัสดุ</th>
-          <th className="unit">หน่วยนับ</th>
-          <th className="money">ค่าวัสดุ</th>
-          <th className="money">ค่าแรง</th>
-          <th className="money">ราคาต่อหน่วย</th>
-        </tr>
-      </thead>
-      <tbody>
-        {entries.map((entry) =>
-          entry.kind === 'category' ? (
-            <CategoryRow
-              key={entry.key}
-              category={entry.category}
-              categoryCode={entry.categoryCode}
-              categoryKey={entry.categoryKey}
-              isContinuation={entry.isContinuation}
-            />
-          ) : (
-            <PriceRow
-              key={entry.row.id}
-              row={entry.row}
-              categoryKey={entry.categoryKey}
-              localSequence={entry.localSequence}
-            />
-          ),
-        )}
-      </tbody>
-    </table>
+            ) : (
+              <PriceRow
+                key={entry.row.id}
+                row={entry.row}
+                categoryKey={entry.categoryKey}
+                localSequence={entry.localSequence}
+              />
+            ),
+          )}
+        </tbody>
+      </table>
+    </>
   );
 }
 
@@ -581,12 +713,29 @@ function PriceRow({
 }) {
   return (
     <tr
+      className={row.isActive ? undefined : 'inactive-row'}
+      data-row-active={row.isActive ? 'true' : 'false'}
+      data-identity-id={row.identityId}
+      data-item-code={row.itemCode}
+      data-item-name={row.itemName}
+      data-unit={row.unit}
+      data-material-cost={row.materialCost.toFixed(2)}
+      data-labor-cost={row.laborCost.toFixed(2)}
+      data-unit-cost={row.unitCost.toFixed(2)}
+      data-category-code={row.categoryCode ?? ''}
+      data-category-name={row.categoryName ?? ''}
       data-display-order={row.displayOrder}
       data-category-key={categoryKey}
       data-category-sequence={localSequence}
+      data-category-local-sequence={localSequence}
     >
       <td className="seq">{localSequence.toLocaleString('th-TH')}</td>
-      <td className="item-name">{row.itemName}</td>
+      <td className="item-name">
+        {row.itemName}
+        {row.isActive ? null : (
+          <span className="inactive-mark">ยกเลิกใช้</span>
+        )}
+      </td>
       <td className="unit">{row.unit}</td>
       <td className="money">{formatMoney(row.materialCost)}</td>
       <td className="money">{formatMoney(row.laborCost)}</td>
@@ -615,8 +764,4 @@ function formatMoney(value: number): string {
     minimumFractionDigits: 2,
     maximumFractionDigits: 2,
   });
-}
-
-function cssString(value: string): string {
-  return value.replace(/\\/g, '\\\\').replace(/"/g, '\\"');
 }

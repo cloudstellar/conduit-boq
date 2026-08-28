@@ -1,22 +1,32 @@
 # Phase 4 Review Guide
 
-> **Current Master Catalog admin-edit completion overlay (2026-08-28):** The
-> data/publication milestone is complete (`2568.1.0`, `710` rows, reviewed
-> ITEM-0429/ITEM-0615 values, XLSX/PDF passed, no historical BOQ reprice, no
-> Factor F change), and P-13/P-14/P-14C/P-15 are complete and must not be
-> replayed. Migration 027 was applied once and is immutable. The deployed Admin
-> UI is intentionally read-only, so end-to-end completion remains pending.
-> [Plan #105](./105-phase4-master-catalog-admin-edit-completion-plan.md) restores
-> the original active-Admin draft workflow through a new forward-only 028 gate
-> projection while keeping published rows immutable and new-identity/
-> retirement capabilities disabled. Current authority covers local docs, code,
-> tests, and the reviewed package commit/push only to
-> `codex/master-catalog-admin-edit`; no merge/push to `main`, Production
-> write, flag change, Production deploy, or automatic next step is authorized.
+> **Current Master Catalog full-Admin completion amendment (2026-08-28):**
+> The data/publication milestone is complete (`2568.1.0`, `710` rows,
+> reviewed ITEM-0429/ITEM-0615 values, XLSX/PDF passed, no historical BOQ
+> reprice, no Factor F change), and P-13/P-14/P-14C/P-15 are complete and must not be
+> replayed. Migration 027 was applied once and is immutable. The
+> deployed Admin UI remains intentionally read-only and all three capability
+> settings remain exact boolean `false`.
+> [Plan #105 V2](./105-phase4-master-catalog-admin-edit-completion-plan.md)
+> retains immutable published rows and sets the final staged target: Admin
+> enables Edit/Recode plus eligible Withdraw/Reactivate recovery; New identity
+> adds Add/Supplement and placement; Retirement adds Retire. All three settings
+> are ultimately `true`. Published identities are never
+> hard-deleted. P-19 direction is now active-only field-facing official PDF,
+> while draft PDF visibly marks inactive rows and Excel/database/history retain
+> the complete dataset. P-49 formal closeout remains pending; its unrun expanded
+> Production persona rehearsal remains an accepted residual, never a
+> retrospective PASS. The baseline Admin-gate commit `705eeca...` is pushed
+> only to `codex/master-catalog-admin-edit`; the bounded P-19 application, tests,
+> render QA, and exact PDF-to-Excel parity are complete locally at `48` files /
+> `444` tests. The Owner then issued `APPROVE MASTER CATALOG FINAL`,
+> authorizing R-02 through R-05 in exact staged order with no retry. It does not
+> authorize catalog publication, pointer restore, BOQ mutation, Factor F mutation,
+> or migration replay.
 > This overlay supersedes all prior live Status/Current/next-action wording;
 > all dated text below is retained as historical evidence only.
 
-<!-- MASTER_CATALOG_ADMIN_EDIT_STATUS_V1 {"schema":"conduit-boq/master-catalog-admin-edit-status/v1","recordedAt":"2026-08-28","catalogDataPublicationComplete":true,"publishedVersion":"2568.1.0","publishedRowCount":710,"p13P14P14cP15CompleteNoReplay":true,"migration027AppliedOnceNoReplay":true,"readOnlyAdminUiLive":true,"endToEndComplete":false,"plan":"105-phase4-master-catalog-admin-edit-completion-plan.md","target":"active-admin-draft-workflow","migration028Required":true,"catalogNewIdentityEnabledTarget":false,"catalogRetirementEnabledTarget":false,"localDocsCodeTestsAuthorized":true,"featureBranchGitPublicationAuthorized":true,"featureBranch":"codex/master-catalog-admin-edit","commitAuthorized":true,"pushAuthorized":true,"mainMergeAuthorized":false,"productionWriteAuthorized":false,"deployAuthorized":false,"automaticNextStep":false} -->
+<!-- MASTER_CATALOG_ADMIN_EDIT_STATUS_V2 {"schema":"conduit-boq/master-catalog-admin-edit-status/v2","recordedAt":"2026-08-28","catalogDataPublicationComplete":true,"publishedVersion":"2568.1.0","publishedRowCount":710,"p13P14P14cP15CompleteNoReplay":true,"migration027AppliedOnceNoReplay":true,"readOnlyAdminUiLive":true,"endToEndComplete":false,"p49FormalCloseoutComplete":false,"expandedProductionPersonaTestAcceptedResidual":true,"plan":"105-phase4-master-catalog-admin-edit-completion-plan.md","target":"full-active-admin-draft-workflow","publishedHardDeleteAllowed":false,"p19Policy":"official-pdf-active-only-draft-pdf-mark-inactive","p19ImplementationComplete":true,"p19RenderedFixturesVerified":true,"p19LocalTestResult":"48-files-444-tests-pass","migration028Required":true,"migration029Required":false,"catalogAdminEnabledCurrent":false,"catalogNewIdentityEnabledCurrent":false,"catalogRetirementEnabledCurrent":false,"catalogAdminEnabledTarget":true,"catalogNewIdentityEnabledTarget":true,"catalogRetirementEnabledTarget":true,"baselineFeatureCommit":"705eeca0c86df5eda06cd4ea9efeda5b9bfeeebe","planDocsAmendmentAuthorized":true,"planDocsAmendmentComplete":true,"finalReleaseAuthorization":"APPROVE MASTER CATALOG FINAL","applicationCodeAuthorized":true,"commitAuthorized":true,"pushAuthorized":true,"mainMergeAuthorized":true,"productionReadAuthorized":true,"productionWriteAuthorized":true,"deployAuthorized":true,"flagChangeAuthorized":true,"automaticNextStep":true} -->
 
 
 **Prepared:** 2026-06-22
@@ -361,8 +371,8 @@ checkpoint.
 | Runtime font/logo derivative ใด commit/deploy ได้ | P-10 approved แบบจำกัด; ใช้เฉพาะ runtime derivatives ตาม Decision Register และ [Doc #24](./24-phase4-nt-ci-runtime-asset-analysis.md) |
 | Metadata จริงของ baseline `2568.0.0` | P-08 approved: effective `2026-01-01`; approval ref `เอ็นที วทฐฐ./405 ลงวันที่ 27 พ.ย. 2568`; publisher `ผู้จัดการฝ่ายท่อร้อยสาย (ทฐฐ.)` |
 | รูปแบบตัวอย่าง Excel/PDF ตาม Export Spec | P-11/WP-6 accepted สำหรับ exact Local pair แล้ว; Production filing/P-15 ยังแยก |
-| P-18 placement governance สำหรับ add/supplement | P-30 รับรองกติกา V1, amended WP-7.5 ผ่าน P-32 Local DB/browser/export evidence และ P-33 รับรองขอบเขตเทคนิคแล้วตาม [Review Note #28](./28-phase4-p18-placement-governance-review-note.md). P-36 integrated Local technical rehearsal และ corrected P-37 recovery/owner keyboard/focus/presentation UAT ผ่าน; Owner accepted P-37 เมื่อ 2026-07-25 ภายใต้ guided-UAT variance ที่บันทึกตามจริง. Add/Supplement ยังซ่อน/ปิดจนถึง P-14 และต้อง re-evaluate residual ก่อน enablement |
-| P-19 PDF policy สำหรับรายการยกเลิกใช้ | ถ้า version ใดมี inactive/retired rows ต้องตัดสินใจว่าจะ exclude/mark/appendix ก่อน filed PDF |
+| P-18 placement governance สำหรับ add/supplement | P-30 รับรองกติกา V1, amended WP-7.5 ผ่าน P-32 Local DB/browser/export evidence และ P-33 รับรองขอบเขตเทคนิคแล้วตาม [Review Note #28](./28-phase4-p18-placement-governance-review-note.md). P-36 integrated Local technical rehearsal และ corrected P-37 recovery/owner keyboard/focus/presentation UAT ผ่าน; Owner accepted P-37 เมื่อ 2026-07-25 ภายใต้ guided-UAT variance ที่บันทึกตามจริง. P-14 จบและห้าม replay; Add/Supplement ยังปิดจนถึง staged rollout ตาม Plan #105 V2 และ exact checks ผ่าน |
+| P-19 PDF policy สำหรับรายการยกเลิกใช้ | Owner อนุมัติ direction แล้ว: official published/archived PDF แสดงเฉพาะ active, draft PDF แสดงครบและทำเครื่องหมาย `ยกเลิกใช้`; implementation/tests/render QA ยังรอและ Retirement ต้องยังปิดจนกว่าจะผ่าน |
 | P-20 canonical hash portability | Owner approved deterministic baseline identity จาก Production-derived `price_list.id`; independent two-rebuild proof ของ data-bearing chain ผ่านแล้ว. `017a` และ `026` เป็น data-free ACL-only changes จึงไม่ทำให้ต้อง repeat portability reset สองรอบ; แต่ต้องมี corrected integration bootstrap ใหม่หนึ่งครั้งหลัง P-47 และต้องขอ Owner reset approval ใหม่. P-15 final hash acceptance ยังแยก |
 | P-12 Production readiness | **Complete 2026-08-17.** Exact `017` -> `017a` -> `018`-`026`, objective closeout, and checksum-verified v7 post-`026` backup/isolated restore passed; all Phase 4 flags remain false. P-49 does not reopen this evidence. |
 | P-49 pending-account authorization | Business target approved: pending is profile/onboarding-only and catalog `022`/`023` remains active-only. Current BOQ/RPC/Factor-F/profile/API paths are not aligned; risk remains open/high and implementation is deferred/unapproved. P-51 waives it only as blocker for the exact first closeout, then requires re-entry. |

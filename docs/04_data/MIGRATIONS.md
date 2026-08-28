@@ -7,11 +7,16 @@
 > **Current-state supersession (2026-08-28):** P-13/P-14/P-14C/P-15 are
 > complete and must not be replayed. Migration 027 was applied exactly once as
 > ledger `20260827174634/p49_active_profile_authorization_hardening` and remains
-> immutable. Migration 028 is now a Local-only, function/ACL-only candidate;
+> immutable. Migration 028 is a reviewed, not-yet-applied function/ACL-only
+> candidate at baseline feature commit `705eeca...`;
 > it leaves all catalog flags false and changes no Master Catalog, pointer, BOQ,
-> or Factor F data. Its reviewed feature-branch commit/push is authorized;
-> merge/push to `main`, Production application, matching Production deployment,
-> and later flag change remain separate gates under
+> or Factor F data. That baseline feature commit is already pushed only to
+> `codex/master-catalog-admin-edit`. Plan #105 V2 sets the later staged target
+> to Admin -> New identity -> Retirement. Flag transitions are recorded runtime
+> configuration changes, not migration-ledger entries; do not create 029 or
+> edit/replay 027/028. P-19 application/tests must pass before Retirement.
+> Merge/push to `main`, Production application, matching deployment, and any
+> flag change remain unauthorized under this documentation step. See
 > [Plan #105](../plans/master-catalog/105-phase4-master-catalog-admin-edit-completion-plan.md).
 
 > **Current Production overlay (supersedes stale pre-execution status and

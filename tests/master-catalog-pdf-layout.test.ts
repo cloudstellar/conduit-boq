@@ -4,6 +4,7 @@ import {
   paginateCatalogPdfRows,
   type CatalogPdfLayoutRow,
 } from '../lib/master-catalog/export/pdfLayout';
+import { buildFieldFacingPdfPresentation } from '../lib/master-catalog/export/pdfPresentation';
 
 function row(
   id: string,
@@ -214,5 +215,28 @@ describe('Master Catalog PDF layout', () => {
   it('rejects row limits that cannot hold a category heading and one item', () => {
     expect(() => paginateCatalogPdfRows([], 1)).toThrow(RangeError);
     expect(() => paginateCatalogPdfRows([], 2.5)).toThrow(RangeError);
+  });
+
+  it('omits inactive-only categories and restarts visible sequences after official filtering', () => {
+    const sourceRows = [
+      { ...row('inactive-a', 0, '1.1', 'หมวด A'), isActive: false },
+      { ...row('active-b1', 1, '1.2', 'หมวด B'), isActive: true },
+      { ...row('inactive-b', 2, '1.2', 'หมวด B'), isActive: false },
+      { ...row('active-b2', 3, '1.2', 'หมวด B'), isActive: true },
+    ];
+    const presentation = buildFieldFacingPdfPresentation(sourceRows, 'active');
+    const entries = paginateCatalogPdfRows(presentation.rows, 20)
+      .flatMap((page) => page.entries);
+
+    expect(entries
+      .filter((entry) => entry.kind === 'category')
+      .map((entry) => entry.categoryKey)).toEqual(['code:1.2']);
+    expect(entries
+      .filter((entry) => entry.kind === 'row')
+      .map((entry) => [entry.row.id, entry.localSequence])).toEqual([
+      ['active-b1', 1],
+      ['active-b2', 2],
+    ]);
+    expect(sourceRows).toHaveLength(4);
   });
 });

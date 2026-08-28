@@ -1,25 +1,44 @@
 # Master Catalog Phase 4 Execution Progress Tracker
 
-> **Current Master Catalog admin-edit completion overlay (2026-08-28):** The
-> data/publication milestone is complete (`2568.1.0`, `710` rows, reviewed
-> ITEM-0429/ITEM-0615 values, XLSX/PDF passed, no historical BOQ reprice, no
-> Factor F change), and P-13/P-14/P-14C/P-15 are complete and must not be
-> replayed. Migration 027 was applied once and is immutable. The deployed Admin
-> UI is intentionally read-only, so end-to-end completion remains pending.
-> [Plan #105](./105-phase4-master-catalog-admin-edit-completion-plan.md) restores
-> the original active-Admin draft workflow through a new forward-only 028 gate
-> projection while keeping published rows immutable and new-identity/
-> retirement capabilities disabled. Current authority covers local docs, code,
-> tests, and the reviewed package commit/push only to
-> `codex/master-catalog-admin-edit`; no merge/push to `main`, Production
-> write, flag change, Production deploy, or automatic next step is authorized.
+> **Current Master Catalog full-Admin completion amendment (2026-08-28):**
+> The data/publication milestone is complete (`2568.1.0`, `710` rows,
+> reviewed ITEM-0429/ITEM-0615 values, XLSX/PDF passed, no historical BOQ
+> reprice, no Factor F change), and P-13/P-14/P-14C/P-15 are complete and must not be
+> replayed. Migration 027 was applied once and is immutable. The
+> deployed Admin UI remains intentionally read-only and all three capability
+> settings remain exact boolean `false`.
+> [Plan #105 V2](./105-phase4-master-catalog-admin-edit-completion-plan.md)
+> retains immutable published rows and sets the final staged target: Admin
+> enables Edit/Recode plus eligible Withdraw/Reactivate recovery; New identity
+> adds Add/Supplement and placement; Retirement adds Retire. All three settings
+> are ultimately `true`. Published identities are never
+> hard-deleted. P-19 direction is now active-only field-facing official PDF,
+> while draft PDF visibly marks inactive rows and Excel/database/history retain
+> the complete dataset. P-49 formal closeout remains pending; its unrun expanded
+> Production persona rehearsal remains an accepted residual, never a
+> retrospective PASS. The baseline Admin-gate commit `705eeca...` is pushed
+> only to `codex/master-catalog-admin-edit`; the bounded P-19 application, tests,
+> render QA, and exact PDF-to-Excel parity are complete locally at `48` files /
+> `444` tests. The Owner then issued `APPROVE MASTER CATALOG FINAL`,
+> authorizing R-02 through R-05 in exact staged order with no retry. It does not
+> authorize catalog publication, pointer restore, BOQ mutation, Factor F mutation,
+> or migration replay.
 > This overlay supersedes all prior live Status/Current/next-action wording;
 > all dated text below is retained as historical evidence only.
 
-<!-- MASTER_CATALOG_ADMIN_EDIT_STATUS_V1 {"schema":"conduit-boq/master-catalog-admin-edit-status/v1","recordedAt":"2026-08-28","catalogDataPublicationComplete":true,"publishedVersion":"2568.1.0","publishedRowCount":710,"p13P14P14cP15CompleteNoReplay":true,"migration027AppliedOnceNoReplay":true,"readOnlyAdminUiLive":true,"endToEndComplete":false,"plan":"105-phase4-master-catalog-admin-edit-completion-plan.md","target":"active-admin-draft-workflow","migration028Required":true,"catalogNewIdentityEnabledTarget":false,"catalogRetirementEnabledTarget":false,"localDocsCodeTestsAuthorized":true,"featureBranchGitPublicationAuthorized":true,"featureBranch":"codex/master-catalog-admin-edit","commitAuthorized":true,"pushAuthorized":true,"mainMergeAuthorized":false,"productionWriteAuthorized":false,"deployAuthorized":false,"automaticNextStep":false} -->
+<!-- MASTER_CATALOG_ADMIN_EDIT_STATUS_V2 {"schema":"conduit-boq/master-catalog-admin-edit-status/v2","recordedAt":"2026-08-28","catalogDataPublicationComplete":true,"publishedVersion":"2568.1.0","publishedRowCount":710,"p13P14P14cP15CompleteNoReplay":true,"migration027AppliedOnceNoReplay":true,"readOnlyAdminUiLive":true,"endToEndComplete":false,"p49FormalCloseoutComplete":false,"expandedProductionPersonaTestAcceptedResidual":true,"plan":"105-phase4-master-catalog-admin-edit-completion-plan.md","target":"full-active-admin-draft-workflow","publishedHardDeleteAllowed":false,"p19Policy":"official-pdf-active-only-draft-pdf-mark-inactive","p19ImplementationComplete":true,"p19RenderedFixturesVerified":true,"p19LocalTestResult":"48-files-444-tests-pass","migration028Required":true,"migration029Required":false,"catalogAdminEnabledCurrent":false,"catalogNewIdentityEnabledCurrent":false,"catalogRetirementEnabledCurrent":false,"catalogAdminEnabledTarget":true,"catalogNewIdentityEnabledTarget":true,"catalogRetirementEnabledTarget":true,"baselineFeatureCommit":"705eeca0c86df5eda06cd4ea9efeda5b9bfeeebe","planDocsAmendmentAuthorized":true,"planDocsAmendmentComplete":true,"finalReleaseAuthorization":"APPROVE MASTER CATALOG FINAL","applicationCodeAuthorized":true,"commitAuthorized":true,"pushAuthorized":true,"mainMergeAuthorized":true,"productionReadAuthorized":true,"productionWriteAuthorized":true,"deployAuthorized":true,"flagChangeAuthorized":true,"automaticNextStep":true} -->
+
+## Canonical current status
+
+[Handoff #106](./106-phase4-master-catalog-exact-remaining-work-handoff.md)
+is the sole authority for volatile current status, no-replay items,
+authorization, and the exact remaining work. This Tracker retains dated
+execution evidence; lower `Current`, `HOLD`, or `unauthorized` wording not
+explicitly tied to Handoff #106 is historical.
 
 
-**Current P-50I execution receipt (2026-08-24):** **authorization consumed;
+**Historical P-50I execution receipt (2026-08-24; superseded by Handoff
+#106):** **authorization consumed;
 exact patch target passed; local gate failed; no Git publication; P-13 hard
 hold.** Preflight bound the approved Proposal #59 SHA-256 `dad63f43...`, exact
 branch/HEAD/upstream/remote, and empty index. The patch applied once and matched
@@ -29,20 +48,22 @@ two frozen-diff examples plus the one actual EOF marker; anchored count is one.
 Focused ESLint and deterministic P-50C checks passed. See [Result
 #60](./60-phase4-p50i-local-validation-failure-result-record.md). Fail-fast
 stopped before stage/commit/push; no new CI/Preview or Production action
-occurred. HEAD/upstream/live remote remain `2b45f9b...`, index empty, and the
-exact P-50I target remains uncommitted. P-50I cannot be replayed. [P-50J
+occurred. At that checkpoint HEAD/upstream/live remote remained `2b45f9b...`,
+the index was empty, and the exact P-50I target remained uncommitted. P-50I
+cannot be replayed. [P-50J
 Proposal #61](./61-phase4-p50j-marker-count-correction-and-ci-authorization-proposal.md)
-is the sole current review and is preparation-only. Published `2568.0.0` and
-all Production state remain unchanged; P-50C remains local review evidence and
-`2568.1.0` remains provisional/registry-pending. No correction execution,
-commit/push, CI, database/Production, P-13-P-15, deploy, or publication is
-currently authorized. Earlier current-status paragraphs remain chronology.
+was the sole review at that checkpoint and was preparation-only. Published
+`2568.0.0` and all Production state were then unchanged; P-50C was local review
+evidence and `2568.1.0` was provisional/registry-pending. No correction
+execution, commit/push, CI, database/Production, P-13-P-15, deploy, or
+publication was authorized by this historical receipt. Earlier current-status
+paragraphs are chronology.
 Historical bindings remain [P-50H Result #58](./58-phase4-p50h-local-git-ci-preview-result-record.md),
 [P-50I Proposal #59](./59-phase4-p50i-quality-fixture-remediation-and-ci-rerun-authorization-proposal.md),
-and failed Quality run `32661774094`; none grants current authority.
+and failed Quality run `32661774094`; none is current authority.
 
-**Historical pre-P-50H authority receipt (2026-08-24; superseded by the P-50I
-receipt above):** **P-12 remains COMPLETE. Exact
+**Historical pre-P-50H authority receipt (2026-08-24; superseded by Handoff
+#106):** **P-12 remains COMPLETE. Exact
 P-50D V3 Owner confirmation (ratification) is received and the decision is
 complete only in `decision-record-only` scope. P-50C technical/data review
 PASSED and the candidate is accepted only as local review evidence under
@@ -56,7 +77,8 @@ records PASS. P-50G cannot be replayed. P-50H Proposal #57 and its exact
 manifest were prepared for separate Owner review at that checkpoint. P-50H execution,
 database, Production, network, candidate application, Git stage/commit/push,
 CI/Preview, P-13, P-14, P-14C, P-15, deployment, pointer movement, and
-publication remain unauthorized. Nothing continues automatically. The
+publication were unauthorized at that checkpoint. Nothing continued
+automatically. The
 correction and same-day snapshot markers below are retained as superseded
 pre-receipt chronology.
 
@@ -341,11 +363,11 @@ false. C-08 passed. At that checkpoint P-37 was HOLD only for explicit Owner
 accept/hold, not for more default execution. The Owner subsequently accepted
 P-37 on 2026-07-25 under the recorded guided-UAT variance.
 
-**Purpose:** Owner-facing progress tracker for Master Catalog Phase 4 local
-implementation and rehearsal. This file is the authority for current WP status,
-blockers, next safe step, and the authority/evidence index. Detailed decisions,
-contracts, execution steps, and test evidence remain in their named sources
-below.
+**Purpose:** Owner-facing historical progress tracker for Master Catalog Phase
+4 local implementation and rehearsal. Handoff #106 is the authority for
+current WP status, blockers, authorization, and exact remaining work. This
+Tracker retains the authority/evidence index; detailed decisions, contracts,
+execution steps, and test evidence remain in their named sources below.
 
 ## 1. Update rules
 
@@ -368,9 +390,9 @@ Allowed statuses:
 - `Ready for owner review`
 - `Complete`
 
-## 2. Current dashboard
+## 2. Historical dashboard snapshot - superseded by Handoff #106
 
-| Field | Current value |
+| Field | Historical recorded value |
 |---|---|
 | Current branch | `codex/p12-production-authority-r2`; local HEAD, upstream, and live remote remain exact P-50H commit `2b45f9b1679d12caac933568e89e1065d74dbd74`, ahead/behind `0/0`, index empty. P-50I authorization was consumed after exact preflight/patch/target PASS, but its local gate failed before stage. The P-50I test target, Result #60, P-50J Proposal #61, and aligned authority docs remain uncommitted; no commit/push is authorized. |
 | Owner-accepted G3/WP-6.6 checkpoint | `78e96ab3ed9993707014c4aba1d285b7592b17a1` at 2026-07-14 23:50 +07 |
@@ -396,7 +418,7 @@ Allowed statuses:
 
 | Fact or contract | Single authority | Update rule |
 |---|---|---|
-| Current WP/status/blocker/next safe step | This Tracker | Update whenever work pauses or a gate changes |
+| Current WP/status/blocker/next safe step | [Handoff #106](./106-phase4-master-catalog-exact-remaining-work-handoff.md) | Update Handoff #106 whenever current status or authorization changes; retain this Tracker as dated evidence only |
 | WP-8/P-37 open-gate accounting | [Closure Matrix #34](./34-phase4-wp8-p37-closure-matrix.md) | Close only the named row proved by exact technical, browser, or owner evidence |
 | WP-8/P-37 evidence reuse, scored tasks, performance budget, and cleanup | [Owner UAT Script #35](./35-phase4-wp8-p37-evidence-reconciliation-and-owner-uat-script.md) | Developer preflight is not scored; only the intended admin can supply the named Owner evidence |
 | WP-8/P-38 input recipes, hashes, no-reset harness, and exact preflight baseline | [Preflight Note #36](./36-phase4-wp8-p38-no-reset-owner-uat-preflight.md) | Reverify after source/parser/authority/input change; mutating prepare requires exact clean pushed source |
@@ -622,6 +644,9 @@ Current evidence baseline:
 
 ## 3. Work package checklist
 
+This checklist is retained closeout history. Handoff #106 supersedes its old
+P-13/P-14/P-14C/P-15 and WP-9 next-action wording.
+
 | WP | Scope | Status | Exit evidence | Owner review |
 |---|---|---|---|---|
 | WP-0 | Branch, dependency, codebase, docs, and read-only DB readiness | Complete | Branch `codex/master-catalog-phase4`, git state, codebase inspection, read-only DB preflight, advisor baseline, local checks, snapshot plan | Completed before WP-1 |
@@ -718,7 +743,7 @@ scope.
 | P-18 publish guard | Before WP-7 and before any add/supplement publish readiness claim | P-30 accepted the placement contract and P-33 accepted WP-7.5 technically; retain the release hold until every WP-8/P-14 placement UX gate passes |
 | Structured-code publish guard | Before WP-7 and before any first structured-code publication readiness claim | Review WP-6.5 evidence that only the approved `ITEM-0139` legacy exception remains active |
 | P-18 display placement | Any draft/version contains added or supplement catalog rows | Technical, functional, proportional Owner interaction, and cleanup evidence passed; P-37 was accepted and P-12 later completed. Preserve the placement contract before any P-14/P-14C progression. |
-| P-19 inactive/retired export policy | Any candidate version contains inactive/retired rows | Approve PDF rendering/exclusion policy before official filing |
+| P-19 inactive/retired export policy | Direction approved 2026-08-28: official published/archived PDF is active-only; draft PDF shows and marks inactive rows; Excel/history/hash remain complete | Implement and verify exact code/tests/render QA before enabling Retirement or filing a mixed-status official PDF |
 | P-20 hash portability | Initial WP-6.5 and post-`020` WP-6.6 proofs passed; rerun after any WP-7.5 migration change and before WP-8/migration fingerprint/P-15 acceptance | Prove identical identity/hash output across the approved independent rebuild scope |
 | P-21 / WP-6.6 initial scope | Start and historical Local evidence accepted for execution 2026-07-12 | Preserve the evidence as history; it does not close the P-22-amended candidate |
 | P-22/P-23/P-23.1/P-24/P-25/P-26 / WP-6.6 operator correction | Exact G1R/G2 candidate `721c2c2`, P-25 visual evidence, real-route G3 walkthrough on `6599c30`, and P-26 human-intent proof passed | Accepted via P-27 on exact application checkpoint `78e96ab`; P-28 later approved G4R source integration only |
@@ -952,7 +977,7 @@ scope.
 | 2026-07-05 22:38 +07 | WP-5/WP-8/P-20 | Local clean-reset dataset hashes changed across separate clean bootstraps because the earlier Phase 4 draft generated baseline identity UUIDs while `identity_id` is part of the lineage hash | Approved deterministic `price_list.id` mapping is implemented in `017` with fail-closed preflight/postcondition and a tracked two-run comparator | Resolved: independent WP-6.5 and final G1R/G2 rebuilds reproduced the hashes, and P-36 repeated them after integrated `021`. Data-free/ACL-only `017a` does not invalidate that historical two-rebuild portability proof; PRE-P-12 requires one new corrected integration bootstrap. Repeat a new reset only if source that can affect data/identity changes or the run fails, and only with fresh approval. Final P-15 hash acceptance remains separate. |
 | 2026-07-05 23:47 +07 | WP-6/P-11 | In-app browser control could render/smoke the print route but could not prove the Excel attachment download event; final owner acceptance is still required for real filed artifacts | Owner/reviewer accept unit/build/manual proof for this slice or approve stronger e2e/download/PDF artifact tooling before final P-11 acceptance | Resolved for WP-6 on 2026-07-11 22:20 +07: exact generated binaries passed route/semantic/file QA and owner visual acceptance. Stronger browser attachment-download automation remains optional and nonblocking. |
 | 2026-07-06 01:20 +07 | WP-6/P-18 | Current Phase 4 Core mechanics place newly added/supplement items at the end (`max(display_order) + 1`) and provide no owner placement/reorder review | Shared readiness and DB publish guard keep such drafts reviewable but unpublishable; later owner/data custodian decides placement workflow | Resolved technically and through corrected Owner interaction. Closure Matrix #34 C-07 through C-11 passed; C-09 was accepted on 2026-07-25 under the guided-UAT variance. Production remains separate and Add/Supplement stays hidden until P-14. |
-| 2026-07-07 01:01 +07 | P-19 | Field-facing PDF currently omits row status while Excel includes `ใช้งาน` / `ยกเลิกใช้` | Owner/data custodian decide whether inactive/retired rows are excluded, visibly marked, or placed in an appendix before filing an official PDF for any version that contains them | Open; not blocking the current 710-row active baseline proof |
+| 2026-07-07 01:01 +07 | P-19 | Field-facing PDF currently omits row status while Excel includes `ใช้งาน` / `ยกเลิกใช้` | Plan #105 V2 now selects active-only published/archived PDF, complete draft PDF with visible inactive marks, and complete Excel/history/canonical hash; implement the bounded presentation/tests/render QA before Retirement enablement | Direction approved 2026-08-28; implementation/evidence pending and not inferred from the all-active 2568.1.0 proof |
 | 2026-07-07 01:01 +07 | WP-6.5/P-15 | Structured-code completeness requires the temporary `ITEM-0139` exception to be executable, while unchanged legacy-only clones must remain valid | Shared readiness/publish guard activates only after an active canonical structured code appears, then rejects every other active `ITEM-####` | Resolved for WP-6.5 guard behavior on 2026-07-11 by live unchanged-clone and structured negative fixtures; final candidate evidence remains required before P-15. |
 | 2026-07-11 01:36 +07 | WP-6.5 | Reusable actions created a new UUID on each submission, so an uncertain retry could bypass the intended database idempotency key | Client/form owns the operation ID; DB stores actor+payload fingerprints and rejects changed reuse; bounded timeout is configured | Resolved on `9becdf6`; P-36 repeated the integrated DB replay/mismatch contract. Independent recovery comprehension remains in UAT. |
 | 2026-07-11 01:36 +07 | WP-6.5/WP-7 | CI did not run migration/RPC/RLS/hotfix behavior against a live Local database | Tracked WP-6.5 and WP-7 Local DB harnesses now exist | Resolved technically by earlier evidence and the integrated P-36 rerun through `021`; independent operator UAT remains separate. |

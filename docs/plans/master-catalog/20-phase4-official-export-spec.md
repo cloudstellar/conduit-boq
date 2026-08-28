@@ -1,19 +1,44 @@
 # Phase 4 Official Excel and PDF Export Specification
 
+> **P-19 inactive/retired-row policy amendment approved 2026-08-28:** A
+> published or archived field-facing official PDF displays only active rows.
+> A draft review PDF displays the complete draft and visibly marks every
+> inactive row `ยกเลิกใช้`. Excel, database/history, canonical JSON,
+> `item_count`, and the canonical dataset SHA-256 continue to include both
+> active and inactive rows. Official PDF filtering is presentation-only and
+> occurs after full count/hash validation. When inactive rows exist, the cover
+> separately states displayed active rows, complete-version rows, and excluded
+> inactive rows, and labels the SHA-256 as covering the complete version. Empty
+> post-filter categories are omitted and visible per-category numbering is
+> recomputed without changing stored `display_order`. The release manifest
+> records full canonical hash, PDF binary hash, total/active/inactive counts,
+> and this policy. The current local candidate completes this presentation
+> implementation; its focused contract/verifier tests and three-fixture render
+> QA are complete and passed locally. That local evidence is not a Production
+> execution, deployment, filing, or enablement result; Retirement remains
+> subject to its separate release gate.
+>
+> This amendment supersedes prior requirements that a published mixed-status
+> PDF contain every canonical row. The complete-row requirement continues to
+> apply to Excel, canonical verification, and draft review PDF.
+
 > **PDF category-grouping amendment recorded 2026-08-25:** The Owner approved
 > a presentation-only rule for draft and published field-facing PDF/print
-> output. Starting from the complete canonical rowset, export groups all rows
-> with the same normalized display-category identity into one contiguous
-> block. Category blocks follow the first occurrence of each category in the
-> canonical global `display_order`; rows inside each block retain their
-> canonical global `display_order`. The visible PDF sequence restarts at `1`
+> output. Export first validates the complete canonical rowset. Its visible
+> presentation rowset is the complete set for a draft PDF and the active subset
+> for a published/archived PDF. It then groups the selected presentation rows
+> with the same normalized display-category identity into one contiguous block.
+> Category blocks follow the first occurrence of each category in the canonical
+> global `display_order`; rows inside each block retain their canonical global
+> `display_order`. The visible PDF sequence restarts at `1`
 > for each category and continues across page breaks. Continued pages repeat
 > the category heading with `(ต่อ)`. For every coded category, the visible
 > heading includes the normalized category code, one ASCII period (`U+002E`),
 > one ASCII space (`U+0020`), and the category name: `1.1. <name>`; its
 > continuation is exactly `1.1. <name> (ต่อ)`. Uncategorized rows form one
-> explicit `ไม่ระบุหมวดหมู่` block. The export must prove that every canonical row
-> appears exactly once and no row is duplicated.
+> explicit `ไม่ระบุหมวดหมู่` block. The export must prove that every row in the
+> selected presentation rowset appears exactly once and no row is duplicated;
+> canonical validation and hashing still cover the complete version.
 > Display-category identity is the trimmed/NFC-normalized `category_code` when
 > present, otherwise the trimmed/NFC-normalized `category_name`, otherwise the
 > single uncategorized identity. The first row encountered supplies the visible
@@ -28,9 +53,9 @@
 > order. A PDF presentation change may alter pagination and PDF binary SHA-256,
 > but cannot by itself alter the canonical dataset SHA-256.
 
-**Status:** Owner-approved export specification for implementation/local
-rehearsal; records, UI/CI, application verification, and Production publication
-remain separately gated
+**Status:** Owner-approved normative export specification with current local
+P-19 implementation/render evidence; records acceptance, release, deployment,
+Production verification, and official filing remain separately gated
 
 **Prepared:** 2026-06-22
 
@@ -53,7 +78,7 @@ named catalog version.
 **P-11 visual-direction amendment recorded:** 2026-07-04 — owner direction
 for the field-facing PDF price list is A4 portrait in the historic NT
 price-list style; the main PDF price table does not show a dedicated item-code
-column; the footer shows department / page `x/y` / version-status or
+column; the footer shows department / exact page `หน้า n/N` / version-status or
 version-effective-date; truncated SHA-256 values are not printed in the
 field-facing footer; the final field-facing PDF does not append a technical
 verification page; and QR code is deferred as post-Core polish unless a stable
@@ -79,9 +104,9 @@ rules, and acceptance tests.
 
 After publication, the immutable database version is the system of record.
 Excel and PDF generated from that selected version are official reference
-copies when their version, item count, and canonical dataset SHA-256 match the
-published record. The source workbook in the physical filing system remains
-supporting evidence.
+copies when their version, complete-version item count, and canonical dataset
+SHA-256 match the published record. The source workbook in the physical filing
+system remains supporting evidence.
 
 This specification is only for Master Catalog reference exports. BOQ print and
 Excel exports remain separate operational documents and must continue to show
@@ -162,7 +187,7 @@ only the small subset that helps a reader identify and use the price list.
 | Approved-by / publisher snapshot | Publisher actor/display snapshot is derived from the authenticated profile and stored immutably; a separately governed business approver, if required, uses a distinct field; Excel metadata sheet and release/filing manifest retain the result | Do not show |
 | Physical archive reference | Required version-level immutable publication/custody value for every Phase 4-created version, including manual-only publication; an import-level source reference may additionally identify a workbook | Do not show |
 | Exported at/by | Release/filing manifest and audit log | Do not show |
-| Item count | Exact active/included count covered by the dataset hash | Show |
+| Item count | Exact complete-version count covered by the dataset hash; active displayed and inactive excluded are separate presentation counts | Show complete count; for mixed-status published/archived PDF also show displayed active and excluded inactive counts |
 | Dataset SHA-256 | Full `sha256:<64 lowercase hex>` on PDF summary, Excel verification sheet, and release/filing manifest. The field-facing PDF footer must not show a truncated hash. A short hash may appear only in admin/export screens or audit manifests as an identifier, never as proof. | Show full hash on the summary |
 | Generated by / export-spec revision | Workbook properties and release/filing manifest | Do not show |
 
@@ -175,17 +200,16 @@ Draft exports:
 
 - show the exact marker `DRAFT - ห้ามใช้อ้างอิง`, using the ASCII
   hyphen-minus (`U+002D`) rather than an en dash or em dash, prominently on the
-  first sheet/page and on every price page. In the browser print route, place
-  the repeated marker in a dedicated row inside each pre-paginated price
-  section's logical `<thead>`. The component renders that complete header in
-  every logical price section; print CSS uses
-  `@media print { thead { display: table-row-group; } }` so Chrome does not
-  fragment or repeat the header independently of the section. Also include the
+  first sheet/page and on every price page. In the browser print route, the
+  print-fixed header layer repeats the marker and every manually paginated
+  `.price-section` also renders its own fallback header. The currency line and
+  column-header grid are explicit per-page elements outside the data table;
+  do not use or rely on `<thead>` repetition for this control. Also include the
   exact marker in the route-rendered draft price-page footer. Do not depend on
-  Chrome's optional browser-generated header/footer setting for this control;
+  Chrome's optional browser-generated header/footer setting;
 - show version status as Draft, never Published;
 - use a draft dataset hash calculated for review but clearly label it
-  `Draft dataset hash - not an official publication hash`;
+  `Draft dataset SHA-256 (ข้อมูลครบทั้งฉบับ รวมรายการยกเลิกใช้) - ไม่ใช่ค่าแฮชการเผยแพร่ทางการ`;
 - are active-admin only;
 - use a filename beginning `DRAFT-`;
 - cannot be presented as approval evidence or a current standard price list.
@@ -421,13 +445,21 @@ custody is required.
 - A4 portrait for the field-facing price-list PDF. Portrait is the default
   because the document is read, printed, filed, and used as a standard price
   list rather than as a BOQ-style wide spreadsheet.
+- Under `@media print`, each logical `.sheet` occupies one deterministic A4
+  slot: `290mm` content height plus a `7mm` trailing bottom slot, totaling the
+  exact `297mm` A4 height under `@page { size: A4 portrait; margin: 0; }`.
+  The cover and every manually constructed price section use the same slot;
+  do not add a second forced page break that can create a blank overflow page.
 - The cover uses a larger, top-centered NT company lockup. The document title
   follows beneath it, with `ประจำปี {catalog year}` on a distinct title-level
   line using the same size and weight; do not repeat version or status in the
   header.
 - The cover/summary keeps its metadata table centered in the upper-middle area.
-  It contains only catalog version, status, effective date, item count, and
-  full dataset hash. It must not show
+  It contains only catalog version, status, effective date, row counts, and
+  full dataset hash. An all-active version may use one item count. A version
+  with inactive rows must separately show displayed active rows,
+  complete-version rows, and inactive rows excluded from the official price
+  table. It must not show
   `Current Default`, approval reference/date, approved-by/publisher, exported
   at/by, generated-by, or export-spec revision.
 - A non-current published export shows the Thai warning
@@ -450,13 +482,20 @@ custody is required.
 - `item_code` is not a dedicated column in the field-facing PDF price table.
   Legacy/canonical codes remain available in the Excel workbook and
   release/filing evidence.
-- The field-facing PDF baseline visual direction assumes an all-active price
-  list. Excel includes the visible `สถานะ` column (`ใช้งาน` / `ยกเลิกใช้`),
-  but PDF does not. Before filing an official PDF for any version with
-  inactive/retired rows, P-19 must approve whether those rows are excluded,
-  visibly marked, or moved to a separate appendix.
-- Table headers repeat on every data page.
-- Footer repeats department name, page number as `x/y`, and version/status or
+- Under the approved P-19 policy, a published or archived field-facing PDF
+  price table includes active rows only. A draft review PDF includes all rows
+  and appends a visible text mark `ยกเลิกใช้` to each inactive row; color alone
+  is not sufficient. Excel keeps the visible `สถานะ` column (`ใช้งาน` /
+  `ยกเลิกใช้`) and all rows. The full hash label must state that its scope is
+  the complete version, including inactive rows.
+- The complete price-page header repeats on every data page. Print CSS supplies
+  a fixed header layer and each logical `.price-section` supplies the same
+  per-sheet fallback. The fallback includes the logo/title, draft marker when
+  applicable, currency line, and column-header grid. The grid uses explicit
+  column-header semantics outside the data table; the implementation must not
+  depend on `<thead>` or `table-header-group` pagination.
+- Footer repeats department name, page number exactly as `หน้า n/N`, and
+  version/status or
   version/effective-date. The left footer department text is
   `ส่วนวิศวกรรมท่อร้อยสาย (วทฐฐ.)`. A draft price-page right footer includes
   the exact draft marker plus its draft reference, for example
@@ -472,19 +511,33 @@ custody is required.
 - Long descriptions wrap without clipping.
 - No interactive-only control appears in printed output.
 
-**Chrome pre-pagination regression rule (recorded 2026-08-26):** The print
-component constructs one complete `.price-section` for each logical price
-page. Using `thead { display: table-header-group; }` inside those already
-pre-paginated sections allowed Chrome to fragment the section and emit an
-extra physical page whose repeated header was detached from the intended
-page. The accepted local fix is to render the logical `<thead>` as
-`table-row-group` under `@media print` and keep each `.price-section` together
-with `break-inside: avoid` / `page-break-inside: avoid`. A saved-PDF regression
-test must prove that physical page count is exactly one cover plus the number
-of logical price sections, every price page contains its own full header and
-footer, and no clipped, split, or blank overflow page exists. This rule is
-specific to the pre-paginated print component; it does not remove the logical
-table-header semantics from the HTML.
+**Chrome pre-pagination regression rule (revised 2026-08-28):** The application
+manually constructs one complete `.price-section` for each logical price page.
+Browser-managed `<thead>` repetition is prohibited because it previously
+fragmented an already paginated section and produced detached headers or blank
+overflow pages. The supported print path uses a print-fixed header plus an
+explicit per-sheet fallback and a data table whose rows are in `<tbody>`; the
+separate column-header grid retains `role="columnheader"` semantics. Every
+sheet uses the deterministic `290mm + 7mm` A4 slot above, and the route computes
+`N` as one cover plus the number of logical price sections before rendering
+each footer as `หน้า n/N`. A saved-PDF regression must prove that physical page
+count equals this computed value, every price page has the required header and
+footer, and there is no clipped, split, or blank overflow page.
+
+**P-19 current local rendered-fixture checkpoint (2026-08-28):** Local render
+QA passed for three synthetic fixtures exercising the current component and
+the contract above:
+all-active official (`96` total / `96` displayed), mixed-status official (`96`
+total / `85` displayed / `11` inactive excluded), and mixed-status draft (`96`
+total / `96` displayed / `11` inactive visibly marked). Each saved result is a
+four-page A4 PDF (one cover plus three logical price pages) with route-rendered
+`หน้า n/N` footers. The exact local PDF SHA-256 values are respectively
+`7d99d558ddb1985ad51538217f5566a870d342ebc8b2b7af71f1a7717d10cd63`,
+`2ebe6f7071dc19199c486becdbd00a5ddaf46ee16267282a24cb9e9eb6d75205`,
+and `00443751be15f7a4a31c364e0cffd01e1fc7605a95abed25d7cf6a2940b6a3e2`.
+They are local synthetic presentation evidence only: they do not claim an
+authenticated Production selected-version route, deployment, runtime flag
+change, official filing, or Production acceptance.
 
 **Corrected category-code heading local QA checkpoint (2026-08-26):** A fresh
 local Chromium render of the exact presentation component passed the heading
@@ -512,11 +565,23 @@ page number.
 2. Price catalog grouped by approved display category
 
 For item `r`, define its PDF-visible sequence as its one-based position among
-all rows with the same normalized display-category identity after those rows
-are ordered by canonical global `display_order`. The number resets only when
-the category changes, not when the physical page changes. Grouping is a pure
-presentation projection over the complete verified rowset; it must not write
-the grouped order or local sequence back to the database.
+the rows presented by that PDF with the same normalized display-category
+identity after those rows are ordered by canonical global `display_order`.
+Published/archived official PDFs first exclude inactive rows; draft PDFs do
+not. The number resets only when the category changes, not when the physical
+page changes. Grouping and status filtering are pure presentation projections
+over the complete verified rowset; they must not write the grouped order or
+local sequence back to the database.
+
+Pagination is manual and deterministic before browser rendering. Walk the
+presentation rows in the grouped order above, charge one row unit for each
+category heading and one for each item, and begin a category only when the
+current logical page has room for both its heading and first item. When a
+category crosses a logical page boundary, start the next page with the same
+heading plus exactly ` (ต่อ)` and continue its existing category-local sequence.
+The renderer then emits exactly one `.price-section` for each logical page.
+Do not delegate category grouping, row numbering, or page construction to the
+browser's automatic table pagination.
 
 For a category with `category_code`, its visible heading is
 `{normalized category_code}. {category name}`. The separator is exactly one
@@ -573,7 +638,8 @@ On the export screen:
 
 - color is never the only status indicator;
 - metadata keys and values remain selectable text;
-- logical table headers are present in print HTML;
+- explicit `role="columnheader"` semantics are present in the per-page print
+  header grid even though the data table intentionally has no `<thead>`;
 - Excel headers are plain text and filters/freeze panes do not hide context;
 - Thai text remains searchable/copyable in PDF;
 - numbers use consistent two decimals and right alignment;
@@ -603,6 +669,14 @@ On the export screen:
   canonical reconstruction, visible price/verification fields against canonical
   JSON, numeric cell types, formula/link absence, PDF count/hash/page structure,
   regular same-directory files, and binary hashes from a clean checkout;
+- the generated print-DOM proof records, for every displayed PDF row,
+  `identity_id`, `item_code`, description, unit, three normalized two-decimal
+  costs, category code/name, stored `display_order`, category-local sequence,
+  and active state. The semantic verifier independently derives the expected
+  presentation rows from Excel's canonical verification rows, applies the
+  official-active-only or draft-all policy plus category grouping, and compares
+  every field at every index. Missing/invalid metadata, a count/order mismatch,
+  or any same-count field drift fails verification;
 - `npm run artifacts:master-catalog:generate` is Local-loopback only, refuses a
   dirty tracked tree, writes to a unique staging directory, and renames the
   evidence directory into place only after semantic verification passes;
@@ -610,14 +684,19 @@ On the export screen:
   verification using only tracked code and paths relative to the manifest;
 - P-20 identity/hash portability passes before a clean-environment hash is used
   as cross-environment equivalence evidence.
-- After P-18 acceptance, placement tests prove the workbook/PDF sequence equals
-  the unique contiguous final `display_order` at the data-binding layer;
+- After P-18 acceptance, placement tests prove the workbook/PDF source sequence
+  equals the unique contiguous final `display_order` at the data-binding layer;
   shifted inherited rows remain in base-relative order and the canonical hash
-  changes to the exact final values. The PDF rendering assertion then proves
-  its presentation projection separately: category blocks are contiguous,
-  category-local numbering is gap-free and starts at `1`, numbering continues
-  across page breaks, and the union of PDF rows equals the complete canonical
-  rowset exactly once.
+  changes to the exact final values. PDF rendering then proves category blocks
+  are contiguous, category-local numbering is gap-free and starts at `1`, and
+  numbering continues across page breaks. A draft PDF contains the complete
+  canonical rowset exactly once and marks inactive rows. A published/archived
+  official PDF contains exactly the active subset once and omits fully inactive
+  categories. The print-DOM metadata matches Excel exactly on every listed
+  parity field, including identity/code/order/status fields that are not printed
+  as dedicated columns; the visible table separately matches description, unit,
+  material/labor/unit costs, category grouping, and category-local sequence.
+  Other Excel-only audit fields are not a PDF parity requirement.
 
 ### 8.2 Visual/manual
 
@@ -639,7 +718,7 @@ On the export screen:
   exactly one ASCII period and one ASCII space, and every continuation follows
   `1.1. <name> (ต่อ)` without losing or duplicating the code;
 - saved PDF text is searchable and official stamp matches the selected version;
-- field-facing PDF footer uses department name, `x/y` page numbering, and
+- field-facing PDF footer uses department name, exact `หน้า n/N` page numbering, and
   version/status or version/effective-date, without a truncated hash;
 - full SHA-256 appears on the PDF cover/summary, Excel verification sheet, and
   release/filing manifest; any short-hash location in admin/audit contexts uses
@@ -651,7 +730,9 @@ On the export screen:
 Record in the [Release Note](./16-phase4-release-note-template.md):
 
 - version, effective date, approval reference;
-- item count and dataset SHA-256;
+- total/active/inactive counts, displayed-PDF count, excluded-inactive count,
+  and the complete-version dataset SHA-256;
+- P-19 presentation policy identifier;
 - exact exported filenames;
 - binary SHA-256 of the filed Excel and final saved PDF;
 - exported/filed by and timestamp;

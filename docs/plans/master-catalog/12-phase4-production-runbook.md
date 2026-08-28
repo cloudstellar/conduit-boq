@@ -1,33 +1,88 @@
 # Master Catalog Phase 4 Production Runbook
 
-> **Current Master Catalog admin-edit completion overlay (2026-08-28):** The
-> data/publication milestone is complete (`2568.1.0`, `710` rows, reviewed
-> ITEM-0429/ITEM-0615 values, XLSX/PDF passed, no historical BOQ reprice, no
-> Factor F change), and P-13/P-14/P-14C/P-15 are complete and must not be
-> replayed. Migration 027 was applied once and is immutable. The deployed Admin
-> UI is intentionally read-only, so end-to-end completion remains pending.
-> [Plan #105](./105-phase4-master-catalog-admin-edit-completion-plan.md) restores
-> the original active-Admin draft workflow through a new forward-only 028 gate
-> projection while keeping published rows immutable and new-identity/
-> retirement capabilities disabled. Current authority covers local docs, code,
-> tests, and the reviewed package commit/push only to
-> `codex/master-catalog-admin-edit`; no merge/push to `main`, Production
-> write, flag change, Production deploy, or automatic next step is authorized.
+> **Current Master Catalog full-Admin completion amendment (2026-08-28):**
+> The data/publication milestone is complete (`2568.1.0`, `710` rows,
+> reviewed ITEM-0429/ITEM-0615 values, XLSX/PDF passed, no historical BOQ
+> reprice, no Factor F change), and P-13/P-14/P-14C/P-15 are complete and must not be
+> replayed. Migration 027 was applied once and is immutable. The
+> deployed Admin UI remains intentionally read-only and all three capability
+> settings remain exact boolean `false`.
+> [Plan #105 V2](./105-phase4-master-catalog-admin-edit-completion-plan.md)
+> retains immutable published rows and sets the final staged target: Admin
+> enables Edit/Recode plus eligible Withdraw/Reactivate recovery; New identity
+> adds Add/Supplement and placement; Retirement adds Retire. All three settings
+> are ultimately `true`. Published identities are never
+> hard-deleted. P-19 direction is now active-only field-facing official PDF,
+> while draft PDF visibly marks inactive rows and Excel/database/history retain
+> the complete dataset. P-49 formal closeout remains pending; its unrun expanded
+> Production persona rehearsal remains an accepted residual, never a
+> retrospective PASS. The baseline Admin-gate commit `705eeca...` is pushed
+> only to `codex/master-catalog-admin-edit`; the bounded P-19 application, tests,
+> render QA, and exact PDF-to-Excel parity are complete locally at `48` files /
+> `444` tests. The Owner then issued `APPROVE MASTER CATALOG FINAL`,
+> authorizing R-02 through R-05 in exact staged order with no retry. It does not
+> authorize catalog publication, pointer restore, BOQ mutation, Factor F mutation,
+> or migration replay.
 > This overlay supersedes all prior live Status/Current/next-action wording;
 > all dated text below is retained as historical evidence only.
 
-<!-- MASTER_CATALOG_ADMIN_EDIT_STATUS_V1 {"schema":"conduit-boq/master-catalog-admin-edit-status/v1","recordedAt":"2026-08-28","catalogDataPublicationComplete":true,"publishedVersion":"2568.1.0","publishedRowCount":710,"p13P14P14cP15CompleteNoReplay":true,"migration027AppliedOnceNoReplay":true,"readOnlyAdminUiLive":true,"endToEndComplete":false,"plan":"105-phase4-master-catalog-admin-edit-completion-plan.md","target":"active-admin-draft-workflow","migration028Required":true,"catalogNewIdentityEnabledTarget":false,"catalogRetirementEnabledTarget":false,"localDocsCodeTestsAuthorized":true,"featureBranchGitPublicationAuthorized":true,"featureBranch":"codex/master-catalog-admin-edit","commitAuthorized":true,"pushAuthorized":true,"mainMergeAuthorized":false,"productionWriteAuthorized":false,"deployAuthorized":false,"automaticNextStep":false} -->
+<!-- MASTER_CATALOG_ADMIN_EDIT_STATUS_V2 {"schema":"conduit-boq/master-catalog-admin-edit-status/v2","recordedAt":"2026-08-28","catalogDataPublicationComplete":true,"publishedVersion":"2568.1.0","publishedRowCount":710,"p13P14P14cP15CompleteNoReplay":true,"migration027AppliedOnceNoReplay":true,"readOnlyAdminUiLive":true,"endToEndComplete":false,"p49FormalCloseoutComplete":false,"expandedProductionPersonaTestAcceptedResidual":true,"plan":"105-phase4-master-catalog-admin-edit-completion-plan.md","target":"full-active-admin-draft-workflow","publishedHardDeleteAllowed":false,"p19Policy":"official-pdf-active-only-draft-pdf-mark-inactive","p19ImplementationComplete":true,"p19RenderedFixturesVerified":true,"p19LocalTestResult":"48-files-444-tests-pass","migration028Required":true,"migration029Required":false,"catalogAdminEnabledCurrent":false,"catalogNewIdentityEnabledCurrent":false,"catalogRetirementEnabledCurrent":false,"catalogAdminEnabledTarget":true,"catalogNewIdentityEnabledTarget":true,"catalogRetirementEnabledTarget":true,"baselineFeatureCommit":"705eeca0c86df5eda06cd4ea9efeda5b9bfeeebe","planDocsAmendmentAuthorized":true,"planDocsAmendmentComplete":true,"finalReleaseAuthorization":"APPROVE MASTER CATALOG FINAL","applicationCodeAuthorized":true,"commitAuthorized":true,"pushAuthorized":true,"mainMergeAuthorized":true,"productionReadAuthorized":true,"productionWriteAuthorized":true,"deployAuthorized":true,"flagChangeAuthorized":true,"automaticNextStep":true} -->
+
+> **Canonical current operator entrypoint:**
+> [Handoff #106](./106-phase4-master-catalog-exact-remaining-work-handoff.md)
+> owns which work remains and whether it is authorized. Plan #105 Sections
+> 6-8 own execution and recovery mechanics. Do not execute from dated status
+> text retained below.
+
+## Current post-closeout staged rollout - Plan #105 V2
+
+This short path supersedes older live next-action wording while retaining the
+dated procedures below as historical evidence:
+
+**Hard precondition:** Handoff #106 R-01 and R-02 must both be complete on one
+exact reviewed feature commit, including focused P-19 tests/render evidence and
+publication of that exact feature commit to remote `github`. If either block is
+incomplete, stop; do not start migration 028 or any later step.
+
+1. apply unchanged migration 028 exactly once with
+   `false/false/false` and verify ledger, ACL/RLS/RPC, and unchanged data;
+2. merge/push the exact reviewed application commit to `main` once and wait for
+   its automatic Vercel Production deployment to be Ready while flags stay
+   false;
+3. enable Admin only and verify Edit/Recode, eligible recovery authorization,
+   and non-Admin denial;
+4. enable New identity only after Stage A passes, then verify Add, placement,
+   an eligible never-published Withdraw, audit, and disposable-draft cleanup;
+5. enable Retirement only after the approved P-19 PDF implementation and
+   render evidence pass; use a disposable draft to Retire, verify the marked
+   draft PDF, Reactivate, verify audit, and abandon/clean up. Bind official
+   active-only behavior to exact local automated/render evidence; do not
+   publish a mixed-status version for smoke;
+6. after all three stages pass, record the short P-49 formal closeout while
+   retaining the unrun expanded persona rehearsal as accepted residual, not
+   PASS; and
+7. on any failure, set the Admin kill switch false first, restore the remaining
+   capability flags false, preserve evidence, and stop without retry.
+
+One bounded Owner-approved window may cover all stages, but each stage must use
+a conditional expected-before compare-and-set for one key in one transaction,
+with exact before/after readback. A mismatch, non-one row count, or uncertain
+response closes the global gate and stops without retry. Runtime
+flag transitions are configuration changes, not migrations; do not create 029
+or edit/replay 020, 021, 027, or 028.
 
 
-**Status:** Retained execution/closeout runbook. P-12 **COMPLETE** on
+**Historical P-12 runbook checkpoint:** P-12 **COMPLETE** on
 2026-08-17 in exact order `017` -> `017a` -> `018`-`026`, with the
 checksum-verified v7 post-`026` backup/isolated restore complete.
-P-13/P-14/P-14C/P-15 remain unauthorized.
+At that retained historical checkpoint, P-13/P-14/P-14C/P-15 were
+unauthorized; they later completed and must not be replayed.
 **Prepared:** 2026-06-22
 **Production project:** `otlssvssvgkohqwuuiir`
 **Default posture:** Feature flag disabled; stop on any failed gate
 
-> **Current pre-Production stop (2026-08-24):** P-50I preflight and exact patch
+> **Historical pre-Production stop (2026-08-24; superseded by Handoff #106):**
+> P-50I preflight and exact patch
 > target passed, then fail-fast local validation stopped at `21/22` authority
 > tests and `30/31` exact P-50 tests because the raw P-50I marker-name regex
 > counted two frozen-diff examples plus the one actual EOF marker. The anchored
@@ -35,10 +90,10 @@ P-13/P-14/P-14C/P-15 remain unauthorized.
 > #60](./60-phase4-p50i-local-validation-failure-result-record.md) is the
 > canonical receipt. No stage, commit, push, new CI/Preview, database, or
 > Production action occurred; HEAD/upstream/remote remain `2b45f9b...` and the
-> exact P-50I target is retained uncommitted. This runbook remains stopped
-> before P-13. Only [P-50J Proposal
+> exact P-50I target is retained uncommitted. At that checkpoint the runbook
+> remained stopped before P-13. Only [P-50J Proposal
 > #61](./61-phase4-p50j-marker-count-correction-and-ci-authorization-proposal.md)
-> is current, and it is review-only until separately approved. Earlier P-50H
+> was current, and it was review-only until separately approved. Earlier P-50H
 > and P-50I-pending wording below is historical.
 > Historical bindings remain [P-50H Result #58](./58-phase4-p50h-local-git-ci-preview-result-record.md),
 > [P-50I Proposal #59](./59-phase4-p50i-quality-fixture-remediation-and-ci-rerun-authorization-proposal.md),

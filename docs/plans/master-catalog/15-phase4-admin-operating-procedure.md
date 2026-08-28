@@ -1,29 +1,42 @@
 # Master Catalog Phase 4 Admin Operating Procedure
 
-> **Current Master Catalog admin-edit completion overlay (2026-08-28):** The
-> data/publication milestone is complete (`2568.1.0`, `710` rows, reviewed
-> ITEM-0429/ITEM-0615 values, XLSX/PDF passed, no historical BOQ reprice, no
-> Factor F change), and P-13/P-14/P-14C/P-15 are complete and must not be
-> replayed. Migration 027 was applied once and is immutable. The deployed Admin
-> UI is intentionally read-only, so end-to-end completion remains pending.
-> [Plan #105](./105-phase4-master-catalog-admin-edit-completion-plan.md) restores
-> the original active-Admin draft workflow through a new forward-only 028 gate
-> projection while keeping published rows immutable and new-identity/
-> retirement capabilities disabled. Current authority covers local docs, code,
-> tests, and the reviewed package commit/push only to
-> `codex/master-catalog-admin-edit`; no merge/push to `main`, Production
-> write, flag change, Production deploy, or automatic next step is authorized.
+> **Current Master Catalog full-Admin completion amendment (2026-08-28):**
+> The data/publication milestone is complete (`2568.1.0`, `710` rows,
+> reviewed ITEM-0429/ITEM-0615 values, XLSX/PDF passed, no historical BOQ
+> reprice, no Factor F change), and P-13/P-14/P-14C/P-15 are complete and must not be
+> replayed. Migration 027 was applied once and is immutable. The
+> deployed Admin UI remains intentionally read-only and all three capability
+> settings remain exact boolean `false`.
+> [Plan #105 V2](./105-phase4-master-catalog-admin-edit-completion-plan.md)
+> retains immutable published rows and sets the final staged target: Admin
+> enables Edit/Recode plus eligible Withdraw/Reactivate recovery; New identity
+> adds Add/Supplement and placement; Retirement adds Retire. All three settings
+> are ultimately `true`. Published identities are never
+> hard-deleted. P-19 direction is now active-only field-facing official PDF,
+> while draft PDF visibly marks inactive rows and Excel/database/history retain
+> the complete dataset. P-49 formal closeout remains pending; its unrun expanded
+> Production persona rehearsal remains an accepted residual, never a
+> retrospective PASS. The baseline Admin-gate commit `705eeca...` is pushed
+> only to `codex/master-catalog-admin-edit`; the bounded P-19 application, tests,
+> render QA, and exact PDF-to-Excel parity are complete locally at `48` files /
+> `444` tests. The Owner then issued `APPROVE MASTER CATALOG FINAL`,
+> authorizing R-02 through R-05 in exact staged order with no retry. It does not
+> authorize catalog publication, pointer restore, BOQ mutation, Factor F mutation,
+> or migration replay.
 > This overlay supersedes all prior live Status/Current/next-action wording;
 > all dated text below is retained as historical evidence only.
 
-<!-- MASTER_CATALOG_ADMIN_EDIT_STATUS_V1 {"schema":"conduit-boq/master-catalog-admin-edit-status/v1","recordedAt":"2026-08-28","catalogDataPublicationComplete":true,"publishedVersion":"2568.1.0","publishedRowCount":710,"p13P14P14cP15CompleteNoReplay":true,"migration027AppliedOnceNoReplay":true,"readOnlyAdminUiLive":true,"endToEndComplete":false,"plan":"105-phase4-master-catalog-admin-edit-completion-plan.md","target":"active-admin-draft-workflow","migration028Required":true,"catalogNewIdentityEnabledTarget":false,"catalogRetirementEnabledTarget":false,"localDocsCodeTestsAuthorized":true,"featureBranchGitPublicationAuthorized":true,"featureBranch":"codex/master-catalog-admin-edit","commitAuthorized":true,"pushAuthorized":true,"mainMergeAuthorized":false,"productionWriteAuthorized":false,"deployAuthorized":false,"automaticNextStep":false} -->
+<!-- MASTER_CATALOG_ADMIN_EDIT_STATUS_V2 {"schema":"conduit-boq/master-catalog-admin-edit-status/v2","recordedAt":"2026-08-28","catalogDataPublicationComplete":true,"publishedVersion":"2568.1.0","publishedRowCount":710,"p13P14P14cP15CompleteNoReplay":true,"migration027AppliedOnceNoReplay":true,"readOnlyAdminUiLive":true,"endToEndComplete":false,"p49FormalCloseoutComplete":false,"expandedProductionPersonaTestAcceptedResidual":true,"plan":"105-phase4-master-catalog-admin-edit-completion-plan.md","target":"full-active-admin-draft-workflow","publishedHardDeleteAllowed":false,"p19Policy":"official-pdf-active-only-draft-pdf-mark-inactive","p19ImplementationComplete":true,"p19RenderedFixturesVerified":true,"p19LocalTestResult":"48-files-444-tests-pass","migration028Required":true,"migration029Required":false,"catalogAdminEnabledCurrent":false,"catalogNewIdentityEnabledCurrent":false,"catalogRetirementEnabledCurrent":false,"catalogAdminEnabledTarget":true,"catalogNewIdentityEnabledTarget":true,"catalogRetirementEnabledTarget":true,"baselineFeatureCommit":"705eeca0c86df5eda06cd4ea9efeda5b9bfeeebe","planDocsAmendmentAuthorized":true,"planDocsAmendmentComplete":true,"finalReleaseAuthorization":"APPROVE MASTER CATALOG FINAL","applicationCodeAuthorized":true,"commitAuthorized":true,"pushAuthorized":true,"mainMergeAuthorized":true,"productionReadAuthorized":true,"productionWriteAuthorized":true,"deployAuthorized":true,"flagChangeAuthorized":true,"automaticNextStep":true} -->
 
-> **Post-closeout operating rule:** After Plan #105 is separately deployed and
-> only `catalog_admin_enabled` is enabled, an active Admin may create and
-> manage the single audited working draft and edit/recode existing rows.
-> Published rows stay immutable; Add/Supplement and retirement remain disabled.
-> A future publish or pointer restore still needs its own business approval and
-> is not a replay of P-13/P-14/P-14C/P-15.
+> **Post-closeout full-Admin operating rule:** Plan #105 V2 releases capability
+> in three independently verified stages: Admin enables draft lifecycle plus
+> Edit/Recode plus eligible never-published Withdraw and Reactivate recovery;
+> New identity additionally enables Add/Supplement and placement; Retirement
+> additionally enables Retire. Published identities stay immutable and are never
+> hard-deleted. A future publish or pointer restore still needs its normal
+> business approval and is not a replay of P-13/P-14/P-14C/P-15. The current
+> Production state remains `false/false/false`; this rule describes the target,
+> not a capability already enabled.
 
 
 > **Current operator boundary (2026-08-24):** the exact one-time P-50I run
@@ -436,9 +449,11 @@ review their change, and reapply deliberately. Do not overwrite blindly.
 
 Retirement removes the item from the new version's active set; it does not
 delete identity, code registry, history, prior versions, or historical BOQs.
-Until P-19 is approved, show that a draft with retired rows cannot produce a
-final field-facing PDF and identify the required owner/data-custodian policy
-before the operator proceeds to publication readiness.
+Under approved P-19 direction, a draft PDF keeps and visibly marks the retired
+row, while the published/archived field-facing official PDF excludes it and
+reports complete/active/excluded counts plus complete-version hash scope.
+Retirement must remain disabled until that application behavior, tests, and
+render QA pass on the exact release commit.
 
 ## 7. Recode an item
 
@@ -750,7 +765,7 @@ Use only when a published current version must stop being used for new BOQs.
 | Export hash mismatch | Do not distribute; report with request/version/hash details |
 | Placement review required | Keep the draft; open **จัดตำแหน่งรายการใหม่**, review every pending new item as one batch, confirm with a real reason, then reload publication readiness |
 | Placement changed after page load | Reload the exact draft and placement page, inspect the current batch, and confirm again; never force hidden revision/order values |
-| Retired-row PDF policy required | Keep the draft; do not file the field-facing PDF until P-19 is approved |
+| Retired-row PDF policy required | P-19 direction is approved; keep the draft and do not file the field-facing PDF until its implementation, focused tests, and render QA pass |
 | Result uncertain / timed out | Do not repeatedly create new submissions. Confirm the submitted values remain visible, copy the request ID, refresh audit/state, and retry only through the same operation when instructed; report any cleared field before retrying |
 | Factor F change requested | Out of scope for this procedure; do not edit Master Catalog data, Factor F data, or legacy BOQs |
 

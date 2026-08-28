@@ -71,7 +71,23 @@
 - Existing BOQ regression suite passed: `Yes / No`
 - WP-6.6 capability matrix passed for every visible release action: `Yes / No`
 - P-18 placement review current or Add/Supplement hidden: `Yes / No / N/A`
-- P-19 retired-row PDF policy satisfied or Retire hidden: `Yes / No / N/A`
+- P-19 active-only official PDF policy implemented and verified, or Retirement
+  hidden: `Yes / No / N/A`
+
+## P-19 export summary
+
+Complete this section for every release; use zero for an all-active version.
+
+| Field | Value |
+|---|---|
+| Complete canonical row count |  |
+| Active rows displayed in official PDF |  |
+| Inactive rows excluded from official PDF |  |
+| Draft PDF visibly marks inactive rows | `Yes / No / N/A` |
+| Excel includes active and inactive rows with status | `Yes / No` |
+| Canonical SHA-256 scope | `Complete version including inactive rows` |
+| Official PDF binary SHA-256 |  |
+| P-19 policy | `official-pdf-active-only-draft-pdf-mark-inactive` |
 
 ## Rollback/current-pointer information
 
@@ -91,8 +107,10 @@
 | Executor |  | Pending |  |  |
 | Verifier |  | Pending |  |  |
 
-This release note is valid only when its version, item count, and dataset hash
-match the published database version and official exports.
+This release note is valid only when its version, complete item count, and
+complete-version dataset hash match the published database version and Excel,
+and the official PDF active/excluded counts plus binary hash match its recorded
+P-19 presentation projection.
 
 Dataset SHA-256 proves catalog-data equivalence. Each binary SHA-256 proves an
 exact filed file copy and is calculated after that final file exists, following

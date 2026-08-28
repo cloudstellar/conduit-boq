@@ -514,7 +514,9 @@ describe('Master Catalog authority consistency', () => {
       'Accepted via P-30; P-32/P-33 technical scope and P-36 integrated technical rehearsal passed; independent intended-admin WP-8/P-14 release evidence and Production remain separate',
     )
     expect(decisions).toContain('P-19')
-    expect(decisions).toContain('Pending; recorded 2026-07-07')
+    expect(decisions).toContain(
+      'Local implementation/evidence complete 2026-08-28; combined release uncommitted; R-02 through R-05 pending',
+    )
     expect(decisions).toContain(
       'Approved contract; final G1R/G2 comparison and P-36 integrated rerun passed; P-15 acceptance pending',
     )

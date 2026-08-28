@@ -604,10 +604,12 @@ function PreparedPreview({
       {prepared.retirementCandidateCount > 0 ? (
         <Alert>
           <ShieldAlert />
-          <AlertTitle>มีรายการยกเลิกใช้ที่ต้องพิจารณานโยบาย PDF</AlertTitle>
+          <AlertTitle>มีรายการยกเลิกใช้สำหรับตรวจใน PDF ฉบับร่าง</AlertTitle>
           <AlertDescription>
             พบอย่างน้อย {prepared.retirementCandidateCount.toLocaleString('th-TH')} รายการ
-            หลังบันทึกต้องตรวจจำนวนจริงอีกครั้ง และต้องยืนยันนโยบายเอกสารสำหรับรายการยกเลิกใช้ก่อนรับรอง PDF เป็นฉบับทางการ
+            หลังบันทึกให้ตรวจจำนวนจริงอีกครั้ง PDF ฉบับร่างจะแสดงและทำเครื่องหมายรายการเหล่านี้
+            ส่วน PDF ที่เผยแพร่หรือจัดเก็บถาวรจะแสดงเฉพาะรายการใช้งาน
+            โดยจำนวนรวมและ Dataset SHA-256 ยังคงครอบคลุมข้อมูลครบทั้งฉบับ
           </AlertDescription>
         </Alert>
       ) : null}

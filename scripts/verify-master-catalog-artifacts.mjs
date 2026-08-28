@@ -4,7 +4,16 @@ import { basename, dirname, isAbsolute, normalize, relative, resolve } from 'nod
 import { fileURLToPath } from 'node:url'
 import ExcelJS from 'exceljs'
 
-export const ARTIFACT_MANIFEST_SCHEMA_VERSION = 1
+export const ARTIFACT_MANIFEST_SCHEMA_VERSION = 2
+export const ARTIFACT_PDF_PRESENTATION_POLICY =
+  'official-pdf-active-only-draft-pdf-mark-inactive'
+export const ARTIFACT_PDF_HASH_SCOPE = 'complete-version-including-inactive'
+
+const LEGACY_ARTIFACT_MANIFEST_SCHEMA_VERSION = 1
+const SUPPORTED_ARTIFACT_MANIFEST_SCHEMA_VERSIONS = new Set([
+  LEGACY_ARTIFACT_MANIFEST_SCHEMA_VERSION,
+  ARTIFACT_MANIFEST_SCHEMA_VERSION,
+])
 
 const EXPECTED_SHEETS = [
   'ข้อมูลเอกสาร',
@@ -84,7 +93,13 @@ export async function verifyMasterCatalogArtifacts(manifestPath) {
   )
 
   const excel = excelFile
-    ? await verifyWorkbook(excelPath, manifest.version, failures)
+    ? await verifyWorkbook(
+        excelPath,
+        manifest.version,
+        manifest.schemaVersion,
+        manifest.domProof,
+        failures,
+      )
     : null
   const pdf = pdfFile
     ? verifyPdf(pdfFile.buffer, manifest.domProof, failures)
@@ -93,7 +108,13 @@ export async function verifyMasterCatalogArtifacts(manifestPath) {
     ? verifyPrintHtml(printHtmlFile.buffer, manifest, failures)
     : null
 
-  verifyDomProof(manifest.domProof, manifest.version, failures)
+  verifyDomProof(
+    manifest.domProof,
+    manifest.version,
+    manifest.pdfPresentation,
+    manifest.schemaVersion,
+    failures,
+  )
 
   return {
     schemaVersion: ARTIFACT_MANIFEST_SCHEMA_VERSION,
@@ -133,7 +154,13 @@ export function sha256(buffer) {
   return createHash('sha256').update(buffer).digest('hex')
 }
 
-async function verifyWorkbook(workbookPath, version, failures) {
+async function verifyWorkbook(
+  workbookPath,
+  version,
+  manifestSchemaVersion,
+  domProof,
+  failures,
+) {
   const workbook = new ExcelJS.Workbook()
   await workbook.xlsx.readFile(workbookPath)
 
@@ -307,6 +334,23 @@ async function verifyWorkbook(workbookPath, version, failures) {
     )
   }
 
+  let activeCanonicalRows = null
+  let inactiveCanonicalRows = null
+  if (manifestSchemaVersion === ARTIFACT_MANIFEST_SCHEMA_VERSION) {
+    activeCanonicalRows = canonicalRowObjects.filter((row) => row.is_active === true).length
+    inactiveCanonicalRows = canonicalRowObjects.filter((row) => row.is_active === false).length
+    if (activeCanonicalRows + inactiveCanonicalRows !== canonicalRowObjects.length) {
+      failures.push('Excel canonical is_active values must all be boolean')
+    }
+    if (activeCanonicalRows !== version?.activeItemCount) {
+      failures.push(`Excel canonical active row count ${activeCanonicalRows} != ${version?.activeItemCount}`)
+    }
+    if (inactiveCanonicalRows !== version?.inactiveItemCount) {
+      failures.push(`Excel canonical inactive row count ${inactiveCanonicalRows} != ${version?.inactiveItemCount}`)
+    }
+    verifyPdfExcelRowParity(domProof, canonicalRowObjects, version, failures)
+  }
+
   const documentValues = readKeyValueSheet(documentSheet)
   assertDocumentValue(documentValues, 'ฉบับบัญชีราคา', version?.versionString, failures)
   assertDocumentValue(
@@ -349,6 +393,8 @@ async function verifyWorkbook(workbookPath, version, failures) {
     priceDataRows,
     verificationDataRows,
     reconstructedDatasetHash,
+    activeCanonicalRows,
+    inactiveCanonicalRows,
   }
 }
 
@@ -385,37 +431,254 @@ function verifyPrintHtml(buffer, manifest, failures) {
   return { bytes: buffer.length }
 }
 
-function verifyDomProof(domProof, version, failures) {
+function verifyDomProof(domProof, version, pdfPresentation, schemaVersion, failures) {
   if (!domProof || typeof domProof !== 'object') {
     failures.push('DOM proof is missing')
     return
   }
 
-  const expectedItemCount = Number(version?.itemCount)
   const expectedPageCount = Number(domProof.expectedPageCount)
   const priceSectionCount = Number(domProof.priceSectionCount)
   if (domProof.readyState !== 'complete') failures.push('DOM proof was not captured at readyState complete')
   if (domProof.fontsReady !== true) failures.push('DOM proof did not confirm document fonts')
   if (domProof.imagesReady !== true) failures.push('DOM proof did not confirm document images')
-  if (Number(domProof.rowCount) !== expectedItemCount) failures.push('DOM row count mismatch')
-  if (Number(domProof.firstSeqInDom) !== 1) failures.push('DOM first sequence is not 1')
-  if (Number(domProof.lastSeqInDom) !== expectedItemCount) failures.push('DOM last sequence mismatch')
-  if (Number(domProof.uniqueSeqCount) !== expectedItemCount) failures.push('DOM unique sequence mismatch')
-  if (Number(domProof.sequenceBreakCount) !== 0) failures.push('DOM sequence contains a break')
   if (domProof.hashPresent !== true) failures.push('DOM dataset hash is missing')
   if (domProof.watermarkPresent !== true) failures.push('DOM watermark text is missing')
-  if (!Number.isInteger(priceSectionCount) || priceSectionCount < 1) {
-    failures.push('DOM price section count is invalid')
+
+  if (schemaVersion === LEGACY_ARTIFACT_MANIFEST_SCHEMA_VERSION) {
+    const expectedItemCount = Number(version?.itemCount)
+    if (Number(domProof.rowCount) !== expectedItemCount) failures.push('DOM row count mismatch')
+    if (Number(domProof.firstSeqInDom) !== 1) failures.push('DOM first sequence is not 1')
+    if (Number(domProof.lastSeqInDom) !== expectedItemCount) failures.push('DOM last sequence mismatch')
+    if (Number(domProof.uniqueSeqCount) !== expectedItemCount) failures.push('DOM unique sequence mismatch')
+    if (Number(domProof.sequenceBreakCount) !== 0) failures.push('DOM sequence contains a break')
+    if (!Number.isInteger(priceSectionCount) || priceSectionCount < 1) {
+      failures.push('DOM price section count is invalid')
+    }
+  } else if (schemaVersion === ARTIFACT_MANIFEST_SCHEMA_VERSION) {
+    verifyP19DomProof(domProof, version, pdfPresentation, failures)
+    const displayedItemCount = Number(pdfPresentation?.displayedItemCount)
+    const minimumPriceSections = displayedItemCount === 0 ? 0 : 1
+    if (!Number.isInteger(priceSectionCount) || priceSectionCount < minimumPriceSections) {
+      failures.push('DOM price section count is invalid')
+    }
   }
+
   if (expectedPageCount !== priceSectionCount + 1) {
     failures.push('DOM expected page count must equal cover plus price sections')
   }
 }
 
-function validateManifestShape(manifest, failures) {
-  if (manifest?.schemaVersion !== ARTIFACT_MANIFEST_SCHEMA_VERSION) {
+function verifyP19DomProof(domProof, version, pdfPresentation, failures) {
+  const totalItemCount = Number(version?.itemCount)
+  const activeItemCount = Number(version?.activeItemCount)
+  const inactiveItemCount = Number(version?.inactiveItemCount)
+  const displayedItemCount = Number(pdfPresentation?.displayedItemCount)
+  const excludedInactiveItemCount = Number(pdfPresentation?.excludedInactiveItemCount)
+  const rowCount = Number(domProof.rowCount)
+  const requiredNonNegativeIntegers = [
+    'rowCount',
+    'totalItemCount',
+    'displayedItemCount',
+    'activeItemCount',
+    'inactiveItemCount',
+    'excludedInactiveItemCount',
+    'activeRowCount',
+    'inactiveRowCount',
+    'invalidRowActiveCount',
+    'inactiveMarkedRowCount',
+    'uniqueDisplayOrderCount',
+    'invalidDisplayOrderCount',
+    'invalidCategoryMetadataCount',
+    'visibleSequenceMismatchCount',
+    'categorySequenceBreakCount',
+    'categoryReentryCount',
+    'categoryCount',
+    'invalidParityMetadataCount',
+  ]
+  if (requiredNonNegativeIntegers.some(
+    (field) => !isNonNegativeInteger(domProof[field]),
+  )) {
+    failures.push('DOM P-19 count or sequence metadata is invalid')
+  }
+
+  if (domProof.pdfPolicy !== pdfPresentation?.mode) failures.push('DOM PDF policy mismatch')
+  if (domProof.pdfHashScope !== pdfPresentation?.hashScope) {
+    failures.push('DOM PDF hash scope mismatch')
+  }
+  if (domProof.hashScopeLabelPresent !== true) {
+    failures.push('DOM complete-version hash scope label is missing')
+  }
+  if (Number(domProof.totalItemCount) !== totalItemCount) {
+    failures.push('DOM complete-version item count mismatch')
+  }
+  if (Number(domProof.activeItemCount) !== activeItemCount) {
+    failures.push('DOM active item count mismatch')
+  }
+  if (Number(domProof.inactiveItemCount) !== inactiveItemCount) {
+    failures.push('DOM inactive item count mismatch')
+  }
+  if (Number(domProof.displayedItemCount) !== displayedItemCount || rowCount !== displayedItemCount) {
+    failures.push('DOM row count mismatch')
+  }
+  if (Number(domProof.excludedInactiveItemCount) !== excludedInactiveItemCount) {
+    failures.push('DOM excluded inactive item count mismatch')
+  }
+  if (Number(domProof.activeRowCount) + Number(domProof.inactiveRowCount) !== rowCount) {
+    failures.push('DOM rendered active/inactive row counts do not equal the displayed count')
+  }
+  if (Number(domProof.invalidRowActiveCount) !== 0) {
+    failures.push('DOM row active metadata is invalid')
+  }
+  if (Number(domProof.uniqueDisplayOrderCount) !== rowCount) {
+    failures.push('DOM display-order values are not unique')
+  }
+  if (Number(domProof.invalidDisplayOrderCount) !== 0) {
+    failures.push('DOM display-order metadata is invalid')
+  }
+  if (Number(domProof.invalidCategoryMetadataCount) !== 0) {
+    failures.push('DOM category metadata is invalid')
+  }
+  if (Number(domProof.invalidParityMetadataCount) !== 0) {
+    failures.push('DOM PDF/Excel parity metadata is invalid')
+  }
+  if (!Array.isArray(domProof.displayedRows)) {
+    failures.push('DOM displayed-row parity proof is missing')
+  } else if (domProof.displayedRows.length !== rowCount) {
+    failures.push('DOM displayed-row parity proof count mismatch')
+  }
+  if (Number(domProof.visibleSequenceMismatchCount) !== 0) {
+    failures.push('DOM visible category-local sequence mismatches metadata')
+  }
+  if (Number(domProof.categorySequenceBreakCount) !== 0) {
+    failures.push('DOM category-local sequence contains a break')
+  }
+  if (Number(domProof.categoryReentryCount) !== 0) {
+    failures.push('DOM category rows are not contiguous')
+  }
+  const categoryCount = Number(domProof.categoryCount)
+  if (!Number.isInteger(categoryCount) || categoryCount < (rowCount === 0 ? 0 : 1)) {
+    failures.push('DOM category count is invalid')
+  }
+
+  if (version?.status === 'draft') {
+    if (Number(domProof.activeRowCount) !== activeItemCount) {
+      failures.push('Draft DOM active row count mismatch')
+    }
+    if (Number(domProof.inactiveRowCount) !== inactiveItemCount) {
+      failures.push('Draft DOM inactive row count mismatch')
+    }
+    if (Number(domProof.inactiveMarkedRowCount) !== inactiveItemCount) {
+      failures.push('Draft DOM inactive rows are not all visibly marked')
+    }
+  } else {
+    if (Number(domProof.activeRowCount) !== displayedItemCount) {
+      failures.push('Official DOM contains a non-active displayed row')
+    }
+    if (Number(domProof.inactiveRowCount) !== 0) {
+      failures.push('Official DOM contains an inactive row')
+    }
+    if (Number(domProof.inactiveMarkedRowCount) !== 0) {
+      failures.push('Official DOM contains an inactive-row marker')
+    }
+  }
+}
+
+function verifyPdfExcelRowParity(domProof, canonicalRows, version, failures) {
+  if (!Array.isArray(domProof?.displayedRows)) return
+
+  const expectedRows = buildExpectedPdfRows(canonicalRows, version?.status)
+  const actualRows = domProof.displayedRows
+  if (actualRows.length !== expectedRows.length) {
     failures.push(
-      `Manifest schema version ${manifest?.schemaVersion ?? 'missing'} != ${ARTIFACT_MANIFEST_SCHEMA_VERSION}`,
+      `PDF/Excel row parity count ${actualRows.length} != ${expectedRows.length}`,
+    )
+  }
+
+  const fields = [
+    'identityId',
+    'itemCode',
+    'itemName',
+    'unit',
+    'materialCost',
+    'laborCost',
+    'unitCost',
+    'categoryCode',
+    'categoryName',
+    'displayOrder',
+    'categoryLocalSequence',
+    'isActive',
+  ]
+  let mismatchCount = 0
+  for (let index = 0; index < Math.min(actualRows.length, expectedRows.length); index += 1) {
+    const actual = actualRows[index]
+    const expected = expectedRows[index]
+    for (const field of fields) {
+      if (!actual || typeof actual !== 'object' || actual[field] !== expected[field]) {
+        mismatchCount += 1
+        if (mismatchCount <= 20) {
+          failures.push(
+            `PDF/Excel row parity mismatch at index ${index} (${expected.itemCode}): ${field}`,
+          )
+        }
+      }
+    }
+  }
+  if (mismatchCount > 20) {
+    failures.push(`PDF/Excel row parity has ${mismatchCount - 20} additional mismatches`)
+  }
+}
+
+function buildExpectedPdfRows(canonicalRows, status) {
+  const sourceRows = status === 'draft'
+    ? canonicalRows
+    : canonicalRows.filter((row) => row.is_active === true)
+  const orderedRows = [...sourceRows].sort((left, right) => {
+    const displayOrderDifference = Number(left.display_order) - Number(right.display_order)
+    if (displayOrderDifference !== 0) return displayOrderDifference
+    return String(left.item_code).localeCompare(String(right.item_code), 'en')
+  })
+  const categoryGroups = new Map()
+  for (const row of orderedRows) {
+    const key = pdfCategoryKey(row)
+    const group = categoryGroups.get(key)
+    if (group) group.push(row)
+    else categoryGroups.set(key, [row])
+  }
+
+  return [...categoryGroups.values()].flatMap((rows) => rows.map((row, index) => ({
+    identityId: row.identity_id,
+    itemCode: row.item_code,
+    itemName: row.item_name,
+    unit: row.unit,
+    materialCost: row.material_cost,
+    laborCost: row.labor_cost,
+    unitCost: row.unit_cost,
+    categoryCode: row.category_code ?? '',
+    categoryName: row.category_name ?? '',
+    displayOrder: row.display_order,
+    categoryLocalSequence: index + 1,
+    isActive: row.is_active,
+  })))
+}
+
+function pdfCategoryKey(row) {
+  const code = normalizedPdfCategoryText(row.category_code)
+  if (code) return `code:${encodeURIComponent(code)}`
+  const name = normalizedPdfCategoryText(row.category_name)
+  return name ? `name:${encodeURIComponent(name)}` : 'uncategorized'
+}
+
+function normalizedPdfCategoryText(value) {
+  if (typeof value !== 'string') return null
+  const normalized = value.normalize('NFC').trim()
+  return normalized.length > 0 ? normalized : null
+}
+
+function validateManifestShape(manifest, failures) {
+  if (!SUPPORTED_ARTIFACT_MANIFEST_SCHEMA_VERSIONS.has(manifest?.schemaVersion)) {
+    failures.push(
+      `Manifest schema version ${manifest?.schemaVersion ?? 'missing'} is unsupported`,
     )
   }
   if (manifest?.environment !== 'local') failures.push('Manifest environment must be local')
@@ -452,6 +715,9 @@ function validateManifestShape(manifest, failures) {
   if (!/^sha256:[0-9a-f]{64}$/.test(manifest?.version?.datasetHash ?? '')) {
     failures.push('Manifest dataset hash is invalid')
   }
+  if (manifest?.schemaVersion === ARTIFACT_MANIFEST_SCHEMA_VERSION) {
+    validateP19ManifestShape(manifest, failures)
+  }
   for (const name of ['excel', 'pdf', 'printHtml']) {
     const artifact = manifest?.artifacts?.[name]
     if (!artifact?.path) failures.push(`Manifest ${name} path is missing`)
@@ -462,6 +728,69 @@ function validateManifestShape(manifest, failures) {
       failures.push(`Manifest ${name} binary SHA-256 is invalid`)
     }
   }
+}
+
+function validateP19ManifestShape(manifest, failures) {
+  const version = manifest.version
+  const presentation = manifest.pdfPresentation
+  const itemCount = version?.itemCount
+  const activeItemCount = version?.activeItemCount
+  const inactiveItemCount = version?.inactiveItemCount
+  const displayedItemCount = presentation?.displayedItemCount
+  const excludedInactiveItemCount = presentation?.excludedInactiveItemCount
+
+  if (!['active', 'archived', 'draft'].includes(version?.status)) {
+    failures.push('Manifest version status is not PDF-exportable')
+  }
+  if (!isNonNegativeInteger(itemCount) || itemCount < 1) failures.push('Manifest item count is invalid for schema 2')
+  if (!isNonNegativeInteger(activeItemCount)) failures.push('Manifest active item count is invalid')
+  if (!isNonNegativeInteger(inactiveItemCount)) failures.push('Manifest inactive item count is invalid')
+  if (activeItemCount + inactiveItemCount !== itemCount) {
+    failures.push('Manifest active/inactive counts do not equal the complete item count')
+  }
+  if (presentation?.policy !== ARTIFACT_PDF_PRESENTATION_POLICY) {
+    failures.push('Manifest PDF presentation policy is invalid')
+  }
+  if (presentation?.hashScope !== ARTIFACT_PDF_HASH_SCOPE) {
+    failures.push('Manifest PDF hash scope is invalid')
+  }
+  if (!isNonNegativeInteger(presentation?.totalItemCount)) {
+    failures.push('Manifest PDF total item count is invalid')
+  } else if (presentation.totalItemCount !== itemCount) {
+    failures.push('Manifest PDF total item count mismatch')
+  }
+  if (!isNonNegativeInteger(presentation?.inactiveItemCount)) {
+    failures.push('Manifest PDF inactive item count is invalid')
+  } else if (presentation.inactiveItemCount !== inactiveItemCount) {
+    failures.push('Manifest PDF inactive item count mismatch')
+  }
+  if (!isNonNegativeInteger(displayedItemCount)) failures.push('Manifest PDF displayed item count is invalid')
+  if (!isNonNegativeInteger(excludedInactiveItemCount)) {
+    failures.push('Manifest PDF excluded inactive item count is invalid')
+  }
+
+  if (version?.status === 'draft') {
+    if (presentation?.mode !== 'draft-all-mark-inactive') {
+      failures.push('Manifest draft PDF presentation mode is invalid')
+    }
+    if (displayedItemCount !== itemCount || excludedInactiveItemCount !== 0) {
+      failures.push('Manifest draft PDF counts must include the complete version')
+    }
+  } else {
+    if (presentation?.mode !== 'official-active-only') {
+      failures.push('Manifest official PDF presentation mode is invalid')
+    }
+    if (
+      displayedItemCount !== activeItemCount
+      || excludedInactiveItemCount !== inactiveItemCount
+    ) {
+      failures.push('Manifest official PDF counts must describe the active-only view')
+    }
+  }
+}
+
+function isNonNegativeInteger(value) {
+  return typeof value === 'number' && Number.isInteger(value) && value >= 0
 }
 
 function resolveArtifactPath(manifestDirectory, value) {

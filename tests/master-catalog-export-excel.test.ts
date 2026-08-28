@@ -16,6 +16,7 @@ import {
   hashCanonicalCatalogDatasetRows,
   type CanonicalCatalogDatasetRow,
 } from '../lib/master-catalog/hash/canonicalDataset';
+import { buildFieldFacingPdfPresentation } from '../lib/master-catalog/export/pdfPresentation';
 
 const CANONICAL_ROWS: CanonicalCatalogDatasetRow[] = [
   {
@@ -101,6 +102,32 @@ describe('Master Catalog official Excel export', () => {
     ]);
     expect(priceSheet!.getCell(5, 5).value).toBe(100);
     expect(priceSheet!.getCell(5, 5).numFmt).toBe('#,##0.00');
+    expect(priceSheet!.getCell(5, 13).value).toBe('ใช้งาน');
+    expect(priceSheet!.getCell(6, 13).value).toBe('ยกเลิกใช้');
+
+    const pdfRows = buildFieldFacingPdfPresentation(
+      dataset.rows,
+      dataset.version.status,
+    ).rows;
+    expect(pdfRows.map((row) => ({
+      identityId: row.identityId,
+      itemName: row.itemName,
+      unit: row.unit,
+      materialCost: row.materialCost,
+      laborCost: row.laborCost,
+      unitCost: row.unitCost,
+      categoryCode: row.categoryCode,
+    }))).toEqual(dataset.rows
+      .filter((row) => row.isActive)
+      .map((row) => ({
+        identityId: row.identityId,
+        itemName: row.itemName,
+        unit: row.unit,
+        materialCost: row.materialCost,
+        laborCost: row.laborCost,
+        unitCost: row.unitCost,
+        categoryCode: row.categoryCode,
+      })));
 
     const verificationSheet = workbook.getWorksheet('ข้อมูลตรวจสอบ');
     expect(verificationSheet).toBeDefined();

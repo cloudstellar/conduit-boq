@@ -2,8 +2,9 @@
 ## Conduit BOQ System
 
 **Last Updated:** 2026-08-28
-**Status:** Migration 027/P-49 authorization is applied in Production; migration
-028 bounded Admin gate projection is a Local-only candidate under Plan #105
+**Status:** Migration 027/P-49 authorization is applied in Production;
+migration 028 bounded Admin gate projection is a reviewed, not-yet-applied
+feature-branch candidate under Plan #105 V2
 **Database:** PostgreSQL 17 (Supabase)
 
 > **Current-state supersession:** Migration 027 is applied exactly once and raw
@@ -14,6 +15,11 @@
 > `public.get_my_catalog_admin_gate()` invoker wrapper; it does not enable a
 > flag or mutate catalog, BOQ, or Factor F data. See
 > [Plan #105](../plans/master-catalog/105-phase4-master-catalog-admin-edit-completion-plan.md).
+> The final operating target is staged `true/true/true` for Admin, New identity,
+> and Retirement after their exact checks. Those transitions are runtime
+> configuration changes, not schema changes; migration 029 is not required.
+> Retirement remains false until the approved P-19 PDF application/tests/render
+> QA pass.
 
 ---
 
