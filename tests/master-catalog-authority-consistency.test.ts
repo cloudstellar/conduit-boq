@@ -515,7 +515,7 @@ describe('Master Catalog authority consistency', () => {
     )
     expect(decisions).toContain('P-19')
     expect(decisions).toContain(
-      'Local implementation/evidence complete 2026-08-28; combined release uncommitted; R-02 through R-05 pending',
+      '**COMPLETE AND LIVE 2026-08-28.** Exact release `f3ccc6e...`; Stage C Retire/DRAFT PDF/Reactivate QA passed; no mixed-status version was published during smoke.',
     )
     expect(decisions).toContain(
       'Approved contract; final G1R/G2 comparison and P-36 integrated rerun passed; P-15 acceptance pending',

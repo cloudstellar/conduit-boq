@@ -96,7 +96,14 @@ describe('Master Catalog post-closeout admin edit completion', () => {
     expect(markers[0]).toContain(
       '"p19LocalTestResult":"48-files-444-tests-pass"',
     );
-    expect(markers[0]).toContain('"p49FormalCloseoutComplete":false');
+    expect(markers[0]).toContain('"p49FormalCloseoutComplete":true');
+    expect(markers[0]).toContain('"endToEndComplete":true');
+    expect(markers[0]).toContain('"readOnlyAdminUiLive":false');
+    expect(markers[0]).toContain('"fullAdminDraftUiLive":true');
+    expect(markers[0]).toContain('"migration028AppliedOnceNoReplay":true');
+    expect(markers[0]).toContain('"catalogAdminEnabledCurrent":true');
+    expect(markers[0]).toContain('"catalogNewIdentityEnabledCurrent":true');
+    expect(markers[0]).toContain('"catalogRetirementEnabledCurrent":true');
     expect(markers[0]).toContain(
       '"expandedProductionPersonaTestAcceptedResidual":true',
     );
@@ -104,11 +111,16 @@ describe('Master Catalog post-closeout admin edit completion', () => {
     expect(markers[0]).toContain(
       '"finalReleaseAuthorization":"APPROVE MASTER CATALOG FINAL"',
     );
-    expect(markers[0]).toContain('"commitAuthorized":true');
-    expect(markers[0]).toContain('"productionWriteAuthorized":true');
+    expect(markers[0]).toContain('"commitAuthorized":false');
+    expect(markers[0]).toContain('"productionWriteAuthorized":false');
+    expect(markers[0]).toContain(
+      '"releaseCommit":"f3ccc6ec389d4ae7d09f75e15d0857c45515c96e"',
+    );
+    expect(markers[0]).toContain('"workingDraftCount":0');
+    expect(markers[0]).toContain('"automaticNextStep":false');
   });
 
-  it('keeps one canonical handoff with the exact remaining work and authority', () => {
+  it('keeps one canonical final handoff with no open release work', () => {
     const handoffPath =
       'docs/plans/master-catalog/106-phase4-master-catalog-exact-remaining-work-handoff.md';
     const handoff = source(handoffPath);
@@ -127,20 +139,20 @@ describe('Master Catalog post-closeout admin edit completion', () => {
       unknown
     >;
 
-    expect(marker.openWorkIds).toEqual([
-      'R-02',
-      'R-03',
-      'R-04',
-      'R-05',
-    ]);
+    expect(marker.openWorkIds).toEqual([]);
     expect(marker.productionReadOnlyQueryPerformed).toBe(true);
     expect(marker.catalogVersion).toBe('2568.1.0');
     expect(marker.catalogTotalRows).toBe(710);
     expect(marker.catalogActiveRows).toBe(710);
     expect(marker.catalogInactiveRows).toBe(0);
     expect(marker.migration027AppliedOnceNoReplay).toBe(true);
-    expect(marker.migration028Applied).toBe(false);
-    expect(marker.migration028FunctionsPresent).toBe(false);
+    expect(marker.migration028Applied).toBe(true);
+    expect(marker.migration028AppliedOnceNoReplay).toBe(true);
+    expect(marker.migration028FunctionsPresent).toBe(true);
+    expect(marker.latestProductionMigrationVersion).toBe('20260828070433');
+    expect(marker.latestProductionMigrationName).toBe(
+      'master_catalog_admin_gate_projection',
+    );
     expect(marker.migration029Required).toBe(false);
     expect(marker.p19DirectionApproved).toBe(true);
     expect(marker.p19ImplementationComplete).toBe(true);
@@ -148,28 +160,39 @@ describe('Master Catalog post-closeout admin edit completion', () => {
     expect(marker.p19LocalTestResult).toBe('48-files-444-tests-pass');
     expect(marker.fullWp8P37UatReplayRequired).toBe(false);
     expect(marker.p49TechnicalImplementationLive).toBe(true);
-    expect(marker.p49FormalCloseoutComplete).toBe(false);
+    expect(marker.p49FormalCloseoutComplete).toBe(true);
     expect(marker.expandedProductionPersonaTestDisposition).toBe(
       'accepted-residual-not-pass',
     );
-    expect(marker.vercelDeploymentShaVerified).toBe(false);
-    expect(marker.applicationCodeAuthorized).toBe(true);
+    expect(marker.vercelDeploymentShaVerified).toBe(true);
+    expect(marker.vercelProductionReady).toBe(true);
+    expect(marker.productionAdminUi).toBe('full-admin-draft-workflow');
+    expect(marker.catalogAdminEnabled).toBe(true);
+    expect(marker.catalogNewIdentityEnabled).toBe(true);
+    expect(marker.catalogRetirementEnabled).toBe(true);
+    expect(marker.productionQaResult).toBe('pass');
+    expect(marker.workingDraftCount).toBe(0);
+    expect(marker.masterCatalogEndToEndComplete).toBe(true);
+    expect(marker.deployedMain).toBe(
+      'f3ccc6ec389d4ae7d09f75e15d0857c45515c96e',
+    );
+    expect(marker.applicationCodeAuthorized).toBe(false);
     expect(marker.finalReleaseAuthorization).toBe(
       'APPROVE MASTER CATALOG FINAL',
     );
-    expect(marker.commitAuthorized).toBe(true);
-    expect(marker.pushAuthorized).toBe(true);
-    expect(marker.mainMergeAuthorized).toBe(true);
-    expect(marker.productionReadAuthorized).toBe(true);
-    expect(marker.productionWriteAuthorized).toBe(true);
-    expect(marker.deployAuthorized).toBe(true);
-    expect(marker.flagChangeAuthorized).toBe(true);
-    expect(marker.automaticNextStep).toBe(true);
+    expect(marker.commitAuthorized).toBe(false);
+    expect(marker.pushAuthorized).toBe(false);
+    expect(marker.mainMergeAuthorized).toBe(false);
+    expect(marker.productionReadAuthorized).toBe(false);
+    expect(marker.productionWriteAuthorized).toBe(false);
+    expect(marker.deployAuthorized).toBe(false);
+    expect(marker.flagChangeAuthorized).toBe(false);
+    expect(marker.automaticNextStep).toBe(false);
 
-    expect(handoff.match(/^### R-0[2-5] -/gm)).toHaveLength(4);
-    expect(handoff).toContain('## 4. Completed local block - R-01');
+    expect(handoff.match(/^### R-0[1-5] —/gm)).toHaveLength(5);
+    expect(handoff).toContain('## 2. Completed final route');
     expect(handoff).toContain('must not be replayed');
-    expect(handoff).toContain('does not require a full UAT replay');
+    expect(handoff).toContain('There is no open R-01 through R-05 work');
 
     const linkedDocuments = [
       '105-phase4-master-catalog-admin-edit-completion-plan.md',
@@ -217,15 +240,18 @@ describe('Master Catalog post-closeout admin edit completion', () => {
     expect(decisionRegister).not.toContain(
       'Result #60 plus P-50J Proposal #61 are current',
     );
-    expect(handoff).toMatch(
-      /exact applied migration\s+027 ledger and frozen source\/function fingerprint/,
+    expect(handoff).toContain(
+      '20260828070433/master_catalog_admin_gate_projection',
     );
     expect(handoff).toMatch(
-      /Stage A:[\s\S]*Add and Retire denial at both UI and database boundaries/,
+      /Existing-row Edit\/Recode[\s\S]*non-Admin denial[\s\S]*Add\/Retire denial/,
+    );
+    expect(handoff).toContain(
+      '[Result #107](./107-phase4-p49-master-catalog-final-closeout-result.md)',
     );
   });
 
-  it('records current false flags, the staged full-Admin target, and remaining gates truthfully', () => {
+  it('records the completed full-Admin rollout and retained safeguards truthfully', () => {
     const plan = source(
       'docs/plans/master-catalog/105-phase4-master-catalog-admin-edit-completion-plan.md',
     );
@@ -238,13 +264,10 @@ describe('Master Catalog post-closeout admin edit completion', () => {
     const migrationRegister = source('docs/04_data/MIGRATIONS.md');
 
     expect(plan).toContain('data and publication');
-    expect(plan).toMatch(/end-to-end operating\s+target is not complete/);
+    expect(plan).toMatch(/full end-to-end operating\s+target are complete/);
     expect(plan).toContain('P-13, P-14, P-14C, and P-15 are complete');
     expect(plan).toContain('must not be replayed');
     expect(plan).toContain('MASTER_CATALOG_ADMIN_EDIT_PLAN_V2');
-    expect(plan).toContain('catalog_admin_enabled=false');
-    expect(plan).toContain('catalog_new_identity_enabled=false');
-    expect(plan).toContain('catalog_retirement_enabled=false');
     expect(plan).toContain('catalog_admin_enabled=true');
     expect(plan).toContain('catalog_new_identity_enabled=true');
     expect(plan).toContain('catalog_retirement_enabled=true');
@@ -254,7 +277,7 @@ describe('Master Catalog post-closeout admin edit completion', () => {
     expect(plan).toContain('"p19ImplementationComplete":true');
     expect(plan).toContain('"p19RenderedFixturesVerified":true');
     expect(plan).toMatch(/Completed local P-19 release evidence[\s\S]*48` test files \/ `444` tests passed/);
-    expect(plan).toContain('"p49FormalCloseoutComplete":false');
+    expect(plan).toContain('"p49FormalCloseoutComplete":true');
     expect(plan).toContain('conditional compare-and-set');
     expect(plan).toMatch(/Withdraw[\s\S]*Admin \+ eligible draft-only\/never-published state guard/);
     expect(plan).toMatch(/Reactivate[\s\S]*Admin \+ eligible inherited inactive-in-draft state guard/);
@@ -263,28 +286,71 @@ describe('Master Catalog post-closeout admin edit completion', () => {
     expect(plan).toContain('Do not create migration 029');
     expect(plan).toMatch(/existing BOQs keep\s+their bound snapshot/i);
     expect(plan).toMatch(/There is no\s+raw `app_settings` fallback/);
-    expect(plan).toContain('is pushed only to');
     expect(plan).toContain('Production Vercel auto-deployment');
     expect(plan).toContain('already-running transaction may finish');
     expect(plan).toMatch(/must not be relabelled as evidence/);
     expect(plan).toContain(migrationDigest);
     expect(migrationRegister).toContain(migrationDigest);
     expect(plan).toContain('"baselineFeatureCommit":"705eeca0c86df5eda06cd4ea9efeda5b9bfeeebe"');
-    expect(plan).toContain('"catalogAdminEnabledCurrent":false');
+    expect(plan).toContain('"catalogAdminEnabledCurrent":true');
+    expect(plan).toContain('"catalogNewIdentityEnabledCurrent":true');
+    expect(plan).toContain('"catalogRetirementEnabledCurrent":true');
     expect(plan).toContain('"catalogAdminEnabledTarget":true');
     expect(plan).toContain('"catalogNewIdentityEnabledTarget":true');
     expect(plan).toContain('"catalogRetirementEnabledTarget":true');
-    expect(plan).toContain('"applicationCodeAuthorized":true');
+    expect(plan).toContain('"applicationCodeAuthorized":false');
     expect(plan).toContain(
       '"finalReleaseAuthorization":"APPROVE MASTER CATALOG FINAL"',
     );
-    expect(plan).toContain('"commitAuthorized":true');
-    expect(plan).toContain('"pushAuthorized":true');
-    expect(plan).toContain('"mainMergeAuthorized":true');
-    expect(plan).toContain('"productionReadAuthorized":true');
-    expect(plan).toContain('"productionWriteAuthorized":true');
-    expect(plan).toContain('"deployAuthorized":true');
-    expect(plan).toContain('"flagChangeAuthorized":true');
-    expect(plan).toContain('"automaticNextStep":true');
+    expect(plan).toContain('"commitAuthorized":false');
+    expect(plan).toContain('"pushAuthorized":false');
+    expect(plan).toContain('"mainMergeAuthorized":false');
+    expect(plan).toContain('"productionReadAuthorized":false');
+    expect(plan).toContain('"productionWriteAuthorized":false');
+    expect(plan).toContain('"deployAuthorized":false');
+    expect(plan).toContain('"flagChangeAuthorized":false');
+    expect(plan).toContain('"automaticNextStep":false');
+    expect(plan).toContain(
+      '"releaseCommit":"f3ccc6ec389d4ae7d09f75e15d0857c45515c96e"',
+    );
+    expect(plan).toContain(
+      '"migration028Ledger":"20260828070433/master_catalog_admin_gate_projection"',
+    );
+    expect(plan).toContain('"workingDraftCount":0');
+  });
+
+  it('records the short P-49 final Production closeout without widening scope', () => {
+    const closeout = source(
+      'docs/plans/master-catalog/107-phase4-p49-master-catalog-final-closeout-result.md',
+    );
+    const capture = closeout.match(
+      /<!-- MASTER_CATALOG_P49_FINAL_CLOSEOUT_V1 (\{[^\n]+\}) -->/,
+    );
+
+    expect(capture).not.toBeNull();
+    const marker = JSON.parse(capture?.[1] ?? '{}') as Record<string, unknown>;
+    expect(marker.result).toBe('pass');
+    expect(marker.masterCatalogEndToEndComplete).toBe(true);
+    expect(marker.p49FormalCloseoutComplete).toBe(true);
+    expect(marker.releaseCommit).toBe(
+      'f3ccc6ec389d4ae7d09f75e15d0857c45515c96e',
+    );
+    expect(marker.migration028Ledger).toBe(
+      '20260828070433/master_catalog_admin_gate_projection',
+    );
+    expect(marker.catalogAdminEnabled).toBe(true);
+    expect(marker.catalogNewIdentityEnabled).toBe(true);
+    expect(marker.catalogRetirementEnabled).toBe(true);
+    expect(marker.workingDraftCount).toBe(0);
+    expect(marker.qaDraftsAbandoned).toBe(2);
+    expect(marker.catalogPublicationPerformed).toBe(false);
+    expect(marker.catalogPointerChanged).toBe(false);
+    expect(marker.boqChanged).toBe(false);
+    expect(marker.factorFChanged).toBe(false);
+    expect(marker.expandedProductionPersonaTestDisposition).toBe(
+      'accepted-residual-not-pass',
+    );
+    expect(marker.openWorkIds).toEqual([]);
+    expect(marker.automaticNextStep).toBe(false);
   });
 });

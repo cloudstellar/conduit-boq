@@ -1,32 +1,29 @@
 # Phase 4 P-49 Pending-Account Authorization Hardening Plan
 
-> **Current Master Catalog full-Admin completion amendment (2026-08-28):**
-> The data/publication milestone is complete (`2568.1.0`, `710` rows,
-> reviewed ITEM-0429/ITEM-0615 values, XLSX/PDF passed, no historical BOQ
-> reprice, no Factor F change), and P-13/P-14/P-14C/P-15 are complete and must not be
-> replayed. Migration 027 was applied once and is immutable. The
-> deployed Admin UI remains intentionally read-only and all three capability
-> settings remain exact boolean `false`.
+> **Current Master Catalog end-to-end closeout (2026-08-28):**
+> Data/publication remains complete at `2568.1.0` / `710` active rows with
+> reviewed ITEM-0429 and ITEM-0615 values, reviewed XLSX/PDF, no historical BOQ
+> reprice, and no Factor F change. P-13/P-14/P-14C/P-15 are complete; they
+> must not be replayed. Exact release commit `f3ccc6e...` is on `github/main` and its
+> Vercel Production deployment is `Ready`. Migration 028 was applied exactly
+> once as `20260828070433/master_catalog_admin_gate_projection`; migrations
+> 027 and 028 are immutable/no-replay.
 > [Plan #105 V2](./105-phase4-master-catalog-admin-edit-completion-plan.md)
-> retains immutable published rows and sets the final staged target: Admin
-> enables Edit/Recode plus eligible Withdraw/Reactivate recovery; New identity
-> adds Add/Supplement and placement; Retirement adds Retire. All three settings
-> are ultimately `true`. Published identities are never
-> hard-deleted. P-19 direction is now active-only field-facing official PDF,
-> while draft PDF visibly marks inactive rows and Excel/database/history retain
-> the complete dataset. P-49 formal closeout remains pending; its unrun expanded
+> retains the invariant and recovery contract. The full audited Admin draft
+> workflow is live with Admin/New identity/Retirement exact boolean
+> `true/true/true`; published rows remain immutable. Stages A/B/C passed and
+> both disposable drafts are `abandoned`, leaving zero working drafts. P-49
+> technical implementation and formal closeout are complete. Its unrun expanded
 > Production persona rehearsal remains an accepted residual, never a
-> retrospective PASS. The baseline Admin-gate commit `705eeca...` is pushed
-> only to `codex/master-catalog-admin-edit`; the bounded P-19 application, tests,
-> render QA, and exact PDF-to-Excel parity are complete locally at `48` files /
-> `444` tests. The Owner then issued `APPROVE MASTER CATALOG FINAL`,
-> authorizing R-02 through R-05 in exact staged order with no retry. It does not
-> authorize catalog publication, pointer restore, BOQ mutation, Factor F mutation,
-> or migration replay.
+> retrospective PASS. [Result #107](./107-phase4-p49-master-catalog-final-closeout-result.md)
+> is the final Production receipt. `APPROVE MASTER CATALOG FINAL` is consumed;
+> there is no open release block, replay, or automatic next step. No catalog
+> publication/restore, pointer movement, BOQ mutation, or Factor F mutation
+> occurred during this final rollout.
 > This overlay supersedes all prior live Status/Current/next-action wording;
 > all dated text below is retained as historical evidence only.
 
-<!-- MASTER_CATALOG_ADMIN_EDIT_STATUS_V2 {"schema":"conduit-boq/master-catalog-admin-edit-status/v2","recordedAt":"2026-08-28","catalogDataPublicationComplete":true,"publishedVersion":"2568.1.0","publishedRowCount":710,"p13P14P14cP15CompleteNoReplay":true,"migration027AppliedOnceNoReplay":true,"readOnlyAdminUiLive":true,"endToEndComplete":false,"p49FormalCloseoutComplete":false,"expandedProductionPersonaTestAcceptedResidual":true,"plan":"105-phase4-master-catalog-admin-edit-completion-plan.md","target":"full-active-admin-draft-workflow","publishedHardDeleteAllowed":false,"p19Policy":"official-pdf-active-only-draft-pdf-mark-inactive","p19ImplementationComplete":true,"p19RenderedFixturesVerified":true,"p19LocalTestResult":"48-files-444-tests-pass","migration028Required":true,"migration029Required":false,"catalogAdminEnabledCurrent":false,"catalogNewIdentityEnabledCurrent":false,"catalogRetirementEnabledCurrent":false,"catalogAdminEnabledTarget":true,"catalogNewIdentityEnabledTarget":true,"catalogRetirementEnabledTarget":true,"baselineFeatureCommit":"705eeca0c86df5eda06cd4ea9efeda5b9bfeeebe","planDocsAmendmentAuthorized":true,"planDocsAmendmentComplete":true,"finalReleaseAuthorization":"APPROVE MASTER CATALOG FINAL","applicationCodeAuthorized":true,"commitAuthorized":true,"pushAuthorized":true,"mainMergeAuthorized":true,"productionReadAuthorized":true,"productionWriteAuthorized":true,"deployAuthorized":true,"flagChangeAuthorized":true,"automaticNextStep":true} -->
+<!-- MASTER_CATALOG_ADMIN_EDIT_STATUS_V2 {"schema":"conduit-boq/master-catalog-admin-edit-status/v2","recordedAt":"2026-08-28T14:32:33+07:00","catalogDataPublicationComplete":true,"publishedVersion":"2568.1.0","publishedRowCount":710,"p13P14P14cP15CompleteNoReplay":true,"migration027AppliedOnceNoReplay":true,"migration028AppliedOnceNoReplay":true,"migration028Ledger":"20260828070433/master_catalog_admin_gate_projection","readOnlyAdminUiLive":false,"fullAdminDraftUiLive":true,"endToEndComplete":true,"p49FormalCloseoutComplete":true,"expandedProductionPersonaTestAcceptedResidual":true,"plan":"105-phase4-master-catalog-admin-edit-completion-plan.md","closeoutResult":"107-phase4-p49-master-catalog-final-closeout-result.md","target":"full-active-admin-draft-workflow","targetAchieved":true,"publishedHardDeleteAllowed":false,"p19Policy":"official-pdf-active-only-draft-pdf-mark-inactive","p19ImplementationComplete":true,"p19RenderedFixturesVerified":true,"p19LocalTestResult":"48-files-444-tests-pass","migration028Required":true,"migration029Required":false,"catalogAdminEnabledCurrent":true,"catalogNewIdentityEnabledCurrent":true,"catalogRetirementEnabledCurrent":true,"catalogAdminEnabledTarget":true,"catalogNewIdentityEnabledTarget":true,"catalogRetirementEnabledTarget":true,"baselineFeatureCommit":"705eeca0c86df5eda06cd4ea9efeda5b9bfeeebe","releaseCommit":"f3ccc6ec389d4ae7d09f75e15d0857c45515c96e","vercelProductionReady":true,"productionQaResult":"pass","workingDraftCount":0,"openWorkIds":[],"planDocsAmendmentAuthorized":true,"planDocsAmendmentComplete":true,"finalReleaseAuthorization":"APPROVE MASTER CATALOG FINAL","finalReleaseAuthorizationConsumed":true,"applicationCodeAuthorized":false,"commitAuthorized":false,"pushAuthorized":false,"mainMergeAuthorized":false,"productionReadAuthorized":false,"productionWriteAuthorized":false,"deployAuthorized":false,"flagChangeAuthorized":false,"automaticNextStep":false} -->
 
 
 **Status:** OPEN SECURITY RISK; BUSINESS TARGET RETAINED; REMEDIATION DEFERRED

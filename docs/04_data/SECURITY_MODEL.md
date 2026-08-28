@@ -1,21 +1,23 @@
 # Security Model: Current Runtime and P-49 Target
 
-**Current status (2026-08-28):** Migration 027 and the matching application
-hardening are live; `pending = profile/onboarding-only` is enforced. P-13,
-P-14, P-14C, and P-15 are complete and must not be replayed. The Master Catalog
-Admin surface remains read-only because all three catalog flags are false.
-Plan #105 V2 prepares a bounded staged path to Admin, New identity, and
-Retirement capabilities without reopening raw settings or weakening database
-enforcement. Published rows remain immutable; published identities are never
-hard-deleted. Retirement stays false until P-19 PDF behavior is implemented
-and verified. See
-[Plan #105](../plans/master-catalog/105-phase4-master-catalog-admin-edit-completion-plan.md).
+**Current status (2026-08-28):** Migrations 027 and 028 and the matching
+application hardening are live; `pending = profile/onboarding-only` is
+enforced. P-13, P-14, P-14C, and P-15 are complete and must not be replayed.
+Exact release `f3ccc6e...` is Vercel Production `Ready`. The full audited
+Master Catalog draft workflow is live with Admin, New identity, and Retirement
+exact boolean `true/true/true`. Published rows remain immutable; published
+identities are never hard-deleted. Staged Production QA and P-49 formal
+closeout passed. See [Plan #105](../plans/master-catalog/105-phase4-master-catalog-admin-edit-completion-plan.md)
+and [Result #107](../plans/master-catalog/107-phase4-p49-master-catalog-final-closeout-result.md).
 
-Migration 028 is fail-fast against the exact post-027 active-Admin predicate,
+Migration 028 is applied once as
+`20260828070433/master_catalog_admin_gate_projection` and is fail-fast against
+the exact post-027 active-Admin predicate,
 catalog function/policy fingerprints, catalog RLS/direct-DML posture, raw
 settings ACL, and private-schema owner/usage boundary. It creates only a
-bounded read projection and leaves every catalog feature flag false. Later
-flag transitions are runtime configuration changes, not schema migrations.
+bounded read projection and did not itself enable a feature flag. The later
+one-by-one flag transitions were runtime configuration changes, not schema
+migrations.
 
 > The “target” and “current runtime gaps” sections below are preserved as the
 > pre-027 threat analysis. They are not a statement of the current Production
@@ -28,10 +30,9 @@ Client permissions, middleware, navigation, and copy must mirror that boundary
 but cannot replace it. Unknown status, a missing profile, or an unclassified
 resource/action fails closed.
 
-## P-49 target access matrix
+## P-49 implemented access matrix
 
-This matrix is the approved target, not a claim that the current runtime is
-already aligned.
+This matrix is the approved and implemented Production contract.
 
 | Profile state | Profile/onboarding | Business data and routes | Admin/privileged operations |
 |---|---|---|---|
@@ -45,7 +46,7 @@ Pending-owned BOQs are retained unchanged while hidden and become accessible
 again only after a valid transition to `active`, under the normal active-role
 rules. No data is deleted or reassigned to implement the waiting state.
 
-## Current runtime gaps
+## Historical pre-027 runtime gaps
 
 - Master Catalog migrations `022`/`023` already enforce active-only catalog
   reads and remain unchanged.

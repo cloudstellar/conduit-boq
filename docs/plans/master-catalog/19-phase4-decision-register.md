@@ -1,44 +1,41 @@
 # Phase 4 Decision Register
 
-> **Current Master Catalog full-Admin completion amendment (2026-08-28):**
-> The data/publication milestone is complete (`2568.1.0`, `710` rows,
-> reviewed ITEM-0429/ITEM-0615 values, XLSX/PDF passed, no historical BOQ
-> reprice, no Factor F change), and P-13/P-14/P-14C/P-15 are complete and must not be
-> replayed. Migration 027 was applied once and is immutable. The
-> deployed Admin UI remains intentionally read-only and all three capability
-> settings remain exact boolean `false`.
+> **Current Master Catalog end-to-end closeout (2026-08-28):**
+> Data/publication remains complete at `2568.1.0` / `710` active rows with
+> reviewed ITEM-0429 and ITEM-0615 values, reviewed XLSX/PDF, no historical BOQ
+> reprice, and no Factor F change. P-13/P-14/P-14C/P-15 are complete; they
+> must not be replayed. Exact release commit `f3ccc6e...` is on `github/main` and its
+> Vercel Production deployment is `Ready`. Migration 028 was applied exactly
+> once as `20260828070433/master_catalog_admin_gate_projection`; migrations
+> 027 and 028 are immutable/no-replay.
 > [Plan #105 V2](./105-phase4-master-catalog-admin-edit-completion-plan.md)
-> retains immutable published rows and sets the final staged target: Admin
-> enables Edit/Recode plus eligible Withdraw/Reactivate recovery; New identity
-> adds Add/Supplement and placement; Retirement adds Retire. All three settings
-> are ultimately `true`. Published identities are never
-> hard-deleted. P-19 direction is now active-only field-facing official PDF,
-> while draft PDF visibly marks inactive rows and Excel/database/history retain
-> the complete dataset. P-49 formal closeout remains pending; its unrun expanded
+> retains the invariant and recovery contract. The full audited Admin draft
+> workflow is live with Admin/New identity/Retirement exact boolean
+> `true/true/true`; published rows remain immutable. Stages A/B/C passed and
+> both disposable drafts are `abandoned`, leaving zero working drafts. P-49
+> technical implementation and formal closeout are complete. Its unrun expanded
 > Production persona rehearsal remains an accepted residual, never a
-> retrospective PASS. The baseline Admin-gate commit `705eeca...` is pushed
-> only to `codex/master-catalog-admin-edit`; the bounded P-19 application, tests,
-> render QA, and exact PDF-to-Excel parity are complete locally at `48` files /
-> `444` tests. The Owner then issued `APPROVE MASTER CATALOG FINAL`,
-> authorizing R-02 through R-05 in exact staged order with no retry. It does not
-> authorize catalog publication, pointer restore, BOQ mutation, Factor F mutation,
-> or migration replay.
+> retrospective PASS. [Result #107](./107-phase4-p49-master-catalog-final-closeout-result.md)
+> is the final Production receipt. `APPROVE MASTER CATALOG FINAL` is consumed;
+> there is no open release block, replay, or automatic next step. No catalog
+> publication/restore, pointer movement, BOQ mutation, or Factor F mutation
+> occurred during this final rollout.
 > This overlay supersedes all prior live Status/Current/next-action wording;
 > all dated text below is retained as historical evidence only.
 
-<!-- MASTER_CATALOG_ADMIN_EDIT_STATUS_V2 {"schema":"conduit-boq/master-catalog-admin-edit-status/v2","recordedAt":"2026-08-28","catalogDataPublicationComplete":true,"publishedVersion":"2568.1.0","publishedRowCount":710,"p13P14P14cP15CompleteNoReplay":true,"migration027AppliedOnceNoReplay":true,"readOnlyAdminUiLive":true,"endToEndComplete":false,"p49FormalCloseoutComplete":false,"expandedProductionPersonaTestAcceptedResidual":true,"plan":"105-phase4-master-catalog-admin-edit-completion-plan.md","target":"full-active-admin-draft-workflow","publishedHardDeleteAllowed":false,"p19Policy":"official-pdf-active-only-draft-pdf-mark-inactive","p19ImplementationComplete":true,"p19RenderedFixturesVerified":true,"p19LocalTestResult":"48-files-444-tests-pass","migration028Required":true,"migration029Required":false,"catalogAdminEnabledCurrent":false,"catalogNewIdentityEnabledCurrent":false,"catalogRetirementEnabledCurrent":false,"catalogAdminEnabledTarget":true,"catalogNewIdentityEnabledTarget":true,"catalogRetirementEnabledTarget":true,"baselineFeatureCommit":"705eeca0c86df5eda06cd4ea9efeda5b9bfeeebe","planDocsAmendmentAuthorized":true,"planDocsAmendmentComplete":true,"finalReleaseAuthorization":"APPROVE MASTER CATALOG FINAL","applicationCodeAuthorized":true,"commitAuthorized":true,"pushAuthorized":true,"mainMergeAuthorized":true,"productionReadAuthorized":true,"productionWriteAuthorized":true,"deployAuthorized":true,"flagChangeAuthorized":true,"automaticNextStep":true} -->
+<!-- MASTER_CATALOG_ADMIN_EDIT_STATUS_V2 {"schema":"conduit-boq/master-catalog-admin-edit-status/v2","recordedAt":"2026-08-28T14:32:33+07:00","catalogDataPublicationComplete":true,"publishedVersion":"2568.1.0","publishedRowCount":710,"p13P14P14cP15CompleteNoReplay":true,"migration027AppliedOnceNoReplay":true,"migration028AppliedOnceNoReplay":true,"migration028Ledger":"20260828070433/master_catalog_admin_gate_projection","readOnlyAdminUiLive":false,"fullAdminDraftUiLive":true,"endToEndComplete":true,"p49FormalCloseoutComplete":true,"expandedProductionPersonaTestAcceptedResidual":true,"plan":"105-phase4-master-catalog-admin-edit-completion-plan.md","closeoutResult":"107-phase4-p49-master-catalog-final-closeout-result.md","target":"full-active-admin-draft-workflow","targetAchieved":true,"publishedHardDeleteAllowed":false,"p19Policy":"official-pdf-active-only-draft-pdf-mark-inactive","p19ImplementationComplete":true,"p19RenderedFixturesVerified":true,"p19LocalTestResult":"48-files-444-tests-pass","migration028Required":true,"migration029Required":false,"catalogAdminEnabledCurrent":true,"catalogNewIdentityEnabledCurrent":true,"catalogRetirementEnabledCurrent":true,"catalogAdminEnabledTarget":true,"catalogNewIdentityEnabledTarget":true,"catalogRetirementEnabledTarget":true,"baselineFeatureCommit":"705eeca0c86df5eda06cd4ea9efeda5b9bfeeebe","releaseCommit":"f3ccc6ec389d4ae7d09f75e15d0857c45515c96e","vercelProductionReady":true,"productionQaResult":"pass","workingDraftCount":0,"openWorkIds":[],"planDocsAmendmentAuthorized":true,"planDocsAmendmentComplete":true,"finalReleaseAuthorization":"APPROVE MASTER CATALOG FINAL","finalReleaseAuthorizationConsumed":true,"applicationCodeAuthorized":false,"commitAuthorized":false,"pushAuthorized":false,"mainMergeAuthorized":false,"productionReadAuthorized":false,"productionWriteAuthorized":false,"deployAuthorized":false,"flagChangeAuthorized":false,"automaticNextStep":false} -->
 
 ## Current post-closeout disposition
 
 [Handoff #106](./106-phase4-master-catalog-exact-remaining-work-handoff.md)
-owns volatile status, no-replay scope, current authorization, and exact
-remaining work. The decision rows below retain their decision-time facts and
-authority boundaries.
+and [Result #107](./107-phase4-p49-master-catalog-final-closeout-result.md)
+own final status and no-replay scope. The decision rows below retain their
+decision-time facts and authority boundaries.
 
 | Decision | Current disposition |
 |---|---|
-| P-19 | Direction approved; local application/tests/render and exact PDF-to-Excel parity complete at `48` files / `444` tests. Combined release is uncommitted; R-02 through R-05 remain pending. |
-| P-49 | Migration 027 and matching technical hardening are live; formal closeout is pending; the unrun expanded persona rehearsal remains accepted residual, not PASS. |
+| P-19 | Complete and live on release commit `f3ccc6e...`; application/tests/render and exact PDF-to-Excel parity passed at `48` files / `444` tests. |
+| P-49 | Migrations 027/028 and matching technical hardening are live; staged Production QA and formal closeout are complete. The unrun expanded persona rehearsal remains accepted residual, not PASS. |
 | P-51 | First-closeout waiver/path is consumed and historical; no replay or new waiver action remains. |
 
 
@@ -1216,8 +1213,9 @@ Proposal #59 preserve that next checkpoint. P-50I was later consumed; Result
 
 > **Current-disposition override:** Rows P-49, P-49S, and P-51 below preserve
 > their pre-027/pre-P-15 decision-time disposition. They are not current
-> runtime status or executable authority; use the disposition table above and
-> [Handoff #106](./106-phase4-master-catalog-exact-remaining-work-handoff.md).
+> runtime status or executable authority; use the disposition table above,
+> [Handoff #106](./106-phase4-master-catalog-exact-remaining-work-handoff.md),
+> and [Result #107](./107-phase4-p49-master-catalog-final-closeout-result.md).
 
 | ID | Decision required | Current evidence/default recommendation | Owner | Due before | Status |
 |---|---|---|---|---|---|
@@ -1240,7 +1238,7 @@ Proposal #59 preserve that next checkpoint. P-50I was later consumed; Result
 | P-16 | Schedule Supabase legacy API-key migration | Separate maintenance change; complete before provider retirement and after inventory/rehearsal | Owner + developer | Separate security window | Pending |
 | P-17 | Record completed Factor F F0-F4 gates before Master Catalog Phase 4 | Completed before Master Catalog Phase 4. ADR-005 and the separate Factor F CR governed the rollout; current baseline from `FACTOR F 2566_7.PDF` is active as `2566.0.0`, the 26 June 2026 source-table annex is current default `2569.0.0`, legacy BOQs were not backfilled, and `015` repaired only missing legacy snapshot metadata without repricing or binding old BOQs. Production hotfix `016` followed as a BOQ save regression fix, not a Factor F publication. | Owner + factor data custodian | Before Master Catalog Phase 4 Production migration | Completed 2026-06-29; hotfix follow-up 2026-07-06; see Factor F closeout and migration ledger |
 | P-18 | Decide display-order placement governance for newly added or supplement catalog items | Keep the proven DB hold until a supported workflow passes. Accepted V1: place only identities absent from the base; choose category plus same-category before/after anchor; confirm all pending rows in one audited batch; one active admin/data custodian may confirm under the existing publisher model; preserve inherited base relative order; arbitrary reorder remains a separate CR. Implement through append-only migration `021`, DB placement revision/review, exact RPC/RLS/audit/concurrency controls, Thai UI, and WP-8 UAT. See [Review Note #28](./28-phase4-p18-placement-governance-review-note.md). | Owner + data custodian | Before WP-7.5 implementation, before P-14 full Add/Supplement enablement, and before P-15 for any version with new identities | Accepted via P-30; P-32/P-33 technical scope and P-36 integrated technical rehearsal passed; independent intended-admin WP-8/P-14 release evidence and Production remain separate |
-| P-19 | Decide official export/rendering policy for inactive or retired catalog rows | Approved direction: published/archived field-facing official PDF displays active rows only; draft review PDF displays all rows and visibly marks inactive rows `ยกเลิกใช้`; Excel/database/history/canonical hash retain all rows. Mixed-status official PDF separately states active displayed, complete total, and inactive excluded counts, and labels the hash as complete-version scope. Release manifest records those counts, policy, canonical hash, and PDF binary hash. Exact local application/tests/render QA and PDF-to-Excel parity now pass; Retirement remains disabled until the exact combined release is committed, deployed flags-off, and its Stage C gate is reached. | Owner + data custodian | Before enabling `catalog_retirement_enabled` and before official filing of a mixed-status version | Local implementation/evidence complete 2026-08-28; combined release uncommitted; R-02 through R-05 pending |
+| P-19 | Decide official export/rendering policy for inactive or retired catalog rows | Approved direction: published/archived field-facing official PDF displays active rows only; draft review PDF displays all rows and visibly marks inactive rows `ยกเลิกใช้`; Excel/database/history/canonical hash retain all rows. Mixed-status official PDF separately states active displayed, complete total, and inactive excluded counts, and labels the hash as complete-version scope. Release manifest records those counts, policy, canonical hash, and PDF binary hash. Exact local application/tests/render QA and PDF-to-Excel parity passed before the exact release was deployed flags-off and Stage C ran. | Owner + data custodian | Before enabling `catalog_retirement_enabled` and before official filing of a mixed-status version | **COMPLETE AND LIVE 2026-08-28.** Exact release `f3ccc6e...`; Stage C Retire/DRAFT PDF/Reactivate QA passed; no mixed-status version was published during smoke. |
 | P-20 | Decide the cross-environment canonical hash/identity portability contract | Approved contract: initialize each legacy baseline `catalog_item_identities.id` directly from its existing immutable Production-derived `price_list.id`, then keep `identity_id` in the canonical lineage hash. The restored public snapshot carries explicit `price_list.id` values, so clean environments using the same approved snapshot have the same deterministic identity mapping. Migration `017` fails closed on nulls, duplicate/colliding mappings, incomplete coverage, or a pre-existing non-deterministic assignment; repeated execution does not replace an assigned identity. Do not introduce a second business-content hash, silently remove identity, or accept environment-specific hashes as equivalent in Phase 4. The tracked comparator first passed two owner-approved independent clean rebuilds on `1ad01b9`; the pre-P-22 `020` candidate also passed two inputs on `3bfc74e`. Final G1R/G2 on `721c2c2` reproduced the same 710-row dataset and identity hashes for the P-24 candidate and the comparator passed with no failures. P-36 then reproduced the same dataset and identity mapping after the integrated chain through `021`. | Owner + database/data-governance reviewer | Initial implementation before WP-6.5 exit (passed); amended-candidate G2 comparison (passed); integrated P-36 rerun (passed); final P-15 hash acceptance remains separate | Approved contract; final G1R/G2 comparison and P-36 integrated rerun passed; P-15 acceptance pending |
 | P-21 | Approve the exact WP-6.6 capability-completeness scope, Local-only implementation, and closeout | Approved Audit #29, later extended through C-17 and Execution Pack slices A-L by P-22/P-23/P-23.1/P-24/P-26. Preserve bounded WP-6.5 evidence, use fix-forward candidate `020`, keep bootstrap at `017`-`019` until owner closeout, and hide unsupported release controls. Earlier Local evidence remains historical after each candidate amendment. Review [WP-6.6 Owner Review Note](./30-phase4-wp66-owner-review-note.md) for the recorded closeout. Acceptance does not approve P-18/`021`, WP-7 execution, Factor F workflow changes, hotfix expansion, or Production. | Owner + developer | Closeout before WP-7 starts | Complete via P-27; G3/WP-6.6 accepted on exact `78e96ab3ed9993707014c4aba1d285b7592b17a1` at 2026-07-14 23:50 +07 |
 | P-22 | Approve the WP-6.6 operator workflow correction for one current-base working draft, audited abandon, full searchable item-first workspace, and authoritative pre-publish snapshot comparison | Accept [Doc #31](./31-phase4-wp66-operator-workflow-correction-plan.md): one mutable draft per base enforced in candidate `020`; stale/abandoned versions remain read-only; final diff compares database snapshots by identity and carries the exact lock into the existing one-publisher publish path. Amend the unaccepted Local-only `020`, supersede its old evidence, and rerun only after separate reset approvals. Do not create a multi-stage approval engine or cross P-18/P-19/WP-7/Factor F/hotfix/Production boundaries. | Owner + developer | Before revised WP-6.6 closeout and before WP-7 | Historical P-22 decision/evidence accepted via P-27; its per-base/stale lifecycle is superseded for future execution by P-39R |

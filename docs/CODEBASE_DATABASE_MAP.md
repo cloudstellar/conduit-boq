@@ -2,31 +2,26 @@
 
 > **Current-state supersession (2026-08-28):** This document remains a
 > historical 2026-06-11 map. Production now includes the immutable Phase 4
-> chain through migration 027, Master Catalog `2568.1.0` with `710` active
-> rows, and the P-49 hardened application. The deployed Admin UI is read-only.
-> Plan #105 V2 retains migration 028 plus the shared fail-closed app loader and
-> defines staged Admin -> New identity -> Retirement enablement. The baseline
-> package is pushed only to `codex/master-catalog-admin-edit` at `705eeca...`;
-> bounded P-19 application/tests/render and exact PDF-to-Excel parity are
-> complete locally at `48` files / `444` tests. The Owner issued `APPROVE
-> MASTER CATALOG FINAL`, authorizing exact staged R-02 through R-05 execution
-> with no retry. Published rows remain immutable; the approval excludes catalog
-> publication, pointer restore, BOQ mutation, Factor F mutation, and migration
-> replay. See
-> [Plan #105](./plans/master-catalog/105-phase4-master-catalog-admin-edit-completion-plan.md).
+> chain through migration 028, Master Catalog `2568.1.0` with `710` active
+> rows, and the P-49 hardened application. Exact release `f3ccc6e...` is Vercel
+> Production `Ready`. The full audited Admin draft UI is live with Admin, New
+> identity, and Retirement exact boolean `true/true/true`; published rows
+> remain immutable. Bounded P-19 application/tests/render and exact
+> PDF-to-Excel parity passed at `48` files / `444` tests. Production Stages
+> A/B/C and cleanup passed; working-draft count is `0`. P-49 formal closeout is
+> complete. No catalog publication/restore, pointer movement, BOQ mutation, or
+> Factor F mutation occurred in the final rollout. See [Plan #105](./plans/master-catalog/105-phase4-master-catalog-admin-edit-completion-plan.md)
+> and [Result #107](./plans/master-catalog/107-phase4-p49-master-catalog-final-closeout-result.md).
 
 **Project:** Conduit BOQ  
 **Generated:** 2026-06-11  
 **Scope:** อ่านจาก source code, docs, migrations, scripts, tests, และ production Supabase  
 **Database source:** ตรวจสอบ production Supabase ผ่าน OAuth MCP project `Conduit Price List` (`otlssvssvgkohqwuuiir`) ณ 2026-06-11
 
-> **P-49 supersession note (2026-08-17):** counts and runtime observations in
-> this map remain a historical 2026-06-11 snapshot. The former pending-own-BOQ/
-> price-list business rule is superseded by the approved profile/onboarding-only
-> target, but that target is not yet implemented across DB and app layers. See
-> [P-49 Plan](./plans/master-catalog/45-phase4-p49-pending-authorization-hardening-plan.md).
-> P-51 later accepted this risk temporarily for the exact first closeout and
-> deferred remediation until after P-15; it did not change these observations.
+> **P-49 supersession note:** counts and runtime observations below remain a
+> historical 2026-06-11 snapshot. The profile/onboarding-only contract is now
+> implemented across the database and application by the Production migration
+> 027/application release. Result #107 closes the former P-51 residual path.
 
 ---
 

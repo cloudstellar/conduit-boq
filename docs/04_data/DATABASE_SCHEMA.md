@@ -2,24 +2,25 @@
 ## Conduit BOQ System
 
 **Last Updated:** 2026-08-28
-**Status:** Migration 027/P-49 authorization is applied in Production;
-migration 028 bounded Admin gate projection is a reviewed, not-yet-applied
-feature-branch candidate under Plan #105 V2
+**Status:** Migrations 027 and 028 are applied once in Production; the full
+audited Master Catalog Admin draft workflow is live under Plan #105 V2
 **Database:** PostgreSQL 17 (Supabase)
 
-> **Current-state supersession:** Migration 027 is applied exactly once and raw
+> **Current-state supersession:** Migrations 027 and 028 are applied exactly
+> once and raw
 > `app_settings` is not an anonymous/authenticated client API. The deployed
-> Master Catalog Admin UI is intentionally read-only while all three catalog
-> flags remain false. Local migration 028 adds only
+> Master Catalog Admin UI is the full audited draft workflow; all three catalog
+> flags are exact boolean `true`. Migration 028 adds only
 > `private.catalog_admin_gate_projection()` plus the
-> `public.get_my_catalog_admin_gate()` invoker wrapper; it does not enable a
-> flag or mutate catalog, BOQ, or Factor F data. See
+> `public.get_my_catalog_admin_gate()` invoker wrapper; it did not enable a
+> flag or mutate catalog, BOQ, or Factor F data. It is recorded as
+> `20260828070433/master_catalog_admin_gate_projection`. See
 > [Plan #105](../plans/master-catalog/105-phase4-master-catalog-admin-edit-completion-plan.md).
-> The final operating target is staged `true/true/true` for Admin, New identity,
-> and Retirement after their exact checks. Those transitions are runtime
+> The final operating state is `true/true/true` for Admin, New identity, and
+> Retirement after their exact staged checks. Those transitions were runtime
 > configuration changes, not schema changes; migration 029 is not required.
-> Retirement remains false until the approved P-19 PDF application/tests/render
-> QA pass.
+> The approved P-19 PDF application/tests/render QA and Production Stage C
+> passed. See [Result #107](../plans/master-catalog/107-phase4-p49-master-catalog-final-closeout-result.md).
 
 ---
 

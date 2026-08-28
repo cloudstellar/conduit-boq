@@ -1,24 +1,23 @@
 # Phase 4 Master Catalog Full Admin Completion Plan - Amendment V2
 
-**Status:** FINAL RELEASE AUTHORIZED 2026-08-28; LOCAL P-19 COMPLETE; EXECUTE
-R-02 THROUGH R-05 IN ORDER WITH NO RETRY; NO CATALOG PUBLICATION, BOQ CHANGE,
-OR FACTOR F CHANGE
+**Status:** COMPLETE 2026-08-28; R-01 THROUGH R-05 PASSED; NO REPLAY; NO
+CATALOG PUBLICATION, BOQ CHANGE, OR FACTOR F CHANGE DURING FINAL ROLLOUT
 
 **Amended:** 2026-08-28 (+07)
 
 **Feature branch:** `codex/master-catalog-admin-edit`
 
-**Reviewed baseline feature commit:**
-`705eeca0c86df5eda06cd4ea9efeda5b9bfeeebe`
+**Deployed release commit:**
+`f3ccc6ec389d4ae7d09f75e15d0857c45515c96e`
 
-<!-- MASTER_CATALOG_ADMIN_EDIT_PLAN_V2 {"schema":"conduit-boq/master-catalog-admin-edit-plan/v2","recordedAt":"2026-08-28","catalogDataPublicationComplete":true,"publishedVersion":"2568.1.0","publishedRowCount":710,"p13P14P14cP15CompleteNoReplay":true,"migration027AppliedOnceNoReplay":true,"readOnlyAdminUiLive":true,"endToEndComplete":false,"p49FormalCloseoutComplete":false,"expandedProductionPersonaTestAcceptedResidual":true,"target":"full-active-admin-draft-workflow","publishedRowsDirectlyMutable":false,"publishedHardDeleteAllowed":false,"draftOnlyWithdrawAllowed":true,"p19Policy":"official-pdf-active-only-draft-pdf-mark-inactive","p19DirectionApproved":true,"p19ImplementationComplete":true,"p19RenderedFixturesVerified":true,"p19LocalTestResult":"48-files-444-tests-pass","migration028Required":true,"migration029Required":false,"catalogAdminEnabledCurrent":false,"catalogNewIdentityEnabledCurrent":false,"catalogRetirementEnabledCurrent":false,"catalogAdminEnabledTarget":true,"catalogNewIdentityEnabledTarget":true,"catalogRetirementEnabledTarget":true,"baselineFeatureCommit":"705eeca0c86df5eda06cd4ea9efeda5b9bfeeebe","planDocsAmendmentAuthorized":true,"planDocsAmendmentComplete":true,"finalReleaseAuthorization":"APPROVE MASTER CATALOG FINAL","applicationCodeAuthorized":true,"commitAuthorized":true,"pushAuthorized":true,"mainMergeAuthorized":true,"productionReadAuthorized":true,"productionWriteAuthorized":true,"deployAuthorized":true,"flagChangeAuthorized":true,"automaticNextStep":true} -->
+<!-- MASTER_CATALOG_ADMIN_EDIT_PLAN_V2 {"schema":"conduit-boq/master-catalog-admin-edit-plan/v2","recordedAt":"2026-08-28T14:32:33+07:00","catalogDataPublicationComplete":true,"publishedVersion":"2568.1.0","publishedRowCount":710,"p13P14P14cP15CompleteNoReplay":true,"migration027AppliedOnceNoReplay":true,"migration028AppliedOnceNoReplay":true,"migration028Ledger":"20260828070433/master_catalog_admin_gate_projection","readOnlyAdminUiLive":false,"fullAdminDraftUiLive":true,"endToEndComplete":true,"p49FormalCloseoutComplete":true,"expandedProductionPersonaTestAcceptedResidual":true,"target":"full-active-admin-draft-workflow","targetAchieved":true,"publishedRowsDirectlyMutable":false,"publishedHardDeleteAllowed":false,"draftOnlyWithdrawAllowed":true,"p19Policy":"official-pdf-active-only-draft-pdf-mark-inactive","p19DirectionApproved":true,"p19ImplementationComplete":true,"p19RenderedFixturesVerified":true,"p19LocalTestResult":"48-files-444-tests-pass","migration028Required":true,"migration029Required":false,"catalogAdminEnabledCurrent":true,"catalogNewIdentityEnabledCurrent":true,"catalogRetirementEnabledCurrent":true,"catalogAdminEnabledTarget":true,"catalogNewIdentityEnabledTarget":true,"catalogRetirementEnabledTarget":true,"baselineFeatureCommit":"705eeca0c86df5eda06cd4ea9efeda5b9bfeeebe","releaseCommit":"f3ccc6ec389d4ae7d09f75e15d0857c45515c96e","vercelProductionReady":true,"productionQaResult":"pass","workingDraftCount":0,"openWorkIds":[],"planDocsAmendmentAuthorized":true,"planDocsAmendmentComplete":true,"finalReleaseAuthorization":"APPROVE MASTER CATALOG FINAL","finalReleaseAuthorizationConsumed":true,"applicationCodeAuthorized":false,"commitAuthorized":false,"pushAuthorized":false,"mainMergeAuthorized":false,"productionReadAuthorized":false,"productionWriteAuthorized":false,"deployAuthorized":false,"flagChangeAuthorized":false,"automaticNextStep":false} -->
 
 > **Volatile status authority:** [Canonical Handoff #106](./106-phase4-master-catalog-exact-remaining-work-handoff.md)
-> owns current completion/no-replay status, authorization, and the exact
-> remaining work. This Plan owns the target, invariants, validation contract,
+> owns current completion/no-replay status and the final result. This Plan
+> owns the target, invariants, validation contract,
 > rollout order, and recovery rules.
 
-## 1. Current truth
+## 1. Final current truth
 
 The Master Catalog data and publication are complete:
 
@@ -37,27 +36,29 @@ P-13, P-14, P-14C, and P-15 are complete and must not be replayed. Migration
 as ledger `20260827174634/p49_active_profile_authorization_hardening` and is
 immutable.
 
-P-49's database correction is therefore in place, but its formal closeout
-record is still pending. The expanded Production persona rehearsal that was
-not run remains an accepted residual, not a PASS.
+P-49's database correction and formal closeout are complete. The expanded
+Production persona rehearsal that was not run remains an accepted residual,
+not a PASS.
 
-The deployed application currently exposes the Master Catalog Admin pages in
-safe read-only mode. All three runtime settings remain exact JSON boolean
-`false`:
+The deployed application now exposes the full audited Master Catalog draft
+workflow. All three runtime settings are exact JSON boolean `true`:
 
-- `catalog_admin_enabled=false`;
-- `catalog_new_identity_enabled=false`; and
-- `catalog_retirement_enabled=false`.
+- `catalog_admin_enabled=true`;
+- `catalog_new_identity_enabled=true`; and
+- `catalog_retirement_enabled=true`.
 
-The reviewed baseline feature commit
-`705eeca0c86df5eda06cd4ea9efeda5b9bfeeebe` is pushed only to
-`codex/master-catalog-admin-edit`. It prepares migration 028 and the shared
-fail-closed Admin gate, but it intentionally does not enable a capability.
+Exact release commit
+`f3ccc6ec389d4ae7d09f75e15d0857c45515c96e` is on `github/main` and its
+Vercel Production deployment is `Ready`. Migration 028 is live exactly once as
+`20260828070433/master_catalog_admin_gate_projection`. Stages A/B/C and cleanup
+passed; both disposable drafts are `abandoned` and the working-draft count is
+`0`.
 
-Therefore data/publication is complete, while the full end-to-end operating
-target is not complete.
+Therefore the data/publication milestone and the full end-to-end operating
+target are complete. [Result #107](./107-phase4-p49-master-catalog-final-closeout-result.md)
+records the final Production evidence.
 
-## 2. Owner-approved operating target
+## 2. Owner-approved operating target — achieved
 
 The final steady state is one audited draft workflow for an authenticated,
 currently active Admin with all three capability settings enabled:
@@ -66,9 +67,9 @@ currently active Admin with all three capability settings enabled:
 - `catalog_new_identity_enabled=true`; and
 - `catalog_retirement_enabled=true`.
 
-These values are the final target, not the current Production state. They must
-be released in the staged order in Section 7 and must never be changed together
-in one database statement.
+These values are both the approved target and the current Production state.
+They were released in the staged order in Section 7 and were never changed
+together in one database statement.
 
 ### 2.1 Action semantics
 
@@ -198,9 +199,9 @@ This completion must not:
 - modify or replay the completed P-13/P-14/P-14C/P-15 sequence; or
 - claim an unrun database, browser, PDF render, or capability test as PASS.
 
-## 6. Local validation required before Git publication
+## 6. Local validation completed before Git publication
 
-The follow-up implementation must pass:
+The final release implementation passed:
 
 1. existing migration 028 and Admin-gate contract tests unchanged;
 2. one capability projection test for exact `true/true` Add/Retire values and
@@ -232,12 +233,12 @@ Admin-gate package at `705eeca...`. They must not be relabelled as evidence for
 the later P-19 amendment; the separate final local evidence is recorded in
 Section 9.1.
 
-## 7. Production rollout order - authorized 2026-08-28, conditionally staged
+## 7. Completed Production rollout order - authorized 2026-08-28
 
-The Owner may approve one bounded Production window covering all stages in
-advance. That avoids repeated ceremony, but advancement is allowed only after
-the current stage passes its exact readback and denial checks. A failed stage
-stops the window; it never authorizes retry or later stages.
+The Owner approved one bounded Production window covering all stages in
+advance. Execution advanced only after each stage passed its exact readback
+and denial checks. The procedure below is retained as the completed release
+record and recovery contract; it is not authority to replay any step.
 
 Every setting transition is a conditional compare-and-set against its exact
 typed expected-before value, changes one key in one transaction, and returns
@@ -360,7 +361,8 @@ post-027/028 persona rehearsal was not run. That remains an accepted residual,
 not a PASS, and belongs to the flags-off rollout verification.
 
 This retained evidence does not by itself prove the later V2 P-19 work. The
-separate evidence below does. Production capability enablement remains pending.
+separate evidence below does. Production capability enablement later passed as
+recorded in [Result #107](./107-phase4-p49-master-catalog-final-closeout-result.md).
 
 ### 9.1 Completed local P-19 release evidence - 2026-08-28
 
@@ -384,14 +386,16 @@ No mixed-status version was created or published in Production.
 
 ## 10. Final release authority snapshot - 2026-08-28
 
-The Owner's `APPROVE MASTER CATALOG FINAL` instruction authorizes the exact
+The Owner's `APPROVE MASTER CATALOG FINAL` instruction authorized the exact
 staged R-02 through R-05 route: feature commit/push, one fresh Production
 preflight, unchanged migration 028 once with no retry, exact `main` push and
 flags-off Vercel deployment, three one-by-one capability transitions with
-disposable-draft QA/cleanup, and short P-49 closeout.
+disposable-draft QA/cleanup, and short P-49 closeout. That authority is now
+consumed and grants no replay or automatic continuation.
 
 The instruction does not authorize a catalog publication, pointer restore,
 BOQ mutation, Factor F mutation, migration replay, or retry after uncertainty.
-For the current execution state and exact remaining work, use
-[Canonical Handoff #106](./106-phase4-master-catalog-exact-remaining-work-handoff.md);
-do not infer it from this dated snapshot.
+For the final execution state and no-replay boundary, use [Canonical Handoff
+#106](./106-phase4-master-catalog-exact-remaining-work-handoff.md) and [Result
+#107](./107-phase4-p49-master-catalog-final-closeout-result.md); do not infer
+current state from an earlier dated snapshot.

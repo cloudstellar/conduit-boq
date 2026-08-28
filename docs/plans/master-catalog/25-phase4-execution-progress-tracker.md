@@ -1,40 +1,54 @@
 # Master Catalog Phase 4 Execution Progress Tracker
 
-> **Current Master Catalog full-Admin completion amendment (2026-08-28):**
-> The data/publication milestone is complete (`2568.1.0`, `710` rows,
-> reviewed ITEM-0429/ITEM-0615 values, XLSX/PDF passed, no historical BOQ
-> reprice, no Factor F change), and P-13/P-14/P-14C/P-15 are complete and must not be
-> replayed. Migration 027 was applied once and is immutable. The
-> deployed Admin UI remains intentionally read-only and all three capability
-> settings remain exact boolean `false`.
+> **Current Master Catalog end-to-end closeout (2026-08-28):**
+> Data/publication remains complete at `2568.1.0` / `710` active rows with
+> reviewed ITEM-0429 and ITEM-0615 values, reviewed XLSX/PDF, no historical BOQ
+> reprice, and no Factor F change. P-13/P-14/P-14C/P-15 are complete; they
+> must not be replayed. Exact release commit `f3ccc6e...` is on `github/main` and its
+> Vercel Production deployment is `Ready`. Migration 028 was applied exactly
+> once as `20260828070433/master_catalog_admin_gate_projection`; migrations
+> 027 and 028 are immutable/no-replay.
 > [Plan #105 V2](./105-phase4-master-catalog-admin-edit-completion-plan.md)
-> retains immutable published rows and sets the final staged target: Admin
-> enables Edit/Recode plus eligible Withdraw/Reactivate recovery; New identity
-> adds Add/Supplement and placement; Retirement adds Retire. All three settings
-> are ultimately `true`. Published identities are never
-> hard-deleted. P-19 direction is now active-only field-facing official PDF,
-> while draft PDF visibly marks inactive rows and Excel/database/history retain
-> the complete dataset. P-49 formal closeout remains pending; its unrun expanded
+> retains the invariant and recovery contract. The full audited Admin draft
+> workflow is live with Admin/New identity/Retirement exact boolean
+> `true/true/true`; published rows remain immutable. Stages A/B/C passed and
+> both disposable drafts are `abandoned`, leaving zero working drafts. P-49
+> technical implementation and formal closeout are complete. Its unrun expanded
 > Production persona rehearsal remains an accepted residual, never a
-> retrospective PASS. The baseline Admin-gate commit `705eeca...` is pushed
-> only to `codex/master-catalog-admin-edit`; the bounded P-19 application, tests,
-> render QA, and exact PDF-to-Excel parity are complete locally at `48` files /
-> `444` tests. The Owner then issued `APPROVE MASTER CATALOG FINAL`,
-> authorizing R-02 through R-05 in exact staged order with no retry. It does not
-> authorize catalog publication, pointer restore, BOQ mutation, Factor F mutation,
-> or migration replay.
+> retrospective PASS. [Result #107](./107-phase4-p49-master-catalog-final-closeout-result.md)
+> is the final Production receipt. `APPROVE MASTER CATALOG FINAL` is consumed;
+> there is no open release block, replay, or automatic next step. No catalog
+> publication/restore, pointer movement, BOQ mutation, or Factor F mutation
+> occurred during this final rollout.
 > This overlay supersedes all prior live Status/Current/next-action wording;
 > all dated text below is retained as historical evidence only.
 
-<!-- MASTER_CATALOG_ADMIN_EDIT_STATUS_V2 {"schema":"conduit-boq/master-catalog-admin-edit-status/v2","recordedAt":"2026-08-28","catalogDataPublicationComplete":true,"publishedVersion":"2568.1.0","publishedRowCount":710,"p13P14P14cP15CompleteNoReplay":true,"migration027AppliedOnceNoReplay":true,"readOnlyAdminUiLive":true,"endToEndComplete":false,"p49FormalCloseoutComplete":false,"expandedProductionPersonaTestAcceptedResidual":true,"plan":"105-phase4-master-catalog-admin-edit-completion-plan.md","target":"full-active-admin-draft-workflow","publishedHardDeleteAllowed":false,"p19Policy":"official-pdf-active-only-draft-pdf-mark-inactive","p19ImplementationComplete":true,"p19RenderedFixturesVerified":true,"p19LocalTestResult":"48-files-444-tests-pass","migration028Required":true,"migration029Required":false,"catalogAdminEnabledCurrent":false,"catalogNewIdentityEnabledCurrent":false,"catalogRetirementEnabledCurrent":false,"catalogAdminEnabledTarget":true,"catalogNewIdentityEnabledTarget":true,"catalogRetirementEnabledTarget":true,"baselineFeatureCommit":"705eeca0c86df5eda06cd4ea9efeda5b9bfeeebe","planDocsAmendmentAuthorized":true,"planDocsAmendmentComplete":true,"finalReleaseAuthorization":"APPROVE MASTER CATALOG FINAL","applicationCodeAuthorized":true,"commitAuthorized":true,"pushAuthorized":true,"mainMergeAuthorized":true,"productionReadAuthorized":true,"productionWriteAuthorized":true,"deployAuthorized":true,"flagChangeAuthorized":true,"automaticNextStep":true} -->
+<!-- MASTER_CATALOG_ADMIN_EDIT_STATUS_V2 {"schema":"conduit-boq/master-catalog-admin-edit-status/v2","recordedAt":"2026-08-28T14:32:33+07:00","catalogDataPublicationComplete":true,"publishedVersion":"2568.1.0","publishedRowCount":710,"p13P14P14cP15CompleteNoReplay":true,"migration027AppliedOnceNoReplay":true,"migration028AppliedOnceNoReplay":true,"migration028Ledger":"20260828070433/master_catalog_admin_gate_projection","readOnlyAdminUiLive":false,"fullAdminDraftUiLive":true,"endToEndComplete":true,"p49FormalCloseoutComplete":true,"expandedProductionPersonaTestAcceptedResidual":true,"plan":"105-phase4-master-catalog-admin-edit-completion-plan.md","closeoutResult":"107-phase4-p49-master-catalog-final-closeout-result.md","target":"full-active-admin-draft-workflow","targetAchieved":true,"publishedHardDeleteAllowed":false,"p19Policy":"official-pdf-active-only-draft-pdf-mark-inactive","p19ImplementationComplete":true,"p19RenderedFixturesVerified":true,"p19LocalTestResult":"48-files-444-tests-pass","migration028Required":true,"migration029Required":false,"catalogAdminEnabledCurrent":true,"catalogNewIdentityEnabledCurrent":true,"catalogRetirementEnabledCurrent":true,"catalogAdminEnabledTarget":true,"catalogNewIdentityEnabledTarget":true,"catalogRetirementEnabledTarget":true,"baselineFeatureCommit":"705eeca0c86df5eda06cd4ea9efeda5b9bfeeebe","releaseCommit":"f3ccc6ec389d4ae7d09f75e15d0857c45515c96e","vercelProductionReady":true,"productionQaResult":"pass","workingDraftCount":0,"openWorkIds":[],"planDocsAmendmentAuthorized":true,"planDocsAmendmentComplete":true,"finalReleaseAuthorization":"APPROVE MASTER CATALOG FINAL","finalReleaseAuthorizationConsumed":true,"applicationCodeAuthorized":false,"commitAuthorized":false,"pushAuthorized":false,"mainMergeAuthorized":false,"productionReadAuthorized":false,"productionWriteAuthorized":false,"deployAuthorized":false,"flagChangeAuthorized":false,"automaticNextStep":false} -->
 
 ## Canonical current status
 
 [Handoff #106](./106-phase4-master-catalog-exact-remaining-work-handoff.md)
-is the sole authority for volatile current status, no-replay items,
-authorization, and the exact remaining work. This Tracker retains dated
-execution evidence; lower `Current`, `HOLD`, or `unauthorized` wording not
-explicitly tied to Handoff #106 is historical.
+and [Result #107](./107-phase4-p49-master-catalog-final-closeout-result.md)
+are the authorities for final status and no-replay scope. This Tracker retains
+dated execution evidence; lower `Current`, `HOLD`, `pending`, or `unauthorized`
+wording is historical.
+
+### Final closeout receipt — 2026-08-28
+
+`APPROVE MASTER CATALOG FINAL` is consumed. Exact release `f3ccc6e...` was
+pushed to the feature branch and `github/main`; Vercel Production reached
+`Ready` flags-off. Fresh preflight passed and migration 028 was applied once as
+`20260828070433/master_catalog_admin_gate_projection`, with no retry. Admin,
+New identity, and Retirement were then enabled one-by-one. Production QA passed
+Edit/Recode, non-Admin and disabled-capability denial, server-allocated Add,
+placement, Withdraw, Retire, DRAFT PDF inactive mark, Reactivate, audit, and
+cleanup. Both disposable drafts are `abandoned`; working-draft count is `0`.
+The final catalog remains `2568.1.0` / `710` active rows, BOQ remains
+`263/2617/326`, and Factor F remains `2569.0.0` / `36` rows. No catalog
+publication/restore, pointer, BOQ, or Factor F mutation occurred. P-49 formal
+closeout and Master Catalog end-to-end work are complete. The unrun expanded
+persona rehearsal remains `accepted residual — not PASS`. See [Result
+#107](./107-phase4-p49-master-catalog-final-closeout-result.md).
 
 
 **Historical P-50I execution receipt (2026-08-24; superseded by Handoff
@@ -995,9 +1009,12 @@ scope.
 | 2026-08-17 02:58 +07 | P-49/P-13 pending-account authorization | Owner selected the safest pending business outcome: profile/onboarding-only and a clear waiting state. Cross-layer audit proved UI-only alignment is not an authorization boundary: `007`/`009`/`012`/`016`, raw settings/selectors, profile SELECT/INSERT/UPDATE, role helpers, and a service-role API leave non-active/privacy/escalation paths. | Preserve active-only catalog RLS `022`/`023`; withdraw pending catalog-read widening; record exact target/state matrix and require a separately authorized forward-only DB/application correction plus real-session proof | **BUSINESS INTENT APPROVED; TECHNICAL HOLD; IMPLEMENTATION NOT AUTHORIZED.** P-12 remains complete and data is not classified corrupt. P-13 is hard-stopped. HEAD `6f0953b19c25f6f96b1d2d11ee99ff43c33c5443` Quality/Preview evidence is pre-P-49 history, not a deploy candidate. One local decision-record commit is allowed; no external publication, Production query/write, migration implementation, merge, deploy, flag, P-14, P-15, or automatic next step is authorized. See Plan #45. |
 | 2026-08-17 23:44 +07 | P-50 known catalog price erratum planning | Owner reported `งานเจาะผนังบ่อพักย่อย (PB)` should be `0/1764/1764` rather than frozen `0/1763/1763`, asked about finishing Master Catalog first, and requested the safest plan. Source review also found unresolved adjacent differences on the same PDF page. | Recommend preserving first structured `2568.1.0` as zero-price-change, then considering a separate correction only after Owner order acceptance, first P-15 closeout, full filed-source reconciliation, and ADR-003 classification | **RECOMMENDATION RECORDED; OWNER DECISION PENDING; NO ACTION AUTHORIZED.** P-49 remains the next operational blocker. No current draft/catalog/BOQ mutation, P-13/P-14/P-15, commit, push, publication, adjacent-row change, or automatic next step. See Recommendation #46. |
 
-## 7. Handoff note template
+## 7. Historical handoff templates — chronology only
 
-Use this canonical current template for the next session:
+Do not use the templates in this section as current state. They preserve old
+checkpoints only. Use [Handoff #106](./106-phase4-master-catalog-exact-remaining-work-handoff.md)
+and [Result #107](./107-phase4-p49-master-catalog-final-closeout-result.md)
+for any next session.
 
 ```text
 Current WP: P-50I consumed exactly once. Exact preflight and patch target cdcd110e... passed, then local authority validation returned 21/22 and the exact P-50 set returned 30/31 because a raw marker-name regex counted two frozen-diff examples plus the actual EOF marker. Anchored count is 1; focused lint and deterministic P-50C checks passed. Result #60 is canonical. Fail-fast stopped before stage/commit/push/new CI. P-50J Proposal #61 is prepared for Owner review only and is not execution authority

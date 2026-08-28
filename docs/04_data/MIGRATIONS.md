@@ -7,17 +7,16 @@
 > **Current-state supersession (2026-08-28):** P-13/P-14/P-14C/P-15 are
 > complete and must not be replayed. Migration 027 was applied exactly once as
 > ledger `20260827174634/p49_active_profile_authorization_hardening` and remains
-> immutable. Migration 028 is a reviewed, not-yet-applied function/ACL-only
-> candidate at baseline feature commit `705eeca...`;
-> it leaves all catalog flags false and changes no Master Catalog, pointer, BOQ,
-> or Factor F data. That baseline feature commit is already pushed only to
-> `codex/master-catalog-admin-edit`. Plan #105 V2 sets the later staged target
-> to Admin -> New identity -> Retirement. Flag transitions are recorded runtime
-> configuration changes, not migration-ledger entries; do not create 029 or
-> edit/replay 027/028. P-19 application/tests must pass before Retirement.
-> Merge/push to `main`, Production application, matching deployment, and any
-> flag change remain unauthorized under this documentation step. See
-> [Plan #105](../plans/master-catalog/105-phase4-master-catalog-admin-edit-completion-plan.md).
+> immutable. Migration 028 was applied exactly once as ledger
+> `20260828070433/master_catalog_admin_gate_projection`, source SHA-256
+> `6c03dff28d6f71bc4468ba799c70f8a1a7222017353d23f6446bb4be4fb006e3`.
+> It changed no Master Catalog, pointer, BOQ, or Factor F data and did not
+> itself enable a flag. Exact release `f3ccc6e...` is on `github/main` and
+> Vercel Production is `Ready`. The later Admin -> New identity -> Retirement
+> transitions were runtime configuration changes and passed one-by-one; all
+> three are now exact boolean `true`. Do not create 029 or edit/replay 027/028.
+> See [Plan #105](../plans/master-catalog/105-phase4-master-catalog-admin-edit-completion-plan.md)
+> and [Result #107](../plans/master-catalog/107-phase4-p49-master-catalog-final-closeout-result.md).
 
 > **Current Production overlay (supersedes stale pre-execution status and
 > authority text below):**
@@ -33,11 +32,10 @@
 > Applied migration bytes remain immutable.
 >
 > P-49 preserves active-only catalog RLS in `022`/`023` and rejects any
-> migration that widens pending catalog reads. Its separate forward-only BOQ/
-> profile/Factor-F/API correction remains required but is deferred until after
-> P-15 under P-51. Proposal #47 is unapproved and reserves no filename/number.
-> P-51 authorizes no migration or database action. See
-> [P-51 Plan](../plans/master-catalog/48-phase4-p51-risk-accepted-master-catalog-closeout-plan.md).
+> migration that widens pending catalog reads. Its forward-only database and
+> application correction is live through migration 027 and the deployed
+> application; its formal closeout is complete in Result #107. Proposal #47
+> remains historical design evidence and is not executable authority.
 
 ---
 
@@ -80,7 +78,7 @@
 | `025_master_catalog_phase4_withdraw_order_compaction.sql` | P-41 forward-only correction: compact a draft's `display_order` atomically after never-published-row withdrawal while preserving relative order and one placement-revision advance per transaction | **Local-only SHA-256 `00d79d7750aa52ba7f003f6bb82fedb1d31ab111be417d74329c1cd3d899f76f`; incrementally applied without reset on 2026-07-19; exact pushed source `bb27b0d28e116e97ce1e7ee3e582f39bcc4edf22` passed 34 files/220 tests and incremental smoke; owner-approved exact execution source `adcca3939f3080cdf64bc6ad807051e9e85fed94` clean-applied `009`-`015`, hotfix `016`, and `017`-`025`; later P-42 recovery, proportional D005 execution, exact D007 stale-choice replay, and D009 Full-import correction passed against the unchanged chain and restored `2568.0.0`/710, zero drafts, and flags false; P-37 was Owner-accepted on 2026-07-25 under the recorded guided-UAT variance; not Production-applied** |
 | `026_master_catalog_phase4_catalog_action_error_acl.sql` | P-47 forward-only per-object callability correction: retain the pure `private.catalog_action_error` body/owner/signature/empty search path, change it to `SECURITY INVOKER`, and grant `EXECUTE` only to `authenticated` while denying `PUBLIC`, `anon`, and `service_role` | **Repository/static review passed; P-48 exact Git-only publication authorized; ledger `20260729002600 master_catalog_phase4_catalog_action_error_acl`; SHA-256 `472fa04b81bc8e96e9b507e20fc20cfee3114c80fda45f2ffba3893480920d8a`; required after immutable `025`; no table/data/default-privilege change; not applied to Local or Production; replacement Git/Remote result, separately authorized clean Local rehearsal, two-pass evidence, and P-12 remain HOLD** |
 | `027_p49_active_profile_authorization_hardening.sql` | P-49 current-active authorization, profile protection, bounded settings projections, and least-privilege API/RLS hardening | **Applied to Production exactly once as `20260827174634 p49_active_profile_authorization_hardening`; SHA-256 `7b96ac17aefc96ee7a788327ddee7508e15eaec73c54f609b44adccf8159eabe`; immutable/no replay** |
-| `028_master_catalog_admin_gate_projection.sql` | Add a private active-Admin gate projection and public security-invoker wrapper without changing flags or business data | **Local-only SHA-256 `6c03dff28d6f71bc4468ba799c70f8a1a7222017353d23f6446bb4be4fb006e3` under Plan #105; reviewed feature-branch commit/push authorized; apply only after exact 027 while all three catalog flags are false; not merged to `main` or Production-applied** |
+| `028_master_catalog_admin_gate_projection.sql` | Add a private active-Admin gate projection and public security-invoker wrapper without changing flags or business data | **Applied once to Production 2026-08-28** (`20260828070433/master_catalog_admin_gate_projection`); source SHA-256 `6c03dff28d6f71bc4468ba799c70f8a1a7222017353d23f6446bb4be4fb006e3`; immutable/no replay |
 | `017+_master_catalog_phase4_*.sql` | Umbrella reference for the Local-only Phase 4 range; canonical bootstrap source applies `017`, `017a`, then `018`-`026` after hotfix `016` | **Current candidate range — prior clean runs through `025` are historical evidence. P-46 completed the exact chain but WP-6.5 then exposed the formatter callability defect and stopped fail-closed. `017a` remains the required pre-`018` global-default bridge; `026` is a distinct, narrowly scoped post-`025` object exception and does not rewrite any reviewed migration. Repository/static review passed and P-48 authorizes exact Git-only publication; replacement Git/Remote result, separately authorized clean Local rehearsal, isolated pass 1, independent contract review, pass 2, and closeout remain mandatory. Every Production approval remains absent.** |
 
 The 2026-07-28 disposable rehearsal does not supersede the prior Local
