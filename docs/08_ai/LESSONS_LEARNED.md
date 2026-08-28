@@ -4,6 +4,19 @@
 **Last Updated:** 2026-08-17
 **Status:** Living Document (Update constantly)
 
+<!-- MASTER_CATALOG_CURRENT_STATE_20260829 -->
+> [!IMPORTANT]
+> **Current-state addendum (2026-08-29):** Master Catalog Phase 4 and P-49 are
+> complete end-to-end. [Handoff #106](../plans/master-catalog/106-phase4-master-catalog-exact-remaining-work-handoff.md)
+> and [Result #107](../plans/master-catalog/107-phase4-p49-master-catalog-final-closeout-result.md)
+> supersede dated `HOLD`, deferred-remediation, and migration-candidate wording
+> below. A read-only Production recheck at `2026-08-29 01:38:54 +07`
+> reconfirmed 027 then 028 with no 029, catalog `2568.1.0` at `710/710`, its
+> reviewed prices, unchanged Factor F, the three catalog flags plus
+> migration-028 functions/raw `app_settings` ACL, and `0` working drafts at
+> that instant; it performed no write. The older statements
+> remain historical chronology and must not be replayed.
+
 > [!IMPORTANT]
 > **AI Must Read This First:** This file contains critical lessons learned from past mistakes. Ignoring these rules causes regressions.
 
@@ -63,10 +76,10 @@ supabase.auth.onAuthStateChange((event, session) => {
 - **New rule:** a pending profile's stored `role` grants no authority. Check
   current `status='active'` together with role before every privileged action,
   and never permit self-service mutation of role/status or approval/audit fields.
-- **Current gate:** P-49 remains open/high, but P-51 accepts the risk
-  temporarily and defers remediation until after the exact first P-15 closeout.
-  P-13 remains separately unauthorized; the P-49 matrix is still mandatory for
-  the later remediation rather than silently waived. See
+- **Historical gate at 2026-08-18:** P-49 remained open/high, while P-51
+  accepted the risk temporarily and deferred remediation until after the exact
+  first P-15 closeout. P-13 was separately unauthorized; the P-49 matrix
+  remained mandatory for later remediation rather than silently waived. See
   [P-51 Plan](../plans/master-catalog/48-phase4-p51-risk-accepted-master-catalog-closeout-plan.md).
 
 ---

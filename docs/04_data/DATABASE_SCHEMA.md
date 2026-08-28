@@ -6,6 +6,18 @@
 audited Master Catalog Admin draft workflow is live under Plan #105 V2
 **Database:** PostgreSQL 17 (Supabase)
 
+<!-- MASTER_CATALOG_CURRENT_STATE_20260829 -->
+> [!IMPORTANT]
+> **Current-state authority:** [Handoff #106](../plans/master-catalog/106-phase4-master-catalog-exact-remaining-work-handoff.md)
+> and [Result #107](../plans/master-catalog/107-phase4-p49-master-catalog-final-closeout-result.md)
+> record end-to-end completion. A read-only Production recheck at
+> `2026-08-29 01:38:54 +07` reconfirmed 027 then 028 with no 029, catalog
+> `2568.1.0` at `710/710` with its recorded hash/lock and reviewed prices,
+> unchanged Factor F, the three catalog flags plus migration-028 functions/raw
+> `app_settings` ACL, and `0` working drafts at that instant; it made no write.
+> Any lower section describing P-49 as open or
+> 028 as a candidate is retained as historical chronology only.
+
 > **Current-state supersession:** Migrations 027 and 028 are applied exactly
 > once and raw
 > `app_settings` is not an anonymous/authenticated client API. The deployed
@@ -347,6 +359,11 @@ post-P-15 P-49 correction requires an exact grants/policies/functions inventory.
 
 ### Key Policies
 
+> **Historical P-49 pre-remediation snapshot:** The policy descriptions in
+> this subsection record the state assessed before the completed P-49 rollout.
+> They are retained for audit chronology; use #106/#107 and the current-state
+> authority above for the deployed posture.
+
 **user_profiles:**
 - Frozen baseline currently includes permissive authenticated policy
   `Users can view all profiles`; P-49 treats pending/inactive/suspended
@@ -363,14 +380,14 @@ post-P-15 P-49 correction requires an exact grants/policies/functions inventory.
 - Owner/Assignee: always see own BOQ
 - Sector access: staff/sector_manager (active only)
 - Department access: dept_manager/procurement (active only)
-- Current applied behavior: `009` BOQ owner visibility lacks a current active
+- At the historical pre-remediation snapshot, `009` BOQ owner visibility lacked an active
   profile requirement, and `016` still permits pending saves.
 - P-49 target: pending is profile/onboarding-only and has no business access.
-  The target is not yet enforced and requires a separately approved append-only
-  correction; applied migrations remain immutable.
-- Current `app_settings`, `can_approve_boq`, `get_user_role`/`is_admin`, and
-  legacy/versioned Factor F surfaces also lack the complete P-49 status/scope
-  boundary and belong in the same correction inventory.
+  This was not yet enforced in the historical snapshot; its later correction
+  and formal closeout are recorded in #106/#107.
+- At that snapshot, `app_settings`, `can_approve_boq`,
+  `get_user_role`/`is_admin`, and legacy/versioned Factor F surfaces lacked the
+  complete P-49 status/scope boundary and belonged in the correction inventory.
 - Organization/department/sector policies expose all selector rows to every
   authenticated status; the target permits pending only active onboarding rows
   and denies selectors to inactive/suspended/missing/unknown profiles.
@@ -420,17 +437,25 @@ idx_boq_items_route_id   ON boq_items(route_id)
 ### Auto-create user profile
 - `handle_new_user()` - Creates user_profiles entry when auth.users row is created
 
-### Lock org fields after onboarding (v1.2.0)
-- `lock_org_fields_after_onboarding()` - Prevents user from changing dept/sector after onboarding
+### Current P-49 profile mutation guard
+
+- `private.p49_guard_user_profile_mutation()` — current profile mutation guard
+- `trg_p49_guard_user_profile_mutation` — current `user_profiles` trigger
+- Migration 027 removed historical `public.lock_org_fields_after_onboarding()`
+  and `trg_lock_org`.
 
 ---
 
-## 🔧 RPC Functions (v1.2.0)
+## 🔧 Current P-49 Profile RPC Functions
 
 | Function | Description |
 |----------|-------------|
-| `admin_approve_user(p_target_id)` | Atomic approve: copies requested→actual, sets active |
-| `admin_reject_user(p_target_id, p_note)` | Reject user with note |
+| `admin_approve_user(p_target_id uuid, p_request_id uuid, p_reason text)` | Atomic guarded approve transition |
+| `admin_reject_user(p_target_id uuid, p_reason text, p_request_id uuid)` | Atomic guarded reject transition |
+
+Migration 027 dropped the historical one-argument
+`admin_approve_user(p_target_id uuid)` and two-argument
+`admin_reject_user(p_target_id uuid, p_note text)` signatures.
 
 ---
 

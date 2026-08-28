@@ -1,10 +1,19 @@
 # Codebase and Database Map
 
+<!-- MAIN_CONVERGENCE_TEMPORAL_ADDENDUM_20260829 -->
+> **Repository convergence addendum (2026-08-29):** Commit `f3ccc6e...` below
+> is the 2026-08-28 runtime release baseline/ancestor recorded by #106/#107;
+> it is not the repository identity to copy after this convergence. The
+> repository commit containing this addendum is a docs/verifier-only
+> descendant with unchanged application runtime and migration SQL tree. After
+> convergence succeeds, resolve and verify the exact `main` and Vercel SHAs
+> independently. This convergence performs no database write.
+
 > **Current-state supersession (2026-08-28):** This document remains a
 > historical 2026-06-11 map. Production now includes the immutable Phase 4
 > chain through migration 028, Master Catalog `2568.1.0` with `710` active
-> rows, and the P-49 hardened application. Exact release `f3ccc6e...` is Vercel
-> Production `Ready`. The full audited Admin draft UI is live with Admin, New
+> rows, and the P-49 hardened application. Runtime release baseline
+> `f3ccc6e...` was Vercel Production `Ready` on 2026-08-28. The full audited Admin draft UI is live with Admin, New
 > identity, and Retirement exact boolean `true/true/true`; published rows
 > remain immutable. Bounded P-19 application/tests/render and exact
 > PDF-to-Excel parity passed at `48` files / `444` tests. Production Stages

@@ -2,15 +2,27 @@
 ## Conduit BOQ System
 
 **Last Updated:** 2026-08-18
-**Status:** P-49 target canonical; risk open/high; remediation deferred under
-P-51; P-13 separately unauthorized
+**Historical snapshot:** P-49 target before its completed Production
+remediation and formal closeout
 
+<!-- MASTER_CATALOG_CURRENT_STATE_20260829 -->
 > [!IMPORTANT]
-> P-49 changes the pending business rule to profile/onboarding-only. Current
-> `lib/permissions.ts`, middleware, BOQ RLS/RPC, Factor F reads, profile grants,
-> and privileged APIs are not yet aligned. UI permission helpers are never the
-> authorization boundary. P-51 accepts this risk temporarily but does not
-> change the permission target. See
+> **Current state:** P-49 implementation and formal closeout are complete; see
+> [Handoff #106](../plans/master-catalog/106-phase4-master-catalog-exact-remaining-work-handoff.md)
+> and [Result #107](../plans/master-catalog/107-phase4-p49-master-catalog-final-closeout-result.md).
+> A read-only Production recheck at `2026-08-29 01:38:54 +07` reconfirmed the
+> three catalog flags plus migration-028 functions/raw `app_settings` ACL,
+> migrations 027 then 028 with no 029, and `0` working drafts at that instant;
+> it made no write. The former
+> open-risk and runtime-not-aligned wording below is historical chronology,
+> not the current permission state or replay authority.
+
+> [!NOTE]
+> **Historical P-49 note (2026-08-18):** P-49 changed the pending business
+> rule to profile/onboarding-only. The application and database layers listed
+> below were not yet aligned at that date. UI permission helpers are never the
+> authorization boundary. P-51 temporarily accepted rather than changed the
+> target. See
 > [P-51 Plan](../plans/master-catalog/48-phase4-p51-risk-accepted-master-catalog-closeout-plan.md).
 
 ---
@@ -124,10 +136,11 @@ const isLegacy = context?.created_by === null
 > [!WARNING]
 > RLS is the source of truth. The `can()` function is for UI display only.
 
-P-49 therefore cannot be implemented by editing `can()` alone. The future database
-grants/policies/RPCs, server/API checks, middleware allowlist, loaders/actions,
-and UI must pass the same matrix. Current source still implements the former
-pending-own-BOQ rule and remains an open risk rather than an accepted pattern.
+**Historical implementation note (2026-08-18):** P-49 could not be implemented
+by editing `can()` alone. The future database grants/policies/RPCs, server/API
+checks, middleware allowlist, loaders/actions, and UI had to pass the same
+matrix. At that date, the source still implemented the former pending-own-BOQ
+rule and remained an open risk rather than an accepted pattern.
 
 ---
 
@@ -136,7 +149,7 @@ pending-own-BOQ rule and remains an open risk rather than an accepted pattern.
 | User Status | Effect |
 |-------------|--------|
 | `active` | Full role permissions |
-| `pending` | Profile/onboarding only (P-49 target; current runtime not yet aligned) |
+| `pending` | Profile/onboarding only (P-49 target; runtime alignment was still pending in this 2026-08-18 snapshot) |
 | `inactive` | No business access; own blocked status and auth self-service only; no profile edits |
 | `suspended` | No business access; own blocked status and auth self-service only; no profile edits |
 

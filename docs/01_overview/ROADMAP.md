@@ -3,9 +3,21 @@
 
 **Last Updated:** 2026-06-29
 
+<!-- MASTER_CATALOG_CURRENT_STATE_20260829 -->
+> [!IMPORTANT]
+> **Current-state addendum (2026-08-29):** Master Catalog Phase 4 and P-49 are
+> complete end-to-end. See [Handoff #106](../plans/master-catalog/106-phase4-master-catalog-exact-remaining-work-handoff.md)
+> and [Result #107](../plans/master-catalog/107-phase4-p49-master-catalog-final-closeout-result.md).
+> The read-only Production recheck at `2026-08-29 01:38:54 +07` reconfirmed
+> 027 then 028 with no 029, `2568.1.0` at `710/710`, reviewed prices, unchanged
+> Factor F, the three catalog flags plus migration-028 functions/raw
+> `app_settings` ACL, and `0` working drafts at that instant; it made no write.
+> The June roadmap and later dated rollout/gate prose below
+> are preserved as historical chronology, not current status or replay work.
+
 ---
 
-## Current position
+## Historical roadmap position recorded 2026-06-29
 
 ```text
 Foundation             Master Catalog baseline       Factor F versioning        Master Catalog Phase 4
@@ -61,7 +73,7 @@ Completed in Production on 2026-06-29:
 Evidence:
 [Factor F Production Rollout Closeout](../plans/factor-f/10-production-rollout-closeout.md).
 
-## Master Catalog Phase 4 — Local implementation in progress; Production not started
+## Master Catalog Phase 4 — Historical pre-release plan snapshot
 
 ### Completed Local evidence bands
 

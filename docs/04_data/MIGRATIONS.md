@@ -4,6 +4,15 @@
 **Last Updated:** 2026-08-28
 **Status:** Canonical
 
+<!-- MAIN_CONVERGENCE_TEMPORAL_ADDENDUM_20260829 -->
+> **Repository convergence addendum (2026-08-29):** Commit `f3ccc6e...` below
+> is the 2026-08-28 runtime release baseline/ancestor recorded by #106/#107;
+> it is not the repository identity to copy after this convergence. The
+> repository commit containing this addendum is a docs/verifier-only
+> descendant with unchanged application runtime and migration SQL tree. After
+> convergence succeeds, resolve and verify the exact `main` and Vercel SHAs
+> independently. This convergence performs no database write.
+
 > **Current-state supersession (2026-08-28):** P-13/P-14/P-14C/P-15 are
 > complete and must not be replayed. Migration 027 was applied exactly once as
 > ledger `20260827174634/p49_active_profile_authorization_hardening` and remains
@@ -11,8 +20,8 @@
 > `20260828070433/master_catalog_admin_gate_projection`, source SHA-256
 > `6c03dff28d6f71bc4468ba799c70f8a1a7222017353d23f6446bb4be4fb006e3`.
 > It changed no Master Catalog, pointer, BOQ, or Factor F data and did not
-> itself enable a flag. Exact release `f3ccc6e...` is on `github/main` and
-> Vercel Production is `Ready`. The later Admin -> New identity -> Retirement
+> itself enable a flag. Runtime release baseline `f3ccc6e...` was recorded on
+> `github/main` with Vercel Production `Ready` on 2026-08-28. The later Admin -> New identity -> Retirement
 > transitions were runtime configuration changes and passed one-by-one; all
 > three are now exact boolean `true`. Do not create 029 or edit/replay 027/028.
 > See [Plan #105](../plans/master-catalog/105-phase4-master-catalog-admin-edit-completion-plan.md)

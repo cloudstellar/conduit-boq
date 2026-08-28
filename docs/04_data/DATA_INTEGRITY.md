@@ -2,15 +2,28 @@
 ## Conduit BOQ System
 
 **Last Updated:** 2026-08-18
-**Status:** P-49 target recorded; risk open/high; remediation deferred under
-P-51 for the exact first closeout
+**Historical snapshot:** P-49 target before its completed Production
+remediation and formal closeout
 
+<!-- MASTER_CATALOG_CURRENT_STATE_20260829 -->
 > [!IMPORTANT]
-> The former pending-own-BOQ rule is superseded as business intent by P-49.
-> The approved target is `pending = profile/onboarding-only`.
-> Current database paths are not yet aligned, so this document distinguishes
-> current behavior from the approved target. P-51 accepts but does not fix that
-> risk. See [P-51 Plan](../plans/master-catalog/48-phase4-p51-risk-accepted-master-catalog-closeout-plan.md).
+> **Current state:** P-49 implementation and formal closeout are complete; see
+> [Handoff #106](../plans/master-catalog/106-phase4-master-catalog-exact-remaining-work-handoff.md)
+> and [Result #107](../plans/master-catalog/107-phase4-p49-master-catalog-final-closeout-result.md).
+> A read-only Production recheck at `2026-08-29 01:38:54 +07` reconfirmed 027
+> then 028 with no 029, catalog `2568.1.0` at `710/710` with its reviewed
+> prices, unchanged Factor F, the three catalog flags plus migration-028
+> functions/raw `app_settings` ACL, and `0` working drafts at that instant; it
+> made no write. The former open-risk and
+> deferred-remediation wording below is historical chronology, not current
+> behavior or replay authority.
+
+> [!NOTE]
+> **Historical P-49 note (2026-08-18):** The former pending-own-BOQ rule was
+> superseded by the approved `pending = profile/onboarding-only` target. The
+> database paths were not yet aligned at that date, and P-51 temporarily
+> accepted rather than fixed that risk. See
+> [P-51 Plan](../plans/master-catalog/48-phase4-p51-risk-accepted-master-catalog-closeout-plan.md).
 
 ---
 
@@ -31,38 +44,45 @@ Phase 4 surfaces; P-49 requires an exact grants/policies/functions inventory.
 
 ### Key Policies
 
+> **Historical P-49 pre-remediation snapshot (2026-08-18):** The bullets in
+> this subsection record the source-derived gaps that led to the correction.
+> P-49 implementation/formal closeout are complete under #106/#107; do not read
+> the words `current` or `blocker` below as the deployed state.
+
 **user_profiles:**
-- Frozen baseline currently includes permissive authenticated policy
+- The frozen baseline then included permissive authenticated policy
   `Users can view all profiles`; this is a source-derived profile/PII release
-  blocker pending exact read-only live verification
+  blocker recorded before the completed correction
 - Admin can read/update all
 - Managers can read profiles in their department
-- Current own-row INSERT may exploit the profile `active` default; UPDATE
-  grants/policies are broader than the P-49 safe-field target; role-only admin
-  UPDATE and the trigger do not protect the full state machine. Treat profile
-  self-creation/protected-field mutation as open high-priority blockers.
+- At that snapshot, own-row INSERT could exploit the profile `active` default;
+  UPDATE grants/policies were broader than the P-49 safe-field target; and the
+  role-only Admin UPDATE plus old trigger did not protect the full state
+  machine. Profile self-creation/protected-field mutation were open
+  high-priority blockers at that time.
 
 **boq:**
 - Legacy BOQ (created_by IS NULL): **Admin-only** (v1.2.0)
 - Owner/Assignee: always see own BOQ
 - Sector access: staff/sector_manager (active only)
 - Department access: dept_manager/procurement (active only)
-- Current applied behavior: `009` BOQ owner visibility lacks a current active
-  profile requirement, and `016` still permits pending saves.
+- At that snapshot, applied `009` BOQ owner visibility lacked an active
+  profile requirement, and `016` still permitted pending saves.
 - P-49 target: pending has no BOQ or other business-data access. Existing rows
   remain unchanged and hidden until valid activation.
 
 **settings / role helpers / Factor F:**
-- Current raw `app_settings` SELECT is anonymous/authenticated-wide;
+- At that snapshot, raw `app_settings` SELECT was anonymous/authenticated-wide;
   insert/update checks stored admin role without active status.
-- Current authenticated `can_approve_boq` lacks an active-status check, and
-  `get_user_role`/`is_admin` can disclose arbitrary-user role metadata.
-- Legacy and versioned Factor F reads are authenticated-wide. Post-P-15 P-49
-  remediation requires a complete table/view/RPC inventory and non-active
-  denial.
-- Organization/department/sector policies expose all selector rows to every
-  authenticated status; P-49 permits pending only active onboarding selectors
-  and denies them to inactive/suspended/missing/unknown profiles.
+- At that snapshot, authenticated `can_approve_boq` lacked an active-status
+  check, and `get_user_role`/`is_admin` could disclose arbitrary-user role
+  metadata.
+- Legacy and versioned Factor F reads were authenticated-wide in that snapshot.
+  The later P-49 correction/closeout is recorded in #106/#107.
+- Organization/department/sector policies exposed all selector rows to every
+  authenticated status; the P-49 target permitted pending only active
+  onboarding selectors and denied them to
+  inactive/suspended/missing/unknown profiles.
 
 ---
 
@@ -107,8 +127,8 @@ idx_boq_items_route_id   ON boq_items(route_id)
 ### Lock org fields after onboarding (v1.2.0)
 - `lock_org_fields_after_onboarding()` - Prevents user from changing dept/sector after onboarding
 - Admin bypass: Admins can still modify these fields
-- It does not currently protect `role` or `status`; do not treat it as a
-  complete profile-authority boundary.
+- In the historical snapshot it did not protect `role` or `status`; do not
+  treat that old trigger alone as a complete profile-authority boundary.
 
 ---
 
@@ -119,10 +139,10 @@ idx_boq_items_route_id   ON boq_items(route_id)
 | `admin_approve_user(p_target_id)` | Atomic approve: copies requested→actual, sets active |
 | `admin_reject_user(p_target_id, p_note)` | Reject user with note |
 
-Every privileged profile operation must ultimately require current
-`role='admin' AND status='active'`. The post-P-15 forward-only correction and
-its real-session matrix require separate Owner authority; P-51 is not that
-authority.
+Every privileged profile operation must require current
+`role='admin' AND status='active'`. The forward-only P-49 implementation and
+formal closeout are complete under #106/#107. The unrun expanded Production
+persona rehearsal remains an accepted residual, not PASS.
 
 ---
 

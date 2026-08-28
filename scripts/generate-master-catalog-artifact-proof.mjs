@@ -390,7 +390,32 @@ async function waitForDomProof(cdp, version) {
         const activeItemCount = totalItemCount !== null && inactiveItemCount !== null
           ? totalItemCount - inactiveItemCount
           : null;
-        const priceSectionCount = document.querySelectorAll('.price-section').length;
+        const priceSections = [...document.querySelectorAll('.price-section')];
+        const normalizeHeadingText = (value) => String(value ?? '').normalize('NFC').trim();
+        const categoryHeadingProof = {
+          proofVersion: 1,
+          pages: priceSections.map((section, pageIndex) => ({
+            pageIndex,
+            entries: [...section.querySelectorAll('.print-page-body > tr')].map((entry) => {
+              if (entry.classList.contains('category-row')) {
+                return {
+                  kind: 'heading',
+                  categoryKey: normalizeHeadingText(entry.dataset.categoryKey),
+                  categoryCode: normalizeHeadingText(entry.dataset.categoryCode),
+                  categoryLabel: normalizeHeadingText(entry.dataset.categoryLabel),
+                  continuationAttribute: entry.dataset.categoryContinuation ?? null,
+                  text: normalizeHeadingText(entry.textContent),
+                };
+              }
+              return {
+                kind: 'row',
+                categoryKey: normalizeHeadingText(entry.dataset.categoryKey),
+                itemCode: normalizeHeadingText(entry.dataset.itemCode),
+              };
+            }),
+          })),
+        };
+        const priceSectionCount = priceSections.length;
         const expectedPageCount = document.querySelectorAll('.sheet').length;
         return {
           readyState: document.readyState,
@@ -459,6 +484,7 @@ async function waitForDomProof(cdp, version) {
           categoryReentryCount: categoryReentries.length,
           categoryReentries: categoryReentries.slice(0, 5),
           categoryCount: new Set(rowProofs.map((row) => row.categoryKey).filter(Boolean)).size,
+          categoryHeadingProof,
           priceSectionCount,
           expectedPageCount,
           title: document.querySelector('h1')?.textContent?.trim() ?? null,
@@ -497,6 +523,11 @@ async function waitForDomProof(cdp, version) {
       && last.categorySequenceBreakCount === 0
       && last.categoryReentryCount === 0
       && last.categoryCount >= (last.rowCount === 0 ? 0 : 1)
+      && last.categoryHeadingProof?.proofVersion === 1
+      && Array.isArray(last.categoryHeadingProof.pages)
+      && last.categoryHeadingProof.pages.length === last.priceSectionCount
+      && last.categoryHeadingProof.pages.flatMap((page) => page.entries ?? [])
+        .filter((entry) => entry.kind === 'row').length === last.rowCount
       && last.priceSectionCount >= (last.displayedItemCount === 0 ? 0 : 1)
       && last.expectedPageCount === last.priceSectionCount + 1
       && last.hashPresent

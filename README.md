@@ -5,6 +5,19 @@
 [![Next.js](https://img.shields.io/badge/Next.js-16.x-black.svg)](https://nextjs.org/)
 [![Supabase](https://img.shields.io/badge/Supabase-PostgreSQL-green.svg)](https://supabase.com/)
 
+<!-- MASTER_CATALOG_CURRENT_STATE_20260829 -->
+> [!IMPORTANT]
+> **Master Catalog current state:** Phase 4 and P-49 are complete end-to-end.
+> Use [Canonical Final Handoff #106](docs/plans/master-catalog/106-phase4-master-catalog-exact-remaining-work-handoff.md)
+> and [Final Closeout Result #107](docs/plans/master-catalog/107-phase4-p49-master-catalog-final-closeout-result.md)
+> as the current authority. A read-only Production recheck at
+> `2026-08-29 01:38:54 +07` reconfirmed migrations 027 then 028 (no 029),
+> catalog `2568.1.0` at `710/710`, the reviewed prices, the three catalog flags
+> plus migration-028 functions/raw `app_settings` ACL, unchanged Factor F, and
+> `0` working drafts at that instant; it made
+> no write. Dated rollout or gate wording elsewhere is historical chronology,
+> not current work or replay authority.
+
 ---
 
 ## 📖 Overview

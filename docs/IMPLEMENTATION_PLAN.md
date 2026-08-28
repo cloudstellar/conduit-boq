@@ -1,11 +1,23 @@
 # Implementation Plan
 ## ระบบประมาณราคาท่อร้อยสายสื่อสารใต้ดิน (Conduit BOQ)
 
+<!-- MASTER_CATALOG_CURRENT_STATE_20260829 -->
+> [!IMPORTANT]
+> **Current-state addendum (2026-08-29):** Master Catalog Phase 4 and P-49 are
+> complete end-to-end. See [Handoff #106](./plans/master-catalog/106-phase4-master-catalog-exact-remaining-work-handoff.md)
+> and [Result #107](./plans/master-catalog/107-phase4-p49-master-catalog-final-closeout-result.md).
+> A read-only Production recheck at `2026-08-29 01:38:54 +07` reconfirmed 027
+> then 028 with no 029, `2568.1.0` at `710/710`, reviewed prices, unchanged
+> Factor F, the three catalog flags plus migration-028 functions/raw
+> `app_settings` ACL, and `0` working drafts at that instant; it made no write.
+> Dated rollout, approval, and gate sections below are
+> historical chronology and do not authorize a replay.
+
 ---
 
 ## 📋 Project Overview
 
-**Current Version:** v1.6.0 (Added Excel export via `exceljs`)  
+**Historical application-version label (document snapshot):** v1.6.0 (Added Excel export via `exceljs`)
 **Production URL:** Deployed on Vercel  
 
 ---
@@ -41,7 +53,7 @@ Next.js 16 + React 19 + TypeScript + Tailwind CSS 4
 
 **Strategy:** Quality Baseline → P0 Containment → Foundation (DB) → Integration (Codebase) → Hardening (Locks) → Governance (Admin GUI)
 
-**Current rollout state (2026-06-22):** P0 → Phase 1A → Phase 2 → Phase 1B is
+**Historical rollout state (2026-06-22):** P0 → Phase 1A → Phase 2 → Phase 1B is
 complete in Production. Active/default version `2568.0.0` contains 710 rows;
 the version-aware application and hardening are deployed and verified. See the
 [Production verification report](./plans/master-catalog/05-verification-report.md).
@@ -111,14 +123,16 @@ the version-aware application and hardening are deployed and verified. See the
 - Set `boq.price_list_version_id` to `NOT NULL`.
 - Enable `trigger_prevent_boq_version_modification` to seal historical BOQ version states.
 
-#### **Phase 4: Catalog Administration & Official Publication — planned**
+#### **Phase 4: Catalog Administration & Official Publication — historical pre-release plan**
 
 The earlier three-bullet GUI sketch is superseded by the reviewed
 [Revision 8 architecture plan](./plans/master-catalog/08-phase4-architecture-ci-plan.md)
 and [Phase 4 Change Request](./plans/master-catalog/09-phase4-change-request.md).
 Phase 4 now includes stable identity, manual and fixed-profile Excel changes,
 full item history, immutable publish, official hashed Excel/PDF, and audited
-pointer restore. It has not started and requires owner approval.
+pointer restore. At this document's 2026-06-22 snapshot, it had not started
+and required owner approval. The current completion state is owned by the
+2026-08-29 supersession block above and #106/#107.
 
 #### **Factor F Change Track — completed before Master Catalog Phase 4**
 

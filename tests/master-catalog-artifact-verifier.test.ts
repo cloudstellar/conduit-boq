@@ -96,6 +96,45 @@ describe('Master Catalog artifact verifier', () => {
     expect(result.artifacts.pdf?.semantic.pageCount).toBe(3);
   });
 
+  it('accepts a historical schema 1 manifest with a complete category-local proof', async () => {
+    const manifestPath = await writeFixture({
+      schemaVersion: 1,
+      domProof: makeLegacyCategoryLocalProof(),
+    });
+    const result = await verifyMasterCatalogArtifacts(manifestPath);
+
+    expect(result.status).toBe('passed');
+    expect(result.failures).toEqual([]);
+  });
+
+  it('fails closed when a schema 1 category-local proof is incomplete', async () => {
+    const categoryLocalProof = makeLegacyCategoryLocalProof();
+    delete categoryLocalProof.headingRowLinkBreakCount;
+    const manifestPath = await writeFixture({
+      schemaVersion: 1,
+      domProof: categoryLocalProof,
+    });
+    const result = await verifyMasterCatalogArtifacts(manifestPath);
+
+    expect(result.status).toBe('failed');
+    expect(result.failures).toContain(
+      'DOM category heading and item-row linkage is invalid',
+    );
+  });
+
+  it('fails closed on an unknown schema 1 numbering proof mode', async () => {
+    const manifestPath = await writeFixture({
+      schemaVersion: 1,
+      domProof: { numberingMode: 'unexpected-mode' },
+    });
+    const result = await verifyMasterCatalogArtifacts(manifestPath);
+
+    expect(result.status).toBe('failed');
+    expect(result.failures).toContain(
+      'DOM numbering mode is unsupported: unexpected-mode',
+    );
+  });
+
   it('accepts a mixed official PDF that excludes inactive rows while Excel stays complete', async () => {
     const manifestPath = await writeFixture({ inactiveSecondRow: true });
     const result = await verifyMasterCatalogArtifacts(manifestPath);
@@ -127,6 +166,85 @@ describe('Master Catalog artifact verifier', () => {
 
     expect(result.status).toBe('failed');
     expect(result.failures).toContain('DOM category-local sequence contains a break');
+  });
+
+  it('verifies optional schema 2 category headings including a page continuation', async () => {
+    const manifestPath = await writeFixture({
+      categoryHeadingProof: makeCategoryHeadingProof(),
+      domProof: { priceSectionCount: 2, expectedPageCount: 3 },
+    });
+    const result = await verifyMasterCatalogArtifacts(manifestPath);
+
+    expect(result.status).toBe('passed');
+    expect(result.failures).toEqual([]);
+  });
+
+  it('fails closed when a schema 2 heading has invalid continuation semantics', async () => {
+    const proof = makeCategoryHeadingProof();
+    proof.pages[1].entries[0].continuationAttribute = 'false';
+    const manifestPath = await writeFixture({
+      categoryHeadingProof: proof,
+      domProof: { priceSectionCount: 2, expectedPageCount: 3 },
+    });
+    const result = await verifyMasterCatalogArtifacts(manifestPath);
+
+    expect(result.status).toBe('failed');
+    expect(result.failures).toContain(
+      'DOM category-heading continuation placement mismatch: 1:0',
+    );
+    expect(result.failures).toContain(
+      'DOM category-heading initial heading count mismatch: code:1.1',
+    );
+  });
+
+  it('fails closed on schema 2 heading metadata, exact text, or row-link drift', async () => {
+    const proof = makeCategoryHeadingProof();
+    proof.pages[0].entries[0].categoryLabel = 'หมวดอื่น';
+    proof.pages[0].entries[0].text = '1.1. ข้อความที่ไม่ตรง';
+    proof.pages[0].entries[1].categoryKey = 'code:9.9';
+    const manifestPath = await writeFixture({
+      categoryHeadingProof: proof,
+      domProof: { priceSectionCount: 2, expectedPageCount: 3 },
+    });
+    const result = await verifyMasterCatalogArtifacts(manifestPath);
+
+    expect(result.status).toBe('failed');
+    expect(result.failures).toContain('DOM category-heading metadata mismatch: code:1.1');
+    expect(result.failures).toContain('DOM category-heading text mismatch: 0:0');
+    expect(result.failures).toContain('DOM category-heading row linkage mismatch: 0:0');
+    expect(result.failures).toContain('DOM category-heading proof row order mismatch at index 0');
+  });
+
+  it('fails closed when schema 2 heading proof omits the one initial heading', async () => {
+    const proof = makeCategoryHeadingProof();
+    proof.pages[0].entries.splice(0, 1);
+    const manifestPath = await writeFixture({
+      categoryHeadingProof: proof,
+      domProof: { priceSectionCount: 2, expectedPageCount: 3 },
+    });
+    const result = await verifyMasterCatalogArtifacts(manifestPath);
+
+    expect(result.status).toBe('failed');
+    expect(result.failures).toContain(
+      'DOM category-heading initial heading count mismatch: code:1.1',
+    );
+    expect(result.failures).toContain('DOM category-heading active-row linkage mismatch: 0:0');
+  });
+
+  it('fails closed when a schema 2 heading-proof page is empty', async () => {
+    const proof = makeCategoryHeadingProof();
+    proof.pages[0].entries.push(proof.pages[1].entries[1]);
+    proof.pages[1].entries = [];
+    const manifestPath = await writeFixture({
+      categoryHeadingProof: proof,
+      domProof: { priceSectionCount: 2, expectedPageCount: 3 },
+    });
+    const result = await verifyMasterCatalogArtifacts(manifestPath);
+
+    expect(result.status).toBe('failed');
+    expect(result.failures).toContain(
+      'DOM category-heading proof page 1 has no heading followed by a row',
+    );
   });
 
   it('fails closed instead of coercing a null schema 2 count to zero', async () => {
@@ -229,6 +347,7 @@ async function writeFixture(options: {
   reversePdfRows?: boolean;
   domProof?: Record<string, unknown>;
   pdfPresentation?: Record<string, unknown>;
+  categoryHeadingProof?: unknown;
 } = {}): Promise<string> {
   const directory = await mkdtemp(join(tmpdir(), 'master-catalog-artifacts-'));
   temporaryDirectories.push(directory);
@@ -311,6 +430,9 @@ async function writeFixture(options: {
         categorySequenceBreakCount: 0,
         categoryReentryCount: 0,
         categoryCount: displayedItemCount === 0 ? 0 : 1,
+        ...(typeof options.categoryHeadingProof === 'undefined'
+          ? {}
+          : { categoryHeadingProof: options.categoryHeadingProof }),
         priceSectionCount: displayedItemCount === 0 ? 0 : 1,
         expectedPageCount: displayedItemCount === 0 ? 1 : 2,
         hashPresent: true,
@@ -365,6 +487,68 @@ async function writeFixture(options: {
   const manifestPath = join(directory, 'artifact-manifest.json');
   await writeFile(manifestPath, `${JSON.stringify(manifest, null, 2)}\n`);
   return manifestPath;
+}
+
+function makeLegacyCategoryLocalProof(): Record<string, number | string> {
+  return {
+    numberingMode: 'category-local',
+    nonNumericDisplayOrderCount: 0,
+    uniqueDisplayOrderCount: 2,
+    displayOrderMin: 0,
+    displayOrderMax: 1,
+    displayOrderSetBreakCount: 0,
+    displayOrderDomBreakCount: 0,
+    missingCategoryKeyCount: 0,
+    categoryCount: 1,
+    nonNumericCategorySequenceCount: 0,
+    nonNumericVisibleSequenceCount: 0,
+    categorySequenceBreakCount: 0,
+    visibleSequenceMismatchCount: 0,
+    categoryReentryCount: 0,
+    categoryOrderBreakCount: 0,
+    withinCategoryDisplayOrderBreakCount: 0,
+    initialCategoryHeadingBreakCount: 0,
+    invalidHeadingContinuationAttributeCount: 0,
+    headingRowLinkBreakCount: 0,
+    continuationPlacementBreakCount: 0,
+    continuationTextMismatchCount: 0,
+  };
+}
+
+function makeCategoryHeadingProof() {
+  return {
+    proofVersion: 1,
+    pages: [
+      {
+        pageIndex: 0,
+        entries: [
+          {
+            kind: 'heading',
+            categoryKey: 'code:1.1',
+            categoryCode: '1.1',
+            categoryLabel: 'หมวดทดสอบ',
+            continuationAttribute: 'false',
+            text: '1.1. หมวดทดสอบ',
+          },
+          { kind: 'row', categoryKey: 'code:1.1', itemCode: 'AAA-BBB-001' },
+        ],
+      },
+      {
+        pageIndex: 1,
+        entries: [
+          {
+            kind: 'heading',
+            categoryKey: 'code:1.1',
+            categoryCode: '1.1',
+            categoryLabel: 'หมวดทดสอบ',
+            continuationAttribute: 'true',
+            text: '1.1. หมวดทดสอบ (ต่อ)',
+          },
+          { kind: 'row', categoryKey: 'code:1.1', itemCode: 'AAA-BBB-002' },
+        ],
+      },
+    ],
+  };
 }
 
 function makePdfParityRows(

@@ -2,13 +2,21 @@
 
 > [!NOTE]
 > This guide documents the historical `002_add_multi_route_support.sql`
-> workflow only. For the canonical migration ledger and Master Catalog v26
+> workflow only. For the canonical migration ledger and current Master Catalog
 > rollout artifacts, use
-> [`docs/04_data/MIGRATIONS.md`](../docs/04_data/MIGRATIONS.md). The current
-> generic Local bootstrap replays `009`-`015`, Production hotfix `016`,
-> then Phase 4 `017`-`026`. Applied migration 027 and Local-only candidate
-> 028 are exact-ledger-bound and require an isolated post-027 rehearsal; they
-> must not be appended blindly to `scripts/bootstrap-local-db.sh`.
+> [`docs/04_data/MIGRATIONS.md`](../docs/04_data/MIGRATIONS.md), [Canonical
+> Handoff #106](../docs/plans/master-catalog/106-phase4-master-catalog-exact-remaining-work-handoff.md),
+> and [Closeout Result
+> #107](../docs/plans/master-catalog/107-phase4-p49-master-catalog-final-closeout-result.md).
+>
+> Production evidence recorded on 2026-08-28 shows migration 027 and migration
+> 028 applied exactly once. Both files are immutable and **must not be edited,
+> retried, or replayed**. Migration 028 is ledger-bound as
+> `20260828070433/master_catalog_admin_gate_projection` with source SHA-256
+> `6c03dff28d6f71bc4468ba799c70f8a1a7222017353d23f6446bb4be4fb006e3`.
+> Repository/document convergence requires no migration 029 and no database
+> write. Do not append 027/028 blindly to a bootstrap or infer permission for a
+> new migration from this historical guide.
 
 ## 📋 Overview
 This migration adds multi-route support to the BOQ system while preserving all existing data.

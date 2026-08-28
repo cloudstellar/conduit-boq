@@ -1,9 +1,19 @@
 # Security Model: Current Runtime and P-49 Target
 
+<!-- MAIN_CONVERGENCE_TEMPORAL_ADDENDUM_20260829 -->
+> **Repository convergence addendum (2026-08-29):** Commit `f3ccc6e...` below
+> is the 2026-08-28 runtime release baseline/ancestor recorded by #106/#107;
+> it is not the repository identity to copy after this convergence. The
+> repository commit containing this addendum is a docs/verifier-only
+> descendant with unchanged application runtime and migration SQL tree. After
+> convergence succeeds, resolve and verify the exact `main` and Vercel SHAs
+> independently. This convergence performs no database write.
+
 **Current status (2026-08-28):** Migrations 027 and 028 and the matching
 application hardening are live; `pending = profile/onboarding-only` is
 enforced. P-13, P-14, P-14C, and P-15 are complete and must not be replayed.
-Exact release `f3ccc6e...` is Vercel Production `Ready`. The full audited
+Runtime release baseline `f3ccc6e...` was Vercel Production `Ready` on
+2026-08-28. The full audited
 Master Catalog draft workflow is live with Admin, New identity, and Retirement
 exact boolean `true/true/true`. Published rows remain immutable and published
 identities are never hard-deleted. Staged Production QA and P-49 formal

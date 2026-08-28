@@ -2,14 +2,26 @@
 ## Conduit BOQ System
 
 **Last Updated:** 2026-08-18
-**Status:** P-49 target canonical; risk open/high; remediation deferred under
-P-51; P-13 separately unauthorized
+**Historical snapshot:** P-49 target before its completed Production
+remediation and formal closeout
 
+<!-- MASTER_CATALOG_CURRENT_STATE_20260829 -->
 > [!IMPORTANT]
-> P-49 supersedes the former `pending = own BOQ` business rule. The target is
-> profile/onboarding-only, but current BOQ RLS/RPC and profile grants are not yet
-> aligned. P-51 accepts that exposure temporarily only for the exact first
-> closeout; it does not change this target or authorize a gate. See
+> **Current state:** P-49 implementation and formal closeout are complete; see
+> [Handoff #106](../plans/master-catalog/106-phase4-master-catalog-exact-remaining-work-handoff.md)
+> and [Result #107](../plans/master-catalog/107-phase4-p49-master-catalog-final-closeout-result.md).
+> A read-only Production recheck at `2026-08-29 01:38:54 +07` reconfirmed the
+> three catalog flags plus migration-028 functions/raw `app_settings` ACL,
+> migrations 027 then 028 with no 029, and `0` working drafts at that instant;
+> it made no write. The former
+> open-risk and deferred-remediation wording below is historical chronology,
+> not the current access state or replay authority.
+
+> [!NOTE]
+> **Historical P-49 note (2026-08-18):** P-49 superseded the former
+> `pending = own BOQ` business rule. Its target was profile/onboarding-only,
+> while the BOQ RLS/RPC and profile grants were not yet aligned at that date.
+> P-51 temporarily accepted that exposure for the exact first closeout. See
 > [P-51 Plan](../plans/master-catalog/48-phase4-p51-risk-accepted-master-catalog-closeout-plan.md).
 
 ---
@@ -54,7 +66,7 @@ P-51; P-13 separately unauthorized
 | Status | Meaning | Access Level |
 |--------|---------|--------------|
 | `active` | Full access per role | Normal |
-| `pending` | Authenticated user waiting admin approval | Profile/onboarding only; no business access (P-49 target, not yet fully enforced) |
+| `pending` | Authenticated user waiting admin approval | Profile/onboarding only; no business access (completed P-49 contract; #106/#107) |
 | `inactive` | Disabled but not deleted | No business access; own blocked status and auth self-service only; no profile edits |
 | `suspended` | Temporarily blocked | No business access; own blocked status and auth self-service only; no profile edits |
 
@@ -83,15 +95,13 @@ selectors needed for onboarding. It may not use Dashboard, BOQ (including its
 own retained BOQs), Price List/Master Catalog, Factor F, print/export, admin,
 or privileged RPC/API paths until `status='active'`.
 
-This is the approved P-49 target. It is not yet the complete runtime contract:
-`007`, `009`, `012`, and `016` still expose non-active settings/business paths;
-authenticated role helpers disclose or trust stored role without active status;
-raw settings and all selector rows are too broad; broad profile SELECT/INSERT/
-UPDATE may expose every row, permit missing-profile active self-creation, and
-allow protected-column mutation; and one privileged API checks admin role
-without active status.
-UI/middleware changes alone are insufficient. Inactive/suspended self-profile
-edits and generic status transitions must also fail in the target state machine.
+This is the completed P-49 contract. The implementation and formal closeout are
+recorded in #106/#107. The broad-path inventory that motivated the correction
+is retained in the historical P-49 plans; UI/middleware changes alone remain
+insufficient as a general security rule. The 2026-08-29 read-only recheck was
+scoped to the three catalog flags, migration-028 functions/raw `app_settings`
+ACL, and the other explicitly listed closeout invariants; it was not a fresh
+rehearsal of every persona and predicate.
 
 ### 5.2 Legacy = Admin-only
 BOQ with `created_by IS NULL` is only visible to admins.
@@ -99,25 +109,33 @@ BOQ with `created_by IS NULL` is only visible to admins.
 > [!NOTE]
 > Fixed in v1.2.0: `lib/permissions.ts` now correctly blocks legacy for staff (matching RLS).
 
-### 5.3 Org Lock
-After onboarding, user cannot change `department_id` or `sector_id`.
-- Enforced by: `trg_lock_org_fields_after_onboarding` trigger
-- Admin bypass: Admins can still modify these fields
+### 5.3 Current P-49 profile mutation guard
 
-The current trigger does not lock `role` or `status`; P-49 still requires a
-separately authorized forward-only protected-field boundary after the first
-P-15 closeout.
+Migration 027 removed `public.lock_org_fields_after_onboarding()` and
+`trg_lock_org`. The current row guard is private function
+`private.p49_guard_user_profile_mutation()` on trigger
+`trg_p49_guard_user_profile_mutation`; approved Admin state transitions pass
+through the guarded P-49 transition RPCs.
+
+**Historical pre-remediation note:** The v1.2.0 snapshot used
+`trg_lock_org_fields_after_onboarding` and did not lock `role` or `status`.
+That object description is not the current schema.
 
 ### 5.4 Separation of Duties
 - Creator cannot approve their own BOQ
 - Enforced in both UI (`can()`) and RLS policies
 
 ### 5.5 RPC Approve
-Admin uses `admin_approve_user()` for atomic approval:
+Admin uses
+`admin_approve_user(p_target_id uuid, p_request_id uuid, p_reason text)` for
+the current atomic P-49 approval transition:
 - Copies `requested_department_id` → `department_id`
 - Copies `requested_sector_id` → `sector_id`
 - Sets `status` = `active`
 - Sets `approved_at`, `approved_by`
+
+Migration 027 dropped the historical one-argument
+`admin_approve_user(p_target_id uuid)` function.
 
 ---
 
@@ -125,20 +143,20 @@ Admin uses `admin_approve_user()` for atomic approval:
 
 | File | Purpose |
 |------|---------|
-| `lib/permissions.ts` | Client-side UI checks; current pending rule is superseded and awaiting implementation |
+| `lib/permissions.ts` | Client-side UI checks; P-49 completion is recorded in #106/#107 |
 | `migrations/008_rls_and_trigger.sql` | Historical DB enforcement; applied bytes remain immutable |
 | `app/admin/page.tsx` | Admin UI calls RPC |
-| `docs/plans/master-catalog/45-phase4-p49-pending-authorization-hardening-plan.md` | Current target, gap inventory, and acceptance gates |
+| `docs/plans/master-catalog/45-phase4-p49-pending-authorization-hardening-plan.md` | Historical target, gap inventory, and acceptance gates |
 
 ---
 
 ## 7. Verification
 
 The legacy `scripts/test-rls-security.sql` pending-own-BOQ expectation is no
-longer canonical. During post-P-15 P-49 remediation, run the real-session
-status x resource x action matrix across DB policies/grants/RPC, page and API
-deep links, protected profile columns, transition E2E, and unchanged
-active-user behavior.
+longer canonical. The P-49 implementation and bounded Production closeout are
+recorded in #106/#107. The expanded Production persona rehearsal that was not
+run remains an accepted residual, not PASS; do not infer that it ran from this
+completed contract.
 
 ---
 

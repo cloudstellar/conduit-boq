@@ -1,11 +1,23 @@
 # Implementation Plan
 ## ระบบประมาณราคาท่อร้อยสายสื่อสารใต้ดิน (Conduit BOQ)
 
+<!-- MASTER_CATALOG_CURRENT_STATE_20260829 -->
+> [!IMPORTANT]
+> **Current-state addendum (2026-08-29):** Master Catalog Phase 4 and P-49 are
+> complete end-to-end. See [Handoff #106](../plans/master-catalog/106-phase4-master-catalog-exact-remaining-work-handoff.md)
+> and [Result #107](../plans/master-catalog/107-phase4-p49-master-catalog-final-closeout-result.md).
+> A read-only Production recheck at `2026-08-29 01:38:54 +07` reconfirmed 027
+> then 028 with no 029, `2568.1.0` at `710/710`, reviewed prices, unchanged
+> Factor F, the three catalog flags plus migration-028 functions/raw
+> `app_settings` ACL, and `0` working drafts at that instant; it made no write.
+> Dated rollout, approval, and gate sections below are
+> historical chronology and do not authorize a replay.
+
 ---
 
 ## 📋 Project Overview
 
-**Current Version:** v1.6.0 (Excel export + Factor F correction)
+**Historical application-version label (document snapshot):** v1.6.0 (Excel export + Factor F correction)
 **Production URL:** Deployed on Vercel  
 
 ---
@@ -41,7 +53,7 @@ Next.js 16 + React 19 + TypeScript + Tailwind CSS 4
 
 **Strategy:** Quality Baseline → P0 Containment → Nullable DB Setup → Application Integration → DB Hardening → Future Governance
 
-**Current rollout state (2026-06-22):** Production P0 → Phase 1A → Phase 2 →
+**Historical rollout state (2026-06-22):** Production P0 → Phase 1A → Phase 2 →
 Phase 1B completed on 2026-06-21. The active/default version is `2568.0.0`
 with 710 rows. Migrations `009`, `010`, four operational `010a` indexes, and
 `011` are applied and verified; the version-aware Phase 2 application was
@@ -94,7 +106,7 @@ the user creates a new BOQ copy/revision and chooses an active Factor F version.
 Closeout evidence:
 [Factor F Production Rollout Closeout](../plans/factor-f/10-production-rollout-closeout.md).
 
-### 🚧 Phase 4: Catalog Administration and Official Publication (LOCAL IN PROGRESS)
+### Phase 4: Historical local pre-release plan
 
 Admin manual change/import, stable identity, item history, catalog publish,
 official stamped Excel/PDF, and audited pointer restore require the separate
@@ -106,11 +118,13 @@ Catalog Phase 4 database migrations start at `017+`, and every Phase 4
 preflight must preserve Factor F version bindings, hotfix `016` BOQ item suffix
 behavior, and live legacy snapshot state.
 
-Current status is owned by the Phase 4 Tracker: WP-6/P-11 is complete and
-WP-6.5 passed its bounded reliability scope, but the 2026-07-12 owner/developer
-capability audit found operator/authority gaps. WP-6.6 must close those gaps
-before WP-7; proposed P-18 placement is WP-7.5. Production Phase 4 remains not
-started and requires P-12 through P-15. See
+At this plan's 2026-07-12 snapshot, status was owned by the Phase 4 Tracker:
+WP-6/P-11 was complete and WP-6.5 had passed its bounded reliability scope,
+but the owner/developer capability audit had found operator/authority gaps.
+WP-6.6 still had to close those gaps before WP-7; proposed P-18 placement was
+WP-7.5. Production Phase 4 had not started and required P-12 through P-15 at
+that snapshot. The current completion state is owned by the 2026-08-29
+supersession block above and #106/#107. See
 [Capability Audit #29](../plans/master-catalog/29-phase4-owner-dev-completeness-audit.md).
 
 Start review from the

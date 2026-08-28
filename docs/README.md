@@ -3,6 +3,15 @@
 
 ---
 
+> [!IMPORTANT]
+> AI agents and maintainers must start at
+> [`08_ai/AI_HANDOFF.md`](./08_ai/AI_HANDOFF.md). For the completed Master
+> Catalog Production state, [Handoff
+> #106](./plans/master-catalog/106-phase4-master-catalog-exact-remaining-work-handoff.md)
+> and [Result
+> #107](./plans/master-catalog/107-phase4-p49-master-catalog-final-closeout-result.md)
+> are canonical. The older [`docs/ai/`](./ai/README.md) tree is historical.
+
 ## 📖 Overview
 
 ระบบ Conduit BOQ เป็น web application สำหรับประมาณราคางานท่อร้อยสายสื่อสารใต้ดิน พัฒนาสำหรับ บมจ. โทรคมนาคมแห่งชาติ (NT)
@@ -88,22 +97,19 @@ conduit-boq/
 | [CODEBASE_DATABASE_MAP.md](./CODEBASE_DATABASE_MAP.md) | Detailed codebase and production database map |
 | [km/README.md](./km/README.md) | Knowledge Management competition document packet |
 | [PRD.md](./PRD.md) | Product Requirements Document |
-| [KNOWLEDGE_BASE.md](./KNOWLEDGE_BASE.md) | User guide & troubleshooting |
+| [KNOWLEDGE_BASE.md](./01_overview/KNOWLEDGE_BASE.md) | User guide & troubleshooting |
 | [IMPLEMENTATION_PLAN.md](./IMPLEMENTATION_PLAN.md) | Technical implementation details |
-| [TECHNICAL.md](./TECHNICAL.md) | Developer technical reference |
-| [DATABASE_SCHEMA.md](./DATABASE_SCHEMA.md) | Database tables and relationships |
+| [Engineering docs](./06_engineering/) | Current developer technical references |
+| [DATABASE_SCHEMA.md](./04_data/DATABASE_SCHEMA.md) | Database tables and relationships |
 
-### AI-Native Documentation (`docs/ai/`)
+### Current AI Handoff (`docs/08_ai/`)
+
 | Document | Description |
 |----------|-------------|
-| [AI_CONTEXT.md](./ai/AI_CONTEXT.md) | **START HERE** - AI agent rules and workflow |
-| [PROJECT_CONTEXT.md](./ai/PROJECT_CONTEXT.md) | Business goals, users, domain terms |
-| [DOMAIN_MODEL.md](./ai/DOMAIN_MODEL.md) | Entities, relationships, business rules |
-| [SYSTEM_ARCHITECTURE.md](./ai/SYSTEM_ARCHITECTURE.md) | Tech stack, layers, data flow |
-| [BOQ_CALCULATION_LOGIC.md](./ai/BOQ_CALCULATION_LOGIC.md) | How costs are calculated |
-| [ROADMAP.md](./ai/ROADMAP.md) | Phase-based development plan |
-| [HANDOFF.md](./ai/HANDOFF.md) | Session continuity template |
-| [DECISIONS/ADR-001](./ai/DECISIONS/ADR-001-supabase-rls-authorization.md) | Why RLS for authorization |
+| [AI_HANDOFF.md](./08_ai/AI_HANDOFF.md) | **START HERE** — current repository and Master Catalog handoff |
+| [AI_CONTEXT.md](./08_ai/AI_CONTEXT.md) | Current agent authority, safety, and source-of-truth map |
+| [LESSONS_LEARNED.md](./08_ai/LESSONS_LEARNED.md) | Durable technical lessons and invariants |
+| [Historical `docs/ai/` index](./ai/README.md) | Legacy Phase 1/2 context; not current status authority |
 
 ---
 

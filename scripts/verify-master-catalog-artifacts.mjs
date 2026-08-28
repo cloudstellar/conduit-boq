@@ -448,10 +448,13 @@ function verifyDomProof(domProof, version, pdfPresentation, schemaVersion, failu
   if (schemaVersion === LEGACY_ARTIFACT_MANIFEST_SCHEMA_VERSION) {
     const expectedItemCount = Number(version?.itemCount)
     if (Number(domProof.rowCount) !== expectedItemCount) failures.push('DOM row count mismatch')
-    if (Number(domProof.firstSeqInDom) !== 1) failures.push('DOM first sequence is not 1')
-    if (Number(domProof.lastSeqInDom) !== expectedItemCount) failures.push('DOM last sequence mismatch')
-    if (Number(domProof.uniqueSeqCount) !== expectedItemCount) failures.push('DOM unique sequence mismatch')
-    if (Number(domProof.sequenceBreakCount) !== 0) failures.push('DOM sequence contains a break')
+    if (typeof domProof.numberingMode === 'undefined') {
+      verifyLegacyGlobalDomNumbering(domProof, expectedItemCount, failures)
+    } else if (domProof.numberingMode === 'category-local') {
+      verifyLegacyCategoryLocalDomNumbering(domProof, expectedItemCount, failures)
+    } else {
+      failures.push(`DOM numbering mode is unsupported: ${String(domProof.numberingMode)}`)
+    }
     if (!Number.isInteger(priceSectionCount) || priceSectionCount < 1) {
       failures.push('DOM price section count is invalid')
     }
@@ -466,6 +469,150 @@ function verifyDomProof(domProof, version, pdfPresentation, schemaVersion, failu
 
   if (expectedPageCount !== priceSectionCount + 1) {
     failures.push('DOM expected page count must equal cover plus price sections')
+  }
+}
+
+function verifyLegacyGlobalDomNumbering(domProof, expectedItemCount, failures) {
+  if (Number(domProof.firstSeqInDom) !== 1) failures.push('DOM first sequence is not 1')
+  if (Number(domProof.lastSeqInDom) !== expectedItemCount) failures.push('DOM last sequence mismatch')
+  if (Number(domProof.uniqueSeqCount) !== expectedItemCount) failures.push('DOM unique sequence mismatch')
+  if (Number(domProof.sequenceBreakCount) !== 0) failures.push('DOM sequence contains a break')
+}
+
+function verifyLegacyCategoryLocalDomNumbering(domProof, expectedItemCount, failures) {
+  assertDomInteger(
+    domProof,
+    'nonNumericDisplayOrderCount',
+    0,
+    'DOM display-order values must all be numeric integers',
+    failures,
+  )
+  assertDomInteger(
+    domProof,
+    'uniqueDisplayOrderCount',
+    expectedItemCount,
+    'DOM unique display-order count mismatch',
+    failures,
+  )
+  assertDomInteger(domProof, 'displayOrderMin', 0, 'DOM minimum display order is not 0', failures)
+  assertDomInteger(
+    domProof,
+    'displayOrderMax',
+    expectedItemCount - 1,
+    'DOM maximum display order mismatch',
+    failures,
+  )
+  assertDomInteger(
+    domProof,
+    'displayOrderSetBreakCount',
+    0,
+    'DOM display-order set is not contiguous 0..N-1',
+    failures,
+  )
+  if (
+    !Number.isInteger(domProof.displayOrderDomBreakCount)
+    || domProof.displayOrderDomBreakCount < 0
+  ) {
+    failures.push('DOM display-order-in-DOM break count is invalid')
+  }
+
+  assertDomInteger(domProof, 'missingCategoryKeyCount', 0, 'DOM category key is missing', failures)
+  if (
+    !Number.isInteger(domProof.categoryCount)
+    || domProof.categoryCount < 1
+    || domProof.categoryCount > expectedItemCount
+  ) {
+    failures.push('DOM category count is invalid')
+  }
+  assertDomInteger(
+    domProof,
+    'nonNumericCategorySequenceCount',
+    0,
+    'DOM category sequence values must all be numeric integers',
+    failures,
+  )
+  assertDomInteger(
+    domProof,
+    'nonNumericVisibleSequenceCount',
+    0,
+    'DOM visible sequence values must all be numeric integers',
+    failures,
+  )
+  assertDomInteger(
+    domProof,
+    'categorySequenceBreakCount',
+    0,
+    'DOM category sequence contains a break',
+    failures,
+  )
+  assertDomInteger(
+    domProof,
+    'visibleSequenceMismatchCount',
+    0,
+    'DOM visible sequence does not match category sequence',
+    failures,
+  )
+  assertDomInteger(
+    domProof,
+    'categoryReentryCount',
+    0,
+    'DOM category block re-enters after closing',
+    failures,
+  )
+  assertDomInteger(
+    domProof,
+    'categoryOrderBreakCount',
+    0,
+    'DOM category blocks do not follow first global display-order occurrence',
+    failures,
+  )
+  assertDomInteger(
+    domProof,
+    'withinCategoryDisplayOrderBreakCount',
+    0,
+    'DOM display order is not strictly ascending within a category',
+    failures,
+  )
+  assertDomInteger(
+    domProof,
+    'initialCategoryHeadingBreakCount',
+    0,
+    'DOM category must have exactly one non-continuation heading',
+    failures,
+  )
+  assertDomInteger(
+    domProof,
+    'invalidHeadingContinuationAttributeCount',
+    0,
+    'DOM category heading continuation attribute is invalid',
+    failures,
+  )
+  assertDomInteger(
+    domProof,
+    'headingRowLinkBreakCount',
+    0,
+    'DOM category heading and item-row linkage is invalid',
+    failures,
+  )
+  assertDomInteger(
+    domProof,
+    'continuationPlacementBreakCount',
+    0,
+    'DOM continuation heading is not at a valid page boundary',
+    failures,
+  )
+  assertDomInteger(
+    domProof,
+    'continuationTextMismatchCount',
+    0,
+    'DOM continuation heading text does not match its continuation attribute',
+    failures,
+  )
+}
+
+function assertDomInteger(domProof, field, expected, failure, failures) {
+  if (!Number.isInteger(domProof[field]) || domProof[field] !== expected) {
+    failures.push(failure)
   }
 }
 
@@ -560,6 +707,7 @@ function verifyP19DomProof(domProof, version, pdfPresentation, failures) {
   if (!Number.isInteger(categoryCount) || categoryCount < (rowCount === 0 ? 0 : 1)) {
     failures.push('DOM category count is invalid')
   }
+  verifyOptionalCategoryHeadingProof(domProof, failures)
 
   if (version?.status === 'draft') {
     if (Number(domProof.activeRowCount) !== activeItemCount) {
@@ -582,6 +730,211 @@ function verifyP19DomProof(domProof, version, pdfPresentation, failures) {
       failures.push('Official DOM contains an inactive-row marker')
     }
   }
+}
+
+function verifyOptionalCategoryHeadingProof(domProof, failures) {
+  if (typeof domProof.categoryHeadingProof === 'undefined') return
+
+  const proof = domProof.categoryHeadingProof
+  if (!proof || typeof proof !== 'object' || proof.proofVersion !== 1) {
+    failures.push('DOM category-heading proof metadata is invalid')
+    return
+  }
+  if (!Array.isArray(proof.pages)) {
+    failures.push('DOM category-heading proof pages are missing')
+    return
+  }
+
+  const priceSectionCount = Number(domProof.priceSectionCount)
+  if (proof.pages.length !== priceSectionCount) {
+    failures.push('DOM category-heading proof page count mismatch')
+  }
+
+  const displayedRows = Array.isArray(domProof.displayedRows) ? domProof.displayedRows : []
+  const expectedMetadata = new Map()
+  for (const row of displayedRows) {
+    if (!row || typeof row !== 'object') continue
+    const categoryCode = normalizedPdfCategoryText(row.categoryCode)
+    const categoryName = normalizedPdfCategoryText(row.categoryName)
+    const categoryKey = pdfCategoryKey({
+      category_code: categoryCode,
+      category_name: categoryName,
+    })
+    const metadata = {
+      categoryCode: categoryCode ?? '',
+      categoryLabel: categoryName ?? categoryCode ?? 'ไม่ระบุหมวดหมู่',
+    }
+    const previous = expectedMetadata.get(categoryKey)
+    if (
+      previous
+      && (
+        previous.categoryCode !== metadata.categoryCode
+        || previous.categoryLabel !== metadata.categoryLabel
+      )
+    ) {
+      failures.push(`DOM category-heading row metadata conflicts for ${categoryKey}`)
+    } else {
+      expectedMetadata.set(categoryKey, metadata)
+    }
+  }
+
+  const seenInitialHeadings = new Map()
+  const proofRows = []
+  const seenCoordinates = new Set()
+  let previousPageLastRowCategoryKey = null
+  for (let pageArrayIndex = 0; pageArrayIndex < proof.pages.length; pageArrayIndex += 1) {
+    const page = proof.pages[pageArrayIndex]
+    if (
+      !page
+      || typeof page !== 'object'
+      || page.pageIndex !== pageArrayIndex
+      || !Array.isArray(page.entries)
+    ) {
+      failures.push(`DOM category-heading proof page ${pageArrayIndex} is invalid`)
+      previousPageLastRowCategoryKey = null
+      continue
+    }
+    const hasLinkedHeadingAndRow = page.entries.some((entry, entryIndex) => {
+      const nextEntry = page.entries[entryIndex + 1]
+      return entry?.kind === 'heading'
+        && typeof entry.categoryKey === 'string'
+        && entry.categoryKey.length > 0
+        && nextEntry?.kind === 'row'
+        && nextEntry.categoryKey === entry.categoryKey
+    })
+    if (!hasLinkedHeadingAndRow) {
+      failures.push(
+        `DOM category-heading proof page ${pageArrayIndex} has no heading followed by a row`,
+      )
+    }
+
+    let activeHeadingKey = null
+    let pageLastRowCategoryKey = null
+    for (let entryIndex = 0; entryIndex < page.entries.length; entryIndex += 1) {
+      const entry = page.entries[entryIndex]
+      const coordinate = `${pageArrayIndex}:${entryIndex}`
+      if (seenCoordinates.has(coordinate)) {
+        failures.push('DOM category-heading proof entry coordinates are duplicated')
+      }
+      seenCoordinates.add(coordinate)
+
+      if (!entry || typeof entry !== 'object') {
+        failures.push(`DOM category-heading proof entry ${coordinate} is invalid`)
+        activeHeadingKey = null
+        continue
+      }
+      if (entry.kind === 'heading') {
+        const metadata = expectedMetadata.get(entry.categoryKey)
+        if (!metadata) {
+          failures.push(`DOM category-heading metadata has no displayed category: ${String(entry.categoryKey)}`)
+        } else if (
+          entry.categoryCode !== metadata.categoryCode
+          || entry.categoryLabel !== metadata.categoryLabel
+        ) {
+          failures.push(`DOM category-heading metadata mismatch: ${entry.categoryKey}`)
+        }
+
+        if (!['true', 'false'].includes(entry.continuationAttribute)) {
+          failures.push(`DOM category-heading continuation attribute is invalid: ${coordinate}`)
+        }
+        const isContinuation = entry.continuationAttribute === 'true'
+        const expectedText = metadata
+          ? formatPdfCategoryHeading(metadata, isContinuation)
+          : null
+        if (typeof entry.text !== 'string' || entry.text !== expectedText) {
+          failures.push(`DOM category-heading text mismatch: ${coordinate}`)
+        }
+
+        const nextEntry = page.entries[entryIndex + 1]
+        if (
+          !entry.categoryKey
+          || !nextEntry
+          || nextEntry.kind !== 'row'
+          || nextEntry.categoryKey !== entry.categoryKey
+        ) {
+          failures.push(`DOM category-heading row linkage mismatch: ${coordinate}`)
+        }
+
+        const expectedContinuation = entryIndex === 0
+          && pageArrayIndex > 0
+          && previousPageLastRowCategoryKey === entry.categoryKey
+        if (isContinuation !== expectedContinuation) {
+          failures.push(`DOM category-heading continuation placement mismatch: ${coordinate}`)
+        }
+        if (isContinuation && !seenInitialHeadings.has(entry.categoryKey)) {
+          failures.push(`DOM category-heading continuation precedes its initial heading: ${coordinate}`)
+        }
+        if (!isContinuation) {
+          seenInitialHeadings.set(
+            entry.categoryKey,
+            (seenInitialHeadings.get(entry.categoryKey) ?? 0) + 1,
+          )
+        }
+        activeHeadingKey = entry.categoryKey
+        continue
+      }
+
+      if (entry.kind === 'row') {
+        if (
+          typeof entry.itemCode !== 'string'
+          || typeof entry.categoryKey !== 'string'
+          || !entry.categoryKey
+        ) {
+          failures.push(`DOM category-heading row metadata is invalid: ${coordinate}`)
+        }
+        if (!activeHeadingKey || activeHeadingKey !== entry.categoryKey) {
+          failures.push(`DOM category-heading active-row linkage mismatch: ${coordinate}`)
+        }
+        proofRows.push({ itemCode: entry.itemCode, categoryKey: entry.categoryKey })
+        pageLastRowCategoryKey = entry.categoryKey
+        continue
+      }
+
+      failures.push(`DOM category-heading proof entry kind is invalid: ${coordinate}`)
+      activeHeadingKey = null
+    }
+    previousPageLastRowCategoryKey = pageLastRowCategoryKey
+  }
+
+  for (const categoryKey of expectedMetadata.keys()) {
+    if (seenInitialHeadings.get(categoryKey) !== 1) {
+      failures.push(`DOM category-heading initial heading count mismatch: ${categoryKey}`)
+    }
+  }
+  for (const categoryKey of seenInitialHeadings.keys()) {
+    if (!expectedMetadata.has(categoryKey)) {
+      failures.push(`DOM category-heading initial heading is orphaned: ${categoryKey}`)
+    }
+  }
+
+  if (proofRows.length !== displayedRows.length) {
+    failures.push('DOM category-heading proof row count mismatch')
+  }
+  for (let index = 0; index < Math.min(proofRows.length, displayedRows.length); index += 1) {
+    const expectedRow = displayedRows[index]
+    const expectedCategoryKey = pdfCategoryKey({
+      category_code: expectedRow?.categoryCode,
+      category_name: expectedRow?.categoryName,
+    })
+    if (
+      proofRows[index].itemCode !== expectedRow?.itemCode
+      || proofRows[index].categoryKey !== expectedCategoryKey
+    ) {
+      failures.push(`DOM category-heading proof row order mismatch at index ${index}`)
+    }
+  }
+}
+
+function formatPdfCategoryHeading(metadata, isContinuation) {
+  const categoryCode = normalizedPdfCategoryText(metadata.categoryCode)
+  const category = normalizedPdfCategoryText(metadata.categoryLabel) ?? 'ไม่ระบุหมวดหมู่'
+  const codeWithTerminator = categoryCode && !categoryCode.endsWith('.')
+    ? `${categoryCode}.`
+    : categoryCode
+  const heading = codeWithTerminator
+    ? (category === categoryCode ? codeWithTerminator : `${codeWithTerminator} ${category}`)
+    : category
+  return isContinuation ? `${heading} (ต่อ)` : heading
 }
 
 function verifyPdfExcelRowParity(domProof, canonicalRows, version, failures) {

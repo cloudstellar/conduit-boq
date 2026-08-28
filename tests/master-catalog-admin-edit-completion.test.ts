@@ -353,4 +353,158 @@ describe('Master Catalog post-closeout admin edit completion', () => {
     expect(marker.openWorkIds).toEqual([]);
     expect(marker.automaticNextStep).toBe(false);
   });
+
+  it('routes live and AI entry documents to the completed no-replay authority', () => {
+    const entryDocuments = [
+      'AGENTS.md',
+      'README.md',
+      'docs/README.md',
+      'docs/ai/README.md',
+      'docs/08_ai/AI_CONTEXT.md',
+      'docs/08_ai/AI_HANDOFF.md',
+      'docs/08_ai/LESSONS_LEARNED.md',
+    ];
+    const liveDocuments = [
+      'README.md',
+      'docs/08_ai/LESSONS_LEARNED.md',
+      'docs/01_overview/ROADMAP.md',
+      'docs/01_overview/IMPLEMENTATION_PLAN.md',
+      'docs/IMPLEMENTATION_PLAN.md',
+      'docs/07_process/RELEASE_PROCESS.md',
+      'docs/07_process/PHASE_GUARDRAILS.md',
+      'docs/03_domain/ACCESS_MODEL.md',
+      'docs/04_data/DATA_INTEGRITY.md',
+      'docs/06_engineering/PERMISSION_PATTERNS.md',
+      'docs/04_data/DATABASE_SCHEMA.md',
+      'docs/02_architecture/ADR/ADR-003-master-catalog-rollout-and-version-numbering.md',
+      'docs/02_architecture/ADR/ADR-004-phase4-catalog-governance-and-official-publication.md',
+    ];
+
+    for (const path of entryDocuments) {
+      const content = source(path);
+      expect(content, path).toContain(
+        '106-phase4-master-catalog-exact-remaining-work-handoff.md',
+      );
+      expect(content, path).toContain(
+        '107-phase4-p49-master-catalog-final-closeout-result.md',
+      );
+    }
+
+    for (const path of liveDocuments) {
+      const content = source(path);
+      const currentState = content.slice(0, 2200);
+      expect(content, path).toContain('MASTER_CATALOG_CURRENT_STATE_20260829');
+      expect(currentState, path).toContain(
+        '106-phase4-master-catalog-exact-remaining-work-handoff.md',
+      );
+      expect(currentState, path).toContain(
+        '107-phase4-p49-master-catalog-final-closeout-result.md',
+      );
+      expect(currentState, path).toMatch(
+        /historical[\s\S]{0,40}(?:chronology|pre-release plan)/iu,
+      );
+      expect(currentState, path).not.toMatch(
+        /\*\*Status:\*\*[^\n]*(?:P-49[^\n]*(?:HOLD|open)|028[^\n]*candidate)/iu,
+      );
+    }
+
+    const stalePhrasesByDocument: Record<string, string[]> = {
+      'docs/07_process/RELEASE_PROCESS.md': [
+        'Phase 4 administration/publication has not started',
+        'Current: **v1.2.0**',
+      ],
+      'docs/03_domain/ACCESS_MODEL.md': [
+        'not yet fully enforced',
+        'It is not yet the complete runtime contract',
+        'P-49 still requires',
+        'awaiting implementation',
+        'During post-P-15 P-49 remediation',
+      ],
+      'docs/04_data/DATA_INTEGRITY.md': [
+        'blocker pending exact read-only live verification',
+        'Current applied behavior',
+        'Current raw `app_settings`',
+        'Post-P-15 P-49 remediation requires',
+        'post-P-15 forward-only correction',
+      ],
+      'docs/06_engineering/PERMISSION_PATTERNS.md': [
+        'current runtime not yet aligned',
+        'Current source still implements',
+      ],
+      'docs/04_data/DATABASE_SCHEMA.md': ['Current applied behavior'],
+      'docs/IMPLEMENTATION_PLAN.md': [
+        '**Current Version:** v1.6.0',
+        'Phase 4: Catalog Administration & Official Publication — planned',
+        'It has not started and requires owner approval',
+      ],
+      'docs/01_overview/IMPLEMENTATION_PLAN.md': [
+        '**Current Version:** v1.6.0',
+        'Current status is owned by the Phase 4 Tracker',
+        'Production Phase 4 remains not started',
+      ],
+    };
+
+    for (const [path, phrases] of Object.entries(stalePhrasesByDocument)) {
+      const content = source(path);
+      for (const phrase of phrases) {
+        expect(content, `${path}: ${phrase}`).not.toContain(phrase);
+      }
+    }
+
+    const migrationGuide = source('migrations/README.md');
+    const migrationGuideAuthority = migrationGuide.slice(0, 2200);
+    expect(migrationGuideAuthority).toMatch(
+      /migration 027 and migration[\s\S]*028 applied exactly once/iu,
+    );
+    expect(migrationGuideAuthority).toMatch(
+      /must not be edited,[\s\S]{0,40}retried, or replayed/iu,
+    );
+    expect(migrationGuideAuthority).toContain(
+      'Repository/document convergence requires no migration 029',
+    );
+    expect(migrationGuideAuthority).not.toMatch(
+      /migration 028[^\n]*(?:candidate|pending)/iu,
+    );
+
+    const temporalDocuments = [
+      'docs/04_data/MIGRATIONS.md',
+      'docs/04_data/SECURITY_MODEL.md',
+      'docs/SECURITY.md',
+      'docs/CODEBASE_DATABASE_MAP.md',
+    ];
+    for (const path of temporalDocuments) {
+      const content = source(path);
+      const addendum = content.slice(0, 1800);
+      const normalizedAddendum = addendum.replace(/^>\s?/gm, '');
+      expect(addendum, path).toContain(
+        'MAIN_CONVERGENCE_TEMPORAL_ADDENDUM_20260829',
+      );
+      expect(addendum, path).toContain('runtime release baseline/ancestor');
+      expect(addendum, path).toContain(
+        'not the repository identity to copy after this convergence',
+      );
+      expect(normalizedAddendum, path).toMatch(
+        /resolve and verify the exact `main` and Vercel SHAs\s+independently/,
+      );
+      expect(addendum, path).toMatch(
+        /unchanged[\s\S]{0,80}(?:application runtime|migration SQL tree)|(?:application runtime|migration SQL tree)[\s\S]{0,80}unchanged/iu,
+      );
+    }
+
+    const accessModel = source('docs/03_domain/ACCESS_MODEL.md');
+    const databaseSchema = source('docs/04_data/DATABASE_SCHEMA.md');
+    for (const content of [accessModel, databaseSchema]) {
+      expect(content).toContain('private.p49_guard_user_profile_mutation()');
+      expect(content).toContain('trg_p49_guard_user_profile_mutation');
+      expect(content).toContain(
+        'admin_approve_user(p_target_id uuid, p_request_id uuid, p_reason text)',
+      );
+    }
+    expect(databaseSchema).toContain(
+      'admin_reject_user(p_target_id uuid, p_reason text, p_request_id uuid)',
+    );
+    expect(databaseSchema).toMatch(
+      /Migration 027 dropped the historical one-argument[\s\S]*two-argument\s+`admin_reject_user\(p_target_id uuid, p_note text\)` signatures/,
+    );
+  });
 });

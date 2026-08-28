@@ -1,5 +1,18 @@
 # ADR-004: Phase 4 Master Catalog Governance and Official Publication
 
+<!-- MASTER_CATALOG_CURRENT_STATE_20260829 -->
+> [!IMPORTANT]
+> **Implementation addendum (2026-08-29):** This governance decision is
+> implemented and Master Catalog Phase 4/P-49 are complete end-to-end. See
+> [Handoff #106](../../plans/master-catalog/106-phase4-master-catalog-exact-remaining-work-handoff.md)
+> and [Result #107](../../plans/master-catalog/107-phase4-p49-master-catalog-final-closeout-result.md).
+> A read-only Production recheck at `2026-08-29 01:38:54 +07` reconfirmed 027
+> then 028 with no 029, catalog `2568.1.0` at `710/710` with reviewed prices,
+> unchanged Factor F, the three catalog flags plus migration-028 functions/raw
+> `app_settings` ACL, and `0` working drafts at that instant; it made no write.
+> Dated approval boundaries and pre-release
+> status below remain historical chronology and do not authorize replay.
+
 **Status:** Owner-approved as Phase 4 governance/architecture decision for
 implementation/local rehearsal; Production migration, deploy, feature
 enablement, and publication require separate approvals

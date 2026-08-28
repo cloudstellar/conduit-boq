@@ -1,11 +1,24 @@
 # ADR-003: Master Catalog Rollout Start and Version Numbering
 
+<!-- MASTER_CATALOG_CURRENT_STATE_20260829 -->
+> [!IMPORTANT]
+> **Implementation addendum (2026-08-29):** The versioning decision remains
+> accepted, and Master Catalog Phase 4/P-49 are now complete end-to-end at
+> `2568.1.0`. See [Handoff #106](../../plans/master-catalog/106-phase4-master-catalog-exact-remaining-work-handoff.md)
+> and [Result #107](../../plans/master-catalog/107-phase4-p49-master-catalog-final-closeout-result.md).
+> A read-only Production recheck at `2026-08-29 01:38:54 +07` reconfirmed 027
+> then 028 with no 029, `710/710`, reviewed prices, unchanged Factor F, the
+> three catalog flags plus migration-028 functions/raw `app_settings` ACL, and
+> `0` working drafts at that instant; it made no
+> write. Earlier baseline/proposal wording below is historical chronology, not
+> current publication status or replay authority.
+
 **Status:** Accepted; Production baseline rollout implemented; version-intent
 and bounded annual-year amendments accepted 2026-07-13; P-39 draft-identity
 and P-39R release-number/lifecycle correction accepted 2026-07-18
 **Date:** 2026-06-05
 **Decision Makers:** Owner, Development Team
-**Implementation status:** Production `2568.0.0`, singleton pointer, Phase 2
+**Historical implementation snapshot (2026-06-21):** Production `2568.0.0`, singleton pointer, Phase 2
 application, and Phase 1B hardening were applied/deployed and verified on
 2026-06-21. The first proposed structured-code release `2568.1.0` remains
 unpublished Phase 4 scope under ADR-004 and requires owner approval.
