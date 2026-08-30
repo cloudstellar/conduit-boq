@@ -1,185 +1,116 @@
-# Conduit BOQ
-## ระบบประมาณราคาท่อร้อยสายสื่อสารใต้ดิน
+# Conduit BOQ Documentation Index
 
----
+เอกสารนี้เป็นสารบัญสำหรับค้นหา source of truth ที่ถูกต้อง ไม่ใช่สถานะ
+Production แบบ live และไม่ใช่สิทธิ์ให้ deploy, apply migration หรือแก้ข้อมูล
 
 > [!IMPORTANT]
-> AI agents and maintainers must start at
-> [`08_ai/AI_HANDOFF.md`](./08_ai/AI_HANDOFF.md). For the completed Master
-> Catalog Production state, [Handoff
-> #106](./plans/master-catalog/106-phase4-master-catalog-exact-remaining-work-handoff.md)
-> and [Result
-> #107](./plans/master-catalog/107-phase4-p49-master-catalog-final-closeout-result.md)
-> are canonical. The older [`docs/ai/`](./ai/README.md) tree is historical.
+> ก่อนเปลี่ยน repository ให้อ่าน [`AGENTS.md`](../AGENTS.md),
+> [`08_ai/AI_HANDOFF.md`](./08_ai/AI_HANDOFF.md),
+> [`08_ai/AI_CONTEXT.md`](./08_ai/AI_CONTEXT.md) และ
+> [`08_ai/LESSONS_LEARNED.md`](./08_ai/LESSONS_LEARNED.md) ตามลำดับ
 
-## 📖 Overview
+## Current authority
 
-ระบบ Conduit BOQ เป็น web application สำหรับประมาณราคางานท่อร้อยสายสื่อสารใต้ดิน พัฒนาสำหรับ บมจ. โทรคมนาคมแห่งชาติ (NT)
+| เอกสาร | ใช้สำหรับ | ข้อจำกัด |
+|---|---|---|
+| [`AGENTS.md`](../AGENTS.md) | กติกา repository, no-replay boundary และ workspace custody | ต้องตรวจ branch, HEAD, upstream และ worktree ใหม่ทุกครั้ง |
+| [`AI_HANDOFF.md`](./08_ai/AI_HANDOFF.md) | handoff ปัจจุบันและลำดับ source of truth | หลักฐานที่เปลี่ยนตามเวลาไม่ใช่ live guarantee |
+| [`AI_CONTEXT.md`](./08_ai/AI_CONTEXT.md) | product/code/database context และ authority boundary | ห้ามตีความ plan เป็น execution approval |
+| [`LESSONS_LEARNED.md`](./08_ai/LESSONS_LEARNED.md) | invariants และข้อผิดพลาดที่ห้ามทำซ้ำ | ข้อความ chronology เก่าต้องอ่านร่วมกับ current-state addendum |
+| [Master Catalog Handoff #106](./plans/master-catalog/106-phase4-master-catalog-exact-remaining-work-handoff.md) | canonical final handoff ของ Phase 4/P-49 | เป็นหลักฐานตามเวลาที่บันทึก ไม่ใช่ live mutable state |
+| [Master Catalog Result #107](./plans/master-catalog/107-phase4-p49-master-catalog-final-closeout-result.md) | closeout result และ accepted residuals | ห้ามใช้ approval receipt เก่าเป็นสิทธิ์ทำงานใหม่ |
 
-### ✨ Key Features
-- 📋 สร้าง BOQ (Bill of Quantities) ได้รวดเร็ว
-- 🛣️ รองรับหลายเส้นทาง (Multi-Route)
-- 💰 คำนวณ Factor F จากคอลัมน์ `factor` และ VAT อัตโนมัติ
-- 📊 Price List มาตรฐานปัจจุบัน 710 รายการ
-- 🔐 ระบบ Authentication & Authorization
-- 👥 Role-Based Access Control (RBAC)
+Migration 027 และ 028 ถูกบันทึกว่า applied ครั้งเดียวและห้ามแก้ retry หรือ
+replay ส่วน expanded Production persona rehearsal ยังเป็น accepted residual
+ไม่ใช่ PASS หากต้องอ้างสถานะ Production ที่เปลี่ยนได้ ให้เก็บ fresh read-only
+evidence ใหม่
 
----
+## Current product decisions and research
 
-## 🛠️ Tech Stack
+| เอกสาร | สถานะ | เนื้อหา |
+|---|---|---|
+| [01 — Product Evolution Decision Plan](./plans/product/01-conduit-boq-product-evolution-decision-plan.md) | D2/D3/D9 ถูกเลือก; exact DUP-1 Production release ได้รับอนุญาตและกำลังดำเนินการ; decision อื่นยังมี TBD | roadmap, Atomic Duplicate, Quantity Expression, auth, workflow และระยะยาว |
+| [02 — BOQ List Scaling Decision Plan](./plans/product/02-boq-list-scaling-decision-plan.md) | proposed; LIST-1 ยังไม่มี implementation authority | server pagination, search/filter/sort, RLS count และ bounded route loading |
+| [03 — Pagination Best-Practice Research](./plans/product/03-boq-list-pagination-best-practice-research.md) | research evidence; ไม่ใช่ approval | หลักฐานภายนอกและ trade-off ของ pagination |
 
-| Layer | Technology |
-|-------|------------|
-| Frontend | Next.js 16, React 19, TypeScript |
-| Styling | Tailwind CSS 4 |
-| Backend | Supabase (PostgreSQL + Auth) |
-| Hosting | Vercel |
+DUP-1 ต้องไม่ถูกเรียกว่าใช้งานแล้วจนกว่า implementation, isolated database
+rehearsal, tests, Production verification และ postflight evidence จะผ่าน Migration
+`029_atomic_boq_duplicate.sql` เป็น forward-development artifact สำหรับงานใหม่
+ไม่ใช่ migration ที่ใช้เพื่อ repository convergence และยังห้ามอ้างว่า applied
+หรือ released
 
----
+## Developer entry points
 
-## 🚀 Getting Started
+| จุดเริ่ม | ใช้สำหรับ |
+|---|---|
+| [Root README](../README.md) | ภาพรวม application, setup และ quality commands |
+| [`package.json`](../package.json) | scripts และ dependency versions ที่ repository ใช้จริง |
+| [CI quality workflow](../.github/workflows/quality.yml) | Node.js 22, `npm ci`, lint, test และ build contract |
+| [Local Supabase guide](./LOCAL_SUPABASE.md) | Local-only commands, destructive reset warning และ unlinked safety |
+| [`scripts/bootstrap-local-db.sh`](../scripts/bootstrap-local-db.sh) | executable source ของ Local bootstrap ledger ปัจจุบัน |
 
-### Prerequisites
-- Node.js 18+
-- npm or yarn
-- Supabase account
+ใช้ Node.js 22 และ `npm ci` ให้ตรงกับ CI ตรวจสอบ `npm run lint`, `npm test`
+และ `npm run build` ก่อนส่งมอบ แต่ web CI ไม่ได้แทน database/RLS/persona
+rehearsal
 
-### Installation
+## Database and migration sources
 
-```bash
-# Clone repository
-git clone https://github.com/cloudstellar/conduit-boq.git
-cd conduit-boq
+- [`../migrations/`](../migrations/) คือที่เก็บ forward SQL artifacts ระดับ
+  repository การมีไฟล์อยู่ไม่ได้แปลว่า applied หรือ authorized
+- [`04_data/MIGRATIONS.md`](./04_data/MIGRATIONS.md) เป็น migration inventory
+  และ chronology ให้อ่าน current addendum/closeout ก่อนข้อความเก่า
+- [`LOCAL_SUPABASE.md`](./LOCAL_SUPABASE.md) และ
+  [`scripts/bootstrap-local-db.sh`](../scripts/bootstrap-local-db.sh) เป็นคู่
+  สำหรับ Local rebuild ปัจจุบัน ซึ่ง apply root chain ถึง 026 เท่านั้น
+- [`supabase/local/production-baseline.sql`](../supabase/local/production-baseline.sql)
+  เป็น Local schema baseline ไม่ใช่ Production migration
+- [`../migrations/README.md`](../migrations/README.md) เป็นคู่มือ historical
+  multi-route migration 002 ไม่ใช่ runbook สำหรับ migration ปัจจุบัน
 
-# Install dependencies
-npm install
+ห้ามเพิ่ม 027, 028 หรือ 029 เข้า bootstrap แบบเงียบ ๆ Bootstrap ปัจจุบันยัง
+ไม่มี post-028 parity ดังนั้น DUP-1/029 ต้องใช้ isolated database ที่สร้างจาก
+approved post-028-equivalent contract แล้ว apply 029 แยกเพื่อ rehearse เมื่อ
+ได้รับอนุญาต ห้ามใช้ `supabase link`, `supabase db push`, `supabase db pull`
+หรือ linked diff จาก worktree นี้
 
-# Setup environment variables
-cp .env.example .env.local
-# Edit .env.local with your Supabase credentials
+## Reference documentation by topic
 
-# Run development server
-npm run dev
-```
+เอกสารต่อไปนี้เป็น reference ตามหัวข้อ ต้องเทียบกับ code, root migrations,
+current handoff และ fresh database evidence เมื่อข้อมูลขัดกัน:
 
-### Environment Variables
+| หัวข้อ | เอกสาร |
+|---|---|
+| Product overview | [`01_overview/`](./01_overview/) |
+| Architecture and ADRs | [`02_architecture/`](./02_architecture/) |
+| Domain and access concepts | [`03_domain/`](./03_domain/) |
+| Schema, integrity, RLS and migration chronology | [`04_data/`](./04_data/) |
+| Calculation, Factor F and VAT | [`05_calculation/`](./05_calculation/) |
+| Engineering conventions | [`06_engineering/`](./06_engineering/) |
+| Change/release process | [`07_process/`](./07_process/) |
+| Security cross-layer summary | [`SECURITY.md`](./SECURITY.md) |
+| Local operational instructions | [`LOCAL_SUPABASE.md`](./LOCAL_SUPABASE.md) |
 
-```env
-NEXT_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
-NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
-```
+## Historical and audit material
 
----
+รายการต่อไปนี้เก็บไว้เพื่อ chronology/audit และต้องไม่ใช้เป็น current
+operational authority เว้นแต่เอกสาร current ข้างต้นจะ adopt อย่างชัดเจน:
 
-## 📁 Project Structure
+- [`docs/ai/`](./ai/) — Phase 1/2 agent handoffs, plans และ UX notes
+- [`docs/legacy/`](./legacy/) — legacy schema/technical references
+- [`CANONICAL_ORDER.md`](./CANONICAL_ORDER.md) — draft documentation migration
+  plan ลงวันที่ 2026-01 ไม่ใช่ current authority map
+- root-level historical PRD/implementation/KM material เช่น [`PRD.md`](./PRD.md),
+  [`IMPLEMENTATION_PLAN.md`](./IMPLEMENTATION_PLAN.md),
+  [`PRODUCT_BRIEF_AND_MEASUREMENT_PLAN.md`](./PRODUCT_BRIEF_AND_MEASUREMENT_PLAN.md)
+  และ [`km/`](./km/)
+- [`CODEBASE_DATABASE_MAP.md`](./CODEBASE_DATABASE_MAP.md) — dated 2026-06-11
+  code/database snapshot with later supersession notes; useful chronology, not
+  live database authority
+- Master Catalog plans ก่อน #106/#107 รวมถึงข้อความ `HOLD`, `pending`,
+  `unauthorized` หรือ `current` ที่ถูกเก็บไว้เป็นหลักฐานตามเวลา
+- [`MIGRATION_MAP.md`](./MIGRATION_MAP.md) และคู่มือ migration เก่าที่บรรยาย
+  workflow ก่อน current closeout
 
-```
-conduit-boq/
-├── app/                    # Next.js App Router pages
-├── components/             # Reusable React components
-├── lib/                    # Libraries & utilities
-│   ├── context/           # React contexts
-│   ├── hooks/             # Custom hooks
-│   ├── supabase/          # Supabase clients
-│   └── types/             # TypeScript types
-├── migrations/            # SQL migrations
-└── docs/                  # Documentation
-```
-
----
-
-## 📚 Documentation
-
-### User & Business Documentation
-| Document | Description |
-|----------|-------------|
-| [PRODUCT_BRIEF_AND_MEASUREMENT_PLAN.md](./PRODUCT_BRIEF_AND_MEASUREMENT_PLAN.md) | Product brief, objectives, benefits, workflow, KPIs, and measurement plan |
-| [CODEBASE_DATABASE_MAP.md](./CODEBASE_DATABASE_MAP.md) | Detailed codebase and production database map |
-| [km/README.md](./km/README.md) | Knowledge Management competition document packet |
-| [PRD.md](./PRD.md) | Product Requirements Document |
-| [KNOWLEDGE_BASE.md](./01_overview/KNOWLEDGE_BASE.md) | User guide & troubleshooting |
-| [IMPLEMENTATION_PLAN.md](./IMPLEMENTATION_PLAN.md) | Technical implementation details |
-| [Engineering docs](./06_engineering/) | Current developer technical references |
-| [DATABASE_SCHEMA.md](./04_data/DATABASE_SCHEMA.md) | Database tables and relationships |
-
-### Current AI Handoff (`docs/08_ai/`)
-
-| Document | Description |
-|----------|-------------|
-| [AI_HANDOFF.md](./08_ai/AI_HANDOFF.md) | **START HERE** — current repository and Master Catalog handoff |
-| [AI_CONTEXT.md](./08_ai/AI_CONTEXT.md) | Current agent authority, safety, and source-of-truth map |
-| [LESSONS_LEARNED.md](./08_ai/LESSONS_LEARNED.md) | Durable technical lessons and invariants |
-| [Historical `docs/ai/` index](./ai/README.md) | Legacy Phase 1/2 context; not current status authority |
-
----
-
-## 👥 User Roles
-
-| Role | Description |
-|------|-------------|
-| Admin | ผู้ดูแลระบบ - จัดการทุกอย่าง |
-| Dept Manager | ผู้จัดการฝ่าย - อนุมัติ BOQ ของฝ่าย |
-| Sector Manager | ผู้จัดการส่วน - Review BOQ ของส่วน |
-| Staff | พนักงาน - สร้าง/แก้ไข BOQ ของตัวเอง |
-| Procurement | จัดซื้อจัดจ้าง - ดู BOQ ที่อนุมัติแล้ว |
-
----
-
-## 🔐 Security
-
-- **Authentication:** Supabase Auth (Email/Password)
-- **Authorization:** Row Level Security (RLS) at database level
-- **Separation of Duties:** ผู้สร้าง BOQ ไม่สามารถอนุมัติเองได้
-
----
-
-## 📝 Scripts
-
-```bash
-# Development
-npm run dev          # Start dev server
-
-# Build
-npm run build        # Build for production
-npm run start        # Start production server
-
-# Linting
-npm run lint         # Run ESLint
-```
-
----
-
-## 🗄️ Database
-
-### Core Tables
-- `boq` - BOQ header
-- `boq_routes` - เส้นทางของ BOQ
-- `boq_items` - รายการใน BOQ
-- `price_list` - ราคามาตรฐาน
-
-### Auth Tables
-- `organizations` - องค์กร
-- `departments` - ฝ่าย
-- `sectors` - ส่วน
-- `user_profiles` - ข้อมูลผู้ใช้
-
----
-
-## 🚢 Deployment
-
-Production deployment is automated via Vercel:
-1. Push to `main` branch
-2. Vercel auto-builds and deploys
-
----
-
-## 📞 Support
-
-- **Issues:** GitHub Issues
-- **Email:** admin@ntplc.co.th
-
----
-
-## 📄 License
-
-Private - NT Internal Use Only
+อย่าแก้ historical evidence ให้ดูเหมือนเป็นสถานะปัจจุบัน หากเอกสารสองฉบับ
+ขัดกัน ให้หยุดและใช้ authority hierarchy ด้านบนพร้อมตรวจ code/database ใหม่
+ก่อนตัดสินใจ

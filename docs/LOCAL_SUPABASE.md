@@ -21,20 +21,15 @@ and removes every BOQ, route, and item that it creates.
 Run `npm run db:local:bootstrap` only when the local database should be rebuilt
 from the captured production snapshot. This is destructive for the Local
 Supabase database: it resets the local stack, restores business data and
-scrubbed auth metadata, applies the canonical root chain `009` through `015`,
-production hotfix `016`, and the current Phase 4 local scripts `017` through
-`021`, seeds local-only role accounts, then runs auth and Master Catalog
-workflow smoke tests. Get owner approval before using this command as evidence
-when preserving existing Local state matters.
-
-WP-6.6 migration `020_master_catalog_phase4_admin_workflow_hardening.sql` passed
-G1R/G2 and the combined G4E clean bootstrap. WP-7.5 migration
-`021_master_catalog_phase4_placement_governance.sql`, SHA-256
-`e4de258756bbfbda0508e55d7b76ba2e907f644625b49bc29d4a4d7ac42fa714`,
-passed the P-32 separate-apply technical evidence and P-33/P-34 bounded gates.
-P-35 now places that unchanged file in the canonical bootstrap source. Source
-inclusion is not execution evidence: do not run the command below until the
-owner receives the destructive-reset warning and explicitly approves P-36.
+scrubbed auth metadata, applies `009` and `010`, the four operational
+`010a`-equivalent concurrent indexes, `011` through `015`, production hotfix
+`016`, `017`, `017a`, and the explicit Phase 4 local chain `018` through `026`,
+seeds local-only role accounts, then runs auth and Master Catalog workflow smoke
+tests. The executable ledger is
+[`scripts/bootstrap-local-db.sh`](../scripts/bootstrap-local-db.sh); if this
+paragraph and the script differ, stop and inspect the script rather than
+guessing. Get fresh owner approval before a destructive rebuild when existing
+Local state or evidence must be preserved.
 
 ```bash
 npm run db:local:bootstrap
@@ -79,16 +74,44 @@ Do not run `supabase link`, `supabase db push`, `supabase db pull`, or
 The canonical Local rebuild is `npm run db:local:bootstrap`. The schema-only
 snapshot is stored at `supabase/local/production-baseline.sql`, outside the
 Supabase CLI migration directory, so `db push` cannot treat it as a Production
-migration. The bootstrap script applies the explicit root sequence `009` through
-`015`, then production hotfix `016_hotfix_preserve_boq_item_suffix.sql`, then
-the current Phase 4 scripts `017_master_catalog_phase4_foundation.sql`,
-`018_master_catalog_phase4_draft_mutation.sql`, and
-`019_master_catalog_phase4_publish_pointer.sql`,
-`020_master_catalog_phase4_admin_workflow_hardening.sql`, and
-`021_master_catalog_phase4_placement_governance.sql`.
+migration. The bootstrap script applies `009`, `010`, the four operational
+`010a`-equivalent concurrent indexes, `011` through `015`, production hotfix
+`016_hotfix_preserve_boq_item_suffix.sql`, then
+`017_master_catalog_phase4_foundation.sql`,
+`017a_master_catalog_phase4_global_function_default_privileges.sql`, and the
+explicit Phase 4 local chain `018` through
+`026_master_catalog_phase4_catalog_action_error_acl.sql`.
 Consequently, `supabase db diff --local` will show the rehearsed schema as drift
 from an empty CLI migration ledger. Do not generate a new migration from that
 expected diff.
+
+## Post-028 and DUP-1/029 boundary
+
+The current bootstrap stops at root migration 026. It does **not** establish
+post-028 parity and it does not include migration 027, 028, or
+`029_atomic_boq_duplicate.sql`.
+
+- Production evidence records 027 and 028 as applied exactly once. Do not edit,
+  retry, replay, or append either file to this bootstrap.
+- Migration 029 is a new DUP-1 forward-development artifact. Its presence in
+  the repository does not mean it is applied or released. The exact DUP-1
+  Production release was separately authorized on 2026-08-31, but remains
+  release-in-progress until execution and postflight evidence are recorded.
+- Do not add 029 to `db:local:bootstrap` while its input database still stops at
+  026. A green run over the wrong predecessor schema would not be valid DUP-1
+  evidence.
+- Before testing 029, create a disposable isolated database from an approved,
+  sanitized post-028-equivalent schema/contract fixture. Verify the expected
+  predecessor tables, columns, functions, triggers, RLS, grants, owners and ACL
+  fingerprints; then apply 029 separately and run its migration, persona,
+  atomicity, idempotency, concurrency, rollback and output-parity tests.
+- Destroy or reset that disposable target after evidence capture. Do not point
+  it at Production, do not import Production users/sessions/tokens/secrets, and
+  do not treat isolated rehearsal as deployment authorization.
+
+Updating the canonical bootstrap to a genuine post-028-equivalent baseline is
+a separate reviewed change. Until that parity contract exists and is approved,
+keep the current 009–026 bootstrap unchanged and keep 029 rehearsal explicit.
 
 ## Test users
 

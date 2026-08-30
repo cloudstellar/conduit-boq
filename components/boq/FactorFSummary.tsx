@@ -3,7 +3,12 @@
 import { useState, useEffect, useMemo } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import { roundMoney, calculateVAT, multiplyFactor } from '@/lib/calculation';
-import { calculateInterpolatedFactorFromRefs, findFactorBracketRefs } from '@/lib/factorF';
+import {
+  calculateInterpolatedFactorFromRefs,
+  findFactorBracketRefs,
+  getFactorVatPercent,
+  getFactorVatRate,
+} from '@/lib/factorF';
 import {
   FACTOR_REFERENCE_VERSION_REQUIRED_MESSAGE,
   FactorReferenceVersionData,
@@ -103,6 +108,8 @@ export default function FactorFSummary({
     [grandTotalCost, lowerFactorRef, upperFactorRef],
   );
   const factor = factorResult?.factor ?? 0;
+  const vatPercent = getFactorVatPercent(factorVersion);
+  const vatRate = getFactorVatRate(factorVersion);
   const factorVersionLabel = factorVersion?.version_string
     ? `เวอร์ชัน ${factorVersion.version_string}`
     : 'ไม่พบเวอร์ชัน';
@@ -111,7 +118,7 @@ export default function FactorFSummary({
     : 'ยังไม่ทราบเวอร์ชัน Factor F';
   const costInMillion = grandTotalCost / 1000000;
   const { beforeVAT: totalWithFactor, total: totalWithVAT } =
-    calculateVAT(multiplyFactor(grandTotalCost, factor));
+    calculateVAT(multiplyFactor(grandTotalCost, factor), vatRate);
 
   // Call callback when factor values change (for snapshot saving)
   // Must be before early returns to comply with React hooks rules
@@ -241,7 +248,7 @@ export default function FactorFSummary({
             <div className="text-xs text-blue-600">ก่อน VAT</div>
           </div>
           <div className="min-w-0">
-            <div className="text-xs text-green-700">รวม VAT 7%</div>
+            <div className="text-xs text-green-700">รวม VAT {vatPercent.toFixed(2)}%</div>
             <div className="truncate text-sm font-bold text-green-700 md:text-base">
               {formatNumber(totalWithVAT)}
             </div>
@@ -276,7 +283,7 @@ export default function FactorFSummary({
           <div className="text-sm font-medium text-muted-foreground">ราคาแยกรายเส้นทาง (คูณ Factor F):</div>
           {routes.map((route, index) => {
             const routeWithFactorF = roundMoney(multiplyFactor(route.total_cost, factor));
-            const { total: routeWithVAT } = calculateVAT(routeWithFactorF);
+            const { total: routeWithVAT } = calculateVAT(routeWithFactorF, vatRate);
             return (
               <Card key={route.id}>
                 <CardContent className="p-4">
@@ -295,7 +302,9 @@ export default function FactorFSummary({
                       <div className="font-medium text-blue-600">{formatNumber(routeWithFactorF)}</div>
                     </div>
                     <div>
-                      <span className="text-muted-foreground">รวม VAT 7%:</span>
+                      <span className="text-muted-foreground">
+                        รวม VAT {vatPercent.toFixed(2)}%:
+                      </span>
                       <div className="font-bold text-green-600">{formatNumber(routeWithVAT)}</div>
                     </div>
                   </div>
@@ -325,7 +334,9 @@ export default function FactorFSummary({
           </Card>
           <Card className="bg-green-100 border-2 border-green-400">
             <CardContent className="p-4">
-              <div className="text-sm text-green-600">รวมทั้งสิ้น (VAT 7%)</div>
+              <div className="text-sm text-green-600">
+                รวมทั้งสิ้น (VAT {vatPercent.toFixed(2)}%)
+              </div>
               <div className="text-xl font-bold text-green-700">
                 {formatNumber(totalWithVAT)}
               </div>

@@ -1,11 +1,19 @@
 'use client';
 
 import { useState, useEffect, useMemo } from 'react';
+import Link from 'next/link';
 import { useParams, useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
 import { useAuth } from '@/lib/context/AuthContext';
 import { can, BOQContext } from '@/lib/permissions';
 import { requireActiveProfile } from '@/lib/auth/authorization';
+import {
+  duplicateBOQAtomic,
+  getDuplicateBOQErrorMessage,
+  getDuplicateBOQRecoveryAction,
+  type DuplicateBOQRecoveryAction,
+} from '@/lib/boq/duplicate';
+import { isFactorSnapshotUsable } from '@/lib/factorF';
 import type { CatalogVersionSummary } from '@/lib/catalog/defaultVersion';
 import { getPriceListVersionSummary } from '@/lib/catalog/defaultVersion';
 import {
@@ -24,15 +32,38 @@ import { ProjectInfo } from '@/app/boq/create/page';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
 import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
+import {
   Select,
   SelectContent,
+  SelectGroup,
   SelectItem,
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { AlertTriangle, Copy, Printer } from 'lucide-react';
+import {
+  AlertTriangle,
+  Copy,
+  Loader2,
+  Plus,
+  Printer,
+  RefreshCw,
+} from 'lucide-react';
 
-const FACTOR_COPY_DISABLED_REASON = 'ปิดการสร้างสำเนา Factor F ชั่วคราวจนกว่าระบบคัดลอกแบบ atomic จะพร้อมใช้งาน';
+interface FactorCopyIntent {
+  requestId: string;
+  factorVersionId: string;
+  factorVersionLabel: string;
+  expectedSourceUpdatedAt: string;
+  error: string | null;
+  recovery: DuplicateBOQRecoveryAction;
+}
 
 export default function EditBOQPage() {
   const params = useParams();
@@ -49,6 +80,8 @@ export default function EditBOQPage() {
   });
   const [boqContext, setBOQContext] = useState<BOQContext | null>(null);
   const [priceListVersionId, setPriceListVersionId] = useState<string | null>(null);
+  const [sourceTotalCost, setSourceTotalCost] = useState(0);
+  const [sourceUpdatedAt, setSourceUpdatedAt] = useState<string | null>(null);
   const [catalogVersion, setCatalogVersion] = useState<CatalogVersionSummary | null>(null);
   const [factorReferenceVersionId, setFactorReferenceVersionId] = useState<string | null>(null);
   const [factorVersionOptions, setFactorVersionOptions] = useState<FactorReferenceVersionData[]>([]);
@@ -56,6 +89,9 @@ export default function EditBOQPage() {
   const [factorVersionLoadError, setFactorVersionLoadError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
+  const [isCreatingFactorCopy, setIsCreatingFactorCopy] = useState(false);
+  const [factorCopyIntent, setFactorCopyIntent] = useState<FactorCopyIntent | null>(null);
+  const [isFactorReviewRequired, setIsFactorReviewRequired] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   // Factor F snapshot data from MultiRouteEditor
@@ -74,6 +110,7 @@ export default function EditBOQPage() {
   const canEdit = can(user, 'update', 'boq', boqContext || undefined);
   const canCreateBOQ = can(user, 'create', 'boq');
   const isLegacyFactorSnapshotOnly = !factorReferenceVersionId;
+  const canAttemptSelectedFactorCopy = isLegacyFactorSnapshotOnly && sourceTotalCost > 0;
   const isEditorReadOnly = !canEdit || isLegacyFactorSnapshotOnly;
 
   // Fetch BOQ data
@@ -99,8 +136,15 @@ export default function EditBOQPage() {
         );
 
         setPriceListVersionId(boq.price_list_version_id);
+        setSourceTotalCost(Number(boq.total_cost));
+        setSourceUpdatedAt(boq.updated_at);
         setCatalogVersion(boundCatalogVersion);
         setFactorReferenceVersionId(boq.factor_reference_version_id ?? null);
+        setIsFactorReviewRequired(Boolean(
+          boq.factor_reference_version_id
+          && Number(boq.total_cost) > 0
+          && !isFactorSnapshotUsable(Number(boq.total_cost), boq),
+        ));
 
         setProjectInfo({
           estimator_name: boq.estimator_name,
@@ -174,14 +218,13 @@ export default function EditBOQPage() {
         { material: 0, labor: 0, total: 0 }
       );
 
-      if (
-        grandTotals.total > 0 &&
-        (factorData.factor <= 0 ||
-          factorData.lowerCost <= 0 ||
-          factorData.upperCost <= 0 ||
-          factorData.lowerValue <= 0 ||
-          factorData.upperValue <= 0)
-      ) {
+      if (grandTotals.total > 0 && !isFactorSnapshotUsable(grandTotals.total, {
+        factor_f: factorData.factor,
+        factor_f_lower_cost: factorData.lowerCost,
+        factor_f_upper_cost: factorData.upperCost,
+        factor_f_lower_value: factorData.lowerValue,
+        factor_f_upper_value: factorData.upperValue,
+      })) {
         throw new Error('ยังคำนวณ Factor F ไม่สำเร็จ กรุณาตรวจสอบตาราง Factor F แล้วลองบันทึกอีกครั้ง');
       }
 
@@ -240,12 +283,82 @@ export default function EditBOQPage() {
 
       if (rpcError) throw rpcError;
 
+      setIsFactorReviewRequired(false);
       alert('บันทึกสำเร็จ!');
     } catch (err) {
       console.error('Error saving BOQ:', err);
       setError(err instanceof Error ? err.message : 'เกิดข้อผิดพลาดในการบันทึก');
     } finally {
       setIsSaving(false);
+    }
+  };
+
+  const openFactorCopyDialog = () => {
+    if (!canCreateBOQ) {
+      setError('คุณไม่มีสิทธิ์สร้างใบประมาณราคาใหม่ กรุณาติดต่อผู้ดูแลระบบ');
+      return;
+    }
+
+    const selectedVersion = factorVersionOptions.find(
+      (version) => version.id === selectedFactorCopyVersionId,
+    );
+
+    if (!selectedVersion) {
+      setFactorVersionLoadError('กรุณาเลือกเวอร์ชัน Factor F ที่ต้องการ');
+      return;
+    }
+
+    if (!sourceUpdatedAt) {
+      setError('ไม่พบเวลาที่แก้ไขล่าสุดของ BOQ กรุณาโหลดหน้านี้ใหม่');
+      return;
+    }
+
+    setFactorCopyIntent({
+      requestId: crypto.randomUUID(),
+      factorVersionId: selectedVersion.id,
+      factorVersionLabel: selectedVersion.version_string,
+      expectedSourceUpdatedAt: sourceUpdatedAt,
+      error: null,
+      recovery: 'retry',
+    });
+  };
+
+  const handleFactorCopyDialogOpenChange = (open: boolean) => {
+    if (!open && !isCreatingFactorCopy) {
+      setFactorCopyIntent(null);
+    }
+  };
+
+  const handleCreateFactorCopy = async () => {
+    if (!factorCopyIntent || isCreatingFactorCopy) return;
+
+    setIsCreatingFactorCopy(true);
+    setFactorCopyIntent((current) => current
+      ? { ...current, error: null, recovery: 'retry' }
+      : current);
+
+    try {
+      const result = await duplicateBOQAtomic(supabase, {
+        sourceBOQId: boqId,
+        requestId: factorCopyIntent.requestId,
+        expectedSourceUpdatedAt: factorCopyIntent.expectedSourceUpdatedAt,
+        mode: 'select_factor',
+        factorReferenceVersionId: factorCopyIntent.factorVersionId,
+      });
+
+      router.push(`/boq/${result.boq_id}/edit`);
+    } catch (err) {
+      console.error('Error creating atomic selected-Factor copy:', err);
+      const message = getDuplicateBOQErrorMessage(err, 'select_factor');
+      setFactorCopyIntent((current) => current?.requestId === factorCopyIntent.requestId
+        ? {
+            ...current,
+            error: message,
+            recovery: getDuplicateBOQRecoveryAction(err, 'select_factor'),
+          }
+        : current);
+    } finally {
+      setIsCreatingFactorCopy(false);
     }
   };
 
@@ -300,21 +413,14 @@ export default function EditBOQPage() {
 
         {/* Action buttons */}
         <div className="mb-4 flex flex-col justify-end gap-2 sm:flex-row">
-          {isLegacyFactorSnapshotOnly && (
-            <Button
-              type="button"
-              variant="outline"
-              disabled
-              title={FACTOR_COPY_DISABLED_REASON}
-            >
-              <Copy className="h-4 w-4" />
-              คัดลอก (ปิดชั่วคราว)
-            </Button>
-          )}
           <Button
             type="button"
             variant="secondary"
             onClick={() => router.push(`/boq/${boqId}/print`)}
+            disabled={isFactorReviewRequired}
+            title={isFactorReviewRequired
+              ? 'กรุณาตรวจสอบและบันทึก Factor F ก่อนพิมพ์หรือส่งออก'
+              : undefined}
           >
             <Printer className="h-4 w-4" />
             พิมพ์
@@ -328,6 +434,19 @@ export default function EditBOQPage() {
             </div>
           )}
 
+          {isFactorReviewRequired && (
+            <Alert className="mb-4 border-amber-200 bg-amber-50 text-amber-950">
+              <AlertTriangle />
+              <AlertTitle>ต้องตรวจสอบและบันทึก Factor F ก่อนใช้งานเอกสาร</AlertTitle>
+              <AlertDescription className="text-amber-900">
+                <p>
+                  BOQ สำเนานี้ผูกกับเวอร์ชัน Factor F แล้ว แต่ผลคำนวณที่บันทึกไว้ยังไม่ครบ
+                  กรุณาตรวจสอบข้อมูลและกดบันทึกให้สำเร็จก่อนพิมพ์ PDF หรือส่งออก Excel
+                </p>
+              </AlertDescription>
+            </Alert>
+          )}
+
           {isLegacyFactorSnapshotOnly && (
             <Alert className="mb-4 border-amber-200 bg-amber-50 text-amber-950">
               <AlertTriangle className="h-4 w-4" />
@@ -336,46 +455,82 @@ export default function EditBOQPage() {
                 <p>
                   ระบบจะไม่คำนวณด้วยตาราง Factor F ล่าสุดให้ย้อนหลังอัตโนมัติ
                   เพื่อไม่ให้เอกสารเดิมเปลี่ยนความหมาย การดูและพิมพ์ BOQ เดิมยังใช้งานได้
-                  แต่การสร้างสำเนาถูกปิดชั่วคราวจนกว่าการคัดลอกแบบ atomic จะพร้อมใช้งาน
+                  หากต้องการทำงานต่อ ให้เลือกเวอร์ชัน Factor F แล้วสร้างฉบับร่างใหม่
+                  โดยรายการ ปริมาณ และราคาของต้นฉบับจะไม่เปลี่ยน
+                </p>
+                <p className="font-medium">
+                  หากต้องการบัญชีราคาและ Factor F ปัจจุบัน ให้สร้าง BOQ ใหม่แบบสะอาดแทนการคัดลอก
                 </p>
                 {factorVersionLoadError && (
                   <p className="font-medium text-red-700">{factorVersionLoadError}</p>
                 )}
-                {canCreateBOQ ? (
-                  <div className="mt-2 flex flex-col gap-2 sm:flex-row sm:items-center">
-                    <Select
-                      value={selectedFactorCopyVersionId}
-                      onValueChange={setSelectedFactorCopyVersionId}
-                      disabled
-                    >
-                      <SelectTrigger className="w-full bg-white sm:w-[280px]">
-                        <SelectValue placeholder="เลือกเวอร์ชัน Factor F" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {factorVersionOptions.map((version) => (
-                          <SelectItem key={version.id} value={version.id}>
-                            {version.version_string}
-                            {version.loan_interest_percent != null
-                              ? ` - ดอกเบี้ย ${Number(version.loan_interest_percent).toFixed(2)}%`
-                              : ''}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                    <Button
-                      type="button"
-                      size="sm"
-                      disabled
-                      title={FACTOR_COPY_DISABLED_REASON}
-                    >
-                      <Copy className="h-4 w-4" />
-                      คัดลอก (ปิดชั่วคราว)
-                    </Button>
+                {canCreateBOQ && canAttemptSelectedFactorCopy ? (
+                  <div className="mt-2 flex flex-col gap-3">
+                    <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
+                      <Select
+                        value={selectedFactorCopyVersionId}
+                        onValueChange={(value) => {
+                          setSelectedFactorCopyVersionId(value);
+                          setFactorVersionLoadError(null);
+                        }}
+                        disabled={isCreatingFactorCopy || factorVersionOptions.length === 0}
+                      >
+                        <SelectTrigger className="w-full bg-white sm:w-[280px]">
+                          <SelectValue placeholder="เลือกเวอร์ชัน Factor F" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectGroup>
+                            {factorVersionOptions.map((version) => (
+                              <SelectItem key={version.id} value={version.id}>
+                                {version.version_string}
+                                {version.loan_interest_percent != null
+                                  ? ` - ดอกเบี้ย ${Number(version.loan_interest_percent).toFixed(2)}%`
+                                  : ''}
+                              </SelectItem>
+                            ))}
+                          </SelectGroup>
+                        </SelectContent>
+                      </Select>
+                      <Button
+                        type="button"
+                        size="sm"
+                        onClick={openFactorCopyDialog}
+                        disabled={
+                          isCreatingFactorCopy
+                          || !selectedFactorCopyVersionId
+                          || factorVersionOptions.length === 0
+                        }
+                      >
+                        <Copy data-icon="inline-start" />
+                        ตรวจสอบและสร้างสำเนา
+                      </Button>
+                    </div>
+                    <div>
+                      <Button asChild type="button" size="sm" variant="outline">
+                        <Link href="/boq/create">
+                          <Plus data-icon="inline-start" />
+                          สร้าง BOQ ใหม่ด้วยราคาปัจจุบัน
+                        </Link>
+                      </Button>
+                    </div>
                   </div>
-                ) : (
+                ) : !canCreateBOQ ? (
                   <p className="font-medium">
                     ผู้ใช้บัญชีนี้ไม่มีสิทธิ์สร้าง BOQ ใหม่ กรุณาติดต่อผู้ดูแลระบบ
                   </p>
+                ) : (
+                  <div className="mt-2 space-y-2">
+                    <p className="font-medium">
+                      BOQ นี้มียอดรวมเป็นศูนย์ จึงยังไม่สามารถสร้างสำเนาพร้อมเลือก
+                      Factor F โดยคงสถานะรอตรวจสอบได้อย่างปลอดภัย
+                    </p>
+                    <Button asChild type="button" size="sm" variant="outline">
+                      <Link href="/boq/create">
+                        <Plus data-icon="inline-start" />
+                        สร้าง BOQ ใหม่
+                      </Link>
+                    </Button>
+                  </div>
                 )}
               </AlertDescription>
             </Alert>
@@ -415,10 +570,106 @@ export default function EditBOQPage() {
               isSaving={isSaving}
               onFactorCalculated={setFactorData}
               readOnly={isEditorReadOnly}
+              printDisabled={isFactorReviewRequired}
+              printDisabledReason="กรุณาตรวจสอบและบันทึก Factor F ก่อนพิมพ์หรือส่งออก"
             />
           )}
         </div>
       </div>
+
+      <Dialog
+        open={factorCopyIntent !== null}
+        onOpenChange={handleFactorCopyDialogOpenChange}
+      >
+        <DialogContent showCloseButton={!isCreatingFactorCopy}>
+          <DialogHeader>
+            <DialogTitle className="pr-8">ยืนยันการสร้างสำเนาและเลือก Factor F</DialogTitle>
+            <DialogDescription>
+              ระบบจะสร้างฉบับร่างใหม่จาก “{projectInfo.project_name}” และผูกกับ Factor F
+              เวอร์ชัน {factorCopyIntent?.factorVersionLabel}
+            </DialogDescription>
+          </DialogHeader>
+
+          <Alert>
+            <AlertTriangle />
+            <AlertTitle>เปลี่ยนเฉพาะ Factor F ของสำเนา</AlertTitle>
+            <AlertDescription>
+              <p>
+                บัญชีราคา {catalogVersion?.versionString ?? 'ของต้นฉบับ'} รายการ ปริมาณ
+                และราคาต่อหน่วยจะคงเดิม ระบบจะล้างผลคำนวณ Factor F ในสำเนา
+                เพื่อให้คุณตรวจสอบและบันทึกใหม่
+              </p>
+              <p>
+                ระบบจะตรวจความครบถ้วนของข้อมูลต้นฉบับอีกครั้งก่อนสร้างสำเนา
+                หากไม่ผ่านจะให้เริ่ม BOQ ใหม่แทนโดยไม่แก้ข้อมูลเดิมย้อนหลัง
+              </p>
+              <p>BOQ ต้นฉบับจะไม่ถูกเปลี่ยนแปลง</p>
+            </AlertDescription>
+          </Alert>
+
+          {factorCopyIntent?.error && (
+            <Alert variant="destructive" aria-live="assertive">
+              <AlertTriangle />
+              <AlertTitle>สร้างสำเนาไม่สำเร็จ</AlertTitle>
+              <AlertDescription>
+                <p>{factorCopyIntent.error}</p>
+                <p>
+                  {factorCopyIntent.recovery === 'reload'
+                    ? 'ระบบจะไม่คัดลอกจากข้อมูลเก่า กรุณาโหลด BOQ ใหม่ก่อนเริ่มคำขอใหม่'
+                    : factorCopyIntent.recovery === 'create_new'
+                      ? 'ระบบจะไม่ซ่อมหรือคำนวณข้อมูลเดิมย้อนหลัง กรุณาเริ่มจาก BOQ ใหม่'
+                      : factorCopyIntent.recovery === 'dismiss'
+                        ? 'ปิดหน้าต่างนี้และตรวจสอบสิทธิ์หรือสถานะบัญชีกับผู้ดูแลระบบ'
+                        : 'กด “ลองสร้างสำเนาอีกครั้ง” เพื่อส่งคำขอเดิมอย่างปลอดภัย'}
+                </p>
+              </AlertDescription>
+            </Alert>
+          )}
+
+          <DialogFooter>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => setFactorCopyIntent(null)}
+              disabled={isCreatingFactorCopy}
+            >
+              ยกเลิก
+            </Button>
+            <Button
+              type="button"
+              onClick={factorCopyIntent?.recovery === 'reload'
+                ? () => window.location.reload()
+                : factorCopyIntent?.recovery === 'create_new'
+                  ? () => router.push('/boq/create')
+                  : factorCopyIntent?.recovery === 'dismiss'
+                    ? () => setFactorCopyIntent(null)
+                    : handleCreateFactorCopy}
+              disabled={isCreatingFactorCopy}
+            >
+              {factorCopyIntent?.recovery === 'reload' ? (
+                <RefreshCw data-icon="inline-start" />
+              ) : factorCopyIntent?.recovery === 'create_new' ? (
+                <Plus data-icon="inline-start" />
+              ) : isCreatingFactorCopy ? (
+                <Loader2 data-icon="inline-start" className="animate-spin" />
+              ) : (
+                <Copy data-icon="inline-start" />
+              )}
+              {factorCopyIntent?.recovery === 'reload'
+                ? 'โหลด BOQ ใหม่'
+                : factorCopyIntent?.recovery === 'create_new'
+                  ? 'สร้าง BOQ ใหม่'
+                  : factorCopyIntent?.recovery === 'dismiss'
+                    ? 'ปิด'
+                : isCreatingFactorCopy
+                ? 'กำลังสร้างสำเนา'
+                : factorCopyIntent?.error
+                  ? 'ลองสร้างสำเนาอีกครั้ง'
+                  : 'ยืนยันและเปิดสำเนา'}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

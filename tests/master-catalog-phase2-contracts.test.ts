@@ -7,16 +7,25 @@ function readSource(path: string): string {
 }
 
 describe('Master Catalog Phase 2 application contracts', () => {
-  it('binds new BOQs and keeps duplicate BOQ copy disabled pending an atomic contract', () => {
+  it('binds new BOQs and restores preserve-copy through the atomic RPC contract', () => {
     const createPage = readSource('app/boq/create/page.tsx')
     const listPage = readSource('app/boq/page.tsx')
+    const duplicateClient = readSource('lib/boq/duplicate.ts')
 
     expect(createPage).toContain('price_list_version_id: latestCatalogVersion.id')
-    expect(listPage).toContain('copyDisabledReason')
-    expect(listPage).toMatch(/disabled title=\{copyDisabledReason\}/)
-    expect(listPage).not.toContain('handleDuplicate')
-    expect(listPage).not.toContain('originalBOQ')
+    expect(listPage).toContain('duplicateBOQAtomic')
+    expect(listPage).toContain("mode: 'preserve'")
+    expect(listPage).toContain('factor_reference_version_id')
+    expect(duplicateClient).toContain("DUPLICATE_BOQ_RPC = 'duplicate_boq_atomic'")
+    expect(duplicateClient).toContain('p_source_boq_id: request.sourceBOQId')
+    expect(duplicateClient).toContain('p_request_id: request.requestId')
+    expect(duplicateClient).toContain(
+      'p_expected_source_updated_at: request.expectedSourceUpdatedAt',
+    )
+    expect(listPage).toContain('expectedSourceUpdatedAt: copyIntent.boq.updated_at')
+    expect(listPage).toContain('เปิดหน้าแก้ไขเพื่อเลือกเวอร์ชัน Factor F')
     expect(listPage).not.toContain("from('boq_items').insert")
+    expect(listPage).not.toContain("from('boq_routes').insert")
   })
 
   it('filters both item-search queries by the BOQ catalog version', () => {
