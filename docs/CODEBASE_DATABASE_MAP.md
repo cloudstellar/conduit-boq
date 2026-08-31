@@ -22,6 +22,18 @@
 > Factor F mutation occurred in the final rollout. See [Plan #105](./plans/master-catalog/105-phase4-master-catalog-admin-edit-completion-plan.md)
 > and [Result #107](./plans/master-catalog/107-phase4-p49-master-catalog-final-closeout-result.md).
 
+<!-- DUP1_CURRENT_STATE_20260831 -->
+> **Later product-release supersession (2026-08-31):** Production now also
+> includes exact migration 029
+> `20260831004110/atomic_boq_duplicate` and matching merge/deployment
+> `0e76ed39e68746c9bd6003da69a03f096ae482a3`. Atomic preserve Copy and the
+> separate eligible-legacy selected-Factor flow are live; final postflight was
+> `263` BOQs, `326` routes, `2,617` items, `0` private request rows, with
+> unchanged Catalog/Factor anchors. See
+> [DUP-1 Production Result](./plans/product/04-atomic-boq-duplicate-production-release-result.md).
+> The body below remains a dated 2026-06-11 map and must not override current
+> code, schema, or the release result. Migrations 027/028/029 are no-replay.
+
 **Project:** Conduit BOQ  
 **Generated:** 2026-06-11  
 **Scope:** อ่านจาก source code, docs, migrations, scripts, tests, และ production Supabase  

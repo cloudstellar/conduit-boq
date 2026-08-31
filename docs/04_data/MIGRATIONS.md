@@ -1,7 +1,7 @@
 # Migrations
 ## Conduit BOQ System
 
-**Last Updated:** 2026-08-28
+**Last Updated:** 2026-08-31
 **Status:** Canonical
 
 <!-- MAIN_CONVERGENCE_TEMPORAL_ADDENDUM_20260829 -->
@@ -26,6 +26,19 @@
 > three are now exact boolean `true`. Do not create 029 or edit/replay 027/028.
 > See [Plan #105](../plans/master-catalog/105-phase4-master-catalog-admin-edit-completion-plan.md)
 > and [Result #107](../plans/master-catalog/107-phase4-p49-master-catalog-final-closeout-result.md).
+
+<!-- DUP1_PRODUCTION_CLOSEOUT_20260831 -->
+> **Later product-release overlay (2026-08-31):** The line above saying “Do not
+> create 029” is retained as the 2026-08-28 Master Catalog/repository-convergence
+> boundary. Migration 029 was subsequently created and applied exactly once for
+> the separately authorized DUP-1 product release as
+> `20260831004110/atomic_boq_duplicate`, source SHA-256
+> `748a84431c36bc0aa4bf3f8293aa818768d5198d9da82c9f1e0ad5106a382c3d`.
+> Final independent postflight verified its exact objects/ACL, `0` private
+> request-ledger rows, unchanged `263/326/2617` BOQ graph counts, all five BOQ
+> policy fingerprints, and unchanged Catalog/Factor hashes and pointers. See
+> [DUP-1 Production Result](../plans/product/04-atomic-boq-duplicate-production-release-result.md).
+> Migrations 027, 028, and 029 are now all applied-once, immutable, and no-replay.
 
 > **Current Production overlay (supersedes stale pre-execution status and
 > authority text below):**
@@ -88,6 +101,7 @@
 | `026_master_catalog_phase4_catalog_action_error_acl.sql` | P-47 forward-only per-object callability correction: retain the pure `private.catalog_action_error` body/owner/signature/empty search path, change it to `SECURITY INVOKER`, and grant `EXECUTE` only to `authenticated` while denying `PUBLIC`, `anon`, and `service_role` | **Repository/static review passed; P-48 exact Git-only publication authorized; ledger `20260729002600 master_catalog_phase4_catalog_action_error_acl`; SHA-256 `472fa04b81bc8e96e9b507e20fc20cfee3114c80fda45f2ffba3893480920d8a`; required after immutable `025`; no table/data/default-privilege change; not applied to Local or Production; replacement Git/Remote result, separately authorized clean Local rehearsal, two-pass evidence, and P-12 remain HOLD** |
 | `027_p49_active_profile_authorization_hardening.sql` | P-49 current-active authorization, profile protection, bounded settings projections, and least-privilege API/RLS hardening | **Applied to Production exactly once as `20260827174634 p49_active_profile_authorization_hardening`; SHA-256 `7b96ac17aefc96ee7a788327ddee7508e15eaec73c54f609b44adccf8159eabe`; immutable/no replay** |
 | `028_master_catalog_admin_gate_projection.sql` | Add a private active-Admin gate projection and public security-invoker wrapper without changing flags or business data | **Applied once to Production 2026-08-28** (`20260828070433/master_catalog_admin_gate_projection`); source SHA-256 `6c03dff28d6f71bc4468ba799c70f8a1a7222017353d23f6446bb4be4fb006e3`; immutable/no replay |
+| `029_atomic_boq_duplicate.sql` | Add private deny-by-default copy-request ledger, canonical graph helper, and guarded atomic/idempotent BOQ duplicate RPC | **Applied once to Production 2026-08-31** (`20260831004110/atomic_boq_duplicate`); source SHA-256 `748a84431c36bc0aa4bf3f8293aa818768d5198d9da82c9f1e0ad5106a382c3d`; immutable/no replay |
 | `017+_master_catalog_phase4_*.sql` | Umbrella reference for the Local-only Phase 4 range; canonical bootstrap source applies `017`, `017a`, then `018`-`026` after hotfix `016` | **Current candidate range — prior clean runs through `025` are historical evidence. P-46 completed the exact chain but WP-6.5 then exposed the formatter callability defect and stopped fail-closed. `017a` remains the required pre-`018` global-default bridge; `026` is a distinct, narrowly scoped post-`025` object exception and does not rewrite any reviewed migration. Repository/static review passed and P-48 authorizes exact Git-only publication; replacement Git/Remote result, separately authorized clean Local rehearsal, isolated pass 1, independent contract review, pass 2, and closeout remain mandatory. Every Production approval remains absent.** |
 
 The 2026-07-28 disposable rehearsal does not supersede the prior Local
@@ -418,6 +432,14 @@ Production execution is authorized only by the owning reviewed runbook; this
 inventory is not executor approval. Historical `009`-`016` ledger records and
 the operational `010a` index evidence remain unchanged.
 
+The separately authorized DUP-1 execution is complete and its one-shot
+authority is consumed. Exact migration 029 was applied once before the matching
+application merge/deploy; rollback-scoped functional proof, rendered
+desktop/mobile QA, live PostgREST fail-closed proof, and final no-residue
+postflight passed. Use the
+[DUP-1 Production Result](../plans/product/04-atomic-boq-duplicate-production-release-result.md)
+as its execution receipt, not as authority to rerun it.
+
 For Master Catalog Phase 4 P-12,
 [Package #39 section 4.1](../plans/master-catalog/39-phase4-p12-production-readiness-package.md)
 and [Production Runbook section 9](../plans/master-catalog/12-phase4-production-runbook.md)
@@ -484,4 +506,5 @@ exact incident/window. Never edit an applied migration file.
 - Phase 4 change request: [09-phase4-change-request.md](../plans/master-catalog/09-phase4-change-request.md)
 - Factor F no-maintenance runbook: [09-production-no-maintenance-runbook.md](../plans/factor-f/09-production-no-maintenance-runbook.md)
 - Factor F rollout closeout: [10-production-rollout-closeout.md](../plans/factor-f/10-production-rollout-closeout.md)
+- DUP-1 Atomic BOQ Duplicate Production result: [04-atomic-boq-duplicate-production-release-result.md](../plans/product/04-atomic-boq-duplicate-production-release-result.md)
 - Database Schema: [DATABASE_SCHEMA.md](./DATABASE_SCHEMA.md)

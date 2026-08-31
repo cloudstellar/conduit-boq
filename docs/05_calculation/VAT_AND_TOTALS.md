@@ -1,16 +1,21 @@
 # VAT and Totals
 ## Conduit BOQ System
 
-**Last Updated:** 2026-05-30  
+**Last Updated:** 2026-08-31
 **Status:** Canonical
 
 ---
 
 ## 1. VAT Rate
 
-**VAT is always 7%** — this is fixed and not configurable.
+Version-bound BOQs derive VAT from the bound Factor F version's
+`vat_percent`. Current published Factor versions store `7`, and legacy metadata
+fallback is explicitly `7`.
 
-The rate is applied uniformly across all BOQ calculations. There is no per-project or per-route override.
+There is no user, project, or route override. All routes in one BOQ use the same
+bound-version rate. A future governed Factor version may carry another validated
+non-negative rate; consumers must use `getFactorVatPercent()` /
+`getFactorVatRate()` rather than embedding `0.07` in UI/output code.
 
 ---
 
@@ -20,11 +25,11 @@ The total for any BOQ (or route within a BOQ) follows a strict three-step pipeli
 
 ```
 Grand Total × Factor F = beforeVAT
-beforeVAT × 0.07      = VAT
+beforeVAT × vatRate   = VAT
 beforeVAT + VAT        = total
 ```
 
-| Step | Formula | Example (Grand Total = 1,234,567.89, Factor F = 1.1545) |
+| Step | Formula | Example (Grand Total = 1,234,567.89, Factor F = 1.1545, bound VAT = 7%) |
 |------|---------|----------------------------------------------------------|
 | 1. Before VAT | `grandTotal × factorF` | 1,234,567.89 × 1.1545 = **1,425,302.63** |
 | 2. VAT | `beforeVAT × 0.07` | 1,425,302.63 × 0.07 = **99,771.18** |
@@ -62,9 +67,9 @@ const total = roundMoney(beforeVAT + vat);
 **Good** — each value is independently rounded:
 ```typescript
 // ✅ CORRECT: round each value first, then add rounded values
-const roundedBeforeVAT = roundMoney(grandTotal * factorF);
-const roundedVAT = roundMoney(roundedBeforeVAT * 0.07);
-const total = roundMoney(roundedBeforeVAT + roundedVAT);
+const vatRate = getFactorVatRate(factorVersion);
+const roundedBeforeVAT = roundMoney(multiplyFactor(grandTotal, factorF));
+const { vat: roundedVAT, total } = calculateVAT(roundedBeforeVAT, vatRate);
 ```
 
 This ensures that any sub-totals printed or stored will always add up to the final total shown.
@@ -111,13 +116,14 @@ The last route is chosen as the adjustment target because:
 | Function | File | Purpose |
 |----------|------|---------|
 | `roundMoney()` | `lib/calculation.ts` | Round to 2 decimal places using exponential notation |
-| `calculateVAT()` | `lib/calculation.ts` | Apply 7% VAT to a given `beforeVAT` value |
-| `allocateToRoutes()` | `lib/calculation.ts` | Distribute grand totals across routes with remainder adjustment |
+| `getFactorVatPercent()` / `getFactorVatRate()` | `lib/factorF.ts` | Read bound Factor-version VAT; explicit legacy fallback 7% |
+| `calculateVAT(amount, vatRate)` | `lib/calculation.ts` | Apply the supplied rate; low-level default remains 7% for legacy callers |
+| `allocateToRoutes(routeCosts, factor, vatRate)` | `lib/calculation.ts` | Distribute grand totals across routes with one BOQ-wide rate and remainder adjustment |
 
 ---
 
 ## References
 
 - Calculation Engine: [`lib/calculation.ts`](../../lib/calculation.ts)
-- Multi-Route Architecture: [MULTI_ROUTE_ARCHITECTURE.md](../03_features/MULTI_ROUTE_ARCHITECTURE.md)
+- Multi-route domain reference: [DOMAIN_MODEL.md](../03_domain/DOMAIN_MODEL.md)
 - Coding Rules (Float Safety): [CODING_RULES.md](../06_engineering/CODING_RULES.md#23-float-precision-safety-v162)

@@ -12,9 +12,10 @@ especially the active Admin view that can see every BOQ allowed by RLS
 **Related plan:**
 [Conduit BOQ Product Evolution Decision Plan](./01-conduit-boq-product-evolution-decision-plan.md)
 
-**Adjacent selected work:** `DUP-1` Atomic BOQ Duplicate was selected and its
-exact Production release was separately authorized by the Owner on 2026-08-31.
-Its execution evidence is pending. LIST-1 remains a separate proposed decision.
+**Adjacent completed work:** `DUP-1` Atomic BOQ Duplicate was released and
+verified in Production on 2026-08-31 under
+[Result #04](./04-atomic-boq-duplicate-production-release-result.md). Its
+authority is consumed. LIST-1 remains a separate proposed decision.
 
 **Research basis:**
 [BOQ Register Pagination Best-Practice Research](./03-boq-list-pagination-best-practice-research.md)
@@ -27,12 +28,12 @@ Production deployment, commit, push, data mutation, catalog operation, Factor F
 change, or historical BOQ cleanup.
 
 This LIST-1 document does not grant authority for pagination implementation.
-The separate DUP-1 instruction authorizes its exact forward migration,
-application release, and bounded Production verification: normal Atomic
-Preserve Copy plus a separate Selected-Factor Copy for eligible legacy BOQs,
-both preserving the source Catalog/items/prices. It does not authorize LIST-1
-or broaden DUP-1 into Catalog/Factor publication, repricing, or source-BOQ
-mutation.
+The separate DUP-1 instruction was executed and consumed for its exact forward
+migration, application release, and bounded Production verification: normal
+Atomic Preserve Copy plus a separate Selected-Factor Copy for eligible legacy
+BOQs, both preserving the source Catalog/items/prices. Its result does not
+authorize LIST-1 or broaden DUP-1 into Catalog/Factor publication, repricing,
+or source-BOQ mutation.
 
 The Owner decision requested is:
 
@@ -59,21 +60,21 @@ decision and is not required to solve the current list problem.
 The code and dated evidence show that list scale is already a real problem, not
 only a future optimization:
 
-- The page loads every RLS-visible row and every column using `select('*')`,
-  with no `limit()` or `range()`, in
-  [app/boq/page.tsx](../../../app/boq/page.tsx#L42-L52).
+- The page still loads every RLS-visible row using `select('*')` plus Catalog
+  and Factor-version labels, with no `limit()` or `range()`, in
+  [app/boq/page.tsx](../../../app/boq/page.tsx#L118-L140).
 - Search runs only over the rows already loaded into browser memory in
-  [app/boq/page.tsx](../../../app/boq/page.tsx#L62-L67).
+  [app/boq/page.tsx](../../../app/boq/page.tsx#L142-L147).
 - Ordering uses only `created_at DESC`; equal timestamps have no deterministic
   tie-breaker in
-  [app/boq/page.tsx](../../../app/boq/page.tsx#L46-L50).
+  [app/boq/page.tsx](../../../app/boq/page.tsx#L122-L129).
 - The header calls `boqList.length` “ทั้งหมด”, although it is only the number of
   rows returned by the API, in
-  [app/boq/page.tsx](../../../app/boq/page.tsx#L128-L133).
+  [app/boq/page.tsx](../../../app/boq/page.tsx#L254-L256).
 - Mobile cards and the desktop table are both mounted and mapped even though
   CSS hides one presentation at a time, in
-  [app/boq/page.tsx](../../../app/boq/page.tsx#L163-L180) and
-  [app/boq/page.tsx](../../../app/boq/page.tsx#L211-L233).
+  [app/boq/page.tsx](../../../app/boq/page.tsx#L289-L299) and
+  [app/boq/page.tsx](../../../app/boq/page.tsx#L377-L400).
 - Every mounted `RouteBadge` immediately issues its own `boq_routes` request in
   [RouteBadge.tsx](../../../components/boq/RouteBadge.tsx#L30-L42). The two
   responsive render trees therefore produce approximately `2N` route requests
@@ -91,10 +92,10 @@ only a future optimization:
   active Admin to select all BOQs, while other roles are scope-limited. This is
   why Admin experiences the scaling problem first. RLS remains the authority;
   UI filters must not replace it.
-- Whole-BOQ Copy is currently disabled. DUP-1 is planned before Quantity
-  Expression to replace the former multi-request browser copy with an atomic
-  trusted operation; this document must test its list action once available but
-  must not claim the feature is released.
+- Whole-BOQ Copy is live through the atomic trusted DUP-1 operation. Normal Copy
+  and the separate selected-Factor legacy action must remain correct across
+  pagination/search transitions; LIST-1 must not reintroduce the former
+  multi-request browser copy or duplicate the RPC eligibility predicate.
 
 The current `/price-list` page has page controls, but it first loads all rows
 and then slices the array in memory. Its controls may inform visual style, but
@@ -132,9 +133,12 @@ the list's search/filter contract. Row count alone is not the upgrade trigger.
   free-text estimator when the authorized directory data is available.
 - Keep one primary row action such as Open/Edit; permission-dependent secondary
   actions must reflect `can()` and RLS rather than failing only after a click.
-- After DUP-1 is released, normal Copy may return as a secondary row action only
-  when the actor and source are eligible. Its label/help must state that Catalog,
-  prices, and Factor F are preserved. Do not label it as current-price copy.
+- Normal Copy is a current secondary row action when the actor/source pass the
+  UI's candidate-level checks. Its label/help states that Catalog, prices, and
+  Factor F are preserved. The trusted RPC remains the final eligibility
+  authority and may fail the action closed; a future LIST-1 projection may make
+  that decision available to the list without weakening the RPC check. Do not
+  label it as current-price copy.
 
 ### Mobile
 
@@ -310,8 +314,8 @@ unmeasured row threshold.
 
 An order index or later trigram text-search index has storage and write cost.
 Do not add one by assumption at only 263 rows. Any justified index is a newly
-approved forward product migration after 028. Never edit, retry, or replay
-migrations 027/028.
+approved forward product migration after 029. Never edit, retry, or replay
+migrations 027/028/029.
 
 ## 9. RLS and adjacent permission finding
 
@@ -396,11 +400,11 @@ These are planning ranges, not implementation approval or commitments.
   server-authorized current set/count; and
 - true Project grouping/entity if the business distinguishes Project from BOQ.
 
-LIST-1 can run independently or in parallel with DUP-1. If work must be
-serialized, apply the smallest R0 guard and establish the approved test baseline
-first, deliver DUP-1 next under the recorded Owner priority, then LIST-1 before
-the larger Quantity Expression DB-1 release. LIST-1 still addresses current
-Admin pain, has a smaller blast radius, and may require no schema change.
+DUP-1 is complete. The next recommended serialized decision is LIST-1 before
+the larger Quantity Expression DB-1 release, with the calculation safety/test
+baseline established before expression implementation. LIST-1 still addresses
+current Admin pain, has a smaller blast radius, and may require no schema
+change.
 
 ## 12. Test and release gates
 
@@ -420,7 +424,7 @@ Minimum scenarios:
 | Routes | Page load performs a bounded batch/embedded route request; request count does not grow per BOQ row. |
 | Personas | Active Admin, owner, assignee, staff, department/sector manager, procurement, pending/inactive, and out-of-scope users see matching rows and counts. |
 | Responsive/a11y | 390, 768, 1024, and 1440 px plus zoom, keyboard, focus, landmark, current-page, boundary Previous/Next, page-number document title, loading, error, empty, and no-result checks. |
-| Regression | Create, Open/Edit, Print, allowed Delete, and return-to-list behavior retain intended permissions. Until DUP-1 release, Copy remains intentionally disabled. After release, normal Atomic Preserve Copy appears only for eligible actor/source pairs, Selected-Factor Copy remains a separate eligible-legacy action, current-price guidance points to Create New, and pagination/search transitions cannot submit a stale/duplicate copy request. |
+| Regression | Create, Open/Edit, Print, allowed Delete, and return-to-list behavior retain intended permissions. Current normal Atomic Preserve Copy is a candidate/advisory action whose final eligibility is decided by the trusted RPC (or surfaced by a future trusted LIST-1 projection); Selected-Factor Copy remains a separate eligible-legacy action, current-price guidance points to Create New, and pagination/search transitions cannot submit a stale/duplicate copy request. |
 
 GO only when:
 
@@ -438,7 +442,7 @@ STOP if:
 - any per-row route query remains on initial list load;
 - rows duplicate/disappear under the approved fixed-dataset ordering fixtures;
 - a view/RPC bypasses RLS; or
-- implementation requires replaying or changing migrations 027/028.
+- implementation requires replaying or changing migrations 027/028/029.
 
 ## 13. Owner decision sheet
 
@@ -452,7 +456,7 @@ STOP if:
 | Count policy | Exact visible count now; reviewed estimated/indeterminate fallback only after measured need | `TBD` |
 | Admin L2 filters | Department + sector + owner + date | `TBD` |
 | Route behavior | Embed current-page route fields or use one current-page batch; no per-row or per-click list query | `TBD` |
-| First implementation order | R0A smallest input guard/test baseline, then DUP-1, then LIST-1, then expression DB-1; LIST-1 may run in parallel | `DUP-1 priority recorded 2026-08-31; LIST-1 itself remains TBD` |
+| First implementation order | DUP-1 complete; decide/implement LIST-1 next, then calculation baseline and expression DB-1 | `DUP-1 released 2026-08-31; LIST-1 itself remains TBD` |
 
 ## 14. Proposed approval wording
 
@@ -470,7 +474,7 @@ commit, push, Preview, schema/index/RPC/migration work, Production deployment,
 or any Production write.
 ```
 
-The previously recorded DUP-1 priority is not a LIST-1 approval and does not
-claim that Copy is released. A later LIST-1 implementation must integrate the
-then-current verified DUP-1 eligibility/actions without duplicating Factor
+The completed DUP-1 release is not a LIST-1 approval. A later LIST-1
+implementation must integrate the current verified DUP-1 eligibility/actions
+without duplicating Factor
 queries per row or changing the D9 preserve/reset semantics.

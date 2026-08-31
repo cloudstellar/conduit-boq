@@ -1,10 +1,24 @@
 # Database Schema
 ## Conduit BOQ System
 
-**Last Updated:** 2026-08-28
-**Status:** Migrations 027 and 028 are applied once in Production; the full
-audited Master Catalog Admin draft workflow is live under Plan #105 V2
+**Last Updated:** 2026-08-31
+**Status:** Migrations 027, 028, and 029 are applied once in Production; the
+audited Master Catalog workflow and Atomic BOQ Duplicate are live
 **Database:** PostgreSQL 17 (Supabase)
+
+<!-- DUP1_PRODUCTION_CLOSEOUT_20260831 -->
+> [!IMPORTANT]
+> **Latest product-schema overlay:** Migration 029 is applied exactly once as
+> `20260831004110/atomic_boq_duplicate`, source SHA-256
+> `748a84431c36bc0aa4bf3f8293aa818768d5198d9da82c9f1e0ad5106a382c3d`.
+> It adds the private idempotency ledger/helper and guarded authenticated
+> `duplicate_boq_atomic` RPC described below. Final independent postflight at
+> `2026-08-31 00:55:26 UTC` found `0` request-ledger rows, unchanged
+> `263/326/2617` BOQ/route/item counts, all five BOQ policy fingerprints
+> unchanged, and unchanged Catalog/Factor hashes and pointers. See
+> [DUP-1 Production Result](../plans/product/04-atomic-boq-duplicate-production-release-result.md).
+> This is a separate product release after the Master Catalog closeout; 027,
+> 028, and 029 are immutable and must not be replayed.
 
 <!-- MASTER_CATALOG_CURRENT_STATE_20260829 -->
 > [!IMPORTANT]
@@ -30,7 +44,9 @@ audited Master Catalog Admin draft workflow is live under Plan #105 V2
 > [Plan #105](../plans/master-catalog/105-phase4-master-catalog-admin-edit-completion-plan.md).
 > The final operating state is `true/true/true` for Admin, New identity, and
 > Retirement after their exact staged checks. Those transitions were runtime
-> configuration changes, not schema changes; migration 029 is not required.
+> configuration changes, not schema changes; migration 029 was not required for
+> that Master Catalog closeout. It was later applied only for the separate
+> DUP-1 product release described in the latest overlay.
 > The approved P-19 PDF application/tests/render QA and Production Stage C
 > passed. See [Result #107](../plans/master-catalog/107-phase4-p49-master-catalog-final-closeout-result.md).
 
@@ -164,7 +180,7 @@ BOQ Header - ใบประมาณราคา
 | `total_cost` | DECIMAL(15,2) | NO | รวมทั้งหมด |
 | `factor_f` | DECIMAL(10,4) | YES | ค่า Factor F |
 | `total_with_factor_f` | DECIMAL(15,2) | NO | รวมหลังคูณ Factor F |
-| `total_with_vat` | DECIMAL(15,2) | NO | รวมหลัง VAT 7% |
+| `total_with_vat` | DECIMAL(15,2) | NO | ยอดที่บันทึกหลัง VAT จาก metadata ของ Factor F version ที่ผูกไว้; เวอร์ชัน published ปัจจุบันและ legacy fallback ใช้ 7% |
 | `factor_f_raw` | DECIMAL(15,4) | YES | ค่าเบื้องต้นดิบ (ก่อนปัด) |
 | `factor_f_lower_cost` | DECIMAL(15,2) | YES | B: ค่างานต้นทุนตัวต่ำ |
 | `factor_f_upper_cost` | DECIMAL(15,2) | YES | C: ค่างานต้นทุนตัวสูง |
@@ -268,7 +284,7 @@ BOQ Header - ใบประมาณราคา
 | `profit_percent` | DECIMAL | NO | % กำไร |
 | `total_expense_percent` | DECIMAL | NO | % ค่าใช้จ่ายรวม |
 | `factor` | DECIMAL | NO | ค่า "รวมในรูป Factor" ที่ระบบใช้คำนวณ |
-| `vat_percent` | DECIMAL | NO | % VAT |
+| `vat_percent` | DECIMAL | NO | Legacy/source row metadata (historically VAT coefficient such as `1.0700`); not the BOQ VAT percentage consumed by current version-bound calculation |
 | `factor_f` | DECIMAL | NO | ค่า Factor F หลัง VAT ในตารางอ้างอิง (ไม่ได้ใช้เป็นตัวคูณหลักของ BOQ) |
 | `factor_f_rain_1` | DECIMAL | NO | Factor F ฤดูฝน 1 |
 | `factor_f_rain_2` | DECIMAL | NO | Factor F ฤดูฝน 2 |
@@ -292,7 +308,7 @@ BOQ Header - ใบประมาณราคา
 | `advance_payment_percent` | NUMERIC(10,4) | YES | เงื่อนไขเงินจ่ายล่วงหน้า |
 | `retention_percent` | NUMERIC(10,4) | YES | เงื่อนไขเงินประกันผลงาน |
 | `loan_interest_percent` | NUMERIC(10,4) | YES | อัตราดอกเบี้ยเงินกู้ |
-| `vat_percent` | NUMERIC(10,4) | YES | VAT สำหรับข้อความเงื่อนไข |
+| `vat_percent` | NUMERIC(10,4) | YES | Authoritative VAT percentage for version-bound BOQ calculation, route allocation, Print, and Excel (current published versions use `7`) |
 | `row_count` | INTEGER | YES | จำนวนแถวของเวอร์ชัน |
 | `dataset_hash` | TEXT | YES | SHA-256 canonical dataset hash |
 
@@ -312,7 +328,7 @@ BOQ Header - ใบประมาณราคา
 | `profit_percent` | NUMERIC(10,4) | YES | Legacy/source-derived metadata |
 | `total_expense_percent` | NUMERIC(10,4) | YES | Legacy/source-derived metadata |
 | `factor` | NUMERIC(10,4) | NO | ค่า "รวมในรูป Factor" ที่ใช้คำนวณ BOQ |
-| `vat_percent` | NUMERIC(10,4) | NO | VAT ของแถว |
+| `vat_percent` | NUMERIC(10,4) | NO | Legacy/source row metadata (for example `1.0700`); not the current BOQ percentage input—use the parent version's `vat_percent` |
 | `factor_f` | NUMERIC(10,4) | NO | ค่า Factor F ในตารางอ้างอิง |
 | `factor_f_rain_1` | NUMERIC(10,4) | NO | Factor F ฝนชุก 1 |
 | `factor_f_rain_2` | NUMERIC(10,4) | NO | Factor F ฝนชุก 2 |
@@ -339,6 +355,33 @@ singleton pointer สำหรับ Factor F default หลัง migration 012
 | `value` | JSONB | YES | ค่า (JSON) |
 | `created_at` | TIMESTAMPTZ | NO | วันที่สร้าง |
 | `updated_at` | TIMESTAMPTZ | NO | วันที่แก้ไขล่าสุด |
+
+---
+
+### 10a. private.boq_copy_requests
+
+Private idempotency/evidence ledger added by migration 029. It is not a direct
+Data API table: RLS is enabled, it has no policies, and all table privileges are
+revoked from `PUBLIC`, `anon`, `authenticated`, and `service_role`. Only the
+guarded RPC may use it through its owner execution context.
+
+| Column | Type | Nullable | Description |
+|---|---|---|---|
+| `actor_id` | UUID | NO | Authenticated actor; part of primary key |
+| `request_id` | UUID | NO | Client idempotency key; part of primary key |
+| `source_boq_id` | UUID | NO | Locked source BOQ |
+| `expected_source_updated_at` | TIMESTAMPTZ | NO | Optimistic source-write token |
+| `mode` | TEXT | NO | `preserve` or `select_factor` |
+| `requested_factor_reference_version_id` | UUID | YES | Required only for `select_factor` |
+| `source_graph_sha256` | TEXT | NO | Canonical 64-hex source graph fingerprint |
+| `result_boq_id` | UUID | NO | Unique destination returned for this request |
+| `result_factor_reference_version_id` | UUID | NO | Factor version bound to the destination |
+| `created_at` | TIMESTAMPTZ | NO | Server statement timestamp |
+
+The primary key is `(actor_id, request_id)` and `result_boq_id` is unique. A
+replayed request with the same actor, request ID, and full parameter contract
+returns the same destination; key reuse with a different source, write token,
+mode, or requested Factor version fails closed.
 
 ---
 
@@ -457,14 +500,26 @@ Migration 027 dropped the historical one-argument
 `admin_approve_user(p_target_id uuid)` and two-argument
 `admin_reject_user(p_target_id uuid, p_note text)` signatures.
 
+### Atomic BOQ Duplicate RPC
+
+| Function | Security/ACL | Description |
+|---|---|---|
+| `public.duplicate_boq_atomic(p_source_boq_id uuid, p_request_id uuid, p_expected_source_updated_at timestamptz, p_mode text, p_factor_reference_version_id uuid)` | owner `postgres`; `SECURITY DEFINER`; empty `search_path`; `lock_timeout=5s`; `statement_timeout=30s`; execute only `postgres` and `authenticated` | Atomically creates one complete draft copy or none. `preserve` retains Catalog/prices/Factor state; `select_factor` is restricted to eligible Factor-unbound legacy BOQs and resets Factor-derived state for review/save. |
+
+The owner-only `private.boq_copy_graph_sha256(uuid, boolean)` helper creates the
+canonical route/item graph fingerprint. The public RPC performs its own
+`auth.uid()`/active-profile/source-scope checks and is the authorization
+boundary; client button visibility is not authority.
+
 ---
 
 ## 📁 Migration Files
 
 > [!IMPORTANT]
-> Current Production supersession (2026-08-17): Factor F `012`-`015` and the
+> Current Production supersession (updated 2026-08-31): Factor F `012`-`015`, the
 > exact Phase 4 sequence `017` -> `017a` -> `018`-`026` were later applied and
-> verified. The former draft/planned labels below are retained only where
+> verified; 027, 028, and the separate DUP-1 migration 029 are also applied
+> exactly once. The former draft/planned labels below are retained only where
 > explicitly marked historical. [MIGRATIONS.md](./MIGRATIONS.md) owns current
 > ledger status and [Verification Report #13](../plans/master-catalog/13-phase4-verification-report.md)
 > owns the P-12 evidence.
@@ -491,6 +546,9 @@ Migration 027 dropped the historical one-argument
 | `014_factor_f_publish_2569_0_0.sql` | Publish Factor F `2569.0.0` from confirmed ว 481 source | ✅ Production; former Local-only status superseded |
 | `015_factor_f_repair_legacy_snapshot_metadata.sql` | Repair legacy Factor F snapshot metadata without repricing or binding old BOQs | ✅ Production; former draft status superseded |
 | `017+_master_catalog_phase4_*.sql` | Master Catalog Phase 4 database migrations | ✅ Production exact `017` -> `017a` -> `018`-`026`; P-12 complete |
+| `027_p49_active_profile_authorization_hardening.sql` | Current-active authorization and least-privilege API/RLS hardening | ✅ Production once; immutable/no replay |
+| `028_master_catalog_admin_gate_projection.sql` | Bounded active-Admin gate projection | ✅ Production once; immutable/no replay |
+| `029_atomic_boq_duplicate.sql` | Private idempotency ledger/helper and guarded atomic BOQ duplicate RPC | ✅ Production `20260831004110/atomic_boq_duplicate`; immutable/no replay |
 
 ---
 

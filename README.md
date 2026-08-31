@@ -20,9 +20,12 @@ Quantities) สำหรับการใช้งานภายใน บม�
 ## ความสามารถหลัก
 
 > [!NOTE]
-> รายการ Atomic Duplicate ด้านล่างคือ release candidate `DUP-1` ที่ได้รับ
-> อนุญาตและกำลังดำเนินการ ยังไม่ถือว่า live จนกว่า migration 029, application
-> deployment และ Production postflight จะผ่านและถูกบันทึกใน AI handoff
+> Atomic Duplicate `DUP-1` เปิดใช้งานบน Production แล้วเมื่อ 2026-08-31 ผ่าน
+> migration 029, application deployment และ Production desktop/mobile
+> postflight ตาม
+> [Production release result](docs/plans/product/04-atomic-boq-duplicate-production-release-result.md)
+> Migration 029 เป็น product release ใหม่หลังงาน Master Catalog ไม่ใช่งาน
+> repository convergence และห้ามแก้ไขหรือ replay
 
 - สร้างและแก้ไข BOQ แบบหลายเส้นทาง (Multi-Route)
 - เลือกรายการจาก Master Catalog แบบมีเวอร์ชัน และเก็บราคาเป็น snapshot ของ
@@ -116,6 +119,7 @@ docs/                product, architecture, data, process และ handoff
   สำหรับลำดับพัฒนาระยะยาว
 - [BOQ list scaling plan](docs/plans/product/02-boq-list-scaling-decision-plan.md)
 - [BOQ list pagination research](docs/plans/product/03-boq-list-pagination-best-practice-research.md)
+- [Atomic BOQ Duplicate Production result](docs/plans/product/04-atomic-boq-duplicate-production-release-result.md)
 - [Database schema](docs/04_data/DATABASE_SCHEMA.md),
   [migrations](docs/04_data/MIGRATIONS.md) และ
   [security model](docs/04_data/SECURITY_MODEL.md)
@@ -126,13 +130,18 @@ docs/                product, architecture, data, process และ handoff
 
 ## ขอบเขตและแผนถัดไป
 
-- Atomic Duplicate ต้องมี migration และ application release ที่ตรงกัน
-  ก่อนเปิดใช้; สถานะ live ให้ยึด [AI handoff](docs/08_ai/AI_HANDOFF.md)
+- Atomic Duplicate เปิดใช้แล้วโดย migration 029 และ application ที่ตรงกัน;
+  สถานะ/ข้อจำกัดให้ยึด [AI handoff](docs/08_ai/AI_HANDOFF.md) และ
+  [release result](docs/plans/product/04-atomic-boq-duplicate-production-release-result.md)
 - หน้ารายการ BOQ ยังโหลดรายการที่ผู้ใช้มองเห็นทั้งหมด การแบ่งหน้าแบบ
-  server-side/keyset เป็นงาน `LIST-1` ถัดไป
+  server-side แบบมีเลขหน้าเป็นงาน `LIST-1B` ถัดไป; keyset เป็นทางเลือกภายหลัง
+  เมื่อมีหลักฐานด้าน deep-page performance หรือ mutation churn
 - Quantity Expression ยังเป็นแผน: `*` จะเป็นรูปแบบ canonical และรับ
   `x`, `X`, `×` เป็น alias สูตรจะแสดงเฉพาะ editor ส่วน PDF/Excel แสดงตัวเลข
   เท่านั้น
+- งาน account/security `S0` เป็น lane แยกที่ยังไม่ได้อนุมัติ implementation:
+  พิจารณา invite/pre-provision, MFA/AAL2 และ session policy ก่อน แล้วประเมิน
+  enterprise SSO ภายหลัง
 
 ## Version และการ release
 

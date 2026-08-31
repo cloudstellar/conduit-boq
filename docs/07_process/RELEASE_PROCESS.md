@@ -2,7 +2,7 @@
 ## Conduit BOQ System
 
 > **Status:** CANONICAL
-> **Last Updated:** 2026-06-22
+> **Last Updated:** 2026-08-31
 
 <!-- MASTER_CATALOG_CURRENT_STATE_20260829 -->
 > [!IMPORTANT]
@@ -25,6 +25,27 @@ pull request is merged into `main`.
 
 Supabase Production DB migrations are separate operations. A code merge or
 Vercel deploy must never be treated as evidence that a migration was applied.
+
+### DUP-1 release record — 2026-08-31
+
+Atomic BOQ Duplicate is released and verified. Exact migration 029 was applied
+once as `20260831004110/atomic_boq_duplicate` (SHA-256
+`748a84431c36bc0aa4bf3f8293aa818768d5198d9da82c9f1e0ad5106a382c3d`),
+then PR [#9](https://github.com/cloudstellar/conduit-boq/pull/9) was merged as
+`0e76ed39e68746c9bd6003da69a03f096ae482a3` and the matching Vercel Production
+deployment reached success.
+
+Database evidence and application evidence were checked separately. Isolated
+PostgreSQL, CI, rollback-scoped Production functional proof, desktop/mobile
+rendered QA, an expected live PostgREST fail-closed probe, and final
+`263/326/2617/0` BOQ/route/item/request-ledger no-residue postflight passed.
+Catalog and Factor F hashes/pointers remained unchanged. The complete receipt
+and residuals are in the
+[DUP-1 Production Result](../plans/product/04-atomic-boq-duplicate-production-release-result.md).
+
+That one-shot release authority is consumed. Do not replay migration 029 or
+infer authority for LIST-1, Quantity Expression, another deploy, or another
+Production write.
 
 ## 2. Pre-Release Checklist
 

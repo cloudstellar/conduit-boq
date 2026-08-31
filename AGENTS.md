@@ -22,7 +22,8 @@ current.
   complete with `710` active rows and the full audited Admin draft workflow
   live.
 - Migrations 027 and 028 were applied exactly once. Do not edit, retry, or
-  replay them. Repository convergence does not require migration 029.
+  replay them. The completed Master Catalog repository convergence did not
+  require migration 029.
 - Do not replay P-13, P-14, P-14C, P-15, or R-01 through R-05.
 - Do not mutate or republish the catalog, reprice/backfill existing BOQs, move
   the catalog pointer, or change Factor F as a documentation/repository
@@ -31,6 +32,26 @@ current.
   approval; it is not continuation of the completed phase.
 - The expanded Production persona rehearsal remains an accepted residual,
   **not PASS**.
+
+## Atomic BOQ Duplicate current boundary
+
+`DUP-1_PRODUCTION_CLOSEOUT_20260831`
+
+- Atomic BOQ Duplicate is live in Production from merge commit
+  `0e76ed39e68746c9bd6003da69a03f096ae482a3`; use
+  [DUP-1 Production Release Result](docs/plans/product/04-atomic-boq-duplicate-production-release-result.md)
+  as the execution receipt.
+- Migration 029 was later applied exactly once as the separate product release
+  `20260831004110/atomic_boq_duplicate`. It was not needed for Master Catalog
+  convergence, and it does not change that historical statement.
+- Migrations 027, 028, and 029 are all immutable/no-replay. A later database
+  change requires fresh explicit approval and a new forward migration.
+- Normal Copy preserves Catalog/items/prices and Factor F. The separate
+  selected-Factor path is only for eligible legacy BOQs and blocks official
+  output until trusted review/save. Current prices require Create New.
+- DUP-1 authority is consumed. It does not authorize LIST-1, Quantity
+  Expression, Catalog/Factor operations, account changes, another deployment,
+  or Production mutation.
 
 Production facts in #106/#107 are evidence as recorded on 2026-08-28. If a
 task needs a claim about live mutable state, obtain fresh read-only evidence.

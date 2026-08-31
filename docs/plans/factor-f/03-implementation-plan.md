@@ -1,5 +1,15 @@
 # Factor F Versioning Implementation Plan
 
+<!-- DUP1_CURRENT_STATE_20260831 -->
+> **Later F4 product release:** DUP-1 is live. Normal Copy preserves the source
+> Catalog/items/prices/Factor state; selected-Factor Copy applies only to an
+> eligible positive-total Factor-unbound legacy BOQ, resets Factor-derived
+> state, and blocks output until trusted review/save. Current prices require
+> Create New; there is no reprice/backfill. See
+> [DUP-1 Production Result](../product/04-atomic-boq-duplicate-production-release-result.md).
+> The content below remains dated Factor F rollout history and grants no replay
+> authority.
+
 **Status:** Completed rollout plan; Production `012` through `015` applied on
 2026-06-29
 **Date:** 2026-06-28

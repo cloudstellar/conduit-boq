@@ -5,6 +5,18 @@
 **Decision makers:** Owner, Development Team
 **Related change request:** [Versioned Factor F Change Request](../../plans/factor-f/01-versioned-factor-f-change-request.md)
 
+<!-- DUP1_CURRENT_STATE_20260831 -->
+> [!IMPORTANT]
+> **F4 completion addendum:** The first narrow F4 path is live through DUP-1
+> migration 029 and matching application release. See
+> [DUP-1 Production Result](../../plans/product/04-atomic-boq-duplicate-production-release-result.md).
+> Normal Copy preserves the bound Factor version/snapshot. The separate
+> selected-Factor path is only for eligible positive-total, Factor-unbound
+> legacy BOQs; it preserves old Catalog/items/prices, resets Factor-derived
+> state, and blocks official output until trusted review/save. It never
+> reprices/backfills the source, changes a Factor pointer, or supplies current
+> Catalog prices. Current prices require Create New.
+
 ## Context
 
 The BOQ application already stores Factor F calculation snapshots on `boq`
@@ -94,15 +106,16 @@ future Factor F change:
 | F1 | Deploy additive Factor F version foundation and compatible app changes | New BOQs can bind a factor version; old BOQs stay snapshot-only |
 | F2 | Seed the audited current Factor F table as the initial published factor version for future BOQs only | No legacy BOQ backfill |
 | F3 | Create and publish the new Factor F version, then move the factor default pointer | New BOQs use the new Factor F version |
-| F4 | Add or refine duplicate/reprice UX for old project data | Users create a new estimate instead of mutating history |
+| F4 | Add the bounded duplicate/select-Factor UX for eligible old project data | **Completed by DUP-1 2026-08-31**; users create a new estimate instead of mutating history |
 
-The first F4 UX path is deliberately narrow: from an edit page, users can
-create a new BOQ copy bound to a selected active Factor F version. The default
-choice is the current pointer, but users may choose the old published baseline
-when the work must continue under the old-factor policy. The source BOQ remains
-unchanged, the new copy resets Factor F snapshot fields, and the user must
-review and save the new BOQ before it becomes the durable calculation record.
-This is not a blanket backfill.
+The implemented first F4 UX path is deliberately narrow: from an eligible
+positive-total, Factor-unbound legacy BOQ edit page, users can create a new BOQ
+copy bound to an explicitly selected active Factor F version. The source BOQ
+remains unchanged, the new copy preserves Catalog/items/prices while resetting
+Factor F snapshot/derived fields, and the user must review and save before
+Print/PDF/Excel is available. The trusted RPC makes the final eligibility
+decision; zero-total, mixed-graph, or otherwise invalid sources fail closed to
+Create New. This is not a blanket backfill, repair, or current-price copy.
 
 F1 and F2 should happen before the live Factor F values are changed. F3 is the
 actual Factor F policy change.
@@ -129,8 +142,8 @@ starts at `017+`. See
 - Factor F can change without forcing a Master Catalog price version bump.
 - New BOQs can cite the exact Factor F reference version used.
 - Old BOQs avoid false provenance caused by current-version backfill.
-- Duplicate/reprice becomes an explicit user action rather than a hidden data
-  rewrite.
+- Duplicate/select-Factor becomes an explicit user action rather than a hidden
+  data rewrite; current Catalog prices require Create New.
 
 ### Negative
 

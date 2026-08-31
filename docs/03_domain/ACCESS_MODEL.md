@@ -1,7 +1,7 @@
 # Access Model
 ## Conduit BOQ System
 
-**Last Updated:** 2026-08-18
+**Last Updated:** 2026-08-31
 **Historical snapshot:** P-49 target before its completed Production
 remediation and formal closeout
 
@@ -23,6 +23,14 @@ remediation and formal closeout
 > while the BOQ RLS/RPC and profile grants were not yet aligned at that date.
 > P-51 temporarily accepted that exposure for the exact first closeout. See
 > [P-51 Plan](../plans/master-catalog/48-phase4-p51-risk-accepted-master-catalog-closeout-plan.md).
+
+<!-- DUP1_CURRENT_STATE_20260831 -->
+> [!IMPORTANT]
+> **Later product release:** Atomic BOQ Duplicate is live through migration 029;
+> see [DUP-1 Production Result](../plans/product/04-atomic-boq-duplicate-production-release-result.md).
+> The dated statement above that the ledger ended at 028 remains correct only
+> for its 2026-08-29 Master Catalog recheck. Migrations 027/028/029 are now all
+> applied-once/no-replay.
 
 ---
 
@@ -137,6 +145,27 @@ the current atomic P-49 approval transition:
 Migration 027 dropped the historical one-argument
 `admin_approve_user(p_target_id uuid)` function.
 
+### 5.6 Atomic Copy authorization
+
+| Profile/role | May invoke a successful copy? | Additional requirement |
+|---|---|---|
+| active `admin` | ✅ | Source must remain visible and pass the locked integrity/mode contract |
+| active `dept_manager` | ✅ | Source must be owned/assigned or in authorized department scope |
+| active `sector_manager` | ✅ | Source must be owned/assigned or in authorized sector scope |
+| active `staff` | ✅ | Source must be owned/assigned or in authorized sector scope |
+| active `procurement` | ❌ | Read scope does not imply copy/create authority |
+| pending/inactive/suspended/missing/unknown | ❌ | No BOQ business mutation |
+| anonymous | ❌ | Authentication required |
+
+The database RPC rechecks `auth.uid()`, current active profile/role, source
+visibility, exact mode/Factor eligibility, graph integrity, expected
+`boq.updated_at`, and request-key reuse. Client button visibility is advisory,
+not an authorization boundary. Every destination is a new actor-owned draft in
+the actor's current scope; the source remains unchanged. Normal Copy preserves
+Catalog/items/prices/Factor state. The separate selected-Factor path applies
+only to eligible positive-total Factor-unbound legacy BOQs and blocks official
+output until trusted review/save.
+
 ---
 
 ## 6. Implementation Files
@@ -146,6 +175,8 @@ Migration 027 dropped the historical one-argument
 | `lib/permissions.ts` | Client-side UI checks; P-49 completion is recorded in #106/#107 |
 | `migrations/008_rls_and_trigger.sql` | Historical DB enforcement; applied bytes remain immutable |
 | `app/admin/page.tsx` | Admin UI calls RPC |
+| `lib/boq/duplicate.ts` | Typed atomic-copy client; UX/error mapping, not authorization |
+| `migrations/029_atomic_boq_duplicate.sql` | Database-authoritative atomic copy, idempotency, eligibility, and ACL contract |
 | `docs/plans/master-catalog/45-phase4-p49-pending-authorization-hardening-plan.md` | Historical target, gap inventory, and acceptance gates |
 
 ---

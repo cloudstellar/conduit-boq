@@ -1,7 +1,7 @@
 # Calculation Rules
 ## Conduit BOQ System
 
-**Last Updated:** 2026-06-05
+**Last Updated:** 2026-08-31
 **Status:** Canonical
 
 ---
@@ -19,7 +19,8 @@ Items → Routes → BOQ Total → Factor F → VAT → Final Total
 1. **Standard Prices**: All unit prices come from the official price list (710 items: base 682 + PN6 28)
 2. **Separation of Costs**: Material and labor costs are tracked separately
 3. **Factor F**: A multiplier that accounts for overhead, profit, and interest
-4. **VAT**: Always 7% on top of Factor F-adjusted total
+4. **VAT**: Use the BOQ's bound Factor-version `vat_percent`; current published
+   versions and the explicit legacy fallback are 7%
 5. **No Manual Overrides**: Calculations are automatic, not editable
 
 ---
@@ -32,7 +33,8 @@ Items → Routes → BOQ Total → Factor F → VAT → Final Total
 │  ┌───────────────────────────────────────────────────────┐ │
 │  │ Grand Total = Σ(Route Totals)                         │ │
 │  │ Total with Factor F = Grand Total × Factor F          │ │
-│  │ Total with VAT = Total with Factor F × 1.07           │ │
+│  │ VAT = rounded Total with Factor F × bound vatRate     │ │
+│  │ Total with VAT = rounded before VAT + rounded VAT     │ │
 │  └───────────────────────────────────────────────────────┘ │
 │                           ▲                                 │
 │                           │                                 │
@@ -112,10 +114,17 @@ system does not use `factor_reference.factor_f` as the main BOQ multiplier.
 ### Step 5: VAT Calculation
 
 ```
-Total with VAT = Total with Factor F × 1.07
+vatRate = Factor version vat_percent / 100
+Before VAT = roundMoney(Total with Factor F)
+VAT = roundMoney(Before VAT × vatRate)
+Total with VAT = roundMoney(Before VAT + VAT)
 ```
 
-> **VAT is always 7%** — this is fixed and not configurable.
+Bound Factor-version metadata is authoritative for versioned BOQs. Current
+published Factor versions carry `vat_percent = 7`, and legacy metadata fallback
+is 7%. There is no user, project, or route override. A future governed Factor
+version could carry another validated non-negative rate without changing every
+consumer.
 
 ### Rounding Rules
 
@@ -123,7 +132,7 @@ Total with VAT = Total with Factor F × 1.07
 |---------|-----------|
 | **Factor F** | Truncate (ตัดทิ้ง) เหลือ 4 ทศนิยม |
 | **ค่าก่อน VAT** | ปัดเป็น 2 ทศนิยม (standard rounding) |
-| **VAT 7%** | ปัดตามหลักกรมสรรพากร: ทศนิยมตำแหน่งที่ 3 < 5 ปัดทิ้ง, ≥ 5 ปัดขึ้น |
+| **VAT ตาม bound Factor version** | ปัดตามหลักกรมสรรพากร: ทศนิยมตำแหน่งที่ 3 < 5 ปัดทิ้ง, ≥ 5 ปัดขึ้น |
 | **รวม VAT** | **ก่อน VAT (ปัดแล้ว) + VAT (ปัดแล้ว)** — ไม่คำนวณใหม่ |
 
 > [!IMPORTANT]
@@ -168,6 +177,7 @@ Total with VAT = Total with Factor F × 1.07
 | Rounding | `lib/calculation.ts` | `roundMoney()` |
 | Route allocation | `lib/calculation.ts` | `allocateToRoutes()` |
 | Factor F lookup/interpolation | `lib/factorF.ts` | `calculateInterpolatedFactorFromRefs()` |
+| Bound-version VAT metadata | `lib/factorF.ts` | `getFactorVatPercent()` / `getFactorVatRate()`; legacy fallback 7% |
 | Factor F snapshot validation | `lib/factorF.ts` | `isFactorSnapshotUsable()` |
 | Factor F live edit display | `components/boq/FactorFSummary.tsx` | Load reference rows once, then calculate locally |
 
@@ -201,7 +211,8 @@ Total with VAT = Total with Factor F × 1.07
 1. **Quantity**: Must be > 0
 2. **Unit costs**: From price list, not editable
 3. **Factor F**: Auto-selected, not editable
-4. **VAT**: Fixed at 7%, not editable
+4. **VAT**: Derived from bound Factor-version metadata; not user-editable;
+   current published versions and legacy fallback are 7%
 5. **Totals**: Auto-calculated, not editable
 
 ---

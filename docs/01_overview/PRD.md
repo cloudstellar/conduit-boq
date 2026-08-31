@@ -5,6 +5,17 @@
 **วันที่:** 17 มกราคม 2569  
 **สถานะ:** Production  
 
+<!-- DUP1_CURRENT_STATE_20260831 -->
+> [!IMPORTANT]
+> เอกสารฉบับนี้เป็น PRD baseline เดิมและมีจำนวน/flow บางส่วนที่ล้าสมัย
+> ปัจจุบัน Atomic BOQ Duplicate เปิดใช้แล้ว: Copy ปกติรักษา
+> Catalog/items/prices/Factor เดิม ส่วน selected-Factor ใช้ได้เฉพาะ legacy BOQ
+> ที่เข้าเงื่อนไขและต้อง review/save ก่อน output หากต้องการราคาปัจจุบันให้ใช้
+> Create New; ไม่มี Requote/Reprice/Rebase ดูสถานะจริงที่
+> [DUP-1 Production Result](../plans/product/04-atomic-boq-duplicate-production-release-result.md)
+> VAT ปัจจุบัน derive จาก bound Factor-version metadata; version ปัจจุบันและ
+> legacy fallback เป็น 7% ไม่ใช่ user/project/route override
+
 ---
 
 ## 1. Executive Summary
@@ -165,4 +176,3 @@ Organization (NT)
 - [ ] Notifications
 - [ ] Mobile PWA / Offline
 - [ ] Analytics & Reporting
-

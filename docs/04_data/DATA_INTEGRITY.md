@@ -1,7 +1,7 @@
 # Data Integrity
 ## Conduit BOQ System
 
-**Last Updated:** 2026-08-18
+**Last Updated:** 2026-08-31
 **Historical snapshot:** P-49 target before its completed Production
 remediation and formal closeout
 
@@ -24,6 +24,31 @@ remediation and formal closeout
 > database paths were not yet aligned at that date, and P-51 temporarily
 > accepted rather than fixed that risk. See
 > [P-51 Plan](../plans/master-catalog/48-phase4-p51-risk-accepted-master-catalog-closeout-plan.md).
+
+<!-- DUP1_CURRENT_STATE_20260831 -->
+> [!IMPORTANT]
+> **Later product release:** Atomic BOQ Duplicate is live through migration 029;
+> see [DUP-1 Production Result](../plans/product/04-atomic-boq-duplicate-production-release-result.md).
+> The 2026-08-29 “no 029” statement above remains dated Master Catalog evidence,
+> not the current ledger. Migrations 027/028/029 are all applied-once/no-replay.
+
+## Atomic duplicate integrity invariants
+
+- One authenticated actor/request ID/full parameter contract creates exactly
+  one complete destination or none; a safe replay returns the same destination.
+- The source BOQ, routes, and items remain unchanged. New route/item IDs are
+  remapped atomically; mixed real-route plus unlinked-item graphs fail closed.
+- Preserve mode retains Catalog/item/price/Factor provenance and stored totals.
+  Selected-Factor mode is restricted to eligible positive-total Factor-unbound
+  legacy BOQs, clears Factor-derived state, and blocks official output until a
+  trusted save completes.
+- The supported optimistic-write token is `boq.updated_at`. Arbitrary direct
+  child-table DML outside the trusted save/copy boundary does not advance that
+  header token; this is an accepted residual, not proof of arbitrary-DML graph
+  freshness.
+- `private.boq_copy_requests` is durable idempotency evidence with no current
+  TTL/cleanup path. Do not delete its rows ad hoc: cleanup/retention must be
+  separately designed so response-loss retry semantics remain safe.
 
 ---
 

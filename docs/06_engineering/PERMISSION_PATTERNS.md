@@ -1,7 +1,7 @@
 # Permission Patterns
 ## Conduit BOQ System
 
-**Last Updated:** 2026-08-18
+**Last Updated:** 2026-08-31
 **Historical snapshot:** P-49 target before its completed Production
 remediation and formal closeout
 
@@ -24,6 +24,13 @@ remediation and formal closeout
 > authorization boundary. P-51 temporarily accepted rather than changed the
 > target. See
 > [P-51 Plan](../plans/master-catalog/48-phase4-p51-risk-accepted-master-catalog-closeout-plan.md).
+
+<!-- DUP1_CURRENT_STATE_20260831 -->
+> [!IMPORTANT]
+> Atomic BOQ Duplicate is live through migration 029; see
+> [DUP-1 Production Result](../plans/product/04-atomic-boq-duplicate-production-release-result.md).
+> The dated “no 029” line above is the 2026-08-29 Master Catalog observation.
+> Migrations 027/028/029 are now applied-once/no-replay.
 
 ---
 
@@ -136,6 +143,27 @@ const isLegacy = context?.created_by === null
 > [!WARNING]
 > RLS is the source of truth. The `can()` function is for UI display only.
 
+### Atomic copy request pattern
+
+UI eligibility and `lib/boq/duplicate.ts` are advisory/transport contracts. A
+copy must go through `public.duplicate_boq_atomic`; never implement it as a
+client sequence of header/route/item inserts.
+
+- Generate one stable UUID request key per user intent and reuse that exact key
+  only when retrying the same full parameter contract after an uncertain
+  response.
+- Send the source `boq.updated_at` as the expected write token. On stale-token
+  failure, reload and require a new user intent/request key; do not auto-copy a
+  changed source.
+- Disable duplicate triggers while a request is pending, but rely on database
+  idempotency—not button state—to prevent duplicate destinations.
+- Treat the RPC as final authority for active role/source scope, graph
+  integrity, mode/Factor eligibility, and retry matching. Permanent failures
+  use the explicit mode-appropriate recovery (open source/select Factor or
+  Create New), never an infinite retry.
+- Never grant the browser direct access to `private.boq_copy_requests` or the
+  graph helper.
+
 **Historical implementation note (2026-08-18):** P-49 could not be implemented
 by editing `can()` alone. The future database grants/policies/RPCs, server/API
 checks, middleware allowlist, loaders/actions, and UI had to pass the same
@@ -176,3 +204,4 @@ and ordinary callers must not use an arbitrary user ID as a role-disclosure API.
 
 - Access Model: [03_domain/ACCESS_MODEL.md](../03_domain/ACCESS_MODEL.md)
 - Code: `lib/permissions.ts`
+- Atomic copy client: `lib/boq/duplicate.ts`

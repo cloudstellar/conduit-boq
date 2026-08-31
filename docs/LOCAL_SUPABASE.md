@@ -85,18 +85,21 @@ Consequently, `supabase db diff --local` will show the rehearsed schema as drift
 from an empty CLI migration ledger. Do not generate a new migration from that
 expected diff.
 
-## Post-028 and DUP-1/029 boundary
+## Applied DUP-1/029 and Local parity boundary
 
-The current bootstrap stops at root migration 026. It does **not** establish
-post-028 parity and it does not include migration 027, 028, or
+The current bootstrap stops at root migration 026. It establishes neither
+post-028 nor post-029 parity and it does not include migration 027, 028, or
 `029_atomic_boq_duplicate.sql`.
 
-- Production evidence records 027 and 028 as applied exactly once. Do not edit,
-  retry, replay, or append either file to this bootstrap.
-- Migration 029 is a new DUP-1 forward-development artifact. Its presence in
-  the repository does not mean it is applied or released. The exact DUP-1
-  Production release was separately authorized on 2026-08-31, but remains
-  release-in-progress until execution and postflight evidence are recorded.
+- Production evidence records 027 and 028 as applied exactly once. DUP-1
+  migration 029 is also applied exactly once as
+  `20260831004110/atomic_boq_duplicate`, source SHA-256
+  `748a84431c36bc0aa4bf3f8293aa818768d5198d9da82c9f1e0ad5106a382c3d`.
+  All three are immutable/no-replay; do not append them to this bootstrap.
+- Migration 029 is a separate product release, not a Master Catalog
+  convergence migration. Its application and postflight are complete in the
+  [DUP-1 Production Result](./plans/product/04-atomic-boq-duplicate-production-release-result.md);
+  that receipt grants no authority to apply it again.
 - Do not add 029 to `db:local:bootstrap` while its input database still stops at
   026. A green run over the wrong predecessor schema would not be valid DUP-1
   evidence.
@@ -109,8 +112,9 @@ post-028 parity and it does not include migration 027, 028, or
   it at Production, do not import Production users/sessions/tokens/secrets, and
   do not treat isolated rehearsal as deployment authorization.
 
-Updating the canonical bootstrap to a genuine post-028-equivalent baseline is
-a separate reviewed change. Until that parity contract exists and is approved,
+Updating the canonical bootstrap beyond 026—to a reviewed post-028-equivalent
+baseline and, only if deliberately included, exact 029/post-029 parity—is a
+separate reviewed change. Until that parity contract exists and is approved,
 keep the current 009–026 bootstrap unchanged and keep 029 rehearsal explicit.
 
 ## Test users
