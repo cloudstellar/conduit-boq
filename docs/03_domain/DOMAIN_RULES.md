@@ -1,8 +1,16 @@
 # Domain Rules
 ## Conduit BOQ System
 
-**Last Updated:** 2026-05-30  
-**Status:** Canonical
+**Last Updated:** 2026-05-30
+**Status:** REFERENCE BASELINE — dated; current schema/access sources override
+
+> **Scoped 2026-08-31 calculation overlay:** The VAT term below now reflects
+> bound Factor-version metadata (current/fallback 7%). Other counts, permission
+> prose, and issue notes in this document remain a dated baseline and were not
+> re-audited by that change. Use [Access Model](./ACCESS_MODEL.md),
+> [Database Schema](../04_data/DATABASE_SCHEMA.md), and
+> [DUP-1 Result](../plans/product/04-atomic-boq-duplicate-production-release-result.md)
+> for current runtime contracts.
 
 ---
 
@@ -72,7 +80,7 @@ Organization (องค์กร) — NT
 | **Labor Cost** | ค่าแรง | Cost of installation labor |
 | **Unit Cost** | ราคาต่อหน่วย | Material + Labor per unit |
 | **Factor F** | ค่าสัมประสิทธิ์ | Markup for overhead, profit, interest |
-| **VAT** | ภาษีมูลค่าเพิ่ม | Value Added Tax (fixed at 7%) |
+| **VAT** | ภาษีมูลค่าเพิ่ม | Rate from bound Factor-version metadata; current published versions and legacy fallback are 7%, with no user/project/route override |
 
 ### 4.3 Status Terminology
 

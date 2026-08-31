@@ -13,6 +13,13 @@
 > Dated approval boundaries and pre-release
 > status below remain historical chronology and do not authorize replay.
 
+<!-- DUP1_CURRENT_STATE_20260831 -->
+> **Later product-release note:** Migration 029 was subsequently applied once
+> for Atomic BOQ Duplicate, not for this Master Catalog governance release. See
+> [DUP-1 Production Result](../../plans/product/04-atomic-boq-duplicate-production-release-result.md).
+> The dated “no 029” evidence above remains unchanged chronology;
+> 027/028/029 are now immutable/no-replay.
+
 **Status:** Owner-approved as Phase 4 governance/architecture decision for
 implementation/local rehearsal; Production migration, deploy, feature
 enablement, and publication require separate approvals

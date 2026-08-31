@@ -1,7 +1,7 @@
 # AI Context — Mandatory Agent Rules
 
 > **Status:** CANONICAL  
-> **Aligned:** 2026-08-29
+> **Aligned:** 2026-08-31
 
 Read [AI Handoff](./AI_HANDOFF.md) first. For Master Catalog current-state and
 no-replay decisions, [Handoff
@@ -21,10 +21,24 @@ authorization is consumed by its recorded operation and cannot be reused.
 For the completed Master Catalog phase:
 
 - migrations 027 and 028 are immutable, applied-once, no-replay artifacts;
-- repository/document convergence requires no migration 029;
+- the completed Master Catalog repository/document convergence did not require
+  migration 029; 029 was later applied only for DUP-1 as described below;
 - P-13, P-14, P-14C, P-15 and R-01 through R-05 are complete and no-replay;
 - existing BOQs and Factor F must not be changed by convergence work; and
 - the accepted expanded-persona residual must never be relabelled PASS.
+
+For the completed Atomic BOQ Duplicate release:
+
+- migration 029 is a new product migration after 028, applied exactly once as
+  `20260831004110/atomic_boq_duplicate`; it was not a Master Catalog
+  convergence migration;
+- migrations 027, 028, and 029 are immutable/no-replay;
+- normal Copy preserves the source Catalog, items, prices, Factor provenance,
+  and cost basis; selected-Factor Copy is a separate eligible-legacy flow;
+- current Catalog/default prices require Create New; never silently requote,
+  reprice, repair, rebase, or backfill a copied/source BOQ; and
+- the authoritative execution receipt is [DUP-1 Production Release
+  Result](../plans/product/04-atomic-boq-duplicate-production-release-result.md).
 
 ## Critical implementation patterns
 
@@ -45,6 +59,12 @@ middleware/routes, server actions, grants, RLS, protected columns, RPC bodies
 and ACLs, service-role paths, and real authenticated tests. Database controls
 remain authoritative for direct Data API/RPC access.
 
+For DUP-1, the typed client and visible Copy actions are UX contracts only.
+`public.duplicate_boq_atomic` must re-check `auth.uid()`, active allowed role,
+source scope, mode/Factor eligibility, graph integrity, expected source token,
+and request-key reuse inside the database. Never reproduce that full predicate
+client-side and treat it as authorization.
+
 ## Source-of-truth map
 
 | Topic | Canonical location |
@@ -52,11 +72,12 @@ remain authoritative for direct Data API/RPC access.
 | Current repository handoff | [`08_ai/AI_HANDOFF.md`](./AI_HANDOFF.md) |
 | Host-local canonical checkout and archive custody | [AI Handoff — Host-local workspace handoff](./AI_HANDOFF.md#host-local-workspace-handoff--2026-08-29) |
 | Master Catalog final state | [Handoff #106](../plans/master-catalog/106-phase4-master-catalog-exact-remaining-work-handoff.md) and [Result #107](../plans/master-catalog/107-phase4-p49-master-catalog-final-closeout-result.md) |
+| Atomic BOQ Duplicate Production result | [`plans/product/04-atomic-boq-duplicate-production-release-result.md`](../plans/product/04-atomic-boq-duplicate-production-release-result.md) |
 | Database schema | [`04_data/DATABASE_SCHEMA.md`](../04_data/DATABASE_SCHEMA.md) |
 | Production migration ledger | [`04_data/MIGRATIONS.md`](../04_data/MIGRATIONS.md) |
 | Current security model | [`04_data/SECURITY_MODEL.md`](../04_data/SECURITY_MODEL.md) |
 | Historical integrity guidance | [`04_data/DATA_INTEGRITY.md`](../04_data/DATA_INTEGRITY.md) (dated gaps are historical; use #106/#107 for completion) |
-| Domain entities | [`03_domain/DOMAIN_MODEL.md`](../03_domain/DOMAIN_MODEL.md) |
+| Domain entities | [`03_domain/DOMAIN_MODEL.md`](../03_domain/DOMAIN_MODEL.md) (dated reference baseline; current schema/access docs override) |
 | Calculation rules | [`05_calculation/CALCULATION_RULES.md`](../05_calculation/CALCULATION_RULES.md) |
 | Engineering patterns | [`06_engineering/`](../06_engineering/) |
 
@@ -73,6 +94,13 @@ For this repository convergence, Production was reconfirmed read-only at
 `2026-08-29 01:38:54 +07` against the closeout state summarized in
 [AI Handoff](./AI_HANDOFF.md). The check made no Production mutation and does
 not authorize a later write, migration, deployment, or replay.
+
+That dated convergence observation ended at migration 028. DUP-1 was later
+separately authorized, applied, deployed, and closed on 2026-08-31. Its latest
+independent read-only postflight at `2026-08-31 00:55:26 UTC` reconfirmed 029,
+zero private request-ledger rows, `263/326/2617` BOQ/route/item counts, unchanged
+Catalog/Factor hashes and pointers, and unchanged BOQ policy fingerprints. It
+also grants no future write, migration, deployment, or replay authority.
 
 ## Completion check
 

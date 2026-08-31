@@ -1,7 +1,7 @@
 # Lessons Learned & AI Constitution
 ## Conduit BOQ System
 
-**Last Updated:** 2026-08-17
+**Last Updated:** 2026-08-31
 **Status:** Living Document (Update constantly)
 
 <!-- MASTER_CATALOG_CURRENT_STATE_20260829 -->
@@ -16,6 +16,15 @@
 > migration-028 functions/raw `app_settings` ACL, and `0` working drafts at
 > that instant; it performed no write. The older statements
 > remain historical chronology and must not be replayed.
+
+<!-- DUP1_CURRENT_STATE_20260831 -->
+> [!IMPORTANT]
+> **Later product-release addendum:** Migration 029 was subsequently applied
+> once for the separate Atomic BOQ Duplicate release as
+> `20260831004110/atomic_boq_duplicate`; see
+> [DUP-1 Production Result](../plans/product/04-atomic-boq-duplicate-production-release-result.md).
+> The 2026-08-29 “no 029” observation above is still valid chronology for the
+> Master Catalog closeout. Migrations 027/028/029 are now immutable/no-replay.
 
 > [!IMPORTANT]
 > **AI Must Read This First:** This file contains critical lessons learned from past mistakes. Ignoring these rules causes regressions.
@@ -81,6 +90,22 @@ supabase.auth.onAuthStateChange((event, session) => {
   first P-15 closeout. P-13 was separately unauthorized; the P-49 matrix
   remained mandatory for later remediation rather than silently waived. See
   [P-51 Plan](../plans/master-catalog/48-phase4-p51-risk-accepted-master-catalog-closeout-plan.md).
+
+### 1.6 Atomic copy — one trusted intent, one graph or none
+
+- Never restore a whole-BOQ copy as multiple browser inserts. Use one guarded,
+  atomic, idempotent database operation with a stable request key and expected
+  source-write token.
+- Button visibility and typed client validation are UX only. The database must
+  re-authorize actor/status/role/source and validate the complete graph, mode,
+  Factor eligibility, ACL, and retry contract.
+- Preserve mode means preserve Catalog/items/prices/Factor provenance. Choosing
+  current prices is a new clean BOQ, not a hidden requote/rebase.
+- A selected-Factor legacy copy must clear Factor-derived state and block
+  official output until trusted review/save. Never “repair” a bad source during
+  copy.
+- A private idempotency ledger is durable evidence. Do not ad-hoc-delete rows or
+  add a cleanup job without designing retention against response-loss retries.
 
 ---
 

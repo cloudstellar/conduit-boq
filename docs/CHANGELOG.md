@@ -3,6 +3,26 @@
 
 ---
 
+## 2026-08-31 — Atomic BOQ Duplicate Production release
+
+- เปิดใช้ **คัดลอก** แบบ atomic/idempotent: สำเนาปกติรักษา Catalog รายการ
+  ราคา และ Factor F ของต้นฉบับ พร้อม reset เป็น draft ใหม่
+- เพิ่ม flow แยก **คัดลอกและเลือก Factor F** สำหรับ legacy BOQ ที่เข้าเงื่อนไข;
+  ระบบรักษา Catalog/items/prices เดิมและปิด Print/PDF/Excel จน review/save
+  สำเร็จ
+- หากต้องการราคาปัจจุบันให้ใช้ **สร้างใหม่**; ไม่มี requote/reprice/rebase
+  หรือ backfill ต้นฉบับ
+- Editor, route allocation, Print และ Excel derive VAT จาก bound Factor-version
+  metadata; published versions ปัจจุบันและ legacy fallback ยังเป็น 7% โดยไม่มี
+  Factor dataset/default-pointer change
+- Apply migration 029 ครั้งเดียวเป็น
+  `20260831004110/atomic_boq_duplicate`; PR #9 merge/deploy และ Production
+  desktop/mobile/fail-closed/no-residue postflight ผ่านครบ
+
+รายละเอียด: [DUP-1 Production Result](./plans/product/04-atomic-boq-duplicate-production-release-result.md)
+
+---
+
 ## [v1.7.0] - 2026-05-31 (Calm & Professional NT Enterprise Dashboard MVP)
 
 ### 🎨 สุนทรียภาพดีไซน์: ปรับปรุงหน้าแรกสู่ Calm Enterprise Dashboard

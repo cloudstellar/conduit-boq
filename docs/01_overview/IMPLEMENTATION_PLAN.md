@@ -13,6 +13,15 @@
 > Dated rollout, approval, and gate sections below are
 > historical chronology and do not authorize a replay.
 
+<!-- DUP1_CURRENT_STATE_20260831 -->
+> [!IMPORTANT]
+> **Later product release:** Atomic BOQ Duplicate is live through migration 029
+> and merge `0e76ed39e68746c9bd6003da69a03f096ae482a3`; see
+> [DUP-1 Production Result](../plans/product/04-atomic-boq-duplicate-production-release-result.md).
+> The dated “no 029” line above remains the Master Catalog recheck at that
+> instant. Migrations 027/028/029 are now applied-once/no-replay; old phase
+> checklists below grant no current execution authority.
+
 ---
 
 ## 📋 Project Overview

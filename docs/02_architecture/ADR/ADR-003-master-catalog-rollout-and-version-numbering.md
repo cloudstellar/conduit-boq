@@ -13,6 +13,13 @@
 > write. Earlier baseline/proposal wording below is historical chronology, not
 > current publication status or replay authority.
 
+<!-- DUP1_CURRENT_STATE_20260831 -->
+> **Later product-release note:** Migration 029 was subsequently applied once
+> for Atomic BOQ Duplicate, not for this Master Catalog ADR. See
+> [DUP-1 Production Result](../../plans/product/04-atomic-boq-duplicate-production-release-result.md).
+> The dated “no 029” evidence above remains unchanged chronology;
+> 027/028/029 are now immutable/no-replay.
+
 **Status:** Accepted; Production baseline rollout implemented; version-intent
 and bounded annual-year amendments accepted 2026-07-13; P-39 draft-identity
 and P-39R release-number/lifecycle correction accepted 2026-07-18

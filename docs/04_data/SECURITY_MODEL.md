@@ -33,6 +33,43 @@ migrations.
 > pre-027 threat analysis. They are not a statement of the current Production
 > posture. Unexecuted expanded P-49 tests remain accepted residuals, not PASS.
 
+<!-- DUP1_CURRENT_STATE_20260831 -->
+## DUP-1 atomic-copy boundary
+
+Migration 029 is live exactly once as
+`20260831004110/atomic_boq_duplicate`; see the
+[Production result](../plans/product/04-atomic-boq-duplicate-production-release-result.md).
+This is a later product release and does not alter the dated Master Catalog
+chronology above.
+
+- Only an authenticated `active` profile with role `admin`, `dept_manager`,
+  `sector_manager`, or `staff` may create a copy. `procurement`, pending,
+  inactive, suspended, missing/unknown profiles, and anonymous requests are
+  denied.
+- Source visibility/scope is rechecked inside the database under the same
+  actor. A visible client action is not authorization. The destination is
+  always a new actor-owned `draft` in the actor's current organizational scope;
+  assignment, submission, approval, external handoff, and source-instance audit
+  state are not inherited.
+- `public.duplicate_boq_atomic` is owner-`postgres`, `SECURITY DEFINER`, with
+  fixed empty `search_path`, explicit object qualification, 5-second lock and
+  30-second statement timeouts, `auth.uid()` plus profile/source/internal graph
+  guards, expected-source `updated_at` token, and stable request-key
+  idempotency. `EXECUTE` is granted only to `postgres` and `authenticated`;
+  `PUBLIC`, `anon`, and `service_role` are denied.
+- `private.boq_copy_requests` has RLS enabled, no policies, and no direct API
+  grants. The graph helper is private/owner-only. These intentional postures
+  explain the two accepted advisor findings; they are not evidence that the
+  advisor is globally clean.
+- Preserve Copy leaves the source unchanged and retains its Catalog/prices/
+  Factor state. Selected-Factor Copy is restricted to eligible positive-total
+  Factor-unbound legacy BOQs, resets Factor-derived state, and cannot produce
+  official output until trusted review/save succeeds.
+
+Migrations 027, 028, and 029 are immutable/no-replay. This completed release
+grants no authority for another migration, deployment, account change, or
+Catalog/Factor operation.
+
 ## Authorization boundary
 
 PostgreSQL grants, RLS, triggers, and guarded RPCs are the security boundary.

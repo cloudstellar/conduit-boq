@@ -17,6 +17,15 @@
 > The v26 state, counts, and phase gates below are retained as
 > historical chronology and do not override the current no-replay boundary.
 
+<!-- DUP1_CURRENT_STATE_20260831 -->
+> [!IMPORTANT]
+> **Later product release:** Atomic BOQ Duplicate is live through migration 029
+> and merge `0e76ed39e68746c9bd6003da69a03f096ae482a3`; see
+> [DUP-1 Production Result](../plans/product/04-atomic-boq-duplicate-production-release-result.md).
+> The dated “no 029” line above remains Master Catalog chronology. Migrations
+> 027/028/029 are all applied-once/no-replay, and this v26 checklist does not
+> authorize another operation.
+
 ---
 
 ## Master Catalog v26 Rollout

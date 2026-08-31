@@ -1,8 +1,17 @@
 # Domain Model
 ## Conduit BOQ System
 
-**Last Updated:** 2026-01-22  
-**Status:** Canonical
+**Last Updated:** 2026-01-22
+**Status:** REFERENCE BASELINE — dated; current schema/access sources override
+
+> **Scoped 2026-08-31 calculation overlay:** The VAT field/invariant below now
+> reflects bound Factor-version metadata (current/fallback 7%). The rest of this
+> entity inventory remains a dated baseline and is not a complete map of later
+> versioned Catalog, Factor F, migration 029, or Production counts. Use
+> [Database Schema](../04_data/DATABASE_SCHEMA.md),
+> [Access Model](./ACCESS_MODEL.md), and
+> [DUP-1 Result](../plans/product/04-atomic-boq-duplicate-production-release-result.md)
+> for those current contracts.
 
 ---
 
@@ -129,7 +138,7 @@
 | factor_f | Decimal | No | Factor F value |
 | total_cost | Decimal | Yes | Sum before Factor F |
 | total_with_factor_f | Decimal | Yes | Sum × Factor F |
-| total_with_vat | Decimal | Yes | Sum including VAT 7% |
+| total_with_vat | Decimal | Yes | Rounded before-VAT amount plus rounded VAT from bound Factor-version metadata; current/legacy fallback 7% |
 | created_by | UUID | No | FK to auth.users |
 | org_id | UUID | No | Inherited from creator |
 | department_id | UUID | No | Inherited from creator |
@@ -140,7 +149,7 @@
 > [!NOTE]
 > Reserved for Phase 3: `pending_review`, `pending_approval` (code exists but not active)
 
-**Invariant:** `total_with_vat = total_with_factor_f × 1.07`
+**Invariant:** `total_with_vat = roundMoney(roundMoney(total_with_factor_f) + roundMoney(roundMoney(total_with_factor_f) × vatRate))`, where `vatRate` comes from the bound Factor version and legacy fallback is 7%
 
 ---
 

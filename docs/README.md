@@ -19,25 +19,28 @@ Production แบบ live และไม่ใช่สิทธิ์ให้
 | [`LESSONS_LEARNED.md`](./08_ai/LESSONS_LEARNED.md) | invariants และข้อผิดพลาดที่ห้ามทำซ้ำ | ข้อความ chronology เก่าต้องอ่านร่วมกับ current-state addendum |
 | [Master Catalog Handoff #106](./plans/master-catalog/106-phase4-master-catalog-exact-remaining-work-handoff.md) | canonical final handoff ของ Phase 4/P-49 | เป็นหลักฐานตามเวลาที่บันทึก ไม่ใช่ live mutable state |
 | [Master Catalog Result #107](./plans/master-catalog/107-phase4-p49-master-catalog-final-closeout-result.md) | closeout result และ accepted residuals | ห้ามใช้ approval receipt เก่าเป็นสิทธิ์ทำงานใหม่ |
+| [DUP-1 Production Result #04](./plans/product/04-atomic-boq-duplicate-production-release-result.md) | exact migration/application release, Production QA และ residuals ของ Atomic BOQ Duplicate | เป็น execution receipt ที่ใช้แล้ว ไม่ใช่สิทธิ์ deploy/mutate ซ้ำหรือเริ่ม roadmap item ถัดไป |
 
-Migration 027 และ 028 ถูกบันทึกว่า applied ครั้งเดียวและห้ามแก้ retry หรือ
-replay ส่วน expanded Production persona rehearsal ยังเป็น accepted residual
-ไม่ใช่ PASS หากต้องอ้างสถานะ Production ที่เปลี่ยนได้ ให้เก็บ fresh read-only
-evidence ใหม่
+Migration 027, 028 และ 029 ถูกบันทึกว่า applied ครั้งเดียวและห้ามแก้ retry
+หรือ replay โดย 029 เป็น DUP-1 product release ภายหลัง ไม่ใช่ Master Catalog
+convergence ส่วน expanded Production persona rehearsal ของ Master Catalog
+ยังเป็น accepted residual ไม่ใช่ PASS หากต้องอ้างสถานะ Production ที่เปลี่ยน
+ได้ ให้เก็บ fresh read-only evidence ใหม่
 
 ## Current product decisions and research
 
 | เอกสาร | สถานะ | เนื้อหา |
 |---|---|---|
-| [01 — Product Evolution Decision Plan](./plans/product/01-conduit-boq-product-evolution-decision-plan.md) | D2/D3/D9 ถูกเลือก; exact DUP-1 Production release ได้รับอนุญาตและกำลังดำเนินการ; decision อื่นยังมี TBD | roadmap, Atomic Duplicate, Quantity Expression, auth, workflow และระยะยาว |
+| [01 — Product Evolution Decision Plan](./plans/product/01-conduit-boq-product-evolution-decision-plan.md) | D2/D3/D9 ถูกเลือก; DUP-1 live บน Production แล้ว; decision อื่นยังมี TBD | roadmap, Atomic Duplicate, Quantity Expression, auth, workflow และระยะยาว |
 | [02 — BOQ List Scaling Decision Plan](./plans/product/02-boq-list-scaling-decision-plan.md) | proposed; LIST-1 ยังไม่มี implementation authority | server pagination, search/filter/sort, RLS count และ bounded route loading |
 | [03 — Pagination Best-Practice Research](./plans/product/03-boq-list-pagination-best-practice-research.md) | research evidence; ไม่ใช่ approval | หลักฐานภายนอกและ trade-off ของ pagination |
+| [04 — Atomic BOQ Duplicate Production Result](./plans/product/04-atomic-boq-duplicate-production-release-result.md) | complete; released and verified 2026-08-31 | migration 029, PR/merge/deploy, database postflight, rendered QA และ residuals |
 
-DUP-1 ต้องไม่ถูกเรียกว่าใช้งานแล้วจนกว่า implementation, isolated database
-rehearsal, tests, Production verification และ postflight evidence จะผ่าน Migration
-`029_atomic_boq_duplicate.sql` เป็น forward-development artifact สำหรับงานใหม่
-ไม่ใช่ migration ที่ใช้เพื่อ repository convergence และยังห้ามอ้างว่า applied
-หรือ released
+DUP-1 ผ่าน implementation, isolated database rehearsal, tests, Production
+verification และ postflight แล้ว Migration `029_atomic_boq_duplicate.sql`
+ถูก apply ครั้งเดียวเป็น `20260831004110/atomic_boq_duplicate` สำหรับ product
+release ใหม่นี้ ไม่ใช่ migration ที่ใช้เพื่อ repository convergence และห้าม
+แก้ไขหรือ replay 027, 028 หรือ 029
 
 ## Developer entry points
 
@@ -67,11 +70,12 @@ rehearsal
 - [`../migrations/README.md`](../migrations/README.md) เป็นคู่มือ historical
   multi-route migration 002 ไม่ใช่ runbook สำหรับ migration ปัจจุบัน
 
-ห้ามเพิ่ม 027, 028 หรือ 029 เข้า bootstrap แบบเงียบ ๆ Bootstrap ปัจจุบันยัง
-ไม่มี post-028 parity ดังนั้น DUP-1/029 ต้องใช้ isolated database ที่สร้างจาก
-approved post-028-equivalent contract แล้ว apply 029 แยกเพื่อ rehearse เมื่อ
-ได้รับอนุญาต ห้ามใช้ `supabase link`, `supabase db push`, `supabase db pull`
-หรือ linked diff จาก worktree นี้
+ห้ามเพิ่ม 027, 028 หรือ 029 เข้า bootstrap แบบเงียบ ๆ Bootstrap ปัจจุบันหยุด
+ที่ 026 และไม่มีทั้ง post-028 หรือ post-029 parity งานทดสอบฐานข้อมูล DUP-1
+ต้องใช้ isolated post-028-equivalent contract แล้ว apply exact 029 แยกตาม
+[release result](./plans/product/04-atomic-boq-duplicate-production-release-result.md)
+ห้ามใช้ `supabase link`, `supabase db push`, `supabase db pull` หรือ linked
+diff จาก worktree นี้
 
 ## Reference documentation by topic
 
@@ -110,6 +114,11 @@ operational authority เว้นแต่เอกสาร current ข้า�
   `unauthorized` หรือ `current` ที่ถูกเก็บไว้เป็นหลักฐานตามเวลา
 - [`MIGRATION_MAP.md`](./MIGRATION_MAP.md) และคู่มือ migration เก่าที่บรรยาย
   workflow ก่อน current closeout
+- [`plans/factor-f/`](./plans/factor-f/) — หลักฐาน change/runbook/closeout ของ
+  rollout 2026-06-29; F4 ปัจจุบันให้ยึด
+  [`ADR-005`](./02_architecture/ADR/ADR-005-versioned-factor-f-reference.md),
+  [`FACTOR_F.md`](./05_calculation/FACTOR_F.md) และ
+  [DUP-1 Result #04](./plans/product/04-atomic-boq-duplicate-production-release-result.md)
 
 อย่าแก้ historical evidence ให้ดูเหมือนเป็นสถานะปัจจุบัน หากเอกสารสองฉบับ
 ขัดกัน ให้หยุดและใช้ authority hierarchy ด้านบนพร้อมตรวจ code/database ใหม่

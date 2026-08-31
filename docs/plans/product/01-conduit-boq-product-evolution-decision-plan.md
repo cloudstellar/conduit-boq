@@ -1,15 +1,19 @@
 # Conduit BOQ Product Evolution Decision Plan
 
 **Status:** PROPOSED ROADMAP — D2, D3, AND D9 OWNER DIRECTIONS RECORDED;
-DUP-1 EXACT RELEASE AUTHORIZED 2026-08-31 AND IN PROGRESS; REMAINING OWNER
-DECISIONS REQUIRED
+DUP-1 RELEASED AND VERIFIED 2026-08-31; REMAINING OWNER DECISIONS REQUIRED
 
 **Prepared:** 2026-08-30; final evidence review plus D2/D3/D9 scope updates
 2026-08-31 (Asia/Bangkok)
 
-**Repository snapshot:** `main` at
+**Initial planning repository snapshot (before this plan/feature work):** `main` at
 `c41495ae9c1007cd3f147df9d0791e2a27a1adad`, equal to `origin/main` before
 this document and its evidence images were added
+
+**DUP-1 release result:** feature `bc357dbc7a8bd8d696c19550f57452f79a6a4372`,
+merged/deployed `0e76ed39e68746c9bd6003da69a03f096ae482a3`, migration
+`20260831004110/atomic_boq_duplicate`; see
+[Production Result #04](./04-atomic-boq-duplicate-production-release-result.md)
 
 **Scope:** Product direction, UI/UX, calculation integrity, database design,
 BOQ-register scalability, account/login security, governed BOQ workflow, and a
@@ -36,8 +40,9 @@ forward migration 029, source commit/push/merge/deployment, and bounded
 Production verification. It does not authorize Catalog or Factor F
 publication/default-pointer changes, repricing/rebasing/backfill, mutation of a
 source/historical BOQ, replay of migrations 027/028, LIST-1, or Quantity
-Expression. `DUP-1` remains labelled release-in-progress until exact execution
-and postflight evidence are recorded.
+Expression. That exact `DUP-1` release and postflight are now complete under
+[Result #04](./04-atomic-boq-duplicate-production-release-result.md), and its
+one-shot authority is consumed.
 
 The completed Master Catalog boundary remains exactly as recorded in
 [Canonical Final Handoff #106](../master-catalog/106-phase4-master-catalog-exact-remaining-work-handoff.md)
@@ -46,9 +51,9 @@ and
 
 - Master Catalog `2568.1.0` and its `710` active rows are completed Production
   history, not work to replay.
-- Migrations 027 and 028 were applied exactly once. Do not edit, retry, or
-  replay them. A future database change must be a newly approved forward
-  migration after 028.
+- Migrations 027, 028, and the later DUP-1 migration 029 were applied exactly
+  once. Do not edit, retry, or replay them. A future database change must be a
+  newly approved forward migration after 029.
 - Do not replay P-13, P-14, P-14C, P-15, or R-01 through R-05.
 - Do not move the Catalog or Factor F default pointer, change/publish reference
   data, republish the Catalog, or mutate/reprice/backfill historical BOQs as
@@ -70,12 +75,12 @@ not replace a new preflight at implementation or release time.
 
 ## 2. Executive recommendation
 
-The next product implementation restores a useful existing workflow as
-**Atomic BOQ Duplicate**, after the smallest silent-input guard and an approved
-post-028-equivalent Local/CI test baseline. Quantity Expression still must not
-begin as a UI-only calculator: the current UI, client calculation, database
-precision, and save RPC can interpret the same value differently. Its later
-R0–R2 work must first make the saved result authoritative.
+**Atomic BOQ Duplicate** is now released and verified. The next recommended
+decision is `LIST-1B`, because the growing Admin register still loads an
+unbounded result and per-row routes. Quantity Expression still must not begin
+as a UI-only calculator: the current UI, client calculation, database precision,
+and save RPC can interpret the same value differently. Its later R0–R2 work
+must first make the saved result authoritative.
 
 Recommended decision bundle:
 
@@ -99,9 +104,9 @@ The recommended sequence is:
 
 ```text
 Documentation and recorded decisions
-  -> R0A smallest silent-input guard + approved post-028-equivalent test baseline
-  -> DUP-1 Atomic BOQ Duplicate
-  -> LIST-1 bounded BOQ register (independent; may run in parallel)
+  -> DUP-1 Atomic BOQ Duplicate [complete 2026-08-31]
+  -> LIST-1 bounded BOQ register decision and implementation
+  -> R0A smallest silent-input guard + approved post-029-equivalent test baseline
   -> R0 calculation contract completion
   -> R1 expression pilot + chosen desktop/mobile scope
   -> R2 trusted save/reload/print/export release
@@ -136,7 +141,7 @@ The detailed analysis follows, but these are the decisions that control scope.
 | D6 | Formal BOQ authority | W0 estimate only / W-H external approval / W1 in-app approval / W2 engine | discovery gate, then W-H or W1 according to the real authority | `TBD` |
 | D7 | Mobile release scope | desktop-only named pilot / responsive pilot / responsive Production | desktop-only pilot is acceptable only when visibly unsupported on mobile; responsive required before general Production claim | `TBD` |
 | D8 | BOQ/project list scale | client pages / server numbered pages / cursor-load more / infinite scroll | `LIST-1B`: initial fixed 25-row server numbered pages + whole-result search/filter/sort + batched routes | `TBD — see LIST-1 plan and research` |
-| D9 | Whole-BOQ Duplicate | old multi-request client copy / atomic preserve copy / eligible-legacy selected-Factor copy / catalog requote-rebase | `DUP-1`: normal atomic preserve copy; separate selected-Factor copy only for eligible legacy BOQs; current prices require clean Create New; no catalog requote/rebase | `Selected and exact Production release authorized 2026-08-31; execution evidence pending` |
+| D9 | Whole-BOQ Duplicate | old multi-request client copy / atomic preserve copy / eligible-legacy selected-Factor copy / catalog requote-rebase | `DUP-1`: normal atomic preserve copy; separate selected-Factor copy only for eligible legacy BOQs; current prices require clean Create New; no catalog requote/rebase | `Released and verified 2026-08-31 — Result #04; authority consumed` |
 
 Dependencies that can reverse the roadmap:
 
@@ -159,10 +164,10 @@ Dependencies that can reverse the roadmap:
   with Create New. Catalog Requote/Reprice/Rebase is not in this release.
 - If mobile is part of the pilot cohort, responsive route and item work enters
   R1; otherwise it gates general Production, not the desktop-only pilot.
-- LIST-1 is independent of DB-1. If work is serialized, apply the smallest R0
-  input guard and establish the test baseline, deliver DUP-1, then LIST-1 before
-  the larger expression release. LIST-1 may run in parallel because it has no
-  DUP-1 or DB-1 dependency.
+- LIST-1 is independent of DB-1. Now that DUP-1 is complete, decide/implement
+  LIST-1 next; establish the R0A/R0 calculation safety and test baseline before
+  the larger expression release. R0 work may proceed in parallel because
+  LIST-1 has no DB-1 dependency.
 
 Detailed D8 evidence, alternatives, UX/data contracts, and gates are in the
 [BOQ / Project List Scaling Decision Plan](./02-boq-list-scaling-decision-plan.md),
@@ -182,18 +187,19 @@ one.
 | Level | What it permits | Current status |
 |---|---|---|
 | A — Direction/documentation | Record decisions, refine flows, prepare plans/evidence | This document only; no implementation authorization |
-| B — Local implementation | Edit code/tests locally; no commit, push, Preview, DB migration, or external state | Authorized for exact DUP-1 by separate Owner instruction |
-| C — Source/Preview | Commit, push, and deploy a named candidate | Authorized for exact DUP-1 release only |
-| D — Database design | Draft a new forward migration/RPC and rehearsal plan without applying it | Authorized for exact DUP-1 migration 029 only |
-| E — Production release | Apply approved forward change, deploy, flag rollout, Production QA/rollback | Authorized for exact DUP-1 release on 2026-08-31; evidence pending |
+| B — Local implementation | Edit code/tests locally; no commit, push, Preview, DB migration, or external state | Executed and consumed for exact DUP-1 only |
+| C — Source/Preview | Commit, push, and deploy a named candidate | Executed and consumed for exact DUP-1 only |
+| D — Database design | Draft a new forward migration/RPC and rehearsal plan without applying it | Executed and consumed for exact DUP-1 migration 029 only |
+| E — Production release | Apply approved forward change, deploy, flag rollout, Production QA/rollback | Executed, verified, and consumed for exact DUP-1 on 2026-08-31 |
 
-The current-session exception comes from the separate Owner instructions, not
-from this table: DUP-1 alone has scoped Levels B–E through bounded Production
-verification. This authority does not transfer to another roadmap item or to
-reference-data operations.
+The current-session exception came from the separate Owner instructions, not
+from this table: DUP-1 alone executed scoped Levels B–E through bounded
+Production verification. That authority is consumed and does not transfer to
+another roadmap item or reference-data operation.
 
-Migration 027/028 execution is excluded from every level. No level permits
-replaying those artifacts.
+Migration 027/028/029 execution is excluded from every future level. Migration
+029's one-shot DUP-1 execution is consumed; no level permits replaying any of
+those artifacts.
 
 ## 3. What the application is becoming
 
@@ -249,7 +255,7 @@ quantity. The database column then stores quantity as `numeric(12,2)`. See:
 
 - [QuantityEditor.tsx](../../../components/boq/QuantityEditor.tsx#L57-L80)
 - [calculation.ts](../../../lib/calculation.ts#L22-L43)
-- [edit page save payload](../../../app/boq/%5Bid%5D/edit/page.tsx#L188-L239)
+- [edit page save payload](../../../app/boq/%5Bid%5D/edit/page.tsx#L205-L285)
 - [migration 027 save RPC](../../../migrations/027_p49_active_profile_authorization_hardening.sql#L2959-L3073)
 - [Production baseline data types](../../../supabase/local/production-baseline.sql#L413-L430)
 
@@ -353,9 +359,9 @@ visible layout problem.
 The fixed 240 px route sidebar and a line-item table with a minimum width of
 800 px push the working area outside the viewport. The quantity control and
 totals are effectively off-canvas. The relevant layout is in
-[MultiRouteEditor.tsx](../../../components/boq/MultiRouteEditor.tsx#L502-L527)
+[MultiRouteEditor.tsx](../../../components/boq/MultiRouteEditor.tsx#L506-L528)
 and
-[MultiRouteEditor.tsx](../../../components/boq/MultiRouteEditor.tsx#L668-L682).
+[MultiRouteEditor.tsx](../../../components/boq/MultiRouteEditor.tsx#L672-L686).
 
 Recommended mobile baseline:
 
@@ -588,8 +594,9 @@ VAT rules without changing their business meaning:
 - select the BOQ-bound Factor F reference version and exact lower/upper rows;
 - derive the raw interpolated factor and truncate—not round—the factor to four
   decimal places under the canonical Factor F rule;
-- round the amount before VAT, then VAT at the current canonical 7% rate, then
-  the final total at the documented stages;
+- derive VAT from the BOQ-bound Factor-version metadata (current published
+  versions and explicit legacy fallback are 7%), then round the amount before
+  VAT, VAT, and final total at the documented stages;
 - apply the existing deterministic multi-route remainder allocation; and
 - reject any client-supplied reference version, bracket, raw/truncated factor,
   Factor F total, VAT, or final total that does not match the trusted result.
@@ -701,7 +708,7 @@ selected direction.
 ### DB-1 — Persist expression beside the canonical result (selected)
 
 Keep the current numeric quantity authoritative and add the smallest nullable
-metadata set in a newly approved forward migration after 028:
+metadata set in a newly approved forward migration after 029:
 
 ```text
 quantity_expression     bounded normalized arithmetic text or NULL
@@ -834,8 +841,8 @@ stale-client, persona, or rollback gates.
 1. Close D0; D2 already selects normalized semantic persistence and editor-only
    display, while D3 selects canonical `*` with input aliases. Freeze shared
    G1 fixtures, including decimal and rounding edges.
-2. Establish an approved post-028 local test baseline without editing or
-   replaying migrations 027/028.
+2. Establish an approved post-029-equivalent local test baseline without
+   editing or replaying migrations 027/028/029.
 3. Build the pure TypeScript parser, UI states, and DB-1-compatible types
    behind a flag, with all database expression writes still disabled.
 4. Draft and rehearse a new additive forward schema change with nullable
@@ -929,9 +936,9 @@ numeric result, can drift during copy/edit, complicate privacy/search, and mix
 business evidence with free text. It creates technical debt without delivering
 real provenance.
 
-### DB-DUP — Atomic whole-BOQ duplicate (D9 selected; release in progress)
+### DB-DUP — Atomic whole-BOQ duplicate (D9 released and verified)
 
-The disabled multi-request browser copy must not be restored as-is. `DUP-1`
+The former disabled multi-request browser copy was not restored as-is. `DUP-1`
 replaces it with one trusted atomic database operation and two deliberately
 different user actions:
 
@@ -1079,9 +1086,10 @@ pure-route-less success plus mixed-graph rejection, source-change,
 double-click/retry, lock-timeout, rollback, and
 Print/PDF/Excel tests. Normal Copy outputs must equal the preserved source cost
 snapshot. Selected-Factor copies must fail official output before trusted save
-and agree with the selected Factor version afterward. No row, RPC, UI state, or
-document may imply that `DUP-1` is released before those gates pass and the
-authorized release has exact postflight evidence.
+and agree with the selected Factor version afterward. These gates and exact
+postflight evidence passed for DUP-1 on 2026-08-31 under
+[Result #04](./04-atomic-boq-duplicate-production-release-result.md). A future
+change must earn its own gates rather than inheriting this result.
 
 ## 10. Decision E — Login and account creation
 
@@ -1369,10 +1377,10 @@ Work:
 3. Build read-only discrepancy fixtures for the observed legacy patterns;
    classify rather than mutate them.
 4. Design a disposable Local/CI schema/RPC/RLS contract equivalent to the
-   approved post-028 state using an approved sanitized schema snapshot or
+   approved post-029 state using an approved sanitized schema snapshot or
    equivalent contract fixture, with method and hash recorded. The present
-   bootstrap stops at 026, but 027/028 must not be executed, edited, retried, or
-   replayed to close that gap. The baseline mechanism needs a separate Owner
+   bootstrap stops at 026, but 027/028/029 must not be executed, edited,
+   retried, or replayed to close that gap. The baseline mechanism needs a separate Owner
    decision and must exclude Production users, sessions, MFA, tokens, and
    secrets.
 5. If D7 includes mobile in the pilot, specify responsive route navigation and
@@ -1386,17 +1394,16 @@ Work:
 - signed calculation decision table;
 - failing regression test for `5x2 -> 52` exists and the safe guard passes;
 - agreed legacy-data disposition is “preserve/report,” not backfill;
-- an explicitly approved non-replay Local/CI contract represents the post-028
+- an explicitly approved non-replay Local/CI contract represents the post-029
   behavior without Production identities/session data; and
 - the D7 scope is explicit: either the 390 px core task passes, or the named
   pilot is desktop-only and cannot be mistaken for supported mobile.
 
-### DUP-1 — Atomic BOQ Duplicate (approximately 2–4 weeks)
+### DUP-1 — Atomic BOQ Duplicate (complete; original estimate 2–4 weeks)
 
-**Status:** D9 selected; exact DUP-1 commit/push/migration/deployment and bounded
-Production verification were authorized on 2026-08-31. Release is in progress
-and must not be called complete until the exit gates and postflight evidence
-pass.
+**Status:** COMPLETE — released and verified in Production on 2026-08-31 under
+[Result #04](./04-atomic-boq-duplicate-production-release-result.md). The exact
+release authority is consumed.
 
 **Outcome:** users can copy a BOQ without partial data. Normal Copy preserves
 the original cost basis; eligible legacy BOQs additionally offer an explicit
@@ -1441,8 +1448,9 @@ Work:
   durable review-state/output-gate design are approved;
 - current Catalog/default prices are reachable only through Create New;
 - every required persona and direct/RPC attack test passes; and
-- the result remains labeled release-in-progress until the already authorized
-  migration/deploy/Production verification completes and its evidence exists.
+- migration 029, matching application deployment, Production verification, and
+  no-residue postflight are recorded in Result #04; future changes need new
+  authority.
 
 ### LIST-1 — Bounded BOQ/project register (independent 1–2 weeks)
 
@@ -1453,9 +1461,9 @@ restorable state, an initial 25-row default, RLS-correct count, and a bounded
 route batch instead of loading every BOQ and issuing route requests per
 rendered row.
 
-This lane can run independently and may proceed in parallel. If one team must
-serialize the work, complete the smallest R0 safety/test-baseline prerequisites,
-then DUP-1, then LIST-1 before R1/DB-1 Quantity Expression. See the
+Now that DUP-1 is complete, LIST-1 is the next recommended decision. The R0A
+calculation safety/test baseline must still precede R1/DB-1 Quantity Expression.
+See the
 [focused LIST-1 plan](./02-boq-list-scaling-decision-plan.md) and its
 [best-practice research](./03-boq-list-pagination-best-practice-research.md).
 
@@ -1738,7 +1746,7 @@ Deliverables:
 
 Deliverables:
 
-- preflight and new forward migration plan after 028;
+- preflight and new forward migration plan after 029;
 - additive nullable DB-1 fields, named coherence constraints, no formula
   backfill, and a versioned trusted save successor;
 - an expected BOQ write-version/precondition that rejects two-tab stale writes
@@ -1760,12 +1768,12 @@ Deliverables:
 - atomic rollback and concurrency/idempotency tests;
 - non-destructive feature rollback that retains expressions and all supported
   parser versions; never roll back to a writer that omits DB-1 fields;
-- fix-forward recovery that never replays 027/028; and
+- fix-forward recovery that never replays 027/028/029; and
 - no Production execution without a separate exact approval.
 
-If a future new product migration is numbered 029, its records must say that it
-is a newly approved product change—not a migration required for repository
-convergence.
+Migration 029 already records a separately approved product change—not a
+migration required for repository convergence. Any future product migration
+must follow it forward under fresh approval and must not replay 027/028/029.
 
 ### Q5 — Reload, print-view/controlled PDF, and Excel parity
 
@@ -1828,7 +1836,7 @@ Deliverables:
 | Parser-version drift changes a saved formula | Medium / critical | Version-addressed evaluator; shared frozen fixtures; unknown version read-only | A saved expression is interpreted with “latest” semantics or changes after reload. |
 | Direct edit/stepper leaves a stale formula | Medium / high | Explicit atomic conversion to direct mode with visible notice and transition tests | Displayed formula no longer explains canonical quantity. |
 | Expression leaks through read-only UI, outputs, or telemetry | Low / high | Editor-only expression view model; numeric-only read-only/Print/PDF/Excel models; no raw telemetry | Formula content appears anywhere outside the quantity editor or persisted DB-1 fields. |
-| Migration/no-replay violation | Low / critical | New forward migration, checksum/preflight, explicit approval | Any proposal edits/retries/replays 027/028. |
+| Migration/no-replay violation | Low / critical | New forward migration, checksum/preflight, explicit approval | Any proposal edits/retries/replays 027/028/029. |
 | Mobile feature exists but is unreachable | High / medium | Responsive route/item redesign and 390 px UAT | Core quantity task cannot complete on agreed viewport. |
 | Workflow slows operations | Medium / medium | Authority discovery, W-H or W1 only, SLA/queue, observe exceptions | Pilot cycle time breaches Owner threshold without quality gain. |
 | Self-signup creates unmanaged identities | Medium / high | Invite/pre-provision; rate limits; disable open signup | Account exists without sponsor/ownership or pending cleanup SLA. |
@@ -1908,7 +1916,7 @@ Disable the feature flag and investigate if any of these occurs:
   output before trusted save.
 - Do not add Catalog Requote/Reprice/Rebase, item remapping, or a mixed
   old-structure/current-price copy. Current Catalog prices require Create New.
-- Do not edit, retry, or replay migrations 027/028.
+- Do not edit, retry, or replay migrations 027/028/029.
 - Do not bundle Quantity Expression with catalog Publish/Restore, Factor F,
   Master Catalog changes, API key rotation, SSO, or a generic workflow engine.
 - Do not claim mobile support until the core task passes the agreed viewport and
@@ -1928,8 +1936,8 @@ The one-page source of truth is the [Owner decision dashboard](#21-owner-decisio
 No implementation begins until the relevant decisions are recorded and the
 required authority is granted separately. The exception already recorded is
 DUP-1: the Owner authorized its exact implementation and bounded Production
-release on 2026-08-31. It remains release-in-progress until execution evidence
-is recorded; that authority does not transfer to another roadmap item.
+release on 2026-08-31; execution and postflight are complete in Result #04.
+That authority is consumed and does not transfer to another roadmap item.
 
 | ID | Decision | Options | Recommendation | Owner choice |
 |---|---|---|---|---|
@@ -1944,7 +1952,7 @@ is recorded; that authority does not transfer to another roadmap item.
 | D6 | Formal authority | W0 / W-H external / W1 in-app / W2 | discover current authority, then W-H or W1 | `TBD` |
 | D7 | Mobile scope | desktop-only pilot / responsive pilot / responsive Production | explicit desktop-only pilot permitted; responsive before general claim | `TBD` |
 | D8 | BOQ/project list scale | client pages / server numbered pages / cursor-load more / infinite scroll | `LIST-1B`: initial fixed 25-row server pages, safe URL state, whole-result search/filter/sort, batched routes | TBD — see [LIST-1](./02-boq-list-scaling-decision-plan.md) and [LIST-1 research](./03-boq-list-pagination-best-practice-research.md) |
-| D9 | Whole-BOQ Duplicate | multi-request old copy / atomic preserve / eligible-legacy selected Factor / catalog requote-rebase | normal Atomic Preserve Copy plus separate Selected-Factor Copy only for eligible legacy BOQs; preserve old Catalog/items/prices; current prices use Create New; no catalog requote/rebase | `Selected and exact Production release authorized 2026-08-31; execution evidence pending` |
+| D9 | Whole-BOQ Duplicate | multi-request old copy / atomic preserve / eligible-legacy selected Factor / catalog requote-rebase | normal Atomic Preserve Copy plus separate Selected-Factor Copy only for eligible legacy BOQs; preserve old Catalog/items/prices; current prices use Create New; no catalog requote/rebase | `Released and verified 2026-08-31 — Result #04; authority consumed` |
 
 Also confirm:
 
@@ -1996,10 +2004,9 @@ implementation later requires an exact Level B approval; source/Preview,
 database design, and Production each require their own higher-level approvals
 from Section 2.2.
 
-D9 is different only because the Owner separately authorized the exact DUP-1
-implementation and bounded Production release in the 2026-08-31 session. That
-instruction does not turn this Level A wording into authority for another
-feature, Catalog/Factor publication or pointer change, repricing/rebase/
-backfill, source-BOQ mutation, or migration 027/028 replay. It also does not
-establish that DUP-1 has been released before its execution and postflight
-evidence are recorded.
+D9 is different only because the Owner separately authorized and completed the
+exact DUP-1 implementation and bounded Production release in the 2026-08-31
+session; Result #04 is its execution receipt. That consumed instruction does
+not turn this Level A wording into authority for another feature,
+Catalog/Factor publication or pointer change, repricing/rebase/backfill,
+source-BOQ mutation, or migration 027/028/029 replay.

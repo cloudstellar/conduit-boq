@@ -1,7 +1,7 @@
 # Factor F
 ## Conduit BOQ System
 
-**Last Updated:** 2026-06-29
+**Last Updated:** 2026-08-31
 **Status:** Canonical
 
 ---
@@ -119,6 +119,7 @@ Math.floor(interpolatedFactor * 10000) / 10000
 |------|----------|
 | `lib/factorF.ts` | `calculateInterpolatedFactorFromRefs()` |
 | `lib/factorF.ts` | `isFactorSnapshotUsable()` |
+| `lib/factorF.ts` | `getFactorVatPercent()` / `getFactorVatRate()` from bound-version metadata, with explicit legacy 7% fallback |
 | `components/boq/FactorFSummary.tsx` | Load reference rows once, live edit display |
 | `app/boq/[id]/print/page.tsx` | Use valid saved snapshot before live fallback |
 | `lib/exportBoqExcel.ts` | Use valid saved snapshot before live fallback |
@@ -146,10 +147,22 @@ rules:
    for a nonzero BOQ total, the system shows an error and blocks saving instead
    of substituting a default value.
 7. A legacy BOQ with no `factor_reference_version_id` is not silently rebound
-   to the latest table. In edit mode it is treated as snapshot-only/read-only
-   for line-item changes. To continue work, the user creates a new BOQ copy,
-   chooses the intended active Factor F version, reviews it, and saves a new
-   snapshot.
+   to the latest table. DUP-1 now exposes a separate selected-Factor copy only
+   when the legacy source has a positive total and passes the trusted
+   Catalog/item/route/quantity/price integrity predicate. The new draft keeps
+   the old Catalog/items/prices, binds the explicitly selected active Factor F
+   version, clears old Factor-derived state, and blocks Print/PDF/Excel until
+   review/save succeeds. Zero-total or otherwise ineligible legacy sources
+   fail closed to Create New; no repair or backfill occurs.
+8. Normal **คัดลอก** is distinct: it requires usable bound Factor provenance
+   and preserves the source Factor version/snapshot and cost basis. Neither copy
+   mode updates Catalog prices; current prices require Create New.
+9. Editor, route allocation, Print, and Excel derive VAT from the same bound
+   Factor-version `vat_percent`. Current published versions and the legacy
+   fallback are 7%; there is no user/project/route override.
+
+The implemented copy/result contract is recorded in
+[DUP-1 Production Result](../plans/product/04-atomic-boq-duplicate-production-release-result.md).
 
 ### Verification Caveat
 
@@ -171,3 +184,4 @@ current default `2569.0.0` with 36 rows. The 30M smoke row for `2569.0.0` is
 
 - Calculation flow: [CALCULATION_RULES.md](./CALCULATION_RULES.md)
 - VAT rules: [VAT_AND_TOTALS.md](./VAT_AND_TOTALS.md)
+- Atomic duplicate Production result: [04-atomic-boq-duplicate-production-release-result.md](../plans/product/04-atomic-boq-duplicate-production-release-result.md)

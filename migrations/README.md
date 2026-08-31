@@ -17,6 +17,12 @@
 > Repository/document convergence requires no migration 029 and no database
 > write. Do not append 027/028 blindly to a bootstrap or infer permission for a
 > new migration from this historical guide.
+>
+> **Later product-release overlay (2026-08-31):** Exact migration 029 was
+> subsequently applied once for the separately authorized DUP-1 release as
+> `20260831004110/atomic_boq_duplicate`, not for repository/document
+> convergence. It is now immutable/no-replay together with 027/028. See the
+> [DUP-1 Production Result](../docs/plans/product/04-atomic-boq-duplicate-production-release-result.md).
 
 ## 📋 Overview
 This migration adds multi-route support to the BOQ system while preserving all existing data.

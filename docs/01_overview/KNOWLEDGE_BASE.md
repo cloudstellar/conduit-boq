@@ -131,8 +131,13 @@ NT (Organization)
 **สูตร:**
 ```
 Total with Factor F = Grand Total × Factor F
-Total with VAT = Total with Factor F × 1.07
+VAT = Total with Factor F (ปัดแล้ว) × VAT rate ของ Factor F version
+Total with VAT = Total with Factor F (ปัดแล้ว) + VAT (ปัดแล้ว)
 ```
+
+Factor F version ที่ published อยู่ในปัจจุบันและ legacy fallback ใช้ VAT 7%
+เหมือนเดิม ระบบดึง rate จาก metadata ของ version และผู้ใช้ไม่สามารถ override
+แยกตามโครงการหรือ route ได้
 
 **ตัวอย่าง:**
 - Grand Total = 1,000,000 บาท
@@ -161,7 +166,8 @@ Route with Factor F = Route Total × Factor F
 ```
 Grand Total = ผลรวมของ Route Total ทุก Route
 Grand Total with Factor F = Grand Total × Factor F
-Grand Total with VAT = Grand Total with Factor F × 1.07
+VAT = Grand Total with Factor F (ปัดแล้ว) × bound vatRate
+Grand Total with VAT = Grand Total with Factor F (ปัดแล้ว) + VAT (ปัดแล้ว)
 ```
 
 ---
@@ -191,4 +197,3 @@ Grand Total with VAT = Grand Total with Factor F × 1.07
 ## 📞 ติดต่อ Support
 - Email: suthorn@ntplc.co.th
 - ระบบ: เมนู Profile → ติดต่อผู้ดูแล
-
