@@ -4,6 +4,7 @@ import type { Workbook, Worksheet, Border, Fill } from 'exceljs';
 import {
   calculateInterpolatedFactorFromRefs,
   formatFactorReferenceCondition,
+  getFactorVatPercent,
   isFactorSnapshotUsable,
   type FactorReferenceCondition,
 } from './factorF';
@@ -526,7 +527,7 @@ function createSummarySheet(
   ws.getCell(r, 8).font = defaultFont({ bold: true });
   r++;
 
-  ws.getCell(r, 1).value = '(2) ภาษีมูลค่าเพิ่ม 7.00 %';
+  ws.getCell(r, 1).value = `(2) ภาษีมูลค่าเพิ่ม ${getFactorVatPercent(factorCondition).toFixed(2)} %`;
   ws.getCell(r, 1).font = defaultFont({ bold: true });
   ws.mergeCells(r, 1, r, 7);
   ws.getCell(r, 8).value = vatAmount;

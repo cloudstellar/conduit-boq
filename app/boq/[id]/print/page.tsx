@@ -3,6 +3,7 @@
 /* eslint-disable @next/next/no-img-element -- Native images keep browser print/PDF rendering deterministic. */
 
 import { useState, useEffect, useMemo } from 'react';
+import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
 import { requireActiveProfile } from '@/lib/auth/authorization';
@@ -11,6 +12,8 @@ import {
   calculateInterpolatedFactorFromRefs,
   findFactorBracketRefs,
   formatFactorReferenceCondition,
+  getFactorVatPercent,
+  getFactorVatRate,
   isFactorSnapshotUsable,
   type FactorReferenceCondition,
 } from '@/lib/factorF';
@@ -31,7 +34,7 @@ import {
   PRINT_CONSTANTS,
 } from '@/lib/printUtils';
 import { Button } from '@/components/ui/button';
-import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Skeleton } from '@/components/ui/skeleton';
 import { ArrowLeft, Printer, FileSpreadsheet, AlertCircle } from 'lucide-react';
 
@@ -504,6 +507,7 @@ export default function PrintBOQPage() {
   const [factorError, setFactorError] = useState<string | null>(null);
   const [catalogVersion, setCatalogVersion] = useState<CatalogVersionSummary | null>(null);
   const [loadError, setLoadError] = useState<string | null>(null);
+  const [isFactorReviewRequired, setIsFactorReviewRequired] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
@@ -572,8 +576,16 @@ export default function PrintBOQPage() {
 
         if (boqData) {
           const hasUsableSnapshot = isFactorSnapshotUsable(boqData.total_cost, boqData);
+          const factorReviewRequired = Boolean(
+            boqData.factor_reference_version_id
+            && Number(boqData.total_cost) > 0
+            && !hasUsableSnapshot
+          );
+          setIsFactorReviewRequired(factorReviewRequired);
 
-          if (boqData.factor_reference_version_id) {
+          if (factorReviewRequired) {
+            setFactorError('BOQ นี้ต้องตรวจสอบและบันทึก Factor F ให้สำเร็จก่อนพิมพ์หรือส่งออก');
+          } else if (boqData.factor_reference_version_id) {
             const [version, rows] = await Promise.all([
               getActiveFactorReferenceVersion(supabase, boqData.factor_reference_version_id),
               getFactorReferenceRowsForVersion(supabase, boqData.factor_reference_version_id),
@@ -632,13 +644,35 @@ export default function PrintBOQPage() {
     );
   }
 
+  if (isFactorReviewRequired) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
+        <Alert className="max-w-lg border-amber-200 bg-amber-50 text-amber-950">
+          <AlertCircle className="h-4 w-4" />
+          <AlertTitle>ต้องบันทึก Factor F ก่อนพิมพ์หรือส่งออก</AlertTitle>
+          <AlertDescription className="space-y-3 text-amber-900">
+            <p>
+              BOQ นี้ผูกกับเวอร์ชัน Factor F แล้ว แต่ผลคำนวณที่บันทึกไว้ยังไม่ครบ
+              ระบบจึงยังไม่แสดงเอกสารสำหรับพิมพ์หรือส่งออก Excel
+            </p>
+            <Button asChild size="sm">
+              <Link href={`/boq/${boqId}/edit`}>
+                กลับไปตรวจสอบและบันทึก
+              </Link>
+            </Button>
+          </AlertDescription>
+        </Alert>
+      </div>
+    );
+  }
+
   // ── handleExportExcel must be after the null check for boq ──
   const handleExportExcel = async () => {
     try {
       await requireActiveProfile(supabase);
       const { exportBoqToExcel } = await import('@/lib/exportBoqExcel');
       const routeCosts = routes.map(r => r.total_cost);
-      const alloc = allocateToRoutes(routeCosts, factor);
+      const alloc = allocateToRoutes(routeCosts, factor, factorVatRate);
       await exportBoqToExcel(
         {
           ...boq,
@@ -672,7 +706,9 @@ export default function PrintBOQPage() {
   const liveFactorResult = calculateInterpolatedFactorFromRefs(totalCost, lowerFactorRef, upperFactorRef);
   const useSavedFactor = isFactorSnapshotUsable(totalCost, boq);
   const factor = useSavedFactor ? boq.factor_f! : liveFactorResult?.factor ?? 0;
-  const calculatedTotals = calculateVAT(multiplyFactor(totalCost, factor));
+  const factorVatPercent = getFactorVatPercent(factorCondition);
+  const factorVatRate = getFactorVatRate(factorCondition);
+  const calculatedTotals = calculateVAT(multiplyFactor(totalCost, factor), factorVatRate);
   const constructionCostBeforeVAT = useSavedFactor && boq.total_with_factor_f > 0
     ? boq.total_with_factor_f
     : calculatedTotals.beforeVAT;
@@ -944,7 +980,7 @@ export default function PrintBOQPage() {
         const showFactorGT5 = grandTotalInMillion > 5;
 
         const routeCosts = routes.map(r => r.total_cost);
-        const allocated = allocateToRoutes(routeCosts, factor);
+        const allocated = allocateToRoutes(routeCosts, factor, factorVatRate);
 
         // Calculate which routes are in this chunk
         let routeStartIdx = 0;
@@ -1050,7 +1086,9 @@ export default function PrintBOQPage() {
                     <span className="calc-value">{formatNumber(constructionCostBeforeVAT)}</span>
                   </div>
                   <div className="calc-row">
-                    <span className="calc-label">(2) ภาษีมูลค่าเพิ่ม 7.00 %</span>
+                    <span className="calc-label">
+                      (2) ภาษีมูลค่าเพิ่ม {factorVatPercent.toFixed(2)} %
+                    </span>
                     <span className="calc-value">{formatNumber(vatAmount)}</span>
                   </div>
                   <div className="calc-row total">

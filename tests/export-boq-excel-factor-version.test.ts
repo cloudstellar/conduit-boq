@@ -55,13 +55,14 @@ function makeBoq(projectName: string, factor: number): ExportBOQData {
 function makeCondition(
   versionString: string | null,
   interestPercent: number,
+  vatPercent = 7,
 ): FactorReferenceCondition {
   return {
     version_string: versionString,
     advance_payment_percent: 0,
     retention_percent: 0,
     loan_interest_percent: interestPercent,
-    vat_percent: 7,
+    vat_percent: vatPercent,
   }
 }
 
@@ -156,5 +157,16 @@ describe('BOQ Excel Factor F version labels', () => {
 
     expect(text).toContain('บัญชีราคา: ฉบับ 2568.0.0')
     expect(text).toContain('สรุปรวม บัญชีราคา ฉบับ 2568.0.0')
+  })
+
+  it('labels Excel VAT from the BOQ-bound Factor version instead of hard-coding 7%', async () => {
+    const workbook = await exportAndReadWorkbook(
+      makeBoq('dynamic-vat-bound', 1.1422),
+      makeCondition('2570.0.0', 6, 8.25),
+    )
+    const text = workbookText(workbook)
+
+    expect(text).toContain('(2) ภาษีมูลค่าเพิ่ม 8.25 %')
+    expect(text).not.toContain('(2) ภาษีมูลค่าเพิ่ม 7.00 %')
   })
 })

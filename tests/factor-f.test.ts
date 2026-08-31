@@ -2,10 +2,22 @@ import { describe, expect, it } from 'vitest'
 import {
   calculateInterpolatedFactorFromRefs,
   formatFactorReferenceCondition,
+  getFactorVatPercent,
+  getFactorVatRate,
   isFactorSnapshotUsable,
 } from '../lib/factorF'
 
 describe('Factor F interpolation', () => {
+  it('derives VAT from the bound Factor version and keeps 7% only as the legacy fallback', () => {
+    expect(getFactorVatPercent({ vat_percent: 8.25 })).toBe(8.25)
+    expect(getFactorVatRate({ vat_percent: 8.25 })).toBe(0.0825)
+    expect(getFactorVatPercent(null)).toBe(7)
+    expect(getFactorVatRate(undefined)).toBe(0.07)
+    expect(() => getFactorVatRate({ vat_percent: -1 })).toThrow(
+      'Invalid Factor F VAT percentage',
+    )
+  })
+
   it('interpolates a 30-40 million job from the table factor column and truncates to 4 decimals', () => {
     const result = calculateInterpolatedFactorFromRefs(
       34_444_444.444444,

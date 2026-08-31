@@ -390,20 +390,31 @@ describe('P-49 application authorization contract', () => {
     expect(middleware).not.toContain("'/price-list'")
   })
 
-  it('keeps unsafe client-side clone paths disabled and pending UX consistent', async () => {
-    const [boqList, boqEdit, profilePage, loginPage, useUser, adminPage] = await Promise.all([
+  it('uses the active-profile atomic duplicate RPC and keeps pending UX consistent', async () => {
+    const [boqList, boqEdit, duplicateClient, profilePage, loginPage, useUser, adminPage] = await Promise.all([
       readFile('app/boq/page.tsx', 'utf8'),
       readFile('app/boq/[id]/edit/page.tsx', 'utf8'),
+      readFile('lib/boq/duplicate.ts', 'utf8'),
       readFile('app/profile/page.tsx', 'utf8'),
       readFile('app/login/page.tsx', 'utf8'),
       readFile('lib/hooks/useUser.ts', 'utf8'),
       readFile('app/admin/page.tsx', 'utf8'),
     ])
 
-    expect(boqList).not.toContain('handleDuplicate')
-    expect(boqList).toContain('copyDisabledReason')
-    expect(boqEdit).not.toContain('handleCreateFactorCopy')
-    expect(boqEdit).toContain('FACTOR_COPY_DISABLED_REASON')
+    expect(boqList).toContain('duplicateBOQAtomic')
+    expect(boqList).toContain("mode: 'preserve'")
+    expect(boqEdit).toContain('duplicateBOQAtomic')
+    expect(boqEdit).toContain("mode: 'select_factor'")
+    expect(duplicateClient).toContain("DUPLICATE_BOQ_RPC = 'duplicate_boq_atomic'")
+    expect(duplicateClient).toContain('await requireActiveProfile(supabase)')
+    expect(duplicateClient).toContain('p_request_id: request.requestId')
+    expect(duplicateClient).toContain(
+      'p_expected_source_updated_at: request.expectedSourceUpdatedAt',
+    )
+    expect(boqList).toContain('expectedSourceUpdatedAt: copyIntent.boq.updated_at')
+    expect(boqEdit).toContain('expectedSourceUpdatedAt: sourceUpdatedAt')
+    expect(boqList).not.toContain("from('boq_items').insert")
+    expect(boqEdit).not.toContain("from('boq_items').insert")
     expect(profilePage).toContain('<Link href="/pending">')
     expect(loginPage).toContain("safeInternalPath(searchParams.get('redirectTo'))")
     expect(useUser).not.toContain(".eq('is_active', true).maybeSingle()")

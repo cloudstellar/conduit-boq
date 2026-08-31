@@ -29,6 +29,27 @@ export interface FactorSnapshotData {
   factor_f_upper_value: number | null;
 }
 
+export const DEFAULT_FACTOR_VAT_PERCENT = 7;
+
+export function getFactorVatPercent(
+  condition?: Pick<FactorReferenceCondition, 'vat_percent'> | null,
+): number {
+  if (condition?.vat_percent == null) return DEFAULT_FACTOR_VAT_PERCENT;
+
+  const vatPercent = Number(condition.vat_percent);
+  if (!Number.isFinite(vatPercent) || vatPercent < 0) {
+    throw new Error('Invalid Factor F VAT percentage');
+  }
+
+  return vatPercent;
+}
+
+export function getFactorVatRate(
+  condition?: Pick<FactorReferenceCondition, 'vat_percent'> | null,
+): number {
+  return getFactorVatPercent(condition) / 100;
+}
+
 const MINIMUM_FACTOR_REFERENCE_COST = 5_000_000;
 const MAXIMUM_FACTOR_REFERENCE_COST = 700_000_000;
 

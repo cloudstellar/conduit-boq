@@ -36,6 +36,8 @@ interface MultiRouteEditorProps {
   onSave: (routes: Route[], routeItems: Record<string, LineItem[]>) => Promise<void>;
   isSaving: boolean;
   readOnly?: boolean;
+  printDisabled?: boolean;
+  printDisabledReason?: string;
   /** Callback to pass calculated factor values up for snapshot saving */
   onFactorCalculated?: (data: {
     factor: number;
@@ -81,6 +83,8 @@ export default function MultiRouteEditor({
   onSave,
   isSaving,
   readOnly = false,
+  printDisabled = false,
+  printDisabledReason,
   onFactorCalculated,
 }: MultiRouteEditorProps) {
   const supabase = useMemo(() => createClient(), []);
@@ -586,7 +590,7 @@ export default function MultiRouteEditor({
                   {readOnly && !factorReferenceVersionId ? (
                     <div className="rounded-md border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-900 shadow-sm">
                       BOQ นี้เป็นเอกสารเดิมแบบ snapshot-only จึงไม่คำนวณ Factor F สดบนหน้าแก้ไข
-                      หากต้องการแก้ไขราคาให้สร้างสำเนาและเลือกเวอร์ชัน Factor F
+                      หากต้องการใช้ราคาปัจจุบัน ให้สร้าง BOQ ใหม่แบบสะอาด
                     </div>
                   ) : (
                     <FactorFSummary
@@ -740,7 +744,8 @@ export default function MultiRouteEditor({
         <Button
           variant="outline"
           onClick={() => window.open(`/boq/${boqId}/print`, '_blank')}
-          disabled={isSaving || routes.length === 0}
+          disabled={isSaving || routes.length === 0 || printDisabled}
+          title={printDisabled ? printDisabledReason : undefined}
           className="cursor-pointer"
         >
           <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
