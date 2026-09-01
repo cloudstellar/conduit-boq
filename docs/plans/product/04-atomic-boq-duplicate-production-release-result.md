@@ -6,6 +6,12 @@
 
 <!-- DUP1_PRODUCTION_CLOSEOUT_V1 {"result":"pass","featureCommit":"bc357dbc7a8bd8d696c19550f57452f79a6a4372","pr":9,"mergeCommit":"0e76ed39e68746c9bd6003da69a03f096ae482a3","gitTree":"4fd4384e7d648b1efa08b933e87d1bc9c9ae985d","migrationLedger":"20260831004110/atomic_boq_duplicate","migrationSha256":"748a84431c36bc0aa4bf3f8293aa818768d5198d9da82c9f1e0ad5106a382c3d","boqCount":263,"routeCount":326,"itemCount":2617,"requestLedgerCount":0,"catalogChanged":false,"factorFChanged":false,"sourceBoqChanged":false,"persistentQaCopyCreated":false,"outerTransactionRollbackProof":true,"renderedDesktopPass":true,"renderedMobilePass":true,"postgrestFailClosedPass":true,"branchDeleted":false,"automaticNextStep":false} -->
 
+> **Later repository custody:** This frozen receipt correctly records
+> `branchDeleted: false` at the DUP-1 release-closeout instant. The separately
+> approved later documentation merge and exact branch cleanup are recorded in
+> [Post-DUP-1 Repository Custody Result #05](./05-post-dup1-repository-custody-result.md).
+> Do not rewrite this marker to make the later event appear simultaneous.
+
 **Scope:** Restore whole-BOQ Copy as one atomic, idempotent operation; retain
 the source Catalog/items/prices and Factor F for normal Copy; provide a separate
 selected-Factor path for eligible legacy BOQs; keep current-price work on the

@@ -53,6 +53,28 @@ current.
   Expression, Catalog/Factor operations, account changes, another deployment,
   or Production mutation.
 
+## Post-DUP-1 repository custody
+
+`POST_DUP1_REPOSITORY_CUSTODY_20260831`
+
+- Use [Post-DUP-1 Repository Custody Result
+  #05](docs/plans/product/05-post-dup1-repository-custody-result.md) for the
+  later documentation-closeout and branch-cleanup receipt.
+- Documentation PR #10 merged as
+  `07dd75558b513037a1d38b576ffe03be356623c2`. At the recorded Vercel
+  observation, its docs-only deployment was Production, Ready, and Current.
+  This did not replace the frozen DUP-1 application-release identity above.
+- The separately approved cleanup removed local and remote refs for exactly
+  `codex/atomic-boq-duplicate`, `codex/atomic-boq-duplicate-closeout`, and
+  `codex/main-convergence`. The frozen Result #04 `branchDeleted: false` value
+  remains correct for its earlier release-closeout instant.
+- The exact commit/push/merge/deployment-observation and branch-deletion
+  permissions are consumed. Any later branch/worktree deletion or external
+  operation needs fresh explicit approval.
+- Git branch, HEAD, upstream, worktree, and deployment state remain mutable;
+  verify them live rather than treating the dated receipt as a perpetual
+  current-state guarantee.
+
 Production facts in #106/#107 are evidence as recorded on 2026-08-28. If a
 task needs a claim about live mutable state, obtain fresh read-only evidence.
 Never infer current operational authority from an old approval receipt or from
@@ -80,9 +102,10 @@ this file.
 - The archived repository's linked worktree at
   `/Users/cloud/.codex/worktrees/1ede/conduit-boq` was repaired after the move.
   It remains part of the archive lineage and is not the canonical checkout.
-- No branch was deleted. Branch/worktree pruning and archive retention are
-  optional, separate maintenance tasks requiring fresh explicit approval; they
-  are not Master Catalog completion work.
+- At the 2026-08-29 custody handoff, no branch had yet been deleted. The later
+  exact cleanup is recorded in Post-DUP-1 Repository Custody Result #05. Any
+  further branch/worktree pruning or archive-retention action requires fresh
+  explicit approval; it is not Master Catalog completion work.
 - The Owner's 2026-08-29 `MAIN CONVERGENCE` commit/push permission was one-shot
   and is consumed. This handoff does not authorize another commit, push,
   deployment, Production operation, or branch deletion.

@@ -1,7 +1,7 @@
 # AI Context — Mandatory Agent Rules
 
 > **Status:** CANONICAL  
-> **Aligned:** 2026-08-31
+> **Aligned:** 2026-09-01
 
 Read [AI Handoff](./AI_HANDOFF.md) first. For Master Catalog current-state and
 no-replay decisions, [Handoff
@@ -40,6 +40,14 @@ For the completed Atomic BOQ Duplicate release:
 - the authoritative execution receipt is [DUP-1 Production Release
   Result](../plans/product/04-atomic-boq-duplicate-production-release-result.md).
 
+For the later repository-only closeout, use [Post-DUP-1 Repository Custody
+Result](../plans/product/05-post-dup1-repository-custody-result.md). It records
+docs PR #10, the dated Production deployment observation, and the separately
+approved deletion of exactly the two atomic branches plus
+`codex/main-convergence`. Result #04's earlier `branchDeleted: false` remains
+frozen chronology. The cleanup permission is consumed and grants no authority
+for another branch/worktree or archive operation.
+
 ## Critical implementation patterns
 
 ### Auth deadlock prevention
@@ -73,6 +81,7 @@ client-side and treat it as authorization.
 | Host-local canonical checkout and archive custody | [AI Handoff — Host-local workspace handoff](./AI_HANDOFF.md#host-local-workspace-handoff--2026-08-29) |
 | Master Catalog final state | [Handoff #106](../plans/master-catalog/106-phase4-master-catalog-exact-remaining-work-handoff.md) and [Result #107](../plans/master-catalog/107-phase4-p49-master-catalog-final-closeout-result.md) |
 | Atomic BOQ Duplicate Production result | [`plans/product/04-atomic-boq-duplicate-production-release-result.md`](../plans/product/04-atomic-boq-duplicate-production-release-result.md) |
+| Post-DUP-1 repository custody | [`plans/product/05-post-dup1-repository-custody-result.md`](../plans/product/05-post-dup1-repository-custody-result.md) |
 | Database schema | [`04_data/DATABASE_SCHEMA.md`](../04_data/DATABASE_SCHEMA.md) |
 | Production migration ledger | [`04_data/MIGRATIONS.md`](../04_data/MIGRATIONS.md) |
 | Current security model | [`04_data/SECURITY_MODEL.md`](../04_data/SECURITY_MODEL.md) |
@@ -101,6 +110,14 @@ independent read-only postflight at `2026-08-31 00:55:26 UTC` reconfirmed 029,
 zero private request-ledger rows, `263/326/2617` BOQ/route/item counts, unchanged
 Catalog/Factor hashes and pointers, and unchanged BOQ policy fingerprints. It
 also grants no future write, migration, deployment, or replay authority.
+
+The later repository-custody observation recorded docs PR #10 merge
+`07dd75558b513037a1d38b576ffe03be356623c2`, its Ready/Current Production
+deployment at that instant, and absence of the three explicitly deleted branch
+refs. Those Git/Vercel facts are dated evidence, not perpetual current state.
+Always inspect the live checkout/upstream and deployment when present identity
+matters; do not replace the frozen DUP-1 application merge
+`0e76ed39e68746c9bd6003da69a03f096ae482a3` with a docs-only merge.
 
 ## Completion check
 
