@@ -3,6 +3,23 @@
 
 ---
 
+## 2026-09-01 — Post-DUP-1 repository custody alignment
+
+- บันทึก docs PR #10 และ Vercel Production observation แบบมีวันที่ โดยแยก
+  ออกจาก frozen DUP-1 application release identity
+- บันทึกการลบ local/remote refs ของ `codex/atomic-boq-duplicate`,
+  `codex/atomic-boq-duplicate-closeout` และ `codex/main-convergence` หลังตรวจ
+  ancestry และ merge ครบแล้ว
+- รักษา `branchDeleted: false` ใน Result #04 เป็น chronology ณ release closeout
+  และเพิ่ม Result #05 เป็น custody overlay ภายหลัง
+- ไม่มีการเปลี่ยน application runtime, database, migrations, Catalog, Factor F,
+  BOQs, accounts หรือ protected archive
+
+รายละเอียด: [Post-DUP-1 Repository Custody Result
+#05](./plans/product/05-post-dup1-repository-custody-result.md)
+
+---
+
 ## 2026-08-31 — Atomic BOQ Duplicate Production release
 
 - เปิดใช้ **คัดลอก** แบบ atomic/idempotent: สำเนาปกติรักษา Catalog รายการ

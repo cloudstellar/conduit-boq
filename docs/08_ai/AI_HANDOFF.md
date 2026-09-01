@@ -2,12 +2,15 @@
 
 > **Status:** CANONICAL REPOSITORY ENTRY POINT
 >
-> **Aligned:** 2026-08-31
+> **Aligned:** 2026-09-01
 >
 > **Latest Production closeout evidence:** 2026-08-31 — DUP-1
 >
 > **Latest independent read-only postflight:** 2026-08-31 00:55:26 UTC;
 > no Production mutation
+>
+> **Latest repository-custody evidence:** 2026-08-31 — post-DUP-1 docs
+> closeout and exact branch cleanup
 
 ## Start here
 
@@ -20,6 +23,8 @@
    #107](../plans/master-catalog/107-phase4-p49-master-catalog-final-closeout-result.md).
 4. For the current product release, read [DUP-1 Production Release
    Result](../plans/product/04-atomic-boq-duplicate-production-release-result.md).
+5. For the later documentation merge and branch cleanup, read [Post-DUP-1
+   Repository Custody Result](../plans/product/05-post-dup1-repository-custody-result.md).
 
 The files under [`docs/ai/`](../ai/README.md) are legacy Phase 1/2 context.
 They are useful history, but they are not the current session handoff.
@@ -66,6 +71,35 @@ phase. Statements below that “029 was not required” or that the ledger ended
 Production migration inventory. Migrations 027, 028, and 029 are all immutable
 applied-once/no-replay artifacts.
 
+## Post-DUP-1 repository custody
+
+`POST_DUP1_REPOSITORY_CUSTODY_20260831`
+
+[Post-DUP-1 Repository Custody Result
+#05](../plans/product/05-post-dup1-repository-custody-result.md) records the
+later repository-only closeout:
+
+- documentation commit `654ba7674707fec2151ed510ce478bb4135d48c5`
+  merged through [PR #10](https://github.com/cloudstellar/conduit-boq/pull/10)
+  as `07dd75558b513037a1d38b576ffe03be356623c2`, with exact tree
+  `c6750930f23982ec08dab27bcb4da26d961411ea`;
+- GitHub Quality run `33349901736` completed successfully;
+- Vercel deployment `BQyAnbjjbBfYYWXLznsLSbKFo7yY` was observed as
+  Production, Ready, and Current from that merge commit;
+- the separately approved cleanup removed local and remote refs for exactly
+  `codex/atomic-boq-duplicate`, `codex/atomic-boq-duplicate-closeout`, and
+  `codex/main-convergence`; and
+- final branch evidence at that instant showed a clean canonical checkout on
+  `main`, equality with `origin/main`, no matching remote refs for those three
+  names, and no other local branch.
+
+This repository operation did not change application runtime code, database
+state, migrations, Catalog, Factor F, BOQs, accounts, or the protected archive.
+Its authority is consumed. Result #04's `branchDeleted: false` remains correct
+for the earlier frozen DUP-1 release instant; Result #05 is the later custody
+overlay. Git and deployment state are mutable, so verify their live identity
+instead of treating `07dd755...` or the observed deployment as perpetual.
+
 ## Current Master Catalog state
 
 The closeout evidence in #106/#107 records:
@@ -102,8 +136,10 @@ the complete P-49 persona, policy, or predicate suite.
 Keep the repository's different version domains separate:
 
 - `2568.1.0` is the current Master Catalog business-data version;
-- the exact Git `main` SHA is the deployed-source identity; DUP-1 was deployed
-  from merge commit `0e76ed39e68746c9bd6003da69a03f096ae482a3`;
+- the frozen DUP-1 application release was deployed from merge commit
+  `0e76ed39e68746c9bd6003da69a03f096ae482a3`; the later docs-only PR #10
+  deployment was observed from `07dd75558b513037a1d38b576ffe03be356623c2`;
+  neither SHA should be assumed to be the perpetual current Git/Vercel source;
 - `package.json` version `1.2.0`, the README release badge `1.4.0`, and
   historical implementation-plan labels such as `1.6.0` are retained
   application/document metadata, not Master Catalog or deployment authority.
@@ -148,9 +184,11 @@ approval receipt.
 - The archived repository's linked worktree at
   `/Users/cloud/.codex/worktrees/1ede/conduit-boq` was repaired after the move;
   it remains archive lineage, not canonical `main`.
-- No branch was deleted. The local `codex/main-convergence` branch remains at
-  the same pushed convergence commit. Branch deletion was deliberately left
-  outside this operation.
+- At this 2026-08-29 handoff, no branch had yet been deleted and local
+  `codex/main-convergence` remained at the pushed convergence commit. The later
+  separately approved exact cleanup is recorded in Post-DUP-1 Repository
+  Custody Result #05; do not rewrite this dated observation as if cleanup had
+  already happened on 2026-08-29.
 
 This section records host-local custody, not portable Production truth. On a
 different host, verify paths independently. Its preparation grants no commit,
@@ -166,8 +204,9 @@ Only these independent optional maintenance decisions remain:
 
 1. Keep the local archive as-is unless the Owner later approves a specific
    encrypted backup, retention, or removal operation.
-2. Classify or prune old branches/worktrees only under a new, explicit cleanup
-   approval. Keeping them is safe and does not block normal work on `main`.
+2. Classify or prune any further old branches/worktrees only under a new,
+   explicit cleanup approval. The exact three-branch cleanup in Result #05 is
+   complete and its permission is consumed.
 3. Run the expanded Production persona rehearsal only as a newly authorized
    security-review task. Until then its status remains `accepted residual — not
    PASS`.
@@ -185,6 +224,7 @@ these items has implementation or Production authority yet.
 
 For a new AI session: work from the canonical checkout, read this file plus
 `AGENTS.md`, `AI_CONTEXT.md`, Master Catalog #106/#107, and
-[`DUP-1 Production Release Result`](../plans/product/04-atomic-boq-duplicate-production-release-result.md),
+[`DUP-1 Production Release Result`](../plans/product/04-atomic-boq-duplicate-production-release-result.md)
+and [`Post-DUP-1 Repository Custody Result`](../plans/product/05-post-dup1-repository-custody-result.md),
 then inspect Git status before any change. Do not enter or inventory the
 archive unless the Owner explicitly asks.
