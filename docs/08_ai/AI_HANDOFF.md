@@ -2,7 +2,7 @@
 
 > **Status:** CANONICAL REPOSITORY ENTRY POINT
 >
-> **Aligned:** 2026-09-01
+> **Aligned:** 2026-09-05
 >
 > **Latest Production closeout evidence:** 2026-08-31 — DUP-1
 >
@@ -11,6 +11,10 @@
 >
 > **Latest repository-custody evidence:** 2026-08-31 — post-DUP-1 docs
 > closeout and exact branch cleanup
+>
+> **Prior repository checkpoint:** PR #11 published 2026-09-01; clean local
+> `main` observed before this handoff alignment on 2026-09-05; verify the
+> containing commit and upstream live; no Production recheck or mutation
 
 ## Start here
 
@@ -25,6 +29,9 @@
    Result](../plans/product/04-atomic-boq-duplicate-production-release-result.md).
 5. For the later documentation merge and branch cleanup, read [Post-DUP-1
    Repository Custody Result](../plans/product/05-post-dup1-repository-custody-result.md).
+6. For proposed next product work, read the [Product Evolution Decision
+   Plan](../plans/product/01-conduit-boq-product-evolution-decision-plan.md) and
+   [LIST-1 Decision Plan](../plans/product/02-boq-list-scaling-decision-plan.md).
 
 The files under [`docs/ai/`](../ai/README.md) are legacy Phase 1/2 context.
 They are useful history, but they are not the current session handoff.
@@ -100,6 +107,52 @@ for the earlier frozen DUP-1 release instant; Result #05 is the later custody
 overlay. Git and deployment state are mutable, so verify their live identity
 instead of treating `07dd755...` or the observed deployment as perpetual.
 
+## Later handoff-publication checkpoint
+
+`NEXT_SESSION_REPOSITORY_CHECKPOINT_20260905`
+
+The repository later published Result #05 and its cross-references through
+[PR #11](https://github.com/cloudstellar/conduit-boq/pull/11):
+
+- documentation commit `0feba13611c8816baab6402ec2ef400bf1d326cf`
+  merged into `main` as
+  `a3deb9cc0c2a7930dd3036196afedb04550bfb25`;
+- the merge and head trees both equal
+  `ababa45e02f9a22c6805ce8716c9f64cfeaf0685`;
+- this was a seven-Markdown-file publication of the already recorded custody
+  event, not a new application feature or database release; and
+- a read-only local check on 2026-09-05 observed the canonical checkout clean
+  on `main`, equal to its local `origin/main` tracking ref, with only local
+  branch `main`.
+
+The prior session observed Vercel deployment
+`FLEShkQ4m6e5nuFat9PpgSuCJC4a` from the PR #11 merge as Production, Ready, and
+Current on 2026-09-01. That observation was not independently rechecked on
+2026-09-05 and must not be treated as a perpetual live-state claim. This
+checkpoint grants no commit, push, deployment, branch deletion, database, or
+Production authority.
+
+### Handoff-alignment changeset — 2026-09-05
+
+The clean observation above predates preparation of this next-session handoff.
+This documentation-only alignment changes exactly these eight files:
+
+- `README.md`;
+- `docs/README.md`;
+- `docs/01_overview/ROADMAP.md`;
+- `docs/08_ai/AI_HANDOFF.md`;
+- `docs/08_ai/AI_CONTEXT.md`;
+- `docs/08_ai/LESSONS_LEARNED.md`;
+- `docs/plans/product/01-conduit-boq-product-evolution-decision-plan.md`; and
+- `docs/plans/product/02-boq-list-scaling-decision-plan.md`.
+
+They are the Owner-requested handoff/plan-alignment edits. Git state is mutable:
+the changes may be committed and the worktree clean, or part of the changeset
+may still be local. The next session must run `git status`, verify HEAD/upstream,
+inspect any remaining diff, and preserve uncommitted handoff work unless the
+Owner directs otherwise. This record itself grants no later commit, push, PR,
+merge, deployment, database, or Production authority.
+
 ## Current Master Catalog state
 
 The closeout evidence in #106/#107 records:
@@ -140,9 +193,10 @@ Keep the repository's different version domains separate:
   `0e76ed39e68746c9bd6003da69a03f096ae482a3`; the later docs-only PR #10
   deployment was observed from `07dd75558b513037a1d38b576ffe03be356623c2`;
   neither SHA should be assumed to be the perpetual current Git/Vercel source;
-- `package.json` version `1.2.0`, the README release badge `1.4.0`, and
-  historical implementation-plan labels such as `1.6.0` are retained
-  application/document metadata, not Master Catalog or deployment authority.
+- `package.json` version `1.2.0` and historical implementation-plan labels such
+  as `1.6.0` are retained application/document metadata, not Master Catalog or
+  deployment authority. The root README does not currently declare a separate
+  application-release badge.
 
 Do not normalize those application labels during repository convergence. A
 future application-version decision is separate work with separate approval.
@@ -213,14 +267,91 @@ Only these independent optional maintenance decisions remain:
 4. Normalize application-version labels only as a separate product/versioning
    decision; it is unrelated to Master Catalog `2568.1.0`.
 
-For product development, the recommended next decision is `LIST-1B`: bounded
-server-side numbered BOQ pages, whole-result search/filter/sort, RLS-correct
-count, batched route loading, and trusted duplicate eligibility projection.
-After the calculation-safety baseline, Quantity Expression remains the next
-larger feature: canonical `*`, input aliases `x`/`X`/`×`, persisted normalized
-formula visible only in the quantity editor, and numeric-only Print/PDF/Excel.
-Authentication/security (`S0`) is a separate parallel decision lane. None of
-these items has implementation or Production authority yet.
+## Next product decision handoff — 2026-09-05
+
+`R0A_LIST1_NEXT_DECISION_HANDOFF_20260905`
+
+Everything in this section is **proposed and awaiting Owner decision**. It is
+not implementation, commit, Preview, migration, account, deployment, or
+Production authority.
+
+### Confirmed code risks
+
+- [QuantityEditor](../../components/boq/QuantityEditor.tsx) removes every
+  character except digits and a decimal point, then immediately publishes the
+  sanitized number. Inputs such as `5*2`, `5x2`, `5X2`, and `5×2` can therefore
+  become `52` without an error. Quantity Expression is not implemented; the
+  current repository persists numeric quantity only.
+- The [`/boq` register](../../app/boq/page.tsx) makes an unpaginated BOQ
+  request, filters only the rows returned to browser memory, labels the
+  returned array length as the total, lacks a deterministic ID tie-breaker,
+  mounts separate mobile and desktop result trees, and lets each mounted
+  [`RouteBadge`](../../components/boq/RouteBadge.tsx) issue its own route query.
+  The recorded `263`-BOQ / approximately `527`-request estimate is dated
+  2026-08-31 evidence, not a live count for 2026-09-05.
+
+### Recommended order, still unapproved
+
+1. Close the Level-A product decisions for both the narrow `R0A` guard and
+   `LIST-1B` without changing code or external state.
+2. Release `R0A` separately: keep numeric-only entry, retain invalid draft text,
+   explain unsupported input, and never update the last committed quantity or
+   totals from a destructively sanitized value. It adds no parser, formula
+   persistence, schema change, or migration.
+3. Implement `LIST-1B` as the next substantial feature: initial fixed 25-row
+   server-numbered pages, whole-result server search/filter/sort, exact
+   RLS-visible count, deterministic ordering after preflight, safe URL/session
+   state, and one bounded route batch.
+4. Complete the wider `R0` accounting/calculation contract, then proceed to
+   `R1`/`R2` Quantity Expression. The selected direction remains canonical `*`,
+   aliases `x`/`X`/`×`, persisted normalized expression plus canonical numeric
+   result, editor-only formula visibility, and numeric-only Print/PDF/Excel.
+5. Run authentication/security `S0` as a separate parallel lane with its own
+   approvals and releases.
+
+This refines the earlier Result #04 recommendation by placing only the small
+fail-closed `R0A` guard before LIST-1 implementation. Result #04 remains frozen
+chronology and must not be rewritten. The Owner may instead keep LIST-1 first
+or run R0A in parallel; the next session must record that choice before
+implementation.
+
+### Pending LIST-1 choices
+
+The recommended Level-A defaults are `LIST-1B`, 25 rows, exact visible count,
+`updated_at DESC, id DESC` after a fresh semantics/distribution preflight,
+structured non-sensitive state in the URL, free-text `q` in same-session state,
+and one embedded/batched route request for the current page. Search, filters,
+sort, and RLS must apply before range.
+
+Do not add an index, listing RPC, or migration without query-plan evidence and
+fresh authority. Keep `public.duplicate_boq_atomic` as the final Copy authority.
+Whether a trusted batched duplicate-eligibility projection belongs in first
+release `L1` or a later `L1.1` is still an explicit Owner scope decision; do not
+silently expand LIST-1 into new privileged database work. Do not change
+Procurement visibility or any RLS policy as pagination cleanup.
+
+### Authentication nuance
+
+The source contains a password-recovery path: login requests a recovery email,
+the callback exchanges the code for a session, and Profile calls
+`auth.updateUser({ password })`. It is therefore incorrect to declare recovery
+broken from source inspection alone. It also has no end-to-end recovery proof:
+test email delivery/configuration, redirect, expired/reused links, recovery
+session behavior, and successful password change before claiming PASS. The
+same signup-eligibility precheck currently gates login, signup, and recovery;
+the callback error query is not currently surfaced on the login page; and the
+intended recovery behavior for inactive or suspended accounts remains a policy
+decision. Separating account admission from authentication/recovery remains
+proposed S0 work.
+
+### First safe action for the next session
+
+Re-read the mandatory files, verify Git/worktree state, and present the pending
+R0A/LIST-1 sequence plus LIST-1 scope choices to the Owner. If the Owner grants
+only decision/documentation authority, do not edit runtime code. R0A and
+LIST-1 implementation, commit/push/Preview, any new database object or forward
+migration, and every Production/account operation each require their own
+explicit current authorization.
 
 For a new AI session: work from the canonical checkout, read this file plus
 `AGENTS.md`, `AI_CONTEXT.md`, Master Catalog #106/#107, and

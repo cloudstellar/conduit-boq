@@ -4,7 +4,8 @@
 
 **Status:** PROPOSED — OWNER DECISION REQUIRED; NO IMPLEMENTATION AUTHORITY
 
-**Prepared:** 2026-08-31 (Asia/Bangkok)
+**Prepared:** 2026-08-31; next-session scope refinement 2026-09-05
+(Asia/Bangkok)
 
 **Scope:** The `/boq` register that users commonly call the project list,
 especially the active Admin view that can see every BOQ allowed by RLS
@@ -39,6 +40,11 @@ The Owner decision requested is:
 
 > Should the BOQ register move to server-side numbered pagination with
 > server-side search/filter/sort and bounded route loading?
+
+The Owner must also decide whether the optional trusted batched Copy-eligibility
+projection belongs in first release `L1` or a separately authorized `L1.1`.
+The lower-blast-radius recommendation is `L1.1`: preserve current candidate UI
+behavior in L1 and keep the existing trusted Copy RPC as final authority.
 
 **Research-backed recommendation:** yes. Choose `LIST-1B` below with an
 initial fixed first-release page size of 25. Server-side whole-result
@@ -190,10 +196,12 @@ the list's search/filter contract. Row count alone is not the upgrade trigger.
 - Distinguish “ยังไม่มี BOQ” from “ไม่พบตามตัวกรอง” and offer “ล้างตัวกรอง”.
 - Selected-Factor Copy is a separate, explicit action for a candidate unbound,
   Catalog-bound legacy BOQ. DUP-1 performs its final eligibility check inside
-  the trusted copy RPC and sends permanent failures to Create New. LIST-1
-  should add one trusted batched eligibility projection for its bounded page
+  the trusted copy RPC and sends permanent failures to Create New. An optional
+  `L1.1` may add one trusted batched eligibility projection for the bounded page
   so ineligible actions can be hidden without duplicating the predicate in the
-  browser or adding one Factor/version query per row. It
+  browser or adding one Factor/version query per row. L1 must preserve the
+  current fail-closed RPC behavior even when the projection is deferred. The
+  selected-Factor path
   preserves the old Catalog/items/prices, clears old Factor-derived snapshots/
   totals, and blocks official output until trusted save. Current Catalog prices
   always require Create New; LIST-1 does not introduce Requote/Reprice/Rebase.
@@ -382,6 +390,23 @@ These are planning ranges, not implementation approval or commitments.
   loading/error/empty/no-result handling; and
 - persona, race, responsive, and network-count tests.
 
+L1 keeps the existing Copy RPC as final eligibility authority and does not add
+a privileged eligibility projection unless the Owner explicitly includes that
+scope with its database/security gates.
+
+### `L1.1` — Optional trusted Copy-eligibility projection
+
+- one bounded current-page projection that reuses, rather than weakly
+  reimplements, the trusted eligibility contract;
+- RLS/ACL/persona and direct-call tests proving no source existence or Factor
+  detail leaks outside the caller's authorized BOQ scope; and
+- a separately approved schema/RPC/migration path only if implementation
+  evidence shows a database object is required.
+
+L1.1 improves row-action accuracy but is not required for safe pagination: the
+existing RPC continues to fail ineligible Copy requests closed and provide the
+current recovery path.
+
 ### `L2` — Admin findability polish (approximately 3–5 engineer-days)
 
 - department/sector/owner/date filters;
@@ -400,11 +425,13 @@ These are planning ranges, not implementation approval or commitments.
   server-authorized current set/count; and
 - true Project grouping/entity if the business distinguishes Project from BOQ.
 
-DUP-1 is complete. The next recommended serialized decision is LIST-1 before
-the larger Quantity Expression DB-1 release, with the calculation safety/test
-baseline established before expression implementation. LIST-1 still addresses
-current Admin pain, has a smaller blast radius, and may require no schema
-change.
+DUP-1 is complete. The next recommended decision closeout covers the narrow
+R0A input guard and LIST-1. Latest source review recommends a small separate
+R0A release before LIST-1 implementation, subject to Owner choice. LIST-1
+remains the next substantial feature before the larger Quantity Expression
+DB-1 release, while the wider calculation safety/test baseline must be
+established before expression implementation. LIST-1 addresses current Admin
+pain, has a smaller blast radius than DB-1, and may require no schema change.
 
 ## 12. Test and release gates
 
@@ -456,7 +483,8 @@ STOP if:
 | Count policy | Exact visible count now; reviewed estimated/indeterminate fallback only after measured need | `TBD` |
 | Admin L2 filters | Department + sector + owner + date | `TBD` |
 | Route behavior | Embed current-page route fields or use one current-page batch; no per-row or per-click list query | `TBD` |
-| First implementation order | DUP-1 complete; decide/implement LIST-1 next, then calculation baseline and expression DB-1 | `DUP-1 released 2026-08-31; LIST-1 itself remains TBD` |
+| Copy eligibility projection | Defer optional trusted projection to L1.1; keep current RPC final authority in L1 | `TBD` |
+| First implementation order | Close R0A/LIST-1 decisions together; recommend narrow R0A release, then LIST-1, wider calculation baseline, and expression DB-1 | `DUP-1 released 2026-08-31; R0A/LIST-1 remain TBD` |
 
 ## 14. Proposed approval wording
 
@@ -468,6 +496,8 @@ server search/filter/sort/count before range;
 URL-restorable non-sensitive structured state;
 free-text search follows the separately selected confidentiality policy;
 bounded route batch with no per-row initial query;
+existing Copy RPC remains final authority; optional trusted eligibility
+projection is deferred to separately approved L1.1;
 RLS remains authoritative.
 This records direction/documentation only. It does not authorize code edits,
 commit, push, Preview, schema/index/RPC/migration work, Production deployment,

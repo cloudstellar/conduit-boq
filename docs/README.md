@@ -32,8 +32,8 @@ convergence ส่วน expanded Production persona rehearsal ของ Master 
 
 | เอกสาร | สถานะ | เนื้อหา |
 |---|---|---|
-| [01 — Product Evolution Decision Plan](./plans/product/01-conduit-boq-product-evolution-decision-plan.md) | D2/D3/D9 ถูกเลือก; DUP-1 live บน Production แล้ว; decision อื่นยังมี TBD | roadmap, Atomic Duplicate, Quantity Expression, auth, workflow และระยะยาว |
-| [02 — BOQ List Scaling Decision Plan](./plans/product/02-boq-list-scaling-decision-plan.md) | proposed; LIST-1 ยังไม่มี implementation authority | server pagination, search/filter/sort, RLS count และ bounded route loading |
+| [01 — Product Evolution Decision Plan](./plans/product/01-conduit-boq-product-evolution-decision-plan.md) | D2/D3/D9 ถูกเลือก; DUP-1 live แล้ว; R0A/LIST-1 และ decision อื่นยังรอ Owner | roadmap, R0A silent-input guard, Quantity Expression, auth, workflow และระยะยาว |
+| [02 — BOQ List Scaling Decision Plan](./plans/product/02-boq-list-scaling-decision-plan.md) | proposed; LIST-1/L1.1 ยังไม่มี implementation authority | server pagination, search/filter/sort, RLS count, bounded route loading และ optional Copy-eligibility projection |
 | [03 — Pagination Best-Practice Research](./plans/product/03-boq-list-pagination-best-practice-research.md) | research evidence; ไม่ใช่ approval | หลักฐานภายนอกและ trade-off ของ pagination |
 | [04 — Atomic BOQ Duplicate Production Result](./plans/product/04-atomic-boq-duplicate-production-release-result.md) | complete; released and verified 2026-08-31 | migration 029, PR/merge/deploy, database postflight, rendered QA และ residuals |
 | [05 — Post-DUP-1 Repository Custody Result](./plans/product/05-post-dup1-repository-custody-result.md) | complete; exact cleanup recorded 2026-08-31 | docs PR #10, dated Production deployment evidence, branch ancestry/deletion และ consumed authority |

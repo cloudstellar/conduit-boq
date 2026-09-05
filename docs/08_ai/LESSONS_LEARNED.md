@@ -1,7 +1,7 @@
 # Lessons Learned & AI Constitution
 ## Conduit BOQ System
 
-**Last Updated:** 2026-08-31
+**Last Updated:** 2026-09-05
 **Status:** Living Document (Update constantly)
 
 <!-- MASTER_CATALOG_CURRENT_STATE_20260829 -->
@@ -106,6 +106,23 @@ supabase.auth.onAuthStateChange((event, session) => {
   copy.
 - A private idempotency ledger is durable evidence. Do not ad-hoc-delete rows or
   add a cleanup job without designing retention against response-loss retries.
+
+### 1.7 Numeric input — never turn rejected syntax into another number
+
+- **Lesson (2026-09):** removing unsupported characters from a numeric input can
+  silently change user intent. The current quantity sanitizer can turn `5*2`,
+  `5x2`, `5X2`, or `5×2` into `52` and publish that number immediately.
+- **Rule:** rejected syntax must never be converted into and committed as a
+  different numeric value. It must not change the last valid quantity, totals,
+  save payload, Print/PDF, or Excel state.
+- **Proposed R0A UX — awaiting Owner decision:** keep the guard numeric-only,
+  retain unsupported text as a visible invalid draft, and show an accessible
+  explanation. R0A would not evaluate an expression or create formula history.
+  A future expression parser requires a bounded grammar, canonical decimal
+  semantics, parser versioning, trusted-save validation, and separate approval.
+- **Proposed R0A verification:** cover typing and paste for `*`, `x`, `X`, and
+  `×`, plus blur, Enter, correction, mobile input, save/reload, and a regression
+  proving that no invalid draft is committed as concatenated digits.
 
 ---
 

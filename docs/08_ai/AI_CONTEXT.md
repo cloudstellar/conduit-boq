@@ -1,7 +1,7 @@
 # AI Context — Mandatory Agent Rules
 
 > **Status:** CANONICAL  
-> **Aligned:** 2026-09-01
+> **Aligned:** 2026-09-05
 
 Read [AI Handoff](./AI_HANDOFF.md) first. For Master Catalog current-state and
 no-replay decisions, [Handoff
@@ -48,6 +48,13 @@ approved deletion of exactly the two atomic branches plus
 frozen chronology. The cleanup permission is consumed and grants no authority
 for another branch/worktree or archive operation.
 
+Documentation PR #11 later published that custody record and current handoff
+cross-references as `main` commit
+`a3deb9cc0c2a7930dd3036196afedb04550bfb25`. Treat it as a dated repository
+checkpoint, not a new application-release identity or perpetual live Git/Vercel
+claim. See [AI Handoff — Later handoff-publication
+checkpoint](./AI_HANDOFF.md#later-handoff-publication-checkpoint).
+
 ## Critical implementation patterns
 
 ### Auth deadlock prevention
@@ -73,6 +80,17 @@ source scope, mode/Factor eligibility, graph integrity, expected source token,
 and request-key reuse inside the database. Never reproduce that full predicate
 client-side and treat it as authorization.
 
+### Numeric input must fail closed
+
+Never remove unsupported operators or letters and then commit the remaining
+digits as though they were the user's intended quantity. The current
+`QuantityEditor` can turn `5*2` or `5x2` into `52`; `R0A` is the proposed small
+guard for that risk. The invariant is that rejected syntax must not alter the
+last committed quantity, totals, or save/output state. Retaining the invalid
+draft text and showing an accessible explanation is the proposed R0A UX,
+pending Owner decision. A UI guard does not authorize a parser, formula
+persistence, schema/RPC change, or migration.
+
 ## Source-of-truth map
 
 | Topic | Canonical location |
@@ -82,6 +100,9 @@ client-side and treat it as authorization.
 | Master Catalog final state | [Handoff #106](../plans/master-catalog/106-phase4-master-catalog-exact-remaining-work-handoff.md) and [Result #107](../plans/master-catalog/107-phase4-p49-master-catalog-final-closeout-result.md) |
 | Atomic BOQ Duplicate Production result | [`plans/product/04-atomic-boq-duplicate-production-release-result.md`](../plans/product/04-atomic-boq-duplicate-production-release-result.md) |
 | Post-DUP-1 repository custody | [`plans/product/05-post-dup1-repository-custody-result.md`](../plans/product/05-post-dup1-repository-custody-result.md) |
+| Next product sequence and unresolved scope | [AI Handoff — Next product decision handoff](./AI_HANDOFF.md#next-product-decision-handoff--2026-09-05) |
+| Product evolution decisions | [`plans/product/01-conduit-boq-product-evolution-decision-plan.md`](../plans/product/01-conduit-boq-product-evolution-decision-plan.md) |
+| LIST-1 proposed design | [`plans/product/02-boq-list-scaling-decision-plan.md`](../plans/product/02-boq-list-scaling-decision-plan.md) |
 | Database schema | [`04_data/DATABASE_SCHEMA.md`](../04_data/DATABASE_SCHEMA.md) |
 | Production migration ledger | [`04_data/MIGRATIONS.md`](../04_data/MIGRATIONS.md) |
 | Current security model | [`04_data/SECURITY_MODEL.md`](../04_data/SECURITY_MODEL.md) |
@@ -118,6 +139,29 @@ refs. Those Git/Vercel facts are dated evidence, not perpetual current state.
 Always inspect the live checkout/upstream and deployment when present identity
 matters; do not replace the frozen DUP-1 application merge
 `0e76ed39e68746c9bd6003da69a03f096ae482a3` with a docs-only merge.
+
+PR #11 later published the custody documentation as
+`a3deb9cc0c2a7930dd3036196afedb04550bfb25`. A local read-only check on
+2026-09-05 observed clean `main` equal to the local `origin/main` tracking ref
+with only local branch `main`. Recheck before acting; this observation grants no
+commit, push, deployment, database, Production, branch-deletion, or archive
+authority.
+
+That clean observation predates preparation of the current handoff. The
+documentation-only handoff alignment covers exactly eight files listed in [AI
+Handoff — Handoff-alignment
+changeset](./AI_HANDOFF.md#handoff-alignment-changeset--2026-09-05). Verify
+live whether the changeset is committed and whether any diff remains; preserve
+uncommitted handoff work unless the Owner directs otherwise. This record grants
+no later commit, push, PR, merge, deployment, database, or Production
+authority.
+
+The next recommended sequence is still unapproved: close the `R0A` and
+`LIST-1B` Level-A decisions, release the narrow fail-closed R0A input guard,
+then implement LIST-1B before the larger R0/R1/R2 Quantity Expression work.
+`S0` authentication/security remains a separate parallel lane. The Owner may
+select a different R0A/LIST ordering; no plan text itself grants implementation
+or external-operation authority.
 
 ## Completion check
 

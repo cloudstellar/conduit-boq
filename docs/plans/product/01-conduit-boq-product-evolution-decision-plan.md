@@ -4,7 +4,8 @@
 DUP-1 RELEASED AND VERIFIED 2026-08-31; REMAINING OWNER DECISIONS REQUIRED
 
 **Prepared:** 2026-08-30; final evidence review plus D2/D3/D9 scope updates
-2026-08-31 (Asia/Bangkok)
+2026-08-31; next-session R0A/LIST-1 analysis refinement 2026-09-05
+(Asia/Bangkok)
 
 **Initial planning repository snapshot (before this plan/feature work):** `main` at
 `c41495ae9c1007cd3f147df9d0791e2a27a1adad`, equal to `origin/main` before
@@ -76,17 +77,23 @@ not replace a new preflight at implementation or release time.
 ## 2. Executive recommendation
 
 **Atomic BOQ Duplicate** is now released and verified. The next recommended
-decision is `LIST-1B`, because the growing Admin register still loads an
-unbounded result and per-row routes. Quantity Expression still must not begin
-as a UI-only calculator: the current UI, client calculation, database precision,
-and save RPC can interpret the same value differently. Its later R0–R2 work
-must first make the saved result authoritative.
+decision closeout covers both the narrow `R0A` safety guard and `LIST-1B`.
+Latest source review recommends releasing only the small fail-closed R0A guard
+before LIST-1 implementation because current quantity input can destructively
+sanitize an expression into another number. `LIST-1B` remains the next
+substantial feature because the growing Admin register still makes an
+unpaginated request and per-rendered-row route queries. The exact R0A/LIST
+ordering remains an Owner choice and neither item has implementation authority.
+Full Quantity Expression still must not begin as a UI-only calculator: the
+current UI, client calculation, database precision, and save RPC can interpret
+the same value differently. Its later R0–R2 work must first make the saved
+result authoritative.
 
 Recommended decision bundle:
 
 | Decision | Recommended choice | Why |
 |---|---|---|
-| Immediate safety | `R0` integrity baseline | Prevent silent input conversion and align one numeric result across UI, save, reload, print, and Excel. |
+| Immediate safety | `R0A` fail-closed input guard, then the wider `R0` integrity baseline | Stop destructive input conversion first; then align one numeric result across UI, save, reload, print, and Excel before expression work. |
 | Whole-BOQ copy | `DUP-1` atomic normal copy plus a separate eligible-legacy selected-Factor path | Restore Copy without partial records; preserve Catalog/items/prices; make every Factor change deliberate; current prices require a clean Create New flow. |
 | Quantity UI | `UI-2` expression-aware field | Shows the expression and preview only inside the quantity editor; committed/read-only/output surfaces show the numeric result. |
 | Pilot grammar | `G1` multiplication-only | Uses `*` as the canonical operator, accepts `x`, `X`, and `×` as input aliases, and reopens a normalized form such as `5*2`. |
@@ -105,8 +112,10 @@ The recommended sequence is:
 ```text
 Documentation and recorded decisions
   -> DUP-1 Atomic BOQ Duplicate [complete 2026-08-31]
-  -> LIST-1 bounded BOQ register decision and implementation
-  -> R0A smallest silent-input guard + approved post-029-equivalent test baseline
+  -> joint Level-A closeout for R0A and LIST-1B [Owner choice pending]
+  -> R0A smallest silent-input guard [recommended first; separately released]
+  -> LIST-1 bounded BOQ register implementation
+  -> approved post-029-equivalent test baseline
   -> R0 calculation contract completion
   -> R1 expression pilot + chosen desktop/mobile scope
   -> R2 trusted save/reload/print/export release
@@ -164,10 +173,12 @@ Dependencies that can reverse the roadmap:
   with Create New. Catalog Requote/Reprice/Rebase is not in this release.
 - If mobile is part of the pilot cohort, responsive route and item work enters
   R1; otherwise it gates general Production, not the desktop-only pilot.
-- LIST-1 is independent of DB-1. Now that DUP-1 is complete, decide/implement
-  LIST-1 next; establish the R0A/R0 calculation safety and test baseline before
-  the larger expression release. R0 work may proceed in parallel because
-  LIST-1 has no DB-1 dependency.
+- LIST-1 is independent of DB-1. Now that DUP-1 is complete, close the R0A and
+  LIST-1 Level-A decisions together. Latest source review recommends shipping
+  only the narrow R0A silent-input guard before LIST-1 implementation; the Owner
+  may retain LIST-1 first or run R0A in parallel. In every case the wider R0
+  calculation safety/test baseline must precede the larger expression release,
+  and LIST-1 has no DB-1 dependency.
 
 Detailed D8 evidence, alternatives, UX/data contracts, and gates are in the
 [BOQ / Project List Scaling Decision Plan](./02-boq-list-scaling-decision-plan.md),
@@ -623,8 +634,8 @@ The save API/RPC should:
 - emit safe diagnostic/audit metadata without logging expression content if it
   could contain unexpected sensitive text.
 
-This must be a new forward change after migration 028. It must not modify or
-replay migration 027.
+This must be a newly approved forward change after immutable migration 029. It
+must not modify or replay migrations 027, 028, or 029.
 
 RLS answers which rows a caller may access; it does not by itself prove the
 quantity/amount invariant. This is true for DB-0 as well as DB-1/DB-2 because
@@ -1047,9 +1058,11 @@ Use two unambiguous actions rather than one dialog that silently changes mode:
   selected version and require explicit confirmation. If the source is
   permanently ineligible, do not loop the same retry: explain that no repair or
   backfill occurred and offer Create New. A trusted batched eligibility
-  projection that hides ineligible row actions is deferred to LIST-1 so this
-  release does not duplicate the large predicate in client code or add an N+1
-  check per row.
+  projection that hides ineligible row actions is a candidate `L1.1`
+  follow-up, pending an explicit Owner scope decision, so the first list release
+  need not duplicate the large predicate in client code or add privileged
+  database work without evidence. The existing trusted Copy RPC remains the
+  final authority.
 - Guidance beside both flows: “หากต้องการราคาปัจจุบัน ให้สร้าง BOQ ใหม่”
 - The positive-total selected-Factor destination displays an
   incomplete/review-required banner and disables Print/PDF/Excel until trusted
@@ -1369,25 +1382,42 @@ when its exit gate passes.
 **Outcome:** one approved numeric contract and no silent formula-to-number
 conversion.
 
+#### R0A — Silent-input safety guard (small separate release)
+
+**Status:** proposed and awaiting Owner decision; no implementation authority.
+
+R0A keeps the editor numeric-only. If the draft contains unsupported syntax
+such as `5*2`, `5x2`, `5X2`, or `5×2`, retain the invalid draft so the user can
+see and correct it, show an accessible explanation, and leave the last valid
+quantity and every derived total unchanged. Blur, Enter, paste, and mobile
+input must not commit concatenated digits.
+
+R0A adds no expression evaluator, parser version, persisted formula, database
+column, RPC/schema change, or migration. Its exit gate is a component/domain
+regression suite proving invalid drafts never reach `onChange`, save payloads,
+Print/PDF, or Excel, while valid direct numeric entry and stepper behavior still
+work.
+
+#### Remaining R0 contract work
+
 Work:
 
-1. Replace destructive character stripping with reject-and-explain behavior.
-2. Freeze quantity scale, zero policy, maximum, rounding mode, and every amount
+1. Freeze quantity scale, zero policy, maximum, rounding mode, and every amount
    rounding stage with Owner/accounting sign-off.
-3. Build read-only discrepancy fixtures for the observed legacy patterns;
+2. Build read-only discrepancy fixtures for the observed legacy patterns;
    classify rather than mutate them.
-4. Design a disposable Local/CI schema/RPC/RLS contract equivalent to the
+3. Design a disposable Local/CI schema/RPC/RLS contract equivalent to the
    approved post-029 state using an approved sanitized schema snapshot or
    equivalent contract fixture, with method and hash recorded. The present
    bootstrap stops at 026, but 027/028/029 must not be executed, edited,
    retried, or replayed to close that gap. The baseline mechanism needs a separate Owner
    decision and must exclude Production users, sessions, MFA, tokens, and
    secrets.
-5. If D7 includes mobile in the pilot, specify responsive route navigation and
+4. If D7 includes mobile in the pilot, specify responsive route navigation and
    line-item cards using the current design system; otherwise specify an
    explicit unsupported-mobile boundary and gate responsive work before general
    Production.
-6. Define security quick-win changes as a separate release lane.
+5. Define security quick-win changes as a separate release lane.
 
 **Exit gate**
 
@@ -1461,9 +1491,11 @@ restorable state, an initial 25-row default, RLS-correct count, and a bounded
 route batch instead of loading every BOQ and issuing route requests per
 rendered row.
 
-Now that DUP-1 is complete, LIST-1 is the next recommended decision. The R0A
-calculation safety/test baseline must still precede R1/DB-1 Quantity Expression.
-See the
+Now that DUP-1 is complete, the next recommended decision closeout covers R0A
+and LIST-1 together. Latest source review recommends the narrow R0A guard as a
+small separate release before LIST-1 implementation, subject to Owner choice;
+LIST-1 remains the next substantial feature. The wider R0 calculation
+safety/test baseline must still precede R1/DB-1 Quantity Expression. See the
 [focused LIST-1 plan](./02-boq-list-scaling-decision-plan.md) and its
 [best-practice research](./03-boq-list-pagination-best-practice-research.md).
 

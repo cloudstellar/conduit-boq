@@ -133,9 +133,16 @@ docs/                product, architecture, data, process และ handoff
 - Atomic Duplicate เปิดใช้แล้วโดย migration 029 และ application ที่ตรงกัน;
   สถานะ/ข้อจำกัดให้ยึด [AI handoff](docs/08_ai/AI_HANDOFF.md) และ
   [release result](docs/plans/product/04-atomic-boq-duplicate-production-release-result.md)
-- หน้ารายการ BOQ ยังโหลดรายการที่ผู้ใช้มองเห็นทั้งหมด การแบ่งหน้าแบบ
-  server-side แบบมีเลขหน้าเป็นงาน `LIST-1B` ถัดไป; keyset เป็นทางเลือกภายหลัง
-  เมื่อมีหลักฐานด้าน deep-page performance หรือ mutation churn
+- งานตัดสินใจถัดไปครอบคลุม `R0A` และ `LIST-1B` โดยลำดับที่เสนอคือปล่อย
+  numeric-only safety guard ขนาดเล็กก่อน เพื่อห้าม `5*2`/`5x2` ถูกแปลงเงียบ
+  เป็น `52`; ยังไม่มี parser, formula persistence หรือ database change ใน R0A
+- หน้ารายการ BOQ ยังส่ง query แบบไม่แบ่งหน้าและค้นหาเฉพาะแถวที่ browser ได้รับ;
+  การแบ่งหน้าแบบ server-side แบบมีเลขหน้าเป็นงานหลัก `LIST-1B` ถัดจาก guard;
+  keyset เป็นทางเลือกภายหลังเมื่อมีหลักฐานด้าน deep-page performance หรือ
+  mutation churn
+- `LIST-1B` รุ่นแรกเสนอ 25 แถว, whole-result server search/filter/sort/count
+  และ route batch เดียว; optional trusted Copy-eligibility projection เสนอให้
+  แยกเป็น `L1.1` โดย RPC เดิมยังเป็น final authority
 - Quantity Expression ยังเป็นแผน: `*` จะเป็นรูปแบบ canonical และรับ
   `x`, `X`, `×` เป็น alias สูตรจะแสดงเฉพาะ editor ส่วน PDF/Excel แสดงตัวเลข
   เท่านั้น

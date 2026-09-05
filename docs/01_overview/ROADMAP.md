@@ -1,7 +1,9 @@
 # Roadmap
 ## Conduit BOQ System
 
-**Last Updated:** 2026-06-29
+**Historical base:** 2026-06-29
+
+**Last Updated:** 2026-09-05
 
 <!-- MASTER_CATALOG_CURRENT_STATE_20260829 -->
 > [!IMPORTANT]
@@ -24,6 +26,20 @@
 > instant. Migrations 027/028/029 are now applied-once/no-replay. The next
 > recommended product decision is LIST-1; Quantity Expression and S0 remain
 > separate and unapproved.
+
+<!-- NEXT_PRODUCT_DECISION_REFINEMENT_20260905 -->
+> [!IMPORTANT]
+> **Next-decision refinement (2026-09-05):** later source review confirmed that
+> the current quantity sanitizer can silently turn unsupported expression-like
+> input such as `5*2` into `52`. The latest recommendation is therefore to close
+> the `R0A` and `LIST-1B` Level-A decisions together, release only the narrow
+> fail-closed R0A guard first, then implement LIST-1B before the wider
+> calculation contract and Quantity Expression work. The Owner may retain
+> LIST-1 first or run the guard in parallel. This refines the dated 2026-08-31
+> recommendation above without rewriting it. All of this remains proposed and
+> unapproved; see [AI Handoff](../08_ai/AI_HANDOFF.md#next-product-decision-handoff--2026-09-05),
+> [Product Evolution Decision Plan](../plans/product/01-conduit-boq-product-evolution-decision-plan.md),
+> and [LIST-1 Decision Plan](../plans/product/02-boq-list-scaling-decision-plan.md).
 
 ---
 
