@@ -39,10 +39,13 @@ describe('Master Catalog Phase 2 application contracts', () => {
     const editor = readSource('components/boq/MultiRouteEditor.tsx')
     const printPage = readSource('app/boq/[id]/print/page.tsx')
     const editPage = readSource('app/boq/[id]/edit/page.tsx')
+    const editorData = readSource('lib/boq/editorData.ts')
 
     expect(editor).not.toContain('price_list(category)')
     expect(printPage).not.toContain('price_list(category)')
-    expect(editPage).toContain('category: item.category')
+    expect(editorData).not.toContain('price_list(category)')
+    expect(editPage).toContain('buildBOQRoutesPayload(routes, routeItems)')
+    expect(editorData).toContain('category: item.category')
   })
 
   it('filters shared catalog views through the fail-closed default lookup', () => {
