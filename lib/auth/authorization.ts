@@ -1,4 +1,4 @@
-import type { SupabaseClient, User } from '@supabase/supabase-js'
+import { isAuthSessionMissingError, type SupabaseClient, type User } from '@supabase/supabase-js'
 import type { UserProfileWithOrg, UserRole, UserStatus } from '@/lib/types/auth'
 
 export const CURRENT_PROFILE_RPC = 'get_my_profile_v2'
@@ -177,6 +177,11 @@ export async function loadCurrentAuthorization(
   }
 
   const user = authResult.data.user
+  // The SDK reports an absent session as an error; fresh visitors still need Login.
+  if (!user && isAuthSessionMissingError(authResult.error)) {
+    return { state: 'unauthenticated', user: null, profile: null, source: null }
+  }
+
   if (authResult.error) {
     return {
       state: 'unavailable',

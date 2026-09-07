@@ -7,6 +7,7 @@ import { createClient } from '@/lib/supabase/client';
 import { useAuth } from '@/lib/context/AuthContext';
 import { can, BOQContext } from '@/lib/permissions';
 import { requireActiveProfile } from '@/lib/auth/authorization';
+import { buildBOQRoutesPayload } from '@/lib/boq/editorData';
 import {
   duplicateBOQAtomic,
   getDuplicateBOQErrorMessage,
@@ -207,6 +208,8 @@ export default function EditBOQPage() {
     setError(null);
 
     try {
+      // Reject missing item sets before any request; an explicit [] is valid.
+      const routesData = buildBOQRoutesPayload(routes, routeItems);
       await requireActiveProfile(supabase);
       // Calculate grand totals
       const grandTotals = routes.reduce(
@@ -249,30 +252,6 @@ export default function EditBOQPage() {
         factor_f_lower_value: factorData.lowerValue,
         factor_f_upper_value: factorData.upperValue,
       };
-
-      const routesData = routes.map((route) => ({
-        route_name: route.route_name,
-        route_description: route.route_description || null,
-        construction_area: route.construction_area || null,
-        total_material_cost: route.total_material_cost,
-        total_labor_cost: route.total_labor_cost,
-        total_cost: route.total_cost,
-        items: (routeItems[route.id] || []).map((item) => ({
-          item_order: item.item_order,
-          price_list_id: item.price_list_id,
-          item_name: item.item_name,
-          quantity: item.quantity,
-          unit: item.unit,
-          material_cost_per_unit: item.material_cost_per_unit,
-          labor_cost_per_unit: item.labor_cost_per_unit,
-          unit_cost: item.unit_cost,
-          total_material_cost: item.total_material_cost,
-          total_labor_cost: item.total_labor_cost,
-          total_cost: item.total_cost,
-          remarks: item.remarks,
-          category: item.category,
-        })),
-      }));
 
       // Use RPC function for atomic transaction - if any step fails, everything rolls back
       const { error: rpcError } = await supabase.rpc('save_boq_with_routes', {
@@ -563,6 +542,7 @@ export default function EditBOQPage() {
           {/* Section 2: Multi-Route Editor */}
           {priceListVersionId && (
             <MultiRouteEditor
+              key={boqId}
               boqId={boqId}
               priceListVersionId={priceListVersionId}
               factorReferenceVersionId={factorReferenceVersionId}

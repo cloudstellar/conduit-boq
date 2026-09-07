@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback, useMemo } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import { PriceListItem } from '@/lib/supabase';
 import { safeItemCalc } from '@/lib/calculation';
+import { loadBOQEditorData } from '@/lib/boq/editorData';
 import { Route } from './RouteManager';
 import RouteSidebar from './RouteSidebar';
 import LineItemsTable, { LineItem } from './LineItemsTable';
@@ -91,7 +92,16 @@ export default function MultiRouteEditor({
   const [routes, setRoutes] = useState<Route[]>([]);
   const [routeItems, setRouteItems] = useState<Record<string, LineItem[]>>({});
   const [activeRouteId, setActiveRouteId] = useState<string | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const [loadAttempt, setLoadAttempt] = useState(0);
+  const [loadState, setLoadState] = useState<{
+    boqId: string;
+    attempt: number;
+    status: 'ready' | 'error';
+  } | null>(null);
+  // A different BOQ or retry is loading immediately, before the effect starts.
+  const isCurrentLoad = loadState?.boqId === boqId && loadState.attempt === loadAttempt;
+  const isReady = isCurrentLoad && loadState.status === 'ready';
+  const hasLoadError = isCurrentLoad && loadState.status === 'error';
 
   // State for special item modal (งานวางท่อ / งานดันท่อ)
   const [pendingSpecialItem, setPendingSpecialItem] = useState<PriceListItem | null>(null);
@@ -114,96 +124,26 @@ export default function MultiRouteEditor({
     });
   }, []);
 
-  // Load routes and items
+  // Publish the editor data only after every route/item query succeeds.
   useEffect(() => {
+    let cancelled = false;
     const loadData = async () => {
       try {
-        // Load routes
-        const { data: routesData, error: routesError } = await supabase
-          .from('boq_routes')
-          .select('*')
-          .eq('boq_id', boqId)
-          .order('route_order');
-
-        if (routesError) throw routesError;
-
-        if (routesData && routesData.length > 0) {
-          setRoutes(routesData.map(r => ({
-            id: r.id,
-            route_order: r.route_order,
-            route_name: r.route_name,
-            route_description: r.route_description || '',
-            construction_area: r.construction_area || '',
-            total_material_cost: Number(r.total_material_cost),
-            total_labor_cost: Number(r.total_labor_cost),
-            total_cost: Number(r.total_cost),
-          })));
-          setActiveRouteId(routesData[0].id);
-
-          // Load independent route item sets in parallel.
-          const itemEntries = await Promise.all(routesData.map(async (route) => {
-            const { data: items, error: itemsError } = await supabase
-              .from('boq_items')
-              .select('*')
-              .eq('route_id', route.id)
-              .order('item_order');
-
-            if (itemsError) throw itemsError;
-            return [route.id, (items || []) as LineItem[]] as const;
-          }));
-          setRouteItems(Object.fromEntries(itemEntries));
-        } else {
-          // Check for legacy items without route
-          const { data: legacyRaw, error: legacyError } = await supabase
-            .from('boq_items')
-            .select('*')
-            .eq('boq_id', boqId)
-            .is('route_id', null)
-            .order('item_order');
-
-          if (legacyError) throw legacyError;
-          const legacyItems = (legacyRaw || []) as LineItem[];
-
-          if (legacyItems && legacyItems.length > 0) {
-            // Create default route for legacy items
-            const defaultRoute: Route = {
-              id: crypto.randomUUID(),
-              route_order: 1,
-              route_name: 'เส้นทางหลัก',
-              route_description: '',
-              construction_area: '',
-              total_material_cost: legacyItems.reduce((sum, i) => sum + Number(i.total_material_cost), 0),
-              total_labor_cost: legacyItems.reduce((sum, i) => sum + Number(i.total_labor_cost), 0),
-              total_cost: legacyItems.reduce((sum, i) => sum + Number(i.total_cost), 0),
-            };
-            setRoutes([defaultRoute]);
-            setRouteItems({ [defaultRoute.id]: legacyItems });
-            setActiveRouteId(defaultRoute.id);
-          } else {
-            // No routes and no legacy items - create first route automatically
-            const firstRoute: Route = {
-              id: crypto.randomUUID(),
-              route_order: 1,
-              route_name: 'เส้นทาง 1',
-              route_description: '',
-              construction_area: '',
-              total_material_cost: 0,
-              total_labor_cost: 0,
-              total_cost: 0,
-            };
-            setRoutes([firstRoute]);
-            setRouteItems({ [firstRoute.id]: [] });
-            setActiveRouteId(firstRoute.id);
-          }
-        }
+        const data = await loadBOQEditorData(supabase, boqId);
+        if (cancelled) return;
+        setRoutes(data.routes);
+        setRouteItems(data.routeItems);
+        setActiveRouteId(data.activeRouteId);
+        setLoadState({ boqId, attempt: loadAttempt, status: 'ready' });
       } catch (err) {
+        if (cancelled) return;
         console.error('Error loading routes:', err);
-      } finally {
-        setIsLoading(false);
+        setLoadState({ boqId, attempt: loadAttempt, status: 'error' });
       }
     };
     loadData();
-  }, [boqId, supabase]);
+    return () => { cancelled = true; };
+  }, [boqId, loadAttempt, supabase]);
 
   const handleAddRoute = useCallback(() => {
     if (readOnly) return;
@@ -445,6 +385,8 @@ export default function MultiRouteEditor({
       { material: 0, labor: 0, total: 0 }
     );
 
+    // Preserve the existing active-route total synchronization in this load-safety change.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setRoutes(prev =>
       prev.map(r =>
         r.id === activeRouteId
@@ -471,7 +413,7 @@ export default function MultiRouteEditor({
   );
 
   useEffect(() => {
-    if (grandTotals.total <= 0 && onFactorCalculated) {
+    if (isReady && grandTotals.total <= 0 && onFactorCalculated) {
       onFactorCalculated({
         factor: 0,
         totalWithFactor: 0,
@@ -483,7 +425,7 @@ export default function MultiRouteEditor({
         upperValue: 0,
       });
     }
-  }, [grandTotals.total, onFactorCalculated]);
+  }, [isReady, grandTotals.total, onFactorCalculated]);
 
   const activeRouteItems = activeRouteId
     ? sortItemsByCategory(routeItems[activeRouteId] || [])
@@ -491,14 +433,29 @@ export default function MultiRouteEditor({
   const activeRoute = routes.find(r => r.id === activeRouteId);
 
   const handleSaveClick = async () => {
-    if (readOnly) return;
+    if (readOnly || isSaving || !isReady) return;
     await onSave(routes, routeItems);
   };
 
-  if (isLoading) {
+  if (hasLoadError) {
     return (
-      <div className="flex items-center justify-center py-12">
-        <Loader2 className="w-8 h-8 animate-spin text-blue-500" />
+      <div role="alert" className="rounded-lg border border-destructive/30 bg-destructive/5 p-6 space-y-3">
+        <p className="font-semibold">โหลดรายการ BOQ ไม่สำเร็จ</p>
+        <p className="text-sm text-muted-foreground">
+          ยังโหลดเส้นทางและรายการไม่ครบ จึงยังบันทึกไม่ได้ เพื่อป้องกันการบันทึกทับข้อมูลที่มีอยู่
+        </p>
+        <Button variant="outline" onClick={() => setLoadAttempt(attempt => attempt + 1)}>
+          ลองโหลดอีกครั้ง
+        </Button>
+      </div>
+    );
+  }
+
+  if (!isReady) {
+    return (
+      <div role="status" className="flex items-center justify-center py-12">
+        <Loader2 aria-hidden="true" className="w-8 h-8 animate-spin text-blue-500" />
+        <span className="sr-only">กำลังโหลดเส้นทางและรายการ BOQ</span>
       </div>
     );
   }
@@ -755,7 +712,7 @@ export default function MultiRouteEditor({
         </Button>
         <Button
           onClick={handleSaveClick}
-          disabled={readOnly || isSaving || routes.length === 0}
+          disabled={readOnly || isSaving || !isReady || routes.length === 0}
           className="cursor-pointer"
         >
           {isSaving ? (
