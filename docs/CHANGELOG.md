@@ -3,7 +3,7 @@
 
 ---
 
-## Unreleased — Quantity Input Safety local committed candidate
+## Unreleased — Quantity Input Safety Preview-verified candidate
 
 - Numeric-only Quantity safety, real-time editor totals, cancel/restore,
   stable draft identity and Factor-bound Save coordination are implemented and
@@ -11,10 +11,16 @@
 - The local freeze created runtime/tests commit `b18e69a` and documentation
   commit `a467d38`. The final clean HEAD passed 643 tests in 56 files, ESLint,
   TypeScript, production build and `git diff --check`.
-- This work still has no upstream, push, Preview, merge or Production release.
-  It adds no formula parser, schema/RPC change or migration. The Owner selected
-  the no-PR/no-separate-CI Solo Preview path recorded in [Product Plan
-  #06](./plans/product/06-r0a-quantity-input-safety-release-plan.md).
+- Exact source `5527fe9` was pushed to `codex/quantity-input-safety` and passed
+  authenticated no-write Vercel Preview QA under the Owner-selected
+  no-PR/no-separate-CI Solo path. The branch remains unmerged and there is no
+  Production release.
+- Preview verified valid real-time totals/Factor, visible rejection of `5x2`,
+  Escape/Cancel, route identity, reload/no-Save behavior, and saved Print data.
+  Current-schema Save, console capture, and Preview Excel/PDF remain recorded
+  residuals. Details: [Product Plan #06](./plans/product/06-r0a-quantity-input-safety-release-plan.md)
+  and [Preview Result #07](./plans/product/07-r0a-quantity-input-safety-preview-result.md).
+- The candidate adds no formula parser, schema/RPC change or migration.
 
 ---
 

@@ -62,13 +62,16 @@ Result #04](../plans/security/04-boq-save-null-authorization-production-release-
 and the repository closeout is `7c09ab8`. Migrations 027–030 are
 immutable/no-replay and this release authority is consumed.
 
-Quantity Input Safety was not part of that release. It is now a locally
-committed, unpushed `LOCAL COMMITTED CANDIDATE` governed by [Product Plan
-#06](../plans/product/06-r0a-quantity-input-safety-release-plan.md). Q-A phase 1
-froze runtime/tests as `b18e69a` and docs as `a467d38` and is complete/consumed.
-Q-A phase 2 is the selected direct branch push plus Preview path, with no PR or
-separate CI gate. Q-B separately covers reviewed `main` integration and
-Production. A Production write test needs its own named data and authority.
+Quantity Input Safety was not part of that release. It is now a
+`PREVIEW-VERIFIED CANDIDATE` governed by [Product Plan
+#06](../plans/product/06-r0a-quantity-input-safety-release-plan.md) and
+[Preview Result #07](../plans/product/07-r0a-quantity-input-safety-preview-result.md).
+Q-A phase 1 froze runtime/tests as `b18e69a` and docs as `a467d38`; Q-A phase 2
+pushed/deployed exact source `5527fe9` through the selected no-PR/no-separate-CI
+Solo Preview path and completed authenticated no-write QA. Both authorities are
+consumed. Persistence/output-console residuals and Q-B reviewed `main`
+integration/Production remain separate decisions. A Production write test
+needs its own named data and authority.
 
 ## 2. Pre-Release Checklist
 

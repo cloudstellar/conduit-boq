@@ -1,13 +1,12 @@
 # R0A Quantity Input Safety — Release Candidate Plan
 
 **Prepared:** 2026-10-12
-**Status:** `LOCAL COMMITTED CANDIDATE`; implementation, local validation and
-Q-A phase 1 local freeze are complete/consumed at runtime/tests commit
-`b18e69adeeaedbf10ca70c767ac4cf80a351b6bc` plus documentation commit
-`a467d385041d4d5b05d7a539ac28269a252b3f6d`. This current status-only
-documentation alignment is a later descendant and changes no runtime. At the
-post-freeze checkpoint there was no upstream, push, Preview, integration or
-deployment.
+**Status:** `PREVIEW-VERIFIED CANDIDATE`; Q-A phases 1–2 are complete/consumed.
+Runtime/tests commit `b18e69adeeaedbf10ca70c767ac4cf80a351b6bc` and freeze
+documentation commit `a467d385041d4d5b05d7a539ac28269a252b3f6d` were carried
+by exact Preview source `5527fe9fe9ce6e1f8888912c18dc9b26e7b1b6b3`. See
+[Preview Result #07](./07-r0a-quantity-input-safety-preview-result.md). The
+candidate is not merged or released to Production.
 **Dependency:** Satisfied — migration 030 is `PRODUCTION PASS` and no-replay;
 see [Security Result #04](../security/04-boq-save-null-authorization-production-release-result.md).
 
@@ -21,9 +20,12 @@ see [Security Result #04](../security/04-boq-save-null-authorization-production-
   documentation as `a467d38`. At the post-freeze checkpoint `HEAD` was clean at
   `a467d38`, had no upstream, and was zero commits behind/two ahead of
   `origin/main` at `7c09ab8`.
-- There is now an immutable local application freeze at those two payload
-  commits plus this later status-only documentation alignment, but no branch
-  push, Preview receipt, `main` integration or Production release is recorded.
+- Q-A phase 2 later pushed exact source `5527fe9` to
+  `origin/codex/quantity-input-safety`. Local HEAD and the remote ref matched;
+  `origin/main` remained `7c09ab8`. Vercel reported a successful Preview with
+  `production_environment == false`; authenticated no-write QA passed with the
+  limitations recorded in Result #07. No PR, separate CI, Save, `main`
+  integration, or Production release occurred.
 - The runtime work began from the earlier PR #12 base `c0cb6451...`; the
   independent security source/closeout commits `cb2bb60` and `7c09ab8` are now
   in the base. The dated validation record below is preserved as the evidence
@@ -69,9 +71,10 @@ Runtime candidate paths:
   `tests/export-boq-excel-factor-version.test.ts`
 
 The security migration and its SQL fixture/runner/tests are excluded from this
-application release. The Q-A phase 1 documentation commit is `a467d38`; this
-later status-only alignment preserves the runtime commit and every migration
-or Production receipt. Reverify the resulting live HEAD before branch push.
+application release. The Q-A phase 1 documentation commit is `a467d38`; later
+status/result alignments preserve the runtime commit and every migration or
+Production receipt. The application Preview identity is frozen at `5527fe9`;
+reverify live Git/deployment state before later work.
 
 ## Immutable local-candidate evidence — 2026-10-12
 
@@ -126,14 +129,16 @@ Migration 030 is complete. The remaining gates are:
    `b18e69a` and the aligned shared documentation as `a467d38`; confirm no
    migration/security harness file is included; run unit/lint/type/build and
    diff checks on the clean exact HEAD.
-2. **Phase 2 — current:** under fresh applicable authority, push the exact
-   `codex/quantity-input-safety` branch and verify the matching Vercel Preview.
-   The Owner selected this Solo path with no PR and no separate CI gate. It does
-   not include `main` integration or Production deployment.
-3. Verify Preview without persistent Production writes: login, open an
-   editable BOQ, exercise valid real-time input, invalid operator input,
-   Escape/Cancel, route switching and saved-version output, then reload to
-   confirm no Save occurred.
+2. **Phase 2 — complete/consumed:** exact source `5527fe9` was pushed to
+   `codex/quantity-input-safety` and verified in the matching Vercel Preview.
+   The Owner-selected Solo path used no PR and no separate CI gate and did not
+   include `main` integration or Production deployment.
+3. Authenticated no-write Preview QA covered list/RouteBadge loading, valid
+   real-time input, invalid operator input, Escape/Cancel, route switching,
+   genuine reload/no-Save proof, and saved-version Print output. A read-only
+   database query independently confirmed persisted quantity/totals and
+   unchanged `updated_at`. Console capture, Preview Excel/PDF, and a current-
+   schema persistent Save remain recorded limitations in Result #07.
 4. The Owner must then explicitly choose whether to accept the
    documented current-schema persistence residual or authorize a separate
    disposable current-schema rehearsal. Do not silently replay 027/028/029/030 or
@@ -161,13 +166,12 @@ add LIST-1 or full Quantity Expression while closing this release.
 
 ## Remaining Owner decisions
 
-1. **Q-A phase 2 publication:** after the completed/consumed local freeze,
-   approve or verify the applicable authority for the exact branch push and
-   Preview. No PR or separate CI gate is part of the Owner-selected Solo path;
-   this does not include `main` integration or Production deployment.
-2. **Persistence evidence:** after Preview, either accept the documented lack
+1. **Persistence evidence:** either accept the documented lack
    of a current-post-030-schema write rehearsal or separately authorize a
    disposable rehearsal. Existing or Production BOQs are not implicit fixtures.
+2. **Output/console evidence:** accept the recorded lack of native-console
+   capture and Preview Excel/PDF download/generation, or authorize a separate
+   bounded evidence pass. Saved-version Print rendering passed.
 3. **Q-B release:** separately approve reviewed integration/push to `main` and
    Production deployment after the immutable commits, local checks, Preview and
    residual decision are reviewable.

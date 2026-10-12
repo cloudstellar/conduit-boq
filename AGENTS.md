@@ -75,9 +75,9 @@ current.
   LIST-1, broader Auth/Security work, Catalog/Factor/BOQ data operations,
   account changes, another deployment or Production mutation.
 
-## Active local Quantity candidate
+## Active Quantity Preview candidate
 
-`R0A_QUANTITY_INPUT_SAFETY_LOCAL_CANDIDATE_20261012`
+`R0A_QUANTITY_INPUT_SAFETY_PREVIEW_VERIFIED_20261012`
 
 - A reviewed Quantity Input Safety candidate is preserved locally on
   `codex/quantity-input-safety`; always verify the live branch, HEAD, upstream,
@@ -92,17 +92,28 @@ current.
   alignment is a later descendant of that checkpoint; verify its live HEAD
   before publication.
 - Use the [R0A Quantity Input Safety release-candidate plan](docs/plans/product/06-r0a-quantity-input-safety-release-plan.md)
-  for exact behavior, paths, validation, residuals, and the Q-A/Q-B gates.
+  for exact behavior and gates, and [Preview Result #07](docs/plans/product/07-r0a-quantity-input-safety-preview-result.md)
+  for the executed Q-A phase 2 receipt.
 - This is numeric-only input safety plus editor/save coordination. It is not
   Quantity Expression and adds no formula persistence, schema/RPC change,
   migration, Catalog/Factor mutation, BOQ backfill, or account change.
-- The candidate is a `LOCAL COMMITTED CANDIDATE`, not a release. Q-A phase 1
-  local-freeze authority is complete and consumed. The Owner selected a Solo
-  Preview path: Q-A phase 2 is an exact branch push plus Preview verification,
-  with no PR or separate CI gate; merge/main integration and Production remain
-  a separate Q-B decision. Do not discard or mix the candidate into unrelated
-  work, create another commit, push, Preview, integrate, or deploy without
-  fresh explicit authority for the applicable operation.
+- The exact application candidate at
+  `5527fe9fe9ce6e1f8888912c18dc9b26e7b1b6b3` (tree
+  `66b83f60482da3ca6c6e9390113452180cef0d47`) is a
+  `PREVIEW-VERIFIED CANDIDATE`. Local HEAD and
+  `origin/codex/quantity-input-safety` matched that commit while `origin/main`
+  remained `7c09ab8`; the local branch still had no configured upstream. Q-A
+  phase 2 used the Owner-selected Solo path with no PR or separate CI and is
+  complete/consumed. It performed no Save, database mutation, merge, or
+  Production deployment. The persistence/output-console residual decision and
+  Q-B `main`/Production release remain separate. Q-A phase 2
+  branch-publication/Preview authority is complete/consumed. The previously
+  approved Q-A plan leaves exactly one local documentation-only closeout commit
+  containing Result #07 and the synchronized status files; it must not change
+  runtime and grants no push or another Preview. After that exact closeout
+  commit, do not discard or mix the candidate into unrelated work, create or
+  amend another commit, push, Preview, integrate, or deploy without fresh
+  explicit authority for the applicable operation.
 - LIST-1B, wider R0 accounting decisions, R1/R2 Quantity Expression, and wider
   S0 Auth/Security remain separate decisions. Migration 030 being complete
   satisfies a dependency; it does not authorize the Quantity release.

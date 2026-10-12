@@ -36,11 +36,12 @@ Quantities) สำหรับการใช้งานภายใน บม�
 > แล้ว
 
 > [!NOTE]
-> Quantity Input Safety เป็น **LOCAL COMMITTED CANDIDATE** ที่ทำ ทดสอบ และ
-> freeze ไว้ใน local commits `b18e69a` (runtime/tests) และ `a467d38` (docs)
-> แล้ว แต่ยังไม่มี upstream, push, Preview, merge หรือ Production release
-> ดูขอบเขตและงานค้างที่
+> Quantity Input Safety เป็น **PREVIEW-VERIFIED CANDIDATE**: runtime/tests
+> `b18e69a`, freeze docs `a467d38` และ exact Preview source `5527fe9`
+> ผ่าน local gates กับ authenticated no-write Preview QA แล้วโดยไม่มี PR หรือ
+> separate CI; ยังไม่ merge และยังไม่ deploy Production ดูขอบเขตที่
 > [R0A release-candidate plan](docs/plans/product/06-r0a-quantity-input-safety-release-plan.md)
+> และหลักฐานที่ [Preview Result #07](docs/plans/product/07-r0a-quantity-input-safety-preview-result.md)
 > LIST-1B และ Full Quantity Expression ยังเป็นงานแยกที่ไม่ได้รับ implementation
 > authority
 
@@ -135,7 +136,8 @@ docs/                product, architecture, data, process และ handoff
 - [Product evolution decision plan](docs/plans/product/01-conduit-boq-product-evolution-decision-plan.md)
   สำหรับลำดับพัฒนาระยะยาว
 - [BOQ list scaling plan](docs/plans/product/02-boq-list-scaling-decision-plan.md)
-- [Quantity Input Safety local candidate](docs/plans/product/06-r0a-quantity-input-safety-release-plan.md)
+- [Quantity Input Safety release plan](docs/plans/product/06-r0a-quantity-input-safety-release-plan.md)
+  และ [Preview result](docs/plans/product/07-r0a-quantity-input-safety-preview-result.md)
 - [BOQ Save guard Production result](docs/plans/security/04-boq-save-null-authorization-production-release-result.md)
 - [BOQ list pagination research](docs/plans/product/03-boq-list-pagination-best-practice-research.md)
 - [Atomic BOQ Duplicate Production result](docs/plans/product/04-atomic-boq-duplicate-production-release-result.md)
@@ -152,10 +154,10 @@ docs/                product, architecture, data, process และ handoff
 - Atomic Duplicate เปิดใช้แล้วโดย migration 029 และ application ที่ตรงกัน;
   สถานะ/ข้อจำกัดให้ยึด [AI handoff](docs/08_ai/AI_HANDOFF.md) และ
   [release result](docs/plans/product/04-atomic-boq-duplicate-production-release-result.md)
-- Quantity Input Safety ที่ห้าม `5*2`/`5x2` ถูกแปลงเงียบเป็น `52` ทำและทดสอบ
-  แล้วและ freeze เป็น local commits สองรายการ ลำดับถัดไปตาม Solo Preview ที่
-  Owner เลือกคือ Q-A ระยะ 2 push branch เดิมและตรวจ Preview โดยไม่มี PR หรือ
-  CI แยก -> ตัดสินใจเรื่อง current-schema persistence evidence -> Q-B
+- Quantity Input Safety ที่ห้าม `5*2`/`5x2` ถูกแปลงเงียบเป็น `52` ผ่าน Q-A
+  ระยะ 2 แบบ Solo Preview แล้วที่ exact source `5527fe9` โดยไม่มี PR หรือ CI
+  แยก ลำดับถัดไปคือ Owner ตัดสินใจยอมรับหรือขอหลักฐานเพิ่มสำหรับ
+  current-schema persistence, console และ Preview Excel/PDF -> Q-B
   แยกสำหรับ integrate/push `main` และ Production -> จึงพิจารณา `LIST-1B`;
   candidate นี้ยังไม่มี parser, formula persistence หรือ database change
 - หน้ารายการ BOQ ยังส่ง query แบบไม่แบ่งหน้าและค้นหาเฉพาะแถวที่ browser ได้รับ;

@@ -1,7 +1,7 @@
 # Conduit BOQ Product Evolution Decision Plan
 
 **Status:** CURRENT DECISION DASHBOARD — DUP-1 AND SECURITY 030 ARE
-`PRODUCTION PASS`; QUANTITY INPUT SAFETY IS A `LOCAL COMMITTED CANDIDATE`;
+`PRODUCTION PASS`; QUANTITY INPUT SAFETY IS A `PREVIEW-VERIFIED CANDIDATE`;
 LIST-1 AND REMAINING PRODUCT DECISIONS REQUIRE OWNER AUTHORITY
 
 **Prepared:** 2026-08-30; final evidence review plus D2/D3/D9 scope updates
@@ -38,17 +38,18 @@ the historical decisions and evidence below.
   [Security Result #04](../security/04-boq-save-null-authorization-production-release-result.md).
 - Quantity Input Safety is no longer wholly proposed. The R0A core plus the
   accepted editor/Save-coordination behavior is implemented and validated as
-  a `LOCAL COMMITTED CANDIDATE`: runtime/tests commit `b18e69a` is followed by
-  docs commit `a467d38`. It has no upstream, push, Preview, integration, or
-  Production deployment. See [Plan #06](./06-r0a-quantity-input-safety-release-plan.md).
+  a `PREVIEW-VERIFIED CANDIDATE`: runtime/tests commit `b18e69a` is followed by
+  docs commit `a467d38`, and exact application source `5527fe9` passed the
+  Owner-selected authenticated no-write Preview. It has no `main` integration
+  or Production deployment. See [Plan #06](./06-r0a-quantity-input-safety-release-plan.md)
+  and [Result #07](./07-r0a-quantity-input-safety-preview-result.md).
 - LIST-1B remains `PROPOSED`; none of its Level-A choices or implementation is
   authorized by the Quantity work.
 - Wider R0/D0 accounting policy, R1/R2 Quantity Expression and wider S0
   Auth/Security remain separate decisions. Full Quantity Expression has not
   started.
-- Q-A phase 1 local freeze is complete and consumed. The current sequence is
-  Q-A phase 2 direct branch push/Preview under the Owner-selected Solo path
-  without a PR or separate CI gate, the persistence-residual decision, and a
+- Q-A phases 1–2 are complete and consumed. The current sequence is the
+  persistence/console/Preview Excel-PDF residual decision, followed by a
   separate Q-B reviewed `main` integration/Production decision. Plan text does
   not grant those operations.
 
@@ -108,8 +109,9 @@ not replace a new preflight at implementation or release time.
 The accepted Quantity safety scope is now a local implementation rather than a
 two-line proposal: it combines fail-closed numeric input, real-time totals,
 draft identity, and matching Factor/save preparation. Its local freeze is
-complete at `b18e69a` + `a467d38`; branch publication, Preview and Production
-remain gated through Q-A phase 2 and Q-B. `LIST-1B` remains the next substantial
+complete at `b18e69a` + `a467d38`; exact source `5527fe9` passed Q-A phase 2
+Preview, while residual acceptance and Production remain gated before Q-B.
+`LIST-1B` remains the next substantial
 proposed feature because the growing Admin register still makes an unpaginated
 request and per-rendered-row route queries. LIST-1B has no implementation authority.
 Full Quantity Expression still must not begin as a UI-only calculator: the
@@ -142,8 +144,8 @@ Documentation and recorded decisions
   -> DUP-1 Atomic BOQ Duplicate [complete 2026-08-31]
   -> Quantity Input Safety local implementation/testing [complete locally]
   -> Q-A phase 1 local freeze [complete/consumed: b18e69a + a467d38]
-  -> Q-A phase 2 Solo branch push/Preview [pending; no PR/separate CI]
-  -> persistence decision -> Q-B main/Production gate [pending]
+  -> Q-A phase 2 Solo branch push/Preview [complete/consumed: 5527fe9]
+  -> persistence/output-console decision -> Q-B main/Production gate [pending]
   -> LIST-1 bounded BOQ register implementation
   -> approved post-030-equivalent test baseline
   -> R0 calculation contract completion
@@ -203,9 +205,9 @@ Dependencies that can reverse the roadmap:
   with Create New. Catalog Requote/Reprice/Rebase is not in this release.
 - If mobile is part of the pilot cohort, responsive route and item work enters
   R1; otherwise it gates general Production, not the desktop-only pilot.
-- LIST-1 is independent of DB-1. Quantity Input Safety is already implemented
-  and frozen locally. It must close through Q-A phase 2 Solo Preview, the
-  persistence-evidence decision, and Q-B before LIST-1 becomes the next
+- LIST-1 is independent of DB-1. Quantity Input Safety is implemented, frozen,
+  and Preview-verified. It must close the residual-evidence decision and Q-B
+  before LIST-1 becomes the next
   substantial proposed feature. The wider
   R0 calculation safety/test baseline must precede the larger expression
   release, and LIST-1 has no DB-1 dependency.
@@ -229,15 +231,15 @@ one.
 |---|---|---|
 | A — Direction/documentation | Record decisions, refine flows, prepare plans/evidence | This document only; no implementation authorization |
 | B — Local implementation | Edit code/tests locally; no commit, push, Preview, DB migration, or external state | Executed and consumed for DUP-1 and the Quantity candidate |
-| C — Source/Preview | Freeze, publish and Preview a named candidate under its approved release path | Quantity local-freeze portion complete/consumed at `b18e69a` + `a467d38`; direct branch push/Preview remains Q-A phase 2; Owner selected no PR/separate CI |
+| C — Source/Preview | Freeze, publish and Preview a named candidate under its approved release path | Quantity Q-A phases 1–2 complete/consumed at `b18e69a` + `a467d38` and exact Preview source `5527fe9`; no PR/separate CI; not merged or Production-deployed |
 | D — Database design | Draft a new forward migration/RPC and rehearsal plan without applying it | Completed/consumed for migrations 029 and 030 only; Quantity candidate has no DB change |
 | E — Production release | Apply approved forward change, deploy, flag rollout, Production QA/rollback | Completed/consumed for DUP-1 and Save guard 030; Quantity Q-B remains pending |
 
 The dated DUP-1 session executed scoped Levels B–E through bounded Production
 verification. A later independent authority executed security migration 030.
-The current Quantity work executed and consumed Level B plus Q-A phase 1 local
-freeze. Q-A phase 2 branch publication/Preview and Q-B `main`/Production remain
-separate. Every completed authority is consumed and does not transfer to
+The current Quantity work executed and consumed Level B plus Q-A phases 1–2.
+The residual decision and Q-B `main`/Production remain separate. Every
+completed authority is consumed and does not transfer to
 another roadmap item or reference-data operation.
 
 Migration 027/028/029/030 execution is excluded from every future level.
@@ -1418,9 +1420,10 @@ conversion.
 
 #### R0A — Silent-input safety guard (small separate release)
 
-**Status:** `LOCAL COMMITTED CANDIDATE`; local implementation/testing and the
-Q-A phase 1 freeze are complete at `b18e69a` + `a467d38`; upstream push,
-Preview, `main` integration and Production deployment remain separate gates.
+**Status:** `PREVIEW-VERIFIED CANDIDATE`; local implementation/testing and the
+Q-A phase 1 freeze are complete at `b18e69a` + `a467d38`; exact source
+`5527fe9` passed Q-A phase 2 Preview. Residual acceptance, `main` integration
+and Production deployment remain separate gates.
 
 R0A keeps the editor numeric-only. If the draft contains unsupported syntax
 such as `5*2`, `5x2`, `5X2`, or `5×2`, retain the invalid draft so the user can
@@ -1527,8 +1530,8 @@ restorable state, an initial 25-row default, RLS-correct count, and a bounded
 route batch instead of loading every BOQ and issuing route requests per
 rendered row.
 
-Quantity Input Safety now has a local committed candidate. Q-A phase 1 is
-complete/consumed; Q-A phase 2 Solo Preview and Q-B Production remain open.
+Quantity Input Safety now has a Preview-verified candidate. Q-A phases 1–2 are
+complete/consumed; residual acceptance and Q-B Production remain open.
 After that closeout, LIST-1 remains the next substantial proposed
 feature. The wider R0 calculation
 safety/test baseline must still precede R1/DB-1 Quantity Expression. See the

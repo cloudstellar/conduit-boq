@@ -123,7 +123,10 @@ does not authorize a formula parser, new persisted quantity fields, schema/RPC
 change or migration. The 2026-09-08 local-work approval did not authorize a
 commit or deployment; a later separate Q-A phase 1 authority froze the reviewed
 candidate as runtime/tests commit `b18e69a` plus docs commit `a467d38` and is
-now consumed.
+now consumed. Q-A phase 2 later verified exact source `5527fe9` through the
+Owner-selected no-PR/no-separate-CI Preview path; see [Preview Result
+#07](../plans/product/07-r0a-quantity-input-safety-preview-result.md). That
+authority is also consumed, and the candidate remains unmerged/unreleased.
 
 The Owner later explicitly chose to restore the previous route-total behavior:
 loading synchronizes only the selected route, selecting a route synchronizes
@@ -159,7 +162,7 @@ schema; those limits remain recorded in the handoff.
 | Current work and immediate Owner decisions | [AI Handoff — Current work register](./AI_HANDOFF.md#current-work-register--2026-10-12) |
 | Product evolution decisions | [`plans/product/01-conduit-boq-product-evolution-decision-plan.md`](../plans/product/01-conduit-boq-product-evolution-decision-plan.md) |
 | LIST-1 proposed design | [`plans/product/02-boq-list-scaling-decision-plan.md`](../plans/product/02-boq-list-scaling-decision-plan.md) |
-| Quantity Input Safety local candidate | [`plans/product/06-r0a-quantity-input-safety-release-plan.md`](../plans/product/06-r0a-quantity-input-safety-release-plan.md) |
+| Quantity Input Safety Preview candidate | [Plan #06](../plans/product/06-r0a-quantity-input-safety-release-plan.md) and [Preview Result #07](../plans/product/07-r0a-quantity-input-safety-preview-result.md) |
 | Database schema | [`04_data/DATABASE_SCHEMA.md`](../04_data/DATABASE_SCHEMA.md) |
 | Production migration ledger | [`04_data/MIGRATIONS.md`](../04_data/MIGRATIONS.md) |
 | Current security model | [`04_data/SECURITY_MODEL.md`](../04_data/SECURITY_MODEL.md) |
@@ -213,14 +216,13 @@ uncommitted handoff work unless the Owner directs otherwise. This record grants
 no later commit, push, PR, merge, deployment, database, or Production
 authority.
 
-The current recommended sequence is: Q-A phase 1 local freeze (complete and
-consumed) -> Q-A phase 2 direct branch push and Preview under the Owner-selected
-Solo path, with no PR or separate CI gate -> persistence-residual decision ->
-separate Q-B reviewed `main` integration and Production deployment ->
+The current recommended sequence is: Q-A phases 1–2 complete/consumed at exact
+Preview source `5527fe9` -> persistence, console and Preview Excel/PDF residual
+decision -> separate Q-B reviewed `main` integration and Production deployment ->
 decide/implement LIST-1B -> address wider R0/D0 before R1/R2 Quantity
-Expression. The candidate is locally committed but remains unpushed and
-unreleased at its recorded checkpoint. Each external operation still requires
-its applicable current approval.
+Expression. The candidate is `PREVIEW-VERIFIED` but remains unmerged and
+unreleased to Production. Each external operation still requires its applicable
+current approval.
 `S0` authentication/security remains a separate parallel lane. No plan text
 itself grants implementation or external-operation authority.
 

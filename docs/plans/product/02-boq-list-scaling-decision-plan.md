@@ -21,11 +21,11 @@ authority is consumed. LIST-1 remains a separate proposed decision.
 
 **Current adjacent work:** the BOQ Save NULL authorization guard is
 `PRODUCTION PASS` through immutable migration 030. Quantity Input Safety is a
-separate `LOCAL COMMITTED CANDIDATE`: implementation/testing and the local
-freeze exist at runtime/tests commit `b18e69a` plus docs commit `a467d38`, but
-it has no upstream, push, Preview or Production release. See [Quantity Plan
-#06](./06-r0a-quantity-input-safety-release-plan.md). The Owner selected a
-no-PR/no-separate-CI Solo Preview path for that candidate. Neither status
+separate `PREVIEW-VERIFIED CANDIDATE`: runtime/tests commit `b18e69a`, docs
+commit `a467d38`, and exact Preview source `5527fe9`; it is not merged or
+released to Production. See [Quantity Plan #06](./06-r0a-quantity-input-safety-release-plan.md)
+and [Preview Result #07](./07-r0a-quantity-input-safety-preview-result.md).
+Q-A phase 2 used the no-PR/no-separate-CI Solo Preview path. Neither status
 authorizes LIST-1; all Level-A rows in the Owner decision sheet remain `TBD`.
 
 **Research basis:**
@@ -436,9 +436,9 @@ current recovery path.
 - true Project grouping/entity if the business distinguishes Project from BOQ.
 
 DUP-1 and security migration 030 are complete. Quantity Input Safety has moved
-from proposal to a separate local committed candidate. Its Q-A phase 1 freeze
-is complete/consumed, while Q-A phase 2 Solo Preview and Q-B Production remain
-pending. LIST-1 remains the next substantial proposed feature after that
+from proposal to a separate Preview-verified candidate. Its Q-A phases 1–2 are
+complete/consumed, while residual acceptance and Q-B Production remain pending.
+LIST-1 remains the next substantial proposed feature after that
 closeout and before the larger Quantity Expression
 DB-1 release, while the wider calculation safety/test baseline must be
 established before expression implementation. LIST-1 addresses current Admin
@@ -495,7 +495,7 @@ STOP if:
 | Admin L2 filters | Department + sector + owner + date | `TBD` |
 | Route behavior | Embed current-page route fields or use one current-page batch; no per-row or per-click list query | `TBD` |
 | Copy eligibility projection | Defer optional trusted projection to L1.1; keep current RPC final authority in L1 | `TBD` |
-| First implementation order | Close the committed Quantity candidate through Q-A phase 2 Solo Preview, persistence decision and Q-B, then LIST-1, wider calculation baseline, and expression DB-1 | `DUP-1 and 030 complete; Quantity committed locally/unpushed/unreleased; LIST-1 TBD` |
+| First implementation order | Close the Preview-verified Quantity candidate through residual decision and Q-B, then LIST-1, wider calculation baseline, and expression DB-1 | `DUP-1 and 030 complete; Quantity Q-A phases 1–2 complete, unmerged/unreleased; LIST-1 TBD` |
 
 ## 14. Proposed approval wording
 
