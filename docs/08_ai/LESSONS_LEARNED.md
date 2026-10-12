@@ -1,7 +1,7 @@
 # Lessons Learned & AI Constitution
 ## Conduit BOQ System
 
-**Last Updated:** 2026-09-05
+**Last Updated:** 2026-10-12
 **Status:** Living Document (Update constantly)
 
 <!-- MASTER_CATALOG_CURRENT_STATE_20260829 -->
@@ -25,6 +25,16 @@
 > [DUP-1 Production Result](../plans/product/04-atomic-boq-duplicate-production-release-result.md).
 > The 2026-08-29 “no 029” observation above is still valid chronology for the
 > Master Catalog closeout. Migrations 027/028/029 are now immutable/no-replay.
+
+<!-- SAVE_GUARD_PRODUCTION_CLOSEOUT_20261012 -->
+> [!IMPORTANT]
+> **Current security addendum:** Migration 030 was later applied exactly once
+> as `20261012100608/boq_save_null_authorization_guard`; see
+> [BOQ Save Guard Production Result #04](../plans/security/04-boq-save-null-authorization-production-release-result.md).
+> It fixes only the NULL authorization decision in the existing Save RPC and
+> does not close wider S0/Auth/Security work. Migrations 027–030 are immutable,
+> no-replay, and the release authority is consumed. Quantity Input Safety is a
+> separate `LOCAL CANDIDATE`, not part of that Production release.
 
 > [!IMPORTANT]
 > **AI Must Read This First:** This file contains critical lessons learned from past mistakes. Ignoring these rules causes regressions.
@@ -110,21 +120,38 @@ supabase.auth.onAuthStateChange((event, session) => {
 ### 1.7 Numeric input — never turn rejected syntax into another number
 
 - **Lesson (2026-09):** removing unsupported characters from a numeric input can
-  silently change user intent. The current quantity sanitizer can turn `5*2`,
+  silently change user intent. The deployed/base predecessor sanitizer can turn `5*2`,
   `5x2`, `5X2`, or `5×2` into `52` and publish that number immediately.
 - **Rule:** rejected syntax must never be converted into and committed as a
   different numeric value. It must not change the last valid quantity, totals,
   save payload, Print/PDF, or Excel state.
-- **Proposed R0A UX — awaiting Owner decision:** keep the guard numeric-only,
-  retain unsupported text as a visible invalid draft, and show an accessible
-  explanation. R0A would not evaluate an expression or create formula history.
+- **R0A status:** the Owner approved local implementation/testing on 2026-09-08
+  and the candidate is now implemented and validated locally, but it remains
+  uncommitted and unreleased. Keep the guard numeric-only, retain unsupported
+  text as a visible invalid draft, and show an accessible explanation. R0A does
+  not evaluate an expression or create formula history.
   A future expression parser requires a bounded grammar, canonical decimal
   semantics, parser versioning, trusted-save validation, and separate approval.
-- **Proposed R0A verification:** cover typing and paste for `*`, `x`, `X`, and
+- **R0A verification:** cover typing and paste for `*`, `x`, `X`, and
   `×`, plus blur, Enter, correction, mobile input, save/reload, and a regression
   proving that no invalid draft is committed as concatenated digits.
 
 ---
+
+### 1.8 SQL authorization must reject unknown decisions
+
+- SQL booleans can be TRUE, FALSE or NULL. For an allow predicate, deny when
+  `predicate IS NOT TRUE`; `IF NOT predicate` skips the denial when it is NULL.
+- Test nullable owner/assignee/scope combinations against an existing resource
+  and the actual privileged function. A missing-resource probe tests an earlier
+  guard and cannot prove the later scope decision is correct.
+- A `SECURITY DEFINER` function owned by the table owner cannot rely on the
+  caller's RLS to repair its own missing authorization check.
+- The 2026-09-08 Save finding and local proof are recorded in the
+  [plan and local result](../plans/security/02-boq-save-null-authorization-guard-plan-and-result.md).
+  The correction was later applied once as migration 030 and closed in
+  [Production Result #04](../plans/security/04-boq-save-null-authorization-production-release-result.md).
+  This is evidence, not authority to edit or replay migrations 027–030.
 
 ## 2. Documentation Patterns
 

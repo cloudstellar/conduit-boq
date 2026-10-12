@@ -20,6 +20,11 @@
 > The dated “no 029” evidence above remains unchanged chronology;
 > 027/028/029 are now immutable/no-replay.
 
+> **Later security note (2026-10-12):** migration 030 was applied once for the
+> independent BOQ Save NULL-authorization guard, not for this governance ADR;
+> see [Security Result #04](../../plans/security/04-boq-save-null-authorization-production-release-result.md).
+> Migrations 027–030 are immutable/no-replay.
+
 **Status:** Owner-approved as Phase 4 governance/architecture decision for
 implementation/local rehearsal; Production migration, deploy, feature
 enablement, and publication require separate approvals

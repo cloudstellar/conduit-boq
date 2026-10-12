@@ -21,10 +21,13 @@ Production แบบ live และไม่ใช่สิทธิ์ให้
 | [Master Catalog Result #107](./plans/master-catalog/107-phase4-p49-master-catalog-final-closeout-result.md) | closeout result และ accepted residuals | ห้ามใช้ approval receipt เก่าเป็นสิทธิ์ทำงานใหม่ |
 | [DUP-1 Production Result #04](./plans/product/04-atomic-boq-duplicate-production-release-result.md) | exact migration/application release, Production QA และ residuals ของ Atomic BOQ Duplicate | เป็น execution receipt ที่ใช้แล้ว ไม่ใช่สิทธิ์ deploy/mutate ซ้ำหรือเริ่ม roadmap item ถัดไป |
 | [Post-DUP-1 Repository Custody Result #05](./plans/product/05-post-dup1-repository-custody-result.md) | docs PR #10, dated deployment observation และ exact branch cleanup | เป็น repository-custody receipt ที่ใช้แล้ว ไม่ใช่ live Git guarantee หรือสิทธิ์ cleanup รอบใหม่ |
+| [BOQ Save Guard Production Result #04](./plans/security/04-boq-save-null-authorization-production-release-result.md) | migration 030, Production postflight และ residuals ของ NULL authorization guard | `PRODUCTION PASS`; authority consumed; ไม่ใช่สิทธิ์ replay หรือเริ่ม Quantity/S0 |
+| [R0A Quantity Input Safety Plan #06](./plans/product/06-r0a-quantity-input-safety-release-plan.md) | exact local candidate, validation, residuals และ Q-A/Q-B release gates | `LOCAL CANDIDATE`; ยังไม่มี commit/PR/Preview/Production release |
 
-Migration 027, 028 และ 029 ถูกบันทึกว่า applied ครั้งเดียวและห้ามแก้ retry
-หรือ replay โดย 029 เป็น DUP-1 product release ภายหลัง ไม่ใช่ Master Catalog
-convergence ส่วน expanded Production persona rehearsal ของ Master Catalog
+Migration 027, 028, 029 และ 030 ถูกบันทึกว่า applied ครั้งเดียวและห้ามแก้
+retry หรือ replay โดย 029 เป็น DUP-1 product release และ 030 เป็น BOQ Save
+NULL-authorization correction ภายหลัง ไม่ใช่ Master Catalog convergence ส่วน
+expanded Production persona rehearsal ของ Master Catalog
 ยังเป็น accepted residual ไม่ใช่ PASS หากต้องอ้างสถานะ Production ที่เปลี่ยน
 ได้ ให้เก็บ fresh read-only evidence ใหม่
 
@@ -32,11 +35,12 @@ convergence ส่วน expanded Production persona rehearsal ของ Master 
 
 | เอกสาร | สถานะ | เนื้อหา |
 |---|---|---|
-| [01 — Product Evolution Decision Plan](./plans/product/01-conduit-boq-product-evolution-decision-plan.md) | D2/D3/D9 ถูกเลือก; DUP-1 live แล้ว; R0A/LIST-1 และ decision อื่นยังรอ Owner | roadmap, R0A silent-input guard, Quantity Expression, auth, workflow และระยะยาว |
+| [01 — Product Evolution Decision Plan](./plans/product/01-conduit-boq-product-evolution-decision-plan.md) | DUP-1 และ 030 live; R0A เป็น local candidate; LIST-1 และ decision อื่นยังรอ Owner | roadmap, Quantity safety, Quantity Expression, auth, workflow และระยะยาว |
 | [02 — BOQ List Scaling Decision Plan](./plans/product/02-boq-list-scaling-decision-plan.md) | proposed; LIST-1/L1.1 ยังไม่มี implementation authority | server pagination, search/filter/sort, RLS count, bounded route loading และ optional Copy-eligibility projection |
 | [03 — Pagination Best-Practice Research](./plans/product/03-boq-list-pagination-best-practice-research.md) | research evidence; ไม่ใช่ approval | หลักฐานภายนอกและ trade-off ของ pagination |
 | [04 — Atomic BOQ Duplicate Production Result](./plans/product/04-atomic-boq-duplicate-production-release-result.md) | complete; released and verified 2026-08-31 | migration 029, PR/merge/deploy, database postflight, rendered QA และ residuals |
 | [05 — Post-DUP-1 Repository Custody Result](./plans/product/05-post-dup1-repository-custody-result.md) | complete; exact cleanup recorded 2026-08-31 | docs PR #10, dated Production deployment evidence, branch ancestry/deletion และ consumed authority |
+| [06 — R0A Quantity Input Safety Release Candidate](./plans/product/06-r0a-quantity-input-safety-release-plan.md) | local candidate; uncommitted/unreleased | numeric-only input safety, realtime editor behavior, Save/Factor coherence, evidence, residuals และ Q-A/Q-B |
 
 DUP-1 ผ่าน implementation, isolated database rehearsal, tests, Production
 verification และ postflight แล้ว Migration `029_atomic_boq_duplicate.sql`
@@ -72,8 +76,8 @@ rehearsal
 - [`../migrations/README.md`](../migrations/README.md) เป็นคู่มือ historical
   multi-route migration 002 ไม่ใช่ runbook สำหรับ migration ปัจจุบัน
 
-ห้ามเพิ่ม 027, 028 หรือ 029 เข้า bootstrap แบบเงียบ ๆ Bootstrap ปัจจุบันหยุด
-ที่ 026 และไม่มีทั้ง post-028 หรือ post-029 parity งานทดสอบฐานข้อมูล DUP-1
+ห้ามเพิ่ม 027, 028, 029 หรือ 030 เข้า bootstrap แบบเงียบ ๆ Bootstrap ปัจจุบัน
+หยุดที่ 026 และไม่มี post-030 parity งานทดสอบฐานข้อมูล DUP-1
 ต้องใช้ isolated post-028-equivalent contract แล้ว apply exact 029 แยกตาม
 [release result](./plans/product/04-atomic-boq-duplicate-production-release-result.md)
 ห้ามใช้ `supabase link`, `supabase db push`, `supabase db pull` หรือ linked

@@ -22,9 +22,9 @@ docs/SQL-only PR may still trigger Vercel to redeploy the unchanged application
 runtime; that deployment must be explicitly authorized, observed and recorded
 or a proven skip mechanism must be documented.
 
-The Quantity release may be reviewed in the same Owner session, but it has a
-separate commit/PR, GO decision, deployment and result. Migration 030 must pass
-postflight before the Quantity deployment starts.
+The Quantity release has a separate commit/PR, GO decision, deployment and
+result. Migration 030 passed postflight; the Quantity candidate remains local
+and its Q-A/Q-B gates have not been executed.
 
 ## Frozen preflight — 2026-10-12
 

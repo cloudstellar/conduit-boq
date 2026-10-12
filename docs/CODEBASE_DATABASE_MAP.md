@@ -34,6 +34,19 @@
 > The body below remains a dated 2026-06-11 map and must not override current
 > code, schema, or the release result. Migrations 027/028/029 are no-replay.
 
+<!-- SAVE_GUARD_AND_LOCAL_QUANTITY_20261012 -->
+> **Current supersession (2026-10-12):** Migration 030 is `PRODUCTION PASS`,
+> applied exactly once as
+> `20261012100608/boq_save_null_authorization_guard`; see [Security Result
+> #04](./plans/security/04-boq-save-null-authorization-production-release-result.md).
+> Migrations 027–030 are immutable/no-replay. Quantity Input Safety is a
+> separate uncommitted `LOCAL CANDIDATE` with no schema/RPC/migration change;
+> see [Product Plan #06](./plans/product/06-r0a-quantity-input-safety-release-plan.md).
+> The 2026-06-11 body below includes obsolete table, ACL and function findings;
+> use current code, [Database Schema](./04_data/DATABASE_SCHEMA.md), [Migration
+> inventory](./04_data/MIGRATIONS.md) and [Security Model](./04_data/SECURITY_MODEL.md)
+> for present design. Do not treat the historical body as live database truth.
+
 **Project:** Conduit BOQ  
 **Generated:** 2026-06-11  
 **Scope:** อ่านจาก source code, docs, migrations, scripts, tests, และ production Supabase  

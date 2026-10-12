@@ -1,10 +1,27 @@
 # Database Schema
 ## Conduit BOQ System
 
-**Last Updated:** 2026-08-31
-**Status:** Migrations 027, 028, and 029 are applied once in Production; the
-audited Master Catalog workflow and Atomic BOQ Duplicate are live
+**Last Updated:** 2026-10-12
+**Status:** Migrations 027–030 are applied once in Production and immutable;
+the audited Master Catalog workflow, Atomic BOQ Duplicate, and BOQ Save NULL
+authorization guard are live
 **Database:** PostgreSQL 17 (Supabase)
+
+<!-- SAVE_GUARD_PRODUCTION_CLOSEOUT_20261012 -->
+> [!IMPORTANT]
+> **Latest database overlay:** Migration 030 is applied exactly once as
+> `20261012100608/boq_save_null_authorization_guard`, source SHA-256
+> `e6a3175413f961d24feb03dbe7f757782dd2f08710a911732531ebc9b3d9081a`.
+> It replaces only the final Save authorization test with
+> `IF v_is_authorized IS NOT TRUE`; no table, column, RLS policy, ACL, function
+> identity/configuration, monetary calculation, Catalog, Factor or BOQ row was
+> changed. See [Security Result #04](../plans/security/04-boq-save-null-authorization-production-release-result.md).
+> Migrations 027–030 are immutable/no-replay. The uncommitted Quantity Input
+> Safety candidate has no schema, RPC or migration change.
+> Lower dated target/gap sections remain **historical chronology** and do not
+> override this current overlay.
+> Master Catalog completion remains governed by [Handoff #106](../plans/master-catalog/106-phase4-master-catalog-exact-remaining-work-handoff.md)
+> and [Result #107](../plans/master-catalog/107-phase4-p49-master-catalog-final-closeout-result.md).
 
 <!-- DUP1_PRODUCTION_CLOSEOUT_20260831 -->
 > [!IMPORTANT]
@@ -549,6 +566,7 @@ boundary; client button visibility is not authority.
 | `027_p49_active_profile_authorization_hardening.sql` | Current-active authorization and least-privilege API/RLS hardening | ✅ Production once; immutable/no replay |
 | `028_master_catalog_admin_gate_projection.sql` | Bounded active-Admin gate projection | ✅ Production once; immutable/no replay |
 | `029_atomic_boq_duplicate.sql` | Private idempotency ledger/helper and guarded atomic BOQ duplicate RPC | ✅ Production `20260831004110/atomic_boq_duplicate`; immutable/no replay |
+| `030_boq_save_null_authorization_guard.sql` | Reject NULL and false in the existing Save scope-authorization guard; preserve all other function behavior | ✅ Production `20261012100608/boq_save_null_authorization_guard`; immutable/no replay; [Result #04](../plans/security/04-boq-save-null-authorization-production-release-result.md) |
 
 ---
 

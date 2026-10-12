@@ -3,6 +3,40 @@
 
 ---
 
+## Unreleased — Quantity Input Safety local candidate
+
+- Numeric-only Quantity safety, real-time editor totals, cancel/restore,
+  stable draft identity and Factor-bound Save coordination are implemented and
+  validated locally.
+- This work has no Quantity commit, PR, Preview, merge or Production release.
+  It adds no formula parser, schema/RPC change or migration. See [Product Plan
+  #06](./plans/product/06-r0a-quantity-input-safety-release-plan.md).
+
+---
+
+## 2026-10-12 — BOQ Save NULL authorization guard Production release
+
+- Applied migration 030 once as
+  `20261012100608/boq_save_null_authorization_guard` from reviewed source
+  `cb2bb60`; repository closeout is `7c09ab8`.
+- Changed only the final Save authorization check to reject NULL as well as
+  false while preserving function identity, ACL, configuration, calculations
+  and business data.
+- Migrations 027–030 are immutable/no-replay; the release authority is
+  consumed. Details: [Security Result
+  #04](./plans/security/04-boq-save-null-authorization-production-release-result.md).
+
+---
+
+## 2026-09-08 — BOQ editor-load/Save guard and signed-out login correction
+
+- PR #12 merged as `c0cb6451c4d9924f69de93df4eee80abb6cca3c9`.
+- The editor blocks Save when required BOQ graph data is incomplete and login
+  remains usable when no existing auth session is present.
+- This repository result is separate from the later Quantity local candidate.
+
+---
+
 ## 2026-09-01 — Post-DUP-1 repository custody alignment
 
 - บันทึก docs PR #10 และ Vercel Production observation แบบมีวันที่ โดยแยก

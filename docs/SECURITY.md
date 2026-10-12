@@ -1,4 +1,10 @@
-# Security Model: Current Runtime and P-49 Target
+# Security Model: Current Runtime and Historical P-49 Target
+
+> **Compatibility entry point. Last aligned 2026-10-12.** The canonical
+> maintained security reference is
+> [`04_data/SECURITY_MODEL.md`](./04_data/SECURITY_MODEL.md). Dated target/gap
+> sections in this mirror are historical; current overlays and release results
+> take precedence.
 
 <!-- MAIN_CONVERGENCE_TEMPORAL_ADDENDUM_20260829 -->
 > **Repository convergence addendum (2026-08-29):** Commit `f3ccc6e...` below
@@ -69,6 +75,19 @@ chronology above.
 Migrations 027, 028, and 029 are immutable/no-replay. This completed release
 grants no authority for another migration, deployment, account change, or
 Catalog/Factor operation.
+
+<!-- SAVE_GUARD_PRODUCTION_CLOSEOUT_20261012 -->
+## BOQ Save NULL authorization guard
+
+Migration 030 is `PRODUCTION PASS`, applied exactly once as
+`20261012100608/boq_save_null_authorization_guard`; see [Security Result
+#04](./plans/security/04-boq-save-null-authorization-production-release-result.md).
+It changes only the existing `save_boq_with_routes` final allow decision from
+`IF NOT v_is_authorized` to `IF v_is_authorized IS NOT TRUE`, so a nullable
+scope comparison fails closed. Function identity, owner, ACL, configuration,
+business calculations and data are preserved. Migrations 027–030 are
+immutable/no-replay and the exact release authority is consumed. Wider S0
+Auth/Security work remains separate.
 
 ## Authorization boundary
 

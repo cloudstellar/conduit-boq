@@ -3,7 +3,7 @@
 
 **Historical base:** 2026-06-29
 
-**Last Updated:** 2026-09-05
+**Last Updated:** 2026-10-12
 
 <!-- MASTER_CATALOG_CURRENT_STATE_20260829 -->
 > [!IMPORTANT]
@@ -40,6 +40,26 @@
 > unapproved; see [AI Handoff](../08_ai/AI_HANDOFF.md#next-product-decision-handoff--2026-09-05),
 > [Product Evolution Decision Plan](../plans/product/01-conduit-boq-product-evolution-decision-plan.md),
 > and [LIST-1 Decision Plan](../plans/product/02-boq-list-scaling-decision-plan.md).
+
+<!-- CURRENT_WORK_STATUS_20261012 -->
+> [!IMPORTANT]
+> **Current status board (2026-10-12):** this overlay supersedes dated status
+> labels below without rewriting their chronology.
+>
+> | Work | Status | Next boundary |
+> |---|---|---|
+> | Master Catalog / P-49 | **PRODUCTION PASS** | complete; 027/028 no-replay |
+> | Atomic BOQ Duplicate | **PRODUCTION PASS** | complete; 029 no-replay |
+> | BOQ Save NULL authorization guard | **PRODUCTION PASS** | migration 030 applied once; [Security Result #04](../plans/security/04-boq-save-null-authorization-production-release-result.md); authority consumed |
+> | Quantity Input Safety | **LOCAL CANDIDATE** | R0A core plus editor/Save coordination is implemented and validated locally; no Quantity commit/PR/Preview/Production; [Plan #06](../plans/product/06-r0a-quantity-input-safety-release-plan.md) |
+> | LIST-1B | **PROPOSED** | decide Level-A scope after Quantity closeout; no implementation authority |
+> | Wider R0/D0 | **PROPOSED** | decide rounding/parity and current-schema evidence contract |
+> | R1/R2 Quantity Expression | **PROPOSED** | `*` canonical, `x`/`X`/`×` aliases; editor-only expression and numeric-only output; implementation not authorized |
+> | Wider S0 Auth/Security | **PROPOSED, separate lane** | migration 030 fixed one Save guard only |
+>
+> Immediate sequence: Q-A Quantity commit/PR/Preview decision -> persistence
+> residual decision -> Q-B merge/Production decision -> LIST-1B decision. No
+> plan text grants an external operation or Production write.
 
 ---
 

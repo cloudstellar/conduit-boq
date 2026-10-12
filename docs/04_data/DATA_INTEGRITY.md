@@ -1,7 +1,7 @@
 # Data Integrity
 ## Conduit BOQ System
 
-**Last Updated:** 2026-08-31
+**Last Updated:** 2026-10-12
 **Historical snapshot:** P-49 target before its completed Production
 remediation and formal closeout
 
@@ -31,6 +31,17 @@ remediation and formal closeout
 > see [DUP-1 Production Result](../plans/product/04-atomic-boq-duplicate-production-release-result.md).
 > The 2026-08-29 “no 029” statement above remains dated Master Catalog evidence,
 > not the current ledger. Migrations 027/028/029 are all applied-once/no-replay.
+
+<!-- SAVE_GUARD_PRODUCTION_CLOSEOUT_20261012 -->
+> [!IMPORTANT]
+> Migration 030 is `PRODUCTION PASS`, applied once as
+> `20261012100608/boq_save_null_authorization_guard`; see [Security Result
+> #04](../plans/security/04-boq-save-null-authorization-production-release-result.md).
+> It strengthens the existing Save allow decision without changing business,
+> Catalog, Factor, BOQ or account rows, calculations, tables or RLS; the
+> migration ledger records the applied migration. Migrations 027–030 are
+> immutable/no-replay.
+> Quantity Input Safety remains a separate local application candidate.
 
 ## Atomic duplicate integrity invariants
 

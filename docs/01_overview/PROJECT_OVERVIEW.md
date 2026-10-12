@@ -1,9 +1,19 @@
 # Project Overview
 ## ระบบประมาณราคาท่อร้อยสายสื่อสารใต้ดิน (Conduit BOQ)
 
-**Last Updated:** 2026-01-22  
-**Version:** 1.2.0  
+**Last Updated:** 2026-10-12
+**Historical application-version label:** 1.2.0
 **Status:** Production
+
+> [!IMPORTANT]
+> **Current-state overlay:** the recorded 2026-08-28/29 Production release
+> baseline is Master Catalog `2568.1.0` with 710 active rows;
+> Atomic BOQ Duplicate and migrations 027–030 are live and closed under their
+> recorded release results. Quantity Input Safety is an uncommitted/unreleased
+> `LOCAL CANDIDATE`; LIST-1B and Full Quantity Expression remain proposed. Use
+> [AI Handoff](../08_ai/AI_HANDOFF.md) for the current work register and
+> authority boundaries. The overview body describes product purpose and does
+> not grant implementation or release authority.
 
 ---
 
@@ -28,7 +38,7 @@
 ## 3. Solution
 
 Web application ที่:
-- มี price list มาตรฐาน **682 รายการ** (52 หมวดหมู่)
+- Production release baseline ที่บันทึกไว้มี Master Catalog **710 รายการ**
 - รองรับ **multi-route BOQ** (หลายเส้นทางใน 1 โครงการ)
 - คำนวณ **Factor F** และ **VAT 7%** อัตโนมัติ
 - มีระบบ **authentication** และ **authorization** ตามโครงสร้างองค์กร
@@ -43,7 +53,7 @@ Web application ที่:
 | 📋 BOQ Creation | สร้างใบประมาณราคาได้อย่างเป็นระบบและรวดเร็ว |
 | 🛣️ Multi-Route | รองรับงานหลายเส้นทาง (Multi-Route / Multi-Segment) |
 | 💰 Auto-Calculate | คำนวณ Factor F, VAT, รวมยอดอัตโนมัติ |
-| 📊 Price List | ราคามาตรฐาน 682 รายการ |
+| 📊 Price List | Recorded Production baseline: Master Catalog 710 รายการ |
 | 🔐 Auth | Supabase Auth (Email/Password) + Domain restriction |
 | 👥 RBAC | Role-Based Access Control |
 | 🧾 Separation of Duties | แยกบทบาท "ผู้จัดทำ / ผู้ตรวจสอบ / ผู้อนุมัติ" |

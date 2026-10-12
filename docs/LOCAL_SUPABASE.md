@@ -85,21 +85,29 @@ Consequently, `supabase db diff --local` will show the rehearsed schema as drift
 from an empty CLI migration ledger. Do not generate a new migration from that
 expected diff.
 
-## Applied DUP-1/029 and Local parity boundary
+## Applied 027–030 and Local parity boundary
 
 The current bootstrap stops at root migration 026. It establishes neither
-post-028 nor post-029 parity and it does not include migration 027, 028, or
-`029_atomic_boq_duplicate.sql`.
+post-028, post-029 nor post-030 parity and it does not include migrations 027,
+028, `029_atomic_boq_duplicate.sql`, or
+`030_boq_save_null_authorization_guard.sql`.
 
 - Production evidence records 027 and 028 as applied exactly once. DUP-1
   migration 029 is also applied exactly once as
   `20260831004110/atomic_boq_duplicate`, source SHA-256
   `748a84431c36bc0aa4bf3f8293aa818768d5198d9da82c9f1e0ad5106a382c3d`.
-  All three are immutable/no-replay; do not append them to this bootstrap.
+  Migration 030 was later applied once as
+  `20261012100608/boq_save_null_authorization_guard`; see [Security Result
+  #04](./plans/security/04-boq-save-null-authorization-production-release-result.md).
+  All four migrations 027–030 are immutable/no-replay; do not append them to
+  this bootstrap.
 - Migration 029 is a separate product release, not a Master Catalog
   convergence migration. Its application and postflight are complete in the
   [DUP-1 Production Result](./plans/product/04-atomic-boq-duplicate-production-release-result.md);
   that receipt grants no authority to apply it again.
+- Migration 030 is a separate security correction, not a DUP-1 or Quantity
+  migration. Its receipt grants no authority to apply it again or to release
+  the local Quantity candidate.
 - Do not add 029 to `db:local:bootstrap` while its input database still stops at
   026. A green run over the wrong predecessor schema would not be valid DUP-1
   evidence.
@@ -112,10 +120,12 @@ post-028 nor post-029 parity and it does not include migration 027, 028, or
   it at Production, do not import Production users/sessions/tokens/secrets, and
   do not treat isolated rehearsal as deployment authorization.
 
-Updating the canonical bootstrap beyond 026—to a reviewed post-028-equivalent
-baseline and, only if deliberately included, exact 029/post-029 parity—is a
+Updating the canonical bootstrap beyond 026—to a reviewed current-equivalent
+baseline and, only if deliberately included, exact 027–030 parity—is a
 separate reviewed change. Until that parity contract exists and is approved,
-keep the current 009–026 bootstrap unchanged and keep 029 rehearsal explicit.
+keep the current 009–026 bootstrap unchanged and keep 029-specific rehearsal
+instructions as historical DUP-1 evidence rather than treating them as
+post-030 parity.
 
 ## Test users
 

@@ -1,10 +1,12 @@
 # Conduit BOQ Product Evolution Decision Plan
 
-**Status:** PROPOSED ROADMAP — D2, D3, AND D9 OWNER DIRECTIONS RECORDED;
-DUP-1 RELEASED AND VERIFIED 2026-08-31; REMAINING OWNER DECISIONS REQUIRED
+**Status:** CURRENT DECISION DASHBOARD — DUP-1 AND SECURITY 030 ARE
+`PRODUCTION PASS`; QUANTITY INPUT SAFETY IS A `LOCAL CANDIDATE`; LIST-1 AND
+REMAINING PRODUCT DECISIONS REQUIRE OWNER AUTHORITY
 
 **Prepared:** 2026-08-30; final evidence review plus D2/D3/D9 scope updates
-2026-08-31; next-session R0A/LIST-1 analysis refinement 2026-09-05
+2026-08-31; R0A/LIST-1 refinement 2026-09-05; current execution overlay
+2026-10-12
 (Asia/Bangkok)
 
 **Initial planning repository snapshot (before this plan/feature work):** `main` at
@@ -24,6 +26,28 @@ gated 0–24 month roadmap
 how to support quantity expressions such as canonical `5*2 = 10`, how to scale
 the growing Admin BOQ/project register, and which foundations must precede
 those features
+
+## Current execution overlay — 2026-10-12
+
+This overlay supersedes dated status language in this plan without rewriting
+the historical decisions and evidence below.
+
+- DUP-1 is `PRODUCTION PASS`; migration 029 is immutable/no-replay.
+- The BOQ Save NULL authorization guard is `PRODUCTION PASS`; migration 030
+  was applied once as `20261012100608/boq_save_null_authorization_guard`. See
+  [Security Result #04](../security/04-boq-save-null-authorization-production-release-result.md).
+- Quantity Input Safety is no longer wholly proposed. The R0A core plus the
+  accepted editor/Save-coordination behavior is implemented and validated as
+  a `LOCAL CANDIDATE`, but it has no Quantity commit, PR, Preview, merge, or
+  Production deployment. See [Plan #06](./06-r0a-quantity-input-safety-release-plan.md).
+- LIST-1B remains `PROPOSED`; none of its Level-A choices or implementation is
+  authorized by the Quantity work.
+- Wider R0/D0 accounting policy, R1/R2 Quantity Expression and wider S0
+  Auth/Security remain separate decisions. Full Quantity Expression has not
+  started.
+- Immediate gates are Q-A Quantity commit/push/PR/Preview, the persistence
+  residual decision, and a separate Q-B merge/Production decision. Plan text
+  does not grant those operations.
 
 ## 1. Authority and non-authority
 
@@ -52,9 +76,10 @@ and
 
 - Master Catalog `2568.1.0` and its `710` active rows are completed Production
   history, not work to replay.
-- Migrations 027, 028, and the later DUP-1 migration 029 were applied exactly
-  once. Do not edit, retry, or replay them. A future database change must be a
-  newly approved forward migration after 029.
+- Migrations 027, 028, the later DUP-1 migration 029, and the later Save-guard
+  migration 030 were applied exactly once. Do not edit, retry, or replay them.
+  A future database change must be a newly approved forward migration after
+  030.
 - Do not replay P-13, P-14, P-14C, P-15, or R-01 through R-05.
 - Do not move the Catalog or Factor F default pointer, change/publish reference
   data, republish the Catalog, or mutate/reprice/backfill historical BOQs as
@@ -76,14 +101,13 @@ not replace a new preflight at implementation or release time.
 
 ## 2. Executive recommendation
 
-**Atomic BOQ Duplicate** is now released and verified. The next recommended
-decision closeout covers both the narrow `R0A` safety guard and `LIST-1B`.
-Latest source review recommends releasing only the small fail-closed R0A guard
-before LIST-1 implementation because current quantity input can destructively
-sanitize an expression into another number. `LIST-1B` remains the next
-substantial feature because the growing Admin register still makes an
-unpaginated request and per-rendered-row route queries. The exact R0A/LIST
-ordering remains an Owner choice and neither item has implementation authority.
+**Atomic BOQ Duplicate** and security migration 030 are released and verified.
+The accepted Quantity safety scope is now a local implementation rather than a
+two-line proposal: it combines fail-closed numeric input, real-time totals,
+draft identity, and matching Factor/save preparation. Its release authority is
+still pending through Q-A/Q-B. `LIST-1B` remains the next substantial proposed
+feature because the growing Admin register still makes an unpaginated request
+and per-rendered-row route queries. LIST-1B has no implementation authority.
 Full Quantity Expression still must not begin as a UI-only calculator: the
 current UI, client calculation, database precision, and save RPC can interpret
 the same value differently. Its later R0–R2 work must first make the saved
@@ -112,10 +136,10 @@ The recommended sequence is:
 ```text
 Documentation and recorded decisions
   -> DUP-1 Atomic BOQ Duplicate [complete 2026-08-31]
-  -> joint Level-A closeout for R0A and LIST-1B [Owner choice pending]
-  -> R0A smallest silent-input guard [recommended first; separately released]
+  -> Quantity Input Safety local implementation/testing [complete locally]
+  -> Q-A Preview gate -> persistence decision -> Q-B Production gate [pending]
   -> LIST-1 bounded BOQ register implementation
-  -> approved post-029-equivalent test baseline
+  -> approved post-030-equivalent test baseline
   -> R0 calculation contract completion
   -> R1 expression pilot + chosen desktop/mobile scope
   -> R2 trusted save/reload/print/export release
@@ -173,12 +197,11 @@ Dependencies that can reverse the roadmap:
   with Create New. Catalog Requote/Reprice/Rebase is not in this release.
 - If mobile is part of the pilot cohort, responsive route and item work enters
   R1; otherwise it gates general Production, not the desktop-only pilot.
-- LIST-1 is independent of DB-1. Now that DUP-1 is complete, close the R0A and
-  LIST-1 Level-A decisions together. Latest source review recommends shipping
-  only the narrow R0A silent-input guard before LIST-1 implementation; the Owner
-  may retain LIST-1 first or run R0A in parallel. In every case the wider R0
-  calculation safety/test baseline must precede the larger expression release,
-  and LIST-1 has no DB-1 dependency.
+- LIST-1 is independent of DB-1. Quantity Input Safety is already implemented
+  locally and must close through Q-A, the persistence-evidence decision, and
+  Q-B before LIST-1 becomes the next substantial proposed feature. The wider
+  R0 calculation safety/test baseline must precede the larger expression
+  release, and LIST-1 has no DB-1 dependency.
 
 Detailed D8 evidence, alternatives, UX/data contracts, and gates are in the
 [BOQ / Project List Scaling Decision Plan](./02-boq-list-scaling-decision-plan.md),
@@ -198,19 +221,20 @@ one.
 | Level | What it permits | Current status |
 |---|---|---|
 | A — Direction/documentation | Record decisions, refine flows, prepare plans/evidence | This document only; no implementation authorization |
-| B — Local implementation | Edit code/tests locally; no commit, push, Preview, DB migration, or external state | Executed and consumed for exact DUP-1 only |
-| C — Source/Preview | Commit, push, and deploy a named candidate | Executed and consumed for exact DUP-1 only |
-| D — Database design | Draft a new forward migration/RPC and rehearsal plan without applying it | Executed and consumed for exact DUP-1 migration 029 only |
-| E — Production release | Apply approved forward change, deploy, flag rollout, Production QA/rollback | Executed, verified, and consumed for exact DUP-1 on 2026-08-31 |
+| B — Local implementation | Edit code/tests locally; no commit, push, Preview, DB migration, or external state | Executed for DUP-1 and the current Quantity local candidate; no reusable authority |
+| C — Source/Preview | Commit, push, and deploy a named candidate | Completed/consumed only for named completed releases; Quantity Q-A remains pending |
+| D — Database design | Draft a new forward migration/RPC and rehearsal plan without applying it | Completed/consumed for migrations 029 and 030 only; Quantity candidate has no DB change |
+| E — Production release | Apply approved forward change, deploy, flag rollout, Production QA/rollback | Completed/consumed for DUP-1 and Save guard 030; Quantity Q-B remains pending |
 
-The current-session exception came from the separate Owner instructions, not
-from this table: DUP-1 alone executed scoped Levels B–E through bounded
-Production verification. That authority is consumed and does not transfer to
+The dated DUP-1 session executed scoped Levels B–E through bounded Production
+verification. A later independent authority executed security migration 030.
+The current Quantity work executed local Level B only; Q-A and Q-B remain
+pending. Every completed authority is consumed and does not transfer to
 another roadmap item or reference-data operation.
 
-Migration 027/028/029 execution is excluded from every future level. Migration
-029's one-shot DUP-1 execution is consumed; no level permits replaying any of
-those artifacts.
+Migration 027/028/029/030 execution is excluded from every future level.
+Their one-shot execution is consumed; no level permits replaying any of those
+artifacts.
 
 ## 3. What the application is becoming
 
@@ -250,27 +274,29 @@ Long-term product principles:
 7. **AI after evidence.** Suggestions require stable revisions, outcomes,
    feedback, and clear human approval.
 
-## 4. Verified current state and key discovery
+## 4. Verified state chronology and key discovery
 
-### 4.1 Current quantity behavior
+### 4.1 Released predecessor quantity behavior at the dated discovery
 
-The present quantity editor is numeric-only. Its sanitizer removes every
-character except digits and a decimal point. As a result, entering `5x2` or
-`5*2` can become `52`, not `10` and not an error. See
-[QuantityEditor.tsx](../../../components/boq/QuantityEditor.tsx#L17-L23).
+At the 2026-09-05 discovery, the then-current released quantity editor was
+numeric-only and removed every character except digits and a decimal point.
+As a result, entering `5x2` or `5*2` could become `52`, not `10` and not an
+error. The later PR #12 base `c0cb645`, merged on 2026-09-08, still carried the
+same sanitizer and became the original base of the local candidate that fixes
+this behavior; see [Plan #06](./06-r0a-quantity-input-safety-release-plan.md).
 
-The editor formats to two decimal places on blur, but the React state may still
-contain the higher-precision value entered before blur. The client calculation
-rounds quantity internally, while the save RPC multiplies the raw JSON
-quantity. The database column then stores quantity as `numeric(12,2)`. See:
+The same released predecessor formatted to two decimal places on blur, while
+React state could still contain the higher-precision value entered before
+blur. Client calculation rounded quantity internally, while the save RPC
+multiplied raw JSON quantity and the database stored `numeric(12,2)`. The
+The later candidate comparison used immutable base `c0cb645` (inspect with
+`git show c0cb645:<path>`) plus these unchanged contract sources:
 
-- [QuantityEditor.tsx](../../../components/boq/QuantityEditor.tsx#L57-L80)
 - [calculation.ts](../../../lib/calculation.ts#L22-L43)
-- [edit page save payload](../../../app/boq/%5Bid%5D/edit/page.tsx#L205-L285)
 - [migration 027 save RPC](../../../migrations/027_p49_active_profile_authorization_hardening.sql#L2959-L3073)
 - [Production baseline data types](../../../supabase/local/production-baseline.sql#L413-L430)
 
-Illustrative failure mode under the current contracts:
+Illustrative failure mode under the then-current contracts:
 
 ```text
 Input                         1.234
@@ -719,7 +745,7 @@ selected direction.
 ### DB-1 — Persist expression beside the canonical result (selected)
 
 Keep the current numeric quantity authoritative and add the smallest nullable
-metadata set in a newly approved forward migration after 029:
+metadata set in a newly approved forward migration after 030:
 
 ```text
 quantity_expression     bounded normalized arithmetic text or NULL
@@ -852,8 +878,8 @@ stale-client, persona, or rollback gates.
 1. Close D0; D2 already selects normalized semantic persistence and editor-only
    display, while D3 selects canonical `*` with input aliases. Freeze shared
    G1 fixtures, including decimal and rounding edges.
-2. Establish an approved post-029-equivalent local test baseline without
-   editing or replaying migrations 027/028/029.
+2. Establish an approved post-030-equivalent local test baseline without
+   editing or replaying migrations 027/028/029/030.
 3. Build the pure TypeScript parser, UI states, and DB-1-compatible types
    behind a flag, with all database expression writes still disabled.
 4. Draft and rehearse a new additive forward schema change with nullable
@@ -1384,7 +1410,8 @@ conversion.
 
 #### R0A — Silent-input safety guard (small separate release)
 
-**Status:** proposed and awaiting Owner decision; no implementation authority.
+**Status:** `LOCAL CANDIDATE`; local implementation/testing complete; Quantity
+commit, PR, Preview, merge and Production deployment remain unauthorized.
 
 R0A keeps the editor numeric-only. If the draft contains unsupported syntax
 such as `5*2`, `5x2`, `5X2`, or `5×2`, retain the invalid draft so the user can
@@ -1392,7 +1419,7 @@ see and correct it, show an accessible explanation, and leave the last valid
 quantity and every derived total unchanged. Blur, Enter, paste, and mobile
 input must not commit concatenated digits.
 
-R0A adds no expression evaluator, parser version, persisted formula, database
+The candidate adds no expression evaluator, parser version, persisted formula, database
 column, RPC/schema change, or migration. Its exit gate is a component/domain
 regression suite proving invalid drafts never reach `onChange`, save payloads,
 Print/PDF, or Excel, while valid direct numeric entry and stepper behavior still
@@ -1407,9 +1434,9 @@ Work:
 2. Build read-only discrepancy fixtures for the observed legacy patterns;
    classify rather than mutate them.
 3. Design a disposable Local/CI schema/RPC/RLS contract equivalent to the
-   approved post-029 state using an approved sanitized schema snapshot or
+   approved post-030 state using an approved sanitized schema snapshot or
    equivalent contract fixture, with method and hash recorded. The present
-   bootstrap stops at 026, but 027/028/029 must not be executed, edited,
+   bootstrap stops at 026, but 027/028/029/030 must not be executed, edited,
    retried, or replayed to close that gap. The baseline mechanism needs a separate Owner
    decision and must exclude Production users, sessions, MFA, tokens, and
    secrets.
@@ -1424,7 +1451,7 @@ Work:
 - signed calculation decision table;
 - failing regression test for `5x2 -> 52` exists and the safe guard passes;
 - agreed legacy-data disposition is “preserve/report,” not backfill;
-- an explicitly approved non-replay Local/CI contract represents the post-029
+- an explicitly approved non-replay Local/CI contract represents the post-030
   behavior without Production identities/session data; and
 - the D7 scope is explicit: either the 390 px core task passes, or the named
   pilot is desktop-only and cannot be mistaken for supported mobile.
@@ -1491,10 +1518,9 @@ restorable state, an initial 25-row default, RLS-correct count, and a bounded
 route batch instead of loading every BOQ and issuing route requests per
 rendered row.
 
-Now that DUP-1 is complete, the next recommended decision closeout covers R0A
-and LIST-1 together. Latest source review recommends the narrow R0A guard as a
-small separate release before LIST-1 implementation, subject to Owner choice;
-LIST-1 remains the next substantial feature. The wider R0 calculation
+Quantity Input Safety now has a local candidate whose Q-A/Q-B release gates
+remain open. After that closeout, LIST-1 remains the next substantial proposed
+feature. The wider R0 calculation
 safety/test baseline must still precede R1/DB-1 Quantity Expression. See the
 [focused LIST-1 plan](./02-boq-list-scaling-decision-plan.md) and its
 [best-practice research](./03-boq-list-pagination-best-practice-research.md).
@@ -1778,7 +1804,7 @@ Deliverables:
 
 Deliverables:
 
-- preflight and new forward migration plan after 029;
+- preflight and new forward migration plan after 030;
 - additive nullable DB-1 fields, named coherence constraints, no formula
   backfill, and a versioned trusted save successor;
 - an expected BOQ write-version/precondition that rejects two-tab stale writes
@@ -1800,12 +1826,13 @@ Deliverables:
 - atomic rollback and concurrency/idempotency tests;
 - non-destructive feature rollback that retains expressions and all supported
   parser versions; never roll back to a writer that omits DB-1 fields;
-- fix-forward recovery that never replays 027/028/029; and
+- fix-forward recovery that never replays 027/028/029/030; and
 - no Production execution without a separate exact approval.
 
-Migration 029 already records a separately approved product change—not a
-migration required for repository convergence. Any future product migration
-must follow it forward under fresh approval and must not replay 027/028/029.
+Migrations 029 and 030 record separately approved product/security changes,
+not migrations required for repository convergence. Any future product
+migration must follow 030 forward under fresh approval and must not replay
+027/028/029/030.
 
 ### Q5 — Reload, print-view/controlled PDF, and Excel parity
 
@@ -1868,7 +1895,7 @@ Deliverables:
 | Parser-version drift changes a saved formula | Medium / critical | Version-addressed evaluator; shared frozen fixtures; unknown version read-only | A saved expression is interpreted with “latest” semantics or changes after reload. |
 | Direct edit/stepper leaves a stale formula | Medium / high | Explicit atomic conversion to direct mode with visible notice and transition tests | Displayed formula no longer explains canonical quantity. |
 | Expression leaks through read-only UI, outputs, or telemetry | Low / high | Editor-only expression view model; numeric-only read-only/Print/PDF/Excel models; no raw telemetry | Formula content appears anywhere outside the quantity editor or persisted DB-1 fields. |
-| Migration/no-replay violation | Low / critical | New forward migration, checksum/preflight, explicit approval | Any proposal edits/retries/replays 027/028/029. |
+| Migration/no-replay violation | Low / critical | New forward migration, checksum/preflight, explicit approval | Any proposal edits/retries/replays 027/028/029/030. |
 | Mobile feature exists but is unreachable | High / medium | Responsive route/item redesign and 390 px UAT | Core quantity task cannot complete on agreed viewport. |
 | Workflow slows operations | Medium / medium | Authority discovery, W-H or W1 only, SLA/queue, observe exceptions | Pilot cycle time breaches Owner threshold without quality gain. |
 | Self-signup creates unmanaged identities | Medium / high | Invite/pre-provision; rate limits; disable open signup | Account exists without sponsor/ownership or pending cleanup SLA. |
@@ -1948,7 +1975,7 @@ Disable the feature flag and investigate if any of these occurs:
   output before trusted save.
 - Do not add Catalog Requote/Reprice/Rebase, item remapping, or a mixed
   old-structure/current-price copy. Current Catalog prices require Create New.
-- Do not edit, retry, or replay migrations 027/028/029.
+- Do not edit, retry, or replay migrations 027/028/029/030.
 - Do not bundle Quantity Expression with catalog Publish/Restore, Factor F,
   Master Catalog changes, API key rotation, SSO, or a generic workflow engine.
 - Do not claim mobile support until the core task passes the agreed viewport and
@@ -2041,4 +2068,4 @@ exact DUP-1 implementation and bounded Production release in the 2026-08-31
 session; Result #04 is its execution receipt. That consumed instruction does
 not turn this Level A wording into authority for another feature,
 Catalog/Factor publication or pointer change, repricing/rebase/backfill,
-source-BOQ mutation, or migration 027/028/029 replay.
+source-BOQ mutation, or migration 027/028/029/030 replay.

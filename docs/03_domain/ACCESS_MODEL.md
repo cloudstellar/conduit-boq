@@ -1,7 +1,7 @@
 # Access Model
 ## Conduit BOQ System
 
-**Last Updated:** 2026-08-31
+**Last Updated:** 2026-10-12
 **Historical snapshot:** P-49 target before its completed Production
 remediation and formal closeout
 
@@ -31,6 +31,15 @@ remediation and formal closeout
 > The dated statement above that the ledger ended at 028 remains correct only
 > for its 2026-08-29 Master Catalog recheck. Migrations 027/028/029 are now all
 > applied-once/no-replay.
+
+<!-- SAVE_GUARD_PRODUCTION_CLOSEOUT_20261012 -->
+> [!IMPORTANT]
+> **Later security correction:** migration 030 is `PRODUCTION PASS`, applied
+> once as `20261012100608/boq_save_null_authorization_guard`; see [Security
+> Result #04](../plans/security/04-boq-save-null-authorization-production-release-result.md).
+> The trusted Save RPC now denies nullable as well as false scope decisions.
+> It does not change the access matrix, roles, RLS policies, accounts, Catalog,
+> Factor or BOQ data. Migrations 027–030 are immutable/no-replay.
 
 ---
 

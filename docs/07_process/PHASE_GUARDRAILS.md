@@ -2,7 +2,7 @@
 ## Conduit BOQ System
 
 > **Status:** CANONICAL - MASTER CATALOG v26
-> **Last Updated:** 2026-06-21
+> **Last Updated:** 2026-10-12
 > **Source:** `docs/plans/master-catalog/02-implementation.md`
 
 <!-- MASTER_CATALOG_CURRENT_STATE_20260829 -->
@@ -25,6 +25,14 @@
 > The dated “no 029” line above remains Master Catalog chronology. Migrations
 > 027/028/029 are all applied-once/no-replay, and this v26 checklist does not
 > authorize another operation.
+
+<!-- SAVE_GUARD_PRODUCTION_CLOSEOUT_20261012 -->
+> [!IMPORTANT]
+> Migration 030 was later applied once as
+> `20261012100608/boq_save_null_authorization_guard`; see [Security Result
+> #04](../plans/security/04-boq-save-null-authorization-production-release-result.md).
+> Migrations 027–030 are immutable/no-replay. This historical Master Catalog
+> checklist grants no Quantity, LIST-1, deployment, or Production authority.
 
 ---
 

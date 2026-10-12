@@ -27,6 +27,21 @@ Quantities) สำหรับการใช้งานภายใน บม�
 > Migration 029 เป็น product release ใหม่หลังงาน Master Catalog ไม่ใช่งาน
 > repository convergence และห้ามแก้ไขหรือ replay
 
+> [!IMPORTANT]
+> BOQ Save NULL authorization guard เป็น **PRODUCTION PASS** แล้วผ่าน migration
+> 030 ซึ่ง apply ครั้งเดียวเป็น
+> `20261012100608/boq_save_null_authorization_guard` ตาม
+> [Production release result](docs/plans/security/04-boq-save-null-authorization-production-release-result.md)
+> Migrations 027–030 เป็น immutable/no-replay และสิทธิ์ release รอบนั้นถูกใช้
+> แล้ว
+
+> [!NOTE]
+> Quantity Input Safety เป็น **LOCAL CANDIDATE** ที่ทำและทดสอบไว้แล้ว แต่ยัง
+> ไม่มี commit, PR, Preview หรือ Production release ดูขอบเขตและงานค้างที่
+> [R0A release-candidate plan](docs/plans/product/06-r0a-quantity-input-safety-release-plan.md)
+> LIST-1B และ Full Quantity Expression ยังเป็นงานแยกที่ไม่ได้รับ implementation
+> authority
+
 - สร้างและแก้ไข BOQ แบบหลายเส้นทาง (Multi-Route)
 - เลือกรายการจาก Master Catalog แบบมีเวอร์ชัน และเก็บราคาเป็น snapshot ของ
   BOQ เดิม
@@ -118,6 +133,8 @@ docs/                product, architecture, data, process และ handoff
 - [Product evolution decision plan](docs/plans/product/01-conduit-boq-product-evolution-decision-plan.md)
   สำหรับลำดับพัฒนาระยะยาว
 - [BOQ list scaling plan](docs/plans/product/02-boq-list-scaling-decision-plan.md)
+- [Quantity Input Safety local candidate](docs/plans/product/06-r0a-quantity-input-safety-release-plan.md)
+- [BOQ Save guard Production result](docs/plans/security/04-boq-save-null-authorization-production-release-result.md)
 - [BOQ list pagination research](docs/plans/product/03-boq-list-pagination-best-practice-research.md)
 - [Atomic BOQ Duplicate Production result](docs/plans/product/04-atomic-boq-duplicate-production-release-result.md)
 - [Database schema](docs/04_data/DATABASE_SCHEMA.md),
@@ -133,9 +150,11 @@ docs/                product, architecture, data, process และ handoff
 - Atomic Duplicate เปิดใช้แล้วโดย migration 029 และ application ที่ตรงกัน;
   สถานะ/ข้อจำกัดให้ยึด [AI handoff](docs/08_ai/AI_HANDOFF.md) และ
   [release result](docs/plans/product/04-atomic-boq-duplicate-production-release-result.md)
-- งานตัดสินใจถัดไปครอบคลุม `R0A` และ `LIST-1B` โดยลำดับที่เสนอคือปล่อย
-  numeric-only safety guard ขนาดเล็กก่อน เพื่อห้าม `5*2`/`5x2` ถูกแปลงเงียบ
-  เป็น `52`; ยังไม่มี parser, formula persistence หรือ database change ใน R0A
+- Quantity Input Safety ที่ห้าม `5*2`/`5x2` ถูกแปลงเงียบเป็น `52` ทำและทดสอบ
+  ไว้แล้วแบบ local แต่ยังไม่ commit หรือ release ลำดับถัดไปคือ Q-A
+  commit/PR/Preview -> ตัดสินใจเรื่อง current-schema persistence evidence ->
+  Q-B merge/Production -> จึงพิจารณา `LIST-1B`; candidate นี้ยังไม่มี parser,
+  formula persistence หรือ database change
 - หน้ารายการ BOQ ยังส่ง query แบบไม่แบ่งหน้าและค้นหาเฉพาะแถวที่ browser ได้รับ;
   การแบ่งหน้าแบบ server-side แบบมีเลขหน้าเป็นงานหลัก `LIST-1B` ถัดจาก guard;
   keyset เป็นทางเลือกภายหลังเมื่อมีหลักฐานด้าน deep-page performance หรือ

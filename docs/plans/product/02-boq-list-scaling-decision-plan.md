@@ -4,7 +4,8 @@
 
 **Status:** PROPOSED — OWNER DECISION REQUIRED; NO IMPLEMENTATION AUTHORITY
 
-**Prepared:** 2026-08-31; next-session scope refinement 2026-09-05
+**Prepared:** 2026-08-31; scope refinement 2026-09-05; adjacent-work status
+aligned 2026-10-12
 (Asia/Bangkok)
 
 **Scope:** The `/boq` register that users commonly call the project list,
@@ -17,6 +18,13 @@ especially the active Admin view that can see every BOQ allowed by RLS
 verified in Production on 2026-08-31 under
 [Result #04](./04-atomic-boq-duplicate-production-release-result.md). Its
 authority is consumed. LIST-1 remains a separate proposed decision.
+
+**Current adjacent work:** the BOQ Save NULL authorization guard is
+`PRODUCTION PASS` through immutable migration 030. Quantity Input Safety is a
+separate `LOCAL CANDIDATE`: implementation/testing exists, but it has no
+Quantity commit, PR, Preview or Production release. See [Quantity Plan
+#06](./06-r0a-quantity-input-safety-release-plan.md). Neither status authorizes
+LIST-1; all Level-A rows in the Owner decision sheet remain `TBD`.
 
 **Research basis:**
 [BOQ Register Pagination Best-Practice Research](./03-boq-list-pagination-best-practice-research.md)
@@ -322,8 +330,8 @@ unmeasured row threshold.
 
 An order index or later trigram text-search index has storage and write cost.
 Do not add one by assumption at only 263 rows. Any justified index is a newly
-approved forward product migration after 029. Never edit, retry, or replay
-migrations 027/028/029.
+approved forward product migration after 030. Never edit, retry, or replay
+migrations 027/028/029/030.
 
 ## 9. RLS and adjacent permission finding
 
@@ -425,10 +433,10 @@ current recovery path.
   server-authorized current set/count; and
 - true Project grouping/entity if the business distinguishes Project from BOQ.
 
-DUP-1 is complete. The next recommended decision closeout covers the narrow
-R0A input guard and LIST-1. Latest source review recommends a small separate
-R0A release before LIST-1 implementation, subject to Owner choice. LIST-1
-remains the next substantial feature before the larger Quantity Expression
+DUP-1 and security migration 030 are complete. Quantity Input Safety has moved
+from proposal to a separate local candidate, while its Q-A/Q-B release gates
+remain pending. LIST-1 remains the next substantial proposed feature after
+that closeout and before the larger Quantity Expression
 DB-1 release, while the wider calculation safety/test baseline must be
 established before expression implementation. LIST-1 addresses current Admin
 pain, has a smaller blast radius than DB-1, and may require no schema change.
@@ -469,7 +477,7 @@ STOP if:
 - any per-row route query remains on initial list load;
 - rows duplicate/disappear under the approved fixed-dataset ordering fixtures;
 - a view/RPC bypasses RLS; or
-- implementation requires replaying or changing migrations 027/028/029.
+- implementation requires replaying or changing migrations 027/028/029/030.
 
 ## 13. Owner decision sheet
 
@@ -484,7 +492,7 @@ STOP if:
 | Admin L2 filters | Department + sector + owner + date | `TBD` |
 | Route behavior | Embed current-page route fields or use one current-page batch; no per-row or per-click list query | `TBD` |
 | Copy eligibility projection | Defer optional trusted projection to L1.1; keep current RPC final authority in L1 | `TBD` |
-| First implementation order | Close R0A/LIST-1 decisions together; recommend narrow R0A release, then LIST-1, wider calculation baseline, and expression DB-1 | `DUP-1 released 2026-08-31; R0A/LIST-1 remain TBD` |
+| First implementation order | Close the existing Quantity candidate through Q-A/Q-B, then LIST-1, wider calculation baseline, and expression DB-1 | `DUP-1 and 030 complete; Quantity local/unreleased; LIST-1 TBD` |
 
 ## 14. Proposed approval wording
 

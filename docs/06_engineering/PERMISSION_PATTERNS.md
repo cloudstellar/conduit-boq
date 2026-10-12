@@ -1,7 +1,7 @@
 # Permission Patterns
 ## Conduit BOQ System
 
-**Last Updated:** 2026-08-31
+**Last Updated:** 2026-10-12
 **Historical snapshot:** P-49 target before its completed Production
 remediation and formal closeout
 
@@ -31,6 +31,15 @@ remediation and formal closeout
 > [DUP-1 Production Result](../plans/product/04-atomic-boq-duplicate-production-release-result.md).
 > The dated “no 029” line above is the 2026-08-29 Master Catalog observation.
 > Migrations 027/028/029 are now applied-once/no-replay.
+
+<!-- SAVE_GUARD_PRODUCTION_CLOSEOUT_20261012 -->
+> [!IMPORTANT]
+> Migration 030 is `PRODUCTION PASS`, applied once as
+> `20261012100608/boq_save_null_authorization_guard`; see [Security Result
+> #04](../plans/security/04-boq-save-null-authorization-production-release-result.md).
+> The Save RPC uses `IS NOT TRUE` for the final nullable authorization decision.
+> Client helpers remain UX only; database authorization remains authoritative.
+> Migrations 027–030 are immutable/no-replay.
 
 ---
 

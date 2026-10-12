@@ -2,19 +2,438 @@
 
 > **Status:** CANONICAL REPOSITORY ENTRY POINT
 >
-> **Aligned:** 2026-09-05
+> **Aligned:** 2026-10-12
 >
-> **Latest Production closeout evidence:** 2026-08-31 — DUP-1
+> **Latest Production closeout:** 2026-10-12 — BOQ Save NULL authorization
+> guard, migration 030; `PRODUCTION PASS`, authority consumed
 >
-> **Latest independent read-only postflight:** 2026-08-31 00:55:26 UTC;
-> no Production mutation
->
-> **Latest repository-custody evidence:** 2026-08-31 — post-DUP-1 docs
-> closeout and exact branch cleanup
->
-> **Prior repository checkpoint:** PR #11 published 2026-09-01; clean local
-> `main` observed before this handoff alignment on 2026-09-05; verify the
-> containing commit and upstream live; no Production recheck or mutation
+> **Dated Git observation (mutable):** branch `codex/quantity-input-safety`;
+> `HEAD == origin/main == 7c09ab8214c4d2d213349b3281680aef653e5109`;
+> branch has no upstream; Quantity work remains modified/untracked and
+> uncommitted. Reverify before acting.
+
+## Current work register — 2026-10-12
+
+| Work | Status | Durable authority / next boundary |
+|---|---|---|
+| Master Catalog Phase 4 / P-49 | **PRODUCTION PASS** | [Handoff #106](../plans/master-catalog/106-phase4-master-catalog-exact-remaining-work-handoff.md) and [Result #107](../plans/master-catalog/107-phase4-p49-master-catalog-final-closeout-result.md); migrations 027/028 no-replay; expanded persona rehearsal remains accepted residual, not PASS |
+| Atomic BOQ Duplicate (DUP-1) | **PRODUCTION PASS** | [Product Result #04](../plans/product/04-atomic-boq-duplicate-production-release-result.md); migration 029 no-replay; release authority consumed |
+| Editor-load/Save guard and signed-out login correction (PR #12) | **REPOSITORY COMPLETE** | merged as `c0cb6451c4d9924f69de93df4eee80abb6cca3c9`; do not infer a current deployment identity without fresh evidence |
+| BOQ Save NULL authorization guard | **PRODUCTION PASS** | [Security Result #04](../plans/security/04-boq-save-null-authorization-production-release-result.md); migration 030 applied once as `20261012100608/boq_save_null_authorization_guard`; source `cb2bb60`, closeout `7c09ab8`; authority consumed |
+| Quantity Input Safety (R0A core plus editor/Save coordination) | **LOCAL CANDIDATE** | [Plan #06](../plans/product/06-r0a-quantity-input-safety-release-plan.md); implemented and validated locally, but no Quantity commit, upstream, PR, Preview, merge, or Production deployment |
+| LIST-1B BOQ register scaling | **PROPOSED** | [Plan #02](../plans/product/02-boq-list-scaling-decision-plan.md); no implementation authority |
+| Wider R0/D0 accounting contract | **PROPOSED** | rounding/parity and related decisions remain open; do not fold them into the Quantity safety release |
+| R1/R2 Quantity Expression | **PROPOSED** | canonical `*`, aliases `x`/`X`/`×`, editor-only expression and numeric-only output direction retained; implementation not authorized |
+| Wider S0 Auth/Security | **PROPOSED, separate lane** | migration 030 fixed one NULL guard only; admission/recovery/MFA/session decisions remain separate |
+
+### Immediate Owner decisions
+
+1. **Q-A:** authorize the exact Quantity-only commit, branch push, PR, CI and
+   Preview; this gate excludes merge and Production deployment.
+2. After Preview, accept the documented current-schema persistence residual or
+   authorize a disposable post-030-equivalent rehearsal.
+3. **Q-B:** separately authorize the exact PR merge and Production deployment.
+4. After Quantity closes, decide LIST-1B Level-A scope. Wider R0/D0,
+   Quantity Expression and S0 remain later/separate decisions.
+
+No current approval authorizes commit, push, PR, Preview, merge, deployment,
+database mutation, account change, or Production write. Historical approvals
+and completed release receipts cannot be reused.
+
+## BOQ Save authorization correction — preparation and closeout
+
+`BOQ_SAVE_NULL_AUTHORIZATION_LOCAL_20260908`
+
+A separately approved read-only Production metadata capture at
+`2026-09-08T01:48:01.443092+00:00` found a NULL authorization defect in the
+existing Save RPC. The monetary write section matches the tested local
+contract, but the authorization behavior does not: `IF NOT v_is_authorized`
+does not reject NULL scope comparisons. This is not caused by the local
+quantity changes, and no Production business rows or unauthorized Save were
+accessed to establish the finding.
+
+The Owner then approved preparing the narrow patch, a new forward migration
+030, and isolated tests. The patch and local SQL regression now pass: 63 cases
+reproduced three predecessor bypasses, then the same 63 cases gave 17 valid
+saves and 46 denials with zero known bypasses after 030. Drift and replay
+refusals preserved snapshots. The new network-disabled test container was
+removed; the existing local app database was not changed. Combined-working-tree
+checks passed: Vitest 643 tests / 56 files, ESLint, TypeScript and production
+build. Each separated immutable release candidate still requires its own rerun.
+Those results were the pre-release local evidence, not by themselves a
+Production fix or full Supabase Auth/HTTP/concurrency acceptance. See the
+canonical [plan
+and local result](../plans/security/02-boq-save-null-authorization-guard-plan-and-result.md)
+for exact hashes, evidence and limitations.
+The separate [Production release runbook](../plans/security/03-boq-save-null-authorization-production-runbook.md)
+records the fresh 2026-10-12 preflight and executed two-stage release. The
+exact migration was applied once as
+`20261012100608/boq_save_null_authorization_guard`; postflight passed and the
+closeout is [Security Result #04](../plans/security/04-boq-save-null-authorization-production-release-result.md).
+Migrations 027–030 are immutable/no-replay. This completed release grants no
+authority for Quantity, broader S0, another deployment, or Production change.
+
+## Local quantity safety work — 2026-09-08
+
+`QUANTITY_INPUT_SAFETY_LOCAL_20260908`
+
+The [R0A release candidate plan](../plans/product/06-r0a-quantity-input-safety-release-plan.md)
+records the separate application-release boundary and its fresh 2026-10-12
+validation. It does not authorize commit, Preview or deployment.
+
+This later checkpoint supersedes the dated “proposed / pending Owner decision”
+wording below **only for the local work described here**. The Owner approved
+incremental local implementation and testing, including rejecting newly entered
+quantities with more than two decimal places. Commit, push, Preview, deployment,
+database changes, and Production operations require a separate next approval.
+
+- Original local-work base: `c0cb6451c4d9924f69de93df4eee80abb6cca3c9`
+  (PR #12, complete editor loading/save guard plus the missing-auth-session
+  login correction). The current dated base is `7c09ab8` after the independent
+  security 030 source and closeout entered `origin/main`; the Quantity diff
+  remains uncommitted.
+- Local branch: `codex/quantity-input-safety`; verify HEAD, worktree and upstream
+  live. This work is not a release receipt.
+- **Owner correction after local trial (2026-09-08):** restore calculation
+  while typing. Valid numeric drafts now update quantities, item/route totals,
+  and Factor F immediately. Enter/Tab/blur ends the edit session; Escape or the
+  visible Cancel restores its starting quantity and totals. Invalid/incomplete
+  text retains the latest valid preview and blocks Save. This correction does
+  not change the other local behaviors listed below or grant release authority.
+  Unsupported syntax stays visible with an error;
+  `5*2` / `5x2` cannot become `52`. Blank / `.` are incomplete; explicit `0` is
+  allowed. New input accepts at most 2 decimal places, `0..9999999999.99`, with
+  a decimal point and no comma, exponent, sign, or operators. There is no silent
+  rounding. Untouched loaded values are not normalized or backfilled.
+- Drafts belong to BOQ/route/item IDs. Save validates all routes and captures
+  quantities, item/route totals, and the matching Factor result together. It
+  waits for the exact BOQ/revision/total/reference-version result, locks edits,
+  and stops on failure, cancellation, or timeout; late results do not restart
+  a stopped Save. Once the save request starts, cancellation is not promised.
+- Page state is keyed by BOQ ID, so a newly opened BOQ cannot use the previous
+  header, permissions, or reference version while loading.
+- Both editor Print buttons say **พิมพ์ฉบับที่บันทึกแล้ว** and block invalid
+  quantity drafts. They open saved data; direct Print URLs continue to read the
+  saved database record. This is not automatic Save-and-Print or an output lock
+  on other sessions.
+- Existing calculation functions, money/Factor rounding rules, Catalog/Factor
+  data, schema, RLS, RPC, and migrations remain unchanged. This does not close
+  wider R0/D0 accounting parity or authorize LIST-1B / Quantity Expression.
+- Validation of the initial local version: **608 tests in 55 files**, ESLint, TypeScript,
+  production build, and `git diff --check` passed. The build used a loopback
+  placeholder Supabase URL/key; Google Fonts access was needed to build.
+- CUA tested the actual editor and edit page with synthetic auth/data at
+  desktop and 390 × 844 browser sizes: typed/pasted invalid syntax, retained
+  precision errors, Tab/Enter/Escape/Cancel, stepping from a draft, hidden-route
+  validation, item deletion retaining other drafts, explicit zero/empty-route
+  save, immediate Save, delayed auth/Factor, failure/manual retry, cancellation,
+  timeout, stale reference replies and BOQ/header navigation. Matching payloads
+  and zero saves after a stopped preparation were observed. Both Print buttons
+  blocked invalid drafts; top Print opened the saved-data path without Save.
+  Route-reorder identity is covered by state tests, not a completed rendered
+  drag-and-drop acceptance. Expected injected failures were the only console
+  errors in the editor harness; the actual-page harness had none.
+- This is browser-size QA, not physical touch-device acceptance. The existing
+  wide table still needs horizontal scrolling/sidebar collapse on mobile; a
+  wider mobile layout redesign remains outside this change. No live BOQ was
+  saved, copied, or used as a write-test fixture; no live DB verification is
+  claimed for this local implementation.
+- **Real-time correction validation (2026-09-08):** **617 tests in 55 files**,
+  ESLint, TypeScript, and production build passed using the same loopback build
+  configuration. State tests cover preview/confirm/cancel, exact legacy-value
+  restoration, route/item identity, and stale Factor rejection after a preview
+  or cancellation. Independent source review found no regression blocker.
+  CUA on the actual edit page with synthetic data confirmed that typing `5`
+  while the input remains focused changes cost from `100.00` to `250.00`,
+  Factor total to `275.00`, and VAT total to `294.25`. Continuing to `5x2`
+  retains that preview and blocks Save; Escape and visible Cancel restore the
+  starting values. Tab/Enter retain the current calculation. Immediate Save
+  after entering `4.25`, with auth deliberately held, produced exactly one
+  mock request containing quantity `4.25`, cost `212.50`, Factor total
+  `233.75`, and VAT total `250.11`; editing stayed locked while waiting.
+  The actual-page harness had no console warnings/errors. The owner demo at
+  `http://127.0.0.1:4180/demo.html` was updated for this correction; it uses
+  synthetic data and depends on a host-local server, not a Preview deployment.
+- **Evidence correction after Owner challenge (2026-09-08):** the original
+  demo A/B used constant reference factors `1.1000` / `1.3000`. That evidence
+  established changing totals with a fixed multiplier, not a changing Factor
+  coefficient while typing. The 617-test count must not substitute for that
+  missing UI scenario. A separately labelled synthetic C was added only to
+  the temporary harness, using reference points `(5M,1.2)`, `(10M,1.1)`,
+  `(20M,1.05)`, `(700M,1.01)` with the unchanged application calculations.
+  CUA verified focused-input quantities `100000`, `150000`, `200000`,
+  `300000`, `123456` at unit cost `50` yield respectively `1.2000`,
+  `1.1500`, `1.1000`, `1.0750`, `1.1765`, with matching Factor/VAT totals.
+  Expected values were independently derived. Immediate mock Save for
+  `123456` contained cost `6172800`, Factor `1.1765`, after-Factor cost
+  `7262299.20`, and VAT total `7770660.14`. Console warnings/errors were
+  absent. This is synthetic UI/mock-request evidence only; it does not prove
+  live reference contents, database persistence, or Print/PDF/Excel parity.
+  No application runtime or calculation-rule change was made for this demo.
+
+### Local behavior review and open decisions — 2026-09-08
+
+This compares the local changeset with HEAD `c0cb6451`. It is an acceptance
+checklist, not an assertion that every row was newly approved or tested live.
+
+| User action / condition | HEAD behavior | Current local behavior |
+|---|---|---|
+| Type a valid quantity | Calculate during typing | Calculate during typing; restored after Owner correction |
+| Type or paste `5x2` / `5*2` | Could remove the operator and publish `52` | Retain rejected text, show error, reject Save; retain latest valid numeric preview |
+| Leave blank or `.` | Convert to zero on blur | Remain incomplete; require explicit zero or cancellation |
+| Enter more than 2 decimal places | Accept, while displaying 2 places | Reject new input; no silent rounding |
+| Focus/blur an untouched loaded `1.234` | Could republish displayed `1.23` | Preserve original numeric value; show source-value hint and block steppers until valid replacement |
+| Escape / visible Cancel | No cancellation contract | Restore quantity and item totals from start of that edit session |
+| Use +/- | Operate on numeric value | Operate once from valid draft; block invalid/incomplete/boundary input |
+| Switch routes / delete an item | Local drafts could disappear | Retain drafts by stable IDs; prune only deleted objects |
+| Copy a route | Copy current values | Require source-route drafts to be confirmed/cancelled |
+| Save | Graph and Factor callback updated separately | Validate every route; capture matching graph/Factor; lock edits; stop preparation on error/cancel/timeout |
+| Print from editor | Open saved BOQ, label “พิมพ์” | Still open saved BOQ; explicit saved-version label; block invalid drafts and pending Save |
+| Open another BOQ | Reuse page component state | Reset the edit session by BOQ ID |
+| Quantity control layout | One control row | Reserve an extra Cancel row; show validation/source hints |
+| Load a BOQ with stale route summaries | Recompute active route only | Active-route behavior restored after explicit Owner approval; preserve unopened route summaries |
+
+The earlier local load behavior was material: if active A totals `100`, and hidden B
+stores `999` while its items sum to `210`, HEAD initially totals `1099` while
+the earlier local implementation totalled `310`. A metadata-only Save could
+therefore send a changed hidden-route summary. **The Owner explicitly selected
+restoring the earlier loading/total behavior on 2026-09-08.** That correction
+is now implemented: load synchronizes only the selected route, item edits
+synchronize their route, and selecting another route synchronizes that route
+before an immediate Save can run. Other loaded summaries remain unchanged.
+This preserves existing behavior; it does not repair inconsistent stored data.
+
+Read-only review also identified a **pre-existing accounting parity risk** from
+unchanged repository contracts: quantity `2.50` × unit cost `19.99` produces
+raw `49.975`. Two one-item routes total `99.95` in the editor; persisting each
+route to `numeric(15,2)` can produce `49.98` each, whose sum is `99.96`.
+Migration 027's Save function also derives item amounts from bound catalog
+prices independently of browser header/route totals. Print reads the persisted
+header and separately allocates across saved route totals. This is an inference
+from schema/RPC/source, **not a live database observation**, and is not fixed by
+the numeric guard. Preserve migrations 027/028/029/030 and existing rounding rules;
+wider R0/D0 policy and isolated persistence/output verification remain open.
+
+Existing output checks have limited scope: the Excel suite creates and reads
+workbook buffers. Its 8.25% fixture now uses matching input amounts and asserts
+actual route/total/summary cells `34266000`, `2826945`, `37092945`; this verifies
+the exporter preserves the supplied amounts. Some other Print/VAT contracts
+only inspect source text. Neither those checks nor synthetic mock Save prove real Save/reload,
+Print/PDF/Excel accounting parity. Physical-device input, rendered route
+drag-and-drop acceptance, and large-BOQ typing performance also remain open.
+
+After the restoration, CUA observed an unopened synthetic B summary of `999`
+remain unchanged through A's realtime edit, Cancel, and metadata-only mock Save
+(A `15` + B `999` = `1014`). Selecting B then immediately saving used its
+item sum `30` and grand total `45`, with Factor `1.3` / after-Factor `58.50` /
+VAT total `62.60`. The active-route deletion browser attempt stopped at a
+browser-control timeout and is **not a rendered PASS**; deletion and successor
+selection are covered by state tests. The separate owner page remained usable:
+C's focused input `150000` produced Factor `1.1500`, rejected `150000x2`
+blocked Save, and Cancel restored the original quantity. Its console was clean.
+
+Earlier in this review, the delayed-reference harness verified total `7500000`
+waits for A's Factor `1.25` before one mock Save; cancelling preparation leaves
+zero Saves after A arrives. When B is selected, late A is ignored, and only B's
+Factor `1.45` / VAT `10%` completes Save. These are synthetic response controls,
+not network/production observations.
+
+**Final local validation after Owner-approved restoration:** `639` tests in
+`55` files, full ESLint, TypeScript, production build with the loopback
+Supabase placeholder, and `git diff --check` passed. The additional tests
+include 11 composed Factor bracket/interpolation cases and 11 route-summary
+preservation cases. Independent final source review found no blocker in the
+restoration. HEAD remains `c0cb6451c4d9924f69de93df4eee80abb6cca3c9` on
+`codex/quantity-input-safety` without an upstream at this observation. Changes
+remain local and uncommitted. These checks do not close the open live-data,
+output, physical-device, rendered deletion/reorder, or scale checks above.
+
+### Isolated local persistence checkpoint — 2026-09-08
+
+The Owner's later continuation was used for dedicated local test records in
+the already-running loopback Supabase (`127.0.0.1:55321`, database port
+`55322`). No database was bootstrapped/reset, no migration was applied or
+replayed, and no schema, reference data, account configuration, or Production
+operation was performed. This extends local test evidence only.
+
+**Environment limitation:** the observed local database has active Catalog
+`2568.0.0` (710 rows), Factor reference `2569.0.0` (36 rows, VAT 7%), no
+`supabase_migrations.schema_migrations` table and no `duplicate_boq_atomic`.
+Its existing Save RPC is an older pre-P49 implementation (definition MD5
+`f8c84210351e72e63143a0e36af07226`), including older authorization behavior.
+It is not the recorded Production schema/reference state and must not be
+upgraded by replaying migrations 027/028/029/030 for this test.
+
+The actual editor state, quantity parser, Factor/calculation and payload/loader
+helpers were used with a signed-in existing active local admin. The unexported
+page header mapping was mirrored in a temporary script. Five actual Save RPC
+calls and fresh database reloads matched independently calculated expectations:
+
+| Local case | Quantity | Base cost | Factor F | Before VAT | VAT | Final |
+|---|---:|---:|---:|---:|---:|---:|
+| ITEM-0001 | 2.50 | 4,420.00 | 1.2733 | 5,627.99 | 393.96 | 6,021.95 |
+| ITEM-0025 below 5M | 441.61 | 4,999,908.42 | 1.2733 | 6,366,383.39 | 445,646.84 | 6,812,030.23 |
+| ITEM-0025 above 5M | 441.62 | 5,000,021.64 | 1.2732 | 6,366,027.55 | 445,621.93 | 6,811,649.48 |
+| ITEM-0025 near 7.5M | 662.43 | 7,500,032.46 | 1.2495 | 9,371,290.56 | 655,990.34 | 10,027,280.90 |
+| Two ITEM-0001 routes | 2.50 each | 8,840.00 | 1.2733 | 11,255.97 | 787.92 | 12,043.89 |
+
+All sent header/item fields, including Factor raw/bracket snapshot values,
+matched the reload. Child identity was compared by route/item order because
+Save recreates child UUIDs. This is **actual helpers → authenticated local
+predecessor RPC → database reload**, not rendered browser Save coordination.
+The small final-total drop immediately above 5M follows the unchanged Factor
+truncation policy; this test did not change that policy.
+
+Before/after row fingerprints matched for all original 198 BOQs, 217 routes
+and 1,547 items. Full-table fingerprints matched for Catalog rows/versions/
+default pointer, Factor rows/versions/default pointer, user profiles and app
+settings. These fingerprints cover the named tables, not every account or
+external service setting. Exactly three dedicated BOQs (four routes/items)
+were added and retained for local browser review:
+
+- normal: `25b912e9-bf5b-4db8-af37-201adf1fd287`
+- factor-bracket: `916bfd9d-6a64-4bbf-8b97-eb162180d0df`
+- two-routes: `aa4634bb-0480-43e6-8ff9-11bc0c01dcbb`
+
+Their names start with `LOCAL QA quantity 20260908`; any later test writes or
+cleanup must use the exact IDs above, never a broad name-based mutation. Safe
+temporary receipts were recorded under `/tmp/conduit-boq-persistence-qa/` at
+that checkpoint; the directory was no longer present on 2026-10-12. They were
+never durable published release evidence.
+
+Actual local columns confirm quantity `numeric(12,2)` and money
+`numeric(15,2)`. All 710 active local Catalog rows have whole-baht unit,
+material and labor prices. The fractional-price route/header discrepancy
+described above therefore was **not reproduced with this reference data**;
+no Catalog row or unsupported quantity was fabricated to force it.
+
+At that checkpoint, browser Save/reload and Print/PDF/download acceptance were
+pending local browser authentication. The local application was opened at
+`http://127.0.0.1:3000/login` with an explicit loopback environment override.
+It is separate from the synthetic demo at port 4180 and is not a deployment.
+Current-Production-schema acceptance remains a separate uncompleted gate.
+
+**Excel artifact check:** the unchanged exporter generated five workbooks from
+the actual saved/reloaded snapshots above. In a non-browser test context only
+`file-saver` was captured, and the actual local Factor conditions were read.
+An independent audit checked 110 exact numeric cells for quantity, prices,
+item/route totals, Factor, VAT, consolidation and summary. All matched. For
+the two-route workbook, `สรุปรวม!F7:H7` contains
+`5627.99 / 393.96 / 6021.95`, `F8:H8` contains
+`5627.98 / 393.96 / 6021.94`, and `F9:H9` contains
+`11255.97 / 787.92 / 12043.89`. This confirms the existing last-route remainder
+allocation for this case. It does not establish browser download/auth,
+rendered Print, PDF layout or native Excel rendering. The temporary receipt was
+recorded at `/tmp/conduit-boq-persistence-qa/export-receipts.json`; it is no
+longer present. No application runtime, test suite, or calculation rule was
+changed for this checkpoint.
+
+**Later authenticated browser check (2026-09-08):** after the Owner signed in,
+CUA exercised the actual local Next.js app in the in-app browser, using only
+the three dedicated fixtures above:
+
+- Normal: while the quantity input retained focus, `4.25` changed base cost
+  to `7514`, after-Factor cost to `9567.58`, and VAT total to `10237.31`.
+  Entering `5x2` and clicking Save showed validation errors; a fresh database
+  read still showed the saved `2.50` and total `6021.95`. Both Print buttons
+  were disabled. Save itself remains clickable so it can identify errors.
+  Escape and visible Cancel restored the starting values. Entering `4.25`
+  and clicking Save without an intervening state read persisted the matching
+  graph/snapshot. Database read, editor reload and actual Print DOM all
+  matched `4.25 / 7514 / 1.2733 / 9567.58 / 669.73 / 10237.31`.
+- Bracket: focused input values `441.61` and `441.62` displayed Factor
+  `1.2733` and `1.2732` with the expected totals. An immediate Save after
+  the change to `441.62`, a database read, editor reload and Print DOM all
+  matched `5000021.64 / 1.2732 / 6366027.55 / 445621.93 / 6811649.48`.
+- Two routes: an invalid `5x2` draft in route 2 remained actionable after
+  selecting route 1. Save returned to the erroneous route and rejected the
+  operation; database read still showed both quantities `2.50`. After Cancel
+  and Save, reload and Print DOM showed consolidated quantity `5.00`, base
+  cost `8840`, route final amounts `6021.95 / 6021.94`, and the matching
+  total `12043.89`.
+- Five successful browser Saves include restoring normal to `2.50`, restoring
+  bracket to `662.43`, and saving the resolved two-route fixture. No additional
+  BOQ was created. A fresh post-browser fingerprint comparison preserved all
+  original 198 BOQs / 217 routes / 1547 items and all eight named reference/
+  profile/settings fingerprints. Evidence was recorded in temporary
+  `browser-save-*.json`, `browser-hidden-invalid-reload.json`, and
+  `after-browser-raw.txt` / `browser-invariants.json` receipts, which are no
+  longer present on this host.
+
+Page identity, meaningful content, no framework error overlay, and numerical
+interaction checks passed for these local editor/Print pages. Their sampled
+warning/error console logs were empty. The dev-server log separately contained
+a home-page logo LCP recommendation; it is not a quantity failure. Screenshots
+were observed, but the narrow in-app panel horizontally clips the fixed-width
+Print page, and a full-page capture contained repeated content whose cause was
+not resolved. The two-route Print DOM has five landscape pages, each about
+1122.5 × 793.7 pixels, with no vertical content overflow at that observation.
+Neither screenshot is proof of a clean generated PDF.
+
+**Output gate at the in-app browser checkpoint:** clicking Excel did not yield a download event
+within 15 seconds, no matching fixture workbook was found in Downloads, and
+no page error was recorded. Clicking Print did not expose an accessible print
+dialog. The cause is unresolved between browser capability and application
+behavior; this is not a browser download or PDF PASS. The earlier 110-cell
+exporter-artifact result remains valid within its narrower scope. No runtime
+fix was made on the basis of this uncertainty. Current-schema acceptance,
+physical-device/reorder/deletion and scale residuals remain open as above.
+
+**Owner-approved Chrome output follow-up (2026-09-08):** the Owner authorized
+continuing in Chrome and completed the local login there. The Chrome browser
+connector was unavailable, so CUA's native Chrome accessibility controls opened
+a new tab at the same loopback app. No extension, browser setting, package,
+runtime code, database data or schema was changed for this output check.
+
+Actual Excel clicks produced completed Chrome downloads for the two-route and
+factor-bracket fixtures. Copies were inspected under the former temporary path
+`/tmp/conduit-boq-persistence-qa/`, which is no longer present:
+
+| Downloaded file | Exact workbook checks | Observed result |
+|---|---|---|
+| `chrome-two-routes.xlsx` | Five sheets, 34 cells (33 numeric plus VAT label) | Quantities 2.50 each / consolidated 5; Factor 1.2733; before/VAT/final 11255.97 / 787.92 / 12043.89; route allocation 6021.95 + 6021.94 |
+| `chrome-factor-bracket.xlsx` | Three sheets, 28 cells (19 numeric plus nine text/blank) | Quantity 662.43; Factor 1.2495 in the >5M column; 5M/10M references, raw 1.24954969163; before/VAT/final 9371290.56 / 655990.34 / 10027280.90 |
+
+Independent arithmetic matched and neither workbook contained Excel error
+cells. These 62 actual-download cell checks are separate from the earlier
+110-cell non-browser exporter check. The original downloads remain in the
+host Downloads folder with the `BOQ_LOCAL QA quantity 20260908 ...` filenames.
+The former temporary `chrome-xlsx-receipt.json` and
+`chrome-factor-bracket-xlsx-receipt.json` recorded exact cells and SHA-256
+hashes; those receipt files are no longer present.
+
+Both actual Chrome Print dialogs selected Save as PDF, all pages, one page per
+sheet and no margins. The saved PDFs were read, rendered with Poppler, and
+**every page was visually inspected**:
+
+- `chrome-two-routes.pdf`: five A4 landscape pages (two routes, consolidation,
+  summary, Factor supplement). Quantities, per-route allocation and the final
+  `12043.89` agree with database/Print/Excel evidence.
+- `chrome-factor-bracket.pdf`: three A4 landscape pages (route, summary,
+  Factor supplement). The >5M column, interpolation references/raw/truncated
+  Factor and final `10027280.90` agree with database/Print/Excel evidence.
+- No blank/duplicated page, clipped text/table, or broken Thai glyph was found
+  in these eight PDF pages. Document page counters and reference-version
+  footers were present. The earlier in-app full-page capture's repeated content
+  did not appear in these generated PDFs. PDF text/numeric/hash receipts were
+  recorded as `chrome-pdf-receipt.json` and
+  `chrome-factor-pdf-receipt.json`; those temporary files are no longer present.
+
+This closes actual Chrome download/PDF verification **for these two saved local
+fixtures**. The in-app browser behavior remains unresolved, but it did not
+prevent the unchanged app from producing correct files in Chrome. Native
+Excel rendering, long multi-page BOQs, physical-device/drag-and-drop/scale
+residuals and acceptance against a current-Production-equivalent test schema
+remain outside this result. No release, commit or deployment is authorized by
+this checkpoint. At that checkpoint the temporary directory also contained the
+Owner-requested local password display file. The directory is no longer
+present; if equivalent evidence is recreated, never upload or share the whole
+directory. Only specifically reviewed fixture artifacts/receipts may be used as
+output evidence.
+
+All earlier Master Catalog / DUP-1 receipts and archive custody boundaries
+remain historical authority for their exact operations; migrations 027, 028,
+and 029 remain immutable/no-replay.
 
 ## Start here
 
@@ -76,7 +495,9 @@ Migration 029 is a separate product release after the completed Master Catalog
 phase. Statements below that “029 was not required” or that the ledger ended at
 028 are dated Master Catalog/repository-convergence facts, not the current
 Production migration inventory. Migrations 027, 028, and 029 are all immutable
-applied-once/no-replay artifacts.
+applied-once/no-replay artifacts. Migration 030 was later applied once for the
+independent Save NULL-authorization correction described in the current work
+register; it is also immutable/no-replay.
 
 ## Post-DUP-1 repository custody
 
@@ -203,7 +624,7 @@ future application-version decision is separate work with separate approval.
 
 ## No-replay boundary
 
-Do not replay P-13, P-14, P-14C, P-15, migrations 027/028/029, R-01 through
+Do not replay P-13, P-14, P-14C, P-15, migrations 027/028/029/030, R-01 through
 R-05, or disposable Production QA. Migration 029 was not needed merely to
 align documentation or Git; it was later created and applied only for the
 separately authorized DUP-1 product release. A future catalog Publish/Restore
@@ -250,6 +671,10 @@ push, deploy, database, publication, or deletion authority.
 
 ## What remains
 
+This section is the Master Catalog/custody residual list. It does not replace
+the 2026-10-12 current work register above; Quantity Q-A/Q-B and later product
+decisions are tracked there and in Product Plan #06.
+
 There is **no required Master Catalog execution work** and no open R-01 through
 R-05 item. Do not replay the completed release, migrations, disposable QA, or
 closeout.
@@ -271,9 +696,13 @@ Only these independent optional maintenance decisions remain:
 
 `R0A_LIST1_NEXT_DECISION_HANDOFF_20260905`
 
-Everything in this section is **proposed and awaiting Owner decision**. It is
-not implementation, commit, Preview, migration, account, deployment, or
-Production authority.
+This section is a **HISTORICAL** 2026-09-05 decision snapshot. Since then the
+Owner authorized local Quantity implementation/testing and the repository now
+contains the uncommitted `LOCAL CANDIDATE` described in the current work
+register and [Product Plan #06](../plans/product/06-r0a-quantity-input-safety-release-plan.md).
+LIST-1B, wider R0/D0, Quantity Expression and S0 remain proposed. Nothing in
+this dated section is current commit, Preview, migration, account, deployment,
+or Production authority.
 
 ### Confirmed code risks
 
@@ -344,14 +773,14 @@ intended recovery behavior for inactive or suspended accounts remains a policy
 decision. Separating account admission from authentication/recovery remains
 proposed S0 work.
 
-### First safe action for the next session
+### Historical first-safe-action guidance
 
-Re-read the mandatory files, verify Git/worktree state, and present the pending
-R0A/LIST-1 sequence plus LIST-1 scope choices to the Owner. If the Owner grants
-only decision/documentation authority, do not edit runtime code. R0A and
-LIST-1 implementation, commit/push/Preview, any new database object or forward
-migration, and every Production/account operation each require their own
-explicit current authorization.
+Re-read the mandatory files and verify Git/worktree state. The R0A local
+implementation step named here has since occurred, while its release gates
+remain open. Follow the current register and Product Plan #06 for Quantity;
+follow Product Plan #02 for LIST-1. Any new database object or forward
+migration and every Production/account operation still require explicit
+current authorization.
 
 For a new AI session: work from the canonical checkout, read this file plus
 `AGENTS.md`, `AI_CONTEXT.md`, Master Catalog #106/#107, and

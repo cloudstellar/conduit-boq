@@ -1,7 +1,7 @@
 # AI Context — Mandatory Agent Rules
 
 > **Status:** CANONICAL  
-> **Aligned:** 2026-09-05
+> **Aligned:** 2026-10-12
 
 Read [AI Handoff](./AI_HANDOFF.md) first. For Master Catalog current-state and
 no-replay decisions, [Handoff
@@ -40,6 +40,19 @@ For the completed Atomic BOQ Duplicate release:
 - the authoritative execution receipt is [DUP-1 Production Release
   Result](../plans/product/04-atomic-boq-duplicate-production-release-result.md).
 
+For the completed BOQ Save NULL authorization correction:
+
+- migration 030 was applied exactly once as
+  `20261012100608/boq_save_null_authorization_guard` and changes only the final
+  authorization denial from `IF NOT v_is_authorized` to
+  `IF v_is_authorized IS NOT TRUE`;
+- migrations 027, 028, 029 and 030 are immutable/no-replay;
+- the authoritative receipt is [BOQ Save Guard Production Result
+  #04](../plans/security/04-boq-save-null-authorization-production-release-result.md);
+  and
+- that authority is consumed and grants no Quantity, broader S0, deployment,
+  database, account, Catalog, Factor, or BOQ-data operation.
+
 For the later repository-only closeout, use [Post-DUP-1 Repository Custody
 Result](../plans/product/05-post-dup1-repository-custody-result.md). It records
 docs PR #10, the dated Production deployment observation, and the separately
@@ -69,6 +82,16 @@ supabase.auth.onAuthStateChange((event, session) => {
 
 ### Authorization is cross-layer
 
+The Owner-approved 2026-09-08 metadata review found a NULL scope-authorization
+defect in the deployed Save RPC. The narrow forward correction was later
+committed as `cb2bb60`, applied to Production once as migration 030, and closed
+in repository commit `7c09ab8`. Use the [Save guard plan and local
+result](../plans/security/02-boq-save-null-authorization-guard-plan-and-result.md),
+[executed runbook](../plans/security/03-boq-save-null-authorization-production-runbook.md),
+and [Production Result #04](../plans/security/04-boq-save-null-authorization-production-release-result.md)
+for the bounded evidence and residuals. Do not infer that this one guard closes
+the wider S0/Auth/Security lane.
+
 UI permission helpers are not security boundaries. Align product rules,
 middleware/routes, server actions, grants, RLS, protected columns, RPC bodies
 and ACLs, service-role paths, and real authenticated tests. Database controls
@@ -83,13 +106,42 @@ client-side and treat it as authorization.
 ### Numeric input must fail closed
 
 Never remove unsupported operators or letters and then commit the remaining
-digits as though they were the user's intended quantity. The current
-`QuantityEditor` can turn `5*2` or `5x2` into `52`; `R0A` is the proposed small
-guard for that risk. The invariant is that rejected syntax must not alter the
-last committed quantity, totals, or save/output state. Retaining the invalid
-draft text and showing an accessible explanation is the proposed R0A UX,
-pending Owner decision. A UI guard does not authorize a parser, formula
-persistence, schema/RPC change, or migration.
+digits as though they were the user's intended quantity. The previous
+`QuantityEditor` could turn `5*2` or `5x2` into `52`. The Owner approved local
+draft/confirm/cancel and numeric-only safety work on 2026-09-08; see the
+[current local checkpoint](./AI_HANDOFF.md#local-quantity-safety-work--2026-09-08)
+and [R0A release candidate plan](../plans/product/06-r0a-quantity-input-safety-release-plan.md)
+for the exact scope and release boundary. After the local trial, the Owner
+requested real-time calculation during typing: valid numeric drafts update
+the displayed quantities and totals immediately; rejected syntax retains the
+latest valid preview, and Cancel restores the starting quantity and totals.
+Save must still reject invalid drafts. New input is limited to 2 decimal places without
+silent rounding; existing loaded data is not backfilled. Save must match one
+BOQ/revision/total/reference-version calculation, rather than merely accepting
+a Factor bracket that also happened to fit an earlier total. Local approval
+does not authorize a formula parser, new persisted quantity fields, schema/RPC change, migration,
+commit, or deployment.
+
+The Owner later explicitly chose to restore the previous route-total behavior:
+loading synchronizes only the selected route, selecting a route synchronizes
+that route, and quantity edits update their own route. Preserve summaries of
+other unopened routes; do not normalize all loaded summaries as an input-safety
+side effect. This preserves an existing behavior, not an accounting-parity fix.
+For evidence limits and the pre-existing rounding risk, see the local behavior
+review in the handoff. A passing mock Save or test count is not proof of real
+database persistence or Print/PDF/Excel parity.
+
+The later isolated persistence checkpoint used only new, explicitly identified
+test BOQs in an already-running loopback database. Actual helper/RPC/reload
+checks passed there, but that database has a pre-P49 Save RPC and older Catalog
+state. Do not describe it as current Production-equivalent acceptance or replay
+027/028/029/030 to make it equivalent. See the handoff's
+[isolated local checkpoint](./AI_HANDOFF.md#isolated-local-persistence-checkpoint--2026-09-08)
+for exact fixture IDs, observed results, and remaining acceptance gates. The
+later Owner-approved Chrome check verified real Excel downloads and rendered
+PDFs for the two-route and interpolated-Factor local fixtures. Do not extend
+that result to all BOQs, native Excel rendering, or the current Production
+schema; those limits remain recorded in the handoff.
 
 ## Source-of-truth map
 
@@ -100,9 +152,11 @@ persistence, schema/RPC change, or migration.
 | Master Catalog final state | [Handoff #106](../plans/master-catalog/106-phase4-master-catalog-exact-remaining-work-handoff.md) and [Result #107](../plans/master-catalog/107-phase4-p49-master-catalog-final-closeout-result.md) |
 | Atomic BOQ Duplicate Production result | [`plans/product/04-atomic-boq-duplicate-production-release-result.md`](../plans/product/04-atomic-boq-duplicate-production-release-result.md) |
 | Post-DUP-1 repository custody | [`plans/product/05-post-dup1-repository-custody-result.md`](../plans/product/05-post-dup1-repository-custody-result.md) |
-| Next product sequence and unresolved scope | [AI Handoff — Next product decision handoff](./AI_HANDOFF.md#next-product-decision-handoff--2026-09-05) |
+| BOQ Save NULL guard Production result | [`plans/security/04-boq-save-null-authorization-production-release-result.md`](../plans/security/04-boq-save-null-authorization-production-release-result.md) |
+| Current work and immediate Owner decisions | [AI Handoff — Current work register](./AI_HANDOFF.md#current-work-register--2026-10-12) |
 | Product evolution decisions | [`plans/product/01-conduit-boq-product-evolution-decision-plan.md`](../plans/product/01-conduit-boq-product-evolution-decision-plan.md) |
 | LIST-1 proposed design | [`plans/product/02-boq-list-scaling-decision-plan.md`](../plans/product/02-boq-list-scaling-decision-plan.md) |
+| Quantity Input Safety local candidate | [`plans/product/06-r0a-quantity-input-safety-release-plan.md`](../plans/product/06-r0a-quantity-input-safety-release-plan.md) |
 | Database schema | [`04_data/DATABASE_SCHEMA.md`](../04_data/DATABASE_SCHEMA.md) |
 | Production migration ledger | [`04_data/MIGRATIONS.md`](../04_data/MIGRATIONS.md) |
 | Current security model | [`04_data/SECURITY_MODEL.md`](../04_data/SECURITY_MODEL.md) |
@@ -147,8 +201,8 @@ with only local branch `main`. Recheck before acting; this observation grants no
 commit, push, deployment, database, Production, branch-deletion, or archive
 authority.
 
-That clean observation predates preparation of the current handoff. The
-documentation-only handoff alignment covers exactly eight files listed in [AI
+That clean observation predates the **2026-09-05 handoff checkpoint**. That
+documentation-only alignment covered exactly eight files listed in [AI
 Handoff — Handoff-alignment
 changeset](./AI_HANDOFF.md#handoff-alignment-changeset--2026-09-05). Verify
 live whether the changeset is committed and whether any diff remains; preserve
@@ -156,12 +210,13 @@ uncommitted handoff work unless the Owner directs otherwise. This record grants
 no later commit, push, PR, merge, deployment, database, or Production
 authority.
 
-The next recommended sequence is still unapproved: close the `R0A` and
-`LIST-1B` Level-A decisions, release the narrow fail-closed R0A input guard,
-then implement LIST-1B before the larger R0/R1/R2 Quantity Expression work.
-`S0` authentication/security remains a separate parallel lane. The Owner may
-select a different R0A/LIST ordering; no plan text itself grants implementation
-or external-operation authority.
+The current recommended sequence is: close the existing Quantity Input Safety
+candidate through Q-A Preview and Q-B Production gates; then decide/implement
+LIST-1B; then address wider R0/D0 before R1/R2 Quantity Expression. The local
+Quantity implementation/testing step has occurred, but commit/push/PR/Preview,
+merge and Production deployment remain unauthorized until their exact gates.
+`S0` authentication/security remains a separate parallel lane. No plan text
+itself grants implementation or external-operation authority.
 
 ## Completion check
 

@@ -2,7 +2,7 @@
 ## Conduit BOQ System
 
 > **Status:** CANONICAL
-> **Last Updated:** 2026-08-31
+> **Last Updated:** 2026-10-12
 
 <!-- MASTER_CATALOG_CURRENT_STATE_20260829 -->
 > [!IMPORTANT]
@@ -46,6 +46,21 @@ and residuals are in the
 That one-shot release authority is consumed. Do not replay migration 029 or
 infer authority for LIST-1, Quantity Expression, another deploy, or another
 Production write.
+
+### BOQ Save NULL authorization guard record — 2026-10-12
+
+Migration 030 was applied exactly once as
+`20261012100608/boq_save_null_authorization_guard`, after the reviewed source
+commit `cb2bb60`. Exact postflight and limitations are recorded in [Security
+Result #04](../plans/security/04-boq-save-null-authorization-production-release-result.md),
+and the repository closeout is `7c09ab8`. Migrations 027–030 are
+immutable/no-replay and this release authority is consumed.
+
+Quantity Input Safety was not part of that release. It remains an uncommitted
+`LOCAL CANDIDATE` governed by [Product Plan
+#06](../plans/product/06-r0a-quantity-input-safety-release-plan.md): Q-A covers
+commit/push/PR/CI/Preview, and Q-B separately covers merge/Production. A
+Production write test needs its own named data and authority.
 
 ## 2. Pre-Release Checklist
 
