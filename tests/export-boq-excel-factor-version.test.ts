@@ -2,7 +2,8 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { Workbook } from 'exceljs'
 import { saveAs } from 'file-saver'
 import { exportBoqToExcel, type ExportBOQData } from '../lib/exportBoqExcel'
-import type { FactorReferenceCondition } from '../lib/factorF'
+import { calculateVAT, multiplyFactor } from '../lib/calculation'
+import { getFactorVatRate, type FactorReferenceCondition } from '../lib/factorF'
 
 vi.mock('file-saver', () => ({
   saveAs: vi.fn(),
@@ -70,21 +71,23 @@ async function exportAndReadWorkbook(
   boq: ExportBOQData,
   factorCondition: FactorReferenceCondition,
 ): Promise<Workbook> {
+  const factor = boq.factor_f ?? 0
+  const totals = calculateVAT(
+    multiplyFactor(boq.total_cost, factor),
+    getFactorVatRate(factorCondition),
+  )
+
   await exportBoqToExcel(
     boq,
     [route],
     { [route.id]: [item] },
-    boq.factor_f ?? 0,
-    [{
-      beforeVAT: 30_000_000 * (boq.factor_f ?? 0),
-      vat: 30_000_000 * (boq.factor_f ?? 0) * 0.07,
-      total: 30_000_000 * (boq.factor_f ?? 0) * 1.07,
-    }],
-    30_000_000 * (boq.factor_f ?? 0),
-    30_000_000 * (boq.factor_f ?? 0) * 0.07,
-    30_000_000 * (boq.factor_f ?? 0) * 1.07,
-    { cost_million: 30, factor: boq.factor_f ?? 0 },
-    { cost_million: 30, factor: boq.factor_f ?? 0 },
+    factor,
+    [totals], // This fixture has one route containing the entire BOQ cost.
+    totals.beforeVAT,
+    totals.vat,
+    totals.total,
+    { cost_million: 30, factor },
+    { cost_million: 30, factor },
     factorCondition,
   )
 
@@ -110,7 +113,7 @@ function workbookText(workbook: Workbook): string {
   return values.join('\n')
 }
 
-describe('BOQ Excel Factor F version labels', () => {
+describe('BOQ Excel bound versions and supplied totals', () => {
   beforeEach(() => {
     vi.mocked(saveAs).mockClear()
   })
@@ -159,7 +162,7 @@ describe('BOQ Excel Factor F version labels', () => {
     expect(text).toContain('สรุปรวม บัญชีราคา ฉบับ 2568.0.0')
   })
 
-  it('labels Excel VAT from the BOQ-bound Factor version instead of hard-coding 7%', async () => {
+  it('writes the bound 8.25% VAT label and corresponding supplied numeric totals', async () => {
     const workbook = await exportAndReadWorkbook(
       makeBoq('dynamic-vat-bound', 1.1422),
       makeCondition('2570.0.0', 6, 8.25),
@@ -168,5 +171,22 @@ describe('BOQ Excel Factor F version labels', () => {
 
     expect(text).toContain('(2) ภาษีมูลค่าเพิ่ม 8.25 %')
     expect(text).not.toContain('(2) ภาษีมูลค่าเพิ่ม 7.00 %')
+
+    const summary = workbook.getWorksheet('สรุปรวม')!
+    expect(summary).toBeDefined()
+    expect(summary.getCell('B7').value).toBe('Route A')
+
+    // Independent expected amounts: 30,000,000 × 1.1422 = 34,266,000;
+    // 34,266,000 × 8.25 / 100 = 2,826,945; total = 37,092,945.
+    // This checks the generated workbook preserves supplied amounts; it does
+    // not exercise Print's derivation of them or database persistence.
+    for (const row of [7, 8]) { // Route row and the table's total row.
+      expect(summary.getCell(`F${row}`).value).toBe(34_266_000)
+      expect(summary.getCell(`G${row}`).value).toBe(2_826_945)
+      expect(summary.getCell(`H${row}`).value).toBe(37_092_945)
+    }
+    expect(summary.getCell('H10').value).toBe(34_266_000)
+    expect(summary.getCell('H11').value).toBe(2_826_945)
+    expect(summary.getCell('H12').value).toBe(37_092_945)
   })
 })

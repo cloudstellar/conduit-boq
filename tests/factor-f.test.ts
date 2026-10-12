@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import {
   calculateInterpolatedFactorFromRefs,
+  findFactorBracketRefs,
   formatFactorReferenceCondition,
   getFactorVatPercent,
   getFactorVatRate,
@@ -8,6 +9,70 @@ import {
 } from '../lib/factorF'
 
 describe('Factor F interpolation', () => {
+  describe('bracket selection with changing reference factors', () => {
+    const refs = [
+      { cost_million: 5, factor: 1.2 },
+      { cost_million: 10, factor: 1.1 },
+      { cost_million: 20, factor: 1.05 },
+      { cost_million: 700, factor: 1.01 },
+    ]
+
+    // Midpoints use the mean of the two reference factors; costs outside the
+    // table use its endpoint. Expected values are independent of the helper.
+    it.each([
+      { label: 'below the 5M floor', cost: 4_000_000, lower: 0, upper: 0, resultLower: 5_000_000, resultUpper: 5_000_000, factor: 1.2 },
+      { label: 'exactly 5M', cost: 5_000_000, lower: 0, upper: 1, resultLower: 5_000_000, resultUpper: 5_000_000, factor: 1.2 },
+      { label: 'halfway between 5M and 10M', cost: 7_500_000, lower: 0, upper: 1, resultLower: 5_000_000, resultUpper: 10_000_000, factor: 1.15 },
+      { label: 'exactly 10M', cost: 10_000_000, lower: 1, upper: 2, resultLower: 10_000_000, resultUpper: 10_000_000, factor: 1.1 },
+      { label: 'halfway between 10M and 20M', cost: 15_000_000, lower: 1, upper: 2, resultLower: 10_000_000, resultUpper: 20_000_000, factor: 1.075 },
+      { label: 'exactly 20M', cost: 20_000_000, lower: 2, upper: 3, resultLower: 20_000_000, resultUpper: 20_000_000, factor: 1.05 },
+      { label: 'exactly the 700M ceiling', cost: 700_000_000, lower: 3, upper: null, resultLower: 700_000_000, resultUpper: 700_000_000, factor: 1.01 },
+      { label: 'above the 700M ceiling', cost: 800_000_000, lower: 3, upper: null, resultLower: 700_000_000, resultUpper: 700_000_000, factor: 1.01 },
+    ])('selects bounds and calculates the factor $label', ({ cost, lower, upper, resultLower, resultUpper, factor }) => {
+      const { lowerFactorRef, upperFactorRef } = findFactorBracketRefs(cost, refs)
+
+      expect(lowerFactorRef).toBe(refs[lower])
+      expect(upperFactorRef).toBe(upper === null ? null : refs[upper])
+      expect(calculateInterpolatedFactorFromRefs(cost, lowerFactorRef, upperFactorRef)).toMatchObject({
+        factor,
+        lowerCost: resultLower,
+        upperCost: resultUpper,
+      })
+    })
+
+    it('truncates the selected 5M–10M interpolation at 6,172,800 to 1.1765', () => {
+      const { lowerFactorRef, upperFactorRef } = findFactorBracketRefs(6_172_800, refs)
+
+      expect(lowerFactorRef).toBe(refs[0])
+      expect(upperFactorRef).toBe(refs[1])
+
+      const result = calculateInterpolatedFactorFromRefs(6_172_800, lowerFactorRef, upperFactorRef)
+
+      // The cost advances 23.456% across a factor drop of 0.1: the decrease
+      // is 0.023456, leaving 1.176544 before truncation to four decimals.
+      expect(result?.raw).toBeCloseTo(1.176544, 12)
+      expect(result).toMatchObject({
+        factor: 1.1765,
+        lowerCost: 5_000_000,
+        upperCost: 10_000_000,
+        lowerValue: 1.2,
+        upperValue: 1.1,
+        exactMatch: false,
+      })
+    })
+
+    it.each([
+      { label: 'references are unavailable', cost: 7_500_000, references: [] },
+      { label: 'the total cost is zero', cost: 0, references: refs },
+    ])('returns no bracket or calculated factor when $label', ({ cost, references }) => {
+      const { lowerFactorRef, upperFactorRef } = findFactorBracketRefs(cost, references)
+
+      expect(lowerFactorRef).toBeNull()
+      expect(upperFactorRef).toBeNull()
+      expect(calculateInterpolatedFactorFromRefs(cost, lowerFactorRef, upperFactorRef)).toBeNull()
+    })
+  })
+
   it('derives VAT from the bound Factor version and keeps 7% only as the legacy fallback', () => {
     expect(getFactorVatPercent({ vat_percent: 8.25 })).toBe(8.25)
     expect(getFactorVatRate({ vat_percent: 8.25 })).toBe(0.0825)

@@ -3,11 +3,14 @@
 import { useState, useEffect, useMemo } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import { roundMoney, calculateVAT, multiplyFactor } from '@/lib/calculation';
+import type { FactorCalculationState, FactorSnapshot } from '@/lib/boq/editorState';
 import {
   calculateInterpolatedFactorFromRefs,
   findFactorBracketRefs,
   getFactorVatPercent,
   getFactorVatRate,
+  type FactorCalculationResult,
+  type FactorReferenceRow,
 } from '@/lib/factorF';
 import {
   FACTOR_REFERENCE_VERSION_REQUIRED_MESSAGE,
@@ -29,103 +32,113 @@ interface RouteData {
 }
 
 interface FactorFSummaryProps {
+  boqId: string;
+  revision: number;
   routes: RouteData[];
   grandTotalCost: number;
   factorReferenceVersionId: string | null;
   variant?: 'full' | 'compact';
-  /** Callback to pass calculated factor values up for snapshot saving */
-  onFactorCalculated?: (data: {
-    factor: number;
-    totalWithFactor: number;
-    totalWithVAT: number;
-    /** Factor F ดิบก่อน truncate */
-    factorRaw: number;
-    /** B: ค่างานต้นทุนช่วงล่าง (ล้านบาท → บาท) */
-    lowerCost: number;
-    /** C: ค่างานต้นทุนช่วงบน */
-    upperCost: number;
-    /** D: Factor F ของช่วงล่าง */
-    lowerValue: number;
-    /** E: Factor F ของช่วงบน */
-    upperValue: number;
-  }) => void;
+  onCalculationStateChange: (state: FactorCalculationState) => void;
 }
 
+type ReferenceLoadState = {
+  boqId: string;
+  versionId: string;
+} & (
+  | { status: 'ready'; version: FactorReferenceVersionData; refs: FactorReferenceRow[] }
+  | { status: 'error'; message: string }
+);
+
+type FactorEvaluation =
+  | {
+      status: 'ready';
+      factorResult: FactorCalculationResult;
+      vatPercent: number;
+      vatRate: number;
+      snapshot: FactorSnapshot;
+    }
+  | { status: 'error'; message: string };
+
+const EMPTY_FACTOR_REFS: FactorReferenceRow[] = [];
+
 export default function FactorFSummary({
+  boqId,
+  revision,
   routes,
   grandTotalCost,
   factorReferenceVersionId,
   variant = 'full',
-  onFactorCalculated,
+  onCalculationStateChange,
 }: FactorFSummaryProps) {
   const supabase = useMemo(() => createClient(), []);
-  const [factorRefs, setFactorRefs] = useState<{ cost_million: number; factor: number }[]>([]);
-  const [factorVersion, setFactorVersion] = useState<FactorReferenceVersionData | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const [factorError, setFactorError] = useState<string | null>(null);
+  const [referenceState, setReferenceState] = useState<ReferenceLoadState | null>(null);
+  // Match the rows actually loaded, even before a changed-version effect starts.
+  const currentReference = referenceState?.boqId === boqId
+    && referenceState.versionId === factorReferenceVersionId
+    ? referenceState
+    : null;
+  const isLoading = Boolean(factorReferenceVersionId && !currentReference);
+  const factorVersion = currentReference?.status === 'ready' ? currentReference.version : null;
+  const factorRefs = currentReference?.status === 'ready' ? currentReference.refs : EMPTY_FACTOR_REFS;
+  const referenceError = !factorReferenceVersionId
+    ? FACTOR_REFERENCE_VERSION_REQUIRED_MESSAGE
+    : currentReference?.status === 'error' ? currentReference.message : null;
 
   useEffect(() => {
+    if (!factorReferenceVersionId) return;
+    let cancelled = false;
+
     const fetchFactorReference = async () => {
       try {
-        setIsLoading(true);
-        setFactorError(null);
-
-        if (!factorReferenceVersionId) {
-          throw new Error(FACTOR_REFERENCE_VERSION_REQUIRED_MESSAGE);
-        }
-
         const [version, rows] = await Promise.all([
           getActiveFactorReferenceVersion(supabase, factorReferenceVersionId),
           getFactorReferenceRowsForVersion(supabase, factorReferenceVersionId),
         ]);
-        setFactorVersion(version);
-        setFactorRefs(rows);
+        if (cancelled) return;
+        if (version.id !== factorReferenceVersionId || version.status !== 'active') {
+          throw new Error('ไม่พบเวอร์ชัน Factor F ที่เปิดใช้งานสำหรับ BOQ นี้');
+        }
+        setReferenceState({
+          boqId, versionId: version.id, status: 'ready', version, refs: rows,
+        });
       } catch (err) {
+        if (cancelled) return;
         if (!(err instanceof Error) || err.message !== FACTOR_REFERENCE_VERSION_REQUIRED_MESSAGE) {
           console.error('Error fetching factor reference:', err);
         }
-        setFactorVersion(null);
-        setFactorRefs([]);
-        setFactorError(err instanceof Error ? err.message : 'ไม่สามารถอ่านตาราง Factor F ได้');
-      } finally {
-        setIsLoading(false);
+        setReferenceState({
+          boqId,
+          versionId: factorReferenceVersionId,
+          status: 'error',
+          message: err instanceof Error ? err.message : 'ไม่สามารถอ่านตาราง Factor F ได้',
+        });
       }
     };
 
     fetchFactorReference();
-  }, [supabase, factorReferenceVersionId]);
+    return () => { cancelled = true; };
+  }, [supabase, boqId, factorReferenceVersionId]);
 
   const formatNumber = (num: number) =>
     num.toLocaleString('th-TH', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
-  const { lowerFactorRef, upperFactorRef } = useMemo(() => {
-    return findFactorBracketRefs(grandTotalCost, factorRefs);
-  }, [factorRefs, grandTotalCost]);
+  // Keep the existing arithmetic, using only the reference set for this BOQ/version.
+  const calculation = useMemo((): FactorEvaluation => {
+    try {
+      if (!factorVersion || !Number.isFinite(grandTotalCost) || grandTotalCost <= 0) {
+        throw new Error('ไม่พบข้อมูลอ้างอิงในตาราง Factor F สำหรับยอดรวมนี้');
+      }
+      const { lowerFactorRef, upperFactorRef } = findFactorBracketRefs(grandTotalCost, factorRefs);
+      const factorResult = calculateInterpolatedFactorFromRefs(grandTotalCost, lowerFactorRef, upperFactorRef);
+      if (!factorResult) throw new Error('ไม่พบข้อมูลอ้างอิงในตาราง Factor F');
 
-  // Calculate factor and derived values instantly from the loaded reference table.
-  const factorResult = useMemo(
-    () => calculateInterpolatedFactorFromRefs(grandTotalCost, lowerFactorRef, upperFactorRef),
-    [grandTotalCost, lowerFactorRef, upperFactorRef],
-  );
-  const factor = factorResult?.factor ?? 0;
-  const vatPercent = getFactorVatPercent(factorVersion);
-  const vatRate = getFactorVatRate(factorVersion);
-  const factorVersionLabel = factorVersion?.version_string
-    ? `เวอร์ชัน ${factorVersion.version_string}`
-    : 'ไม่พบเวอร์ชัน';
-  const factorVersionStatus = factorVersion?.version_string
-    ? `ใช้ Factor F เวอร์ชัน ${factorVersion.version_string}`
-    : 'ยังไม่ทราบเวอร์ชัน Factor F';
-  const costInMillion = grandTotalCost / 1000000;
-  const { beforeVAT: totalWithFactor, total: totalWithVAT } =
-    calculateVAT(multiplyFactor(grandTotalCost, factor), vatRate);
-
-  // Call callback when factor values change (for snapshot saving)
-  // Must be before early returns to comply with React hooks rules
-  useEffect(() => {
-    if (onFactorCalculated && !isLoading && grandTotalCost > 0 && factorResult) {
-      onFactorCalculated({
-        factor: factorResult.factor,
+      const factor = factorResult.factor;
+      const vatPercent = getFactorVatPercent(factorVersion);
+      const vatRate = getFactorVatRate(factorVersion);
+      const { beforeVAT: totalWithFactor, total: totalWithVAT } =
+        calculateVAT(multiplyFactor(grandTotalCost, factor), vatRate);
+      const snapshot: FactorSnapshot = {
+        factor,
         totalWithFactor,
         totalWithVAT,
         factorRaw: factorResult.raw,
@@ -133,31 +146,42 @@ export default function FactorFSummary({
         upperCost: factorResult.upperCost,
         lowerValue: factorResult.lowerValue,
         upperValue: factorResult.upperValue,
-      });
+      };
+      if (factor <= 0 || !Object.values(snapshot).every(Number.isFinite)) {
+        throw new Error('ผลคำนวณ Factor F ไม่ถูกต้อง');
+      }
+      return { status: 'ready', factorResult, vatPercent, vatRate, snapshot };
+    } catch (err) {
+      return {
+        status: 'error',
+        message: err instanceof Error ? err.message : 'ไม่สามารถคำนวณ Factor F ได้',
+      };
     }
-  }, [
-    factorResult,
-    totalWithFactor,
-    totalWithVAT,
-    onFactorCalculated,
-    isLoading,
-    grandTotalCost,
-  ]);
+  }, [factorVersion, factorRefs, grandTotalCost]);
+  const factorError = referenceError ?? (calculation.status === 'error' ? calculation.message : null);
+  const factorVersionLabel = factorVersion?.version_string
+    ? `เวอร์ชัน ${factorVersion.version_string}`
+    : 'ไม่พบเวอร์ชัน';
+  const factorVersionStatus = factorVersion?.version_string
+    ? `ใช้ Factor F เวอร์ชัน ${factorVersion.version_string}`
+    : 'ยังไม่ทราบเวอร์ชัน Factor F';
+  const costInMillion = grandTotalCost / 1000000;
+  const calculationState = useMemo((): FactorCalculationState => {
+    const identity = { boqId, revision, totalCost: grandTotalCost, factorReferenceVersionId };
+    if (isLoading) return { ...identity, status: 'loading', snapshot: null };
+    if (factorError || calculation.status === 'error') {
+      return {
+        ...identity, status: 'error', snapshot: null,
+        message: factorError ?? 'ไม่สามารถคำนวณ Factor F ได้',
+      };
+    }
+    return { ...identity, status: 'ready', snapshot: calculation.snapshot };
+  }, [boqId, revision, grandTotalCost, factorReferenceVersionId, isLoading, factorError, calculation]);
 
+  // Each callback identifies the exact editor input from which it was calculated.
   useEffect(() => {
-    if (onFactorCalculated && !isLoading && grandTotalCost > 0 && !factorResult) {
-      onFactorCalculated({
-        factor: 0,
-        totalWithFactor: 0,
-        totalWithVAT: 0,
-        factorRaw: 0,
-        lowerCost: 0,
-        upperCost: 0,
-        lowerValue: 0,
-        upperValue: 0,
-      });
-    }
-  }, [factorResult, onFactorCalculated, isLoading, grandTotalCost]);
+    onCalculationStateChange(calculationState);
+  }, [onCalculationStateChange, calculationState]);
 
   if (isLoading) {
     if (variant === 'compact') {
@@ -178,7 +202,7 @@ export default function FactorFSummary({
     );
   }
 
-  if (factorError || !factorResult) {
+  if (factorError || calculation.status === 'error') {
     const requiresVersionBinding =
       factorError === FACTOR_REFERENCE_VERSION_REQUIRED_MESSAGE;
 
@@ -211,6 +235,9 @@ export default function FactorFSummary({
       </Alert>
     );
   }
+
+  const { factorResult, vatPercent, vatRate, snapshot } = calculation;
+  const { factor, totalWithFactor, totalWithVAT } = snapshot;
 
   if (variant === 'compact') {
     const lowerMillion = factorResult.lowerCost / 1000000;

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import Link from 'next/link';
 import { useParams, useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
@@ -8,6 +8,7 @@ import { useAuth } from '@/lib/context/AuthContext';
 import { can, BOQContext } from '@/lib/permissions';
 import { requireActiveProfile } from '@/lib/auth/authorization';
 import { buildBOQRoutesPayload } from '@/lib/boq/editorData';
+import type { FactorSnapshot, EditorInteractionState } from '@/lib/boq/editorState';
 import {
   duplicateBOQAtomic,
   getDuplicateBOQErrorMessage,
@@ -68,8 +69,14 @@ interface FactorCopyIntent {
 
 export default function EditBOQPage() {
   const params = useParams();
-  const router = useRouter();
   const boqId = params.id as string;
+  // Reset header, permissions, references, and drafts as one BOQ-owned session.
+  // A late response for the previous BOQ cannot populate this new instance.
+  return <EditBOQSession key={boqId} boqId={boqId} />;
+}
+
+function EditBOQSession({ boqId }: { boqId: string }) {
+  const router = useRouter();
   const supabase = useMemo(() => createClient(), []);
   const { user } = useAuth();
 
@@ -95,17 +102,12 @@ export default function EditBOQPage() {
   const [isFactorReviewRequired, setIsFactorReviewRequired] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Factor F snapshot data from MultiRouteEditor
-  const [factorData, setFactorData] = useState({
-    factor: 0,
-    totalWithFactor: 0,
-    totalWithVAT: 0,
-    factorRaw: 0,
-    lowerCost: 0,
-    upperCost: 0,
-    lowerValue: 0,
-    upperValue: 0,
-  });
+  const [editorInteraction, setEditorInteraction] = useState<EditorInteractionState>({ hasInvalidDrafts: false, busy: false });
+  const editorInteractionRef = useRef(editorInteraction);
+  const handleEditorInteractionChange = useCallback((state: EditorInteractionState) => {
+    editorInteractionRef.current = state;
+    setEditorInteraction(state);
+  }, []);
 
   // Check edit permission
   const canEdit = can(user, 'update', 'boq', boqContext || undefined);
@@ -200,17 +202,18 @@ export default function EditBOQPage() {
   }, [factorReferenceVersionId, isLoading, supabase]);
 
   const handleProjectInfoChange = (field: keyof ProjectInfo, value: string) => {
+    if (editorInteractionRef.current.busy || isSaving || isEditorReadOnly) return;
     setProjectInfo((prev) => ({ ...prev, [field]: value }));
   };
 
-  const handleSave = async (routes: Route[], routeItems: Record<string, LineItem[]>) => {
+  const handleSave = useCallback(async (routes: Route[], routeItems: Record<string, LineItem[]>, factorData: FactorSnapshot) => {
+    if (isEditorReadOnly) throw new Error('BOQ นี้ไม่สามารถบันทึกการแก้ไขได้');
     setIsSaving(true);
     setError(null);
 
     try {
       // Reject missing item sets before any request; an explicit [] is valid.
       const routesData = buildBOQRoutesPayload(routes, routeItems);
-      await requireActiveProfile(supabase);
       // Calculate grand totals
       const grandTotals = routes.reduce(
         (acc, route) => ({
@@ -253,6 +256,7 @@ export default function EditBOQPage() {
         factor_f_upper_value: factorData.upperValue,
       };
 
+      await requireActiveProfile(supabase);
       // Use RPC function for atomic transaction - if any step fails, everything rolls back
       const { error: rpcError } = await supabase.rpc('save_boq_with_routes', {
         p_boq_id: boqId,
@@ -270,7 +274,7 @@ export default function EditBOQPage() {
     } finally {
       setIsSaving(false);
     }
-  };
+  }, [boqId, isEditorReadOnly, projectInfo, supabase]);
 
   const openFactorCopyDialog = () => {
     if (!canCreateBOQ) {
@@ -395,14 +399,19 @@ export default function EditBOQPage() {
           <Button
             type="button"
             variant="secondary"
-            onClick={() => router.push(`/boq/${boqId}/print`)}
-            disabled={isFactorReviewRequired}
-            title={isFactorReviewRequired
+            onClick={() => {
+              if (isFactorReviewRequired || isSaving || editorInteractionRef.current.busy || editorInteractionRef.current.hasInvalidDrafts) return;
+              router.push(`/boq/${boqId}/print`);
+            }}
+            disabled={isFactorReviewRequired || isSaving || editorInteraction.busy || editorInteraction.hasInvalidDrafts}
+            title={editorInteraction.hasInvalidDrafts
+              ? 'กรุณาแก้ไขหรือยกเลิกปริมาณที่ไม่ถูกต้องก่อนพิมพ์'
+              : isFactorReviewRequired
               ? 'กรุณาตรวจสอบและบันทึก Factor F ก่อนพิมพ์หรือส่งออก'
-              : undefined}
+              : 'พิมพ์ข้อมูลที่บันทึกไว้ล่าสุด'}
           >
             <Printer className="h-4 w-4" />
-            พิมพ์
+            พิมพ์ฉบับที่บันทึกแล้ว
           </Button>
         </div>
 
@@ -534,7 +543,7 @@ export default function EditBOQPage() {
           <ProjectInfoForm
             projectInfo={projectInfo}
             onChange={handleProjectInfoChange}
-            disabled={isEditorReadOnly}
+            disabled={isEditorReadOnly || isSaving || editorInteraction.busy}
           />
 
           <hr className="my-6 md:my-8" />
@@ -548,7 +557,7 @@ export default function EditBOQPage() {
               factorReferenceVersionId={factorReferenceVersionId}
               onSave={handleSave}
               isSaving={isSaving}
-              onFactorCalculated={setFactorData}
+              onInteractionStateChange={handleEditorInteractionChange}
               readOnly={isEditorReadOnly}
               printDisabled={isFactorReviewRequired}
               printDisabledReason="กรุณาตรวจสอบและบันทึก Factor F ก่อนพิมพ์หรือส่งออก"

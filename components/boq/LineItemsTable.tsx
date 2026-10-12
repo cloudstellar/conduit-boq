@@ -5,6 +5,7 @@ import { Fragment } from 'react';
 import { PriceListItem } from '@/lib/supabase';
 import ItemSearch from './ItemSearch';
 import { QuantityEditor } from './QuantityEditor';
+import { parseQuantityDraft } from '@/lib/boq/quantityInput';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -39,20 +40,30 @@ interface LineItemsTableProps {
   items: LineItem[];
   priceListVersionId: string;
   onAddItem: (priceItem: PriceListItem) => void;
-  onUpdateQuantity: (id: string, quantity: number) => void;
+  quantityDrafts: Record<string, string>;
+  onQuantityDraftChange: (id: string, text: string) => void;
+  onQuantityCommit: (id: string) => void;
+  onQuantityCancel: (id: string) => void;
+  onQuantityStep: (id: string, delta: number) => void;
   onUpdateRemarks: (id: string, remarks: string) => void;
   onRemoveItem: (id: string) => void;
   readOnly?: boolean;
+  disabled?: boolean;
 }
 
 export default function LineItemsTable({
   items,
   priceListVersionId,
   onAddItem,
-  onUpdateQuantity,
+  quantityDrafts,
+  onQuantityDraftChange,
+  onQuantityCommit,
+  onQuantityCancel,
+  onQuantityStep,
   onUpdateRemarks,
   onRemoveItem,
   readOnly = false,
+  disabled = false,
 }: LineItemsTableProps) {
   const formatNumber = (num: number) => num.toLocaleString('th-TH', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
@@ -67,6 +78,8 @@ export default function LineItemsTable({
         <div className="mb-4 rounded-md border bg-muted/40 px-3 py-2 text-sm text-muted-foreground">
           โหมดดูอย่างเดียว ไม่สามารถเพิ่ม ลบ หรือแก้ไขรายการใน BOQ เดิมได้
         </div>
+      ) : disabled ? (
+        <p className="text-sm text-muted-foreground">กำลังเตรียมข้อมูลและบันทึก กรุณารอสักครู่</p>
       ) : (
         <div className="mb-4 space-y-2">
           <Label>เพิ่มรายการ</Label>
@@ -116,7 +129,7 @@ export default function LineItemsTable({
                       <Input
                         value={item.remarks || ''}
                         onChange={(e) => onUpdateRemarks(item.id, e.target.value)}
-                        disabled={readOnly}
+                        disabled={readOnly || disabled}
                         placeholder="หมายเหตุ (ถ้ามี)"
                         className="mt-1 h-7 text-xs text-muted-foreground bg-muted/30 border-dashed max-w-md"
                       />
@@ -128,9 +141,20 @@ export default function LineItemsTable({
                     <TableCell className="p-1">
                       <QuantityEditor
                         value={item.quantity ?? 0}
+                        draft={quantityDrafts[item.id]}
+                        error={(() => {
+                          const draft = quantityDrafts[item.id];
+                          if (draft === undefined) return undefined;
+                          const parsed = parseQuantityDraft(draft);
+                          return parsed.status === 'valid' ? undefined : parsed.message;
+                        })()}
                         step={1}
-                        onChange={(v) => onUpdateQuantity(item.id, v)}
-                        disabled={readOnly}
+                        onDraftChange={text => onQuantityDraftChange(item.id, text)}
+                        onCommit={() => onQuantityCommit(item.id)}
+                        onCancel={() => onQuantityCancel(item.id)}
+                        onStep={delta => onQuantityStep(item.id, delta)}
+                        disabled={readOnly || disabled}
+                        ariaLabel={`ปริมาณ ${item.item_name}`}
                       />
                     </TableCell>
                     <TableCell className="text-center text-sm">{item.unit}</TableCell>
@@ -154,7 +178,8 @@ export default function LineItemsTable({
                         variant="ghost"
                         size="icon"
                         onClick={() => onRemoveItem(item.id)}
-                        disabled={readOnly}
+                        disabled={readOnly || disabled}
+                        aria-label={`ลบรายการ ${item.item_name}`}
                         className="h-8 w-8 text-destructive hover:text-destructive hover:bg-destructive/10"
                       >
                         <Trash2 className="h-4 w-4" />

@@ -1,10 +1,15 @@
 'use client';
 
-import { useState, useEffect, useCallback, useMemo } from 'react';
+import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import { PriceListItem } from '@/lib/supabase';
-import { safeItemCalc } from '@/lib/calculation';
 import { loadBOQEditorData } from '@/lib/boq/editorData';
+import {
+  createEditorState, updateEditorGraph, setQuantityDraft, cancelQuantityDraft,
+  commitQuantityDraft, settleQuantityDrafts, stepQuantity, getDraftErrors,
+  getEditorTotal, matchesFactorCalculation, ZERO_FACTOR_SNAPSHOT,
+  type EditorState, type FactorCalculationState, type FactorSnapshot, type EditorInteractionState,
+} from '@/lib/boq/editorState';
 import { Route } from './RouteManager';
 import RouteSidebar from './RouteSidebar';
 import LineItemsTable, { LineItem } from './LineItemsTable';
@@ -34,22 +39,19 @@ interface MultiRouteEditorProps {
   boqId: string;
   priceListVersionId: string;
   factorReferenceVersionId: string | null;
-  onSave: (routes: Route[], routeItems: Record<string, LineItem[]>) => Promise<void>;
+  onSave: (routes: Route[], routeItems: Record<string, LineItem[]>, factor: FactorSnapshot) => Promise<void>;
   isSaving: boolean;
   readOnly?: boolean;
   printDisabled?: boolean;
   printDisabledReason?: string;
-  /** Callback to pass calculated factor values up for snapshot saving */
-  onFactorCalculated?: (data: {
-    factor: number;
-    totalWithFactor: number;
-    totalWithVAT: number;
-    factorRaw: number;
-    lowerCost: number;
-    upperCost: number;
-    lowerValue: number;
-    upperValue: number;
-  }) => void;
+  onInteractionStateChange?: (state: EditorInteractionState) => void;
+}
+
+interface PendingSave {
+  editor: EditorState;
+  referenceVersionId: string | null;
+  started: boolean;
+  timeout?: ReturnType<typeof setTimeout>;
 }
 
 export interface RouteWithItems extends Route {
@@ -86,12 +88,94 @@ export default function MultiRouteEditor({
   readOnly = false,
   printDisabled = false,
   printDisabledReason,
-  onFactorCalculated,
+  onInteractionStateChange,
 }: MultiRouteEditorProps) {
   const supabase = useMemo(() => createClient(), []);
-  const [routes, setRoutes] = useState<Route[]>([]);
-  const [routeItems, setRouteItems] = useState<Record<string, LineItem[]>>({});
+  const [editor, setEditor] = useState(() => createEditorState(boqId));
+  const editorRef = useRef(editor);
+  const { routes, routeItems } = editor;
   const [activeRouteId, setActiveRouteId] = useState<string | null>(null);
+  const pendingSaveRef = useRef<PendingSave | null>(null);
+  const factorRef = useRef<FactorCalculationState | null>(null);
+  const [isPreparingSave, setIsPreparingSave] = useState(false);
+  const [saveError, setSaveError] = useState<string | null>(null);
+  const [factorAttempt, setFactorAttempt] = useState(0);
+  const [factorFailed, setFactorFailed] = useState(false);
+  const locked = readOnly || isSaving || isPreparingSave;
+  const draftErrors = getDraftErrors(editor);
+  const hasInvalidDrafts = draftErrors.length > 0;
+
+  // Commands read this ref immediately, including blur followed by click in one gesture.
+  const publishEditor = useCallback((next: EditorState) => {
+    editorRef.current = next;
+    setEditor(next);
+    onInteractionStateChange?.({
+      hasInvalidDrafts: getDraftErrors(next).length > 0,
+      busy: Boolean(pendingSaveRef.current),
+    });
+  }, [onInteractionStateChange]);
+
+  const mutateGraph = useCallback((change: (current: EditorState) => Pick<EditorState, 'routes' | 'routeItems'>) => {
+    if (readOnly || isSaving || pendingSaveRef.current) return;
+    const current = editorRef.current;
+    const next = change(current);
+    publishEditor(updateEditorGraph(current, next.routes, next.routeItems, activeRouteId));
+    setSaveError(null);
+  }, [readOnly, isSaving, publishEditor, activeRouteId]);
+
+  const selectRoute = useCallback((routeId: string | null) => {
+    const current = editorRef.current;
+    if (routeId && !current.routes.some(route => route.id === routeId)) return;
+    // Match the existing active-route totals behavior, publishing synchronously
+    // so an immediate Save cannot use totals from before the route was opened.
+    publishEditor(updateEditorGraph(current, current.routes, current.routeItems, routeId));
+    setActiveRouteId(routeId);
+  }, [publishEditor]);
+
+  const finishPreparation = useCallback((request: PendingSave, message?: string) => {
+    if (pendingSaveRef.current !== request) return;
+    clearTimeout(request.timeout);
+    pendingSaveRef.current = null;
+    setIsPreparingSave(false);
+    if (message) setSaveError(message);
+    onInteractionStateChange?.({ hasInvalidDrafts: getDraftErrors(editorRef.current).length > 0, busy: false });
+  }, [onInteractionStateChange]);
+
+  const trySave = useCallback((calculation: FactorCalculationState | null) => {
+    const request = pendingSaveRef.current;
+    if (!request || request.started) return;
+    if (request.editor !== editorRef.current || request.editor.boqId !== boqId ||
+      request.referenceVersionId !== factorReferenceVersionId || readOnly) {
+      finishPreparation(request, 'ข้อมูลเปลี่ยนระหว่างเตรียมบันทึก กรุณาตรวจสอบแล้วกดบันทึกอีกครั้ง');
+      return;
+    }
+    if (!matchesFactorCalculation(request.editor, request.referenceVersionId, calculation)) return;
+    if (calculation.status === 'loading') return;
+    if (calculation.status === 'error' || !calculation.snapshot) {
+      finishPreparation(request, calculation.message || 'ยังคำนวณ Factor F ไม่สำเร็จ กรุณาลองโหลด Factor F อีกครั้ง');
+      return;
+    }
+    request.started = true;
+    clearTimeout(request.timeout);
+    // The accepted graph and Factor result are captured together before any auth/RPC awaits.
+    void onSave(request.editor.routes, request.editor.routeItems, { ...calculation.snapshot })
+      .catch(err => {
+        if (pendingSaveRef.current === request) setSaveError(err instanceof Error ? err.message : 'บันทึกไม่สำเร็จ');
+      })
+      .finally(() => finishPreparation(request));
+  }, [boqId, factorReferenceVersionId, readOnly, onSave, finishPreparation]);
+
+  const handleCalculationStateChange = useCallback((calculation: FactorCalculationState) => {
+    if (!matchesFactorCalculation(editorRef.current, factorReferenceVersionId, calculation)) return;
+    factorRef.current = calculation;
+    setFactorFailed(calculation.status === 'error');
+    trySave(calculation);
+  }, [factorReferenceVersionId, trySave]);
+
+  useEffect(() => () => {
+    clearTimeout(pendingSaveRef.current?.timeout);
+    pendingSaveRef.current = null;
+  }, [boqId]);
   const [loadAttempt, setLoadAttempt] = useState(0);
   const [loadState, setLoadState] = useState<{
     boqId: string;
@@ -131,8 +215,7 @@ export default function MultiRouteEditor({
       try {
         const data = await loadBOQEditorData(supabase, boqId);
         if (cancelled) return;
-        setRoutes(data.routes);
-        setRouteItems(data.routeItems);
+        publishEditor(createEditorState(boqId, data.routes, data.routeItems, data.activeRouteId));
         setActiveRouteId(data.activeRouteId);
         setLoadState({ boqId, attempt: loadAttempt, status: 'ready' });
       } catch (err) {
@@ -143,53 +226,54 @@ export default function MultiRouteEditor({
     };
     loadData();
     return () => { cancelled = true; };
-  }, [boqId, loadAttempt, supabase]);
+  }, [boqId, loadAttempt, supabase, publishEditor]);
 
   const handleAddRoute = useCallback(() => {
-    if (readOnly) return;
+    if (locked || pendingSaveRef.current) return;
+    const currentRoutes = editorRef.current.routes;
 
     const newRoute: Route = {
       id: crypto.randomUUID(),
-      route_order: routes.length + 1,
-      route_name: `เส้นทาง ${routes.length + 1}`,
+      route_order: currentRoutes.length + 1,
+      route_name: `เส้นทาง ${currentRoutes.length + 1}`,
       route_description: '',
       construction_area: '',
       total_material_cost: 0,
       total_labor_cost: 0,
       total_cost: 0,
     };
-    setRoutes(prev => [...prev, newRoute]);
-    setRouteItems(prev => ({ ...prev, [newRoute.id]: [] }));
-    setActiveRouteId(newRoute.id);
-  }, [readOnly, routes.length]);
+    mutateGraph(current => ({ routes: [...current.routes, newRoute], routeItems: { ...current.routeItems, [newRoute.id]: [] } }));
+    selectRoute(newRoute.id);
+  }, [locked, mutateGraph, selectRoute]);
 
   const handleSelectRoute = useCallback((routeId: string) => {
-    setActiveRouteId(routeId);
-  }, []);
+    if (pendingSaveRef.current || isSaving) return;
+    selectRoute(routeId);
+  }, [isSaving, selectRoute]);
 
   const handleUpdateRoute = useCallback((routeId: string, field: keyof Route, value: string) => {
-    if (readOnly) return;
-    setRoutes(prev => prev.map(r => r.id === routeId ? { ...r, [field]: value } : r));
-  }, [readOnly]);
+    mutateGraph(current => ({ ...current, routes: current.routes.map(r => r.id === routeId ? { ...r, [field]: value } : r) }));
+  }, [mutateGraph]);
 
   const handleRemoveRoute = useCallback((routeId: string) => {
-    if (readOnly) return;
-
-    setRoutes(prev => prev.filter(r => r.id !== routeId));
-    setRouteItems(prev => {
-      const newItems = { ...prev };
-      delete newItems[routeId];
-      return newItems;
-    });
+    if (locked || pendingSaveRef.current) return;
+    mutateGraph(current => ({ ...current, routes: current.routes.filter(r => r.id !== routeId) }));
     if (activeRouteId === routeId) {
-      setActiveRouteId(routes.find(r => r.id !== routeId)?.id || null);
+      selectRoute(editorRef.current.routes[0]?.id ?? null);
     }
-  }, [activeRouteId, readOnly, routes]);
+  }, [activeRouteId, locked, mutateGraph, selectRoute]);
 
   // Duplicate a route with all its items (deep copy)
   const handleDuplicateRoute = useCallback((routeId: string) => {
-    if (readOnly) return;
+    if (locked || pendingSaveRef.current) return;
+    const current = editorRef.current;
+    if (Object.keys(current.drafts[routeId] || {}).length) {
+      selectRoute(routeId);
+      setSaveError('กรุณายืนยันหรือยกเลิกปริมาณที่กำลังแก้ไขในเส้นทางนี้ก่อนคัดลอก');
+      return;
+    }
 
+    const { routes, routeItems } = current;
     const sourceRoute = routes.find(r => r.id === routeId);
     if (!sourceRoute) return;
 
@@ -225,30 +309,29 @@ export default function MultiRouteEditor({
     }));
 
     // Update state
-    setRoutes(prev => [...prev, newRoute]);
-    setRouteItems(prev => ({ ...prev, [newRoute.id]: newItems }));
+    mutateGraph(current => ({ routes: [...current.routes, newRoute], routeItems: { ...current.routeItems, [newRoute.id]: newItems } }));
 
     // Switch to new route
-    setActiveRouteId(newRoute.id);
-  }, [readOnly, routes, routeItems]);
+    selectRoute(newRoute.id);
+  }, [locked, mutateGraph, selectRoute]);
 
   // Reorder routes after drag-and-drop (receives new ordered array of route IDs)
   const handleReorderRoutes = useCallback((orderedIds: string[]) => {
-    if (readOnly) return;
-
-    setRoutes(prev => {
-      const routeMap = new Map(prev.map(r => [r.id, r]));
-      return orderedIds
+    mutateGraph(current => {
+      const routeMap = new Map(current.routes.map(r => [r.id, r]));
+      if (new Set(orderedIds).size !== current.routes.length || orderedIds.some(id => !routeMap.has(id))) return current;
+      const reordered = orderedIds
         .map((id, idx) => {
           const route = routeMap.get(id);
           return route ? { ...route, route_order: idx + 1 } : null;
         })
         .filter((r): r is Route => r !== null);
+      return { ...current, routes: reordered };
     });
-  }, [readOnly]);
+  }, [mutateGraph]);
 
   const handleAddItem = useCallback((priceItem: PriceListItem) => {
-    if (readOnly || !activeRouteId) return;
+    if (locked || !activeRouteId) return;
 
     // Check if it's a special item (งานวางท่อ / งานดันท่อ)
     if (isSpecialItem(priceItem.item_name)) {
@@ -286,15 +369,14 @@ export default function MultiRouteEditor({
       remarks: priceItem.remarks,
       category: priceItem.category,
     };
-    setRouteItems(prev => ({
-      ...prev,
-      [activeRouteId]: [...(prev[activeRouteId] || []), newItem],
-    }));
-  }, [activeRouteId, readOnly, routeItems]);
+    mutateGraph(current => ({ ...current, routeItems: {
+      ...current.routeItems, [activeRouteId]: [...(current.routeItems[activeRouteId] || []), newItem],
+    } }));
+  }, [activeRouteId, locked, routeItems, mutateGraph, setPendingSpecialItem, setShowSpecialItemModal]);
 
   // Handle special item selection (Main Duct / Riser / Steel Pole / Riser Service)
   const handleSpecialItemSelect = useCallback((type: 'Main Duct' | 'Riser' | 'Steel Pole' | 'Riser Service') => {
-    if (readOnly || !activeRouteId || !pendingSpecialItem) return;
+    if (locked || !activeRouteId || !pendingSpecialItem) return;
 
     const itemNameWithType = `${pendingSpecialItem.item_name} (${type})`;
     const currentItems = routeItems[activeRouteId] || [];
@@ -328,78 +410,37 @@ export default function MultiRouteEditor({
       category: pendingSpecialItem.category,
     };
 
-    setRouteItems(prev => ({
-      ...prev,
-      [activeRouteId]: [...(prev[activeRouteId] || []), newItem],
-    }));
+    mutateGraph(current => ({ ...current, routeItems: {
+      ...current.routeItems, [activeRouteId]: [...(current.routeItems[activeRouteId] || []), newItem],
+    } }));
 
     setShowSpecialItemModal(false);
     setPendingSpecialItem(null);
-  }, [activeRouteId, pendingSpecialItem, readOnly, routeItems]);
+  }, [activeRouteId, pendingSpecialItem, locked, routeItems, mutateGraph, setPendingSpecialItem, setShowSpecialItemModal]);
 
-  const handleUpdateQuantity = useCallback((itemId: string, quantity: number) => {
-    if (readOnly || !activeRouteId) return;
-    setRouteItems(prev => ({
-      ...prev,
-      [activeRouteId]: (prev[activeRouteId] || []).map(item => {
-        if (item.id !== itemId) return item;
-        return {
-          ...item,
-          quantity,
-          total_material_cost: safeItemCalc(quantity, item.material_cost_per_unit),
-          total_labor_cost: safeItemCalc(quantity, item.labor_cost_per_unit),
-          total_cost: safeItemCalc(quantity, item.unit_cost),
-        };
-      }),
-    }));
-  }, [activeRouteId, readOnly]);
+  const changeQuantity = useCallback((change: (current: EditorState) => EditorState) => {
+    if (readOnly || isSaving || pendingSaveRef.current) return;
+    publishEditor(change(editorRef.current));
+    setSaveError(null);
+  }, [readOnly, isSaving, publishEditor]);
 
   const handleUpdateRemarks = useCallback((itemId: string, remarks: string) => {
-    if (readOnly || !activeRouteId) return;
-    setRouteItems(prev => ({
-      ...prev,
-      [activeRouteId]: (prev[activeRouteId] || []).map(item =>
+    if (!activeRouteId) return;
+    mutateGraph(current => ({ ...current, routeItems: {
+      ...current.routeItems,
+      [activeRouteId]: (current.routeItems[activeRouteId] || []).map(item =>
         item.id === itemId ? { ...item, remarks } : item
       ),
-    }));
-  }, [activeRouteId, readOnly]);
+    } }));
+  }, [activeRouteId, mutateGraph]);
 
   const handleRemoveItem = useCallback((itemId: string) => {
-    if (readOnly || !activeRouteId) return;
-    setRouteItems(prev => ({
-      ...prev,
-      [activeRouteId]: (prev[activeRouteId] || []).filter(item => item.id !== itemId),
-    }));
-  }, [activeRouteId, readOnly]);
-
-  // Calculate route totals whenever items change
-  useEffect(() => {
     if (!activeRouteId) return;
-    const items = routeItems[activeRouteId] || [];
-    const totals = items.reduce(
-      (acc, item) => ({
-        material: acc.material + item.total_material_cost,
-        labor: acc.labor + item.total_labor_cost,
-        total: acc.total + item.total_cost,
-      }),
-      { material: 0, labor: 0, total: 0 }
-    );
-
-    // Preserve the existing active-route total synchronization in this load-safety change.
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    setRoutes(prev =>
-      prev.map(r =>
-        r.id === activeRouteId
-          ? {
-            ...r,
-            total_material_cost: totals.material,
-            total_labor_cost: totals.labor,
-            total_cost: totals.total,
-          }
-          : r
-      )
-    );
-  }, [activeRouteId, routeItems]);
+    mutateGraph(current => ({ ...current, routeItems: {
+      ...current.routeItems,
+      [activeRouteId]: (current.routeItems[activeRouteId] || []).filter(item => item.id !== itemId),
+    } }));
+  }, [activeRouteId, mutateGraph]);
 
   // Grand totals across all routes
   const grandTotals = routes.reduce(
@@ -412,29 +453,38 @@ export default function MultiRouteEditor({
     { material: 0, labor: 0, total: 0, itemCount: 0 }
   );
 
-  useEffect(() => {
-    if (isReady && grandTotals.total <= 0 && onFactorCalculated) {
-      onFactorCalculated({
-        factor: 0,
-        totalWithFactor: 0,
-        totalWithVAT: 0,
-        factorRaw: 0,
-        lowerCost: 0,
-        upperCost: 0,
-        lowerValue: 0,
-        upperValue: 0,
-      });
-    }
-  }, [isReady, grandTotals.total, onFactorCalculated]);
-
   const activeRouteItems = activeRouteId
     ? sortItemsByCategory(routeItems[activeRouteId] || [])
     : [];
   const activeRoute = routes.find(r => r.id === activeRouteId);
 
   const handleSaveClick = async () => {
-    if (readOnly || isSaving || !isReady) return;
-    await onSave(routes, routeItems);
+    if (readOnly || isSaving || pendingSaveRef.current || !isReady) return;
+    const settled = settleQuantityDrafts(editorRef.current);
+    if (settled.errors.length) {
+      selectRoute(settled.errors[0].routeId);
+      setSaveError('ยังมีปริมาณที่ไม่ถูกต้อง กรุณาแก้ไขหรือยกเลิกก่อนบันทึก');
+      return;
+    }
+    if (!settled.state.routes.length) return;
+    publishEditor(settled.state);
+    setSaveError(null);
+    const request: PendingSave = { editor: settled.state, referenceVersionId: factorReferenceVersionId, started: false };
+    pendingSaveRef.current = request;
+    setIsPreparingSave(true);
+    onInteractionStateChange?.({ hasInvalidDrafts: false, busy: true });
+    // This is a failure deadline, never an assumption that calculation is ready.
+    request.timeout = setTimeout(() => {
+      if (pendingSaveRef.current !== request || request.started) return;
+      setFactorFailed(true);
+      finishPreparation(request,
+        'เตรียมบันทึกไม่สำเร็จภายในเวลาที่กำหนด กรุณาลองโหลด Factor F แล้วกดบันทึกอีกครั้ง');
+    }, 15000);
+    const totalCost = getEditorTotal(settled.state);
+    trySave(totalCost === 0 ? {
+      boqId, revision: settled.state.revision, totalCost, factorReferenceVersionId,
+      status: 'ready', snapshot: ZERO_FACTOR_SNAPSHOT,
+    } : factorRef.current);
   };
 
   if (hasLoadError) {
@@ -480,7 +530,7 @@ export default function MultiRouteEditor({
             onDuplicateRoute={handleDuplicateRoute}
             onReorderRoutes={handleReorderRoutes}
             isCollapsed={isSidebarCollapsed}
-            readOnly={readOnly}
+            readOnly={locked}
           />
         </div>
 
@@ -516,7 +566,8 @@ export default function MultiRouteEditor({
                         variant="ghost"
                         size="icon"
                         onClick={() => activeRouteId && handleDuplicateRoute(activeRouteId)}
-                        disabled={readOnly}
+                        disabled={locked || Object.keys(editor.drafts[activeRouteId] || {}).length > 0}
+                        aria-label="คัดลอกข้อมูลเส้นทางนี้"
                         className="h-8 w-8"
                       >
                         <Copy className="h-4 w-4" />
@@ -551,6 +602,9 @@ export default function MultiRouteEditor({
                     </div>
                   ) : (
                     <FactorFSummary
+                      key={factorAttempt}
+                      boqId={boqId}
+                      revision={editor.revision}
                       routes={routes.map(r => ({
                         id: r.id,
                         route_name: r.route_name,
@@ -561,7 +615,7 @@ export default function MultiRouteEditor({
                       grandTotalCost={grandTotals.total}
                       factorReferenceVersionId={factorReferenceVersionId}
                       variant="compact"
-                      onFactorCalculated={onFactorCalculated}
+                      onCalculationStateChange={handleCalculationStateChange}
                     />
                   )}
                 </div>
@@ -578,7 +632,7 @@ export default function MultiRouteEditor({
                     <Input
                       value={activeRoute.route_name}
                       onChange={(e) => handleUpdateRoute(activeRouteId, 'route_name', e.target.value)}
-                      disabled={readOnly}
+                      disabled={locked}
                       placeholder="เช่น ถนนพระราม 4 (แยกคลองเตย-สุขุมวิท)"
                       className="text-lg font-semibold"
                     />
@@ -592,7 +646,7 @@ export default function MultiRouteEditor({
                           handleRemoveRoute(activeRouteId);
                         }
                       }}
-                      disabled={readOnly}
+                      disabled={locked}
                       className="mt-6 text-destructive hover:text-destructive hover:bg-destructive/10"
                       title="ลบเส้นทาง"
                     >
@@ -607,7 +661,7 @@ export default function MultiRouteEditor({
                   <Input
                     value={activeRoute.construction_area}
                     onChange={(e) => handleUpdateRoute(activeRouteId, 'construction_area', e.target.value)}
-                    disabled={readOnly}
+                    disabled={locked}
                     placeholder="เช่น ชส.คลองเตย จ.กรุงเทพมหานคร"
                   />
                 </div>
@@ -618,7 +672,7 @@ export default function MultiRouteEditor({
                   <textarea
                     value={activeRoute.route_description}
                     onChange={(e) => handleUpdateRoute(activeRouteId, 'route_description', e.target.value)}
-                    disabled={readOnly}
+                    disabled={locked}
                     placeholder="หมายเหตุสำหรับเส้นทางนี้ (จะแสดงในหน้าสรุปรวม)"
                     rows={2}
                     className="w-full px-3 py-2 text-sm border border-border rounded-md bg-background focus:ring-2 focus:ring-ring focus:border-ring resize-none"
@@ -634,10 +688,15 @@ export default function MultiRouteEditor({
                       items={activeRouteItems}
                       priceListVersionId={priceListVersionId}
                       onAddItem={handleAddItem}
-                      onUpdateQuantity={handleUpdateQuantity}
+                      quantityDrafts={editor.drafts[activeRouteId] || {}}
+                      onQuantityDraftChange={(itemId, text) => changeQuantity(current => setQuantityDraft(current, activeRouteId, itemId, text))}
+                      onQuantityCommit={itemId => changeQuantity(current => commitQuantityDraft(current, activeRouteId, itemId))}
+                      onQuantityCancel={itemId => changeQuantity(current => cancelQuantityDraft(current, activeRouteId, itemId))}
+                      onQuantityStep={(itemId, delta) => changeQuantity(current => stepQuantity(current, activeRouteId, itemId, delta))}
                       onUpdateRemarks={handleUpdateRemarks}
                       onRemoveItem={handleRemoveItem}
                       readOnly={readOnly}
+                      disabled={locked}
                     />
                   </div>
                 </div>
@@ -697,28 +756,62 @@ export default function MultiRouteEditor({
       )}
 
       {/* Save + Print Buttons */}
-      <div className="flex justify-end gap-2 mt-6">
+      {hasInvalidDrafts && (
+        <div role="alert" className="mt-4 rounded-md border border-destructive/30 bg-destructive/5 p-3 text-sm">
+          <p>ยังมีปริมาณที่ต้องแก้ไขหรือยกเลิก {draftErrors.length} รายการ</p>
+          <div className="mt-2 flex flex-wrap gap-2">
+            {[...new Set(draftErrors.map(error => error.routeId))].map(routeId => (
+              <Button key={routeId} variant="outline" size="sm" onClick={() => handleSelectRoute(routeId)}>
+                ไปที่ {routes.find(route => route.id === routeId)?.route_name}
+              </Button>
+            ))}
+          </div>
+        </div>
+      )}
+      {saveError && <p role="alert" className="mt-4 text-sm text-destructive">{saveError}</p>}
+      {factorFailed && !locked && grandTotals.total > 0 && (
+        <Button className="mt-3" variant="outline" onClick={() => {
+          factorRef.current = null;
+          setFactorFailed(false);
+          setSaveError(null);
+          setFactorAttempt(attempt => attempt + 1);
+        }}>ลองโหลด Factor F อีกครั้ง</Button>
+      )}
+      {isPreparingSave && !isSaving && (
+        <div role="status" className="mt-4 flex items-center gap-3 text-sm">
+          <Loader2 className="h-4 w-4 animate-spin" />
+          กำลังตรวจยอดรวมและ Factor F ก่อนบันทึก
+          <Button variant="outline" size="sm" onClick={() => {
+            const request = pendingSaveRef.current;
+            if (request && !request.started) finishPreparation(request, 'ยกเลิกการเตรียมบันทึกแล้ว');
+          }}>ยกเลิกการเตรียมบันทึก</Button>
+        </div>
+      )}
+      <div className="flex flex-wrap justify-end gap-2 mt-6">
         <Button
           variant="outline"
-          onClick={() => window.open(`/boq/${boqId}/print`, '_blank')}
-          disabled={isSaving || routes.length === 0 || printDisabled}
-          title={printDisabled ? printDisabledReason : undefined}
+          onClick={() => {
+            if (pendingSaveRef.current || getDraftErrors(editorRef.current).length || printDisabled || isSaving) return;
+            window.open(`/boq/${boqId}/print`, '_blank');
+          }}
+          disabled={isSaving || isPreparingSave || hasInvalidDrafts || routes.length === 0 || printDisabled}
+          title={hasInvalidDrafts ? 'กรุณาแก้ไขหรือยกเลิกปริมาณที่ไม่ถูกต้องก่อนพิมพ์' : printDisabled ? printDisabledReason : 'พิมพ์ข้อมูลที่บันทึกไว้ล่าสุด'}
           className="cursor-pointer"
         >
           <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
           </svg>
-          พิมพ์
+          พิมพ์ฉบับที่บันทึกแล้ว
         </Button>
         <Button
           onClick={handleSaveClick}
-          disabled={readOnly || isSaving || !isReady || routes.length === 0}
+          disabled={locked || !isReady || routes.length === 0}
           className="cursor-pointer"
         >
-          {isSaving ? (
+          {isSaving || isPreparingSave ? (
             <>
               <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-              กำลังบันทึก...
+              {isSaving ? 'กำลังบันทึก...' : 'กำลังเตรียมบันทึก...'}
             </>
           ) : (
             'บันทึก'
