@@ -37,7 +37,7 @@
 | BOQ Save NULL authorization guard | **PRODUCTION PASS** | [Security Result #04](../plans/security/04-boq-save-null-authorization-production-release-result.md); migration 030 applied once as `20261012100608/boq_save_null_authorization_guard`; source `cb2bb60`, closeout `7c09ab8`; authority consumed |
 | Quantity Input Safety (R0A core plus editor/Save coordination) | **PRODUCTION PASS** | [Production Result #08](../plans/product/08-r0a-quantity-input-safety-production-release-result.md); exact `main` source `4d285f8`; no-write QA/database proof passed; no migration; Q-A/Q-B authority consumed |
 | Production dependency advisories | **ACTION REQUIRED — SEPARATE PATCH** | `npm audit --omit=dev` reports 6 production dependency findings, including direct `next@16.2.9` as critical; fix path reports `next@16.4.0`; applicability and patch scope require a fresh reviewed release |
-| LIST-1B BOQ register scaling | **PROPOSED — NEXT PRODUCT DECISION** | [Plan #02](../plans/product/02-boq-list-scaling-decision-plan.md); Production reproduced incorrect RouteBadge fallback plus request amplification; no implementation authority |
+| LIST-1B BOQ register scaling | **PROPOSED — NEXT PRODUCT DECISION** | [Plan #02](../plans/product/02-boq-list-scaling-decision-plan.md); Production confirmed one multi-route mismatch (`UI Test #5`: list 1, editor/DB 2) and separately confirmed per-row request amplification; a real one-route badge 1 is correct and the observation's exact trigger remains unproven; no implementation authority |
 | Wider R0/D0 accounting contract | **PROPOSED** | rounding/parity and related decisions remain open; do not fold them into the Quantity safety release |
 | R1/R2 Quantity Expression | **PROPOSED** | canonical `*`, aliases `x`/`X`/`×`, editor-only expression and numeric-only output direction retained; implementation not authorized |
 | Wider S0 Auth/Security | **PROPOSED, separate lane** | migration 030 fixed one NULL guard only; admission/recovery/MFA/session decisions remain separate |
@@ -53,7 +53,9 @@
    application dependency graph and should precede feature work.
 3. **LIST-1B — next product decision:** approve or adjust Level-A scope for
    server pagination/search/filter/sort/count and one route batch. Production
-   reproduced the known RouteBadge error fallback and high request volume.
+   confirmed one multi-route badge mismatch and independently measured high
+   request volume. Do not generalize that finding to correct one-route badges;
+   the exact trigger for the mismatched badge observation was not captured.
 4. Wider R0/D0, Quantity Expression and S0 remain later/separate decisions.
 
 Q-A and Q-B authorities are complete/consumed. Do not create or amend another

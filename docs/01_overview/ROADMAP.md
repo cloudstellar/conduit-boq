@@ -53,7 +53,7 @@
 > | BOQ Save NULL authorization guard | **PRODUCTION PASS** | migration 030 applied once; [Security Result #04](../plans/security/04-boq-save-null-authorization-production-release-result.md); authority consumed |
 > | Quantity Input Safety | **PRODUCTION PASS** | exact `main` source `4d285f8`; Quality/Vercel and authenticated no-write Production QA passed; no migration; Q-B authority consumed; [Result #08](../plans/product/08-r0a-quantity-input-safety-production-release-result.md) |
 > | Production dependency patch | **ACTION REQUIRED** | `npm audit --omit=dev`: 6 findings including direct `next@16.2.9` critical; review/apply the offered non-major `16.4.0` path as a separate release |
-> | LIST-1B | **PROPOSED — NEXT DECISION** | Production exposed the known RouteBadge N+1/error-fallback defect; decide Level-A scope; no implementation authority |
+> | LIST-1B | **PROPOSED — NEXT DECISION** | Production confirmed one multi-route mismatch (`UI Test #5`: list 1, editor/DB 2) plus independently verified per-row request amplification; ordinary one-route badge 1 is correct, prevalence/exact trigger remain unproven; decide Level-A scope; no implementation authority |
 > | Wider R0/D0 | **PROPOSED** | decide rounding/parity and current-schema evidence contract |
 > | R1/R2 Quantity Expression | **PROPOSED** | `*` canonical, `x`/`X`/`×` aliases; editor-only expression and numeric-only output; implementation not authorized |
 > | Wider S0 Auth/Security | **PROPOSED, separate lane** | migration 030 fixed one Save guard only |

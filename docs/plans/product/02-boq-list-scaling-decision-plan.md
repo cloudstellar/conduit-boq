@@ -25,9 +25,14 @@ also `PRODUCTION PASS`: runtime/tests `b18e69a` reached exact `main` source
 `4d285f8` and passed Q-B no-write verification. See [Quantity Plan
 #06](./06-r0a-quantity-input-safety-release-plan.md) and [Production Result
 #08](./08-r0a-quantity-input-safety-production-release-result.md). Its
-Production smoke reproduced an incorrect RouteBadge fallback and extreme
-per-row request amplification, increasing the priority of this plan. Quantity
-authority does not authorize LIST-1; all Level-A rows remain `TBD`.
+Production smoke confirmed one bounded multi-route mismatch: `UI Test #5`
+showed one route in the list while its editor/database had two. A genuine
+one-route BOQ showing one is correct. Code inspection and logs separately
+confirm the per-row query design, missing explicit error state, dual responsive
+mounts, and high request amplification; they do not prove which condition
+triggered that badge observation. These facts increase this plan's
+priority without establishing wider prevalence. Quantity authority does not
+authorize LIST-1; all Level-A rows remain `TBD`.
 
 **Research basis:**
 [BOQ Register Pagination Best-Practice Research](./03-boq-list-pagination-best-practice-research.md)

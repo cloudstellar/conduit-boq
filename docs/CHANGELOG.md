@@ -38,8 +38,12 @@
   [Preview Result #07](./plans/product/07-r0a-quantity-input-safety-preview-result.md),
   and [Production Result #08](./plans/product/08-r0a-quantity-input-safety-production-release-result.md).
 - The candidate adds no formula parser, schema/RPC change or migration.
-- Production exposed the pre-existing RouteBadge N+1/error-fallback defect;
-  it is recorded as LIST-1B work and is not a Quantity regression.
+- Production confirmed one multi-route RouteBadge mismatch: `UI Test #5`
+  showed one route in the register while its editor/database had two. A real
+  one-route BOQ showing one is expected. Per-row queries, ignored error state,
+  fallback behavior, and high request amplification remain LIST-1B risks, but
+  the exact trigger for that badge observation was not captured. This is not a
+  Quantity regression and no stored route was lost.
 
 ---
 

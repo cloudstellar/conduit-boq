@@ -97,10 +97,16 @@ current.
 - Authenticated no-write Production QA, a clean browser console, saved-version
   Print, and a read-only database check passed. No Save, database mutation, or
   migration occurred. Migrations 027–030 remain immutable/no-replay.
-- A Production RouteBadge discrepancy was confirmed as the pre-existing
-  LIST-1B N+1/error-fallback defect, not a Quantity regression. Do not roll back
-  Quantity or restore comma-splitting; names may contain commas. Fix it through
-  one embedded/batched current-page route load plus explicit error state.
+- Production confirmed one bounded RouteBadge mismatch: multi-route BOQ
+  `UI Test #5` showed `1` in `/boq` while its editor/database had two rows. A
+  genuine one-route BOQ showing `1` is expected and is not evidence of this
+  issue. Code confirms per-row requests, ignored query errors, legacy fallback,
+  and duplicate responsive mounts; request logs separately confirm high
+  amplification, but the exact trigger for that mismatched badge observation was not
+  captured. Treat it as a pre-existing LIST-1B residual, not a Quantity
+  regression. Do not restore comma-splitting; names may contain commas. Fix it
+  through one embedded/batched current-page route load plus explicit error
+  state.
 - Q-A and Q-B authorities are complete/consumed. This result grants no further
   commit, push, deployment, Production write, branch cleanup, LIST-1B, wider R0,
   R1/R2 Quantity Expression, or wider S0 Auth/Security authority.

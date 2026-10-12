@@ -115,26 +115,39 @@ configuration, and the protected archive were not changed.
 
 The Production register displayed `1 เส้นทาง` for `UI Test #5`, while its
 editor and a read-only database query confirmed two route rows. Investigation
-classified this as a pre-existing `/boq` RouteBadge defect, not a Quantity
-regression:
+classified this as one confirmed, pre-existing `/boq` list-metadata mismatch,
+not a Quantity regression. A BOQ that truly has one route and displays
+`1 เส้นทาง` is correct; that common case is not evidence of the mismatch. This
+verification did not establish how many other multi-route BOQs, if any, are
+affected.
+
+The relevant code and operational evidence show a credible failure path and a
+separate scaling problem:
 
 - Quantity changed neither `RouteBadge.tsx` nor the `/boq` list code;
 - the row has not been updated since 2026-03-16;
-- `RouteBadge` performs one route query per rendered BOQ, ignores query errors,
-  and falls back to the whole legacy route string as one item; and
+- each mounted `RouteBadge` instance performs one route query, does not retain
+  the returned query error, converts a result without usable route rows to an
+  empty array, and then falls back to the whole legacy route string as one item;
+  and
 - both mobile and desktop register trees are mounted, amplifying requests.
 
 Read-only Supabase edge-log evidence for the observed
 `2026-10-12 11:49:50–11:50:40 UTC` load contained 1,198 OPTIONS and 740 GET
-requests for `boq_routes`. The editor's
-authoritative route query returned both rows. The request amplification and
-error/fallback behavior are the already documented LIST-1B N+1 risk.
+requests for `boq_routes`. Those counts confirm high request volume consistent
+with the source-confirmed per-mounted-`RouteBadge` and dual-tree design. The
+editor query and independent database read confirmed both stored rows remained
+intact. The logs did not capture the specific Badge response, error, or status,
+so they do not prove that request volume caused the `UI Test #5` mismatch. Code
+behavior shows that a result without usable rows would render the observed
+one-item legacy fallback, but its specific trigger remains unproven.
 
-This finding has medium user-visible metadata impact and no demonstrated
-effect on stored data, Quantity calculation, Save, Print, or authorization. It
-does not justify a Quantity rollback. LIST-1B should replace per-row queries
-with one embedded or batched current-page route load, expose explicit
-loading/error/empty states, and cover failed-network and legacy-row behavior.
+The demonstrated impact is a wrong list count for one known multi-route BOQ;
+prevalence is unknown. There is no demonstrated effect on stored data,
+Quantity calculation, Save, Print, or authorization. It does not justify a
+Quantity rollback. LIST-1B should replace per-row queries with one embedded or
+batched current-page route load, distinguish loading/error/true-empty states,
+and cover successful multi-route, failed-network, and legacy-row behavior.
 
 ## Separate dependency-security finding
 
@@ -189,8 +202,9 @@ clean baseline.
   this result.
 
 The recommended order is the isolated dependency-security release, then
-LIST-1B because the Production smoke produced direct evidence of incorrect
-badge fallback and severe request amplification. Wider R0/D0 should still
-precede R1/R2 Quantity Expression.
+LIST-1B because the Production smoke produced direct evidence of one
+multi-route list-count mismatch plus independent evidence of high request
+volume consistent with the per-mounted-`RouteBadge` and dual-tree design. Wider
+R0/D0 should still precede R1/R2 Quantity Expression.
 
-<!-- R0A_QUANTITY_INPUT_SAFETY_PRODUCTION_RESULT_V1 {"schema":"conduit-boq/r0a-quantity-input-safety-production-result/v1","executedOn":"2026-10-12","boundary":"R0A_QUANTITY_INPUT_SAFETY_PRODUCTION_CLOSEOUT_20261012","status":"production-pass","runtimeCommit":"b18e69adeeaedbf10ca70c767ac4cf80a351b6bc","previewSourceCommit":"5527fe9fe9ce6e1f8888912c18dc9b26e7b1b6b3","productionSourceCommit":"4d285f81fa7ad418039ccd8428c2e55ac1e65ce8","productionSourceTree":"4a2a2fa8ba848de2c367420e43ad2c765efdc95b","mainPrevious":"7c09ab8214c4d2d213349b3281680aef653e5109","remoteMainEqual":true,"remoteFeatureEqual":true,"githubQualityRun":38244719648,"githubQualityJob":114795628519,"vercelDeployment":"93LpycwQchZYVpPx9mCiVGokQSPG","vercelStatusId":56136566683,"environment":"Production","productionEnvironment":true,"noPersistentSave":true,"databaseChanged":false,"migrationRun":false,"routeBadgeFinding":"pre-existing-list1b-residual","productionAuditFindings":6,"productionAuditCritical":1,"dependencyPatchRequired":true,"qBComplete":true,"qBAuthorityConsumed":true,"automaticNextStep":false} -->
+<!-- R0A_QUANTITY_INPUT_SAFETY_PRODUCTION_RESULT_V1 {"schema":"conduit-boq/r0a-quantity-input-safety-production-result/v1","executedOn":"2026-10-12","boundary":"R0A_QUANTITY_INPUT_SAFETY_PRODUCTION_CLOSEOUT_20261012","status":"production-pass","runtimeCommit":"b18e69adeeaedbf10ca70c767ac4cf80a351b6bc","previewSourceCommit":"5527fe9fe9ce6e1f8888912c18dc9b26e7b1b6b3","productionSourceCommit":"4d285f81fa7ad418039ccd8428c2e55ac1e65ce8","productionSourceTree":"4a2a2fa8ba848de2c367420e43ad2c765efdc95b","mainPrevious":"7c09ab8214c4d2d213349b3281680aef653e5109","remoteMainEqual":true,"remoteFeatureEqual":true,"githubQualityRun":38244719648,"githubQualityJob":114795628519,"vercelDeployment":"93LpycwQchZYVpPx9mCiVGokQSPG","vercelStatusId":56136566683,"environment":"Production","productionEnvironment":true,"noPersistentSave":true,"databaseChanged":false,"migrationRun":false,"routeBadgeFinding":"one-confirmed-multi-route-list-count-mismatch","routeBadgeSingleRouteOneExpected":true,"routeBadgeExactTriggerProven":false,"routeBadgePrevalenceKnown":false,"productionAuditFindings":6,"productionAuditCritical":1,"dependencyPatchRequired":true,"qBComplete":true,"qBAuthorityConsumed":true,"automaticNextStep":false} -->

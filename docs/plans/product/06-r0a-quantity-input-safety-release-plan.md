@@ -180,8 +180,11 @@ add LIST-1 or full Quantity Expression while closing this release.
    console passed; repeating browser PDF generation and Excel download remains
    a separate bounded evidence task.
 3. **Next product scope:** decide LIST-1B, then wider R0/D0 before R1/R2
-   Quantity Expression. The Production RouteBadge finding increases LIST-1B
-   priority but grants no implementation authority.
+   Quantity Expression. Production confirmed one multi-route RouteBadge
+   mismatch (`UI Test #5`: list 1, editor/database 2) and separately confirmed
+   per-row request amplification. A real one-route badge 1 is correct, and the
+   observation's exact trigger/prevalence remain unproven. The bounded
+   finding increases LIST-1B priority but grants no implementation authority.
 
 Later decisions remain outside this candidate: LIST-1B scope, wider R0/D0
 rounding/parity, physical-device and large-BOQ acceptance, R1/R2 Quantity

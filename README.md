@@ -158,8 +158,11 @@ docs/                product, architecture, data, process และ handoff
 - Quantity Input Safety ที่ห้าม `5*2`/`5x2` ถูกแปลงเงียบเป็น `52` และคำนวณ
   numeric draft แบบ real time เปิดใช้บน Production แล้วที่ `main` `4d285f8`;
   ไม่มี parser, formula persistence หรือ database change การตรวจ Production
-  พบ RouteBadge บางแถวแสดงจำนวนเส้นทางไม่ตรงฐานข้อมูล ซึ่งสอดคล้องกับปัญหา
-  เดิมด้าน per-row query/error fallback ของ LIST-1B และไม่ใช่ Quantity regression
+  พบ mismatch ที่ยืนยันแล้วหนึ่งกรณี: `UI Test #5` มีสอง route ใน Editor/ฐานข้อมูล
+  แต่หน้า `/boq` แสดง `1` ส่วน BOQ ที่มี route เดียวและแสดง `1` ถือว่าปกติ
+  ข้อมูลไม่ได้หาย และยังไม่ทราบ trigger ที่แน่ชัดของ badge observation นั้น โค้ด
+  per-row query/error fallback กับ request amplification เป็นความเสี่ยงเดิมของ
+  LIST-1B และไม่ใช่ Quantity regression
 - หลัง release พบ dependency advisory แยกจาก Quantity: `npm audit --omit=dev`
   รายงาน 6 รายการ รวม `next@16.2.9` ระดับ critical และเสนอ `16.4.0` เป็นทางแก้
   แบบไม่ข้าม major ควร patch และตรวจ release gate ใหม่ก่อนเริ่ม feature ถัดไป
