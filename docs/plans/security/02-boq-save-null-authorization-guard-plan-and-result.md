@@ -2,8 +2,8 @@
 
 **Prepared:** 2026-09-08
 **Release-readiness refreshed:** 2026-10-12
-**Status:** Security-only local commit preparation authorized; isolated PostgreSQL tests and combined-worktree repository checks passed; no external release authorized.
-**Production:** Existing defect observed read-only; no fix applied or release authorized.
+**Status:** Production release completed 2026-10-12; see the immutable [release result](./04-boq-save-null-authorization-production-release-result.md).
+**Production:** Migration 030 applied exactly once as `20261012100608/boq_save_null_authorization_guard`; no replay.
 
 ## Problem and evidence
 
@@ -14,8 +14,9 @@ read-only transaction, for the three BOQ tables, their triggers and selected
 Save/authorization functions. It did not read business/profile/session rows or
 invoke Save. The observed PostgreSQL version was 17.6.
 
-The deployed `public.save_boq_with_routes(uuid,jsonb,jsonb)` function body
-matches immutable migration 027. Its final authorization guard is
+At that 2026-09-08 capture, the then-deployed
+`public.save_boq_with_routes(uuid,jsonb,jsonb)` function body matched immutable
+migration 027. Its final authorization guard was
 `IF NOT v_is_authorized THEN`. A scope comparison can produce SQL `NULL`, which
 does not enter that denial branch:
 
@@ -73,9 +74,11 @@ and verify the exact successor before finishing atomically. It reads no
 application rows and changes no table, policy, reference, account or ledger.
 This pins a reviewed predecessor rather than overwriting later changes.
 
-Migrations 027/028/029 remain unchanged and immutable. A future application of
-030 requires a separately approved exact artifact and fresh preflight; this
-document is not an execution receipt or authority for that operation.
+Migrations 027/028/029 remained unchanged and immutable. At that checkpoint,
+application of 030 required a separately approved exact artifact and fresh
+preflight; this plan was not an execution receipt or authority for that
+operation. The later execution is recorded in the
+[Production release result](./04-boq-save-null-authorization-production-release-result.md).
 
 ## Isolated validation design
 
@@ -258,8 +261,18 @@ It is host-temporary evidence. The exact Production execution and verification
 sequence is frozen separately in the
 [Production release runbook](./03-boq-save-null-authorization-production-runbook.md).
 
-## Owner decision after local validation
+## Production closure
 
-Review the exact patch and results before authorizing any next repository or
-Production operation. No Production fix, release or data-impact audit has been
-performed under the preparation approval.
+The Owner later approved the exact security-only release. Commit
+`cb2bb60eed7ea3d72149df4a4273d8fe1bfdf3c1` reached `main`, its GitHub quality
+gate and Vercel deployment passed, and the final fresh preflight matched this
+plan. Migration 030 was applied once and postflight verified ledger version
+`20261012100608`, successor function SHA-256
+`929466b05250a96e3c5ff20c90d99d7d0da415b8cd021a19c1069396c8c06506`,
+old/new guard counts `0/1`, and preserved OID/owner/ACL/config/profile contract.
+
+The canonical execution receipt is the
+[Production release result](./04-boq-save-null-authorization-production-release-result.md).
+This preparation and execution authority is consumed. Migration 030 is now
+immutable/no-replay; later work requires a new forward change and fresh Owner
+approval.

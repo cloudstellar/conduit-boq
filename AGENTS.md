@@ -53,6 +53,28 @@ current.
   Expression, Catalog/Factor operations, account changes, another deployment,
   or Production mutation.
 
+## BOQ Save NULL authorization guard current boundary
+
+`BOQ_SAVE_NULL_AUTHORIZATION_GUARD_PRODUCTION_CLOSEOUT_20261012`
+
+- The reviewed security source is commit
+  `cb2bb60eed7ea3d72149df4a4273d8fe1bfdf3c1` on `main`; use the
+  [Production Release Result](docs/plans/security/04-boq-save-null-authorization-production-release-result.md)
+  as the execution receipt.
+- Migration 030 was applied exactly once as
+  `20261012100608/boq_save_null_authorization_guard`. It changes only the final
+  Save guard from `IF NOT v_is_authorized` to
+  `IF v_is_authorized IS NOT TRUE` and preserves function identity, ACL,
+  configuration and business calculations.
+- Migrations 027, 028, 029 and 030 are immutable/no-replay. A later database
+  correction requires a new forward migration and fresh explicit approval.
+- The generic advisor warning for authenticated execution of the intentional
+  `SECURITY DEFINER` Save RPC remains accepted for this bounded release. Other
+  existing advisor findings remain separate work and are not fixed by 030.
+- The release authority is consumed. It does not authorize Quantity runtime,
+  LIST-1, broader Auth/Security work, Catalog/Factor/BOQ data operations,
+  account changes, another deployment or Production mutation.
+
 ## Post-DUP-1 repository custody
 
 `POST_DUP1_REPOSITORY_CUSTODY_20260831`

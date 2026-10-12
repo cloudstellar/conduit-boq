@@ -1,8 +1,13 @@
 # BOQ Save NULL Authorization Guard — Production Release Runbook
 
 **Prepared:** 2026-10-12
-**Status:** Security-only local commit preparation authorized; no push, migration application or deployment authorized.
+**Status:** Executed and closed 2026-10-12; migration 030 applied exactly once; see the [Production release result](./04-boq-save-null-authorization-production-release-result.md).
 **Production project:** `otlssvssvgkohqwuuiir`
+
+This is the preserved execution runbook. Its gates were completed under the
+Owner's explicit GO. The final ledger identity is
+`20261012100608/boq_save_null_authorization_guard`; do not reuse this runbook as
+authority to retry or replay the migration.
 
 ## Release boundary
 
@@ -23,7 +28,7 @@ postflight before the Quantity deployment starts.
 
 ## Frozen preflight — 2026-10-12
 
-The latest read-only capture at `2026-10-12T09:24:41.823811Z`
+The planning read-only capture at `2026-10-12T09:24:41.823811Z`
 (`16:24:41.823811` Asia/Bangkok) found:
 
 | Check | Required and observed value |
