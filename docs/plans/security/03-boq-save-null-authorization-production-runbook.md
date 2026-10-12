@@ -22,9 +22,14 @@ docs/SQL-only PR may still trigger Vercel to redeploy the unchanged application
 runtime; that deployment must be explicitly authorized, observed and recorded
 or a proven skip mechanism must be documented.
 
-The Quantity release has a separate commit/PR, GO decision, deployment and
-result. Migration 030 passed postflight; the Quantity candidate remains local
-and its Q-A/Q-B gates have not been executed.
+At this security-release closeout, the Quantity release still had a separate
+future source/Preview gate, GO decision, deployment and result; the candidate
+was local and its then-planned Q-A/Q-B gates had not been executed. Preserve
+that chronology. The later current state is a local committed candidate at
+`b18e69a` + `a467d38`, and the Owner selected a no-PR/no-separate-CI Solo
+Preview path; see [Product Plan
+#06](../product/06-r0a-quantity-input-safety-release-plan.md). Nothing in this
+030 runbook grants that later push, integration or deployment authority.
 
 ## Frozen preflight — 2026-10-12
 

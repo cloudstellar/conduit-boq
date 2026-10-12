@@ -7,10 +7,12 @@
 > **Latest Production closeout:** 2026-10-12 — BOQ Save NULL authorization
 > guard, migration 030; `PRODUCTION PASS`, authority consumed
 >
-> **Dated Git observation (mutable):** branch `codex/quantity-input-safety`;
-> `HEAD == origin/main == 7c09ab8214c4d2d213349b3281680aef653e5109`;
-> branch has no upstream; Quantity work remains modified/untracked and
-> uncommitted. Reverify before acting.
+> **Pre-alignment dated Git observation (mutable):** branch
+> `codex/quantity-input-safety`; clean
+> `HEAD == a467d385041d4d5b05d7a539ac28269a252b3f6d`; no upstream;
+> `origin/main == 7c09ab8214c4d2d213349b3281680aef653e5109`; branch was zero
+> behind and two commits ahead. This file's status-only alignment is a later
+> descendant, so reverify its live HEAD before acting.
 
 ## Current work register — 2026-10-12
 
@@ -20,7 +22,7 @@
 | Atomic BOQ Duplicate (DUP-1) | **PRODUCTION PASS** | [Product Result #04](../plans/product/04-atomic-boq-duplicate-production-release-result.md); migration 029 no-replay; release authority consumed |
 | Editor-load/Save guard and signed-out login correction (PR #12) | **REPOSITORY COMPLETE** | merged as `c0cb6451c4d9924f69de93df4eee80abb6cca3c9`; do not infer a current deployment identity without fresh evidence |
 | BOQ Save NULL authorization guard | **PRODUCTION PASS** | [Security Result #04](../plans/security/04-boq-save-null-authorization-production-release-result.md); migration 030 applied once as `20261012100608/boq_save_null_authorization_guard`; source `cb2bb60`, closeout `7c09ab8`; authority consumed |
-| Quantity Input Safety (R0A core plus editor/Save coordination) | **LOCAL CANDIDATE** | [Plan #06](../plans/product/06-r0a-quantity-input-safety-release-plan.md); implemented and validated locally, but no Quantity commit, upstream, PR, Preview, merge, or Production deployment |
+| Quantity Input Safety (R0A core plus editor/Save coordination) | **LOCAL COMMITTED CANDIDATE** | [Plan #06](../plans/product/06-r0a-quantity-input-safety-release-plan.md); runtime/tests `b18e69a` plus frozen docs `a467d38` are clean and validated locally; this later status-only alignment changes no runtime; no branch publication, Preview, integration, or Production deployment is recorded yet |
 | LIST-1B BOQ register scaling | **PROPOSED** | [Plan #02](../plans/product/02-boq-list-scaling-decision-plan.md); no implementation authority |
 | Wider R0/D0 accounting contract | **PROPOSED** | rounding/parity and related decisions remain open; do not fold them into the Quantity safety release |
 | R1/R2 Quantity Expression | **PROPOSED** | canonical `*`, aliases `x`/`X`/`×`, editor-only expression and numeric-only output direction retained; implementation not authorized |
@@ -28,17 +30,25 @@
 
 ### Immediate Owner decisions
 
-1. **Q-A:** authorize the exact Quantity-only commit, branch push, PR, CI and
-   Preview; this gate excludes merge and Production deployment.
-2. After Preview, accept the documented current-schema persistence residual or
+1. **Q-A phase 1 — complete/consumed:** the exact local freeze created
+   runtime/tests commit `b18e69a` and docs commit `a467d38`; final clean-HEAD
+   checks passed. This later status-only documentation alignment records that
+   outcome without changing the runtime candidate.
+2. **Q-A phase 2 — current:** publish the exact branch and verify Preview under
+   the Owner-selected Solo Preview path. It has no PR or separate CI gate and
+   excludes `main` integration and Production deployment.
+3. After Preview, accept the documented current-schema persistence residual or
    authorize a disposable post-030-equivalent rehearsal.
-3. **Q-B:** separately authorize the exact PR merge and Production deployment.
-4. After Quantity closes, decide LIST-1B Level-A scope. Wider R0/D0,
+4. **Q-B:** separately authorize reviewed integration/push to `main` and the
+   matching Production deployment.
+5. After Quantity closes, decide LIST-1B Level-A scope. Wider R0/D0,
    Quantity Expression and S0 remain later/separate decisions.
 
-No current approval authorizes commit, push, PR, Preview, merge, deployment,
-database mutation, account change, or Production write. Historical approvals
-and completed release receipts cannot be reused.
+Q-A phase 1 local-commit authority is consumed and grants no additional commit,
+amend, push, Preview, integration, deployment, database mutation, account
+change, or Production write. The selected release path is not itself execution
+authority; verify the current-session approval before each external operation.
+Historical approvals and completed release receipts cannot be reused.
 
 ## BOQ Save authorization correction — preparation and closeout
 
@@ -79,19 +89,26 @@ authority for Quantity, broader S0, another deployment, or Production change.
 
 The [R0A release candidate plan](../plans/product/06-r0a-quantity-input-safety-release-plan.md)
 records the separate application-release boundary and its fresh 2026-10-12
-validation. It does not authorize commit, Preview or deployment.
+validation. It records completed local commits but does not itself authorize a
+later push, Preview, integration or deployment.
 
 This later checkpoint supersedes the dated “proposed / pending Owner decision”
 wording below **only for the local work described here**. The Owner approved
 incremental local implementation and testing, including rejecting newly entered
-quantities with more than two decimal places. Commit, push, Preview, deployment,
-database changes, and Production operations require a separate next approval.
+quantities with more than two decimal places. That 2026-09-08 approval did not
+authorize commit, push, Preview, deployment, database changes, or Production
+operations; the later local-freeze authority is recorded separately below.
 
 - Original local-work base: `c0cb6451c4d9924f69de93df4eee80abb6cca3c9`
   (PR #12, complete editor loading/save guard plus the missing-auth-session
   login correction). The current dated base is `7c09ab8` after the independent
-  security 030 source and closeout entered `origin/main`; the Quantity diff
-  remains uncommitted.
+  security 030 source and closeout entered `origin/main`.
+- **Local freeze checkpoint (2026-10-12):** runtime/tests commit
+  `b18e69adeeaedbf10ca70c767ac4cf80a351b6bc` is followed by documentation
+  commit `a467d385041d4d5b05d7a539ac28269a252b3f6d`. Final `HEAD` was clean at
+  `a467d38`, with no upstream, zero commits behind and two ahead of
+  `origin/main`. The exact HEAD passed 643 tests in 56 files, ESLint,
+  TypeScript, production build and `git diff --check`.
 - Local branch: `codex/quantity-input-safety`; verify HEAD, worktree and upstream
   live. This work is not a release receipt.
 - **Owner correction after local trial (2026-09-08):** restore calculation
@@ -672,7 +689,8 @@ push, deploy, database, publication, or deletion authority.
 ## What remains
 
 This section is the Master Catalog/custody residual list. It does not replace
-the 2026-10-12 current work register above; Quantity Q-A/Q-B and later product
+the 2026-10-12 current work register above; Quantity Q-A phase 1 local freeze,
+Q-A phase 2 Solo Preview, Q-B Production integration and later product
 decisions are tracked there and in Product Plan #06.
 
 There is **no required Master Catalog execution work** and no open R-01 through
@@ -696,10 +714,11 @@ Only these independent optional maintenance decisions remain:
 
 `R0A_LIST1_NEXT_DECISION_HANDOFF_20260905`
 
-This section is a **HISTORICAL** 2026-09-05 decision snapshot. Since then the
-Owner authorized local Quantity implementation/testing and the repository now
-contains the uncommitted `LOCAL CANDIDATE` described in the current work
-register and [Product Plan #06](../plans/product/06-r0a-quantity-input-safety-release-plan.md).
+This section is a **HISTORICAL** 2026-09-05 decision snapshot. The Owner later
+authorized local Quantity implementation/testing, followed by the separately
+authorized local freeze at `b18e69a` + `a467d38`. The current work register and
+[Product Plan #06](../plans/product/06-r0a-quantity-input-safety-release-plan.md)
+govern the resulting `LOCAL COMMITTED CANDIDATE`.
 LIST-1B, wider R0/D0, Quantity Expression and S0 remain proposed. Nothing in
 this dated section is current commit, Preview, migration, account, deployment,
 or Production authority.

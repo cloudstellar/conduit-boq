@@ -36,8 +36,10 @@ Quantities) สำหรับการใช้งานภายใน บม�
 > แล้ว
 
 > [!NOTE]
-> Quantity Input Safety เป็น **LOCAL CANDIDATE** ที่ทำและทดสอบไว้แล้ว แต่ยัง
-> ไม่มี commit, PR, Preview หรือ Production release ดูขอบเขตและงานค้างที่
+> Quantity Input Safety เป็น **LOCAL COMMITTED CANDIDATE** ที่ทำ ทดสอบ และ
+> freeze ไว้ใน local commits `b18e69a` (runtime/tests) และ `a467d38` (docs)
+> แล้ว แต่ยังไม่มี upstream, push, Preview, merge หรือ Production release
+> ดูขอบเขตและงานค้างที่
 > [R0A release-candidate plan](docs/plans/product/06-r0a-quantity-input-safety-release-plan.md)
 > LIST-1B และ Full Quantity Expression ยังเป็นงานแยกที่ไม่ได้รับ implementation
 > authority
@@ -151,10 +153,11 @@ docs/                product, architecture, data, process และ handoff
   สถานะ/ข้อจำกัดให้ยึด [AI handoff](docs/08_ai/AI_HANDOFF.md) และ
   [release result](docs/plans/product/04-atomic-boq-duplicate-production-release-result.md)
 - Quantity Input Safety ที่ห้าม `5*2`/`5x2` ถูกแปลงเงียบเป็น `52` ทำและทดสอบ
-  ไว้แล้วแบบ local แต่ยังไม่ commit หรือ release ลำดับถัดไปคือ Q-A
-  commit/PR/Preview -> ตัดสินใจเรื่อง current-schema persistence evidence ->
-  Q-B merge/Production -> จึงพิจารณา `LIST-1B`; candidate นี้ยังไม่มี parser,
-  formula persistence หรือ database change
+  แล้วและ freeze เป็น local commits สองรายการ ลำดับถัดไปตาม Solo Preview ที่
+  Owner เลือกคือ Q-A ระยะ 2 push branch เดิมและตรวจ Preview โดยไม่มี PR หรือ
+  CI แยก -> ตัดสินใจเรื่อง current-schema persistence evidence -> Q-B
+  แยกสำหรับ integrate/push `main` และ Production -> จึงพิจารณา `LIST-1B`;
+  candidate นี้ยังไม่มี parser, formula persistence หรือ database change
 - หน้ารายการ BOQ ยังส่ง query แบบไม่แบ่งหน้าและค้นหาเฉพาะแถวที่ browser ได้รับ;
   การแบ่งหน้าแบบ server-side แบบมีเลขหน้าเป็นงานหลัก `LIST-1B` ถัดจาก guard;
   keyset เป็นทางเลือกภายหลังเมื่อมีหลักฐานด้าน deep-page performance หรือ
@@ -173,7 +176,10 @@ docs/                product, architecture, data, process และ handoff
 
 เลขรุ่นข้อมูล เช่น Master Catalog `2568.1.0`, เวอร์ชัน package และ Git SHA
 เป็นคนละ domain ห้ามใช้แทนกัน ตามกระบวนการ release ของ repository การเปลี่ยน
-application ต้องผ่าน pull request เข้า `main` และตรวจ deployment แยกต่างหาก;
-การ merge ไม่ได้ apply Supabase migration อัตโนมัติ
+application ใช้ pull request เข้า `main` เป็นค่าเริ่มต้นและต้องตรวจ deployment
+แยกต่างหาก สำหรับ R0A นี้ Owner เลือก bounded Solo Preview exception: ใช้
+local checks กับ exact commits เป็น quality gate, push branch เพื่อ Preview,
+แล้วขออนุมัติ integrate/push `main` แยกอีกครั้ง การ integrate ไม่ได้ apply
+Supabase migration อัตโนมัติ และ workflow ที่รันเมื่อ push `main` ไม่ถูกปิด
 
 โครงการนี้เป็นซอฟต์แวร์ภายใน (Private — NT Internal Use Only)

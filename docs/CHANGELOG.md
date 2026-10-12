@@ -3,13 +3,17 @@
 
 ---
 
-## Unreleased — Quantity Input Safety local candidate
+## Unreleased — Quantity Input Safety local committed candidate
 
 - Numeric-only Quantity safety, real-time editor totals, cancel/restore,
   stable draft identity and Factor-bound Save coordination are implemented and
   validated locally.
-- This work has no Quantity commit, PR, Preview, merge or Production release.
-  It adds no formula parser, schema/RPC change or migration. See [Product Plan
+- The local freeze created runtime/tests commit `b18e69a` and documentation
+  commit `a467d38`. The final clean HEAD passed 643 tests in 56 files, ESLint,
+  TypeScript, production build and `git diff --check`.
+- This work still has no upstream, push, Preview, merge or Production release.
+  It adds no formula parser, schema/RPC change or migration. The Owner selected
+  the no-PR/no-separate-CI Solo Preview path recorded in [Product Plan
   #06](./plans/product/06-r0a-quantity-input-safety-release-plan.md).
 
 ---

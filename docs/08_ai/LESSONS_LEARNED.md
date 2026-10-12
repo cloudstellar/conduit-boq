@@ -34,7 +34,7 @@
 > It fixes only the NULL authorization decision in the existing Save RPC and
 > does not close wider S0/Auth/Security work. Migrations 027–030 are immutable,
 > no-replay, and the release authority is consumed. Quantity Input Safety is a
-> separate `LOCAL CANDIDATE`, not part of that Production release.
+> separate `LOCAL COMMITTED CANDIDATE`, not part of that Production release.
 
 > [!IMPORTANT]
 > **AI Must Read This First:** This file contains critical lessons learned from past mistakes. Ignoring these rules causes regressions.
@@ -126,8 +126,9 @@ supabase.auth.onAuthStateChange((event, session) => {
   different numeric value. It must not change the last valid quantity, totals,
   save payload, Print/PDF, or Excel state.
 - **R0A status:** the Owner approved local implementation/testing on 2026-09-08
-  and the candidate is now implemented and validated locally, but it remains
-  uncommitted and unreleased. Keep the guard numeric-only, retain unsupported
+  and the candidate is now implemented, validated and frozen locally as
+  runtime/tests commit `b18e69a` followed by docs commit `a467d38`; it remains
+  unpushed and unreleased. Keep the guard numeric-only, retain unsupported
   text as a visible invalid draft, and show an accessible explanation. R0A does
   not evaluate an expression or create formula history.
   A future expression parser requires a bounded grammar, canonical decimal

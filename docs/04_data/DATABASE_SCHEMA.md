@@ -16,8 +16,9 @@ authorization guard are live
 > `IF v_is_authorized IS NOT TRUE`; no table, column, RLS policy, ACL, function
 > identity/configuration, monetary calculation, Catalog, Factor or BOQ row was
 > changed. See [Security Result #04](../plans/security/04-boq-save-null-authorization-production-release-result.md).
-> Migrations 027–030 are immutable/no-replay. The uncommitted Quantity Input
-> Safety candidate has no schema, RPC or migration change.
+> Migrations 027–030 are immutable/no-replay. The locally committed, unpushed
+> Quantity Input Safety candidate (`b18e69a` + `a467d38`) has no schema, RPC or
+> migration change.
 > Lower dated target/gap sections remain **historical chronology** and do not
 > override this current overlay.
 > Master Catalog completion remains governed by [Handoff #106](../plans/master-catalog/106-phase4-master-catalog-exact-remaining-work-handoff.md)

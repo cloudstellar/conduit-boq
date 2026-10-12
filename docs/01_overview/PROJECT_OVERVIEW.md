@@ -9,8 +9,9 @@
 > **Current-state overlay:** the recorded 2026-08-28/29 Production release
 > baseline is Master Catalog `2568.1.0` with 710 active rows;
 > Atomic BOQ Duplicate and migrations 027–030 are live and closed under their
-> recorded release results. Quantity Input Safety is an uncommitted/unreleased
-> `LOCAL CANDIDATE`; LIST-1B and Full Quantity Expression remain proposed. Use
+> recorded release results. Quantity Input Safety is a locally committed,
+> unpushed/unreleased `LOCAL COMMITTED CANDIDATE` at `b18e69a` + `a467d38`;
+> LIST-1B and Full Quantity Expression remain proposed. Use
 > [AI Handoff](../08_ai/AI_HANDOFF.md) for the current work register and
 > authority boundaries. The overview body describes product purpose and does
 > not grant implementation or release authority.

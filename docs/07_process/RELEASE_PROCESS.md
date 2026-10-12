@@ -20,8 +20,14 @@
 
 ## 1. Deployment
 
-Production application deployment is automated by Vercel after a reviewed
-pull request is merged into `main`.
+Production application deployment is automated by Vercel from `main`. A
+reviewed pull request is the default integration path. For the bounded R0A
+Quantity release only, the Owner selected a Solo Preview path: exact local
+commits and local checks form the pre-publish review package, the feature
+branch is pushed directly for Preview without a PR or separate CI gate, and
+integration/push to `main` still requires a separate explicit Q-B approval.
+The existing workflow that runs after a `main` push is not disabled by this
+exception.
 
 Supabase Production DB migrations are separate operations. A code merge or
 Vercel deploy must never be treated as evidence that a migration was applied.
@@ -56,11 +62,13 @@ Result #04](../plans/security/04-boq-save-null-authorization-production-release-
 and the repository closeout is `7c09ab8`. Migrations 027–030 are
 immutable/no-replay and this release authority is consumed.
 
-Quantity Input Safety was not part of that release. It remains an uncommitted
-`LOCAL CANDIDATE` governed by [Product Plan
-#06](../plans/product/06-r0a-quantity-input-safety-release-plan.md): Q-A covers
-commit/push/PR/CI/Preview, and Q-B separately covers merge/Production. A
-Production write test needs its own named data and authority.
+Quantity Input Safety was not part of that release. It is now a locally
+committed, unpushed `LOCAL COMMITTED CANDIDATE` governed by [Product Plan
+#06](../plans/product/06-r0a-quantity-input-safety-release-plan.md). Q-A phase 1
+froze runtime/tests as `b18e69a` and docs as `a467d38` and is complete/consumed.
+Q-A phase 2 is the selected direct branch push plus Preview path, with no PR or
+separate CI gate. Q-B separately covers reviewed `main` integration and
+Production. A Production write test needs its own named data and authority.
 
 ## 2. Pre-Release Checklist
 

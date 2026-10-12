@@ -1,18 +1,29 @@
 # R0A Quantity Input Safety — Release Candidate Plan
 
 **Prepared:** 2026-10-12
-**Status:** `LOCAL CANDIDATE`; implementation and local validation complete;
-Quantity commit, push, PR, Preview, merge and deployment are not authorized.
+**Status:** `LOCAL COMMITTED CANDIDATE`; implementation, local validation and
+Q-A phase 1 local freeze are complete/consumed at runtime/tests commit
+`b18e69adeeaedbf10ca70c767ac4cf80a351b6bc` plus documentation commit
+`a467d385041d4d5b05d7a539ac28269a252b3f6d`. This current status-only
+documentation alignment is a later descendant and changes no runtime. At the
+post-freeze checkpoint there was no upstream, push, Preview, integration or
+deployment.
 **Dependency:** Satisfied — migration 030 is `PRODUCTION PASS` and no-replay;
 see [Security Result #04](../security/04-boq-save-null-authorization-production-release-result.md).
 
 ## Current checkpoint
 
-- Dated Git observation on 2026-10-12: branch
-  `codex/quantity-input-safety`, no upstream,
+- The pre-freeze Git observation on 2026-10-12 found branch
+  `codex/quantity-input-safety`, no upstream, and
   `HEAD == origin/main == 7c09ab8214c4d2d213349b3281680aef653e5109`.
-- The Quantity candidate remains modified/untracked and uncommitted. There is
-  no immutable Quantity tree, CI/Preview receipt, merge, or Production release.
+  Preserve that as dated chronology.
+- Q-A phase 1 then froze the reviewed runtime/tests as `b18e69a` and the aligned
+  documentation as `a467d38`. At the post-freeze checkpoint `HEAD` was clean at
+  `a467d38`, had no upstream, and was zero commits behind/two ahead of
+  `origin/main` at `7c09ab8`.
+- There is now an immutable local application freeze at those two payload
+  commits plus this later status-only documentation alignment, but no branch
+  push, Preview receipt, `main` integration or Production release is recorded.
 - The runtime work began from the earlier PR #12 base `c0cb6451...`; the
   independent security source/closeout commits `cb2bb60` and `7c09ab8` are now
   in the base. The dated validation record below is preserved as the evidence
@@ -58,10 +69,30 @@ Runtime candidate paths:
   `tests/export-boq-excel-factor-version.test.ts`
 
 The security migration and its SQL fixture/runner/tests are excluded from this
-application release. Shared handoff documents must be reviewed so that only
-current Quantity/security status is published with the candidate.
+application release. The Q-A phase 1 documentation commit is `a467d38`; this
+later status-only alignment preserves the runtime commit and every migration
+or Production receipt. Reverify the resulting live HEAD before branch push.
 
-## Fresh combined-working-tree evidence — 2026-10-12
+## Immutable local-candidate evidence — 2026-10-12
+
+- Base: `origin/main` at
+  `7c09ab8214c4d2d213349b3281680aef653e5109`.
+- Runtime/tests commit:
+  `b18e69adeeaedbf10ca70c767ac4cf80a351b6bc`, tree
+  `6d3f5c3320184cec840570c2a2dd8d3d16ac6ce2`.
+- Documentation commit:
+  `a467d385041d4d5b05d7a539ac28269a252b3f6d`, tree
+  `1854ea53782a56ce9ac47ead2562a0bbed6f2ffc`.
+- Final clean-HEAD validation passed: Vitest **643 tests / 56 files**, ESLint,
+  TypeScript `--noEmit --incremental false`, Next.js production build and
+  `git diff --check`.
+- The branch had no upstream and was not pushed. No PR, separate CI, Preview,
+  merge, database operation or Production operation occurred.
+- The Owner selected the Solo Preview release path. Local checks are its
+  pre-publish quality gate; no PR or separate pre-Preview CI is required. This
+  does not disable the existing workflow that runs on a later `main` push.
+
+## Earlier combined-working-tree evidence — 2026-10-12
 
 - Vitest: **643 tests / 56 files passed**.
 - ESLint: passed with no finding.
@@ -77,9 +108,9 @@ current Quantity/security status is published with the candidate.
 At that checkpoint the tested working tree contained both separately gated
 Security and Quantity changes; it was not an exact immutable Quantity release
 tree. The security work is now in `origin/main`, while the Quantity diff remains
-local. Q-A therefore reruns validation on the immutable Quantity-only commit.
-These checks
-are source/build evidence. Prior local persistence used a
+local. The later immutable local-candidate validation above satisfied the
+required rerun on the frozen Quantity runtime plus aligned documentation.
+These earlier checks are source/build evidence. Prior local persistence used a
 pre-P49 Save RPC and older Catalog state. Prior rendered Excel/PDF proof covers
 only its named local fixtures. It is not current-Production-schema Save
 acceptance, physical-device acceptance, large-BOQ performance certification,
@@ -89,29 +120,33 @@ or proof that every BOQ has consistent stored route summaries.
 
 Migration 030 is complete. The remaining gates are:
 
-### Q-A — publish and verify Preview
+### Q-A — freeze, publish and verify Preview
 
-1. Freeze the reviewed Quantity-only working-tree diff from the runtime/test
-   paths above and the Quantity sections of shared documentation. Confirm no
-   migration/security harness file is included.
-2. Obtain explicit Owner GO for the exact Quantity commit, branch push, PR, CI
-   and Preview creation. Do not include merge or Production deployment in Q-A.
-3. Re-run unit/lint/type/build checks on the immutable published commit.
-4. Verify Preview without persistent Production writes: login, open an
+1. **Phase 1 — complete/consumed:** freeze the reviewed runtime/test paths as
+   `b18e69a` and the aligned shared documentation as `a467d38`; confirm no
+   migration/security harness file is included; run unit/lint/type/build and
+   diff checks on the clean exact HEAD.
+2. **Phase 2 — current:** under fresh applicable authority, push the exact
+   `codex/quantity-input-safety` branch and verify the matching Vercel Preview.
+   The Owner selected this Solo path with no PR and no separate CI gate. It does
+   not include `main` integration or Production deployment.
+3. Verify Preview without persistent Production writes: login, open an
    editable BOQ, exercise valid real-time input, invalid operator input,
    Escape/Cancel, route switching and saved-version output, then reload to
    confirm no Save occurred.
-5. The Owner must then explicitly choose whether to accept the
+4. The Owner must then explicitly choose whether to accept the
    documented current-schema persistence residual or authorize a separate
    disposable current-schema rehearsal. Do not silently replay 027/028/029/030 or
    use an existing Production BOQ as a write fixture.
 
-### Q-B — merge and deploy Production
+### Q-B — integrate to `main` and deploy Production
 
-1. Present the immutable commit/tree/PR, validation, Preview evidence and the
-   recorded persistence-residual decision.
-2. Obtain a second explicit Owner GO for the exact PR merge and Production
-   deployment.
+1. Present the immutable commits/trees, local validation, Preview evidence and
+   the recorded persistence-residual decision.
+2. Obtain a second explicit Owner GO for the reviewed integration/push to
+   `main` and matching Production deployment. This Solo path has no PR; the
+   existing CI triggered by a `main` push remains an observable post-push check,
+   not a separately required pre-Preview gate.
 3. After Production deployment, repeat the bounded no-write interaction smoke,
    verify the deployed commit, console and saved-version output, and write a
    dated result. Any persistent Save test requires separately identified test
@@ -126,14 +161,16 @@ add LIST-1 or full Quantity Expression while closing this release.
 
 ## Remaining Owner decisions
 
-1. **Q-A publication:** approve the exact Quantity-only commit, push, PR, CI
-   and Preview. This does not include merge or Production deployment.
+1. **Q-A phase 2 publication:** after the completed/consumed local freeze,
+   approve or verify the applicable authority for the exact branch push and
+   Preview. No PR or separate CI gate is part of the Owner-selected Solo path;
+   this does not include `main` integration or Production deployment.
 2. **Persistence evidence:** after Preview, either accept the documented lack
    of a current-post-030-schema write rehearsal or separately authorize a
    disposable rehearsal. Existing or Production BOQs are not implicit fixtures.
-3. **Q-B release:** separately approve the exact PR merge and Production
-   deployment after the immutable tree, CI, Preview and residual decision are
-   reviewable.
+3. **Q-B release:** separately approve reviewed integration/push to `main` and
+   Production deployment after the immutable commits, local checks, Preview and
+   residual decision are reviewable.
 4. **Production write proof, if wanted:** identify disposable test data and
    grant separate write authority. The default post-deploy smoke is no-write.
 

@@ -81,17 +81,28 @@ current.
 
 - A reviewed Quantity Input Safety candidate is preserved locally on
   `codex/quantity-input-safety`; always verify the live branch, HEAD, upstream,
-  and worktree before acting. At the dated 2026-10-12 checkpoint the candidate
-  was uncommitted, had no upstream, and its base HEAD equalled `origin/main` at
-  `7c09ab8214c4d2d213349b3281680aef653e5109`.
+  and worktree before acting. At the pre-freeze 2026-10-12 checkpoint the
+  candidate was uncommitted, had no upstream, and its base HEAD equalled
+  `origin/main` at `7c09ab8214c4d2d213349b3281680aef653e5109`; that remains
+  dated chronology. The later local freeze created runtime/tests commit
+  `b18e69adeeaedbf10ca70c767ac4cf80a351b6bc` and documentation commit
+  `a467d385041d4d5b05d7a539ac28269a252b3f6d`. At that post-freeze checkpoint
+  the worktree was clean at `a467d38`, had no upstream, and was two commits
+  ahead of `origin/main` with none behind. The current status-only documentation
+  alignment is a later descendant of that checkpoint; verify its live HEAD
+  before publication.
 - Use the [R0A Quantity Input Safety release-candidate plan](docs/plans/product/06-r0a-quantity-input-safety-release-plan.md)
   for exact behavior, paths, validation, residuals, and the Q-A/Q-B gates.
 - This is numeric-only input safety plus editor/save coordination. It is not
   Quantity Expression and adds no formula persistence, schema/RPC change,
   migration, Catalog/Factor mutation, BOQ backfill, or account change.
-- The candidate is a `LOCAL CANDIDATE`, not a release. Do not discard it, mix
-  it into unrelated work, stage/commit/push it, create a PR/Preview, merge, or
-  deploy without fresh explicit authority for the applicable gate.
+- The candidate is a `LOCAL COMMITTED CANDIDATE`, not a release. Q-A phase 1
+  local-freeze authority is complete and consumed. The Owner selected a Solo
+  Preview path: Q-A phase 2 is an exact branch push plus Preview verification,
+  with no PR or separate CI gate; merge/main integration and Production remain
+  a separate Q-B decision. Do not discard or mix the candidate into unrelated
+  work, create another commit, push, Preview, integrate, or deploy without
+  fresh explicit authority for the applicable operation.
 - LIST-1B, wider R0 accounting decisions, R1/R2 Quantity Expression, and wider
   S0 Auth/Security remain separate decisions. Migration 030 being complete
   satisfies a dependency; it does not authorize the Quantity release.

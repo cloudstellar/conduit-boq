@@ -119,8 +119,11 @@ Save must still reject invalid drafts. New input is limited to 2 decimal places 
 silent rounding; existing loaded data is not backfilled. Save must match one
 BOQ/revision/total/reference-version calculation, rather than merely accepting
 a Factor bracket that also happened to fit an earlier total. Local approval
-does not authorize a formula parser, new persisted quantity fields, schema/RPC change, migration,
-commit, or deployment.
+does not authorize a formula parser, new persisted quantity fields, schema/RPC
+change or migration. The 2026-09-08 local-work approval did not authorize a
+commit or deployment; a later separate Q-A phase 1 authority froze the reviewed
+candidate as runtime/tests commit `b18e69a` plus docs commit `a467d38` and is
+now consumed.
 
 The Owner later explicitly chose to restore the previous route-total behavior:
 loading synchronizes only the selected route, selecting a route synchronizes
@@ -210,11 +213,14 @@ uncommitted handoff work unless the Owner directs otherwise. This record grants
 no later commit, push, PR, merge, deployment, database, or Production
 authority.
 
-The current recommended sequence is: close the existing Quantity Input Safety
-candidate through Q-A Preview and Q-B Production gates; then decide/implement
-LIST-1B; then address wider R0/D0 before R1/R2 Quantity Expression. The local
-Quantity implementation/testing step has occurred, but commit/push/PR/Preview,
-merge and Production deployment remain unauthorized until their exact gates.
+The current recommended sequence is: Q-A phase 1 local freeze (complete and
+consumed) -> Q-A phase 2 direct branch push and Preview under the Owner-selected
+Solo path, with no PR or separate CI gate -> persistence-residual decision ->
+separate Q-B reviewed `main` integration and Production deployment ->
+decide/implement LIST-1B -> address wider R0/D0 before R1/R2 Quantity
+Expression. The candidate is locally committed but remains unpushed and
+unreleased at its recorded checkpoint. Each external operation still requires
+its applicable current approval.
 `S0` authentication/security remains a separate parallel lane. No plan text
 itself grants implementation or external-operation authority.
 
