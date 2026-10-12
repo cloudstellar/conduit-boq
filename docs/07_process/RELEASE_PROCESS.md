@@ -21,13 +21,13 @@
 ## 1. Deployment
 
 Production application deployment is automated by Vercel from `main`. A
-reviewed pull request is the default integration path. For the bounded R0A
-Quantity release only, the Owner selected a Solo Preview path: exact local
-commits and local checks form the pre-publish review package, the feature
-branch is pushed directly for Preview without a PR or separate CI gate, and
-integration/push to `main` still requires a separate explicit Q-B approval.
-The existing workflow that runs after a `main` push is not disabled by this
-exception.
+reviewed pull request is the default integration path. For the completed
+Quantity release only, the Owner selected a Solo path: exact
+local commits and local checks formed the pre-publish review package, the
+feature branch was pushed directly for Preview without a PR or separate CI
+gate, and a later explicit Q-B approval authorized the exact fast-forward to
+`main` and matching Production deployment. The existing workflow after the
+`main` push remained enabled and passed.
 
 Supabase Production DB migrations are separate operations. A code merge or
 Vercel deploy must never be treated as evidence that a migration was applied.
@@ -62,16 +62,15 @@ Result #04](../plans/security/04-boq-save-null-authorization-production-release-
 and the repository closeout is `7c09ab8`. Migrations 027–030 are
 immutable/no-replay and this release authority is consumed.
 
-Quantity Input Safety was not part of that release. It is now a
-`PREVIEW-VERIFIED CANDIDATE` governed by [Product Plan
-#06](../plans/product/06-r0a-quantity-input-safety-release-plan.md) and
-[Preview Result #07](../plans/product/07-r0a-quantity-input-safety-preview-result.md).
-Q-A phase 1 froze runtime/tests as `b18e69a` and docs as `a467d38`; Q-A phase 2
-pushed/deployed exact source `5527fe9` through the selected no-PR/no-separate-CI
-Solo Preview path and completed authenticated no-write QA. Both authorities are
-consumed. Persistence/output-console residuals and Q-B reviewed `main`
-integration/Production remain separate decisions. A Production write test
-needs its own named data and authority.
+Quantity Input Safety was not part of the security release above. It later
+completed Q-A and Q-B under [Product Plan
+#06](../plans/product/06-r0a-quantity-input-safety-release-plan.md),
+[Preview Result #07](../plans/product/07-r0a-quantity-input-safety-preview-result.md),
+and [Production Result #08](../plans/product/08-r0a-quantity-input-safety-production-release-result.md).
+Runtime/tests `b18e69a` reached Production through exact `main` source
+`4d285f8`; GitHub Quality, Vercel Ready, authenticated no-write QA, console,
+Print, and read-only database verification passed. Q-A/Q-B authorities are
+consumed. A Production write test still needs its own named data and authority.
 
 ## 2. Pre-Release Checklist
 

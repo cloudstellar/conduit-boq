@@ -107,7 +107,8 @@ post-028, post-029 nor post-030 parity and it does not include migrations 027,
   that receipt grants no authority to apply it again.
 - Migration 030 is a separate security correction, not a DUP-1 or Quantity
   migration. Its receipt grants no authority to apply it again or to release
-  the local Quantity candidate.
+  another change. Quantity Input Safety later reached Production without a
+  database change; see [Production Result #08](./plans/product/08-r0a-quantity-input-safety-production-release-result.md).
 - Do not add 029 to `db:local:bootstrap` while its input database still stops at
   026. A green run over the wrong predecessor schema would not be valid DUP-1
   evidence.

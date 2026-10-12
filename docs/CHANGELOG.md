@@ -3,7 +3,21 @@
 
 ---
 
-## Unreleased — Quantity Input Safety Preview-verified candidate
+## Unreleased — Dependency security patch required
+
+- Fresh `npm audit --omit=dev` reports six Production dependency findings:
+  one critical, four high, and one moderate. Direct `next@16.2.9` is critical;
+  npm currently offers `16.4.0` as a non-major fix path.
+- Next.js has announced another out-of-band security update for 2026-10-14.
+  Keep the upgrade separate from Quantity and feature work; prefer one reviewed
+  dependency release after the announced patched version is available unless
+  immediate remediation is chosen.
+- The existing CI workflow does not run `audit:prod`; add a Production audit
+  gate only after a clean dependency baseline is established.
+
+---
+
+## 2026-10-12 — Quantity Input Safety Production release
 
 - Numeric-only Quantity safety, real-time editor totals, cancel/restore,
   stable draft identity and Factor-bound Save coordination are implemented and
@@ -11,16 +25,21 @@
 - The local freeze created runtime/tests commit `b18e69a` and documentation
   commit `a467d38`. The final clean HEAD passed 643 tests in 56 files, ESLint,
   TypeScript, production build and `git diff --check`.
-- Exact source `5527fe9` was pushed to `codex/quantity-input-safety` and passed
-  authenticated no-write Vercel Preview QA under the Owner-selected
-  no-PR/no-separate-CI Solo path. The branch remains unmerged and there is no
-  Production release.
+- Exact Preview source `5527fe9` passed authenticated no-write Vercel Preview
+  QA. Exact source `4d285f8` then fast-forwarded to `main`; GitHub Quality and
+  Vercel Production passed under the Owner-selected Solo Q-B path.
 - Preview verified valid real-time totals/Factor, visible rejection of `5x2`,
   Escape/Cancel, route identity, reload/no-Save behavior, and saved Print data.
-  Current-schema Save, console capture, and Preview Excel/PDF remain recorded
-  residuals. Details: [Product Plan #06](./plans/product/06-r0a-quantity-input-safety-release-plan.md)
-  and [Preview Result #07](./plans/product/07-r0a-quantity-input-safety-preview-result.md).
+  Production repeated the no-write behavior, captured a clean console, rendered
+  saved Print data, and used a read-only database query to confirm unchanged
+  quantity/totals/timestamps. A persistent current-schema Save and repeated
+  Production Excel/PDF generation remain bounded residuals. Details:
+  [Product Plan #06](./plans/product/06-r0a-quantity-input-safety-release-plan.md),
+  [Preview Result #07](./plans/product/07-r0a-quantity-input-safety-preview-result.md),
+  and [Production Result #08](./plans/product/08-r0a-quantity-input-safety-production-release-result.md).
 - The candidate adds no formula parser, schema/RPC change or migration.
+- Production exposed the pre-existing RouteBadge N+1/error-fallback defect;
+  it is recorded as LIST-1B work and is not a Quantity regression.
 
 ---
 

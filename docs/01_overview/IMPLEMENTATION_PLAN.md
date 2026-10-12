@@ -26,13 +26,14 @@
 > [!IMPORTANT]
 > **Current supersession:** migration 030 is `PRODUCTION PASS` and was applied
 > once as `20261012100608/boq_save_null_authorization_guard`; migrations
-> 027–030 are immutable/no-replay. Quantity Input Safety is a
-> `PREVIEW-VERIFIED CANDIDATE` at exact Preview source `5527fe9`; it remains
-> unmerged and unreleased to Production. Q-A phase 2 is complete/consumed;
-> LIST-1B, wider R0/D0, Quantity Expression and
-> wider S0 remain separate proposed work. Use [AI Handoff](../08_ai/AI_HANDOFF.md),
+> 027–030 are immutable/no-replay. Quantity Input Safety is `PRODUCTION PASS`
+> at exact `main` source `4d285f8`; Q-A and Q-B are complete/consumed and no
+> Quantity migration or database write occurred. LIST-1B, wider R0/D0,
+> Quantity Expression and wider S0 remain separate proposed work. Use
+> [AI Handoff](../08_ai/AI_HANDOFF.md),
 > [Quantity Plan #06](../plans/product/06-r0a-quantity-input-safety-release-plan.md),
-> and [Preview Result #07](../plans/product/07-r0a-quantity-input-safety-preview-result.md)
+> [Preview Result #07](../plans/product/07-r0a-quantity-input-safety-preview-result.md),
+> and [Production Result #08](../plans/product/08-r0a-quantity-input-safety-production-release-result.md)
 > instead of the historical implementation phases below for current work.
 
 ---

@@ -16,9 +16,9 @@ authorization guard are live
 > `IF v_is_authorized IS NOT TRUE`; no table, column, RLS policy, ACL, function
 > identity/configuration, monetary calculation, Catalog, Factor or BOQ row was
 > changed. See [Security Result #04](../plans/security/04-boq-save-null-authorization-production-release-result.md).
-> Migrations 027–030 are immutable/no-replay. The
-> `PREVIEW-VERIFIED CANDIDATE` for Quantity Input Safety (`5527fe9`) has no
-> schema, RPC or migration change; see [Preview Result #07](../plans/product/07-r0a-quantity-input-safety-preview-result.md).
+> Migrations 027–030 are immutable/no-replay. Quantity Input Safety is now
+> `PRODUCTION PASS` at `4d285f8` and still has no schema, RPC or migration
+> change; see [Production Result #08](../plans/product/08-r0a-quantity-input-safety-production-release-result.md).
 > Lower dated target/gap sections remain **historical chronology** and do not
 > override this current overlay.
 > Master Catalog completion remains governed by [Handoff #106](../plans/master-catalog/106-phase4-master-catalog-exact-remaining-work-handoff.md)

@@ -9,10 +9,11 @@
 > **Current-state overlay:** the recorded 2026-08-28/29 Production release
 > baseline is Master Catalog `2568.1.0` with 710 active rows;
 > Atomic BOQ Duplicate and migrations 027–030 are live and closed under their
-> recorded release results. Quantity Input Safety is a
-> `PREVIEW-VERIFIED CANDIDATE` at exact Preview source `5527fe9`; it is not
-> merged or released to Production. See [Preview Result #07](../plans/product/07-r0a-quantity-input-safety-preview-result.md);
-> LIST-1B and Full Quantity Expression remain proposed. Use
+> recorded release results. Quantity Input Safety is `PRODUCTION PASS` at exact
+> `main` source `4d285f8`; see [Production Result #08](../plans/product/08-r0a-quantity-input-safety-production-release-result.md).
+> [Preview Result #07](../plans/product/07-r0a-quantity-input-safety-preview-result.md)
+> remains dated Q-A chronology. LIST-1B and Full Quantity Expression remain
+> proposed. Use
 > [AI Handoff](../08_ai/AI_HANDOFF.md) for the current work register and
 > authority boundaries. The overview body describes product purpose and does
 > not grant implementation or release authority.

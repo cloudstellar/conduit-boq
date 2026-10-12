@@ -33,9 +33,9 @@
 > [BOQ Save Guard Production Result #04](../plans/security/04-boq-save-null-authorization-production-release-result.md).
 > It fixes only the NULL authorization decision in the existing Save RPC and
 > does not close wider S0/Auth/Security work. Migrations 027–030 are immutable,
-> no-replay, and the release authority is consumed. Quantity Input Safety is a
-> separate `PREVIEW-VERIFIED CANDIDATE`, not part of that Production release;
-> see [Preview Result #07](../plans/product/07-r0a-quantity-input-safety-preview-result.md).
+> no-replay, and the release authority is consumed. Quantity Input Safety was
+> not part of that security release; it later reached `PRODUCTION PASS` at exact
+> source `4d285f8`. See [Production Result #08](../plans/product/08-r0a-quantity-input-safety-production-release-result.md).
 
 > [!IMPORTANT]
 > **AI Must Read This First:** This file contains critical lessons learned from past mistakes. Ignoring these rules causes regressions.
@@ -129,8 +129,10 @@ supabase.auth.onAuthStateChange((event, session) => {
 - **R0A status:** the Owner approved local implementation/testing on 2026-09-08.
   The candidate was frozen as runtime/tests commit `b18e69a` followed by docs
   commit `a467d38`, then verified in Preview at exact source `5527fe9` under the
-  no-PR/no-separate-CI Solo path. It remains unmerged and unreleased to
-  Production. Keep the guard numeric-only, retain unsupported
+  no-PR/no-separate-CI Solo path. Q-B later fast-forwarded exact source
+  `4d285f8` to `main`; GitHub Quality, Vercel Production and authenticated
+  no-write verification passed. Q-A/Q-B authorities are consumed. Keep the
+  guard numeric-only, retain unsupported
   text as a visible invalid draft, and show an accessible explanation. R0A does
   not evaluate an expression or create formula history.
   A future expression parser requires a bounded grammar, canonical decimal
@@ -155,6 +157,19 @@ supabase.auth.onAuthStateChange((event, session) => {
   The correction was later applied once as migration 030 and closed in
   [Production Result #04](../plans/security/04-boq-save-null-authorization-production-release-result.md).
   This is evidence, not authority to edit or replay migrations 027–030.
+
+### 1.9 A green build does not mean the dependency graph is safe
+
+- The Quantity `main` workflow passed install, lint, tests, and build, while
+  `npm ci` still reported 20 advisories. A fresh `npm audit --omit=dev` reported
+  six Production dependency findings: one critical, four high, and one
+  moderate. Direct `next@16.2.9` was critical and npm identified `16.4.0` as a
+  non-major fix path.
+- Treat install/audit output as its own gate. Never summarize a passing build
+  as a passing dependency or security audit when CI does not run that check.
+- Patch and validate dependency advisories as a separate release. Do not mix
+  the upgrade into LIST-1B, Quantity Expression, database work, or a docs-only
+  closeout.
 
 ## 2. Documentation Patterns
 

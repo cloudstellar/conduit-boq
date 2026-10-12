@@ -41,7 +41,9 @@ remediation and formal closeout
 > Catalog, Factor, BOQ or account rows, calculations, tables or RLS; the
 > migration ledger records the applied migration. Migrations 027–030 are
 > immutable/no-replay.
-> Quantity Input Safety remains a separate local application candidate.
+> Quantity Input Safety later reached `PRODUCTION PASS` at exact application
+> source `4d285f8` without a schema/RPC/migration change or database write; see
+> [Production Result #08](../plans/product/08-r0a-quantity-input-safety-production-release-result.md).
 
 ## Atomic duplicate integrity invariants
 

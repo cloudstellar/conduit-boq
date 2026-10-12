@@ -39,10 +39,9 @@
 > applied exactly once as
 > `20261012100608/boq_save_null_authorization_guard`; see [Security Result
 > #04](./plans/security/04-boq-save-null-authorization-production-release-result.md).
-> Migrations 027–030 are immutable/no-replay. Quantity Input Safety is a
-> separate `PREVIEW-VERIFIED CANDIDATE` at `5527fe9` with no
-> schema/RPC/migration change; see [Product Plan #06](./plans/product/06-r0a-quantity-input-safety-release-plan.md)
-> and [Preview Result #07](./plans/product/07-r0a-quantity-input-safety-preview-result.md).
+> Migrations 027–030 are immutable/no-replay. Quantity Input Safety later
+> reached `PRODUCTION PASS` at exact source `4d285f8` with no
+> schema/RPC/migration change; see [Production Result #08](./plans/product/08-r0a-quantity-input-safety-production-release-result.md).
 > The 2026-06-11 body below includes obsolete table, ACL and function findings;
 > use current code, [Database Schema](./04_data/DATABASE_SCHEMA.md), [Migration
 > inventory](./04_data/MIGRATIONS.md) and [Security Model](./04_data/SECURITY_MODEL.md)

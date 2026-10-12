@@ -22,8 +22,9 @@ Production แบบ live และไม่ใช่สิทธิ์ให้
 | [DUP-1 Production Result #04](./plans/product/04-atomic-boq-duplicate-production-release-result.md) | exact migration/application release, Production QA และ residuals ของ Atomic BOQ Duplicate | เป็น execution receipt ที่ใช้แล้ว ไม่ใช่สิทธิ์ deploy/mutate ซ้ำหรือเริ่ม roadmap item ถัดไป |
 | [Post-DUP-1 Repository Custody Result #05](./plans/product/05-post-dup1-repository-custody-result.md) | docs PR #10, dated deployment observation และ exact branch cleanup | เป็น repository-custody receipt ที่ใช้แล้ว ไม่ใช่ live Git guarantee หรือสิทธิ์ cleanup รอบใหม่ |
 | [BOQ Save Guard Production Result #04](./plans/security/04-boq-save-null-authorization-production-release-result.md) | migration 030, Production postflight และ residuals ของ NULL authorization guard | `PRODUCTION PASS`; authority consumed; ไม่ใช่สิทธิ์ replay หรือเริ่ม Quantity/S0 |
-| [R0A Quantity Input Safety Plan #06](./plans/product/06-r0a-quantity-input-safety-release-plan.md) | exact candidate, validation, residuals และ Q-A/Q-B release gates | `PREVIEW-VERIFIED CANDIDATE`; exact Preview source `5527fe9`; ยังไม่ merge/Production |
-| [R0A Quantity Input Safety Preview Result #07](./plans/product/07-r0a-quantity-input-safety-preview-result.md) | exact Preview deployment, authenticated no-write QA, limitations และ consumed Q-A phase 2 authority | Preview verified; current-schema Save/console/Excel-PDF residuals; Q-B ยังรอ Owner |
+| [R0A Quantity Input Safety Plan #06](./plans/product/06-r0a-quantity-input-safety-release-plan.md) | exact candidate, validation, residuals และ Q-A/Q-B release gates | Q-A/Q-B complete; current release status points to Result #08 |
+| [R0A Quantity Input Safety Preview Result #07](./plans/product/07-r0a-quantity-input-safety-preview-result.md) | exact Preview deployment, authenticated no-write QA, limitations และ consumed Q-A phase 2 authority | frozen Preview chronology; later superseded for current status by Result #08 |
+| [R0A Quantity Input Safety Production Result #08](./plans/product/08-r0a-quantity-input-safety-production-release-result.md) | exact `main` source, CI/Vercel deployment, no-write Production QA และ residuals | `PRODUCTION PASS`; Q-B complete/consumed; no migration or database write |
 
 Migration 027, 028, 029 และ 030 ถูกบันทึกว่า applied ครั้งเดียวและห้ามแก้
 retry หรือ replay โดย 029 เป็น DUP-1 product release และ 030 เป็น BOQ Save
@@ -32,17 +33,23 @@ expanded Production persona rehearsal ของ Master Catalog
 ยังเป็น accepted residual ไม่ใช่ PASS หากต้องอ้างสถานะ Production ที่เปลี่ยน
 ได้ ให้เก็บ fresh read-only evidence ใหม่
 
+Production closeout #08 also records a separate dependency-security finding:
+`npm audit --omit=dev` reports six Production findings, including direct
+`next@16.2.9` as critical. This is not a Quantity regression; handle it as an
+isolated framework/dependency release before LIST-1B.
+
 ## Current product decisions and research
 
 | เอกสาร | สถานะ | เนื้อหา |
 |---|---|---|
-| [01 — Product Evolution Decision Plan](./plans/product/01-conduit-boq-product-evolution-decision-plan.md) | DUP-1 และ 030 live; R0A เป็น Preview-verified candidate; LIST-1 และ decision อื่นยังรอ Owner | roadmap, Quantity safety, Quantity Expression, auth, workflow และระยะยาว |
+| [01 — Product Evolution Decision Plan](./plans/product/01-conduit-boq-product-evolution-decision-plan.md) | DUP-1, 030 และ R0A live; LIST-1 และ decision อื่นยังรอ Owner | roadmap, Quantity safety, Quantity Expression, auth, workflow และระยะยาว |
 | [02 — BOQ List Scaling Decision Plan](./plans/product/02-boq-list-scaling-decision-plan.md) | proposed; LIST-1/L1.1 ยังไม่มี implementation authority | server pagination, search/filter/sort, RLS count, bounded route loading และ optional Copy-eligibility projection |
 | [03 — Pagination Best-Practice Research](./plans/product/03-boq-list-pagination-best-practice-research.md) | research evidence; ไม่ใช่ approval | หลักฐานภายนอกและ trade-off ของ pagination |
 | [04 — Atomic BOQ Duplicate Production Result](./plans/product/04-atomic-boq-duplicate-production-release-result.md) | complete; released and verified 2026-08-31 | migration 029, PR/merge/deploy, database postflight, rendered QA และ residuals |
 | [05 — Post-DUP-1 Repository Custody Result](./plans/product/05-post-dup1-repository-custody-result.md) | complete; exact cleanup recorded 2026-08-31 | docs PR #10, dated Production deployment evidence, branch ancestry/deletion และ consumed authority |
-| [06 — R0A Quantity Input Safety Release Candidate](./plans/product/06-r0a-quantity-input-safety-release-plan.md) | Preview-verified candidate; unmerged/unreleased | numeric-only input safety, realtime editor behavior, Save/Factor coherence, evidence, residuals และ Solo Preview Q-A/Q-B |
-| [07 — R0A Quantity Input Safety Preview Result](./plans/product/07-r0a-quantity-input-safety-preview-result.md) | Q-A phase 2 complete/consumed; not Production | exact source/deployment, no-write QA, no-Save proof และ residuals ก่อน Q-B |
+| [06 — R0A Quantity Input Safety Release Plan](./plans/product/06-r0a-quantity-input-safety-release-plan.md) | Q-A/Q-B complete/consumed | numeric-only input safety, realtime editor behavior, Save/Factor coherence, evidence, residuals และ Solo release path |
+| [07 — R0A Quantity Input Safety Preview Result](./plans/product/07-r0a-quantity-input-safety-preview-result.md) | frozen Q-A phase 2 chronology | exact Preview source/deployment, no-write QA, no-Save proof และข้อจำกัด ณ Preview |
+| [08 — R0A Quantity Input Safety Production Result](./plans/product/08-r0a-quantity-input-safety-production-release-result.md) | complete; released and verified 2026-10-12 | exact `main`/CI/Vercel identity, no-write QA, database proof และ separate LIST-1B finding |
 
 DUP-1 ผ่าน implementation, isolated database rehearsal, tests, Production
 verification และ postflight แล้ว Migration `029_atomic_boq_duplicate.sql`

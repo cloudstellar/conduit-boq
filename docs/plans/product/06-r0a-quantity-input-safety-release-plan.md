@@ -1,12 +1,13 @@
 # R0A Quantity Input Safety — Release Candidate Plan
 
 **Prepared:** 2026-10-12
-**Status:** `PREVIEW-VERIFIED CANDIDATE`; Q-A phases 1–2 are complete/consumed.
+**Status:** `PRODUCTION PASS`; Q-A and Q-B are complete/consumed.
 Runtime/tests commit `b18e69adeeaedbf10ca70c767ac4cf80a351b6bc` and freeze
 documentation commit `a467d385041d4d5b05d7a539ac28269a252b3f6d` were carried
 by exact Preview source `5527fe9fe9ce6e1f8888912c18dc9b26e7b1b6b3`. See
-[Preview Result #07](./07-r0a-quantity-input-safety-preview-result.md). The
-candidate is not merged or released to Production.
+[Preview Result #07](./07-r0a-quantity-input-safety-preview-result.md). Exact
+source `4d285f81fa7ad418039ccd8428c2e55ac1e65ce8` later reached `main` and
+Production; see [Production Result #08](./08-r0a-quantity-input-safety-production-release-result.md).
 **Dependency:** Satisfied — migration 030 is `PRODUCTION PASS` and no-replay;
 see [Security Result #04](../security/04-boq-save-null-authorization-production-release-result.md).
 
@@ -26,14 +27,19 @@ see [Security Result #04](../security/04-boq-save-null-authorization-production-
   `production_environment == false`; authenticated no-write QA passed with the
   limitations recorded in Result #07. No PR, separate CI, Save, `main`
   integration, or Production release occurred.
+- Q-B later fast-forwarded exact source `4d285f8` to `main`. GitHub Quality,
+  Vercel Production, authenticated no-write browser verification, console,
+  saved Print, and a read-only database check passed. No migration or database
+  write occurred. Q-B authority is consumed.
 - The runtime work began from the earlier PR #12 base `c0cb6451...`; the
   independent security source/closeout commits `cb2bb60` and `7c09ab8` are now
   in the base. The dated validation record below is preserved as the evidence
   from its exact checkpoint, not relabelled as a run on a later tree.
-- Migration 030 satisfied the release-order dependency but grants no Quantity
-  release authority. This candidate itself needs no migration.
+- Migration 030 satisfied the release-order dependency but did not grant
+  Quantity release authority. The later separate Q-B authority is now consumed;
+  this release itself needed no migration.
 
-## Scope to finish
+## Released scope
 
 This release closes the already approved local Quantity safety work. It does
 not add Quantity Expression, LIST-1, a persisted formula, schema/RPC changes,
@@ -119,9 +125,9 @@ only its named local fixtures. It is not current-Production-schema Save
 acceptance, physical-device acceptance, large-BOQ performance certification,
 or proof that every BOQ has consistent stored route summaries.
 
-## Separate release gates
+## Executed release gates
 
-Migration 030 is complete. The remaining gates are:
+Migration 030 and both Quantity gates are complete:
 
 ### Q-A — freeze, publish and verify Preview
 
@@ -139,23 +145,25 @@ Migration 030 is complete. The remaining gates are:
    database query independently confirmed persisted quantity/totals and
    unchanged `updated_at`. Console capture, Preview Excel/PDF, and a current-
    schema persistent Save remain recorded limitations in Result #07.
-4. The Owner must then explicitly choose whether to accept the
-   documented current-schema persistence residual or authorize a separate
-   disposable current-schema rehearsal. Do not silently replay 027/028/029/030 or
-   use an existing Production BOQ as a write fixture.
+4. The Owner accepted the documented no-write persistence residual for this
+   release; no disposable current-schema Save rehearsal was authorized. Any
+   later write proof still needs named disposable data and fresh authority. Do
+   not replay 027/028/029/030 or use an existing Production BOQ as a write
+   fixture.
 
 ### Q-B — integrate to `main` and deploy Production
 
-1. Present the immutable commits/trees, local validation, Preview evidence and
-   the recorded persistence-residual decision.
-2. Obtain a second explicit Owner GO for the reviewed integration/push to
-   `main` and matching Production deployment. This Solo path has no PR; the
+1. **Complete/consumed:** the immutable commits/trees, local validation,
+   Preview evidence and recorded residual decision were presented.
+2. The Owner gave a second explicit GO for the reviewed integration/push to
+   `main` and matching Production deployment. This Solo path had no PR; the
    existing CI triggered by a `main` push remains an observable post-push check,
-   not a separately required pre-Preview gate.
-3. After Production deployment, repeat the bounded no-write interaction smoke,
-   verify the deployed commit, console and saved-version output, and write a
-   dated result. Any persistent Save test requires separately identified test
-   data and explicit write authority.
+   and passed.
+3. The bounded no-write Production smoke verified the deployed commit,
+   real-time/invalid/restore behavior, console and saved-version output. Result
+   #08 records the read-only database proof and the separate LIST-1B finding.
+   Any persistent Save test still requires separately identified test data and
+   explicit write authority.
 
 ## Stop conditions
 
@@ -166,17 +174,14 @@ add LIST-1 or full Quantity Expression while closing this release.
 
 ## Remaining Owner decisions
 
-1. **Persistence evidence:** either accept the documented lack
-   of a current-post-030-schema write rehearsal or separately authorize a
-   disposable rehearsal. Existing or Production BOQs are not implicit fixtures.
-2. **Output/console evidence:** accept the recorded lack of native-console
-   capture and Preview Excel/PDF download/generation, or authorize a separate
-   bounded evidence pass. Saved-version Print rendering passed.
-3. **Q-B release:** separately approve reviewed integration/push to `main` and
-   Production deployment after the immutable commits, local checks, Preview and
-   residual decision are reviewable.
-4. **Production write proof, if wanted:** identify disposable test data and
+1. **Production write proof, if wanted:** identify disposable test data and
    grant separate write authority. The default post-deploy smoke is no-write.
+2. **Production Excel/PDF evidence, if wanted:** saved Print and a captured
+   console passed; repeating browser PDF generation and Excel download remains
+   a separate bounded evidence task.
+3. **Next product scope:** decide LIST-1B, then wider R0/D0 before R1/R2
+   Quantity Expression. The Production RouteBadge finding increases LIST-1B
+   priority but grants no implementation authority.
 
 Later decisions remain outside this candidate: LIST-1B scope, wider R0/D0
 rounding/parity, physical-device and large-BOQ acceptance, R1/R2 Quantity

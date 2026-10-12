@@ -51,16 +51,16 @@
 > | Master Catalog / P-49 | **PRODUCTION PASS** | complete; 027/028 no-replay |
 > | Atomic BOQ Duplicate | **PRODUCTION PASS** | complete; 029 no-replay |
 > | BOQ Save NULL authorization guard | **PRODUCTION PASS** | migration 030 applied once; [Security Result #04](../plans/security/04-boq-save-null-authorization-production-release-result.md); authority consumed |
-> | Quantity Input Safety | **PREVIEW-VERIFIED CANDIDATE** | exact Preview source `5527fe9`; authenticated no-write QA passed with recorded persistence/console/Excel-PDF residuals; not merged or Production-deployed; [Plan #06](../plans/product/06-r0a-quantity-input-safety-release-plan.md), [Result #07](../plans/product/07-r0a-quantity-input-safety-preview-result.md) |
-> | LIST-1B | **PROPOSED** | decide Level-A scope after Quantity closeout; no implementation authority |
+> | Quantity Input Safety | **PRODUCTION PASS** | exact `main` source `4d285f8`; Quality/Vercel and authenticated no-write Production QA passed; no migration; Q-B authority consumed; [Result #08](../plans/product/08-r0a-quantity-input-safety-production-release-result.md) |
+> | Production dependency patch | **ACTION REQUIRED** | `npm audit --omit=dev`: 6 findings including direct `next@16.2.9` critical; review/apply the offered non-major `16.4.0` path as a separate release |
+> | LIST-1B | **PROPOSED — NEXT DECISION** | Production exposed the known RouteBadge N+1/error-fallback defect; decide Level-A scope; no implementation authority |
 > | Wider R0/D0 | **PROPOSED** | decide rounding/parity and current-schema evidence contract |
 > | R1/R2 Quantity Expression | **PROPOSED** | `*` canonical, `x`/`X`/`×` aliases; editor-only expression and numeric-only output; implementation not authorized |
 > | Wider S0 Auth/Security | **PROPOSED, separate lane** | migration 030 fixed one Save guard only |
 >
-> Immediate sequence: Q-A phases 1–2 complete/consumed -> persistence,
-> console and Preview Excel/PDF residual decision -> separate Q-B `main`
-> integration/Production decision -> LIST-1B. No
-> plan text grants an external operation or Production write.
+> Immediate sequence: Quantity Q-A/Q-B complete/consumed -> dependency-security
+> patch -> decide LIST-1B -> wider R0/D0 -> R1/R2 Quantity Expression. No plan text grants an external
+> operation or Production write.
 
 ---
 

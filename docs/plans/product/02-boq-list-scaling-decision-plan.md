@@ -20,13 +20,14 @@ verified in Production on 2026-08-31 under
 authority is consumed. LIST-1 remains a separate proposed decision.
 
 **Current adjacent work:** the BOQ Save NULL authorization guard is
-`PRODUCTION PASS` through immutable migration 030. Quantity Input Safety is a
-separate `PREVIEW-VERIFIED CANDIDATE`: runtime/tests commit `b18e69a`, docs
-commit `a467d38`, and exact Preview source `5527fe9`; it is not merged or
-released to Production. See [Quantity Plan #06](./06-r0a-quantity-input-safety-release-plan.md)
-and [Preview Result #07](./07-r0a-quantity-input-safety-preview-result.md).
-Q-A phase 2 used the no-PR/no-separate-CI Solo Preview path. Neither status
-authorizes LIST-1; all Level-A rows in the Owner decision sheet remain `TBD`.
+`PRODUCTION PASS` through immutable migration 030. Quantity Input Safety is
+also `PRODUCTION PASS`: runtime/tests `b18e69a` reached exact `main` source
+`4d285f8` and passed Q-B no-write verification. See [Quantity Plan
+#06](./06-r0a-quantity-input-safety-release-plan.md) and [Production Result
+#08](./08-r0a-quantity-input-safety-production-release-result.md). Its
+Production smoke reproduced an incorrect RouteBadge fallback and extreme
+per-row request amplification, increasing the priority of this plan. Quantity
+authority does not authorize LIST-1; all Level-A rows remain `TBD`.
 
 **Research basis:**
 [BOQ Register Pagination Best-Practice Research](./03-boq-list-pagination-best-practice-research.md)
@@ -435,11 +436,9 @@ current recovery path.
   server-authorized current set/count; and
 - true Project grouping/entity if the business distinguishes Project from BOQ.
 
-DUP-1 and security migration 030 are complete. Quantity Input Safety has moved
-from proposal to a separate Preview-verified candidate. Its Q-A phases 1–2 are
-complete/consumed, while residual acceptance and Q-B Production remain pending.
-LIST-1 remains the next substantial proposed feature after that
-closeout and before the larger Quantity Expression
+DUP-1, security migration 030, and Quantity Input Safety are complete. Quantity
+Q-A/Q-B authorities are consumed. LIST-1 remains the next substantial proposed
+feature before the larger Quantity Expression
 DB-1 release, while the wider calculation safety/test baseline must be
 established before expression implementation. LIST-1 addresses current Admin
 pain, has a smaller blast radius than DB-1, and may require no schema change.
@@ -495,7 +494,7 @@ STOP if:
 | Admin L2 filters | Department + sector + owner + date | `TBD` |
 | Route behavior | Embed current-page route fields or use one current-page batch; no per-row or per-click list query | `TBD` |
 | Copy eligibility projection | Defer optional trusted projection to L1.1; keep current RPC final authority in L1 | `TBD` |
-| First implementation order | Close the Preview-verified Quantity candidate through residual decision and Q-B, then LIST-1, wider calculation baseline, and expression DB-1 | `DUP-1 and 030 complete; Quantity Q-A phases 1–2 complete, unmerged/unreleased; LIST-1 TBD` |
+| First implementation order | Resolve the separate dependency-security patch, then LIST-1, wider calculation baseline, and expression DB-1 | `DUP-1, 030, and Quantity Q-A/Q-B complete; LIST-1 TBD` |
 
 ## 14. Proposed approval wording
 

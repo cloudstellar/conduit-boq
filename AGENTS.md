@@ -75,48 +75,52 @@ current.
   LIST-1, broader Auth/Security work, Catalog/Factor/BOQ data operations,
   account changes, another deployment or Production mutation.
 
-## Active Quantity Preview candidate
+## Quantity Input Safety Production boundary
 
-`R0A_QUANTITY_INPUT_SAFETY_PREVIEW_VERIFIED_20261012`
+`R0A_QUANTITY_INPUT_SAFETY_PRODUCTION_CLOSEOUT_20261012`
 
-- A reviewed Quantity Input Safety candidate is preserved locally on
-  `codex/quantity-input-safety`; always verify the live branch, HEAD, upstream,
-  and worktree before acting. At the pre-freeze 2026-10-12 checkpoint the
-  candidate was uncommitted, had no upstream, and its base HEAD equalled
-  `origin/main` at `7c09ab8214c4d2d213349b3281680aef653e5109`; that remains
-  dated chronology. The later local freeze created runtime/tests commit
-  `b18e69adeeaedbf10ca70c767ac4cf80a351b6bc` and documentation commit
-  `a467d385041d4d5b05d7a539ac28269a252b3f6d`. At that post-freeze checkpoint
-  the worktree was clean at `a467d38`, had no upstream, and was two commits
-  ahead of `origin/main` with none behind. The current status-only documentation
-  alignment is a later descendant of that checkpoint; verify its live HEAD
-  before publication.
-- Use the [R0A Quantity Input Safety release-candidate plan](docs/plans/product/06-r0a-quantity-input-safety-release-plan.md)
-  for exact behavior and gates, and [Preview Result #07](docs/plans/product/07-r0a-quantity-input-safety-preview-result.md)
-  for the executed Q-A phase 2 receipt.
-- This is numeric-only input safety plus editor/save coordination. It is not
+- Quantity Input Safety is live in Production from exact source
+  `4d285f81fa7ad418039ccd8428c2e55ac1e65ce8`, tree
+  `4a2a2fa8ba848de2c367420e43ad2c765efdc95b`. Use
+  [Production Result #08](docs/plans/product/08-r0a-quantity-input-safety-production-release-result.md)
+  as the execution receipt; [Preview Result #07](docs/plans/product/07-r0a-quantity-input-safety-preview-result.md)
+  remains the frozen Q-A chronology.
+- The runtime/tests change is
+  `b18e69adeeaedbf10ca70c767ac4cf80a351b6bc`. The later commits carried the
+  reviewed runtime through Preview and direct fast-forward integration without
+  adding a migration or changing runtime behavior.
+- The release keeps Quantity numeric-only, recalculates valid drafts in real
+  time, retains invalid operator text visibly, prevents `5x2`/`5*2` from
+  becoming `52`, and restores saved values on Escape/Cancel/reload. It is not
   Quantity Expression and adds no formula persistence, schema/RPC change,
   migration, Catalog/Factor mutation, BOQ backfill, or account change.
-- The exact application candidate at
-  `5527fe9fe9ce6e1f8888912c18dc9b26e7b1b6b3` (tree
-  `66b83f60482da3ca6c6e9390113452180cef0d47`) is a
-  `PREVIEW-VERIFIED CANDIDATE`. Local HEAD and
-  `origin/codex/quantity-input-safety` matched that commit while `origin/main`
-  remained `7c09ab8`; the local branch still had no configured upstream. Q-A
-  phase 2 used the Owner-selected Solo path with no PR or separate CI and is
-  complete/consumed. It performed no Save, database mutation, merge, or
-  Production deployment. The persistence/output-console residual decision and
-  Q-B `main`/Production release remain separate. Q-A phase 2
-  branch-publication/Preview authority is complete/consumed. The previously
-  approved Q-A plan leaves exactly one local documentation-only closeout commit
-  containing Result #07 and the synchronized status files; it must not change
-  runtime and grants no push or another Preview. After that exact closeout
-  commit, do not discard or mix the candidate into unrelated work, create or
-  amend another commit, push, Preview, integrate, or deploy without fresh
-  explicit authority for the applicable operation.
-- LIST-1B, wider R0 accounting decisions, R1/R2 Quantity Expression, and wider
-  S0 Auth/Security remain separate decisions. Migration 030 being complete
-  satisfies a dependency; it does not authorize the Quantity release.
+- Authenticated no-write Production QA, a clean browser console, saved-version
+  Print, and a read-only database check passed. No Save, database mutation, or
+  migration occurred. Migrations 027–030 remain immutable/no-replay.
+- A Production RouteBadge discrepancy was confirmed as the pre-existing
+  LIST-1B N+1/error-fallback defect, not a Quantity regression. Do not roll back
+  Quantity or restore comma-splitting; names may contain commas. Fix it through
+  one embedded/batched current-page route load plus explicit error state.
+- Q-A and Q-B authorities are complete/consumed. This result grants no further
+  commit, push, deployment, Production write, branch cleanup, LIST-1B, wider R0,
+  R1/R2 Quantity Expression, or wider S0 Auth/Security authority.
+
+## Open dependency-security boundary
+
+- The successful Quantity Quality run covered install, lint, tests, and build;
+  it did not run the repository's `audit:prod` script.
+- A fresh `npm audit --omit=dev` on 2026-10-12 reported six Production
+  dependency findings: one critical, four high, and one moderate. Direct
+  `next@16.2.9` is critical; npm currently offers `16.4.0` as a non-major fix
+  path.
+- Next.js announced another out-of-band security update for 2026-10-14. Prefer
+  one isolated dependency-security release after that version is available for
+  this Solo workflow unless the Owner chooses immediate remediation followed by
+  a second update.
+- Do not run `npm audit fix` blindly or mix the dependency patch into LIST-1B,
+  Quantity Expression, database work, or a docs-only closeout. Align `next`,
+  `eslint-config-next`, PostCSS override intent, Sharp, and the lockfile under a
+  fresh reviewed release.
 
 ## Post-DUP-1 repository custody
 

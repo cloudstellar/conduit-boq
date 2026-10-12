@@ -126,7 +126,11 @@ candidate as runtime/tests commit `b18e69a` plus docs commit `a467d38` and is
 now consumed. Q-A phase 2 later verified exact source `5527fe9` through the
 Owner-selected no-PR/no-separate-CI Preview path; see [Preview Result
 #07](../plans/product/07-r0a-quantity-input-safety-preview-result.md). That
-authority is also consumed, and the candidate remains unmerged/unreleased.
+authority is consumed. Q-B later fast-forwarded exact source `4d285f8` to
+`main`; GitHub Quality, Vercel Production, authenticated no-write QA, console,
+saved Print and a read-only database check passed. Use [Production Result
+#08](../plans/product/08-r0a-quantity-input-safety-production-release-result.md)
+for the release receipt. Q-B authority is also consumed.
 
 The Owner later explicitly chose to restore the previous route-total behavior:
 loading synchronizes only the selected route, selecting a route synchronizes
@@ -149,6 +153,22 @@ PDFs for the two-route and interpolated-Factor local fixtures. Do not extend
 that result to all BOQs, native Excel rendering, or the current Production
 schema; those limits remain recorded in the handoff.
 
+### Production dependency security requires a separate release
+
+The Quantity `main` workflow passed its configured install/lint/test/build
+steps, but CI does not run the existing `audit:prod` script. Its `npm ci` log
+reported 20 advisories. A fresh `npm audit --omit=dev` reported six Production
+dependency findings, including direct `next@16.2.9` as critical; npm currently
+offers `16.4.0` as a non-major fix path. The application uses relevant Next.js
+surfaces including App Router, `proxy.ts`, Server Actions, and `next/image`.
+
+Keep this outside the frozen Quantity identity. Next.js has announced another
+out-of-band security update for 2026-10-14, so the low-churn Solo recommendation
+is one isolated framework/dependency release after that patched version is
+available, unless the Owner chooses immediate `16.4.0` remediation followed by
+another update. Align `next`, `eslint-config-next`, PostCSS override intent,
+Sharp, and the lockfile deliberately; never run `npm audit fix` blindly.
+
 ## Source-of-truth map
 
 | Topic | Canonical location |
@@ -162,7 +182,7 @@ schema; those limits remain recorded in the handoff.
 | Current work and immediate Owner decisions | [AI Handoff — Current work register](./AI_HANDOFF.md#current-work-register--2026-10-12) |
 | Product evolution decisions | [`plans/product/01-conduit-boq-product-evolution-decision-plan.md`](../plans/product/01-conduit-boq-product-evolution-decision-plan.md) |
 | LIST-1 proposed design | [`plans/product/02-boq-list-scaling-decision-plan.md`](../plans/product/02-boq-list-scaling-decision-plan.md) |
-| Quantity Input Safety Preview candidate | [Plan #06](../plans/product/06-r0a-quantity-input-safety-release-plan.md) and [Preview Result #07](../plans/product/07-r0a-quantity-input-safety-preview-result.md) |
+| Quantity Input Safety Production release | [Plan #06](../plans/product/06-r0a-quantity-input-safety-release-plan.md), [Preview Result #07](../plans/product/07-r0a-quantity-input-safety-preview-result.md), and [Production Result #08](../plans/product/08-r0a-quantity-input-safety-production-release-result.md) |
 | Database schema | [`04_data/DATABASE_SCHEMA.md`](../04_data/DATABASE_SCHEMA.md) |
 | Production migration ledger | [`04_data/MIGRATIONS.md`](../04_data/MIGRATIONS.md) |
 | Current security model | [`04_data/SECURITY_MODEL.md`](../04_data/SECURITY_MODEL.md) |
@@ -216,15 +236,13 @@ uncommitted handoff work unless the Owner directs otherwise. This record grants
 no later commit, push, PR, merge, deployment, database, or Production
 authority.
 
-The current recommended sequence is: Q-A phases 1–2 complete/consumed at exact
-Preview source `5527fe9` -> persistence, console and Preview Excel/PDF residual
-decision -> separate Q-B reviewed `main` integration and Production deployment ->
-decide/implement LIST-1B -> address wider R0/D0 before R1/R2 Quantity
-Expression. The candidate is `PREVIEW-VERIFIED` but remains unmerged and
-unreleased to Production. Each external operation still requires its applicable
-current approval.
-`S0` authentication/security remains a separate parallel lane. No plan text
-itself grants implementation or external-operation authority.
+The current recommended sequence is: Quantity Q-A/Q-B complete/consumed at
+exact Production source `4d285f8` -> address the separately discovered
+Production dependency advisories -> decide/implement LIST-1B -> address wider
+R0/D0 before R1/R2 Quantity Expression. `S0` authentication/security remains a
+separate parallel lane. Each external operation still requires its applicable
+current approval; no plan text grants implementation or external-operation
+authority.
 
 ## Completion check
 

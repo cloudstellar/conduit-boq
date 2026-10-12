@@ -36,14 +36,14 @@ Quantities) สำหรับการใช้งานภายใน บม�
 > แล้ว
 
 > [!NOTE]
-> Quantity Input Safety เป็น **PREVIEW-VERIFIED CANDIDATE**: runtime/tests
-> `b18e69a`, freeze docs `a467d38` และ exact Preview source `5527fe9`
-> ผ่าน local gates กับ authenticated no-write Preview QA แล้วโดยไม่มี PR หรือ
-> separate CI; ยังไม่ merge และยังไม่ deploy Production ดูขอบเขตที่
-> [R0A release-candidate plan](docs/plans/product/06-r0a-quantity-input-safety-release-plan.md)
-> และหลักฐานที่ [Preview Result #07](docs/plans/product/07-r0a-quantity-input-safety-preview-result.md)
-> LIST-1B และ Full Quantity Expression ยังเป็นงานแยกที่ไม่ได้รับ implementation
-> authority
+> Quantity Input Safety เป็น **PRODUCTION PASS** แล้ว: runtime/tests
+> `b18e69a` ถูก carry ผ่าน Preview และ fast-forward เข้า `main` ที่ exact
+> Production source `4d285f8` โดยไม่มี migration การตรวจ no-write บน
+> Production ผ่านครบตาม
+> [Production Result #08](docs/plans/product/08-r0a-quantity-input-safety-production-release-result.md)
+> ส่วน [Preview Result #07](docs/plans/product/07-r0a-quantity-input-safety-preview-result.md)
+> ยังคงเป็น chronology ของ Q-A LIST-1B และ Full Quantity Expression ยังเป็น
+> งานแยกที่ไม่ได้รับ implementation authority
 
 - สร้างและแก้ไข BOQ แบบหลายเส้นทาง (Multi-Route)
 - เลือกรายการจาก Master Catalog แบบมีเวอร์ชัน และเก็บราคาเป็น snapshot ของ
@@ -136,8 +136,9 @@ docs/                product, architecture, data, process และ handoff
 - [Product evolution decision plan](docs/plans/product/01-conduit-boq-product-evolution-decision-plan.md)
   สำหรับลำดับพัฒนาระยะยาว
 - [BOQ list scaling plan](docs/plans/product/02-boq-list-scaling-decision-plan.md)
-- [Quantity Input Safety release plan](docs/plans/product/06-r0a-quantity-input-safety-release-plan.md)
-  และ [Preview result](docs/plans/product/07-r0a-quantity-input-safety-preview-result.md)
+- [Quantity Input Safety release plan](docs/plans/product/06-r0a-quantity-input-safety-release-plan.md),
+  [Preview result](docs/plans/product/07-r0a-quantity-input-safety-preview-result.md)
+  และ [Production result](docs/plans/product/08-r0a-quantity-input-safety-production-release-result.md)
 - [BOQ Save guard Production result](docs/plans/security/04-boq-save-null-authorization-production-release-result.md)
 - [BOQ list pagination research](docs/plans/product/03-boq-list-pagination-best-practice-research.md)
 - [Atomic BOQ Duplicate Production result](docs/plans/product/04-atomic-boq-duplicate-production-release-result.md)
@@ -154,12 +155,14 @@ docs/                product, architecture, data, process และ handoff
 - Atomic Duplicate เปิดใช้แล้วโดย migration 029 และ application ที่ตรงกัน;
   สถานะ/ข้อจำกัดให้ยึด [AI handoff](docs/08_ai/AI_HANDOFF.md) และ
   [release result](docs/plans/product/04-atomic-boq-duplicate-production-release-result.md)
-- Quantity Input Safety ที่ห้าม `5*2`/`5x2` ถูกแปลงเงียบเป็น `52` ผ่าน Q-A
-  ระยะ 2 แบบ Solo Preview แล้วที่ exact source `5527fe9` โดยไม่มี PR หรือ CI
-  แยก ลำดับถัดไปคือ Owner ตัดสินใจยอมรับหรือขอหลักฐานเพิ่มสำหรับ
-  current-schema persistence, console และ Preview Excel/PDF -> Q-B
-  แยกสำหรับ integrate/push `main` และ Production -> จึงพิจารณา `LIST-1B`;
-  candidate นี้ยังไม่มี parser, formula persistence หรือ database change
+- Quantity Input Safety ที่ห้าม `5*2`/`5x2` ถูกแปลงเงียบเป็น `52` และคำนวณ
+  numeric draft แบบ real time เปิดใช้บน Production แล้วที่ `main` `4d285f8`;
+  ไม่มี parser, formula persistence หรือ database change การตรวจ Production
+  พบ RouteBadge บางแถวแสดงจำนวนเส้นทางไม่ตรงฐานข้อมูล ซึ่งสอดคล้องกับปัญหา
+  เดิมด้าน per-row query/error fallback ของ LIST-1B และไม่ใช่ Quantity regression
+- หลัง release พบ dependency advisory แยกจาก Quantity: `npm audit --omit=dev`
+  รายงาน 6 รายการ รวม `next@16.2.9` ระดับ critical และเสนอ `16.4.0` เป็นทางแก้
+  แบบไม่ข้าม major ควร patch และตรวจ release gate ใหม่ก่อนเริ่ม feature ถัดไป
 - หน้ารายการ BOQ ยังส่ง query แบบไม่แบ่งหน้าและค้นหาเฉพาะแถวที่ browser ได้รับ;
   การแบ่งหน้าแบบ server-side แบบมีเลขหน้าเป็นงานหลัก `LIST-1B` ถัดจาก guard;
   keyset เป็นทางเลือกภายหลังเมื่อมีหลักฐานด้าน deep-page performance หรือ
@@ -179,9 +182,9 @@ docs/                product, architecture, data, process และ handoff
 เลขรุ่นข้อมูล เช่น Master Catalog `2568.1.0`, เวอร์ชัน package และ Git SHA
 เป็นคนละ domain ห้ามใช้แทนกัน ตามกระบวนการ release ของ repository การเปลี่ยน
 application ใช้ pull request เข้า `main` เป็นค่าเริ่มต้นและต้องตรวจ deployment
-แยกต่างหาก สำหรับ R0A นี้ Owner เลือก bounded Solo Preview exception: ใช้
-local checks กับ exact commits เป็น quality gate, push branch เพื่อ Preview,
-แล้วขออนุมัติ integrate/push `main` แยกอีกครั้ง การ integrate ไม่ได้ apply
-Supabase migration อัตโนมัติ และ workflow ที่รันเมื่อ push `main` ไม่ถูกปิด
+แยกต่างหาก สำหรับ R0A นี้ Owner เลือก bounded Solo path: ใช้ local checks กับ
+exact commits เป็น quality gate, push branch เพื่อ Preview แล้วอนุมัติ
+fast-forward `main`/Production แยกอีกครั้ง การ integrate ไม่ได้ apply Supabase
+migration และ workflow หลัง push `main` ผ่านครบตาม Result #08
 
 โครงการนี้เป็นซอฟต์แวร์ภายใน (Private — NT Internal Use Only)

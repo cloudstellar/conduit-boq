@@ -46,8 +46,9 @@
 > `e6a3175413f961d24feb03dbe7f757782dd2f08710a911732531ebc9b3d9081a`.
 > Exact postflight and limitations are recorded in [Security Result
 > #04](../plans/security/04-boq-save-null-authorization-production-release-result.md).
-> Migrations 027–030 are immutable/no-replay. Quantity Input Safety is a local
-> application candidate and does not add a migration.
+> Migrations 027–030 are immutable/no-replay. Quantity Input Safety later
+> reached `PRODUCTION PASS` at exact source `4d285f8` and did not add or apply a
+> migration; see [Production Result #08](../plans/product/08-r0a-quantity-input-safety-production-release-result.md).
 
 > **Current Production overlay (supersedes stale pre-execution status and
 > authority text below):**

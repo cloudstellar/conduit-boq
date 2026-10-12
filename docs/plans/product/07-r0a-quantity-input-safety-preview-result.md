@@ -6,6 +6,12 @@
 
 **Boundary:** `R0A_QUANTITY_INPUT_SAFETY_PREVIEW_VERIFIED_20261012`
 
+> **Later status:** This receipt remains the frozen Q-A Preview chronology.
+> Q-B was later separately approved, released, and closed as `PRODUCTION PASS`
+> in [Production Result #08](./08-r0a-quantity-input-safety-production-release-result.md).
+> Do not rewrite the Preview marker below to make the later release appear
+> simultaneous.
+
 ## Result
 
 The exact application candidate at

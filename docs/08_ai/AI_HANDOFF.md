@@ -4,8 +4,8 @@
 >
 > **Aligned:** 2026-10-12
 >
-> **Latest Production closeout:** 2026-10-12 — BOQ Save NULL authorization
-> guard, migration 030; `PRODUCTION PASS`, authority consumed
+> **Latest Production closeout:** 2026-10-12 — Quantity Input Safety at exact
+> `main` source `4d285f8`; `PRODUCTION PASS`, no migration, authority consumed
 >
 > **Pre-alignment dated Git observation (mutable):** branch
 > `codex/quantity-input-safety`; clean
@@ -20,6 +20,12 @@
 > `origin/codex/quantity-input-safety`; `origin/main` remained `7c09ab8` and the
 > local branch still had no configured upstream. The Vercel environment was
 > Preview, not Production. See [Preview Result #07](../plans/product/07-r0a-quantity-input-safety-preview-result.md).
+>
+> **Later Quantity Production observation (mutable):** fresh remote verification
+> found `origin/main`, `origin/codex/quantity-input-safety`, and clean local HEAD
+> at `4d285f81fa7ad418039ccd8428c2e55ac1e65ce8`, tree
+> `4a2a2fa8ba848de2c367420e43ad2c765efdc95b`. GitHub Quality and Vercel
+> Production completed successfully. See [Production Result #08](../plans/product/08-r0a-quantity-input-safety-production-release-result.md).
 
 ## Current work register — 2026-10-12
 
@@ -29,36 +35,31 @@
 | Atomic BOQ Duplicate (DUP-1) | **PRODUCTION PASS** | [Product Result #04](../plans/product/04-atomic-boq-duplicate-production-release-result.md); migration 029 no-replay; release authority consumed |
 | Editor-load/Save guard and signed-out login correction (PR #12) | **REPOSITORY COMPLETE** | merged as `c0cb6451c4d9924f69de93df4eee80abb6cca3c9`; do not infer a current deployment identity without fresh evidence |
 | BOQ Save NULL authorization guard | **PRODUCTION PASS** | [Security Result #04](../plans/security/04-boq-save-null-authorization-production-release-result.md); migration 030 applied once as `20261012100608/boq_save_null_authorization_guard`; source `cb2bb60`, closeout `7c09ab8`; authority consumed |
-| Quantity Input Safety (R0A core plus editor/Save coordination) | **PREVIEW-VERIFIED CANDIDATE** | [Plan #06](../plans/product/06-r0a-quantity-input-safety-release-plan.md) and [Result #07](../plans/product/07-r0a-quantity-input-safety-preview-result.md); exact source `5527fe9` passed local gates and authenticated no-write Preview QA; persistence/console/Excel-PDF residuals recorded; not merged or Production-deployed |
-| LIST-1B BOQ register scaling | **PROPOSED** | [Plan #02](../plans/product/02-boq-list-scaling-decision-plan.md); no implementation authority |
+| Quantity Input Safety (R0A core plus editor/Save coordination) | **PRODUCTION PASS** | [Production Result #08](../plans/product/08-r0a-quantity-input-safety-production-release-result.md); exact `main` source `4d285f8`; no-write QA/database proof passed; no migration; Q-A/Q-B authority consumed |
+| Production dependency advisories | **ACTION REQUIRED — SEPARATE PATCH** | `npm audit --omit=dev` reports 6 production dependency findings, including direct `next@16.2.9` as critical; fix path reports `next@16.4.0`; applicability and patch scope require a fresh reviewed release |
+| LIST-1B BOQ register scaling | **PROPOSED — NEXT PRODUCT DECISION** | [Plan #02](../plans/product/02-boq-list-scaling-decision-plan.md); Production reproduced incorrect RouteBadge fallback plus request amplification; no implementation authority |
 | Wider R0/D0 accounting contract | **PROPOSED** | rounding/parity and related decisions remain open; do not fold them into the Quantity safety release |
 | R1/R2 Quantity Expression | **PROPOSED** | canonical `*`, aliases `x`/`X`/`×`, editor-only expression and numeric-only output direction retained; implementation not authorized |
 | Wider S0 Auth/Security | **PROPOSED, separate lane** | migration 030 fixed one NULL guard only; admission/recovery/MFA/session decisions remain separate |
 
 ### Immediate Owner decisions
 
-1. **Q-A phase 1 — complete/consumed:** the exact local freeze created
-   runtime/tests commit `b18e69a` and docs commit `a467d38`; final clean-HEAD
-   checks passed. This later status-only documentation alignment records that
-   outcome without changing the runtime candidate.
-2. **Q-A phase 2 — complete/consumed:** exact source `5527fe9` was pushed and
-   verified in Vercel Preview under the Owner-selected Solo path, with no PR,
-   separate CI, Save, merge, or Production deployment.
-3. Accept the documented current-schema persistence plus console/Preview
-   Excel-PDF residuals, or authorize a bounded additional evidence pass.
-4. **Q-B:** separately authorize reviewed integration/push to `main` and the
-   matching Production deployment.
-5. After Quantity closes, decide LIST-1B Level-A scope. Wider R0/D0,
-   Quantity Expression and S0 remain later/separate decisions.
+1. **Quantity Q-A/Q-B — complete/consumed:** runtime/tests `b18e69a` passed
+   local gates, exact source `5527fe9` passed Preview, and exact source
+   `4d285f8` passed `main` CI, Vercel Production, and bounded no-write QA.
+2. **Dependency security — recommended first:** review and patch the direct
+   vulnerable Next.js dependency, then rerun the full application/release gate.
+   The advisory was not introduced by Quantity, but it affects the deployed
+   application dependency graph and should precede feature work.
+3. **LIST-1B — next product decision:** approve or adjust Level-A scope for
+   server pagination/search/filter/sort/count and one route batch. Production
+   reproduced the known RouteBadge error fallback and high request volume.
+4. Wider R0/D0, Quantity Expression and S0 remain later/separate decisions.
 
-Q-A phase 1 and the phase 2 branch-publication/Preview authorities are
-complete/consumed. The previously approved Q-A plan leaves exactly one local
-documentation-only closeout commit containing Result #07 and the synchronized
-status files; it must not change runtime and grants no push or another Preview.
-After that exact closeout commit, do not create or amend another commit, push,
-Preview, integrate, deploy, mutate the database, change an account, or write to
-Production without fresh explicit authority. Historical approvals and
-completed release receipts cannot be reused.
+Q-A and Q-B authorities are complete/consumed. Do not create or amend another
+commit, push, Preview, integrate, deploy, mutate the database, change an
+account, or write to Production without fresh explicit authority. Historical
+approvals and completed release receipts cannot be reused.
 
 ## BOQ Save authorization correction — preparation and closeout
 
@@ -101,9 +102,10 @@ The [R0A release candidate plan](../plans/product/06-r0a-quantity-input-safety-r
 records the separate application-release boundary and its fresh 2026-10-12
 validation. It records the local freeze and completed Preview; neither it nor
 [Preview Result #07](../plans/product/07-r0a-quantity-input-safety-preview-result.md)
-authorizes another push or Preview, integration, or deployment. The exact
-local Result #07/status-alignment commit is the final approved bookkeeping
-step described above.
+authorizes another push or Preview, integration, or deployment. Q-B was later
+separately approved, executed, and closed by [Production Result
+#08](../plans/product/08-r0a-quantity-input-safety-production-release-result.md);
+that authority is also consumed.
 
 This later checkpoint supersedes the dated “proposed / pending Owner decision”
 wording below **only for the local work described here**. The Owner approved
@@ -704,7 +706,7 @@ push, deploy, database, publication, or deletion authority.
 This section is the Master Catalog/custody residual list. It does not replace
 the 2026-10-12 current work register above; Quantity Q-A phases 1–2, Q-B
 Production integration and later product decisions are tracked there, in
-Product Plan #06, and in Preview Result #07.
+Product Plan #06, Preview Result #07, and Production Result #08.
 
 There is **no required Master Catalog execution work** and no open R-01 through
 R-05 item. Do not replay the completed release, migrations, disposable QA, or
@@ -732,7 +734,8 @@ authorized local Quantity implementation/testing, followed by the separately
 authorized local freeze at `b18e69a` + `a467d38`. The current work register and
 [Product Plan #06](../plans/product/06-r0a-quantity-input-safety-release-plan.md)
 plus [Preview Result #07](../plans/product/07-r0a-quantity-input-safety-preview-result.md)
-govern the resulting `PREVIEW-VERIFIED CANDIDATE`.
+preserve the Q-A chronology; [Production Result #08](../plans/product/08-r0a-quantity-input-safety-production-release-result.md)
+governs the later `PRODUCTION PASS` release.
 LIST-1B, wider R0/D0, Quantity Expression and S0 remain proposed. Nothing in
 this dated section is current commit, Preview, migration, account, deployment,
 or Production authority.
@@ -809,10 +812,10 @@ proposed S0 work.
 ### Historical first-safe-action guidance
 
 Re-read the mandatory files and verify Git/worktree state. The R0A local
-implementation and Q-A Preview steps named here have since occurred, while the
-residual and Q-B release decisions remain open. Follow the current register,
-Product Plan #06 and Preview Result #07 for Quantity;
-follow Product Plan #02 for LIST-1. Any new database object or forward
+implementation, Q-A Preview, and Q-B Production steps named here have since
+occurred and their authorities are consumed. Follow the current register and
+Production Result #08 for Quantity; follow Product Plan #02 for LIST-1. Any new
+database object or forward
 migration and every Production/account operation still require explicit
 current authorization.
 
