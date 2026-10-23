@@ -406,8 +406,14 @@ describe('Master Catalog post-closeout admin edit completion', () => {
 
     for (const path of liveDocuments) {
       const content = source(path);
-      const currentState = content.slice(0, 2200);
-      expect(content, path).toContain('MASTER_CATALOG_CURRENT_STATE_20260829');
+      const marker = '<!-- MASTER_CATALOG_CURRENT_STATE_20260829 -->';
+      expect(content.match(/<!-- MASTER_CATALOG_CURRENT_STATE_20260829 -->/g), path)
+        .toHaveLength(1);
+      // Inspect the named authority callout rather than unrelated later-release
+      // overlays that may legitimately precede it in a living document.
+      const currentState = content.slice(content.indexOf(marker) + marker.length)
+        .match(/^\r?\n((?:>[^\r\n]*(?:\r?\n|$))+)/)?.[1] ?? '';
+      expect(currentState, path).not.toBe('');
       expect(currentState, path).toContain(
         '106-phase4-master-catalog-exact-remaining-work-handoff.md',
       );
@@ -488,7 +494,11 @@ describe('Master Catalog post-closeout admin edit completion', () => {
     ];
     for (const path of temporalDocuments) {
       const content = source(path);
-      const addendum = content.slice(0, 1800);
+      const marker = '<!-- MAIN_CONVERGENCE_TEMPORAL_ADDENDUM_20260829 -->';
+      expect(content.match(/<!-- MAIN_CONVERGENCE_TEMPORAL_ADDENDUM_20260829 -->/g), path)
+        .toHaveLength(1);
+      const addendum = content.slice(content.indexOf(marker))
+        .match(/^<!-- MAIN_CONVERGENCE_TEMPORAL_ADDENDUM_20260829 -->\r?\n(?:>[^\r\n]*(?:\r?\n|$))+/)?.[0] ?? '';
       const normalizedAddendum = addendum.replace(/^>\s?/gm, '');
       expect(addendum, path).toContain(
         'MAIN_CONVERGENCE_TEMPORAL_ADDENDUM_20260829',

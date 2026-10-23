@@ -4,6 +4,7 @@ import { useEffect, useState, useCallback, useMemo } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { UserProfileWithOrg } from '@/lib/types/auth'
 import { loadCurrentAuthorization } from '@/lib/auth/authorization'
+import { clearBOQListSessions, getBOQListStorage } from '@/lib/boq/listSession'
 
 export function useUser() {
   const [user, setUser] = useState<UserProfileWithOrg | null>(null)
@@ -50,6 +51,7 @@ export function useUser() {
   }, [fetchProfile])
 
   const signOut = useCallback(async () => {
+    try { clearBOQListSessions(getBOQListStorage()) } catch { /* Storage may be disabled. */ }
     await supabase.auth.signOut()
     setUser(null)
     window.location.href = '/login'
@@ -82,6 +84,7 @@ export function useUser() {
         if (!isMounted) return
 
         if (event === 'SIGNED_OUT') {
+          try { clearBOQListSessions(getBOQListStorage()) } catch { /* Storage may be disabled. */ }
           setUser(null)
           setIsLoading(false)
           window.location.href = '/login'

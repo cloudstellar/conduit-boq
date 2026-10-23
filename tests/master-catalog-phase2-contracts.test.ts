@@ -22,7 +22,10 @@ describe('Master Catalog Phase 2 application contracts', () => {
     expect(duplicateClient).toContain(
       'p_expected_source_updated_at: request.expectedSourceUpdatedAt',
     )
-    expect(listPage).toContain('expectedSourceUpdatedAt: copyIntent.boq.updated_at')
+    expect(listPage).toContain('const intent = visibleCopyIntent;')
+    expect(listPage).toContain('sourceBOQId: intent.boq.id')
+    expect(listPage).toContain('requestId: intent.requestId')
+    expect(listPage).toContain('expectedSourceUpdatedAt: intent.boq.updated_at')
     expect(listPage).toContain('เปิดหน้าแก้ไขเพื่อเลือกเวอร์ชัน Factor F')
     expect(listPage).not.toContain("from('boq_items').insert")
     expect(listPage).not.toContain("from('boq_routes').insert")

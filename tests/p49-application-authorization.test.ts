@@ -411,7 +411,10 @@ describe('P-49 application authorization contract', () => {
     expect(duplicateClient).toContain(
       'p_expected_source_updated_at: request.expectedSourceUpdatedAt',
     )
-    expect(boqList).toContain('expectedSourceUpdatedAt: copyIntent.boq.updated_at')
+    expect(boqList).toContain('const intent = visibleCopyIntent;')
+    expect(boqList).toContain('sourceBOQId: intent.boq.id')
+    expect(boqList).toContain('requestId: intent.requestId')
+    expect(boqList).toContain('expectedSourceUpdatedAt: intent.boq.updated_at')
     expect(boqEdit).toContain('expectedSourceUpdatedAt: sourceUpdatedAt')
     expect(boqList).not.toContain("from('boq_items').insert")
     expect(boqEdit).not.toContain("from('boq_items').insert")
