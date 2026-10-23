@@ -1,13 +1,12 @@
 # Conduit BOQ Product Evolution Decision Plan
 
-**Status:** CURRENT DECISION DASHBOARD — DUP-1, SECURITY 030, AND QUANTITY
-INPUT SAFETY ARE `PRODUCTION PASS`; DEPENDENCY PATCH, LIST-1, AND REMAINING
-PRODUCT DECISIONS REQUIRE OWNER AUTHORITY
+**Status:** PRODUCT DECISION ANALYSIS — CURRENT SEQUENCING IN ROADMAP #09;
+DUP-1, SECURITY 030, R0A, DEPENDENCY A, B/031 AND LIST-1B L1 ARE CLOSED;
+S0/USER MINIMUM IS NEXT PROPOSED, WITH PARALLEL IT/SSO DISCOVERY
 
 **Prepared:** 2026-08-30; final evidence review plus D2/D3/D9 scope updates
-2026-08-31; R0A/LIST-1 refinement 2026-09-05; current execution overlay
-2026-10-12
-(Asia/Bangkok)
+2026-08-31; R0A/LIST-1 refinement 2026-09-05; execution overlay 2026-10-12;
+integrated planning 2026-10-14; release/status alignment 2026-10-23 (Asia/Bangkok)
 
 **Initial planning repository snapshot (before this plan/feature work):** `main` at
 `c41495ae9c1007cd3f147df9d0791e2a27a1adad`, equal to `origin/main` before
@@ -27,7 +26,48 @@ how to support quantity expressions such as canonical `5*2 = 10`, how to scale
 the growing Admin BOQ/project register, and which foundations must precede
 those features
 
+## Current planning supersession — 2026-10-14
+
+**Status aligned 2026-10-23:** [Integrated Roadmap #09](./09-integrated-roadmap-and-it-decision-handoff.md)
+is canonical for the remaining proposed order and IT/SSO decision handoff.
+A `a3114fc` → B client `42e01c5` → Production 031 ledger
+`20261023063934/boq_duplicate_stale_conflict_guard` → B closeout are recorded;
+B Production HTTP remains **NOT RUN** by Owner choice, not a pending probe.
+[LIST-1B L1](../../06_engineering/LIST_1B_L1_PRODUCTION_RELEASE_RESULT_20261023.md)
+released at `b1ce4495e4f1ec7c675b1341c2121d7b3e0b589f` with bounded no-write
+Production QA. These are existing receipts, not fresh Production inspection.
+Migrations 027–031 remain immutable/no-replay and release authority is consumed.
+The Owner authorizes local documentation alignment only in this task; no new
+implementation, package/lockfile, schema/RPC/migration, account/data,
+Production or stage/commit/push/deploy operation.
+
+It selectively supersedes the ordering/time-horizon, provisioning/authenticator
+and formal-authority-discovery recommendations in sections 2, 10, 11, 13, 19
+and 20 below. Their technical alternatives and dated release evidence remain
+available; unchanged D2/D3 product direction and completed D9 remain intact.
+Do not treat older multi-engineer planning ranges as a Solo schedule.
+
+After completed A/B/031 and L1, the remaining proposed order is S0/user minimum
+-> wider R0/D0 -> W-H frozen externally approved revision -> R1/R2 Expression.
+Optional L1.1/L2 do not automatically precede S0 or reopen released L1.
+IT hosting/SSO discovery starts now; confirmed IT policy controls cutover and
+release destination. The Owner confirmed signed-paper approval by the conduit
+engineering section manager. W-H is recommended, while recorder/evidence,
+revision/legacy handling and implementation remain undecided. IdP/protocol and
+internal-all hosting policy are not confirmed; Invite/password+MFA are not
+automatically the next build. No earlier TBD is made approved by this update.
+
+The Owner later deferred the three additional market-research proposals in
+[#09 section 8.1](./09-integrated-roadmap-and-it-decision-handoff.md#81-owner-deferral-of-market-research-additions--2026-10-14).
+[Research/Backlog #10](./10-global-estimating-research-and-capability-backlog.md)
+preserves comparisons and older ideas, without inserting Excel intake,
+additional scope/provenance or extra quality/stale-save gates into near-term work.
+
 ## Current execution overlay — 2026-10-12
+
+**Dated overlay:** its then-current package findings and proposed LIST status
+are historical, not remaining work. Its release evidence remains valid as recorded; the later
+#09 planning overlay above governs ordering and newly clarified business facts.
 
 This overlay supersedes dated status language in this plan without rewriting
 the historical decisions and evidence below.
@@ -104,6 +144,11 @@ not replace a new preflight at implementation or release time.
 
 ## 2. Executive recommendation
 
+**Current planning:** the active recommendation/decision tables below reflect
+#09 for provisioning, SSO and external-paper authority. The earlier development
+sequence is retained as a collapsed historical reference; technical alternatives
+and dated observations stay intact. All implementation approvals remain open.
+
 **Atomic BOQ Duplicate**, security migration 030, and Quantity Input Safety are
 released and verified. Quantity combines fail-closed numeric input, real-time
 totals, draft identity, and matching Factor/save preparation. Its exact
@@ -127,14 +172,26 @@ Recommended decision bundle:
 | Pilot data model | `DB-1` persisted normalized expression + canonical numeric result | The Owner requires the formula to be available again when editing the quantity after save/reload/reopen, but not in Print/PDF/Excel. |
 | Production save | New forward RPC hardening change | Normalize quantity once, recompute/reject totals server-side, and retain all P-49 authorization controls. |
 | Mobile | Responsive release, or an explicitly desktop-only named pilot | The current 390 px layout clips the work area; Owner must choose whether mobile blocks only Production or also the pilot. |
-| Account admission | Admin invite/pre-provision next | Better fit for a small internal user base than long-term self-signup. |
-| Authenticator | Password + MFA now; enterprise SSO later if ready | SSO is an authentication option, not an account-admission policy, and should not block calculator work. |
+| Account admission | Decide provisioning with Owner/IT after identity discovery | Existing organizational SSO may change the appropriate model; do not build Invite by default. |
+| Authenticator | Discover organizational SSO now; protocol/build choice TBD | IdP/protocol are unknown; preserve current authorization and handle security defects independently. |
 | Privileged security | MFA/AAL2 for Admin/Approver plus session controls | Reduces account-takeover impact on high-risk actions. |
 | BOQ/project register | `LIST-1B` server-side numbered pages, initial fixed 25-row default, server search/filter/sort, and batched routes | Admin already sees 263 BOQs; the current unbounded list and per-row route requests are a present usability/performance problem. The page size is a measured Conduit v1 choice, not a universal constant. |
-| BOQ authority | Discovery first; then `W1` internal approval or `W-H` external-authority handoff | `263 draft` rows show no stored non-draft lifecycle in this app, but do not prove where formal approval currently happens. |
+| BOQ authority | `W-H` is the proposed fit for confirmed signed-paper approval | Owner confirmed the conduit engineering section manager signs real paperwork; recorder/revision/evidence rules remain TBD. |
 | Long-term data | `DB-2` only when measurements become audit evidence | Structured provenance needs stable line identity and append-only revisions; it should not be bolted onto transient item IDs. |
 
-The recommended sequence is:
+Current proposed sequencing and IT-dependent release conditions are in
+[Roadmap #09](./09-integrated-roadmap-and-it-decision-handoff.md#3-ลำดับที่เสนอและเงื่อนไขเปลี่ยนลำดับ):
+dependency security -> LIST-1B -> S0/user minimum -> wider R0/D0 -> W-H ->
+R1/R2 Expression. IT/SSO discovery starts now; the Owner-deferred additions
+do not add prerequisites or change this order.
+
+<details>
+<summary>Earlier sequence and account recommendations (superseded for current planning)</summary>
+
+The earlier bundle recommended “Admin invite/pre-provision next”, “Password +
+MFA now; enterprise SSO later if ready”, and authority discovery before W-H/W1.
+Those recommendations are retained here as chronology, not current choices.
+The recorded earlier sequence was:
 
 ```text
 Documentation and recorded decisions
@@ -162,6 +219,8 @@ remain separable identity changes. Every security change needs its own change
 request, tests, rollback, and release window rather than being bundled into the
 calculator release.
 
+</details>
+
 ### 2.1 Owner decision dashboard
 
 The detailed analysis follows, but these are the decisions that control scope.
@@ -174,18 +233,19 @@ The detailed analysis follows, but these are the decisions that control scope.
 | D2 | Formula persistence | DB-0 result / DB-1 expression + result / DB-2 structured measurements | DB-1: persist a bounded normalized expression beside canonical numeric quantity; render it only in the quantity editor | `DB-1; Print/PDF/Excel numeric-only — selected 2026-08-31` |
 | D3 | Pilot grammar | G1 multiplication / G2 basic arithmetic | G1 with `*` canonical and `x`/`X`/`×` input aliases | `G1; normalized reopen such as 5*2 — selected 2026-08-31` |
 | D4 | Incomplete/zero by action | edit / draft save / preview / print-Excel / submit / approve | Never coerce blank to zero; allow explicit zero only in incomplete draft; block official output/submit/approve until resolved | `TBD` |
-| D5a | Account provisioning | self-signup + pending / invite-pre-provision / IdP-managed | invite/pre-provision | `TBD` |
-| D5b | Authenticator | password + MFA / SAML SSO | password + MFA now; SSO strategic | `TBD` |
+| D5a | Account provisioning | self-signup + pending / invite-pre-provision / IdP-managed | choose with Owner/IT after SSO discovery; no default Invite build | `TBD — IdP/provisioning model unknown` |
+| D5b | Authenticator | native Auth / organizational SSO (protocol TBD) | SSO discovery now; implement only after IT target and identity continuity gates | `TBD — IdP/protocol unknown` |
 | D5c | Privileged/session policy | AAL level, lifetime, inactivity, concurrency, revocation SLA | AAL2 inside every privileged trusted boundary; explicit timeout/revocation | `TBD` |
-| D6 | Formal BOQ authority | W0 estimate only / W-H external approval / W1 in-app approval / W2 engine | discovery gate, then W-H or W1 according to the real authority | `TBD` |
+| D6 | Formal BOQ authority | W-H external paper authority / W1 only if authority later transfers / W2 deferred | W-H before Expression after S0/D0 foundations | `External paper authority confirmed 2026-10-14; design/implementation TBD` |
 | D7 | Mobile release scope | desktop-only named pilot / responsive pilot / responsive Production | desktop-only pilot is acceptable only when visibly unsupported on mobile; responsive required before general Production claim | `TBD` |
 | D8 | BOQ/project list scale | client pages / server numbered pages / cursor-load more / infinite scroll | `LIST-1B`: initial fixed 25-row server numbered pages + whole-result search/filter/sort + batched routes | `TBD — see LIST-1 plan and research` |
 | D9 | Whole-BOQ Duplicate | old multi-request client copy / atomic preserve copy / eligible-legacy selected-Factor copy / catalog requote-rebase | `DUP-1`: normal atomic preserve copy; separate selected-Factor copy only for eligible legacy BOQs; current prices require clean Create New; no catalog requote/rebase | `Released and verified 2026-08-31 — Result #04; authority consumed` |
 
 Dependencies that can reverse the roadmap:
 
-- If another system or signed paper process is the legal/formal approval
-  authority, implement W-H before or instead of W1.
+- The Owner confirmed signed paper as the current formal authority. W-H is the
+  proposed fit before Expression; W1 requires a new decision transferring
+  authority to the app, not automatic adoption of the UI permission helpers.
 - D2 is now resolved: formulas must survive save/reload/reopen, so the first
   Production expression release uses DB-1. Formula visibility is limited to
   the quantity editor during entry/re-edit; read-only UI, Print/PDF, and Excel
@@ -325,7 +385,7 @@ value throughout.
 | BOQs | `263`; all observed stored status `draft` | This snapshot contains no stored evidence of a non-draft lifecycle in Conduit BOQ; it does not prove that approval is absent from other systems or paper processes. |
 | Routes | `326` | Route grouping is established domain structure. |
 | BOQ items | `2,617` | Enough real data exists to characterize safely before changing the calculation contract. |
-| Quantity zero | `11` rows | [Calculation rules](../../05_calculation/CALCULATION_RULES.md#L197-L205) say quantity must be greater than zero, while UI/database permit zero; D4 must define each action without changing legacy rows. |
+| Quantity zero | `11` rows | [Calculation rules](../../05_calculation/CALCULATION_RULES.md#6-validation-rules) say quantity must be greater than zero, while UI/database permit zero; D4 must define each action without changing legacy rows. |
 | Quantity negative | `0` rows | Negative quantities are not currently observed and should remain disallowed unless a formal variation model is designed. |
 | Component recomputation differences | `14` rows above ฿0.01; `2` above ฿1; maximum ฿1.47 | Small discrepancies exist and require classification; do not rewrite history automatically. |
 | Item total vs. components | `2` rows, both exactly ฿0.01 | Likely rounding-edge behavior; the target contract must define where rounding occurs. |
@@ -1249,6 +1309,11 @@ SSO.
 
 ### Recommended staged account plan
 
+**2026-10-14 update:** this earlier staged plan is conditional, not the current
+mandatory build order. Do not build Invite/native password flows or choose SAML
+before IT confirms the target identity/admission model. Use #09 for S0 minimum,
+identity continuity, session/offboarding and a separately accepted SSO pilot.
+
 1. In the S0 lane, read the exact Auth configuration and prepare
    leaked-password protection, stronger password policy, generic auth errors,
    rate-limit verification, and a separately approved rollout.
@@ -1305,6 +1370,12 @@ switch contexts; integration/manual reconciliation needs an owner.
 another organizational workflow is the formal authority.
 
 ### Authority discovery gate before W-H or W1
+
+**2026-10-14 Owner clarification:** formal approval occurs on real signed
+paperwork by the conduit engineering section manager. This resolves where the
+authority currently sits; W-H is the proposed fit before Expression. The other
+discovery questions below (recording rights, delegation, evidence, revisions,
+retention and legacy handling) remain open. No W-H implementation is approved.
 
 `263 draft` rows prove only that Conduit currently stores no non-draft
 instances. Before choosing the workflow, interview and document:
@@ -1385,6 +1456,12 @@ do not create a generic workflow engine from hypothetical needs.
 
 ## 12. What comparable global products teach
 
+The earlier examples below remain reference patterns. The 2026-10-14 official
+source comparison and capability disposition are recorded in
+[Research/Backlog #10](./10-global-estimating-research-and-capability-backlog.md).
+Vendor capabilities do not become requirements; the Owner deferred the three
+new market additions under #09 section 8.1.
+
 The goal is not to copy product breadth. The useful patterns are:
 
 | Pattern | Industry example | Lesson for Conduit BOQ |
@@ -1405,6 +1482,12 @@ feature list without those foundations would make this product less reliable,
 not more competitive.
 
 ## 13. Recommended development order
+
+**Superseded ordering/horizons:** this section preserves the earlier work-package
+analysis and ranges. The current proposed Solo sequence, W-H-before-Expression
+dependency and conditional hosting/SSO tracks are in
+[Roadmap #09](./09-integrated-roadmap-and-it-decision-handoff.md#3-ลำดับที่เสนอและเงื่อนไขเปลี่ยนลำดับ).
+Do not use R3/R4 placement or the time bands below as the current release plan.
 
 The dates below are planning ranges, not promises. Each horizon advances only
 when its exit gate passes.
@@ -1886,6 +1969,11 @@ Deliverables:
 
 ## 16. Risk register
 
+The risks remain design references, not approval to execute every mitigation.
+Provisioning, SSO and W-H choices follow #09; AUTH-B/W1 mentions below are
+conditional alternatives. Do not turn the three Owner-deferred research
+additions into mandatory quality/provenance scope through this register.
+
 | Risk | Likelihood / impact | Control | Stop condition |
 |---|---|---|---|
 | `5x2` silently becomes `52` | Current / high | UI-0 reject guard; UI-2 parser states | Any unknown input can produce a committed number. |
@@ -1998,7 +2086,13 @@ Disable the feature flag and investigate if any of these occurs:
 
 ## 19. Owner decision sheet
 
-The one-page source of truth is the [Owner decision dashboard](#21-owner-decision-dashboard).
+The product decision dashboard is in
+[section 2.1](#21-owner-decision-dashboard). For current sequencing, IT/SSO and
+external-paper approval facts/open choices, use the
+[Roadmap #09 decision register](./09-integrated-roadmap-and-it-decision-handoff.md#8-decision-register).
+The duplicated D5a/D5b/D6 rows below match the current #09 facts and open
+choices. Earlier recommendations are retained in section 2's historical block;
+no recorded fact or TBD becomes implementation approval.
 No implementation begins until the relevant decisions are recorded and the
 required authority is granted separately. The exception already recorded is
 DUP-1: the Owner authorized its exact implementation and bounded Production
@@ -2012,10 +2106,10 @@ That authority is consumed and does not transfer to another roadmap item.
 | D2 | Formula persistence | DB-0 result only / DB-1 expression + result / DB-2 structured measurement | DB-1 bounded normalized expression + parser version + canonical numeric result; formula visible only in quantity editor | `DB-1; Print/PDF/Excel numeric-only — selected 2026-08-31` |
 | D3 | Pilot grammar | G1 multiplication / G2 basic arithmetic | G1 with `*` canonical and `x`/`X`/`×` input aliases | `G1; normalized reopen such as 5*2 — selected 2026-08-31` |
 | D4 | Incomplete/zero by action | edit / draft save / preview / print-export / submit / approve | explicit incomplete draft only; block official output/submit/approve | `TBD` |
-| D5a | Provisioning | self-signup / invite-pre-provision / IdP-managed | invite/pre-provision | `TBD` |
-| D5b | Authenticator | password + MFA / SAML SSO | password + MFA now; SSO later | `TBD` |
+| D5a | Provisioning | self-signup / invite-pre-provision / IdP-managed | choose with Owner/IT after SSO discovery; no default Invite build | `TBD — IdP/provisioning model unknown` |
+| D5b | Authenticator | native Auth / organizational SSO (protocol TBD) | SSO discovery now; implement after IT target and identity continuity gates | `TBD — IdP/protocol unknown` |
 | D5c | Privileged/session policy | AAL, lifetime, inactivity, concurrency, revocation | AAL2 inside trusted boundary plus explicit session SLA | `TBD` |
-| D6 | Formal authority | W0 / W-H external / W1 in-app / W2 | discover current authority, then W-H or W1 | `TBD` |
+| D6 | Formal authority | W-H external paper / W1 only after authority transfer / W2 deferred | W-H before Expression after S0/D0 foundations | `External paper authority confirmed 2026-10-14; design/implementation TBD` |
 | D7 | Mobile scope | desktop-only pilot / responsive pilot / responsive Production | explicit desktop-only pilot permitted; responsive before general claim | `TBD` |
 | D8 | BOQ/project list scale | client pages / server numbered pages / cursor-load more / infinite scroll | `LIST-1B`: initial fixed 25-row server pages, safe URL state, whole-result search/filter/sort, batched routes | TBD — see [LIST-1](./02-boq-list-scaling-decision-plan.md) and [LIST-1 research](./03-boq-list-pagination-best-practice-research.md) |
 | D9 | Whole-BOQ Duplicate | multi-request old copy / atomic preserve / eligible-legacy selected Factor / catalog requote-rebase | normal Atomic Preserve Copy plus separate Selected-Factor Copy only for eligible legacy BOQs; preserve old Catalog/items/prices; current prices use Create New; no catalog requote/rebase | `Released and verified 2026-08-31 — Result #04; authority consumed` |
@@ -2026,7 +2120,8 @@ Also confirm:
 - final D0 quantity/rounding limits; D2/D3 already select normalized semantic
   display (`5x2`, `5X2`, and `5×2` reopen as canonical `5*2`), not exact raw
   keystroke/whitespace retention;
-- whether Creator may approve their own BOQ and under what threshold;
+- who may record externally signed approval evidence, delegations and any
+  separation-of-duty rule; in-app approval requires a separate authority decision;
 - supported mobile viewport and whether offline entry is in scope (recommended:
   responsive online first; offline later only with a synchronization design);
 - pilot cohort, support owner, success window, and rollback authority;
@@ -2034,6 +2129,11 @@ Also confirm:
 - audit retention period and who may view security/approval events.
 
 ## 20. Proposed approval wording
+
+**2026-10-14 update:** the bundled wording below is an earlier example, not the
+current approval request. It must not preselect AUTH-B/password+MFA/SAML or
+reopen external-authority discovery. Record the relevant #09 decision and a
+small named candidate's local/source/release permissions separately.
 
 The Owner can record product direction without authorizing implementation using
 wording such as:

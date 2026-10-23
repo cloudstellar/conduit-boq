@@ -2,7 +2,18 @@
 ## Conduit BOQ System
 
 > **Status:** CANONICAL
-> **Last Updated:** 2026-10-12
+> **Last Updated:** 2026-10-23
+
+<!-- RELEASE_ALIGNMENT_20261023 -->
+> **Recorded release state — 2026-10-23:** dependency A (`a3114fc`) and
+> [stale-Copy B](../06_engineering/STALE_COPY_B_RELEASE_CLOSEOUT_20261023.md) (`42e01c5` + Production 031 ledger `20261023063934`)
+> are closed. [L1 Production result](../06_engineering/LIST_1B_L1_PRODUCTION_RELEASE_RESULT_20261023.md) records exact `b1ce449`,
+> Ready/Current and bounded no-write smoke PASS at its observation time.
+> B Production stale HTTP remains **NOT RUN**, closed rather than a pending
+> test. Migrations **027–031 are immutable/no-replay**. Earlier dated
+> pending/candidate/approval wording below preserves its own stage. This local
+> documentation alignment makes no fresh Production observation and grants
+> no runtime, DB, reset, migration or publication authority.
 
 <!-- MASTER_CATALOG_CURRENT_STATE_20260829 -->
 > [!IMPORTANT]
@@ -18,11 +29,115 @@
 
 ---
 
+<a id="working-agreement-20261015"></a>
+## Working agreement — clarified 2026-10-15
+
+**Earlier bounded B closeout — 2026-10-23:** Owner chose no additional
+Production HTTP probe and closed B on the recorded evidence; see the
+[final receipt](../06_engineering/STALE_COPY_B_RELEASE_CLOSEOUT_20261023.md).
+Production HTTP stays NOT RUN. It is not a mandatory pending B task or a full
+behavior PASS. Do not repeat that optional-probe approval request automatically
+or apply this choice to future releases. Authority is consumed; current work is
+local documentation/LIST-1B review only with no external operation.
+
+**Latest 031 DB execution — 2026-10-23:** the later explicit one-shot approval
+was completed in the confirmed Copy/no-other-DDL window. Ledger
+`20261023063934/boq_duplicate_stale_conflict_guard`, exact successor and unchanged
+security/non-source metadata/related contracts passed postflight and independent
+review. See the [031 receipt](../06_engineering/STALE_COPY_031_PRODUCTION_MIGRATION_RESULT_20261023.md).
+No business RPC or commit/push/deploy ran. Production stale HTTP remains NOT RUN;
+metadata PASS is not full business-flow PASS. 027–031 are immutable/no-replay,
+execution authority is consumed, and closeout docs remain local. Earlier
+031-unapproved passages below preserve their preceding stages.
+
+**Earlier B client execution — 2026-10-23:** separately approved Solo B4
+publication completed at `42e01c5`; Quality658 PASS and Vercel Production
+Ready/current. See the [B client receipt](../06_engineering/STALE_COPY_B_CLIENT_PRODUCTION_RELEASE_RESULT_20261023.md).
+031 was published as SQL source only; no DB operation/migration ran. Database
+execution and Production stale-RPC proof remain unapproved. Client publication
+authority is consumed; closeout documentation remains local with no second
+push. Earlier A-only/B-unapproved passages below are dated stages.
+
+**Later A execution closeout — 2026-10-23:** the Owner separately approved
+the A-only Solo route. Exact A8 commit `a3114fc` is now on main and Vercel
+Production Ready/Current; see the [A release receipt](../06_engineering/DEPENDENCY_A_PRODUCTION_RELEASE_RESULT_20261023.md).
+The named stale-Copy exception/publication authority are consumed. B and 031
+remain unapproved; no DB operation or migration was part of A. The earlier
+planning-only paragraph below remains its dated stage, not standing authority.
+
+**Named exception recorded later — 2026-10-23:** the Owner accepted the
+preserved stale-Copy FAIL for the exact dependency release A only, then B as a
+separate next release. The [A/B review plan](./DEPENDENCY_AND_STALE_COPY_RELEASE_PLAN_20261023.md)
+binds the exception to source, scope and A closeout. It is not a general waiver
+or publication/Production authority; no repeated request for this A exception
+is needed. The current request authorizes plan/documentation work only.
+
+L1 followed the separately approved Solo path: one exact 15-file commit/push,
+CI and Vercel checks, then a bounded no-write smoke. Its source was `b1ce449`;
+normal Auth/profile reads were distinct from excluded mutating business RPCs.
+No rollback ran. The prior conditional rollback authority is not a standing
+future deployment permission. A later docs-only push may also auto-deploy and
+needs its own reviewed source/target and explicit publication approval.
+
+This records the Owner's expectation of testing locally before Production.
+It is documentation of how later approved work is handled, not approval to
+reset Docker, implement a feature, publish Git changes or operate Production.
+
+1. **Inspect first.** Read the mandatory handoff and inspect relevant source,
+   Git state and test target read-only. Identify what already exists before
+   proposing new work. Do not require a Production inspection for every task.
+2. **Agree one small scope.** Explain the concrete problem, proposed change,
+   affected files/targets and intended tests in plain language. Continue within
+   the approved scope without asking again for routine steps it already covers.
+   Local implementation, an exact local reset/fixture setup and test writes may
+   be approved together. No such execution is authorized by this agreement.
+3. **Test before proposing release.** For application changes that use the
+   database, run the affected user flows against local Docker with the relevant
+   current Production schema, RPCs, permissions and behavior verified. For a
+   new DB change, establish that baseline, then rehearse the approved change
+   and its affected flows. Use recreatable synthetic data; copying all real
+   BOQs/accounts is unnecessary. An isolated SQL fixture proves its named SQL
+   cases, not full Auth/API/browser integration. An unrelated service or full
+   parity programme must not become a prerequisite for every small task.
+4. **Report evidence before release approval.** State the exact source/diff,
+   test target/baseline, cases run, PASS/FAIL/NOT RUN and limitations. Lint,
+   unit tests, build or CI success alone is not a Docker/database-flow PASS.
+   The current Quality workflow does not run Docker integration automatically.
+   If a required test fails or its relevant baseline is unknown, continue the
+   authorized correction work and hold the release recommendation. Any proposed
+   exception must be explicit and accepted by the Owner for that release;
+   a historical accepted residual is not permission to skip a new test.
+5. **Publish only within explicit authority.** Present the tested change and
+   remaining risks before asking to commit/push/integrate/deploy or operate
+   Production. The Owner can authorize named operations together; do not add
+   redundant approval steps. Local approval never implies those operations.
+   Verify deployed source and bounded post-release behavior afterward, with
+   Production writes only when expressly included in the approved scope.
+
+Keep the Solo workflow simple: no mandatory extra PR, test-DB backup or second
+Docker stack. Owner backup/snapshot files remain separate and untouched. A
+documentation-only edit needs appropriate diff/link checks, not an unnecessary
+DB rehearsal. Migrations 027–030 remain immutable/no-replay; use the
+[Local Database Parity Plan](../06_engineering/LOCAL_DATABASE_PARITY_PLAN.md)
+and [Local Parity Result](../06_engineering/LOCAL_DATABASE_PARITY_RESULT.md)
+for the prepared baseline and remaining stale-Copy failed gate. These safeguards
+do not change #09's
+product release order or turn proposed plans into approved implementation.
+
 ## 1. Deployment
 
-Production application deployment is automated by Vercel from `main`. A
-reviewed pull request is the default integration path. For the completed
-Quantity release only, the Owner selected a Solo path: exact
+**Current planning overlay (2026-10-14):**
+[Integrated Roadmap #09](../plans/product/09-integrated-roadmap-and-it-decision-handoff.md)
+governs proposed sequencing and IT/SSO readiness. Choose the simplest adequate
+review/integration path for each newly approved release; a PR is conditional,
+not a new requirement for every Solo task. The completed Quantity Solo path
+below is a receipt whose authority is consumed, not permission to reuse it.
+Internal target and SSO cutover remain unapproved and need separate acceptance.
+
+The recorded Production application deployment is automated by Vercel from
+`main`; verify its live configuration before publishing, since a docs-only push
+may trigger deployment too. A reviewed pull request is one integration path.
+For the completed Quantity release only, the Owner selected a Solo path: exact
 local commits and local checks formed the pre-publish review package, the
 feature branch was pushed directly for Preview without a PR or separate CI
 gate, and a later explicit Q-B approval authorized the exact fast-forward to

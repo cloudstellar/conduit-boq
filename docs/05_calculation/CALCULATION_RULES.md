@@ -1,10 +1,38 @@
 # Calculation Rules
 ## Conduit BOQ System
 
-**Last Updated:** 2026-08-31
+**Last Updated:** 2026-10-23
 **Status:** Canonical
 
+<!-- RELEASE_ALIGNMENT_20261023 -->
+> **Recorded release state — 2026-10-23:** dependency A (`a3114fc`) and
+> [stale-Copy B](../06_engineering/STALE_COPY_B_RELEASE_CLOSEOUT_20261023.md) (`42e01c5` + Production 031 ledger `20261023063934`)
+> are closed. [L1 Production result](../06_engineering/LIST_1B_L1_PRODUCTION_RELEASE_RESULT_20261023.md) records exact `b1ce449`,
+> Ready/Current and bounded no-write smoke PASS at its observation time.
+> B Production stale HTTP remains **NOT RUN**, closed rather than a pending
+> test. Migrations **027–031 are immutable/no-replay**. Earlier dated
+> pending/candidate/approval wording below preserves its own stage. This local
+> documentation alignment makes no fresh Production observation and grants
+> no runtime, DB, reset, migration or publication authority.
+
+> **2026-10-14 scope clarification:** Preserve the financial rules below; this
+> reference does not close wider R0/D0 accounting parity. The released R0A
+> guard remains numeric-only, permits explicit zero in its bounded contract,
+> rejects incomplete/invalid new input and limits new input to two decimal
+> places without backfilling loaded values. The older blanket `Quantity > 0`
+> statement below is not the current per-action validation specification.
+> Exact item/route/header rounding and Save/reload/Print/PDF/Excel parity still
+> require Owner decisions and current-equivalent isolated evidence before
+> W-H/Expression. See [R0A Result #08](../plans/product/08-r0a-quantity-input-safety-production-release-result.md)
+> and [Integrated Roadmap #09](../plans/product/09-integrated-roadmap-and-it-decision-handoff.md).
+
 ---
+
+A dependency patch, the stale-response correction and L1 pagination do not
+close wider R0/D0 or alter Catalog prices, Factor F, VAT/rounding or Quantity
+persistence. L1 saved-Print rendering is bounded no-write evidence, not fresh
+end-to-end accounting parity. Quantity remains numeric-only; schema/formula
+work requires the unresolved accounting decisions and a new approved scope.
 
 ## 1. Calculation Philosophy
 

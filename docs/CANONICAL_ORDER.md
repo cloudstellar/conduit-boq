@@ -4,6 +4,20 @@
 **Last Updated:** 2026-01-22  
 **Status:** DRAFT – Establishing canonical structure
 
+> **Historical structure note (2026-10-14):** the mapping and checkboxes below
+> preserve the 2026-01-22 documentation reorganization plan. They are not a
+> current completeness checklist or instructions to move files. Use the
+> [Documentation Index](./README.md) and [AI Handoff](./08_ai/AI_HANDOFF.md)
+> for current sources, and [Integrated Roadmap #09](./plans/product/09-integrated-roadmap-and-it-decision-handoff.md)
+> for proposed work and Owner/IT decisions. Historical `docs/canonical/` paths
+> do not override the maintained 01–08 structure.
+
+> **Navigation refresh — 2026-10-23:** A/B/031 and L1 `b1ce449` are completed
+> in the current index/handoff, with B Production HTTP NOT RUN. The existing
+> 48-document C alignment is local only; nine tooling/baseline artifacts remain
+> separate. The historical mapping/checkboxes below require no file move,
+> database operation or publication.
+
 ---
 
 ## Reading Order (01 → 08)

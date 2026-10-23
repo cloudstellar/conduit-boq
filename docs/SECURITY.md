@@ -1,6 +1,17 @@
 # Security Model: Current Runtime and Historical P-49 Target
 
-> **Compatibility entry point. Last aligned 2026-10-12.** The canonical
+<!-- RELEASE_ALIGNMENT_20261023 -->
+> **Recorded release state — 2026-10-23:** dependency A (`a3114fc`) and
+> [stale-Copy B](06_engineering/STALE_COPY_B_RELEASE_CLOSEOUT_20261023.md) (`42e01c5` + Production 031 ledger `20261023063934`)
+> are closed. [L1 Production result](06_engineering/LIST_1B_L1_PRODUCTION_RELEASE_RESULT_20261023.md) records exact `b1ce449`,
+> Ready/Current and bounded no-write smoke PASS at its observation time.
+> B Production stale HTTP remains **NOT RUN**, closed rather than a pending
+> test. Migrations **027–031 are immutable/no-replay**. Earlier dated
+> pending/candidate/approval wording below preserves its own stage. This local
+> documentation alignment makes no fresh Production observation and grants
+> no runtime, DB, reset, migration or publication authority.
+
+> **Compatibility entry point. Last aligned 2026-10-23.** The canonical
 > maintained security reference is
 > [`04_data/SECURITY_MODEL.md`](./04_data/SECURITY_MODEL.md). Dated target/gap
 > sections in this mirror are historical; current overlays and release results
@@ -41,6 +52,14 @@ migrations.
 
 <!-- DUP1_CURRENT_STATE_20260831 -->
 ## DUP-1 atomic-copy boundary
+
+The later 031 correction preserves the authorization/ACL contract below and
+changes stale conflict signaling to `PT409` + exact `BOQ_SOURCE_STALE`; see the
+[031 Production receipt](./06_engineering/STALE_COPY_031_PRODUCTION_MIGRATION_RESULT_20261023.md).
+L1 preserves the captured Copy source ID/UUID/token and existing RLS scope;
+actor-separated list-session cleanup is not S0/server-revocation proof. B
+Production stale HTTP stays NOT RUN under its completed closeout.
+
 
 Migration 029 is live exactly once as
 `20260831004110/atomic_boq_duplicate`; see the
@@ -88,6 +107,15 @@ scope comparison fails closed. Function identity, owner, ACL, configuration,
 business calculations and data are preserved. Migrations 027–030 are
 immutable/no-replay and the exact release authority is consumed. Wider S0
 Auth/Security work remains separate.
+
+<!-- INTEGRATED_ROADMAP_PLANNING_20261014 -->
+> **Planning pointer (2026-10-14):** [Integrated Roadmap #09](./plans/product/09-integrated-roadmap-and-it-decision-handoff.md)
+> owns the proposed S0/user-management minimum and IT/SSO decisions. It does
+> not change the implemented access matrix below or authorize implementation.
+> IdP/protocol and internal-all hosting policy remain unconfirmed; paper BOQ
+> approval by the conduit engineering section manager does not grant an app
+> recorder role. Recorder/evidence rules require a new decision. Market
+> additions are deferred under [#09 §8.1](./plans/product/09-integrated-roadmap-and-it-decision-handoff.md#81-owner-deferral-of-market-research-additions--2026-10-14).
 
 ## Authorization boundary
 

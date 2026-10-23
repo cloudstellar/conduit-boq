@@ -1,10 +1,107 @@
 # AI Handoff — Conduit BOQ
 
+## Current handoff — L1 released; local C alignment, 2026-10-23
+
+LIST-1B L1 was published through the explicitly approved exact 15-file Solo
+release: commit `b1ce4495e4f1ec7c675b1341c2121d7b3e0b589f`, tree
+`bc47a60a9d97f2ba655f7bafedd4f0a3154a20d7`. Use the
+[Production receipt](../06_engineering/LIST_1B_L1_PRODUCTION_RELEASE_RESULT_20261023.md)
+for Quality 762/59, Vercel Ready/Current, approximately 14 minutes of bounded
+no-write smoke PASS, exact source/target and limits. The prior
+[local result](../06_engineering/LIST_1B_L1_LOCAL_RESULT_20261023.md) and
+[Solo plan](../07_process/LIST_1B_L1_SOLO_RELEASE_PLAN_20261023.md) remain frozen
+chronology, not pending implementation or publication approval.
+
+A `a3114fc`, B client `42e01c5`, Production 031 ledger
+`20261023063934/boq_duplicate_stale_conflict_guard` and B final closeout are
+complete under their separate receipts. **B Production HTTP = NOT RUN**, closed
+by Owner decision; no repeated probe is required. L1 no-write smoke does not
+convert that limit to PASS or prove Copy/Save writes or all Production personas.
+Search text may appear in Data API URLs/logs; route-cap, concurrent-snapshot,
+cold local build, reported-version and favicon limits remain in the receipts.
+
+The Owner now approves local alignment of the **48 Markdown C documents** and
+documentation checks only. Keep **nine parity tooling/baseline artifacts**
+separate and unchanged. No stage/commit/push/deploy, Production access, DB
+operation/reset/restore, migration, account/reference, Catalog/Factor F or
+package/lockfile change is authorized. 027–031 remain immutable/no-replay.
+All prior execution permissions are consumed; unused conditional rollback is
+not a general future grant. Preserve original local credentials and dirty work.
+
+Next proposed foundation is S0/user minimum, with IT/SSO discovery in parallel,
+then wider R0/D0 → W-H → R1/R2 under [Roadmap #09](../plans/product/09-integrated-roadmap-and-it-decision-handoff.md).
+L1.1/L2 and the three Owner-deferred research additions do not become automatic
+prerequisites. The dated overlays below record their earlier stages; this
+summary and the current work register govern current status.
+
+## Earlier overlay — B closed with Production HTTP NOT RUN, 2026-10-23
+
+The Owner chose no additional Production stale HTTP probe and explicitly
+requested B closeout with **NOT RUN** retained. Use the [B final closeout](../06_engineering/STALE_COPY_B_RELEASE_CLOSEOUT_20261023.md):
+client `42e01c5`, Production 031 ledger `20261023063934`, local integration and
+quality plus Production metadata/ledger postflight support the bounded closed
+release. No full live HTTP/browser PASS is claimed. The optional HTTP probe
+is not a mandatory pending B task; do not ask for it again automatically.
+This decision does not waive LIST-1B or future release tests. Current work is
+local closeout/plan documentation only. All external-operation authority is
+consumed; 027–031 remain immutable/no-replay. No new implementation, Production
+access or commit/push/deploy is authorized. Earlier stage receipts stay dated.
+
+## Earlier LIST-1B recommendation refinement — 2026-10-23
+
+Public official-product research and local source review refined
+[Plan #02](../plans/product/02-boq-list-scaling-decision-plan.md#0-owner-review-brief--2026-10-23)
+and [Research #03](../plans/product/03-boq-list-pagination-best-practice-research.md#0-fresh-official-product-review--2026-10-23).
+Proposed L1 keeps 25 numbered server pages and newest-created order plus ID;
+new Mine/status controls and last-edited sorting move to L2. Default one main
+page/exact-count request plus one complete page-route batch; route-only error
+keeps valid BOQ rows and unavailable badges, while auth failure invalidates all.
+UI query-generation consistency is not a shared DB snapshot. Keep current
+Copy source-token/UUID/031 behavior. All Level-A choices remain TBD; this work
+is local documentation/research only, with no source/package/DB/Production or
+publication authority. #09 retains the broader release order and IT gates.
+
+## Earlier overlay — Production 031 closeout, 2026-10-23
+
+The Owner explicitly approved fresh preflight, one exact 031 application and
+read-only postflight inside the confirmed Copy/no-other-DDL window. The actual
+ledger is `20261023063934/boq_duplicate_stale_conflict_guard`; successor SHA
+`508f70695e5f5578734570d356c5a0921cab0e0dc0a207e8ffcc9aca313b68b2`,
+OID `112777`, non-source metadata/comment/security and related contracts passed
+postflight and independent review. See the [031 Production receipt](../06_engineering/STALE_COPY_031_PRODUCTION_MIGRATION_RESULT_20261023.md).
+Client `42e01c5` remains the observed Production source; no new deployment ran.
+**Approved DB step complete; Production stale HTTP NOT RUN.** No business RPC
+or global business-row invariance proof is claimed. Migrations 027–031 are
+immutable/no-replay; this execution authority is consumed. Local closeout docs
+and C work remain unpublished. Earlier B/031-pending statements below are their
+dated stages, not future authority or denial of this later approved execution.
+
+## Earlier overlay — B client Production closeout, 2026-10-23
+
+Exact B4 commit `42e01c56fe2eacb5239abc8d296ca1848c48a03b`, tree
+`6283410f997d00fc808cd9d8f7153b9bc381786f`, is on main and Vercel Production
+Ready/current. Quality passed 658 tests; the exact 524-file source had already
+passed separate Node 24 checks. Use the [B client receipt](../06_engineering/STALE_COPY_B_CLIENT_PRODUCTION_RELEASE_RESULT_20261023.md)
+for source, CI/deployment and limits. 031 was published as source only: no DB
+connection/query/write or migration ran. **Client stage complete; DB stage
+still open/unapproved.** Production stale HTTP/BOQ/browser acceptance was NOT RUN;
+client publication does not resolve the predecessor retry timeout. The A-only
+exception remains consumed. Do not replay 027–031 or apply 031 without its
+new explicit approval/window/immediate preflight. Client publication authority
+is now consumed; these closeout docs and C work remain local, with no second
+push. Earlier A-current/B-unapproved statements below are their dated stages.
+
 > **Status:** CANONICAL REPOSITORY ENTRY POINT
 >
-> **Aligned:** 2026-10-12
+> **Aligned:** 2026-10-23 — A/B/031 and L1 released; B Production HTTP NOT RUN;
+> current 48-document C alignment remains local/uncommitted
 >
-> **Latest Production closeout:** 2026-10-12 — Quantity Input Safety at exact
+> **Latest recorded application closeout:** L1 `b1ce449`, tree `bc47a60`;
+> Quality/Vercel and bounded no-write smoke PASS. B client `42e01c5` and 031
+> ledger `20261023063934` remain their separate closed release identities;
+> B stale HTTP remains NOT RUN, with no mandatory probe pending
+>
+> **Quantity feature's frozen Production closeout:** 2026-10-12 — Quantity Input Safety at exact
 > `main` source `4d285f8`; `PRODUCTION PASS`, no migration, authority consumed
 >
 > **Pre-alignment dated Git observation (mutable):** branch
@@ -27,7 +124,176 @@
 > `4a2a2fa8ba848de2c367420e43ad2c765efdc95b`. GitHub Quality and Vercel
 > Production completed successfully. See [Production Result #08](../plans/product/08-r0a-quantity-input-safety-production-release-result.md).
 
-## Current work register — 2026-10-12
+## Dependency A Production closeout — 2026-10-23, earlier execution
+
+The later explicit A-only Solo approval has been executed and consumed. Exact
+commit `a3114fc0eda2eb8d898ad2949ebc71250515df1f`, tree
+`8ef2acfacf3f22179c278070a4234ad81b3b9bee`, is on main and Vercel Production
+Ready/Current. Use the [A release receipt](../06_engineering/DEPENDENCY_A_PRODUCTION_RELEASE_RESULT_20261023.md).
+Quality passed 643 tests; live Vercel Node 24.x configuration prompted additional
+host/native Node 24 checks, which passed. Fresh production audit is zero; eleven
+development findings remain. Public login/one observed script HTTP checks passed.
+Authenticated BOQ/Print, app browser/console acceptance and Production DB checks
+were NOT RUN; no business RPC, database operation or migration occurred.
+
+The known stale-Copy timeout remains FAIL; its exception was accepted only for
+this A and is now consumed. B and 031 remain local/unpublished and unapproved.
+Only A8 was committed/pushed; these closeout docs and other C work remain local.
+No further commit/push/deploy, rollback, B execution or DB work follows this
+closeout. Earlier plan-only/no-publication text is its historical stage, not a
+denial that the later approved A operation occurred or future release authority.
+
+## A-first release plan — 2026-10-23, earlier Owner decision
+
+The Owner explicitly accepted the known predecessor stale-Copy FAIL for the
+exact reviewed eight-file dependency/lint release A only, then requested B as a
+separate next release. The exception is **ACCEPTED**, not pending: do not ask
+again; consume it at A closeout and never carry it to B or another release.
+Use the [two-release plan](../07_process/DEPENDENCY_AND_STALE_COPY_RELEASE_PLAN_20261023.md).
+Earlier no-waiver/order-undecided statements below preserve their chronology.
+
+Current scope is **PLAN/DOCS ONLY**: no code/DB tests, runtime changes,
+reset/migration application/replay, staging/commit/push/deploy or Production
+access. Existing source/DB state remains frozen apart from documentation.
+The 031 authority correction still applies; neither execution nor retroactive
+approval is inferred from the accepted exception.
+
+## 031 authority correction — 2026-10-23, later clarification
+
+The earlier 031 creation/local application exceeded the explicit approval:
+the request to continue while the Owner was away was overinterpreted. The
+Owner has now approved local continuation prospectively, without retroactive
+approval of that operation. Preserve the prior receipts and chronology; use
+the [canonical 031 result](../06_engineering/BOQ_DUPLICATE_STALE_CONFLICT_LOCAL_RESULT.md).
+
+Current work is documentation/local release-source validation; 031 SQL and
+the existing DB state stay frozen. No reset, replay/031 application,
+account/reference mutation, Production access, staging/commit/push/deploy or
+named stale-failure release waiver is authorized. Future 031 execution needs
+an exclusive no-concurrent-DDL window for the function/security metadata.
+
+## Local stale-Copy correction — 2026-10-23, latest follow-up
+
+Use the [conflict-fix local result](../06_engineering/BOQ_DUPLICATE_STALE_CONFLICT_LOCAL_RESULT.md)
+for the completed bounded continuation while the Owner was away. Forward 031
+changes only the stale error to `PT409` + `BOQ_SOURCE_STALE`; the helper accepts
+that exact pair and legacy `40001`. Local API **49/49**, real two-tab stale
+denial → reload → fresh Copy, 664 tests, lint (0 errors/3 existing warnings),
+TypeScript and Next build passed. No DB reset, 027–030 replay, Production call
+or publication occurred. Old data/reference/profile rows remain unchanged;
+12 new synthetic BOQs from this run are intentionally retained.
+
+Current local target is **frozen captured baseline plus exact 031 candidate**.
+Earlier baseline/14.5 timeout failures below remain chronology. Keep this
+RPC/client changeset separate from dependency/lint. Combined working-tree tests
+do not certify an isolated release or grant a stale-Copy waiver. Owner decision
+on release order remains outstanding; no further implementation, migration,
+Production access, commit/push/deploy or reset is authorized.
+
+## Local dependency candidate follow-up — 2026-10-23
+
+Use [Dependency Security Local Result](../06_engineering/DEPENDENCY_SECURITY_LOCAL_RESULT.md)
+for the later Owner-approved package/lockfile patch, five-file lint correction,
+existing-Docker checks and real-Next acceptance follow-up. Selected Next/config
+are 16.4.2; PostCSS override is 8.5.23. The unchanged resolved graph had zero
+Production audit findings, while 11 development findings remain. Lint is now
+zero errors/three reported warnings; 649 tests, TypeScript and production
+build passed. The candidate is local/uncommitted at base `b144bca`.
+
+Real production-mode Next Server Actions preserved Placement reason/request
+identity through error/retry for both current and HEAD components: **14 PASS**.
+The earlier standalone-Vite failure remains history and is explained by its
+different form-reset runtime. This is UI/transport evidence with a synthetic
+server ledger, not actual Catalog DB acceptance. No Catalog draft was created.
+
+Stale Copy remains the actual failed local HTTP gate. A later separately
+approved one-shot Production metadata read reported PostgREST **14.5**. The
+Owner then approved a REST-only local alignment: actual local binary is now
+**14.5**; all six remaining containers, including DB, retain their identities
+and configuration, with the same DB start/volume and schema contracts.
+One fresh JWT stale-Copy request still timed out at
+15,003 ms; 30 application-table fingerprints were unchanged. A REST-only restart
+cleared retry activity, and authenticated reads passed afterward. See the
+[14.5 addendum](../06_engineering/DEPENDENCY_SECURITY_LOCAL_RESULT.md#postgrest-145-alignment-and-stale-copy-retest--2026-10-23)
+for exact receipts, CLI version cache and scope. Historical 46 PASS / 1 FAIL
+remains history, not a fresh full-suite run. These tasks are complete; no
+further Production access, RPC/schema correction, reset, 027–030 replay or
+publication is authorized. The Owner identified long-note overflow in the
+local PDF layout and explicitly chose no fix; preserve that deferral and the
+unchanged Print source. Do not generalize the local observation to Production.
+
+## Local baseline execution — 2026-10-23
+
+The Owner authorized the bounded local baseline reset/restore/testing work and
+read-only Production schema capture after the earlier documentation-only phase.
+Use the [execution result](../06_engineering/LOCAL_DATABASE_PARITY_RESULT.md) for
+actual source/target/status/limits. Local application contracts were restored
+from fresh final-state metadata without replaying migrations. A real stale-Copy
+HTTP test exposed the PostgREST 14 `40001` retry problem; it is a failed case,
+not an accepted release exception or permission to patch the live RPC.
+Final evidence: semantic match of 30 tables/96 functions/27 triggers with three
+exact platform mappings; API **46 PASS / 1 FAIL**, browser **11 PASS**, original
+seven `local.*` login/profile checks **PASS** with the unchanged configured
+password. Actual saved Print, five-page PDF and downloaded Excel passed the
+bounded synthetic numerical vector. This is **PARTIAL / NOT RELEASE READY**.
+Synthetic `parity.*` accounts are additional test actors. No Git publication, dependency
+update, Production write or new product/migration implementation is authorized.
+
+## Working agreement clarification — 2026-10-15
+
+The Owner clarified that the intended workflow is local Docker testing before
+Production, with the relevant DB contracts current enough to prove the changed
+behavior. Use the [release working agreement](../07_process/RELEASE_PROCESS.md#working-agreement-20261015)
+as the canonical procedure. Inspect existing tools before adding work; report
+exact source/target, PASS/FAIL/NOT RUN and limitations before release approval.
+CI/build success is not Docker integration evidence. Do not make backup of
+recreatable test data, a second stack, extra PRs or repeated in-scope approvals
+mandatory. This clarification grants no runtime/DB/publication authority.
+
+Fresh local metadata at `2026-10-15T02:22:07.437546Z` (09:22 Bangkok), obtained
+in `BEGIN READ ONLY` followed by `ROLLBACK`, reconfirmed PG 17.6 and Save RPC,
+but no matched final 030 guard, Atomic Duplicate RPC or Admin paging RPC.
+Only local system metadata was queried, not business rows or Production.
+The persistent local stack cannot yet certify those current contracts end to
+end; the older isolated SQL receipts remain valid only for their stated scope.
+
+## Current planning overlay — 2026-10-14
+
+[Integrated Roadmap #09](../plans/product/09-integrated-roadmap-and-it-decision-handoff.md)
+is the current planning source for sequencing, IT readiness and open decisions.
+The Owner authorized local documentation alignment, not implementation,
+packages/lockfile, schema/RPC/migration, accounts/data, commit/push or deployment.
+This does not change the frozen Production identities or prior observations.
+See #09 for the dated pre-edit local Git baseline; no live Production inspection
+was performed for this planning update.
+
+The Owner confirmed external signed-paper approval by the conduit engineering
+section manager. W-H frozen revision/evidence is now recommended before
+Expression, after S0 permission/write-boundary and wider R0/D0 integrity gates.
+Corporate SSO exists but IdP/protocol are unknown. Internal-all hosting remains
+a preliminary assumption pending IT confirmation; start discovery now and
+accept hosting and identity cutovers separately. Do not implement Invite or a
+new password system merely because older recommendations preferred them.
+
+**Later Owner scope decision (2026-10-14):** the three new market-research
+additions (Excel quantity intake, scope/quantity provenance, and extra
+pre-issue quality/stale-save enhancements) are deferred from near-term work.
+They add no prerequisite or release; keep #09's main sequence and original
+S0/D0/W-H contracts. See [#09 §8.1](../plans/product/09-integrated-roadmap-and-it-decision-handoff.md#81-owner-deferral-of-market-research-additions--2026-10-14).
+
+**Documentation alignment candidate:** the Owner later requested one complete
+local documentation pass. Current overview, reference and process entry points
+now carry the relevant planning/runtime/history distinctions. The official
+market comparison and prior capability backlog are in
+[Research/Backlog #10](../plans/product/10-global-estimating-research-and-capability-backlog.md).
+This candidate remains local/uncommitted; preserve its working-tree changes and
+reverify Git before any publication. No staging, commit/push, deployment,
+package/runtime/database/account operation or Production inspection is part of
+this documentation pass. Frozen release results and migrations remain intact.
+
+<a id="current-work-register--2026-10-12"></a>
+<a id="current-work-register--2026-10-14"></a>
+## Current work register — updated 2026-10-23
 
 | Work | Status | Durable authority / next boundary |
 |---|---|---|
@@ -36,32 +302,64 @@
 | Editor-load/Save guard and signed-out login correction (PR #12) | **REPOSITORY COMPLETE** | merged as `c0cb6451c4d9924f69de93df4eee80abb6cca3c9`; do not infer a current deployment identity without fresh evidence |
 | BOQ Save NULL authorization guard | **PRODUCTION PASS** | [Security Result #04](../plans/security/04-boq-save-null-authorization-production-release-result.md); migration 030 applied once as `20261012100608/boq_save_null_authorization_guard`; source `cb2bb60`, closeout `7c09ab8`; authority consumed |
 | Quantity Input Safety (R0A core plus editor/Save coordination) | **PRODUCTION PASS** | [Production Result #08](../plans/product/08-r0a-quantity-input-safety-production-release-result.md); exact `main` source `4d285f8`; no-write QA/database proof passed; no migration; Q-A/Q-B authority consumed |
-| Production dependency advisories | **ACTION REQUIRED — SEPARATE PATCH** | `npm audit --omit=dev` reports 6 production dependency findings, including direct `next@16.2.9` as critical; fix path reports `next@16.4.0`; applicability and patch scope require a fresh reviewed release |
-| LIST-1B BOQ register scaling | **PROPOSED — NEXT PRODUCT DECISION** | [Plan #02](../plans/product/02-boq-list-scaling-decision-plan.md); Production confirmed one multi-route mismatch (`UI Test #5`: list 1, editor/DB 2) and separately confirmed per-row request amplification; a real one-route badge 1 is correct and the observation's exact trigger remains unproven; no implementation authority |
-| Wider R0/D0 accounting contract | **PROPOSED** | rounding/parity and related decisions remain open; do not fold them into the Quantity safety release |
-| R1/R2 Quantity Expression | **PROPOSED** | canonical `*`, aliases `x`/`X`/`×`, editor-only expression and numeric-only output direction retained; implementation not authorized |
-| Wider S0 Auth/Security | **PROPOSED, separate lane** | migration 030 fixed one NULL guard only; admission/recovery/MFA/session decisions remain separate |
+| Production dependency advisories | **A CLOSED; separate from B** | [A release receipt](../06_engineering/DEPENDENCY_A_PRODUCTION_RELEASE_RESULT_20261023.md): exact A8 `a3114fc`, recorded Quality/Vercel and production audit zero; eleven development findings remain separate; A-only exception/authority consumed; B subsequently closed separately |
+| Stale-Copy transport correction | **B CLOSED — Production HTTP NOT RUN** | [Final closeout](../06_engineering/STALE_COPY_B_RELEASE_CLOSEOUT_20261023.md): client `42e01c5`, Production 031 ledger `20261023063934`, recorded local/quality and metadata/ledger evidence; Owner chose no additional live HTTP probe, which is not a mandatory pending B task; no full live behavior PASS claim or further authority |
+| LIST-1B BOQ register scaling — L1 | **RELEASED; bounded no-write PASS** | [Production receipt](../06_engineering/LIST_1B_L1_PRODUCTION_RELEASE_RESULT_20261023.md): exact `b1ce449`, Quality 762, Vercel Ready/Current; sampled former mismatch now badge 2/dialog 2; old observation's exact trigger/prevalence remain unproven; L1.1/L2 deferred |
+| C documentation convergence | **LOCAL ALIGNMENT APPROVED; UNPUBLISHED** | Existing 48 Markdown documents; nine tooling/baseline files excluded; links and documentation contract tests required; no external operation or DB work |
+| Wider S0 Auth/Security and user-management minimum | **PROPOSED, separate release(s)** | migration 030 fixed one NULL guard only; preserve existing account workflow, decide provisioning/permissions/recovery/assurance/session and enforce trusted boundaries |
+| Wider R0/D0 accounting contract | **PROPOSED** | rounding/parity and related decisions remain open; prerequisite to authoritative W-H package and Expression; approved local acceptance must use relevant current contracts, including post-031 when Copy is affected |
+| W-H BOQ operational revisions | **PROPOSED; external authority clarified** | signed-paper engineering section manager approval confirmed by Owner; frozen package/evidence before Expression proposed; recorder, revision, evidence and legacy decisions remain TBD |
+| Internal hosting and organizational SSO | **DISCOVERY NOW; IMPLEMENTATION UNAPPROVED** | IdP/protocol unknown; internal-all policy unconfirmed; target, ownership, identity continuity and independent acceptance gates in #09 |
+| Local Docker captured baseline | **RESTORED; explicit 031 overlay rehearsed** | [Local Parity Result](../06_engineering/LOCAL_DATABASE_PARITY_RESULT.md) preserves original 46/47 evidence; later 49/49 local API PASS against exact 031 overlay; Production 031 was separately applied once, frozen capture unchanged; no new reset/replay/test authority |
+| R1/R2 Quantity Expression | **PROPOSED, after wider R0/D0** | canonical `*`, aliases `x`/`X`/`×`, editor-only expression and numeric-only output direction retained; W-H first recommended; implementation not authorized |
 
 ### Immediate Owner decisions
 
 1. **Quantity Q-A/Q-B — complete/consumed:** runtime/tests `b18e69a` passed
    local gates, exact source `5527fe9` passed Preview, and exact source
    `4d285f8` passed `main` CI, Vercel Production, and bounded no-write QA.
-2. **Dependency security — recommended first:** review and patch the direct
-   vulnerable Next.js dependency, then rerun the full application/release gate.
-   The advisory was not introduced by Quantity, but it affects the deployed
-   application dependency graph and should precede feature work.
-3. **LIST-1B — next product decision:** approve or adjust Level-A scope for
-   server pagination/search/filter/sort/count and one route batch. Production
-   confirmed one multi-route badge mismatch and independently measured high
-   request volume. Do not generalize that finding to correct one-route badges;
-   the exact trigger for the mismatched badge observation was not captured.
-4. Wider R0/D0, Quantity Expression and S0 remain later/separate decisions.
+2. **Dependency A and stale Copy B — closed:** A `a3114fc` and B client
+   `42e01c5`/Production 031 have their separate receipts. Owner chose no extra
+   Production HTTP probe for B; NOT RUN remains an evidence limit, not a
+   mandatory pending test. Eleven development findings remain separate; this
+   did not itself close wider S0 or LIST-1B; L1 closed subsequently under its
+   own receipt. No new external operation is authorized.
+3. **LIST-1B L1 — released; C alignment next:** `b1ce449` has its exact
+   publication, CI/Vercel and bounded no-write receipt. Review the local
+   documentation-only diff before any separately approved C publication.
+   L1.1/L2 are deferred; the original badge trigger/prevalence remain unknown.
+4. **IT/SSO discovery — start now:** send the prepared IT requirements for
+   policy/target/IdP answers. If IT forbids current cloud use, prioritize an
+   approved internal cutover and wait to deploy features to a permitted target.
+   No such policy has been confirmed yet.
+5. **Next foundations:** decide S0/user minimum, then wider R0/D0 and W-H
+   immutable paper-approved revisions before Expression. #09 owns this proposed
+   sequence; all local implementation and external-operation approvals remain
+   separate. Current documentation authority does not settle those decisions.
 
 Q-A and Q-B authorities are complete/consumed. Do not create or amend another
 commit, push, Preview, integrate, deploy, mutate the database, change an
 account, or write to Production without fresh explicit authority. Historical
 approvals and completed release receipts cannot be reused.
+
+### Local Docker baseline planning — 2026-10-14
+
+The Owner requested a plan only. Read-only Docker/PG metadata confirmed one
+existing Supabase local stack, PG 17.6 and Save RPC, but no matched final 030
+guard, Atomic Duplicate RPC or Admin paging RPC. The Owner clarified that the
+second local asset is backup/snapshot **files**, not a second running database;
+their location/capture/restore proof remain unidentified. No backup contents or
+protected archive were inspected. Use the [Local Parity Plan](../06_engineering/LOCAL_DATABASE_PARITY_PLAN.md)
+for a final-state baseline and real Auth/API acceptance.
+No start/reset/restore/seed or Production capture occurred in preparing this plan;
+existing stack/files/scripts/config and migration 027–030 remain unchanged.
+
+**2026-10-15 plan refinement:** use the existing local test target for a future
+approved rebuild with recreatable synthetic fixtures. Backing up that test DB
+and creating a separate candidate stack are optional, not prerequisites. Owner
+backup files remain untouched; locate/review them only if selected as input.
+This replaces the earlier preservation/separate-stack requirement and does not
+authorize a reset now.
 
 ## BOQ Save authorization correction — preparation and closeout
 
@@ -478,18 +776,22 @@ and 029 remain immutable/no-replay.
    #106](../plans/master-catalog/106-phase4-master-catalog-exact-remaining-work-handoff.md)
    and [Final Closeout Result
    #107](../plans/master-catalog/107-phase4-p49-master-catalog-final-closeout-result.md).
-4. For the current product release, read [DUP-1 Production Release
-   Result](../plans/product/04-atomic-boq-duplicate-production-release-result.md).
+4. For the latest recorded application release, read [L1 Production
+   Result](../06_engineering/LIST_1B_L1_PRODUCTION_RELEASE_RESULT_20261023.md).
+   The [DUP-1 Production Result](../plans/product/04-atomic-boq-duplicate-production-release-result.md)
+   remains the frozen Atomic Duplicate business-release receipt.
 5. For the later documentation merge and branch cleanup, read [Post-DUP-1
    Repository Custody Result](../plans/product/05-post-dup1-repository-custody-result.md).
-6. For proposed next product work, read the [Product Evolution Decision
+6. For current proposed sequencing and IT/SSO decisions, read
+   [Integrated Roadmap #09](../plans/product/09-integrated-roadmap-and-it-decision-handoff.md)
+   first. For technical alternatives, read the [Product Evolution Decision
    Plan](../plans/product/01-conduit-boq-product-evolution-decision-plan.md) and
    [LIST-1 Decision Plan](../plans/product/02-boq-list-scaling-decision-plan.md).
 
 The files under [`docs/ai/`](../ai/README.md) are legacy Phase 1/2 context.
 They are useful history, but they are not the current session handoff.
 
-## Current product release — DUP-1
+## Atomic Duplicate feature release — DUP-1
 
 `DUP-1_PRODUCTION_CLOSEOUT_20260831`
 
@@ -706,7 +1008,7 @@ push, deploy, database, publication, or deletion authority.
 ## What remains
 
 This section is the Master Catalog/custody residual list. It does not replace
-the 2026-10-12 current work register above; Quantity Q-A phases 1–2, Q-B
+the current work register above; Quantity Q-A phases 1–2, Q-B
 Production integration and later product decisions are tracked there, in
 Product Plan #06, Preview Result #07, and Production Result #08.
 
@@ -728,6 +1030,12 @@ Only these independent optional maintenance decisions remain:
    decision; it is unrelated to Master Catalog `2568.1.0`.
 
 ## Next product decision handoff — 2026-09-05
+
+**Later planning supersession (2026-10-14):** preserve the dated handoff below
+as chronology. Its ordering, provisioning/SSO recommendations and unresolved
+external-approval assumption are superseded by
+[Integrated Roadmap #09](../plans/product/09-integrated-roadmap-and-it-decision-handoff.md).
+Its code evidence and unchanged decisions do not become implementation authority.
 
 `R0A_LIST1_NEXT_DECISION_HANDOFF_20260905`
 

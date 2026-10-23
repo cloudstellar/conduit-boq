@@ -1,8 +1,19 @@
 # Domain Rules
 ## Conduit BOQ System
 
-**Last Updated:** 2026-05-30
+**Last Updated:** 2026-10-23
 **Status:** REFERENCE BASELINE — dated; current schema/access sources override
+
+<!-- RELEASE_ALIGNMENT_20261023 -->
+> **Recorded release state — 2026-10-23:** dependency A (`a3114fc`) and
+> [stale-Copy B](../06_engineering/STALE_COPY_B_RELEASE_CLOSEOUT_20261023.md) (`42e01c5` + Production 031 ledger `20261023063934`)
+> are closed. [L1 Production result](../06_engineering/LIST_1B_L1_PRODUCTION_RELEASE_RESULT_20261023.md) records exact `b1ce449`,
+> Ready/Current and bounded no-write smoke PASS at its observation time.
+> B Production stale HTTP remains **NOT RUN**, closed rather than a pending
+> test. Migrations **027–031 are immutable/no-replay**. Earlier dated
+> pending/candidate/approval wording below preserves its own stage. This local
+> documentation alignment makes no fresh Production observation and grants
+> no runtime, DB, reset, migration or publication authority.
 
 > **Scoped 2026-08-31 calculation overlay:** The VAT term below now reflects
 > bound Factor-version metadata (current/fallback 7%). Other counts, permission
@@ -12,7 +23,24 @@
 > [DUP-1 Result](../plans/product/04-atomic-boq-duplicate-production-release-result.md)
 > for current runtime contracts.
 
+> **2026-10-14 workflow planning clarification:** The status/manager-approval
+> terminology below does not prove an implemented BOQ submission, immutable
+> issued-revision or evidence-recording workflow. The Owner confirmed that an
+> operational BOQ is approved on real paperwork by the conduit engineering
+> section manager. W-H is the proposed fit; app recorder rights, evidence,
+> correction and legacy handling are still undecided. Use
+> [Integrated Roadmap #09](../plans/product/09-integrated-roadmap-and-it-decision-handoff.md)
+> for current sequencing, IT/SSO questions and deferred research additions.
+> Existing external-integration non-goals are dated baseline scope, not a
+> prohibition on the separately proposed SSO discovery.
+
 ---
+
+A/B/031/L1 do not implement a new BOQ approval workflow or change the financial
+contract. The confirmed external signed-paper approver and unresolved W-H
+recorder/revision rules below remain separate. The proposed next lane after L1
+is S0/user minimum, then wider R0/D0, W-H and Expression, with IT/SSO discovery
+in parallel; this order is not implementation approval.
 
 ## 1. Business Goals
 

@@ -1,6 +1,22 @@
 # Implementation Plan
 ## ระบบประมาณราคาท่อร้อยสายสื่อสารใต้ดิน (Conduit BOQ)
 
+<!-- INTEGRATED_ROADMAP_PLANNING_20261014 -->
+> [!IMPORTANT]
+> **Recorded release/plan alignment (2026-10-23):** dependency A `a3114fc`,
+> B client `42e01c5` and Production 031 are closed. B Production HTTP remains
+> **NOT RUN** by Owner decision, not a pending required probe. LIST-1B L1 was
+> released at `b1ce4495e4f1ec7c675b1341c2121d7b3e0b589f`; see the
+> [L1 Production result](../06_engineering/LIST_1B_L1_PRODUCTION_RELEASE_RESULT_20261023.md).
+> Its Production QA was bounded/no-write, not full business-write acceptance.
+> The next proposed work is S0/user minimum → wider R0/D0 → W-H → R1/R2,
+> with IT/SSO discovery in parallel under [Roadmap #09](../plans/product/09-integrated-roadmap-and-it-decision-handoff.md).
+> L1.1/L2 and the three deferred market additions are not prerequisites.
+> Migrations 027–031 are immutable/no-replay. Earlier phase tables, commands
+> and dated “current” notes below preserve history; they grant no new authority.
+> This task permits local documentation only, with no runtime/DB/Production or
+> stage/commit/push/deploy operation.
+
 <!-- MASTER_CATALOG_CURRENT_STATE_20260829 -->
 > [!IMPORTANT]
 > **Current-state addendum (2026-08-29):** Master Catalog Phase 4 and P-49 are

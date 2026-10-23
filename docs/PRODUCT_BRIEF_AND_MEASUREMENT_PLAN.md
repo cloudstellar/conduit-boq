@@ -6,6 +6,25 @@
 **Generated:** 2026-06-11  
 **Source:** Repo documentation, source code review, and production Supabase snapshot from `Conduit Price List` (`otlssvssvgkohqwuuiir`)  
 
+<!-- INTEGRATED_ROADMAP_PLANNING_20261014 -->
+> [!IMPORTANT]
+> **Planning alignment (2026-10-23):** this brief preserves the 2026-06-11
+> business case, counts, workflow diagrams and measurement proposals. Its
+> “today/current/next” claims are dated, not a fresh Production observation.
+> A/B/031 are closed; B Production HTTP remains **NOT RUN** by Owner choice.
+> [LIST-1B L1](./06_engineering/LIST_1B_L1_PRODUCTION_RELEASE_RESULT_20261023.md)
+> released at `b1ce4495…` with bounded no-write QA. Use
+> [AI Handoff](./08_ai/AI_HANDOFF.md) for receipts and
+> [Roadmap #09](./plans/product/09-integrated-roadmap-and-it-decision-handoff.md)
+> for proposed S0/user minimum → wider R0/D0 → W-H → R1/R2, with parallel
+> IT/SSO discovery. L1.1/L2 and the three deferred market additions are not
+> prerequisites. W-H follows real-paper approval by the conduit engineering
+> section manager; IdP/protocol and internal hosting policy remain unconfirmed.
+> Measurement targets/tables and cleanup proposals below grant no new authority.
+> Migrations 027–031 are immutable/no-replay. Local documentation alignment
+> permits no runtime, DB/Production or stage/commit/push/deploy operation.
+> The historical body remains unchanged.
+
 ---
 
 ## 1. Executive Summary

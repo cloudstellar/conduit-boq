@@ -5,6 +5,28 @@
 **วันที่:** 17 มกราคม 2569  
 **สถานะ:** Production  
 
+<!-- INTEGRATED_ROADMAP_PLANNING_20261014 -->
+> [!IMPORTANT]
+> **Current requirements overlay (2026-10-23):** เนื้อหาด้านล่างเป็น PRD
+> baseline วันที่ 17 มกราคม 2569 ไม่ใช่รายการ capabilities ที่ผ่านทดสอบแล้ว
+> จำนวน 682 รายการเป็น baseline เดิม; ใช้ [AI Handoff](./08_ai/AI_HANDOFF.md)
+> สำหรับ release receipts และ [Integrated Roadmap #09](./plans/product/09-integrated-roadmap-and-it-decision-handoff.md)
+> สำหรับลำดับ/decisions ปัจจุบัน A/B/031 ปิดแล้ว; B HTTP คง **NOT RUN**
+> ตาม Owner decision และ [LIST-1B L1](./06_engineering/LIST_1B_L1_PRODUCTION_RELEASE_RESULT_20261023.md)
+> released ที่ `b1ce4495…` พร้อม bounded no-write QA ไม่ใช่ full business-write
+> acceptance งานถัดไปที่เสนอคือ S0/user minimum พร้อม IT/SSO discovery;
+> L1.1/L2 และ market additions ที่พักไว้ไม่เป็น prerequisites
+> BOQ ฉบับใช้งานได้รับอนุมัติจากเอกสารจริงโดย
+> ผู้จัดการส่วนวิศวกรรมท่อร้อยสาย; W-H เป็นแนวทางเสนอ ส่วน submit/approve
+> และ manager approval ใน baseline ไม่ใช่ workflow ที่เปิดใช้ครบแล้ว
+> สิทธิ์ปัจจุบันยึด [Security Model](./04_data/SECURITY_MODEL.md)
+> องค์กรมี SSO แต่ IdP/protocol และนโยบายย้ายทั้งหมดภายในยังไม่ยืนยัน
+> ไม่เลือก protocol หรือสร้าง Invite/password flows ใหม่จาก baseline นี้
+> Owner พัก market additions ทั้งสามตาม [#09 §8.1](./plans/product/09-integrated-roadmap-and-it-decision-handoff.md#81-owner-deferral-of-market-research-additions--2026-10-14);
+> ไม่เพิ่ม gate ระยะใกล้ ค่า success metrics เป็นเป้าหมายเดิม ไม่ใช่ผลวัด
+> Migrations 027–031 immutable/no-replay; งานนี้อนุมัติเฉพาะ local docs
+> ไม่อนุมัติ implementation, migration, Production หรือ stage/commit/push/deploy
+
 <!-- DUP1_CURRENT_STATE_20260831 -->
 > [!IMPORTANT]
 > เอกสารฉบับนี้เป็น PRD baseline เดิมและมีจำนวน/flow บางส่วนที่ล้าสมัย

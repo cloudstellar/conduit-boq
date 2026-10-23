@@ -2,14 +2,141 @@
 
 **Research ID:** `LIST-1-R`
 
-**Status:** COMPLETE — RESEARCH EVIDENCE ONLY; NO IMPLEMENTATION AUTHORITY
+**Status:** COMPLETE — RESEARCH EVIDENCE; L1 ADOPTION RECORDED; NO NEW AUTHORITY
 
-**Prepared:** 2026-08-31 (Asia/Bangkok)
+**Prepared:** 2026-08-31; fresh official-product review 2026-10-23 (Asia/Bangkok)
 
 **Decision supported:** `LIST-1`
 
 **Related plan:**
 [BOQ / Project List Scaling Decision Plan](./02-boq-list-scaling-decision-plan.md)
+
+## 0. Fresh official product review — 2026-10-23
+
+**Owner request:** compare established international estimating/project systems,
+explain risk prevention, and refine the plan for Conduit's sole maintainer.
+This review reads local source plus public official documentation only; no
+vendor account, live Conduit Production, Docker, database or business RPC was
+used. At this research stage the plan was **PROPOSED** and every Level-A choice
+was **TBD**. Later L1 approval/execution is recorded in
+[Plan #02 §13](./02-boq-list-scaling-decision-plan.md#13-owner-decision-sheet)
+and the [L1 Production result](../../06_engineering/LIST_1B_L1_PRODUCTION_RELEASE_RESULT_20261023.md):
+`b1ce4495…` released with bounded no-write Production QA. Present-tense source
+observations and pre-release gates below refer to their dated research stage,
+not remaining L1 implementation or a new live Production inspection.
+
+### 0.1 What the official product documentation actually establishes
+
+| System / exact surface | Documented behavior | Conduit lesson / boundary |
+|---|---|---|
+| [Procore Bid Board / Portfolio Planning](https://support.procore.com/products/online/user-guide/company-level/bid-board/tutorials/search-for-and-filter-projects-on-the-bid-board) | Automatic keyword results, business filters with Clear All, selectable sort and direction | Preserve quick search, clear result state and useful order. Do not import bidding stages, sales metrics or customer/office directories into this pagination fix. |
+| [Autodesk Forma project list](https://help.autodesk.com/cloudhelp/ENU/Build-GS/files/Getting_Started_Navigation.html) | Lists accessible projects; name search, column sorting including number/date created, combined filters | Scope and identification should be clear. Conduit rows remain BOQs, not new Project entities; do not build a project hierarchy. |
+| [Trimble B2W Estimate — Market Analysis Bid Results Listing](https://help.trimble.com/doc/b2w-estimate/b2w-estimate/market-analysis/bid-results-listing-tab) | All Estimates flattens accessible estimates; search as typing, filters, per-user column settings restored | Retain low-friction search and same-session return to results. Saved columns/folders/account preferences are later options. This is a bid-results listing, not evidence about every estimate editor. |
+| [RIB CostX — database-search product-specialist tip](https://www.rib-software.com/en/blogs/rib-costx-database-search) | Recent Buildings plus Select Building sort/filter/grouping and saved searches help locate older jobs | Findability matters more than reproducing a large table. Grouping and persistent custom views are optional later work; the older tip does not certify the current release's entire UI. |
+
+**Evidence limit:** these sources document user behavior. They do not disclose
+or prove those vendors' pagination transport, SQL/RLS, count accuracy, API cap,
+page size, snapshot isolation or use of offset/cursor. No source establishes
+that all leading systems use numbered pages or 25 rows. We did not benchmark
+or inspect their private applications. Dates here are access dates unless the
+source explicitly supplies its own date.
+
+### 0.2 Technical references and inference for our system
+
+- [MUI pagination](https://mui.com/x/react-data-grid/pagination/) distinguishes
+  server/client processing and warns that client filtering with server pages
+  sees partial data. This supports whole-result query semantics, not adding MUI.
+- [GOV.UK pagination](https://design-system.service.gov.uk/components/pagination/)
+  supports explicit navigation and warns about automatic infinite scroll for
+  keyboard users. [SAP Fiori Grid List](https://experience.sap.com/fiori-design-web/grid-list/)
+  also has growing patterns: there is no universal navigation winner.
+- [PostgreSQL 17 LIMIT/OFFSET](https://www.postgresql.org/docs/17/queries-limit.html)
+  requires predictable order and explains skipped-row cost. Thus created order
+  plus unique ID is a suitable low-change starting point; use cursor only if
+  measured deep-offset/churn harm justifies the extra state.
+- [PostgREST 14 transactions](https://docs.postgrest.org/en/v14/references/transactions.html)
+  run each request in its own transaction, with READ COMMITTED as the default.
+  One main request plus one route request is **not one shared snapshot**.
+  Generation-safe UI state prevents stale replies; it cannot freeze concurrent
+  BOQ/route edits across requests.
+- [Supabase RLS](https://supabase.com/docs/guides/database/postgres/row-level-security)
+  and [select/count](https://supabase.com/docs/reference/javascript/select)
+  support caller-scoped rows/count. A route-batch exact visible count must
+  equal returned rows to detect a capped result. It does not prove hidden
+  physical child rows do not exist; persona tests must prove the intended
+  parent/child visibility contract.
+- [Supabase or()](https://supabase.com/docs/reference/javascript/or) uses raw
+  PostgREST filter syntax. Grammar escaping, SQL LIKE wildcard escaping and URL
+  encoding are separate concerns; punctuation tests are necessary. An escaping
+  failure can broaden or break search; do not claim every such bug bypasses RLS.
+
+### 0.3 Best fit for Conduit: smaller L1, explicit correctness gates
+
+**Recommend LIST-1B:** fixed 25 numbered server pages, exact authorized count,
+whole-result search/sort, one complete current-page route batch and explicit
+error states. Use existing components; add no grid package, RPC, migration,
+account flow, realtime or mandatory Production write probe.
+
+Changes from the preceding recommendation, reflected in Plan #02 §§0, 5–8,
+11–14:
+
+1. **Preserve newest-created default**, `created_at DESC NULLS LAST, id DESC`,
+   instead of introducing last-edited order. This keeps the existing primary
+   behavior and avoids auditing/changing every writer just to paginate. Keep
+   `updated_at` in the selected fields for the already released Copy token.
+2. **Defer new Mine/status controls to L2**, alongside department/owner filters.
+   L1 needs search and created/document-date/project-name sorts, not new
+   ownership or approval-status semantics. Amount sort remains deferred until
+   its field/label is selected; mobile/desktop currently use different totals.
+3. **Preserve as-you-type search**, approximately 300 ms debounce, with explicit
+   updating state and query + actor/auth-generation guards. Session-only q
+   reduces application-URL exposure but does not remove Data API URL logging.
+4. **Default to two bounded data requests**, main page+count and one route
+   batch for its IDs (skip batch for an empty page). Embedding is an optional
+   locally proven alternative; it must preserve parents with zero routes or
+   nullable legacy relationships. No aggregate configuration or new privileged
+   RPC is a convenience prerequisite.
+5. **Separate main failure from route-only failure.** Main rows/count must
+   match the applied controls; route-only failure leaves good BOQ rows and
+   route-independent actions available, while badges say unavailable and retry
+   one batch. Auth/session/permission failure invalidates the whole page.
+   Error/partial data never means route count 0/1 or successful legacy fallback.
+6. **Treat the list as live**, refresh on return from editor and after deletion,
+   and offer ordinary retry/refresh. Do not promise a frozen cross-page view or
+   add polling/realtime/snapshot schema to hide the offset limitation.
+
+**Why this fits Solo:** it addresses the observed request amplification and
+bounded badge failure with a single reviewable list release. New filter
+semantics, Copy eligibility projection, workflow, SSO, saved views, bulk
+operations and indexing are separated because each adds its own authority or
+maintenance surface. They are not prerequisites disguised as pagination work.
+The Owner-deferred Excel intake/provenance/pre-issue proposals remain deferred.
+
+### 0.4 Acceptance and unresolved decisions
+
+The detailed risk table and local implementation/test order are in
+[Plan #02 §§0.3–0.4](./02-boq-list-scaling-decision-plan.md#03-แผน-local-implementationtest-ภายหลังอนุมัติ).
+Before proposing release, demonstrate >1,000-row cross-page search/count,
+real-user RLS, fixed-dataset tie/null traversal, literal punctuation, route
+cap/error handling, actor/race safety, current Copy/031 regression and
+responsive keyboard behavior on the existing Docker target. Record p50/p95,
+payload bytes and count cost with named fixture/environment; agree the budget
+from that evidence rather than inventing an SLA. Build/unit PASS alone is not
+database-flow PASS.
+
+The Owner subsequently selected the L1 bundle and session-only search policy;
+[Plan #02 §13](./02-boq-list-scaling-decision-plan.md#13-owner-decision-sheet)
+and its local/Production receipts record what passed and the remaining limits.
+The gates above describe that pre-release recommendation, not instructions to
+repeat completed tests. Future L1.1/L2 scope/publication requires new approval.
+B is already closed with Production HTTP **NOT RUN**; this research neither
+reopens that probe nor waives LIST tests. Migrations 027–031 remain no-replay.
+
+**Historical custody:** the dated 263 BOQs / 326 routes below remains the
+2026-08-31 observation, not current Production size. This fresh review updates
+recommendations and corrects source attribution; original release/evidence
+files are unchanged. The earlier Primer “20 as starting point” attribution is
+not reaffirmed by the current verified pagination guideline; 25 is our choice.
 
 ## 1. Scope and authority
 
@@ -30,8 +157,8 @@ The research question is:
 ## 2. Executive verdict
 
 **Yes, with important qualifications.** The correctness contract is strongly
-source-backed, while numbered offset is justified by Conduit's current shallow
-Admin register. “Numbered pages,” “exact count,” and especially “25 rows” are
+source-backed, while numbered offset is justified by Conduit's dated shallow
+Admin-register evidence, subject to the current local performance gate. “Numbered pages,” “exact count,” and especially “25 rows” are
 not universal database rules; they are contextual product choices that should
 be measured after release.
 
@@ -109,8 +236,9 @@ missing-results bug.
 Supabase states that `range()` respects query order and can behave unexpectedly
 without one. PostgreSQL requires a unique, predictable `ORDER BY` for consistent
 `LIMIT/OFFSET` subsets. A timestamp alone is not unique, so Conduit needs a
-stable tie-breaker such as `updated_at DESC NULLS LAST, id DESC`, subject to the
-fresh data preflight already required by the plan.
+stable tie-breaker. The current recommendation is
+`created_at DESC NULLS LAST, id DESC`, preserving the existing primary order;
+last-edited ordering is deferred pending its supported-write contract audit.
 
 ### 4.4 Show location and result state honestly
 
@@ -157,9 +285,9 @@ broaden RLS.
 
 | Choice | Evidence | Conduit decision now |
 |---|---|---|
-| Numbered page vs cursor | MUI supports both; Carbon/PatternFly use full pagination; Shopify's official table API supports Previous/Next | Numbered pages fit an Admin register with random access and only about 11 pages |
-| Page size | Primer says page complexity determines the size and suggests 20 as a starting point; MUI supports configurable page-size options | Start fixed at 25 to reduce L1 controls; measure before adding 50 |
-| Exact count | MUI and PostgREST support exact, estimated, or unknown totals; PatternFly supports indeterminate pagination | Exact visible count is reasonable at 263 rows; define a measured fallback |
+| Numbered page vs cursor | MUI supports both; Carbon/PatternFly use full pagination; Shopify's official table API supports Previous/Next | Numbered pages fit random access; the dated 263-row example has about 11 pages, not a current Production-size guarantee |
+| Page size | Current Primer pagination guidance requires a suitable size; the earlier “20” attribution is not reaffirmed by the 2026-10-23 check. MUI supports configurable sizes | Start fixed at 25 as our product choice, not a vendor standard; measure before adding 50 |
+| Exact count | MUI and PostgREST support exact, estimated, or unknown totals; PatternFly supports indeterminate pagination | Exact visible count is reasonable in the dated 263-row example; validate the first-release latency and define a measured fallback |
 | Top and bottom controls | Design systems differ; Carbon favors directly below the table, PatternFly may use both | Top result summary and bottom navigation; avoid duplicating full controls initially |
 | URL persistence | Primer treats pagination as navigation that changes URL; VA documents page/filter/sort/search parameters | Persist safe structured state; free-text search needs a confidentiality decision |
 | Infinite/growing list | GOV.UK warns against automatic infinite scroll; SAP Fiori supports growing lists in some responsive-list contexts | Reject for this register, not as a universal claim about every product |
@@ -197,10 +325,9 @@ keyset/cursor when representative evidence shows one or more of:
   important.
 
 Cursor pagination must include every sort key, direction, and active
-search/filter/sort identity in its state. Because the proposed `updated_at` is
-currently treated as nullable, a future cursor must use an audited `NOT NULL`
-contract, an explicit null bucket/sentinel matching `NULLS LAST`, or a
-composite predicate that handles nulls; a naive tuple comparison can omit null
+search/filter/sort identity in its state. For any nullable selected sort key,
+a future cursor must use an audited `NOT NULL` contract, an explicit null
+bucket/sentinel matching `NULLS LAST`, or a composite predicate that handles nulls; a naive tuple comparison can omit null
 rows. Cursor transport improves deep-offset performance and insertion
 stability, but it does not make sort-key updates immovable, and it makes random
 page jumps, totals, and reverse navigation more complex.
@@ -267,12 +394,19 @@ Do not silently treat full URL-restorable free-text search as risk-free.
   `aria-disabled` alone is insufficient. Move focus to the initiating control
   or loading/status element before making a subtree inert.
 - A slower old request must never overwrite a newer query result.
-- Rows, count, page, routes, normalized controls, and query identity are one
-  committed state. A successful response replaces them atomically.
-- Failure: replace the active result area with error/retry for the attempted
-  controls, or atomically restore the last committed controls/results. Never
+- Main rows/count/page/normalized controls commit as one UI query generation.
+  Route state is keyed to that actor/generation and exact page IDs and may load
+  or fail separately. This is UI consistency, not a shared database snapshot
+  across HTTP requests.
+- Main failure: replace the active result area with error/retry for the attempted
+  controls, or restore the last committed controls/results together. Never
   leave new controls beside old rows/count looking current, and never render
   failure as “no BOQs” or “no matches.”
+- Route-only failure: keep valid main rows/count and route-independent actions,
+  show unavailable badges and retry one page batch; never fake 0/1/legacy
+  fallback. Auth/session/permission failure invalidates the whole page.
+- Cancellation alone is insufficient: include query, actor/auth and attempt
+  generation in stale-reply guards and clear per-user state on logout.
 - Invalid/out-of-range page from a URL: redirect to page 1.
 - Validate `page` as an integer greater than or equal to 1 before querying. If
   a previously valid page returns PostgREST `PGRST103` / HTTP 416, refetch page
@@ -324,7 +458,9 @@ and count. It must never infer global selection from rows loaded in memory.
 - one canonical query adapter owns page, page size, search, filters, sort, count
   mode, and stale-request identity;
 - select only list fields;
-- deterministic total ordering;
+- default newest-created plus unique ID, with explicit null/tie rules;
+- L1 search and created/document-date/project-name sorts; new Mine/status and
+  last-edited controls deferred to L2; amount sort awaits field/label choice;
 - exact visible count now;
 - one BOQ page/count request plus at most one batched current-page route request;
 - no service-role bypass; and
@@ -337,6 +473,7 @@ and count. It must never infer global selection from rows loaded in memory.
   numeric latency budget for page 1 and the deepest commonly used page by
   persona;
 - list p50/p95 response time by persona and page depth;
+- payload bytes, sample count and fixture/environment identity;
 - count cost from paired local/staging diagnostics with and without
   `count: 'exact'`;
 - requests per list transition;
@@ -356,8 +493,8 @@ read-only and proportionate.
 |---|---|---|
 | High | Search/filter/sort sees only the current page | One server result contract; cross-page fixtures |
 | High | Count reveals rows outside RLS | Same end-user session and filters for rows/count; persona tests |
-| High | Route N+1 remains after pagination | Embedded or one batch query for current page |
-| High | Stale request overwrites the latest state | Cancel or identify requests and ignore old responses |
+| High | Route N+1 or silent capped/failed batch | Default one page batch with exact visible-count/rows check, explicit badge error, no false legacy fallback; optional embed must preserve parent rows |
+| High | Old query/actor reply or open Copy intent targets the wrong BOQ | Query/actor/attempt guard, stable IDs, stale actions inert, dialog intent safety, current UUID/source-token behavior |
 | High | “Select all” implies unloaded rows | No bulk selection in L1 |
 | Medium | Exact count becomes slow later | Measure separately; estimated/indeterminate fallback policy |
 | Medium | Offset pages shift during concurrent mutations | Explain behavior; keyset trigger if measured harm appears |
@@ -373,14 +510,16 @@ read-only and proportionate.
 - [GOV.UK Pagination](https://design-system.service.gov.uk/components/pagination/)
   — paginate for usability/performance; avoid infinite scroll for keyboard
   users; numbered layout for similar search/case items.
-- [IBM Carbon Pagination](https://carbondesignsystem.com/components/pagination/usage/)
+- [IBM Carbon Pagination](https://www.carbondesignsystem.com/building-blocks/core/components/pagination/guidelines)
   — data-table pagination anatomy, range/total, page size, placement, responsive
   and accessibility behavior.
 - [Red Hat PatternFly Pagination](https://www.patternfly.org/components/pagination/design-guidelines/)
   — full desktop, compact mobile, and indeterminate variants.
 - [GitHub Primer DataTable guidelines](https://primer.style/product/components/data-table/guidelines/)
-  — pagination for focus/performance; page size depends on row/filter/column
-  complexity; 20 is a starting suggestion, not a universal rule.
+  — retained as the earlier research reference. The current
+  [pagination guidelines](https://primer.style/product/components/pagination/guidelines/)
+  support navigation/appropriate sizing; this review does not reaffirm the
+  former attribution of a 20-row starting recommendation.
 - [GitHub Primer Pagination](https://primer.style/product/components/pagination/)
   and [Primer navigation pattern](https://primer.style/product/ui-patterns/navigation/)
   — numbered links support random navigation; pagination is URL navigation.
@@ -444,11 +583,15 @@ read-only and proportionate.
 
 This research **tightens but does not reverse** `LIST-1B`:
 
-- retain server-side numbered pages for the current register;
+- retain server-side numbered pages for the register; current Production size
+  is not reverified by this review;
 - retain an initial fixed size of 25, labeled as a measured v1 choice;
-- add count fallback, URL confidentiality, stale-row inertness, one responsive
-  result contract, no-grid-dependency, and no-bulk-selection boundaries; and
+- retain count fallback, URL confidentiality, stale-row inertness, one responsive
+  result contract, no-grid-dependency, and no-bulk-selection boundaries;
+- preserve created order, defer new Mine/status and last-edited controls, and
+  distinguish route-only failure and UI consistency from database snapshot; and
 - replace any claim that offset/25 is universally best with explicit upgrade
   triggers.
 
-Owner approval remains required before implementation.
+Fresh Owner approval is required for implementation beyond the completed L1;
+S0/user minimum with parallel IT/SSO discovery remains next proposed under #09.

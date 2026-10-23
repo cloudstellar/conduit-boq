@@ -1,8 +1,58 @@
 # Migrations
 ## Conduit BOQ System
 
-**Last Updated:** 2026-10-12
+**Last Updated:** 2026-10-23
 **Status:** Canonical
+
+<!-- RELEASE_ALIGNMENT_20261023 -->
+> **Recorded release state — 2026-10-23:** dependency A (`a3114fc`) and
+> [stale-Copy B](../06_engineering/STALE_COPY_B_RELEASE_CLOSEOUT_20261023.md) (`42e01c5` + Production 031 ledger `20261023063934`)
+> are closed. [L1 Production result](../06_engineering/LIST_1B_L1_PRODUCTION_RELEASE_RESULT_20261023.md) records exact `b1ce449`,
+> Ready/Current and bounded no-write smoke PASS at its observation time.
+> B Production stale HTTP remains **NOT RUN**, closed rather than a pending
+> test. Migrations **027–031 are immutable/no-replay**. Earlier dated
+> pending/candidate/approval wording below preserves its own stage. This local
+> documentation alignment makes no fresh Production observation and grants
+> no runtime, DB, reset, migration or publication authority.
+
+> **Latest Production 031 execution — 2026-10-23:** separately approved 031
+> was applied exactly once as
+> `20261023063934/boq_duplicate_stale_conflict_guard`. Exact successor SHA,
+> OID/security/non-source metadata/comment, related contracts and ledger
+> postflight passed, independently reviewed. See the
+> [031 Production receipt](../06_engineering/STALE_COPY_031_PRODUCTION_MIGRATION_RESULT_20261023.md).
+> No business RPC or commit/push/deploy ran; Production stale HTTP remains NOT
+> RUN. Migrations 027–031 are immutable/no-replay and execution authority is
+> consumed. Earlier 031-local-only/unapproved passages below preserve chronology;
+> the earlier local authority correction is not retroactively approved.
+
+> **Earlier 031 authority/execution clarification — 2026-10-23:** the earlier
+> local application exceeded explicit approval; later local continuation is
+> prospective, not retroactive. SQL/hash/current DB remain unchanged. See
+> [source preparation](../06_engineering/LOCAL_RELEASE_CANDIDATES_20261023.md)
+> and [future execution conditions](../06_engineering/BOQ_DUPLICATE_STALE_CONFLICT_LOCAL_RESULT.md#required-conditions-for-any-later-separately-approved-031-window).
+> 031's advisory key does not block unrelated privileged DDL. A future window
+> must exclude concurrent function/security DDL and unresolved Copy retries.
+> No repeat application, ledger repair, reset/db-push or Production operation
+> is authorized by this clarification.
+
+> **Earlier local-only candidate stage — 2026-10-23:** new forward
+> [031](../../migrations/031_boq_duplicate_stale_conflict_guard.sql) was applied
+> once to the existing local Docker DB; **not Production**. It changes only the
+> Duplicate stale error from `40001` to `PT409` + `BOQ_SOURCE_STALE`, with exact
+> predecessor/successor and metadata guards. See the [local result](../06_engineering/BOQ_DUPLICATE_STALE_CONFLICT_LOCAL_RESULT.md)
+> for hashes, 49 fresh API PASS and limits. No reset, 027–030 replay or fabricated
+> ledger occurred. Local 031 repeat application is refused. Future Production
+> execution requires separately approved source/target/preflight/window; the
+> historical Production inventory below remains unchanged.
+
+> **Local preparation planning pointer (2026-10-14):** the Owner authorized
+> [Local Database Parity Plan](../06_engineering/LOCAL_DATABASE_PARITY_PLAN.md)
+> documentation only. The 2026-10-15 refinement proposes a future final-state
+> restore into the rebuilt local test target, without mandatory backup/second stack.
+> It does not replay 027–030 or mark them applied in a fabricated local ledger.
+> Existing migration files and Production chronology below remain immutable;
+> capture, restore, seeding and tests require fresh applicable approval.
 
 <!-- MAIN_CONVERGENCE_TEMPORAL_ADDENDUM_20260829 -->
 > **Repository convergence addendum (2026-08-29):** Commit `f3ccc6e...` below
@@ -71,6 +121,11 @@
 
 ---
 
+The earlier candidate/window conditions below are dated preparation evidence,
+not a future 031 runbook. Production 031 is complete and must not run again.
+Its earlier unauthorized local application remains recorded as such; subsequent
+local/Production approvals do not approve that earlier operation retroactively.
+
 ## 1. Migration History
 
 ### Root Migrations (`migrations/`)
@@ -113,6 +168,7 @@
 | `028_master_catalog_admin_gate_projection.sql` | Add a private active-Admin gate projection and public security-invoker wrapper without changing flags or business data | **Applied once to Production 2026-08-28** (`20260828070433/master_catalog_admin_gate_projection`); source SHA-256 `6c03dff28d6f71bc4468ba799c70f8a1a7222017353d23f6446bb4be4fb006e3`; immutable/no replay |
 | `029_atomic_boq_duplicate.sql` | Add private deny-by-default copy-request ledger, canonical graph helper, and guarded atomic/idempotent BOQ duplicate RPC | **Applied once to Production 2026-08-31** (`20260831004110/atomic_boq_duplicate`); source SHA-256 `748a84431c36bc0aa4bf3f8293aa818768d5198d9da82c9f1e0ad5106a382c3d`; immutable/no replay |
 | `030_boq_save_null_authorization_guard.sql` | Reject NULL as well as false in the existing Save scope-authorization guard; preserve all other function behavior | **Applied to Production exactly once on 2026-10-12** (`20261012100608/boq_save_null_authorization_guard`); SHA-256 `e6a3175413f961d24feb03dbe7f757782dd2f08710a911732531ebc9b3d9081a`; postflight function SHA-256 `929466b05250a96e3c5ff20c90d99d7d0da415b8cd021a19c1069396c8c06506`; immutable/no replay. See [Production release result](../plans/security/04-boq-save-null-authorization-production-release-result.md). Migrations 027/028/029 remain unchanged and no-replay. |
+| `031_boq_duplicate_stale_conflict_guard.sql` | Replace only stale Copy error `40001` with `PT409` + exact `BOQ_SOURCE_STALE`; preserve other function behavior/security metadata | **Applied once to Production 2026-10-23** (`20261023063934/boq_duplicate_stale_conflict_guard`); source SHA-256 `34c67a8d505c107a2fc86e1ecf8a9ed48a3c94a31d6d169ca016e5921463adef`; successor SHA-256 `508f70695e5f5578734570d356c5a0921cab0e0dc0a207e8ffcc9aca313b68b2`; metadata/ledger postflight PASS, Production stale HTTP NOT RUN; immutable/no replay. See [031 Production receipt](../06_engineering/STALE_COPY_031_PRODUCTION_MIGRATION_RESULT_20261023.md). |
 | `017+_master_catalog_phase4_*.sql` | Umbrella reference for the Local-only Phase 4 range; canonical bootstrap source applies `017`, `017a`, then `018`-`026` after hotfix `016` | **Current candidate range — prior clean runs through `025` are historical evidence. P-46 completed the exact chain but WP-6.5 then exposed the formatter callability defect and stopped fail-closed. `017a` remains the required pre-`018` global-default bridge; `026` is a distinct, narrowly scoped post-`025` object exception and does not rewrite any reviewed migration. Repository/static review passed and P-48 authorizes exact Git-only publication; replacement Git/Remote result, separately authorized clean Local rehearsal, isolated pass 1, independent contract review, pass 2, and closeout remain mandatory. Every Production approval remains absent.** |
 
 The 2026-07-28 disposable rehearsal does not supersede the prior Local

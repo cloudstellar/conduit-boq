@@ -4,7 +4,31 @@
 **Migration Date:** 2026-01-22  
 **Status:** Complete (Skeleton Phase)
 
+<!-- RELEASE_ALIGNMENT_20261023 -->
+> **Recorded release state — 2026-10-23:** dependency A (`a3114fc`) and
+> [stale-Copy B](06_engineering/STALE_COPY_B_RELEASE_CLOSEOUT_20261023.md) (`42e01c5` + Production 031 ledger `20261023063934`)
+> are closed. [L1 Production result](06_engineering/LIST_1B_L1_PRODUCTION_RELEASE_RESULT_20261023.md) records exact `b1ce449`,
+> Ready/Current and bounded no-write smoke PASS at its observation time.
+> B Production stale HTTP remains **NOT RUN**, closed rather than a pending
+> test. Migrations **027–031 are immutable/no-replay**. Earlier dated
+> pending/candidate/approval wording below preserves its own stage. This local
+> documentation alignment makes no fresh Production observation and grants
+> no runtime, DB, reset, migration or publication authority.
+
+> **Historical navigation note (2026-10-14):** this is the 2026-01-22
+> documentation-move record, not a database migration ledger or current task
+> list. The former `docs/canonical/` structure and “active/authoritative” labels
+> below are retained chronology. Use the [Documentation Index](./README.md),
+> [AI Handoff](./08_ai/AI_HANDOFF.md) and [Integrated Roadmap #09](./plans/product/09-integrated-roadmap-and-it-decision-handoff.md)
+> for present navigation/planning; database history is in [Migration Ledger](./04_data/MIGRATIONS.md).
+> No file move, cleanup, migration or implementation is authorized by this map.
+
 ---
+
+The recorded application succession A (`a3114fc`) → B (`42e01c5`) → L1
+(`b1ce449`) is release chronology, not a reason to execute this old file-move
+plan. Database031 belongs to [Migrations](./04_data/MIGRATIONS.md); documentation
+convergence neither moves protected evidence nor applies migrations.
 
 ## Files Created
 

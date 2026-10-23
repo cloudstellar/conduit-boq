@@ -3,7 +3,42 @@
 
 **Historical base:** 2026-06-29
 
-**Last Updated:** 2026-10-12
+**Last Updated:** 2026-10-23
+
+> **Latest completion/next decision — 2026-10-23:** dependency A `a3114fc`,
+> B client `42e01c5` and Production 031 are closed. See the
+> [B final closeout](../06_engineering/STALE_COPY_B_RELEASE_CLOSEOUT_20261023.md):
+> Production HTTP remains **NOT RUN** by Owner choice, not a pending B probe.
+> [LIST-1B L1](../06_engineering/LIST_1B_L1_PRODUCTION_RELEASE_RESULT_20261023.md)
+> released at `b1ce4495…` with bounded no-write Production QA. The next proposed
+> work is S0/user minimum → wider R0/D0 → W-H → R1/R2; IT/SSO discovery stays
+> parallel under #09. L1.1/L2 and deferred market additions are not prerequisites.
+> Migrations 027–031 are immutable/no-replay. This task authorizes local docs
+> only, no code, DB/Production or stage/commit/push/deploy; dated boards below
+> remain history, including their former “current” and “next” labels.
+
+<!-- INTEGRATED_ROADMAP_PLANNING_20261014 -->
+> [!IMPORTANT]
+> **Historical planning supersession (2026-10-14):** use
+> [Integrated Roadmap #09](../plans/product/09-integrated-roadmap-and-it-decision-handoff.md)
+> for current proposed sequencing and IT/SSO decisions. It supersedes only the
+> older ordering/provisioning/approval-authority assumptions below: dependency
+> security -> LIST-1B -> S0/user minimum -> wider R0/D0 -> W-H externally
+> paper-approved revisions -> R1/R2 Expression. IT/SSO discovery starts now;
+> internal-all hosting policy and IdP/protocol remain unconfirmed. The Owner
+> confirmed signed-paper approval by the conduit engineering section manager;
+> W-H design/implementation remains unapproved. This is documentation alignment,
+> not runtime, database, account, commit/push or deployment authority. Preserve
+> all dated status boards as historical chronology and release evidence below;
+> migrations 027–030 remain
+> immutable/no-replay.
+
+> **Later Owner scope decision (2026-10-14):** Excel quantity intake, new
+> business-scope/quantity-provenance fields and additional pre-issue
+> quality/stale-save enhancements from the market review are deferred under
+> [#09 §8.1](../plans/product/09-integrated-roadmap-and-it-decision-handoff.md#81-owner-deferral-of-market-research-additions--2026-10-14).
+> They add no release or prerequisite. Keep the main sequence and original
+> S0/D0/W-H contracts; future enhancement lists below do not reactivate them.
 
 <!-- MASTER_CATALOG_CURRENT_STATE_20260829 -->
 > [!IMPORTANT]
@@ -43,7 +78,7 @@
 
 <!-- CURRENT_WORK_STATUS_20261012 -->
 > [!IMPORTANT]
-> **Current status board (2026-10-12):** this overlay supersedes dated status
+> **Historical status board (2026-10-12):** this overlay superseded earlier status
 > labels below without rewriting their chronology.
 >
 > | Work | Status | Next boundary |

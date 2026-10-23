@@ -1,6 +1,29 @@
 # Knowledge Base
 ## ระบบประมาณราคาท่อร้อยสายสื่อสารใต้ดิน (Conduit BOQ)
 
+<!-- INTEGRATED_ROADMAP_PLANNING_20261014 -->
+> [!IMPORTANT]
+> **Reader guidance (2026-10-23):** คู่มือด้านล่างเป็น baseline เดิม ไม่ใช่
+> current user guide ที่ผ่านการตรวจรับทุก flow Login ใน source ปัจจุบันใช้
+> email/password; ขั้นตอน Google login เดิมไม่ใช่หลักฐาน corporate SSO ที่
+> เปิดใช้แล้ว IdP/protocol ยังไม่ทราบ ใช้ [Security Model](../04_data/SECURITY_MODEL.md)
+> สำหรับ access matrix ปัจจุบัน: pending เป็น profile/onboarding-only และ
+> inactive/suspended ไม่มี business access ตาราง Approve และ troubleshooting
+> เรื่องอนุมัติด้านล่างเป็น future intent ไม่ใช่ workflow ที่เปิดใช้ครบแล้ว
+> Owner ยืนยันการอนุมัติบนเอกสารจริงโดยผู้จัดการส่วนวิศวกรรมท่อร้อยสาย;
+> W-H proposed revisions/evidence และลำดับงานอยู่ใน [Integrated Roadmap #09](../plans/product/09-integrated-roadmap-and-it-decision-handoff.md)
+> การคำนวณอ้าง [Calculation Rules](../05_calculation/CALCULATION_RULES.md)
+> และ wider R0/D0 ยังไม่ปิดจากผล R0A เพียงอย่างเดียว Market additions สามข้อ
+> ถูกพักตาม [#09 §8.1](../plans/product/09-integrated-roadmap-and-it-decision-handoff.md#81-owner-deferral-of-market-research-additions--2026-10-14)
+> โดยไม่เพิ่ม near-term gate หรืออนุมัติ implementation
+> A/B/031 ปิดแล้ว; B Production HTTP คง **NOT RUN** ตาม Owner decision
+> [LIST-1B L1](../06_engineering/LIST_1B_L1_PRODUCTION_RELEASE_RESULT_20261023.md)
+> released ที่ `b1ce4495…`: เลขหน้า 25 BOQs, ค้นหา/เรียง/นับทั้งผลที่มีสิทธิ์
+> และ route batch ต่อหน้า พร้อมแยก error จากข้อมูลว่าง ไม่ split ชื่อที่มี comma
+> ผล Production เป็น bounded no-write smoke ไม่ใช่การตรวจทุก flow ในคู่มือนี้
+> งานถัดไปที่เสนอคือ S0/user minimum พร้อม IT/SSO discovery; ไม่เริ่มงานใหม่
+> จากเอกสารนี้ และ migrations 027–031 immutable/no-replay
+
 ---
 
 ## 📖 สารบัญ

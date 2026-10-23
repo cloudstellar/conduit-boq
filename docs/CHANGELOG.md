@@ -3,17 +3,180 @@
 
 ---
 
-## Unreleased — Dependency security patch required
+## 2026-10-23 — C documentation alignment (local; unpublished)
 
-- Fresh `npm audit --omit=dev` reports six Production dependency findings:
+- Owner approved the existing 48 Markdown documents for local convergence,
+  link checks and documentation contract tests. Nine parity tooling/baseline
+  artifacts remain excluded and unchanged; no runtime/package/migration change.
+- Aligned current entry points, roadmap, stack and local-guidance boundaries to
+  completed A/B/031 and L1. Older entries and execution receipts retain their
+  as-of-stage facts, including predecessor FAIL and the local 031 authority error.
+- B Production HTTP stays **NOT RUN**, closed by Owner decision. No extra probe,
+  Docker/DB operation, Production access, stage/commit/push/deploy is part of C.
+  A later docs-only push still needs explicit approval and may trigger Vercel.
+
+## 2026-10-23 — LIST-1B L1 Solo Production release
+
+- Exact 15-file commit `b1ce4495e4f1ec7c675b1341c2121d7b3e0b589f`, tree
+  `bc47a60a9d97f2ba655f7bafedd4f0a3154a20d7`, from B `42e01c5`; one normal
+  push, no C/tooling/package/DB/migration changes.
+- Quality run `39947480932`: 762 tests/59 files, lint 0 errors/3 existing
+  warnings, build PASS. Vercel `47nXCLuL9ZhXLkDiGWaEfqGhx5df` was Ready/Current
+  at exact L1; approximately 14 minutes of bounded Owner no-write smoke passed.
+- Page1/2/search/sort/Back/route dialog/Print passed; sampled former mismatch
+  displayed badge2/dialog2. Page/count1GET + route batch1GET per observed attempt,
+  excluding normal Auth/profile, CORS and Next prefetch calls.
+- The [L1 receipt](./06_engineering/LIST_1B_L1_PRODUCTION_RELEASE_RESULT_20261023.md)
+  retains search URL/log exposure, route cap/concurrency, sandbox cold-build and
+  reported-version limits, plus cosmetic favicon404. No write probes or rollback
+  ran; L1.1/L2 and other roadmap work remain unapproved.
+
+## 2026-10-23 — Production 031 and bounded B final closeout
+
+- Separately approved Production 031 ran once, actual ledger
+  `20261023063934/boq_duplicate_stale_conflict_guard`, OID `112777`, successor
+  SHA `508f70695e5f5578734570d356c5a0921cab0e0dc0a207e8ffcc9aca313b68b2`;
+  selected metadata/security/ledger postflight and independent review passed.
+- No business RPC ran. Owner then chose no additional stale HTTP probe and
+  closed B on recorded local/quality/deployment and metadata/ledger evidence.
+  **Production stale HTTP remains NOT RUN**, not full behavior PASS or a required
+  pending task; this decision does not waive future release tests.
+- See [031 receipt](./06_engineering/STALE_COPY_031_PRODUCTION_MIGRATION_RESULT_20261023.md)
+  and [B final closeout](./06_engineering/STALE_COPY_B_RELEASE_CLOSEOUT_20261023.md).
+  027–031 remain immutable/no-replay; no new Git publication occurred in this DB step.
+
+## 2026-10-23 — B client Solo Production release
+
+- Published exact B4 `42e01c56fe2eacb5239abc8d296ca1848c48a03b`, tree
+  `6283410f997d00fc808cd9d8f7153b9bc381786f`; Quality658 PASS and Vercel
+  `Gf8gmTN8H5k7dYebeEzRwV5DwjW5` Ready/Current at that stage.
+- Client accepts legacy `40001` and only `PT409` + `BOQ_SOURCE_STALE` as stale;
+  request UUID/source token/recovery remain. 031 was SQL source only during
+  client publication; its later DB execution is a separate entry above.
+- [Client receipt](./06_engineering/STALE_COPY_B_CLIENT_PRODUCTION_RELEASE_RESULT_20261023.md)
+  remains frozen. C was excluded. Each older entry below describes its own
+  stage; its "current", "unreleased" or "unapproved" wording is not today's status.
+
+## 2026-10-23 — Dependency A Solo Production release
+
+- Published only the approved A8 commit `a3114fc0eda2eb8d898ad2949ebc71250515df1f`:
+  Next/config16.4.2, PostCSS8.5.23, Sharp0.35.5 lock and bounded lint corrections.
+- Fresh production audit0; representative Node24 host/native checks passed.
+  Quality39907043530 passed643 tests; Vercel6WnAcbAV88JxGJ7bHsW5Jgy85pCz is
+  Production Ready/Current. Bounded public-login/script HTTP checks passed;
+  authenticated BOQ/Print, app browser/console and Production DB QA were NOT RUN.
+- [A result](./06_engineering/DEPENDENCY_A_PRODUCTION_RELEASE_RESULT_20261023.md)
+  records exact source, tests and limits. The known stale-Copy FAIL remains
+  tracked; its A-only exception and publication authority are consumed.
+  B/031 remain local/unapproved; no DB mutation/reset/migration occurred.
+  Closeout docs and existing C work stay local, with no second commit/push/deploy.
+
+## 2026-10-23 — A-only exception accepted; two-release plan for review
+
+- Owner explicitly accepted the preserved stale-Copy FAIL temporarily for the
+  exact dependency/lint candidate A, then B as a separate next release. The
+  exception is accepted and consumed at A closeout; it does not cover B or
+  new failures and grants no publication/Production authority.
+- Added a [reviewable A/B plan](./07_process/DEPENDENCY_AND_STALE_COPY_RELEASE_PLAN_20261023.md)
+  with exact allowlists/hashes, Solo/CI timing, target checks, client-before-DB
+  order, 031 executor/window/ledger proposal, bounded QA and recovery limits.
+- Planning/docs only: no runtime/package/DB/test change, staging, commit/push,
+  deployment or Production access. Historical FAIL/approval-correction receipts
+  and immutable 027–031 artifacts remain unchanged.
+
+## 2026-10-23 — Prospective authority correction and local source separation
+
+- Recorded that the earlier 031 creation/application overinterpreted the Owner's
+  request to continue; later local approval is prospective. Kept original
+  receipts/SQL/hash and current DB unchanged.
+- Added future 031 execution conditions, including no concurrent DDL and no
+  unresolved in-flight Copy retries; no automatic restart/reversal/ledger repair.
+- Exact A-only checks: 643 tests, lint, TypeScript/build PASS. A+B: 658 tests
+  and the same quality gates PASS. Six separate baseline-tooling tests explain
+  the previous 649/664 totals. Fresh Production audit 0 and Linux x64 native
+  Production-only install/Sharp smoke PASS.
+- READ ONLY local postflight matched 30 table fingerprints and 031 metadata.
+  No DB writes, reset/replay, Production access or Git publication. See the
+  [local preparation result](./06_engineering/LOCAL_RELEASE_CANDIDATES_20261023.md).
+
+## 2026-10-23 — Stale-Copy local forward correction (unreleased)
+
+- Added exact guarded forward 031 and compatible client handling for
+  `PT409`/`BOQ_SOURCE_STALE`, preserving legacy `40001` recognition and all other
+  Duplicate behavior. Applied once to the existing local target; no reset,
+  historical migration replay or Production request.
+- Fresh API **49/49**, real two-tab stale denial/reload/fresh Copy, **664 tests**,
+  lint (0 errors/3 existing warnings), TypeScript and Next build passed.
+- Local is captured baseline plus explicit 031 candidate. Earlier failures and
+  frozen baseline remain unchanged. Dependency and conflict-fix releases stay
+  separate pending Owner sequencing/approval; no commit/push/deploy. See the
+  [local result](./06_engineering/BOQ_DUPLICATE_STALE_CONFLICT_LOCAL_RESULT.md).
+
+## 2026-10-23 — Local Docker baseline prepared (unreleased; PARTIAL)
+
+- Added final-state metadata capture/materialization, strict existing-local target
+  guards, synthetic fixtures and real Auth/API/browser acceptance tooling.
+  Captured application contracts match 30 tables, 96 functions and 27 triggers
+  with three exact platform mappings; no migration 027–030 replay.
+- Restored all seven original local usernames with the unchanged configured
+  password. API result: 46 PASS / 1 stale-Copy transport FAIL. Browser checks,
+  saved Print, actual five-page PDF and downloaded Excel passed the bounded
+  synthetic vector. See [Local Parity Result](./06_engineering/LOCAL_DATABASE_PARITY_RESULT.md).
+- Kept the real stale-Copy failure as a separate correction decision; no product
+  behavior/dependency change, Production write, commit/push or deployment.
+
+## 2026-10-15 — Local test baseline plan simplified (unreleased)
+
+- Recorded the [release working agreement](./07_process/RELEASE_PROCESS.md#working-agreement-20261015)
+  and mandatory agent/handoff pointers: inspect existing work first, perform
+  affected DB-backed acceptance on local Docker with relevant current contracts,
+  report source/target/PASS/FAIL/NOT RUN/limits, then obtain explicit release
+  authority. CI/build alone is not database integration evidence; no extra PR,
+  backup/stack or repeated in-scope approval is required.
+- Recorded the 2026-10-15 09:22 Bangkok read-only local metadata recheck in the
+  handoff and local plan; the same three successor RPC/guard probes remain absent.
+- Refined the [Local Database Parity Plan](./06_engineering/LOCAL_DATABASE_PARITY_PLAN.md)
+  to propose rebuilding the existing local test DB after execution approval.
+  Backup of recreatable test data and a separate candidate stack are optional,
+  replacing the requirements in the 2026-10-14 plan below. Owner backup files
+  remain untouched and are not a prerequisite unless selected as input.
+- No database/container/config/script change, migration replay, commit or push.
+
+## 2026-10-14 — Local documentation alignment candidate (unreleased)
+
+- Added the plan-only [Local Database Parity Plan](./06_engineering/LOCAL_DATABASE_PARITY_PLAN.md)
+  after read-only local Docker/PG metadata checks. It preserves the existing
+  test stack and Owner backup/snapshot files and proposes a separately approved
+  final-state candidate, with no 027–030 replay or database/config/script change.
+
+- Recorded [Integrated Roadmap #09](./plans/product/09-integrated-roadmap-and-it-decision-handoff.md)
+  as current proposed sequencing: dependency security -> LIST-1B -> S0/user
+  minimum -> wider R0/D0 -> W-H -> Quantity Expression, with IT/SSO discovery
+  now and cutover order conditional on confirmed IT policy.
+- Recorded signed-paper approval by the conduit engineering section manager,
+  unknown IdP/protocol and unconfirmed internal-all hosting requirements.
+- Recorded the Owner's deferral of the three additional market-research
+  proposals; [Research/Backlog #10](./plans/product/10-global-estimating-research-and-capability-backlog.md)
+  preserves comparisons and prior ideas without new release/prerequisite scope.
+- Aligned active documentation entry points and reference qualifiers; preserved
+  dated release receipts, financial rules and historical status boards.
+- This is local documentation work, not an application release, Git
+  commit/push, deployment, package update, migration or Production operation.
+
+---
+
+## Historical pre-A advisory plan — later completed by Dependency A
+
+- The read-only audits recorded on 2026-10-12/14 reported six Production findings:
   one critical, four high, and one moderate. Direct `next@16.2.9` is critical;
-  npm currently offers `16.4.0` as a non-major fix path.
+  the recorded npm fix path offered `16.4.0` as a non-major candidate.
 - Next.js has announced another out-of-band security update for 2026-10-14.
   Keep the upgrade separate from Quantity and feature work; prefer one reviewed
   dependency release after the announced patched version is available unless
   immediate remediation is chosen.
-- The existing CI workflow does not run `audit:prod`; add a Production audit
-  gate only after a clean dependency baseline is established.
+- The existing CI workflow does not run `audit:prod`; adding a CI audit gate is
+  an open scope decision, not authorized by documentation alignment. Reverify
+  registry/advisories before choosing a patched version; see #09 section 6.
 
 ---
 

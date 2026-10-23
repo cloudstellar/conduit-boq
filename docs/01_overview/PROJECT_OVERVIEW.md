@@ -1,22 +1,29 @@
 # Project Overview
 ## ระบบประมาณราคาท่อร้อยสายสื่อสารใต้ดิน (Conduit BOQ)
 
-**Last Updated:** 2026-10-12
+**Last Updated:** 2026-10-23
 **Historical application-version label:** 1.2.0
 **Status:** Production
 
+<!-- INTEGRATED_ROADMAP_PLANNING_20261014 -->
 > [!IMPORTANT]
-> **Current-state overlay:** the recorded 2026-08-28/29 Production release
-> baseline is Master Catalog `2568.1.0` with 710 active rows;
-> Atomic BOQ Duplicate and migrations 027–030 are live and closed under their
-> recorded release results. Quantity Input Safety is `PRODUCTION PASS` at exact
-> `main` source `4d285f8`; see [Production Result #08](../plans/product/08-r0a-quantity-input-safety-production-release-result.md).
-> [Preview Result #07](../plans/product/07-r0a-quantity-input-safety-preview-result.md)
-> remains dated Q-A chronology. LIST-1B and Full Quantity Expression remain
-> proposed. Use
-> [AI Handoff](../08_ai/AI_HANDOFF.md) for the current work register and
-> authority boundaries. The overview body describes product purpose and does
-> not grant implementation or release authority.
+> **Recorded state and remaining roadmap (2026-10-23):** Master Catalog/P-49,
+> DUP-1, Save guard and numeric-only R0A retain their recorded closeouts.
+> Dependency A `a3114fc`, B client `42e01c5` and Production 031 are closed;
+> B HTTP remains **NOT RUN** by Owner choice, not a pending required probe.
+> [LIST-1B L1](../06_engineering/LIST_1B_L1_PRODUCTION_RELEASE_RESULT_20261023.md)
+> released at `b1ce4495e4f1ec7c675b1341c2121d7b3e0b589f`; its Production QA
+> was bounded/no-write. These are receipt-based facts, not a new live check.
+> [Roadmap #09](../plans/product/09-integrated-roadmap-and-it-decision-handoff.md)
+> now proposes S0/user minimum → wider R0/D0 → W-H → R1/R2, with IT/SSO
+> discovery in parallel. IdP/protocol and internal-all hosting policy remain
+> unconfirmed. W-H records real-paper approval by the conduit engineering
+> section manager; an in-app approval/revision workflow is not yet implemented.
+> L1.1/L2 and the three deferred market additions are not prerequisites.
+> Use the [Security Model](../04_data/SECURITY_MODEL.md) for existing access
+> boundaries. Success metrics below are baseline targets, not measured results.
+> Migrations 027–031 are immutable/no-replay. This task permits local docs only,
+> no implementation, DB/Production or stage/commit/push/deploy operation.
 
 ---
 
@@ -112,6 +119,7 @@ These are explicitly **NOT** in current scope:
 
 ## Related Documents
 
-- Detailed requirements: [PRD.md](../PRD.md)
+- Detailed requirements baseline: [PRD.md](./PRD.md)
+- Current proposed roadmap and decisions: [Integrated Roadmap #09](../plans/product/09-integrated-roadmap-and-it-decision-handoff.md)
 - Phase roadmap: [ROADMAP.md](./ROADMAP.md)
 - Implementation status: [IMPLEMENTATION_PLAN.md](./IMPLEMENTATION_PLAN.md)

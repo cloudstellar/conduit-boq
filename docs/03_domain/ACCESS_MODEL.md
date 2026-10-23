@@ -1,9 +1,20 @@
 # Access Model
 ## Conduit BOQ System
 
-**Last Updated:** 2026-10-12
+**Last Updated:** 2026-10-23
 **Historical snapshot:** P-49 target before its completed Production
 remediation and formal closeout
+
+<!-- RELEASE_ALIGNMENT_20261023 -->
+> **Recorded release state — 2026-10-23:** dependency A (`a3114fc`) and
+> [stale-Copy B](../06_engineering/STALE_COPY_B_RELEASE_CLOSEOUT_20261023.md) (`42e01c5` + Production 031 ledger `20261023063934`)
+> are closed. [L1 Production result](../06_engineering/LIST_1B_L1_PRODUCTION_RELEASE_RESULT_20261023.md) records exact `b1ce449`,
+> Ready/Current and bounded no-write smoke PASS at its observation time.
+> B Production stale HTTP remains **NOT RUN**, closed rather than a pending
+> test. Migrations **027–031 are immutable/no-replay**. Earlier dated
+> pending/candidate/approval wording below preserves its own stage. This local
+> documentation alignment makes no fresh Production observation and grants
+> no runtime, DB, reset, migration or publication authority.
 
 <!-- MASTER_CATALOG_CURRENT_STATE_20260829 -->
 > [!IMPORTANT]
@@ -40,6 +51,14 @@ remediation and formal closeout
 > The trusted Save RPC now denies nullable as well as false scope decisions.
 > It does not change the access matrix, roles, RLS policies, accounts, Catalog,
 > Factor or BOQ data. Migrations 027–030 are immutable/no-replay.
+
+> **2026-10-14 planning boundary:** Current access controls remain unchanged.
+> Approval-role labels and separation-of-duties rules below are not a completed
+> BOQ lifecycle or authority to record an external approval. The Owner confirmed
+> signed-paper approval by the conduit engineering section manager; proposed
+> W-H recorder rights and transitions remain TBD. Corporate SSO must preserve
+> Auth UUID/BOQ ownership and current status/role/scope checks; its IdP/protocol
+> are unknown. See [Integrated Roadmap #09](../plans/product/09-integrated-roadmap-and-it-decision-handoff.md).
 
 ---
 
@@ -177,6 +196,13 @@ output until trusted review/save.
 
 ---
 
+031 changes the stale conflict response to HTTP 409 / `PT409` with exact detail
+`BOQ_SOURCE_STALE`; it does not expand copy roles or source visibility. L1 uses
+these existing RLS/RPC contracts for full-result search/count and page routes.
+The visible Delete gate follows existing active-Admin/creator-draft rules; the
+database remains authoritative. S0/user management and W-H/SSO are not delivered
+by list-session cleanup or this release.
+
 ## 6. Implementation Files
 
 | File | Purpose |
@@ -186,6 +212,8 @@ output until trusted review/save.
 | `app/admin/page.tsx` | Admin UI calls RPC |
 | `lib/boq/duplicate.ts` | Typed atomic-copy client; UX/error mapping, not authorization |
 | `migrations/029_atomic_boq_duplicate.sql` | Database-authoritative atomic copy, idempotency, eligibility, and ACL contract |
+| `migrations/031_boq_duplicate_stale_conflict_guard.sql` | Applied-once stale-response correction; same authorization/identity/ACL contract, no replay |
+| `lib/boq/list.ts`, `lib/boq/useBOQList.ts` | RLS-filtered list reads and client lifecycle guards; no new permission model |
 | `docs/plans/master-catalog/45-phase4-p49-pending-authorization-hardening-plan.md` | Historical target, gap inventory, and acceptance gates |
 
 ---

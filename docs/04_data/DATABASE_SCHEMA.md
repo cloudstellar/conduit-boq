@@ -1,11 +1,32 @@
 # Database Schema
 ## Conduit BOQ System
 
-**Last Updated:** 2026-10-12
-**Status:** Migrations 027–030 are applied once in Production and immutable;
-the audited Master Catalog workflow, Atomic BOQ Duplicate, and BOQ Save NULL
-authorization guard are live
+**Last Updated:** 2026-10-23
+**Status:** Migrations 027–031 are recorded applied once in Production and
+immutable; Master Catalog, Atomic BOQ Duplicate, the Save NULL guard and the
+stale-Copy response correction are released. L1 adds no schema change
 **Database:** PostgreSQL 17 (Supabase)
+
+<!-- RELEASE_ALIGNMENT_20261023 -->
+> **Recorded release state — 2026-10-23:** dependency A (`a3114fc`) and
+> [stale-Copy B](../06_engineering/STALE_COPY_B_RELEASE_CLOSEOUT_20261023.md) (`42e01c5` + Production 031 ledger `20261023063934`)
+> are closed. [L1 Production result](../06_engineering/LIST_1B_L1_PRODUCTION_RELEASE_RESULT_20261023.md) records exact `b1ce449`,
+> Ready/Current and bounded no-write smoke PASS at its observation time.
+> B Production stale HTTP remains **NOT RUN**, closed rather than a pending
+> test. Migrations **027–031 are immutable/no-replay**. Earlier dated
+> pending/candidate/approval wording below preserves its own stage. This local
+> documentation alignment makes no fresh Production observation and grants
+> no runtime, DB, reset, migration or publication authority.
+
+> **031 schema/contract record — 2026-10-23:** the separately approved
+> application is ledger `20261023063934/boq_duplicate_stale_conflict_guard`.
+> `public.duplicate_boq_atomic` retains OID `112777`, owner/ACL/config/security
+> and other behavior, with successor definition SHA-256
+> `508f70695e5f5578734570d356c5a0921cab0e0dc0a207e8ffcc9aca313b68b2`.
+> Only stale conflict classification changed to `PT409` + `BOQ_SOURCE_STALE`;
+> see the [031 Production receipt](../06_engineering/STALE_COPY_031_PRODUCTION_MIGRATION_RESULT_20261023.md).
+> L1 preflight rechecked five selected relation/six function contracts, not the
+> whole live schema or business data. No table/column/RLS/index was added by L1.
 
 <!-- SAVE_GUARD_PRODUCTION_CLOSEOUT_20261012 -->
 > [!IMPORTANT]
@@ -206,8 +227,6 @@ BOQ Header - ใบประมาณราคา
 | `factor_f_upper_value` | DECIMAL(10,4) | YES | E: ค่า Factor F ของ C |
 | `factor_reference_version_id` | UUID | YES | FK → factor_reference_versions.id หลัง migration 012; legacy BOQs remain nullable/snapshot-only |
 | `status` | TEXT | NO | สถานะ (draft/submitted/approved) ¹ |
-
-¹ Reserved for Phase 3: `pending_review`, `pending_approval`
 | `created_by` | UUID | YES | FK → auth.users.id |
 | `assigned_to` | UUID | YES | FK → auth.users.id |
 | `org_id` | UUID | YES | FK → organizations.id |
@@ -216,6 +235,17 @@ BOQ Header - ใบประมาณราคา
 | `updated_by` | UUID | YES | FK → auth.users.id |
 | `created_at` | TIMESTAMPTZ | NO | วันที่สร้าง |
 | `updated_at` | TIMESTAMPTZ | NO | วันที่แก้ไขล่าสุด |
+
+¹ Reserved for Phase 3: `pending_review`, `pending_approval`
+
+The status type and existing authorization fields do not establish a complete
+submission/approval or immutable issued-revision workflow. Proposed W-H will
+record externally signed-paper approval, with the actual signer distinct from
+the app recorder; exact state names, evidence and schema remain undecided in
+[Integrated Roadmap #09](../plans/product/09-integrated-roadmap-and-it-decision-handoff.md).
+No W-H, SSO identity-binding or Quantity Expression schema change is authorized
+by this reference. Auth UUID ownership relationships must be preserved until an
+explicitly reviewed identity transition is approved.
 
 ---
 
@@ -527,7 +557,11 @@ Migration 027 dropped the historical one-argument
 The owner-only `private.boq_copy_graph_sha256(uuid, boolean)` helper creates the
 canonical route/item graph fingerprint. The public RPC performs its own
 `auth.uid()`/active-profile/source-scope checks and is the authorization
-boundary; client button visibility is not authority.
+boundary; client button visibility is not authority. The applied 031 successor
+returns HTTP 409 / `PT409` with exact detail `BOQ_SOURCE_STALE` for a stale
+source. The client retains legacy `40001` compatibility and the same captured
+source ID/request UUID/source token through bounded recovery; L1 did not change
+the RPC payload or database authorization.
 
 ---
 
@@ -568,6 +602,7 @@ boundary; client button visibility is not authority.
 | `028_master_catalog_admin_gate_projection.sql` | Bounded active-Admin gate projection | ✅ Production once; immutable/no replay |
 | `029_atomic_boq_duplicate.sql` | Private idempotency ledger/helper and guarded atomic BOQ duplicate RPC | ✅ Production `20260831004110/atomic_boq_duplicate`; immutable/no replay |
 | `030_boq_save_null_authorization_guard.sql` | Reject NULL and false in the existing Save scope-authorization guard; preserve all other function behavior | ✅ Production `20261012100608/boq_save_null_authorization_guard`; immutable/no replay; [Result #04](../plans/security/04-boq-save-null-authorization-production-release-result.md) |
+| `031_boq_duplicate_stale_conflict_guard.sql` | Stale Copy uses `PT409` + exact `BOQ_SOURCE_STALE`; function identity/security preserved | ✅ Production once `20261023063934/boq_duplicate_stale_conflict_guard`; immutable/no replay; metadata/ledger PASS, stale HTTP NOT RUN; [031 receipt](../06_engineering/STALE_COPY_031_PRODUCTION_MIGRATION_RESULT_20261023.md) |
 
 ---
 

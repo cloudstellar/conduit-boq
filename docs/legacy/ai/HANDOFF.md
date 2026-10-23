@@ -1,7 +1,13 @@
 > [!WARNING]
-> **DEPRECATED:** This file has been migrated to the canonical documentation system.
-> See [docs/canonical/AI_HANDOFF.md](../../canonical/AI_HANDOFF.md) for the authoritative version.
-> This file is preserved for historical reference.
+> **DEPRECATED — historical Phase 1/2 handoff. Navigation aligned 2026-10-23.**
+> Start at [Current AI Handoff](../../08_ai/AI_HANDOFF.md) and
+> [Integrated Roadmap #09](../../plans/product/09-integrated-roadmap-and-it-decision-handoff.md).
+> The upgrade prerequisites, “ready/next” wording and execution prompt below
+> remain the 2026-01-20 snapshot, not current authority. The body is preserved
+> for historical reference.
+> A/B/031 and [L1](../../06_engineering/LIST_1B_L1_PRODUCTION_RELEASE_RESULT_20261023.md)
+> subsequently completed; B Production HTTP remains NOT RUN. Current C work is
+> local documentation only, with no new infrastructure, DB or publication authority.
 
 # Handoff Document
 

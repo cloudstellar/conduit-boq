@@ -1,12 +1,37 @@
 # Architecture
 ## Conduit BOQ System
 
-**Last Updated:** 2026-05-30  
+**Last Updated:** 2026-10-23
 **Status:** Canonical
+
+<!-- RELEASE_ALIGNMENT_20261023 -->
+> **Recorded release state — 2026-10-23:** dependency A (`a3114fc`) and
+> [stale-Copy B](../06_engineering/STALE_COPY_B_RELEASE_CLOSEOUT_20261023.md) (`42e01c5` + Production 031 ledger `20261023063934`)
+> are closed. [L1 Production result](../06_engineering/LIST_1B_L1_PRODUCTION_RELEASE_RESULT_20261023.md) records exact `b1ce449`,
+> Ready/Current and bounded no-write smoke PASS at its observation time.
+> B Production stale HTTP remains **NOT RUN**, closed rather than a pending
+> test. Migrations **027–031 are immutable/no-replay**. Earlier dated
+> pending/candidate/approval wording below preserves its own stage. This local
+> documentation alignment makes no fresh Production observation and grants
+> no runtime, DB, reset, migration or publication authority.
+
+> **2026-10-14 reference boundary:** The diagrams, version table and flows below
+> are the dated architecture baseline, not a fresh Production inventory. Use
+> [Tech Stack](../06_engineering/TECH_STACK.md) for repository dependency versions
+> and [Security Model](../04_data/SECURITY_MODEL.md) for current trusted controls.
+> The application has Next.js server/API paths as well as browser-to-Supabase
+> calls; a static-only web server or bare PostgreSQL is not an equivalent target.
+> [Integrated Roadmap #09](../plans/product/09-integrated-roadmap-and-it-decision-handoff.md)
+> records proposed internal-hosting/SSO discovery: IdP/protocol and IT data
+> boundary remain unconfirmed. No target architecture or migration is approved.
 
 ---
 
 ## 1. Tech Stack
+
+The table below preserves the 2026-05-30 architecture baseline. Repository
+Next/config versions are now `16.4.2`; use the maintained Tech Stack for the
+recorded dependency/runtime details rather than treating this old table as live.
 
 | Layer | Technology | Version |
 |-------|------------|---------|
@@ -82,8 +107,9 @@
 
 **Key Files:**
 - `app/page.tsx` - Dashboard
+- `app/boq/page.tsx` - L1 server-paged BOQ register
 - `app/boq/create/page.tsx` - BOQ creation
-- `app/boq/[id]/page.tsx` - BOQ view/edit
+- `app/boq/[id]/edit/page.tsx` - BOQ editor
 - `app/admin/page.tsx` - Admin panel
 - `components/boq/*` - BOQ-specific components
 
@@ -97,6 +123,13 @@
 **Key Files:**
 - `lib/hooks/useUser.ts` - User auth state hook
 - `lib/context/AuthContext.tsx` - Auth context provider
+
+The released list uses `lib/boq/useBOQList.ts` with `list.ts` for one authorized
+25-row page/exact-count request plus at most one complete route batch.
+`listSession.ts` keeps the search/page/sort unit per actor; search is absent
+from shared app URLs but may appear in Data API URLs/logs. Separate list/route
+requests are not one DB snapshot; auth errors invalidate the list, while route
+errors retain valid rows with unavailable badges.
 
 ### 3.3 Data Access (`lib/supabase/`)
 
@@ -117,7 +150,10 @@
 - UI display logic
 - Separation of Duties enforcement
 
-> **Important:** RLS policies are the actual security layer. The `can()` function is for UI only.
+> **Important:** The `can()` function is for UI only. Current trusted controls
+> include grants, RLS, protected-column triggers and guarded RPC bodies/ACLs,
+> together with privileged server/API checks; RLS alone does not validate a
+> `SECURITY DEFINER` function's authorization. See the Security Model above.
 
 ### 3.5 Database Layer (Supabase PostgreSQL)
 
@@ -145,6 +181,12 @@
 
 ### 4.2 BOQ Creation Flow
 
+The following is a simplified historical flow. Current graph Save uses the
+guarded `save_boq_with_routes` RPC; whole-BOQ Copy uses
+`duplicate_boq_atomic`. Do not implement either as a browser sequence of
+header/route/item inserts. See [Database Schema](../04_data/DATABASE_SCHEMA.md)
+and the current release results linked there.
+
 ```
 1. User fills BOQ form
 2. Form validation (client-side)
@@ -171,6 +213,11 @@
 ## 5. Security Model
 
 ### 5.1 Authentication
+
+This lists the historical authentication design, not a current cookie-security
+verification. Session configuration must be checked in the actual clients and
+target deployment; organizational SSO remains proposed under #09.
+
 - Email/Password via Supabase Auth
 - JWT tokens stored in httpOnly cookies
 - Session refresh via middleware

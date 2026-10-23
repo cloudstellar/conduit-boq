@@ -1,9 +1,20 @@
 # Permission Patterns
 ## Conduit BOQ System
 
-**Last Updated:** 2026-10-12
+**Last Updated:** 2026-10-23
 **Historical snapshot:** P-49 target before its completed Production
 remediation and formal closeout
+
+<!-- RELEASE_ALIGNMENT_20261023 -->
+> **Recorded release state — 2026-10-23:** dependency A (`a3114fc`) and
+> [stale-Copy B](STALE_COPY_B_RELEASE_CLOSEOUT_20261023.md) (`42e01c5` + Production 031 ledger `20261023063934`)
+> are closed. [L1 Production result](LIST_1B_L1_PRODUCTION_RELEASE_RESULT_20261023.md) records exact `b1ce449`,
+> Ready/Current and bounded no-write smoke PASS at its observation time.
+> B Production stale HTTP remains **NOT RUN**, closed rather than a pending
+> test. Migrations **027–031 are immutable/no-replay**. Earlier dated
+> pending/candidate/approval wording below preserves its own stage. This local
+> documentation alignment makes no fresh Production observation and grants
+> no runtime, DB, reset, migration or publication authority.
 
 <!-- MASTER_CATALOG_CURRENT_STATE_20260829 -->
 > [!IMPORTANT]
@@ -41,7 +52,22 @@ remediation and formal closeout
 > Client helpers remain UX only; database authorization remains authoritative.
 > Migrations 027–030 are immutable/no-replay.
 
+> **2026-10-14 planning boundary:** `approve`/committee helper examples below
+> are eligibility illustrations, not evidence of a complete BOQ approval UI,
+> transition API or immutable issued revision. Proposed W-H records external
+> signed-paper approval; recorder authority remains undecided. S0/user and SSO
+> work must retain trusted current-profile status + role + scope checks and
+> Auth UUID ownership continuity. IdP/protocol remain unknown; do not infer
+> provisioning, automatic account linking or role activation from SSO. See
+> [Integrated Roadmap #09](../plans/product/09-integrated-roadmap-and-it-decision-handoff.md).
+
 ---
+
+L1 page/count and route reads continue under the existing actor/RLS scope.
+Client list invalidation, actor-separated session storage and logout cleanup
+are UX safeguards, not server revocation/offboarding or S0 completion. Copy
+retains the captured source ID/request UUID/source token and the 031 conflict
+contract; no list helper replaces the trusted RPC authorization boundary.
 
 ## 1. Client-Side Permission Check
 
