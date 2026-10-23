@@ -2,6 +2,8 @@ import type { SupabaseClient } from '@supabase/supabase-js';
 import { requireActiveProfile } from '@/lib/auth/authorization';
 
 export const DUPLICATE_BOQ_RPC = 'duplicate_boq_atomic';
+export const DUPLICATE_BOQ_SOURCE_STALE_CODE = 'PT409';
+export const DUPLICATE_BOQ_SOURCE_STALE_DETAIL = 'BOQ_SOURCE_STALE';
 
 export type DuplicateBOQMode = 'preserve' | 'select_factor';
 export type DuplicateBOQRecoveryAction =
@@ -82,7 +84,14 @@ export async function duplicateBOQAtomic(
 }
 
 export function isDuplicateBOQSourceStaleError(error: unknown): boolean {
-  return isRecord(error) && error.code === '40001';
+  return isRecord(error) && (
+    // Keep the predecessor RPC compatible while the client is released first.
+    error.code === '40001'
+    || (
+      error.code === DUPLICATE_BOQ_SOURCE_STALE_CODE
+      && error.details === DUPLICATE_BOQ_SOURCE_STALE_DETAIL
+    )
+  );
 }
 
 export function getDuplicateBOQRecoveryAction(
@@ -93,7 +102,7 @@ export function getDuplicateBOQRecoveryAction(
     ? error.code
     : '';
 
-  if (code === '40001') return 'reload';
+  if (isDuplicateBOQSourceStaleError(error)) return 'reload';
   if (mode === 'preserve' && code === '22023') return 'open_source';
   if (code === '22023' || code === '55000') return 'create_new';
   if (
@@ -131,7 +140,7 @@ export function getDuplicateBOQErrorMessage(
     return 'ไม่พบ BOQ ต้นฉบับ หรือคุณไม่มีสิทธิ์เข้าถึงรายการนี้';
   }
 
-  if (code === '40001') {
+  if (isDuplicateBOQSourceStaleError(error)) {
     return 'BOQ ต้นฉบับเปลี่ยนแปลงแล้ว กรุณาโหลดข้อมูลใหม่ก่อนคัดลอกอีกครั้ง';
   }
 

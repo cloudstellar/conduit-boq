@@ -88,8 +88,10 @@ describe('atomic BOQ duplicate client', () => {
     ])
   })
 
-  it('surfaces a stale source token without silently retrying against newer source data', async () => {
-    const staleError = { code: '40001', message: 'source changed' }
+  it.each([
+    { code: '40001', message: 'source changed' },
+    { code: 'PT409', details: 'BOQ_SOURCE_STALE', message: 'source changed' },
+  ])('surfaces stale $code without silently retrying against newer source data', async (staleError) => {
     const rpc = vi.fn().mockResolvedValue({ data: null, error: staleError })
     const supabase = { rpc } as unknown as SupabaseClient
 
@@ -166,5 +168,40 @@ describe('atomic BOQ duplicate client', () => {
     expect(getDuplicateBOQRecoveryAction({ code: '55000' }, 'preserve')).toBe('create_new')
     expect(getDuplicateBOQRecoveryAction({ code: '42501' }, 'preserve')).toBe('dismiss')
     expect(getDuplicateBOQRecoveryAction({ code: 'PGRST202' }, 'preserve')).toBe('dismiss')
+  })
+
+  it.each(['preserve', 'select_factor'] as const)(
+    'recognizes only the exact new stale conflict in %s mode while retaining legacy compatibility',
+    (mode) => {
+      for (const error of [
+        { code: 'PT409', details: 'BOQ_SOURCE_STALE' },
+        { code: '40001' },
+      ]) {
+        expect(isDuplicateBOQSourceStaleError(error)).toBe(true)
+        expect(getDuplicateBOQRecoveryAction(error, mode)).toBe('reload')
+        expect(getDuplicateBOQErrorMessage(error, mode)).toContain('โหลดข้อมูลใหม่')
+      }
+    },
+  )
+
+  it.each([
+    null,
+    undefined,
+    {},
+    { status: 409 },
+    { code: 'PT409' },
+    { code: 'PT409', details: null },
+    { code: 'PT409', details: 'OTHER_CONFLICT' },
+    { code: 'PT409', details: ' BOQ_SOURCE_STALE' },
+    { code: 'PT409', details: { code: 'BOQ_SOURCE_STALE' } },
+    { code: '23505', details: 'BOQ_SOURCE_STALE' },
+    { code: 'P0001', message: 'BOQ_SOURCE_STALE' },
+    { code: '409', details: 'BOQ_SOURCE_STALE' },
+  ])('does not mistake an unrelated conflict for a stale source: %j', (error) => {
+    expect(isDuplicateBOQSourceStaleError(error)).toBe(false)
+    for (const mode of ['preserve', 'select_factor'] as const) {
+      expect(getDuplicateBOQRecoveryAction(error, mode)).toBe('retry')
+      expect(getDuplicateBOQErrorMessage(error, mode)).not.toContain('โหลดข้อมูลใหม่')
+    }
   })
 })
