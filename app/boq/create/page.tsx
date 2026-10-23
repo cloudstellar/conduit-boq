@@ -43,30 +43,40 @@ export default function CreateBOQPage() {
   const [catalogVersion, setCatalogVersion] = useState<CatalogVersionSummary | null>(null);
   const [catalogError, setCatalogError] = useState<string | null>(null);
   const [isCatalogLoading, setIsCatalogLoading] = useState(true);
+  const [previousUser, setPreviousUser] = useState<typeof user>(null);
 
   const loadCatalogVersion = useCallback(async () => {
-    setIsCatalogLoading(true);
-    setCatalogError(null);
-
     try {
       await requireActiveProfile(supabase);
-      setCatalogVersion(await getActiveDefaultPriceListVersion(supabase));
+      return { version: await getActiveDefaultPriceListVersion(supabase), error: null };
     } catch (err) {
-      setCatalogVersion(null);
-      setCatalogError(
-        err instanceof Error ? err.message : DEFAULT_CATALOG_UNAVAILABLE_MESSAGE,
-      );
-    } finally {
-      setIsCatalogLoading(false);
+      return {
+        version: null,
+        error: err instanceof Error ? err.message : DEFAULT_CATALOG_UNAVAILABLE_MESSAGE,
+      };
     }
   }, [supabase]);
 
-  useEffect(() => {
-    void loadCatalogVersion();
-  }, [loadCatalogVersion]);
+  const applyCatalogResult = useCallback((result: {
+    version: CatalogVersionSummary | null;
+    error: string | null;
+  }) => {
+    setCatalogVersion(result.version);
+    setCatalogError(result.error);
+    setIsCatalogLoading(false);
+  }, []);
 
-  // Auto-fill from user profile
   useEffect(() => {
+    let cancelled = false;
+    void loadCatalogVersion().then((result) => {
+      if (!cancelled) applyCatalogResult(result);
+    });
+    return () => { cancelled = true; };
+  }, [loadCatalogVersion, applyCatalogResult]);
+
+  // Adjust editable defaults when the profile changes, before committing the form.
+  if (user !== previousUser) {
+    setPreviousUser(user);
     if (user) {
       const fullName = [user.title, user.first_name, user.last_name]
         .filter(Boolean)
@@ -85,7 +95,7 @@ export default function CreateBOQPage() {
         department: deptDisplay || prev.department,
       }));
     }
-  }, [user]);
+  }
 
   const handleProjectInfoChange = (field: keyof ProjectInfo, value: string) => {
     setProjectInfo((prev) => ({ ...prev, [field]: value }));
@@ -200,7 +210,11 @@ export default function CreateBOQPage() {
               type="button"
               size="sm"
               variant="outline"
-              onClick={loadCatalogVersion}
+              onClick={() => {
+                setIsCatalogLoading(true);
+                setCatalogError(null);
+                void loadCatalogVersion().then(applyCatalogResult);
+              }}
               disabled={isCatalogLoading}
               className="shrink-0 border-red-200 bg-white text-red-700 hover:bg-red-100 hover:text-red-800"
             >

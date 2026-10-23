@@ -360,7 +360,12 @@ describe('Master Catalog P-22 operator workflow', () => {
 
     expect(placementStorage).toContain('CATALOG_PLACEMENT_STORAGE_SCHEMA_VERSION = 3');
     expect(placementStorage).toContain('hasUserChanges');
-    expect(placementWorkspace).toContain('const storageReady = readyStorageKey === storageKey');
+    expect(placementWorkspace).toContain('const storageReady = storageSnapshot !== null');
+    expect(placementWorkspace).toContain('restoredScope?.storageKey === storageKey');
+    expect(placementWorkspace).toContain('restoredScope.suggestedAssignments === suggestedAssignments');
+    expect(placementWorkspace).toContain('restoredScope.draftItems === draftItems');
+    expect(placementWorkspace).toContain('restoredScope.baseItems === workspace.baseItems');
+    expect(placementWorkspace).toContain("if (state.status === 'success') return;");
     expect(placementWorkspace).toContain("window.addEventListener('beforeunload'");
     expect(placementWorkspace).toContain("document.addEventListener('click', guardSameOriginNavigation, true)");
     expect(placementWorkspace).toContain('กู้คืนตัวเลือกที่ยังไม่ยืนยันแล้ว');

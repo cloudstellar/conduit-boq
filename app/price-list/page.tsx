@@ -93,11 +93,6 @@ export default function PriceListPage() {
     fetchData();
   }, [supabase]);
 
-  // Reset to page 1 when filters change
-  useEffect(() => {
-    setCurrentPage(1);
-  }, [searchTerm, selectedCategory]);
-
   const filteredItems = items.filter((item) => {
     const matchesSearch =
       item.item_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -152,7 +147,11 @@ export default function PriceListPage() {
   // Handle Select change with sentinel pattern
   const selectValue = selectedCategory || '__ALL__';
   const handleCategoryChange = (value: string) => {
-    setSelectedCategory(value === '__ALL__' ? '' : value);
+    const category = value === '__ALL__' ? '' : value;
+    if (category !== selectedCategory) {
+      setSelectedCategory(category);
+      setCurrentPage(1);
+    }
   };
 
   if (isLoading) {
@@ -197,7 +196,12 @@ export default function PriceListPage() {
                 <Input
                   placeholder="พิมพ์ชื่อรายการหรือรหัส..."
                   value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
+                  onChange={(e) => {
+                    if (e.target.value !== searchTerm) {
+                      setSearchTerm(e.target.value);
+                      setCurrentPage(1);
+                    }
+                  }}
                 />
               </div>
               <div className="space-y-2">
