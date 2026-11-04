@@ -1,5 +1,21 @@
 # UX Guidelines for BOQ Application
 
+## Current NT design-planning reference — 2026-10-24
+
+For future changes, use [sitewide NT plan #11](../plans/product/11-nt-brand-system-and-sitewide-ui-rollout-plan.md)
+and [UM-A/UM-B #12](../plans/product/12-user-management-um-a-and-um-b-plan.md),
+with [Roadmap #09](../plans/product/09-integrated-roadmap-and-it-decision-handoff.md)
+for sequence. Owner direction is one NT identity across the website, using the
+Master Catalog frame and documented CI sources. Shared styling/font changes,
+exact design acceptance and implementation remain separately scoped work.
+
+The January/February guidance below is dated history, not NT CI authority or
+permission to restore old numeric sanitizing, pending-account behavior or list
+loading patterns. Current R0A remains numeric-only and rejects unsupported text
+without changing it into another number; L1 and P-49 receipts govern their
+released behavior. Reuse useful layout/state patterns only when current source
+and contracts agree. No runtime or data operation is authorized by this document.
+
 > สร้าง: 2026-01-31 | ปรับปรุง: 2026-01-31
 
 ## 1. หลัก UX พื้นฐาน

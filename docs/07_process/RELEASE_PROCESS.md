@@ -1,8 +1,28 @@
 # Release Process
 ## Conduit BOQ System
 
+> **S0 source publication approval — 2026-11-05:** Owner approved exact25paths,
+> fresh readonlypreflight,CI/Vercel/anonymous no-write smoke and conditional
+> clientrollback under the [Solo plan](./S0_SOLO_RELEASE_PLAN_20261104.md).
+> Actual outcome/grant consumption is in S0's canonical checkpoint. Existing
+> MCP transaction contract is documented-supported with limits,not runtimePASS.
+> Production032apply/DBmutation/replay027–032 remain forbidden;A1/parity9 excluded.
+
+> **Later S0 Solo proposal — 2026-11-04:** [Exact S0 plan](./S0_SOLO_RELEASE_PLAN_20261104.md)
+> proposes25paths (5source+20linkedMarkdown),excluding A1application/parity9.
+> R5scopeddesktop/cleanupPASS carries mobile/evidence limits. Source publication
+> and one-shotProduction032 are distinct explicit gates;neither is authorized
+> by local planning. After S0,refresh A1's base/allowlist/rollback and keep032.
+
 > **Status:** CANONICAL
 > **Last Updated:** 2026-10-23
+
+> **Later local release proposal — 2026-11-02:** [UM-A1 Solo plan](./UM_A1_SOLO_RELEASE_PLAN_20261102.md)
+> proposes exactly27 paths and a fresh pre-A1 rollback target. It is planning
+> only: no Production/DB/Auth, staging or publication. Local functional/settled
+> visual evidence is not actual-commit CI or a fresh hosted preflight. Parity9,
+> real local UM runners4 and private fixture/evidence files stay separate.
+> S0 and future UM/NT implementation remain outside A1 release scope.
 
 <!-- RELEASE_ALIGNMENT_20261023 -->
 > **Recorded release state — 2026-10-23:** dependency A (`a3114fc`) and
@@ -123,6 +143,48 @@ and [Local Parity Result](../06_engineering/LOCAL_DATABASE_PARITY_RESULT.md)
 for the prepared baseline and remaining stale-Copy failed gate. These safeguards
 do not change #09's
 product release order or turn proposed plans into approved implementation.
+
+## NT brand and UM planning boundary — 2026-10-24
+
+The Owner selected a future consistent NT identity across web surfaces and
+approved local plan alignment. Use [brand #11](../plans/product/11-nt-brand-system-and-sitewide-ui-rollout-plan.md),
+[UM #12](../plans/product/12-user-management-um-a-and-um-b-plan.md) and
+[Roadmap #09](../plans/product/09-integrated-roadmap-and-it-decision-handoff.md).
+This is no runtime, asset/config/package, DB/Auth/fixture, Production or Git
+publication grant. Existing nine parity artifacts remain separate; 027–031
+remain immutable/no-replay. Documentation-only work needs diff/link and affected
+documentation contract checks, not Docker or a test-database backup.
+
+Future visual candidates must name affected routes and any shared/global
+font/token/component change. Use real NT assets with recorded provenance,
+measure Thai text/wrapping and state/focus/mobile behavior in the rendered app,
+and distinguish web acceptance from Print/PDF/Excel acceptance. Concept images
+are not final CI or accessibility PASS. Do not bundle accounting, authority,
+Catalog/Factor or migration changes into a restyle. Focused S0 is separate and
+must not wait for the full-site restyle; a minimal reviewed NT pilot may be
+included with UM-A instead of inventing another mandatory release/PR.
+
+Current proposed first UI candidate is Admin-only UM-A1: directory/read-only
+details/labels and scoped NT presentation. Keep shared Auth/Login/callback/
+middleware/context/hooks, pending/profile, domain policy, global styles/fonts/
+primitives and existing RPC command semantics unchanged. A1 includes canonical
+post-command reread and truthful completed/refresh-unavailable/transport-uncertain
+states; preserving old partial optimistic updates is not a release invariant.
+A2 signup/confirmation and
+later command-UX are separately reviewed scopes. Back-office navigation must
+not auto-update accounts; explicit existing Admin commands retain their intended
+targeted effects. Do not require A2 mail-delivery proof for A1 presentation.
+Before a new UM-B authority transition, review server-side expected-review/conflict,
+same-intent replay/current-state and legacy-client compatibility. Keep these
+limits visible in #12's completion register; do not close all UM with A1 alone.
+
+Actual signup/approval tests write synthetic local Auth/profile data. Future
+approval must cover exact fixture creation/cleanup and relevant DB-backed flows;
+preserve original usernames/passwords, account authority and data. No reset or
+Auth/SMTP configuration change is inferred. Report UX, callback and real-mail
+delivery separately; local mail capture is not hosted delivery proof. Required
+unknown/failed gates hold release-ready claims. Publication and any hosted
+preflight remain separate explicitly approved operations.
 
 ## 1. Deployment
 

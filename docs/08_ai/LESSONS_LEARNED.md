@@ -1,8 +1,103 @@
 # Lessons Learned & AI Constitution
 ## Conduit BOQ System
 
-**Last Updated:** 2026-10-23
+**Last Updated:** 2026-11-03
 **Status:** Living Document (Update constantly)
+
+## A denied INSERT may stop before the intended RLS guard — 2026-11-03
+
+- Negative API tests must identify the actual denial boundary. An existing
+  SECURITY INVOKER reference trigger can reject a pending actor before table
+  RLS. No inserted row is evidence of no persisted write, not by itself proof
+  that the new RLS predicate caused the denial. Keep an exact trigger contract
+  separate from RLS acceptance; never broaden success to arbitrary4xx/5xx.
+- On assertion failure, retain bounded non-sensitive case/status/SQLSTATE and
+  persisted-state evidence. A response hash plus generic error cannot recover
+  the exact failed response later. Correlated source/log evidence supports a
+  diagnosis but must not be restated as the missing observed HTTP response.
+- Stop verification on a core HOLD. Successful DDL and hundreds of earlier
+  checks do not close remaining gates. Recovery cleanup can be separately
+  authorized and PASS while acceptance stays HOLD; finalized fixtures remain
+  closed, security guards stay in place, and future validation targets the
+  successor without replay. See the [S0 local receipt](../06_engineering/S0_BOQ_WRITER_BOUNDARY_LOCAL_RESULT.md).
+
+## Generic continuation is not an ungranted Auth/fixture operation — 2026-11-03
+
+- Check the actual Owner grant before first DB/Auth/fixture/DDL dispatch. A
+  prepared packet, passing source/build and an assistant-written authority
+  summary cannot supply a missing explicit execution grant. In this S0 task,
+  automatic review rejected `prepare` before any Auth/fixture mutation; the
+  earlier broad continuation interpretation is corrected in the handoff.
+- Stop on that rejection; complete unaffected source/document checks, retain
+  exact evidence and ask for the bounded operation explicitly. Do not switch
+  tools/actors or execute indirectly. This does not require repeated approval
+  for routine steps already covered by an actual explicit Owner grant.
+- Interactive runners must reject non-TTY execution before locks/credentials/
+  DB access. A pre-Auth startup exit with0intents must not be reported as a
+  completed fixture run or silently reopen a closed attempt.
+
+## Isolate build evidence before manual handoff — 2026-11-03
+
+- A normal Terminal retry against the same private `.next` is not necessarily
+  a fresh permission test. Installed Next16.4.2 enables persistent build cache;
+  the S0 cache retained earlier port/EPERM messages before the manual FAIL.
+  Treat cached-error causation as a hypothesis until a fresh-output comparison,
+  not a proven user-machine or application defect.
+- Before handing off an environment diagnosis, preserve the owned temporary
+  build output by rename and prepare a fresh-output build plus narrow closed
+  loopback probes. Keep all old failures/logs; do not reset data, alter source/
+  packages/config/fonts, weaken OS protections or substitute a bundler to label
+  acceptance PASS. See the [S0 intermediate result](../06_engineering/S0_BOQ_WRITER_BOUNDARY_LOCAL_RESULT.md).
+- A real build PASS still does not prove DB-backed behavior. Keep Auth/fixture/
+  DDL gates closed until the required fresh target/contracts and runtime checks.
+
+## Sitewide NT identity and account planning — 2026-10-24
+
+- Read the existing CI analysis and real surface implementation before choosing
+  a new visual baseline. Master Catalog already has a restrained NT-yellow
+  frame. Its web IBM font is not the approved NT document font; existing
+  blue/orange tokens are not proof of primary NT CI colors. Use
+  [brand plan #11](../plans/product/11-nt-brand-system-and-sitewide-ui-rollout-plan.md)
+  for source/assets, typography rollout and actual rendered acceptance.
+- A concept image can redraw logos, miss wording or imply unsupported controls.
+  It is design intent, not CI acceptance, accessibility proof or a working app.
+  Use authentic runtime assets and measured layout/state checks after approval.
+- One global font/token change can affect every route and output. Pilot a named
+  surface and test Thai glyphs, wrapping, focus and responsive states before
+  wider rollout; keep accepted PDF/Excel layouts and business contracts separate.
+- Active status, requested affiliation and email confirmation are independent.
+  UI lookup failures are not NULL assignments; NULL approval metadata is not
+  proof of never-approved history. Missing affiliation alone must not remove
+  approved post-S0 access; this does not preserve unintended procurement writes.
+  Investigate true pending-business-access as a separate security finding.
+- UI-only source work does not mean test-data-free execution. Signup and Admin
+  approval write Auth/profile records; explicitly scope synthetic local fixture
+  creation/cleanup, preserve original accounts/passwords and do not infer reset
+  or Production authority. See [UM plan #12](../plans/product/12-user-management-um-a-and-um-b-plan.md).
+- Back-office labels do not make a combined Auth/Admin patch isolated. Begin
+  UM-A1 with Admin directory/read-only details and scoped styling; preserve
+  shared Login/callback/middleware/context/hooks, domain settings and existing
+  commands. A2 signup/callback and later command-UX need their own impact scope.
+  Current domain checks affect existing login/recovery/web access as well as
+  signup, so changing the setting can cause lockout without revoking all API access.
+- Preserve command business semantics, not incomplete optimistic projections.
+  Richer Admin raw IDs/details require authoritative reread after success in A1;
+  success plus refresh failure is not mutation failure. Never manufacture approval
+  metadata from requested values or client time. One record/presenter prevents
+  table/drawer/count drift without a new user store or permission engine.
+- Row locking and idempotent replay do not prove the Admin-reviewed snapshot is
+  still current. Define server reviewed-state conflict and old-client compatibility
+  before new UM-B transitions. Keep SSO UUID continuity an explicit later gate;
+  unknown IdP behavior cannot justify promising migration-free integration.
+- Do not turn a future consistent-brand goal into a full-site prerequisite for
+  urgent security work. Keep the [focused S0 correction](../plans/security/05-s0-boq-writer-boundary-plan.md)
+  separate from visual/UM changes. Operational correction follows the Owner's
+  existing Copy-to-independent-draft direction, without imposing a new revision
+  or supersede engine. Preserve old dated evidence rather than rewriting it.
+
+The 2026-10-24 task is local documentation only; docs C is already represented
+by local baseline commit 67c1e6f. Earlier C-in-progress passages retain their
+stage. No runtime/DB/Production or publication authority follows.
 
 **Current release/documentation lesson — 2026-10-23:** A `a3114fc`, B client
 `42e01c5`, Production 031 and L1 `b1ce449` have separate completed receipts;

@@ -4,6 +4,8 @@ Local Supabase uses project ID `conduit-boq-local` and the dedicated port range
 `55320-55329`, so it does not collide with the default `5432x` ports used by
 other Supabase projects.
 
+Owner quick reference: [บัญชีทดสอบ local และจุดดูรหัสเดิม](#test-users).
+
 <!-- RELEASE_ALIGNMENT_20261023 -->
 > **Recorded release state — 2026-10-23:** dependency A (`a3114fc`) and
 > [stale-Copy B](06_engineering/STALE_COPY_B_RELEASE_CLOSEOUT_20261023.md) (`42e01c5` + Production 031 ledger `20261023063934`)
@@ -325,20 +327,38 @@ all seven logins and current profiles. Account UUIDs are recreated local fixture
 usernames/password remain usable. The password file was not rewritten.
 Pending/suspended users retain their restricted application state.
 
+**รายการสำหรับ Owner — ปรับให้อ่านง่ายวันที่ 2026-11-02**
+
+บัญชีหลักสำหรับเข้าหน้าจัดการคือ **`local.admin@ntplc.co.th`**
+ดูรหัสเดิมจากไฟล์ `supabase/.env.local` โดยค้นหาตัวแปร
+**`LOCAL_TEST_PASSWORD`** บัญชีชุดเดิมทั้งเจ็ดใช้ค่ารหัสเดียวกันตามหลักฐาน
+ข้างต้น เก็บรหัสไว้ที่ไฟล์เดิมแห่งเดียวเพื่อไม่ให้สำเนารหัสในเอกสารเก่าล้าสมัย
+รายการนี้ไม่คัดลอกรหัสผ่านหรือ key ลงเอกสารที่อาจถูก commit
+
+| บัญชี | บทบาทตามชุดทดสอบเดิม | สถานะตามชุดทดสอบเดิม |
+|---|---|---|
+| `local.admin@ntplc.co.th` | ผู้ดูแลระบบ | ใช้งาน |
+| `local.staff@ntplc.co.th` | พนักงาน | ใช้งาน |
+| `local.sector-manager@ntplc.co.th` | ผู้จัดการส่วน | ใช้งาน |
+| `local.dept-manager@ntplc.co.th` | ผู้จัดการฝ่าย | ใช้งาน |
+| `local.procurement@ntplc.co.th` | จัดซื้อจัดจ้าง | ใช้งาน |
+| `local.pending@ntplc.co.th` | พนักงาน | รออนุมัติ |
+| `local.suspended@ntplc.co.th` | พนักงาน | ระงับ |
+
+นี่คือ quick reference ของบัญชีเดิม ไม่ใช่รายชื่อบัญชีทั้งหมดในฐาน local
+และไม่ใช่การตรวจ role/status/login สดในวันที่จัดรายการ ไม่มีการเรียก Auth/API
+เปลี่ยนรหัสหรือแก้บัญชีเพื่อทำเอกสารนี้ บัญชี `uma1.*` ของ run ที่ปิดแล้วเป็น
+หลักฐานทดสอบแยก ไม่ใช่บัญชีใช้งานประจำของ Owner
+
+การเปิดดูรายชื่อนี้ไม่ต้องรัน seed, bootstrap, reset หรือ restore และไม่เปิด
+fixture run เดิม การทดสอบ Docker จริงครั้งถัดไปยังต้องได้รับอนุมัติแยกตามขอบเขต
+
 Quote the complete value when `LOCAL_TEST_PASSWORD` or
 `LOCAL_SUPABASE_SECRET_KEY` contains a literal `#`, for example
 `LOCAL_TEST_PASSWORD="value-with-#-inside"`. An unquoted `#` can be interpreted
 as an inline-comment delimiter by Node env-file semantics. Local scripts fail
 closed on an ambiguous guarded secret instead of seeding one password and
 testing another. Never commit `supabase/.env.local`.
-
-- `local.admin@ntplc.co.th`
-- `local.staff@ntplc.co.th`
-- `local.sector-manager@ntplc.co.th`
-- `local.dept-manager@ntplc.co.th`
-- `local.procurement@ntplc.co.th`
-- `local.pending@ntplc.co.th`
-- `local.suspended@ntplc.co.th`
 
 The current baseline contains synthetic Catalog/Factor/organization/BOQ graphs
 and local Auth identities. No Production password hashes, sessions, OTPs, MFA

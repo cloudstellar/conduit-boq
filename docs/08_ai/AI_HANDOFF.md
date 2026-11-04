@@ -1,5 +1,571 @@
 # AI Handoff — Conduit BOQ
 
+## S0 source publication approved; 032 apply forbidden — 2026-11-05
+
+Owner explicitly approved updating transaction-review documents/manifest,
+fresh read-only preflight,then stage/commit/push/deploy ONLY the exact25paths
+in the [S0 Solo plan](../07_process/S0_SOLO_RELEASE_PLAN_20261104.md),CI/Vercel
+and clean anonymous no-write smoke;conditional client rollback per that plan.
+Stop on preflight drift. Existing MCP transaction route is DOCUMENTED_SUPPORTED
+WITH LIMITS,not payload runtime PASS. Keep immutable032 unchanged and DO NOT
+apply it,change DB,replay027–032,or include A1/parity9/private fixtures.
+Production scope is source/config/rollback reads and anonymous Login/static
+smoke only;no BOQ/account reads,Auth/businessRPC or fixture operations.
+This is one source-publication grant,not standing repeat authority;canonical
+S0 section6/12 records consumption/outcome. No Production032 grant follows.
+
+## S0 short release plan review only — 2026-11-05
+
+Owner approved a local Markdown revision of the [S0 Solo plan](../07_process/S0_SOLO_RELEASE_PLAN_20261104.md).
+Keep the same25paths/A1-parity-private exclusions and immutable032. Proposed
+existing-MCP payload omits only outer BEGIN/final COMMIT;source592872b3… and
+payload9cc46a3d… are distinct. Mapping is file-only proof,not runtime PASS;
+runner transaction continuity remains OPEN before apply. Platform records
+history;verify actual version/name/statements and old-ledger preservation,
+no custom ledger writer/repair/retry. Prior bounded Nov5 hosted read is dated
+evidence,grant consumed;see canonical S0 section6/11. Current scope is local
+plan/link/hash checks only:no Production/DB/Auth/Docker/browser/fixtures,
+stage/commit/push/deploy or replay027–032. No execution/rollback grant.
+
+## S0 Solo release proposal only — 2026-11-04
+
+Owner requested [the exact S0-only release plan](../07_process/S0_SOLO_RELEASE_PLAN_20261104.md). Proposed25paths:
+5source(Loginprop+032+localrunner+2tests),20linkedMarkdown. UM-A1 code/tests/
+mock9,realUMrunners/privatefixtures/parity9 stay excluded and unchanged.
+Current work is localMarkdown/prospective source checks only,no staging/commit/
+push/deploy,Production/DB/Auth/Docker/browser/fixture or replay027–032.
+Recommended source/client publication first,then explicitly gated one-shot032;
+publication alone does not close the security gap. R5desktopPASS/mobileP2
+limits/threeedgeNOTRUN/BHTTPNOTRUN remain factual. Hostedsource/config/rollback/
+DBpreflight and actualreleaseCI/smoke are NOTRUN. No execution/rollback grant.
+
+
+## R5 finalized: scoped desktop flow PASS, mobile limitation — 2026-11-04
+
+Use [S0 section9.22/current checkpoint](../plans/security/05-s0-boq-writer-boundary-plan.md#922-r5-local-execution--2026-11-04).
+R5 is FINALIZED/PASS for bounded desktopCreate/Save/reload/calculation/Print
+plus reviewedmobilecapture,cleanupPASS. Exactly1Create/1Save,quantity3.00 at
+both checkpoints,total176.55;1inactive synthetic profile/audit/1BOQ1route1item
+retained,3sessionsCLOSED/0sessions0tokens/10CONFIRMED/0UNKNOWN. Actual32vectors/
+originalAuthhashes/7audits/source171+549 independently filecheckedPASS;normal
+serverstopreceipt andPID/portabsence confirmed. Grant consumed,alloldrunsclosed.
+Mobile image hasP2unchanged editorclipping;mobileusability/responsive NOT
+VALIDATED. Repeated header-like band cause unconfirmed. Do not claim blanket
+visual/mobilePASS. Raw savedgraph/Factor rows unretained;runtime source-enforced
+checks passed,but file-only interpolation reconstruction unavailable.
+Current authority is source/evidence/Markdown only:no furtherDB/Docker/Auth/
+fixtures/browser/server/Production/reset/replay027–032 or publication. Next
+appropriate step is an exact S0-only Solo release proposal separating A1/parity9
+and recording mobile/release limits;no release or Production032 grant follows.
+
+
+## Explicit R5 local execution approval — 2026-11-04
+
+Owner approved fresh local preflight and exactR5 under [S0 section9.22](../plans/security/05-s0-boq-writer-boundary-plan.md#922-r5-local-execution--2026-11-04).
+Includes1newstaff/max3sessions/normalAuthbookkeeping,oneCreateSave/caps1BOQ/
+4routes/8items and settled-HOLD cleanup retaininginactiveprofile/audit/owned
+BOQgraph with0sessions/tokens. UNKNOWN stops. Use unchangedpassword/originals,
+qualified helper/peers/build/171pins. No oldrun/reset/restore/replay027–032,
+Production or stage/commit/push/deploy. This supersedes source-only limits
+only for this explicit bounded run;approval is not acceptancePASS.
+This exact R5 grant is complete/consumed;section9.22 records actual final results.
+
+
+## Qualified-helper peer source integration prepared — 2026-11-04
+
+Owner's later continuation prepares NEW coordinator/preflight sources bound
+to the completed helper;use [S0 section9.21/current checkpoint](../plans/security/05-s0-boq-writer-boundary-plan.md#921-qualified-helper-integration-and-r5-proposal--2026-11-04).
+Preparation only:101offlinePASS,helperd2abf58f… byte-exact,coordinator/producer
+path/hash rebinding only;171pins/candidate549 unchanged,independent reviewsPASS.
+NEW server/guard templates only rebind future paths;normalstop protocol intact.
+No livepreflight/R5run/Auth/fixtures/DB/Docker/browser/server/Production or
+publication. Proposed next1newstaff/max3sessions/oneCreateSave/caps1-4-8 needs
+an explicit execution grant. Preserve oldpeer/helper/source/evidence copies,
+original accounts/password/data/parity9/027–032. R4stays FINALIZED/UIHOLD/
+cleanupPASS;sourceintegration does not make S0 runtime/release ready.
+
+
+## Approved NEW helper correction; source-only — 2026-11-04
+
+Owner explicitly approved NEW helper-copy corrections for both quantity checks
+and diagnostics,offline tests/checkpoint only. Use [S0 section9.20](../plans/security/05-s0-boq-writer-boundary-plan.md#920-new-helper-quantity-and-diagnostics-correction--2026-11-04).
+Private helperd2abf58f… waits for canonical3.00/unfocused/ARIAfalse/no draft
+at both afterEnter/afterreload;persists bounded actual diagnostics before
+assertion,and tracks Edit→Print by substep. Offline51PASS including real
+component/state11;source qualification/review closeout is recorded there.
+Current authority remains source/offline/Markdown only:no R5/livepreflight,
+DB/Docker/Auth/fixtures/browser/server,Production,replay027–032 or publication.
+Do not repin old coordinator/producer or reopen closed runs. Preserve151
+pinned inputs/candidate549/all original accounts/password/data and parity9.
+R4 remains FINALIZED/UIHOLD/cleanupPASS;this patch is not runtime or releasePASS.
+
+
+## R4 finalized HOLD; quantity-check correction proposed — 2026-11-04
+
+Use [S0 section9.18/current checkpoint](../plans/security/05-s0-boq-writer-boundary-plan.md#918-r4-local-execution--2026-11-04)
+and [section9.19](../plans/security/05-s0-boq-writer-boundary-plan.md#919-quantity-contract-review-and-correction-proposal--2026-11-04).
+R4 is FINALIZED:preflight/Login/Create/selectorPASS,SaveNOTDISPATCHED/UIHOLD,
+cleanupPASS;1inactive synthetic profile/audit/emptyBOQ retained,3CLOSED/
+0sessions0tokens/9CONFIRMED/0UNKNOWN. Actual32table/Authhashvectors are now
+persisted and independently comparedPASS;122pins/549candidate bytes retained.
+Helper demands string3 afterEnter ANDreload,but existing editor renders
+committed3.00. Real component/state isolated6testsPASS supports that contract;
+actual R4input text at failure remains unretained. Do not relabel HOLD asPASS.
+Server stoppedreceipt absent after operatorCtrlC;separate ps/lsof confirm
+PID/port absent,not a normal shutdown receipt. Grant consumed;all oldrunsclosed.
+Current work is source/evidence/offline/Markdown only,no newDB/Docker/Auth/
+fixtures/browser/server/Production/publication or replay027–032. New helper
+correction/full-path review is proposed;no R5 source bundle/runtime authority.
+
+
+## R4 explicitly approved local execution — 2026-11-04
+
+Owner approved fresh local preflight and exact R4 under [S0 section9.18](../plans/security/05-s0-boq-writer-boundary-plan.md#918-r4-local-execution--2026-11-04).
+Includes1newstaff/max3sessions,normalAuthbookkeeping,oneCreate/oneSave,caps1BOQ/
+4routes/8items and settled-HOLD cleanup retaining inactiveprofile/audit/owned
+BOQgraph with0sessions/tokens. UNKNOWN stops. Use unchanged password/originals,
+qualified R4 sources/exact Login-fixed build/122pins. No oldrun reopening,
+reset/restore/replay027–032,Production or stage/commit/push/deploy. This narrow
+explicit grant supersedes prior R4 preparation-only text;approval is not PASS.
+This exact R4 grant is complete/consumed;section9.18 records actual closeout.
+
+
+## R3 finalized; R4 source-only preparation — 2026-11-04
+
+Use [S0 section9.16](../plans/security/05-s0-boq-writer-boundary-plan.md#916-r3-local-execution--2026-11-04)
+and [section9.17/current checkpoint](../plans/security/05-s0-boq-writer-boundary-plan.md#917-r4-selector-correction-and-source-only-packet--2026-11-04).
+R3 is FINALIZED:CreatePASS,SaveNOTDISPATCHED/UIHOLD,cleanupPASS;1inactive
+synthetic profile/audit/emptyBOQ retained,3sessionsCLOSED/0sessions0tokens.
+Helper terms mismatched fixture names/codes;unit_cost is present,no Catalog/
+pricing/032 repair. Search response bodies/counts were not retained;final
+custody vectors were executor-checked but not persisted for independent
+recomputation. Preserve those limits and closed-run evidence. Grant consumed.
+NEW R4 copies/offline74PASS use exactPRT-SYN-001,pre-Auth readonly selector
+feasibility and private persistence of existing custody vectors. Preserve122
+pinned inputs/originals/passwords/qualified Login build/027–032. Current work
+is source/offline/Markdown only;no livepreflight/DB/Docker/Auth/fixtures/browser/
+server/Production/publication. R4 newstaff1/max3sessions/oneCreateSave/caps1-4-8
+and settled-HOLD cleanup are proposed,NOT APPROVED/NOT RUN. No oldrun reopening.
+
+## R3 runtime explicitly approved — 2026-11-04
+
+Owner approved freshlocalpreflight/R3/Authfixtures/oneCreateSave/settled-HOLD
+cleanup under [S0 section9.16](../plans/security/05-s0-boq-writer-boundary-plan.md#916-r3-local-execution--2026-11-04).1newstaff/max3sessions/caps1BOQ4routes8items,
+same password/originals,retainedinactive profile/audit/graph and0sessions/tokens.
+UNKNOWN stops,no retry. Use exact qualified peers/patched build and107pins;
+no reset/replay027–032/Production/publication. Record actual outcomes separately.
+This exact grant is complete/consumed;section9.16 records settled results.
+
+## S0 UI business R3 source ready — 2026-11-04
+
+Use [S0 section9.15](../plans/security/05-s0-boq-writer-boundary-plan.md#915-create-save-r3-approval-packet--2026-11-04). Owner continuation prepared NEW R2-derived copies bound
+to the Login-fixed build;70offline checks passed,107inputs unchanged. Proposed
+newstaff1/max3sessions/oneCreateSave/caps1-4-8 and inactive-profile/audit/graph
+retention are reviewable,but NOT APPROVED/NOT RUN. No live preflight/Auth/DB/
+Docker/browser/server/Production/publication;all old runs remain closed. Helper
+now waits for accepted Save alert before reload and records known logout before
+browser-close diagnostics. No app/package/SQL change;S0 business-flow stillHOLD.
+
+## Patched-Login authenticated regression PASS — 2026-11-04
+
+Owner approved the prepared2991c8a… verifier for exactly1original-staff session,
+readonly local pre/postflight,normal Auth bookkeeping and exact local logout.
+Use [S0 section9.14](../plans/security/05-s0-boq-writer-boundary-plan.md#914-patched-login-authenticated-regression--2026-11-04). No Create/Save/business write/identity/profile/role change,
+Production,migration/replay027–032 or publication. Preserve original sessions/
+data and86artifacts;known-session cleanup survives diagnosticHOLD,UNKNOWN stops.
+No previous closed run is reopened;record new actual results before closeout.
+The one-session run is FINALIZED/PASS:Login/Createform200,0root prefetch/404/
+console/network/API/guard errors;1login/1local logout/0residue,32table and
+originalAuthcustodyPASS,metadata unchanged,browser/server gone. Root reviewed
+the actual PNG. Grant consumed;no further Auth/DB/runtime. This closes the
+post-Login404 check only;S0 Create/Save/calculation/output remains HOLD/NOT RUN.
+
+## Login prefetch patch locally validated — 2026-11-04
+
+Owner continued the proposed NT-logo Link prefetch=false correction. Use
+[S0 section9.13](../plans/security/05-s0-boq-writer-boundary-plan.md#913-login-logo-prefetch-correction--2026-11-04):one application prop,NEW build/no-Auth browser validation,
+original86artifacts/closedruns retained. No Auth/DB/Docker/Production/business
+write/migration/publication grant follows; full S0 UI remains HOLD. No package/
+config or UM-A1 overlay. Fresh actual results must be recorded before closeout.
+Completed:default Node24Turbopack build,37Auth tests,lint,TypeScript,4probe
+safety cases and reviewed public desktop/mobile PASS. Baseline rootprefetch1
+each→candidate0each;Enter/tap logo navigation intact,0Auth/Data/serveregress.
+Browser/servers closed;86prior artifacts unchanged. Future original-staff
+1session verification tooling is prepared/offline9PASS,NOT RUN/NOT APPROVED.
+No authenticated404 or S0 Create/Save PASS follows;source/evidence/docs now.
+
+## Existing-staff trace finalized — 2026-11-04
+
+Owner approved one NEW original-local-staff session, readonly pre/postflight,
+normal Auth bookkeeping and exact local logout. See [S0 section9.12](../plans/security/05-s0-boq-writer-boundary-plan.md#912-existing-staff-request-trace--2026-11-04).
+New private operator only; do not reopen R2/fixtures or create accounts. Block
+business writes/BOQ reads/extra login/refresh/global logout and nonlocal egress.
+No Production/replay027–032/publication. Record actual outcome separately from
+R2's unrecoverable missing signature; preserve84 artifacts and original custody.
+Actual trace completed:one existing-staff session/login/local logout,0residue,
+32table+originalAuthcustodyPASS,server/browser stopped. Correlated Login segment
+/login/__PAGE__ was redirected to root and returned404/postponed2/same-IDabort;
+root lacks that segment. Body unobserved;classifier remains strict. Two favicon
+blocks were diagnostic allowlist errors. S0 UI/business acceptance stays HOLD.
+Grant consumed;no further Auth/DB/runtime. One-Link prefetch=false correction
+is proposed only; full details/evidence/limits in9.12.
+
+## R2 closed; 404 mechanism investigated — 2026-11-04
+
+See [S0 section9.11](../plans/security/05-s0-boq-writer-boundary-plan.md#911-r2-ui-only-execution--2026-11-04). R2 Login/Createform passed readiness but local web GET/404
+plus console error held UI before Create/Save. Finalized1inactive/3CLOSED/
+0sessions0tokens/32custodyPASS/7Authaudits; processes stopped, grant consumed.
+Anonymous public protocol controls then reproduced 200 ordinary/valid-prefetch
+and404 missing-segment+x-nextjs-postponed2+emptybody withoutAuth/DB. R2 lacks
+headers/requestIDs; do not retroactively call its404 benign or mark PASS.
+Collector offline4PASS; proposed actual trace uses existing local staff1session
+only if separately approved, no new account/role/business write. Source/docs now.
+
+## R2 explicitly approved — 2026-11-04
+
+Use [S0 section9.11](../plans/security/05-s0-boq-writer-boundary-plan.md#911-r2-ui-only-execution--2026-11-04) for actual execution progress. Owner approved fresh local
+preflight/NEW1staff/max3sessions/oneCreateSave/caps1-4-8 and settled-HOLD cleanup;
+UNKNOWN stops. Keep password/originals/83pins/closedruns; no reset/replay027–032,
+Production or publication. Source gate passed; live results are pending.
+
+## Qualified-helper integration source only — 2026-11-04
+
+Owner approved NEW coordinator/producer copies, source-pins and offline tests
+before a full-test proposal. Use [S0 section9.10/checkpoint](../plans/security/05-s0-boq-writer-boundary-plan.md#910-coordinator-and-producer-integration-preparation--2026-11-04).
+No new account/session/old-run operation/browser/server/Docker/DB/Production or
+publication. Preserve83 prior/copy/evidence artifacts; helper345… remains the
+qualified bytes. Do not turn source integration or old no-Auth PASS into fresh
+preflight/Auth/business-flow PASS. Proposed R2 remains NOT CREATED.
+Preparation passed21coordinator/13producer/4source-pin-integration offline
+tests plus actual83-file custody and9fixed-input/165built-file checks. Fresh
+live preflight and Auth remain NOT RUN; use the new reviewed proposal in9.10.
+
+## New helper / no-Auth Login validation approved — 2026-11-04
+
+Owner approved [S0 section9.9](../plans/security/05-s0-boq-writer-boundary-plan.md#99-new-helper-and-unauthenticated-login-probe--2026-11-04):new helper copy, offline tests and existing-build
+Login probe without accounts/Auth sessions, old-run reopening, DB/Production or
+publication. Browser Auth/Data API is blocked; server egress is denied. Keep
+the48 prior artifacts and original app/package/build/credentials unchanged.
+This cannot close the authenticated S0 business-flow gate or create UI_READY.
+Completed:helper18/18,safety3/3 and actual unauthenticated Login desktop/mobile
+PASS; two PNGs reviewed, no errors/blockedAPI/serveregress/accounts/Authsessions.
+First probe HOLD from an overly narrow local-prefetch allowlist is retained;
+the corrected probe permits only marked same-origin RSC Logo-Link prefetch.
+Both browsers/servers are closed. Grant consumed; full S0 UI stays HOLD.
+
+## UI-only attempt finalized; pre-browser guard stopped — 2026-11-04
+
+Read [S0 section9.8/checkpoint](../plans/security/05-s0-boq-writer-boundary-plan.md#98-ui-only-execution--2026-11-04).
+Fresh preflight and one staff preparation passed. Browser login was NOT
+DISPATCHED; helper reported body0 while controls/title were ready, then a later
+reviewed PNG showed the Login form. Source proves a premature-ready contract
+gap, not its exact rendering cause or an app/permission defect. No Create/Save.
+Coordinator acceptance NOT RUN; real UI remains HOLD. Run FINALIZED, cleanup
+PASS1inactive/2sessionsCLOSED/0sessions0tokens/32tablecustody, processes stopped.
+Grant consumed; no run reopening/newAuth/runtime/Production/publication/replay.
+
+## UI-only local execution explicitly approved — 2026-11-04
+
+Owner approved [S0 section9.8](../plans/security/05-s0-boq-writer-boundary-plan.md#98-ui-only-execution--2026-11-04):fresh local preflight,
+NEW1staff/max3sessions including Admin API-only bookkeeping, one Create/Save,
+caps1/4/8, unchanged password/originals and settled-HOLD cleanup. UNKNOWN stops.
+No old-run reopening/reset/replay027–032/Production/publication. Use the
+checkpoint for actual outcomes; this grant is not acceptance PASS.
+
+## Fresh preflight producer preparation — 2026-11-04
+
+Latest continuation prepares a NEW private producer for coordinator-compatible
+read-only preflight proofs plus offline tests. See [S0 section9.7/checkpoint](../plans/security/05-s0-boq-writer-boundary-plan.md#97-fresh-preflight-producer-preparation--2026-11-04).
+No live Docker/DB/Auth/browser/server/preflight/run or Production/publication.
+Keep47 protected artifacts and all closed runs unchanged. The frozen baseline
+plus031 predecessor is historical input; fresh post032 metadata must remain
+separate. Source/mock PASS cannot supply a fresh observation or execution grant.
+Producer source is now qualified by13/13 offline tests; live capture/run remain
+NOT RUN. Exact source and remaining execution scope are recorded in section9.7.
+
+## One-user coordinator source preparation — 2026-11-03
+
+The private one-user coordinator is implemented; qualified hashes and offline
+results are in [S0 section9.6/checkpoint](../plans/security/05-s0-boq-writer-boundary-plan.md#96-coordinator-source-and-offline-lifecycle-preparation).
+This continuation covers source, injected tests and documentation only: no run,
+browser, server, Docker, DB/Auth, Production, publication or replay027–032.
+Preserve all45 frozen artifacts and closed runs. Real UI remains HOLD; fresh
+preflight and a new1staff/3session lifecycle remain NOT RUN and require their own
+explicit bounded approval. Earlier unimplemented text is dated preparation history.
+
+## UI-only helper/plan task only — 2026-11-03
+
+Owner requested helper readiness/diagnostics correction and1newstaff/max3session
+UI-only plan for review. See [S0 section9/checkpoint](../plans/security/05-s0-boq-writer-boundary-plan.md#9-ui-only-helper-and-one-user-validation-packet--2026-11-03).
+New private helper copy/offlinefakepage tests and documentation only,no browser/
+server/Docker/DB/Auth/run/Production/publication/replay027–032. Keep43protected
+artifacts and all finalized runs unchanged. Newone-user coordinator remains
+unimplemented; helper PASS cannot authorize or certify a real UI-only run.
+Privatehelper syntax/default/help/nonTTY and15fakepage/protocol cases PASS;
+current realUI staysHOLD. Section9 records the reviewable plan and next source
+implementation gate,not an execution grant. No browser/DB/Auth or newrun opened.
+
+## S0 successor-r1 closed — 2026-11-03
+
+Latest [checkpoint](../plans/security/05-s0-boq-writer-boundary-plan.md#6-current-checkpoint)/[receipt](../06_engineering/S0_BOQ_WRITER_BOUNDARY_LOCAL_RESULT.md):
+remainingAPI PASS;builtApp/overall HOLD at title assertion after login,with no
+Create/Save/PNG or captured actualtitle;one unmappedconsole404. Cleanup PASS,
+13sessions CLOSED/0sessions/0tokens,originalcustody PASS,ownedprocesses stopped.
+Run FINALIZED and execution grant consumed; no new DB/Auth/fixture/runtime or
+Production/publication/replay027–032. Source/docs review only. Keep bothclosed
+S0runs/UMruns/originals/A1/parity/credentials immutable.801source tests passed;
+future focusedUI-only1staff/max3sessions requires separate bounded approval.
+
+## S0 successor-r1 explicitly approved — 2026-11-03
+
+Owner approved exact freshlocalpreflight/Auth11/max13sessions/22BOQs28routes
+34items/unchangedpassword/remainingAPI+browser and settled-HOLD-cleanup scope;
+use [S0 checkpoint/section8](../plans/security/05-s0-boq-writer-boundary-plan.md#8-successor-only-remaining-validation-packet--2026-11-03).
+UNKNOWN stops for readonlyreconciliation. No oldrun/originaldata/Catalog/Factor
+change,reset/restore,replay027–032,Production or publication. Pre-Auth harness
+custody/browser-outcome safety corrections require refreshed offline hashes;
+no broader feature or new grant is inferred. Keep earlier evidence/authority
+stages intact and use the checkpoint for actual progress, not approval as PASS.
+
+## S0 successor harness preparation — 2026-11-03
+
+Latest continuation starts runner/safety-test patch and offline quality checks,
+not new DB/Docker/Auth/fixtures or Production/publication. Use [section8](../plans/security/05-s0-boq-writer-boundary-plan.md#8-successor-only-remaining-validation-packet--2026-11-03)
+and the canonical checkpoint. Finish the concrete candidate before requesting
+explicit new11actor/13session execution/settled-HOLD-cleanup scope. Never infer
+it from this generic continuation after the earlier review rejection. Closed
+run/032 guards/A1/parity/original credentials/data remain protected.
+The candidate now passed798source tests,lint0errors/3oldwarnings,TypeScript
+and fresh-output Node24/defaultTurbopack. Temporary copied-bin symlink repair
+closed its build failure without app/package/config changes; retain both FAILs
+and the new PASS. No new DB/Docker/Auth/fixture or runtime acceptance occurred.
+
+## S0 local execution HOLD; recovery finalized — 2026-11-03
+
+Read [S0 checkpoint](../plans/security/05-s0-boq-writer-boundary-plan.md#6-current-checkpoint)
+and [local receipt](../06_engineering/S0_BOQ_WRITER_BOUNDARY_LOCAL_RESULT.md)
+before continuation.032 applied once local,DDL postflight PASS; verification
+HOLD after399PASSrecords at pending INSERT error classification, not full
+acceptance. Row absent; exact failed response code/body unavailable. Later
+explicitly approved recovery finalized the run with0sessions/0refresh tokens
+and original custody PASS; runner/server stopped. Never reopen this run,
+earlier preAuth attempts or closed UM runs. Execution/recovery grants consumed;
+source/docs/checks only, no more DB/Auth/fixtures/migration/Production/publication.
+Keep032 unchanged and027–032no-replay. A1 source/parity9/credentials/originals
+retained. Proposed next step is harness-only review then separately approved
+successor validation; no predecessor/032 replay. Earlier stages below are history.
+
+## Explicit S0 local execution approval — 2026-11-03
+
+Owner explicitly approved S0local including Auth/fixtures, apply032once and
+three named NOT RUN limits, with noreset/replay027–031/Production/publication.
+Use section7 and [S0 checkpoint](../plans/security/05-s0-boq-writer-boundary-plan.md#6-current-checkpoint):
+NEWrun,11newactors/boundedgraphs,one existingAdmin API-only dedicatedsession,
+freshpreflight→reproduce→032once→verify/builtapp→finalize. Preserve originals,
+passwords/A1/parity9/references/closedruns; no package/config or other feature.
+This later explicit approval supersedes the earlier execution hold only for
+this bounded local scope; retain rejection/correction history below unchanged.
+
+## S0 execution authority correction — 2026-11-03
+
+Automatic approval review rejected the first fixture `prepare` because this
+exact Auth/fixture operation lacked explicit trusted Owner approval. It did
+not run. Earlier assistant interpretation of “ทำต่อครับ” below is corrected;
+it is not local DB/Auth/fixture/032 authority. Continue source/docs/checks only,
+ask explicit bounded execution approval and never retry via another tool.
+Build/freshreadonlypreflight and latest786source tests/lint/TypeScript PASS;
+runtime remains NOT RUN and032sourceonly. Both S0 attempts closed preAuth with
+zero dispatch/session/actor; ownedserver stopped. Preserve all evidence and
+original/A1/parity/027–031 boundaries. See [canonical checkpoint](../plans/security/05-s0-boq-writer-boundary-plan.md#6-current-checkpoint)
+and [receipt](../06_engineering/S0_BOQ_WRITER_BOUNDARY_LOCAL_RESULT.md).
+
+## Bounded S0 local continuation — 2026-11-03
+
+**Earlier assistant interpretation; execution authority corrected above.**
+
+The later Owner “ทำต่อครับ” follows the exact local readiness packet and
+authorizes [S0 section7](../plans/security/05-s0-boq-writer-boundary-plan.md#7-local-approval-packet--2026-11-02)
+only: four source/test paths, once-only forward application after preflight/
+reproduction,11newactors/boundedgraphs, one existingAdmin API-only session and
+three named NOT RUN edge limits. Follow [S0's checkpoint](../plans/security/05-s0-boq-writer-boundary-plan.md#6-current-checkpoint)
+for actual outcomes; no acceptance/release is implied. No Production, staging/
+publication, reset/replay027–031, package/config/reference mutation or old-run
+reopening. A1 source and original credentials/data/sessions/parity9 remain
+protected. Earlier planning-only passages retain their dated stage. UM-B's
+positive fixture remains HOLD; no affiliation repair or A1 release is started.
+Owner's later fresh-output defaultTurbopack/Node24build and parent/childprobes
+passed; oldcache/FAILs retained. Full fresh readonlypreflight passed. See its
+checkpoint/[intermediate receipt](../06_engineering/S0_BOQ_WRITER_BOUNDARY_LOCAL_RESULT.md)
+for current harness/privateUI-driver review beforeAuth. No032apply/newsession/
+fixture yet; offline/build PASS is not runtime acceptance or standing parity.
+
+## Priority UM-B legacy confirmation planning — 2026-11-02
+
+Use [UM#12 section15](../plans/product/12-user-management-um-a-and-um-b-plan.md#15-um-b-priority-legacy-affiliation-confirmation-plan)
+and its canonical section12 tracker. Owner's prior-approval report and the
+completed one-account READONLY Production result are separate evidence; no
+historical cause or never-approved conclusion is established. No names/emails/
+UUIDs/raw results belong inrepo. That read grant is consumed.
+Owner continuation permits local plan/roadmap/document checks only, not SQL,
+DB/Auth/fixtures, further Production or publication. Proposed order now takes
+narrow legacy confirmation after S0/A1 and before A2/remaining UM-B. Faithful
+positive fixture is HOLD. [Section16](../plans/product/12-user-management-um-a-and-um-b-plan.md#16-legacy-confirmation-audit-and-replay-contract)
+now selects the private immutable APPLIED/DENIED outcome/audit contract at plan
+level only, not SQL/runtime PASS. [Section17](../plans/product/12-user-management-um-a-and-um-b-plan.md#17-local-aggregate-only-fixture-feasibility-packet)
+was later approved and completed; [section17.4](../plans/product/12-user-management-um-a-and-um-b-plan.md#174-approved-count-result--2026-11-02)
+records0/0/0 on the exactexistinglocal target,RRreadonly/ROLLBACK,0identities.
+Read grant is consumed; no further DB/Auth/fixture or Production access. The
+zero count leaves no primary positive fixture; no reopened UM run, trigger
+bypass or S0 waiver. A1 runtime remains unchanged.
+
+## Focused S0 local plan only — 2026-11-02
+
+Next planning step is [S0#05 section7/local checkpoint](../plans/security/05-s0-boq-writer-boundary-plan.md#7-local-approval-packet--2026-11-02).
+Owner's continuation covers preparing that packet, not implementation. No SQL
+creation/numbering, DB/Docker/Auth/fixture, Production or staging/publication.
+The proposed11newactors/existingAdmin API-only session/three edge-test limits
+are explicit decisions for the next local approval. Do not force old fixture
+states by disabling triggers or reopening UM runs. A1 source stays unchanged;
+keep S0-only and A1+S0 evidence separate, and recalculate A1 source/allowlist/
+rollback after S0 release. S0 owns its tracker; #12 still owns UM status.
+
+## UM-A1 Solo release planning only — 2026-11-02
+
+Review the [exact27-path Solo proposal](../07_process/UM_A1_SOLO_RELEASE_PLAN_20261102.md)
+and #12's canonical checkpoint. It covers local source/document checks,
+preflight, future smoke/risks and proposed rollback only; no stage/commit/push/
+deploy, Production, DB/Auth/browser/fixture or package/config operation is
+authorized. Parity9, real local runners4 and private fixtures/evidence remain
+separate. Both fixture runs and the dedicated visual session are closed.
+S0-first remains a recommendation to decide, not automatic implementation or
+an accepted S0 waiver. Use completed receipts without reopening their grants.
+
+## UM-A1 settled visual execution approved — 2026-11-02
+
+Owner approved section14: one existing localAdmin/newdedicatedsession, normal
+Auth bookkeeping, visual-only built-app reads, exact scope:local cleanup and
+read-only custody. R5 browser exception is bounded to this task; no UI/global
+logout, profile/rights/business change, fixture reuse/newfixture, reset/migration/
+replay027–031, Production or stage/commit/push/deploy. Review PNGs beforecleanup;
+use #12 checkpoint. Earlier plan-only text below is its dated approval stage.
+Execution has completed; use the [settled visual receipt](../06_engineering/UM_A1_SETTLED_VISUAL_LOCAL_RESULT.md).
+Reviewed PNGs and independent postflight close the specific resting-image gap;
+the dedicated session was locally signed out, originals retained. No further
+Auth/fixture/runtime/Production/publication grant follows from completion.
+
+## UM-A1 visual plan only — 2026-11-02
+
+Read the [section14 visual approval packet](../plans/product/12-user-management-um-a-and-um-b-plan.md#14-um-a1-settled-visual-review-approval-packet).
+This request prepares the remaining desktop/mobile review; no runtime/Auth/DB
+operation is approved. Both fixture runs stay closed; the existing-Admin browser
+exception and normal Auth bookkeeping are proposed explicitly, not inferred.
+Use #12 checkpoint for actual evidence; no Production or publication authority.
+
+## UM-A1 new real Docker validation — 2026-11-02
+
+Owner approved one NEW18-account run `um-a1-20261102-real18` on the existing
+Docker target with the existing local password. Run-owned Auth/profile/Admin
+transitions and real built-app/API tests are authorized after passing preflight;
+retain/finalize only these new fixtures and their audit. Preserve all original
+data, including the finalized105-fixture run. No old-run reopening, DB reset,
+migration creation/application/replay027–031, Production, package/config change
+or stage/commit/push/deploy. Use #12 checkpoint for progress and actual results.
+The earlier client-only boundary below remains dated history for that patch.
+The new18 run has completed and is finalized; use the [real Docker result](../06_engineering/UM_A1_REAL_DOCKER_LOCAL_RESULT.md)
+and #12. Functional results do not close the retained resting-screenshot gap.
+No reactivation/reopening, additional Auth/fixture run, Production or publication
+authority follows from completion.
+
+## Later UM-A1 corrective authority — 2026-11-01
+
+Owner approved patching the three review findings with integration tests and
+checkpoint updates. Client-only correction; no DB/Auth operation, fixture run,
+Production, package/config or publication. Finalized105-fixture run stays closed;
+027–031 immutable/no-replay. Read the current checkpoint in #12 before resuming.
+Use the [corrective result](../06_engineering/UM_A1_CORRECTIVE_LOCAL_RESULT.md)
+for completed client/mock integration evidence and retained build/runtime limits;
+the initial826-test receipt is dated history, not corrective real-DB acceptance.
+
+## Later UM-A1 local authority — 2026-11-01
+
+The Owner subsequently said “ทำต่อครับ” after the final readiness verdict.
+This authorizes the bounded UM-A1 local implementation/test/105-fixture-retention
+envelope in #12 sections 11/13, with existing accounts/passwords/data preserved.
+Use the canonical checkpoint below and [local result](../06_engineering/UM_A1_LOCAL_RESULT.md).
+Earlier planning-only paragraphs are dated stages for this task. No Production,
+publication, package/config/DB contract change, reset or replay 027–031 is granted;
+S0/A2/UM-B remain separate. The exact routine local steps need no repeat approval.
+The bounded local candidate and retained-fixture finalization are now complete;
+resume at #12's Owner-review step and the local receipt, not fixture preparation.
+This completion grants no new run, migration, Production or publication action.
+
+## UM-A1 resume entry — 2026-11-01
+
+Read the [canonical execution checkpoint in UM #12](../plans/product/12-user-management-um-a-and-um-b-plan.md#12-execution-status-and-resume-checkpoint)
+before deciding what to do next. It owns the current progress, approval boundary,
+evidence dates, pending decisions and resume instructions; do not maintain a
+second progress table here. Read the [approval packet](../plans/product/12-user-management-um-a-and-um-b-plan.md#11-um-a1-approval-packet)
+and the checkpoint's current readiness/open findings before proposing execution.
+This entry grants no implementation, local fixture/runtime writes or release;
+current work is documentation only.
+The recommended S0-first publication order is not permission to start S0 or
+replace the Owner's UM planning focus. Reconcile the checkpoint with fresh Git
+and the applicable authorization before any later execution. Local drafts,
+including untracked #12, are not present in remote/new worktrees automatically.
+
+## Current planning handoff — 2026-10-24
+
+Owner-approved work is local plan/documentation alignment for consistent NT
+brand identity across the whole website. See [Roadmap #09](../plans/product/09-integrated-roadmap-and-it-decision-handoff.md),
+[NT brand #11](../plans/product/11-nt-brand-system-and-sitewide-ui-rollout-plan.md),
+[UM-A/UM-B #12](../plans/product/12-user-management-um-a-and-um-b-plan.md) and
+[focused S0](../plans/security/05-s0-boq-writer-boundary-plan.md).
+No implementation/configuration/assets/packages, DB/Auth/test fixtures,
+Production access or stage/commit/push/deploy is authorized. 027–031 are
+immutable/no-replay; original local users/passwords/data, nine parity artifacts
+and protected archive remain unchanged. Documentation checks need no Docker.
+
+The proposed order is focused S0 → Admin-only UM-A1/scoped NT pilot →
+UM-A2 Auth follow-up → UM-B/account-security minimum → wider R0/D0 → operational BOQ → Viewer/TOR →
+Expression. NT rollout extends incrementally to all web surfaces; it is not a
+big-bang prerequisite for security fixes. IT/SSO discovery stays parallel and
+confirmed policy can reorder release targets. Exact scopes/releases are unapproved.
+Master Catalog's frame/NT-yellow line and recorded CI assets are the design
+baseline; current IBM web fonts and NT PDF fonts must not be conflated.
+Accepted Print/PDF/Excel and deferred long-note layout work are not restyle scope.
+
+The first A1 candidate changes only Admin directory/read-only details/labels and
+scoped presentation. Keep Login/callback/middleware, shared Auth/context/hook,
+pending/profile, domain policy, global fonts/tokens/primitives and existing
+RPC semantics unchanged. Minimal canonical reread after commands is required
+in A1; do not freeze old optimistic state patches or fabricate IDs/audit metadata.
+No automatic account update on load/navigation/retry. Reuse one record/presenter,
+existing tokens/primitives and the current IBM font; defer the actual NT-font swap.
+User-facing Auth, later command-UX recovery and trusted UM-B changes are separate
+proposed scopes; do not describe all UM work as isolated back-office behavior.
+Before new UM-B transitions, settle reviewed-state conflict, replay/current-state
+and legacy-endpoint compatibility. A1 is not whole-UM completion or a promise
+that future SSO identity migration is unnecessary; use #12's retained-limit register.
+
+UM-A keeps current Auth UUID/session and role/status/scope, distinguishes active
+from requested/missing affiliation, and handles signup/pending/Admin UX using
+existing contracts. UM-B is required for trusted affiliation/atomic activation
+changes; email confirmation is not application approval. Hosted Auth/mail
+configuration and UM-A end-to-end acceptance remain unverified/NOT RUN.
+Future signup/approval tests write synthetic local Auth/profile data and require
+explicit test-write scope. Do not expose personal identifiers from the bounded
+account diagnosis in public repository documentation.
+
+Operational direction is signed-paper approval recorded by an authorized app
+recorder, locked operational content and existing Copy to an independent draft.
+No mandatory revision/source-link/supersede engine. TOR committee names are not
+new account roles. Viewer scope/print/export and recorder/evidence decisions remain open.
+
+Local source baseline is docs C `67c1e6fbf80da77d5bb6d6e115d3fa06016611b5`;
+L1 `b1ce449` remains latest recorded application release. No fresh Production
+inspection occurs in this task. A/B/031/L1 remain closed; B HTTP stays NOT RUN.
+The following older current/C-unpublished overlays preserve their dates.
+
 ## Current handoff — L1 released; local C alignment, 2026-10-23
 
 LIST-1B L1 was published through the explicitly approved exact 15-file Solo

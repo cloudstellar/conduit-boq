@@ -120,7 +120,7 @@ function LoginForm() {
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
       <div className="sm:mx-auto sm:w-full sm:max-w-md">
-        <Link href="/" className="flex justify-center">
+        <Link href="/" prefetch={false} className="flex justify-center">
           <Image
             src="/nt_logo.svg"
             alt="NT Logo"

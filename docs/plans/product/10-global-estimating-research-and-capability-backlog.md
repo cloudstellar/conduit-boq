@@ -1,5 +1,22 @@
 # Global Estimating Research and Capability Backlog
 
+## Current planning overlay — 2026-10-24
+
+Use [Roadmap #09](./09-integrated-roadmap-and-it-decision-handoff.md),
+[NT brand #11](./11-nt-brand-system-and-sitewide-ui-rollout-plan.md) and
+[UM-A/UM-B #12](./12-user-management-um-a-and-um-b-plan.md) for active proposed
+work. Whole-site NT consistency is an Owner-selected direction, delivered
+incrementally through existing components, not a new requirement for a component
+library/package migration or a big-bang redesign. Focused S0 remains a separate
+security candidate ahead of proposed NT/UM-A implementation.
+
+The Owner's operational correction minimum is ordinary Copy to an independent
+draft. Revision diff/chains, source links and supersede automation remain later
+ideas, not first-workflow prerequisites. TOR has a three-name print form and
+blank Excel template direction; these do not reintroduce deferred Excel intake.
+Committee readership calls for one scoped Viewer design, not three new roles.
+No backlog entry authorizes code, schema, accounts, hosted access or publication.
+
 **Recorded:** 2026-10-14; disposition aligned 2026-10-23 (Asia/Bangkok)
 
 **Status:** RESEARCH / BACKLOG REFERENCE — NO IMPLEMENTATION AUTHORITY

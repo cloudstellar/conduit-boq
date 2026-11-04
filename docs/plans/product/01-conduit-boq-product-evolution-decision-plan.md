@@ -1,5 +1,26 @@
 # Conduit BOQ Product Evolution Decision Plan
 
+## Later planning direction — 2026-10-24
+
+[Integrated Roadmap #09](./09-integrated-roadmap-and-it-decision-handoff.md),
+[sitewide NT brand #11](./11-nt-brand-system-and-sitewide-ui-rollout-plan.md) and
+[UM-A/UM-B #12](./12-user-management-um-a-and-um-b-plan.md) govern proposed
+sequencing and the new whole-site brand direction. Local documentation alignment
+is approved; runtime, shared-font/global-style, database and release operations
+are not. The focused [S0 writer-boundary plan](../security/05-s0-boq-writer-boundary-plan.md)
+is separate from the app-only NT/UM-A candidate. Full-site styling does not delay
+security correction or become a prerequisite for every small feature.
+
+The Owner chose ordinary existing Copy from an operational BOQ into a new
+independent draft for correction. A mandatory source-link/revision-chain,
+supersede/void engine or in-app approval authority is not part of that minimum.
+Older W-H/R3/R4 proposals below retain their research/design history and do not
+reintroduce those features as requirements. Operational content still needs
+trusted authorization, numeric integrity, a match to actual signed paperwork
+and protection against in-place edits. The actual signer is already confirmed;
+recorder, evidence minimum and erroneous-record handling still need decisions.
+All frozen release receipts, numeric invariants and deferred research remain intact.
+
 **Status:** PRODUCT DECISION ANALYSIS — CURRENT SEQUENCING IN ROADMAP #09;
 DUP-1, SECURITY 030, R0A, DEPENDENCY A, B/031 AND LIST-1B L1 ARE CLOSED;
 S0/USER MINIMUM IS NEXT PROPOSED, WITH PARALLEL IT/SSO DISCOVERY
