@@ -1,14 +1,15 @@
 # S0 — BOQ direct-write role boundary plan
 
 **Prepared:** 2026-10-24 (Asia/Bangkok)\
-**Status:** LOCAL API EVIDENCE PASS / R5 DESKTOP FLOW PASS / MOBILE CAPTURE LIMIT / CLEANUP PASS\
+**Status:** PRODUCTION032 METADATA/HISTORY PASS / BUSINESS HTTP NOT RUN / LOCAL R5 LIMITS RETAINED\
 **Updated:** 2026-11-05 (Asia/Bangkok). See [current checkpoint](#6-current-checkpoint)
 and [local approval packet](#7-local-approval-packet--2026-11-02).\
-**Current authority:** Owner-approved source publication under the [S0 Solo plan](../../07_process/S0_SOLO_RELEASE_PLAN_20261104.md)
-only:document/manifest update,fresh readonlypreflight,exact25paths publication,
-CI/Vercel/anonymous no-write smoke and conditionalclientrollback. See
-[section12](#12-s0-source-publication-approval--2026-11-05) for outcome/grant consumption.
-No032apply/DBmutation/Auth/businessRPC/fixtures or replay027–032. R5 grants remain
+**Current authority:** Source publication and the later explicitly approved
+one-shot Production032 application are complete/consumed. Source/CI/Vercel/smoke
+and Production032 metadata/history PASS. Owner later approved only the five-document
+publication in [section14](#14-five-document-closeout-publication--2026-11-05);
+see [section13](#13-production032-one-shot-application--2026-11-05) for DB outcome.
+No further apply/Production/DBmutation/Auth/businessRPC/fixtures or replay027–032. R5 grants remain
 consumed;mobileusability NOT VALIDATED and recorded evidence limits unchanged.
 
 ## 1. Problem and evidence limit
@@ -228,7 +229,7 @@ Quantity Expression remain separate unapproved work under
 ## 6. Current checkpoint
 
 Last updated: **2026-11-05 (Asia/Bangkok)**. Current milestone:
-**S0_SOURCE_PUBLICATION_APPROVED — PREFLIGHT_PENDING — PRODUCTION032_NOT_AUTHORIZED**.
+**S0_SOURCE_PUBLISHED — PRODUCTION032_METADATA_HISTORY_PASS — BUSINESS_HTTP_NOT_RUN — GRANTS_CONSUMED**.
 
 This section owns S0 progress/authority. UM#12 continues to own UM progress;
 do not copy S0's execution tracker there. Older sections1–5 remain the focused
@@ -237,11 +238,11 @@ design/evidence record; section7 makes the next local scope concrete.
 | Item | Actual state | Next gate / limit |
 |---|---|---|
 | Finding | FRESH LOCAL REPRODUCTION PASS | Procurement creator/assignee loophole reproduced before 032; no current Production/prevalence claim |
-| Source inspected for this packet | Local `main == origin/main == 67c1e6fbf80da77d5bb6d6e115d3fa06016611b5`; index empty | Prior bounded Nov5 hosted source/tree matched67;not perpetual fresh evidence. Unrelated A1 dirty source retained |
+| Application source release | `4dfdc44c1a8ce0e0310f466f7568e5d83240e77c`; tree7232a02bc19ba72069d3fa0bb7083c2f77fda31a | Exact25files,base67;A1/parity/private excluded. Section14 publishes only five closeout documents;application bytes stay unchanged |
 | Local execution scope | PRIOR CORE/UI RUNS + TWO STAFF-ONLY RUNS + R3/R4/R5 FINALIZED / GRANTS CONSUMED | Guard2/successor-r1,UI-onlyR1/R2/R3/R4/R5,staff diagnosis and patched-Login regression retain their own outcomes;no reopening or automatic repeat |
-| Current authority | EXACT25 SOURCE PUBLICATION / PREFLIGHT / CI-VERCEL / ANONYMOUS SMOKE / CONDITIONAL CLIENT ROLLBACK | Owner's explicit later grant;stop on drift. No032apply/DBmutation/Auth/businessRPC/fixtures/replay027–032;R5 grants remain consumed |
+| Current authority | SOURCE/APPLY GRANTS CONSUMED / SEPARATE FIVE-DOCUMENT PUBLICATION ONLY | Section14:preflight→one commit/push→CI/Vercel. No DB/Auth/fixture/apply/businessHTTP or replay027–032;no repeat publication after that commit |
 | Prior hosted preflight Nov5 | SOURCE / PREDECESSOR METADATA PASS WITH LIMITS | Section11:source67/ReadyNode24/main/auto-assignment;15policies/31ledger/Copy031/prehash matched. Vercel env value unobserved;not an added OTP gate. No current hosted authority |
-| Proposed032 MCP delivery | DOCUMENTED_SUPPORTED_WITH_LIMITS / PAYLOAD RUNTIME NOT RUN | Immutable source592872b3…;proposedpayload9cc46a3d… omits only outerBEGIN/finalCOMMIT. Officialcontract review complete,not hostedbackend proof;no payload sent/apply grant. Platform records history;postflight/UNKNOWN/no-retry retained |
+| 032 MCP delivery | APPLIED ONCE / METADATA-HISTORY PASS / BUSINESS HTTP NOT RUN | Immutable source592872b3…;payload9cc46a3d… omits only outerBEGIN/finalCOMMIT. Actual one-call success+9guards+history20261105001914;storedSQL byte-exact. Does not prove general exactly-once/combined HTTP-ack atomicity;no retry/replay |
 | Create/Save UI R3 | FINALIZED / CREATE PASS / SAVE NOT DISPATCHED / UI HOLD / CLEANUP PASS | Exact helper searches did not match fixture source names/codes;0Save requests. One inactive synthetic profile + one empty BOQ retained;3sessionsCLOSED/0sessions0tokens. Section9.16 records evidence limits |
 | Corrected UI R4 | FINALIZED / SELECTOR AND CREATE PASS / SAVE NOT DISPATCHED / UI HOLD / CLEANUP PASS | Section9.18:selector200/rows1/eligible1,quantity string assertion HOLD;3CLOSED/0residue/32table+originalAuth independentPASS;no childwrite |
 | Quantity contract correction | NEW HELPER51OFFLINE PASS / LIVE NOT RUN | Section9.20:both checkpoints require canonical3.00/no focus/ARIAfalse/no draft;bounded read/persisted actualstate;expectedEdit→Print substeps.151pins/candidate549 unchanged;R4actualinput unretained andHOLD retained |
@@ -258,7 +259,7 @@ design/evidence record; section7 makes the next local scope concrete.
 | Successor-only remaining validation | CORE API PASS / BUILT APP + OVERALL HOLD | Newrun112PASSrecords including45prepare;227DataAPIrequests;37status/control records; title assertion stopped browser afterLogin,0UIbusinesswrites/PNGs; actualtitle unretained and console404 unmapped |
 | Running-local preflight | R5 FRESH READ-ONLY PREFLIGHT PASS | Section9.22 exactDB/volume/containerIDs/14.5/fullpost032metadata/credential/default/selectorbindings match;2RRreadonlyROLLBACK/0AuthHTTPwritesDDL before Auth. Runtime metadata barriers passed;no Production observation |
 | New migration / runner / safety tests | FOUR-PATH SOURCE CHECKS PASS; 032 APPLIED ONCE LOCAL | [Local receipt](../../06_engineering/S0_BOQ_WRITER_BOUNDARY_LOCAL_RESULT.md); SQL SHA592872b3…3fbd41f; one dispatch/exit0; +9 restrictive policies,0 other relevant metadata delta,35 table digests unchanged across DDL; no ledger relation/entry |
-| S0-only source quality | PROSPECTIVE25PATHS FRESH801/61PASS / LINT0ERRORS3OLDWARNINGS / TYPESCRIPT PASS | Current exact S0+Login+Markdown projection excludesA1/parity;Node24.2.0. Old801preLogin/37Authsubset remain dated. Qualified unchanged Turbopack reused;actualNode22CI/hostedbuildNOTRUN |
+| S0-only source quality | LOCAL NODE24 AND ACTUAL NODE22 CI PASS | Local801/61/lint0errors3oldwarnings/TypeScript retain their dates. Actual commit CI41887051576:801tests/61files,lint0errors3warnings,TypeScript/defaultTurbopackbuild PASS. VercelNode24 Ready/current;no app/package/config changed during publication |
 | Local consolidated document checks — R5 closeout Nov4 | DATED22/22 /570LINKS198ANCHORS19MARKDOWN PASS | R5runtimecloseout/scopeddesktopPASS/mobilelimit/cleanupPASS;171oldpins+216aftermap/candidate549 unchanged,indexempty. Source101 is dated pre-execution qualification |
 | Short-plan document checks — Nov5 | 6 EXISTING CONTRACTS /586LINKS201ANCHORS20MARKDOWN PASS | Documentation-only checks on Node24;no new fullsuite/build/DB/runtime. Source032/proposedpayload mapping unchanged;see section11 |
 | Default Turbopack / real built app | QUALIFIED LOGIN-PATCH BUILD / R5 DESKTOP CREATE-SAVE-RELOAD-PRINT PASS | Exact existing source/buildf225…/5b34… used;549sourcebytes unchanged. Mobilecapture reviewedwithlimit,no fullmobile/exportPASS. No package/config/newbuild change |
@@ -267,7 +268,7 @@ design/evidence record; section7 makes the next local scope concrete.
 | Fixture/Auth lifecycle | R5 FINALIZED / CLEANUP PASS |1inactive synthetic profile/audit/1BOQ1route1item retained;3exact sessionsCLOSED/0sessions0tokens/7audits/10CONFIRMED0UNKNOWN. Actual32table+originalAuthhashvectors independently comparedPASS. Earlier runs/evidence limits retained |
 | Core direct API / app / Save / Copy031 acceptance | COMPOSITE API EVIDENCE + R5 DESKTOP FLOW PASS WITH LIMITS | Core earlier scopedAPI evidence retained;newdesktopCreate/Save/reload/calculation/savedPrint PASS. Mobileusability NOTVALIDATED/P2limit;threeacceptededgeNOTRUN retained. Rawgraph/Factor rows unretained,so file-only interpolation reconstruction unavailable. Release needs exact separate proposal |
 | Missing-profile / activeNULL / positive eligible-legacy fresh cases | NOT RUN — EXPLICITLY ACCEPTED FOR THIS LOCAL S0 SCOPE | Section7.5 only; no waiver for feasible NULL-Save/core failures or UM-B's primary positive case; never bypass current guards |
-| Publication / Production / rollback |25PATH SOURCE PUBLICATION APPROVED / ACTUAL RELEASE CHECKS PENDING | Same5source+20Markdown,excludesA1/parity9;sourcefirst. Owner approved conditionalclientrollback/anonymoussmoke under plan. Production032apply remains NOT RUN/NOT AUTHORIZED;recorded mobile/evidence limits unchanged |
+| Publication / Production / rollback |25PATH SOURCE PUBLISHED / PRODUCTION032 METADATA-HISTORY PASS / NO ROLLBACK | Commit4dfdc44 unchanged;Vercel8QwQZoe9Q18bNK4enoLaxPmHtZqP Current. One-shot032 applied after freshpreflight;9guards/24policies/history32. No businessHTTP/RPC test;editor mobile/evidence limits unchanged |
 
 History for this planning step:
 
@@ -2883,5 +2884,132 @@ payload runtime stays NOT RUN,with separate futureapplyapproval/postflight/
 UNKNOWN/no-autoretry. No extra local BOQ fixture programme is required for
 unchanged application source. Exact source/payload hashes remain in Solo plan.
 
-Publication preflight/actualcommit CI/Vercel/anonymoussmoke: PENDING at this
-prospective checkpoint update. Runtime/DB/032 execution remains outside scope.
+The committed prospective checkpoint recorded publication checks as PENDING.
+The following closeout was prepared locally after those actual outcomes.
+It was outside the frozen25-file source manifest and is published separately
+under the five-document approval in section14.
+
+### Actual source-publication closeout — 2026-11-05
+
+- Fresh source/config/rollback preflight PASS:local/remote67,indexempty,
+  Vercelrepo/main/Node24/auto-assignment and healthy predecessorFwQR53… matched.
+  Final25content manifest SHA-256 `471be1cdc487790230f2c3b2d15aabd9deee4cf6d4f6eb0822b964570698f602`;
+  staged and committed blobs independently matched all25. Five source files
+  byte-identical to qualified R5;excluded28/protected216 unchanged.
+- Solo commit/push PASS:[4dfdc44c1a8ce0e0310f466f7568e5d83240e77c](https://github.com/cloudstellar/conduit-boq/commit/4dfdc44c1a8ce0e0310f466f7568e5d83240e77c),
+  parent67c1e6f…,tree `7232a02bc19ba72069d3fa0bb7083c2f77fda31a`.
+  Exactly25paths;no A1 runtime/tests/mock,parity9,package/lock/config or private
+  fixture/evidence publication. Normal push,no force;index empty afterward.
+- Actual [Quality41887051576](https://github.com/cloudstellar/conduit-boq/actions/runs/41887051576)
+  completed success for exact4dfdc44:Node22,lint0errors/3existingwarnings,
+  801tests/61files,TypeScript/defaultTurbopack build PASS. This is separate
+  from earlier localNode24 proof;no local package installation/build rerun.
+- [Vercel deployment](https://vercel.com/cloudwho-2662s-projects/conduit-boq/8QwQZoe9Q18bNK4enoLaxPmHtZqP)
+  `dpl_8QwQZoe9Q18bNK4enoLaxPmHtZqP`,URL
+  `https://conduit-2zviwo9q8-cloudwho-2662s-projects.vercel.app` is Ready/current
+  Production,source4dfdc44/main,domain `boq.ntconduit.com`,Node24/Next16.4.2.
+  Warnings:deprecated npm cache-dir config twice,and unrs-resolver install-script
+  approval coverage. Build succeeded;no setting/package change was made.
+  Masked public env value remains unobserved,as accepted in the source plan.
+- Anonymous no-write smoke PASS after correcting a temporary harness omission.
+  First attempt HOLD:guard blocked existing `/favicon.svg` declared in layout;
+  retained unchanged,no proven app regression. NEWcopy allowed only that extra
+  same-origin staticGET;23offline cases/source review PASS. Actual second
+  attempt26GET/26HTTP200,0blocked/console/page/network errors,0browser Auth/
+  DataAPI/business calls,no typing/submit/login,empty final cookies/localStorage.
+  Reviewed desktop1440x1000/mobile390x844 Login PNGs and keyboard focus;context
+  and browser CLOSED. This is browser-side delivery evidence,not proof of
+  unobserved server egress or authenticated/RLS/editor-mobile usability.
+- Conditional client rollback NOT TRIGGERED:no confirmed deployment/Login
+  regression. No extra forward commit or rollback action. No Supabase/DB/Auth/
+  Docker/fixture/BOQ operations or migration replay during this publication.
+  Immutable032 SHA592872b3…3fbd41f remains unchanged and NOT APPLIED to Production.
+  Publication alone does not close the confirmed procurement direct-write gap.
+
+Private source/preflight/commit/CI-summary/Vercel/smoke evidence is under
+`/private/tmp/s0-source-release-20261105-5lwkxo0t`;no credentials/PII/raw business
+responses are in this closeout. Grant is complete/consumed. Next032 apply needs
+fresh explicit approval/write window and fresh DB pre/postflight under Solo§6;
+no such grant follows. R5mobileP2/threeedgeNOTRUN/BHTTPNOTRUN limits stay factual.
+
+## 13. Production032 one-shot application — 2026-11-05
+
+**Actual status: METADATA/HISTORY PASS; GRANT COMPLETE/CONSUMED.** Owner later
+explicitly approved Production032 via existing MCP once,with15minute BOQ-write
+pause from approval/no otherDDL,freshpreflight→apply→postflight,stopondrift,
+no businessRPC/replay027–032/commit/push/deploy. This superseded the prior
+apply-forbidden planning stage only for that exact one-shot lifecycle.
+
+First observed clock00:14:56UTC (07:14:56Bangkok);honor the full agreed pause
+through00:29:56UTC/07:29:56Bangkok even though postflight completed earlier.
+The private dispatch deadline00:29:45 was a conservative safety cutoff,not an
+earlier reopening time. No forced logout/account/password/maintenance-mode change.
+
+| Gate | Actual result |
+|---|---|
+| Source/config/target | PASS:main/localorigin/liveGitHub4dfdc44,tree7232a02…;Vercel8QwQZoe9Q18bNK4enoLaxPmHtZqP Ready/current,domainboq.ntconduit.com,Node24/Next.js/defaultcommands/rootempty. Supabaseotlssvssvgkohqwuuiir/Conduit Price List ACTIVE_HEALTHY,Postgres17.6,session/current/databasepostgres. Maskedenvvalue remains accepted unobserved limit |
+| Full fresh DB preflight | PASS at00:16:56UTC:RRREADONLY→ROLLBACK,9relations/30functions/8triggers/2schemas,portableSHA1df6e90e98b017ff13b6e566d1c6734f48edcf9ebb0be651b85a69ebbd3e0723;15oldpolicies/noS0guards,31ledgerrows/versionnames match prior snapshot,Copy031definition/owner/config/ACL and authenticated posture unchanged |
+| Immediately-before-apply activity | PASS at00:18:55UTC:3targets,0relevantwriters/0waiters/0idle-in-transaction/0hiddenclients;catalog/activity counts only,no query text/business rows or session killing |
+| Immutable source | SHA-256 `592872b3488a51e80866f2f67129ddbdef644408ffd93266bb89bb8033fbd41f`;byte-identical to committed032. 027–032 unchanged/no replay |
+| Approved payload | SHA-256 `9cc46a3d2fb4ef7dbc0bd2a0f1f1d12be445ee33d16e0cc50390f408766c5432`,19132UTF8bytes;omits only outerBEGIN/finalCOMMIT15bytes. All other bytes retained |
+| Apply | One recorded intent/one `supabase_apply_migration` call,projectotlssvssvgkohqwuuiir/name`s0_boq_writer_boundary`;response`success:true`. No retry,alternate executor or manual history write |
+| Metadata postflight | PASS at00:19:27UTC:9exactnewRESTRICTIVE/TOauthenticated policies for three tables×I/U/D;UPDATE hasUSING+WITHCHECK,INSERTcheck/DELETEusing,currentactivefourwriterroles. Policies15→24,old15 unchanged. Normalized portablepredecessor1df6… unchanged after excluding only exactnine guards;Copy031 and authenticatedposture unchanged |
+| History postflight | PASS:31→32,all31old version/name/fullrowSHA unchanged. Exactlyone new `20261105001914/s0_boq_writer_boundary`. Platform-generated hostedversion is distinct from filename032 |
+| Stored SQL comparison | PASS:actualstatements is a one-elementarray containing the complete approved payload;exactUTF8byte equality/hash9cc46… verified. No splitting/joining,semicolon parser,normalization or canonical-file-equality claim |
+| Independent review | PASS:file-only reviewer recomputed guard/predicate/oldpolicy/predecessor/Copy/ledger/source-payload comparisons. No second Production actor/call |
+| Production business HTTP / RPC smoke | NOT RUN. No BOQ/profile/Auth rows read,fixture or application businessRPC invoked. Outcome is metadata/history acceptance supported by dated local API/R5 evidence,not an observed Production business-write PASS |
+| Publication / rollback | NONE:source/client remains4dfdc44,no stage/commit/push/deploy/clientrollback/DBrollback. No Catalog/FactorF/account/BOQ data mutation by the DDL-only payload |
+
+Private evidence:`/private/tmp/s0-prod032-20261105-rokxoyr5`,including approved
+source-payload mapping,read queries/pre-post metadata,old ledger hashes,intent,
+success response and independently checked validation. PrequerySHA036e6443…
+22cd5c1e/postquerySHA9237090e…0505cffe;both reviewed RRREADONLY/ROLLBACK.
+An initial local response-wrapper parser matched instruction prose instead of
+the data tag and failed before validation;corrected to the anchored data-tag
+boundary without repeating the Production query. No failed/repeated migration.
+
+Confirmed procurement direct-table writer guards are now installed. This does
+not close broaderS0/UM-B/workflow/Viewer/SSO/R0-D0 work or change recorded
+R5mobileP2/threefresh-edgeNOTRUN/BProductionHTTPNOTRUN limits. The earlier
+source-publication/client-rollback grant and this apply/postflight grant are
+consumed. No further Production/DB/Auth/runtime/apply/replay authority follows.
+Keep committed guards;any defect requires a separately reviewed/approved forward
+correction,no automatic drop/restore/retry/historyrepair or clientrollback.
+
+These result/handoff updates are included in the separately approved five-document
+publication in section14. Preserve excludedA1/parity9/privatefixtures/original
+credentials/data/protectedarchives unchanged.
+
+
+## 14. Five-document closeout publication — 2026-11-05
+
+Owner explicitly approved a Solo publication of these five Markdown paths only:
+
+1. `AGENTS.md`
+2. `docs/08_ai/AI_CONTEXT.md`
+3. `docs/08_ai/AI_HANDOFF.md`
+4. `docs/07_process/S0_SOLO_RELEASE_PLAN_20261104.md`
+5. `docs/plans/security/05-s0-boq-writer-boundary-plan.md`
+
+Scope is fresh source/config/content preflight→exact five-file commit/push→
+actual commit CI/Vercel verification. Stop on drift. No UM-A1 application/test/
+mock,parity9,real runners/privatefixtures,packages/config,migrations,DB/Auth/
+businessHTTP/RPC or replay027–032. This first five-file commit consumes the
+publication grant when pushed;no standing repeat publication/rollback follows.
+
+Publication records the actual source release and one-shot032 outcomes already
+verified in sections12–13. Production businessHTTP remains NOT RUN;R5mobileP2/
+threefresh-edgeNOTRUN/BProductionHTTPNOTRUN stay factual. New deployment from
+this documentation-only commit has application content identical to4dfdc44;
+its Git/deployment identity will differ. Existing Vercel auto-deployment follows
+normal push;no manual redeploy or migration operation is part of this scope.
+
+The prospective document content cannot know its own final Git identity or
+future CI result. Freeze/check five-file content hashes before staging;record
+actual parent/commit/tree/CI/deployment and exclusion custody in the private
+release receipt,not a recursive follow-up documentation commit:
+`/private/tmp/s0-closeout-docs-release-20261105-74f1hxlc/release-result.json`.
+Check that receipt or actual commit checks for completion;approval is not PASS.
+After publication,the next proposed work is to refresh A1's base/allowlist/
+quality/rollback under separate scope. Old27-file/base67 assumptions are dated;
+no A1/UM-B implementation,fixture or release grant follows from this closeout.

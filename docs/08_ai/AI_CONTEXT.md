@@ -1,5 +1,32 @@
 # AI Context — Mandatory Agent Rules
 
+## S0/032 five-document publication — 2026-11-05
+
+Owner approved one Solo publication of the exact five Markdown paths in
+[S0 section14](../plans/security/05-s0-boq-writer-boundary-plan.md#14-five-document-closeout-publication--2026-11-05):freshpreflight,commit/push,CI/Vercel.
+This first five-file commit consumes that publication grant when pushed;
+no repeat publication/rollback authority follows. Application content stays
+at4dfdc44;Production032/history20261105001914 remain the dated PASS evidence.
+Exclude UM-A1/parity9/private evidence;no DB/SQL/replay027–032/businessHTTP.
+Actual commit/check/deployment result is retained in the private release receipt
+`/private/tmp/s0-closeout-docs-release-20261105-74f1hxlc/release-result.json`;verification is required,not inferred from approval.
+
+## Production 032 applied once; grant consumed — 2026-11-05
+
+Use [S0 current checkpoint/section13](../plans/security/05-s0-boq-writer-boundary-plan.md#13-production032-one-shot-application--2026-11-05).
+Owner explicitly approved one MCP application with15minute BOQ-write pause/no
+otherDDL. FreshpreflightPASS,oneapplysuccess,readonlypostflightPASS:9exact
+restrictiveguards/24total,old15/Copy031/contracts unchanged;history31→32,
+new20261105001914/s0_boq_writer_boundary,allold31fullrowhashes unchanged.
+StoredsingleSQLstring byte-exact payload9cc46a3d…6c5432;immutable032source
+592872b3…3fbd41f unchanged. Source/client stays4dfdc44;no publication/replay.
+Production businessHTTP/RPC NOT RUN;no BOQ/account rows read or changed by
+this operation. Application/postflight grant complete/consumed;no further
+Production/DB/Auth/fixture/apply/replay or publication authority follows.
+Keep guards;any DB correction needs a fresh reviewed forward approval.
+This closeout/handoff is included in the approved five-document publication;
+historical entries below keep their dates and operation boundaries.
+
 ## S0 source publication approved; 032 apply forbidden — 2026-11-05
 
 Owner explicitly approved updating transaction-review documents/manifest,

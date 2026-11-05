@@ -1,6 +1,18 @@
 # S0 — แผนปล่อยแบบ Solo ฉบับย่อ
 
-**Prepared:** 2026-11-04. **Revised:** 2026-11-05 (Asia/Bangkok). **Status: SOURCE PUBLICATION APPROVED — PREFLIGHT PENDING; 032 APPLY FORBIDDEN.**
+**Prepared:** 2026-11-04. **Revised:** 2026-11-05 (Asia/Bangkok). **Current status: SOURCE PUBLISHED; PRODUCTION032 METADATA/HISTORY PASS; GRANTS CONSUMED.**
+
+Actual later outcome:Owner separately approved one-shot032 with15minute write
+pause;MCPsuccess/postflightPASS,history `20261105001914/s0_boq_writer_boundary`.
+See [canonical closeout](../plans/security/05-s0-boq-writer-boundary-plan.md#13-production032-one-shot-application--2026-11-05).
+No businessHTTP/RPC test,no new publication or replay. Earlier prospective
+approval/pending/apply-forbidden wording below records the prior source stage;
+it is not current apply status or standing authority to repeat032.
+
+Owner later approved publication of the five closeout Markdown paths only;
+see [section14](../plans/security/05-s0-boq-writer-boundary-plan.md#14-five-document-closeout-publication--2026-11-05).
+This is documentation publication with CI/Vercel verification,not another
+application change or032 application. Source/apply grants above are consumed.
 
 ลำดับที่เสนอ: preflight → ปล่อยเฉพาะ 25 ไฟล์ → CI/Vercel → งดเขียน BOQ 15 นาที → Supabase MCP เดิมหนึ่งครั้ง → ตรวจ metadata/history. ให้แพลตฟอร์มบันทึก history; ไม่เพิ่ม psql, custom ledger writer, guards, package หรือรอบ fixture ใหม่ในแผนนี้.
 
