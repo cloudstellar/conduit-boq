@@ -4,6 +4,18 @@ Recorded: 2026-10-24 (Asia/Bangkok)
 Approval-packet update: 2026-10-26 (Asia/Bangkok)
 Status: LOCAL VALIDATION COMPLETE / SOLO RELEASE PLAN FOR OWNER REVIEW — no publication/Production authority
 
+## Post-S0/032 Solo plan refresh — 2026-11-05
+
+Owner requested local Markdown planning only after S0 source/032/closeout
+publication. The [refreshed Solo plan](../../07_process/UM_A1_SOLO_RELEASE_PLAN_20261102.md)
+uses localHEAD6393355 and a proposed14paths:runtime5/tests3/mockrunner1/Markdown5.
+All9A1sourcehashes still match accepted evidence;all18oldplanningdocuments are
+already tracked. Old27/base67 assumptions are dated,not current approval scope.
+S0's [canonical checkpoint](../security/05-s0-boq-writer-boundary-plan.md#6-current-checkpoint)
+owns its completed032 metadata/history result;do not duplicate that tracker.
+A1 remains unreleased. Fresh exact14 quality/hosted preflight/release are NOT RUN.
+No source/DB/Auth/Docker/browser/fixture/Production/staging/publication authority.
+
 ## Priority legacy affiliation planning — 2026-11-02
 
 Owner reports having approved the selected account's affiliation request and
@@ -14,7 +26,7 @@ A2-before-all-UM-B ordering only. A1 source/local acceptance remains frozen;
 all implementation/SQL/DB/Auth/fixtures/publication require their own scope.
 The one-account Production read has completed; no further Production grant.
 
-## Current release planning only — 2026-11-02
+## Dated release planning only — 2026-11-02 (superseded by Nov5 refresh)
 
 Owner requested the [UM-A1 Solo release proposal](../../07_process/UM_A1_SOLO_RELEASE_PLAN_20261102.md):
 exact27-file scope, preflight, risks and conditional rollback. Current work is
@@ -55,21 +67,18 @@ across the whole website. This authorizes local Markdown planning only.
 Use [Roadmap #09](./09-integrated-roadmap-and-it-decision-handoff.md) for order,
 [NT brand plan #11](./11-nt-brand-system-and-sitewide-ui-rollout-plan.md) for
 shared visual rules, and the [focused S0 plan](../security/05-s0-boq-writer-boundary-plan.md)
-for the separate proposed writer-boundary correction. No code, package,
+for the separately completed bounded032 rollout and its remaining limits. No code, package,
 configuration, SQL, account/reference data, Docker/DB operation, staging,
 commit/push/deploy or Production access follows from this plan. Migrations
-027–031 remain immutable/no-replay. Existing local credentials, data, nine
+027–032 remain immutable/no-replay. Existing local credentials, data, nine
 parity artifacts and protected archive custody remain unchanged.
 
-The proposed delivery order is focused S0 verification/correction, then an
-Admin-only UM-A1 / scoped NT pilot, the narrow section15 UM-B legacy affiliation
-confirmation, a separately reviewed UM-A2 signup/confirmation candidate, then
-remaining UM-B and account-security policy.
-This is the recommended publication sequence, not an Owner selection or grant
-to start S0. Preparing/reviewing A1 now does not require S0 implementation first.
-Full-site restyling is incremental and must
-not delay a confirmed security correction. These are proposed candidates,
-not approved execution or a requirement for additional PRs.
+The bounded S0/032 prerequisite was selected and completed separately. Remaining
+proposed order is Admin-only UM-A1 / scoped NT pilot → narrow section15 UM-B
+legacy affiliation confirmation → separately reviewed UM-A2 signup/confirmation
+→ remaining UM-B and account-security policy. This is not a new execution
+approval or a request to repeat S0. Full-site restyling remains incremental;
+no additional PR process follows from this planning sequence.
 
 ## 2. Confirmed contracts and unresolved facts
 
@@ -837,7 +846,39 @@ HEAD/index และ app/package/lockfile/migrations ไม่เปลี่ย
 
 ## 12. Execution status and resume checkpoint
 
-**Latest release-sequencing pointer — 2026-11-04:** [S0 Solo proposal](../../07_process/S0_SOLO_RELEASE_PLAN_20261104.md)
+**Latest read-only Production preflight — 2026-11-05:** Owner explicitly approved
+source/config/metadata/rollback only for14paths. Completed PASS with recorded
+limits at04:08UTC:source639/VercelCurrent7d9/config/APIcap1000,19function/4relation
+contracts,031/032policies/history and healthy639rollbackcandidate. See
+[Solo4.4](../../07_process/UM_A1_SOLO_RELEASE_PLAN_20261102.md#44-actual-read-only-production-preflight--2026-11-05)
+and12.5 below. No accounts/BOQs/businessRPC/Auth/DBwrites/replay or publication.
+Grant complete/consumed;current work local result/handoff/document review only.
+Next Owner approval is14-file publication/finalfreshness/CI-Vercel/delivery and
+optionalconditionalrollback,not another fixture or default AdminHTTP test.
+
+**Earlier source-only qualification — 2026-11-05:** Owner explicitly approved
+639+14 on Node24 for tests/lint/TS/Turbopack/mock only;completed PASS878/64,
+lint0errors3oldwarnings,standaloneTS,fresh defaultTurbopack and9mockgroups.
+See [Solo4.3](../../07_process/UM_A1_SOLO_RELEASE_PLAN_20261102.md#43-actual-post-s0-source-qualification--2026-11-05)
+and section12.4 below. Initial symlink-build FAIL retained;physical existing
+installed dependency copy resolved the temporary root issue without source/
+package/config changes. Mock=WebpackDEV/fakebackend,not realDB/Production.
+Grant complete/consumed,no owned processes/listeners remain. Only local result/
+handoff/document review now;no Production/preflight/Auth/DB/fixture/publication.
+
+**Earlier post-S0 planning pointer — 2026-11-05:** Owner authorized the local
+[14-path Solo refresh](../../07_process/UM_A1_SOLO_RELEASE_PLAN_20261102.md) only.
+Base639335546b018bdfbf6e37e854af308693158a53/tree2dce4710c113adc507d9b29d9df14c0ef07b1642;
+application baseline4dfdc44. S0/032 and its five-document closeout are complete;
+A1ninepaths remain unchanged/uncommitted,old105/new18 fixtures closed. Keep
+all installed032guards/history and Loginprefetchfalse. New exact-candidate
+Node24tests/lint/TS/defaultTurbopack/mock integration and future metadata-only
+Production preflight/actualCI/hosting/delivery are NOT RUN. No automatic new
+DB/Auth/fixture run or Production Admin/business RPC test. Current work edits
+only five planning/handoff documents and performs document/source-hash checks.
+No source/package/config/DB/Production/stage/commit/push/deploy in this refresh.
+
+**Dated release-sequencing pointer — 2026-11-04:** [S0 Solo proposal](../../07_process/S0_SOLO_RELEASE_PLAN_20261104.md)
 is local source/document planning after S0's separately approved tests. Use
 [S0's canonical checkpoint](../security/05-s0-boq-writer-boundary-plan.md#6-current-checkpoint)
 for actual S0status/limits;do not duplicate its tracker here. A1stays locally
@@ -848,8 +889,8 @@ positivefixtureHOLD and SSO/A2 scope are unchanged. No publication/Production/
 DB/Auth/fixtures or new UMimplementation authority follows. Earlier milestones
 below retain their dated stages.
 
-Last updated: **2026-11-02 (Asia/Bangkok)**. Recorded by: repository assistant.
-Current milestone: **SOLO_RELEASE_PLAN — OWNER_REVIEW_PENDING**.
+Last updated: **2026-11-05 (Asia/Bangkok)**. Recorded by: repository assistant.
+Current milestone: **SOURCE_QUALIFIED_READONLY_PREFLIGHT_PASS — OWNER_RELEASE_APPROVAL_PENDING — GRANTS_CONSUMED**.
 
 **Earlier S0 closeout pointer — 2026-11-03:** local032 applied once; verification
 HOLD, not release-ready. The Owner's separately approved recovery is complete;
@@ -889,8 +930,9 @@ established by this result.
 Owner continuation covers [section15](#15-um-b-priority-legacy-affiliation-confirmation-plan)
 and roadmap/handoff documentation only. The prior single-account read is
 completed/consumed; no further Production, DB/Auth, fixture or SQL operation.
-S0 remains the first implementation/release candidate pending its separate
-local approval; this UM-B plan does not start it or widen A1.
+The earlier S0-first sequencing is now fulfilled for bounded032;its canonical
+checkpoint records actual scope/limits. This UM-B plan does not grant A1 work
+or replace UM-B's missing primary positive fixture with S0 edge-case waivers.
 
 **Later sequencing/planning step — 2026-11-02:** Owner agreed to prepare the
 focused S0 local scope first. Use [S0#05 checkpoint/packet](../security/05-s0-boq-writer-boundary-plan.md#6-current-checkpoint)
@@ -900,12 +942,12 @@ Its release proposal waits for the S0 path; after S0 publication, recalculate
 the actual A1 base/diff/allowlist/count/rollback rather than reuse27/67c1e6f.
 Do not copy the S0 progress table here or reopen A1 tests/fixtures automatically.
 
-The [exact27-file Solo plan](../../07_process/UM_A1_SOLO_RELEASE_PLAN_20261102.md)
-is prepared from completed same-application functional/visual receipts.
-Current scope is Markdown and source/document verification only. Hosted
-preflight, publication, smoke and conditional rollback are proposed and NOT RUN;
-no DB/Auth/browser/fixture/Production operation or staging is authorized.
-The settled visual acceptance below remains closed; no fixture/session reuse.
+The [current14-path Solo plan](../../07_process/UM_A1_SOLO_RELEASE_PLAN_20261102.md)
+recalculates the envelope on6393355;dated pre-S0 functional/visual receipts stay
+unchanged. Fresh candidate qualification and hosted preflight/publication/
+delivery/conditionalrollback remain NOT RUN and need separate scope. Current
+work is Markdown/source-hash/document checks only;no DB/Auth/browser/fixture/
+Production or staging. Settled visual acceptance stays closed,no session reuse.
 
 The approved section14 review has completed:29/29 original PNGs inspected by
 root and an independent reviewer **beforecleanup**, then exact scope:local
@@ -929,7 +971,7 @@ does not grant login, browser, fixture, DB or release execution. Both finalized
 runs remain closed; the proposed existing-Admin browser exception and normal
 Auth bookkeeping require explicit approval before use.
 
-Latest Owner approval: one NEW18-account run `um-a1-20261102-real18` against
+Earlier bounded local approval — 2026-11-02: one NEW18-account run `um-a1-20261102-real18` against
 the existing Docker target, using the unchanged local password; canonical
 built-app/Auth/API validation and run-owned trusted transitions/finalization.
 All earlier accounts/data, including the finalized105-fixture run, are protected
@@ -964,19 +1006,20 @@ of these newly found interleavings. Preserve it and append corrective results.
 |---|---|---|
 | แผน/แบบ/ขอบเขต A1 | **FUNCTIONAL + SETTLED VISUAL LOCAL PASS** | New18functionalreceipt + [section14visualreceipt](../../06_engineering/UM_A1_SETTLED_VISUAL_LOCAL_RESULT.md); olderFAIL/NOTRUN/rejectedimages retained; Ownerreview/productionpreflight/release still separate |
 | Execution contracts R1–R7 | **LOCAL EVIDENCE RECORDED WITH LIMITS** | ใช้ผลจริงและ NOT RUN ใน receipt; closure matrix13.3 ด้านล่างเก็บเกณฑ์เดิม ไม่ใช้แทนผล runtime |
-| งานที่อนุมัติอยู่ | **PRIORITY LEGACY UM-B PLANNING / LOCAL SOURCE-DOC CHECKS ONLY** | Section15/roadmap/handoff refinement; previous single-account Productionread consumed; no furtherDB/Auth/browser/fixture/closedrunreuse/SQL/Production/staging/publication |
-| A1 implementation | **CORRECTED LOCALLY / UNCOMMITTED** | Initial9paths plus new client integration runner;7corrective code/test paths frozen in receipt; no shared Auth/domain/config/package/DB-contract diff |
-| A1 local DB/API preflight | **FRESH NEW18 PREFLIGHT + FINAL CUSTODY PASS** | Existing DB/container/volume/full service graph, actual PostgREST14.5/cap1000/exact post031 metadata unchanged; original125profiles/126Auth identities,32tables/26sessions/544Authaudits protected;143profile/6page exact traversal PASS |
+| งานที่อนุมัติอยู่ | **QUALIFICATION + READONLY PREFLIGHT COMPLETE / GRANTS CONSUMED** | Only local result/handoff/document review now;no source/package/DB/Auth/Docker/fixture/furtherProduction/stage/commit/push/deploy. Existing closed runs remain closed |
+| A1 implementation | **CORRECTED LOCALLY / UNCOMMITTED / NINE HASHES UNCHANGED** | Runtime5+tests3+mockrunner1;accepted hashes match on639 baseline. No shared Auth/domain/config/package/DB-contract edit;source not changed in this refresh |
+| A1 local DB/API preflight | **DATED NOV2 NEW18 PREFLIGHT + FINAL CUSTODY PASS** | Existing DB/container/volume/full service graph, actual PostgREST14.5/cap1000/exact post031 metadata unchanged; original125profiles/126Auth identities,32tables/26sessions/544Authaudits protected;143profile/6page exact traversal PASS |
 | A1 test accounts/data | **OLD105 CLOSED / NEW18 FINALIZED** | Newrun `um-a1-20261102-real18` retained18Auth/profile/identity:15inactive/2pending/1suspended;0active/0new sessions/0newOwner sessions/0unresolved intents; no BOQ write or original-account repair |
-| A1 mock/static/browser/API/DB acceptance | **REAL FUNCTIONAL + SETTLED VISUAL PASS** | Sameapplication845tests/63files/9mockgroups;31APIchecks/13distinctfunctionalbrowsergroups remain datedsame-sourcePASS;section14 freshNode24Turbopack/TS+29PNGvisual/custody PASS. NewtoolfirstmissingimportFAILbeforeAuth preserved,fixedimportonly; CI/Production NOT RUN |
+| A1 mock/static/browser/API/DB acceptance | **DATED REAL FUNCTIONAL + SETTLED VISUAL PASS** | Sameapplication845tests/63files/9mockgroups;31APIchecks/13distinctfunctionalbrowsergroups remain datedsame-sourcePASS;section14 freshNode24Turbopack/TS+29PNGvisual/custody PASS. NewtoolfirstmissingimportFAILbeforeAuth preserved,fixedimportonly; CI/Production NOT RUN |
 | Fixture finalization | **PASS — BOTH RUNS CLOSED / NO ACTIVE RESIDUE** | New18 independentSQL confirms0active/0sessions, originals32table digests/26sessionlinks/544Authaudits retained; old105manifest/package/027–031/parity/credential hashes unchanged; retain accounts/audit, no harddelete/reset |
 | คำสั่งที่ผลไม่แน่นอน | **REAL UUID-KEYED CONTAINMENT VERIFIED** | Actual held/lost responses, sameJWTrolecycle/timeout,2UUIDsame-target,off-page warning and actorchanges passed;15UIUUIDs/8controlled transitions exactjournal/actual2xx;0serverUNKNOWN left. Exact off-page-newB-success remains mock-only; current value alone never resolves oldUUID |
 | A1 publication/Production | **NOT STARTED / NOT AUTHORIZED** | ไม่มี stage/commit/push/deploy/Production operation; การอนุมัติ local ในอนาคตไม่รวม publication |
-| A1 Solo proposal | **LOCAL PLAN VERIFIED / OWNER REVIEW PENDING** | Exact27-path projection:839tests/62files, lint0errors/3oldwarnings, standaloneTypeScript and394links/51anchors PASS. Runtime5/tests3/mockrunner1/docs18; parity9/realrunners4/privatefixtures excluded; projectionbuild/remote/config/contracts/rollback/CI/smoke NOT RUN |
+| A1 Solo proposal | **POST639 EXACT14 SOURCE QUALIFIED / OWNER REVIEW** | Runtime5/tests3/mockrunner1/docs5;fresh878/64/lint0errors3oldwarnings/TS/defaultTurbopack/mock9 PASS. Initial symlink-build FAIL retained. HostedpreflightPASS per12.5;actualA1CI/delivery NOT RUN. Excludeparity9/realrunners4/privatefixtures |
 | Narrow UM-B legacy confirmation | **AUDIT CONTRACT SELECTED IN PLAN / POSITIVE FIXTURE HOLD** | Sections15–17; count completed0/0/0, no eligible shape on the verified local snapshot. New-command SQL/positive API/runtime NOT RUN; no implementation-ready claim or permission to create a fixture |
 | Local aggregate-only feasibility read | **COMPLETE — READ PASS / FIXTURE HOLD** | Ownerapproved section17;2026-11-02T10:47:54Z, exactexistingDocker/RRreadonly/ROLLBACK;0eligible/0protected/0remaining,0identities. One successfulDBtransaction, earlier client failures beforeconnection retained; grantconsumed |
 | Bounded legacy-account Production read | **COMPLETE / READ AUTHORITY CONSUMED** | One target,2026-11-02T08:15:31Z,READONLY:on/ROLLBACK; active/staff,actualallNULL,requestedvalid,approvalfieldsNULL/events0. Owner reports prior approval; causeunknown. NoPII/raw response inrepo; noBOQ/businessRPC/write |
-| S0 / A2 / UM-B | **SEPARATE PROPOSED WORK** | ไม่มีชุดใดได้รับอนุมัติ implementation จากบันทึกนี้; S0-first เป็นคำแนะนำลำดับปล่อย ไม่ใช่งานที่ให้เริ่มอัตโนมัติ |
+| S0 bounded032 | **COMPLETED OUTSIDE UM / GRANTS CONSUMED** | See S0canonical13–14/source639closeout;keep032/031/Loginfix. No claim that broaderS0 is complete and no fresh Production observation here |
+| A2 / UM-B | **SEPARATE PROPOSED WORK** | OrderA1→narrowlegacyconfirmation→A2→remainingUM-B;no new implementation/SQL/fixtures/Production grant |
 
 **Pre-implementation source checkpoint — dated stage:** ตรวจแบบ read-only
 วันที่ 2026-11-01: canonical checkout
@@ -991,11 +1034,15 @@ remote/Production observation และห้ามใช้แทน preflight 
 status/handoff updates ใช้ exact SHA ใน local result เป็น current candidate
 ไม่ใช้ข้อความไม่มี app diff ของ pre-implementation stage แทนสถานะนี้
 
-ไฟล์ #11/#12/S0 ยังเป็น untracked local drafts บันทึกจึงอ่านต่อได้จาก checkout
+**Dated pre-S0 custody note:** ไฟล์ #11/#12/S0 ยังเป็น untracked local drafts บันทึกจึงอ่านต่อได้จาก checkout
 นี้ แต่ยังไม่อยู่ใน Git commit/remote/new worktree โดยอัตโนมัติ ห้าม clean,
 ย้าย/ทิ้ง dirty work หรือเริ่มจาก checkout อื่นโดยสมมติว่าแผนตามไปแล้ว
 หากเปลี่ยนเครื่อง/worktree ต้องส่งมอบและตรวจไฟล์ภายใต้ขอบเขตที่อนุมัติก่อน
 ไม่ commit/push เพียงเพื่อ sync checkpoint โดยไม่มีอำนาจเผยแพร่
+
+**Current Nov5 custody:** those planning files/receipts are now tracked in HEAD639;
+A1ninecode/test/mockpaths remain local and unreleased. Do not use the dated
+untracked-note above as current Git state or a reason to republish unchanged files.
 
 ### 12.2 Evidence and decision log
 
@@ -1004,6 +1051,9 @@ status/handoff updates ใช้ exact SHA ใน local result เป็น curr
 
 | วันที่ / เหตุการณ์ | ผลและข้อจำกัด |
 |---|---|
+| 2026-11-05 — Read-only Production preflight | Owner approved source/config/metadata/rollback only. Source639/Current7d9/settings/APIcap1000,19function+4relationcontracts/031/032history PASS;rollbackfutureeligibility conditional. No account/BOQ/RPC/Auth/DBwrite/replay/publication. One RRREADONLY/ROLLBACK catalog/history query. Grant consumed |
+| 2026-11-05 — Source-only qualification | Owner approved639+14/Node24 only. Tests878/64,lint0errors3warnings,TS,defaultTurbopack andmock9 PASS;symlink-build FAIL retained then NEWphysical-dependency build PASS without source/package changes. FakeAPI/Web listeners/owned processes absent. Mock3generic503 messages consistent with3intentionalfaults,not zero-console proof. No DB/Authจริง/Production/publication |
+| 2026-11-05 — Post-S0 Solo refresh | Owner approved fiveMarkdown edits only. Base639/tree2dce,exact14 proposal,all9sourcehashes unchanged;S0/032 complete per separate checkpoint. Dated old27/839/API/visual evidence preserved. Document6tests/20files601links213anchors/whitespace PASS;fresh candidate quality/Production/publication NOT RUN. No source/DB/Auth/fixture change |
 | 2026-10-26 — เตรียม approval packet A1 | Section 11 พร้อมรีวิว: แบบเป็น wireframe, runtime/code/test-write ยังไม่อนุมัติ |
 | 2026-10-26 — ตรวจเอกสาร | 28/28 documentation tests, 310 links/33 anchors และ diff checks ผ่านตาม receipt ท้าย section 11; เป็นผลเอกสารวันนั้น ไม่ใช่ fresh A1 runtime |
 | 2026-11-01 — ทบทวนความพร้อม | ตรวจ Git/แผนในเครื่องแบบ read-only; application/migrations ไม่เปลี่ยนและไม่มี staged files; ไม่เข้า DB/Docker/Production |
@@ -1079,12 +1129,13 @@ Later bounded local approval/execution ด้านบนครอบคลุ�
 ที่ยังไม่ได้ implement และไม่เปลี่ยน UNKNOWN เป็น failed เพียงเพราะรอนาน
 
 **A1 next safe step:** Owner review the
-[locally verified Solo release proposal](../../07_process/UM_A1_SOLO_RELEASE_PLAN_20261102.md),
-with its later S0-first hold/refresh overlay. The immediate approval review is
-now [focused S0 local scope](../security/05-s0-boq-writer-boundary-plan.md#7-local-approval-packet--2026-11-02),
-not A1 publication or S0 execution. Preserve completed A1 evidence; no extraAuth/
-session/fixture, closed-run reuse, Production or stage/commit/push/deploy is
-authorized. 027–031/archive custodyคงเดิม
+[post-S0/032 fourteen-path Solo plan](../../07_process/UM_A1_SOLO_RELEASE_PLAN_20261102.md),
+now that qualification and readonlypreflight passed. Next review/approve the
+exact14 source/content envelope for one publication/finalsource-target freshness/
+CI-Vercel/anonymousdelivery with optionalconditionalrollback. Source/config/
+rollback drift or delay needs scoped refresh;do not assume the snapshot is
+perpetual. Do not repeat S0 or reopen105/18 fixtures. Keep027–032/installedguards/
+Loginfix/parity/archive/originals unchanged;no current Auth/DB/Production grant.
 
 **UM-B next safe step:** retain the section16 contract and section17.4 actual
 zero-count result, then prepare a concrete faithful-fixture/rehearsal proposal
@@ -1092,7 +1143,111 @@ for Owner review. No matching local shape was found; no permission to create
 one, inspect more rows or borrow a protected actor. The bounded local read has
 completed and grants no further DB access; no
 automatic login, protected-account mutation, closed-run reuse or new test stack.
-S0's existing local packet remains first in the proposed execution order.
+The bounded S0/032 stage is complete;current order is A1→narrow UM-B→A2→
+remaining UM-B. Use S0's canonical checkpoint for its dated outcome/limits.
+
+### 12.4 Post-S0 source qualification result — 2026-11-05
+
+Source snapshot=HEAD639+14 at
+`/private/tmp/um-a1-source-qualification-20261105-bz0w0chz`.
+Tests878/64,lint0errors3oldwarnings,standaloneTS/defaultTurbopack/fakeintegration9
+PASS on Node24.2.0. Exact9A1source/package/lock/CI/Login/027–032 unchanged.
+Two source projections retain the same568inputs;only dependency layout differs
+for the successful hermetic Turbopack root. No installed package/version change.
+
+Tests used readonly Git metadata and explicitdummyAPI;real runners/parity9/
+privatefixtures/localenvfiles absent. The freshbuild has no prior.next/cache.
+Initial Pythoncache syntax-check permission failure preceded applicationchecks;
+initial defaultbuild then failed externalnode_modules symlink resolution. Both
+remain retained setup outcomes;new APFS-cloned installed dependencies inside
+NEWroot allowed defaultTurbopackPASS,without config/font/bundler/source edits.
+
+Existing unmodified mock runner6f2c6db2… uses newfake memory-only Auth/Data API,
+synthetic users/tokens,NextWebpackDEV and fresh browsercontexts.9/9functional
+cases PASS,0unknownAPI/blockedbrowserorigins/uncaughtpageerrors. Three console
+503messages are consistent with3intentionalfault responses;individual console
+URL/time mapping unretained. Development blocked registry/font hosts/fallback
+is not Production font/NTvisual proof. Root reviewed desktop/mobile mock PNGs;
+prior29settledreal-font images retain their separate dated acceptance.
+
+Supervisor confirms no observed owned processes;API51193/WEB51194 listener
+absence checked. This is temporary mock process cleanup,not realAuth/DB state
+inspection. No real account/session creation,DB/Docker/Production access,
+closed-run operation or migration/publication. HTTP/HTTPS/fetch/dummyenv/browser
+origin fences are not a full OS network audit. Final five Markdown checkpoint
+updates are separate document checks;application9 bytes remain the tested ones.
+
+Final five-document closeout checks:6existing document contracts,20Markdown/
+605links/217anchors/whitespace PASS. No application input changed after testing.
+
+Qualification grant complete/consumed. A1 remains uncommitted/unreleased;future
+hosted contract/cap/rollback preflight,actualA1commitCI/Vercel/delivery and
+Production businessHTTP are NOT RUN. Next approval must cover only the reviewed
+release/preflight/delivery/conditionalrollback scope;do not infer another
+qualification/fixture/Auth/DB/Production operation from a prior completed grant.
+
+### 12.5 Read-only Production preflight result — 2026-11-05
+
+Exact14envelope/localHEAD639/indexempty/source9unchanged;all568qualification
+inputs differ only in five Markdown result updates. LiveGitHubmain639/quality
+success;Vercel639/dpl_7d9EfUvHhTpKtEEBprybrb8waCn3 ReadyCurrent,expectedrepo/main/
+domains/Node24/defaultcommands/rootempty/autoassignON. No deploymentchecks;
+actualA1commit must pass both Quality andVercel after separate release approval.
+
+One catalog/history query captured04:08:13.642277UTC withRRREADONLY/ROLLBACK,
+no applicationrows/functions. Exactly19expected profiles/directory/sixcommands/
+currentactive/transition/cataloggate signatures/fullhashes/owner/config/ACL match;
+no extraoverloads,effectiveEXECUTE matchesrolegrants. Fourprofile/referenceRLS/
+ACL contracts match datedacceptedlocalmetadata. Directory24fields/rawcursor/
+limit contract verified from unchanged definitions;not invoked. Independent
+file-only reviewer recomputed comparisonsPASS,no second Productioncaller.
+
+DataAPI dashboard cap1000≥26directory/50referenceIDs;public+graphql_public
+exposed/privateoff,autoexposeNewTablesoff;no settings/key reveal. Dashboard
+aggregate counters exclude custom least-privilege grants and must not be
+"fixed" by toggling broad permissions;officialsource rationale inSolo4.4.
+This is configuration/metadata proof,not actual gateway/AdminHTTP behavior.
+PublicVercelenv value remains acceptedunobserved;names/scopes/Jan19updateddate
+observed,no OTP reveal gate added.
+
+Normalizedpost031hash1df6… matches;Copy031/24policies/authenticatedposture and
+all32migrationfullrowhashes identical toactual032postflight. Exact032version
+20261105001914/name/singlepayloadSHA9cc46… retained. No replay or DB correction.
+Rollbackcandidate639/dpl7d9 remainshealthyCurrent;Hobby/30dayretention observed.
+If A1 is nextCurrent with no interveningdeployment,it can be immediatepredecessor;
+recheck eligibility at action time. No rollback/promotion/conditionalgrant tested
+or supplied by readonlypreflight.
+
+Private evidence:`/private/tmp/um-a1-production-preflight-20261105-_t3ipi6z`.
+No accounts/BOQs/Authsessions/businessRPC/DBwrites/fixtures/Docker/sourcechange/
+stage/commit/push/deploy in this operation. Grant complete/consumed;current
+local result/handoff checks only. ActualA1CI/Vercel/delivery/rollback and
+ProductionAdminbusinessHTTP NOT RUN. KeepS0/closedrun/evidence limits intact;
+no additional sourcequalification required absent relevantdrift.
+
+### 12.6 Solo publication checkpoint — 2026-11-05
+
+Owner approved one Solo release of the exact 14 files in the UM-A1 plan.
+Fresh source, hosted config, Data API cap, backend metadata and rollback
+preflight passed against base 6393355. The approved release includes GitHub
+Quality, Vercel Current, anonymous Login smoke and conditional rollback
+under the plan. Keep S0/031/032 and the Login fix. Exclude parity tooling,
+private fixtures and real local runners. No DB changes, migration replay,
+account or BOQ reads, or authenticated Production Admin test.
+
+The published envelope remains five runtime paths, three tests, one mock
+runner and five Markdown paths. The nine qualified inputs match byte for
+byte. The Production metadata comparison at 08:17:33 UTC matched all 19
+function contracts, four relations, 24 policies and 32 migration history
+rows. The Data API cap is 1,000 and the expected predecessor is Vercel
+`dpl_7d9EfUvHhTpKtEEBprybrb8waCn3` at `6393355`. Recheck eligibility if a
+rollback trigger occurs.
+
+The actual commit, Quality, Vercel, anonymous delivery and any rollback
+outcome belong in the private receipt `/private/tmp/um-a1-solo-release-20261105-PQgbTOVA/release-result.json`.
+This checkpoint records approval and preflight only. Use the receipt to
+verify publication and grant consumption before resuming. Production
+authenticated Admin behavior remains NOT RUN.
 
 ## 13. Detailed readiness review
 
@@ -1781,6 +1936,7 @@ Before implementation, close these decisions in this order:
    contract, then resolve the positive fixture and exact source/file/SQL scope/
    predecessor/successor before bounded local implementation/test approval.
 
+**Dated Nov2 sequencing, superseded by current section12 for S0:**
 Current next execution candidate remains focused S0 under its existing packet,
 then A1 publication under refreshed source/rollback gates. The prioritized UM-B
 substep can be designed meanwhile. An unresolved UM-B fixture is not a blanket
@@ -2056,6 +2212,8 @@ requested-hierarchy shape. This does not mean there are no users in local, and
 does not permit changing eligibility, reconstructing the real Production account,
 modifying protected accounts, weakening triggers or starting another stack.
 Prepare a separately reviewed faithful-fixture/rehearsal plan before any such
-scope is considered. Keep S0 as the first separate implementation candidate;
-its approval is not supplied by this read. No further local/Production access,
+scope is considered. **Dated Nov2 sequencing:** S0 was the first separate
+implementation candidate at that read;its later bounded completion is recorded
+in the current section12/S0 checkpoint. That read supplied no S0 approval.
+No further local/Production access,
 stage/commit/push/deploy or fixture write is authorized by this closeout.

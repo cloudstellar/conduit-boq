@@ -1,628 +1,400 @@
 'use client'
 
-// Force dynamic rendering to prevent prerender error on Vercel
 export const dynamic = 'force-dynamic'
 
-import { useState, useEffect, useMemo, useCallback } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import nextDynamic from 'next/dynamic'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
+import { Database, Loader2 } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import { useAuth } from '@/lib/context/AuthContext'
-import { UserRole } from '@/lib/types/auth'
-import { getRoleLabel } from '@/lib/permissions'
+import { AuthorizationError, canAdminTransitionUserStatus, requireActiveAdmin } from '@/lib/auth/authorization'
+import type { UserRole, UserStatus } from '@/lib/types/auth'
 import { loadCatalogAdminGateProjection } from '@/lib/master-catalog/admin/adminGate'
 import {
-  canAdminTransitionUserStatus,
-  isExactMissingRpcError,
-  requireActiveAdmin,
-} from '@/lib/auth/authorization'
+  createDirectoryRequestGate, DirectoryDeadlineError, DirectoryRequestInvalidatedError,
+  readAdminDirectoryPage, withDirectoryDeadline,
+  type AdminDirectoryPage, type DirectoryCursor, type DirectoryTicket, type DirectoryMutationTicket,
+} from '@/lib/admin/users/directory'
+import { presentAdminUser } from '@/lib/admin/users/presentation'
+import { AdminUsersDirectory } from './_components/AdminUsersDirectory'
+import { AdminUserDetailsSheet } from './_components/AdminUserDetailsSheet'
+import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Alert, AlertDescription } from '@/components/ui/alert'
-import { Badge } from '@/components/ui/badge'
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/components/ui/table'
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select'
-import { Loader2, ArrowLeft, Check, X, Database } from 'lucide-react'
-
-interface UserProfile {
-  id: string
-  email: string | null
-  first_name: string
-  last_name: string
-  title: string | null
-  position: string | null
-  role: UserRole
-  status: 'active' | 'inactive' | 'suspended' | 'pending'
-  department: { id: string; name: string } | null
-  sector: { id: string; name: string } | null
-  requested_department: { id: string; name: string } | null
-  requested_sector: { id: string; name: string } | null
-  onboarding_completed: boolean
-  created_at: string
-}
 
 type CatalogAdminEntryState = 'loading' | 'enabled' | 'read-only' | 'unavailable'
+type ReadRequest = { cursor: DirectoryCursor; history: DirectoryCursor[]; kind: 'initial' | 'navigate' | 'refresh' | 'reread'; explicitReview?: boolean; reloadCatalog?: boolean }
+interface Workspace {
+  actorId: string | null
+  page: AdminDirectoryPage | null
+  cursor: DirectoryCursor
+  history: DirectoryCursor[]
+  requested: ReadRequest | null
+  loading: boolean
+  stale: boolean
+  error: string | null
+  notice: string | null
+  noticeRequestId: string | null
+  refreshAfterSuccess: boolean
+  announcement: string
+  selectedId: string | null
+  editingId: string | null
+}
+function emptyWorkspace(actorId: string | null): Workspace {
+  return { actorId, page: null, cursor: null, history: [], requested: null, loading: true,
+    stale: false, error: null, notice: null, noticeRequestId: null, refreshAfterSuccess: false, announcement: 'กำลังโหลดทะเบียนผู้ใช้งาน', selectedId: null,
+    editingId: null }
+}
+class ConfirmedCommandFailure extends Error {}
+async function settled<T>(operation: PromiseLike<T>): Promise<PromiseSettledResult<T>> {
+  try { return { status: 'fulfilled', value: await operation } }
+  catch (reason) { return { status: 'rejected', reason } }
+}
+const descriptions: Record<CatalogAdminEntryState, { label: string; description: string; variant: 'outline' | 'default' | 'destructive' }> = {
+  loading: { label: 'กำลังตรวจสถานะ', description: 'กำลังตรวจสถานะเครื่องมือ Master Catalog', variant: 'outline' },
+  enabled: { label: 'พร้อมแก้ไข', description: 'เปิดดูบัญชีราคาและใช้เครื่องมือแก้ไขตามสิทธิ์ผู้ดูแลระบบได้', variant: 'default' },
+  'read-only': { label: 'เปิดดูอย่างเดียว', description: 'เปิดดูบัญชีปัจจุบัน ทะเบียนฉบับ และประวัติได้ เครื่องมือแก้ไขถูกปิดไว้', variant: 'outline' },
+  unavailable: { label: 'ตรวจสถานะไม่ได้', description: 'ยังเปิดดู Master Catalog ได้ เครื่องมือแก้ไขจะปิดแบบปลอดภัยจนกว่าจะตรวจสถานะได้', variant: 'destructive' },
+}
 
 function AdminContent() {
   const { user, isLoading: authLoading } = useAuth()
   const router = useRouter()
-  const [users, setUsers] = useState<UserProfile[]>([])
-  const [isLoading, setIsLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
-  const [editingUser, setEditingUser] = useState<string | null>(null)
-  const [savingUser, setSavingUser] = useState<string | null>(null)
-  const [approvingUser, setApprovingUser] = useState<string | null>(null)
-  const [adminMutationsEnabled, setAdminMutationsEnabled] = useState(false)
-  const [catalogAdminEntryState, setCatalogAdminEntryState] = useState<CatalogAdminEntryState>('loading')
-  const [catalogSettingsIssue, setCatalogSettingsIssue] = useState<string | null>(null)
-
+  const actorId = user?.id ?? null
+  const role = user?.role
+  const status = user?.status
   const supabase = useMemo(() => createClient(), [])
+  const gate = useMemo(() => createDirectoryRequestGate(), [])
+  const [workspace, setWorkspace] = useState<Workspace>(() => emptyWorkspace(null))
+  const [catalog, setCatalog] = useState<{ actorId: string | null; state: CatalogAdminEntryState; issue: string | null }>({ actorId: null, state: 'loading', issue: null })
+  const headingRef = useRef<HTMLHeadingElement>(null)
+  const detailsTrigger = useRef<HTMLButtonElement | null>(null)
+  const latestRead = useRef<ReadRequest | null>(null)
+  const [, setControllerVersion] = useState(0)
+  const notifyCommands = useCallback(() => setControllerVersion(version => version + 1), [])
 
-  // Redirect to login if not authenticated
-  useEffect(() => {
-    if (!authLoading && !user) {
-      router.push('/login?redirectTo=/admin')
+  const readPage = useCallback(async (actor: string, request: ReadRequest, reconciliation?: DirectoryMutationTicket): Promise<boolean> => {
+    latestRead.current = request
+    try {
+      if (gate.queueRead(actor, () => { void readPage(actor, request) }, reconciliation)) return false
+    } catch { return false }
+    let ticket: DirectoryTicket
+    try { ticket = gate.startRead(actor, reconciliation) } catch { return false }
+    if (!gate.isCurrent(ticket)) return false
+    let expired = false
+    let stage: 'authorization' | 'data' = 'authorization'
+    const assertCurrent = () => { if (expired || !gate.isCurrent(ticket)) throw new DirectoryRequestInvalidatedError() }
+    const setCatalogAdminEntryState = (state: CatalogAdminEntryState, issue: string | null = state === 'unavailable' ? 'ยังยืนยันสถานะเครื่องมือแก้ไขไม่ได้' : null) => {
+      setCatalog({ actorId: actor, state, issue })
     }
-  }, [authLoading, user, router])
-
-  const loadAuthorizedUsers = useCallback(async (source: 'v2' | 'legacy-read-only') => {
-    const pageResult = await supabase.rpc('get_admin_profiles_page', {
-      p_limit: 100,
-      p_cursor_created_at: null,
-      p_cursor_id: null,
-    })
-
-    if (pageResult.error) {
-      if (
-        source !== 'legacy-read-only'
-        || !isExactMissingRpcError(pageResult.error, 'get_admin_profiles_page')
-      ) {
-        throw new Error('ไม่สามารถอ่านทะเบียนผู้ใช้งานที่ได้รับอนุญาตได้')
+    setWorkspace((previous) => ({ ...(previous.actorId === actor ? previous : emptyWorkspace(actor)),
+      loading: true, error: null, requested: request, editingId: null,
+      announcement: 'กำลังโหลดทะเบียน หน้าที่ ' + (request.history.length + 1),
+      selectedId: request.kind === 'navigate' ? null : previous.actorId === actor ? previous.selectedId : null }))
+    const operation = async () => {
+      const authorization = await requireActiveAdmin(supabase)
+      if (authorization.user.id !== actor) throw new AuthorizationError('ADMIN_REQUIRED', 'ผู้ดูแลที่ลงชื่อเข้าใช้เปลี่ยนไป', 403)
+      assertCurrent()
+      stage = 'data'
+      const [pageResult, catalogResult] = await Promise.all([
+        settled(readAdminDirectoryPage(supabase, { source: authorization.source, cursor: request.cursor })),
+        settled(request.kind === 'initial' || request.reloadCatalog
+          ? authorization.source === 'v2' ? loadCatalogAdminGateProjection(supabase) : Promise.resolve({ enabled: false, issue: null })
+          : Promise.resolve(null)),
+      ])
+      assertCurrent()
+      stage = 'authorization'
+      const after = await requireActiveAdmin(supabase)
+      if (after.user.id !== actor || after.source !== authorization.source) {
+        throw new AuthorizationError('AUTHORIZATION_UNAVAILABLE', 'สิทธิ์ผู้ดูแลเปลี่ยนระหว่างอ่าน กรุณาโหลดใหม่', 403)
       }
-
-      const fallback = await supabase.from('user_profiles').select(`
-        id, email, first_name, last_name, title, position, role, status, created_at, onboarding_completed,
-        department:departments!user_profiles_department_id_fkey(id, name),
-        sector:sectors!user_profiles_sector_id_fkey(id, name),
-        requested_department:departments!user_profiles_requested_department_id_fkey(id, name),
-        requested_sector:sectors!user_profiles_requested_sector_id_fkey(id, name)
-      `).order('created_at', { ascending: false })
-
-      if (fallback.error) throw new Error('ไม่สามารถอ่านทะเบียนผู้ใช้งานได้')
-      return (fallback.data || []) as unknown as UserProfile[]
+      assertCurrent()
+      stage = 'data'
+      if (pageResult.status === 'rejected') throw pageResult.reason
+      return { page: pageResult.value, catalogProjection: catalogResult.status === 'fulfilled'
+        ? catalogResult.value : { enabled: false, issue: 'ตรวจสถานะ Master Catalog ไม่สำเร็จ' } }
     }
+    try {
+      const result = await withDirectoryDeadline(operation(), 15_000, request.kind === 'reread' ? 'reread' : 'read')
+      if (!gate.publishRead(ticket, result.page.records.map(row => row.id), request.explicitReview === true)) return false
+      setWorkspace((previous) => {
+        if (previous.actorId !== actor || !gate.isCurrent(ticket)) return previous
+        const selectedId = previous.selectedId && result.page.records.some((row) => row.id === previous.selectedId) ? previous.selectedId : null
+        return { ...previous, page: result.page, cursor: request.cursor, history: request.history,
+          requested: null, loading: false, stale: false, error: null, selectedId, editingId: null,
+          notice: previous.refreshAfterSuccess ? 'ดำเนินการสำเร็จและโหลดข้อมูลล่าสุดแล้ว' : previous.notice,
+          refreshAfterSuccess: false,
+          announcement: 'โหลดทะเบียนหน้าที่ ' + (request.history.length + 1) + ' แล้ว หน้านี้ ' + result.page.records.length + ' คน' }
+      })
+      if (result.catalogProjection) {
+        const projection = result.catalogProjection
+        setCatalogAdminEntryState(projection.enabled ? 'enabled' : projection.issue ? 'unavailable' : 'read-only', projection.issue)
+      }
+      return true
+    } catch (error) {
+      if (!gate.isCurrent(ticket) || error instanceof DirectoryRequestInvalidatedError) return false
+      if (error instanceof DirectoryDeadlineError) expired = true
+      gate.invalidate()
+      if (error instanceof AuthorizationError || (error instanceof DirectoryDeadlineError && stage === 'authorization')) {
+        setWorkspace((previous) => ({ ...emptyWorkspace(actor), loading: false,
+          refreshAfterSuccess: previous.actorId === actor && previous.refreshAfterSuccess,
+          noticeRequestId: previous.actorId === actor ? previous.noticeRequestId : null,
+          notice: request.kind === 'reread' ? 'ดำเนินการสำเร็จ แต่ยังยืนยันข้อมูลล่าสุดไม่ได้' : null,
+          error: !(error instanceof AuthorizationError) || error.code === 'AUTHORIZATION_UNAVAILABLE' ? 'ตรวจสอบสิทธิ์ผู้ดูแลไม่ได้ กรุณาลองโหลดใหม่' : 'บัญชีนี้ไม่มีสิทธิ์ผู้ดูแลที่กำลังใช้งาน กรุณาตรวจสอบบัญชี',
+          announcement: 'ไม่สามารถยืนยันสิทธิ์ผู้ดูแลได้' }))
+        setCatalogAdminEntryState('unavailable')
+      } else {
+        setWorkspace((previous) => previous.actorId !== actor ? previous : { ...previous, loading: false, stale: Boolean(previous.page),
+          notice: request.kind === 'reread' ? 'ดำเนินการสำเร็จ กรุณาโหลดข้อมูลล่าสุดอีกครั้ง' : previous.notice,
+          error: request.kind === 'reread' ? 'ดำเนินการสำเร็จ แต่โหลดข้อมูลล่าสุดไม่สำเร็จ' : 'โหลดทะเบียนหน้านี้ไม่สำเร็จ ข้อมูลที่แสดงอาจเป็นข้อมูลเดิม',
+          announcement: 'โหลดข้อมูลล่าสุดไม่สำเร็จ' })
+        if (request.kind === 'initial') setCatalogAdminEntryState('unavailable')
+      }
+      return false
+    }
+  }, [gate, supabase])
 
-    const rows = (Array.isArray(pageResult.data) ? pageResult.data : []) as Record<string, unknown>[]
-    const [departmentsResult, sectorsResult] = await Promise.all([
-      supabase.from('departments').select('id,name'),
-      supabase.from('sectors').select('id,name'),
-    ])
-    const departments = new Map(
-      (departmentsResult.data || []).map((row) => [String(row.id), { id: String(row.id), name: String(row.name) }]),
-    )
-    const sectors = new Map(
-      (sectorsResult.data || []).map((row) => [String(row.id), { id: String(row.id), name: String(row.name) }]),
-    )
+  useEffect(() => () => { gate.dispose() }, [gate])
 
-    return rows.map((row) => ({
-      id: String(row.id),
-      email: typeof row.email === 'string' ? row.email : null,
-      first_name: String(row.first_name ?? ''),
-      last_name: String(row.last_name ?? ''),
-      title: typeof row.title === 'string' ? row.title : null,
-      position: typeof row.position === 'string' ? row.position : null,
-      role: row.role as UserRole,
-      status: row.status as UserProfile['status'],
-      department: departments.get(String(row.department_id)) ?? null,
-      sector: sectors.get(String(row.sector_id)) ?? null,
-      requested_department: departments.get(String(row.requested_department_id)) ?? null,
-      requested_sector: sectors.get(String(row.requested_sector_id)) ?? null,
-      onboarding_completed: row.onboarding_completed === true,
-      created_at: String(row.created_at ?? ''),
-    }))
-  }, [supabase])
-
-  // Load the bounded admin directory. The legacy table fallback is read-only
-  // and is reachable only when both new profile RPCs are exactly missing.
   useEffect(() => {
-    if (!user || user.role !== 'admin') return
+    gate.setActor(actorId)
+    if (authLoading) return
+    if (!actorId) { router.push('/login?redirectTo=/admin'); return }
+    const initialize = async () => {
+      gate.invalidate()
+      setWorkspace(previous => ({ ...emptyWorkspace(actorId),
+        notice: previous.actorId === actorId ? previous.notice : null,
+        noticeRequestId: previous.actorId === actorId ? previous.noticeRequestId : null,
+        refreshAfterSuccess: previous.actorId === actorId && previous.refreshAfterSuccess }))
+      setCatalog({ actorId, state: 'loading', issue: null })
+      if (role === 'admin' && status === 'active') {
+        await readPage(actorId, { cursor: null, history: [], kind: 'initial' })
+      }
+    }
+    void initialize()
+    return () => { gate.invalidate() }
+  }, [actorId, role, status, authLoading, gate, readPage, router])
 
-    let cancelled = false
+  const visible = workspace.actorId === actorId ? workspace : emptyWorkspace(actorId)
+  const page = visible.page
+  const adminMutationsEnabled = Boolean(page?.source === 'v2' && !visible.loading && !visible.stale && !visible.error && !gate.mutationInFlight() && gate.snapshotCurrent())
+  const rows = useMemo(() => workspace.actorId === actorId ? (workspace.page?.records ?? []).map(presentAdminUser) : [], [workspace.actorId, workspace.page, actorId])
+  const unresolvedCommands = gate.unresolved().filter(command => command.ticket.actorId === actorId)
+  const unresolvedTargetIds = new Set(unresolvedCommands.map(command => command.ticket.targetId))
+  const needsFreshReadTargetIds = new Set([...unresolvedTargetIds].filter(id => gate.needsFreshRead(id)))
+  const selected = rows.find((row) => row.id === visible.selectedId) ?? null
 
-    const loadData = async () => {
-      setCatalogAdminEntryState('loading')
-      setCatalogSettingsIssue(null)
-      setAdminMutationsEnabled(false)
-      try {
+  const refresh = () => {
+    if (!actorId || gate.mutationInFlight()) return
+    void readPage(actorId, { cursor: visible.cursor, history: visible.history, kind: page ? 'refresh' : 'initial', explicitReview: true })
+  }
+  const retry = () => {
+    if (!actorId || gate.mutationInFlight()) return
+    void readPage(actorId, { ...(visible.requested ?? { cursor: visible.cursor, history: visible.history, kind: page ? 'refresh' : 'initial' }), explicitReview: true })
+  }
+  const previous = () => {
+    if (!actorId || !visible.history.length || gate.mutationInFlight()) return
+    void readPage(actorId, { cursor: visible.history.at(-1) ?? null, history: visible.history.slice(0, -1), kind: 'navigate', explicitReview: true })
+  }
+  const next = () => {
+    if (!actorId || !page?.hasNext || !page.nextCursor || gate.mutationInFlight()) return
+    void readPage(actorId, { cursor: page.nextCursor, history: [...visible.history, visible.cursor], kind: 'navigate', explicitReview: true })
+  }
+
+  const submit = async (targetId: string, action: 'role' | 'status' | 'approve' | 'reject', value?: UserRole | UserStatus) => {
+    if (!actorId || !adminMutationsEnabled || !gate.snapshotCurrent() || gate.mutationInFlight() || targetId === actorId) return
+    const record = page?.records.find((row) => row.id === targetId)
+    const presentation = rows.find((row) => row.id === targetId)
+    if (!record || !presentation) return
+    const uncertain = gate.hasUnresolved(targetId)
+    if (gate.needsFreshRead(targetId)) return
+    if ((action === 'role' || action === 'status') && !value) return
+    const actionReview = action === 'role'
+      ? 'เปลี่ยนบทบาท: ' + presentation.roleLabel + ' → ' + presentAdminUser({ ...record, role: value as UserRole }).roleLabel
+      : action === 'status'
+        ? 'เปลี่ยนสถานะ: ' + presentation.statusLabel + ' → ' + presentAdminUser({ ...record, status: value as UserStatus }).statusLabel
+        : action === 'approve' ? 'อนุมัติตามสังกัดที่ยื่นขอ' : 'ส่งกลับแก้ไข'
+    let preview: DirectoryTicket
+    try { preview = gate.capture(actorId) } catch { return }
+    if (uncertain && !confirm('ผลคำสั่งก่อนหน้ายังยืนยันไม่ได้ การดำเนินการนี้เป็นคำสั่งใหม่\n\nบัญชี: ' + presentation.email + '\nสถานะปัจจุบัน: ' + presentation.statusLabel + '\n' + actionReview + '\nกรุณาทบทวนข้อมูลล่าสุดก่อนดำเนินการ')) return
+    let rpcName: string
+    let reason: string
+    let newRole: UserRole | undefined
+    if (action === 'role') {
+      if (record.status !== 'active' || value === record.role) return
+      newRole = value as UserRole
+      rpcName = 'admin_set_user_role'
+      reason = prompt('บัญชี: ' + presentation.email + '\n' + actionReview + '\nระบุเหตุผลที่เปลี่ยนบทบาท:')?.trim() ?? ''
+    } else if (action === 'status') {
+      if (!value || !canAdminTransitionUserStatus(record.status, value as UserStatus)) return
+      rpcName = value === 'active' ? 'admin_reactivate_user' : value === 'inactive' ? 'admin_deactivate_user' : 'admin_suspend_user'
+      reason = prompt('บัญชี: ' + presentation.email + '\n' + actionReview + '\nระบุเหตุผลที่เปลี่ยนสถานะ:')?.trim() ?? ''
+    } else if (action === 'approve') {
+      if (!presentation.canApprove) return
+      if (!confirm('ยืนยันอนุมัติ ' + presentation.email + '?\n\nสังกัดที่ยื่นขอ:\n' + presentation.requestedAffiliation.lines.join('\n'))) return
+      rpcName = 'admin_approve_user'
+      reason = 'อนุมัติข้อมูลและสังกัดตามคำขอ'
+    } else {
+      if (!presentation.canReject) return
+      rpcName = 'admin_reject_user'
+      reason = prompt('ระบุเหตุผลที่ส่งกลับแก้ไขบัญชี ' + presentation.email + ':')?.trim() ?? ''
+    }
+    if (!reason || !gate.isCurrent(preview)) return
+    const requestId = crypto.randomUUID()
+    const args = { p_target_id: targetId, p_reason: reason, p_request_id: requestId,
+      ...(newRole ? { p_new_role: newRole } : {}) }
+    const ticket = gate.acquireMutation(actorId, targetId, requestId, { rpc: rpcName, args })
+    if (!ticket) return
+    setWorkspace((current) => current.actorId !== actorId ? current : { ...current,
+      noticeRequestId: ticket.requestId, notice: null, error: null, editingId: null })
+    let submitted = false
+    let timedOut = false
+    try {
+      const requireV2AdminMutationAuthority = async () => {
         const authorization = await requireActiveAdmin(supabase)
-        const [loadedUsers, catalogGate] = await Promise.all([
-          loadAuthorizedUsers(authorization.source),
-          authorization.source === 'v2'
-            ? loadCatalogAdminGateProjection(supabase)
-            : Promise.resolve({ enabled: false, issue: null }),
-        ])
-
-        if (cancelled) return
-        setUsers(loadedUsers)
-        setAdminMutationsEnabled(authorization.source === 'v2')
-        setCatalogAdminEntryState(
-          catalogGate.enabled
-            ? 'enabled'
-            : catalogGate.issue
-              ? 'unavailable'
-              : 'read-only'
-        )
-        setCatalogSettingsIssue(catalogGate.issue)
-      } catch (err) {
-        console.error('Load error:', err)
-        if (!cancelled) {
-          setAdminMutationsEnabled(false)
-          setCatalogAdminEntryState('unavailable')
-          setCatalogSettingsIssue('โหลดการตั้งค่าระบบไม่สำเร็จ เครื่องมือแก้ไขบัญชีราคาจึงถูกปิดแบบปลอดภัย')
-          setError(err instanceof Error ? err.message : 'โหลดข้อมูลผู้ดูแลระบบไม่สำเร็จ')
+        if (authorization.source !== 'v2') throw new AuthorizationError('AUTHORIZATION_UNAVAILABLE', 'การจัดการบัญชีอยู่ในโหมดอ่านอย่างเดียว', 403)
+        if (authorization.user.id !== ticket.actorId) throw new AuthorizationError('ADMIN_REQUIRED', 'ผู้ดูแลที่ลงชื่อเข้าใช้เปลี่ยนไป', 403)
+        return authorization
+      }
+      try { await withDirectoryDeadline(requireV2AdminMutationAuthority(), 15_000, 'read') }
+      catch (error) {
+        if (error instanceof DirectoryDeadlineError) throw new AuthorizationError('AUTHORIZATION_UNAVAILABLE', 'ตรวจสอบสิทธิ์ผู้ดูแลไม่สำเร็จภายในเวลาที่กำหนด', 403)
+        throw error
+      }
+      if (!gate.markSubmitted(ticket)) return
+      submitted = true
+      const observeTransport = (outcome: 'success' | 'denied' | 'unknown') => {
+        if (!gate.settle(ticket, outcome)) return
+        notifyCommands()
+        if (timedOut) {
+          setWorkspace(current => current.actorId !== actorId || !gate.isCommandOwned(ticket) ? current : { ...current,
+            stale: Boolean(current.page), announcement: 'ได้รับผลคำสั่งก่อนหน้า กรุณาโหลดข้อมูลล่าสุด',
+            notice: current.noticeRequestId !== ticket.requestId ? current.notice
+              : outcome === 'success' ? 'ได้รับผลยืนยันว่าดำเนินการสำเร็จ กำลังอ่านข้อมูลล่าสุด'
+                : outcome === 'denied' ? 'ได้รับผลยืนยันว่าคำสั่งก่อนหน้าไม่สำเร็จ กรุณาโหลดข้อมูลล่าสุด' : null,
+            refreshAfterSuccess: current.noticeRequestId === ticket.requestId ? outcome === 'success' : current.refreshAfterSuccess })
+          const currentRead = latestRead.current
+          if (currentRead) void readPage(actorId, { ...currentRead, kind: 'refresh', explicitReview: false,
+            reloadCatalog: currentRead.kind === 'initial' || currentRead.reloadCatalog })
         }
       }
-      if (!cancelled) {
-        setIsLoading(false)
+      const transport = Promise.resolve(supabase.rpc(rpcName, args)).then(result => {
+        observeTransport(!result.error ? 'success'
+          : result.status >= 400 && result.status < 500 && result.status !== 408 ? 'denied' : 'unknown')
+        return result
+      }, error => { observeTransport('unknown'); throw error })
+      const result = await withDirectoryDeadline(transport, 20_000, 'mutation')
+      if (result.error) {
+        if (result.status === 401 || result.status === 403) throw new AuthorizationError('ADMIN_REQUIRED', 'สิทธิ์ปัจจุบันไม่อนุญาตให้ดำเนินการ', 403)
+        if (result.status >= 400 && result.status < 500 && result.status !== 408) throw new ConfirmedCommandFailure()
+        throw new DirectoryDeadlineError('mutation')
       }
-    }
-    loadData()
-
-    return () => { cancelled = true }
-  }, [user, supabase, loadAuthorizedUsers])
-
-  const refreshUsers = async () => {
-    setIsLoading(true)
-    try {
-      const authorization = await requireActiveAdmin(supabase)
-      setUsers(await loadAuthorizedUsers(authorization.source))
-      setAdminMutationsEnabled(authorization.source === 'v2')
-    } catch {
-      setAdminMutationsEnabled(false)
-      setError('ไม่สามารถโหลดทะเบียนผู้ใช้งานล่าสุดได้')
+      if (!gate.isCommandOwned(ticket)) return
+      setWorkspace((current) => current.actorId !== actorId || !gate.isCommandOwned(ticket) ? current : { ...current,
+        refreshAfterSuccess: true, notice: 'ดำเนินการสำเร็จ กำลังอ่านข้อมูลล่าสุด' })
+      gate.discardQueuedRead(ticket)
+      const currentRead = latestRead.current
+      const readSucceeded = await readPage(actorId, { cursor: currentRead?.cursor ?? null, history: currentRead?.history ?? [],
+        kind: 'reread', reloadCatalog: currentRead?.kind === 'initial' || currentRead?.reloadCatalog }, ticket)
+      if (readSucceeded && gate.isCommandOwned(ticket)) {
+        setWorkspace((current) => current.actorId !== actorId ? current : { ...current, notice: 'ดำเนินการสำเร็จและโหลดข้อมูลล่าสุดแล้ว' })
+      }
+    } catch (error) {
+      if (!gate.isCommandOwned(ticket)) return
+      if (submitted && error instanceof DirectoryDeadlineError) { timedOut = true; gate.markUnknown(ticket) }
+      if (error instanceof AuthorizationError) {
+        setWorkspace((current) => current.actorId !== actorId || !gate.isCommandOwned(ticket) ? current : ({ ...emptyWorkspace(actorId), loading: false,
+          error: 'สิทธิ์ผู้ดูแลไม่พร้อมใช้งาน กรุณาโหลดข้อมูลใหม่' }))
+        setCatalog({ actorId, state: 'unavailable', issue: 'ยังยืนยันสิทธิ์ผู้ดูแลไม่ได้' })
+      } else if (submitted && !(error instanceof ConfirmedCommandFailure)) {
+        setWorkspace((current) => current.actorId !== actorId ? current : { ...current, loading: false, stale: false,
+          notice: null,
+          announcement: 'ยังยืนยันผลคำสั่งไม่ได้ ไม่มีการส่งซ้ำอัตโนมัติ' })
+      } else {
+        setWorkspace((current) => current.actorId !== actorId ? current : { ...current, stale: Boolean(current.page),
+          error: 'ไม่สามารถดำเนินการได้ กรุณาโหลดข้อมูลล่าสุดก่อนทบทวนใหม่' })
+      }
     } finally {
-      setIsLoading(false)
+      gate.releaseMutation(ticket)
+      if (gate.isOwned(ticket)) notifyCommands()
     }
   }
 
-  const requireV2AdminMutationAuthority = async () => {
-    const authorization = await requireActiveAdmin(supabase)
-    if (authorization.source !== 'v2') {
-      throw new Error('P-49 mutation RPCs are not available yet')
-    }
-    return authorization
+  const closeDetails = (open: boolean) => { if (!open) setWorkspace((current) => ({ ...current, selectedId: null })) }
+  const returnFocus = (event: Event) => {
+    event.preventDefault()
+    const trigger = detailsTrigger.current
+    if (trigger?.isConnected && !trigger.disabled) trigger.focus()
+    else headingRef.current?.focus()
   }
 
-  const handleRoleChange = async (userId: string, newRole: UserRole) => {
-    if (!adminMutationsEnabled) {
-      alert('การจัดการบัญชีถูกปิดชั่วคราวระหว่างปรับปรุงสิทธิ์')
-      return
-    }
-    const target = users.find((candidate) => candidate.id === userId)
-    if (!target || target.status !== 'active') {
-      alert('เปลี่ยนบทบาทได้เฉพาะบัญชีที่กำลังใช้งาน')
-      setEditingUser(null)
-      return
-    }
-    const reason = prompt('ระบุเหตุผลที่เปลี่ยนบทบาท:')?.trim()
-    if (!reason) return
-    setSavingUser(userId)
-    try {
-      await requireV2AdminMutationAuthority()
-      const { error } = await supabase.rpc('admin_set_user_role', {
-        p_target_id: userId,
-        p_new_role: newRole,
-        p_reason: reason,
-        p_request_id: crypto.randomUUID(),
-      })
-
-      if (error) throw error
-      setUsers((currentUsers) => currentUsers.map(
-        (candidate) => candidate.id === userId ? { ...candidate, role: newRole } : candidate,
-      ))
-      setEditingUser(null)
-    } catch {
-      alert('ไม่สามารถเปลี่ยนบทบาทได้ กรุณาตรวจสอบสิทธิ์และลองใหม่')
-    } finally {
-      setSavingUser(null)
-    }
-  }
-
-  const handleStatusChange = async (userId: string, newStatus: 'active' | 'inactive' | 'suspended' | 'pending') => {
-    if (!adminMutationsEnabled) {
-      alert('การจัดการบัญชีถูกปิดชั่วคราวระหว่างปรับปรุงสิทธิ์')
-      return
-    }
-    const target = users.find((candidate) => candidate.id === userId)
-    if (!target || target.status === newStatus) return
-    if (!canAdminTransitionUserStatus(target.status, newStatus)) {
-      alert('ไม่อนุญาตให้เปลี่ยนสถานะตามเส้นทางนี้')
-      return
-    }
-    const rpcName = newStatus === 'active'
-      ? 'admin_reactivate_user'
-      : newStatus === 'inactive'
-        ? 'admin_deactivate_user'
-        : 'admin_suspend_user'
-    const reason = prompt('ระบุเหตุผลที่เปลี่ยนสถานะบัญชี:')?.trim()
-    if (!reason) return
-    setSavingUser(userId)
-    try {
-      await requireV2AdminMutationAuthority()
-      const { error } = await supabase.rpc(rpcName, {
-        p_target_id: userId,
-        p_reason: reason,
-        p_request_id: crypto.randomUUID(),
-      })
-      if (error) throw error
-      setUsers((currentUsers) => currentUsers.map(
-        (candidate) => candidate.id === userId ? { ...candidate, status: newStatus } : candidate,
-      ))
-    } catch {
-      alert('ไม่สามารถเปลี่ยนสถานะบัญชีได้ กรุณาตรวจสอบสิทธิ์และลองใหม่')
-    } finally {
-      setSavingUser(null)
-    }
-  }
-
-  // v1.2.0: Approve pending user via RPC
-  const handleApproveUser = async (userId: string) => {
-    if (!adminMutationsEnabled) {
-      alert('การจัดการบัญชีถูกปิดชั่วคราวระหว่างปรับปรุงสิทธิ์')
-      return
-    }
-    const targetUser = users.find(u => u.id === userId)
-    if (!targetUser?.requested_department || !targetUser?.requested_sector) {
-      alert('ผู้ใช้ยังไม่ได้เลือกฝ่าย/ส่วน กรุณาให้ผู้ใช้ลงทะเบียนสังกัดก่อน')
-      return
-    }
-
-    if (!confirm(`ยืนยันอนุมัติ ${targetUser.email}?\n\nฝ่าย: ${targetUser.requested_department.name}\nส่วน: ${targetUser.requested_sector.name}`)) {
-      return
-    }
-
-    setApprovingUser(userId)
-    try {
-      await requireV2AdminMutationAuthority()
-      const { error } = await supabase.rpc('admin_approve_user', {
-        p_target_id: userId,
-        p_request_id: crypto.randomUUID(),
-        p_reason: 'อนุมัติข้อมูลและสังกัดตามคำขอ',
-      })
-      if (error) throw error
-      // Update local state
-      setUsers((currentUsers) => currentUsers.map((candidate) => candidate.id === userId ? {
-        ...candidate,
-        status: 'active' as const,
-        department: targetUser.requested_department,
-        sector: targetUser.requested_sector,
-        onboarding_completed: true
-      } : candidate))
-    } catch {
-      alert('ไม่สามารถอนุมัติบัญชีได้ กรุณาตรวจสอบสิทธิ์และข้อมูลล่าสุด')
-    } finally {
-      setApprovingUser(null)
-    }
-  }
-
-  // v1.2.0: Reject pending user via RPC  
-  const handleRejectUser = async (userId: string) => {
-    if (!adminMutationsEnabled) {
-      alert('การจัดการบัญชีถูกปิดชั่วคราวระหว่างปรับปรุงสิทธิ์')
-      return
-    }
-    const note = prompt('ระบุเหตุผลที่ปฏิเสธ:')?.trim()
-    if (!note) return
-
-    setApprovingUser(userId)
-    try {
-      await requireV2AdminMutationAuthority()
-      const { error } = await supabase.rpc('admin_reject_user', {
-        p_target_id: userId,
-        p_reason: note,
-        p_request_id: crypto.randomUUID(),
-      })
-      if (error) throw error
-      alert('ปฏิเสธเรียบร้อย ผู้ใช้สามารถแก้ไขสังกัดและส่งใหม่ได้')
-      await refreshUsers()
-    } catch {
-      alert('ไม่สามารถปฏิเสธบัญชีได้ กรุณาตรวจสอบสิทธิ์และข้อมูลล่าสุด')
-    } finally {
-      setApprovingUser(null)
-    }
-  }
-
-  // Loading state
-  if (authLoading) {
-    return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <Loader2 className="h-8 w-8 animate-spin text-blue-600" />
-      </div>
-    )
-  }
-
-  // Redirect handled in useEffect, show loading while redirecting
-  if (!user) {
-    return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <Loader2 className="h-8 w-8 animate-spin text-blue-600" />
-      </div>
-    )
-  }
-
-  // Check if current user is admin
-  if (user.role !== 'admin') {
-    return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center">
-          <h1 className="text-2xl font-bold text-gray-900 mb-4">ไม่มีสิทธิ์เข้าถึง</h1>
-          <p className="text-muted-foreground mb-4">หน้านี้สำหรับผู้ดูแลระบบเท่านั้น</p>
-          <Link href="/" className="text-blue-600 hover:underline">กลับหน้าหลัก</Link>
+  if (authLoading || !user) return <LoadingState />
+  if (role !== 'admin' || status !== 'active') return (
+    <main className="flex min-h-screen items-center justify-center bg-muted/30 p-6">
+      <div className="space-y-3 text-center"><h1 className="text-xl font-semibold">ไม่มีสิทธิ์เข้าถึง</h1>
+        <p className="text-muted-foreground">หน้านี้สำหรับผู้ดูแลระบบที่กำลังใช้งาน</p>
+        {unresolvedCommands.length ? <p role="note">มีคำสั่งก่อนหน้าที่ยังยืนยันผลไม่ได้ {unresolvedCommands.length} รายการ</p> : null}
+        {gate.mutationInFlight() ? <p role="status">กำลังรอผลคำสั่งก่อนหน้า</p> : null}
+        <Button asChild variant="outline"><Link href="/">กลับหน้าหลัก</Link></Button></div>
+    </main>
+  )
+  const catalogState = catalog.actorId === actorId ? catalog : { state: 'loading' as const, issue: null }
+  const catalogDescription = descriptions[catalogState.state]
+  const catalogEntry = (
+    <Card className="mb-6">
+      <CardHeader className="flex-row items-center justify-between gap-3">
+        <CardTitle>Master Catalog</CardTitle>
+        <Badge variant={catalogDescription.variant}>{catalogDescription.label}</Badge>
+      </CardHeader>
+      <CardContent className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex items-start gap-3">
+          <div className="flex size-10 shrink-0 items-center justify-center rounded-md border text-muted-foreground"><Database className="size-4" /></div>
+          <div><div className="font-medium">บัญชีราคามาตรฐาน</div>
+            <p className="text-sm text-muted-foreground">{catalogDescription.description}</p>
+            {catalogState.issue ? <p role="status" className="mt-1 text-sm text-destructive">{catalogState.issue}</p> : null}</div>
         </div>
-      </div>
-    )
-  }
-
-  const pendingCount = users.filter(u => u.status === 'pending').length
-  const catalogEntryStatus = {
-    loading: {
-      label: 'กำลังตรวจสถานะ',
-      description: 'กำลังตรวจว่าเครื่องมือแก้ไขพร้อมใช้งานหรืออยู่ในโหมดอ่านอย่างเดียว',
-      variant: 'outline' as const,
-    },
-    enabled: {
-      label: 'พร้อมแก้ไข',
-      description: 'เปิดดูบัญชีราคาและใช้เครื่องมือแก้ไขตามสิทธิ์ผู้ดูแลระบบได้',
-      variant: 'default' as const,
-    },
-    'read-only': {
-      label: 'เปิดดูอย่างเดียว',
-      description: 'บัญชีปัจจุบัน ทะเบียนฉบับ และประวัติยังเปิดดูได้ โดยเครื่องมือแก้ไขถูกปิดไว้',
-      variant: 'outline' as const,
-    },
-    unavailable: {
-      label: 'ตรวจสถานะไม่ได้',
-      description: 'ยังเปิดดู Master Catalog ได้ แต่เครื่องมือแก้ไขจะปิดแบบปลอดภัยจนกว่าจะอ่านการตั้งค่าได้',
-      variant: 'destructive' as const,
-    },
-  }[catalogAdminEntryState]
+        <Button asChild><Link href="/admin/master-catalog">เปิด Master Catalog</Link></Button>
+      </CardContent>
+    </Card>
+  )
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <header className="bg-white shadow-sm">
-        <div className="max-w-7xl mx-auto px-4 py-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              <Link href="/" className="text-muted-foreground hover:text-gray-700 flex items-center gap-1">
-                <ArrowLeft className="h-4 w-4" />
-                กลับ
-              </Link>
-              <h1 className="text-xl font-semibold text-gray-900">จัดการผู้ใช้งาน</h1>
-            </div>
-            <div className="flex items-center gap-4">
-              {pendingCount > 0 && (
-                <Badge className="bg-yellow-100 text-yellow-800">
-                  {pendingCount} รอการอนุมัติ
-                </Badge>
-              )}
-              <span className="text-sm text-muted-foreground">{users.length} ผู้ใช้</span>
-            </div>
-          </div>
-        </div>
-      </header>
-
-      <main className="max-w-7xl mx-auto px-4 py-6 sm:px-6 lg:px-8">
-        <Card className="mb-6">
-          <CardHeader className="flex-row items-center justify-between gap-3">
-            <CardTitle>Master Catalog</CardTitle>
-            <Badge variant={catalogEntryStatus.variant}>{catalogEntryStatus.label}</Badge>
-          </CardHeader>
-          <CardContent>
-            <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-              <div className="flex items-start gap-3">
-                <div className="flex size-10 items-center justify-center rounded-md border bg-background text-muted-foreground">
-                  <Database className="size-4" />
-                </div>
-                <div>
-                  <div className="font-medium">บัญชีราคามาตรฐาน</div>
-                  <div className="text-sm text-muted-foreground">
-                    {catalogEntryStatus.description}
-                  </div>
-                  {catalogSettingsIssue ? (
-                    <div className="mt-1 text-sm text-destructive" role="status">
-                      {catalogSettingsIssue}
-                    </div>
-                  ) : null}
-                </div>
-              </div>
-              <Button asChild>
-                <Link href="/admin/master-catalog">เปิด Master Catalog</Link>
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
-
-        {error && (
-          <Alert variant="destructive" className="mb-4">
-            <AlertDescription>{error}</AlertDescription>
-          </Alert>
-        )}
-
-        {!isLoading && !adminMutationsEnabled && (
-          <Alert className="mb-4 border-amber-200 bg-amber-50 text-amber-900">
-            <AlertDescription>
-              ขณะนี้ดูทะเบียนผู้ใช้ได้ตามปกติ แต่การอนุมัติ เปลี่ยนบทบาท และเปลี่ยนสถานะถูกปิดชั่วคราวจนกว่าฐานข้อมูลสิทธิ์รุ่นใหม่จะพร้อม
-            </AlertDescription>
-          </Alert>
-        )}
-
-        {isLoading ? (
-          <div className="flex justify-center py-12">
-            <Loader2 className="h-8 w-8 animate-spin text-blue-600" />
-          </div>
-        ) : (
-          <Card>
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>ผู้ใช้</TableHead>
-                  <TableHead>สังกัด</TableHead>
-                  <TableHead>บทบาท</TableHead>
-                  <TableHead>สถานะ</TableHead>
-                  <TableHead>การดำเนินการ</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {users.map((u) => (
-                  <TableRow key={u.id} className={savingUser === u.id ? 'opacity-50' : ''}>
-                    <TableCell>
-                      <div className="font-medium">
-                        {[u.title, u.first_name, u.last_name].filter(Boolean).join(' ') || 'ไม่ระบุชื่อ'}
-                      </div>
-                      <div className="text-sm text-muted-foreground">{u.email}</div>
-                    </TableCell>
-                    <TableCell className="text-sm">
-                      {/* v1.2.0: Show actual or requested org */}
-                      {u.department?.name ? (
-                        <>
-                          <div>{u.department.name}</div>
-                          <div className="text-xs text-muted-foreground">{u.sector?.name || ''}</div>
-                        </>
-                      ) : u.requested_department?.name ? (
-                        <>
-                          <div className="text-amber-600">
-                            (ขอ) {u.requested_department.name}
-                          </div>
-                          <div className="text-xs text-amber-500">
-                            {u.requested_sector?.name || 'ยังไม่เลือกส่วน'}
-                          </div>
-                        </>
-                      ) : (
-                        <span className="text-muted-foreground">ยังไม่ได้ลงทะเบียน</span>
-                      )}
-                    </TableCell>
-                    <TableCell>
-                      {editingUser === u.id ? (
-                        <Select
-                          value={u.role}
-                          onValueChange={(v) => handleRoleChange(u.id, v as UserRole)}
-                          disabled={!adminMutationsEnabled || savingUser === u.id || u.status !== 'active'}
-                        >
-                          <SelectTrigger className="w-[140px]">
-                            <SelectValue />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="admin">ผู้ดูแลระบบ</SelectItem>
-                            <SelectItem value="dept_manager">ผู้จัดการฝ่าย</SelectItem>
-                            <SelectItem value="sector_manager">ผู้จัดการส่วน</SelectItem>
-                            <SelectItem value="staff">พนักงาน</SelectItem>
-                            <SelectItem value="procurement">จัดซื้อจัดจ้าง</SelectItem>
-                          </SelectContent>
-                        </Select>
-                      ) : (
-                        <Button
-                          variant="link"
-                          className="p-0 h-auto"
-                          onClick={() => setEditingUser(u.id)}
-                          disabled={!adminMutationsEnabled || u.id === user?.id || u.status !== 'active'}
-                          title={u.status === 'active' ? 'เปลี่ยนบทบาท' : 'เปลี่ยนบทบาทได้เฉพาะบัญชีที่กำลังใช้งาน'}
-                        >
-                          {getRoleLabel(u.role)}
-                        </Button>
-                      )}
-                    </TableCell>
-                    <TableCell>
-                      <Select
-                        value={u.status}
-                        onValueChange={(v) => handleStatusChange(u.id, v as 'active' | 'inactive' | 'suspended' | 'pending')}
-                        disabled={!adminMutationsEnabled || savingUser === u.id || u.id === user?.id || u.status === 'pending'}
-                      >
-                        <SelectTrigger className={`w-[130px] ${u.status === 'pending' ? 'border-yellow-400 bg-yellow-50' : ''}`}>
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="active">ใช้งาน</SelectItem>
-                          {u.status === 'pending' && (
-                            <SelectItem value="pending" disabled>รอการอนุมัติ</SelectItem>
-                          )}
-                          {u.status === 'active' && (
-                            <>
-                              <SelectItem value="inactive">ไม่ใช้งาน</SelectItem>
-                              <SelectItem value="suspended">ระงับ</SelectItem>
-                            </>
-                          )}
-                          {u.status === 'inactive' && (
-                            <SelectItem value="inactive" disabled>ไม่ใช้งาน</SelectItem>
-                          )}
-                          {u.status === 'suspended' && (
-                            <SelectItem value="suspended" disabled>ระงับ</SelectItem>
-                          )}
-                        </SelectContent>
-                      </Select>
-                    </TableCell>
-                    <TableCell>
-                      <div className="flex items-center gap-2">
-                        {/* v1.2.0: Show approve/reject for pending with requested org */}
-                        {u.status === 'pending' && u.onboarding_completed && u.id !== user?.id ? (
-                          <>
-                            <Button
-                              size="sm"
-                              variant="outline"
-                              onClick={() => handleApproveUser(u.id)}
-                              disabled={!adminMutationsEnabled || approvingUser === u.id}
-                              className="h-7 bg-green-50 text-green-700 hover:bg-green-100"
-                            >
-                              {approvingUser === u.id ? <Loader2 className="h-3 w-3 animate-spin" /> : <Check className="h-3 w-3" />}
-                            </Button>
-                            <Button
-                              size="sm"
-                              variant="outline"
-                              onClick={() => handleRejectUser(u.id)}
-                              disabled={!adminMutationsEnabled || approvingUser === u.id}
-                              className="h-7 bg-red-50 text-red-700 hover:bg-red-100"
-                            >
-                              <X className="h-3 w-3" />
-                            </Button>
-                          </>
-                        ) : null}
-                      </div>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </Card>
-        )}
-      </main>
-    </div>
+    <>
+      <AdminUsersDirectory rows={rows} actorId={actorId} source={page?.source ?? 'unknown'} pagination={page?.pagination ?? 'legacy-bounded'}
+        catalogEntry={catalogEntry} canMutate={adminMutationsEnabled}
+        loading={visible.loading} stale={visible.stale} error={visible.error} notice={visible.notice}
+        announcement={visible.announcement} mutationBusy={gate.mutationInFlight()}
+        unresolvedTargetIds={unresolvedTargetIds} needsFreshReadTargetIds={needsFreshReadTargetIds}
+        unresolvedCommandCount={unresolvedCommands.length} unresolvedAccountCount={unresolvedTargetIds.size} editingUserId={visible.editingId}
+        hasPrevious={visible.history.length > 0} hasNext={Boolean(page?.hasNext)}
+        onRefresh={refresh} onPrevious={previous} onNext={next}
+        onRetry={retry}
+        onCancelNavigation={visible.requested?.kind === 'navigate' && page ? () => setWorkspace((current) => ({
+          ...current, requested: null, error: null, stale: true,
+          notice: 'ยังแสดงข้อมูลหน้าเดิม กรุณาโหลดใหม่ก่อนดำเนินการ',
+        })) : undefined}
+        onDetails={(id, trigger) => { detailsTrigger.current = trigger; setWorkspace((current) => ({ ...current, selectedId: id })) }}
+        onRoleChange={(id, value) => { void submit(id, 'role', value) }}
+        onStatusChange={(id, value) => { void submit(id, 'status', value) }}
+        onApprove={(id) => { void submit(id, 'approve') }}
+        onReject={(id) => { void submit(id, 'reject') }}
+        onEditingChange={(id) => setWorkspace((current) => ({ ...current, editingId: id }))}
+        headingRef={headingRef}
+      />
+      <AdminUserDetailsSheet user={selected} open={Boolean(visible.selectedId)} onOpenChange={closeDetails}
+        loading={visible.loading} stale={visible.stale} onCloseAutoFocus={returnFocus}
+        unresolvedCommandCount={unresolvedCommands.filter(command => command.ticket.targetId === selected?.id).length}
+        needsFreshRead={Boolean(selected && gate.needsFreshRead(selected.id))} />
+    </>
   )
 }
 
-// Dynamic export to prevent SSR/prerendering issues with useAuth
-const DynamicAdminContent = nextDynamic(() => Promise.resolve(AdminContent), {
-  ssr: false,
-  loading: () => (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-      <Loader2 className="h-8 w-8 animate-spin text-blue-600" />
-    </div>
-  ),
-})
-
-export default function AdminPage() {
-  return <DynamicAdminContent />
+function LoadingState() {
+  return <div className="flex min-h-screen items-center justify-center bg-muted/30" role="status">
+    <Loader2 className="mr-2 size-5 animate-spin" aria-hidden="true" />กำลังตรวจสอบผู้ใช้งาน
+  </div>
 }
+const DynamicAdminContent = nextDynamic(() => Promise.resolve(AdminContent), { ssr: false, loading: LoadingState })
+export default function AdminPage() { return <DynamicAdminContent /> }

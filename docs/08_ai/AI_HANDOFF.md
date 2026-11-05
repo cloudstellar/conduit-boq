@@ -1,5 +1,56 @@
 # AI Handoff — Conduit BOQ
 
+## UM-A1 Solo publication approved — 2026-11-05
+
+Owner approved one Solo release of the exact 14 files in the UM-A1 plan.
+Fresh source, hosted config, Data API cap, backend metadata and rollback
+preflight passed against base 6393355. The approved release includes GitHub
+Quality, Vercel Current, anonymous Login smoke and conditional rollback
+under the plan. Keep S0/031/032 and the Login fix. Exclude parity tooling,
+private fixtures and real local runners. No DB changes, migration replay,
+account or BOQ reads, or authenticated Production Admin test.
+See [UM checkpoint 12.6](../plans/product/12-user-management-um-a-and-um-b-plan.md#126-solo-publication-checkpoint--2026-11-05).
+The exact release outcome is recorded in the private receipt named there.
+
+## UM-A1 read-only Production preflight passed — 2026-11-05
+
+Owner approved14pathsource/config/metadata/rollback readonly only. Completed
+source639/VercelCurrent7d9/config/cap1000,19functions/4profile-referencecontracts,
+031/032policies/history PASS;healthy639rollbackcandidate conditional on future
+immediatepredecessor eligibility. See [UM checkpoint12.5](../plans/product/12-user-management-um-a-and-um-b-plan.md#125-read-only-production-preflight-result--2026-11-05).
+One RRREADONLY/ROLLBACK metadataquery;no accounts/BOQs/businessRPC/Auth/DBwrite/
+replay or publication. Privateproof /private/tmp/um-a1-production-preflight-20261105-_t3ipi6z.
+Grant consumed;local result/handoff/document review only now. No standing
+Production/DBread or stage/commit/push/deploy authority. A1remains unreleased;
+next14-filepublication/finalfreshness/CI-Vercel/delivery/conditionalrollback
+requires explicit approval. Keep032/031/Loginfix/parity9/closed105-18unchanged.
+
+## UM-A1 source-only qualification passed — 2026-11-05
+
+Owner approved639+14/Node24 tests/lint/TS/Turbopack/mock only. Completed878tests/
+64files,lint0errors3oldwarnings,standaloneTS,defaultTurbopack and9mockgroupsPASS.
+Use [UM checkpoint12.4](../plans/product/12-user-management-um-a-and-um-b-plan.md#124-post-s0-source-qualification-result--2026-11-05).
+Initial symlink-build FAIL retained;NEWphysicalcopy of installed dependencies
+resolved isolated root without source/package/lock/config changes. Mock uses
+WebpackDEV/fakeAuthAPI,3generic503console messages consistent withintentional
+faults;not realDB/Production/fontproof. Own processes/API/WEB listeners closed.
+All9A1sourcebytes unchanged;old105/18fixtures remain closed. Grant consumed;
+no further runtime/DB/Auth/fixtures/Production/stage/commit/push/deploy. Current
+work result/handoff/document review only;future14-file release needs explicit
+preflight/publication scope and must retain032/031/Loginprefetchfix.
+
+## UM-A1 post-S0 Solo plan refresh only — 2026-11-05
+
+Owner requested local Markdown refresh of the UM-A1 Solo proposal after6393355/
+Production032. Use [UM checkpoint](../plans/product/12-user-management-um-a-and-um-b-plan.md#12-execution-status-and-resume-checkpoint).
+Current proposed release14paths=runtime5/tests3/mockrunner1/Markdown5;old27/
+base67 are dated. All9A1sourcehashes match accepted evidence;A1unreleased,
+fresh639+14quality NOT RUN. S0/032/source-closeout grants complete/consumed.
+Only five planning/handoff documents/source-hash/document checks now;no source,
+package/config,DB/Auth/Docker/browser/fixtures/Production or stage/commit/push/
+deploy. Do not reopen old105/18 runs or replay027–032. FutureA1rollback must
+retain032guards/history and Loginprefetchfalse;fresheligibility/approval required.
+
 ## S0/032 five-document publication — 2026-11-05
 
 Owner approved one Solo publication of the exact five Markdown paths in
