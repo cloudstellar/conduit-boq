@@ -185,6 +185,27 @@ function AdminContent() {
   const unresolvedTargetIds = new Set(unresolvedCommands.map(command => command.ticket.targetId))
   const needsFreshReadTargetIds = new Set([...unresolvedTargetIds].filter(id => gate.needsFreshRead(id)))
   const selected = rows.find((row) => row.id === visible.selectedId) ?? null
+  const selectedRecord = page?.records.find((row) => row.id === selected?.id)
+  const canReviewAffiliation = Boolean(actorId && selectedRecord && selectedRecord.id !== actorId
+    && selectedRecord.source === 'v2' && selectedRecord.role === 'staff' && selectedRecord.status === 'active'
+    && selectedRecord.org_id === null && selectedRecord.department_id === null && selectedRecord.sector_id === null)
+
+  const prepareAffiliation = () => {
+    if (!actorId || !adminMutationsEnabled || !canReviewAffiliation || !selected || gate.hasUnresolved(selected.id)) return false
+    try {
+      const ticket = gate.capture(actorId)
+      return gate.isCurrent(ticket) && gate.snapshotCurrent() && !gate.mutationInFlight()
+    } catch {
+      return false
+    }
+  }
+
+  const refreshAfterAffiliation = async () => {
+    if (!actorId) return false
+    const current = latestRead.current
+    return readPage(actorId, { cursor: current?.cursor ?? null, history: current?.history ?? [],
+      kind: 'refresh', reloadCatalog: current?.kind === 'initial' || current?.reloadCatalog })
+  }
 
   const refresh = () => {
     if (!actorId || gate.mutationInFlight()) return
@@ -385,6 +406,12 @@ function AdminContent() {
       />
       <AdminUserDetailsSheet user={selected} open={Boolean(visible.selectedId)} onOpenChange={closeDetails}
         loading={visible.loading} stale={visible.stale} onCloseAutoFocus={returnFocus}
+        affiliation={actorId && page?.source === 'v2' ? { client: supabase, actorId,
+          canReview: canReviewAffiliation, canMutate: adminMutationsEnabled && Boolean(selected && !gate.hasUnresolved(selected.id)),
+          canReadHistory: !visible.loading && !visible.stale && !visible.error && Boolean(selectedRecord && selectedRecord.id !== actorId
+            && selectedRecord.role === 'staff' && selectedRecord.status === 'active'
+            && selectedRecord.org_id && selectedRecord.department_id && selectedRecord.sector_id),
+          canSubmit: prepareAffiliation, refresh: refreshAfterAffiliation } : undefined}
         unresolvedCommandCount={unresolvedCommands.filter(command => command.ticket.targetId === selected?.id).length}
         needsFreshRead={Boolean(selected && gate.needsFreshRead(selected.id))} />
     </>

@@ -14,10 +14,12 @@ vi.mock('@/components/ui/alert', () => import('../components/ui/alert'))
 vi.mock('@/components/ui/badge', () => import('../components/ui/badge'))
 vi.mock('@/components/ui/button', () => import('../components/ui/button'))
 vi.mock('@/components/ui/card', () => import('../components/ui/card'))
+vi.mock('@/components/ui/label', () => import('../components/ui/label'))
 vi.mock('@/components/ui/select', () => import('../components/ui/select'))
 vi.mock('@/components/ui/skeleton', () => import('../components/ui/skeleton'))
 vi.mock('@/components/ui/table', () => import('../components/ui/table'))
 vi.mock('@/components/ui/sheet', () => import('../components/ui/sheet'))
+vi.mock('@/lib/admin/users/affiliation-confirmation', () => import('../lib/admin/users/affiliation-confirmation'))
 
 function row(overrides: Partial<AdminUserPresentation> = {}): AdminUserPresentation {
   return {

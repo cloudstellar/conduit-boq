@@ -8,6 +8,7 @@ import { Skeleton } from '@/components/ui/skeleton'
 import {
   Sheet, SheetClose, SheetContent, SheetDescription, SheetHeader, SheetTitle,
 } from '@/components/ui/sheet'
+import { AdminAffiliationConfirmation, type AffiliationConfirmationProps } from './AdminAffiliationConfirmation'
 
 export interface AdminUserDetailsSheetProps {
   user: AdminUserPresentation | null
@@ -16,24 +17,29 @@ export interface AdminUserDetailsSheetProps {
   stale?: boolean
   unresolvedCommandCount?: number
   needsFreshRead?: boolean
+  affiliation?: AffiliationConfirmationProps
   onOpenChange: (open: boolean) => void
   onCloseAutoFocus?: (event: Event) => void
 }
 
-export function AdminUserDetailsSheet({ user, open, loading = false, stale = false, unresolvedCommandCount = 0, needsFreshRead = true, onOpenChange, onCloseAutoFocus }: AdminUserDetailsSheetProps) {
+export function AdminUserDetailsSheet({ user, open, loading = false, stale = false, unresolvedCommandCount = 0, needsFreshRead = true, affiliation, onOpenChange, onCloseAutoFocus }: AdminUserDetailsSheetProps) {
+  const details = user ? <AdminUserDetailsContent user={user} loading={loading} stale={stale}
+    unresolvedCommandCount={unresolvedCommandCount} needsFreshRead={needsFreshRead} /> : null
   return <Sheet open={open && user !== null} onOpenChange={onOpenChange}>
     <SheetContent side="right" showCloseButton={false} className="w-full min-w-0 gap-0 sm:max-w-lg motion-reduce:animate-none! motion-reduce:transition-none!" onCloseAutoFocus={onCloseAutoFocus} data-admin-user-details="true">
       <SheetHeader className="shrink-0 border-b">
         <div className="flex items-start justify-between gap-3">
           <div className="min-w-0">
             <SheetTitle>ข้อมูลผู้ใช้งาน</SheetTitle>
-            <SheetDescription className="mt-1">รายละเอียดอ่านอย่างเดียวจากทะเบียนที่ได้รับสิทธิ์</SheetDescription>
+            <SheetDescription className="mt-1">รายละเอียดจากทะเบียนผู้ใช้งานที่ได้รับสิทธิ์</SheetDescription>
           </div>
           <SheetClose asChild><Button variant="outline" className="min-h-11 shrink-0" aria-label="ปิดรายละเอียดผู้ใช้งาน">ปิด</Button></SheetClose>
         </div>
       </SheetHeader>
       <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain p-4 sm:p-6" aria-busy={loading}>
-        {user ? <AdminUserDetailsContent user={user} loading={loading} stale={stale} unresolvedCommandCount={unresolvedCommandCount} needsFreshRead={needsFreshRead} /> : null}
+        {open && user && affiliation ? (
+          <AdminAffiliationConfirmation key={`${affiliation.actorId}:${user.id}`} {...affiliation} user={user}>{details}</AdminAffiliationConfirmation>
+        ) : details}
       </div>
     </SheetContent>
   </Sheet>
