@@ -185,4 +185,26 @@ describe('middleware with real SSR clients and no cookies', () => {
     expect(response.headers.get('location')).toBeNull()
     expect(response.headers.get('x-middleware-next')).toBe('1')
   })
+
+  it('lets signed-out visitors open the exact auth callback error page', async () => {
+    const response = await updateSession(new NextRequest(`${APP_ORIGIN}/auth/callback-error`))
+
+    expect(response.status).toBe(200)
+    expect(response.headers.get('location')).toBeNull()
+    expect(response.headers.get('x-middleware-next')).toBe('1')
+    expect(response.headers.get('cache-control')).toBe('private, no-store')
+    expect(response.headers.get('referrer-policy')).toBe('no-referrer')
+  })
+
+  it.each(['/auth/callback-error/example', '/auth/callback-error-example'])(
+    'keeps %s outside the public error page exception',
+    async path => {
+      const response = await updateSession(new NextRequest(`${APP_ORIGIN}${path}`))
+
+      expect(response.status).toBe(307)
+      const destination = new URL(response.headers.get('location')!)
+      expect(destination.pathname).toBe('/login')
+      expect(destination.searchParams.get('redirectTo')).toBe(path)
+    },
+  )
 })

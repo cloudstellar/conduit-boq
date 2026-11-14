@@ -36,6 +36,12 @@ export async function updateSession(request: NextRequest) {
   const pathname = request.nextUrl.pathname
   const isApi = pathname === '/api' || pathname.startsWith('/api/')
 
+  if (pathname === '/auth/callback-error') {
+    supabaseResponse.headers.set('Cache-Control', 'private, no-store')
+    supabaseResponse.headers.set('Referrer-Policy', 'no-referrer')
+    return supabaseResponse
+  }
+
   if (PUBLIC_AUTH_PATHS.some((path) => isPathWithin(pathname, path))) {
     return supabaseResponse
   }

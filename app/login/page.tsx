@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useMemo, Suspense } from 'react'
+import { useState, useMemo, useEffect, useRef, Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import Image from 'next/image'
 import Link from 'next/link'
@@ -30,6 +30,18 @@ function LoginForm() {
   const [success, setSuccess] = useState<string | null>(null)
   const [mode, setMode] = useState<'login' | 'signup' | 'forgot'>('login')
   const [emailDomainError, setEmailDomainError] = useState<string | null>(null)
+  const [submittedEmail, setSubmittedEmail] = useState<string | null>(null)
+  const checkEmailHeading = useRef<HTMLHeadingElement>(null)
+  const signupInFlight = useRef(false)
+
+  useEffect(() => {
+    if (submittedEmail) checkEmailHeading.current?.focus()
+  }, [submittedEmail])
+
+  const finishSignup = (nextMode: 'login' | 'signup') => {
+    setMode(nextMode)
+    setSubmittedEmail(null)
+  }
 
   // Local syntax is only a display hint. The bounded database routine is the
   // authoritative domain decision at submit time.
@@ -65,6 +77,7 @@ function LoginForm() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    if (signupInFlight.current) return
 
     const emailForAuth = normalizeOrganizationEmail(email, true)
     if (emailForAuth !== email) {
@@ -76,13 +89,15 @@ function LoginForm() {
       return
     }
 
+    if (mode === 'signup') signupInFlight.current = true
     setIsLoading(true)
     setError(null)
     setSuccess(null)
 
     try {
       if (!await isSignupEmailAllowed(supabase, emailForAuth)) {
-        throw new Error('ไม่สามารถยืนยันสิทธิ์อีเมลนี้ได้ กรุณาตรวจสอบอีเมลหรือติดต่อผู้ดูแลระบบ')
+        setError('ไม่สามารถยืนยันสิทธิ์อีเมลนี้ได้ กรุณาตรวจสอบอีเมลหรือติดต่อผู้ดูแลระบบ')
+        return
       }
 
       if (mode === 'login') {
@@ -94,7 +109,7 @@ function LoginForm() {
         router.push(redirectTo)
         router.refresh()
       } else if (mode === 'signup') {
-        const { error } = await supabase.auth.signUp({
+        const { data, error } = await supabase.auth.signUp({
           email: emailForAuth,
           password,
           options: {
@@ -102,7 +117,13 @@ function LoginForm() {
           },
         })
         if (error) throw error
-        setSuccess('กรุณาตรวจสอบอีเมลเพื่อยืนยันการสมัคร')
+        setPassword('')
+        if (data.session) {
+          router.push(redirectTo)
+          router.refresh()
+        } else {
+          setSubmittedEmail(emailForAuth)
+        }
       } else if (mode === 'forgot') {
         const { error } = await supabase.auth.resetPasswordForEmail(emailForAuth, {
           redirectTo: `${window.location.origin}/auth/callback?next=/profile`,
@@ -111,8 +132,11 @@ function LoginForm() {
         setSuccess('ส่งลิงก์รีเซ็ตรหัสผ่านไปยังอีเมลของคุณแล้ว')
       }
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'เกิดข้อผิดพลาด')
+      setError(mode === 'signup'
+        ? 'สมัครสมาชิกไม่สำเร็จ กรุณาลองใหม่หรือติดต่อผู้ดูแลระบบ'
+        : err instanceof Error ? err.message : 'เกิดข้อผิดพลาด')
     } finally {
+      if (mode === 'signup') signupInFlight.current = false
       setIsLoading(false)
     }
   }
@@ -129,9 +153,15 @@ function LoginForm() {
             className="h-12 w-auto"
           />
         </Link>
-        <h2 className="mt-6 text-center text-2xl font-bold text-gray-900">
-          {mode === 'login' ? 'เข้าสู่ระบบ' : mode === 'signup' ? 'สมัครสมาชิก' : 'ลืมรหัสผ่าน'}
-        </h2>
+        {submittedEmail ? (
+          <h2 ref={checkEmailHeading} tabIndex={-1} className="mt-6 text-center text-2xl font-bold text-gray-900">
+            ตรวจสอบอีเมล
+          </h2>
+        ) : (
+          <h2 className="mt-6 text-center text-2xl font-bold text-gray-900">
+            {mode === 'login' ? 'เข้าสู่ระบบ' : mode === 'signup' ? 'สมัครสมาชิก' : 'ลืมรหัสผ่าน'}
+          </h2>
+        )}
         <p className="mt-2 text-center text-sm text-muted-foreground">
           ระบบประมาณราคาท่อร้อยสายสื่อสารใต้ดิน
         </p>
@@ -139,7 +169,24 @@ function LoginForm() {
 
       <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
         <Card>
-          <CardContent className="pt-6">
+          {submittedEmail ? (
+            <CardContent className="space-y-4 pt-6">
+              <p className="text-sm text-muted-foreground">
+                ตรวจกล่องจดหมายและโฟลเดอร์จดหมายขยะ แล้วเปิดลิงก์ยืนยันในเบราว์เซอร์ที่ใช้สมัคร
+              </p>
+              <p className="rounded-md bg-muted px-3 py-2 text-sm font-medium [overflow-wrap:anywhere]" dir="ltr">
+                {submittedEmail}
+              </p>
+              <div className="grid gap-2">
+                <Button type="button" onClick={() => finishSignup('signup')}>
+                  กลับไปกรอกอีเมลใหม่
+                </Button>
+                <Button type="button" variant="ghost" onClick={() => finishSignup('login')}>
+                  กลับไปเข้าสู่ระบบ
+                </Button>
+              </div>
+            </CardContent>
+          ) : <CardContent className="pt-6">
             <form className="space-y-6" onSubmit={handleSubmit}>
               {error && (
                 <Alert variant="destructive">
@@ -238,13 +285,14 @@ function LoginForm() {
                 <Button
                   variant="outline"
                   className="w-full"
+                  disabled={mode === 'signup' && isLoading}
                   onClick={() => { setMode(mode === 'login' ? 'signup' : 'login'); setError(null); setSuccess(null) }}
                 >
                   {mode === 'forgot' ? 'กลับไปเข้าสู่ระบบ' : mode === 'login' ? 'สมัครสมาชิก' : 'เข้าสู่ระบบ'}
                 </Button>
               </div>
             </div>
-          </CardContent>
+          </CardContent>}
         </Card>
       </div>
     </div>
