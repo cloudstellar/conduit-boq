@@ -4,20 +4,22 @@
 <a id="current-resume-checkpoint-20261118"></a>
 ## Current resume checkpoint — 2026-11-19
 
-Read this checkpoint before the dated records below. The Owner approved local
-handoff-document alignment and the follow-up documentation fixes after review.
-That scope covers document edits and verification. Implementation, Docker,
-DB/Auth, Production and Git publication require separate authority. Earlier
-apply, publication and conditional rollback grants are consumed.
+Read this checkpoint before the dated records below. The current Owner scope is
+to update this document with the completed local Docker cleanup and retention
+results. The earlier local commit and the scoped copy, cache deletion and
+Docker removal approvals were used for their recorded steps. Earlier apply,
+publication and conditional rollback grants are consumed. Further cleanup,
+implementation, DB/Auth, Production and Git publication require separate authority.
 
 ### Resume action when the Owner says only “ทำต่อ”
 
-Begin with a read-only review of the [documentation candidate](#documentation-publication-candidate).
-Read the mandatory entry sections and relevant ADRs, then verify local Git
-state and linked documents. Use the canonical checkout while the candidate is
-local. Once the reviewed document commit exists, use a checkout containing
-that commit. Report the available source, recorded checks and next Owner
-decision. Reuse the recorded checks when their source still matches.
+Begin with a read-only review of this checkpoint, including the
+[local document commit](#documentation-publication-candidate) and
+[local cleanup and evidence custody](#local-targets-and-evidence-custody).
+Read the mandatory entry sections and relevant ADRs, then verify local Git and
+linked documents in the canonical checkout. Report the available source,
+recorded results and next Owner decision. Reuse checks when their source still
+matches.
 
 “ทำต่อ” resumes the current checkpoint review. Product implementation, Docker
 cleanup, runtime tests and publication remain separate decisions. Update this
@@ -114,10 +116,14 @@ npm test -- --no-cache tests/master-catalog-admin-edit-completion.test.ts \
 The Git index was empty. Application runtime checks, Docker, DB/Auth,
 Production and Git publication were **NOT RUN** for this follow-up.
 
-The Owner's next decision is whether to authorize publication of the reviewed
-document set. Check the then-current source and approved route before any Git
-publication. A `main` push can trigger CI and Vercel under the
-[recorded release method](../07_process/RELEASE_PROCESS.md#solo-application-publication).
+The Owner approved staging and a local commit of the 16 reviewed files on
+2026-11-19. The staged names and contents were verified before commit and the
+resulting tree was checked afterward. Local `main` is
+`008a2fe25078d986224c423fea0181cf85150cb8`, one commit ahead of local
+`origin/main` at `33a0f426842c1c0ec69abd23b95d7c8bbf93dda5`. This cleanup
+checkpoint update is unstaged and outside that commit. Separate approval is
+required for any publication. A `main` push can trigger CI and Vercel under
+the [recorded release method](../07_process/RELEASE_PROCESS.md#solo-application-publication).
 
 ### Choose a proven method that fits the task
 
@@ -171,20 +177,50 @@ Both product proposals remain outside the documentation scope.
 
 ### Local targets and evidence custody
 
-The latest read-only inventory in this chat on 2026-11-18 found the original
-`conduit-boq-local` stack with seven running containers, UM-B
-`conduit-boq-um-b-20261108-r1` with four stopped containers and UM-A2
-`conduit-boq-uma2-bhcfb7lv` with four stopped containers. These are dated
-inventory observations, not a current-schema or functional PASS. No container,
-network, image or volume has been deleted, and cleanup remains unapproved.
+The 2026-11-18 inventory recorded seven running containers in
+`conduit-boq-local` and four stopped containers in each isolated test stack.
 
-Some specifically referenced `/private/tmp` evidence directories were absent
-at that check. A path in an old receipt does not establish that its files still
-exist. Do not infer that evidence has a backup, that a runner can be rerun, or
-that stopped DB volumes are disposable. Preserve the existing local accounts,
-passwords and data, Catalog/Factor F, immutable/no-replay migrations 027–033,
-closed-run evidence, Owner backups and the protected archive. Do not inspect
-the protected archive to fill an evidence gap.
+**Scoped Docker cleanup PASS — 2026-11-19.** On local context `desktop-linux`,
+the Owner authorized removal of the eight named test containers and two private
+networks. All targets were `exited` before `docker container rm`. Both networks
+had zero endpoints before container removal and again before `docker network rm`.
+The post-check confirmed all ten named targets absent.
+
+| Test stack | Removed container names (prefix plus suffix) | Removed network | Retained DB volume |
+|---|---|---|---|
+| `conduit-boq-um-b-20261108-r1` | `-gateway-1`, `-rest-1`, `-auth-1`, `-db-1` | `conduit-boq-um-b-20261108-r1-private` | `conduit-boq-um-b-20261108-r1-db` |
+| `conduit-boq-uma2-bhcfb7lv` | `-auth`, `-rest`, `-mail`, `-db` | `conduit-boq-uma2-bhcfb7lv-private` | `conduit-boq-uma2-bhcfb7lv-dbdata` |
+
+Post-checks verified both test DB volumes, the three main-stack volumes and
+the seven distinct images referenced by the test and main containers. The
+`conduit-boq-local` stack retained all seven running containers and its network
+metadata. The removal approval is consumed. DB volume access, DB/Auth operations,
+application runtime tests and Production checks were **NOT RUN** in this cleanup.
+
+**Private retention verified — 2026-11-19.** The owner-only local directory is
+`/Users/cloud/Cloudstellar/conduit-boq-retention/2026-11-19/`, outside Git.
+
+- `deliverables/` holds 28 copies of the manual and infographic sources,
+  history and exports. `local-test-workspace/` holds 19 copies of the local
+  parity and UM-A1 runners, baselines and reports, with their relative paths
+  preserved. `SHA256SUMS.txt` records the 47 copies verified against their
+  originals. The 47 originals remain in the checkout. Only the seven approved
+  Python cache files were deleted. A separate retention backup was not verified.
+- `private-evidence/DOCKER_SUPPLEMENT_2026-11-19.txt` holds filtered UM-B Auth
+  request counts and the stop times, exit codes and log drivers of all eight
+  containers. The check found no recoverable original report in their writable
+  layers. The supplement preserves observations without upgrading test outcomes.
+- `MISSING_EVIDENCE.tsv` retains all **12** original entries, six for UM-B and
+  six for UM-A2, as `MISSING_AT_RECORDED_PATH`. This covers the recorded
+  `/private/tmp` paths. Copies elsewhere remain unverified. The dated results
+  remain in [UM-B §20.19](../plans/product/12-user-management-um-a-and-um-b-plan.md#2019-local-first-round-qualification--2026-11-14)
+  and [UM-A2 §24.2](../plans/product/12-user-management-um-a-and-um-b-plan.md#242-local-test-decision),
+  with the release limits linked above.
+
+Preserve existing local accounts, passwords and data, Catalog/Factor F,
+immutable/no-replay migrations 027–033, closed-run evidence, Owner backups and
+the protected archive. A further volume, evidence or publication action needs
+its own reviewed scope.
 
 For future work, record the reviewed runner/config/source identities, exact
 target, results and cleanup status in the established handoff. Keep reusable
