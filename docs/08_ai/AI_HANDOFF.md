@@ -5,16 +5,15 @@
 ## Current resume checkpoint — 2026-11-19
 
 Read this checkpoint before the dated records below. The current Owner scope is
-to update this document with the completed local Docker cleanup and retention
-results. The earlier local commit and the scoped copy, cache deletion and
-Docker removal approvals were used for their recorded steps. Earlier apply,
-publication and conditional rollback grants are consumed. Further cleanup,
-implementation, DB/Auth, Production and Git publication require separate authority.
+to record the completed two-commit documentation publication in this document.
+The one-push approval and the earlier local cleanup and retention approvals
+were used for their recorded steps. Further cleanup, implementation, DB/Auth,
+Production operations and Git publication require separate authority.
 
 ### Resume action when the Owner says only “ทำต่อ”
 
 Begin with a read-only review of this checkpoint, including the
-[local document commit](#documentation-publication-candidate) and
+[documentation publication result](#documentation-publication-candidate) and
 [local cleanup and evidence custody](#local-targets-and-evidence-custody).
 Read the mandatory entry sections and relevant ADRs, then verify local Git and
 linked documents in the canonical checkout. Report the available source,
@@ -86,19 +85,40 @@ inspection. Application qualification, Docker/DB/Auth, Production and Git
 publication were outside that documentation round.
 
 <a id="documentation-publication-candidate"></a>
-### Documentation publication candidate — 2026-11-19
+### Documentation publication result — 2026-11-19
 
-The approved follow-up reconciles the current wording in this handoff,
+**Publication PASS.** The Owner authorized one fast-forward push to GitHub
+`main` with Vercel's automatic Production deployment. The push advanced
+`main` from `33a0f426842c1c0ec69abd23b95d7c8bbf93dda5` through
+[`008a2fe25078d986224c423fea0181cf85150cb8`](https://github.com/cloudstellar/conduit-boq/commit/008a2fe25078d986224c423fea0181cf85150cb8)
+to [`e341734989c7d06cebacba269333745c321096f5`](https://github.com/cloudstellar/conduit-boq/commit/e341734989c7d06cebacba269333745c321096f5).
+GitHub post-checks confirmed exactly those two commits and 16 documentation
+paths. Local `main` and `origin/main` both matched the published tip.
+
+- **GitHub Quality PASS.** [Run #76](https://github.com/cloudstellar/conduit-boq/actions/runs/44507169055)
+  completed at 17:38:19 ICT. Lint, test and build passed for `e341734` on `main`.
+- **Vercel preflight PASS.** The [previous deployment](https://vercel.com/cloudwho-2662s-projects/conduit-boq/ANBpWZ16EHX6uZTbsTNHyDuDMKuy)
+  was **Ready / Current** for `boq.ntconduit.com` at `33a0f42` before the push.
+- **Vercel post-check PASS.** The [automatic deployment](https://vercel.com/cloudwho-2662s-projects/conduit-boq/AJC3cyykTs19wdSV27R6nVAooQn5)
+  was **Ready / Current** for the same Production domain at `e341734`.
+
+The Vercel dashboard was checked read-only. Application smoke tests, manual
+deployment, rollback and DB/Auth operations were **NOT RUN**. This follow-up
+records that receipt in the worktree. Further staging, commits, push and
+deployment are outside its scope under the
+[recorded release method](../07_process/RELEASE_PROCESS.md#solo-application-publication).
+
+#### Pre-publication documentation review
+
+The approved follow-up reconciled the wording in this handoff,
 [Roadmap #09](../plans/product/09-integrated-roadmap-and-it-decision-handoff.md),
 [UM #12](../plans/product/12-user-management-um-a-and-um-b-plan.md),
 [BOQ workflow #13](../plans/product/13-boq-operational-workflow-plan.md), the
 [repository README](../../README.md) and [Change Process](../07_process/CHANGE_PROCESS.md).
-The candidate contains 16 documentation paths against local `33a0f42`: the 14
-handoff, navigation and product documents reviewed together, plus the two
-repository entry points. The [ADR index](../02_architecture/ADR/README.md),
-[AGENTS snapshot](./AGENTS_HISTORY_20261118.txt) and #13 must travel with it.
-Unrelated output files, scripts, database evidence and application changes are
-outside this candidate.
+The reviewed set contained 16 documentation paths against local `33a0f42`,
+including the [ADR index](../02_architecture/ADR/README.md),
+[AGENTS snapshot](./AGENTS_HISTORY_20261118.txt) and #13. Unrelated output files,
+scripts, database evidence and application changes stayed outside that set.
 
 Follow-up verification on 2026-11-19 used the local-documentation method. The
 diff and whitespace checks passed, including the new Markdown files, and
@@ -113,17 +133,9 @@ npm test -- --no-cache tests/master-catalog-admin-edit-completion.test.ts \
   tests/master-catalog-authority-consistency.test.ts
 ```
 
-The Git index was empty. Application runtime checks, Docker, DB/Auth,
-Production and Git publication were **NOT RUN** for this follow-up.
-
-The Owner approved staging and a local commit of the 16 reviewed files on
-2026-11-19. The staged names and contents were verified before commit and the
-resulting tree was checked afterward. Local `main` is
-`008a2fe25078d986224c423fea0181cf85150cb8`, one commit ahead of local
-`origin/main` at `33a0f426842c1c0ec69abd23b95d7c8bbf93dda5`. This cleanup
-checkpoint update is unstaged and outside that commit. Separate approval is
-required for any publication. A `main` push can trigger CI and Vercel under
-the [recorded release method](../07_process/RELEASE_PROCESS.md#solo-application-publication).
+The Git index was empty at that local review. Application runtime checks,
+Docker, DB/Auth, Production and Git publication were **NOT RUN** during that
+pre-publication review. The subsequent delivery result is recorded above.
 
 ### Choose a proven method that fits the task
 
