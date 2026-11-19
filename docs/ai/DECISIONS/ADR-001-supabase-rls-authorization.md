@@ -1,3 +1,19 @@
+# Historical ADR-001 copy — use the canonical record
+
+This path is retained for historical references. The maintained decision is
+[canonical ADR-001](../../02_architecture/ADR/ADR-001-supabase-rls-authorization.md).
+Use the [ADR index](../../02_architecture/ADR/README.md) to discover related
+decisions and the [current handoff](../../08_ai/AI_HANDOFF.md#current-resume-checkpoint)
+for current work and later closeouts. Do not maintain this legacy body as a
+second copy of the architectural decision or use its Phase 1 policy list as
+current runtime authority.
+
+The original 5,736-byte body below is frozen and retained unchanged. At the
+2026-11-19 inventory it matched canonical ADR-001; its SHA-256 is
+`0283190ee7687b648a70aad105730c20f24091bff7d539da8b0f6e27801b2e3e`.
+Later changes belong in the canonical decision process, not this snapshot.
+
+<!-- LEGACY_ADR001_SNAPSHOT_START -->
 # ADR-001: Supabase RLS as Primary Authorization Layer
 
 **Status:** Accepted  

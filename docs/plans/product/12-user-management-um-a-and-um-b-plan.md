@@ -1,8 +1,29 @@
+> **Current navigation — 2026-11-19:** Use [Roadmap #09](./09-integrated-roadmap-and-it-decision-handoff.md)
+> for the next product priority and the [current checkpoint](../../08_ai/AI_HANDOFF.md#current-resume-checkpoint)
+> for the current task and authority. The [current UM status table](#121-current-state-and-authority)
+> links the applicable results. “Current” and “next” in dated planning and
+> closeout entries refer to their recorded stage.
+
 # User Management UM-A and UM-B Plan
 
 Recorded: 2026-10-24 (Asia/Bangkok)
 Approval-packet update: 2026-10-26 (Asia/Bangkok)
-Status: LOCAL VALIDATION COMPLETE / SOLO RELEASE PLAN FOR OWNER REVIEW — no publication/Production authority
+Status (2026-11-14): UM-A1 RELEASED / FIRST UM-B CONFIRMATION CLOSED / UM-A2 RELEASED AND CLOSED / ADMIN ASSIGNMENT PROPOSED
+
+Use the [current status table](#121-current-state-and-authority), the
+[first UM-B Production closeout](#2020-first-round-production-closeout), the
+[proposal for Admin assignment when a request is wrong](#21-admin-assignment-for-an-incorrect-affiliation-request),
+and the [roadmap for groups and permission templates](#22-groups-roles-and-access-scope).
+[Section 27](#27-um-a2-production-closeout) records the UM-A2 release and its
+two explicitly accepted Production `NOT RUN` results.
+[Section 23](#23-um-a2-implementation-review) records the reviewed UM-A2 scope.
+[Section 24](#24-um-a2-solo-release-review) records the local test results and
+the seven-file Solo release proposal.
+[Section 25](#25-production-auth-redirect-review) records the hosted redirect
+change and readback. [Section 26](#26-nt-smtp-proposal-for-um-a2) records the
+NT SMTP setup and the earlier mail test on UM-B.
+[Section 20.19](#2019-local-first-round-qualification--2026-11-14) preserves
+the Docker and browser evidence as recorded before release.
 
 ## Post-S0/032 Solo plan refresh — 2026-11-05
 
@@ -47,7 +68,7 @@ transitions พร้อม retention/finalization ที่เสนอไว�
 ข้อความ planning-only/NOT AUTHORIZED ด้านล่างเป็นช่วงก่อนอำนาจ local นี้
 ใช้ checkpoint section12 และ local result แยกหลักฐานจริงจากแผนทุกครั้ง
 
-For the current bounded decision, read [section 11: UM-A1 approval packet](#11-um-a1-approval-packet)
+For the bounded decision at the 2026-11-01 stage, read [section 11: UM-A1 approval packet](#11-um-a1-approval-packet)
 first. It specifies the proposed screens, file allowlist, existing-user impact,
 fixture lifecycle and acceptance. The Owner approved this Markdown refinement
 only; neither S0 nor UM-A1 implementation/test writes are approved by it.
@@ -70,15 +91,18 @@ shared visual rules, and the [focused S0 plan](../security/05-s0-boq-writer-boun
 for the separately completed bounded032 rollout and its remaining limits. No code, package,
 configuration, SQL, account/reference data, Docker/DB operation, staging,
 commit/push/deploy or Production access follows from this plan. Migrations
-027–032 remain immutable/no-replay. Existing local credentials, data, nine
+027–033 remain immutable/no-replay. Existing local credentials, data, nine
 parity artifacts and protected archive custody remain unchanged.
 
-The bounded S0/032 prerequisite was selected and completed separately. Remaining
-proposed order is Admin-only UM-A1 / scoped NT pilot → narrow section15 UM-B
-legacy affiliation confirmation → separately reviewed UM-A2 signup/confirmation
-→ remaining UM-B and account-security policy. This is not a new execution
-approval or a request to repeat S0. Full-site restyling remains incremental;
-no additional PR process follows from this planning sequence.
+Focused S0/032, Admin-only UM-A1, the first UM-B legacy confirmation and UM-A2
+are complete within their recorded gates. The
+[Admin assignment proposal](#21-admin-assignment-for-an-incorrect-affiliation-request)
+is deferred until an active employee with no actual affiliation has an
+incorrect request and cannot access a BOQ needed for work. Follow
+[Roadmap #09](./09-integrated-roadmap-and-it-decision-handoff.md#product-sequencing)
+for sequencing and prioritize other UM-B and account-security work by actual
+need or confirmed risk.
+Roll out NT branding incrementally on the affected screens.
 
 ## 2. Confirmed contracts and unresolved facts
 
@@ -89,8 +113,8 @@ no additional PR process follows from this planning sequence.
 | Admin commands | Existing RPCs approve/reject, change an active account's role and suspend/deactivate/reactivate with active-admin, target, reason and request-ID guards. They do not support choosing a new role and affiliation atomically during approval. |
 | Directory | Existing get_admin_profiles_page accepts cursor and limit up to 100, orders by created_at/id descending, and supplies neither global search/filter nor exact total. |
 | Legacy affiliation | One bounded Owner-approved account read on 2026-10-24 recorded active staff, missing actual organization/department/sector, and valid requested department/sector. This explains that observed requested-affiliation label, not all accounts. Absence of approval metadata/audit does not establish who changed it or whether historical approval ever occurred. No personal identifiers or raw query results belong in this plan; that read permission is consumed. |
-| Later bounded read and Owner report | Section15 records the 2026-11-02 one-account READ ONLY result and the Owner's explicit prior-approval report separately. Actual affiliation remains NULL; its historical cause is unknown. The evidence does not justify automatic repair or another Production read. |
-| Mail/configuration | Actual hosted confirmation settings, SMTP, templates, redirect configuration, delivery and rate limits remain unverified for UM-A. Public documentation or local mail capture is not fresh hosted evidence. |
+| Later bounded read and Owner report | Section 15 records that actual affiliation was NULL in the 2026-11-02 read and separately records the Owner's prior-approval report. The historical cause remains unknown. The Owner then reported a successful confirmation in the [Production closeout](#2020-first-round-production-closeout). |
+| Mail/configuration | The dated hosted readback verified Confirm Email, both templates, both public callback redirects and the NT SMTP host and port. One signup email arrived on UM-B. Production confirmation-link and reset behavior on UM-A2 are **NOT RUN**. See [25.5](#255-redirect-change-readback-and-auth-preflight), [26.5](#265-production-smtp-checkpoint) and [27](#27-um-a2-production-closeout). |
 | Visual baseline | Master Catalog supplies the shared shell and NT-yellow accent. Its web UI currently inherits IBM Plex Sans Thai; official catalog PDF uses NT Regular/Bold. Prior concept images are not final NT CI or rendered acceptance. |
 
 Source references: [Login](../../../app/login/page.tsx),
@@ -111,7 +135,7 @@ Admin-only candidate below; do not carry all subsequent sections into it.
 | Candidate | Proposed first scope | Explicit boundary |
 |---|---|---|
 | UM-A1 — Admin first | Existing /admin directory pagination, truthful affiliation labels, read-only account details and scoped NT presentation | Keep Login/callback/middleware, AuthProvider/useUser, pending/profile/dashboard, domain settings/predicate, cookies/session, shared primitives/global fonts/tokens and database contracts unchanged. |
-| UM-A2 — user-facing Auth follow-up | Signup/confirmation/resend/error guidance, narrowly reviewed callback routing and pending/profile presentation | This reaches current users too; establish actual configuration and regression evidence under a new exact scope before implementation. It is not an Admin-only restyle. |
+| UM-A2 — user-facing Auth follow-up | Show the correct next step after signup and help users when a verification link fails | Use the current email input and the existing Pending/Profile pages. Keep existing password recovery in the acceptance checks. [Current scope](#23-um-a2-implementation-review) |
 | Later Admin command UX | Replace native prompts if needed; strengthen actor/target binding and uncertain-command recovery using existing commands | Not part of A1. Review its actual client diff separately before new UM-B transitions; no new backend concurrency guarantees are inferred. |
 
 UM-A1 keeps existing approval/role/status controls and RPC semantics. It does
@@ -137,39 +161,16 @@ organization correction or account cleanup is included.
 
 ### UM-A2: Signup and confirmation
 
-Flow: signup request → email confirmation when required by actual Auth config
-→ own profile/requested affiliation → Admin review → active application access.
-Handle both session-present and no-session signup results. A successful call
-supports request-accepted guidance, not proof of delivery, verification, new
-account creation or application approval. Do not infer account existence from
-identities, profiles or lookup APIs. Map bounded error codes to safe Thai copy;
-never render raw callback/provider details, tokens or passwords.
-
-Resend is a deliberate user action through the existing Auth SDK, with busy
-state and cooldown guidance; backend rate limits remain authoritative. Do not
-send on page load. Preserve recovery and safe same-origin redirects.
-
-Preserve the existing organization-email normalization in login, signup and
-recovery, including both a short username and a full email address. The current
-input deliberately uses type="text", autocomplete="username" and inputMode="email".
-A redesign must not introduce native email validation that rejects the short
-form before normalization. Keep password-manager/autofill behavior and test both
-input forms through the same existing admission and Auth boundaries.
-
-The concept button “แก้ไขอีเมล” must become “กลับไปกรอกอีเมลใหม่”: without an
-authenticated session this is not an edit of an existing Auth identity. A new
-address is a new signup intent and may leave an older unconfirmed account.
-Show the normalized address clearly before submit; do not delete, merge or
-rewrite old accounts to hide this outcome. Retention/cleanup is a later policy.
-
-The proposed callback fix includes a narrowly recognized callback-error route
-case for existing active/pending sessions, preserving cookies and blocked-account
-handling. Adding a Login banner alone is insufficient because current middleware
-redirects signed-in users first. Unknown error values must not loosen business
-route guards or trigger automatic logout. This routing change requires explicit
-regression coverage in the future candidate.
+After signup, guide users to check their email when the response has no session.
+When Supabase returns a session, hand off to the current route guards and
+Pending/Profile path. Give users a visible next step if their confirmation
+link fails. The [current scope and Docker plan](#23-um-a2-implementation-review)
+cover these two changes using the existing email input and policy.
 
 ### UM-A2: Pending and profile presentation
+
+Deferred proposal. In the first UM-A2 release, landing in the existing flow is
+an acceptance check. The table below describes a later presentation change.
 
 | Trusted profile state | UI and permitted next step |
 |---|---|
@@ -306,12 +307,10 @@ components/pure view models and meaningful tests. Use the existing authorization
 helpers and RPCs without editing their definitions. Keep the Catalog entry/gate
 and legacy read-only fallback. No new settings-control or hard-delete capability.
 
-UM-A2's separate possible boundary is app/login/page.tsx,
-app/auth/callback/route.ts, lib/supabase/middleware.ts, app/pending/page.tsx and
-app/profile/page.tsx. components/dashboard/DashboardHeader.tsx may later change
-only truthful account guidance. These are not A1 paths. AuthProvider/useUser,
-shared authorization logic and global layout are excluded from A1; do not expand
-into them to make an Admin visual change easier.
+UM-A2's proposed runtime boundary is `app/login/page.tsx`,
+`app/auth/callback/route.ts`, one informational page, and the middleware rule
+for that exact route. See [the proposed files](#233-proposed-files-and-user-impact).
+Pending, Profile and Dashboard presentation remain future work.
 
 Any shared visual source/font change must have a named #11 pilot surface and
 regression scope before implementation approval. Master Catalog business code,
@@ -423,6 +422,15 @@ several screens. The focused S0 plan does not close all these topics.
 Future SQL must be reviewed and explicitly approved; do not create/apply a migration
 from this planning approval.
 
+### Affiliation cases and proposed Admin flows
+
+| Case | Admin action | User action | Scope |
+|---|---|---|---|
+| Pending account with an incorrect request | Return it with a reason. Review the revised request before approval. | Correct the department and sector in the profile and resubmit. | [Existing pending flow](#um-a2-pending-and-profile-presentation). |
+| Active staff with no confirmed affiliation and a correct request | Verify the requested hierarchy, review the BOQ visibility effect and confirm with a reason. | Continue using the existing account. | [First UM-B candidate](#152-narrow-first-candidate-and-impact). |
+| Active staff with no confirmed affiliation and an incorrect request | Defer confirmation and verify the correct department and sector. Existing access continues during review. | Provide the correct details to Admin through the usual contact channel. | The deferred [Admin assignment proposal](#21-admin-assignment-for-an-incorrect-affiliation-request) would retain the original request and record the verified assignment. Active-user resubmission remains an option for separate review. |
+| A confirmed affiliation changes after a transfer | Verify the transfer, select the destination from the directory and review old and new affiliations and BOQ visibility before confirming with a reason. Record who confirmed the transfer and when. | Report the transfer if Admin has not already received it from the organization. Continue with the same account. | Proposed follow-on with separate approval. BOQ ownership or assignment handover is a separate action. |
+
 ## 7. SSO and subsequent business features
 
 Current email/password use can continue while IT confirms provider/protocol and
@@ -439,16 +447,44 @@ Until IT confirms the mechanism, keep existing UUID references intact and requir
 an approved, rehearsed mapping/ownership plan before enabling SSO. Do not add a
 speculative identity table now or silently replace BOQ/audit owners later.
 
-After account/security minimum, wider R0/D0 precedes an operational BOQ workflow.
-Real-paper approval remains with the conduit engineering section manager; the
-app recorder is a separate undecided authority. Lock operational content and use
-ordinary existing Copy to a new independent draft for correction. No mandatory
-revision-chain/source-link/supersede engine is added. TOR three-name fields do not
+Use the existing Admin review as the starting point for future SSO affiliation
+review. Keep the user's request, the organization's reported affiliation and
+the application's confirmed affiliation distinct. SSO can prefill profile
+details and suggest a department or sector when an approved organization code
+maps to a valid internal record. If data is missing, unmapped or conflicts with
+the confirmed affiliation, show the reason for review and preserve current
+access during affiliation review. Confirmed affiliation, application role and
+account status continue to govern BOQ access. Titles and groups have no access
+effect until Owner and IT approve an explicit mapping and lifecycle policy.
+
+Before the SSO pilot, confirm the stable identity key, which attributes IT can
+supply, which system owns the organization codes and how joiners, transfers
+and departures are reported. Use only the approved attributes needed by the
+application. Review account continuity and any automatic access changes under
+the separate SSO scope.
+
+The [first UM-B candidate](#152-narrow-first-candidate-and-impact) still confirms
+only the existing valid request for active staff with no actual affiliation.
+An Admin choosing a different affiliation, or an active user correcting a
+request, can be reviewed separately if current cases require it.
+
+Follow [Roadmap #09](./09-integrated-roadmap-and-it-decision-handoff.md#product-sequencing)
+for the order of BOQ workflow review, the relevant R0/D0 criteria, and release.
+Prioritize remaining account-security work by actual need or confirmed risk.
+The [BOQ workflow plan #13](./13-boq-operational-workflow-plan.md) describes
+paper approval and the separate roles allowed to record it in the app.
+Lock operational content and use ordinary existing Copy to a new independent
+draft for correction. No mandatory revision-chain/source-link/supersede engine
+is added. TOR three-name fields do not
 create account roles. Names and wording are per-print inputs without database
 persistence in the first release; exact print form and blank Excel template are
 separate output decisions. Quantity Expression follows the approved numeric foundation.
 
-## 8. Decisions and present status
+<a id="8-decisions-and-present-status"></a>
+## 8. Original planning decisions and status — 2026-10-24
+
+This records the original planning stage. See the [current UM status table](#121-current-state-and-authority)
+for subsequent releases and retained limits.
 
 Approved direction: whole-site NT brand consistency and planning alignment.
 For review first: the Admin-only A1 visual/state set, scoped #11 pilot/file
@@ -846,6 +882,10 @@ HEAD/index และ app/package/lockfile/migrations ไม่เปลี่ย
 
 ## 12. Execution status and resume checkpoint
 
+The entries before the [current UM status table](#121-current-state-and-authority)
+preserve their earlier planning, qualification and approval stages. For the
+active task and authority, use the [current handoff](../../08_ai/AI_HANDOFF.md#current-resume-checkpoint).
+
 **Latest read-only Production preflight — 2026-11-05:** Owner explicitly approved
 source/config/metadata/rollback only for14paths. Completed PASS with recorded
 limits at04:08UTC:source639/VercelCurrent7d9/config/APIcap1000,19function/4relation
@@ -919,7 +959,7 @@ S0's subsequent build-environment HOLD is recorded only in that checkpoint and
 its [intermediate receipt](../../06_engineering/S0_BOQ_WRITER_BOUNDARY_LOCAL_RESULT.md);
 no Auth/fixture/032application ran. A1 stays validated locally and unreleased.
 
-**Current UM-B planning state:** **AUDIT_CONTRACT_DEFINED_IN_PLAN — POSITIVE_FIXTURE_HOLD_NO_LOCAL_SHAPE**.
+**Dated UM-B planning state — 2026-11-02:** **AUDIT_CONTRACT_DEFINED_IN_PLAN — POSITIVE_FIXTURE_HOLD_NO_LOCAL_SHAPE**.
 The later [section16 contract](#16-legacy-confirmation-audit-and-replay-contract)
 selects the outcome/audit approach; SQL and runtime are NOT RUN. The
 [section17 aggregate-only local packet](#17-local-aggregate-only-fixture-feasibility-packet)
@@ -933,6 +973,9 @@ completed/consumed; no further Production, DB/Auth, fixture or SQL operation.
 The earlier S0-first sequencing is now fulfilled for bounded032;its canonical
 checkpoint records actual scope/limits. This UM-B plan does not grant A1 work
 or replace UM-B's missing primary positive fixture with S0 edge-case waivers.
+The later isolated target and release are recorded in the
+[local qualification](#2019-local-first-round-qualification--2026-11-14)
+and [Production closeout](#2020-first-round-production-closeout).
 
 **Later sequencing/planning step — 2026-11-02:** Owner agreed to prepare the
 focused S0 local scope first. Use [S0#05 checkpoint/packet](../security/05-s0-boq-writer-boundary-plan.md#6-current-checkpoint)
@@ -1004,22 +1047,26 @@ of these newly found interleavings. Preserve it and append corrective results.
 
 | รายการ | สถานะที่เกิดขึ้นจริง | อำนาจ/หลักฐานและขั้นถัดไป |
 |---|---|---|
-| แผน/แบบ/ขอบเขต A1 | **FUNCTIONAL + SETTLED VISUAL LOCAL PASS** | New18functionalreceipt + [section14visualreceipt](../../06_engineering/UM_A1_SETTLED_VISUAL_LOCAL_RESULT.md); olderFAIL/NOTRUN/rejectedimages retained; Ownerreview/productionpreflight/release still separate |
+| แผน/แบบ/ขอบเขต A1 | **FUNCTIONAL + SETTLED VISUAL LOCAL PASS** | New18 functional receipt and [section 14 visual receipt](../../06_engineering/UM_A1_SETTLED_VISUAL_LOCAL_RESULT.md) record the dated local qualification, including the earlier FAIL/NOT RUN results and rejected images. See [12.7](#127-post-release-checkpoint--2026-11-06) for the later release. |
 | Execution contracts R1–R7 | **LOCAL EVIDENCE RECORDED WITH LIMITS** | ใช้ผลจริงและ NOT RUN ใน receipt; closure matrix13.3 ด้านล่างเก็บเกณฑ์เดิม ไม่ใช้แทนผล runtime |
-| งานที่อนุมัติอยู่ | **QUALIFICATION + READONLY PREFLIGHT COMPLETE / GRANTS CONSUMED** | Only local result/handoff/document review now;no source/package/DB/Auth/Docker/fixture/furtherProduction/stage/commit/push/deploy. Existing closed runs remain closed |
-| A1 implementation | **CORRECTED LOCALLY / UNCOMMITTED / NINE HASHES UNCHANGED** | Runtime5+tests3+mockrunner1;accepted hashes match on639 baseline. No shared Auth/domain/config/package/DB-contract edit;source not changed in this refresh |
+| งานที่อนุมัติอยู่ | [Current handoff](../../08_ai/AI_HANDOFF.md#current-resume-checkpoint) | Use the checkpoint and the Owner's latest scope for the active task. Previous release and rollback authority is consumed. |
+| A1 implementation | **RELEASED IN `a588bfe`** | Admin directory and details with the scoped NT pilot. Shared Auth, domain policy and existing Admin command semantics were preserved. |
 | A1 local DB/API preflight | **DATED NOV2 NEW18 PREFLIGHT + FINAL CUSTODY PASS** | Existing DB/container/volume/full service graph, actual PostgREST14.5/cap1000/exact post031 metadata unchanged; original125profiles/126Auth identities,32tables/26sessions/544Authaudits protected;143profile/6page exact traversal PASS |
 | A1 test accounts/data | **OLD105 CLOSED / NEW18 FINALIZED** | Newrun `um-a1-20261102-real18` retained18Auth/profile/identity:15inactive/2pending/1suspended;0active/0new sessions/0newOwner sessions/0unresolved intents; no BOQ write or original-account repair |
-| A1 mock/static/browser/API/DB acceptance | **DATED REAL FUNCTIONAL + SETTLED VISUAL PASS** | Sameapplication845tests/63files/9mockgroups;31APIchecks/13distinctfunctionalbrowsergroups remain datedsame-sourcePASS;section14 freshNode24Turbopack/TS+29PNGvisual/custody PASS. NewtoolfirstmissingimportFAILbeforeAuth preserved,fixedimportonly; CI/Production NOT RUN |
+| A1 mock/static/browser/API/DB acceptance | **DATED REAL FUNCTIONAL + SETTLED VISUAL PASS** | Sameapplication845tests/63files/9mockgroups;31APIchecks/13distinctfunctionalbrowsergroups remain datedsame-sourcePASS;section14 freshNode24Turbopack/TS+29PNGvisual/custody PASS. NewtoolfirstmissingimportFAILbeforeAuth preserved,fixedimportonly; CI/Production NOT RUN in that local qualification |
 | Fixture finalization | **PASS — BOTH RUNS CLOSED / NO ACTIVE RESIDUE** | New18 independentSQL confirms0active/0sessions, originals32table digests/26sessionlinks/544Authaudits retained; old105manifest/package/027–031/parity/credential hashes unchanged; retain accounts/audit, no harddelete/reset |
 | คำสั่งที่ผลไม่แน่นอน | **REAL UUID-KEYED CONTAINMENT VERIFIED** | Actual held/lost responses, sameJWTrolecycle/timeout,2UUIDsame-target,off-page warning and actorchanges passed;15UIUUIDs/8controlled transitions exactjournal/actual2xx;0serverUNKNOWN left. Exact off-page-newB-success remains mock-only; current value alone never resolves oldUUID |
-| A1 publication/Production | **NOT STARTED / NOT AUTHORIZED** | ไม่มี stage/commit/push/deploy/Production operation; การอนุมัติ local ในอนาคตไม่รวม publication |
-| A1 Solo proposal | **POST639 EXACT14 SOURCE QUALIFIED / OWNER REVIEW** | Runtime5/tests3/mockrunner1/docs5;fresh878/64/lint0errors3oldwarnings/TS/defaultTurbopack/mock9 PASS. Initial symlink-build FAIL retained. HostedpreflightPASS per12.5;actualA1CI/delivery NOT RUN. Excludeparity9/realrunners4/privatefixtures |
-| Narrow UM-B legacy confirmation | **AUDIT CONTRACT SELECTED IN PLAN / POSITIVE FIXTURE HOLD** | Sections15–17; count completed0/0/0, no eligible shape on the verified local snapshot. New-command SQL/positive API/runtime NOT RUN; no implementation-ready claim or permission to create a fixture |
+| A1 publication/Production | **RELEASED** | CI, Vercel and anonymous Login smoke passed at delivery. The earlier release evidence and authenticated-check limit are in [12.7](#127-post-release-checkpoint--2026-11-06). |
+| A1 exact-14 source qualification | **PASS — DATED EVIDENCE** | [12.4](#124-post-s0-source-qualification-result--2026-11-05) retains Node 24 tests/lint/TypeScript/Turbopack/mock results and the initial symlink-build failure. |
+| First UM-B legacy confirmation | **CLOSED — RELEASED / FIRST ADMIN CONFIRMATION PASS** | [20.20](#2020-first-round-production-closeout) records 033, the exact seven-file release and the Owner's first-account observation. User-side Production BOQ visibility remains **NOT RUN**. |
 | Local aggregate-only feasibility read | **COMPLETE — READ PASS / FIXTURE HOLD** | Ownerapproved section17;2026-11-02T10:47:54Z, exactexistingDocker/RRreadonly/ROLLBACK;0eligible/0protected/0remaining,0identities. One successfulDBtransaction, earlier client failures beforeconnection retained; grantconsumed |
 | Bounded legacy-account Production read | **COMPLETE / READ AUTHORITY CONSUMED** | One target,2026-11-02T08:15:31Z,READONLY:on/ROLLBACK; active/staff,actualallNULL,requestedvalid,approvalfieldsNULL/events0. Owner reports prior approval; causeunknown. NoPII/raw response inrepo; noBOQ/businessRPC/write |
 | S0 bounded032 | **COMPLETED OUTSIDE UM / GRANTS CONSUMED** | See S0canonical13–14/source639closeout;keep032/031/Loginfix. No claim that broaderS0 is complete and no fresh Production observation here |
-| A2 / UM-B | **SEPARATE PROPOSED WORK** | OrderA1→narrowlegacyconfirmation→A2→remainingUM-B;no new implementation/SQL/fixtures/Production grant |
+| UM-A2 | **RELEASED AND CLOSED** | Exact seven-file `33a0f42`. CI, Vercel and anonymous no-write smoke **PASS**. Real Production confirmation-link and password-reset journeys **NOT RUN** by Owner choice for this release. [Closeout](#27-um-a2-production-closeout) |
+| Auth redirects for UM-A2 | **CONFIG PASS / REAL UM-A2 CALLBACK NOT RUN** | [Section 25.5](#255-redirect-change-readback-and-auth-preflight) records the callback rules and [section 27](#27-um-a2-production-closeout) separates the no-write smoke from the real link. |
+| NT SMTP | **CONFIG PASS / ONE UM-B SIGNUP EMAIL DELIVERED** | [Section 26.5](#265-production-smtp-checkpoint) records where the earlier Production test stopped. |
+| Admin assignment when the request is wrong | **DEFERRED / NOT STARTED** | Revisit when an active employee with no actual affiliation has an incorrect request and cannot access a BOQ needed for work. [Section 21](#21-admin-assignment-for-an-incorrect-affiliation-request) retains the proposal. |
+| Remaining UM-B and account security | **SEPARATE PRODUCT DECISIONS** | Confirmed-affiliation correction/transfer, role and affiliation during activation, and account lifecycle policy remain open. IT-dependent identity and hosting decisions are tracked separately. |
 
 **Pre-implementation source checkpoint — dated stage:** ตรวจแบบ read-only
 วันที่ 2026-11-01: canonical checkout
@@ -1128,7 +1175,7 @@ Later bounded local approval/execution ด้านบนครอบคลุ�
 ตาม contract ที่รองรับ ไม่ส่งซ้ำอัตโนมัติ ไม่อ้างว่า A1 มี full command recovery
 ที่ยังไม่ได้ implement และไม่เปลี่ยน UNKNOWN เป็น failed เพียงเพราะรอนาน
 
-**A1 next safe step:** Owner review the
+**Dated A1 pre-release step:** Owner review the
 [post-S0/032 fourteen-path Solo plan](../../07_process/UM_A1_SOLO_RELEASE_PLAN_20261102.md),
 now that qualification and readonlypreflight passed. Next review/approve the
 exact14 source/content envelope for one publication/finalsource-target freshness/
@@ -1137,14 +1184,14 @@ rollback drift or delay needs scoped refresh;do not assume the snapshot is
 perpetual. Do not repeat S0 or reopen105/18 fixtures. Keep027–032/installedguards/
 Loginfix/parity/archive/originals unchanged;no current Auth/DB/Production grant.
 
-**UM-B next safe step:** retain the section16 contract and section17.4 actual
-zero-count result, then prepare a concrete faithful-fixture/rehearsal proposal
-for Owner review. No matching local shape was found; no permission to create
-one, inspect more rows or borrow a protected actor. The bounded local read has
-completed and grants no further DB access; no
-automatic login, protected-account mutation, closed-run reuse or new test stack.
-The bounded S0/032 stage is complete;current order is A1→narrow UM-B→A2→
-remaining UM-B. Use S0's canonical checkpoint for its dated outcome/limits.
+**Dated UM-B local qualification — 2026-11-14:** the
+[local qualification checkpoint](#2019-local-first-round-qualification--2026-11-14)
+records the isolated target results and the gate remaining at that stage. The
+previous 0/0/0 result remains the dated result for the existing local DB.
+The [Production closeout](#2020-first-round-production-closeout) records the
+later release under its own approval. Use [Roadmap #09](./09-integrated-roadmap-and-it-decision-handoff.md)
+for current sequencing and the [current handoff](../../08_ai/AI_HANDOFF.md#current-resume-checkpoint)
+for the active task and authority.
 
 ### 12.4 Post-S0 source qualification result — 2026-11-05
 
@@ -1248,6 +1295,54 @@ outcome belong in the private receipt `/private/tmp/um-a1-solo-release-20261105-
 This checkpoint records approval and preflight only. Use the receipt to
 verify publication and grant consumption before resuming. Production
 authenticated Admin behavior remains NOT RUN.
+
+### 12.7 Post-release checkpoint — 2026-11-06
+
+The release receipt records UM-A1 `a588bfe` as released on November 5. GitHub
+Quality, Vercel Production and the anonymous Login smoke passed. The release
+grant is consumed. An authenticated Production Admin check remains `NOT RUN`
+in the receipt. See the private receipt in [section 12.6](#126-solo-publication-checkpoint--2026-11-05).
+
+Next is the narrow UM-B confirmation for active staff with a valid requested
+hierarchy and no actual affiliation. A current active Admin reviews the
+requested hierarchy before confirming. The proposed confirmation can add
+shared-sector BOQ visibility through the existing access rules. See the
+[eligibility and impact](#152-narrow-first-candidate-and-impact).
+
+At this checkpoint the UM-A2 draft covered signup, confirmation and pending
+presentation. The working order was narrow UM-B, then UM-A2, then the rest of
+UM-B. The Owner deferred IT coordination. See the [current UM-A2 review](#23-um-a2-implementation-review)
+for the narrowed first-release scope.
+
+This continuation prepared the [fixture feasibility proposal](#18-um-b-fixture-feasibility-proposal--2026-11-06)
+from source and dated receipts. Candidate existence and runtime remain `NOT RUN`.
+The subsequent [inventory review and schema capture proposal](#19-um-b-fixture-inventory-and-schema-capture-proposal--2026-11-06)
+found no documented disposable inventory and narrowed the next proposed action
+to one catalog-only read on the existing local target.
+The [preflight result](#193-preflight-and-offline-result--2026-11-06) records the
+initial stop before SQL. The later [one-shot catalog result](#194-approved-unix-socket-catalog-result--2026-11-06)
+records the completed read and comparison. Use the
+[researched delivery plan](#20-um-b-researched-delivery-plan--2026-11-06) for
+the stages after this checkpoint, the [private review packet](#204-private-review-packet--2026-11-06)
+for the fixture proposal and [Master Catalog visual alignment](#205-master-catalog-visual-alignment--2026-11-06)
+for the revised design. The [first-round readiness review](#206-first-round-readiness-and-isolated-docker-review--2026-11-06)
+records the proposed execution gates. The [offline Docker packet](#207-owner-scope-and-offline-docker-review-packet--2026-11-08)
+records the Owner decision. The [Docker configuration review](#208-local-docker-metadata-and-configuration-review--2026-11-08)
+records the checked host and image identities. The [isolation and bootstrap
+packet](#209-isolation-and-native-auth-bootstrap-review--2026-11-08) records
+the revised API-only setup and proof gates. The [API-only setup
+result](#2010-api-only-bootstrap-held-at-egress--2026-11-08) records the
+settled original canary hold. The [route lookup result](#2011-route-lookup-passed-native-extension-hold--2026-11-08)
+records the later egress proof. The [pg_net-only exception result](#2012-pg_net-only-exception-passed-app-pre-data-hold--2026-11-08)
+records the accepted exception and app pre-data hold. The [role inventory
+review](#2013-isolated-role-inventory-and-renderer-adjustment-plan--2026-11-08)
+records the exact role differences. The [private renderer result](#2014-private-isolated-renderer-offline-result--2026-11-08)
+records the offline patch. The [ACL read-only result](#2015-isolated-acl-read-only-query-hold--2026-11-08)
+records the one-shot query failure and the corrected review SQL.
+The [ACL v2 result](#2016-isolated-acl-v2-read-passed-coverage-hold--2026-11-08)
+records the replacement read and its dated coverage HOLD. The later
+[L1 baseline result](#2017-l1-isolated-api-baseline-pass--2026-11-14) records
+what was resolved and what remains open for implementation.
 
 ## 13. Detailed readiness review
 
@@ -1839,8 +1934,8 @@ This is a future B candidate; current A1 code and read-only Sheet stay intact.
 - Show **“ยืนยันสังกัด”** only from a fresh eligible/capability-supported Admin
   projection. An unavailable/new RPC must disable only this new action safely;
   do not fall back to a different mutating endpoint or change old commands.
-- Use one review surface: switch the existing details Sheet to an explicit
-  review mode, or replace it with one dialog; avoid nested Sheet+Dialog flows.
+- Use one review surface by switching the existing details Sheet to an
+  explicit review mode.
   Identity, existing active/staff status, actual missing fields and exact
   requested organization/department/sector remain visible and read-only.
 - Explain plainly that this sets actual affiliation and may add access to
@@ -1865,7 +1960,11 @@ Owner's explicit selection for this narrow action.
 
 ### 15.5 Positive fixture gate and required acceptance
 
-**No suitable local positive legacy fixture is confirmed.** Normal signup
+**Dated existing-local finding.** The bounded check in section 17 found no
+suitable legacy fixture in the existing local DB. The later, separate
+[isolated L1 run](#2017-l1-isolated-api-baseline-pass--2026-11-14) proves the
+eligible starting shape and baseline visibility. The acceptance below applies
+to the new UM-B command. Normal signup
 creates pending/staff; approval requires nonNULL actual affiliation; later
 current exact deltas prevent clearing it. Creating eleven more normal actors
 does not generate the primary case. Existing captured NULL-scope fixtures are
@@ -2217,3 +2316,1625 @@ implementation candidate at that read;its later bounded completion is recorded
 in the current section12/S0 checkpoint. That read supplied no S0 approval.
 No further local/Production access,
 stage/commit/push/deploy or fixture write is authorized by this closeout.
+
+## 18. UM-B fixture feasibility proposal — 2026-11-06
+
+The November 2 count found zero profiles with the complete active-staff shape.
+It did not count inactive or suspended staff with the same affiliation state.
+Current signup creates pending staff and normal approval fills the actual
+affiliation. The existing Admin reactivation command takes inactive or
+suspended profiles to active and leaves role and affiliation fields intact.
+It also updates the Admin note and records a reactivation event. That gives a
+possible preparation path **if** an eligible disposable synthetic profile
+already exists. See the [signup guard and hook](../../../migrations/027_p49_active_profile_authorization_hardening.sql#L1542)
+and [transition code](../../../migrations/027_p49_active_profile_authorization_hardening.sql#L2306).
+
+**First proposal for review.** Run one repeatable-read, read-only transaction
+on the existing `conduit-boq-local` target after confirming its identity and
+matching profile, hierarchy and reactivation metadata. Use only an explicit
+inventory of disposable synthetic profiles whose provenance and current
+custody can be verified. Operational accounts, the Owner and all finalized UM
+and S0 run IDs are excluded. With no verifiable inventory, stop before a query.
+Count two disjoint groups within the approved inventory and return only counts:
+
+1. Active staff with all three actual affiliation IDs NULL and a valid requested
+   department and sector under an active organization. The organization,
+   department and sector must all be active and the links must agree.
+2. Inactive or suspended staff with the same actual and requested affiliation
+   shape. Keep this count separate because using such a profile requires an
+   existing Admin reactivation before the rehearsal can begin.
+
+The read ends with `ROLLBACK`. It supplies candidate feasibility only. A
+positive count still needs a separately reviewed exact synthetic target,
+proof of its Auth binding and custody, and a bounded rehearsal scope. With
+zero matches or uncertain provenance, the existing-local fixture stays on
+hold. A normal signup and approval can cover the separate approval regression.
+
+**If the read finds a disposable candidate.** Prefer an already-active match.
+For an inactive or suspended match, a later approved rehearsal may use one
+ordinary audited `admin_reactivate_user` with its own request UUID and record.
+Take the comparison snapshot after that preparation. The confirmation must
+preserve the setup audit, Admin note and old approval fields. The profile
+shape can match the target case even though its audit history differs. A
+successful confirmation consumes this fixture because it fills the missing
+fields. Finalize the exact synthetic profile in an approved inactive or
+suspended state, close its test sessions and retain its audit and resulting
+affiliation. Do not clear affiliation fields to recycle the fixture.
+
+**If there is no candidate.** An isolated, disposable environment seeded only
+with synthetic Auth identities, profiles and BOQs is a separate feasibility
+option. It needs a reviewed schema-only post-032 baseline with independently
+verified post-initialization guards, RLS, grants, Auth hooks and Copy/Save
+contracts. Seed the historical shape before initial attachment of the guards,
+with application and Data API access closed until contract verification passes.
+Use isolated ports, volumes and keys. The older checked-in baseline, current
+fixed-port configuration and existing reset/bootstrap runners are unsuitable.
+Record schema provenance separately from migration history and review how a
+future migration would verify its predecessor on this target. Keep this option
+on hold until its inputs and lifecycle are reviewed. See the
+[baseline note](../../../supabase/migrations/README.md) and the
+[PostgreSQL restore stages](https://www.postgresql.org/docs/current/app-pgrestore.html).
+
+Any eventual positive rehearsal needs real local Auth and API evidence. With
+the same staff session, compare owned, assigned, shared-sector and outside-scope
+synthetic BOQs before and after confirmation. Verify persisted profile fields,
+one confirmation outcome per admitted request, replay and conflict behavior,
+direct-write denials and the existing pending approval path. The full acceptance
+matrix remains in [section 15.5](#155-positive-fixture-gate-and-required-acceptance).
+No local or Production operation, fixture creation or migration replay 027–032
+is covered by this planning checkpoint.
+
+## 19. UM-B fixture inventory and schema capture proposal — 2026-11-06
+
+### 19.1 Inventory review
+
+**No reusable inventory could be verified from source and dated receipts.**
+The seven original local personas are protected. Earlier parity fixtures
+covered authorization cases but the receipt does not identify a disposable
+staff profile that can be consumed by UM-B. The old seed and P-49 smoke sources
+describe setup and test personas. Neither supplies current custody evidence
+for a reusable target. All finalized UM-A1 and S0 runs stay closed. See the
+[parity receipt](../../06_engineering/LOCAL_DATABASE_PARITY_RESULT.md) and
+[UM-A1 release evidence limits](../../07_process/UM_A1_SOLO_RELEASE_PLAN_20261102.md#4-evidence-and-remaining-gates).
+
+The section 18 inventory gate therefore stops before querying account rows.
+The November 2 result remains zero active matches on that snapshot. The
+inactive or suspended group remains `NOT RUN`. The next proposal evaluates
+the isolated synthetic route and does not change the UM-B eligibility rules.
+
+### 19.2 Proposed scope for one catalog capture
+
+The historical parity baseline predates 031 and 032. The later R5 receipt
+records a post-032 metadata digest, but the producer kept the current raw
+definitions in memory. A digest verifies a known payload and cannot supply the
+definitions to build a new target. Obtain one fresh schema-only package from
+the existing local database to determine whether an isolated rehearsal is
+feasible. See the [R5 local result](../../06_engineering/S0_BOQ_WRITER_BOUNDARY_LOCAL_RESULT.md#r5-desktop-flow-and-cleanup--2026-11-04)
+and [metadata producer notes](../security/05-s0-boq-writer-boundary-plan.md#97-fresh-preflight-producer-preparation--2026-11-04).
+
+1. Confirm the existing `conduit-boq-local` project, local Docker Unix socket,
+   `supabase_db_conduit-boq-local` container and named volume, database
+   `postgres` and expected loopback bindings. Use only narrowly formatted
+   identity checks. Stop on a different target, network binding, unknown
+   identity or missing container. Avoid full Docker or environment dumps.
+2. Prepare a new private copy of the existing `supabase/local/parity-capture.sql`
+   catalog projection (current SHA-256
+   `198ec2316f1f17e505b71ad32de24c1ce4bb16d315c21faa4eb81a0c4f148577`).
+   Preserve the projection. Add fixed statement and lock timeouts and
+   same-result database, session role, read-only and isolation checks.
+   Record the exact derived query hash before dispatch. Run once with
+   `psql -X` and `ON_ERROR_STOP` in a repeatable-read read-only transaction
+   ending in `ROLLBACK`.
+3. Read only PostgreSQL catalogs for app-owned `public` and `private`
+   definitions, constraints, triggers, RLS, grants, roles, default privileges,
+   extensions and the app-owned trigger attachments on Auth tables. The capture
+   excludes table rows, accounts, BOQ/Catalog/Factor values, credentials and
+   migration history. It calls PostgreSQL catalog functions only. No Auth or
+   application endpoints belong to this scope.
+4. Offline, compare the complete capture to the reviewed parity baseline and
+   the known successors. Require the Copy 031 definition, the nine exact 032
+   restrictions and all 24 target policies. Compare owners, grants, function
+   definitions, trigger attachments and constraints. Document any reviewed
+   platform differences. Treat unknown drift, unsupported dependencies or
+   sensitive material in a definition as `HOLD` before generating a baseline.
+   The portable digest excluding the nine guards alone is insufficient.
+5. Keep the raw result in a new restricted local evidence directory. Record
+   the exact query and result SHA-256, a stable comparison hash, target/session
+   checks, object counts and unexplained differences in the manifest. Report
+   a redacted summary in the checkpoint. A successful capture qualifies the
+   definitions for review. The isolated environment, synthetic accounts and
+   real Auth/API tests each remain `NOT RUN` after this step.
+
+**Decision for the Owner.** Review one catalog-only capture on the existing
+local target. Setup or cleanup of an isolated stack, fixture writes, SQL for
+the UM-B feature, any application migration and Production work remain separate
+decisions. Migrations 027–032 are immutable. The capture and all later fixture
+options must avoid replaying them.
+
+### 19.3 Preflight and offline result — 2026-11-06
+
+Owner continued with the catalog-only proposal. The Docker identity check
+matched the recorded running local database container and named data volume.
+It also found the API host port `55321` and PostgreSQL host port `55322`
+published on `0.0.0.0` and `::`. The documented API URL `127.0.0.1:55321` is
+the local client destination. It does not establish the host bind address.
+The historical S0 source used Docker's local Unix socket and PostgreSQL's Unix
+socket inside the container. Historical port bindings were not established by
+this inspection. External reachability was not tested. See the
+[S0 runner transport](../../../scripts/test-s0-boq-writer-boundary-local.mjs#L151)
+and [Docker port publishing](https://docs.docker.com/engine/network/port-publishing/).
+
+The published bindings fail the loopback condition in section 19.2. Status
+is `HOLD` before SQL dispatch. The exact alternative under review is to retain
+the existing bindings and allow one query through the two local Unix sockets
+only, with the target IDs, port mapping and same-result Unix socket evidence
+checked. Until that change in scope is agreed, the capture stays `NOT RUN`.
+An offline capture packet is prepared under
+`/private/tmp/um-b-schema-review-20261106-Asq9NfK9`. Five simulated runner
+cases passed for successful capture, binding drift, missing read-only proof,
+query hash mismatch and refusal to dispatch a second attempt.
+
+Offline, the frozen snapshot plus the exact Copy 031 text replacement and
+nine 032 policies produced the expected 30 relations, 96 routines, 27 app
+triggers and 24 policies across the three BOQ tables. The Copy definition
+matched `508f70695e5f5578734570d356c5a0921cab0e0dc0a207e8ffcc9aca313b68b2`.
+The materializer accepted this shape in memory. The comparison rejected both
+a missing guard and a modified role literal. This is an expected model for
+comparison. Live parity and fixture feasibility remain unverified.
+
+### 19.4 Approved Unix socket catalog result — 2026-11-06
+
+The Owner explicitly approved one catalog-only read through the existing local
+Unix sockets despite the known Docker port publications in section 19.3.
+The runner rechecked the exact local container, volume and mappings before
+dispatch. One query completed at 01:41:15 Bangkok in a repeatable-read,
+read-only `postgres` session. The returned transport check confirmed a
+PostgreSQL Unix socket. The pinned script reached `ROLLBACK` and exited zero.
+The one-shot approval is consumed.
+
+The capture contains two app schemas, 30 relations, 96 routines and 27 app
+triggers. The offline semantic comparison passed against the frozen baseline
+plus exact Copy 031 and the nine 032 policies. The three BOQ tables each have
+eight policies. Ordered routine configuration matched. The only accepted
+differences were the three previously recorded platform mappings for
+extensions, role memberships and role inventory. No unexplained difference or
+unsupported object was reported in this projection. An independent file-only
+comparator also passed, with 16 offline self-tests and identical expected and
+captured normalized SHA-256 `218521b65fc599ac7d1acd8a241dda71dac0c0cbdad1a5d6d323b3abca563795`.
+The result qualifies the
+captured app metadata as input to review. Building the isolated target and
+running Auth/API acceptance remain `NOT RUN`.
+
+Private evidence is under `/private/tmp/um-b-schema-review-20261106-Asq9NfK9`
+and `/private/tmp/um-b-review-delivery-20261106-KpS9YR29`. The pinned query SHA-256
+is `c11beb574ddcc8f9833ef9b6e6eaa2652f899ee0e4de9db79c03c73dafd318b5`. The raw
+capture SHA-256 is `a47a085689739a91d3b854e1573510a32d4ba42383b6c056ef195c5f04c65b47`.
+Only catalog definitions and privileges were read. No application table rows,
+account or BOQ data, credentials or migration ledger rows were read. The
+published-port configuration was left in place and external reachability
+was not tested.
+
+## 20. UM-B researched delivery plan — 2026-11-06
+
+### 20.1 International patterns and decisions for this application
+
+| Reference pattern | Decision for UM-B |
+|---|---|
+| Microsoft Entra separates request review from access delivery. Okta shows request details, activity and a decision field before approval. [Entra review](https://learn.microsoft.com/en-us/entra/id-governance/entitlement-management-request-approve) · [Entra delivery](https://learn.microsoft.com/en-us/entra/id-governance/entitlement-management-process) · [Okta review](https://help.okta.com/en-us/content/topics/identity-governance/access-requests/manage-tasks.htm) | Use one review in the existing A1 details Sheet. Show actual and requested affiliation, the possible addition of shared-sector BOQ visibility and a required reason. Show a successful confirmation after a bound `APPLIED` response or confirmed outcome lookup. Keep canonical reread separate. A queue, multiple approval stages and identity-provider integration are outside this candidate. |
+| NIST ABAC evaluates subject, object and action attributes. OWASP calls for server authorization on each request and verifying the transaction data that the user reviewed. [NIST SP 800-162](https://csrc.nist.gov/pubs/sp/800/162/upd2/final) · [OWASP authorization](https://cheatsheetseries.owasp.org/cheatsheets/Authorization_Cheat_Sheet.html) · [OWASP transaction authorization](https://cheatsheetseries.owasp.org/cheatsheets/Transaction_Authorization_Cheat_Sheet.html) | Keep current active Admin as the proposed certifier. Recheck the live actor, target, requested hierarchy and the exact reviewed state under the existing lock-order rules. Use the confirmed sector with existing BOQ policies. Never infer scope from the displayed request or a role claim alone. |
+| AWS uses caller-supplied IDs bound to intent and records the ID with the mutation in one transaction. NIST addresses attributable audit records and protection against alteration. [AWS Builders' Library](https://aws.amazon.com/builders-library/making-retries-safe-with-idempotent-APIs/) · [NIST SP 800-53 Rev. 5, AU-3/AU-9](https://csrc.nist.gov/pubs/sp/800/53/r5/upd1/final) | Use the private outcome store and typed envelope in section 16. Replay only the same intent and UUID with current Admin authority. Store admitted business denials separately from transport uncertainty. Keep the outcome and exact profile delta atomic and expose history through bounded Admin reads. |
+| OWASP organizes authorization tests by role, operation and data. Supabase distinguishes database-level policy tests from application-level tests using the real client. [OWASP authorization testing](https://cheatsheetseries.owasp.org/cheatsheets/Authorization_Testing_Automation_Cheat_Sheet.html) · [Supabase testing overview](https://supabase.com/docs/guides/local-development/testing/overview) | Use both SQL-level invariants and real Auth/API acceptance with synthetic rows. Check the same staff session before and after confirmation and read back committed state. Base acceptance on observed permissions, including denials and out-of-scope data. |
+
+An offline bulk backfill would assign access without a verified per-account
+decision. A manual database correction would bypass the reviewed workflow and
+normal reconciliation. Use one explicit Admin confirmation on an eligible
+account. A broader identity-governance workflow can be reconsidered when there
+is a defined request for delegation, periodic recertification or transfers.
+
+### 20.2 Work sequence and checkpoints
+
+| Stage | Work and completion evidence |
+|---|---|
+| 0. Qualify schema source | Complete for the scoped local catalog projection. The approved Unix socket read and offline comparison are recorded in section 19.4. |
+| 1. Prove the isolated fixture | **PASS for the baseline on November 14.** See [section 20.17](#2017-l1-isolated-api-baseline-pass--2026-11-14) for the retained disposable target, actual harness isolation, post-031/032 catalog/ACL, eligible L1 profile and exact pre-confirmation BOQ read. |
+| 2. Review the implementation | Owner confirms current active Admin as certifier and the possible additional shared-sector visibility. Review exact source, tests and one new forward migration, capability handshake with A1, stored outcome shape and rollback boundaries. Review the Thai copy and desktop/mobile flow in section 20.3 with synthetic data. Preserve ordinary approval and other existing account actions. Keep 027–032 immutable. |
+| 3. Build and qualify locally | Verify the permitted profile delta and one atomic outcome. Cover non-Admin and self denial, stale reviewed data, invalid hierarchy, changed status and two Admins racing. Cover same UUID replay, different payload, audit write failure, lost response and read-back. Check owned and assigned BOQ reads, newly eligible shared-sector reads, denied cross-scope access, direct-write denial and normal pending approval. Run focused unit and API tests, real Auth/browser checks, lint, TypeScript and build. Capture the UI acceptance evidence in section 20.3. Retain cleanup and zero unknown intents as explicit evidence. |
+| 4. Review and release | Propose a Solo release only after local acceptance. Database-first is a candidate only if compatibility with the existing A1 client and the database-only intermediate state are demonstrated. Review and authorize Production preflight, a single new migration application with exact ledger and policy postflight, then exact source publication with CI, Vercel and anonymous smoke. Keep an action-disabled client rollback and preserve audit. A database or unresolved request issue uses separately reviewed forward recovery. |
+| 5. Decide on live use and move to A2 | A real legacy confirmation is a separate deliberate Admin action for the reviewed account. Record the reason and compare the committed outcome and scope. After UM-B closeout, refine A2 as a separate signup, verification and pending-flow release. SMTP delivery and expired-link tests belong to A2. Hosting and SSO remain parked per Owner direction. |
+
+For a pause between stages, retain the commit, input hashes, verified target,
+exact approved scope, evidence path and the next decision. Record `PASS`,
+`HOLD`, `UNKNOWN` and `NOT RUN` separately. A transport `UNKNOWN` after a write
+stops new writes for that intent until exact reconciliation. Published client
+rollback does not undo a stored affiliation or remove its audit history.
+
+### 20.3 UI/UX review and acceptance
+
+Use the existing UM-A1 directory and details Sheet. The new action opens a
+review mode in that Sheet with the same typography, spacing, buttons and NT
+accents as the current Admin and Master Catalog surfaces. The directory keeps
+its existing table/card behavior. Use synthetic examples for the design and
+rendered review. See the [current details Sheet](../../../app/admin/_components/AdminUserDetailsSheet.tsx#L23)
+and [NT design plan](./11-nt-brand-system-and-sitewide-ui-rollout-plan.md).
+
+The review shows the account name, its current status and role, then **สังกัดจริง**
+and **สังกัดที่ยื่นขอ**. In an eligible case, the actual affiliation reads
+**ยังไม่ได้กำหนด**. Show the exact organization, department and sector that
+will be assigned. Put the scope message next to the required **เหตุผลที่ยืนยัน**
+field. Match the trimmed 1,000-character limit in section 16.1 and show any
+input error next to the field. Suggested copy is **บัญชีนี้อาจเห็น BOQ ที่แชร์ในส่วนงานนี้เพิ่มขึ้น**.
+Use **กลับไปดูรายละเอียด** and **ยืนยันสังกัด** as distinct actions. The final
+button becomes available after the current data is verified and a reason is
+entered. A known ineligible account stays in details mode. When current data
+or the new server capability is unavailable, show why confirmation is blocked
+and offer a read retry where it can resolve the issue.
+
+| State | What the Admin sees and can do |
+|---|---|
+| Sending | **กำลังยืนยันสังกัด…** with the target still visible. Prevent a duplicate submission and preserve the command when the Sheet closes. |
+| Applied | **ยืนยันสังกัดแล้ว** after a bound committed outcome. Refresh actual affiliation from the server. If that read fails, show **ยืนยันสังกัดแล้ว แต่ยังโหลดข้อมูลล่าสุดไม่ได้** with a read retry. |
+| Stale or denied | Explain the specific reason in Thai. For a changed profile or hierarchy, offer **โหลดข้อมูลล่าสุด** and require a fresh review. Keep the old command's result distinct from any later intent. |
+| Unknown after dispatch | **ยังตรวจผลการยืนยันไม่ได้** stays visible for this account when the Sheet is reopened. **ตรวจผลคำสั่ง** performs a read using the original request ID. Any permitted resend of that exact intent is a separate deliberate action. |
+
+Define how the unresolved intent survives reload and stays bound to its
+original Admin before approving implementation. The current A1 in-memory
+ledger clears on disposal or actor change. For UM-B, a fresh profile read
+alone must never unlock a new confirmation for a target with an unresolved
+intent. Acceptance covers closing and reopening the Sheet, reloading and
+switching Admin without showing another Admin's unresolved request. See the
+[A1 command lifecycle](../../../lib/admin/users/directory.ts#L301).
+
+Before implementation, review the flow and copy at desktop and mobile sizes.
+For local acceptance, capture the existing A1 view and the rendered review
+at 1440 and 390 CSS pixels and verify reflow at 320 CSS pixels. Test long Thai
+hierarchy names, readable status text without relying on color and actions that
+stay reachable with the mobile keyboard open. Match the existing 44 CSS pixel
+touch controls. With keyboard only, focus the review heading first, keep Tab
+navigation inside the open Sheet and restore focus to the invoking control or
+a logical fallback on close. Enter in the reason field adds a line. Closing
+before submit leaves the account untouched. Verify that a screen reader announces
+progress and outcome messages without moving focus away from the task. Check
+the normal, changed-data, unknown and applied-with-refresh-failure states in
+the browser. See [W3C dialog guidance](https://www.w3.org/WAI/ARIA/apg/patterns/dialog-modal/),
+[WCAG status messages](https://www.w3.org/WAI/WCAG22/Understanding/status-messages.html)
+and [WCAG reflow](https://www.w3.org/WAI/WCAG22/Understanding/reflow.html).
+
+The separate UM-A2 draft at this checkpoint covered signup, verification,
+resend and pending screens. The [current UM-A2 review](#23-um-a2-implementation-review)
+records the narrower scope and its acceptance checks.
+
+### 20.4 Private review packet — 2026-11-06
+
+The Owner approved the one-shot catalog read and private preparations. The
+first design draft approximated the directory and one details Sheet, with synthetic
+records and local-only state. The three scenario controls show ready to confirm,
+changed data and an unknown outcome. The ready scenario also demonstrates a
+simulated success. The unknown scenario's check is a read-only simulation.
+
+Chrome with its normal sandbox passed 11 checks on the standalone HTML at
+1440×900, 390×844 and 320×740. The desktop and mobile flow checks include the
+required reason, stale refresh and review, and unknown outcome on Sheet reopen.
+Desktop keyboard focus returned to the initiating control. The page loaded
+only the local file and the runner recorded no page errors or warnings. This
+was mock UI verification. The mock falls back to a local Thai font when IBM
+Plex Sans Thai is unavailable. A live screen-reader run, a physical mobile
+keyboard and actual app and Auth acceptance are still `NOT RUN`.
+
+Review `final-design/index.html` and `final-design/verification.json` in the
+private delivery directory named in section 19.4. The desktop and mobile
+captures are in the same directory. The `isolated-test-plan.md` proposal
+defines target separation, phased scope, synthetic data and session ceilings,
+acceptance and teardown. Review the setup packet with concrete target, image,
+port and fixture pins before authorizing a new stack. The certifier and the
+shared-sector BOQ visibility consequence still need the Owner's decision before
+implementation. The design draft and successful catalog read do not authorize
+stack setup, migration or product changes.
+
+### 20.5 Master Catalog visual alignment — 2026-11-06
+
+The Owner identified Master Catalog as the visual reference for the current
+application. The first mock reproduced the directory by hand and introduced
+a dark scenario bar, a compressed Master Catalog card and different account
+status styling. It also used the machine's Thai font fallback. Keep the first
+mock as dated evidence and review the source-based revision for appearance.
+
+The revision renders the checked-in A1 directory and account detail content
+with the shared Sheet, Card, Button, Badge and Alert components. The preview
+copies the Master Catalog entry from the A1 source and uses the exact CSS and
+local IBM Plex Sans Thai assets from the qualified A1 build. The desktop table,
+mobile cards, NT header rule and action styling follow the existing components.
+The UM-B work is limited to the new action and its review and outcome views in
+the same Sheet. Test scenarios open as separate private files.
+
+Review `index.html`, `review.html`, `stale.html` and `unknown.html` in
+`/private/tmp/um-b-design-fidelity-20261106-VgcXog9E`. The asset and source
+manifests in that directory record the build provenance. The
+`qa-run-qkb7AZ/verification.json` receipt and eight screenshots record
+desktop 1280×900 and mobile 390×844 with no horizontal overflow, three
+loaded Thai font faces per view and no disallowed page requests. On desktop,
+mouse click and Enter opened the existing details Sheet, Tab stayed inside,
+and Escape restored focus. The simulated confirmation required a reason and
+showed the confirmed state. Earlier harness attempts remain in separate
+receipts. Physical mobile input, a screen reader and the actual app and Auth
+acceptance remain `NOT RUN`. This work changed only the private draft and
+this plan.
+
+### 20.6 First-round readiness and isolated Docker review — 2026-11-06
+
+**Ready for Owner scope review and offline setup preparation. Implementation
+and runtime acceptance are on hold.** The [catalog comparison](#194-approved-unix-socket-catalog-result--2026-11-06)
+passed for the scoped app metadata after 031/032, and the revised design
+passed standalone mock checks. A deployable schema-only baseline, new Docker
+target, faithful legacy fixture and real Auth/API/browser acceptance remain
+`NOT RUN`. The earlier one-shot catalog permission was consumed. Review uses
+its saved metadata and the current source at `a588bfe`.
+
+**Owner decision now.** Confirm the existing active Admin as certifier for
+an active staff account whose actual organization, department and sector are
+all unset, with a valid requested hierarchy that the Admin has verified.
+Accept that confirmed affiliation can add shared-sector BOQ visibility under
+the existing rules. Use the revised Master Catalog-style review with one
+required reason. The [first candidate](#152-narrow-first-candidate-and-impact)
+covers this exact request. Admin assignment to a different affiliation,
+resubmission by an active user, transfers, UM-A2 and SSO have separate scopes.
+
+| Order | Proposed work and gate |
+|---|---|
+| 1. Review setup files offline | Prepare an isolated setup manifest from the saved catalog proof. Pin the new project/run, Docker Engine/context and image digests, container/network/volume identities, loopback-only app/API ports, internal DB access, fresh keys and test origins. Include dependency order, provisioner, baseline/seed/checker hashes, stop and teardown rules. Verify ingress and restrict egress from app, browser and services. Keep the existing Docker target outside the allowlist. The old bootstrap and parity CLI are outside this route. Exact setup inputs remain open. See [Docker port publishing](https://docs.docker.com/engine/network/port-publishing/#publishing-ports). |
+| 2. Qualify the isolated predecessor and fixture | After setup approval, initialize only the new resources. Provision genuine synthetic Auth identities through the reviewed internal bootstrap path and seed the legacy profile shape before initial app guard attachment, with app and normal Data API access closed. Verify the complete relevant guard/hook, constraint, grant/RLS and Save/Copy contract before opening the test routes. Compare actual post-init definitions, including Copy 031 and nine exact 032 guards. Prove that an eligible synthetic account can sign in and that its persisted profile has all actual IDs NULL and a coherent valid request. Record schema provenance separately from migration history. Preserve 027–032 and all existing stacks and records. |
+| 3. Review the exact implementation | Once the isolated fixture is proven, review a small allowlist covering the existing Admin details Sheet, the new command adapter, focused tests and one forward migration. Close the reviewed snapshot and normalization rules, relevant reference writers and lock/timeouts, capability detection, versioned outcome decoding and same-actor unresolved-intent recovery across reload. The [transaction and outcome contract](#16-legacy-confirmation-audit-and-replay-contract) governs the one permitted profile delta and atomic private audit. Select exact paths, predecessor/successor assertions and hashes before any migration is applied. |
+| 4. Apply once and qualify on the isolated target | After approval of the candidate and exact target, verify predecessor again, apply only the new migration once and verify the expected schema delta. Run the acceptance below against the same target. Setup and implementation grants are separate. |
+
+The private Docker proposal at
+`/private/tmp/um-b-review-delivery-20261106-KpS9YR29/isolated-test-plan.md`
+sets review ceilings of 13 synthetic identities, 12 cumulative sessions and
+5 BOQs / 5 routes / 5 items, with at most 24 terminal outcomes including at
+most three `APPLIED`. Pin exact cases and expected writes in the execution
+manifest. Provisioning and failure injection are limited to the disposable
+environment and use reviewed mechanisms that preserve the product guards.
+
+Local acceptance must show the same synthetic staff session before and after
+confirmation. Owned/assigned reads remain, eligible shared-sector reads appear
+and outside-scope reads remain denied. Read back that only the three actual
+affiliation IDs and `updated_at` changed, with one committed audit outcome.
+Check stale review, unauthorized actor, invalid hierarchy, direct writes,
+concurrent Admins, replay/payload mismatch and atomic rollback. Exercise
+ordinary pending approval and the S0 BOQ write boundary. Check real Auth/Data
+API/browser, Node 24 tests, lint, TypeScript, default Turbopack build, and the
+existing Sheet's desktop/mobile and keyboard behavior.
+
+If target identity, parity, fixture or expected writes fail, stop and retain
+evidence. If a dispatched write is `UNKNOWN`, stop writes, retain its exact
+intent and reconcile by outcome read before disposing of evidence. On a settled
+run, close its sessions, verify zero residue and remove only its approved
+disposable resources. Record results and limits in the resume checkpoint.
+This review authorizes no setup, app or database change, Production access,
+migration replay or publication.
+
+### 20.7 Owner scope and offline Docker review packet — 2026-11-08
+
+The Owner approved first-round UM-B scope and offline preparation only. A
+current active Admin may certify the valid existing request for an active staff
+account whose three actual affiliation IDs are unset. The review includes the
+possible gain in shared-sector BOQ visibility and one required reason. Setup,
+app implementation, database work and publication are separate approvals.
+
+The private packet is at `/private/tmp/um-b-offline-docker-20261108-OB1M7wm3`.
+Start with `REVIEW.md`. The setup and fixture review manifests identify the
+proposed new project, services, resources, loopback ports and synthetic-only
+caps. The two app-schema SQL review files were rendered deterministically
+from the pinned section 19.4 capture. The independent file-only verifier
+passed 36 checks on inputs, exact definitions, the fixture model and setup
+limits, including all 24 BOQ policies and the nine 032 writer guards. The
+`SHA256SUMS` file is pinned at
+`1a5661dccf9099a3e3dc98ab5b86b80ba568b56cee7442263abb4a480c942c01`.
+The fixture model expects the same staff session to read two of five BOQs
+before confirmation and three after it. Real Auth and RLS behavior remain
+`NOT RUN`.
+
+Before setup, confirm Docker Engine/context, exact local image IDs and
+repository digests, architecture and port/resource availability. Review native
+Auth bootstrap and platform roles, exact service configuration, installation
+and synthetic provisioning files, independent parity verification and
+project-scoped cleanup. The scoped catalog covers app definitions. Its
+offline rendering does not qualify native Auth, a runnable Compose setup or
+post-initialization parity. Submit the exact setup packet for approval before
+creating any resources. Keep the source capture and 027–032 immutable.
+
+### 20.8 Local Docker metadata and configuration review — 2026-11-08
+
+The Owner authorized a read-only local Docker check and a configuration review
+packet. At 12:04:24 Bangkok, the Unix socket for `desktop-linux` identified
+Docker Desktop Engine 29.8.0 on Linux arm64. Compose reported 5.5.1. Four
+existing image tags and their registry digest references resolved to the same
+local image IDs. The host TCP and Docker publication inventories showed ports
+3041 and 55481 free, with no matching resource names or project labels.
+Availability is a point-in-time result. Recheck it before any future setup.
+
+The packet at `/private/tmp/um-b-docker-final-20261108-OupvGnKa` starts with
+`REVIEW.md`. It includes exact digest-pinned Compose and Kong configuration,
+native password and synthetic domain review SQL, host metadata and a review
+lock that binds the previous schema and fixture artifacts. Compose schema
+validation and 19 independent static checks passed. `SHA256SUMS` is pinned at
+`f361dff24be2d54cea12d6ddef7b00700b0f3f3a5528dc93dbff4dc67f4ef223`.
+Docker runtime, Auth/API and any SQL execution remain `NOT RUN`.
+
+Setup remains on hold before resource creation. The next execution proposal
+needs explicit ingress and egress enforcement and proof, verified native
+bootstrap and role privileges, exact synthetic provisioning and cleanup
+inputs, and fresh approval for the disposable target. Disabling masquerade in
+the reviewed ingress bridge is not egress proof. Keep browser and offline
+font/build qualification separate from the initial API-only fixture check.
+The review did not pull images, create resources, connect to either database,
+alter app source, replay 027–032 or publish anything.
+
+### 20.9 Isolation and native Auth bootstrap review — 2026-11-08
+
+The Owner requested an offline egress and fixture bootstrap packet for review.
+The API-only candidate uses one IPv4 internal bridge in isolated mode and no
+published ports. It keeps the same four locally verified digests and uses
+the Docker Desktop Unix socket for a bounded stdio request to the verified
+Auth container. The exact transport sends native Auth Admin requests only
+to container loopback and later ordinary API requests only to the internal
+Gateway. The prior ingress bridge is absent. Web and browser proof have a
+separate outbound allowlist gate.
+
+The private packet is at `/private/tmp/um-b-isolation-bootstrap-20261108-bZcDzqJa`.
+Start with `REVIEW.md`. It includes Compose, the bounded transport and network
+checks, native preflight and readback SQL, a synthetic seed renderer and an
+order-sensitive parity comparator. The seed sample contains fabricated Auth
+UUIDs. The proposed setup binds only Auth-returned UUIDs for 12 synthetic
+identities, loads five isolated BOQ graphs, attaches the captured app guards
+once and verifies the predecessor after 031/032. The first API proof permits
+one L1 password session and requires an exact local logout and zero remaining
+sessions and refresh tokens. Pending signup and UM-B confirmation belong to
+later tests. `SHA256SUMS` is pinned at
+`7b9f1b2f13757c59a4b7ecc3f56eebe1fa4f2c0d6fd7202e5d7bb50f4860f2ed`.
+
+Compose validation and 15 offline tests passed. The candidate requires fresh
+target and image checks, actual network/namespace and stdio proof, native role
+privileges, exact catalog parity, persisted fixture readback and explicit
+approval before setup. Runtime, Auth/API, SQL and cleanup remain `NOT RUN`.
+This work wrote only private review files and this plan. The exact request,
+actor and effects must be reconciled on UNKNOWN before further writes or
+cleanup. Keep 027–032 and the existing local and Production targets out of
+the setup scope.
+
+### 20.10 API-only bootstrap held at egress — 2026-11-08
+
+The Owner authorized this API-only run on the new disposable project. Fresh
+Docker context, local image/digest, source and resource preflight passed. The
+native DB started on the new volume. An initial runner check incorrectly
+required the process name to be `postgres`. The same isolated DB was
+restarted after a settled stop. Its fresh PID 1 log and Unix-socket readiness
+both passed, and the original probe showed the packaged `.postgres-wrapp`
+name. A continuation-script import error occurred before dispatch and was
+corrected without touching Docker.
+
+The exact DB/Auth target reached the reserved-address canary after network
+membership, zero published ports and namespace route checks. The canary
+failed to report the required `ENETUNREACH`. A same-target, no-provision
+diagnostic reproduced exit 1 with empty stdout and stderr, so the result
+remains `HOLD`. The run dispatched zero app SQL, native Auth requests,
+account creations or L1 logins. L1 logout had no session to close. Native
+permission, app catalog parity and real fixture/API acceptance remain
+`NOT RUN`. There is no unresolved Auth or SQL write.
+
+The private evidence is at `/private/tmp/um-b-api-bootstrap-20261108-7y7gma8s`.
+`closeout.json` SHA-256 is
+`21f8926483bedd7e239b750db8cd375267f31997c2f55c7b70eca2376c21749c`.
+Postflight verified both exact DB/Auth containers stopped cleanly, no REST
+or Gateway container, no published ports and zero active network members.
+The isolated native volume is retained. Existing local and Production
+targets, app source and 027–032 were outside all runtime actions.
+
+Before resuming, review a replacement read-only canary that reports a
+kernel route result. The proposed `/bin/busybox ip route get 192.0.2.1`
+requires explicit `Network unreachable` from the same verified Auth
+namespace, after repeating identity, route and port guards. BusyBox's route
+lookup uses a kernel route request, so this proposal sends no IP packet to
+the reserved address. Require a positive lookup to the exact internal peer
+as well. Missing applet, timeout, ambiguous output or any usable route
+keeps HOLD. Retain the original nc evidence and obtain approval for the
+replacement check before provisioning. [BusyBox route lookup](https://github.com/mirror/busybox/blob/master/networking/libiproute/iproute.c#L912)
+
+### 20.11 Route lookup passed, native extension hold — 2026-11-08
+
+The Owner approved the replacement route lookup and conditional API-only
+continuation on the exact retained isolated DB/Auth containers. Fresh local
+context, image digests, source, resource identity and mounts passed. The
+Auth namespace's positive kernel lookup selected the verified DB peer on
+the connected interface. The approved reserved lookup returned exit 2 and
+`ip: RTNETLINK answers: Network unreachable`. Namespace routes, peer DNS,
+zero published ports and native DB readiness passed. GoTrue 2.190.0 passed
+the internal health check.
+
+The read-only native database preflight then held because the disposable
+database did not have `pg_net` 0.20.3 installed in `extensions`, as required
+by the post-032 reference. The other native preflight assertions matched the
+reference in an offline comparison of the observed result. Available
+extension versions and preload configuration have not been checked. Auth
+counts were zero for users, identities, sessions and refresh tokens. App
+SQL, 12-account provisioning and the L1 proof were not dispatched. There
+are no unknown writes. Both isolated containers stopped cleanly, the
+network has zero active members and the disposable volume is retained.
+
+Evidence is at `/private/tmp/um-b-api-route-resume-20261108-T4Q38ICD`.
+`closeout.json` SHA-256 is
+`cf8a6d4a3c430b98402672a08d9d304520e29f63f16ea573fb2a335c16ef6482`.
+The proposed next scope is one read-only isolated check using
+`pg-net-availability.review.sql` after approval. Verify whether the pinned
+image supplies the exact version and preload requirements before proposing
+any isolated change. No extension installation, fallback version, preload
+change or relaxation of parity follows from this stopped run. Keep the
+existing local and Production targets, app source and 027–032 out of scope.
+See [available extension metadata](https://www.postgresql.org/docs/17/view-pg-available-extension-versions.html)
+and [pg_net setup](https://github.com/supabase/pg_net#installation).
+
+### 20.12 pg_net-only exception passed, app pre-data hold — 2026-11-08
+
+The Owner approved a read-only dependency audit and the exact missing
+`pg_net` exception for this disposable API-only continuation. The pinned
+audit covered 148 tracked source files, 96 captured routines, 27 triggers,
+30 relations and the bounded test path. It found no references or dynamic
+dispatch that depends on `pg_net` in this scope. Earlier parity evidence
+records the local-only extension. The isolated gate accepts only the missing
+reference entry `pg_net` 0.20.3 in `extensions`, owned by `supabase_admin`.
+The raw comparator and its observed data stay intact. Six offline tests
+passed, including rejection of another extension difference, ACL drift,
+Copy 031, S0 032 and routine configuration order changes.
+
+An initial private runner transcribed a truncated network ID and held before
+dispatch. A read-only check matched the full ID. The replacement reads that
+ID from the pinned receipt and verified the exact retained resources. Fresh
+egress, native Auth health and native preflight passed, with only the
+approved `pg_net` exception. The first app pre-data transaction then failed
+on missing `supabase_functions_admin`. The renderer references that role
+at line 10 of the pre-data file as part of a broad default privilege revoke.
+The pinned DDL uses one transaction. `psql` exited 3 with ON_ERROR_STOP and
+the transaction rolled back. An independent catalog readback after rollback
+is `NOT RUN`. No synthetic Auth request or L1 login was dispatched.
+
+The captured app-owned definitions, ACLs and default privileges contain no
+reference to that role. It is a known platform-only role in the earlier
+local comparison. The native preflight checked selected roles and missed
+this broader renderer dependency. Review the full role/membership inventory
+on the same isolated volume before a new rendering decision. Do not assume
+that this was the only role gap. No other exception, role creation or grant
+change was approved. Keep 031/032 and the app ACL/RLS checks exact.
+
+Both containers stopped cleanly with no published ports and zero active
+network members. The isolated volume is retained and no unknown write
+remains. The private evidence is at
+`/private/tmp/um-b-api-pgnet-exception-20261108-TV8dsYxR/qualified-sX7OujjU`.
+`closeout.json` SHA-256 is
+`538088bbb696ecef7c6408d0b66017022552bf9a630a28632ef1d06808186284`.
+The unexecuted `role-inventory.review.sql` proposes a read-only check for
+role attributes, memberships and absence of app tables. Existing local and
+Production targets and migration files 027–032 remain outside scope.
+
+### 20.13 Isolated role inventory and renderer adjustment plan — 2026-11-08
+
+The Owner approved one read-only dispatch of the pinned role inventory SQL
+on the existing isolated DB. At 13:07:16 Bangkok, the exact DB Unix socket
+returned no `public.user_profiles` or `public.boq` table and zero Auth users,
+sessions or refresh tokens. These checks corroborate the recorded pre-data
+transaction rollback. A full post-rollback catalog read remains `NOT RUN`.
+Auth stayed stopped. The DB stopped cleanly afterward and the isolated
+network had zero active members. The isolated volume is retained.
+
+The app role and membership projection used the same seeds and closure as
+the pinned capture. It found 15 roles and 21 memberships, compared with
+17 and 23. The two absent roles are `supabase_functions_admin` and
+`supabase_realtime_admin`. The two absent edges are `postgres` membership
+in each role with grantor `supabase_admin`, ADMIN false, INHERIT true and
+SET true. There were no additional or changed rows in the projected roles
+or edges. Both roles are absent from the full observed inventory as well.
+The app-owned ACL, owners and RLS reference contains neither name. Earlier
+local parity records these as platform-only differences.
+
+The proposed change uses a new private renderer copy with an exact isolated
+inventory gate. After approval, remove only the two verified absent names
+from broad revoke recipient lists in both phases, retain PUBLIC and all
+actual required principals, and preserve every grant, grantor, option,
+owner, app definition and RLS/031/032 clause. Confirm the pre-existing
+schema and default ACLs on the target before any future apply. Fail on
+unexpected principals or membership changes. The catalog gate must retain
+the raw comparison and allow only explicitly approved platform differences.
+No renderer, role, membership or permission changed in this review.
+
+The private packet is at `/private/tmp/um-b-role-inventory-20261108-HEMLxvSd`.
+`renderer-adjustment-plan.md` SHA-256 is
+`f44be74ef79b5e9e36699ae7bce413e1060f99d05f9083c2a0c5b62eaa7a3932`.
+The one-read `closeout.json` SHA-256 is
+`d178af9eacd4909d6cbe45b17267615995a4e1bd5d2a601e2d7b964b139a5091`.
+The role query grant was consumed. A private renderer patch and later
+runtime execution each need separate scope. Preserve existing local and
+Production targets and migration files 027–032.
+
+### 20.14 Private isolated renderer offline result — 2026-11-08
+
+The Owner approved a private isolated renderer copy and offline checks only.
+The optional isolated path binds the pinned role evidence and omits only
+`supabase_functions_admin` and `supabase_realtime_admin` from the recipients
+of `REVOKE ALL PRIVILEGES`. Default output is byte-identical to the original.
+The repository renderer and all source inputs remain unchanged.
+
+The independent comparison verified exactly 24 pre-data and 474 post-data
+revoke lines changed. Every other byte matched, including GRANT and grantor
+semantics, owners, constraints, triggers, Copy 031 and nine S0 032 writer
+policies. Both SQL review outputs are deterministic. Seven Node 24 offline
+tests passed, including rejected exclusions of app roles, another absent
+role, present excluded role, additional membership and changed membership
+flags or grantor. The saved role projection was independently reproducible.
+
+The packet is at `/private/tmp/um-b-renderer-patch-20261108-gzSNZCai`.
+Start with `REVIEW.md`. `SHA256SUMS` SHA-256 is
+`9e63ae0d3e2ac74f0ce31b7b54ec7f988eb1098a2743b402cb53cb6127b8362d`.
+The next gate is a reviewed read-only check of current role/membership and
+pre-existing schema/default ACLs on the exact isolated volume. A later
+apply needs its own authorization and exact app catalog verification.
+SQL execution, role creation, permission or DB changes, Auth/API and
+Production access were outside this offline scope.
+
+### 20.15 Isolated ACL read-only query hold — 2026-11-08
+
+The Owner approved one read-only dispatch for role/membership, schema ACLs
+and default ACLs on the exact isolated DB. Target and volume checks passed.
+Auth stayed stopped. At 13:24:32 Bangkok the query ran through the isolated
+Unix socket in a repeatable-read read-only transaction and exited 3 with
+`ACL arrays must be one-dimensional`. The query passed an empty ACL array
+directly to `aclexplode`, including the branch for an absent schema. No
+catalog result was returned, so the fresh role and ACL gate remains HOLD.
+Both DB and Auth were verified stopped with zero active network members.
+No schema, default privileges or roles changed.
+
+The one-shot authorization is consumed. The failed source and receipt are
+preserved in `/private/tmp/um-b-schema-acl-preflight-20261108-dOnM2M3c`.
+`closeout.json` SHA-256 is
+`1d6756ef966418c604f22295c7e70582ee48b8153aeae7c03965a795854117db`.
+The corrected review file `acl-preflight-v2.review.sql` SHA-256 is
+`1e6d04c23dfd925c98e1f2c9caec05a71c33fb974ead217e19d61bd2ca4e4e62`.
+It normalizes empty arrays to NULL at the three `aclexplode` call sites,
+retaining the original read-only transaction and result scope. The
+correction was checked by file diff only and remains `NOT RUN`. A new
+approval is required for one replacement read. API-only execution planning
+remains gated on a valid ACL receipt. Pre/post-data, existing databases and
+Production remain outside the read scope.
+
+### 20.16 Isolated ACL v2 read passed, coverage HOLD — 2026-11-08
+
+The Owner approved one dispatch of the exact v2 file on the existing
+isolated Docker DB. The target check passed. At 13:29:45 Bangkok the query
+returned one catalog result through the Unix socket under repeatable-read,
+read-only transaction framing with `ROLLBACK`. The inventory matched all
+29 roles and 21 memberships. `public` schema coverage passed and `private`
+remains absent. The gate evaluated six explicit default ACL scopes and 15
+built-in global scopes.
+
+Overall pre-apply coverage is **HOLD**. Three explicit `supabase_admin`
+default ACLs in `public` fall outside the reviewed renderer's managed scopes:
+tables (`r`), sequences (`S`) and functions (`f`). Each grants defaults to
+`postgres`, `anon`, `authenticated` and `service_role` without grant options.
+This is a comparison of defaults for future objects created by that role.
+The read does not establish any drift in effective privileges on app objects.
+Resolve the exact scope against the reviewed schema capture before considering
+any change to the renderer or a later apply.
+
+The one-shot grant is consumed. DB and Auth were verified stopped with no
+active isolated network members. No further SQL was dispatched. API-only
+planning stays gated. No pre/post-data, Auth/fixtures, account or BOQ reads,
+migration replay, existing local DB access or Production access occurred.
+Private evidence is in `/private/tmp/um-b-schema-acl-v2-20261108-DEFzvVkX`.
+`closeout.json` SHA-256 is
+`bd99ccb77804a82448485bb60caebed8c54d136876e7db84840a03f4f75bcd4d`.
+`acl-comparison.json` SHA-256 is
+`d4bb3e89e5433a0239056d2e399934a82d1acdff70cff85801abcb93e38f5704`.
+
+### 20.17 L1 isolated API baseline PASS — 2026-11-14
+
+**PASS for the starting fixture and pre-confirmation visibility.** The later
+API-only continuation verified the final post-031/032 app catalog and ACLs,
+12 synthetic Auth identities, 11 profiles and five BOQ/route/item graphs.
+Its original summary held the HTTP 200 BOQ result without an exact row-set
+verdict. The focused L1 run settled that missing check on the same isolated
+project and retained volume, `conduit-boq-um-b-20261108-r1`.
+
+| Check | Verified result |
+|---|---|
+| Preflight | Exact isolated Docker target, platform ACL and app catalog, eligible L1 profile, synthetic fixture and zero prior sessions/tokens passed. L1 is active staff with all three actual affiliation IDs unset and a valid requested hierarchy. |
+| Auth and profile | Across both attempts, one native password update for synthetic L1 (`200`), one login (`200`) and one profile read (`200`). Account readback and the scoped profile comparison passed. |
+| BOQ Data API | One read (`200`) returned exactly B01 (owned) and B02 (assigned). B03 (same requested sector), B04 (other sector) and B05 (outside organization) were absent. The runner recorded the exact set verdict before cleanup. |
+| Cleanup | One exact local logout (`204`), followed by 0 sessions / 0 refresh tokens. All four services verified stopped, with zero active network members. PostgREST reported exit 255 during shutdown. The cause of that code was not established. |
+
+The first attempt stopped before opening Auth when Python 3.9 rejected a valid
+five-digit fractional timestamp. The private successor corrected timestamp
+parsing, verified the first attempt's DB-only start/stop and reran preflight.
+There was no additional Auth or business API dispatch. The L1 grant is consumed.
+The existing local database and Production were outside both attempts. No app
+change, SQL write, migration replay or publication took place. The isolated
+volume remains stopped and retained; its synthetic password update and normal
+Auth bookkeeping belong to this test run.
+
+Private evidence is in `/private/tmp/um-b-l1-r2-run-20261114`.
+`verified-summary.json` SHA-256 is
+`a1cc65d7e2c16555565bb450660224216d003deabc52b7808205fb38a928073e`.
+`result.json` SHA-256 is
+`36d725796ccbef5f2d5fa771820da70369ff1003ed28c32bfeb618dff175ca3a`.
+The first HOLD receipt is `/private/tmp/um-b-l1-approve-20261114-01/result.json`
+(SHA-256 `42b45da5cdc3c7588509caa0ed6a6cf79b4bb076d90c646656daac5e4c24a4c5`).
+The earlier [existing-local count](#174-approved-count-result--2026-11-02)
+and [ACL coverage HOLD](#2016-isolated-acl-v2-read-passed-coverage-hold--2026-11-08)
+remain dated evidence for their own stages.
+
+### 20.18 First-round implementation and test review — 2026-11-14
+
+**Ready to start the first local source candidate after Owner approval.** The
+isolated L1 baseline closes the fixture prerequisite. The new command, its
+forward migration, post-confirmation access, live UI and release acceptance
+remain `NOT RUN`. The [scope approved for planning](#207-owner-scope-and-offline-docker-review-packet--2026-11-08)
+still applies.
+
+#### Proposed source boundary
+
+1. A current active Admin confirms the valid existing request of a different
+   active staff account whose actual org/department/sector are all unset. The
+   account keeps its UUID, role, status, credentials, existing sessions and
+   original approval fields. The command sets only the three actual affiliation
+   IDs and `updated_at` on the profile. The Admin reviews the potential gain
+   in shared-sector BOQ visibility. BOQ records and write policies stay intact.
+2. Prepare one new forward migration under `migrations/` for the narrow profile
+   guard extension, one private append-only outcome store and the bounded
+   Admin review, confirmation, outcome and history functions in
+   [section 16](#16-legacy-confirmation-audit-and-replay-contract). Keep existing
+   RPCs and audit rows and preserve 027–032. Freeze the reviewed snapshot,
+   typed response, current authority checks, compatible reference locks and
+   bounded timeouts. Apply the profile change and its `APPLIED` outcome in one
+   transaction; enforce exact actor/request UUID and payload binding.
+3. Integrate with the [Admin page](../../../app/admin/page.tsx) and its
+   [existing details Sheet](../../../app/admin/_components/AdminUserDetailsSheet.tsx),
+   using a dedicated typed adapter under `lib/admin/users/` and focused tests.
+   Keep Master Catalog styling and use one required trimmed reason (maximum
+   1,000 characters). Show actual versus requested affiliation, the change in
+   visibility and the current status. Absence of the new capability disables
+   only confirmation. A bound `DENIED` response can be HTTP 200. Separate
+   applied, stale and unknown states. Freeze how the same Admin can recover an
+   unresolved intent after reload, which fields are retained and when they are
+   cleared. Use the original UUID to inspect the result; any exact resend needs
+   an explicit action. The [UI acceptance](#203-uiux-review-and-acceptance)
+   governs copy, responsive behavior and focus.
+
+The exact allowlist, filename, predecessor/successor assertions and test
+inputs are review outputs of the source candidate. This round leaves ordinary
+A1 approval paths in place. General affiliation assignment, correction to a
+different requested hierarchy, transfers, batch repair, role changes, A2, SSO,
+sitewide styling, package/lockfile changes and Production are outside scope.
+
+#### Proposed local qualification after candidate review
+
+| Order | Test and acceptance |
+|---|---|
+| 1. Verify isolated predecessor | Reuse the retained synthetic-only target if exact services, volume, isolation, post-031/032 metadata, L1 eligibility and zero sessions/tokens still match. Review the exact session budget, credential lifecycle, fault injection and browser ingress before runtime. Add no identities or rows by default. Review any additional fixture needed for a negative case before using it. |
+| 2. Apply the reviewed candidate once | After explicit approval for the target and exact file, apply only the new forward migration on isolated Docker. Check the expected DB delta and rollback on forced mid-command failure. Check that the existing A1 client still works against the migrated DB, and that the B client hides/disables its action against the predecessor. |
+| 3. Prove the positive case | Use the same L1 staff session to read exactly B01/B02 before confirmation and B01/B02/B03 after an active synthetic Admin confirms once. B04/B05 stay hidden. Verify the three profile IDs and timestamp, one committed `APPLIED` outcome, unchanged requested and old approval data, unchanged BOQ graphs and unchanged write scope. Refresh the L1 profile normally in the same session. |
+| 4. Prove denials and recovery | Use synthetic actors for unauthenticated, nonactive/non-Admin, self, wrong target and stale profile/hierarchy checks. Exercise two Admins racing, same UUID with same and different payloads, current authority loss, durable `DENIED`, direct profile write denial, malformed response, lost response and exact outcome read after reload. Verify that a failed audit write rolls back the profile change. Exercise existing pending approval and S0 staff/procurement write limits. Use source/predicate evidence for states that supported fixtures cannot represent. |
+| 5. Verify UI and quality | Check the real Admin Sheet at 1440/390 px and reflow at 320 px, Thai text and existing fonts, keyboard/focus, accessible status, confirmation, changed data, unknown and applied-but-refresh-failed screens. Run focused tests, lint, TypeScript and default Turbopack build on Node 24. |
+| 6. Close the test run | Retain exact receipts by case. Close only test sessions, verify 0 sessions / 0 refresh tokens and no unresolved intents in a settled run, then verify isolated services stopped. Stop on preflight drift. If a write result is `UNKNOWN`, stop further writes and reconcile the exact intent before continuing. Preserve the volume and evidence for review. |
+
+The Owner's next decision is whether to start this local source candidate.
+The candidate and its exact isolated runtime scope return for review before
+any application of the new migration or synthetic mutation. The present
+checkpoint changes the plan only. Release and any real-account confirmation
+remain later, separate decisions.
+
+### 20.19 Local first-round qualification — 2026-11-14
+
+The Owner authorized implementation and testing through completion on the
+retained isolated Docker project `conduit-boq-um-b-20261108-r1`, including
+one application of the new migration. The target, fixture and post-032
+preflight passed. `033_um_b_confirm_legacy_affiliation.sql` committed once
+through the isolated Unix socket. SHA-256
+`453c31e163d864bd8a04db276b50167d7f403e2edd0dd913a57cdd9f57c1bf4c`.
+Postflight verified the exact profile guard change, four public RPCs, three
+private helpers and the expected private outcome store. Applying the file
+changed no account or application fixture rows. Local socket application
+does not establish a hosted migration history entry.
+
+Using the same synthetic L1 staff session, the Data API returned B01/B02
+before confirmation and B01/B02/B03 after it. B04/B05 remained outside L1's
+read scope. The run recorded one committed `APPLIED` and two `DENIED`
+outcomes. Competing Admins produced one confirmation. Replaying the same
+UUID returned its stored result, a different payload with that UUID was
+rejected, and a different Admin could not retrieve the exact request outcome.
+Forced failure inserting the outcome rolled the profile change back. S0
+write-boundary checks and the existing pending onboarding/approval replay
+passed. BOQ, Catalog and Factor fixture fingerprints stayed equal. The old
+approval path added its expected two audit events to the synthetic pending
+fixture. The original seven test sessions were closed and both session/token
+counts returned to zero. All four services stopped.
+
+The original run is recorded as **API PASS / browser HOLD**. The real app
+blocked the test email at the existing domain gate. It recorded no browser
+business writes. The private run directory is
+`/private/tmp/um-b-first-round-results-20261114-0m5n5w_n` and its
+`result.json` SHA-256 is
+`04f8eb0bb6eb724980bc53468f21d01202f7abb281e51c90b2455fd3e442fa24`.
+Any browser continuation uses this settled result and the installed 033,
+with no replay or repeat confirmation. The existing local DB, Production,
+packages and migrations 027–032 were outside execution scope.
+
+**Browser and source-qualified result.** After the first browser hold, the
+loopback harness supplied the domain-gate answer only for the exact signed-in
+synthetic Admin. The application and underlying Auth, directory, reference,
+and confirmed affiliation/history reads were real. To exercise the review
+after L1 was confirmed, the harness reconstructed the eligible L1 input from
+pinned before/after evidence and intercepted mutations, including stale,
+unknown across reload, and saved-but-refresh-failed responses. It also mocked
+the missing-RPC response for predecessor compatibility. Those browser cases
+sent no business writes to the backend. The actual before/after persistence,
+concurrency, replay and rollback evidence came from the separate real API run.
+
+The rendered app kept the existing Admin details Sheet, shared controls and
+IBM Plex Sans Thai. Review passed at 1440 and 390 CSS pixels and reflow passed
+at 320. Keyboard focus stayed in the open Sheet and returned to the trigger.
+The confirmed view loaded actual audit date/reason on demand. The final
+settled browser run had no unhandled page exceptions or unexpected console
+errors. Physical mobile keyboard and screen-reader execution were not tested.
+An actual predecessor database browser run was not repeated. The failure
+paths used controlled test responses, including the stale snapshot check,
+with no live concurrent organization hierarchy writer.
+
+Final browser evidence is in
+`/private/tmp/um-b-browser-final-results-20261114-kg8f60oz`.
+`result.json` SHA-256
+`7c82f56b2452901d6a5e1f50e5c69300035a6ac767f963e5a42912981eddcea9`.
+The browser reruns made one synthetic Admin session each. Final readback shows
+0 sessions and refresh tokens, 4 services stopped and 0 active members of the
+isolated network. Retained business and fixture fingerprints matched the API
+run. PostgREST's stopped process reported exit 255. The isolated volume retains
+033 and the synthetic test results. No credentials or raw evidence are part of
+the proposed release.
+
+Node 24.2.0 passed 892 tests in 66 files, lint with zero errors and three old
+warnings, standalone TypeScript and the default Turbopack build. The private
+build used the installed dependencies and copies of the app's existing font
+assets served through loopback. Source and font-loader configuration were
+unchanged by that build harness. Review the seven-file Solo proposal at
+`/private/tmp/um-b-first-round-20261114/SOLO_RELEASE_REVIEW.md`. It proposes
+an independently authorized read-only hosted preflight, database-first apply
+and postflight, then exact source release and conditional client rollback.
+The hosted MCP execution payload and the migration ledger are separate from
+the local socket receipt. At this checkpoint, Production preflight, apply,
+publication and use on any real account each awaited separate authorization.
+The subsequent results are recorded in [20.20](#2020-first-round-production-closeout).
+
+### 20.20 First-round Production closeout
+
+On 2026-11-14 (Asia/Bangkok), UM-B released the first Admin action for
+confirming a valid existing request for an active staff account with no actual
+affiliation. The database application, app delivery and first Admin use have
+separate evidence.
+
+| Gate | Recorded outcome |
+|---|---|
+| Migration 033 | **PASS.** Applied once through Supabase MCP at 18:59 Bangkok. History increased from 32 to 33. Supabase recorded `20261114115939 / um_b_confirm_legacy_affiliation`. All 32 prior row hashes matched and the stored SQL matched the submitted payload hash. The scoped postflight verified the four public RPCs, private audit store and ACL/RLS, existing Copy 031 and all nine 032 guards. Management OpenAPI showed the four routes and no private audit-table endpoint. |
+| Exact Solo release | **PASS.** Seven files in `e497ffaf45ddb7d97d64cdfa1f88d82b27c010ac`, parent `a588bfeb9d15c189293d0c0ec53585b988f10668`. [GitHub Quality](https://github.com/cloudstellar/conduit-boq/actions/runs/43593324859) passed. [Vercel deployment](https://vercel.com/cloudwho-2662s-projects/conduit-boq/R8ZZVx4oqC4MY12f1b99YGiJZaizRX) was Ready and Current for `boq.ntconduit.com` at release verification. Rollback was not triggered. |
+| Anonymous Login and static assets | **PASS.** 26 same-origin GET requests returned HTTP 200 in a clean browser. No Auth/Data API requests, console errors or page errors were observed. Earlier harness issues are retained in the release receipt. |
+| First Production Admin confirmation | **PASS — Owner-observed.** For one existing staff account, the Owner confirmed that the displayed actual affiliation was correct, the account stayed active and its history showed one new confirmation entry. Private account identifiers, the reason entered and the exact event timestamp are kept in the system audit. |
+| Production BOQ visibility after confirmation | **NOT RUN.** The first-account observation covers the Admin view. The user-side BOQ visibility test used synthetic data on isolated Docker in [20.19](#2019-local-first-round-qualification--2026-11-14). Neither the apply nor the release automation invoked a business RPC. |
+
+Private receipt paths for traceability are
+`/private/tmp/um-b-prod033-20261114-apply/result.json` and
+`/private/tmp/um-b-solo-release-20261114/release-result.json`.
+The release and migration grants were consumed. This checkpoint closes the
+first confirmation scope. Admin assignment when the request is wrong, changes
+to an existing affiliation and UM-A2 remain tracked in [12.1](#121-current-state-and-authority).
+
+## 21. Admin assignment for an incorrect affiliation request
+
+**Status: DEFERRED / NOT STARTED.** Revisit under
+[Roadmap #09](./09-integrated-roadmap-and-it-decision-handoff.md#product-sequencing)
+when an active employee with no actual affiliation has an incorrect request
+and cannot access a BOQ needed for work. Review the account scope and
+affiliation evidence with the Owner if that case arises.
+
+The current Admin action confirms a correct request. If the request is wrong,
+Admin can leave it unconfirmed while the employee or their unit provides the
+correct details through the existing contact channel. The employee keeps
+working with their current access. Pending accounts use the existing
+return-and-resubmit flow.
+
+### 21.1 Proposed scope and Admin flow
+
+1. In the existing Admin details Sheet, offer **กำหนดสังกัดที่ตรวจสอบแล้ว**
+   to a current active Admin reviewing another active staff account with all
+   three actual affiliation IDs empty and an existing, structurally valid
+   request for the wrong affiliation. Keep **ยืนยันสังกัด** for the correct
+   original request.
+2. Display **สังกัดจริง**, **สังกัดที่ยื่นขอ** and **สังกัดที่จะกำหนด**.
+   Select an active department and then an active sector from the existing
+   directory, clearing the sector when the department changes. The server
+   derives the organization. Allow a different sector in the same department
+   or a different department in the same organization.
+3. Before **บันทึกสังกัด**, show the selected account and destination.
+   Suggested review text is “ผู้ใช้อาจเปิดดู พิมพ์ ส่งออก หรือคัดลอก BOQ ที่เข้าเกณฑ์
+   ในส่วนใหม่ตามสิทธิ์เดิม ฉบับร่างที่สร้างหรือคัดลอกใหม่จะใช้สังกัดใหม่”.
+   Require a short reason recording who or what verified the affiliation, such
+   as the responsible unit or an authoritative staff directory. An optional
+   reference may go in the reason. Give Admin a clear way back from review.
+4. After success, reread actual affiliation and history. Show the retained
+   request as **คำขอเดิม** and mark the case resolved. If the reviewed data
+   changes, require a fresh review. If the save response is uncertain, look up
+   the same request. If the save is confirmed and the refresh fails, show the
+   confirmed outcome and offer to reload.
+
+Keep the action in the current Sheet on desktop. On mobile stack the three
+affiliation values and keep review and save reachable without horizontal
+scrolling. Reuse the existing Admin controls and Master Catalog NT styling.
+Test keyboard selection, focus return and readable loading and error states.
+
+The operation updates the existing account's three actual affiliation IDs
+and `updated_at`, plus one audit event. It preserves the original request,
+approval evidence, role, account status, identity, credentials and sessions.
+Own and assigned BOQ access follows existing rules. Eligible shared BOQs in
+the destination sector can become available to view, print, export or Copy,
+subject to existing rules. Existing BOQ rows and ownership stay as recorded.
+New drafts from Create or Copy use the verified affiliation on the current
+profile, which can affect visibility to eligible colleagues.
+[BOQ read policy](../../../migrations/009_master_catalog_p0_containment.sql#L259)
+· [Create](../../../app/boq/create/page.tsx#L129)
+· [Copy](../../../migrations/029_atomic_boq_duplicate.sql#L1425)
+
+The first release covers one account per action. Missing or invalid requests,
+partially or fully filled actual affiliation, post-assignment corrections,
+cross-organization moves and active-user resubmission require separate scope
+decisions. The employee supplies or confirms details if asked. Admin records
+the verified assignment using the existing account.
+
+### 21.2 Proposed implementation boundary
+
+- **Database.** One forward migration adds a distinct Admin command and
+  narrowly scoped profile-guard action. Keep 027–033 byte-for-byte. Under a
+  deterministic lock order compatible with 033, revalidate authority from
+  the current profile, eligibility, reviewed original request, and active
+  destination hierarchy. Require the destination to be a different pair in
+  the same organization. Save the profile and audit outcome atomically.
+  Restrict function execution and verify active Admin inside the command.
+  The existing 033 operation binds actual department/sector to the original
+  request. [Existing guard](../../../migrations/033_um_b_confirm_legacy_affiliation.sql#L453)
+  · [Supabase function privileges](https://supabase.com/docs/guides/database/functions#function-privileges)
+- **History and recovery.** Record a distinct private event with actor, target,
+  time, reason, original requested IDs, previous and resulting actual IDs,
+  and request UUID. The current store requires version 1 and the existing
+  history labels its successful rows as confirmation. Reuse the store if a
+  version-aware extension preserves the old history and outcome contracts.
+  Keep the v1 confirmation filter ahead of its history limit and preserve the
+  v1 outcome envelope for existing clients.
+  Otherwise review separate private storage and a typed combined history for
+  the new client. Bind the UUID to actor, target, command, reviewed state,
+  destination and reason. Serialize confirm and assign for the same target.
+  Look up the original outcome after a lost response before attempting any
+  new write. Keep unresolved legacy confirmation recovery working.
+  [History projection](../../../migrations/033_um_b_confirm_legacy_affiliation.sql#L390)
+  · [Client outcome adapter](../../../lib/admin/users/affiliation-confirmation.ts#L195)
+- **Application and tests.** Keep changes within the existing Admin page,
+  details/affiliation components, the typed adapter under `lib/admin/users/`,
+  one reviewed forward migration and focused tests. Use bounded, ordered
+  directory lookups and discard stale sector responses when the department
+  changes. Confirm the exact allowlist before implementation. Signup, SSO,
+  Auth settings, groups, shared styling, and BOQ policies have separate scopes.
+
+### 21.3 Local acceptance and release review
+
+Use an approved isolated Docker target after checking the post-033 baseline.
+Create a fresh run with synthetic staff, Admin and BOQs, including the
+requested sector, verified destination and out-of-scope controls. Keep prior
+runs closed and preserve existing data. Qualify the new migration on that
+target only under separate authorization.
+
+| Case | Acceptance evidence |
+|---|---|
+| Correct assignment | Actual IDs equal the reviewed destination. Original request, approval metadata, status and role stay the same. Exactly one typed audit event. With the same staff session, compare owned, assigned, eligible destination and out-of-scope BOQ reads and verify that editing others' BOQs remains denied. Cover eligible saved output and synthetic Create/Copy into the new scope. Existing rows retain their recorded affiliation and ownership. |
+| Wrong actor, target or destination | Deny anonymous, non-Admin or revoked Admin with an old session, self, nonstaff, nonactive, partially or fully set actual affiliation, invalid requests and inactive, mismatched, original-pair or cross-organization destinations. Direct profile writes remain denied. |
+| Stale review and concurrent actions | Changing eligibility, original request or destination hierarchy requires re-review. Assignment versus assignment and assignment versus 033 confirmation for one target yield at most one successful change. |
+| Replay and failure | Same UUID and same intent return its outcome. Reusing the UUID for another intent is denied. A lost response is resolved by lookup. Forced audit failure leaves the profile unchanged. |
+| Compatibility and delivery | Verify 033 confirmation/history/recovery, pending approval, normal BOQ access and 031/032. Test the UM-A2 app with the successor schema before and after a synthetic assignment so an app rollback can still open the details Sheet and show actual affiliation and ordinary history. The new typed audit stays stored and is visible through the new history reader. Run focused tests, lint, TypeScript, Node 24 build and keyboard/desktop/mobile checks. |
+
+Suggested order is approve the scope, qualify the patch on isolated Docker,
+then review a separate Production release plan and refresh the exact
+predecessor. App rollback restores the old UI. Correcting an assigned scope
+requires a separate authorized business-data correction. The planning
+estimate is **2–4 focused workdays through local verification** once the
+isolated baseline is available.
+
+Owner decisions are the proposed eligibility limits, whether any current
+active account makes this work urgent, and the minimum verification evidence.
+Recommended authority and evidence are a current active Admin acting on
+confirmation from the responsible unit or an authoritative staff directory,
+with a short required reason. This uses existing Supabase Auth while IT
+considers SSO. This section is for review before implementation, Docker
+execution or any Production operation.
+
+## 22. Groups, roles and access scope
+
+**Status: product direction proposed for review.** Develop account management
+with the existing Supabase Auth identities while IT evaluates SSO and hosting.
+Define access for each BOQ workflow as it is planned. Introduce Admin-managed
+access groups when a specific recurring workflow needs the same access granted
+and revoked for several people. Defer a general editor for permission templates
+until multiple recurring workflows justify it.
+
+### 22.1 Industry comparison and fit
+
+| Product | Documented behavior | Implication for Conduit BOQ |
+|---|---|---|
+| Procore | Project permission templates can be global or project-specific, with a level per tool and selected supported granular actions. Estimating has an action-by-action matrix, including export. [Project templates](https://support.procore.com/products/online/user-guide/company-level/permissions/tutorials/create-a-project-permissions-template) · [Estimating permissions](https://en-ca.support.procore.com/products/online/user-guide/project-level/estimating/permissions) | Define reusable roles for known actions with an explicit scope. Model print and export separately from view and edit. |
+| Autodesk Cost Management | Assigns a module-level permission to members, companies or roles. Some modules have `Collaborate` for assigned items. [Cost Management permissions](https://help.autodesk.com/cloudhelp/ENU/Build-Cost/files/setup-cost/manage-settings/Cost_Permission_Management.html) | Keep an organizational affiliation and an assignment to particular work distinct. The permission set can be small when the workflow is small. |
+| Bluebeam Studio Projects | Project owners can manage and add groups within a project and set permissions. Group overlap has explicit conflict rules. [Studio Projects permissions](https://support.bluebeam.com/user-manual/menus/window/manage-projects-permissions.html) | Start with named project/BOQ scope. Define and test the effective result when access comes from more than one source before enabling that combination. |
+
+### 22.2 Recommended sequence
+
+1. **Improve account management as cases require.** Keep the existing account
+   ID, five roles and current authorization checks. With UM-A2 released, use
+   [Roadmap #09](./09-integrated-roadmap-and-it-decision-handoff.md) to prioritize
+   other account changes. Revisit [section 21](#21-admin-assignment-for-an-incorrect-affiliation-request)
+   when its trigger is met.
+   If the directory gets difficult to operate, consider server-side search and
+   filtering by current affiliation, role and status. The current directory
+   paginates. A filter limited to its visible page would give incomplete results.
+   Filters use existing attributes and grant no access. Review any search work
+   as an independent candidate.
+2. **Define the access matrix alongside each BOQ workflow.** Separate account
+   state and identity, confirmed affiliation, role (allowed actions), and
+   assignment or group membership (the documents covered by a grant). Record
+   who may view drafts or operational BOQs and who may create, edit, Copy,
+   record approved operational status, print or export. Keep the selected
+   paper approval authority for operational BOQ. Use the matrix consistently
+   in the UI, trusted APIs, RLS, and in-app print/export entry points.
+3. **Start with one explicit access group when the workflow is ready.** A
+   candidate is the TOR committee for a named project or reviewed BOQ set, once
+   operational BOQs and Viewer policy are settled. An authorized Admin manages
+   members from existing accounts and sees the documents and effective actions
+   before granting access. Propose viewing only assigned operational BOQs.
+   Decide in-app TOR printing and Excel export separately. The committee grant
+   gives no draft, edit or approval access. Keep a change history and define
+   when membership is removed or expires. Tests must separate access from the
+   committee grant from any rights a member already has through their job.
+4. **Consider configurable templates when needs repeat.** Start with supported
+   action and scope combinations. Before offering an Admin editor, agree who
+   can delegate each grant, how overlapping role/group grants resolve, how to
+   protect against self-escalation, what template edits do to current members,
+   and how revocation is verified for existing sessions. Validate denied and
+   allowed cases across direct APIs, document reads and output routes. Use
+   policy changes to extend the current authorization model. S0/032 names the
+   BOQ writer roles in database guards, so adding a new writer role is a
+   separate access-policy change. [Current roles](../../../lib/types/auth.ts#L2) · [Writer guard](../../../migrations/032_s0_boq_writer_boundary.sql#L204)
+
+For the first group UI, keep the existing Admin details design and show the
+source of each grant alongside the scope and allowed actions. The group view
+should let Admin review members, covered BOQs and expiry, and show the effect
+of adding or removing a member before saving. This helps explain why someone
+can still access a BOQ through their existing role after a group grant ends.
+
+IT decides the provider, stable identity key, source of group membership and
+approved mapping before an organizational SSO pilot. Retain existing account
+IDs and references. Incoming group names or affiliation claims are suggestions
+until a reviewed mapping and lifecycle policy authorize their use. The
+application controls access to its documents throughout the transition. Keep
+SSO, hosting, access groups and permission templates out of the section 21
+release. This section records a proposed sequence and review conditions.
+
+## 23. UM-A2 implementation review
+
+Prepared 2026-11-14 (Asia/Bangkok). **Narrowed for Owner review.** The first
+UM-A2 release addresses what a user sees after signup and when the confirmation
+link cannot be used. It uses existing Supabase Auth and the recorded post-033
+contract for baseline app `e497ffaf45ddb7d97d64cdfa1f88d82b27c010ac`.
+This section records the approved implementation scope. The outcome of the
+local implementation and Docker checks is in [section 24](#24-um-a2-solo-release-review).
+
+### 23.1 Current behavior and scope
+
+- A successful `signUp()` now shows the same check-email message for both
+  kinds of response. Branch on the actual session result. A usable session
+  continues through the normal app route and its authorization guards.
+  Pending users reach the existing `/pending` page with a link to `/profile`.
+  [Signup source](../../../app/login/page.tsx#L66) ·
+  [Pending source](../../../app/pending/page.tsx#L11)
+- Invalid or failed callbacks redirect to `/login?error=auth_callback_error`.
+  Login ignores that flag and Proxy redirects signed-in users away from Login.
+  Use a single informational page for callback failure. Its neutral wording
+  gives instructions for both signup confirmation and password recovery.
+  [Callback](../../../app/auth/callback/route.ts#L5) ·
+  [Proxy logic](../../../lib/supabase/middleware.ts#L36)
+- Preserve the current email field, labels, validation, autofill, automatic
+  `@ntplc.co.th` completion on blur and submit, and the existing admission check
+  in Login, Signup and Forgot. Pending/Profile redesign, Admin changes and
+  resend are deferred. The proposal needs no package, Auth provider setting,
+  email template or database change. Preserve migrations 027–033.
+
+### 23.2 UI/UX for review
+
+Use the current Login card, genuine NT logo, neutral surfaces, IBM Plex Sans
+Thai and existing buttons. The private static mockup is
+`/private/tmp/uma2-review-20261114/um-a2-ui-review.html`.
+[NT brand baseline](./11-nt-brand-system-and-sitewide-ui-rollout-plan.md#3-brand-and-visual-rules)
+
+| State | What the user sees and does |
+|---|---|
+| Signup accepted without a session | **ตรวจสอบอีเมล** shows the exact address sent in this attempt. It tells the user to check the inbox and spam folder, then open the confirmation link in the browser used to sign up. Offer **กลับไปกรอกอีเมลใหม่** and **กลับไปเข้าสู่ระบบ**. Keep the address only in the current screen state and clear the password. Returning to the form requires a new deliberate submit. |
+| Signup returns a session or the original link exchanges successfully | Continue to the normal app entry route and let existing guards decide where to send the user. An eligible pending account reaches the existing **บัญชีอยู่ระหว่างรอการอนุมัติ** page and can open its own profile. A blocked or unavailable account follows the existing route guard. |
+| Link cannot be used | **ใช้ลิงก์นี้ไม่ได้** with the next step. For signup, try the latest link in the original browser. If the address was already confirmed, sign in. If the link still fails or never arrives, contact Admin. For password reset, request a fresh link through **ลืมรหัสผ่าน**. A **กลับไปเข้าสู่ระบบ** link uses the existing route. Signed-in users continue with their current account. |
+
+The check-email screen reports the signup response without claiming delivery,
+new account creation or application approval. Keep provider error text and
+credentials out of the messages. Use a clear heading at each state, keyboard
+focus, and status text alongside color. Check long Thai copy and email reflow
+at 320, 390 and 1440 CSS pixels.
+[GOV.UK confirmation pattern](https://design-system.service.gov.uk/patterns/confirm-an-email-address/)
+
+### 23.3 Proposed files and user impact
+
+Propose seven paths, four runtime files and three tests. The existing browser
+SDK, Auth provider settings, callback URL and route protection remain the basis
+for signup and password recovery.
+
+| Proposed file | Purpose |
+|---|---|
+| [`app/login/page.tsx`](../../../app/login/page.tsx) | Handle the two signup results. Use the existing submitted address for the check-email state. Keep Login, Forgot and the existing email field and handling. |
+| [`app/auth/callback/route.ts`](../../../app/auth/callback/route.ts) | Map unsuccessful exchanges or missing codes to the informational page. Preserve the successful same-origin exchange and existing recovery destination `/profile`. |
+| `app/auth/callback-error/page.tsx` (new) | Show a neutral recovery message and ordinary navigation. It reads no account data and issues no Auth commands. |
+| [`lib/supabase/middleware.ts`](../../../lib/supabase/middleware.ts) | Allow the exact informational path for all visitors. Keep normal route guards in effect for all other paths. |
+| [`tests/auth-missing-session.test.ts`](../../../tests/auth-missing-session.test.ts), `tests/um-a2-auth-flow.test.tsx` and `tests/um-a2-auth-callback.test.ts` (new) | Check that the path exception is exact, both signup outcomes render correctly and callback failure stays separate from recovery success. Run the existing email and authorization suites. |
+
+Risk to current users is concentrated in the shared signup/reset callback.
+Use fixed same-origin failure destinations and a small set of safe UI messages.
+Treat `next` only as a checked navigation hint. Let existing guards decide
+business access. On the failure path, use a no-store response and no-referrer
+policy. Make the redirect explicitly replace any incoming fragment so the
+browser Auth client on the error page cannot process old credentials. Check
+that a failed link leaves the original signed-in session usable and never
+triggers another exchange or signup. If the shared callback cannot meet those
+criteria within these paths, record the reproduced case for review before
+changing session behavior.
+[HTTP redirect semantics](https://www.rfc-editor.org/rfc/rfc9110.html#section-10.2.2) ·
+[Supabase PKCE](https://supabase.com/docs/guides/auth/sessions/pkce-flow)
+
+### 23.4 Docker and acceptance
+
+Use a fresh, synthetic-only Docker project with separate volumes and a reviewed
+post-033 baseline. Before testing, confirm the Docker target, image/digest,
+volume, loopback ports and exact callback allowlist. Block external egress and
+prove the local mail sink can capture mail without a relay. Exercise both
+Confirm Email settings in the isolated configuration. The checked-in local
+config currently disables it. Hold runtime checks if target, mail isolation
+or baseline cannot be verified without replay or using the regular local DB.
+[Checked-in auth settings](../../../supabase/config.toml#L219) ·
+[Supabase local Auth tests](https://supabase.com/docs/guides/auth/testing-auth-flows)
+
+| Check | Required result |
+|---|---|
+| Confirm Email off | One fresh signup gets a session and goes through the existing route to Pending/Profile. No confirmation mail is captured and no application access is granted by the signup result alone. |
+| Confirm Email on | Signup shows **ตรวจสอบอีเมล** with the exact submitted address. The original captured email opens successfully in the initiating browser, verifies the same synthetic UID and reaches Pending/Profile through existing guards. Returning to edit leaves the request count unchanged until a deliberate submit. |
+| Unusable link | Probe an already-used, expired, malformed and wrong-browser link. Use separate mail samples/browser contexts where a probe can consume a link or verifier. Check provider email confirmation and browser sign-in separately. Confirm safe next steps, fixed same-origin failure redirect, no token or raw provider text in the destination, no second browser exchange and no automatic mail. Exercise a bad external `next` and verify that only the exact informational path is public. Verify that failed links preserve the original active or pending session, including a failed link from a different account. Identify provider observations and mock-injected cases separately. |
+| Existing Login, Forgot and recovery | Short names and full emails still work through the current field, blur/submit completion and admission check. Open a captured original reset link, verify it reaches `/profile`, set a new password for one synthetic user and verify sign-in. Check unusable reset links retain an intelligible route to request a new one. |
+| Access and UI | Pending users can open their own Profile and remain denied on BOQ/Admin routes and representative API reads. Current active staff and Admin retain their normal navigation, blocked users remain blocked. No BOQ writes or approval/resubmission tests are needed. Run relevant existing and new tests, lint, TypeScript and default Turbopack build on Node 24. Verify the three screen widths, keyboard and focus in a real local browser. |
+| Fixtures and closeout | Propose up to four new signups, one with Confirm Email off and up to three on, plus three synthetic regression accounts for active staff, Admin and blocked access. Count captured messages and run-owned sessions, close those sessions and stop the isolated services. Record case, final route and outcome. Keep passwords, tokens, raw links and session cookies out of evidence. An uncertain write stops the run for read-only reconciliation. |
+
+Resend is deferred. The pinned SDK can send the resend link without the PKCE
+challenge used for the original signup link. A future resend proposal needs
+its own delivered-link compatibility evidence.
+[Supabase resend change](https://github.com/supabase/supabase-js/pull/2144)
+
+Any later release review must establish the hosted Confirm Email, redirect and
+delivery settings separately. Local mail capture proves delivery inside the
+test stack.
+[Supabase email link guidance](https://supabase.com/docs/guides/deployment/going-into-prod#email-link-validity)
+
+### 23.5 Skills and review decisions
+
+The Owner approved the seven paths and the isolated synthetic run. The results
+and the approval needed for publication are in [section 24](#24-um-a2-solo-release-review).
+
+Supabase and Next.js guidance cover signup, callback and cookies. Product
+Design, shadcn/ui and the existing NT guide inform local layout and copy. UI UX
+Pro Max and the Vercel and W3C guidelines inform keyboard, feedback and touch
+checks. The existing app components provide the visual baseline.
+[Skills article](https://xiengperm.dev/posts/agent-skills-for-ui-ux-th/) ·
+[Vercel guidelines](https://github.com/vercel-labs/web-interface-guidelines) ·
+[W3C form notifications](https://www.w3.org/WAI/tutorials/forms/notifications/)
+
+## 24. UM-A2 Solo release review
+
+2026-11-14 (Asia/Bangkok). **Local checks complete with the recorded harness
+limits. Production preflight and publication await Owner approval.**
+This is the pre-release checkpoint. The later approval and results are in
+[section 27](#27-um-a2-production-closeout).
+
+### 24.1 Source and exact release files
+
+The local `main` and local `refs/remotes/origin/main` both point to
+`e497ffaf45ddb7d97d64cdfa1f88d82b27c010ac`, with base tree
+`77f13370794d972f9da26ac00f36ed1145782bd3` and an empty index at review. The
+candidate is that base plus these four modified files and three new files.
+The expected Git tree is `eaa3cd678fe32f4a70483451b96af2c14614862f`, computed
+from the base and the seven verified files without writing to the index.
+Recheck the live remote and all seven byte hashes before publication.
+
+| Change | Exact path | SHA-256 of tested file |
+|---|---|---|
+| Modify | `app/login/page.tsx` | `d43ef3a8499c592e3dbd0bc45ae308cff444d2c4f85b750e0f62aefc3ad40d6c` |
+| Modify | `app/auth/callback/route.ts` | `3a2465248e553d0bed71818d6a11e7c3a50e7171b342ab3fa422481c18043329` |
+| Add | `app/auth/callback-error/page.tsx` | `b856a92607f91d3dda37fbe9814e6301011b6b7a168e0b1b4323803017a8cf66` |
+| Modify | `lib/supabase/middleware.ts` | `7987ce14eae158c26b74e736c9a6739a515e4b9ee5e58a474d1083bdd0882455` |
+| Modify | `tests/auth-missing-session.test.ts` | `4e095831124fce138742d22022e2ade11abd60b36f10d65ea0a0db1ea1ba560b` |
+| Add | `tests/um-a2-auth-callback.test.ts` | `67da24cf57230041e21a93bd8391b8ef7d989ff21365e1b63d116259f32c66b1` |
+| Add | `tests/um-a2-auth-flow.test.tsx` | `0912178446d792669470de0aea78792a343f4e574572533e49824e05c0473efd` |
+
+The allowlist excludes this document, other local planning changes, tooling and
+baseline files, screenshots and private receipts, environment and CI config,
+packages/lockfile, and all SQL/migrations. The app release preserves the
+existing email form, Admin features and installed 031–033 contracts. It needs
+no DB operation, settings change or outage window.
+
+### 24.2 Local test decision
+
+| Result | Evidence and release implication |
+|---|---|
+| **PASS** | Node 24.2.0 ran 918 tests across 68 suites. Lint had 0 errors and 3 existing warnings. TypeScript and the default Turbopack build passed in a clean copy using locally cached font assets. |
+| **PASS by case** | In isolated Docker, Confirm Email on yielded one successfully confirmed signup and access to its own Profile, with BOQ and Admin access denied as expected. A different browser without the signup verifier did not gain a session. Real expired, used and malformed links reached the help screen. Real reset mail reached Profile, the password changed, and the same identity signed in with the new password. Confirm Email off reached Pending without generating mail. |
+| **Historical harness FAIL retained** | The first Confirm-on run stopped at the harness's Enter activation. Chromium later passed Tab and Enter in a separate run with stubbed signup responses. The successor recorded all eight functional check groups, then reported a blocked request and one unsuccessful logout attempt. The exact blocked path and logout error cause were not retained in that run. |
+| **PASS on focused regression and custody** | A later diagnostic named the read RPC `get_my_catalog_admin_gate` the harness blocked. The corrected existing-account rerun passed for staff, Admin and inactive staff with no denied requests. The empty Catalog fixture still had console errors on existing active/Admin Dashboard flows. Separate read-only reconciliation confirmed 0 sessions and 0 refresh tokens, including after the reported logout failure. Four signup attempts and three regression accounts were accounted for. All owned services were stopped and the original synthetic UM-B source remained stopped. |
+
+Keep the aggregate Confirm-on result as `FAIL`, with individual outcomes above.
+Recommend no full Docker rerun for this result. Repeat only the affected path
+if the source hashes or relevant provider behavior change, or if new evidence
+shows a real regression. [Section 26.5](#265-production-smtp-checkpoint) records
+the later hosted delivery check and its limits. The local reports are in
+`/private/tmp/conduit-uma2-bhcFb7Lv/RESULT.md`, `browser-on-functional-result.json`,
+`browser-existing-result.json`, `backend-final-audit.json` and `backend-stopped.json`.
+
+### 24.3 Preflight and Solo sequence after approval
+
+1. **Source and Vercel.** Verify live `main`, an empty index and the seven
+   hashes before staging. Confirm `cloudstellar/conduit-boq`, Vercel project
+   `conduit-boq`, Production branch `main`, domain `boq.ntconduit.com`, and
+   current Production source `e497ffa…`. Check actual build command, root,
+   Node/runtime, Production Supabase binding and auto-assignment. Establish
+   which Vercel deployment is healthy and eligible for rollback on the plan in
+   use. The completed UM-B receipt records `dpl_R8ZZVx4oqC4MY12f1zD3Tzb39weu`
+   and Quality `43593324859`. Some local notes contain a different ID. Accept
+   the target only after a fresh match of full source, deployment and domain.
+   [Vercel Git deployments](https://vercel.com/docs/git) ·
+   [Vercel rollback eligibility](https://vercel.com/docs/instant-rollback)
+2. **Supabase Auth read-only.** Confirm the project binding, email/password
+   provider, actual Confirm Email setting, Site URL and effective redirect
+   allowlist for the public origin with `/auth/callback` and
+   `/auth/callback?next=/profile`. Inspect signup and recovery templates for
+   compatibility with the current PKCE `code` callback. Review SMTP and recent
+   delivery health using configuration or aggregate evidence when visible.
+   Record only redacted decisions, never secrets, account/BOQ rows, or raw mail
+   links. Reuse recorded post-033 evidence for this app-only release. If there
+   is relevant backend drift, obtain scoped metadata review before publishing.
+   A different link flow, unverified material settings, or an ineligible
+   rollback target holds publication. Resolve drift in a separate decision.
+   [Supabase redirect settings](https://supabase.com/docs/guides/auth/redirect-urls) ·
+   [Supabase PKCE](https://supabase.com/docs/guides/auth/sessions/pkce-flow) ·
+   [Supabase email considerations](https://supabase.com/docs/guides/deployment/going-into-prod#email-link-validity)
+3. **One Solo push.** Recheck predecessor and index. Stage the seven named
+   paths explicitly. Verify the staged paths, hashes and expected tree before
+   committing. Confirm the resulting commit's parent and tree before one normal
+   push to `main`. Verify
+   the exact commit's GitHub Quality result and Vercel Ready/Current source and
+   domain. The repository's Quality workflow uses Node 22, distinct from local
+   Node 24 evidence. Vercel can assign the deployment before CI completes,
+   so track both. Stop progress on drift, failed checks or an uncertain push
+   result until the actual remote and deployment state is known.
+4. **Anonymous no-write smoke.** Use a fresh browser and same-origin GETs for
+   Login, assets and the malformed/missing-code callback. With an inert test
+   marker, verify the `307` relative Location `/auth/callback-error#link`, the
+   final help page `200`, no inherited credentials or provider text, and
+   `private, no-store` and `no-referrer`. Confirm that the path exception is
+   exact with one adjacent route. Block Auth/Data API requests and form
+   submission. Capture redacted result, SHA, run ID and deployment ID. Leave
+   hosted mail delivery and authenticated behavior marked **NOT RUN**.
+
+### 24.4 Conditional rollback for Owner review
+
+Trigger on a new failure in Login, verification/reset routing, session
+continuity, route authorization or response privacy, or a failed required
+delivery check that makes the release unacceptable. Capture the exact source,
+deployment, symptom and affected route. If UM-A2 has never served Production,
+leave the healthy Current artifact in place and hold publication. A verified
+failure after it becomes Current can trigger one approved Vercel rollback to
+the freshly confirmed UM-B artifact from section 24.3. Confirm the domain and
+source after the rollback and repeat the applicable anonymous Login check.
+
+If `main` still points to the exact UM-A2 commit, one authorized forward
+rollback commit can restore the four modified files from `e497ffa…` and remove
+the three paths added by this release. A new commit on `main`, unexpected file
+content or an ineligible deployment requires review before acting. Use a
+normal push and verify CI, Vercel and the domain. Vercel disables production
+domain auto-assignment after Instant Rollback. If needed, promote only the
+verified forward-rollback deployment under the same explicit approval.
+Application rollback preserves the installed 031–033 migrations and all
+stored accounts, sessions and data. It cannot retract an email or undo a
+completed Auth action. [Vercel Instant Rollback](https://vercel.com/docs/instant-rollback)
+
+The next Owner decision is whether to accept the local per-case evidence and
+authorize the bounded read-only preflight, or authorize the Solo publication
+and named conditional rollback together after a passing preflight. This local
+review did not access Production or stage, commit, push or deploy.
+
+## 25. Production Auth redirect review
+
+2026-11-14 (Asia/Bangkok). **Initial redirect check was HOLD.** The approved
+read-only preflight found that the `Conduit Price List` Production project had
+Site URL `https://conduit-boq-cloudwho-2662s-projects.vercel.app/` and the four
+Redirect URLs below. Both public-domain callbacks are outside that scope.
+Vercel showed UM-B `e497ffaf45ddb7d97d64cdfa1f88d82b27c010ac` as Ready and Current
+on `boq.ntconduit.com`. The live Git branch and remaining Auth settings were
+not verified in that preflight. This section proposes a separate settings
+change for Owner review.
+
+### 25.1 Exact before and after
+
+Keep the recorded Site URL and all four existing entries. Compare their exact
+values, not just the displayed count, immediately before any approved edit.
+
+```text
+https://conduit-boq-cloudwho-2662s-projects.vercel.app/
+https://conduit-boq-cloudwho-2662s-projects.vercel.app/**
+https://conduit-*-boq-cloudwho-2662s-projects.vercel.app
+https://conduit-*-boq-cloudwho-2662s-projects.vercel.app/**
+```
+
+Add exactly the two values below in **Authentication → URL Configuration →
+Redirect URLs** on the verified Production project. Both are used by the
+application already running. UM-A2 does not need to be deployed for the setting
+to affect future requests. [Existing Signup and Forgot calls](../../../app/login/page.tsx#L111)
+
+| Flow | URL requested by the browser | Value to store in Supabase |
+|---|---|---|
+| Signup, when confirmation is enabled | `https://boq.ntconduit.com/auth/callback` | `https://boq.ntconduit.com/auth/callback` |
+| Password recovery | `https://boq.ntconduit.com/auth/callback?next=/profile` | `https://boq.ntconduit.com/auth/callback\?next=/profile` |
+
+The single backslash in the second **setting** makes the `?` literal in the
+Supabase glob matcher. The actual browser URL still contains an ordinary `?`.
+The matcher checks the original requested redirect. Supabase then appends the
+PKCE `code` on a successful verification, so the setting uses `/profile`
+literally and omits `code` or percent-encoded alternatives. Check that the
+Dashboard accepts and preserves the backslash. If it rejects, strips or changes
+it, stop and review a supported way to store the same pattern.
+[Supabase redirect matching](https://supabase.com/docs/guides/auth/redirect-urls#use-wildcards-in-redirect-urls) ·
+[Auth matcher source](https://github.com/supabase/auth/blob/v2.190.0/internal/utilities/request.go#L89-L130) ·
+[Auth PKCE redirect source](https://github.com/supabase/auth/blob/v2.190.0/internal/api/verify.go#L500-L508)
+
+### 25.2 Effect on users
+
+- Existing password login, sessions, account status and BOQ permissions use
+  their current rules. The proposal adds two approved destinations after an
+  Auth email flow. No planned downtime is needed for that addition.
+- A newly requested link from the public domain can send the user back to the
+  same origin as the browser that started the flow, provided that the provider,
+  template and delivery work. Requests with no accepted redirect still fall
+  back to the existing Site URL. An email already sent retains the URL in it.
+  If an earlier link went to the wrong host, request a fresh link using the
+  browser that started the new request.
+  [Supabase redirect settings](https://supabase.com/docs/guides/auth/redirect-urls) ·
+  [PKCE browser requirements](https://supabase.com/docs/guides/auth/sessions/pkce-flow#limitations)
+
+### 25.3 Proposed execution and verification after approval
+
+1. Confirm the exact project and Production branch. Reload URL Configuration
+   and check the original Site URL, the four entries above and the absence of
+   the two proposed entries. Ask the operator to avoid parallel Auth config
+   edits during this short change. Stop on drift. The Dashboard appends the
+   values by updating the whole redirect list, so a stale screen could
+   overwrite another edit. [Dashboard save source](https://github.com/supabase/supabase/blob/master/apps/studio/components/interfaces/Auth/RedirectUrls/AddNewURLModal.tsx)
+2. Use **Add URL** to enter both values and review them before selecting
+   **Save URLs** once, if the live Dashboard supports a two-row form. If not,
+   check the fresh list after each save. Leave the Site URL form untouched.
+   If the response is ambiguous, reload and establish what was saved before
+   attempting a further change.
+3. Reload and verify that the list is exactly the previous four plus these
+   two, including the literal separator pattern, and Site URL matches its
+   prior value. The change then has **CONFIG PASS**. If a later approval also
+   covers the remaining UM-A2 preflight, review actual Confirm Email, the two
+   templates, email provider and SMTP or email hook without sending mail.
+   Verify Git and rollback eligibility under that preflight as well.
+4. Configuration readback does not exercise real email or PKCE. Leave both
+   hosted flows **NOT RUN** unless a separate test is approved. If end-to-end
+   proof is requested, use an agreed test mailbox and account. From
+   `boq.ntconduit.com`, check that each new mail link returns to that origin,
+   with `next=/profile` retained for recovery, and open the link in the same
+   browser. Test signup only if the actual project requires confirmation.
+   Record the route and outcome without saving the token or raw link. It is
+   possible to leave UM-A2 held while this settings change is verified.
+
+### 25.4 Configuration rollback for review
+
+If post-save readback shows an incorrect addition or the new setting causes a
+verified regression, inspect the latest list. Under explicit rollback
+approval, remove only the entries added by this operation. Compare with the
+recorded original list and Site URL, and preserve independently added settings.
+If another edit changed the same rows, ownership is uncertain, or a pre-existing
+row has gone missing, stop for review instead of restoring a stale snapshot.
+An already sent mail keeps its original link. This rollback concerns Supabase
+redirect settings. The Vercel app rollback is separate, in section 24.4.
+
+### 25.5 Redirect change readback and Auth preflight
+
+On 2026-11-14, under a separate approval, both public-domain entries were saved
+and verified after reloading the Dashboard. All four original entries and the
+Site URL matched the before state. The recovery entry retained `\?` in the
+stored pattern. The follow-up read-only preflight verified that Email,
+signup and Confirm Email were enabled, both templates linked through
+`{{ .ConfirmationURL }}`, and Custom SMTP was off with no Send Email Hook.
+GitHub `main` and the Vercel UM-B Current source matched `e497ffa…`. The
+preflight stopped at mail delivery. Keep the approved redirect settings as the
+SMTP baseline. Hosted signup, password recovery and email delivery remain
+**NOT RUN**. Final Vercel release and rollback checks remain in section 24.3.
+
+## 26. NT SMTP proposal for UM-A2
+
+2026-11-14 (Asia/Bangkok). **Proposal for Owner review.** NT's mail setup sheet
+lists `mail.ntplc.co.th`, TCP `465`, implicit TLS (labeled SSL) and authenticated
+SMTP. Supabase documents hosted Custom SMTP on port 465. The NT relay's
+reachability and relay policy for Supabase Cloud have yet to be verified.
+The current default Supabase service restricts delivery to project team
+addresses. This blocks signup confirmation and recovery for normal users on
+the existing app as well as UM-A2. The proposed SMTP change can be reviewed
+and verified separately while UM-B remains deployed.
+[Supabase port 465 example](https://supabase.com/kb/troubleshooting/using-google-smtp-with-supabase-custom-smtp-ZZzU4Y) ·
+[Supabase SMTP restrictions](https://supabase.com/docs/guides/auth/auth-smtp)
+
+### 26.1 Information to request from IT
+
+| Ask IT to confirm or provide | Acceptance before changing Production |
+|---|---|
+| Network and TLS | Confirm that **hosted Supabase Auth** may connect to `mail.ntplc.co.th:465` over implicit TLS from outside NT. Identify any VPN, source-IP allowlist or relay requirements. If IT needs fixed egress IPs, get a project-specific answer from Supabase before assuming they exist. The host must present a trusted certificate for the configured hostname. |
+| Sending account | Provide a dedicated SMTP credential for Conduit BOQ, the full SMTP username, approved From address and whether the From must match the username. Confirm the supported authentication method, credential expiry and who handles rotation. Enter the credential through an approved secret-handling channel. Keep it out of chat, Git and evidence. |
+| Recipients and mail handling | Confirm authorized recipients, starting with `@ntplc.co.th`, sending limits and any restrictions on keeping or processing addresses and Auth links in the hosted service. Ask IT to verify the required sender/domain protections and provide a way to look up accepted, deferred or quarantined delivery using a message ID or timestamp. Avoid email link tracking that rewrites the Auth link. |
+| Test and support | Select one controlled NT mailbox outside the Supabase project team for test signup and reset. Agree who can confirm relay results or revoke the SMTP credential if needed. If hosted Supabase cannot use this relay under NT policy, ask IT for an approved relay for this source. |
+
+The intended connection is from Supabase Auth to NT over TLS. Port 465 is the
+proposal. The unencrypted port 25 option in the NT sheet is outside the plan.
+[Implicit TLS on port 465](https://www.rfc-editor.org/rfc/rfc8314.html#section-3.3) ·
+[Supabase SMTP settings and sending guidance](https://supabase.com/docs/guides/auth/auth-smtp)
+
+### 26.2 Proposed settings change and readback
+
+1. After IT confirmation and explicit Owner approval, open the verified
+   Production project **Conduit Price List → Authentication → Emails → SMTP
+   Settings**. Verify the baseline from section 25.5, including Custom SMTP
+   off and no Send Email Hook. Record the email rate limits and compare
+   Confirm Email, email templates, Site URL and six redirect entries. Stop
+   for review if there is material drift. Record only the configuration
+   needed for comparison.
+2. Set Custom SMTP host `mail.ntplc.co.th`, port `465`, the dedicated SMTP
+   username and secret, the IT-approved From address and sender display name
+   `Conduit BOQ` if IT agrees. Use the SMTP settings form to save once. Keep
+   Confirm Email on and preserve the current templates, Site URL, redirects,
+   and sign-in configuration. Review the effective mail rate limits after
+   enabling Custom SMTP. Supabase documents that enabling it can change the
+   effective default. An additional manual rate-limit change is a separate
+   decision. [Supabase SMTP setup](https://supabase.com/docs/guides/auth/auth-smtp#how-to-set-up-a-custom-smtp-server)
+3. Reload and compare the intended public settings with the readback. Inspect
+   settings and mail status without exposing credentials. If the save times
+   out or the result is uncertain, read back the actual state before any
+   further write. A successful save proves configuration only. The new relay
+   can take effect for real signup and reset requests as soon as it is saved,
+   so choose a quiet window when IT can help verify or revert. Existing
+   password sessions, BOQ access and account rights do not use this setting.
+
+### 26.3 Proposed Production acceptance using one controlled account
+
+Approve the test separately from configuration, including the exact test
+mailbox, temporary test credentials, permitted Auth actions and closeout. The
+preferred scope uses one new controlled NT account for both flows. Its status
+stays pending under the current Admin rules. No BOQ or Admin business action
+is needed. Perform each of these steps once and retain only redacted outcomes.
+
+| Test | Steps and required result |
+|---|---|
+| Signup confirmation | Start from `https://boq.ntconduit.com/login` in a clean browser profile and submit the controlled mailbox. Confirm actual receipt and the approved From. Open the link in the same profile and verify that the callback returns to `boq.ntconduit.com`, confirms the intended identity and reaches the existing pending flow. Email confirmation alone does not grant application access. |
+| Password reset | Sign out of the test session, then request one reset from the public domain for the same account. Confirm actual receipt. Open the link in the initiating browser profile. Verify the callback stays on the public origin, preserves application destination `/profile`, and lets the authorized test operator set a new password. Sign out, then sign in with the new test password to verify the same identity and its pending status. |
+| Closeout | Sign out the test sessions through the normal flow. Record how the test account will be retained as pending or closed under the separately approved procedure. Record delivery, redirect, verification and password change as distinct results. Capture time, route and a redacted delivery outcome. Exclude passwords, email links, Auth codes and session tokens. |
+
+An email arriving does not prove the link works. If mail is missing, distinguish
+relay rejection, delayed or quarantined mail, and a link or browser failure.
+Avoid repeating a request whose result is uncertain. If a mail gateway consumes
+or rewrites the one-time link, have IT confirm that behavior before changing a
+template or security control.
+[PKCE browser requirements](https://supabase.com/docs/guides/auth/sessions/pkce-flow#limitations) ·
+[Supabase email link validity](https://supabase.com/docs/guides/deployment/going-into-prod#email-link-validity)
+
+### 26.4 Rollback and release decision
+
+If IT reports unauthorized relay activity, a TLS or authentication failure,
+or sender/delivery problems introduced by the change, stop further test sends.
+Read the current settings and, with explicit rollback authority, restore the
+observed prior SMTP mode by turning **Custom SMTP** back off. Reload and
+verify that mode, existing mail limits, Confirm Email, templates, Site URL and
+all six redirect entries. If a rate limit differs after reverting, report the
+actual difference for review. Ask IT to revoke the dedicated credential if it
+is exposed or the relay use is abandoned. Previously issued mail and completed
+account actions are outside what switching SMTP can undo.
+
+The default service's team-recipient restriction returns on rollback. Keep
+UM-A2 on **HOLD** until the approved mail checks pass, then refresh the
+remaining Solo release checks from section 24.3 and seek publication approval.
+This is the proposed gate at the time of the SMTP review. See the
+[later release decision](#27-um-a2-production-closeout) for the accepted
+exception and final status.
+
+### 26.5 Production SMTP checkpoint
+
+On 2026-11-14 (Asia/Bangkok), the Owner saved Custom SMTP in the Production
+Supabase Dashboard. Readback showed Custom SMTP enabled and
+`mail.ntplc.co.th:465`. The Dashboard masked the sender address, username and
+password. This evidence covers the saved host and port and does not establish
+the IT approval status or the exact sending credential.
+
+On the deployed UM-B app, the Owner submitted one authorized signup. The UI
+showed the check-email message. Scoped read-only Auth logs recorded
+`user_confirmation_requested` and status `200` around 22:38. The Owner then
+provided a screenshot showing the confirmation email in the NT mailbox at
+22:38. This records **PASS for delivery of that signup email**. Keep the
+recipient and raw link out of the repository. No hosted callback was
+verified. The Owner stopped the test because the mailbox holder was no longer
+available. No reset request was sent and UM-A2 was not published.
+
+| Check | Result |
+|---|---|
+| Hosted signup email arrival | **PASS**, one authorized test on the deployed UM-B app. |
+| Hosted confirmation link returns to the public BOQ domain and establishes the expected session | **NOT VERIFIED**, user stopped the test. |
+| Hosted reset email, link to `/profile`, password change and sign-in using the new password | **NOT RUN**. |
+| Isolated Docker signup callback and reset through sign-in with the new password | **PASS by case** on the seven-file candidate. See section 24.2 for the historical harness results. |
+
+The local source hashes still match the tested seven files at this checkpoint.
+Do not reopen the stopped test or reuse the mailbox without a new decision.
+UM-A2 remains on hold under the current release plan. The Owner can later
+choose a fresh authorized mailbox for the outstanding hosted checks. If the
+Owner instead accepts the specific missing hosted evidence as an exception
+for this seven-file release, record both outstanding cases as such and retain
+the full local evidence. This would leave a risk that the hosted mail or
+callback behaves differently from Docker. Refresh the remaining read-only
+release preflight and verify the exact UM-B rollback target before any
+authorized publication. [Solo release process](../../07_process/RELEASE_PROCESS.md)
+
+This checkpoint predates the Owner's option 2 decision and the completed
+[UM-A2 release](#27-um-a2-production-closeout).
+
+## 27. UM-A2 Production closeout
+
+The Owner chose option 2 for the exact seven-file UM-A2 release. The real
+confirmation link and password-reset flow would remain **NOT RUN** on
+Production. Read-only preflight confirmed local and GitHub `main` and
+Vercel Current at UM-B `e497ffaf45ddb7d97d64cdfa1f88d82b27c010ac`. The
+seven hashes and candidate tree matched [section 24](#24-um-a2-solo-release-review).
+The released build's public assets confirmed the expected Supabase binding.
+
+| Gate | Outcome on 2026-11-14 (Asia/Bangkok) |
+|---|---|
+| Source | **PASS.** One Solo commit on `main`: `33a0f426842c1c0ec69abd23b95d7c8bbf93dda5`. Parent was the exact UM-B commit above. Tree `eaa3cd678fe32f4a70483451b96af2c14614862f` contains the seven approved changes. |
+| GitHub Quality | **PASS.** Run [43614551139](https://github.com/cloudstellar/conduit-boq/actions/runs/43614551139) passed lint, tests and build. |
+| Vercel | **PASS.** [`dpl_ANBpWZ16EHX6uZTbsTNHyDuDMKuy`](https://vercel.com/cloudwho-2662s-projects/conduit-boq/ANBpWZ16EHX6uZTbsTNHyDuDMKuy) was Ready/Current on `boq.ntconduit.com` for that exact source. |
+| Anonymous no-write smoke | **PASS.** Login and public assets loaded. Both missing-code and inert malformed callbacks returned the expected relative redirect and privacy headers. The help page rendered, its fragment became `#link`, and an adjacent URL redirected to Login. The isolated browser made zero Auth/Data or non-GET requests. The initial raw-HTML check wrongly required the client-rendered Login form in the server HTML; the corrected HTTP check and independent browser check passed. |
+| Real Production confirmation link and session | **NOT RUN** for UM-A2, per the Owner's release decision. |
+| Real Production password reset and sign-in with the replacement password | **NOT RUN** for UM-A2, per the same decision. |
+| Rollback | Available in the approved release window against the verified immediate predecessor `dpl_R8ZZVx4oqC4MY12f1zD3Tzb39weu` (UM-B). Conditions did not trigger. |
+
+The prior UM-B test verified one signup email arrived, with that confirmation
+callback **NOT VERIFIED** and reset **NOT RUN**. The isolated Docker
+per-case passes and historical harness FAIL remain as recorded in
+[24.2](#242-local-test-decision) and [26.5](#265-production-smtp-checkpoint).
+The seven-file deployment sent no additional emails and made no DB or
+configuration changes. Its publication and conditional rollback authority
+are consumed. The private release receipt is
+`/private/tmp/um-a2-solo-release-20261114-njymacek/release-result.json`.
+
+This closes UM-A2 within the recorded gates. Review [Admin assignment when
+a request is wrong](#21-admin-assignment-for-an-incorrect-affiliation-request)
+next. This closeout records prior results and was prepared locally.

@@ -1,3 +1,44 @@
+# Conduit BOQ — Documentation sources of truth
+
+<a id="single-source-of-truth-map"></a>
+## One maintained source per kind of information
+
+Updated locally on 2026-11-19. This is a navigation and ownership map, not a
+second status register, a live Production observation or an execution grant.
+The Owner's latest explicit instruction governs the current scope.
+
+| Information | Maintained source | How other documents use it |
+|---|---|---|
+| Repository boundaries and agent entry order | [AGENTS.md](../AGENTS.md) | Link the rules; keep task transcripts and release status elsewhere. |
+| Current session task, progress, pending decisions and scope | [Current AI handoff checkpoint](./08_ai/AI_HANDOFF.md#current-resume-checkpoint) | Read the current section; dated history below is not another active work queue. |
+| Reusable methods, engineering decision review, testing and delivery | [Release process](./07_process/RELEASE_PROCESS.md#current-method-selection) | Select the applicable recorded method and check prerequisites. Do not copy a mutable command recipe into several handoffs. |
+| Accepted architectural decisions and amendments | [Canonical ADR index](./02_architecture/ADR/README.md) and its linked records | Read relevant decisions before proposing changes. Legacy copies and architecture summaries point here; they are not maintained in parallel. |
+| Product sequencing and decision gates | [Integrated Roadmap #09](./plans/product/09-integrated-roadmap-and-it-decision-handoff.md) | Link the sequence rather than restating a new task order in every README. |
+| Feature scope, alternatives and acceptance details | The feature plan linked by the roadmap/checkpoint, such as [UM #12](./plans/product/12-user-management-um-a-and-um-b-plan.md) or [BOQ workflow #13](./plans/product/13-boq-operational-workflow-plan.md) | Keep details and their decision status there; a selected direction does not grant implementation. Reconcile later Owner steering before work. |
+| Exact observed tests, releases and residual limits | The dated result/closeout linked by the checkpoint or feature plan; Master Catalog uses [#106](./plans/master-catalog/106-phase4-master-catalog-exact-remaining-work-handoff.md) and [#107](./plans/master-catalog/107-phase4-p49-master-catalog-final-closeout-result.md) | Cite the receipt for its source, target and date. A historical PASS is not a fresh runtime observation or standing permission. |
+| Repeatable mistakes and improvement rationale | [Lessons learned](./08_ai/LESSONS_LEARNED.md) | Link the canonical rule or method instead of creating a second full procedure. |
+| Actual source and command definitions | [package.json](../package.json), reviewed source/migration files and the selected runner | Check what is actually present and compatible. A file's existence does not prove a migration is applied; live target checks need their approved scope. |
+
+A single source of truth does not require deleting immutable historical records.
+It requires one maintained authority for each fact or decision. Mark legacy
+snapshots explicitly, preserve their evidence and link to the current source.
+Edit the owning document when a decision or procedure changes; update navigation
+links rather than copying the new body into every old location.
+
+If sources disagree, distinguish desired design, implemented behavior and dated
+observations. Reconcile them with the applicable later decision/closeout and the
+Owner's instruction. Report an unresolved conflict before affected execution;
+do not silently pick a stale summary or invent a repair.
+
+## Historical documentation index
+
+The complete previous index follows unchanged as a dated 2026-10-23 navigation
+snapshot. Its old headings such as “Current authority”, C alignment and “latest”
+describe that stage. Use the ownership map above to find current status; this
+historical index is not maintained as another current register.
+
+<!-- DOCUMENTATION_INDEX_HISTORICAL_ORIGINAL_START -->
+
 # Conduit BOQ Documentation Index
 
 เอกสารนี้เป็นสารบัญสำหรับค้นหา source of truth ที่ถูกต้อง ไม่ใช่สถานะ

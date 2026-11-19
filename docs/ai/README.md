@@ -21,10 +21,12 @@ Do not use a permission, approval, `HOLD`, or next-step statement from this
 legacy folder without reconciling it against the current handoff and the task's
 explicit current authority.
 
-The current handoff records completed A/B/031 and [L1 Production](../06_engineering/LIST_1B_L1_PRODUCTION_RELEASE_RESULT_20261023.md)
-at `b1ce449`, with B stale HTTP NOT RUN. Current C approval covers local
-documentation and checks only; this navigation refresh grants no implementation,
-Production or publication authority. Historical files below remain unchanged.
+Use the [documentation ownership map](../README.md#single-source-of-truth-map)
+to find the maintained source for each topic, and the
+[current checkpoint](../08_ai/AI_HANDOFF.md#current-resume-checkpoint)
+for current work and authority. This historical directory does not maintain a
+second release-status register. Navigation grants no implementation, Production
+or publication authority.
 
 ## Preserved historical references
 
@@ -37,7 +39,8 @@ Production or publication authority. Historical files below remain unchanged.
 | [TASK_CHECKLIST.md](./TASK_CHECKLIST.md) | Earlier task checklist |
 | [UX_GUIDELINES.md](./UX_GUIDELINES.md) | Earlier UX guidance |
 | [Legacy AI archive](../legacy/ai/) | Older context, domain, architecture, calculation, and handoff files |
-| [ADR-001](./DECISIONS/ADR-001-supabase-rls-authorization.md) | RLS architecture decision |
+| [Canonical ADR index](../02_architecture/ADR/README.md) | Maintained architecture decisions; read the relevant canonical record |
+| [Historical ADR-001 snapshot](./DECISIONS/ADR-001-supabase-rls-authorization.md) | Frozen duplicate with a pointer to canonical ADR-001; not maintained in parallel |
 
 Historical technical rules may still be useful, but code, migrations, current
 numbered documentation, and fresh evidence take precedence when they differ.

@@ -237,19 +237,18 @@ target deployment; organizational SSO remains proposed under #09.
 
 ## 6. Key Architecture Decisions
 
-### ADR-001: Supabase RLS as Primary Authorization Layer
+<a id="adr-001-supabase-rls-as-primary-authorization-layer"></a>
+<a id="adr-002-versioned-master-catalog-with-singleton-default-pointer"></a>
 
-- **Status:** Accepted
-- **Decision:** Use RLS for all authorization
-- **Rationale:** Security by default, reduced API surface, single source of truth
-- **Full document:** [ADR/ADR-001-supabase-rls-authorization.md](./ADR/ADR-001-supabase-rls-authorization.md)
+Use the [canonical ADR index](./ADR/README.md) for the existing decisions,
+including authorization, Master Catalog versions and governance, rollout
+numbering and Factor F. Read the relevant record and its dated amendments
+before proposing a material design change.
 
-### ADR-002: Versioned Master Catalog With Singleton Default Pointer
-
-- **Status:** Proposed
-- **Decision:** Version standard-price catalogs, retain BOQ snapshots, and use a singleton active-default pointer
-- **Rationale:** Historical stability, deterministic defaults, and phased production hardening
-- **Full document:** [ADR/ADR-002-versioned-master-catalog.md](./ADR/ADR-002-versioned-master-catalog.md)
+Decision and implementation status are maintained with those records and their
+linked closeouts, rather than copied into this architecture overview. For
+current task status and authority, read the
+[current handoff checkpoint](../08_ai/AI_HANDOFF.md#current-resume-checkpoint).
 
 ---
 

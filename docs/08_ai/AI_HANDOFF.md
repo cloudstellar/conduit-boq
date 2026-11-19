@@ -1,4 +1,241 @@
+# AI Handoff — current entry point
+
+<a id="current-resume-checkpoint"></a>
+<a id="current-resume-checkpoint-20261118"></a>
+## Current resume checkpoint — 2026-11-19
+
+Read this checkpoint before the dated records below. The Owner approved local
+handoff-document alignment and the follow-up documentation fixes after review.
+That scope covers document edits and verification. Implementation, Docker,
+DB/Auth, Production and Git publication require separate authority. Earlier
+apply, publication and conditional rollback grants are consumed.
+
+### Resume action when the Owner says only “ทำต่อ”
+
+Begin with a read-only review of the [documentation candidate](#documentation-publication-candidate).
+Read the mandatory entry sections and relevant ADRs, then verify local Git
+state and linked documents. Use the canonical checkout while the candidate is
+local. Once the reviewed document commit exists, use a checkout containing
+that commit. Report the available source, recorded checks and next Owner
+decision. Reuse the recorded checks when their source still matches.
+
+“ทำต่อ” resumes the current checkpoint review. Product implementation, Docker
+cleanup, runtime tests and publication remain separate decisions. Update this
+checkpoint as the task advances and record publication only after verification.
+
+Readiness check on 2026-11-19: a separate assistant with no inherited chat
+history read the repository entry points and interpreted “ทำต่อ” as this
+read-only documentation review. It correctly identified completed local docs,
+pending decisions, existing methods/ADRs and the lack of runtime/publication
+authority. Required local files were present; the preserved AGENTS snapshot
+matched its recorded hash. This tests document sufficiency, not automatic
+instruction loading in every client or perfect recall of the old conversation.
+At that check, the modified and untracked documents existed only in the local
+checkout used for the review. The tracked commit alone did not contain them.
+
+The later Anthropic/Atlassian SDLC discussion is now captured as local
+[context, diagnosis and feedback practices](../07_process/RELEASE_PROCESS.md#ai-sdlc-feedback).
+Read that section for traceability, failure classification, lightweight measures
+and learning across sessions. This records selected practices in the existing
+runbook; it does not approve a new platform, automation or runtime operation.
+
+### Documentation alignment result — 2026-11-19
+
+The approved handoff repair and engineering-guidance improvement are complete
+locally: concise AGENTS, this checkpoint, current Context, the task-method index,
+the existing-ADR reading index and the current Lessons addition. The pre-refactor
+AGENTS text is preserved in the [exact earlier snapshot](./AGENTS_HISTORY_20261118.txt).
+AGENTS remains compact; the original 76,631-byte snapshot has SHA-256
+`5c3a6119cd43aca89dfc3a5ce9541cccedbaf1b92ee85f016926c962ec7139d7`.
+Original Handoff, Context, Lessons and Release Process text remains unchanged
+below each historical divider. No prior evidence or grant was rewritten.
+
+The [engineering decision review](../07_process/RELEASE_PROCESS.md#engineering-decision-review)
+now explicitly requires proportionate analysis of material choices: problem and
+acceptance criteria, viable alternatives, tradeoffs, effects on existing users,
+proof/recovery and a recorded Owner decision. Supporting review dimensions cover
+trusted authorization, state/data integrity and maintainable design. Routine
+choices inside an approved scope remain routine. This is improved guidance,
+not a completed codebase-wide compliance audit or approval for implementation.
+
+The Owner highlighted the existing ADR collection and requested a single source
+of truth. The [documentation ownership map](../README.md#single-source-of-truth-map)
+now identifies the maintained source for each topic. The
+[ADR reading index](../02_architecture/ADR/README.md) now links all five distinct
+canonical records found locally, ADR-001 through ADR-005, and identifies the
+already-existing legacy ADR-001 path. Before the navigation change, both ADR-001
+copies matched local HEAD `33a0f426842c1c0ec69abd23b95d7c8bbf93dda5`. The five
+canonical ADR bodies are unchanged. The legacy path now points to canonical
+ADR-001 above its original, byte-exact historical body; it is not maintained in
+parallel. No new ADR identifier was allocated. Read applicable decisions before
+design. Architecture and legacy navigation now link the canonical sources;
+obsolete duplicate status summaries no longer serve as current authority.
+
+The 2026-11-19 initial checks used Node `v24.2.0`. The two existing static
+document contract test files passed **28/28**. Current-section local
+links/anchors and `git diff --check` passed. The 282 recorded tracked
+source/test/config/migration hashes matched the pre-edit baseline. Roadmap #09
+already differed from Git `HEAD` and was unchanged during that final handoff
+review relative to its pre-review local version. That review added navigation
+and decision-status notes above #12 and #13, retaining both plan bodies
+byte-for-byte at that stage. Local HEAD/upstream/origin-main tracking refs were
+`33a0f426842c1c0ec69abd23b95d7c8bbf93dda5`, observed without a fetch or hosted
+inspection. Application qualification, Docker/DB/Auth, Production and Git
+publication were outside that documentation round.
+
+<a id="documentation-publication-candidate"></a>
+### Documentation publication candidate — 2026-11-19
+
+The approved follow-up reconciles the current wording in this handoff,
+[Roadmap #09](../plans/product/09-integrated-roadmap-and-it-decision-handoff.md),
+[UM #12](../plans/product/12-user-management-um-a-and-um-b-plan.md),
+[BOQ workflow #13](../plans/product/13-boq-operational-workflow-plan.md), the
+[repository README](../../README.md) and [Change Process](../07_process/CHANGE_PROCESS.md).
+The candidate contains 16 documentation paths against local `33a0f42`: the 14
+handoff, navigation and product documents reviewed together, plus the two
+repository entry points. The [ADR index](../02_architecture/ADR/README.md),
+[AGENTS snapshot](./AGENTS_HISTORY_20261118.txt) and #13 must travel with it.
+Unrelated output files, scripts, database evidence and application changes are
+outside this candidate.
+
+Follow-up verification on 2026-11-19 used the local-documentation method. The
+diff and whitespace checks passed, including the new Markdown files, and
+comparison with the pre-edit worktree confirmed that only the six named files
+changed. The projected 16-file document tree resolved 795 local link references
+and preserved the 20 inbound anchors checked. The dated closeouts and no-replay
+evidence retained in the reviewed sections matched their pre-edit copies. On
+Node `v24.2.0`, both static document contract suites passed again (**28/28**):
+
+```sh
+npm test -- --no-cache tests/master-catalog-admin-edit-completion.test.ts \
+  tests/master-catalog-authority-consistency.test.ts
+```
+
+The Git index was empty. Application runtime checks, Docker, DB/Auth,
+Production and Git publication were **NOT RUN** for this follow-up.
+
+The Owner's next decision is whether to authorize publication of the reviewed
+document set. Check the then-current source and approved route before any Git
+publication. A `main` push can trigger CI and Vercel under the
+[recorded release method](../07_process/RELEASE_PROCESS.md#solo-application-publication).
+
+### Choose a proven method that fits the task
+
+Start with [AGENTS.md](../../AGENTS.md), the
+[current agent rules](./AI_CONTEXT.md#current-agent-rules),
+[lessons](./LESSONS_LEARNED.md) and the
+[method-selection map](../07_process/RELEASE_PROCESS.md#current-method-selection).
+That runbook records the established methods and when each applies; this
+checkpoint owns current status. Select the previously successful method that
+fits the task rather than forcing every task through one workflow.
+
+Before proposing execution, identify the current task and pending decision,
+the selected method and why it applies, the known runner or script, the exact
+test target/baseline and the authority still required. Verify that the method's
+preconditions and named inputs remain available and compatible. If no recorded
+method fits, report the actual gap and proposed scope before executing a new
+procedure. Do not automatically create a stack, reopen a closed run or repeat
+an old grant. Reusing a proven method does not reuse consumed authority.
+
+### Last closed work and retained limits
+
+- [UM-A2 closeout](../plans/product/12-user-management-um-a-and-um-b-plan.md#27-um-a2-production-closeout):
+  exact seven-file release `33a0f426842c1c0ec69abd23b95d7c8bbf93dda5`
+  closed on 2026-11-14 with recorded CI/Vercel/anonymous no-write smoke PASS.
+  Real Production confirmation-link and password-reset journeys remain
+  **NOT RUN** by the Owner's release decision. Those hosted results are dated
+  evidence, not a fresh Production observation in this documentation task.
+- [UM-B first-round closeout](../plans/product/12-user-management-um-a-and-um-b-plan.md#2020-first-round-production-closeout):
+  033 applied once; Owner-observed Admin affiliation confirmation passed.
+  The user's own Production BOQ visibility check remains **NOT RUN**.
+- [Stale-Copy B closeout](../06_engineering/STALE_COPY_B_RELEASE_CLOSEOUT_20261023.md):
+  Production stale HTTP remains **NOT RUN/closed**. Do not reclassify any
+  retained NOT RUN as PASS or automatically reopen it as a required task.
+
+### Product work awaiting the Owner
+
+Use [Roadmap #09](../plans/product/09-integrated-roadmap-and-it-decision-handoff.md)
+for sequencing. [BOQ workflow #13](../plans/product/13-boq-operational-workflow-plan.md)
+is design only: option 2 uses Draft → Proposed → Operational on the same BOQ;
+proposing locks the BOQ, and signed-paper book/date are recorded afterward.
+The Owner deferred the placement of the submission reference: on the BOQ print,
+on an accompanying document/register, or only in the application. That decision
+is still open; an earlier every-page proposal is not implementation approval.
+No workflow application/schema/migration/test-stack work has started.
+
+The [Admin assignment proposal](../plans/product/12-user-management-um-a-and-um-b-plan.md#21-admin-assignment-for-an-incorrect-affiliation-request)
+is deferred until an active employee with blank actual affiliation and an
+incorrect request cannot access a BOQ needed for work, as recorded in
+[Roadmap #09](../plans/product/09-integrated-roadmap-and-it-decision-handoff.md#product-sequencing).
+Both product proposals remain outside the documentation scope.
+
+### Local targets and evidence custody
+
+The latest read-only inventory in this chat on 2026-11-18 found the original
+`conduit-boq-local` stack with seven running containers, UM-B
+`conduit-boq-um-b-20261108-r1` with four stopped containers and UM-A2
+`conduit-boq-uma2-bhcfb7lv` with four stopped containers. These are dated
+inventory observations, not a current-schema or functional PASS. No container,
+network, image or volume has been deleted, and cleanup remains unapproved.
+
+Some specifically referenced `/private/tmp` evidence directories were absent
+at that check. A path in an old receipt does not establish that its files still
+exist. Do not infer that evidence has a backup, that a runner can be rerun, or
+that stopped DB volumes are disposable. Preserve the existing local accounts,
+passwords and data, Catalog/Factor F, immutable/no-replay migrations 027–033,
+closed-run evidence, Owner backups and the protected archive. Do not inspect
+the protected archive to fill an evidence gap.
+
+For future work, record the reviewed runner/config/source identities, exact
+target, results and cleanup status in the established handoff. Keep reusable
+non-secret instructions in the repository; private evidence needs an approved
+durable location and retention decision before temporary artifacts are removed.
+The document checks above create no new application-runtime, DB or hosted
+acceptance result.
+
+---
+
+## Historical handoff — retained verbatim
+
+The complete earlier handoff follows unchanged. Its dates, grants, results and
+wording such as “current”, “latest”, “pending” and “unreleased” describe those
+historical stages. Begin a new session with the checkpoint above; consult these
+records for the named task's evidence without reviving its consumed authority.
+
 # AI Handoff — Conduit BOQ
+
+## UM-A2 closed on Production — 2026-11-14
+
+The [canonical closeout](../plans/product/12-user-management-um-a-and-um-b-plan.md#27-um-a2-production-closeout)
+records the seven-file `33a0f42` release, CI/Vercel/no-write smoke **PASS**
+and both real UM-A2 Production mail-link journeys **NOT RUN**. One earlier
+signup email reached an NT inbox from UM-B. During UM-A2 delivery no new mail,
+DB operation or rollback ran. Release and conditional rollback grants are consumed.
+
+Next review [Admin assignment for an incorrect request](../plans/product/12-user-management-um-a-and-um-b-plan.md#21-admin-assignment-for-an-incorrect-affiliation-request).
+The scope is one current active staff member with empty actual affiliation and
+a wrong, valid request. Review the evidence for the destination, BOQ visibility,
+and existing 033 contract before implementation. Current work covers local
+documentation only.
+
+## UM-B first round closed on Production — 2026-11-14
+
+The [canonical UM-B closeout](../plans/product/12-user-management-um-a-and-um-b-plan.md#2020-first-round-production-closeout)
+records migration 033 applied once as `20261114115939` and the seven-file app
+release `e497ffaf45ddb7d97d64cdfa1f88d82b27c010ac`. GitHub Quality run
+`43593324859`, Vercel Production `dpl_R8ZZVx4oqC4MY12f1zD3Tzb39weu` and
+anonymous Login smoke passed. The Owner confirmed one existing employee's
+affiliation in the Admin UI and reported correct actual affiliation, continued
+active status and one new audit-history entry. Record this as Owner-observed
+Admin UI acceptance. The user's own Production BOQ visibility check is `NOT RUN`.
+
+The [Admin assignment proposal](../plans/product/12-user-management-um-a-and-um-b-plan.md#21-admin-assignment-for-an-incorrect-affiliation-request)
+is pending review for active employees with no actual affiliation whose request
+is incorrect. Follow [Roadmap #09](../plans/product/09-integrated-roadmap-and-it-decision-handoff.md)
+for the current sequence. Prior apply and release grants are consumed.
+This handoff covers local documentation only. Preserve migrations 027–033 and
+protected evidence. Implementation, database or archive access, Production
+activity and stage/commit/push/deploy require separate authorization.
 
 ## UM-A1 Solo publication approved — 2026-11-05
 

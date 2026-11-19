@@ -6,7 +6,15 @@ Quantities) สำหรับการใช้งานภายใน บม�
 [![Next.js](https://img.shields.io/badge/Next.js-16.x-black.svg)](https://nextjs.org/)
 [![Supabase](https://img.shields.io/badge/Supabase-PostgreSQL-3FCF8E.svg)](https://supabase.com/)
 
-## สถานะ release ที่บันทึกล่าสุด — 2026-10-23
+## สถานะปัจจุบันและบันทึกการเผยแพร่
+
+ดู [checkpoint ปัจจุบัน](docs/08_ai/AI_HANDOFF.md#current-resume-checkpoint)
+สำหรับผลปิดงานล่าสุดที่บันทึกไว้ ข้อจำกัดของผลตรวจ และขอบเขตที่ Owner อนุมัติ
+ใช้ [Roadmap #09](docs/plans/product/09-integrated-roadmap-and-it-decision-handoff.md)
+สำหรับลำดับงานและเรื่องที่รอตัดสินใจ
+
+<a id="สถานะ-release-ที่บันทึกล่าสุด--2026-10-23"></a>
+### บันทึกการเผยแพร่ — 2026-10-23
 
 LIST-1B L1 ปล่อยแล้วที่ exact source `b1ce449` ตาม
 [Production result](docs/06_engineering/LIST_1B_L1_PRODUCTION_RELEASE_RESULT_20261023.md):
@@ -18,8 +26,9 @@ Quality 762 tests, Vercel Ready/Current และ bounded no-write smoke ผ่�
 `a3114fc` และ [stale Copy B](docs/06_engineering/STALE_COPY_B_RELEASE_CLOSEOUT_20261023.md)
 client `42e01c5` + Production 031 ปิดแยกชุดแล้ว **B Production HTTP = NOT RUN**
 ตาม Owner decision ไม่ใช่ probe ค้างบังคับ Migrations **027–031 immutable/no-replay**
-งานปัจจุบันคือปรับเอกสาร C 48 ไฟล์ในเครื่อง โดยแยก tooling/baseline 9 ไฟล์ไว้
-ยังไม่ stage/commit/push/deploy หรือเข้า Production
+checkpoint วันนั้นบันทึกการปรับเอกสาร C 48 ไฟล์ในเครื่อง โดยแยก
+tooling/baseline 9 ไฟล์ไว้ ช่วงงานดังกล่าวยังไม่ stage/commit/push/deploy
+หรือเข้า Production
 
 <!-- MASTER_CATALOG_CURRENT_STATE_20260829 -->
 > [!IMPORTANT]
@@ -148,19 +157,21 @@ docs/                product, architecture, data, process และ handoff
 
 ## เอกสารที่ควรอ่าน
 
-- [Documentation index](docs/README.md)
-- [AI handoff](docs/08_ai/AI_HANDOFF.md) และ
-  [AI context](docs/08_ai/AI_CONTEXT.md) สำหรับข้อจำกัดปัจจุบัน
+- [Documentation index](docs/README.md#single-source-of-truth-map)
+- [AI handoff](docs/08_ai/AI_HANDOFF.md#current-resume-checkpoint) และ
+  [AI context](docs/08_ai/AI_CONTEXT.md#current-agent-rules) สำหรับขอบเขตปัจจุบัน
 - [Integrated roadmap and IT decision handoff](docs/plans/product/09-integrated-roadmap-and-it-decision-handoff.md)
   สำหรับลำดับงานที่เสนอปัจจุบัน เงื่อนไข IT/SSO และ decision ที่ยังเปิดอยู่
+- [BOQ workflow #13](docs/plans/product/13-boq-operational-workflow-plan.md)
+  สำหรับรายละเอียดฉบับใช้งานและเรื่องที่ Owner ต้องตัดสินใจก่อนลงมือ
 - [Research and capability backlog](docs/plans/product/10-global-estimating-research-and-capability-backlog.md)
   สำหรับแนวคิดเดิม/ผลเทียบระบบสากลและสถานะ Later/Deferred; ไม่เพิ่มงานอัตโนมัติ
 - [Product evolution decision plan](docs/plans/product/01-conduit-boq-product-evolution-decision-plan.md)
   สำหรับรายละเอียด ทางเลือก และประวัติการตัดสินใจ; ลำดับงานเดิมให้ยึด overlay ใน #09
 - [BOQ list scaling plan](docs/plans/product/02-boq-list-scaling-decision-plan.md)
 - [Local database parity plan](docs/06_engineering/LOCAL_DATABASE_PARITY_PLAN.md)
-- [Local database preparation result](docs/06_engineering/LOCAL_DATABASE_PARITY_RESULT.md) — captured app contracts matched; API 46 PASS / 1 stale-Copy FAIL; original local logins and bounded UI/outputs PASS; PARTIAL
-  สำหรับ rebuild ฐานทดสอบเดิมด้วย current-state baseline เมื่ออนุมัติ; ไม่บังคับ backup/stack แยก ไม่ replay 027–030 และไม่แตะไฟล์ backup ของ Owner
+- [Local database preparation result](docs/06_engineering/LOCAL_DATABASE_PARITY_RESULT.md) — ผลวันที่ 2026-10-23: captured app contracts matched, API 46 PASS / 1 stale-Copy FAIL, original local logins และ bounded UI/outputs PASS, สถานะรวม PARTIAL
+  งานฐานทดสอบรอบใหม่ให้ใช้ [วิธีและขอบเขตปัจจุบัน](docs/07_process/RELEASE_PROCESS.md#current-method-selection) โดยรักษา migrations 027–033 ตามกติกา immutable/no-replay และเก็บไฟล์ backup ของ Owner ไว้
 - [Quantity Input Safety release plan](docs/plans/product/06-r0a-quantity-input-safety-release-plan.md),
   [Preview result](docs/plans/product/07-r0a-quantity-input-safety-preview-result.md)
   และ [Production result](docs/plans/product/08-r0a-quantity-input-safety-production-release-result.md)
@@ -171,19 +182,17 @@ docs/                product, architecture, data, process และ handoff
   [migrations](docs/04_data/MIGRATIONS.md) และ
   [security model](docs/04_data/SECURITY_MODEL.md)
 - [Change process](docs/07_process/CHANGE_PROCESS.md) และ
-  [release process](docs/07_process/RELEASE_PROCESS.md)
+  [release process](docs/07_process/RELEASE_PROCESS.md#current-method-selection)
 
 เอกสารใต้ `docs/ai/` เป็นประวัติ Phase 1/2 ไม่ใช่ authority ของสถานะปัจจุบัน
 
 ## ขอบเขตและแผนถัดไป
 
-Dependency A, B/031 และ `LIST-1B L1` ปิดแล้ว ลำดับงานเสนอที่เหลือคือ
-`S0`/user management ขั้นจำเป็น → wider `R0/D0` → `W-H` ฉบับใช้งานตาม
-เอกสารอนุมัติภายนอก → `R1/R2` Quantity Expression โดยเริ่มสอบถาม IT เรื่อง
-hosting และ SSO ควบคู่ทันที ลำดับ deploy จริงขึ้นกับนโยบาย IT ที่ยืนยันแล้ว;
-ข้อสันนิษฐานว่าต้องย้ายทั้งหมดภายในองค์กรยังไม่ใช่ข้อกำหนดที่ IT รับรอง
-รายละเอียดและเงื่อนไขยึด [Integrated roadmap #09](docs/plans/product/09-integrated-roadmap-and-it-decision-handoff.md)
-ข้อเสนอนี้ไม่อนุมัติ implementation, migration, commit/push หรือ deployment
+ใช้ [Roadmap #09](docs/plans/product/09-integrated-roadmap-and-it-decision-handoff.md#product-sequencing)
+สำหรับลำดับงานที่เสนอ รวมถึงงาน account/security และเงื่อนไขจาก IT เรื่อง
+hosting และ SSO ใช้ [แผน BOQ ฉบับใช้งาน #13](docs/plans/product/13-boq-operational-workflow-plan.md#wh-owner-decisions)
+สำหรับแบบ 2 ที่เลือกไว้และรายละเอียดที่ยังรอ Owner ตัดสินใจ รวมถึงตำแหน่งรหัสชุด
+ขอบเขตที่อนุมัติให้ลงมืออยู่ใน [checkpoint ปัจจุบัน](docs/08_ai/AI_HANDOFF.md#current-resume-checkpoint)
 
 Owner ให้พักข้อเสนอเพิ่มเติมจากงานวิจัย 3 เรื่อง: Excel quantity intake,
 ข้อมูลขอบเขตงาน/ที่มาปริมาณเพิ่มเติม และ extra pre-issue quality/stale-save
@@ -212,32 +221,22 @@ enhancements จึงไม่เพิ่มเป็น release หรือ 
   URLs/logs; page/count กับ routes ไม่ใช่ shared DB snapshot ขณะมี concurrent edits
 - `L1.1` eligibility projection และ `L2` filters/sorts เพิ่มเติมยัง deferred;
   keyset ต้องมีเหตุผลจาก deep-page performance/mutation churn ก่อน RPC เดิม
-  ยังเป็น final authority ของ Copy ไม่มีงานเหล่านี้แทรกก่อน S0 อัตโนมัติ
+  ยังเป็น final authority ของ Copy ลำดับงานเพิ่มเติมให้ยึด Roadmap #09
 - Quantity Expression ยังเป็นแผน: `*` จะเป็นรูปแบบ canonical และรับ
   `x`, `X`, `×` เป็น alias สูตรจะแสดงเฉพาะ editor ส่วน PDF/Excel แสดงตัวเลข
   เท่านั้น
-- งาน account/security `S0` เป็น lane แยกที่ยังไม่ได้อนุมัติ implementation:
-  เสนอให้ปิดกติกาสิทธิ์ ข้อมูลผู้ใช้ การย้ายสังกัด/ปิดบัญชี session และ recovery
-  ขั้นจำเป็นก่อน wider `R0/D0` และ `W-H`; มี organizational SSO แต่ยังไม่ทราบ
-  IdP/protocol จึงเริ่ม discovery ตอนนี้และยังไม่เลือกวิธี provisioning หรือ
-  สร้างระบบ Invite/รหัสผ่านใหม่ก่อนข้อมูล IT ชัดเจน
-- Owner ยืนยันว่า BOQ “ฉบับใช้งาน” ผ่านการอนุมัติจากเอกสารจริงโดยผู้จัดการ
-  ส่วนวิศวกรรมท่อร้อยสาย แนวทางที่เสนอคือ `W-H`: ตรึง revision ส่งลงนาม
-  บันทึกหลักฐานอนุมัติ และควบคุมการแทนที่/ยกเลิก ก่อน Quantity Expression;
-  ผู้บันทึกหลักฐานในแอป หลักฐานขั้นต่ำ และการจัดการ BOQ ที่อนุมัติแล้ว ยังต้อง
-  ตัดสินใจแยก และยังไม่มี implementation authority
 
 ## Version และการ release
 
 เลขรุ่นข้อมูล เช่น Master Catalog `2568.1.0`, เวอร์ชัน package และ Git SHA
-เป็นคนละ domain ห้ามใช้แทนกัน ตามกระบวนการ release ของ repository การเปลี่ยน
-application ใช้ pull request เข้า `main` เป็นค่าเริ่มต้นและต้องตรวจ deployment
-แยกต่างหาก สำหรับ R0A นี้ Owner เลือก bounded Solo path: ใช้ local checks กับ
-exact commits เป็น quality gate, push branch เพื่อ Preview แล้วอนุมัติ
-fast-forward `main`/Production แยกอีกครั้ง การ integrate ไม่ได้ apply Supabase
-migration และ workflow หลัง push `main` ผ่านครบตาม Result #08 ต่อมา A/B/L1
-ใช้ bounded Solo direct-to-main คนละชุดตาม approval ของแต่ละ release
-การแก้เอกสาร C ครั้งนี้ยังไม่อนุมัติ publication; docs-only push อาจเริ่ม
-CI และ Vercel พร้อมกันได้เช่นเดิม ห้ามถือว่าเอกสารมีสิทธิ์ deploy อัตโนมัติ
+ระบุคนละสิ่ง ใช้ [Release Process](docs/07_process/RELEASE_PROCESS.md#current-method-selection)
+เพื่อเลือกวิธีตรวจและเผยแพร่ตามขอบเขตที่อนุมัติ การ push เข้า `main` เริ่ม
+Quality CI และอาจเริ่ม Vercel deploy แม้แก้เฉพาะเอกสาร ส่วนการ apply
+Supabase migration ใช้ขั้นตอนและการอนุมัติแยกตาม runbook
+
+สำหรับ R0A ที่ปิดแล้ว Owner เลือก bounded Solo path โดยตรวจ exact commits
+ในเครื่อง ใช้ Preview แล้วอนุมัติ fast-forward `main`/Production แยกอีกครั้ง
+workflow หลัง push `main` ผ่านตาม [Result #08](docs/plans/product/08-r0a-quantity-input-safety-production-release-result.md)
+ต่อมา A/B/L1 ใช้ bounded Solo direct-to-main ตามที่อนุมัติในแต่ละรอบ
 
 โครงการนี้เป็นซอฟต์แวร์ภายใน (Private — NT Internal Use Only)

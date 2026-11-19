@@ -1,8 +1,12 @@
 # Change Process
 ## Conduit BOQ System
 
-> **Status:** CANONICAL
-> **Last Aligned:** 2026-10-23 — local documentation only
+This guide covers change review and general guardrails. Use the
+[Release Process method index](./RELEASE_PROCESS.md#current-method-selection)
+to select an execution or delivery procedure, the
+[current handoff](../08_ai/AI_HANDOFF.md#current-resume-checkpoint) for the
+authorized scope, and [Roadmap #09](../plans/product/09-integrated-roadmap-and-it-decision-handoff.md)
+for proposed sequencing and Owner or IT decisions.
 
 <!-- RELEASE_ALIGNMENT_20261023 -->
 > **Recorded release state — 2026-10-23:** dependency A (`a3114fc`) and
@@ -15,20 +19,16 @@
 > documentation alignment makes no fresh Production observation and grants
 > no runtime, DB, reset, migration or publication authority.
 
-Use [Integrated Roadmap #09](../plans/product/09-integrated-roadmap-and-it-decision-handoff.md)
-for current proposed work and Owner/IT decisions. This process describes later
-approved work; the current authorization covers local documentation alignment
-only, with no commit/push, deployment, package/runtime, account/data or database
-operation. A plan or local edit never supplies the next operation's authority.
-
 ---
 
 ## 1. Database Changes
 
 ### Migration Workflow
-Migrations 027–031 are applied-once immutable/no-replay artifacts. A later
-database change needs fresh approval and a new forward migration; use an
-approved current-equivalent test baseline rather than replaying these files.
+Migrations **027–033** are immutable/no-replay. A later database change needs
+fresh approval, a new forward migration and an approved current-equivalent test
+baseline. Use the [method index](./RELEASE_PROCESS.md#current-method-selection)
+for rehearsal and the [Production DB application method](./RELEASE_PROCESS.md#production-db-application-is-a-separate-method)
+for an approved apply.
 
 1. Create and review the migration file in `/migrations/`.
 2. Rehearse on a non-production database.
@@ -52,6 +52,9 @@ not a replay of 031 or an automatically scheduled new DB task.
 ## 2. Code Changes
 
 ### Review and Integration Workflow
+Use the [publication procedure](./RELEASE_PROCESS.md#solo-application-publication)
+when the Owner approves a Solo release.
+
 1. Agree a bounded local candidate, target environment and applicable approvals.
 2. Prepare the diff and run checks appropriate to its actual risks; preserve
    evidence limits and required existing checks.

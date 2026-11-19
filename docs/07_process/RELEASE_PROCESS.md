@@ -1,3 +1,257 @@
+# Release Process — Current Methods
+
+> **Current method index — 2026-11-19.** Choose the previously successful
+> procedure that fits the task. This index records reusable methods, not a
+> standing execution, Production or publication grant. Start with the
+> [current handoff](../08_ai/AI_HANDOFF.md#current-resume-checkpoint),
+> [current rules](../08_ai/AI_CONTEXT.md#current-agent-rules) and
+> [Roadmap #09](../plans/product/09-integrated-roadmap-and-it-decision-handoff.md).
+> The dated record below is preserved as history. Its old uses of “current”,
+> approval windows and pending gates do not supersede this index or the latest
+> Owner instruction.
+
+<a id="current-method-selection"></a>
+## Select the method for the task
+
+Inspect the relevant existing source, runner and accepted result before
+proposing another method. Reuse a matching procedure when its inputs, baseline,
+target and safeguards still apply. Different tasks need different methods;
+neither a full Docker rehearsal nor a new isolated stack is mandatory for all
+work. A previous PASS proves its recorded cases and source only.
+
+| Task and method | Established procedure and reference | Preconditions, effects and stopping point |
+|---|---|---|
+| Local documentation | Check the diff, links, referenced facts and affected documentation contracts. See the [working agreement](#working-agreement-20261015). | Preserve historical evidence and unrelated changes. No app build, Docker, Auth or DB operation is needed merely to edit Markdown. Report checks performed. |
+| Source qualification | Use installed dependencies on Node 24 for the affected tests, lint, TypeScript and default Turbopack build. See [UM-A1 source qualification](../plans/product/12-user-management-um-a-and-um-b-plan.md#124-post-s0-source-qualification-result--2026-11-05) and [UM-A2 local decision](../plans/product/12-user-management-um-a-and-um-b-plan.md#242-local-test-decision). | Use the approved test API/build environment and keep Production credentials out of the candidate. Report source-only coverage; it does not prove DB/Auth flows. Stop the affected gate on failure. |
+| Mocked browser integration | Use the fake Auth/Data API approach in [the checked-in UM-A1 client runner](../../scripts/test-um-a1-client.mjs), after checking its current compatibility and output path. | The runner starts local processes and writes QA artifacts; it is not a real DB test. Keep fake origins and network guards intact, close its processes, and report mock coverage separately. A source or browser-tool mismatch needs a documented correction. |
+| Real DB-backed application flow | Select the appropriate existing local target, check the relevant schema/RPC/permission/API baseline, then use fresh synthetic fixtures and the reviewed API/browser procedure. References: [local parity result](../06_engineering/LOCAL_DATABASE_PARITY_RESULT.md), [S0 local result](../06_engineering/S0_BOQ_WRITER_BOUNDARY_LOCAL_RESULT.md) and [UM-B local qualification](../plans/product/12-user-management-um-a-and-um-b-plan.md#2019-local-first-round-qualification--2026-11-14). | Auth, fixture writes and cleanup must fit the approved scope. Preserve original accounts, passwords and business data. Current-equivalent means relevant contracts, not copying all Production rows. An unknown write outcome stops mutation and requires scoped read-only reconciliation. |
+| Signup, confirmation and password recovery | Follow the [UM-A2 Docker acceptance procedure](../plans/product/12-user-management-um-a-and-um-b-plan.md#234-docker-and-acceptance), using the reviewed Auth configuration and local mail capture. | An isolated target is justified when testing configuration variants or fixture shapes safely requires it. Approve the exact target, accounts, sessions and cleanup. Captured local mail does not prove delivery through Production SMTP; real mail has its own explicit scope. |
+| New DB change and rehearsal | Check the relevant predecessor, rehearse only the newly reviewed forward change on the approved local target, then verify the affected metadata, authority and user flows. See [UM-B qualification and delivery](../plans/product/12-user-management-um-a-and-um-b-plan.md#2018-first-round-implementation-and-test-review--2026-11-14). | Applying a new migration is a DB operation requiring explicit authority. Do not reset/restore or replay 027–033. Review the actual new payload and transaction behavior; an old migration's wrapper is not a universal template. Stop on predecessor drift or an uncertain apply result. |
+
+For the selected method, put a short execution note in the active plan/checkpoint:
+the problem and acceptance cases; the accepted procedure being reused; exact
+source/runner and target; required baseline and approved side effects; stop and
+cleanup behavior; and the resulting PASS/FAIL/NOT RUN limits. Refer to the
+canonical method instead of copying changing commands across handoff files.
+Routine steps already covered by the Owner's approval do not need another
+approval ceremony.
+
+If an accepted runner or private input is unavailable, report exactly what is
+missing. Verify available source/hash evidence before preparing a replacement
+within the authorized scope. Do not silently switch transport, create a stack,
+alter configuration or select another database. A local baseline gap does not
+automatically authorize a fresh Production read.
+
+<a id="ai-sdlc-feedback"></a>
+## AI-assisted SDLC: context, diagnosis and feedback
+
+Apply these practices through the selected method and existing plan/result.
+The lifecycle guidance supplements this repository's process; it does not
+require new intent/spec/plan files, an ADR for every task, additional approvals,
+tools, stacks, CI jobs, hooks or autonomous Production work.
+
+1. **Connect intent to proof.** Link the user outcome and acceptance criteria
+   in the active plan to applicable ADRs, affected source/contracts, the reviewed
+   diff and its test/release result. Use the
+   [documentation ownership map](../README.md#single-source-of-truth-map) rather
+   than copying the same mutable facts into multiple files. Retrieve relevant
+   context within the approved read scope; a missing link grants no broader
+   access to accounts, BOQs, secrets, private evidence or Production.
+2. **Diagnose before another attempt.** Retain bounded expected-versus-actual
+   evidence, source/target and the failure point. Classify the cause as product,
+   test harness, environment or unresolved when supported by evidence. Check
+   whether the test's expectation matches the accepted product contract before
+   changing the app. Do not weaken a check or change business behavior merely
+   to obtain PASS. Explain what a proposed correction/retry will resolve and
+   stay within its authorized scope. Existing UNKNOWN reconciliation and
+   closed-run rules still apply; a suspected cause is not an established one.
+3. **Measure useful outcomes lightly.** Use existing task/run records to note
+   whether a fresh assistant identifies the checkpoint, method/target and next
+   action correctly, and what causes rework or repeated failed test attempts.
+   Separate product defects from harness/environment failures and record
+   unresolved cases honestly. Capture elapsed work/wait time only when actually
+   observed; otherwise say not measured. Pair speed with correctness and
+   residuals instead of using code volume or task counts alone. No new dashboard
+   or retrospective invented baseline is required.
+4. **Feed the result back.** At a meaningful closeout, update the owning result
+   and current checkpoint with actual outcomes, limits, cleanup and next steps.
+   Update the established method only when the evidence justifies it; record
+   reusable lessons and review triggers for retained risks or temporary targets.
+   Validate changed agent guidance with an appropriate bounded read-only handoff
+   check when needed. This is not a reason to repeat completed runtime tests
+   merely because a new session starts or to reopen a closed run.
+
+These are the local adaptations of the playbooks linked in
+[Lessons learned](../08_ai/LESSONS_LEARNED.md#official-guidance-consulted--2026-11-19).
+Product-specific automation examples and reported vendor gains do not establish
+compatibility, authority or performance for Conduit BOQ.
+
+<a id="engineering-decision-review"></a>
+## Material engineering decisions and tradeoffs
+
+Use this review before a choice materially changes business behavior, architecture,
+authorization/security, data/schema or infrastructure. Start from the actual user
+problem, current implementation and binding constraints. Existing procedures and
+accepted decisions are evidence-bearing starting points; recheck their assumptions
+when the requirements or environment change. A new technique is not inherently
+better because it is newer or more generic.
+
+Record the review in the active plan, using the smallest useful format:
+
+1. **Problem and acceptance:** the user/business outcome, existing behavior,
+   in-scope and out-of-scope work, mandatory constraints and observable success
+   cases. Separate confirmed facts, assumptions and important unknowns.
+2. **Viable alternatives:** include reuse, a small change, keeping the current
+   system or deferring work when reasonable. Compare on the same relevant
+   criteria. Do not invent alternatives, numerical scores or certainty to fill
+   a template. If only one option meets the constraints, explain why.
+3. **Tradeoffs and recommendation:** explain advantages, disadvantages, failure
+   modes, implementation effort and ongoing cost/complexity for the Owner. State
+   why the recommended approach is sufficient and what evidence could change it.
+4. **Proof and recovery:** identify affected contracts, acceptance/negative cases,
+   authorized test target, remaining uncertainty and a realistic stop/recovery
+   path. Resolve unknowns before execution when they could change the choice
+   or invalidate a required safety/compatibility condition; a prototype or read
+   still needs the appropriate scope. Client rollback does not undo DB/data.
+5. **Decision and follow-through:** record who decided, when, the rationale,
+   retained limits and a review trigger. Keep Proposed / Accepted / Deferred /
+   Superseded distinct from Not started / Implemented / Tested / Released.
+   Acceptance of a direction does not grant a DB operation or publication.
+
+Before comparing material design alternatives, consult the
+[existing ADR index](../02_architecture/ADR/README.md), discover the records
+currently present, and read applicable decisions with their later amendments
+and closeouts. State what the proposal preserves or would supersede. ADR-001 is
+the existing authorization decision, not a general template to overwrite or an
+identifier to allocate again. Its dated policy list is not a current role matrix.
+
+For a consequential architectural choice that spans features or will be costly
+to reverse, use the established record structure in the existing ADRs and link
+the proposed new record from the plan. Check for an unused identifier first.
+Preserve accepted rationale; a later reviewed decision supersedes it with a
+dated linked record. Smaller choices can stay in the plan.
+Do not require a new ADR, PR, weighted matrix or Owner approval for
+every routine implementation detail already within the approved scope.
+
+### Engineering review dimensions
+
+Apply the dimensions that affect this change; explain a consequential exclusion.
+This is a review guide, not a demand for every test or platform on every task.
+
+| Principle | Practical check for Conduit BOQ |
+|---|---|
+| Business outcome and invariants | Define what users must achieve and what must remain true. Link the requirement to the acceptance cases; code, UI or build completion alone does not establish the business result. |
+| Existing-user compatibility | Review existing accounts/status/scope, old BOQs and client/API contracts, plus Print/PDF/Excel and numeric outputs when affected. For a DB change, check the supported app/DB combinations and the actual rollback behavior. A UI-only task does not authorize redesigning access or data. |
+| Trusted authorization and privacy | Keep eligibility display separate from authoritative server/DB checks; validate the actor, current status, action and resource scope at the trusted boundary. Assess negative access cases and sensitive data/log exposure. These are design checks against current contracts, not permission to change roles or policies. |
+| State and data integrity | For writes or state transitions, identify transaction boundaries, partial-failure behavior, concurrency/stale-state conflicts and duplicate-request handling. Reuse applicable Save/Copy/031/032/033 contracts. Uncertain outcomes follow the existing UNKNOWN stop/reconciliation rule; do not add new business behavior by implication. |
+| Simple, maintainable design | Prefer clear responsibilities and existing conventions; keep authoritative business rules in their appropriate layer and avoid competing copies. Assess lifecycle cost, dependencies and cleanup. Support known extension points without building speculative SSO, a permission engine or generic workflow machinery before requirements justify it. |
+| Useful evidence and review | Select tests that could detect the actual failure, including denied/error/retry cases when relevant. Inspect rendered UI for affected user flows and retain the established NT patterns. Review the focused diff for regressions; a second technical review can be useful without a mandatory extra PR or new role. |
+| Small changes and recoverability | Keep each release coherent and limited in effect. Identify detectable failure conditions and recovery compatible with any state already written. Report residual risk rather than guaranteeing zero risk or zero technical debt; record its impact, mitigation, Owner acceptance when required, and a condition/date for review in the active plan. |
+
+These dimensions add no implementation or runtime authority. Existing method
+selection, test evidence, approval, preservation and checkpoint rules still apply.
+Do not reopen an accepted historical decision merely to repeat analysis when its
+assumptions still hold; do not treat a known defect as acceptable solely because
+an old procedure once passed.
+
+## Source commands and runner selection
+
+[package.json](../../package.json) currently defines `npm test`, `npm run lint`
+and `npm run build`; the build script is `next build` (default Turbopack).
+The installed TypeScript entry point is `./node_modules/.bin/tsc --noEmit`.
+Select focused tests appropriate to the change. These are reference commands;
+execute only checks appropriate to the current approved task. This documentation
+refresh uses static document checks and focused document contract tests, without
+full application qualification, package installation or lockfile changes.
+
+Local source qualification has used **Node 24**. The checked-in
+[Quality workflow](../../.github/workflows/quality.yml) currently specifies
+**Node 22**, with install, lint, tests and build. Report the actual local,
+CI and hosted runtime observations separately; do not claim they are aligned
+or change CI as part of a documentation task. CI does not automatically run
+the local Docker acceptance suite.
+
+Existing scripts are an inventory, not an execution allowlist:
+
+- [UM-A1 mock client](../../scripts/test-um-a1-client.mjs) exercises fake
+  in-memory Auth/Data responses. Its result cannot stand for real DB behavior.
+- [S0 local runner](../../scripts/test-s0-boq-writer-boundary-local.mjs) pins
+  historical target metadata and private evidence. Its execution writes bounded
+  fixtures/Auth state; confirm compatibility and fresh authority before deriving
+  a new run. Never reopen its finalized runs or assume its private paths remain.
+- [Local parity smoke](../../scripts/smoke-local-db-parity.mjs) and
+  [Auth smoke](../../scripts/smoke-local-auth.mjs) are real-backend procedures;
+  inspect their reads, writes, credentials, fixtures and cleanup against the
+  successor schema before choosing them for a task.
+- [Bootstrap](../../scripts/bootstrap-local-db.sh) resets and seeds a database;
+  [seed users](../../scripts/seed-local-users.mjs) writes Auth/profile fixtures.
+  Neither is an automatic pre-test step. Old migration/seed helpers do not
+  authorize replay, a new reset or changes to existing passwords.
+
+Use `conduit-boq-local` as the existing primary local test target when suitable.
+Verify the target and relevant baseline for the selected method, including the
+approved connection route; do not infer suitability solely from its name or
+that Docker is running. Preserve original usernames, password custody, account
+authority, Catalog/Factor F and existing data. Temporary test targets need a
+recorded purpose and retention/cleanup decision. Owner backup/snapshot files
+and protected archive are outside ordinary fixture cleanup. There is no
+mandatory extra PR, test-DB backup or second Docker stack.
+
+## Solo application publication
+
+The established recent route is the [UM-A2 Solo sequence](../plans/product/12-user-management-um-a-and-um-b-plan.md#243-preflight-and-solo-sequence-after-approval).
+For a newly approved exact release:
+
+1. Check fresh Git source/base, the exact file allowlist, exclusions and local
+   test evidence. Under the named hosted read scope, verify Vercel's current
+   source/configuration/domain and the eligible exact rollback target. Stop on
+   drift. A docs-only push may also trigger Vercel.
+2. With explicit publication authority, stage/commit only that allowlist and
+   push the reviewed `main` source through the established Vercel integration.
+   Keep unrelated work out of the release; a new PR or manual deployment route
+   is not an added default requirement.
+3. Verify that commit's GitHub Quality result and Vercel **Ready/Current**, exact
+   source and intended domain. Run only the approved smoke; anonymous no-write
+   checks do not authorize Login, account/BOQ reads, email or business RPCs.
+4. Record the exact commit, CI/deployment identities, smoke outcomes and limits.
+   Use conditional client rollback only when the current release approval names
+   it and its eligibility/trigger conditions still hold. Publication and rollback
+   grants end with their bounded operation.
+
+For the latest recorded release and retained limits, use the
+[current checkpoint](../08_ai/AI_HANDOFF.md#current-resume-checkpoint),
+which links its canonical result. The UM-A2 closeout above is a dated example
+of the method, not another maintained latest-status register or a fresh hosted
+observation. Earlier accepted exceptions apply only to their named release.
+
+## Production DB application is a separate method
+
+The established 032/033 route used the **existing Supabase MCP connection**,
+with a separately approved one-shot apply and explicit operating window. Use
+the [032 application record](../plans/security/05-s0-boq-writer-boundary-plan.md#13-production032-one-shot-application--2026-11-05)
+and [033 closeout](../plans/product/12-user-management-um-a-and-um-b-plan.md#2020-first-round-production-closeout)
+as procedural evidence; their grants are consumed and their migrations remain
+immutable/no-replay.
+
+For any future approved migration, first verify the exact hosted target,
+source/payload mapping, predecessor contracts, migration history and approved
+write pause. Submit the reviewed new payload once through the approved MCP
+route. Then verify the expected metadata delta, actual history version/name/
+stored SQL and preservation of earlier ledger entries, plus the scoped
+postflight. A deployment does not apply a DB migration. A response timeout or
+uncertain write is **UNKNOWN**: stop and reconcile read-only within authority;
+do not retry, repair the history ledger or infer rollback. Any forward recovery
+needs its own reviewed scope. Do not substitute a CLI reset/push or another
+transport merely because it is available.
+
+## Historical record — preserved before the 2026-11-19 method index
+
+The original text follows unchanged, including dated approvals and wording
+that was current at its recorded time. Use the current method index and handoff
+for today's procedure and authority. Historical 027–030/031/032 ranges do not
+relax the current preservation of **027–033**.
+
+<!-- RELEASE_PROCESS_HISTORICAL_ORIGINAL_START -->
 # Release Process
 ## Conduit BOQ System
 

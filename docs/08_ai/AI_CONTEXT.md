@@ -1,3 +1,77 @@
+# AI Context — current agent rules
+
+<a id="current-agent-rules"></a>
+<a id="current-agent-rules-20261118"></a>
+## Current rules and reading order — 2026-11-19
+
+Read [AGENTS.md](../../AGENTS.md), the
+[current handoff checkpoint](./AI_HANDOFF.md#current-resume-checkpoint),
+[LESSONS_LEARNED.md](./LESSONS_LEARNED.md) and the
+[method-selection map](../07_process/RELEASE_PROCESS.md#current-method-selection)
+before proposing work. The handoff checkpoint owns current execution status;
+the release process owns the reusable testing/delivery methods and their
+preconditions. The dated records below preserve prior stages and are not a
+second current work queue.
+
+### Choose the established method appropriate to the task
+
+Identify the current task, last closed work, pending Owner decision, known
+runner/script, exact target/baseline and applicable approved scope at session
+start. Select a proven method from the runbook, state why it applies and check
+its preconditions. Inspect the existing source and available evidence before
+proposing a replacement. Several valid methods may serve different tasks; do
+not force documentation, source checks, DB-backed flows, Auth/mail tests and DB
+changes through one universal procedure. An absent private file or incompatible
+runner is a reported gap, not permission to reconstruct a runtime procedure and
+execute it silently. Explain a demonstrated incompatibility, the proposed
+deviation and its effects before executing a new procedure or seeking any
+additional authority it requires.
+
+Apply the selected method within its approved scope. Do not make a second stack,
+test-DB backup, PR, full data copy or repeated approval step a default prerequisite.
+A previously successful method must still match the new source, target and
+relevant schema/RPC/permission contracts; it is not standing permission to rerun
+a closed fixture or operate Production. CI/build/unit PASS does not establish
+DB/Auth/API/browser PASS.
+
+For material design choices, use the canonical
+[engineering decision review](../07_process/RELEASE_PROCESS.md#engineering-decision-review).
+Record alternatives, effects and the Owner's decision in the active plan;
+method reuse alone does not replace that review. Apply its depth to the impact
+of the choice, keeping routine approved implementation work proportionate.
+
+### Authority and preservation
+
+Read current authority from the handoff checkpoint and the Owner's latest
+instruction; do not infer it from a reusable method or a historical approval.
+Preserve migrations 027–033 as immutable and no-replay; preserve existing
+usernames/passwords, account authority, business data, Catalog/Factor F, closed
+runs, Owner backup/snapshot files and protected evidence. Do not inspect, move,
+edit or delete the protected archive.
+
+Keep historical FAIL/HOLD/NOT RUN evidence and its date; use the checkpoint's
+linked closeouts for specific retained limits. Source or metadata proof does
+not upgrade those results to full runtime PASS.
+Do not treat old `/private/tmp` paths as available without checking within the
+authorized scope; retain reusable non-secret procedures in the repository.
+
+### Plan status is separate from permission
+
+Use the handoff checkpoint for the latest recorded release and open decisions,
+[Roadmap #09](../plans/product/09-integrated-roadmap-and-it-decision-handoff.md)
+for proposed sequencing and the linked feature plans for their reviewed scope.
+A selected product direction, a proposed technical approach or a documentation
+edit authorizes neither implementation nor a database/release operation. Keep
+that distinction when a later plan supersedes an earlier proposal.
+
+---
+
+## Historical context — retained verbatim
+
+The complete earlier context follows unchanged. Its stage-specific “current”,
+“unreleased”, approvals and prohibitions apply to their recorded dates. Use the
+entry point above for today's rules and the current handoff for today's status.
+
 # AI Context — Mandatory Agent Rules
 
 ## UM-A1 Solo publication approved — 2026-11-05

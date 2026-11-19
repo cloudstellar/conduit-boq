@@ -1,3 +1,143 @@
+# Lessons Learned — current handoff guidance
+
+## Reliable AI instructions and continuity — 2026-11-19
+
+The Owner confirmed that several methods can be valid, depending on the task.
+Record each method's applicability and prerequisites, then prefer the matching
+procedure that has already worked. A previous PASS or approval is evidence for
+its bounded operation, not permission to repeat it or a universal workflow.
+
+### Keep each kind of information in one place
+
+Use the [documentation ownership map](../README.md#single-source-of-truth-map)
+for the maintained location of each kind of information. This lessons file links
+the owning rules, methods and checkpoint instead of keeping another ownership
+table or a second current status register.
+
+Do not prepend another whole execution transcript to AGENTS after each run.
+Update the checkpoint and link the actual result. Read current entry sections
+first and retrieve only the history relevant to the task. When status changes,
+update its canonical location and links rather than duplicating a mutable queue
+across every mandatory document.
+
+### Select and verify a method before executing it
+
+1. Identify the task, intended behavior, affected files and allowed operations.
+2. Inspect the matching recorded procedure, runner and accepted result. Verify
+   source, target, prerequisites, side effects and available inputs for this run.
+3. Reuse it when appropriate. If several methods fit, choose the simplest one
+   that supplies the required evidence and preserves the Owner's constraints.
+4. If a procedure no longer fits, show the actual gap and proposed alternative
+   before changing method. Routine implementation choices within the approved
+   scope do not need repeated approval; added DB/Auth/Production/cleanup or
+   publication operations must respect their own authority boundary.
+5. Check the requested outcome and record PASS/FAIL/HOLD/NOT RUN, exact source
+   and target, retained limits, cleanup and the next step at a useful checkpoint.
+
+An absent temporary artifact, obsolete runner pin or historical exception must
+not silently become a newly invented executable procedure. Preserve existing
+accounts/passwords, closed runs and evidence. Document-only work does not need
+an application build or Docker rehearsal. Larger integration work needs its
+relevant behavior checks; a source test alone does not supply those results.
+
+### Execution continuity and engineering judgment are separate checks
+
+The first handoff repair made procedure reuse explicit but left the comparison
+of design alternatives implicit. The Owner identified that gap. A handoff review
+must cover both how to execute safely and how to choose a sound design before
+implementation. A successful old procedure answers neither a changed business
+requirement nor every new architectural choice.
+
+Discover and read the applicable [existing ADRs](../02_architecture/ADR/README.md)
+before proposing a new design. Calling ADR-001 a general format example obscured
+its identity as an existing authorization decision and the other ADRs. Reference
+their decisions explicitly, check identifiers before proposing a new record,
+and preserve original records and legacy copies. An ADR index is not a new ADR.
+
+Use the [engineering decision review](../07_process/RELEASE_PROCESS.md#engineering-decision-review)
+as the canonical checklist for consequential choices. Its scope includes user
+outcomes, alternatives, compatibility, trusted authorization, data integrity,
+maintenance cost, proof and recovery. Keep detail in the active plan instead of
+copying a second checklist here. The Owner decides the material tradeoffs; the
+assistant should supply a reasoned recommendation and evidence, not just list
+options or agree with the latest suggestion. Already approved routine choices
+do not need repeated decision requests.
+
+### New discussion must reach its owning document before handoff
+
+A chat discussion alone does not make a new practice available to future
+sessions. Record an accepted reusable procedure in its canonical runbook and
+link it from the current checkpoint. The selected AI-SDLC additions are maintained
+in [context, diagnosis and feedback](../07_process/RELEASE_PROCESS.md#ai-sdlc-feedback),
+not in a second playbook or a parallel set of intent/spec/plan files.
+
+### A short task prompt is enough when the repository carries the method
+
+The Owner can name the goal and current scope without rewriting all rules:
+
+```text
+เป้าหมาย: [สิ่งที่ต้องการให้เสร็จ]
+บริบท: อ่าน checkpoint และแผน [ชื่อ/ลิงก์] แล้วตรวจของเดิมก่อน
+ขอบเขต: [ทำอะไรได้ / สิ่งที่ยังไม่อนุมัติ]
+เกณฑ์เสร็จ: [พฤติกรรมหรือผลตรวจที่ต้องได้]
+เลือกวิธีที่เคยผ่านและเหมาะกับงานจาก runbook ตรวจเงื่อนไขก่อนใช้
+หากใช้ไม่ได้ให้อธิบายเหตุผลก่อนเปลี่ยนวิธี และบันทึก checkpoint เมื่อจบช่วงงาน
+```
+
+Instructions guide an agent; verification and the existing permission boundary
+provide separate controls. Do not claim that more emphatic wording guarantees
+compliance. The current work changes no hooks, sandbox, MCP or CI configuration.
+Consider packaging a stable repeated procedure as a skill only when it has a
+clear benefit; a new skill, stack or workflow system is not needed for this
+documentation repair.
+
+### Official guidance consulted — 2026-11-19
+
+- [OpenAI Codex best practices](https://learn.chatgpt.com/guides/best-practices):
+  give the goal, relevant context, constraints and completion criteria; keep
+  durable repository guidance short, link detailed procedures and verify work.
+- [Anthropic Claude Code best practices](https://code.claude.com/docs/en/best-practices):
+  provide project knowledge that is otherwise missing, give the agent a check
+  to run, and distinguish model instructions from enforced controls.
+- [GitHub Copilot custom instructions](https://docs.github.com/en/copilot/concepts/prompting-and-context/custom-instructions):
+  use concise instructions with the appropriate scope and avoid conflicts;
+  instruction support and precedence depend on the client.
+- [NASA decision analysis](https://www.nasa.gov/reference/6-8-decision-analysis/):
+  define decision criteria, compare alternatives and uncertainty, and scale
+  analysis to the consequences of the decision.
+- [Microsoft architecture decision records](https://learn.microsoft.com/en-us/azure/well-architected/architect-role/architecture-decision-record):
+  record context, considered options, rationale, consequences and decision status;
+  preserve the history when a later decision supersedes one.
+- [Google engineering review guidance](https://google.github.io/eng-practices/review/reviewer/looking-for.html):
+  review design, user behavior, complexity, concurrency, useful tests and fit
+  with the existing system; avoid speculative generalization.
+- [OWASP authorization guidance](https://cheatsheetseries.owasp.org/cheatsheets/Authorization_Cheat_Sheet.html):
+  apply least privilege and enforce permission checks at the trusted boundary
+  for each request; authentication alone does not establish authorization.
+- [Microsoft safe deployment guidance](https://learn.microsoft.com/en-us/azure/well-architected/operational-excellence/safe-deployments):
+  prefer small controlled changes, validate their health, and plan recovery
+  with the consequences of stateful changes in mind.
+- [Anthropic AI-native SDLC playbook](https://claude.com/resources/articles/the-ai-native-sdlc-playbook):
+  connect stages through inspectable artifacts, provide verification feedback
+  and retain human judgment at consequential gates.
+- [Atlassian AI SDLC transformation playbook](https://www.atlassian.com/blog/ai-at-work/ai-sdlc-transformation-playbook):
+  supply connected, permission-aware context and measure end-to-end outcomes
+  while adapting planning through maintenance.
+- [Data-Espresso Thai commentary](https://data-espresso.com/ai-sdlc-transformation-playbook/)
+  summarizes the Atlassian article with the author's own observations; primary
+  guidance was checked against Atlassian. Vendor benchmarks are not promised
+  outcomes for this repository.
+
+These sources inform the repository's choices; their product-specific syntax,
+permissions and defaults are not interchangeable. The method index and Owner
+instructions define this project's actual procedure and scope.
+
+---
+
+## Earlier lessons — original text retained below
+
+Dates and phase-specific instructions below retain their historical meaning.
+
 # Lessons Learned & AI Constitution
 ## Conduit BOQ System
 
