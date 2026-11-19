@@ -5,10 +5,11 @@
 ## Current resume checkpoint — 2026-11-19
 
 Read this checkpoint before the dated records below. The current Owner scope is
-to record the completed two-commit documentation publication in this document.
-The one-push approval and the earlier local cleanup and retention approvals
-were used for their recorded steps. Further cleanup, implementation, DB/Auth,
-Production operations and Git publication require separate authority.
+to record the completed publication of the `469ac3c` checkpoint commit in this
+document. The one-push approval for `469ac3c` and the earlier publication,
+local cleanup and retention approvals were used for their recorded steps.
+Further cleanup, implementation, DB/Auth, Production operations and Git
+publication require separate authority.
 
 ### Resume action when the Owner says only “ทำต่อ”
 
@@ -87,6 +88,29 @@ publication were outside that documentation round.
 <a id="documentation-publication-candidate"></a>
 ### Documentation publication result — 2026-11-19
 
+#### Latest checkpoint publication
+
+**Publication PASS.** The Owner authorized one fast-forward push of
+[`469ac3cfa69f1d48548690b3593215a77cf87e41`](https://github.com/cloudstellar/conduit-boq/commit/469ac3cfa69f1d48548690b3593215a77cf87e41)
+to GitHub `main` with Vercel's automatic Production deployment. Post-checks
+confirmed the branch advanced from `e341734` to `469ac3c` with one commit and
+only `AI_HANDOFF.md` changed. Local `main` and `origin/main` matched the new tip.
+
+- **GitHub Quality PASS.** [Run #77](https://github.com/cloudstellar/conduit-boq/actions/runs/44510344807)
+  completed at 17:58:40 ICT. Lint, test and build passed for `469ac3c` on `main`.
+- **Vercel preflight PASS.** The [previous deployment](https://vercel.com/cloudwho-2662s-projects/conduit-boq/AJC3cyykTs19wdSV27R6nVAooQn5)
+  was **Ready / Current** for `boq.ntconduit.com` at `e341734` before the push.
+- **Vercel post-check PASS.** The [automatic deployment](https://vercel.com/cloudwho-2662s-projects/conduit-boq/DuEn173GkodsARrQYpixSsmNDU8G)
+  was **Ready / Current** for the same Production domain at `469ac3c`.
+
+Vercel verification was read-only. Manual deployment, application smoke tests,
+rollback and DB/Auth operations were **NOT RUN**. This documentation update
+records the result. Further staging, commits, push and deployment require
+separate authority under the
+[recorded release method](../07_process/RELEASE_PROCESS.md#solo-application-publication).
+
+#### Earlier two-commit documentation publication
+
 **Publication PASS.** The Owner authorized one fast-forward push to GitHub
 `main` with Vercel's automatic Production deployment. The push advanced
 `main` from `33a0f426842c1c0ec69abd23b95d7c8bbf93dda5` through
@@ -102,11 +126,8 @@ paths. Local `main` and `origin/main` both matched the published tip.
 - **Vercel post-check PASS.** The [automatic deployment](https://vercel.com/cloudwho-2662s-projects/conduit-boq/AJC3cyykTs19wdSV27R6nVAooQn5)
   was **Ready / Current** for the same Production domain at `e341734`.
 
-The Vercel dashboard was checked read-only. Application smoke tests, manual
-deployment, rollback and DB/Auth operations were **NOT RUN**. This follow-up
-records that receipt in the worktree. Further staging, commits, push and
-deployment are outside its scope under the
-[recorded release method](../07_process/RELEASE_PROCESS.md#solo-application-publication).
+The Vercel dashboard for that publication was checked read-only. Application
+smoke tests, manual deployment, rollback and DB/Auth operations were **NOT RUN**.
 
 #### Pre-publication documentation review
 
